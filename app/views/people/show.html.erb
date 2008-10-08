@@ -1,0 +1,21 @@
+<table>
+<tr>
+  <td><b>First Name</b></td><td><%= h @person.first_name %></td>
+</tr>
+
+<tr>
+  <td><b>Last Name</b></td><td><%= h @person.last_name %></td>
+</tr>
+
+<tr>
+  <td><b>Institutions</b></td><td><%= h item_list(@person.institutions) %></td>
+</tr>
+
+<tr>
+  <td><b>Projects</b></td><td><%= h item_list(@person.projects) %></td>
+</tr>
+
+</table>
+
+<%= link_to 'Edit', edit_person_path(@person) %> |
+<%= link_to 'Back', people_path %>

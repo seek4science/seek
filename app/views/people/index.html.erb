@@ -1,0 +1,23 @@
+<h1>Listing people</h1>
+
+
+<% for person in @people %>
+  <ul>
+<li>
+  <p>First Name: <%= h person.first_name %><p>
+  <p>Last Name: <%= h person.last_name %></p>
+  <p>Institutions: <% for inst in person.institutions%><%= inst.name %><% end %></p>
+  <p>Projects: <% for proj in person.projects%><%= proj.name %><% end %></p>
+  <p>
+        <%= link_to 'Show', person %>
+        <%= link_to 'Edit', edit_person_path(person) %>
+        <%= link_to 'Destroy', person, :confirm => 'Are you sure?', :method => :delete %>
+  </p>
+</li>
+</ul>
+  
+<% end %>
+
+<br />
+
+<%= link_to 'New person', new_person_path %>
