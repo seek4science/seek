@@ -27,6 +27,10 @@
     <%= f.label :web_page %><br />
     <%= f.text_field :web_page %>
   </p>
+<p>
+    <%= f.label :projects %>
+    <%= collection_select(:person, :project_ids, Project.find(:all), :id, :title, {}, {:multiple=>true}) %>
+</p>
   <p>
     <%= f.submit "Update" %>
   </p>

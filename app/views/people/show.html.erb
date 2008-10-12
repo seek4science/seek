@@ -28,6 +28,12 @@
   <%=h @person.web_page %>
 </p>
 
+<p>
+<b>Projects:</b>
+<% @person.projects.each do |proj| %>
+  <%=link_to h(proj.title), proj %>
+    <% end %>
+</p>
 
 <%= link_to 'Edit', edit_person_path(@person) %> |
 <%= link_to 'Back', people_path %>

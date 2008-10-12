@@ -8,6 +8,7 @@
     <th>Phone</th>
     <th>Skype name</th>
     <th>Web page</th>
+    <th>n Projects </th>
   </tr>
 
 <% for person in @people %>
@@ -18,6 +19,7 @@
     <td><%=h person.phone %></td>
     <td><%=h person.skype_name %></td>
     <td><%=h person.web_page %></td>
+    <td><%= h person.projects.size %></td>
     <td><%= link_to 'Show', person %></td>
     <td><%= link_to 'Edit', edit_person_path(person) %></td>
     <td><%= link_to 'Destroy', person, :confirm => 'Are you sure?', :method => :delete %></td>
