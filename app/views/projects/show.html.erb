@@ -12,6 +12,12 @@
   <b>Wiki page:</b>
   <%=h @project.wiki_page %>
 </p>
+<p>
+<b>Groups:</b>
+<% @project.groups.each do |grp| %>
+  <%=link_to h(grp.group_name), grp %>
+    <% end %>
+</p>
 
 
 <%= link_to 'Edit', edit_project_path(@project) %> |
