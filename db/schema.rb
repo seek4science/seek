@@ -9,37 +9,43 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081008130008) do
+ActiveRecord::Schema.define(:version => 20081012155343) do
 
-  create_table "institutions", :force => true do |t|
-    t.string   "name"
+  create_table "groups", :force => true do |t|
+    t.string   "group_name"
+    t.string   "country"
+    t.string   "city"
+    t.text     "address"
+    t.string   "web_page"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "institutions_people", :id => false, :force => true do |t|
-    t.integer  "institution_id", :limit => 11, :null => false
-    t.integer  "person_id",      :limit => 11, :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+  create_table "groups_projects", :id => false, :force => true do |t|
+    t.integer "group_id",   :limit => 11
+    t.integer "project_id", :limit => 11
   end
 
   create_table "people", :force => true do |t|
-    t.string   "first_name"
+    t.string   "fist_name"
     t.string   "last_name"
+    t.string   "email"
+    t.string   "phone"
+    t.string   "skype_name"
+    t.string   "web_page"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "people_projects", :id => false, :force => true do |t|
-    t.integer  "person_id",  :limit => 11, :null => false
-    t.integer  "project_id", :limit => 11, :null => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.integer "person_id",  :limit => 11
+    t.integer "project_id", :limit => 11
   end
 
   create_table "projects", :force => true do |t|
-    t.string   "name"
+    t.string   "title"
+    t.string   "web_page"
+    t.string   "wiki_page"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

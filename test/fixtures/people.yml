@@ -1,9 +1,17 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  first_name: MyString
+  fist_name: MyString
   last_name: MyString
+  email: MyString
+  phone: MyString
+  skype_name: MyString
+  web_page: MyString
 
 two:
-  first_name: MyString
+  fist_name: MyString
   last_name: MyString
+  email: MyString
+  phone: MyString
+  skype_name: MyString
+  web_page: MyString

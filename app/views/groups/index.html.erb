@@ -1,0 +1,28 @@
+<h1>Listing groups</h1>
+
+<table>
+  <tr>
+    <th>Group name</th>
+    <th>Country</th>
+    <th>City</th>
+    <th>Address</th>
+    <th>Web page</th>
+  </tr>
+
+<% for group in @groups %>
+  <tr>
+    <td><%=h group.group_name %></td>
+    <td><%=h group.country %></td>
+    <td><%=h group.city %></td>
+    <td><%=h group.address %></td>
+    <td><%=h group.web_page %></td>
+    <td><%= link_to 'Show', group %></td>
+    <td><%= link_to 'Edit', edit_group_path(group) %></td>
+    <td><%= link_to 'Destroy', group, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New group', new_group_path %>

@@ -4,8 +4,16 @@
   <%= f.error_messages %>
 
   <p>
-    <%= f.label :name %><br />
-    <%= f.text_area :name %>
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </p>
+  <p>
+    <%= f.label :web_page %><br />
+    <%= f.text_field :web_page %>
+  </p>
+  <p>
+    <%= f.label :wiki_page %><br />
+    <%= f.text_field :wiki_page %>
   </p>
   <p>
     <%= f.submit "Create" %>

@@ -1,21 +1,33 @@
-<table>
-<tr>
-  <td><b>First Name</b></td><td><%= h @person.first_name %></td>
-</tr>
+<p>
+  <b>Fist name:</b>
+  <%=h @person.fist_name %>
+</p>
 
-<tr>
-  <td><b>Last Name</b></td><td><%= h @person.last_name %></td>
-</tr>
+<p>
+  <b>Last name:</b>
+  <%=h @person.last_name %>
+</p>
 
-<tr>
-  <td><b>Institutions</b></td><td><%= h item_list(@person.institutions) %></td>
-</tr>
+<p>
+  <b>Email:</b>
+  <%=h @person.email %>
+</p>
 
-<tr>
-  <td><b>Projects</b></td><td><%= h item_list(@person.projects) %></td>
-</tr>
+<p>
+  <b>Phone:</b>
+  <%=h @person.phone %>
+</p>
 
-</table>
+<p>
+  <b>Skype name:</b>
+  <%=h @person.skype_name %>
+</p>
+
+<p>
+  <b>Web page:</b>
+  <%=h @person.web_page %>
+</p>
+
 
 <%= link_to 'Edit', edit_person_path(@person) %> |
 <%= link_to 'Back', people_path %>

@@ -1,0 +1,193 @@
+  [4;36;1mSQL (0.000237)[0m   [0;1mSELECT count(*) AS count_all FROM "institutions" [0m
+
+
+Processing InstitutionsController#create (for 0.0.0.0 at 2008-10-10 08:07:59) [POST]
+  Session ID: 
+  Parameters: {"institution"=>{}, "action"=>"create", "controller"=>"institutions"}
+  [4;35;1mInstitution Create (0.000200)[0m   [0mINSERT INTO "institutions" ("name", "updated_at", "created_at") VALUES(NULL, '2008-10-10 07:07:59', '2008-10-10 07:07:59')[0m
+Redirected to http://test.host/institutions/996332878
+Completed in 0.00666 (150 reqs/sec) | DB: 0.00175 (26%) | 302 Found [http://test.host/institutions?]
+  [4;36;1mSQL (0.000191)[0m   [0;1mSELECT count(*) AS count_all FROM "institutions" [0m
+  [4;35;1mSQL (0.000202)[0m   [0mSELECT count(*) AS count_all FROM "institutions" [0m
+  [4;36;1mInstitution Load (0.000265)[0m   [0;1mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+
+
+Processing InstitutionsController#destroy (for 0.0.0.0 at 2008-10-10 08:07:59) [DELETE]
+  Session ID: 
+  Parameters: {"action"=>"destroy", "id"=>"953125641", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000273)[0m   [0mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+  [4;36;1mPerson Load (0.000167)[0m   [0;1mSELECT * FROM "people" INNER JOIN "institutions_people" ON "people".id = "institutions_people".person_id WHERE ("institutions_people".institution_id = 953125641 ) [0m
+  [4;35;1mInstitution Destroy (0.000130)[0m   [0m DELETE FROM "institutions"
+ WHERE "id" = 953125641
+[0m
+Redirected to http://test.host/institutions
+Completed in 0.00337 (296 reqs/sec) | DB: 0.00123 (36%) | 302 Found [http://test.host/institutions/953125641]
+  [4;36;1mSQL (0.000180)[0m   [0;1mSELECT count(*) AS count_all FROM "institutions" [0m
+  [4;35;1mInstitution Load (0.000278)[0m   [0mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+
+
+Processing InstitutionsController#edit (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"edit", "id"=>"953125641", "controller"=>"institutions"}
+  [4;36;1mInstitution Load (0.000273)[0m   [0;1mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+Rendering template within layouts/main_layout
+Rendering institutions/edit
+Rendered layouts/_footer (0.00002)
+Completed in 0.00521 (192 reqs/sec) | Rendering: 0.00444 (85%) | DB: 0.00073 (14%) | 200 OK [http://test.host/institutions/953125641/edit]
+
+
+Processing InstitutionsController#index (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"index", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.001250)[0m   [0mSELECT * FROM "institutions" [0m
+Rendering template within layouts/main_layout
+Rendering institutions/index
+Rendered layouts/_footer (0.00001)
+Completed in 0.00484 (206 reqs/sec) | Rendering: 0.00285 (58%) | DB: 0.00125 (25%) | 200 OK [http://test.host/institutions]
+
+
+Processing InstitutionsController#new (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"new", "controller"=>"institutions"}
+Rendering template within layouts/main_layout
+Rendering institutions/new
+Rendered layouts/_footer (0.00002)
+Completed in 0.00310 (322 reqs/sec) | Rendering: 0.00264 (85%) | DB: 0.00000 (0%) | 200 OK [http://test.host/institutions/new]
+  [4;36;1mInstitution Load (0.000302)[0m   [0;1mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+
+
+Processing InstitutionsController#show (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"show", "id"=>"953125641", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000273)[0m   [0mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+Rendering template within layouts/main_layout
+Rendering institutions/show
+Rendered layouts/_footer (0.00002)
+Completed in 0.00244 (410 reqs/sec) | Rendering: 0.00145 (59%) | DB: 0.00058 (23%) | 200 OK [http://test.host/institutions/953125641]
+  [4;36;1mInstitution Load (0.000278)[0m   [0;1mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+
+
+Processing InstitutionsController#update (for 0.0.0.0 at 2008-10-10 08:07:59) [PUT]
+  Session ID: 
+  Parameters: {"institution"=>{}, "action"=>"update", "id"=>"953125641", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000279)[0m   [0mSELECT * FROM "institutions" WHERE ("institutions"."id" = 953125641) [0m
+Redirected to http://test.host/institutions/953125641
+Completed in 0.00193 (519 reqs/sec) | DB: 0.00056 (28%) | 302 Found [http://test.host/institutions/953125641?]
+  [4;36;1mSQL (0.000223)[0m   [0;1mSELECT count(*) AS count_all FROM "people" [0m
+
+
+Processing PeopleController#create (for 0.0.0.0 at 2008-10-10 08:07:59) [POST]
+  Session ID: 
+  Parameters: {"action"=>"create", "controller"=>"people", "person"=>{}}
+  [4;35;1mPerson Create (0.000190)[0m   [0mINSERT INTO "people" ("updated_at", "first_name", "last_name", "created_at") VALUES('2008-10-10 07:07:59', NULL, NULL, '2008-10-10 07:07:59')[0m
+Redirected to http://test.host/people/996332878
+Completed in 0.00598 (167 reqs/sec) | DB: 0.00041 (6%) | 302 Found [http://test.host/people?]
+  [4;36;1mSQL (0.000379)[0m   [0;1mSELECT count(*) AS count_all FROM "people" [0m
+  [4;35;1mSQL (0.000191)[0m   [0mSELECT count(*) AS count_all FROM "people" [0m
+  [4;36;1mPerson Load (0.000297)[0m   [0;1mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+
+
+Processing PeopleController#destroy (for 0.0.0.0 at 2008-10-10 08:07:59) [DELETE]
+  Session ID: 
+  Parameters: {"action"=>"destroy", "id"=>"953125641", "controller"=>"people"}
+  [4;35;1mPerson Load (0.000303)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+  [4;36;1mProject Load (0.000141)[0m   [0;1mSELECT * FROM "projects" INNER JOIN "people_projects" ON "projects".id = "people_projects".project_id WHERE ("people_projects".person_id = 953125641 ) [0m
+  [4;35;1mInstitution Load (0.000142)[0m   [0mSELECT * FROM "institutions" INNER JOIN "institutions_people" ON "institutions".id = "institutions_people".institution_id WHERE ("institutions_people".person_id = 953125641 ) [0m
+  [4;36;1mPerson Destroy (0.000134)[0m   [0;1m DELETE FROM "people"
+ WHERE "id" = 953125641
+[0m
+Redirected to http://test.host/people
+Completed in 0.00511 (195 reqs/sec) | DB: 0.00159 (31%) | 302 Found [http://test.host/people/953125641]
+  [4;35;1mSQL (0.000180)[0m   [0mSELECT count(*) AS count_all FROM "people" [0m
+  [4;36;1mPerson Load (0.000303)[0m   [0;1mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+
+
+Processing PeopleController#edit (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"edit", "id"=>"953125641", "controller"=>"people"}
+  [4;35;1mPerson Load (0.000298)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+Rendering template within layouts/main_layout
+Rendering people/edit
+  [4;36;1mInstitution Load (0.000403)[0m   [0;1mSELECT * FROM "institutions" [0m
+  [4;35;1mInstitution Load (0.000158)[0m   [0mSELECT * FROM "institutions" INNER JOIN "institutions_people" ON "institutions".id = "institutions_people".institution_id WHERE ("institutions_people".person_id = 953125641 ) [0m
+  [4;36;1mProject Load (0.000088)[0m   [0;1mSELECT * FROM "projects" [0m
+  [4;35;1mProject Load (0.000135)[0m   [0mSELECT * FROM "projects" INNER JOIN "people_projects" ON "projects".id = "people_projects".project_id WHERE ("people_projects".person_id = 953125641 ) [0m
+Rendered layouts/_footer (0.00002)
+Completed in 0.00887 (112 reqs/sec) | Rendering: 0.00734 (82%) | DB: 0.00156 (17%) | 200 OK [http://test.host/people/953125641/edit]
+
+
+Processing PeopleController#index (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000486)[0m   [0;1mSELECT * FROM "people" [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mInstitution Load (0.000145)[0m   [0mSELECT * FROM "institutions" INNER JOIN "institutions_people" ON "institutions".id = "institutions_people".institution_id WHERE ("institutions_people".person_id = 953125641 ) [0m
+  [4;36;1mProject Load (0.000151)[0m   [0;1mSELECT * FROM "projects" INNER JOIN "people_projects" ON "projects".id = "people_projects".project_id WHERE ("people_projects".person_id = 953125641 ) [0m
+  [4;35;1mInstitution Load (0.000139)[0m   [0mSELECT * FROM "institutions" INNER JOIN "institutions_people" ON "institutions".id = "institutions_people".institution_id WHERE ("institutions_people".person_id = 996332877 ) [0m
+  [4;36;1mProject Load (0.000134)[0m   [0;1mSELECT * FROM "projects" INNER JOIN "people_projects" ON "projects".id = "people_projects".project_id WHERE ("people_projects".person_id = 996332877 ) [0m
+Rendered layouts/_footer (0.00001)
+Completed in 0.01112 (89 reqs/sec) | Rendering: 0.00935 (84%) | DB: 0.00105 (9%) | 200 OK [http://test.host/people]
+
+
+Processing PeopleController#new (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"new", "controller"=>"people"}
+Rendering template within layouts/main_layout
+Rendering people/new
+  [4;35;1mInstitution Load (0.000421)[0m   [0mSELECT * FROM "institutions" [0m
+  [4;36;1mProject Load (0.000096)[0m   [0;1mSELECT * FROM "projects" [0m
+Rendered layouts/_footer (0.00002)
+Completed in 0.00528 (189 reqs/sec) | Rendering: 0.00431 (81%) | DB: 0.00052 (9%) | 200 OK [http://test.host/people/new]
+  [4;35;1mPerson Load (0.000308)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+
+
+Processing PeopleController#show (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"show", "id"=>"953125641", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000299)[0m   [0;1mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;35;1mInstitution Load (0.000144)[0m   [0mSELECT * FROM "institutions" INNER JOIN "institutions_people" ON "institutions".id = "institutions_people".institution_id WHERE ("institutions_people".person_id = 953125641 ) [0m
+  [4;36;1mProject Load (0.000136)[0m   [0;1mSELECT * FROM "projects" INNER JOIN "people_projects" ON "projects".id = "people_projects".project_id WHERE ("people_projects".person_id = 953125641 ) [0m
+Rendered layouts/_footer (0.00002)
+Completed in 0.00650 (153 reqs/sec) | Rendering: 0.00520 (80%) | DB: 0.00089 (13%) | 200 OK [http://test.host/people/953125641]
+  [4;35;1mPerson Load (0.000304)[0m   [0mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+
+
+Processing PeopleController#update (for 0.0.0.0 at 2008-10-10 08:07:59) [PUT]
+  Session ID: 
+  Parameters: {"action"=>"update", "id"=>"953125641", "controller"=>"people", "person"=>{}}
+  [4;36;1mPerson Load (0.000311)[0m   [0;1mSELECT * FROM "people" WHERE ("people"."id" = 953125641) [0m
+Redirected to http://test.host/people/953125641
+Completed in 0.00199 (503 reqs/sec) | DB: 0.00061 (30%) | 302 Found [http://test.host/people/953125641?]
+  [4;35;1mSQL (0.000202)[0m   [0mSELECT count(*) AS count_all FROM "projects" [0m
+
+
+Processing ProjectsController#create (for 0.0.0.0 at 2008-10-10 08:07:59) [POST]
+  Session ID: 
+  Parameters: {"project"=>{}, "action"=>"create", "controller"=>"projects"}
+  [4;36;1mProject Create (0.000190)[0m   [0;1mINSERT INTO "projects" ("name", "updated_at", "created_at") VALUES(NULL, '2008-10-10 07:07:59', '2008-10-10 07:07:59')[0m
+Redirected to http://test.host/projects/1
+Completed in 0.00560 (178 reqs/sec) | DB: 0.00039 (6%) | 302 Found [http://test.host/projects?]
+  [4;35;1mSQL (0.000191)[0m   [0mSELECT count(*) AS count_all FROM "projects" [0m
+  [4;36;1mSQL (0.000193)[0m   [0;1mSELECT count(*) AS count_all FROM "projects" [0m
+
+
+Processing ProjectsController#index (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;35;1mProject Load (0.000124)[0m   [0mSELECT * FROM "projects" [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+Rendered layouts/_footer (0.00002)
+Completed in 0.00295 (338 reqs/sec) | Rendering: 0.00223 (75%) | DB: 0.00051 (17%) | 200 OK [http://test.host/projects]
+
+
+Processing ProjectsController#new (for 0.0.0.0 at 2008-10-10 08:07:59) [GET]
+  Session ID: 
+  Parameters: {"action"=>"new", "controller"=>"projects"}
+Rendering template within layouts/main_layout
+Rendering projects/new
+Rendered layouts/_footer (0.00002)
+Completed in 0.00327 (306 reqs/sec) | Rendering: 0.00283 (86%) | DB: 0.00000 (0%) | 200 OK [http://test.host/projects/new]

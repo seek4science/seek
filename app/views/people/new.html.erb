@@ -2,18 +2,34 @@
 
 <% form_for(@person) do |f| %>
   <%= f.error_messages %>
-  First Name: <%= f.text_field :first_name%>
-  Last Name: <%= f.text_field :last_name%>
+
   <p>
-        Institutions: <%=collection_select(:person, :institution_ids, Institution.find(:all), :id, :name,{},{ :multiple=>true})%>
+    <%= f.label :fist_name %><br />
+    <%= f.text_field :fist_name %>
   </p>
   <p>
-        Projects: <%=collection_select(:person, :project_ids, Project.find(:all), :id, :name,{},{ :multiple=>true})%>
+    <%= f.label :last_name %><br />
+    <%= f.text_field :last_name %>
+  </p>
+  <p>
+    <%= f.label :email %><br />
+    <%= f.text_field :email %>
+  </p>
+  <p>
+    <%= f.label :phone %><br />
+    <%= f.text_field :phone %>
+  </p>
+  <p>
+    <%= f.label :skype_name %><br />
+    <%= f.text_field :skype_name %>
+  </p>
+  <p>
+    <%= f.label :web_page %><br />
+    <%= f.text_field :web_page %>
   </p>
   <p>
     <%= f.submit "Create" %>
   </p>
-
 <% end %>
 
 <%= link_to 'Back', people_path %>
