@@ -28,9 +28,9 @@
     <%= f.text_field :web_page %>
   </p>
 <p>
-    <%= f.label :projects %>
-    <%= collection_select(:person, :project_ids, Project.find(:all), :id, :title, {}, {:multiple=>true}) %>
-</p>
+    <%= f.label :groups %>
+    <%= collection_select(:person, :group_ids, Group.find(:all), :id, :group_name, {}, {:multiple=>true}) %>
+</p>  
   <p>
     <%= f.submit "Create" %>
   </p>

@@ -29,9 +29,9 @@
 </p>
 
 <p>
-<b>Projects:</b>
-<% @person.projects.each do |proj| %>
-  <%=link_to h(proj.title), proj %>
+<b>Groups:</b>
+<% @person.groups.each do |group| %>
+  <%=link_to h(group.group_name), group %>
     <% end %>
 </p>
 

@@ -5,7 +5,7 @@ development:
   database: seekhub_development
   username: mysqluser
   password: mysqluser
-  socket: /var/run/mysqld/mysqld.sock 
+  #socket: /var/run/mysqld/mysqld.sock 
 
 
 # Warning: The database defined as "test" will be erased and
