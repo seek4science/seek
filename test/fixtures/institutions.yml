@@ -1,15 +1,15 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  group_name: MyString
-  country: MyString
-  city: MyString
+  name: MyString
   address: MyText
+  city: MyString
   web_page: MyString
+  country: MyString
 
 two:
-  group_name: MyString
-  country: MyString
-  city: MyString
+  name: MyString
   address: MyText
+  city: MyString
   web_page: MyString
+  country: MyString

@@ -15,10 +15,7 @@
     <%= f.label :wiki_page %><br />
     <%= f.text_field :wiki_page %>
   </p>
-<p>
-    <%= f.label :groups %>
-    <%= collection_select(:project, :group_ids, Group.find(:all), :id, :group_name, {}, {:multiple=>true}) %>
-</p>
+
   <p>
     <%= f.submit "Update" %>
   </p>

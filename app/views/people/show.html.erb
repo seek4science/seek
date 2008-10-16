@@ -28,12 +28,5 @@
   <%=h @person.web_page %>
 </p>
 
-<p>
-<b>Groups:</b>
-<% @person.groups.each do |group| %>
-  <%=link_to h(group.group_name), group %>
-    <% end %>
-</p>
-
 <%= link_to 'Edit', edit_person_path(@person) %> |
 <%= link_to 'Back', people_path %>

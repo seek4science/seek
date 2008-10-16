@@ -1,0 +1,28 @@
+<p>
+  <b>Name:</b>
+  <%=h @institution.name %>
+</p>
+
+<p>
+  <b>Address:</b>
+  <%=h @institution.address %>
+</p>
+
+<p>
+  <b>City:</b>
+  <%=h @institution.city %>
+</p>
+
+<p>
+  <b>Web page:</b>
+  <%=h @institution.web_page %>
+</p>
+
+<p>
+  <b>Country:</b>
+  <%=h @institution.country %>
+</p>
+
+
+<%= link_to 'Edit', edit_institution_path(@institution) %> |
+<%= link_to 'Back', institutions_path %>

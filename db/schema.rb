@@ -9,26 +9,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081013164402) do
+ActiveRecord::Schema.define(:version => 20081016143812) do
 
-  create_table "groups", :force => true do |t|
-    t.string   "group_name"
-    t.string   "country"
-    t.string   "city"
+  create_table "institutions", :force => true do |t|
+    t.string   "name"
     t.text     "address"
+    t.string   "city"
     t.string   "web_page"
+    t.string   "country"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "groups_people", :id => false, :force => true do |t|
-    t.integer "person_id", :limit => 11
-    t.integer "group_id",  :limit => 11
-  end
-
-  create_table "groups_projects", :id => false, :force => true do |t|
-    t.integer "group_id",   :limit => 11
-    t.integer "project_id", :limit => 11
   end
 
   create_table "people", :force => true do |t|
@@ -48,6 +38,19 @@ ActiveRecord::Schema.define(:version => 20081013164402) do
     t.string   "wiki_page"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "work_groups", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "institution_id", :limit => 11
+    t.integer  "project_id",     :limit => 11
+  end
+
+  create_table "work_groups_people", :id => false, :force => true do |t|
+    t.integer "person_id", :limit => 11
+    t.integer "group_id",  :limit => 11
   end
 
 end
