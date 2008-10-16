@@ -15,7 +15,10 @@
     <%= f.label :wiki_page %><br />
     <%= f.text_field :wiki_page %>
   </p>
-
+<p>
+        <%= f.label :institutions %>
+        <%= f.collection_select :institution_ids, Institution.find(:all), :id, :name, {}, {:multiple=>true} %>
+  </p>
   <p>
     <%= f.submit "Update" %>
   </p>

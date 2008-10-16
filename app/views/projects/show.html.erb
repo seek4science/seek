@@ -13,6 +13,13 @@
   <%=h @project.wiki_page %>
 </p>
 
+<p>
+<b>Institutions:</b>
+  <% @project.institutions.each do |ins|%>
+    <%= h ins.name %>
+  <% end %>
+</p>
+
 
 
 

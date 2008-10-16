@@ -58,7 +58,9 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
     @project = Project.find(params[:id])
-
+    @project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
+      
+    
     respond_to do |format|
       if @project.update_attributes(params[:project])
         flash[:notice] = 'Project was successfully updated.'
