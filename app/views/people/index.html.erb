@@ -12,12 +12,12 @@
 
 <% for person in @people %>
   <tr>
-    <td><%=h person.fist_name %></td>
-    <td><%=h person.last_name %></td>
-    <td><%=h person.email %></td>
-    <td><%=h person.phone %></td>
-    <td><%=h person.skype_name %></td>
-    <td><%=h person.web_page %></td>
+    <td><%=h person.profile.first_name %></td>
+    <td><%=h person.profile.last_name %></td>
+    <td><%=h person.profile.email %></td>
+    <td><%=h person.profile.phone %></td>
+    <td><%=h person.profile.skype_name %></td>
+    <td><%=h person.profile.web_page %></td>
     <td><%= link_to 'Show', person %></td>
     <td><%= link_to 'Edit', edit_person_path(person) %></td>
     <td><%= link_to 'Destroy', person, :confirm => 'Are you sure?', :method => :delete %></td>

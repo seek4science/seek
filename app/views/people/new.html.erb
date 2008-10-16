@@ -1,33 +1,33 @@
 <h1>New person</h1>
 
-<% form_for(@person) do |f| %>
+<% form_for @person do |f| %>
   <%= f.error_messages %>
-
+  <% fields_for @person.profile do |prof|%>
   <p>
-    <%= f.label :fist_name %><br />
-    <%= f.text_field :fist_name %>
+    <%= prof.label :first_name %><br />
+    <%= prof.text_field :first_name %>
   </p>
   <p>
-    <%= f.label :last_name %><br />
-    <%= f.text_field :last_name %>
+    <%= prof.label :last_name %><br />
+    <%= prof.text_field :last_name %>
   </p>
   <p>
-    <%= f.label :email %><br />
-    <%= f.text_field :email %>
+    <%= prof.label :email %><br />
+    <%= prof.text_field :email %>
   </p>
   <p>
-    <%= f.label :phone %><br />
-    <%= f.text_field :phone %>
+    <%= prof.label :phone %><br />
+    <%= prof.text_field :phone %>
   </p>
   <p>
-    <%= f.label :skype_name %><br />
-    <%= f.text_field :skype_name %>
+    <%= prof.label :skype_name %><br />
+    <%= prof.text_field :skype_name %>
   </p>
   <p>
-    <%= f.label :web_page %><br />
-    <%= f.text_field :web_page %>
+    <%= prof.label :web_page %><br />
+    <%= prof.text_field :web_page %>
   </p>
-
+<% end %>
   <p>
     <%= f.submit "Create" %>
   </p>

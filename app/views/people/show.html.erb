@@ -1,31 +1,31 @@
 <p>
   <b>Fist name:</b>
-  <%=h @person.fist_name %>
+  <%=h @person.profile.first_name %>
 </p>
 
 <p>
   <b>Last name:</b>
-  <%=h @person.last_name %>
+  <%=h @person.profile.last_name %>
 </p>
 
 <p>
   <b>Email:</b>
-  <%=h @person.email %>
+  <%=h @person.profile.email %>
 </p>
 
 <p>
   <b>Phone:</b>
-  <%=h @person.phone %>
+  <%=h @person.profile.phone %>
 </p>
 
 <p>
   <b>Skype name:</b>
-  <%=h @person.skype_name %>
+  <%=h @person.profile.skype_name %>
 </p>
 
 <p>
   <b>Web page:</b>
-  <%=h @person.web_page %>
+  <%=h @person.profile.web_page %>
 </p>
 
 <%= link_to 'Edit', edit_person_path(@person) %> |

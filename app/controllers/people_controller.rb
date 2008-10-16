@@ -25,6 +25,7 @@ class PeopleController < ApplicationController
   # GET /people/new.xml
   def new
     @person = Person.new
+    @person.profile=Profile.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -41,6 +42,7 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
+    @person.profile=Profile.new(params[:profile])
 
     respond_to do |format|
       if @person.save
@@ -58,6 +60,7 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
+    @person.profile.update_attributes(params[:profile])
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
