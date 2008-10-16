@@ -19137,3 +19137,308 @@ WARNING: You're using the Ruby-based MySQL library that ships with Rails. This l
   [4;36;1mSQL (0.000644)[0m   [0;1mINSERT INTO `schema_migrations` (version) VALUES ('20081016143448')[0m
   [4;35;1mSQL (0.000692)[0m   [0mINSERT INTO `schema_migrations` (version) VALUES ('20081016143812')[0m
   [4;36;1mSQL (0.000609)[0m   [0;1mINSERT INTO `schema_migrations` (version) VALUES ('20081016151755')[0m
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-16 17:27:22) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiJVBlcnNvbiB3YXMgc3VjY2Vzc2Z1bGx5IHVwZGF0
+ZWQuBjoKQHVzZWR7BjsGVDoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--769fea90492cedfd4716ff84e271a70f1623df84
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002299)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.025399)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;35;1mProfile Load (0.001215)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.002953)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.04805 (20 reqs/sec) | Rendering: 0.01006 (20%) | DB: 0.03187 (66%) | 200 OK [http://localhost/people/1]
+
+
+Processing InstitutionsController#index (for 127.0.0.1 at 2008-10-16 17:27:23) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000665)[0m   [0mSELECT * FROM `institutions` [0m
+Rendering template within layouts/main_layout
+Rendering institutions/index
+Rendered layouts/_footer (0.00004)
+Completed in 0.00787 (127 reqs/sec) | Rendering: 0.00193 (24%) | DB: 0.00066 (8%) | 200 OK [http://localhost/institutions]
+
+
+Processing ProjectsController#index (for 127.0.0.1 at 2008-10-16 17:27:25) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;36;1mProject Load (0.000581)[0m   [0;1mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+Rendered layouts/_footer (0.00004)
+Completed in 0.00757 (132 reqs/sec) | Rendering: 0.00184 (24%) | DB: 0.00058 (7%) | 200 OK [http://localhost/projects]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-16 17:27:28) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Load (0.000488)[0m   [0mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;36;1mPerson Columns (0.012653)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Load (0.001264)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.002872)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00007)
+Completed in 0.03016 (33 reqs/sec) | Rendering: 0.00788 (26%) | DB: 0.01728 (57%) | 200 OK [http://localhost/people]
+
+
+Processing ProjectsController#index (for 127.0.0.1 at 2008-10-16 17:27:31) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;35;1mProject Load (0.000583)[0m   [0mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+Rendered layouts/_footer (0.00004)
+Completed in 0.00655 (152 reqs/sec) | Rendering: 0.00083 (12%) | DB: 0.00058 (8%) | 200 OK [http://localhost/projects]
+
+
+Processing InstitutionsController#index (for 127.0.0.1 at 2008-10-16 17:27:33) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"institutions"}
+  [4;36;1mInstitution Load (0.000711)[0m   [0;1mSELECT * FROM `institutions` [0m
+Rendering template within layouts/main_layout
+Rendering institutions/index
+Rendered layouts/_footer (0.00004)
+Completed in 0.00663 (150 reqs/sec) | Rendering: 0.00083 (12%) | DB: 0.00071 (10%) | 200 OK [http://localhost/institutions]
+
+
+Processing InstitutionsController#index (for 127.0.0.1 at 2008-10-16 17:27:41) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000697)[0m   [0mSELECT * FROM `institutions` [0m
+Rendering template within layouts/main_layout
+Rendering institutions/index
+Rendered layouts/_footer (0.00013)
+Completed in 0.00708 (141 reqs/sec) | Rendering: 0.00096 (13%) | DB: 0.00070 (9%) | 200 OK [http://localhost/institutions]
+
+
+Processing InstitutionsController#new (for 127.0.0.1 at 2008-10-16 17:27:44) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"new", "controller"=>"institutions"}
+  [4;36;1mInstitution Columns (0.012501)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+Rendering template within layouts/main_layout
+Rendering institutions/new
+Rendered layouts/_footer (0.00005)
+Completed in 0.02441 (40 reqs/sec) | Rendering: 0.00612 (25%) | DB: 0.01250 (51%) | 200 OK [http://localhost/institutions/new]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-16 17:29:03) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Load (0.000507)[0m   [0mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;36;1mPerson Columns (0.002258)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Load (0.000738)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.001997)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.01626 (61 reqs/sec) | Rendering: 0.00592 (36%) | DB: 0.00550 (33%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#edit (for 127.0.0.1 at 2008-10-16 17:29:05) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"edit", "id"=>"1", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.012280)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.000624)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering people/edit
+  [4;35;1mProfile Load (0.000800)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.002020)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.03041 (32 reqs/sec) | Rendering: 0.00954 (31%) | DB: 0.01572 (51%) | 200 OK [http://localhost/people/1/edit]
+
+
+Processing PeopleController#update (for 127.0.0.1 at 2008-10-16 17:29:11) [PUT]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"commit"=>"Update", "profile"=>{"skype_name"=>"sdf", "phone"=>"sdfasd", "first_name"=>"sdfsdf", "web_page"=>"sdfsdfsdfsdf", "last_name"=>"sdfAAA", "email"=>"sdf"}, "authenticity_token"=>"9d8b371d4525ee32ad77a41b712c31fbcb0f7b23", "_method"=>"put", "action"=>"update", "id"=>"1", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.001919)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.000429)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+  [4;35;1mProfile Load (0.000731)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.001886)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+  [4;35;1mSQL (0.000202)[0m   [0mBEGIN[0m
+  [4;36;1mProfile Update (0.000384)[0m   [0;1mUPDATE `profiles` SET `updated_at` = '2008-10-16 16:29:11', `web_page` = 'sdfsdfsdfsdf' WHERE `id` = 1[0m
+  [4;35;1mSQL (0.000620)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000144)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000154)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/people/1
+Completed in 0.01923 (52 reqs/sec) | DB: 0.00647 (33%) | 302 Found [http://localhost/people/1]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-16 17:29:11) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7BjoLbm90aWNlIiVQZXJzb24gd2FzIHN1Y2Nlc3NmdWxseSB1cGRhdGVk
+LgY6CkB1c2VkewY7B0Y=--9a4f984726b6d8be8cfa28edef4a5c9627af259f
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.001624)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mPerson Load (0.000439)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;36;1mProfile Load (0.000767)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002109)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.08828 (11 reqs/sec) | Rendering: 0.00624 (7%) | DB: 0.00494 (5%) | 200 OK [http://localhost/people/1]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-16 17:29:27) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiJVBlcnNvbiB3YXMgc3VjY2Vzc2Z1bGx5IHVwZGF0
+ZWQuBjoKQHVzZWR7BjsGVDoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--769fea90492cedfd4716ff84e271a70f1623df84
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000558)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mPerson Columns (0.013225)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.001427)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002848)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00007)
+Completed in 0.03104 (32 reqs/sec) | Rendering: 0.00800 (25%) | DB: 0.01806 (58%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-16 17:29:35) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000495)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mPerson Columns (0.002098)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.000709)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.001971)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.01628 (61 reqs/sec) | Rendering: 0.00597 (36%) | DB: 0.00527 (32%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2008-10-16 17:29:37) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.012212)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Columns (0.002911)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendering template within layouts/main_layout
+Rendering people/new
+Rendered layouts/_footer (0.00006)
+Completed in 0.03175 (31 reqs/sec) | Rendering: 0.00608 (19%) | DB: 0.01512 (47%) | 200 OK [http://localhost/people/new]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-16 17:31:50) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000510)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mPerson Columns (0.001827)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.000719)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002004)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.01604 (62 reqs/sec) | Rendering: 0.00607 (37%) | DB: 0.00506 (31%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-16 17:31:52) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.012607)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mPerson Load (0.001225)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;36;1mProfile Load (0.001200)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.003030)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.03262 (30 reqs/sec) | Rendering: 0.00882 (27%) | DB: 0.01806 (55%) | 200 OK [http://localhost/people/1]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-16 17:31:56) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"format"=>"xml", "action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.011879)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mPerson Load (0.000698)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Completed in 0.13414 (7 reqs/sec) | Rendering: 0.11573 (86%) | DB: 0.01258 (9%) | 200 OK [http://localhost/people/1.xml]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-16 17:43:10) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"format"=>"xml", "action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.012489)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mPerson Load (0.000628)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Completed in 0.02059 (48 reqs/sec) | Rendering: 0.00193 (9%) | DB: 0.01312 (63%) | 200 OK [http://localhost/people/1.xml]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-16 17:43:12) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"format"=>"xml", "action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.012176)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mPerson Load (0.000696)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Completed in 0.02018 (49 reqs/sec) | Rendering: 0.00190 (9%) | DB: 0.01287 (63%) | 200 OK [http://localhost/people/1.xml]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-16 17:43:28) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"format"=>"xml", "action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.011878)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mPerson Load (0.000865)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+  [4;36;1mProfile Load (0.001093)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.003214)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Completed in 0.03344 (29 reqs/sec) | Rendering: 0.00014 (0%) | DB: 0.01705 (50%) | 200 OK [http://localhost/people/1.xml]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-16 17:43:51) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"format"=>"xml", "action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000569)[0m   [0;1mSELECT * FROM `people` [0m
+  [4;35;1mPerson Columns (0.012542)[0m   [0mSHOW FIELDS FROM `people`[0m
+Completed in 0.02250 (44 reqs/sec) | Rendering: 0.00239 (10%) | DB: 0.01311 (58%) | 200 OK [http://localhost/people.xml]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-16 17:44:10) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"format"=>"xml", "action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000546)[0m   [0;1mSELECT * FROM `people` [0m
+  [4;35;1mPerson Columns (0.002414)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.000864)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002303)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Completed in 0.01926 (51 reqs/sec) | Rendering: 0.00010 (0%) | DB: 0.00613 (31%) | 200 OK [http://localhost/people.xml]
