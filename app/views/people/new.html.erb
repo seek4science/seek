@@ -28,7 +28,9 @@
     <%= prof.text_field :web_page %>
   </p>
 <% end %>
-   
+
+  <%= f.label :work_groups %>
+  <%= f.select :work_group_ids, work_group_select_choices %>
   <p>
     <%= f.submit "Create" %>
   </p>

@@ -1,4 +1,4 @@
-class CreatePeopleWorkGorups < ActiveRecord::Migration
+class CreatePeopleWorkGroups < ActiveRecord::Migration
   def self.up
     create_table :people_work_groups, :id=>false do |t|
       t.integer :person_id
