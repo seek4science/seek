@@ -26434,3 +26434,505 @@ WARNING: You're using the Ruby-based MySQL library that ships with Rails. This l
   [4;36;1mSQL (0.000831)[0m   [0;1mINSERT INTO `schema_migrations` (version) VALUES ('20081016143812')[0m
   [4;35;1mSQL (0.000693)[0m   [0mINSERT INTO `schema_migrations` (version) VALUES ('20081016151755')[0m
   [4;36;1mSQL (0.001221)[0m   [0;1mINSERT INTO `schema_migrations` (version) VALUES ('20081016151827')[0m
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-20 10:48:13) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"show", "id"=>"4", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.002050)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.000450)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 4) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;35;1mProfile Load (0.000748)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.002084)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.01723 (58 reqs/sec) | Rendering: 0.00591 (34%) | DB: 0.00533 (30%) | 200 OK [http://localhost/people/4]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-20 10:48:20) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"format"=>"xml", "action"=>"show", "id"=>"4", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.012780)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.001420)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 4) [0m
+  [4;35;1mProfile Load (0.001092)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.003015)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Completed in 0.11212 (8 reqs/sec) | Rendering: 0.00013 (0%) | DB: 0.01831 (16%) | 200 OK [http://localhost/people/4.xml]
+
+
+Processing InstitutionsController#index (for 127.0.0.1 at 2008-10-20 10:50:48) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000802)[0m   [0mSELECT * FROM `institutions` [0m
+Rendering template within layouts/main_layout
+Rendering institutions/index
+  [4;36;1mInstitution Columns (0.002324)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.01120 (89 reqs/sec) | Rendering: 0.00275 (24%) | DB: 0.00313 (27%) | 200 OK [http://localhost/institutions]
+
+
+Processing InstitutionsController#new (for 127.0.0.1 at 2008-10-20 10:50:54) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"new", "controller"=>"institutions"}
+  [4;35;1mInstitution Columns (0.014540)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+Rendering template within layouts/main_layout
+Rendering institutions/new
+Rendered layouts/_footer (0.00006)
+Completed in 0.02597 (38 reqs/sec) | Rendering: 0.00509 (19%) | DB: 0.01454 (55%) | 200 OK [http://localhost/institutions/new]
+
+
+Processing InstitutionsController#create (for 127.0.0.1 at 2008-10-20 10:51:01) [POST]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"commit"=>"Create", "institution"=>{"name"=>"dsfsdfsdf", "city"=>"", "country"=>"", "web_page"=>"", "address"=>"sdf"}, "authenticity_token"=>"9d8b371d4525ee32ad77a41b712c31fbcb0f7b23", "action"=>"create", "controller"=>"institutions"}
+  [4;36;1mInstitution Columns (0.002250)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+  [4;35;1mSQL (0.003636)[0m   [0mBEGIN[0m
+  [4;36;1mInstitution Create (0.000342)[0m   [0;1mINSERT INTO `institutions` (`name`, `city`, `updated_at`, `country`, `web_page`, `address`, `created_at`) VALUES('dsfsdfsdf', '', '2008-10-20 09:51:01', '', '', 'sdf', '2008-10-20 09:51:01')[0m
+  [4;35;1mSQL (0.000511)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/institutions/3
+Completed in 0.01623 (61 reqs/sec) | DB: 0.00674 (41%) | 302 Found [http://localhost/institutions]
+
+
+Processing InstitutionsController#show (for 127.0.0.1 at 2008-10-20 10:51:01) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiKkluc3RpdHV0aW9uIHdhcyBzdWNjZXNzZnVsbHkg
+Y3JlYXRlZC4GOgpAdXNlZHsGOwZGOgxjc3JmX2lkIiU1OGQzYmRmMWY4YWVl
+ZTE0ZDJmMWYyZDA0MWNhNGU2Ng==--1c986da1226b24fabb8f5b1c0c4deda40d97c804
+  Parameters: {"action"=>"show", "id"=>"3", "controller"=>"institutions"}
+  [4;36;1mInstitution Columns (0.001957)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+  [4;35;1mInstitution Load (0.000657)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 3) [0m
+Rendering template within layouts/main_layout
+Rendering institutions/show
+Rendered layouts/_footer (0.00004)
+Completed in 0.01013 (98 reqs/sec) | Rendering: 0.00190 (18%) | DB: 0.00261 (25%) | 200 OK [http://localhost/institutions/3]
+
+
+Processing ProjectsController#index (for 127.0.0.1 at 2008-10-20 10:51:03) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7BjoLbm90aWNlIipJbnN0aXR1dGlvbiB3YXMgc3VjY2Vzc2Z1bGx5IGNy
+ZWF0ZWQuBjoKQHVzZWR7BjsHVA==--f34e1b8dc06071aa03b7e4c6197cc0a9fb094c45
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;36;1mProject Load (0.000656)[0m   [0;1mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+  [4;35;1mProject Columns (0.012197)[0m   [0mSHOW FIELDS FROM `projects`[0m
+Rendered layouts/_footer (0.00005)
+Completed in 0.02210 (45 reqs/sec) | Rendering: 0.00354 (15%) | DB: 0.01285 (58%) | 200 OK [http://localhost/projects]
+
+
+Processing ProjectsController#new (for 127.0.0.1 at 2008-10-20 10:51:06) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"new", "controller"=>"projects"}
+  [4;36;1mProject Columns (0.012377)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+Rendering template within layouts/main_layout
+Rendering projects/new
+  [4;35;1mInstitution Load (0.000812)[0m   [0mSELECT * FROM `institutions` [0m
+  [4;36;1mInstitution Columns (0.002164)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.03583 (27 reqs/sec) | Rendering: 0.01409 (39%) | DB: 0.01535 (42%) | 200 OK [http://localhost/projects/new]
+
+
+Processing ProjectsController#create (for 127.0.0.1 at 2008-10-20 10:51:12) [POST]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"commit"=>"Create", "project"=>{"title"=>"SUMO", "web_page"=>"", "wiki_page"=>"", "institutions"=>["1", "2", "3"]}, "authenticity_token"=>"9d8b371d4525ee32ad77a41b712c31fbcb0f7b23", "action"=>"create", "controller"=>"projects"}
+  [4;35;1mProject Columns (0.002123)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mInstitution Columns (0.001961)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+  [4;35;1mInstitution Load (0.000632)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;36;1mInstitution Load (0.000602)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 2) [0m
+  [4;35;1mInstitution Load (0.000636)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 3) [0m
+  [4;36;1mInstitution Exists (0.000528)[0m   [0;1mSELECT `institutions`.id FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE (`institutions`.`id` = 1) AND ((`work_groups`.project_id = NULL)) LIMIT 1[0m
+  [4;35;1mSQL (0.000151)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000144)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000139)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000140)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000138)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000139)[0m   [0;1mCOMMIT[0m
+  [4;35;1mSQL (0.000143)[0m   [0mBEGIN[0m
+  [4;36;1mProject Create (0.000259)[0m   [0;1mINSERT INTO `projects` (`updated_at`, `title`, `web_page`, `wiki_page`, `created_at`) VALUES('2008-10-20 09:51:12', 'SUMO', '', '', '2008-10-20 09:51:12')[0m
+  [4;35;1mWorkGroup Columns (0.002034)[0m   [0mSHOW FIELDS FROM `work_groups`[0m
+  [4;36;1mWorkGroup Create (0.000301)[0m   [0;1mINSERT INTO `work_groups` (`name`, `updated_at`, `project_id`, `institution_id`, `created_at`) VALUES(NULL, '2008-10-20 09:51:12', 3, 1, '2008-10-20 09:51:12')[0m
+  [4;35;1mWorkGroup Create (0.000205)[0m   [0mINSERT INTO `work_groups` (`name`, `updated_at`, `project_id`, `institution_id`, `created_at`) VALUES(NULL, '2008-10-20 09:51:12', 3, 2, '2008-10-20 09:51:12')[0m
+  [4;36;1mWorkGroup Create (0.000204)[0m   [0;1mINSERT INTO `work_groups` (`name`, `updated_at`, `project_id`, `institution_id`, `created_at`) VALUES(NULL, '2008-10-20 09:51:12', 3, 3, '2008-10-20 09:51:12')[0m
+  [4;35;1mSQL (0.000582)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/projects/3
+Completed in 0.10029 (9 reqs/sec) | DB: 0.01106 (11%) | 302 Found [http://localhost/projects]
+
+
+Processing ProjectsController#show (for 127.0.0.1 at 2008-10-20 10:51:12) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiJlByb2plY3Qgd2FzIHN1Y2Nlc3NmdWxseSBjcmVh
+dGVkLgY6CkB1c2VkewY7BkY6DGNzcmZfaWQiJTU4ZDNiZGYxZjhhZWVlMTRk
+MmYxZjJkMDQxY2E0ZTY2--c9a10dbc971088c7c1792fd226f14f22dd453ea0
+  Parameters: {"action"=>"show", "id"=>"3", "controller"=>"projects"}
+  [4;36;1mProject Columns (0.002114)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+  [4;35;1mProject Load (0.000550)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+Rendering template within layouts/main_layout
+Rendering projects/show
+  [4;36;1mInstitution Load (0.000935)[0m   [0;1mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 3)) [0m
+  [4;35;1mInstitution Columns (0.002241)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+Rendered layouts/_footer (0.00005)
+Completed in 0.02338 (42 reqs/sec) | Rendering: 0.01160 (49%) | DB: 0.00584 (24%) | 200 OK [http://localhost/projects/3]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 10:51:14) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7BjoLbm90aWNlIiZQcm9qZWN0IHdhcyBzdWNjZXNzZnVsbHkgY3JlYXRl
+ZC4GOgpAdXNlZHsGOwdU--4a713cd64a045dba64710bea308fc8139ea71c03
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000545)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mPerson Columns (0.012198)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.001083)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 2) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002884)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+  [4;36;1mProfile Load (0.001067)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 3) LIMIT 1[0m
+  [4;35;1mProfile Load (0.001090)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.03392 (29 reqs/sec) | Rendering: 0.00941 (27%) | DB: 0.01887 (55%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2008-10-20 10:51:16) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.012361)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Columns (0.003111)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendering template within layouts/main_layout
+Rendering people/new
+  [4;36;1mWorkGroup Load (0.000754)[0m   [0;1mSELECT * FROM `work_groups` [0m
+  [4;35;1mWorkGroup Columns (0.002002)[0m   [0mSHOW FIELDS FROM `work_groups`[0m
+  [4;36;1mProject Columns (0.001762)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+  [4;35;1mProject Load (0.000573)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+  [4;36;1mInstitution Columns (0.002067)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+  [4;35;1mInstitution Load (0.000621)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;36;1mProject Load (0.000536)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 2) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 2) [0m
+  [4;35;1mInstitution Load (0.000560)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 2) [0m
+  [4;36;1mProject Load (0.000469)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 2) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;35;1mInstitution Load (0.000570)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 3) [0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.05903 (16 reqs/sec) | Rendering: 0.02275 (38%) | DB: 0.02539 (43%) | 200 OK [http://localhost/people/new]
+
+
+Processing PeopleController#create (for 127.0.0.1 at 2008-10-20 10:51:58) [POST]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"commit"=>"Create", "profile"=>{"skype_name"=>"", "phone"=>"", "first_name"=>"DDD", "web_page"=>"", "last_name"=>"", "email"=>""}, "authenticity_token"=>"9d8b371d4525ee32ad77a41b712c31fbcb0f7b23", "action"=>"create", "controller"=>"people", "person"=>{"work_group_ids"=>"6"}}
+  [4;36;1mPerson Columns (0.002573)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mWorkGroup Columns (0.001923)[0m   [0mSHOW FIELDS FROM `work_groups`[0m
+  [4;36;1mWorkGroup Load (0.000551)[0m   [0;1mSELECT * FROM `work_groups` WHERE (`work_groups`.`id` = 6) [0m
+  [4;35;1mSQL (0.000153)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000150)[0m   [0;1mCOMMIT[0m
+  [4;35;1mProfile Columns (0.002167)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+  [4;36;1mSQL (0.000205)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Create (0.000264)[0m   [0mINSERT INTO `people` (`updated_at`, `created_at`) VALUES('2008-10-20 09:51:58', '2008-10-20 09:51:58')[0m
+  [4;36;1mpeople_work_groups Columns (0.001621)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mSQL (0.000232)[0m   [0mINSERT INTO `people_work_groups` (`work_group_id`, `person_id`) VALUES (6, 5)[0m
+  [4;36;1mProfile Create (0.000236)[0m   [0;1mINSERT INTO `profiles` (`updated_at`, `skype_name`, `phone`, `first_name`, `web_page`, `last_name`, `person_id`, `email`, `created_at`) VALUES('2008-10-20 09:51:58', '', '', 'DDD', '', '', 5, '', '2008-10-20 09:51:58')[0m
+  [4;35;1mSQL (0.034734)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/people/5
+Completed in 0.13327 (7 reqs/sec) | DB: 0.04481 (33%) | 302 Found [http://localhost/people]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-20 10:51:58) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiJVBlcnNvbiB3YXMgc3VjY2Vzc2Z1bGx5IGNyZWF0
+ZWQuBjoKQHVzZWR7BjsGRjoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--fe404428d8751d6e7311a374a69c7c8070f1d443
+  Parameters: {"action"=>"show", "id"=>"5", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.001883)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mPerson Load (0.000425)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 5) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;36;1mProfile Load (0.000897)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002276)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.01804 (55 reqs/sec) | Rendering: 0.00667 (36%) | DB: 0.00548 (30%) | 200 OK [http://localhost/people/5]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 10:52:06) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7BjoLbm90aWNlIiVQZXJzb24gd2FzIHN1Y2Nlc3NmdWxseSBjcmVhdGVk
+LgY6CkB1c2VkewY7B1Q=--0a3659b81cea4f7caa2d8bcc47f8535ecfbc162f
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000562)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mPerson Columns (0.012949)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.001344)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 2) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002860)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+  [4;36;1mProfile Load (0.001138)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 3) LIMIT 1[0m
+  [4;35;1mProfile Load (0.001185)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+  [4;36;1mProfile Load (0.001078)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.03650 (27 reqs/sec) | Rendering: 0.00988 (27%) | DB: 0.02112 (57%) | 200 OK [http://localhost/people]
+
+
+Processing ProjectsController#index (for 127.0.0.1 at 2008-10-20 10:52:15) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;35;1mProject Load (0.000722)[0m   [0mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+  [4;36;1mProject Columns (0.012550)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+Rendered layouts/_footer (0.00005)
+Completed in 0.02276 (43 reqs/sec) | Rendering: 0.00395 (17%) | DB: 0.01327 (58%) | 200 OK [http://localhost/projects]
+
+
+Processing ProjectsController#show (for 127.0.0.1 at 2008-10-20 10:52:19) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"show", "id"=>"3", "controller"=>"projects"}
+  [4;35;1mProject Columns (0.012843)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mProject Load (0.000841)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+Rendering template within layouts/main_layout
+Rendering projects/show
+  [4;35;1mInstitution Load (0.001099)[0m   [0mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 3)) [0m
+  [4;36;1mInstitution Columns (0.002060)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.03689 (27 reqs/sec) | Rendering: 0.01355 (36%) | DB: 0.01684 (45%) | 200 OK [http://localhost/projects/3]
+
+
+Processing ProjectsController#index (for 127.0.0.1 at 2008-10-20 10:52:38) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;35;1mProject Load (0.000797)[0m   [0mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+  [4;36;1mProject Columns (0.014024)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+Rendered layouts/_footer (0.00012)
+Completed in 0.02496 (40 reqs/sec) | Rendering: 0.00424 (16%) | DB: 0.01482 (59%) | 200 OK [http://localhost/projects]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 10:53:38) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Load (0.000589)[0m   [0mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;36;1mPerson Columns (0.013377)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Load (0.001097)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 2) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.002937)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+  [4;35;1mProfile Load (0.001187)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 3) LIMIT 1[0m
+  [4;36;1mProfile Load (0.001044)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+  [4;35;1mProfile Load (0.000993)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.03748 (26 reqs/sec) | Rendering: 0.01030 (27%) | DB: 0.02122 (56%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 10:54:34) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000688)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mPerson Columns (0.001886)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.000727)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 2) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.002049)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+  [4;36;1mProfile Load (0.000736)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 3) LIMIT 1[0m
+  [4;35;1mProfile Load (0.000655)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+  [4;36;1mProfile Load (0.000656)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+
+
+ActionView::TemplateError (undefined method `name' for #<PeopleController:0x24a3a38>) on line #7 of layouts/main_layout.erb:
+4: <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+5: <head>
+6:   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+7:   <title><%= controller.name %>:  <%= controller.action_name %></title>
+8:   <%= stylesheet_link_tag 'scaffold' %>
+9: </head>
+10: <body>
+
+    app/views/layouts/main_layout.erb:7:in `_run_erb_47app47views47layouts47main_layout46erb'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_view/base.rb:338:in `send'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_view/base.rb:338:in `execute'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_view/template_handlers/compilable.rb:29:in `send'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_view/template_handlers/compilable.rb:29:in `render'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_view/template.rb:35:in `render'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_view/template.rb:22:in `render_template'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_view/base.rb:245:in `render_file'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/layout.rb:257:in `render_without_benchmark'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/benchmarking.rb:51:in `render'
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/core_ext/benchmark.rb:8:in `realtime'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/benchmarking.rb:51:in `render'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/mime_responds.rb:131:in `send'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/mime_responds.rb:131:in `custom'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/mime_responds.rb:160:in `call'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/mime_responds.rb:160:in `respond'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/mime_responds.rb:154:in `each'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/mime_responds.rb:154:in `respond'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/mime_responds.rb:107:in `respond_to'
+    app/controllers/people_controller.rb:7:in `index'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/base.rb:1162:in `send'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/base.rb:1162:in `perform_action_without_filters'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/filters.rb:580:in `call_filters'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/filters.rb:573:in `perform_action_without_benchmark'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+    /usr/local/lib/ruby/1.8/benchmark.rb:293:in `measure'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/benchmarking.rb:68:in `perform_action_without_rescue'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/rescue.rb:201:in `perform_action_without_caching'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/caching/sql_cache.rb:13:in `perform_action'
+    /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/connection_adapters/abstract/query_cache.rb:33:in `cache'
+    /usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/query_cache.rb:8:in `cache'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/caching/sql_cache.rb:12:in `perform_action'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/base.rb:529:in `send'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/base.rb:529:in `process_without_filters'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/filters.rb:569:in `process_without_session_management_support'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/session_management.rb:130:in `process'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/base.rb:389:in `process'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/dispatcher.rb:149:in `handle_request'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/dispatcher.rb:107:in `dispatch'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/dispatcher.rb:104:in `synchronize'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/dispatcher.rb:104:in `dispatch'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/dispatcher.rb:120:in `dispatch_cgi'
+    /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/dispatcher.rb:35:in `dispatch'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel/rails.rb:78:in `process'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel/rails.rb:76:in `synchronize'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel/rails.rb:76:in `process'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:618:in `process_client'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:617:in `each'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:617:in `process_client'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:736:in `run'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:736:in `initialize'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:736:in `new'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:736:in `run'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:720:in `initialize'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:720:in `new'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel.rb:720:in `run'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel/configurator.rb:271:in `run'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel/configurator.rb:270:in `each'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel/configurator.rb:270:in `run'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/bin/mongrel_rails:127:in `run'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/lib/mongrel/command.rb:211:in `run'
+    /usr/local/lib/ruby/gems/1.8/gems/mongrel-1.0.1/bin/mongrel_rails:243
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:354:in `new_constants_in'
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+    /usr/local/lib/ruby/gems/1.8/gems/rails-2.1.0/lib/commands/servers/mongrel.rb:64
+    /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:509:in `require'
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:354:in `new_constants_in'
+    /usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:509:in `require'
+    /usr/local/lib/ruby/gems/1.8/gems/rails-2.1.0/lib/commands/server.rb:39
+    /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+    /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+    script/server:3
+
+Rendering /usr/local/lib/ruby/gems/1.8/gems/actionpack-2.1.0/lib/action_controller/templates/rescues/layout.erb (internal_server_error)
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 10:54:43) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Load (0.000563)[0m   [0mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;36;1mPerson Columns (0.011532)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Load (0.001323)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 2) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.002967)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+  [4;35;1mProfile Load (0.001121)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 3) LIMIT 1[0m
+  [4;36;1mProfile Load (0.001030)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+  [4;35;1mProfile Load (0.000951)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.03540 (28 reqs/sec) | Rendering: 0.01029 (29%) | DB: 0.02620 (74%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 10:57:17) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000577)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mPerson Columns (0.001882)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Load (0.000711)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 2) LIMIT 1[0m
+  [4;35;1mProfile Columns (0.001978)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+  [4;36;1mProfile Load (0.000820)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 3) LIMIT 1[0m
+  [4;35;1mProfile Load (0.000725)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 4) LIMIT 1[0m
+  [4;36;1mProfile Load (0.000674)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.02146 (46 reqs/sec) | Rendering: 0.00843 (39%) | DB: 0.00737 (34%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#show (for 127.0.0.1 at 2008-10-20 10:57:20) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"show", "id"=>"5", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.012158)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.000692)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 5) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;35;1mProfile Load (0.001120)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.003234)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.03214 (31 reqs/sec) | Rendering: 0.00866 (26%) | DB: 0.01720 (53%) | 200 OK [http://localhost/people/5]
+
+
+Processing PeopleController#edit (for 127.0.0.1 at 2008-10-20 10:57:23) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"edit", "id"=>"5", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.001974)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.001169)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 5) [0m
+Rendering template within layouts/main_layout
+Rendering people/edit
+  [4;35;1mProfile Load (0.000859)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 5) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.003167)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+  [4;35;1mWorkGroup Load (0.000734)[0m   [0mSELECT * FROM `work_groups` [0m
+  [4;36;1mWorkGroup Columns (0.001938)[0m   [0;1mSHOW FIELDS FROM `work_groups`[0m
+  [4;35;1mProject Columns (0.001746)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mProject Load (0.000530)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+  [4;35;1mInstitution Columns (0.002051)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+  [4;36;1mInstitution Load (0.000650)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;35;1mProject Load (0.000527)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 2) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 2) [0m
+  [4;36;1mInstitution Load (0.000563)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 2) [0m
+  [4;35;1mProject Load (0.000472)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 2) [0m
+  [4;35;1mCACHE (0.000000)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;36;1mInstitution Load (0.000627)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 3) [0m
+  [4;35;1mJoin Table Columns (0.001626)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mWorkGroup Load (0.000657)[0m   [0;1mSELECT * FROM `work_groups` INNER JOIN `people_work_groups` ON `work_groups`.id = `people_work_groups`.work_group_id WHERE (`people_work_groups`.person_id = 5 ) [0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.05205 (19 reqs/sec) | Rendering: 0.02688 (51%) | DB: 0.01929 (37%) | 200 OK [http://localhost/people/5/edit]
