@@ -23334,3 +23334,511 @@ Rendering projects/show
   [4;35;1mInstitution Columns (0.002196)[0m   [0mSHOW FIELDS FROM `institutions`[0m
 Rendered layouts/_footer (0.00004)
 Completed in 0.08789 (11 reqs/sec) | Rendering: 0.07613 (86%) | DB: 0.00594 (6%) | 200 OK [http://localhost/projects/6]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 09:07:03) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiJlByb2plY3Qgd2FzIHN1Y2Nlc3NmdWxseSB1cGRh
+dGVkLgY6CkB1c2VkewY7BlQ6DGNzcmZfaWQiJTU4ZDNiZGYxZjhhZWVlMTRk
+MmYxZjJkMDQxY2E0ZTY2--b0888ff1acb5bd7e86cf993636fe7ff9f3204643
+  Parameters: {"action"=>"index", "controller"=>"people"}
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000286)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Load (0.000730)[0m   [0mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;36;1mPerson Columns (0.052399)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Load (0.001172)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mProfile Columns (0.002574)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendered layouts/_footer (0.00011)
+Completed in 0.15584 (6 reqs/sec) | Rendering: 0.06844 (43%) | DB: 0.05716 (36%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2008-10-20 09:07:06) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;35;1mPerson Columns (0.005521)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mProfile Columns (0.027067)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+Rendering template within layouts/main_layout
+Rendering people/new
+Rendered layouts/_footer (0.00006)
+Completed in 0.08589 (11 reqs/sec) | Rendering: 0.04253 (49%) | DB: 0.03259 (37%) | 200 OK [http://localhost/people/new]
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000210)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.014896)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.000597)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000438)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000380)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000708)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000393)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000370)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000366)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000365)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000362)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000364)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000407)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000378)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000369)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (20081012154554)
+  [4;35;1mSQL (0.000367)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreateProjects (20081012154630)
+  [4;36;1mSQL (0.000365)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreateGroups (20081012154748)
+  [4;35;1mSQL (0.000365)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreateGroupsProjects (20081012155031)
+  [4;36;1mSQL (0.000364)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeopleProjects (20081012155343)
+  [4;35;1mSQL (0.000364)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to RemovePeopleProjects (20081013164000)
+  [4;36;1mSQL (0.000357)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreateGroupsPeople (20081013164402)
+  [4;35;1mSQL (0.000363)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to RenameGroupsToWorkGroups (20081016140820)
+  [4;36;1mSQL (0.000364)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to UpdateWorkGroupFields (20081016142624)
+  [4;35;1mSQL (0.000363)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to RemoveLinksBetweenGroupsAndProjects (20081016143448)
+  [4;36;1mSQL (0.000363)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to CreateInstitutions (20081016143812)
+  [4;35;1mSQL (0.000362)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreateProfiles (20081016151755)
+  [4;36;1mSQL (0.000364)[0m   [0;1mSELECT version FROM schema_migrations[0m
+Migrating to SplitProfileFromPerson (20081016151827)
+  [4;35;1mSQL (0.000364)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreatePropleWorkGorups (20081020081203)
+  [4;36;1mSQL (0.000364)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002235)[0m   [0mCREATE TABLE `people_work_groups` (`person_id` int(11) DEFAULT NULL NULL, `work_group_id` int(11) DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.028667)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081020081203')[0m
+  [4;35;1mSQL (0.001083)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000864)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002911)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+  [4;36;1mSQL (0.002601)[0m   [0;1mdescribe `institutions`[0m
+  [4;35;1mSQL (0.001352)[0m   [0mSHOW KEYS FROM `institutions`[0m
+  [4;36;1mSQL (0.002138)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mSQL (0.002075)[0m   [0mdescribe `people`[0m
+  [4;36;1mSQL (0.000829)[0m   [0;1mSHOW KEYS FROM `people`[0m
+  [4;35;1mSQL (0.001582)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mSQL (0.002235)[0m   [0;1mdescribe `people_work_groups`[0m
+  [4;35;1mSQL (0.001348)[0m   [0mSHOW KEYS FROM `people_work_groups`[0m
+  [4;36;1mSQL (0.002701)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+  [4;35;1mSQL (0.014407)[0m   [0mdescribe `profiles`[0m
+  [4;36;1mSQL (0.001274)[0m   [0;1mSHOW KEYS FROM `profiles`[0m
+  [4;35;1mSQL (0.002415)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mSQL (0.003944)[0m   [0;1mdescribe `projects`[0m
+  [4;35;1mSQL (0.002908)[0m   [0mSHOW KEYS FROM `projects`[0m
+  [4;36;1mSQL (0.002447)[0m   [0;1mSHOW FIELDS FROM `work_groups`[0m
+  [4;35;1mSQL (0.002317)[0m   [0mdescribe `work_groups`[0m
+  [4;36;1mSQL (0.001228)[0m   [0;1mSHOW KEYS FROM `work_groups`[0m
+  [4;35;1mSQL (0.002012)[0m   [0mSHOW FIELDS FROM `work_groups_people`[0m
+  [4;36;1mSQL (0.002297)[0m   [0;1mdescribe `work_groups_people`[0m
+  [4;35;1mSQL (0.001257)[0m   [0mSHOW KEYS FROM `work_groups_people`[0m
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000178)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000510)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000498)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.000571)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreatePropleWorkGorups (20081020081203)
+  [4;36;1mSQL (0.000691)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.010755)[0m   [0mDROP TABLE `people_work_groups`[0m
+  [4;36;1mSQL (0.046566)[0m   [0;1mDELETE FROM schema_migrations WHERE version = '20081020081203'[0m
+Migrating to SplitProfileFromPerson (20081016151827)
+  [4;35;1mSQL (0.001017)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.063144)[0m   [0;1mALTER TABLE `people` ADD `first_name` varchar(255)[0m
+  [4;35;1mSQL (0.031039)[0m   [0mALTER TABLE `people` ADD `last_name` varchar(255)[0m
+  [4;36;1mSQL (0.011187)[0m   [0;1mALTER TABLE `people` ADD `email` varchar(255)[0m
+  [4;35;1mSQL (0.006785)[0m   [0mALTER TABLE `people` ADD `web_page` varchar(255)[0m
+  [4;36;1mSQL (0.006404)[0m   [0;1mALTER TABLE `people` ADD `skype_name` varchar(255)[0m
+  [4;35;1mSQL (0.007044)[0m   [0mALTER TABLE `people` ADD `phone` varchar(255)[0m
+  [4;36;1mSQL (0.000914)[0m   [0;1mDELETE FROM schema_migrations WHERE version = '20081016151827'[0m
+Migrating to CreateProfiles (20081016151755)
+  [4;35;1mSQL (0.000910)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.002036)[0m   [0;1mDROP TABLE `profiles`[0m
+  [4;35;1mSQL (0.000792)[0m   [0mDELETE FROM schema_migrations WHERE version = '20081016151755'[0m
+Migrating to CreateInstitutions (20081016143812)
+  [4;36;1mSQL (0.000728)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002141)[0m   [0mDROP TABLE `institutions`[0m
+  [4;36;1mSQL (0.000763)[0m   [0;1mDELETE FROM schema_migrations WHERE version = '20081016143812'[0m
+Migrating to RemoveLinksBetweenGroupsAndProjects (20081016143448)
+  [4;35;1mSQL (0.000726)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.002406)[0m   [0;1mCREATE TABLE `groups_projects` (`group_id` int(11) DEFAULT NULL NULL, `project_id` int(11) DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000904)[0m   [0mDELETE FROM schema_migrations WHERE version = '20081016143448'[0m
+Migrating to UpdateWorkGroupFields (20081016142624)
+  [4;36;1mSQL (0.000598)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002276)[0m   [0mSHOW COLUMNS FROM `work_groups` LIKE 'name'[0m
+  [4;36;1mSQL (0.006629)[0m   [0;1mALTER TABLE `work_groups` CHANGE `name` `group_name` varchar(255)[0m
+  [4;35;1mSQL (0.006246)[0m   [0mALTER TABLE `work_groups` ADD `country` varchar(255)[0m
+  [4;36;1mSQL (0.005655)[0m   [0;1mALTER TABLE `work_groups` ADD `city` varchar(255)[0m
+  [4;35;1mSQL (0.008657)[0m   [0mALTER TABLE `work_groups` ADD `address` text[0m
+  [4;36;1mSQL (0.007372)[0m   [0;1mALTER TABLE `work_groups` ADD `web_page` varchar(255)[0m
+  [4;35;1mSQL (0.006710)[0m   [0mALTER TABLE `work_groups` DROP `institution_id`[0m
+  [4;36;1mSQL (0.007077)[0m   [0;1mALTER TABLE `work_groups` DROP `project_id`[0m
+  [4;35;1mSQL (0.000772)[0m   [0mDELETE FROM schema_migrations WHERE version = '20081016142624'[0m
+Migrating to RenameGroupsToWorkGroups (20081016140820)
+  [4;36;1mSQL (0.000543)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.001453)[0m   [0mRENAME TABLE `work_groups` TO `groups`[0m
+  [4;36;1mSQL (0.021893)[0m   [0;1mRENAME TABLE `work_groups_people` TO `groups_people`[0m
+  [4;35;1mSQL (0.001428)[0m   [0mDELETE FROM schema_migrations WHERE version = '20081016140820'[0m
+Migrating to CreateGroupsPeople (20081013164402)
+  [4;36;1mSQL (0.000610)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.001821)[0m   [0mDROP TABLE `groups_people`[0m
+  [4;36;1mSQL (0.001541)[0m   [0;1mDELETE FROM schema_migrations WHERE version = '20081013164402'[0m
+Migrating to RemovePeopleProjects (20081013164000)
+  [4;35;1mSQL (0.000478)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.015196)[0m   [0;1mCREATE TABLE `people_projects` (`person_id` int(11) DEFAULT NULL NULL, `project_id` int(11) DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000875)[0m   [0mDELETE FROM schema_migrations WHERE version = '20081013164000'[0m
+Migrating to CreatePeopleProjects (20081012155343)
+  [4;36;1mSQL (0.000549)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.001776)[0m   [0mDROP TABLE `people_projects`[0m
+  [4;36;1mSQL (0.001124)[0m   [0;1mDELETE FROM schema_migrations WHERE version = '20081012155343'[0m
+Migrating to CreateGroupsProjects (20081012155031)
+  [4;35;1mSQL (0.000576)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.001471)[0m   [0;1mDROP TABLE `groups_projects`[0m
+  [4;35;1mSQL (0.000799)[0m   [0mDELETE FROM schema_migrations WHERE version = '20081012155031'[0m
+Migrating to CreateGroups (20081012154748)
+  [4;36;1mSQL (0.000620)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002123)[0m   [0mDROP TABLE `groups`[0m
+  [4;36;1mSQL (0.000871)[0m   [0;1mDELETE FROM schema_migrations WHERE version = '20081012154748'[0m
+Migrating to CreateProjects (20081012154630)
+  [4;35;1mSQL (0.000391)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.029114)[0m   [0;1mDROP TABLE `projects`[0m
+  [4;35;1mSQL (0.000988)[0m   [0mDELETE FROM schema_migrations WHERE version = '20081012154630'[0m
+Migrating to CreatePeople (20081012154554)
+  [4;36;1mSQL (0.001438)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.001895)[0m   [0mDROP TABLE `people`[0m
+  [4;36;1mSQL (0.000837)[0m   [0;1mDELETE FROM schema_migrations WHERE version = '20081012154554'[0m
+  [4;35;1mSQL (0.000317)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000412)[0m   [0;1mSHOW TABLES[0m
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000179)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000567)[0m   [0mSHOW TABLES[0m
+  [4;36;1mSQL (0.000441)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000224)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000700)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000358)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000344)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000377)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000335)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000335)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.045909)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000441)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000211)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000206)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000197)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.000206)[0m   [0mSELECT version FROM schema_migrations[0m
+Migrating to CreatePeople (20081012154554)
+  [4;36;1mSQL (0.000208)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002974)[0m   [0mCREATE TABLE `people` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `fist_name` varchar(255) DEFAULT NULL NULL, `last_name` varchar(255) DEFAULT NULL NULL, `email` varchar(255) DEFAULT NULL NULL, `phone` varchar(255) DEFAULT NULL NULL, `skype_name` varchar(255) DEFAULT NULL NULL, `web_page` varchar(255) DEFAULT NULL NULL, `created_at` datetime DEFAULT NULL NULL, `updated_at` datetime DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000721)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081012154554')[0m
+Migrating to CreateProjects (20081012154630)
+  [4;35;1mSQL (0.000538)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.032813)[0m   [0;1mCREATE TABLE `projects` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `title` varchar(255) DEFAULT NULL NULL, `web_page` varchar(255) DEFAULT NULL NULL, `wiki_page` varchar(255) DEFAULT NULL NULL, `created_at` datetime DEFAULT NULL NULL, `updated_at` datetime DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000933)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('20081012154630')[0m
+Migrating to CreateGroups (20081012154748)
+  [4;36;1mSQL (0.000621)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002338)[0m   [0mCREATE TABLE `groups` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `group_name` varchar(255) DEFAULT NULL NULL, `country` varchar(255) DEFAULT NULL NULL, `city` varchar(255) DEFAULT NULL NULL, `address` text DEFAULT NULL NULL, `web_page` varchar(255) DEFAULT NULL NULL, `created_at` datetime DEFAULT NULL NULL, `updated_at` datetime DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000963)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081012154748')[0m
+Migrating to CreateGroupsProjects (20081012155031)
+  [4;35;1mSQL (0.000525)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.002185)[0m   [0;1mCREATE TABLE `groups_projects` (`group_id` int(11) DEFAULT NULL NULL, `project_id` int(11) DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000712)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('20081012155031')[0m
+Migrating to CreatePeopleProjects (20081012155343)
+  [4;36;1mSQL (0.000596)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002123)[0m   [0mCREATE TABLE `people_projects` (`person_id` int(11) DEFAULT NULL NULL, `project_id` int(11) DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000904)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081012155343')[0m
+Migrating to RemovePeopleProjects (20081013164000)
+  [4;35;1mSQL (0.000509)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.001656)[0m   [0;1mDROP TABLE `people_projects`[0m
+  [4;35;1mSQL (0.001287)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('20081013164000')[0m
+Migrating to CreateGroupsPeople (20081013164402)
+  [4;36;1mSQL (0.000760)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002292)[0m   [0mCREATE TABLE `groups_people` (`person_id` int(11) DEFAULT NULL NULL, `group_id` int(11) DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000740)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081013164402')[0m
+Migrating to RenameGroupsToWorkGroups (20081016140820)
+  [4;35;1mSQL (0.000655)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.003091)[0m   [0;1mRENAME TABLE `groups` TO `work_groups`[0m
+  [4;35;1mSQL (0.001690)[0m   [0mRENAME TABLE `groups_people` TO `work_groups_people`[0m
+  [4;36;1mSQL (0.001109)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081016140820')[0m
+Migrating to UpdateWorkGroupFields (20081016142624)
+  [4;35;1mSQL (0.000798)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.002391)[0m   [0;1mSHOW COLUMNS FROM `work_groups` LIKE 'group_name'[0m
+  [4;35;1mSQL (0.005875)[0m   [0mALTER TABLE `work_groups` CHANGE `group_name` `name` varchar(255)[0m
+  [4;36;1mSQL (0.006085)[0m   [0;1mALTER TABLE `work_groups` DROP `country`[0m
+  [4;35;1mSQL (0.006285)[0m   [0mALTER TABLE `work_groups` DROP `city`[0m
+  [4;36;1mSQL (0.008589)[0m   [0;1mALTER TABLE `work_groups` DROP `address`[0m
+  [4;35;1mSQL (0.006116)[0m   [0mALTER TABLE `work_groups` DROP `web_page`[0m
+  [4;36;1mSQL (0.006059)[0m   [0;1mALTER TABLE `work_groups` ADD `institution_id` int(11)[0m
+  [4;35;1mSQL (0.005870)[0m   [0mALTER TABLE `work_groups` ADD `project_id` int(11)[0m
+  [4;36;1mSQL (0.000734)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081016142624')[0m
+Migrating to RemoveLinksBetweenGroupsAndProjects (20081016143448)
+  [4;35;1mSQL (0.000691)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.001505)[0m   [0;1mDROP TABLE `groups_projects`[0m
+  [4;35;1mSQL (0.000777)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('20081016143448')[0m
+Migrating to CreateInstitutions (20081016143812)
+  [4;36;1mSQL (0.000811)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002425)[0m   [0mCREATE TABLE `institutions` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `name` varchar(255) DEFAULT NULL NULL, `address` text DEFAULT NULL NULL, `city` varchar(255) DEFAULT NULL NULL, `web_page` varchar(255) DEFAULT NULL NULL, `country` varchar(255) DEFAULT NULL NULL, `created_at` datetime DEFAULT NULL NULL, `updated_at` datetime DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000764)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081016143812')[0m
+Migrating to CreateProfiles (20081016151755)
+  [4;35;1mSQL (0.000678)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.004052)[0m   [0;1mCREATE TABLE `profiles` (`id` int(11) DEFAULT NULL auto_increment PRIMARY KEY, `first_name` varchar(255) DEFAULT NULL NULL, `last_name` varchar(255) DEFAULT NULL NULL, `email` varchar(255) DEFAULT NULL NULL, `phone` varchar(255) DEFAULT NULL NULL, `skype_name` varchar(255) DEFAULT NULL NULL, `web_page` varchar(255) DEFAULT NULL NULL, `person_id` int(11) DEFAULT NULL NULL, `created_at` datetime DEFAULT NULL NULL, `updated_at` datetime DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;35;1mSQL (0.000879)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('20081016151755')[0m
+Migrating to SplitProfileFromPerson (20081016151827)
+  [4;36;1mSQL (0.000908)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.006245)[0m   [0mALTER TABLE `people` DROP `fist_name`[0m
+  [4;36;1mSQL (0.006563)[0m   [0;1mALTER TABLE `people` DROP `last_name`[0m
+  [4;35;1mSQL (0.005875)[0m   [0mALTER TABLE `people` DROP `email`[0m
+  [4;36;1mSQL (0.006207)[0m   [0;1mALTER TABLE `people` DROP `web_page`[0m
+  [4;35;1mSQL (0.008579)[0m   [0mALTER TABLE `people` DROP `skype_name`[0m
+  [4;36;1mSQL (0.005387)[0m   [0;1mALTER TABLE `people` DROP `phone`[0m
+  [4;35;1mSQL (0.001028)[0m   [0mINSERT INTO schema_migrations (version) VALUES ('20081016151827')[0m
+Migrating to CreatePeopleWorkGorups (20081020081203)
+  [4;36;1mSQL (0.000664)[0m   [0;1mSELECT version FROM schema_migrations[0m
+  [4;35;1mSQL (0.002413)[0m   [0mCREATE TABLE `people_work_groups` (`person_id` int(11) DEFAULT NULL NULL, `work_group_id` int(11) DEFAULT NULL NULL) ENGINE=InnoDB[0m
+  [4;36;1mSQL (0.000778)[0m   [0;1mINSERT INTO schema_migrations (version) VALUES ('20081020081203')[0m
+  [4;35;1mSQL (0.000753)[0m   [0mSELECT version FROM schema_migrations[0m
+  [4;36;1mSQL (0.000807)[0m   [0;1mSHOW TABLES[0m
+  [4;35;1mSQL (0.002882)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+  [4;36;1mSQL (0.002461)[0m   [0;1mdescribe `institutions`[0m
+  [4;35;1mSQL (0.001205)[0m   [0mSHOW KEYS FROM `institutions`[0m
+  [4;36;1mSQL (0.002583)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mSQL (0.002153)[0m   [0mdescribe `people`[0m
+  [4;36;1mSQL (0.001168)[0m   [0;1mSHOW KEYS FROM `people`[0m
+  [4;35;1mSQL (0.002701)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mSQL (0.002472)[0m   [0;1mdescribe `people_work_groups`[0m
+  [4;35;1mSQL (0.001329)[0m   [0mSHOW KEYS FROM `people_work_groups`[0m
+  [4;36;1mSQL (0.002262)[0m   [0;1mSHOW FIELDS FROM `profiles`[0m
+  [4;35;1mSQL (0.001971)[0m   [0mdescribe `profiles`[0m
+  [4;36;1mSQL (0.000785)[0m   [0;1mSHOW KEYS FROM `profiles`[0m
+  [4;35;1mSQL (0.001910)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mSQL (0.001832)[0m   [0;1mdescribe `projects`[0m
+  [4;35;1mSQL (0.001193)[0m   [0mSHOW KEYS FROM `projects`[0m
+  [4;36;1mSQL (0.001856)[0m   [0;1mSHOW FIELDS FROM `work_groups`[0m
+  [4;35;1mSQL (0.001712)[0m   [0mdescribe `work_groups`[0m
+  [4;36;1mSQL (0.000806)[0m   [0;1mSHOW KEYS FROM `work_groups`[0m
+  [4;35;1mSQL (0.001787)[0m   [0mSHOW FIELDS FROM `work_groups_people`[0m
+  [4;36;1mSQL (0.001684)[0m   [0;1mdescribe `work_groups_people`[0m
+  [4;35;1mSQL (0.000764)[0m   [0mSHOW KEYS FROM `work_groups_people`[0m
+
+
+Processing ProjectsController#index (for 127.0.0.1 at 2008-10-20 09:18:36) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000194)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mProject Load (0.000879)[0m   [0mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+Rendered layouts/_footer (0.00010)
+Completed in 0.08112 (12 reqs/sec) | Rendering: 0.06340 (78%) | DB: 0.00107 (1%) | 200 OK [http://localhost/projects]
+
+
+Processing ProjectsController#new (for 127.0.0.1 at 2008-10-20 09:18:38) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"new", "controller"=>"projects"}
+  [4;36;1mProject Columns (0.012930)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+Rendering template within layouts/main_layout
+Rendering projects/new
+  [4;35;1mInstitution Load (0.000961)[0m   [0mSELECT * FROM `institutions` [0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.06049 (16 reqs/sec) | Rendering: 0.04036 (66%) | DB: 0.01389 (22%) | 200 OK [http://localhost/projects/new]
+
+
+Processing ProjectsController#create (for 127.0.0.1 at 2008-10-20 09:18:46) [POST]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"commit"=>"Create", "project"=>{"title"=>"AAA", "web_page"=>"", "wiki_page"=>""}, "authenticity_token"=>"9d8b371d4525ee32ad77a41b712c31fbcb0f7b23", "action"=>"create", "controller"=>"projects"}
+  [4;36;1mProject Columns (0.014032)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+  [4;35;1mSQL (0.000267)[0m   [0mBEGIN[0m
+  [4;36;1mProject Create (0.000400)[0m   [0;1mINSERT INTO `projects` (`updated_at`, `title`, `web_page`, `wiki_page`, `created_at`) VALUES('2008-10-20 08:18:46', 'AAA', '', '', '2008-10-20 08:18:46')[0m
+  [4;35;1mSQL (0.000616)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/projects/1
+Completed in 0.02487 (40 reqs/sec) | DB: 0.01532 (61%) | 302 Found [http://localhost/projects]
+
+
+Processing ProjectsController#show (for 127.0.0.1 at 2008-10-20 09:18:46) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7BjoLbm90aWNlIiZQcm9qZWN0IHdhcyBzdWNjZXNzZnVsbHkgY3JlYXRl
+ZC4GOgpAdXNlZHsGOwdG--21e324a83d7b1f4e3cc9616a4811ff0c676cf332
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"projects"}
+  [4;36;1mProject Columns (0.002122)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+  [4;35;1mProject Load (0.000572)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering projects/show
+  [4;36;1mInstitution Load (0.000768)[0m   [0;1mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 1)) [0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.04513 (22 reqs/sec) | Rendering: 0.03540 (78%) | DB: 0.00346 (7%) | 200 OK [http://localhost/projects/1]
+
+
+Processing InstitutionsController#index (for 127.0.0.1 at 2008-10-20 09:18:49) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiJlByb2plY3Qgd2FzIHN1Y2Nlc3NmdWxseSBjcmVh
+dGVkLgY6CkB1c2VkewY7BlQ6DGNzcmZfaWQiJTU4ZDNiZGYxZjhhZWVlMTRk
+MmYxZjJkMDQxY2E0ZTY2--11de768c94f8c45517b26aed2578e26aa87e51ab
+  Parameters: {"action"=>"index", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000764)[0m   [0mSELECT * FROM `institutions` [0m
+Rendering template within layouts/main_layout
+Rendering institutions/index
+Rendered layouts/_footer (0.00004)
+Completed in 0.01140 (87 reqs/sec) | Rendering: 0.00250 (21%) | DB: 0.00076 (6%) | 200 OK [http://localhost/institutions]
+
+
+Processing InstitutionsController#new (for 127.0.0.1 at 2008-10-20 09:18:50) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"new", "controller"=>"institutions"}
+  [4;36;1mInstitution Columns (0.012274)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+Rendering template within layouts/main_layout
+Rendering institutions/new
+Rendered layouts/_footer (0.00006)
+Completed in 0.02517 (39 reqs/sec) | Rendering: 0.00721 (28%) | DB: 0.01227 (48%) | 200 OK [http://localhost/institutions/new]
+
+
+Processing InstitutionsController#create (for 127.0.0.1 at 2008-10-20 09:18:59) [POST]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"commit"=>"Create", "institution"=>{"name"=>"AAAAAA", "city"=>"A", "country"=>"", "web_page"=>"AA", "address"=>"AAA"}, "authenticity_token"=>"9d8b371d4525ee32ad77a41b712c31fbcb0f7b23", "action"=>"create", "controller"=>"institutions"}
+  [4;35;1mInstitution Columns (0.002295)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+  [4;36;1mSQL (0.000179)[0m   [0;1mBEGIN[0m
+  [4;35;1mInstitution Create (0.000309)[0m   [0mINSERT INTO `institutions` (`name`, `city`, `updated_at`, `country`, `web_page`, `address`, `created_at`) VALUES('AAAAAA', 'A', '2008-10-20 08:18:59', '', 'AA', 'AAA', '2008-10-20 08:18:59')[0m
+  [4;36;1mSQL (0.000581)[0m   [0;1mCOMMIT[0m
+Redirected to http://localhost:3000/institutions/1
+Completed in 0.01111 (90 reqs/sec) | DB: 0.00336 (30%) | 302 Found [http://localhost/institutions]
+
+
+Processing InstitutionsController#show (for 127.0.0.1 at 2008-10-20 09:18:59) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7BjoLbm90aWNlIipJbnN0aXR1dGlvbiB3YXMgc3VjY2Vzc2Z1bGx5IGNy
+ZWF0ZWQuBjoKQHVzZWR7BjsHRg==--814d2301c1b8afaca715d7c3c28076ea34dbca73
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"institutions"}
+  [4;35;1mInstitution Columns (0.002255)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+  [4;36;1mInstitution Load (0.000639)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering institutions/show
+Rendered layouts/_footer (0.00006)
+Completed in 0.03670 (27 reqs/sec) | Rendering: 0.02835 (77%) | DB: 0.00289 (7%) | 200 OK [http://localhost/institutions/1]
+
+
+Processing PeopleController#index (for 127.0.0.1 at 2008-10-20 09:19:01) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsGOgtub3RpY2UiKkluc3RpdHV0aW9uIHdhcyBzdWNjZXNzZnVsbHkg
+Y3JlYXRlZC4GOgpAdXNlZHsGOwZUOgxjc3JmX2lkIiU1OGQzYmRmMWY4YWVl
+ZTE0ZDJmMWYyZDA0MWNhNGU2Ng==--59e004af79add7dc0c2068efae278223e20a54e1
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;35;1mPerson Load (0.000651)[0m   [0mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+Rendered layouts/_footer (0.00006)
+Completed in 0.01515 (66 reqs/sec) | Rendering: 0.00619 (40%) | DB: 0.00065 (4%) | 200 OK [http://localhost/people]
+
+
+Processing PeopleController#new (for 127.0.0.1 at 2008-10-20 09:19:06) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"new", "controller"=>"people"}
+  [4;36;1mPerson Columns (0.012779)[0m   [0;1mSHOW FIELDS FROM `people`[0m
+  [4;35;1mProfile Columns (0.002840)[0m   [0mSHOW FIELDS FROM `profiles`[0m
+Rendering template within layouts/main_layout
+Rendering people/new
+Rendered layouts/_footer (0.00006)
+Completed in 0.04438 (22 reqs/sec) | Rendering: 0.01761 (39%) | DB: 0.01562 (35%) | 200 OK [http://localhost/people/new]
+
+
+Processing ProjectsController#index (for 127.0.0.1 at 2008-10-20 09:19:15) [GET]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;36;1mProject Load (0.000699)[0m   [0;1mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+  [4;35;1mProject Columns (0.015065)[0m   [0mSHOW FIELDS FROM `projects`[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.02506 (39 reqs/sec) | Rendering: 0.00353 (14%) | DB: 0.01576 (62%) | 200 OK [http://localhost/projects]
+
+
+Processing ProjectsController#edit (for 127.0.0.1 at 2008-10-20 09:19:18) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7AAY6CkB1c2VkewA=--40abda1200032e6d1411968cdeef083385e4952c
+  Parameters: {"action"=>"edit", "id"=>"1", "controller"=>"projects"}
+  [4;36;1mProject Columns (0.012853)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+  [4;35;1mProject Load (0.000831)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering projects/edit
+  [4;36;1mInstitution Load (0.000955)[0m   [0;1mSELECT * FROM `institutions` [0m
+  [4;35;1mInstitution Load (0.000837)[0m   [0mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 1)) [0m
+  [4;36;1mInstitution Columns (0.003519)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+Rendered layouts/_footer (0.00006)
+Completed in 0.06505 (15 reqs/sec) | Rendering: 0.04014 (61%) | DB: 0.01900 (29%) | 200 OK [http://localhost/projects/1/edit]
+
+
+Processing ProjectsController#update (for 127.0.0.1 at 2008-10-20 09:19:20) [PUT]
+  Session ID: BAh7ByIKZmxhc2hJQzonQWN0aW9uQ29udHJvbGxlcjo6Rmxhc2g6OkZsYXNo
+SGFzaHsABjoKQHVzZWR7ADoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQy
+ZjFmMmQwNDFjYTRlNjY=--4d9498540a509bc939dc7a67d910a6919aa26da8
+  Parameters: {"commit"=>"Update", "project"=>{"title"=>"AAA", "institution_ids"=>["1"], "web_page"=>"", "wiki_page"=>""}, "authenticity_token"=>"9d8b371d4525ee32ad77a41b712c31fbcb0f7b23", "_method"=>"put", "action"=>"update", "id"=>"1", "controller"=>"projects"}
+  [4;35;1mProject Columns (0.012362)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mProject Load (0.000880)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+  [4;35;1mWorkGroup Load (0.001147)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.project_id = 1) [0m
+  [4;36;1mInstitution Columns (0.002838)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+  [4;35;1mInstitution Load (0.001005)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;36;1mCACHE (0.000000)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;35;1mInstitution Exists (0.000546)[0m   [0mSELECT `institutions`.id FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE (`institutions`.`id` = 1) AND ((`work_groups`.project_id = 1)) LIMIT 1[0m
+  [4;36;1mSQL (0.000208)[0m   [0;1mBEGIN[0m
+  [4;35;1mWorkGroup Columns (0.002472)[0m   [0mSHOW FIELDS FROM `work_groups`[0m
+  [4;36;1mWorkGroup Create (0.000385)[0m   [0;1mINSERT INTO `work_groups` (`name`, `updated_at`, `project_id`, `institution_id`, `created_at`) VALUES(NULL, '2008-10-20 08:19:20', 1, 1, '2008-10-20 08:19:20')[0m
+  [4;35;1mSQL (0.000606)[0m   [0mCOMMIT[0m
+  [4;36;1mSQL (0.000277)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000222)[0m   [0mCOMMIT[0m
+Redirected to http://localhost:3000/projects/1
+Completed in 0.04878 (20 reqs/sec) | DB: 0.02295 (47%) | 302 Found [http://localhost/projects/1]
+
+
+Processing ProjectsController#show (for 127.0.0.1 at 2008-10-20 09:19:20) [GET]
+  Session ID: BAh7BzoMY3NyZl9pZCIlNThkM2JkZjFmOGFlZWUxNGQyZjFmMmQwNDFjYTRl
+NjYiCmZsYXNoSUM6J0FjdGlvbkNvbnRyb2xsZXI6OkZsYXNoOjpGbGFzaEhh
+c2h7BjoLbm90aWNlIiZQcm9qZWN0IHdhcyBzdWNjZXNzZnVsbHkgdXBkYXRl
+ZC4GOgpAdXNlZHsGOwdG--a14c39d603b6147388928655bd7bdc942d657b69
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"projects"}
+  [4;36;1mProject Columns (0.002170)[0m   [0;1mSHOW FIELDS FROM `projects`[0m
+  [4;35;1mProject Load (0.000586)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering projects/show
+  [4;36;1mInstitution Load (0.000808)[0m   [0;1mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 1)) [0m
+  [4;35;1mInstitution Columns (0.002061)[0m   [0mSHOW FIELDS FROM `institutions`[0m
+Rendered layouts/_footer (0.00004)
+Completed in 0.02176 (45 reqs/sec) | Rendering: 0.01039 (47%) | DB: 0.00562 (25%) | 200 OK [http://localhost/projects/1]
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000166)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mPerson Columns (0.013573)[0m   [0mSHOW FIELDS FROM `people`[0m
+  [4;36;1mPerson Load (0.000613)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+  [4;35;1mProject Columns (0.012915)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mProject Load (0.000801)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+  [4;35;1mPerson Load (0.000615)[0m   [0mSELECT * FROM `people` [0m
+  [4;36;1mSQL (0.000299)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Create (0.000385)[0m   [0mINSERT INTO `people` (`updated_at`, `created_at`) VALUES('2008-10-20 08:20:50', '2008-10-20 08:20:50')[0m
+  [4;36;1mSQL (0.009883)[0m   [0;1mCOMMIT[0m
+  [4;35;1mInstitution Load (0.000839)[0m   [0mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 1)) [0m
+  [4;36;1mInstitution Columns (0.013561)[0m   [0;1mSHOW FIELDS FROM `institutions`[0m
+  [4;35;1mWorkGroup Load (0.000934)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.project_id = 1) [0m
+  [4;36;1mWorkGroup Columns (0.002810)[0m   [0;1mSHOW FIELDS FROM `work_groups`[0m
+  [4;35;1mWorkGroup Load (0.000892)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.`id` = 1) [0m
+  [4;36;1mSQL (0.000185)[0m   [0;1mBEGIN[0m
+  [4;35;1mpeople_work_groups Columns (0.013844)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mSQL (0.000398)[0m   [0;1mINSERT INTO `people_work_groups` (`work_group_id`, `person_id`) VALUES (1, 1)[0m
+  [4;35;1mSQL (0.000596)[0m   [0mCOMMIT[0m
+  [4;36;1mJoin Table Columns (0.002065)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mWorkGroup Load (0.001035)[0m   [0mSELECT * FROM `work_groups` INNER JOIN `people_work_groups` ON `work_groups`.id = `people_work_groups`.work_group_id WHERE (`people_work_groups`.person_id = 1 ) [0m
+  [4;36;1mSQL (0.000276)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000199)[0m   [0mCOMMIT[0m
