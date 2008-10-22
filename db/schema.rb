@@ -59,9 +59,4 @@ ActiveRecord::Schema.define(:version => 20081020081203) do
     t.integer  "project_id",     :limit => 11
   end
 
-  create_table "work_groups_people", :id => false, :force => true do |t|
-    t.integer "person_id", :limit => 11
-    t.integer "group_id",  :limit => 11
-  end
-
 end

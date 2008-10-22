@@ -1,0 +1,9 @@
+#workgroups
+
+one:
+        project_id: 1
+        institution_id: 1
+
+two:
+        project_id: 2
+        institution_id: 2

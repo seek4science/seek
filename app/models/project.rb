@@ -1,5 +1,5 @@
 class Project < ActiveRecord::Base
-  has_many :work_groups
+  has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
   
   def institutions=(new_institutions)
@@ -13,4 +13,5 @@ class Project < ActiveRecord::Base
       institutions << institution unless institutions.include?(institution)
     end
   end
+  
 end
