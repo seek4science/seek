@@ -18,5 +18,13 @@ class WorkGroupTest < ActiveSupport::TestCase
     #todo how to check message?
     assert_raise(Exception) {wg.destroy}
   end
+  
+  def test_can_destroy_with_no_people  
+    wg=WorkGroup.find(1)
+    wg.people=[]
+    assert wg.people.empty?
+    wg.destroy
+  end
+  
 end
 
