@@ -37,7 +37,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_should_destroy_institution
     assert_difference('Institution.count', -1) do
-      delete :destroy, :id => institutions(:one).id
+      delete :destroy, :id => institutions(:four).id
     end
 
     assert_redirected_to institutions_path

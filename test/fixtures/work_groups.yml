@@ -1,9 +1,16 @@
 #workgroups
 
 one:
+        id: 1
         project_id: 1
         institution_id: 1
 
 two:
+        id: 2
         project_id: 2
         institution_id: 2
+
+three:
+        id: 3
+        project_id: 3
+        institution_id: 3

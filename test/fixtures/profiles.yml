@@ -1,7 +1,7 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  first_name: MyString
+  first_name: MrOne
   last_name: MyString
   email: MyString
   phone: MyString
@@ -10,10 +10,19 @@ one:
   person_id: 1
 
 two:
-  first_name: MyString
+  first_name: MrTwo
   last_name: MyString
   email: MyString
   phone: MyString
   skype_name: MyString
   web_page: MyString
   person_id: 2
+
+three:
+  first_name: MrThree
+  last_name: MyString
+  email: MyString
+  phone: MyString
+  skype_name: MyString
+  web_page: MyString
+  person_id: 3

@@ -11,3 +11,16 @@ two:
   title: Project2
   web_page: MyString
   wiki_page: MyString
+
+three:
+  id: 3
+  title: Project3
+  web_page: MyString
+  wiki_page: MyString
+
+#a project not associated with any Workgroups or People
+four:
+  id: 4
+  title: Project4
+  web_page: MyString
+  wiki_page: MyString

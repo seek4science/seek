@@ -15,3 +15,20 @@ two:
   city: MyString
   web_page: MyString
   country: MyString
+
+three:
+  id: 3
+  name: Institution3
+  address: MyText
+  city: MyString
+  web_page: MyString
+  country: MyString
+
+#an institution not associated with any workgroups or people
+four:
+  id: 4
+  name: Institution4
+  address: MyText
+  city: MyString
+  web_page: MyString
+  country: MyString
