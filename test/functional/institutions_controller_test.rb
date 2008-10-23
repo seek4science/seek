@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class InstitutionsControllerTest < ActionController::TestCase
+  
+  fixtures :institutions
+  
   def test_should_get_index
     get :index
     assert_response :success

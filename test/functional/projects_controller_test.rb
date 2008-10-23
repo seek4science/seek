@@ -2,6 +2,7 @@ require 'test_helper'
 
 class ProjectsControllerTest < ActionController::TestCase
   
+  fixtures :projects
   
   def test_should_get_index
     get :index

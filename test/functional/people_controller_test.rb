@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
+  
+  fixtures :people, :profiles
+  
   def test_should_get_index
     get :index
     assert_response :success
