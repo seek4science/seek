@@ -58,7 +58,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
     @project = Project.find(params[:id])
-    @project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
+    #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
       
     
     respond_to do |format|

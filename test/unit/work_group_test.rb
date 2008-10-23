@@ -26,5 +26,10 @@ class WorkGroupTest < ActiveSupport::TestCase
     wg.destroy
   end
   
+  def test_description
+    wg=work_groups(:one)
+    assert_equal "Project1 at Institution1",wg.description
+  end
+  
 end
 

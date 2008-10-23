@@ -11,4 +11,9 @@ class WorkGroup < ActiveRecord::Base
       raise Exception.new("Cannot delete with associated people. This WorkGroup has "+people.size.to_s+" people associated with it")
     end
   end
+  
+  def description
+    project.title + " at " + institution.name
+  end
+  
 end

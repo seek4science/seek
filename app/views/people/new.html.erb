@@ -1,39 +1,39 @@
-<h1>New person</h1>
 
 <% form_for @person do |f| %>
   <%= f.error_messages %>
   <% fields_for @person.profile do |prof|%>
-  <p>
+  <div id="first_name">
     <%= prof.label :first_name %><br />
     <%= prof.text_field :first_name %>
-  </p>
-  <p>
+  </div>
+  <div id="last_name">
     <%= prof.label :last_name %><br />
     <%= prof.text_field :last_name %>
-  </p>
-  <p>
+  </div>
+  <div id="email">
     <%= prof.label :email %><br />
     <%= prof.text_field :email %>
-  </p>
-  <p>
+  </div>
+  <div id="phone_number">
     <%= prof.label :phone %><br />
     <%= prof.text_field :phone %>
-  </p>
-  <p>
+  </div>
+  <div id="skype_name">
     <%= prof.label :skype_name %><br />
     <%= prof.text_field :skype_name %>
-  </p>
-  <p>
+  </div>
+  <div id="web_page">
     <%= prof.label :web_page %><br />
     <%= prof.text_field :web_page %>
-  </p>
+  </div>
 <% end %>
 
-  <%= f.label :work_groups %>
-  <%= f.select :work_group_ids, work_group_select_choices %>
-  <p>
+<%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
+
+ 
+  
     <%= f.submit "Create" %>
-  </p>
+  
 <% end %>
 
 <%= link_to 'Back', people_path %>
