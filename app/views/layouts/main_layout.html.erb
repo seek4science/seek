@@ -8,34 +8,40 @@
     <%= stylesheet_link_tag 'reset-fonts-grids' %>
     <%= stylesheet_link_tag 'base-min' %>
     <%= stylesheet_link_tag 'my_exp' %>
+    <%= stylesheet_link_tag 'gadgets' %>
     <%= stylesheet_link_tag 'styles'  %>
-                        
+                                        
   </head>
   
   
   
   <body>
-    <p style="color: green"><%= flash[:notice] %></p>
+    <p style="color: green"></p>
     <div id="doc2" class="yui-t4">
       <div id="hd">
         <div id="header">
           <%= render :partial=>"layouts/header" %>
         </div>
         <%= render :partial=>"layouts/tabnav" %>
-        
-        <%= render :partial=>"layouts/search_bar" %>
+        <div id="myexp_searchbar">
+          <%= render :partial=>"layouts/search_bar" %>
+        </div>
       </div>
       <div id="bd">
         <div id="yui-main"> 
           <div class="yui-b">
             <div id="myexp_content">
-              <div class="left"></div>
+              <%= flash[:notice] %>
               <%= yield :layout %>
-              <div class="right"/></div>
+                                                      
             </div>
           </div>
         </div>
+        <div id="myexp_sidebar" class="yui-b">
+          <%= render :partial => "layouts/sidebar" %>
+        </div>
       </div>
-      
+    </div>
+    
   </body>
 </html>

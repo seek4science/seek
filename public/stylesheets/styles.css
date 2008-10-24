@@ -39,8 +39,8 @@ text-align: center;
 }
 
 #header {
-    border:solid black 2px;
-    height: 4em;
+    border:dashed gray 1px;
+    height: 6em;
     position: relative;
     width: 100%;
     text-align: center;

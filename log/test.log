@@ -21966,3 +21966,533 @@ Processing ProjectsController#update (for 0.0.0.0 at 2008-10-24 15:12:46) [PUT]
 Redirected to http://test.host/projects/4
 Completed in 0.00231 (433 reqs/sec) | DB: 0.00137 (59%) | 302 Found [http://test.host/projects/4?]
   [4;36;1mSQL (0.000162)[0m   [0;1mROLLBACK[0m
+Unable to load people_work_group, underlying cause no such file to load -- people_work_group 
+
+ /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+/usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:509:in `require'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:354:in `new_constants_in'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:509:in `require'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:101:in `require_or_load'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:60:in `depend_on'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:456:in `require_dependency'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:855:in `try_to_load_dependency'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:870:in `require_fixture_classes'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:867:in `each'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:867:in `require_fixture_classes'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:850:in `fixtures'
+./test/unit/person_test.rb:4
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:354:in `new_constants_in'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+/usr/local/lib/ruby/gems/1.8/gems/rake-0.8.1/lib/rake/rake_test_loader.rb:5
+/usr/local/lib/ruby/gems/1.8/gems/rake-0.8.1/lib/rake/rake_test_loader.rb:5:in `each'
+/usr/local/lib/ruby/gems/1.8/gems/rake-0.8.1/lib/rake/rake_test_loader.rb:5
+Unable to load people_work_group, underlying cause no such file to load -- people_work_group 
+
+ /usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `gem_original_require'
+/usr/local/lib/ruby/site_ruby/1.8/rubygems/custom_require.rb:27:in `require'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:509:in `require'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:354:in `new_constants_in'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:509:in `require'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:101:in `require_or_load'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:60:in `depend_on'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:456:in `require_dependency'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:855:in `try_to_load_dependency'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:870:in `require_fixture_classes'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:867:in `each'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:867:in `require_fixture_classes'
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.1.0/lib/active_record/fixtures.rb:850:in `fixtures'
+./test/unit/work_group_test.rb:5
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:354:in `new_constants_in'
+/usr/local/lib/ruby/gems/1.8/gems/activesupport-2.1.0/lib/active_support/dependencies.rb:502:in `load'
+/usr/local/lib/ruby/gems/1.8/gems/rake-0.8.1/lib/rake/rake_test_loader.rb:5
+/usr/local/lib/ruby/gems/1.8/gems/rake-0.8.1/lib/rake/rake_test_loader.rb:5:in `each'
+/usr/local/lib/ruby/gems/1.8/gems/rake-0.8.1/lib/rake/rake_test_loader.rb:5
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000193)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000113)[0m   [0mBEGIN[0m
+  [4;36;1mWorkGroup Load (0.000571)[0m   [0;1mSELECT * FROM `work_groups` [0m
+  [4;35;1mInstitution Load (0.000617)[0m   [0mSELECT * FROM `institutions` [0m
+  [4;36;1mInstitution Load (0.000535)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;35;1mSQL (0.000259)[0m   [0mSELECT count(*) AS count_all FROM `work_groups` WHERE (`work_groups`.institution_id = 1) [0m
+  [4;36;1mWorkGroup Load (0.000441)[0m   [0;1mSELECT * FROM `work_groups` WHERE (`work_groups`.institution_id = 1) LIMIT 1[0m
+  [4;35;1mJoin Table Columns (0.001813)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mPerson Load (0.000550)[0m   [0;1mSELECT * FROM `people` INNER JOIN `people_work_groups` ON `people`.id = `people_work_groups`.person_id WHERE (`people_work_groups`.work_group_id = 1 ) [0m
+  [4;35;1mWorkGroup Load (0.000461)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.institution_id = 1) [0m
+  [4;36;1mJoin Table Columns (0.001501)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mPerson Load (0.000417)[0m   [0mSELECT * FROM `people` INNER JOIN `people_work_groups` ON `people`.id = `people_work_groups`.person_id WHERE (`people_work_groups`.work_group_id = 1 ) [0m
+  [4;36;1mWorkGroup Destroy (0.000223)[0m   [0;1m DELETE FROM `work_groups`
+ WHERE `id` = 1
+[0m
+  [4;35;1mInstitution Destroy (0.000175)[0m   [0m DELETE FROM `institutions`
+ WHERE `id` = 1
+[0m
+  [4;36;1mInstitution Load (0.000643)[0m   [0;1mSELECT * FROM `institutions` [0m
+  [4;35;1mWorkGroup Load (0.000482)[0m   [0mSELECT * FROM `work_groups` [0m
+  [4;36;1mSQL (0.000708)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000112)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000104)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000112)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000136)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000130)[0m   [0mBEGIN[0m
+  [4;36;1mWorkGroup Load (0.000535)[0m   [0;1mSELECT * FROM `work_groups` [0m
+  [4;35;1mProject Load (0.000478)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 2) [0m
+  [4;36;1mSQL (0.000263)[0m   [0;1mSELECT count(*) AS count_all FROM `work_groups` WHERE (`work_groups`.project_id = 2) [0m
+  [4;35;1mWorkGroup Load (0.000504)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.project_id = 2) LIMIT 1[0m
+  [4;36;1mJoin Table Columns (0.001610)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mPerson Load (0.000488)[0m   [0mSELECT * FROM `people` INNER JOIN `people_work_groups` ON `people`.id = `people_work_groups`.person_id WHERE (`people_work_groups`.work_group_id = 2 ) [0m
+  [4;36;1mSQL (0.000209)[0m   [0;1mDELETE FROM `people_work_groups` WHERE work_group_id = 2 AND person_id IN (2)[0m
+  [4;35;1mWorkGroup Load (0.000459)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.project_id = 2) [0m
+  [4;36;1mJoin Table Columns (0.001501)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mPerson Load (0.000481)[0m   [0mSELECT * FROM `people` INNER JOIN `people_work_groups` ON `people`.id = `people_work_groups`.person_id WHERE (`people_work_groups`.work_group_id = 2 ) [0m
+  [4;36;1mWorkGroup Destroy (0.000205)[0m   [0;1m DELETE FROM `work_groups`
+ WHERE `id` = 2
+[0m
+  [4;35;1mProject Destroy (0.000197)[0m   [0m DELETE FROM `projects`
+ WHERE `id` = 2
+[0m
+  [4;36;1mWorkGroup Load (0.000510)[0m   [0;1mSELECT * FROM `work_groups` [0m
+  [4;35;1mWorkGroup Load (0.000455)[0m   [0mSELECT * FROM `work_groups` [0m
+  [4;36;1mSQL (0.000621)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000137)[0m   [0mBEGIN[0m
+  [4;36;1mWorkGroup Load (0.000550)[0m   [0;1mSELECT * FROM `work_groups` WHERE (`work_groups`.`id` = 1) [0m
+  [4;35;1mJoin Table Columns (0.001579)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mPerson Load (0.000518)[0m   [0;1mSELECT * FROM `people` INNER JOIN `people_work_groups` ON `people`.id = `people_work_groups`.person_id WHERE (`people_work_groups`.work_group_id = 1 ) [0m
+  [4;35;1mSQL (0.000207)[0m   [0mDELETE FROM `people_work_groups` WHERE work_group_id = 1 AND person_id IN (1,3)[0m
+  [4;36;1mWorkGroup Destroy (0.000177)[0m   [0;1m DELETE FROM `work_groups`
+ WHERE `id` = 1
+[0m
+  [4;35;1mSQL (0.000580)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000112)[0m   [0;1mBEGIN[0m
+  [4;35;1mWorkGroup Load (0.000454)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.`id` = 1) [0m
+  [4;36;1mJoin Table Columns (0.002598)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mPerson Load (0.000851)[0m   [0mSELECT * FROM `people` INNER JOIN `people_work_groups` ON `people`.id = `people_work_groups`.person_id WHERE (`people_work_groups`.work_group_id = 1 ) [0m
+  [4;36;1mJoin Table Columns (0.002122)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mWorkGroup Load (0.001693)[0m   [0mSELECT * FROM `work_groups` INNER JOIN `people_work_groups` ON `work_groups`.id = `people_work_groups`.work_group_id WHERE (`people_work_groups`.person_id = 3 ) [0m
+  [4;36;1mSQL (0.000235)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000165)[0m   [0mBEGIN[0m
+  [4;36;1mWorkGroup Load (0.000735)[0m   [0;1mSELECT * FROM `work_groups` WHERE (`work_groups`.`id` = 1) [0m
+  [4;35;1mProject Load (0.000793)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+  [4;36;1mInstitution Load (0.000607)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;35;1mSQL (0.000149)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000109)[0m   [0;1mBEGIN[0m
+  [4;35;1mWorkGroup Load (0.000600)[0m   [0mSELECT * FROM `work_groups` WHERE (`work_groups`.`id` = 1) [0m
+  [4;36;1mJoin Table Columns (0.001689)[0m   [0;1mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;35;1mPerson Load (0.000522)[0m   [0mSELECT * FROM `people` INNER JOIN `people_work_groups` ON `people`.id = `people_work_groups`.person_id WHERE (`people_work_groups`.work_group_id = 1 ) [0m
+  [4;36;1mSQL (0.000147)[0m   [0;1mROLLBACK[0m
+WARNING: You're using the Ruby-based MySQL library that ships with Rails. This library is not suited for production. Please install the C-based MySQL library instead (gem install mysql).
+  [4;36;1mSQL (0.000198)[0m   [0;1mSET SQL_AUTO_IS_NULL=0[0m
+  [4;35;1mSQL (0.000111)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000157)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000181)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000463)[0m   [0;1mSELECT count(*) AS count_all FROM `institutions` [0m
+
+
+Processing InstitutionsController#create (for 0.0.0.0 at 2008-10-24 16:39:09) [POST]
+  Session ID: 
+  Parameters: {"institution"=>{}, "action"=>"create", "controller"=>"institutions"}
+  [4;35;1mInstitution Create (0.000353)[0m   [0mINSERT INTO `institutions` (`name`, `city`, `updated_at`, `country`, `web_page`, `address`, `created_at`) VALUES(NULL, NULL, '2008-10-24 15:39:09', NULL, NULL, NULL, '2008-10-24 15:39:09')[0m
+Redirected to http://test.host/institutions/5
+Completed in 0.00643 (155 reqs/sec) | DB: 0.05451 (847%) | 302 Found [http://test.host/institutions?]
+  [4;36;1mSQL (0.000293)[0m   [0;1mSELECT count(*) AS count_all FROM `institutions` [0m
+  [4;35;1mSQL (0.001171)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000259)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000547)[0m   [0mSELECT count(*) AS count_all FROM `institutions` [0m
+  [4;36;1mInstitution Load (0.000903)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 4) [0m
+
+
+Processing InstitutionsController#destroy (for 0.0.0.0 at 2008-10-24 16:39:09) [DELETE]
+  Session ID: 
+  Parameters: {"action"=>"destroy", "id"=>"4", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000817)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 4) [0m
+  [4;36;1mWorkGroup Load (0.000645)[0m   [0;1mSELECT * FROM `work_groups` WHERE (`work_groups`.institution_id = 4) [0m
+  [4;35;1mInstitution Destroy (0.000209)[0m   [0m DELETE FROM `institutions`
+ WHERE `id` = 4
+[0m
+Redirected to http://test.host/institutions
+Completed in 0.00803 (124 reqs/sec) | DB: 0.00484 (60%) | 302 Found [http://test.host/institutions/4]
+  [4;36;1mSQL (0.000249)[0m   [0;1mSELECT count(*) AS count_all FROM `institutions` [0m
+  [4;35;1mSQL (0.000586)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000129)[0m   [0;1mBEGIN[0m
+  [4;35;1mInstitution Load (0.000642)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+
+
+Processing InstitutionsController#edit (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"edit", "id"=>"1", "controller"=>"institutions"}
+  [4;36;1mInstitution Load (0.000572)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering institutions/edit
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00047)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00819 (122 reqs/sec) | Rendering: 0.00727 (88%) | DB: 0.00218 (26%) | 200 OK [http://test.host/institutions/1/edit]
+  [4;35;1mSQL (0.000197)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000132)[0m   [0;1mBEGIN[0m
+
+
+Processing InstitutionsController#index (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"index", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000747)[0m   [0mSELECT * FROM `institutions` [0m
+Rendering template within layouts/main_layout
+Rendering institutions/index
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00017)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00448 (223 reqs/sec) | Rendering: 0.00319 (71%) | DB: 0.00108 (24%) | 200 OK [http://test.host/institutions]
+  [4;36;1mSQL (0.000155)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000110)[0m   [0mBEGIN[0m
+
+
+Processing InstitutionsController#new (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"new", "controller"=>"institutions"}
+Rendering template within layouts/main_layout
+Rendering institutions/new
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00023)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00430 (232 reqs/sec) | Rendering: 0.00399 (92%) | DB: 0.00027 (6%) | 200 OK [http://test.host/institutions/new]
+  [4;36;1mSQL (0.000402)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000121)[0m   [0mBEGIN[0m
+  [4;36;1mInstitution Load (0.000713)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+
+
+Processing InstitutionsController#show (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.001030)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering institutions/show
+Rendered layouts/_header (0.00002)
+Rendered layouts/_tabnav (0.00023)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00400 (250 reqs/sec) | Rendering: 0.00239 (59%) | DB: 0.00227 (56%) | 200 OK [http://test.host/institutions/1]
+  [4;36;1mSQL (0.000183)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000113)[0m   [0mBEGIN[0m
+  [4;36;1mInstitution Load (0.000621)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+
+
+Processing InstitutionsController#update (for 0.0.0.0 at 2008-10-24 16:39:09) [PUT]
+  Session ID: 
+  Parameters: {"institution"=>{}, "action"=>"update", "id"=>"1", "controller"=>"institutions"}
+  [4;35;1mInstitution Load (0.000574)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+Redirected to http://test.host/institutions/1
+Completed in 0.00172 (580 reqs/sec) | DB: 0.00149 (86%) | 302 Found [http://test.host/institutions/1?]
+  [4;36;1mSQL (0.000157)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000114)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000332)[0m   [0;1mSELECT count(*) AS count_all FROM `people` [0m
+
+
+Processing PeopleController#create (for 0.0.0.0 at 2008-10-24 16:39:09) [POST]
+  Session ID: 
+  Parameters: {"action"=>"create", "controller"=>"people", "person"=>{}}
+  [4;35;1mPerson Create (0.000299)[0m   [0mINSERT INTO `people` (`updated_at`, `created_at`) VALUES('2008-10-24 15:39:09', '2008-10-24 15:39:09')[0m
+  [4;36;1mProfile Create (0.000311)[0m   [0;1mINSERT INTO `profiles` (`updated_at`, `skype_name`, `phone`, `first_name`, `web_page`, `last_name`, `person_id`, `email`, `created_at`) VALUES('2008-10-24 15:39:09', NULL, NULL, NULL, NULL, NULL, 4, NULL, '2008-10-24 15:39:09')[0m
+Redirected to http://test.host/people/4
+Completed in 0.00726 (137 reqs/sec) | DB: 0.01190 (163%) | 302 Found [http://test.host/people?]
+  [4;35;1mSQL (0.000417)[0m   [0mSELECT count(*) AS count_all FROM `people` [0m
+  [4;36;1mSQL (0.000676)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000113)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000267)[0m   [0;1mSELECT count(*) AS count_all FROM `people` [0m
+  [4;35;1mPerson Load (0.000341)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+
+
+Processing PeopleController#destroy (for 0.0.0.0 at 2008-10-24 16:39:09) [DELETE]
+  Session ID: 
+  Parameters: {"action"=>"destroy", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000355)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+  [4;35;1mJoin Table Columns (0.001619)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mWorkGroup Load (0.000725)[0m   [0;1mSELECT * FROM `work_groups` INNER JOIN `people_work_groups` ON `work_groups`.id = `people_work_groups`.work_group_id WHERE (`people_work_groups`.person_id = 1 ) [0m
+  [4;35;1mWorkGroup Columns (0.001769)[0m   [0mSHOW FIELDS FROM `work_groups`[0m
+  [4;36;1mSQL (0.000231)[0m   [0;1mDELETE FROM `people_work_groups` WHERE person_id = 1 AND work_group_id IN (1)[0m
+  [4;35;1mPerson Destroy (0.000169)[0m   [0m DELETE FROM `people`
+ WHERE `id` = 1
+[0m
+Redirected to http://test.host/people
+Completed in 0.00767 (130 reqs/sec) | DB: 0.00668 (87%) | 302 Found [http://test.host/people/1]
+  [4;36;1mSQL (0.000290)[0m   [0;1mSELECT count(*) AS count_all FROM `people` [0m
+  [4;35;1mSQL (0.000622)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000273)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Load (0.000821)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+
+
+Processing PeopleController#edit (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"edit", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000692)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering people/edit
+  [4;35;1mProfile Load (0.001054)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mWorkGroup Load (0.000852)[0m   [0;1mSELECT * FROM `work_groups` [0m
+  [4;35;1mJoin Table Columns (0.002281)[0m   [0mSHOW FIELDS FROM `people_work_groups`[0m
+  [4;36;1mWorkGroup Load (0.000969)[0m   [0;1mSELECT * FROM `work_groups` INNER JOIN `people_work_groups` ON `work_groups`.id = `people_work_groups`.work_group_id WHERE (`people_work_groups`.person_id = 1 ) [0m
+  [4;35;1mProject Columns (0.002290)[0m   [0mSHOW FIELDS FROM `projects`[0m
+  [4;36;1mProject Load (0.000762)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+  [4;35;1mInstitution Load (0.001034)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;36;1mProject Load (0.000835)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 2) [0m
+  [4;35;1mInstitution Load (0.000572)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 2) [0m
+  [4;36;1mProject Load (0.000596)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;35;1mInstitution Load (0.000539)[0m   [0mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 3) [0m
+Rendered people/_work_groups (0.01639)
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00023)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.02676 (37 reqs/sec) | Rendering: 0.01368 (51%) | DB: 0.01448 (54%) | 200 OK [http://test.host/people/1/edit]
+  [4;36;1mSQL (0.000176)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000139)[0m   [0mBEGIN[0m
+
+
+Processing PeopleController#index (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"index", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000430)[0m   [0;1mSELECT * FROM `people` [0m
+Rendering template within layouts/main_layout
+Rendering people/index
+  [4;35;1mProfile Load (0.000680)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+  [4;36;1mProfile Load (0.000627)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 2) LIMIT 1[0m
+  [4;35;1mProfile Load (0.000613)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 3) LIMIT 1[0m
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00017)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00684 (146 reqs/sec) | Rendering: 0.00401 (58%) | DB: 0.00266 (38%) | 200 OK [http://test.host/people]
+  [4;36;1mSQL (0.000154)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000133)[0m   [0mBEGIN[0m
+
+
+Processing PeopleController#new (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"new", "controller"=>"people"}
+Rendering template within layouts/main_layout
+Rendering people/new
+  [4;36;1mWorkGroup Load (0.000655)[0m   [0;1mSELECT * FROM `work_groups` [0m
+  [4;35;1mProject Load (0.000610)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 1) [0m
+  [4;36;1mInstitution Load (0.000577)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 1) [0m
+  [4;35;1mProject Load (0.000480)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 2) [0m
+  [4;36;1mInstitution Load (0.000536)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 2) [0m
+  [4;35;1mProject Load (0.000439)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 3) [0m
+  [4;36;1mInstitution Load (0.000518)[0m   [0;1mSELECT * FROM `institutions` WHERE (`institutions`.`id` = 3) [0m
+Rendered people/_work_groups (0.00586)
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00019)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.01116 (89 reqs/sec) | Rendering: 0.00694 (62%) | DB: 0.00410 (36%) | 200 OK [http://test.host/people/new]
+  [4;35;1mSQL (0.000167)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000122)[0m   [0;1mBEGIN[0m
+  [4;35;1mPerson Load (0.000385)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+
+
+Processing PeopleController#show (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"show", "id"=>"1", "controller"=>"people"}
+  [4;36;1mPerson Load (0.000368)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+Rendering template within layouts/main_layout
+Rendering people/show
+  [4;35;1mProfile Load (0.000666)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00019)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00450 (222 reqs/sec) | Rendering: 0.00301 (66%) | DB: 0.00171 (37%) | 200 OK [http://test.host/people/1]
+  [4;36;1mSQL (0.000179)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000117)[0m   [0mBEGIN[0m
+  [4;36;1mPerson Load (0.000372)[0m   [0;1mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+
+
+Processing PeopleController#update (for 0.0.0.0 at 2008-10-24 16:39:09) [PUT]
+  Session ID: 
+  Parameters: {"action"=>"update", "id"=>"1", "controller"=>"people", "person"=>{}}
+  [4;35;1mPerson Load (0.000366)[0m   [0mSELECT * FROM `people` WHERE (`people`.`id` = 1) [0m
+  [4;36;1mProfile Load (0.000630)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.person_id = 1) LIMIT 1[0m
+Redirected to http://test.host/people/1
+Completed in 0.00328 (304 reqs/sec) | DB: 0.00166 (50%) | 302 Found [http://test.host/people/1?]
+  [4;35;1mSQL (0.000704)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000130)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000342)[0m   [0mSELECT count(*) AS count_all FROM `profiles` [0m
+
+
+Processing ProfilesController#create (for 0.0.0.0 at 2008-10-24 16:39:09) [POST]
+  Session ID: 
+  Parameters: {"profile"=>{}, "action"=>"create", "controller"=>"profiles"}
+  [4;36;1mProfile Create (0.000308)[0m   [0;1mINSERT INTO `profiles` (`updated_at`, `skype_name`, `phone`, `first_name`, `web_page`, `last_name`, `person_id`, `email`, `created_at`) VALUES('2008-10-24 15:39:09', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2008-10-24 15:39:09')[0m
+Redirected to http://test.host/profiles/996332879
+Completed in 0.00352 (284 reqs/sec) | DB: 0.00148 (42%) | 302 Found [http://test.host/profiles?]
+  [4;35;1mSQL (0.000295)[0m   [0mSELECT count(*) AS count_all FROM `profiles` [0m
+  [4;36;1mSQL (0.000611)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000139)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000280)[0m   [0;1mSELECT count(*) AS count_all FROM `profiles` [0m
+  [4;35;1mProfile Load (0.000677)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+
+
+Processing ProfilesController#destroy (for 0.0.0.0 at 2008-10-24 16:39:09) [DELETE]
+  Session ID: 
+  Parameters: {"action"=>"destroy", "id"=>"953125641", "controller"=>"profiles"}
+  [4;36;1mProfile Load (0.000791)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+  [4;35;1mProfile Destroy (0.000226)[0m   [0m DELETE FROM `profiles`
+ WHERE `id` = 953125641
+[0m
+Redirected to http://test.host/profiles
+Completed in 0.00182 (550 reqs/sec) | DB: 0.00302 (166%) | 302 Found [http://test.host/profiles/953125641]
+  [4;36;1mSQL (0.000307)[0m   [0;1mSELECT count(*) AS count_all FROM `profiles` [0m
+  [4;35;1mSQL (0.000653)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000111)[0m   [0;1mBEGIN[0m
+  [4;35;1mProfile Load (0.000702)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+
+
+Processing ProfilesController#edit (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"edit", "id"=>"953125641", "controller"=>"profiles"}
+  [4;36;1mProfile Load (0.000734)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+Rendering template within layouts/profiles
+Rendering profiles/edit
+Completed in 0.00624 (160 reqs/sec) | Rendering: 0.00514 (82%) | DB: 0.00251 (40%) | 200 OK [http://test.host/profiles/953125641/edit]
+  [4;35;1mSQL (0.000195)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000149)[0m   [0;1mBEGIN[0m
+
+
+Processing ProfilesController#index (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"index", "controller"=>"profiles"}
+  [4;35;1mProfile Load (0.000779)[0m   [0mSELECT * FROM `profiles` [0m
+Rendering template within layouts/profiles
+Rendering profiles/index
+Completed in 0.00381 (262 reqs/sec) | Rendering: 0.00252 (66%) | DB: 0.00112 (29%) | 200 OK [http://test.host/profiles]
+  [4;36;1mSQL (0.000183)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000140)[0m   [0mBEGIN[0m
+
+
+Processing ProfilesController#new (for 0.0.0.0 at 2008-10-24 16:39:09) [GET]
+  Session ID: 
+  Parameters: {"action"=>"new", "controller"=>"profiles"}
+Rendering template within layouts/profiles
+Rendering profiles/new
+Completed in 0.07449 (13 reqs/sec) | Rendering: 0.07411 (99%) | DB: 0.00032 (0%) | 200 OK [http://test.host/profiles/new]
+  [4;36;1mSQL (0.000243)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000119)[0m   [0mBEGIN[0m
+  [4;36;1mProfile Load (0.000748)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+
+
+Processing ProfilesController#show (for 0.0.0.0 at 2008-10-24 16:39:10) [GET]
+  Session ID: 
+  Parameters: {"action"=>"show", "id"=>"953125641", "controller"=>"profiles"}
+  [4;35;1mProfile Load (0.000723)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+Rendering template within layouts/profiles
+Rendering profiles/show
+Completed in 0.00295 (338 reqs/sec) | Rendering: 0.00170 (57%) | DB: 0.00183 (62%) | 200 OK [http://test.host/profiles/953125641]
+  [4;36;1mSQL (0.000190)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000116)[0m   [0mBEGIN[0m
+  [4;36;1mProfile Load (0.000678)[0m   [0;1mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+
+
+Processing ProfilesController#update (for 0.0.0.0 at 2008-10-24 16:39:10) [PUT]
+  Session ID: 
+  Parameters: {"profile"=>{}, "action"=>"update", "id"=>"953125641", "controller"=>"profiles"}
+  [4;35;1mProfile Load (0.000670)[0m   [0mSELECT * FROM `profiles` WHERE (`profiles`.`id` = 953125641) [0m
+Redirected to http://test.host/profiles/953125641
+Completed in 0.00195 (513 reqs/sec) | DB: 0.00165 (84%) | 302 Found [http://test.host/profiles/953125641?]
+  [4;36;1mSQL (0.000203)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000114)[0m   [0mBEGIN[0m
+  [4;36;1mSQL (0.000360)[0m   [0;1mSELECT count(*) AS count_all FROM `projects` [0m
+
+
+Processing ProjectsController#create (for 0.0.0.0 at 2008-10-24 16:39:10) [POST]
+  Session ID: 
+  Parameters: {"project"=>{}, "action"=>"create", "controller"=>"projects"}
+  [4;35;1mProject Create (0.000284)[0m   [0mINSERT INTO `projects` (`updated_at`, `title`, `web_page`, `wiki_page`, `created_at`) VALUES('2008-10-24 15:39:10', NULL, NULL, NULL, '2008-10-24 15:39:10')[0m
+Redirected to http://test.host/projects/5
+Completed in 0.00359 (278 reqs/sec) | DB: 0.00526 (146%) | 302 Found [http://test.host/projects?]
+  [4;36;1mSQL (0.000309)[0m   [0;1mSELECT count(*) AS count_all FROM `projects` [0m
+  [4;35;1mSQL (0.000971)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000150)[0m   [0;1mBEGIN[0m
+  [4;35;1mSQL (0.000295)[0m   [0mSELECT count(*) AS count_all FROM `projects` [0m
+  [4;36;1mProject Load (0.000486)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+
+
+Processing ProjectsController#destroy (for 0.0.0.0 at 2008-10-24 16:39:10) [DELETE]
+  Session ID: 
+  Parameters: {"action"=>"destroy", "id"=>"4", "controller"=>"projects"}
+  [4;35;1mProject Load (0.000505)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+  [4;36;1mWorkGroup Load (0.000474)[0m   [0;1mSELECT * FROM `work_groups` WHERE (`work_groups`.project_id = 4) [0m
+  [4;35;1mProject Destroy (0.000220)[0m   [0m DELETE FROM `projects`
+ WHERE `id` = 4
+[0m
+Redirected to http://test.host/projects
+Completed in 0.00250 (399 reqs/sec) | DB: 0.00341 (136%) | 302 Found [http://test.host/projects/4]
+  [4;36;1mSQL (0.000293)[0m   [0;1mSELECT count(*) AS count_all FROM `projects` [0m
+  [4;35;1mSQL (0.000725)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000347)[0m   [0;1mBEGIN[0m
+  [4;35;1mProject Load (0.000812)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+
+
+Processing ProjectsController#edit (for 0.0.0.0 at 2008-10-24 16:39:10) [GET]
+  Session ID: 
+  Parameters: {"action"=>"edit", "id"=>"4", "controller"=>"projects"}
+  [4;36;1mProject Load (0.000777)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+Rendering template within layouts/main_layout
+Rendering projects/edit
+  [4;35;1mInstitution Load (0.001060)[0m   [0mSELECT * FROM `institutions` [0m
+  [4;36;1mInstitution Load (0.000969)[0m   [0;1mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 4)) [0m
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00028)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.01036 (96 reqs/sec) | Rendering: 0.00703 (67%) | DB: 0.00498 (48%) | 200 OK [http://test.host/projects/4/edit]
+  [4;35;1mSQL (0.000249)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000169)[0m   [0;1mBEGIN[0m
+
+
+Processing ProjectsController#index (for 0.0.0.0 at 2008-10-24 16:39:10) [GET]
+  Session ID: 
+  Parameters: {"action"=>"index", "controller"=>"projects"}
+  [4;35;1mProject Load (0.000881)[0m   [0mSELECT * FROM `projects` [0m
+Rendering template within layouts/main_layout
+Rendering projects/index
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00025)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00612 (163 reqs/sec) | Rendering: 0.00451 (73%) | DB: 0.00130 (21%) | 200 OK [http://test.host/projects]
+  [4;36;1mSQL (0.000238)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000167)[0m   [0mBEGIN[0m
+
+
+Processing ProjectsController#new (for 0.0.0.0 at 2008-10-24 16:39:10) [GET]
+  Session ID: 
+  Parameters: {"action"=>"new", "controller"=>"projects"}
+Rendering template within layouts/main_layout
+Rendering projects/new
+  [4;36;1mInstitution Load (0.000978)[0m   [0;1mSELECT * FROM `institutions` [0m
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00028)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00751 (133 reqs/sec) | Rendering: 0.00611 (81%) | DB: 0.00138 (18%) | 200 OK [http://test.host/projects/new]
+  [4;35;1mSQL (0.000272)[0m   [0mROLLBACK[0m
+  [4;36;1mSQL (0.000141)[0m   [0;1mBEGIN[0m
+  [4;35;1mProject Load (0.000602)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+
+
+Processing ProjectsController#show (for 0.0.0.0 at 2008-10-24 16:39:10) [GET]
+  Session ID: 
+  Parameters: {"action"=>"show", "id"=>"4", "controller"=>"projects"}
+  [4;36;1mProject Load (0.000582)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+Rendering template within layouts/main_layout
+Rendering projects/show
+  [4;35;1mInstitution Load (0.000634)[0m   [0mSELECT `institutions`.* FROM `institutions` INNER JOIN work_groups ON institutions.id = work_groups.institution_id WHERE ((`work_groups`.project_id = 4)) [0m
+Rendered layouts/_header (0.00001)
+Rendered layouts/_tabnav (0.00023)
+Rendered layouts/_search_bar (0.00001)
+Completed in 0.00456 (219 reqs/sec) | Rendering: 0.00280 (61%) | DB: 0.00223 (48%) | 200 OK [http://test.host/projects/4]
+  [4;36;1mSQL (0.000170)[0m   [0;1mROLLBACK[0m
+  [4;35;1mSQL (0.000112)[0m   [0mBEGIN[0m
+  [4;36;1mProject Load (0.000493)[0m   [0;1mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+
+
+Processing ProjectsController#update (for 0.0.0.0 at 2008-10-24 16:39:10) [PUT]
+  Session ID: 
+  Parameters: {"project"=>{}, "action"=>"update", "id"=>"4", "controller"=>"projects"}
+  [4;35;1mProject Load (0.000493)[0m   [0mSELECT * FROM `projects` WHERE (`projects`.`id` = 4) [0m
+Redirected to http://test.host/projects/4
+Completed in 0.00161 (622 reqs/sec) | DB: 0.00127 (78%) | 302 Found [http://test.host/projects/4?]
+  [4;36;1mSQL (0.000159)[0m   [0;1mROLLBACK[0m
