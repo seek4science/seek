@@ -21,24 +21,9 @@
         <div id="header">
           <%= render :partial=>"layouts/header" %>
         </div>
-        <div>
-          <ul class="tabnav">
-            <!-- People tab -->
-            <li <%= (["people"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-              <%= link_to "People", people_url -%>
-              </li>
-            <!-- Projects tab -->
-            <li <%= (["projects"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-              <%= link_to "Projects", projects_url -%>
-              </li>
-            <!-- Institutions tab -->
-            <li <%= (["institutions"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-              <%= link_to "Institutions", institutions_url -%>
-              </li>
-          </ul>
-        </div>
+        <%= render :partial=>"layouts/tabnav" %>
         
-        <div id="myexp_searchbar"></div>
+        <%= render :partial=>"layouts/search_bar" %>
       </div>
       <div id="bd">
         <div id="yui-main"> 
