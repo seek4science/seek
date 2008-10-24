@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081020081203) do
+ActiveRecord::Schema.define(:version => 20081024140357) do
 
   create_table "institutions", :force => true do |t|
     t.string   "name"
@@ -53,10 +53,10 @@ ActiveRecord::Schema.define(:version => 20081020081203) do
 
   create_table "work_groups", :force => true do |t|
     t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.integer  "institution_id", :limit => 11
     t.integer  "project_id",     :limit => 11
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end
