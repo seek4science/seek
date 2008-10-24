@@ -1,9 +1,12 @@
 syntax: glob
 *.svn
 db/test.sqlite3
+db/development.sqlite3
 *.DS_Store
 
 \.orig$
 \.orig\..*$
 \.chg\..*$
 \.rej$
+log/*.log
+
