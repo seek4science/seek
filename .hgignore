@@ -3,3 +3,7 @@ syntax: glob
 db/test.sqlite3
 *.DS_Store
 
+\.orig$
+\.orig\..*$
+\.chg\..*$
+\.rej$

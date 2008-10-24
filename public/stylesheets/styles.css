@@ -1,4 +1,13 @@
-
+body {
+	background: #8e8e8e url('/images/body-bg.gif') repeat-y center;
+	/* Only need to define one font here because the 
+	   YUI Fonts CSS provides a degradation path
+	   (see: http://developer.yahoo.com/yui/fonts/) */
+	font-family: arial;
+	/*background-color: #FFFFFF;*/
+	
+	line-height: 1.0;
+}
 
 #errorExplanation {
   width: 400px;
