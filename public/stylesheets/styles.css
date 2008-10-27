@@ -1,13 +1,4 @@
-body {
-	background: #8e8e8e url('/images/body-bg.gif') repeat-y center;
-	/* Only need to define one font here because the 
-	   YUI Fonts CSS provides a degradation path
-	   (see: http://developer.yahoo.com/yui/fonts/) */
-	font-family: arial;
-	/*background-color: #FFFFFF;*/
-	
-	line-height: 1.0;
-}
+
 
 #errorExplanation {
   width: 400px;
@@ -39,14 +30,6 @@ body {
   list-style: square;
 }
 
-
-#development_links {
-width:100%;
-background-color:lightgray;
-top: 5px;
-text-align: center;
-}
-
 #header {
     border:dashed gray 1px;
     height: 6em;
@@ -70,6 +53,10 @@ text-align: center;
 	padding-left: 0.5em;
 	margin-top: 1em;
 	margin-bottom: 3em;
+}
+
+#bd {
+    background-color: #FAFAFA;
 }
 
 

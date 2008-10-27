@@ -9,3 +9,11 @@ two:
 three:
         person_id: 3
         work_group_id: 1
+
+four:
+        person_id: 1
+        work_group_id: 3
+
+five:
+        person_id: 2
+        work_group_id: 4

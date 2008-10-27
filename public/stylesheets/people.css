@@ -1,11 +1,32 @@
-#person {
-    background-color: yellow;
+#person_list_item {
+    background-color: #DDDDDD;
+    margin: 5px;
+    padding: 5px;
+    padding-left: 1em;
+    border: #999999 solid 1px;
+    font-size: 1.1em;
 }
 
-div#name {
-    font-size: 2em;
+#person_list_item #avatar {
+ visibility: hidden;   
 }
 
-div#first_name {
+#person_list_item #name {
+    font-size: 1.5em;
+    position: relative;
+    text-align: center;
+}
+
+#person_list_item ul {margin: 0;  padding: 0;}
+
+#person_list_item li {
     
+    list-style-type:none;
+    margin: 0px 0px 0px 0px;
+    padding: 0 0 0 1em;
+    white-space:nowrap;
+}
+
+#person_list_item label {
+    font-weight: 500;
 }

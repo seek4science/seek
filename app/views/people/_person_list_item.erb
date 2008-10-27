@@ -1,0 +1,56 @@
+<% person=person_list_item %>
+<% profile = person.profile %>
+
+<div id="person_list_item">
+  <div id="avatar">
+    <%= link_to "XXX",url_for(person) %>
+  </div>
+  
+  <div id="name">
+    <%=  link_to  h(person_full_name(person)),url_for(person) %>
+  </div>
+  
+  <div id="email">
+  <% unless profile.email.nil? or profile.email.empty? %>
+  
+    <label>Email: </label>
+    <%= mail_to h(profile.email) %>
+  
+  <% end  %>
+  </div>
+
+  <% unless profile.web_page.nil? or profile.web_page.empty? %>
+  <div id="web_page">
+    <label>Webpage:</label>
+    <%= link_to h(profile.web_page), h(profile.web_page) %>
+   </div>
+  <% end  %>
+
+  <% unless profile.skype_name.nil? or profile.skype_name.empty? %>
+    <div id="skype_name">
+      <label>Skype:</label>
+      <%= h profile.skype_name %>
+    </div>
+  <% end  %>
+
+  <div id="institutions">
+    <ul><label>Institutions:</label>
+    <% for institution in person.institutions %>
+        <li>
+                <%= link_to h(institution.name),url_for(institution) %>
+            </li>
+    <% end  %>
+    </ul>
+  </div>
+  <div id="projects">
+    <ul><label>Projects:</label>
+    <% for project in person.projects %>
+        <li>
+          <%= link_to h(project.title), url_for(project) %>
+        </li>
+    <% end  %>
+    </ul>
+  </div>
+ 
+  
+</div>

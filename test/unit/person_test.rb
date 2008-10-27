@@ -5,6 +5,22 @@ class PersonTest < ActiveSupport::TestCase
   
   # Replace this with your real tests.
   def test_work_groups
-    assert true
+    p=people(:one)
+    assert_equal 2,p.work_groups.size
+  end
+  
+  def test_institutions
+    p=people(:one)
+    assert_equal 2,p.institutions.size
+    
+    p=people(:two)
+    assert_equal 2,p.work_groups.size
+    assert_equal 2,p.projects.size
+    assert_equal 1,p.institutions.size
+  end
+  
+  def test_projects
+    p=people(:one)
+    assert_equal 2,p.projects.size
   end
 end
