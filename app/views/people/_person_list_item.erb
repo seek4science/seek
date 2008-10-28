@@ -2,13 +2,17 @@
 <% profile = person.profile %>
 
 <div id="person_list_item">
-  <div id="avatar">
-    <%= link_to "XXX",url_for(person) %>
-  </div>
   
+  <div id="avatar">
+    <%= image_tag person_avatar_image(person),{:size=>"50x60"} %>
+  </div>
+
+  <div id="details">
+
   <div id="name">
     <%=  link_to  h(person_full_name(person)),url_for(person) %>
   </div>
+
   
   <div id="email">
   <% unless profile.email.nil? or profile.email.empty? %>
@@ -34,6 +38,7 @@
   <% end  %>
 
   <div id="institutions">
+    <% unless person.institutions.empty? %>
     <ul><label>Institutions:</label>
     <% for institution in person.institutions %>
         <li>
@@ -41,8 +46,11 @@
             </li>
     <% end  %>
     </ul>
+    <% end  %>
   </div>
+
   <div id="projects">
+      <% unless person.projects.empty? %>
     <ul><label>Projects:</label>
     <% for project in person.projects %>
         <li>
@@ -50,7 +58,7 @@
         </li>
     <% end  %>
     </ul>
+    <% end  %>
   </div>
- 
-  
+</div>
 </div>

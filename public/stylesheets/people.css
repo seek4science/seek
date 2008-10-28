@@ -5,16 +5,26 @@
     padding-left: 1em;
     border: #999999 solid 1px;
     font-size: 1.1em;
+    min-height: 90px;
 }
 
 #person_list_item #avatar {
- visibility: hidden;   
+    border: black solid 1px;   
+    margin: 1em 1em 1em 1em;
+    float: left;
 }
 
 #person_list_item #name {
     font-size: 1.5em;
-    position: relative;
-    text-align: center;
+    padding-bottom: 0.25em;
+    margin-bottom: 0.25em;
+    border-bottom: black dotted 1px;
+}
+
+#person_list_item #details {
+    margin-left: 100px;
+    padding-left: 1em;
+    border-left: black dotted 1px;  
 }
 
 #person_list_item ul {margin: 0;  padding: 0;}
