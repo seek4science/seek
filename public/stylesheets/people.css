@@ -8,10 +8,14 @@
     min-height: 90px;
 }
 
-#person_list_item #avatar {
-    border: black solid 1px;   
+#person_list_item #avatar_pane {
     margin: 1em 1em 1em 1em;
     float: left;
+}
+
+#person_list_item #avatar {
+    border: black solid 1px;   
+    max-width: 50px;  
 }
 
 #person_list_item #name {

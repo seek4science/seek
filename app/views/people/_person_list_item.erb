@@ -3,62 +3,64 @@
 
 <div id="person_list_item">
   
-  <div id="avatar">
-    <%= image_tag person_avatar_image(person),{:size=>"50x60"} %>
-  </div>
-
-  <div id="details">
-
-  <div id="name">
-    <%=  link_to  h(person_full_name(person)),url_for(person) %>
-  </div>
-
-  
-  <div id="email">
-  <% unless profile.email.nil? or profile.email.empty? %>
-  
-    <label>Email: </label>
-    <%= mail_to h(profile.email) %>
-  
-  <% end  %>
-  </div>
-
-  <% unless profile.web_page.nil? or profile.web_page.empty? %>
-  <div id="web_page">
-    <label>Webpage:</label>
-    <%= link_to h(profile.web_page), h(profile.web_page) %>
-   </div>
-  <% end  %>
-
-  <% unless profile.skype_name.nil? or profile.skype_name.empty? %>
-    <div id="skype_name">
-      <label>Skype:</label>
-      <%= h profile.skype_name %>
+  <div id="avatar_pane">
+    <div id="avatar">
+      <%= image_tag person_avatar_image(person),{:size=>"50x60"} %>
     </div>
-  <% end  %>
-
-  <div id="institutions">
-    <% unless person.institutions.empty? %>
-    <ul><label>Institutions:</label>
-    <% for institution in person.institutions %>
-        <li>
-                <%= link_to h(institution.name),url_for(institution) %>
+  </div>
+  
+  <div id="details">
+    
+    <div id="name">
+      <%=  link_to  h(person_full_name(person)),url_for(person) %>
+    </div>
+    
+    
+    <div id="email">
+      <% unless profile.email.nil? or profile.email.empty? %>
+        
+        <label>Email: </label>
+        <%= mail_to h(profile.email) %>
+      
+      <% end  %>
+    </div>
+    
+    <% unless profile.web_page.nil? or profile.web_page.empty? %>
+      <div id="web_page">
+        <label>Webpage:</label>
+        <%= link_to h(profile.web_page), h(profile.web_page) %>
+      </div>
+    <% end  %>
+    
+    <% unless profile.skype_name.nil? or profile.skype_name.empty? %>
+      <div id="skype_name">
+        <label>Skype:</label>
+        <%= h profile.skype_name %>
+      </div>
+    <% end  %>
+    
+    <div id="institutions">
+      <% unless person.institutions.empty? %>
+        <ul><label>Institutions:</label>
+          <% for institution in person.institutions %>
+            <li>
+              <%= link_to h(institution.name),url_for(institution) %>
             </li>
-    <% end  %>
-    </ul>
-    <% end  %>
-  </div>
-
-  <div id="projects">
+          <% end  %>
+        </ul>
+      <% end  %>
+    </div>
+    
+    <div id="projects">
       <% unless person.projects.empty? %>
-    <ul><label>Projects:</label>
-    <% for project in person.projects %>
-        <li>
-          <%= link_to h(project.title), url_for(project) %>
-        </li>
-    <% end  %>
-    </ul>
-    <% end  %>
+        <ul><label>Projects:</label>
+          <% for project in person.projects %>
+            <li>
+              <%= link_to h(project.title), url_for(project) %>
+            </li>
+          <% end  %>
+        </ul>
+      <% end  %>
+    </div>
   </div>
-</div>
 </div>
