@@ -1,0 +1,28 @@
+Before UK PALS Chapter
+
+Add tags to Person, Institute and Project
+
+Add fields
+        Profile:
+                Personal interests
+                Field/expertises (check with Olga)
+                isPAL?
+                
+        Project
+                PI
+
+Add AJAX controlled vocabularly to:
+        Institute.City
+        Profile.Fields
+
+Improve display of Project and Institute list, and all show pages
+        Can show designated pal for project
+        Show all people associated with a Project, Institute
+
+On Person page:
+        Show related people by Project or Institute
+
+Profile page:
+        Improve Project+Institution selection. Use Grouped selection drop down.
+
+Upload avatar

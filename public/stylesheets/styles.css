@@ -1,33 +1,33 @@
 
 
 #errorExplanation {
-  width: 400px;
-  border: 2px solid red;
-  padding: 7px;
-  padding-bottom: 12px;
-  margin-bottom: 20px;
-  background-color: #f0f0f0;
+    width: 400px;
+    border: 2px solid red;
+    padding: 7px;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
 }
 
 #errorExplanation h2 {
-  text-align: left;
-  font-weight: bold;
-  padding: 5px 5px 5px 15px;
-  font-size: 12px;
-  margin: -7px;
-  background-color: #c00;
-  color: #fff;
+    text-align: left;
+    font-weight: bold;
+    padding: 5px 5px 5px 15px;
+    font-size: 12px;
+    margin: -7px;
+    background-color: #c00;
+    color: #fff;
 }
 
 #errorExplanation p {
-  color: #333;
-  margin-bottom: 0;
-  padding: 5px;
+    color: #333;
+    margin-bottom: 0;
+    padding: 5px;
 }
 
 #errorExplanation ul li {
-  font-size: 12px;
-  list-style: square;
+    font-size: 12px;
+    list-style: square;
 }
 
 #header {
@@ -40,19 +40,19 @@
 }
 
 #footer {
-     background-color: lightgreen;
-    height: 4em;
+    border:dashed gray 1px;
+    height: 6em;
+    position: relative;
+    width: 100%;
     text-align: center;
-    position: absolute; bottom: 5px;
-    width:100%;
     vertical-align: center;
 }
 
 #main_pane {
-	padding-right: 1em;
-	padding-left: 0.5em;
-	margin-top: 1em;
-	margin-bottom: 3em;
+    padding-right: 1em;
+    padding-left: 0.5em;
+    margin-top: 1em;
+    margin-bottom: 3em;
 }
 
 #bd {

@@ -15,14 +15,14 @@
     <div id="name">
       <%=  link_to  h(person_full_name(person)),url_for(person) %>
       <% if @current_user.person==person %>
-        <small><%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit') %></small>
+        <small style="font-size:12px">[<%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit') %>]</small>
       <% end %>
     </div>
     
     
     <div id="email">
       <% unless profile.email.nil? or profile.email.empty? %>
-              
+                    
         <label>Email: </label>
         <%= mail_to h(profile.email) %>
       
@@ -32,7 +32,14 @@
     <% unless profile.web_page.nil? or profile.web_page.empty? %>
       <div id="web_page">
         <label>Webpage:</label>
-        <%= link_to h(profile.web_page), h(profile.web_page) %>
+        <%= link_to h(profile.web_page), h(profile.web_page),:popup=>true %>
+      </div>
+    <% end  %>
+    
+    <% unless profile.phone.nil? or profile.phone.empty? %>
+      <div id="phone">
+        <label>Phone:</label>
+        <%= h profile.phone %>
       </div>
     <% end  %>
     
@@ -42,7 +49,7 @@
         <%= h profile.skype_name %>
       </div>
     <% end  %>
-        
+            
     <div id="institutions">
       <% unless person.institutions.empty? %>
         <ul><label>Institutions:</label>
@@ -67,4 +74,5 @@
       <% end  %>
     </div>
   </div>
+  
 </div>
