@@ -1,4 +1,7 @@
 class InstitutionsController < ApplicationController
+  
+  before_filter :login_required
+  
   # GET /institutions
   # GET /institutions.xml
   def index

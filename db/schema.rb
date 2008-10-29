@@ -62,6 +62,7 @@ ActiveRecord::Schema.define(:version => 20081029130412) do
     t.datetime "remember_token_expires_at"
     t.string   "activation_code",           :limit => 40
     t.datetime "activated_at"
+    t.integer  "person_id",                 :limit => 11
   end
 
   create_table "work_groups", :force => true do |t|

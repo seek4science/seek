@@ -1,4 +1,7 @@
 class ProfilesController < ApplicationController
+  
+  before_filter :login_required
+  
   # GET /profiles
   # GET /profiles.xml
   def index

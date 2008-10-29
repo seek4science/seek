@@ -1,16 +1,56 @@
-<%= error_messages_for :user %>
-<% form_for :user, :url => users_path do |f| -%>
-<p><label for="login">Login</label><br/>
-<%= f.text_field :login %></p>
-
-<p><label for="email">Email</label><br/>
-<%= f.text_field :email %></p>
-
-<p><label for="password">Password</label><br/>
-<%= f.password_field :password %></p>
-
-<p><label for="password_confirmation">Confirm Password</label><br/>
-<%= f.password_field :password_confirmation %></p>
-
-<p><%= submit_tag 'Sign up' %></p>
-<% end -%>
+<p>Return to <%= link_to "login", login_url %></p>
+<div id="signup">
+  
+  <%= error_messages_for :user %>
+  
+  
+  <% form_for :user, :url=>users_url do |f| -%>
+    <p><label for="login">Login name</label><br/>
+    <%= f.text_field :login %></p>
+  
+    <% fields_for @user.person.profile do |prof| %>
+                
+      <p><label for="first_name">First name</label><br/>
+      <%= prof.text_field :first_name %></p>
+  
+      <p><label for="last_name">Last name</label><br/>
+      <%= prof.text_field :last_name %></p>
+  
+    <% end %>
+          
+    <p><label for="email">Email</label><br/>
+    <%= f.text_field :email %></p>
+  
+    <p><label for="password">Password</label><br/>
+    <%= f.password_field :password %></p>
+  
+    <p><label for="password_confirmation">Confirm Password</label><br/>
+    <%= f.password_field :password_confirmation %></p>
+  
+  
+  
+    <% fields_for @user.person.profile do |prof| %>
+                  
+      <div id="phone_number">
+        <p><label for="phone">Phone number</label><br/>
+        <%= prof.text_field :phone %></p>
+      </div>
+      <div id="skype_name">
+        <p><label for="skype_name">Skype name</label><br/>
+        <%= prof.text_field :skype_name %></p>
+      </div>
+      <div id="web_page">
+        <p><label for="web_page">Web page</label><br/>
+        <%= prof.text_field :web_page %></p>
+      </div>
+  
+    <% end %>
+  
+    <% if WorkGroup.count>0 %>
+      <%= render :partial =>"people/work_groups", :locals=>{:person=>@user.person}%>
+    <% end  %>
+    
+    <p><%= submit_tag 'Register' %></p>
+  <% end -%>
+                  
+</div>

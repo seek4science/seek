@@ -1,10 +1,12 @@
 class UsersController < ApplicationController
-  # Be sure to include AuthenticationSystem in Application Controller instead
-  include AuthenticatedSystem
   
-
+  layout 'logged_out'
+  
   # render new.rhtml
   def new
+    @user=User.new
+    @user.person=Person.new
+    @user.person.profile=Profile.new
   end
 
   def create
@@ -14,11 +16,13 @@ class UsersController < ApplicationController
     # uncomment at your own risk
     # reset_session
     @user = User.new(params[:user])
+    @user.person=Person.new(params[:person])
+    @user.person.profile=Profile.new(params[:profile])
+    
     @user.save
     
-    @user.activate
-    
     if @user.errors.empty?
+      @user.activate
       self.current_user = @user
       redirect_back_or_default('/')
       flash[:notice] = "Thanks for signing up!"

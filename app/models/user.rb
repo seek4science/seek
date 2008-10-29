@@ -1,7 +1,10 @@
 require 'digest/sha1'
 class User < ActiveRecord::Base
   
+  
+  
   belongs_to :person
+  validates_associated :person
   
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
@@ -14,7 +17,7 @@ class User < ActiveRecord::Base
   validates_confirmation_of :password,                   :if => :password_required?
   validates_length_of       :login,    :within => 3..40
   validates_length_of       :email,    :within => 3..100
-  validates_uniqueness_of   :login, :email, :case_sensitive => false
+  validates_uniqueness_of   :login, :case_sensitive => false
   before_save :encrypt_password
   before_create :make_activation_code 
   # prevents a user from submitting a crafted form that bypasses activation

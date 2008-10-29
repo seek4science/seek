@@ -1,10 +1,7 @@
-<%#
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-%>
 <% fields_for @person do |f|%>
-<div id="work_groups">
-  <%= f.label "Projects and Institution" %><br/>
-  <%= f.collection_select :work_group_ids, WorkGroup.find(:all), :id, :description,{},{ :multiple=>true } %>
-</div>
+  <div id="work_groups">
+    <p><label for="work_groups">Projects and Institutions</label><br/>
+      <%= f.collection_select :work_group_ids, WorkGroup.find(:all), :id, :description,{},{ :multiple=>true } %>
+    </p>
+  </div>
 <% end  %>

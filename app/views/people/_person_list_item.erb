@@ -9,16 +9,20 @@
     </div>
   </div>
   
+  
   <div id="details">
     
     <div id="name">
       <%=  link_to  h(person_full_name(person)),url_for(person) %>
+      <% if @current_user.person==person %>
+        <small><%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit') %></small>
+      <% end %>
     </div>
     
     
     <div id="email">
       <% unless profile.email.nil? or profile.email.empty? %>
-        
+              
         <label>Email: </label>
         <%= mail_to h(profile.email) %>
       
@@ -38,7 +42,7 @@
         <%= h profile.skype_name %>
       </div>
     <% end  %>
-    
+        
     <div id="institutions">
       <% unless person.institutions.empty? %>
         <ul><label>Institutions:</label>
