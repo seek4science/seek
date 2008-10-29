@@ -8,6 +8,6 @@ class CreatePeopleWorkGroups < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :peope_work_groups
+    drop_table :people_work_groups
   end
 end
