@@ -59,10 +59,15 @@
     background-color: #FAFAFA;
 }
 
-.myexperiment_gadget #avatar img {
+#who_am_i #avatar img {
     margin-top: 0.3em;
     margin-bottom: 0.3em;
     border: black double 4px;
+}
+
+#who_am_i p {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
 }
 
 

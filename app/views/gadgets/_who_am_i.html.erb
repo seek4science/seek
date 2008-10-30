@@ -11,8 +11,8 @@
       <%= link_to(image_tag(person_avatar_image(@current_user.person),{:size=>"50x60"}), url_for(@current_user.person)) %>
     </div>
     
-    <%= link_to "Edit my profile", url_for(:controller=>"people", :action=>"edit", :id=>@current_user.person) %><br/>
-    <%= link_to "Logout", logout_url %>
+    <p><%= link_to "Edit my profile", url_for(:controller=>"people", :action=>"edit", :id=>@current_user.person) %></p>
+    <p><%= link_to "Logout", logout_url %></p>
   </div>
   
   <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
