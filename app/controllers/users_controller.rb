@@ -24,7 +24,7 @@ class UsersController < ApplicationController
     if @user.errors.empty?
       @user.activate
       self.current_user = @user
-      redirect_back_or_default('/')
+      redirect_to(url_for(:controller=>"people", :action=>"edit", :id=>@user.person))
       flash[:notice] = "Thanks for signing up!"
     else
       render :action => 'new'

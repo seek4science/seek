@@ -27,28 +27,6 @@
     <p><label for="password_confirmation">Confirm Password</label><br/>
     <%= f.password_field :password_confirmation %></p>
   
-  
-  
-    <% fields_for @user.person.profile do |prof| %>
-                  
-      <div id="phone_number">
-        <p><label for="phone">Phone number</label><br/>
-        <%= prof.text_field :phone %></p>
-      </div>
-      <div id="skype_name">
-        <p><label for="skype_name">Skype name</label><br/>
-        <%= prof.text_field :skype_name %></p>
-      </div>
-      <div id="web_page">
-        <p><label for="web_page">Web page</label><br/>
-        <%= prof.text_field :web_page %></p>
-      </div>
-  
-    <% end %>
-  
-    <% if WorkGroup.count>0 %>
-      <%= render :partial =>"people/work_groups", :locals=>{:person=>@user.person}%>
-    <% end  %>
     
     <p><%= submit_tag 'Register' %></p>
   <% end -%>
