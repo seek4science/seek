@@ -6,6 +6,7 @@
   </div>
   
   <div class="contents">
+    <%= link_to "Edit my profile", url_for(:controller=>"people", :action=>"edit", :id=>@current_user.person) %><br/>
     <%= link_to "Logout", logout_url %>
   </div>
   

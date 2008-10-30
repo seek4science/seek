@@ -13,7 +13,7 @@ Add fields
 
 Add AJAX controlled vocabularly to:
         Institute.City
-        Profile.Fields
+        Profile.expertise
 
 Improve display of Project and Institute list, and all show pages
         Can show designated pal for project

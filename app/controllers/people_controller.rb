@@ -2,6 +2,12 @@ class PeopleController < ApplicationController
   
   before_filter :login_required
   
+  auto_complete_for :expertise, :name
+  
+  protect_from_forgery :only=>[]
+
+
+  
   # GET /people
   # GET /people.xml
   def index
@@ -64,6 +70,8 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
     @person.profile.update_attributes(params[:profile])
+    expertise_list = params[:expertise][:name]
+    update_person_expertise(@person.profile, expertise_list)
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
@@ -88,4 +96,23 @@ class PeopleController < ApplicationController
       format.xml  { head :ok }
     end
   end
+  
+  def update_person_expertise profile, expertise_list
+    #FIXME: don't clear them all, check what has been removed. 
+    profile.expertises.clear
+    expertise_list.split(",").each do |exp|
+      exp.strip!
+      e=Expertise.find(:first, :conditions=>{:name=>exp})
+      if (e.nil?)
+        e=Expertise.new(:name=>exp)
+        e.save
+        profile.expertises << e
+      else
+        profile.expertises << e unless profile.expertises.include?(e)
+      end
+    end
+  end
+  
+    
+  
 end
