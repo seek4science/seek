@@ -1,8 +1,18 @@
 require 'test_helper'
 
 class InstitutionsControllerTest < ActionController::TestCase
+ 
   
-  fixtures :institutions
+  fixtures :institutions, :users, :people, :profiles
+  
+  include AuthenticatedTestHelper
+  def setup
+    login_as(:quentin)
+  end
+  
+  def setup
+    login_as(:quentin)
+  end
   
   def test_should_get_index
     get :index

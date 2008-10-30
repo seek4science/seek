@@ -2,7 +2,12 @@ require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
   
-  fixtures :people, :profiles
+  fixtures :people, :profiles, :users
+  
+  include AuthenticatedTestHelper
+  def setup
+    login_as(:quentin)
+  end
   
   def test_should_get_index
     get :index
