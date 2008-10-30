@@ -44,3 +44,21 @@
 #person_list_item label {
     font-weight: 500;
 }
+
+#edit_person {
+    padding-top: 5em;
+}
+
+#edit_person input,select {
+    width: 25em;
+}
+
+#edit_person .submit {
+   width: 7em;
+}
+
+#edit_person label {
+    font-weight: bold;
+}
+
+

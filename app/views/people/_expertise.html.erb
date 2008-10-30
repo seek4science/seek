@@ -3,7 +3,7 @@
 <p>
   <% fields_for profile do |prof| %>
 <p>
-  <label for="expertises_text">Expertise</label><br />
+  <label for="expertises_text">Areas of expertise</label><br />
   <%= text_field_with_auto_complete :expertise, :name, {:value=>h(expertises_as_comma_seperated_list(profile.expertises))}, :tokens=>"," %>
   
     </p>

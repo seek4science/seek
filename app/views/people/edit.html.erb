@@ -1,6 +1,5 @@
-<h1>Editing person</h1>
-
-<% form_for @person do |f| %>
+  <div id="edit_person" class="yui-b">
+  <% form_for @person do |f| %>
   <%= f.error_messages %>
   <% fields_for @person.profile do |prof|%>
     <p>
@@ -34,9 +33,7 @@
   <%= render :partial => "expertise", :locals=>{:profile=>@person.profile} %>
 
   <p>
-    <%= f.submit "Update" %>
+    <%= f.submit "Update", :class=>'submit' %>
   </p>
 <% end %>
-
-<%= link_to 'Show', @person %> |
-<%= link_to 'Back', people_path %>
+</div>
