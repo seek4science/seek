@@ -52,6 +52,8 @@ class PeopleController < ApplicationController
   def create
     @person = Person.new(params[:person])
     @person.profile=Profile.new(params[:profile])
+    expertise_list = params[:expertise][:name]
+    update_person_expertise(@person.profile, expertise_list)
 
     respond_to do |format|
       if @person.save
