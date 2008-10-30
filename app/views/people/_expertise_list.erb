@@ -1,0 +1,13 @@
+
+
+<div id="institutions">
+  <% unless is_nil_or_empty? expertise_list %>
+    <ul><label>Areas of expertise:</label>
+      <% for expertise in expertise_list %>
+        <li>
+          <%= expertise.name %>
+        </li>
+      <% end  %>
+    </ul>
+  <% end  %>
+</div>

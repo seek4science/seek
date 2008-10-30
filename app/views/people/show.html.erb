@@ -1,36 +1,40 @@
-<div id="person">
-
-<div id="name">
-<div id="first_name">
-  <b>Fist name:</b>
-  <%=h @person.profile.first_name %>
+<% profile=@person.profile %>
+<div id="show_person" class="yui-b">
+  
+  <div id="name">
+    <p><%= h  person_full_name(@person) %></p>
+  </div>
+  
+  
+  <% unless is_nil_or_empty? profile.web_page %>
+    <div id="web_page">
+      <p><label for="web_page">Web page:</label><%= link_to h(profile.web_page), profile.web_page, :popup=>true %></p>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? profile.email %>
+    <div id="email">
+      <p><label for="email">Email:</label><%= mail_to h(profile.email) %></p>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? profile.skype_name %>
+    <div id="skype">
+      <p><label for="email">Skype:</label><%= h profile.skype_name %></p>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? profile.phone %>
+    <div id="phone">
+      <p><label for="phone">Phone:</label><%= h profile.phone %></p>
+    </div>
+  <% end %>
+  
+  <%= render :partial=>"show_projects", :object=>@person.projects  %>
+  <%= render :partial=>"show_institutions", :object=>@person.institutions  %>
+  <%= render :partial=>"expertise_list", :object=>profile.expertises  %>      
+        
+    
+      
+      
 </div>
-
-<div id="last_name">
-  <b>Last name:</b>
-  <%=h @person.profile.last_name %>
-</div>
-</div>
-
-<div id="email">
-  <b>Email:</b>
-  <%=h @person.profile.email %>
-</div>
-
-<div id="phone">
-  <b>Phone:</b>
-  <%=h @person.profile.phone %>
-</div>
-
-<div id="skype">
-  <b>Skype name:</b>
-  <%=h @person.profile.skype_name %>
-</div>
-
-<div id="web_page">
-  <b>Web page:</b>
-  <%=h @person.profile.web_page %>
-</div>
-</div>
-<%= link_to 'Edit', edit_person_path(@person) %> |
-<%= link_to 'Back', people_path %>

@@ -61,4 +61,12 @@
     font-weight: bold;
 }
 
+#show_person label {
+    font-weight: bold;
+}
+
+#show_person #name p {
+    font-size: 24px;
+    font-weight: bold;
+}
 

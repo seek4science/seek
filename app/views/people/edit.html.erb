@@ -30,7 +30,7 @@
 
   <%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
 
-  <%= render :partial => "expertise", :locals=>{:profile=>@person.profile} %>
+  <%= render :partial => "expertise_text_field", :locals=>{:profile=>@person.profile} %>
 
   <p>
     <%= f.submit "Update", :class=>'submit' %>

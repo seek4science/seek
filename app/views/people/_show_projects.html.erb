@@ -1,0 +1,14 @@
+<% projects=show_projects %>
+
+<div id="projects">
+      <% unless is_nil_or_empty? projects %>
+        <ul><label>Projects:</label>
+          <% for project in projects %>
+            <li>
+              <%= link_to h(project.title), url_for(project) %>
+            </li>
+          <% end  %>
+        </ul>
+      <% end  %>
+    </div>
+  
