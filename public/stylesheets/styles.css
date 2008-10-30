@@ -59,4 +59,10 @@
     background-color: #FAFAFA;
 }
 
+.myexperiment_gadget #avatar img {
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+    border: black double 4px;
+}
+
 

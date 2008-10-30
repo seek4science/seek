@@ -1,4 +1,4 @@
-<div class="myexperiment_gadget">
+<div id="who_am_i" class="myexperiment_gadget">
   <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
 
   <div class="header">
@@ -6,6 +6,11 @@
   </div>
   
   <div class="contents">
+    
+    <div id="avatar">
+      <%= link_to(image_tag(person_avatar_image(@current_user.person),{:size=>"50x60"}), url_for(@current_user.person)) %>
+    </div>
+    
     <%= link_to "Edit my profile", url_for(:controller=>"people", :action=>"edit", :id=>@current_user.person) %><br/>
     <%= link_to "Logout", logout_url %>
   </div>

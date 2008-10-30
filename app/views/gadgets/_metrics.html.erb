@@ -8,6 +8,7 @@
   <div class="contents">
     Users: <%= User.count %><br/>
     People: <%= Person.count %><br/>
+    Profiles: <%= Profile.count != Person.count ? "<b style=color:red;>" +Profile.count.to_s + "</b>" : Profile.count  %><br/>
     Projects: <%= Project.count %><br/>
     Institutions: <%= Institution.count %><br/>
     WorkGroups: <%= WorkGroup.count %><br/>
