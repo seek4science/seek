@@ -25,7 +25,21 @@ class Person < ActiveRecord::Base
     end
   end
 
-  
+  def people_i_may_know
+    res=[]
+    institutions.each do |i|
+      i.people.each do |p|
+        res << p unless p==self or res.include? p
+      end
+    end
+    
+    projects.each do |proj|
+      proj.people.each do |p|
+        res << p unless p==self or res.include? p
+      end
+    end
+    return  res
+  end
   
   def institutions
     res=[]

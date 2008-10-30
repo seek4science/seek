@@ -14,4 +14,12 @@ class Project < ActiveRecord::Base
     end
   end
   
+  def people
+    res=[]
+    work_groups.each do |wg|
+      wg.people.each {|p| res << p}
+    end
+    return res
+  end
+  
 end
