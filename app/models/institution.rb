@@ -3,6 +3,7 @@ class Institution < ActiveRecord::Base
   
   #validates_presence_of :name, :country
   acts_as_solr(:fields => [ :name ]) if SOLR_ENABLED
+  
   def people
     res=[]
     work_groups.each do |wg|
