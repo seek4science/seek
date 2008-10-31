@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :session
 
-  map.resources :profiles
+  #map.resources :profiles
 
   map.resources :institutions
 
