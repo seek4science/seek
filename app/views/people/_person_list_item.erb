@@ -1,7 +1,7 @@
 <% person=person_list_item %>
 <% profile = person.profile %>
 
-<div id="person_list_item">
+<div id="list_item">
   
   <div id="avatar_pane">
     <div id="avatar">
@@ -31,7 +31,7 @@
     
     <% unless profile.web_page.nil? or profile.web_page.empty? %>
       <div id="web_page">
-        <label>Webpage:</label>
+        <label>Web page:</label>
         <%= link_to h(profile.web_page), h(profile.web_page),:popup=>true %>
       </div>
     <% end  %>

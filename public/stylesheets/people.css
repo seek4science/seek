@@ -1,4 +1,4 @@
-#person_list_item {
+#list_item {
     background-color: #EEEEEE;
     margin: 4px;
     padding: 4px;
@@ -8,32 +8,32 @@
     min-height: 90px;
 }
 
-#person_list_item #avatar_pane {
+#list_item #avatar_pane {
     margin: 1em 1em 1em 1em;
     float: left;
 }
 
-#person_list_item #avatar {
+#list_item #avatar {
     border: black solid 1px;   
     max-width: 50px;  
 }
 
-#person_list_item #name {
+#list_item #name {
     font-size: 1.5em;
     padding-bottom: 0.25em;
     margin-bottom: 0.25em;
     border-bottom: black dotted 1px;
 }
 
-#person_list_item #details {
+#list_item #details {
     margin-left: 100px;
     padding-left: 1em;
     border-left: black dotted 1px;  
 }
 
-#person_list_item ul {margin: 0;  padding: 0;}
+#list_item ul {margin: 0;  padding: 0;}
 
-#person_list_item li {
+#list_item li {
     
     list-style-type:none;
     margin: 0px 0px 0px 0px;
@@ -41,7 +41,7 @@
     white-space:nowrap;
 }
 
-#person_list_item label {
+#list_item label {
     font-weight: 500;
 }
 

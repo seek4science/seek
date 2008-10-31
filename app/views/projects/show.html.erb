@@ -1,27 +1,31 @@
-<p>
-  <b>Title:</b>
-  <%=h @project.title %>
-</p>
-
-<p>
-  <b>Web page:</b>
-  <%=h @project.web_page %>
-</p>
-
-<p>
-  <b>Wiki page:</b>
-  <%=h @project.wiki_page %>
-</p>
-
-<p>
-<b>Institutions:</b>
-  <% @project.institutions.each do |ins|%>
-    <%= h ins.name %>
+<div id="show_person" class="yui-b">
+  
+  <div id="name">
+    <p><%= h @project.title %></p>
+  </div>
+  
+  <% unless is_nil_or_empty? @project.web_page %>
+    <div id="web_page">
+      <label>Web page:</label>
+      <%= link_to h(@project.web_page), h(@project.web_page),:popup=>true %>
+    </div>
   <% end %>
-</p>
+  
+  <% unless is_nil_or_empty? @project.wiki_page %>
+    <div id="wiki_page">
+      <label>Wiki page:</label>
+      <%= link_to h(@project.wiki_page), h(@project.wiki_page),:popup=>true %>
+    </div>
+  <% end %>
 
+  <% unless is_nil_or_empty? @project.people %>
+    <div id="project_people">
+      <label>People working on this project: </label>
+      <%= render :partial=>"project_people_item", :collection=>@project.people %>
+      
+    </div>
+  
 
-
-
-<%= link_to 'Edit', edit_project_path(@project) %> |
-<%= link_to 'Back', projects_path %>
+  <% end  %>
+  
+</div>

@@ -1,4 +1,5 @@
-<h1>New project</h1>
+
+<div id="new_project" class="yui-b">
 
 <% form_for(@project) do |f| %>
   <%= f.error_messages %>
@@ -16,7 +17,7 @@
     <%= f.text_field :wiki_page %>
   </p>
   <p>
-        <%= f.label :institutions %>
+        <%= f.label :institutions %><br/>
         <%= f.collection_select :institutions, Institution.find(:all), :id, :name, {}, {:multiple=>true}%>
   </p>
 
@@ -24,5 +25,5 @@
     <%= f.submit "Create" %>
   </p>
 <% end %>
-
+</div>
 <%= link_to 'Back', projects_path %>

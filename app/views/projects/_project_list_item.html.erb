@@ -1,0 +1,21 @@
+<% project = project_list_item %>
+<div id="list_item">
+  
+  <div id="name">
+    <%= link_to h(project.title), url_for(project) %>
+  </div>
+  <% unless is_nil_or_empty? project.web_page %>
+    <div id="web_page">
+      <label>Web page:</label>
+      <%= link_to h(project.web_page), h(project.web_page),:popup=>true %>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? project.wiki_page %>
+    <div id="wiki_page">
+      <label>Wiki page:</label>
+      <%= link_to h(project.wiki_page), h(project.wiki_page),:popup=>true %>
+    </div>
+  <% end %>
+    
+</div>

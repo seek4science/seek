@@ -1,24 +1,2 @@
-<h1>Listing projects</h1>
-
-<table>
-  <tr>
-    <th>Title</th>
-    <th>Web page</th>
-    <th>Wiki page</th>
-  </tr>
-
-<% for project in @projects %>
-  <tr>
-    <td><%=h project.title %></td>
-    <td><%=h project.web_page %></td>
-    <td><%=h project.wiki_page %></td>
-    <td><%= link_to 'Show', project %></td>
-    <td><%= link_to 'Edit', edit_project_path(project) %></td>
-    <td><%= link_to 'Destroy', project, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
-</table>
-
-<br />
-
-<%= link_to 'New project', new_project_path %>
+<%= link_to 'New Project', new_project_path %>
+<%= render :partial=>"project_list_item", :collection=>@projects %>

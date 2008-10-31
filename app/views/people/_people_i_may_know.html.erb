@@ -1,6 +1,6 @@
 <div id="people_i_may_know">
    <% unless is_nil_or_empty? people_i_may_know %>
-    <ul><label>Associated people:</label>
+    <ul><label>People you may know:</label>
       <% for person in people_i_may_know %>
         <li>
           <%= link_to h(person_full_name(person)),url_for(person) %>
