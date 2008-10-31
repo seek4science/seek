@@ -2,6 +2,8 @@ class Project < ActiveRecord::Base
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
   
+  acts_as_solr(:fields => [ :title ]) if SOLR_ENABLED
+  
   def institutions=(new_institutions)
     new_institutions.each_index do |i|
       new_institutions[i]=Institution.find(new_institutions[i]) unless new_institutions.is_a?(Institution)

@@ -5,4 +5,7 @@ class Profile < ActiveRecord::Base
   
   validates_presence_of :first_name, :last_name
   
+  acts_as_solr(:fields => [ :first_name, :last_name ]) if SOLR_ENABLED
+               
+  
 end

@@ -1,0 +1,23 @@
+<% institution = institution_list_item %>
+<div id="list_item">
+  
+  <div id="name">
+    <%= link_to h(institution.name), url_for(institution) %>
+  </div>
+  
+  <% unless is_nil_or_empty? institution.web_page %>
+    <div id="web_page">
+      <label>Web page:</label>
+      <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? institution.country %>
+    <div id="web_page">
+      <label>Country:</label>
+      <%= h institution.country %>&nbsp;<%= flag_icon(institution.country) %>
+    </div>
+  <% end %>
+      
+</div>
+

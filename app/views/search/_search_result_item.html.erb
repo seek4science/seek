@@ -1,0 +1,11 @@
+<% if search_result_item.instance_of?(Profile) %>
+        <%= render :partial=>"/people/person_list_item", :object=>search_result_item.person %>
+<% end %>
+
+<% if search_result_item.instance_of?(Project) %>
+        <%= render :partial=>"/projects/project_list_item", :object=>search_result_item %>
+<% end %>
+
+<% if search_result_item.instance_of?(Institution) %>
+        <%= render :partial=>"/institutions/institution_list_item", :object=>search_result_item %>
+<% end %>

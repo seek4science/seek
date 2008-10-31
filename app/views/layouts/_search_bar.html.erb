@@ -1,5 +1,7 @@
-<% if logged_in? %>
-  <input type="text" />
-  <input type="button" value="Search"/>
+<% if logged_in? and SOLR_ENABLED %>
+  <% form_tag '/search/' do -%>
+    <%= text_field_tag :query %>
+  <%= submit_tag "Go"  %>
+  <% end  -%>
 <% end %>
 

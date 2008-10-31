@@ -1,28 +1,2 @@
-<h1>Listing institutions</h1>
-
-<table>
-  <tr>
-    <th>Name</th>
-    <th>Address</th>
-    <th>City</th>
-    <th>Web page</th>
-    <th>Country</th>
-  </tr>
-
-<% for institution in @institutions %>
-  <tr>
-    <td><%=h institution.name %></td>
-    <td><%=h institution.address %></td>
-    <td><%=h institution.city %></td>
-    <td><%=h institution.web_page %></td>
-    <td><%=h institution.country %></td>
-    <td><%= link_to 'Show', institution %></td>
-    <td><%= link_to 'Edit', edit_institution_path(institution) %></td>
-    <td><%= link_to 'Destroy', institution, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
-</table>
-
-<br />
-
 <%= link_to 'New institution', new_institution_path %>
+<%= render :partial=>"institution_list_item", :collection=>@institutions %>
