@@ -4,7 +4,9 @@
   <% fields_for profile do |prof| %>
 <p>
   <label for="expertises_text">Areas of expertise</label><br />
-  <input type="text" name="name" id="expertise_name"/>
+  <%= text_field :expertise, :name, {:value=>h(expertises_as_comma_seperated_list(profile.expertises))} %>
+
+  
 
   <%= fast_auto_complete_field :expertise_name, :url =>"/expertise" %>
 
