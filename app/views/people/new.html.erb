@@ -28,8 +28,10 @@
   </div>
 <% end %>
 
-<%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
 <%= render :partial =>"expertise_text_field", :locals=>{:profile=>@person.profile} %>
+
+<%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
+
 
  
   
