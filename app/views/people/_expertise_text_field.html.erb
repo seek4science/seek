@@ -4,8 +4,10 @@
   <% fields_for profile do |prof| %>
 <p>
   <label for="expertises_text">Areas of expertise</label><br />
-  <%= text_field_with_auto_complete :expertise, :name, {:value=>h(expertises_as_comma_seperated_list(profile.expertises))}, :tokens=>"," %>
-  
+  <input type="text" name="name" id="expertise_name"/>
+
+  <%= fast_auto_complete_field :expertise_name, :url =>"/expertise" %>
+
     </p>
   <% end %>
   

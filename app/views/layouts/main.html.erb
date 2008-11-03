@@ -7,6 +7,8 @@
     <title><%= controller.controller_name %>:  <%= controller.action_name %></title>
     
     <%= javascript_include_tag :defaults %>
+    <%= javascript_include_tag "boxover.js" %>
+    <%= javascript_include_tag 'scriptaculous.js'  %>
     
     <%= stylesheet_link_tag 'reset-fonts-grids' %>
     <%= stylesheet_link_tag 'base-min' %>
@@ -14,9 +16,10 @@
     <%= stylesheet_link_tag 'gadgets' %>
     <%= stylesheet_link_tag 'styles'  %>
     <%= stylesheet_link_tag 'people' %>
-
-    <%= javascript_include_tag "boxover.js" %>
-                                        
+    <%= stylesheet_link_tag 'fast_auto_complete' %>
+    
+    
+                                            
   </head>
   
   
@@ -37,10 +40,10 @@
         <div id="yui-main"> 
           <div class="yui-b">
             
-              <%= flash[:notice] %>
-              <%= yield :layout %>
-                                                      
-            
+            <%= flash[:notice] %>
+            <%= yield :layout %>
+                                                                  
+                        
           </div>
         </div>
         <div id="myexp_sidebar" class="yui-b">

@@ -2,7 +2,7 @@ class PeopleController < ApplicationController
   
   before_filter :login_required
   
-  auto_complete_for :expertise, :name
+  fast_auto_complete_for :expertise, :name
   
   protect_from_forgery :only=>[]
 

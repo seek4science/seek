@@ -13,6 +13,13 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # :secret => 'cfb59feef722633aaee5ee0fd816b5fb'
   
   
+  def self.fast_auto_complete_for(object, method, options = {})
+    define_method("auto_complete_for_#{object}_#{method}") do
+      render :json => object.to_s.camelize.constantize.find(:all).map(&method).to_json
+    end
+  end
+
+  
   # See ActionController::Base for details 
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
