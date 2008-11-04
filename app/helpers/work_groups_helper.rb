@@ -42,6 +42,8 @@ module WorkGroupsHelper
       projType << WorkGroupOption.new(wg.id, wg.institution.name)
     end
     
+    options << projType unless projType.nil?
+    
     
     return options
     
