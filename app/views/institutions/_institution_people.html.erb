@@ -1,0 +1,9 @@
+<div id="institution_people">
+  <ul><label>People:</label>
+          <% for person in institution_people %>
+            <li>
+              <%=link_to(h(person_full_name(person)), url_for(person)) %>
+            </li>
+          <% end  %>
+        </ul>
+</div>

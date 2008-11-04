@@ -12,6 +12,13 @@
     </div>
   <% end %>
 
+  <% unless is_nil_or_empty? institution.city %>
+    <div id="city">
+      <label>City:</label>
+      <%= h institution.city %>
+    </div>
+  <% end %>
+
   <% unless is_nil_or_empty? institution.web_page %>
     <div id="web_page">
       <label>Web page:</label>

@@ -1,28 +1,41 @@
-<p>
-  <b>Name:</b>
-  <%=h @institution.name %>
-</p>
+<div id="show_person" class="yui-b">
+  <id id="name">
+    <p><%= h @institution.name %></p>
+  </id>
+  
+  <% unless is_nil_or_empty? @institution.country %>
+    <div id="country">
+      <p><label>Country: </label><%= h @institution.country %>&nbsp;<%= flag_icon(@institution.country) %></p>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? @institution.web_page %>
+    <div id="web_page">
+      <p><label>Web page: </label><%= link_to h(@institution.web_page), @institution.web_page, :popup=>true %></p>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? @institution.city %>
+    <div id="city">
+      <p><label>City: </label><%= h @institution.city %></p>
+    </div>
+  <% end %>
+  
+  <% unless is_nil_or_empty? @institution.address %>
+    <div id="address">
+      <p><label>Address: </label><%= h @institution.address %></p>
+    </div>
+  <% end %>
 
-<p>
-  <b>Address:</b>
-  <%=h @institution.address %>
-</p>
+  <% unless is_nil_or_empty? @institution.people %>
+     <%= render :partial=>'institution_people', :object=>@institution.people %>
+  <% end %>
 
-<p>
-  <b>City:</b>
-  <%=h @institution.city %>
-</p>
-
-<p>
-  <b>Web page:</b>
-  <%=h @institution.web_page %>
-</p>
-
-<p>
-  <b>Country:</b>
-  <%=h @institution.country %>
-</p>
-
+  <% unless is_nil_or_empty? @institution.projects %>
+     <%= render :partial=>'institution_projects', :object=>@institution.projects %>
+  <% end %>
+  
+</div>
 
 <%= link_to 'Edit', edit_institution_path(@institution) %> |
 <%= link_to 'Back', institutions_path %>

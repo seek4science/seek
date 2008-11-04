@@ -5,7 +5,7 @@
     <ul><label>Institutions:</label>
       <% for institution in institutions %>
         <li>
-          <%= link_to h(institution.name),url_for(institution) %>
+          <%= link_to h(institution.name),url_for(institution) %>&nbsp;<%= flag_icon(institution.country) %>
         </li>
       <% end  %>
     </ul>
