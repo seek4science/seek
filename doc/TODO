@@ -4,13 +4,14 @@ Tidy up layout for Insitutions and Project -> show - DONE
 
 Populate with Institution / Project data
 
-Fix email bug
+Fix email bug - DONE - temporarily disabled from User details, so only Profile is displayed
 
 Only show related people for the person logged in - DONE
 
 Collapse/Expand in Person list item view - DONE (but needs some tidying)
 
-Some help / guidance tooltips (especially on expertise list) 
+Some help / guidance tooltips (especially on expertise list) - DONE
 
 Profile page:
         Improve Project+Institution selection. Use Grouped selection drop down.
+

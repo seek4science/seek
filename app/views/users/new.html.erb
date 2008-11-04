@@ -1,5 +1,6 @@
+<div id="signup" class="yui-b">
 <p>Return to <%= link_to "login", login_url %></p>
-<div id="signup">
+
   
   <%= error_messages_for :user %>
   
@@ -18,9 +19,10 @@
   
     <% end %>
           
+<!-- 
     <p><label for="email">Email</label><br/>
     <%= f.text_field :email %></p>
-  
+  -->
     <p><label for="password">Password</label><br/>
     <%= f.password_field :password %></p>
   
