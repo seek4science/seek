@@ -1,1 +1,7 @@
+
+<% if !is_nil_or_empty? @results %>
 <%= render :partial=>"search_result_item", :collection=>@results %>
+<% else  %>
+  <br/><br/>
+  <div id="no_result" class="yui-b"><%= "No results for '<b>"+@query+"</b>'" %></div>
+<% end %>
