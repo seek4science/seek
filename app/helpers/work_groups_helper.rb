@@ -6,11 +6,11 @@ module WorkGroupsHelper
   WorkGroupOption = Struct.new(:id, :institution_name)
   
   class ProjectType 
-    attr_reader :type_name, :options, :project
+    attr_reader :project_name, :options, :project
     attr_writer :options
-    def initialize(name,project)
+    def initialize(project)
       @project=project
-      @type_name=name
+      @project_name=project.title
       @options = []
     end
     
@@ -37,7 +37,7 @@ module WorkGroupsHelper
     WorkGroup.find(:all, :order=>"project_id").each do |wg|
       if (projType.nil? or projType.project != wg.project)
         options << projType unless projType.nil?
-        projType=ProjectType.new(wg.project.title, wg.project)
+        projType=ProjectType.new(wg.project)
       end
       projType << WorkGroupOption.new(wg.id, wg.institution.name)
     end
