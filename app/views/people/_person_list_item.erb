@@ -15,7 +15,7 @@
     <div id="name">
       <%=  link_to  h(person_full_name(person)),url_for(person) %>
       <% if @current_user.person==person %>
-        <small style="font-size:12px">[<%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit') %>]</small>
+        <small style="font-size:12px">[<%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit', :controller=>'people') %>]</small>
       <% end %>
     </div>
     
