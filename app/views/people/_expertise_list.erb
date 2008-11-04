@@ -5,7 +5,7 @@
     <ul><label>Areas of expertise:</label>
       <% for expertise in expertise_list %>
         <li>
-          <%= expertise.name %>
+          <%= link_to h(expertise.name), url_for(expertise) %>
         </li>
       <% end  %>
     </ul>

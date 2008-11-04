@@ -1,0 +1,2 @@
+module ExpertiseHelper
+end

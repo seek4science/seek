@@ -1,0 +1,17 @@
+<div id="show_person" class="yui-b">
+  
+  <div id="name">
+    <p><%= h @expertise.name.capitalize %></p>
+  </div>
+  
+  <% unless is_nil_or_empty? @expertise.profiles %>
+    <div id="expertise_people">
+      <ul><label>People with this expertise</label></ul>
+      <% for profile in @expertise.profiles %>
+        <li><%= link_to h(person_full_name(profile.person)), url_for(profile.person)  %>  </li>
+      <% end %>
+    </div>
+
+  <% end %>
+  
+</div>

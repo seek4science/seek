@@ -13,6 +13,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :people
   
+  map.resources :expertise
+  
   
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -50,7 +52,7 @@ ActionController::Routing::Routes.draw do |map|
   # map.root :controller => "welcome"
   
   #
-  map.expertise '/expertise', :controller=>'people', :action=>'auto_complete_for_expertise_name'
+  map.expertise_autocomplete '/expertise_autocomplete', :controller=>'people', :action=>'auto_complete_for_expertise_name'
   map.signup  '/signup', :controller => 'users',   :action => 'new' 
   map.login  '/login',  :controller => 'sessions', :action => 'new'
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'  
