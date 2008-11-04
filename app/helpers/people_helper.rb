@@ -17,4 +17,8 @@ module PeopleHelper
     return res
   end
   
+  def person_list_item_extra_details? person
+    !(person.projects.empty? and person.institutions.empty?)  
+  end
+  
 end

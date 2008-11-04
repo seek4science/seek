@@ -22,7 +22,7 @@
     
     <div id="email">
       <% unless profile.email.nil? or profile.email.empty? %>
-                    
+                          
         <label>Email: </label>
         <%= mail_to h(profile.email) %>
       
@@ -43,36 +43,14 @@
       </div>
     <% end  %>
     
-    <% unless profile.skype_name.nil? or profile.skype_name.empty? %>
+    <% unless profile.skype_name.nil? or profile.skype_name.empty? -%>
       <div id="skype_name">
         <label>Skype:</label>
         <%= h profile.skype_name %>
       </div>
     <% end  %>
-            
-    <div id="institutions">
-      <% unless person.institutions.empty? %>
-        <ul><label>Institutions:</label>
-          <% for institution in person.institutions %>
-            <li>
-              <%= link_to h(institution.name),url_for(institution) %>
-            </li>
-          <% end  %>
-        </ul>
-      <% end  %>
-    </div>
     
-    <div id="projects">
-      <% unless person.projects.empty? %>
-        <ul><label>Projects:</label>
-          <% for project in person.projects %>
-            <li>
-              <%= link_to h(project.title), url_for(project) %>
-            </li>
-          <% end  %>
-        </ul>
-      <% end  %>
-    </div>
+    <%= render :partial=>"person_list_item_extra_details", :object=>person %>
   </div>
   
 </div>
