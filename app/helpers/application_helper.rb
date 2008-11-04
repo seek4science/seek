@@ -9,6 +9,10 @@ module ApplicationHelper
     return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
   end
   
+  def expand_image(margin_left="0.3em")
+    image_tag "folds/unfold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
+  end
+  
   def flag_icon(country, text=country, margin_right='0.3em')
     return '' if country.nil? or country.empty?
     

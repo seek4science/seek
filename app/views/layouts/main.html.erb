@@ -9,6 +9,7 @@
     <%= javascript_include_tag :defaults %>
     <%= javascript_include_tag "boxover.js" %>
     <%= javascript_include_tag 'scriptaculous.js'  %>
+    <%= javascript_include_tag 'folds.js'  %>
     
     <%= stylesheet_link_tag 'reset-fonts-grids' %>
     <%= stylesheet_link_tag 'base-min' %>
@@ -17,9 +18,9 @@
     <%= stylesheet_link_tag 'styles'  %>
     <%= stylesheet_link_tag 'people' %>
     <%= stylesheet_link_tag 'fast_auto_complete' %>
-    
-    
-                                            
+        
+        
+                                                
   </head>
   
   
@@ -42,8 +43,8 @@
             
             <%= flash[:notice] %>
             <%= yield :layout %>
-                                                                  
-                        
+                                                                              
+                                    
           </div>
         </div>
         <div id="myexp_sidebar" class="yui-b">
