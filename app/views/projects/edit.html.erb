@@ -1,4 +1,4 @@
-<h1>Editing project</h1>
+<div id="show_person" class="yui-b">
 
 <% form_for(@project) do |f| %>
   <%= f.error_messages %>
@@ -16,7 +16,7 @@
     <%= f.text_field :wiki_page %>
   </p>
 <p>
-        <%= f.label :institutions %>
+        <%= f.label :institutions %><br/>
         <%= f.collection_select :institution_ids, Institution.find(:all), :id, :name, {}, {:multiple=>true} %>
   </p>
   <p>
@@ -24,6 +24,7 @@
   </p>
 
 <% end %>
-
-<%= link_to 'Show', @project %> |
-<%= link_to 'Back', projects_path %>
+<!--
+<%= link_to 'Show', @project %> 
+-->
+</div>
