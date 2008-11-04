@@ -19,7 +19,7 @@ class Project < ActiveRecord::Base
   def people
     res=[]
     work_groups.each do |wg|
-      wg.people.each {|p| res << p}
+      wg.people.each {|p| res << p unless res.include? p}
     end
     return res
   end
