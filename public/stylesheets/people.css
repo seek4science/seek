@@ -45,6 +45,11 @@
     font-weight: 500;
 }
 
+#list_item #expand_button {
+    text-align: right;
+    float: bottom;
+}
+
 #edit_person {
     padding-top: 5em;
 }
