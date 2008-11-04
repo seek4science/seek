@@ -1,7 +1,12 @@
 <% fields_for @person do |f|%>
   <div id="work_groups">
     <p><label for="work_groups">Projects and Institutions</label><br/>
-      <%= f.collection_select :work_group_ids, WorkGroup.find(:all), :id, :description,{},{ :multiple=>true } %>
+      <select id="person_work_group_ids" multiple="multiple" name="person[work_group_ids][]">
+      <%=  option_groups_from_collection_for_select work_group_groups_for_selection, 
+                                                                                         :options, :type_name, :id, :institution_name, person.work_groups.map {|wg| wg.id}
+      
+      %>
+      </select>
     </p>
   </div>
 <% end  %>
