@@ -13,6 +13,10 @@ module ApplicationHelper
     image_tag "folds/unfold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
   end
   
+  def help_icon(text, delay=200)
+    image_tag "famfamfam_silk/help.png", :alt=>"help", :title=>tooltip_title_attrib(text,delay)
+  end
+  
   def flag_icon(country, text=country, margin_right='0.3em')
     return '' if country.nil? or country.empty?
     
