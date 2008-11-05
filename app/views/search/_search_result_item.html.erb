@@ -9,3 +9,7 @@
 <% if search_result_item.instance_of?(Institution) %>
         <%= render :partial=>"/institutions/institution_list_item", :object=>search_result_item %>
 <% end %>
+
+<% if search_result_item.instance_of?(Expertise) %>
+        <%= render :partial=>"/expertise/expertise_list_item", :object=>search_result_item %>
+<% end %>

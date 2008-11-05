@@ -70,4 +70,13 @@
     padding: 0 0 0 0;
 }
 
+.tabnav {
+	text-align: left;
+	font-weight: bolder;
+	font-size: 108%;
+	padding: 4px 0;
+	padding-left: 2em;
+	margin: 0;
+}
+
 

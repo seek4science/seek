@@ -59,7 +59,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil
   
-  map.root :controller=>"people"
+  map.root :controller=>"home"
 
   # See how all your routes lay out with "rake routes"
 
