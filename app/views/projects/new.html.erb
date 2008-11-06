@@ -18,7 +18,7 @@
   </p>
   <p>
         <%= f.label :institutions %><br/>
-        <%= f.collection_select :institutions, Institution.find(:all), :id, :name, {}, {:multiple=>true}%>
+        <%= f.collection_select :institutions, Institution.find(:all, :order=>:name), :id, :name, {}, {:multiple=>true}%>
   </p>
 
   <p>
