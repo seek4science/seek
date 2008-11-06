@@ -5,7 +5,7 @@ class ProjectsController < ApplicationController
   # GET /projects
   # GET /projects.xml
   def index
-    @projects = Project.find(:all)
+    @projects = Project.find(:all, :order=>:title)
 
     respond_to do |format|
       format.html # index.html.erb

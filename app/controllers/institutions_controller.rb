@@ -5,7 +5,7 @@ class InstitutionsController < ApplicationController
   # GET /institutions
   # GET /institutions.xml
   def index
-    @institutions = Institution.find(:all)
+    @institutions = Institution.find(:all, :order=>:name)
 
     respond_to do |format|
       format.html # index.html.erb

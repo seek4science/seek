@@ -12,6 +12,8 @@ class PeopleController < ApplicationController
   # GET /people.xml
   def index
     @people = Person.find(:all)
+    #FIXME: really inefficient, but will be resolved when People and Profile are resolved, and can be ordered during the find(:all) directly 
+    @people=@people.sort_by{|p| p.profile.last_name.capitalize}
 
     respond_to do |format|
       format.html # index.html.erb
