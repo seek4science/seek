@@ -34,10 +34,8 @@ module WorkGroupsHelper
     end
     
     options << proj_type unless proj_type.nil?
-    
-    
-    return options
-    
+ 
+    return options   
   end
   
 end
