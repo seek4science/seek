@@ -48,21 +48,20 @@ class UsersControllerTest < Test::Unit::TestCase
     end
   end
 
-  def test_should_require_email_on_signup
-    assert_no_difference 'User.count' do
+  def test_should_not_require_email_on_signup
+    assert_difference 'User.count' do
       create_user(:email => nil)
-      assert assigns(:user).errors.on(:email)
-      assert_response :success
+      assert_response :redirect
     end
   end
   
 
   
-  def test_should_sign_up_user_with_activation_code
-    create_user
-    assigns(:user).reload
-    assert_not_nil assigns(:user).activation_code
-  end
+#  def test_should_sign_up_user_with_activation_code
+#    create_user
+#    assigns(:user).reload
+#    assert_not_nil assigns(:user).activation_code
+#  end
 
   def test_should_activate_user
     assert_nil User.authenticate('aaron', 'test')

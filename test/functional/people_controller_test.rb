@@ -1,8 +1,8 @@
-require 'test_helper'
+require File.dirname(__FILE__) + '/../test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
   
-  fixtures :people, :profiles, :users
+  fixtures :people, :users
   
   include AuthenticatedTestHelper
   def setup

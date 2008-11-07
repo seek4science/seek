@@ -50,7 +50,7 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
-    expertise_list = params[:expertise][:name]
+    expertise_list = params[:expertise].nil? ? "" : params[:expertise][:name] 
     update_person_expertise(@person, expertise_list)
 
     respond_to do |format|
@@ -70,8 +70,11 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
     
-    expertise_list = params[:expertise][:name]
-    update_person_expertise(@person, expertise_list)
+    if !params[:expertise].nil?
+      expertise_list = params[:expertise][:name]
+      update_person_expertise(@person, expertise_list)
+    end
+    
 
     respond_to do |format|
       if @person.update_attributes(params[:person])

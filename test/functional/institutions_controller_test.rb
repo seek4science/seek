@@ -1,18 +1,16 @@
-require 'test_helper'
+require File.dirname(__FILE__) + '/../test_helper'
 
 class InstitutionsControllerTest < ActionController::TestCase
  
   
-  fixtures :institutions, :users, :people, :profiles
+  fixtures :institutions, :users, :people
   
   include AuthenticatedTestHelper
-  def setup
-    login_as(:quentin)
-  end
   
   def setup
     login_as(:quentin)
   end
+  
   
   def test_should_get_index
     get :index

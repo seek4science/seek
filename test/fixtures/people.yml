@@ -2,10 +2,16 @@
 
 one:
         id: 1
+        first_name: quentin
+        last_name: last_name
 
 two:
         id: 2
+        first_name: aaron
+        last_name: last_name
 
 three:
         id: 3
+        first_name: no_user
+        last_name: smith
 
