@@ -11,13 +11,11 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    @people = Person.find(:all)
-    #FIXME: really inefficient, but will be resolved when People and Profile are resolved, and can be ordered during the find(:all) directly 
-    @people=@people.sort_by{|p| p.profile.last_name.capitalize}
-
+    @people = Person.find(:all, :order=>:last_name)
+    
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @people.to_xml(:include=>:profile) }
+      format.xml  { render :xml => @people.to_xml}
     end
   end
 
@@ -28,7 +26,7 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @person.to_xml(:include=> :profile) }
+      format.xml  { render :xml => @person.to_xml}
     end
   end
 
@@ -36,8 +34,7 @@ class PeopleController < ApplicationController
   # GET /people/new.xml
   def new
     @person = Person.new
-    @person.profile=Profile.new
-
+   
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @person }
@@ -53,9 +50,8 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
-    @person.profile=Profile.new(params[:profile])
     expertise_list = params[:expertise][:name]
-    update_person_expertise(@person.profile, expertise_list)
+    update_person_expertise(@person, expertise_list)
 
     respond_to do |format|
       if @person.save
@@ -73,9 +69,9 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
-    @person.profile.update_attributes(params[:profile])
+    
     expertise_list = params[:expertise][:name]
-    update_person_expertise(@person.profile, expertise_list)
+    update_person_expertise(@person, expertise_list)
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
@@ -101,18 +97,18 @@ class PeopleController < ApplicationController
     end
   end
   
-  def update_person_expertise profile, expertise_list
+  def update_person_expertise person, expertise_list
     #FIXME: don't clear them all, check what has been removed. 
-    profile.expertises.clear
+    person.expertises.clear
     expertise_list.split(",").each do |exp|
       exp.strip!
       e=Expertise.find(:first, :conditions=>{:name=>exp})
       if (e.nil?)
         e=Expertise.new(:name=>exp)
         e.save
-        profile.expertises << e
+        person.expertises << e
       else
-        profile.expertises << e unless profile.expertises.include?(e)
+        person.expertises << e unless person.expertises.include?(e)
       end
     end
   end

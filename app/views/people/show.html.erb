@@ -1,4 +1,4 @@
-<% profile=@person.profile %>
+
 <div class="yui-b show_basic">
   
   <div id="name">
@@ -6,33 +6,33 @@
   </div>
   
   
-  <% unless is_nil_or_empty? profile.web_page %>
+  <% unless is_nil_or_empty? @person.web_page %>
     <div id="web_page">
-      <p><label for="web_page">Web page:</label><%= link_to h(profile.web_page), profile.web_page, :popup=>true %></p>
+      <p><label for="web_page">Web page:</label><%= link_to h(@person.web_page), @person.web_page, :popup=>true %></p>
     </div>
   <% end %>
   
-  <% unless is_nil_or_empty? profile.email %>
+  <% unless is_nil_or_empty? @person.email %>
     <div id="email">
-      <p><label for="email">Email:</label><%= mail_to h(profile.email) %></p>
+      <p><label for="email">Email:</label><%= mail_to h(@person.email) %></p>
     </div>
   <% end %>
   
-  <% unless is_nil_or_empty? profile.skype_name %>
+  <% unless is_nil_or_empty? @person.skype_name %>
     <div id="skype">
-      <p><label for="email">Skype:</label><%= h profile.skype_name %></p>
+      <p><label for="email">Skype:</label><%= h @person.skype_name %></p>
     </div>
   <% end %>
   
-  <% unless is_nil_or_empty? profile.phone %>
+  <% unless is_nil_or_empty? @person.phone %>
     <div id="phone">
-      <p><label for="phone">Phone:</label><%= h profile.phone %></p>
+      <p><label for="phone">Phone:</label><%= h @person.phone %></p>
     </div>
   <% end %>
   
   <%= render :partial=>"show_projects", :object=>@person.projects  %>
   <%= render :partial=>"show_institutions", :object=>@person.institutions  %>
-  <%= render :partial=>"expertise_list", :object=>profile.expertises  %>
+  <%= render :partial=>"expertise_list", :object=>@person.expertises  %>
  
   <% if @current_user.person == @person %>      
   <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>

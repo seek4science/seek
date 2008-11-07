@@ -1,7 +1,7 @@
 module PeopleHelper
   
   def person_full_name person
-    return person.profile.first_name.capitalize + " " + person.profile.last_name.capitalize
+    return person.first_name.capitalize + " " + person.last_name.capitalize
   end
   
   def person_avatar_image person

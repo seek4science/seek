@@ -1,5 +1,5 @@
 <% person=person_list_item %>
-<% profile = person.profile %>
+
 
 <div id="list_item">
   
@@ -21,32 +21,32 @@
     
     
     <div id="email">
-      <% unless profile.email.nil? or profile.email.empty? %>
+      <% unless person.email.nil? or person.email.empty? %>
                           
         <label>Email: </label>
-        <%= mail_to h(profile.email) %>
+        <%= mail_to h(person.email) %>
       
       <% end  %>
     </div>
     
-    <% unless profile.web_page.nil? or profile.web_page.empty? %>
+    <% unless person.web_page.nil? or person.web_page.empty? %>
       <div id="web_page">
         <label>Web page:</label>
-        <%= link_to h(profile.web_page), h(profile.web_page),:popup=>true %>
+        <%= link_to h(person.web_page), h(person.web_page),:popup=>true %>
       </div>
     <% end  %>
     
-    <% unless profile.phone.nil? or profile.phone.empty? %>
+    <% unless person.phone.nil? or person.phone.empty? %>
       <div id="phone">
         <label>Phone:</label>
-        <%= h profile.phone %>
+        <%= h person.phone %>
       </div>
     <% end  %>
     
-    <% unless profile.skype_name.nil? or profile.skype_name.empty? -%>
+    <% unless person.skype_name.nil? or person.skype_name.empty? -%>
       <div id="skype_name">
         <label>Skype:</label>
-        <%= h profile.skype_name %>
+        <%= h person.skype_name %>
       </div>
     <% end  %>
     

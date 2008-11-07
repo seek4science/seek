@@ -1,34 +1,34 @@
 <div class="yui-b show_basic">
   <% form_for @person do |f| %>
     <%= f.error_messages %>
-    <% fields_for @person.profile do |prof|%>
+    
       <p>
-        <%= prof.label :first_name %><br />
-        <%= prof.text_field :first_name %>
+        <%= f.label :first_name %><br />
+        <%= f.text_field :first_name %>
       </p>
       <p>
-        <%= prof.label :last_name %><br />
-        <%= prof.text_field :last_name %>
+        <%= f.label :last_name %><br />
+        <%= f.text_field :last_name %>
       </p>
       <p>
-        <%= prof.label :email %><br />
-        <%= prof.text_field :email %>
+        <%= f.label :email %><br />
+        <%= f.text_field :email %>
       </p>
       <p>
-        <%= prof.label :phone %><br />
-        <%= prof.text_field :phone %>
+        <%= f.label :phone %><br />
+        <%= f.text_field :phone %>
       </p>
       <p>
-        <%= prof.label :skype_name %><br />
-        <%= prof.text_field :skype_name %>
+        <%= f.label :skype_name %><br />
+        <%= f.text_field :skype_name %>
       </p>
       <p>
-        <%= prof.label :web_page %><br />
-        <%= prof.text_field :web_page %>
+        <%= f.label :web_page %><br />
+        <%= f.text_field :web_page %>
       </p>
-    <% end %>
+    
   
-    <%= render :partial => "expertise_text_field", :locals=>{:profile=>@person.profile} %>
+    <%= render :partial => "expertise_text_field", :locals=>{:person=>@person} %>
   
     <%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
   

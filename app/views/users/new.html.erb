@@ -9,13 +9,13 @@
     <p><label for="login">Login name</label><br/>
     <%= f.text_field :login %></p>
   
-    <% fields_for @user.person.profile do |prof| %>
+    <% fields_for @user.person do |pf| %>
                 
       <p><label for="first_name">First name</label><br/>
-      <%= prof.text_field :first_name %></p>
+      <%= pf.text_field :first_name %></p>
   
       <p><label for="last_name">Last name</label><br/>
-      <%= prof.text_field :last_name %></p>
+      <%= pf.text_field :last_name %></p>
   
     <% end %>
           
