@@ -7,7 +7,7 @@ class CreateProfiles < ActiveRecord::Migration
       t.string   :phone
       t.string   :skype_name
       t.string   :web_page
-      t.integer  :person_id,  :limit => 11
+      t.integer  :person_id
     
       t.timestamps
     end
