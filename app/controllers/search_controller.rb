@@ -6,7 +6,7 @@ class SearchController < ApplicationController
     
     @query = params[:query]
     @results=[]
-    @results = Profile.multi_solr_search(@query, :limit=>100, :models=>[Profile, Project, Institution, Expertise]).results if (SOLR_ENABLED and !@query.nil? and !@query.strip.empty?)
+    @results = Person.multi_solr_search(@query, :limit=>100, :models=>[Person, Project, Institution, Expertise]).results if (SOLR_ENABLED and !@query.nil? and !@query.strip.empty?)
     
   end
   

@@ -1,11 +1,10 @@
 class Person < ActiveRecord::Base
   
-  has_one :profile
-  has_and_belongs_to_many :work_groups
   
-  validates_presence_of :profile
-  validates_associated :profile
-
+  has_and_belongs_to_many :work_groups
+  has_and_belongs_to_many :expertises
+  
+  acts_as_solr(:fields => [ :first_name, :last_name ]) if SOLR_ENABLED
   
   def validates_associated(*associations)
     associations.each do |association|

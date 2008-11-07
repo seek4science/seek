@@ -6,7 +6,6 @@ class UsersController < ApplicationController
   def new
     @user=User.new
     @user.person=Person.new
-    @user.person.profile=Profile.new
   end
 
   def create
@@ -17,7 +16,6 @@ class UsersController < ApplicationController
     # reset_session
     @user = User.new(params[:user])
     @user.person=Person.new(params[:person])
-    @user.person.profile=Profile.new(params[:profile])
     
     @user.save
     

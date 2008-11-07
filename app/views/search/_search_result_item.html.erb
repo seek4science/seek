@@ -1,5 +1,5 @@
-<% if search_result_item.instance_of?(Profile) %>
-        <%= render :partial=>"/people/person_list_item", :object=>search_result_item.person %>
+<% if search_result_item.instance_of?(Person) %>
+        <%= render :partial=>"/people/person_list_item", :object=>search_result_item %>
 <% end %>
 
 <% if search_result_item.instance_of?(Project) %>
