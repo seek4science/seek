@@ -40,10 +40,9 @@ class UserTest < Test::Unit::TestCase
     end
   end
 
-  def test_should_require_email
-    assert_no_difference 'User.count' do
+  def test_should_not_require_email
+    assert_difference 'User.count' do
       u = create_user(:email => nil)
-      assert u.errors.on(:email)
     end
   end
 
