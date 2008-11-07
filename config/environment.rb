@@ -66,5 +66,7 @@ Rails::Initializer.run do |config|
   # config.active_record.observers = :cacher, :garbage_collector
   
   load 'config/environment_local.rb' if FileTest.exist?('config/environment_local.rb')
+  
+  SOLR_ENABLED=false unless !SOLR_ENABLED.nil?
 
 end
