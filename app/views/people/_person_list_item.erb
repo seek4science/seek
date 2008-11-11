@@ -1,13 +1,15 @@
 <% person=person_list_item %>
-
+<% drag_id=model_to_drag_id person %>
 
 <div id="list_item">
-  
-  <div id="avatar_pane">
-    <div id="avatar">
-      <%= image_tag person_avatar_image(person),{:size=>"50x60"} %>
+  <div id="<%= drag_id %>">  
+    <div id="avatar_pane">
+      <div id="avatar">
+        <%= image_tag person_avatar_image(person),:size=>"50x60", :alt=>person_full_name(person) %>
+      </div>
     </div>
   </div>
+  <%= favourite_drag_element(drag_id) %>
   
   
   <div id="details">
@@ -22,7 +24,7 @@
     
     <div id="email">
       <% unless person.email.nil? or person.email.empty? %>
-                          
+                                
         <label>Email: </label>
         <%= mail_to h(person.email) %>
       

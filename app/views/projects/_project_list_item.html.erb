@@ -1,21 +1,36 @@
 <% project = project_list_item %>
+<% drag_id = model_to_drag_id(project) %>
+
 <div id="list_item">
   
-  <div id="name">
-    <%= link_to h(project.title), url_for(project) %>
+  <div id="<%= drag_id %>">  
+    <div id="avatar_pane">
+      <div id="avatar">
+        <%= image_tag "famfamfam_silk/brick.png",:size=>"50x60", :alt=>project.title %>
+      </div>
+    </div>
   </div>
-  <% unless is_nil_or_empty? project.web_page %>
-    <div id="web_page">
-      <label>Web page:</label>
-      <%= link_to h(project.web_page), h(project.web_page),:popup=>true %>
+  <%= favourite_drag_element(drag_id) %>
+      
+      
+  <div id="details">
+    <div id="name">
+      <%= link_to h(project.title), url_for(project) %>
     </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? project.wiki_page %>
-    <div id="wiki_page">
-      <label>Wiki page:</label>
-      <%= link_to h(project.wiki_page), h(project.wiki_page),:popup=>true %>
-    </div>
-  <% end %>
     
+    
+    <% unless is_nil_or_empty? project.web_page %>
+      <div id="web_page">
+        <label>Web page:</label>
+        <%= link_to h(project.web_page), h(project.web_page),:popup=>true %>
+      </div>
+    <% end %>
+    
+    <% unless is_nil_or_empty? project.wiki_page %>
+      <div id="wiki_page">
+        <label>Wiki page:</label>
+        <%= link_to h(project.wiki_page), h(project.wiki_page),:popup=>true %>
+      </div>
+    <% end %>
+  </div>
 </div>

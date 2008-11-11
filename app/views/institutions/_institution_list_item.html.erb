@@ -1,6 +1,18 @@
 <% institution = institution_list_item %>
+<% drag_id=model_to_drag_id institution %>
+
 <div id="list_item">
   
+  <div id="<%= drag_id %>">  
+    <div id="avatar_pane">
+      <div id="avatar">
+        <%= image_tag "famfamfam_silk/book.png",:size=>"50x60", :alt=>institution.name %>
+      </div>
+    </div>
+  </div>
+  <%= favourite_drag_element drag_id %>
+  
+  <div id="details">
   <div id="name">
     <%= link_to h(institution.name), url_for(institution) %>
   </div>
@@ -25,6 +37,7 @@
       <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
     </div>
   <% end %>
+</div>
     
     
         
