@@ -1,0 +1,7 @@
+<% for fav in Favourite.find_all_by_user_id(current_user.id) %>
+   <% person = Person.find(fav.asset_id) 
+      full_name=person_full_name(person)
+    %>
+  <%= link_to image_tag(person_avatar_image(person),:alt=>full_name, :size=>"25x30"), url_for(Person.find(fav.asset_id)), :title=>tooltip_title_attrib(full_name) %>
+
+<% end %>
