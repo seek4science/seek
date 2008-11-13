@@ -46,7 +46,7 @@ module ApplicationHelper
   def fast_auto_complete_field(field_id, options={})
     div_id = "#{field_id}_auto_complete"
     url = options.delete(:url) or raise "url required"
-    options = options.merge(:tokens => ',', :frequency => 0 )
+    options = options.merge(:tokens => ',', :frequency => 0.01 )
     script = javascript_tag <<-end
     new Ajax.Request('#{url}', {
       method: 'get',

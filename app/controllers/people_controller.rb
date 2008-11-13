@@ -105,6 +105,7 @@ class PeopleController < ApplicationController
     person.expertises.clear
     expertise_list.split(",").each do |exp|
       exp.strip!
+      exp.capitalize!
       e=Expertise.find(:first, :conditions=>{:name=>exp})
       if (e.nil?)
         e=Expertise.new(:name=>exp)
