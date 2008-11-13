@@ -16,7 +16,7 @@ module FavouritesHelper
       title=item.name
       image="institution_64x64.png"
     end
-    image_tag = image_tag(image, :size=>"25x30",:alt=>title)
+    image_tag = image_tag(image, :size=>"27x32",:alt=>title)
     return link_to(image_tag, url_for(item), :title=>tooltip_title_attrib(title))
   end
   
