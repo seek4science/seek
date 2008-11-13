@@ -11,12 +11,9 @@
     <%= javascript_include_tag "boxover.js" %>
     <%= javascript_include_tag 'scriptaculous.js'  %>
     
-    <%= stylesheet_link_tag 'reset-fonts-grids' %>
-    <%= stylesheet_link_tag 'base-min' %>
-    <%= stylesheet_link_tag 'my_exp' %>
-    <%= stylesheet_link_tag 'gadgets' %>
-    <%= stylesheet_link_tag 'styles'  %>
-    <%= stylesheet_link_tag 'fast_auto_complete' %>
+
+    <%= stylesheet_link_tag 'reset-fonts-grids', 'base-min', 'my_exp', 'gadgets', 'styles', 'fast_auto_complete', :cache=>'seek'%>
+    
 
   </head>
   
