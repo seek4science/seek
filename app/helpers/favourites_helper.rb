@@ -11,10 +11,10 @@ module FavouritesHelper
       image=person_avatar_image(item)
     elsif (item.instance_of? Project)
       title=item.title
-      image="famfamfam_silk/brick.png"
+      image="project_64x64.png"
     elsif (item.instance_of? Institution)
       title=item.name
-      image="famfamfam_silk/book.png"
+      image="institution_64x64.png"
     end
     image_tag = image_tag(image, :size=>"25x30",:alt=>title)
     return link_to(image_tag, url_for(item), :title=>tooltip_title_attrib(title))
