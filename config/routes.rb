@@ -50,6 +50,7 @@ ActionController::Routing::Routes.draw do |map|
   # map.root :controller => "welcome"
   
   #
+  #FIXME: shouldn't be on people controller
   map.expertise_autocomplete '/expertise_autocomplete', :controller=>'people', :action=>'auto_complete_for_expertise_name'
   map.signup  '/signup', :controller => 'users',   :action => 'new' 
   map.login  '/login',  :controller => 'sessions', :action => 'new'
