@@ -2,7 +2,7 @@
   <ul><label>Projects:</label>
           <% for project in institution_projects %>
             <li>
-              <%=link_to(h(project.title), url_for(project)) %>
+              <%=link_to(h(project.name), url_for(project)) %>
             </li>
           <% end  %>
         </ul>

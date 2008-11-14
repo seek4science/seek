@@ -6,7 +6,7 @@
   <div id="<%= drag_id %>">  
     <div id="avatar_pane">
       
-        <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>project.title %>
+        <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>project.name %>
       
     </div>
   </div>
@@ -15,7 +15,7 @@
       
   <div id="details">
     <div id="name">
-      <%= link_to h(project.title), url_for(project) %>
+      <%= link_to h(project.name), url_for(project) %>
     </div>
     
     

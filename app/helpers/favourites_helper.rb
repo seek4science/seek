@@ -10,7 +10,7 @@ module FavouritesHelper
       title=person_full_name(item)
       image=person_avatar_image(item)
     elsif (item.instance_of? Project)
-      title=item.title
+      title=item.name
       image="project_64x64.png"
     elsif (item.instance_of? Institution)
       title=item.name
