@@ -5,7 +5,7 @@
   <div id="<%= drag_id %>">  
     <div id="avatar_pane">
       <div id="avatar">
-        <%= image_tag person_avatar_image(person),:size=>"50x60", :alt=>person_full_name(person) %>
+        <%= image_tag person_avatar_image(person),:size=>"50x60", :alt=>h(person.name) %>
       </div>
     </div>
   </div>
@@ -15,7 +15,7 @@
   <div id="details">
     
     <div id="name">
-      <%=  link_to  h(person_full_name(person)),url_for(person) %>
+      <%=  link_to  h(person.name),url_for(person) %>
       <% if @current_user.person==person %>
         <small style="font-size:12px">[<%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit', :controller=>'people') %>]</small>
       <% end %>

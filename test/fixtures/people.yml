@@ -3,7 +3,7 @@
 one:
         id: 1
         first_name: quentin
-        last_name: last_name
+        last_name: jones
 
 two:
         id: 2

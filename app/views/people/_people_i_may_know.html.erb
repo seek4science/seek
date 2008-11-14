@@ -3,7 +3,7 @@
     <ul><label>People you may know:</label><%= help_icon("These are people that are related to you either by project or institution.") %>
       <% for person in people_i_may_know %>
         <li>
-          <%= link_to h(person_full_name(person)),url_for(person) %>
+          <%= link_to h(person.name),url_for(person) %>
         </li>
       <% end  %>
     </ul>

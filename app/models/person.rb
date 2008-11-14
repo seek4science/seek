@@ -52,4 +52,8 @@ class Person < ActiveRecord::Base
     return res
   end
   
+  def name
+      return first_name.capitalize + " " + last_name.capitalize
+  end
+  
 end

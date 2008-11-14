@@ -8,7 +8,7 @@
     <div id="expertise_people">
       <ul><label>People with this expertise</label></ul>
       <% for person in @expertise.people %>
-        <li><%= link_to h(person_full_name(person)), url_for(person)  %>  </li>
+        <li><%= link_to h(person.name), url_for(person)  %>  </li>
       <% end %>
     </div>
 

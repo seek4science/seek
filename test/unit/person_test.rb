@@ -23,4 +23,11 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:one)
     assert_equal 2,p.projects.size
   end
+  
+  def test_name
+      p=people(:one)
+      assert_equal "Quentin Jones", p.name
+      p.first_name="Tom"
+      assert_equal "Tom Jones", p.name
+  end
 end

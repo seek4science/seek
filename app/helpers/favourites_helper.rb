@@ -6,8 +6,9 @@ module FavouritesHelper
   
   def fav_image_tag favourite
     item = favourite.model_name.constantize.find(favourite.asset_id)
+    #FIXME: these need to be protected with 'h'
     if (item.instance_of? Person)
-      title=person_full_name(item)
+      title=item.name
       image=person_avatar_image(item)
     elsif (item.instance_of? Project)
       title=item.name
