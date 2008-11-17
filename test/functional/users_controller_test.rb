@@ -84,6 +84,18 @@ class UsersControllerTest < Test::Unit::TestCase
   rescue ActionController::RoutingError
     # well played, sir
   end
+  
+  def test_can_edit_self
+      login_as :quentin
+      get :edit, :id=>users(:quentin)
+      assert_response :success
+  end
+  
+  def test_cant_edit_some_else
+      login_as :quentin
+      get :edit, :id=>users(:aaron)
+      assert_redirected_to root_url
+  end
 
   protected
     def create_user(options = {})

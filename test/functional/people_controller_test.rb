@@ -37,6 +37,16 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, :id => people(:one).id
     assert_response :success
   end
+  
+  def test_not_current_user_doesnt_show_link_to_change_password
+      get :edit, :id => people(:two).id
+      assert_select "a", :text=>"Change login details", :count=>0  
+  end
+  
+  def test_current_user_does_show_link_to_change_password
+      get :edit, :id => people(:one).id
+      assert_select "a", :text=>"Change login details", :count=>1   
+  end
 
   def test_should_update_person
     put :update, :id => people(:one).id, :person => { }

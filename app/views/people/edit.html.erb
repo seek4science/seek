@@ -1,7 +1,7 @@
 <div class="yui-b show_basic">
   <% form_for @person do |f| %>
-    <%= f.error_messages %>
-    
+      <%= f.error_messages %>
+          
       <p>
         <%= f.label :first_name %><br />
         <%= f.text_field :first_name %>
@@ -26,15 +26,21 @@
         <%= f.label :web_page %><br />
         <%= f.text_field :web_page %>
       </p>
-    
   
-    <%= render :partial => "expertise_text_field", :locals=>{:person=>@person} %>
+      <%= render :partial => "expertise_text_field", :locals=>{:person=>@person} %>
   
-    <%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
-  
-  
-    <p>
-      <%= f.submit "Update", :class=>'submit' %>
-    </p>
+      <%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
+        
+        
+      <p>
+        <%= f.submit "Update", :class=>'submit' %>
+      </p>
   <% end %>
+
+  <% if @current_user.person == @person %>
+      <% fields_for @person.user do |user| %>
+        <%= link_to "Change login details", url_for({:controller=>:users, :action=>:edit, :id=>@person.user})%>
+      <% end %>
+  <% end %>
+
 </div>
