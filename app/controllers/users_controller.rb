@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   
     layout 'logged_out'
     
-    before_filter :find_user_auth, :only=>[:edit, :update]
+    before_filter :is_current_user_auth, :only=>[:edit, :update]
   
     # render new.rhtml
     def new
@@ -58,31 +58,6 @@ class UsersController < ApplicationController
         end  
     end
     
-    def find_user_auth
-    begin
-      @user = User.find(params[:id], :conditions => ["id = ?", current_user.id])
-    rescue ActiveRecord::RecordNotFound
-      error("User not found (id not authorized)", "is invalid (not owner)")
-      return false
-    end
     
-    unless @user
-      error("User not found (or not authorized)", "is invalid (not owner)")
-      return false
-    end
-    
-    
-  end
-  
-  private
-
-  def error(notice, message)
-    flash[:error] = notice
-    (err = User.new.errors).add(:id, message)
-    
-    respond_to do |format|
-      format.html { redirect_to root_url }
-    end
-  end
 
 end

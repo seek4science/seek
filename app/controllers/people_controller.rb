@@ -1,6 +1,8 @@
 class PeopleController < ApplicationController
   
   before_filter :login_required
+  before_filter :is_current_user_auth, :only=>[:edit, :update]
+  before_filter :is_user_admin_auth, :only=>[:new, :destroy]
   
   fast_auto_complete_for :expertise, :name
   
@@ -116,7 +118,5 @@ class PeopleController < ApplicationController
       end
     end
   end
-  
-    
   
 end
