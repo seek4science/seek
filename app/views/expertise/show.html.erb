@@ -8,7 +8,8 @@
     <div id="expertise_people">
       <ul><label>People with this expertise</label></ul>
       <% for person in @expertise.people %>
-        <li><%= link_to h(person.name), url_for(person)  %>  </li>
+              <% link_class = person==current_user.person ? "current_user" : "" %>
+        <li><%= link_to h(person.name), url_for(person) , :class=>link_class %>  </li>
       <% end %>
     </div>
 

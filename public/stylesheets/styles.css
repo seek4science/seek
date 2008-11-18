@@ -154,5 +154,9 @@
     white-space:nowrap;
 }
 
+#expertise_people a.current_user {
+    color: red;
+}
+
 
 
