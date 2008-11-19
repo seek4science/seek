@@ -3,16 +3,15 @@
 
 <div id="list_item">
   
-  <div id="<%= drag_id %>" class="asset">  
-    <div id="avatar_pane">
-      
-        <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>project.name %>
-      
+  
+  <div id="avatar_pane">
+    <div id="<%= drag_id %>" class="asset"> 
+      <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>project.name %>         
     </div>
   </div>
   <%= favourite_drag_element(drag_id) %>
-      
-      
+        
+        
   <div id="details">
     <div id="name">
       <%= link_to h(project.name), url_for(project) %>

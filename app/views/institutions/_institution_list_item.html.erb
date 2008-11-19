@@ -3,43 +3,43 @@
 
 <div id="list_item">
   
-  <div id="<%= drag_id %>" class="asset">  
-    <div id="avatar_pane">
-      
-        <%= image_tag "institution_64x64.png",:size=>"50x60", :alt=>institution.name %>
-      
+  
+  <div id="avatar_pane">
+    <div id="<%= drag_id %>" class="asset">
+      <%= image_tag "institution_64x64.png",:size=>"50x60", :alt=>institution.name %>
+            
     </div>
   </div>
   <%= favourite_drag_element drag_id %>
-  
+    
   <div id="details">
-  <div id="name">
-    <%= link_to h(institution.name), url_for(institution) %>
+    <div id="name">
+      <%= link_to h(institution.name), url_for(institution) %>
+    </div>
+    
+    <% unless is_nil_or_empty? institution.country %>
+      <div id="web_page">
+        <label>Country:</label>
+        <%= h institution.country %>&nbsp;<%= flag_icon(institution.country) %>
+      </div>
+    <% end %>
+    
+    <% unless is_nil_or_empty? institution.city %>
+      <div id="city">
+        <label>City:</label>
+        <%= h institution.city %>
+      </div>
+    <% end %>
+    
+    <% unless is_nil_or_empty? institution.web_page %>
+      <div id="web_page">
+        <label>Web page:</label>
+        <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
+      </div>
+    <% end %>
   </div>
   
-  <% unless is_nil_or_empty? institution.country %>
-    <div id="web_page">
-      <label>Country:</label>
-      <%= h institution.country %>&nbsp;<%= flag_icon(institution.country) %>
-    </div>
-  <% end %>
-
-  <% unless is_nil_or_empty? institution.city %>
-    <div id="city">
-      <label>City:</label>
-      <%= h institution.city %>
-    </div>
-  <% end %>
-
-  <% unless is_nil_or_empty? institution.web_page %>
-    <div id="web_page">
-      <label>Web page:</label>
-      <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
-    </div>
-  <% end %>
-</div>
-    
-    
-        
+  
+  
 </div>
 

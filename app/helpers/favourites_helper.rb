@@ -22,7 +22,7 @@ module FavouritesHelper
   end
   
   def favourite_drag_element drag_id
-    return draggable_element(drag_id, :revert=>true, :ghosting=>true)
+    return draggable_element(drag_id, :revert=>true, :ghosting=>false)
   end
   
   private
