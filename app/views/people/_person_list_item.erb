@@ -2,7 +2,7 @@
 <% drag_id=model_to_drag_id person %>
 
 <div id="list_item">
-  <div id="<%= drag_id %>">  
+  <div id="<%= drag_id %>" class="asset">  
     <div id="avatar_pane">
       <div id="avatar">
         <%= image_tag person_avatar_image(person),:size=>"50x60", :alt=>h(person.name) %>

@@ -1,2 +1,0 @@
-page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
-page.visual_effect :highlight, "drop_favourites", :startcolor=>"#DDDDFF"

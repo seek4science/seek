@@ -18,7 +18,7 @@ module FavouritesHelper
       image="institution_64x64.png"
     end
     image_tag = image_tag(image, :size=>"27x32",:alt=>title)
-    return link_to(image_tag, url_for(item), :title=>tooltip_title_attrib(title))
+    return link_to_draggable(image_tag, url_for(item), :title=>tooltip_title_attrib(title),:class=>"favourite", :id=>"fav_#{favourite.id}")
   end
   
   def favourite_drag_element drag_id

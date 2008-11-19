@@ -58,5 +58,27 @@ module ApplicationHelper
     content_tag 'div', script, :class => 'auto_complete', :id => div_id
   end
 
+  def link_to_draggable(link_name, url, link_options = {}, drag_options = {})
+    if !link_options[:id]
+      return ":id mandatory"
+    end
+    
+    can_click_var = "can_click_for_#{link_options[:id]}"
+    html = javascript_tag("var #{can_click_var} = true;");
+    html << link_to(
+      link_name,
+      url,
+      :id => link_options[:id],
+      :class => link_options[:class] || "",
+      :title => link_options[:title] || "",
+      :onclick => "if (!#{can_click_var}) {#{can_click_var}=true;return(false);} else {return true;}",
+      :onMouseUp => "setTimeout('#{can_click_var} = true;', 200);")
+    html << draggable_element(link_options[:id],
+      :revert => drag_options[:revert] || true,
+      :ghosting => drag_options[:ghosting] || false,
+      :change => "function(element){#{can_click_var} = false;}")
+    return html
+  end
+
   
 end

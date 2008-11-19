@@ -1,3 +1,4 @@
 <% for fav in Favourite.find_all_by_user_id(current_user.id) %>
    <%= fav_image_tag(fav) %>
+   
 <% end %>
