@@ -5,3 +5,9 @@
 #
 # two:
 #   column: value
+
+one:
+    model_name: Project
+    asset_id: 2
+    user_id: 1
+
