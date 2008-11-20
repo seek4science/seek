@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   
-    layout 'logged_out'
+    layout "logged_out", :except=>[:edit]
     
     before_filter :is_current_user_auth, :only=>[:edit, :update]
   
@@ -42,6 +42,7 @@ class UsersController < ApplicationController
   
     def edit
         @user = User.find(params[:id])
+        render :action=>:edit, :layout=>"main"
     end
   
     def update

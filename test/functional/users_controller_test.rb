@@ -89,6 +89,8 @@ class UsersControllerTest < Test::Unit::TestCase
       login_as :quentin
       get :edit, :id=>users(:quentin)
       assert_response :success
+      #TODO: is there a better way to test the layout used?
+      assert_select "div#myexp_sidebar" #check its using the right layout
   end
   
   def test_cant_edit_some_else
