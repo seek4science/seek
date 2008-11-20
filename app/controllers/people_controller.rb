@@ -1,7 +1,7 @@
 class PeopleController < ApplicationController
   
   before_filter :login_required
-  before_filter :is_current_user_auth, :only=>[:edit, :update]
+  before_filter :profile_belongs_to_current, :only=>[:edit, :update]
   before_filter :is_user_admin_auth, :only=>[:new, :destroy]
   
   fast_auto_complete_for :expertise, :name
@@ -116,6 +116,16 @@ class PeopleController < ApplicationController
       else
         person.expertises << e unless person.expertises.include?(e)
       end
+    end
+  end
+  
+  private
+  
+  def profile_belongs_to_current
+    @person=Person.find(params[:id])
+    unless @person == current_user.person
+      error("Not the current person", "is invalid (not owner)")
+      return false
     end
   end
   

@@ -15,3 +15,8 @@ three:
         first_name: no_user
         last_name: smith
 
+fred:
+        id: 4
+        first_name: fred
+        last_name: blogs
+

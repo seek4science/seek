@@ -38,6 +38,18 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  def test_cant_edit_someone_else
+    get :edit, :id=> people(:two).id
+    assert_redirected_to root_path
+  end
+  
+  def test_can_edit_person_and_user_id_different
+    #where a user_id for a person are not the same
+    login_as(:fred)
+    get :edit, :id=>people(:fred).id
+    assert_response :success
+  end
+  
   def test_not_current_user_doesnt_show_link_to_change_password
       get :edit, :id => people(:two).id
       assert_select "a", :text=>"Change login details", :count=>0  
