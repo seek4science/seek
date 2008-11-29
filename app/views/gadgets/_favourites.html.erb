@@ -3,15 +3,25 @@
 
   <div class="header">
     Favourites
+    <div id="fav_ajax-loader" style="display:none">
+      <%= image_tag("ajax-loader.gif", :alt=>"loading...",:title=>"loading...") %>
+    </div>
   </div>
   
+  
   <div id="drop_favourites" class="contents" style="min-height:100px">
+    
     <div id="favourite_list">
       <%= render :partial=>"favourites/gadget_list" %>
     </div>
     
   </div>
-  <%= drop_receiving_element(:drop_favourites, :accept=>"asset", :url=>{:controller=>'favourites', :action=>'add'}) %>
+  <%= drop_receiving_element(:drop_favourites, 
+    :accept=>"asset",
+    :url=>{:controller=>'favourites', :action=>'add'},
+    :before => "Element.show('fav_ajax-loader')",
+    :complete => "Element.hide('fav_ajax-loader');")
+  %>
   
   <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
 </div>

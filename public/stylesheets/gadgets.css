@@ -227,5 +227,9 @@
 	font-size: 85%;
 	font-weight: normal;
 }
+#ajax-loader {
+    position: relative;
+    right: 0px;
+}
 
 /* end css Asset Manager Gadget styles */
