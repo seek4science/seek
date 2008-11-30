@@ -1,46 +1,59 @@
-<div class="yui-b show_basic">
+
+<div class="show_basic">
   <% form_for @person do |f| %>
-      <%= f.error_messages %>
-          
-      <p>
-        <%= f.label :first_name %><br />
-        <%= f.text_field :first_name %>
-      </p>
-      <p>
-        <%= f.label :last_name %><br />
-        <%= f.text_field :last_name %>
-      </p>
-      <p>
-        <%= f.label :email %><br />
-        <%= f.text_field :email %>
-      </p>
-      <p>
-        <%= f.label :phone %><br />
-        <%= f.text_field :phone %>
-      </p>
-      <p>
-        <%= f.label :skype_name %><br />
-        <%= f.text_field :skype_name %>
-      </p>
-      <p>
-        <%= f.label :web_page %><br />
-        <%= f.text_field :web_page %>
-      </p>
-  
-      <%= render :partial => "expertise_text_field", :locals=>{:person=>@person} %>
-  
-      <%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
+    <div class="yui-g">
+      <div class="yui-u first">
+        <div id="edit_person_left">
+        
+          <%= f.error_messages %>
+                                                                
+          <p>
+            <%= f.label :first_name %><br />
+            <%= f.text_field :first_name %>
+          </p>
+          <p>
+            <%= f.label :last_name %><br />
+            <%= f.text_field :last_name %>
+          </p>
+          <p>
+            <%= f.label :email %><br />
+            <%= f.text_field :email %>
+          </p>
+          <p>
+            <%= f.label :phone %><br />
+            <%= f.text_field :phone %>
+          </p>
+          <p>
+            <%= f.label :skype_name %><br />
+            <%= f.text_field :skype_name %>
+          </p>
+          <p>
+            <%= f.label :web_page %><br />
+            <%= f.text_field :web_page %>
+          </p>
+          <p>
+            <%= render :partial => "expertise_text_field", :locals=>{:person=>@person} %>
+          </p>
+        
+          <p>
+            <%= f.submit "Update", :class=>'submit' %>
+          </p>
+        </div>
+      </div>
+      <div class="yui-u">
+        <div id="edit_person_right">
         
         
-      <p>
-        <%= f.submit "Update", :class=>'submit' %>
-      </p>
-  <% end %>
-
-  <% if @current_user.person == @person %>
-      <% fields_for @person.user do |user| %>
-        <%= link_to "Change login details", url_for({:controller=>:users, :action=>:edit, :id=>@person.user})%>
-      <% end %>
-  <% end %>
-
-</div>
+          <%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
+        
+          <% if @current_user.person == @person %>
+        
+            <%= link_to "Change login details", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}) %>
+        
+            <% end %>                        
+          </div>
+        </div>
+      </div>
+  
+    <% end %>
+  </div>

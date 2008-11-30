@@ -131,8 +131,35 @@
     float: bottom;
 }
 
-.show_basic input,select {
-    width: 25em;
+.show_basic {
+    padding-top: 1em;
+}
+
+.show_basic input {
+    width: 22em;
+    
+}
+
+.show_basic #expertise_name {
+    width: 22em;
+    max-height: 2.5em;
+}
+
+.show_basic select {
+    width: 22em;
+    height: 25em;
+    min-height: 25em;
+    max-height: 25em;
+}
+
+.show_basic .submit  {
+    width: 5em;
+}
+
+.show_basic #edit_person_left {
+    width:87%;
+    padding-left: 2em;
+    border-right: dotted 1px black;
 }
 
 .show_basic label {

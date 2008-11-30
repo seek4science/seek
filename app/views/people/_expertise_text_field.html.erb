@@ -4,7 +4,7 @@
 <label for="expertises_text">Areas of expertise</label>
 <%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add you own if necessary.") %>
 <br />
-<%= text_field :expertise, :name, {:value=>h(expertises_as_comma_seperated_list(person.expertises))} %>
+<%= text_area :expertise, :name, {:value=>h(expertises_as_comma_seperated_list(person.expertises))} %>
 
 
 
