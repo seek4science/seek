@@ -1,42 +1,53 @@
-<div class="yui-b show_basic">
-  <id id="name">
-    <p><%= h @institution.name %></p>
-  </id>
-  
-  <% unless is_nil_or_empty? @institution.country %>
-    <div id="country">
-      <p><label>Country: </label><%= h @institution.country %>&nbsp;<%= flag_icon(@institution.country) %></p>
+<% drag_id=model_to_drag_id @institution %>
+<div class="show_basic">
+  <div class="yui-gf">
+    <div class="yui-u first">
+      <div id="avatar_pane">
+    <div id="<%= drag_id %>" class="asset">
+      <%= image_tag "institution_64x64.png",:size=>"50x60", :alt=>@institution.name %>
     </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @institution.web_page %>
-    <div id="web_page">
-      <p><label>Web page: </label><%= link_to h(@institution.web_page), @institution.web_page, :popup=>true %></p>
+  </div>
+  <%= favourite_drag_element drag_id %>
     </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @institution.city %>
-    <div id="city">
-      <p><label>City: </label><%= h @institution.city %></p>
+    <div class="yui-u">
+      <id id="name">
+        <p><%= h @institution.name %></p>
+      </id>
+      
+      <% unless is_nil_or_empty? @institution.country %>
+        <div id="country">
+          <p><label>Country: </label><%= h @institution.country %>&nbsp;<%= flag_icon(@institution.country) %></p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @institution.web_page %>
+        <div id="web_page">
+          <p><label>Web page: </label><%= link_to h(@institution.web_page), @institution.web_page, :popup=>true %></p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @institution.city %>
+        <div id="city">
+          <p><label>City: </label><%= h @institution.city %></p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @institution.address %>
+        <div id="address">
+          <p><label>Address: </label><%= h @institution.address %></p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @institution.people %>
+        <%= render :partial=>'institution_people', :object=>@institution.people %>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @institution.projects %>
+        <%= render :partial=>'institution_projects', :object=>@institution.projects %>
+      <% end %>
     </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @institution.address %>
-    <div id="address">
-      <p><label>Address: </label><%= h @institution.address %></p>
-    </div>
-  <% end %>
-
-  <% unless is_nil_or_empty? @institution.people %>
-     <%= render :partial=>'institution_people', :object=>@institution.people %>
-  <% end %>
-
-  <% unless is_nil_or_empty? @institution.projects %>
-     <%= render :partial=>'institution_projects', :object=>@institution.projects %>
-  <% end %>
+  </div>
   
 </div>
-<!--
-<%= link_to 'Edit', edit_institution_path(@institution) %>
--->
+
 

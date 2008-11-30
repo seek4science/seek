@@ -1,51 +1,62 @@
-<div class="yui-b show_basic">
-  
-  <div id="name">
-    <p><%= h @project.name %></p>
-  </div>
-  
-  <% unless is_nil_or_empty? @project.web_page %>
-    <div id="web_page">
-      <p>
-        <label>Web page:</label>
-        <%= link_to h(@project.web_page), h(@project.web_page),:popup=>true %>
-      </p>
+<% drag_id = model_to_drag_id(@project) %>
+<div class="show_basic">
+  <div class="yui-gf">
+    <div class="yui-u first">
+      <div id="avatar_pane">
+          <div id="<%= drag_id %>" class="asset"> 
+            <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>@project.name %>         
+          </div>
+      </div>
+      <%= favourite_drag_element(drag_id) %>
     </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @project.wiki_page %>
-    <div id="wiki_page">
-      <p>
-        <label>Wiki page:</label>
-        <%= link_to h(@project.wiki_page), h(@project.wiki_page),:popup=>true %>
-      </p>
-    </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @project.institutions %>
-    <div id="project_institutions">
-      <ul>
-        <label>Institutions within this project: </label>
-        <% for institution in @project.institutions %>
-        <li>
-          <%= link_to h(institution.name),url_for(institution) %>&nbsp;<%= flag_icon(institution.country) %>
-        </li>
-      <% end  %>
-      </ul>
-    </div>
-  
-  
-  <% end  %>  
-  
-  <% unless is_nil_or_empty? @project.people %>
-    <div id="project_people">
-      <ul>
-        <label>People working within this project: </label>
-        <%= render :partial=>"project_people_item", :collection=>@project.people %>
-      </ul>
-    </div>
-  
-  
-  <% end  %>
+    <div class="yui-u">
+      <div id="name">
+        <p><%= h @project.name %></p>
+      </div>
       
+      <% unless is_nil_or_empty? @project.web_page %>
+        <div id="web_page">
+          <p>
+            <label>Web page:</label>
+            <%= link_to h(@project.web_page), h(@project.web_page),:popup=>true %>
+          </p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @project.wiki_page %>
+        <div id="wiki_page">
+          <p>
+            <label>Wiki page:</label>
+            <%= link_to h(@project.wiki_page), h(@project.wiki_page),:popup=>true %>
+          </p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @project.institutions %>
+        <div id="project_institutions">
+          <ul>
+            <label>Institutions within this project: </label>
+            <% for institution in @project.institutions %>
+              <li>
+                <%= link_to h(institution.name),url_for(institution) %>&nbsp;<%= flag_icon(institution.country) %>
+              </li>
+            <% end  %>
+          </ul>
+        </div>
+      
+      
+      <% end  %>  
+      
+      <% unless is_nil_or_empty? @project.people %>
+        <div id="project_people">
+          <ul>
+            <label>People working within this project: </label>
+            <%= render :partial=>"project_people_item", :collection=>@project.people %>
+          </ul>
+        </div>
+      
+      
+      <% end  %>
+    </div>
+  </div>
 </div>

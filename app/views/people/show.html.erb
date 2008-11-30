@@ -1,41 +1,52 @@
-
-<div class="yui-b show_basic">
+<% drag_id=model_to_drag_id @person %>
+<div class="show_basic">
   
-  <div id="name">
-    <p><%= h  @person.name %></p>
+  <div class="yui-gf">
+    <div class="yui-u first">
+      <div id="avatar_pane">
+        <div id="<%= drag_id %>" class="asset">
+          <div id="avatar">
+            <%= image_tag person_avatar_image(@person),:size=>"50x60", :alt=>h(@person.name) %>
+          </div>
+        </div>
+      </div>
+      <%= favourite_drag_element(drag_id) %>
+    </div>
+    <div class="yui-u">
+      <div id="name">
+        <p><%= h  @person.name %></p>
+      </div>
+      <% unless is_nil_or_empty? @person.web_page %>
+        <div id="web_page">
+          <p><label for="web_page">Web page:</label><%= link_to h(@person.web_page), @person.web_page, :popup=>true %></p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @person.email %>
+        <div id="email">
+          <p><label for="email">Email:</label><%= mail_to h(@person.email) %></p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @person.skype_name %>
+        <div id="skype">
+          <p><label for="email">Skype:</label><%= h @person.skype_name %></p>
+        </div>
+      <% end %>
+      
+      <% unless is_nil_or_empty? @person.phone %>
+        <div id="phone">
+          <p><label for="phone">Phone:</label><%= h @person.phone %></p>
+        </div>
+      <% end %>
+      
+      <%= render :partial=>"show_projects", :object=>@person.projects  %>
+      <%= render :partial=>"show_institutions", :object=>@person.institutions  %>
+      <%= render :partial=>"expertise_list", :object=>@person.expertises  %>
+      
+      <% if @current_user.person == @person %>      
+        <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>
+      <% end  %>
+    </div>
   </div>
-  
-  
-  <% unless is_nil_or_empty? @person.web_page %>
-    <div id="web_page">
-      <p><label for="web_page">Web page:</label><%= link_to h(@person.web_page), @person.web_page, :popup=>true %></p>
-    </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @person.email %>
-    <div id="email">
-      <p><label for="email">Email:</label><%= mail_to h(@person.email) %></p>
-    </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @person.skype_name %>
-    <div id="skype">
-      <p><label for="email">Skype:</label><%= h @person.skype_name %></p>
-    </div>
-  <% end %>
-  
-  <% unless is_nil_or_empty? @person.phone %>
-    <div id="phone">
-      <p><label for="phone">Phone:</label><%= h @person.phone %></p>
-    </div>
-  <% end %>
-  
-  <%= render :partial=>"show_projects", :object=>@person.projects  %>
-  <%= render :partial=>"show_institutions", :object=>@person.institutions  %>
-  <%= render :partial=>"expertise_list", :object=>@person.expertises  %>
- 
-  <% if @current_user.person == @person %>      
-  <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>
-  <% end  %>
-        
 </div>

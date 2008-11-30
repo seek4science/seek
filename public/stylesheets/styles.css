@@ -154,6 +154,15 @@
     white-space:nowrap;
 }
 
+.show_basic #avatar_pane {
+    text-align: center;
+    padding-top: 2em;
+}
+
+.show_basic #avatar img {
+    border: solid black 1px;
+}
+
 #expertise_people a.current_user {
     color: red;
 }
