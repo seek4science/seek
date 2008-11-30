@@ -55,4 +55,22 @@ namespace :solr do
       puts "Index files removed under " + ENV['RAILS_ENV'] + " environment"
     end
   end
+  
+  desc 'Starts Solr. on windows . Options accepted: RAILS_ENV=your_env, PORT=XX. Defaults to development if none.'
+  task :start_win do
+    begin
+      n = Net::HTTP.new('localhost', SOLR_PORT)
+      n.request_head('/').value
+
+    rescue Net::HTTPServerException #responding
+      puts "Port #{SOLR_PORT} in use" and return
+
+    rescue Errno::ECONNREFUSED #not responding
+      Dir.chdir(SOLR_PATH) do
+          exec "java -Dsolr.data.dir=solr/data/#{ENV['RAILS_ENV']} -Djetty.port=#{SOLR_PORT} -jar start.jar"
+        sleep(5)
+        puts "#{ENV['RAILS_ENV']} Solr started sucessfuly on #{SOLR_PORT}, pid: #{pid}."
+      end
+    end
+  end
 end
