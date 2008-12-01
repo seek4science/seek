@@ -9,7 +9,11 @@ Based partly on feedback from Carole:
 
 - split expertise - e.g. tools and organisms
 
-- 
+- updated items page
+
+- make use of and display updated/created timestamp fields
+
+- add footer with credits for myExperiment, and other credits in CREDITS file
 
 - add a getting started text file - will be needed to help Sergy
 - SOPs - just upload for now, but together with contribution model from myExperiment. Can get Sergy's help with this
