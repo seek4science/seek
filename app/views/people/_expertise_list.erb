@@ -1,13 +1,12 @@
 
 
-<div id="institutions">
-  <% unless is_nil_or_empty? expertise_list %>
+<div id="expertise">
     <ul><label>Areas of expertise:</label>
       <% for expertise in expertise_list %>
         <li>
           <%= link_to h(expertise.name), url_for(expertise) %>
         </li>
       <% end  %>
+      <%= empty_list_li_text(expertise_list)%>
     </ul>
-  <% end  %>
 </div>

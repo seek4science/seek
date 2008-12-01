@@ -18,13 +18,13 @@
       </div>
       
       <div id="web_page">
-        <p><label for="web_page">Web page:</label><%= link_to h(@person.web_page), @person.web_page, :popup=>true %></p>
+        <p><label for="web_page">Web page:</label><%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
       </div>
       
       
       
       <div id="email">
-        <p><label for="email">Email:</label><%= is_nil_or_empty?(@person.email) ? text_or_not_specified(@person.email) : mail_to(text_or_not_specified(@person.email)) %></p>
+        <p><label for="email">Email:</label><%= text_or_not_specified(@person.email, :email=>true) %></p>
       </div>
       
       
@@ -36,12 +36,13 @@
       
       
       <div id="phone">
-        <p><label for="phone">Phone:</label><%= h @person.phone %></p>
+        <p><label for="phone">Phone:</label><%= text_or_not_specified(@person.phone) %></p>
       </div>
       
       <p>
         <%= render :partial=>"show_projects", :object=>@person.projects  %>
-      </p><p>
+      </p>
+      <p>
         <%= render :partial=>"show_institutions", :object=>@person.institutions  %>
       </p>
       <p>
@@ -49,9 +50,9 @@
       </p>
       
       <% if @current_user.person == @person %>    
-          <p>  
-            <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>
-          </p>
+        <p>  
+          <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>
+        </p>
       <% end  %>
     </div>
   </div>

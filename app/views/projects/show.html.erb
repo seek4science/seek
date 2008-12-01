@@ -14,25 +14,25 @@
         <p><%= h @project.name %></p>
       </div>
       
-      <% unless is_nil_or_empty? @project.web_page %>
+      
         <div id="web_page">
           <p>
             <label>Web page:</label>
-            <%= link_to h(@project.web_page), h(@project.web_page),:popup=>true %>
+            <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
           </p>
         </div>
-      <% end %>
       
-      <% unless is_nil_or_empty? @project.wiki_page %>
+      
+      
         <div id="wiki_page">
           <p>
             <label>Wiki page:</label>
-            <%= link_to h(@project.wiki_page), h(@project.wiki_page),:popup=>true %>
+            <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
           </p>
         </div>
-      <% end %>
       
-      <% unless is_nil_or_empty? @project.institutions %>
+      
+      
         <div id="project_institutions">
           <ul>
             <label>Institutions within this project: </label>
@@ -41,22 +41,23 @@
                 <%= link_to h(institution.name),url_for(institution) %>&nbsp;<%= flag_icon(institution.country) %>
               </li>
             <% end  %>
+            <%= empty_list_li_text(@project.institutions) %>
           </ul>
         </div>
       
       
-      <% end  %>  
       
-      <% unless is_nil_or_empty? @project.people %>
+      
+      
         <div id="project_people">
           <ul>
             <label>People working within this project: </label>
             <%= render :partial=>"project_people_item", :collection=>@project.people %>
+            <%= empty_list_li_text(@project.people) %>
           </ul>
         </div>
       
       
-      <% end  %>
     </div>
   </div>
 </div>

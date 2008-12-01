@@ -5,11 +5,19 @@ module ApplicationHelper
     thing.nil? or thing.empty?
   end
   
-  def text_or_not_specified text
+  def empty_list_li_text list
+    return "<li><em>None specified</em></li>" if is_nil_or_empty?(list)
+  end
+  
+  def text_or_not_specified text, options = {}
       if text.nil? or text.empty?
           return "<em> Not specified</em>"
       else
-          return h(text)
+          res = h(text)
+          res=mail_to(res) if options[:email]==true
+          res=link_to(res,res,:popup=>true) if options[:external_link]==true
+          res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
+          return res
       end
       
   end

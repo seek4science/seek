@@ -1,13 +1,14 @@
 <% institutions=show_institutions %>
 
 <div id="institutions">
-  <% unless is_nil_or_empty? institutions %>
-    <ul><label>Institutions:</label>
-      <% for institution in institutions %>
-        <li>
-          <%= link_to h(institution.name),url_for(institution) %>&nbsp;<%= flag_icon(institution.country) %>
-        </li>
-      <% end  %>
-    </ul>
-  <% end  %>
+  
+  <ul><label>Institutions:</label>
+    <% for institution in institutions %>
+      <li>
+        <%= link_to h(institution.name),url_for(institution) %>&nbsp;<%= flag_icon(institution.country) %>
+      </li>
+    <% end  %>
+    <%= empty_list_li_text(institutions)%>
+  </ul>
+  
 </div>

@@ -1,9 +1,10 @@
 <div id="institution_projects">
   <ul><label>Projects:</label>
-          <% for project in institution_projects %>
-            <li>
-              <%=link_to(h(project.name), url_for(project)) %>
-            </li>
-          <% end  %>
-        </ul>
+    <% for project in institution_projects %>
+      <li>
+        <%=link_to(h(project.name), url_for(project)) %>
+      </li>
+    <% end  %>
+    <%= empty_list_li_text(institution_projects) %>
+  </ul>
 </div>

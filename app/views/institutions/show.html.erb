@@ -3,48 +3,46 @@
   <div class="yui-gf">
     <div class="yui-u first">
       <div id="avatar_pane">
-    <div id="<%= drag_id %>" class="asset">
-      <%= image_tag "institution_64x64.png",:size=>"50x60", :alt=>@institution.name %>
-    </div>
-  </div>
-  <%= favourite_drag_element drag_id %>
+        <div id="<%= drag_id %>" class="asset">
+          <%= image_tag "institution_64x64.png",:size=>"50x60", :alt=>@institution.name %>
+        </div>
+      </div>
+      <%= favourite_drag_element drag_id %>
     </div>
     <div class="yui-u">
       <id id="name">
         <p><%= h @institution.name %></p>
       </id>
       
-      <% unless is_nil_or_empty? @institution.country %>
-        <div id="country">
-          <p><label>Country: </label><%= h @institution.country %>&nbsp;<%= flag_icon(@institution.country) %></p>
-        </div>
-      <% end %>
       
-      <% unless is_nil_or_empty? @institution.web_page %>
-        <div id="web_page">
-          <p><label>Web page: </label><%= link_to h(@institution.web_page), @institution.web_page, :popup=>true %></p>
-        </div>
-      <% end %>
+      <div id="country">
+        <p><label>Country: </label><%= text_or_not_specified @institution.country, :flag=>true %></p>
+      </div>
       
-      <% unless is_nil_or_empty? @institution.city %>
-        <div id="city">
-          <p><label>City: </label><%= h @institution.city %></p>
-        </div>
-      <% end %>
       
-      <% unless is_nil_or_empty? @institution.address %>
-        <div id="address">
-          <p><label>Address: </label><%= h @institution.address %></p>
-        </div>
-      <% end %>
       
-      <% unless is_nil_or_empty? @institution.people %>
+      <div id="web_page">
+        <p><label>Web page: </label><%= text_or_not_specified(@institution.web_page, :external_link=>true)   %></p>
+      </div>
+      
+      
+      
+      <div id="city">
+        <p><label>City: </label><%= text_or_not_specified @institution.city %></p>
+      </div>
+      
+      
+      
+      <div id="address">
+        <p><label>Address: </label><%= text_or_not_specified @institution.address %></p>
+      </div>
+      
+      <p>
         <%= render :partial=>'institution_people', :object=>@institution.people %>
-      <% end %>
-      
-      <% unless is_nil_or_empty? @institution.projects %>
+      </p>
+      <p>
         <%= render :partial=>'institution_projects', :object=>@institution.projects %>
-      <% end %>
+      </p>
     </div>
   </div>
   
