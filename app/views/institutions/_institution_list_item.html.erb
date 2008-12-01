@@ -5,13 +5,13 @@
   
   
   <div id="avatar_pane">
-    <div id="<%= drag_id %>" class="asset">
-      <%= image_tag "institution_64x64.png",:size=>"50x60", :alt=>institution.name %>
-            
-    </div>
-  </div>
-  <%= favourite_drag_element drag_id %>
     
+    <% image_tag=image_tag "institution_64x64.png",:size=>"50x60", :alt=>institution.name %>
+    <%= link_to_draggable(image_tag, url_for(institution), :id=>drag_id, :class=>"asset") %>      
+      
+  </div>
+  
+  
   <div id="details">
     <div id="name">
       <%= link_to h(institution.name), url_for(institution) %>

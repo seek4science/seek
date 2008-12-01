@@ -4,15 +4,16 @@
 <div id="list_item">
   
   <div id="avatar_pane">
-    <div id="<%= drag_id %>" class="asset">
+    
       <div id="avatar">
-        <%= image_tag person_avatar_image(person),:size=>"50x60", :alt=>h(person.name) %>
+        <% image_tag=image_tag person_avatar_image(person),:size=>"50x60", :alt=>h(person.name) %>
+        <%= link_to_draggable(image_tag, url_for(person), :id=>drag_id, :class=>"asset") %>
       </div>
-    </div>
+    
   </div>
-  <%= favourite_drag_element(drag_id) %>
-    
-    
+  
+      
+      
   <div id="details">
     
     <div id="name">
@@ -25,7 +26,7 @@
     
     <div id="email">
       <% unless person.email.nil? or person.email.empty? %>
-                                      
+                                            
         <label>Email: </label>
         <%= mail_to h(person.email) %>
       
