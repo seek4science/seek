@@ -3,9 +3,9 @@
   <div class="yui-gf">
     <div class="yui-u first">
       <div id="avatar_pane">
-          <div id="<%= drag_id %>" class="asset"> 
-            <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>@project.name %>         
-          </div>
+        <div id="<%= drag_id %>" class="asset"> 
+          <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>@project.name %>         
+        </div>
       </div>
       <%= favourite_drag_element(drag_id) %>
     </div>
@@ -15,25 +15,26 @@
       </div>
       
       
-        <div id="web_page">
-          <p>
-            <label>Web page:</label>
-            <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
-          </p>
-        </div>
+      <div id="web_page">
+        <p>
+          <label>Web page:</label>
+          <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
+        </p>
+      </div>
       
       
       
-        <div id="wiki_page">
-          <p>
-            <label>Wiki page:</label>
-            <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
-          </p>
-        </div>
+      <div id="wiki_page">
+        <p>
+          <label>Wiki page:</label>
+          <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
+        </p>
+      </div>
       
       
       
-        <div id="project_institutions">
+      <div id="project_institutions">
+        <p>
           <ul>
             <label>Institutions within this project: </label>
             <% for institution in @project.institutions %>
@@ -43,19 +44,22 @@
             <% end  %>
             <%= empty_list_li_text(@project.institutions) %>
           </ul>
-        </div>
+        </p>
+      </div>
       
       
       
       
       
-        <div id="project_people">
+      <div id="project_people">
+        <p>
           <ul>
             <label>People working within this project: </label>
             <%= render :partial=>"project_people_item", :collection=>@project.people %>
             <%= empty_list_li_text(@project.people) %>
           </ul>
-        </div>
+        </p>
+      </div>
       
       
     </div>
