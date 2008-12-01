@@ -5,6 +5,15 @@ module ApplicationHelper
     thing.nil? or thing.empty?
   end
   
+  def text_or_not_specified text
+      if text.nil? or text.empty?
+          return "<em> Not specified</em>"
+      else
+          return h(text)
+      end
+      
+  end
+  
   def tooltip_title_attrib(text, delay=200)
     return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
   end

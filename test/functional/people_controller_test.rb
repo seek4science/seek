@@ -32,6 +32,11 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id => people(:one).id
     assert_response :success
   end
+  
+  def test_show_no_email
+      get :show, :id => people(:one).id
+      assert_select "em", :text=>"Not specified"
+  end
 
   def test_should_get_edit
     get :edit, :id => people(:one).id
@@ -42,6 +47,8 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, :id=> people(:two).id
     assert_redirected_to root_path
   end
+  
+  
   
   def test_can_edit_person_and_user_id_different
     #where a user_id for a person are not the same
