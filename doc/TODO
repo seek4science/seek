@@ -11,6 +11,8 @@ Based partly on feedback from Carole:
 
 - updated items page - new users, new assets etc
 
+- show all fields, and if details not provided show Not specified as in myExperiment
+
 - make use of and display updated/created timestamp fields
 
 - add footer with credits for myExperiment, and other credits in CREDITS file
