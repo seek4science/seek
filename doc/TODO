@@ -1,27 +1,15 @@
-Before UK PALS Chapter
+Based partly on feedback from Carole:
 
-Tidy up layout for Insitutions and Project -> show - DONE
+- add more tagging and tag clouds, especially for expertise
+- expand details displayed in lists
+- Project descriptions - scrape from sysmo website
+- make Project/Institution selection more dynamic using a series of drop down selection
+- make more web2.0'y and less like looking over a database - single clicks between relationships
+- make list items more like business cards
 
-Populate with Institution / Project data
+- split expertise - e.g. tools and organisms
 
-Fix email bug - DONE - temporarily disabled from User details, so only Profile is displayed
+- 
 
-Only show related people for the person logged in - DONE
-
-Collapse/Expand in Person list item view - DONE (but needs some tidying)
-
-Some help / guidance tooltips (especially on expertise list) - DONE
-
-Profile page:
-        Improve Project+Institution selection. Use Grouped selection drop down.
-
-Fix:
- Displaying of Address for Institution - DONE
- People are duplicated in Institution/People list and Institution/Project list - DONE
-
-
-
-
-If possible, timewise :-
-
-Make expertise clickable and show people with the same keywords assigned.
+- add a getting started text file - will be needed to help Sergy
+- SOPs - just upload for now, but together with contribution model from myExperiment. Can get Sergy's help with this
