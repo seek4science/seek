@@ -6,12 +6,12 @@ module ApplicationHelper
   end
   
   def empty_list_li_text list
-    return "<li><em>None specified</em></li>" if is_nil_or_empty?(list)
+    return "<li><div class='none_text'> None specified</div></li>" if is_nil_or_empty?(list)
   end
   
   def text_or_not_specified text, options = {}
       if text.nil? or text.empty?
-          return "<em> Not specified</em>"
+          return "<div class='none_text'> Not specified</div>"
       else
           res = h(text)
           res=mail_to(res) if options[:email]==true

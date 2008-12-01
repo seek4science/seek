@@ -35,7 +35,7 @@ class PeopleControllerTest < ActionController::TestCase
   
   def test_show_no_email
       get :show, :id => people(:one).id
-      assert_select "em", :text=>"Not specified"
+      assert_select "div.none_text", :text=>"Not specified"
   end
 
   def test_should_get_edit
