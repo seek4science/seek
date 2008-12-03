@@ -15,6 +15,12 @@
     <%= f.label :wiki_page %><br />
     <%= f.text_field :wiki_page %>
   </p>
+  
+    <p>
+      <%= f.label :description %><br/>
+      <%= f.text_area :description %>
+    </p>
+  
 <p>
         <%= f.label :institutions %><br/>
         <%= f.collection_select :institution_ids, Institution.find(:all), :id, :name, {}, {:multiple=>true} %>

@@ -5,7 +5,6 @@ class Person < ActiveRecord::Base
     has_and_belongs_to_many :expertises
     has_many :work_groups, :through=>:group_memberships
     
-  
     has_one :user
   
     acts_as_solr(:fields => [ :first_name, :last_name ]) if SOLR_ENABLED

@@ -10,18 +10,18 @@ module ApplicationHelper
   end
   
   def text_or_not_specified text, options = {}
-      if text.nil? or text.empty?
-          not_specified_text="Not specified"
-          not_specified_text="No description set" if options[:description]==true
-          res = "<div class='none_text'>#{not_specified_text}</div>"
-      else
-          res = h(text)
-          res=mail_to(res) if options[:email]==true
-          res=link_to(res,res,:popup=>true) if options[:external_link]==true
-          res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
-          
-      end
-      return res
+    if text.nil? or text.empty?
+      not_specified_text="Not specified"
+      not_specified_text="No description set" if options[:description]==true
+      res = "<div class='none_text'>#{not_specified_text}</div>"
+    else
+      #FIXME: handle multi-line descriptions
+      res = h(text)
+      res=mail_to(res) if options[:email]==true
+      res=link_to(res,res,:popup=>true) if options[:external_link]==true
+      res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
+    end
+    return res
   end
   
   def tooltip_title_attrib(text, delay=200)
