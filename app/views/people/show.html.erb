@@ -40,6 +40,11 @@
       </div>
       
       <p>
+      <div id="description" class="box_standout">
+        <%= text_or_not_specified(@person.description, :description=>true) %>
+      </div>
+      <p>
+      <p>
         <%= render :partial=>"show_projects", :object=>@person.projects  %>
       </p>
       <p>

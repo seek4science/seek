@@ -132,8 +132,11 @@
 }
 
 .show_basic input {
-    width: 22em;
-    
+    width: 22em;   
+}
+
+#person_description  {
+    height: 10em;    
 }
 
 .show_basic #expertise_name {

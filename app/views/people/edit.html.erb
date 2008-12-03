@@ -34,6 +34,10 @@
           <p>
             <%= render :partial => "expertise_text_field", :locals=>{:person=>@person} %>
           </p>
+          <p>
+            <%= f.label "Description" %>
+            <%= f.text_area :description, :class=>"description" %>
+          </p>
         
           <p>
             <%= f.submit "Update", :class=>'submit' %>
