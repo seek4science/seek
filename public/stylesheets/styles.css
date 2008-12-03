@@ -76,12 +76,12 @@
 }
 
 #list_item {
-    background-color: #EEEEEE;
+    background-color: #F0F0F0;
     margin: 4px;
     padding: 4px;
     padding-left: 1em;
     border: #999999 solid 1px;
-    font-size: 1.1em;
+    font-size: 93%;
     min-height: 90px;
 }
 
@@ -119,7 +119,13 @@
 }
 
 #list_item label {
-    font-weight: 500;
+    font-weight: bold;
+}
+
+#list_item #expertise {
+    
+    text-align: center;
+    bottom :0px;
 }
 
 #list_item #expand_button {
@@ -161,6 +167,8 @@
     border-right: dotted 1px black;
 }
 
+
+
 .show_basic label {
     font-weight: bold;
 }
@@ -188,6 +196,8 @@
 .show_basic #avatar img {
     border: solid black 1px;
 }
+
+
 
 #expertise_people a.current_user {
     color: red;

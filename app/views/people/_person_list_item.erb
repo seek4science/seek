@@ -1,19 +1,19 @@
 <% person=person_list_item %>
 <% drag_id=model_to_drag_id person %>
 
-<div id="list_item">
+<div id="list_item" class="list_details">
   
   <div id="avatar_pane">
     
-      <div id="avatar">
-        <% image_tag=image_tag person_avatar_image(person),:size=>"50x60", :alt=>h(person.name) %>
-        <%= link_to_draggable(image_tag, url_for(person), :id=>drag_id, :class=>"asset") %>
-      </div>
+    <div id="avatar">
+      <% image_tag=image_tag person_avatar_image(person),:size=>"50x60", :alt=>h(person.name) %>
+      <%= link_to_draggable(image_tag, url_for(person), :id=>drag_id, :class=>"asset") %>
+    </div>
     
   </div>
   
-      
-      
+  
+  
   <div id="details">
     
     <div id="name">
@@ -26,12 +26,20 @@
     
     <div id="email">
       <% unless person.email.nil? or person.email.empty? %>
-                                            
+                                                              
         <label>Email: </label>
         <%= mail_to h(person.email) %>
       
       <% end  %>
     </div>
+    
+    
+    <p>
+      <div class="box_standout">
+        <%= text_or_not_specified person.description, :description=>true %>
+      </div>
+    </p>
+    
     
     <% unless person.web_page.nil? or person.web_page.empty? %>
       <div id="web_page">
@@ -51,6 +59,13 @@
       <div id="skype_name">
         <label>Skype:</label>
         <%= h person.skype_name %>
+      </div>
+    <% end  %>
+    
+    <% unless person.expertises.empty? -%>
+      <div id="expertise">
+        <label>Expertise:</label>
+        <%= list_item_expertise_list person.expertises %>
       </div>
     <% end  %>
     
