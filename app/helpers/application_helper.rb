@@ -15,8 +15,8 @@ module ApplicationHelper
       not_specified_text="No description set" if options[:description]==true
       res = "<div class='none_text'>#{not_specified_text}</div>"
     else
-      #FIXME: handle multi-line descriptions
       res = h(text)
+      res = simple_format(res) if options[:description]==true
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true
       res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
