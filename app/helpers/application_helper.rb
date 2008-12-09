@@ -32,6 +32,116 @@ module ApplicationHelper
     image_tag "folds/unfold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
   end
   
+  
+  def icon(method, url=nil, alt=nil, url_options={}, label=method.humanize, remote=false)
+
+    if (label == 'Destroy')
+      label = 'Delete';
+    end
+
+    return nil unless (filename = method_to_icon_filename(method.downcase))
+    
+    image_options = alt ? { :alt => alt } : { :alt => method.humanize }
+    img_tag = image_tag(filename, image_options)
+    
+    inner = img_tag;
+    inner = "#{img_tag} #{label}" unless label == nil
+
+    if (url)
+      if (remote)
+        inner = link_to_remote(inner, url, url_options);
+      else
+        inner = link_to(inner, url, url_options)
+      end
+    end
+
+    return '<span class="icon">' + inner + '</span>';
+  end
+  
+  def method_to_icon_filename(method)
+    case (method.to_s)
+    when "refresh"
+      return "famfamfam_silk/arrow_refresh_small.png"
+    when "arrow_up"
+      return "famfamfam_silk/arrow_up.png"
+    when "arrow_down"
+      return "famfamfam_silk/arrow_down.png"
+    when "new"
+      return "redmond_studio/add_16.png"
+    when "download"
+      return "redmond_studio/arrow-down_16.png"
+    when "show"
+      return "famfamfam_silk/zoom.png"
+    when "edit"
+      return "famfamfam_silk/pencil.png"
+    when "manage"
+      return "famfamfam_silk/wrench.png"
+    when "destroy"
+      return "famfamfam_silk/cross.png"
+    when "tag"
+      return "famfamfam_silk/tag_blue.png"
+    when "favourite"
+      return "famfamfam_silk/star.png"
+    when "comment"
+      return "famfamfam_silk/comment.png"
+    when "comments"
+      return "famfamfam_silk/comments.png"
+    when "info"
+      return "famfamfam_silk/information.png"
+    when "help"
+      return "famfamfam_silk/help.png"
+    when "confirm"
+      return "famfamfam_silk/accept.png"
+    when "reject"
+      return "famfamfam_silk/cancel.png"
+    when "user"
+      return "famfamfam_silk/user.png"
+    when "user-invite"
+      return "famfamfam_silk/user_add.png"
+    when "avatar"
+      return "famfamfam_silk/picture.png"
+    when "save"
+      return "famfamfam_silk/save.png"
+    when "message"
+      return "famfamfam_silk/email.png"
+    when "message_read"
+      return "famfamfam_silk/email_open.png"
+    when "reply"
+      return "famfamfam_silk/email_go.png"
+    when "message_delete"
+      return "famfamfam_silk/email_delete.png"  
+    when "messages_outbox"
+      return "famfamfam_silk/email_go.png"
+    when "file"
+      return "redmond_studio/documents_16.png"
+    when "logout"
+      return "famfamfam_silk/door_out.png"
+    when "login"
+      return "famfamfam_silk/door_in.png"
+    when "picture"
+      return "famfamfam_silk/picture.png"
+    when "pictures"
+      return "famfamfam_silk/photos.png"
+    when "profile"
+      return "famfamfam_silk/user_suit.png"
+    when "history"
+      return "famfamfam_silk/time.png"   
+    when "news"
+      return "famfamfam_silk/newspaper.png"
+    when "feedback"
+      return "famfamfam_silk/user_comment.png"
+    when "view-all"
+      return "famfamfam_silk/table_go.png"
+    when "announcement"
+      return "famfamfam_silk/transmit.png"
+    when "denied"
+      return "famfamfam_silk/exclamation.png"
+    else
+      return nil
+    end
+  end
+  
+  
   def help_icon(text, delay=200)
     image_tag "famfamfam_silk/help.png", :alt=>"help", :title=>tooltip_title_attrib(text,delay)
   end
