@@ -1,17 +1,26 @@
-<%= error_messages_for :user %>
-<div id="login" class="yui-b">
-<% form_tag session_path do -%>
-<p><label for="login">Login</label><br/>
-<%= text_field_tag 'login' %></p>
+<h1>Log in</h1>
+<% if logged_in? %>
+	<br/>
+	<p style="text-align:center;">You are already logged in.</p>
+	<p style="text-align:center;"><%= link_to "Sign out", signout_path %></p>
+<% else %>
+	<br/>
+	<center>
+  	  <div style="width: 190px;">
+		<%= render :partial => "gadgets/sign_in" %>
+	  </div>
+	</center>
+        
+	<script language="javascript">
+      function focusLogin() {
+        document.getElementById('login').focus();
+      }
 
-<p><label for="password">Password</label><br/>
-<%= password_field_tag 'password' %></p>
-
-<!-- Uncomment this if you want this functionality
-<p><label for="remember_me">Remember me:</label>
-<%= check_box_tag 'remember_me' %></p>
--->
-
-<p><%= submit_tag 'Log in' %> or <%= link_to "Sign up", signup_url %></p>
-<% end -%>
-</div>
+      if (window.addEventListener){
+        window.addEventListener('load', focusLogin, false); 
+      } else if (window.attachEvent){
+        window.attachEvent('onload', focusLogin);
+      }
+    </script>
+	   
+<% end %>

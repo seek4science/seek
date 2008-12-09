@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
             flash[:notice] = "Logged in successfully"
         else
             flash[:error] = "Invalid login"
-            render :action => 'new'
+            redirect_to :action => 'new'
         end
     end
 

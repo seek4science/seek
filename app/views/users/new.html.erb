@@ -1,32 +1,88 @@
-<div id="signup" class="yui-b">
-<p>Return to <%= link_to "login", login_url %></p>
-
-  
-  <%= error_messages_for :user %>
-  
-  
-  <% form_for :user, :url=>users_url do |f| -%>
-    <p><label for="login">Login name</label><br/>
-    <%= f.text_field :login %></p>
-  
-    <% fields_for @user.person do |pf| %>
-                
-      <p><label for="first_name">First name</label><br/>
-      <%= pf.text_field :first_name %></p>
-  
-      <p><label for="last_name">Last name</label><br/>
-      <%= pf.text_field :last_name %></p>
-  
-    <% end %>
-          
-    <p><label for="password">Password</label><br/>
-    <%= f.password_field :password %></p>
-  
-    <p><label for="password_confirmation">Confirm Password</label><br/>
-    <%= f.password_field :password_confirmation %></p>
-  
-    
-    <p><%= submit_tag 'Register' %></p>
-  <% end -%>
-                  
-</div>
+<center>
+	<div id="signup" style="width: 700px;">
+	  <h1>Signup for SysMO</h1>
+		
+		<p class="box_infotext">
+	  	<b>By registering, you are indicating that you have read and agree that:</b>
+			You are responsible for any content that you upload. You may remove your content at 
+			any time. We may make copies for operational purposes. We will take every care to 
+			preserve data but we will not be liable for loss or damage to data while it is stored
+			within SysMO. We receive and store certain types of information whenever you 
+			interact with us which we will use only for operational purposes. We will not make
+			personally identifiable data available to third parties without consent.
+			Please contact us if you have any queries about our terms or our privacy policy.
+	  </p>
+		
+	  <% if error_messages_for :user -%>
+		  <p><%= error_messages_for :user %></p>
+	  <% end -%>
+	  
+		<h2>Please provide your details <%= help_icon("Please note that fields marked with an asterisk are compulsory.") %></h2>
+			  
+	  <% form_for :user, :url=>users_url do |f| -%>
+	    <table style="width: 100%;">
+	    	<tr>
+	    		<td style="width: 50%;">
+	    			<div class="box_simple">
+							<center>
+								<div style="width: 90%;">
+									<p>
+										<label for="user_login">
+											<b><font style="color: #FF0000;">*</font> Login name</b>
+											<%= help_icon("Login should contain a minimum of 3 characters") -%>
+										</label><br/>
+			              <%= f.text_field :login, :style => "width: 100%" %>
+								  </p>
+									
+									<p>
+										<label for="user_password">
+											<b><font style="color: #FF0000;">*</font> Password</b>
+											<%= help_icon("Password should contain a minimum of 4 characters") -%>
+										</label><br/>
+							      <%= f.password_field :password, :style => "width: 100%;" %>
+									</p>
+							  
+							    <p>
+							    	<label for="user_password_confirmation"><b><font style="color: #FF0000;">*</font> Confirm Password</b></label><br/>
+							      <%= f.password_field :password_confirmation, :style => "width: 100%;" %>
+								  </p>
+								</div>
+							</center>
+	    			</div>
+	    		</td>
+					<td style="width: 50%;">
+						<div class="box_simple">
+	    				<% fields_for @user.person do |pf| %>
+					      <center>
+								  <div style="width: 90%">
+										<p><label for="person_first_name"><b>First name</b></label><br/>
+							      <%= pf.text_field :first_name, :style => "width: 100%;" %></p>
+							  
+							      <p><label for="person_last_name"><b>Last name</b></label><br/>
+							      <%= pf.text_field :last_name, :style => "width: 100%;" %></p>
+							    <% end %>
+									
+									<p><label for="user_email"><b>Email address</b></label><br/>
+							    <%= f.text_field :email, :style => "width: 100%;" %></p>
+							  </div>
+							</center>
+	    			</div>
+					</td>
+	    	</tr>
+	    </table>
+			
+			
+			
+	  
+	    
+	          
+	    
+	  
+	    
+	    <p><%= submit_tag 'Register' %></p>
+	  <% end -%>
+	      
+				
+		<p>Return to <%= link_to "login", login_url %></p>            
+	</div>
+</center>
