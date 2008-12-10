@@ -1,6 +1,11 @@
 <center>
-	<div id="signup" style="width: 700px;">
-	  <h1>Signup for SysMO</h1>
+	<div id="signup" style="width: 700px; margin-top: 0.5em;">
+	  
+		<ul class="sectionIcons" style="text-align: right;">
+		  <li><%= icon("refresh", login_url, "Return to login page", nil, "Return to login page") -%></li>
+		</ul>
+		
+		<h1>Signup for SysMO</h1>
 		
 		<p class="box_infotext">
 	  	<b>By registering, you are indicating that you have read and agree that:</b>
@@ -71,18 +76,9 @@
 	    	</tr>
 	    </table>
 			
-			
-			
-	  
-	    
-	          
-	    
-	  
-	    
-	    <p><%= submit_tag 'Register' %></p>
+	    <p style="text-align: center;">
+			  <%= submit_tag 'Register' %>
+			</p>
 	  <% end -%>
-	      
-				
-		<p>Return to <%= link_to "login", login_url %></p>            
 	</div>
 </center>

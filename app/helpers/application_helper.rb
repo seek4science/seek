@@ -142,8 +142,8 @@ module ApplicationHelper
   end
   
   
-  def help_icon(text, delay=200)
-    image_tag method_to_icon_filename("help"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;"
+  def help_icon(text, delay=200, extra_style="")
+    image_tag method_to_icon_filename("help"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
   end
   
   def flag_icon(country, text=country, margin_right='0.3em')
