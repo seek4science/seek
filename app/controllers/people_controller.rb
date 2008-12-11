@@ -4,11 +4,16 @@ class PeopleController < ApplicationController
   before_filter :profile_belongs_to_current, :only=>[:edit, :update]
   before_filter :is_user_admin_auth, :only=>[:new, :destroy]
   
-  fast_auto_complete_for :expertise, :name
+
+  def auto_complete_for_tools_name
+
+    #render :json => object.to_s.camelize.constantize.find(:all).map(&method).to_json
+
+    render :json => Person.tool_counts.map(&:name).to_json
+   
+  end
   
   protect_from_forgery :only=>[]
-
-
   
   # GET /people
   # GET /people.xml
@@ -45,8 +50,10 @@ class PeopleController < ApplicationController
 
   # GET /people/1/edit
   def edit
+    @tags_tools = Person.tool_counts
     @person = Person.find(params[:id])
   end
+
 
   # POST /people
   # POST /people.xml
@@ -72,9 +79,9 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
     
-    if !params[:expertise].nil?
-      expertise_list = params[:expertise][:name]
-      update_person_expertise(@person, expertise_list)
+    if !params[:tool].nil?
+      tools_list = params[:tool][:list]
+      @person.tool_list=tools_list
     end
     
 

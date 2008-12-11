@@ -17,5 +17,11 @@ module PeopleHelper
   def person_list_item_extra_details? person
     !(person.projects.empty? and person.institutions.empty?)  
   end
+
+  def tools_tag_cloud person
+
+  end
+
+  
   
 end
