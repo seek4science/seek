@@ -4,13 +4,8 @@ class PeopleController < ApplicationController
   before_filter :profile_belongs_to_current, :only=>[:edit, :update]
   before_filter :is_user_admin_auth, :only=>[:new, :destroy]
   
-
   def auto_complete_for_tools_name
-
-    #render :json => object.to_s.camelize.constantize.find(:all).map(&method).to_json
-
     render :json => Person.tool_counts.map(&:name).to_json
-   
   end
   
   protect_from_forgery :only=>[]
@@ -59,8 +54,6 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
-    expertise_list = params[:expertise].nil? ? "" : params[:expertise][:name] 
-    update_person_expertise(@person, expertise_list)
 
     respond_to do |format|
       if @person.save
@@ -84,7 +77,6 @@ class PeopleController < ApplicationController
       @person.tool_list=tools_list
     end
     
-
     respond_to do |format|
       if @person.update_attributes(params[:person])
         flash[:notice] = 'Person was successfully updated.'
@@ -106,23 +98,6 @@ class PeopleController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(people_url) }
       format.xml  { head :ok }
-    end
-  end
-  
-  def update_person_expertise person, expertise_list
-    #FIXME: don't clear them all, check what has been removed. 
-    person.expertises.clear
-    expertise_list.split(",").each do |exp|
-      exp.strip!
-      exp.capitalize!
-      e=Expertise.find(:first, :conditions=>{:name=>exp})
-      if (e.nil?)
-        e=Expertise.new(:name=>exp)
-        e.save
-        person.expertises << e
-      else
-        person.expertises << e unless person.expertises.include?(e)
-      end
     end
   end
   

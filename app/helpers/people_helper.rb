@@ -1,20 +1,16 @@
 module PeopleHelper
   
-  def expertises_as_comma_seperated_list expertises
-    res=""
-    expertises.each do |exp|
-      res << exp.name
-      res << ", " unless (expertises.last==exp)
-    end
-    return res
-  end
-  
   def person_list_item_extra_details? person
     !(person.projects.empty? and person.institutions.empty?)  
   end
 
-  def tools_tag_cloud person
 
+
+  def list_item_tools_list tools
+    tools.map do |t|
+      divider=tools.last==t ? "" : " | "
+      link_to(h(t.name),"http://www.google.com")+divider
+    end
   end
 
   

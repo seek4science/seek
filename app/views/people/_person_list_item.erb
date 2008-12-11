@@ -62,10 +62,10 @@
       </div>
     <% end  %>
     
-    <% unless person.expertises.empty? -%>
+    <% unless person.tools.empty? -%>
       <div id="expertise">
-        <label>Expertise:</label>
-        <%= list_item_expertise_list person.expertises %>
+        <label>Tools:</label>
+        <%= list_item_tools_list person.tools %>
       </div>
     <% end  %>
     

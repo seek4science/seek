@@ -2,7 +2,7 @@ class Person < ActiveRecord::Base
   
   
     has_many :group_memberships
-    has_and_belongs_to_many :expertises
+    
     has_many :work_groups, :through=>:group_memberships
 
     acts_as_taggable_on :tools
