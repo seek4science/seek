@@ -1,64 +1,80 @@
 <% drag_id=model_to_drag_id @person %>
+
 <div class="show_basic">
-  
-  <div class="yui-gf">
-    <div class="yui-u first">
-      <div id="avatar_pane">
-        <div id="<%= drag_id %>" class="asset">
-          <div id="avatar">
-            <%= image_tag person_avatar_image(@person),:size=>"50x60", :alt=>h(@person.name) %>
-          </div>
-        </div>
-      </div>
-      <%= favourite_drag_element(drag_id) %>
-    </div>
-    <div class="yui-u">
-      <div id="name">
-        <p><%= h  @person.name %></p>
-      </div>
-      
-      <div id="web_page">
-        <p><label for="web_page">Web page:</label><%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
-      </div>
-      
-      
-      
-      <div id="email">
-        <p><label for="email">Email:</label><%= text_or_not_specified(@person.email, :email=>true) %></p>
-      </div>
-      
-      
-      
-      <div id="skype">
-        <p><label for="email">Skype:</label><%= text_or_not_specified(@person.skype_name) %></p>
-      </div>
-      
-      
-      
-      <div id="phone">
-        <p><label for="phone">Phone:</label><%= text_or_not_specified(@person.phone) %></p>
-      </div>
-      
-      <p>
-      <div id="description" class="box_standout">
-        <%= text_or_not_specified(@person.description, :description=>true) %>
-      </div>
+
+  <h1><%= h @person.name -%></h1>
+	
+  <div class="main_content_left_box">
+  	<div class="box_about_actor">
+  		<p>
+  			<b>Name:</b> <%= h @person.name %>
+  		</p>
+			
+			<p>
+				<b>About me:</b>
+				<div id="description" class="box_standout">
+		      <%= text_or_not_specified(@person.description, :description=>true) %>
+		    </div>
+			</p>
+			
+			<p>
+        <%= render :partial=>"expertise_list", :object => @person.expertises  %>
       </p>
-      <p>
+			
+  	</div>
+		
+		
+		<fieldset>
+			<legend>Professional Involvement</legend>
+			<p>
         <%= render :partial=>"show_projects", :object=>@person.projects  %>
       </p>
       <p>
         <%= render :partial=>"show_institutions", :object=>@person.institutions  %>
       </p>
-      <p>
-        <%= render :partial=>"expertise_list", :object=>@person.expertises  %>
-      </p>
+	  </fieldset>
+		
+		
+		<fieldset>
+  		<legend>Contact Details</legend>
+			<div id="web_page">
+        <p><label for="web_page">Web page:</label> <%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
+      </div>
       
-      <% if @current_user.person == @person %>    
-        <p>  
-          <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>
-        </p>
-      <% end  %>
-    </div>
-  </div>
+      <div id="email">
+        <p><label for="email">Email:</label> <%= text_or_not_specified(@person.email, :email=>true) %></p>
+      </div>
+      
+      <div id="skype">
+        <p><label for="email">Skype:</label> <%= text_or_not_specified(@person.skype_name) %></p>
+      </div>
+      
+      <div id="phone">
+        <p><label for="phone">Phone:</label> <%= text_or_not_specified(@person.phone) %></p>
+      </div>
+  	</fieldset>
+	</div>
+	
+	
+	<div class="main_content_right_box">
+		<div class="contribution_section_box" style="padding-top: 3em; padding-bottom: 3em;">
+  		<div id="<%= drag_id %>" class="asset">
+				<%= link_to_draggable(avatar(@person, 60, true), person_url(@person), :title=>tooltip_title_attrib(h(@person.name)), :id => drag_id) -%>
+	    </div>
+	    <%= favourite_drag_element(drag_id) %>
+		</div>
+		
+		<% if current_user.person.id == @person.id && !is_nil_or_empty?(@person.people_i_may_know) -%>
+			<div class="contribution_section_box">
+			  <p class="heading">
+			  	<%= help_icon("These are people that are related to you either by project or institution.") -%>
+					People I may know
+				</p>
+        <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>
+			</div>
+		<% end -%>
+	</div>
+
+
+
 </div>

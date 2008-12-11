@@ -2,13 +2,13 @@
   <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
 
   <div class="header">
-    <%=  h @current_user.person.name %>
+    <%= h @current_user.person.name %>
   </div>
   
   <div class="contents">
     
     <div id="avatar">
-      <%= link_to(image_tag(person_avatar_image(@current_user.person),{:size=>"50x60"}), url_for(@current_user.person)) %>
+      <%= avatar(current_user.person, 60) -%>
     </div>
     
     <p><%= link_to "Edit my profile", url_for(:controller=>"people", :action=>"edit", :id=>@current_user.person) %></p>
