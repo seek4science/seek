@@ -11,6 +11,8 @@ task :cruise do
     FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
   end
   
+  Rake::Task["db:drop"].invoke
+  Rake::Task["db:create"].invoke
   Rake::Task["db:migrate"].invoke
   Rake::Task["db:test:purge"].invoke
   Rake::Task["db:test:prepare"].invoke
