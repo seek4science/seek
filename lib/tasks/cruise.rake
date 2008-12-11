@@ -1,15 +1,17 @@
 require 'rubygems'
 require 'rake'
+require 'fileutils'
 
 
 desc "task for cruise control"
-task :cruise => :"db:migrate" do
+task :cruise do
   ENV['RAILS_ENV'] = 'test'
   
-  if not File.exists?(Dir.pwd+"/config/database.yml")
-    File.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
+  if !File.exists?(Dir.pwd+"/config/database.yml")
+    FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
   end
   
+  Rake::Task["db:migrate"].invoke
   Rake::Task["db:test:purge"].invoke
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["test"].invoke
