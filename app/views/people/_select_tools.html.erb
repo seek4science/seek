@@ -1,0 +1,16 @@
+<label for="expertises_text">Tools and techniques</label>
+<%= help_icon("A comma seperated list of keywords that describe your tools and techniques.<br/>Please let the suggestions guide you, but feel free to add you own if necessary.") %>
+<br />
+<%= text_area :tool, :list, {:value=>h(person.tool_list)} %>
+
+<div id ="tools_select_tags" class="hTagcloud">
+  <div class="popularity">
+    <% tag_cloud @tags_tools, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| %>
+      <%= link_to tag.name, "ht tp://www.google.com", :class => css_class %>
+    <% end %>
+  </div>
+</div>
+
+
+
+<%= fast_auto_complete_field :tool_list, :url =>tool_list_autocomplete_path %>

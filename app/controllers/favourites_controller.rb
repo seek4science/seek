@@ -9,6 +9,7 @@ class FavouritesController < ApplicationController
     f.user=current_user
     f.model_name=split_id[1]
     f.asset_id=split_id[2].to_i
+    
     if Favourite.find_by_user_id_and_model_name_and_asset_id(current_user,f.model_name,f.asset_id).nil?
       f.save
       render :update, :status=>:created do |page|
@@ -38,4 +39,5 @@ class FavouritesController < ApplicationController
       end
     end
   end
+  
 end
