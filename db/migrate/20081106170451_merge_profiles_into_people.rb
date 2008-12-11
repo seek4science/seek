@@ -14,7 +14,7 @@ class MergeProfilesIntoPeople < ActiveRecord::Migration
     rename_column(:expertises_people, :profile_id, :person_id)
             
     #all expertise is destroyed - there isn't currenlty any REAL data to be concerned about at this moment in time
-    Expertise.delete_all  
+    Expertise.delete_all if (Object.const_defined?("Expertise"))
     
     drop_table :profiles
    
@@ -34,7 +34,7 @@ class MergeProfilesIntoPeople < ActiveRecord::Migration
       t.timestamps
     end
     
-    Expertise.delete_all 
+    Expertise.delete_all if (Object.const_defined?("Expertise"))
     rename_column(:expertises_people, :person_id, :profile_id)
     rename_table(:expertises_people, :expertises_profiles)
     
