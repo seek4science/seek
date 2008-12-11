@@ -5,9 +5,11 @@
 
 <div id ="tools_select_tags" class="hTagcloud">
   <div class="popularity">
-    <% tag_cloud @tags_tools, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| %>
-      <%= link_to tag.name, "ht tp://www.google.com", :class => css_class %>
-    <% end %>
+    <% unless @tags_tools.blank? -%>
+			<% tag_cloud @tags_tools, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| %>
+	      <%= link_to tag.name, "ht tp://www.google.com", :class => css_class %>
+	    <% end %>
+		<% end -%>
   </div>
 </div>
 
