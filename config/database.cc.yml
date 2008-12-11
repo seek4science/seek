@@ -1,0 +1,39 @@
+#Database configuration for cruise control
+
+#MySQL
+#development:
+#  adapter: mysql
+#  database: seekhub_development
+#  username: mysqluser
+#  password: mysqluser
+#  #socket: /var/run/mysqld/mysqld.sock 
+#
+#test:
+#  adapter: mysql
+#  database: seekhub_cruise_test
+#  username: mysqluser
+#  password: mysqluser
+#  #socket: /var/run/mysqld/mysqld.sock 
+#
+#production:
+#  adapter: mysql
+#  database: seekhub_production
+#  username: mysqluser
+#  password: mysqluser
+
+# SQLite version 3.x
+#   gem install sqlite3-ruby (not necessary on OS X Leopard)
+#development:
+#  adapter: sqlite3
+#  database: db/development.sqlite3
+#  timeout: 5000 
+
+test:
+  adapter: sqlite3
+  database: db/cc.sqlite3
+  timeout: 5000
+#
+#production:
+#  adapter: sqlite3
+#  database: db/production.sqlite3
+#  timeout: 5000
