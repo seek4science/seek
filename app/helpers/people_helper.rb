@@ -1,9 +1,4 @@
 module PeopleHelper
-
-  
-  def person_avatar_image person
-    return "avatar.png"
-  end
   
   def expertises_as_comma_seperated_list expertises
     res=""

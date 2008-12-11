@@ -1,13 +1,13 @@
-<% person=person_list_item %>
-<% drag_id=model_to_drag_id person %>
+<% person=person_list_item -%>
+<% drag_id=model_to_drag_id person -%>
 
 <div id="list_item" class="list_details">
   
   <div id="avatar_pane">
     
     <div id="avatar">
-      <% image_tag=image_tag person_avatar_image(person),:size=>"50x60", :alt=>h(person.name) %>
-      <%= link_to_draggable(image_tag, url_for(person), :id=>drag_id, :class=>"asset") %>
+      <% image_tag = avatar(person, 60, true) -%>
+      <%= link_to_draggable(image_tag, url_for(person), :id=>drag_id, :class=>"asset", :title=>tooltip_title_attrib(h(person.name))) -%>
     </div>
     
   </div>
@@ -17,10 +17,10 @@
   <div id="details">
     
     <div id="name">
-      <%=  link_to  h(person.name),url_for(person) %>
-      <% if @current_user.person==person %>
-        <small style="font-size:12px">[<%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit', :controller=>'people') %>]</small>
-      <% end %>
+      <%=  link_to  h(person.name),url_for(person) -%>
+      <% if @current_user.person==person -%>
+        <small style="font-size:12px">[<%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit', :controller=>'people') -%>]</small>
+      <% end -%>
     </div>
     
     

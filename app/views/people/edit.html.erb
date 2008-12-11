@@ -1,3 +1,4 @@
+<h1>Edit profile: <%= link_to(h(@person.name), person_path(@person)) -%></h1>
 
 <div class="show_basic">
   <% form_for @person do |f| %>
@@ -9,38 +10,38 @@
                                                                 
           <p>
             <%= f.label :first_name %><br />
-            <%= f.text_field :first_name %>
+            <%= f.text_field :first_name, :style => "width: 90%;" %>
           </p>
           <p>
             <%= f.label :last_name %><br />
-            <%= f.text_field :last_name %>
+            <%= f.text_field :last_name, :style => "width: 90%;" %>
           </p>
           <p>
             <%= f.label :email %><br />
-            <%= f.text_field :email %>
+            <%= f.text_field :email, :style => "width: 90%;" %>
           </p>
           <p>
             <%= f.label :phone %><br />
-            <%= f.text_field :phone %>
+            <%= f.text_field :phone, :style => "width: 90%;" %>
           </p>
           <p>
             <%= f.label :skype_name %><br />
-            <%= f.text_field :skype_name %>
+            <%= f.text_field :skype_name, :style => "width: 90%;" %>
           </p>
           <p>
             <%= f.label :web_page %><br />
-            <%= f.text_field :web_page %>
+            <%= f.text_field :web_page, :style => "width: 90%;" %>
           </p>
           <p>
             <%= render :partial => "expertise_text_field", :locals=>{:person=>@person} %>
           </p>
           <p>
             <%= f.label "Description" %>
-            <%= f.text_area :description, :class=>"description" %>
+            <%= f.text_area :description, :class=>"description", :style => "width: 90%;" %>
           </p>
         
-          <p>
-            <%= f.submit "Update", :class=>'submit' %>
+          <p style="text-align: center;">
+            <%= f.submit "Update", :class=>'submit' %> or <%= link_to("Cancel", person_path(@person)) -%>
           </p>
         </div>
       </div>

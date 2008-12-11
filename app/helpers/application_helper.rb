@@ -13,7 +13,7 @@ module ApplicationHelper
     if text.nil? or text.empty?
       not_specified_text="Not specified"
       not_specified_text="No description set" if options[:description]==true
-      res = "<div class='none_text'>#{not_specified_text}</div>"
+      res = "<span class='none_text'>#{not_specified_text}</span>"
     else
       res = h(text)
       res = simple_format(res) if options[:description]==true
@@ -170,6 +170,87 @@ module ApplicationHelper
     else
       return ''
     end
+  end
+  
+  # A generic method to produce avatars for entities of all kinds.
+  #
+  # Parameters:
+  # 1) object - the instance of the object which requires the avatar;
+  # 2) size - size of the square are, where the avatar will reside (the aspect ratio of the picture is preserved by ImageMagick);
+  # 3) return_image_tag_only - produces only the <img /> tag; the picture won't be linked to anywhere; no 'alt' / 'title' attributes;
+  # 4) url - when the avatar is clicked, this is the url to redirect to; by default - the url of the "object";
+  # 5) alt - text to show as 'alt' / 'tooltip'; by default "name" attribute of the "object"; when empty string - nothing is shown;
+  # 6) "show_tooltip" - when set to true, text in "alt" get shown as tooltip; otherwise put in "alt" attribute
+  def avatar(object, size=200, return_image_tag_only=false, url=nil, alt=nil, show_tooltip=true)
+    alternative = ""
+    if show_tooltip
+      tooltip_text = (alt.nil? ? h(object.name) : alt)
+    else
+      alternative = (alt.nil? ? h(object.name) : alt) 
+    end
+    
+    case object.class.name.downcase
+      when "person"
+        # TEMP CODE: LINES IN THE FOLLOWING BLOCK WILL GET UNCOMMENTED, WHEN THE AVATAR UPLOAD WILL BE IMPLEMENTED
+        #if person.avatar?
+        #  img = image_tag avatar_url(person.picture_id, size), :title => alt, :class => 'framed'
+        #else
+          img = null_avatar(object.class.name, size, alternative)
+        #end
+        # END OF TEMP CODE
+      when "institution"
+        # TEMP CODE: LINES IN THE FOLLOWING BLOCK WILL GET UNCOMMENTED, WHEN THE AVATAR UPLOAD WILL BE IMPLEMENTED
+        #if person.avatar?
+        #  img = image_tag avatar_url(person.picture_id, size), :title => alt, :class => 'framed'
+        #else
+          img = null_avatar(object.class.name, size, alternative)
+        #end
+        # END OF TEMP CODE
+      when "project"
+        # TEMP CODE: LINES IN THE FOLLOWING BLOCK WILL GET UNCOMMENTED, WHEN THE AVATAR UPLOAD WILL BE IMPLEMENTED
+        #if person.avatar?
+        #  img = image_tag avatar_url(person.picture_id, size), :title => alt, :class => 'framed'
+        #else
+          img = null_avatar(object.class.name, size, alternative)
+        #end
+        # END OF TEMP CODE
+    end
+    
+    # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
+    if return_image_tag_only
+      return img
+    else 
+      unless url
+        url = eval("#{object.class.name.downcase}_url(#{object.id})")
+      end
+      
+      return link_to(img, url, :title => tooltip_title_attrib(tooltip_text))
+    end
+  end
+  
+  # TEMP COMMENT: will be fixed and put in use, when the avatar upload feature is implemented
+  #def avatar_url(picture_id, size=200)
+  #  url_for(:controller => 'pictures',
+  #          :action => 'show',
+  #          :id => picture_id,
+  #          :size => "#{size}x#{size}")
+  #end
+  # END OF TEMP COMMENT
+  
+  def null_avatar(object_class_name, size=200, alt="Anonymous")
+    case object_class_name.downcase
+      when "person"
+        avatar_filename = "avatar.png"
+      when "institution"
+        avatar_filename = "institution_64x64.png"
+      when "project"
+        avatar_filename = "project_64x64.png"
+    end
+    
+    image_tag avatar_filename,
+              :alt => alt, 
+              :size => "#{size}x#{size}",
+              :class => 'framed'
   end
   
   def fast_auto_complete_field(field_id, options={})

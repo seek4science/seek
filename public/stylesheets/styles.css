@@ -134,7 +134,7 @@
 }
 
 .show_basic {
-    padding-top: 1em;
+    padding-left: 2em;
 }
 
 .show_basic input {
@@ -188,20 +188,23 @@
     white-space:nowrap;
 }
 
-.show_basic #avatar_pane {
-    text-align: center;
-    padding-top: 2em;
-}
-
-.show_basic #avatar img {
-    border: solid black 1px;
-}
-
-
-
 #expertise_people a.current_user {
     color: red;
 }
 
 
+/* boxes */
 
+.box_about_actor {
+	/* reserved for potential styling of the box containing personal information about actor */
+}
+
+.main_content_left_box {
+	float: left;
+	width: 73.5%;
+}
+
+.main_content_right_box {
+	float: right;
+	width: 25%;
+}

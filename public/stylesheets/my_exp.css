@@ -37,9 +37,9 @@ h1,h2,h3,h4,h5,h6 {
 
 h1 {
 	text-align: center;
-	font-size: 123.1%;
+	font-size: 167%;
 	color: #000033;
-	margin: 1em 0;
+	margin: 0.8em 0 1em 0;
 	line-height: 1.4;
 }
 
