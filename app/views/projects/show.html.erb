@@ -1,71 +1,65 @@
 <% drag_id = model_to_drag_id(@project) %>
+
+<% truncate_length_for_boxes = 22 -%>
+
+<h1><%= h @project.name -%></h1>
+
 <div class="show_basic">
-  <div class="yui-gf">
-    <div class="yui-u first">
-      <div id="avatar_pane">
-        <div id="<%= drag_id %>" class="asset"> 
-          <%= image_tag "project_64x64.png",:size=>"50x60", :alt=>@project.name %>         
-        </div>
-      </div>
-      <%= favourite_drag_element(drag_id) %>
-    </div>
-    <div class="yui-u">
-      <div id="name">
-        <p><%= h @project.name %></p>
-      </div>
-      
-      
-      <div id="web_page">
+	
+  <div class="main_content_left_box">
+  	<div class="box_about_actor">
+  		<div class="web_page">
         <p>
           <label>Web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
         </p>
       </div>
       
-      
-      
-      <div id="wiki_page">
+      <div class="wiki_page">
         <p>
           <label>Wiki page:</label>
           <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
         </p>
       </div>
       
+      <p style="margin-top: 1em;">
+      	<b>About the project:</b>
+	      <div id="description" class="box_standout">
+	        <%= text_or_not_specified(@project.description, :description=>true) %>
+	      </div>
       <p>
-      <div id="description" class="box_standout">
-        <%= text_or_not_specified(@project.description, :description=>true) %>
+  	</div>
+	</div>
+	
+	<div class="main_content_right_box">
+		<div class="contribution_section_box" style="padding-top: 3em; padding-bottom: 3em;">
+		  <div id="<%= drag_id %>" class="asset"> 
+        <%= link_to_draggable(avatar(@project, 60, true), project_url(@project), :title=>tooltip_title_attrib(h(@project.name)), :id => drag_id) -%>         
       </div>
-      <p>
-      
-      <div id="project_institutions">
-        <p>
-          <ul>
-            <label>Institutions within this project: </label>
-            <% for institution in @project.institutions %>
-              <li>
-                <%= link_to h(institution.name),url_for(institution) %>&nbsp;<%= flag_icon(institution.country) %>
-              </li>
-            <% end  %>
-            <%= empty_list_li_text(@project.institutions) %>
-          </ul>
-        </p>
-      </div>
-      
-      
-      
-      
-      
-      <div id="project_people">
-        <p>
-          <ul>
-            <label>People working within this project: </label>
-            <%= render :partial=>"project_people_item", :collection=>@project.people %>
-            <%= empty_list_li_text(@project.people) %>
-          </ul>
-        </p>
-      </div>
-      
-      
+      <%= favourite_drag_element(drag_id) %>
     </div>
-  </div>
+		
+		<div class="contribution_section_box">
+			<p class="heading">
+				<%= help_icon("Institutions which are involved in this project.") -%>
+				Institutions (<%= @project.institutions.length -%>)
+			</p>
+			<%= render :partial => "layouts/contribution_section_box_item_list", 
+                 :locals => { :collection => @project.institutions,
+                              :icon_type => "flag",
+                              :truncate_to => truncate_length_for_boxes } -%>
+		</div>
+		
+		<div class="contribution_section_box">
+			<p class="heading">
+				<%= help_icon("People working within this project.") -%>
+				People (<%= @project.people.length -%>)
+			</p>
+			<%= render :partial => "layouts/contribution_section_box_item_list", 
+                 :locals => { :collection => @project.people,
+                              :icon_type => "Person",
+                              :truncate_to => truncate_length_for_boxes } -%>
+		</div>
+		
+	</div>
 </div>

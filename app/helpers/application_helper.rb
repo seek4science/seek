@@ -95,7 +95,7 @@ module ApplicationHelper
       return "famfamfam_silk/accept.png"
     when "reject"
       return "famfamfam_silk/cancel.png"
-    when "user"
+    when "user", "person"
       return "famfamfam_silk/user.png"
     when "user-invite"
       return "famfamfam_silk/user_add.png"

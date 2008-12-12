@@ -1,45 +1,41 @@
 <% institution = institution_list_item %>
 <% drag_id=model_to_drag_id institution %>
 
-<div id="list_item">
-  
-  
-  <div id="avatar_pane">
-    
-    <% image_tag=image_tag "institution_64x64.png",:size=>"50x60", :alt=>institution.name %>
-    <%= link_to_draggable(image_tag, url_for(institution), :id=>drag_id, :class=>"asset") %>      
-      
-  </div>
-  
-  
-  <div id="details">
-    <div id="name">
-      <%= link_to h(institution.name), url_for(institution) %>
-    </div>
-    
-    <% unless is_nil_or_empty? institution.country %>
-      <div id="web_page">
-        <label>Country:</label>
-        <%= h institution.country %>&nbsp;<%= flag_icon(institution.country) %>
-      </div>
-    <% end %>
-    
-    <% unless is_nil_or_empty? institution.city %>
-      <div id="city">
-        <label>City:</label>
-        <%= h institution.city %>
-      </div>
-    <% end %>
-    
-    <% unless is_nil_or_empty? institution.web_page %>
-      <div id="web_page">
-        <label>Web page:</label>
-        <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
-      </div>
-    <% end %>
-  </div>
-  
-  
-  
+<div class="list_items_container">
+  <table class="list_item">
+  	<tr>
+  		<td class="item_avatar" style="width: 100px">
+  			<% image_tag = avatar(institution, 60, true) -%>
+  	    <%= link_to_draggable(image_tag, url_for(institution), :id => drag_id, :class => "asset", :title => tooltip_title_attrib(h(institution.name))) -%>
+  		</td>
+			
+			<td class="item_details">
+			  <p class="name">
+		      <% institution_name = h(institution.name) -%>
+					<%= institution_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(institution_name, institution_path(institution)) -%>
+		    </p>
+				
+				<% unless is_nil_or_empty? institution.country %>
+		      <p class="country">
+		        <label>Country: </label>
+		        <%= h institution.country %>&nbsp;<%= flag_icon(institution.country) %>
+		      </p>
+		    <% end %>
+		    
+		    <% unless is_nil_or_empty? institution.city %>
+		      <p class="city">
+		        <label>City:</label>
+		        <%= h institution.city %>
+		      </p>
+		    <% end %>
+		    
+		    <% unless is_nil_or_empty? institution.web_page %>
+		      <p class="web_page">
+		        <label>Web page:</label>
+		        <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
+		      </p>
+		    <% end %>
+			</td>
+		</tr>
+	</table>
 </div>
-

@@ -1,0 +1,20 @@
+<% # the partial expects 3 locals to be defined: "icon_type", "collection" and "truncate_to" -%>
+<% # items in the collection are expected to have .name() method available -%>
+
+<% unless is_nil_or_empty? collection -%>
+    <ul class="list">
+      <% for item in collection -%>
+        <li>
+        	<% unless icon_type.downcase == "flag" -%>
+					  <%= icon(icon_type.downcase, nil, icon_type.camelize, nil, ""); -%>
+					<% else -%>
+					  <%= flag_icon(item.country) -%>
+					<% end -%>
+          <%= link_to truncate(h(item.name), truncate_to), url_for(item), :title => tooltip_title_attrib(h(item.name)) -%>
+        </li>
+      <% end  %>
+    </ul>
+<% else -%>
+  <% # most likely won't be shown, because a check if some people are in this list is carried before calling the partial -%>
+  <p class="none_text">None known</p>
+<% end  -%>

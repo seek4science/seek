@@ -1,51 +1,63 @@
 <% drag_id=model_to_drag_id @institution %>
+
+<% truncate_length_for_boxes = 22 -%>
+
+<h1><%= h @institution.name -%></h1>
+
 <div class="show_basic">
-  <div class="yui-gf">
-    <div class="yui-u first">
-      <div id="avatar_pane">
-        <div id="<%= drag_id %>" class="asset">
-          <%= image_tag "institution_64x64.png",:size=>"50x60", :alt=>@institution.name %>
-        </div>
+	
+  <div class="main_content_left_box">
+  	<div class="box_about_actor">
+      <p class="web_page">
+  			<label>Web page: </label><%= text_or_not_specified(@institution.web_page, :external_link=>true) -%>
+      </p>
+			
+			<fieldset>
+  			<legend>Location</legend>
+				<p class="country">
+		      <label>Country: </label><%= text_or_not_specified @institution.country, :flag=>true -%>
+		    </p>
+				
+				<p class="city">
+	        <label>City: </label><%= text_or_not_specified @institution.city %>
+	      </p>
+	      
+	      <p class="address">
+	        <label>Address: </label><%= text_or_not_specified @institution.address %>
+	      </p>
+  		</fieldset>
+      
+  	</div>
+	</div>
+	
+	<div class="main_content_right_box">
+		<div class="contribution_section_box" style="padding-top: 3em; padding-bottom: 3em;">
+      <div id="<%= drag_id %>" class="asset">
+        <%= link_to_draggable(avatar(@institution, 60, true), institution_url(@institution), :title=>tooltip_title_attrib(h(@institution.name)), :id => drag_id) -%>
       </div>
       <%= favourite_drag_element drag_id %>
-    </div>
-    <div class="yui-u">
-      <id id="name">
-        <p><%= h @institution.name %></p>
-      </id>
-      
-      
-      <div id="country">
-        <p><label>Country: </label><%= text_or_not_specified @institution.country, :flag=>true %></p>
-      </div>
-      
-      
-      
-      <div id="web_page">
-        <p><label>Web page: </label><%= text_or_not_specified(@institution.web_page, :external_link=>true)   %></p>
-      </div>
-      
-      
-      
-      <div id="city">
-        <p><label>City: </label><%= text_or_not_specified @institution.city %></p>
-      </div>
-      
-      
-      
-      <div id="address">
-        <p><label>Address: </label><%= text_or_not_specified @institution.address %></p>
-      </div>
-      
-      <p>
-        <%= render :partial=>'institution_people', :object=>@institution.people %>
-      </p>
-      <p>
-        <%= render :partial=>'institution_projects', :object=>@institution.projects %>
-      </p>
-    </div>
-  </div>
-  
+		</div>
+		
+		<div class="contribution_section_box">
+			<p class="heading">
+				<%= help_icon("People working in #{@institution.name}.") -%>
+			  People (<%= @institution.people.length -%>)
+			</p>
+			<%= render :partial => "layouts/contribution_section_box_item_list", 
+                 :locals => { :collection => @institution.people,
+                              :icon_type => "Person",
+                              :truncate_to => truncate_length_for_boxes } -%>
+		</div>
+		
+		<div class="contribution_section_box">
+			<p class="heading">
+				<%= help_icon("Projects that are undertaken by #{@institution.name}.") -%>
+			  Projects (<%= @institution.projects.length -%>)
+			</p>
+			<%= render :partial => "layouts/contribution_section_box_item_list", 
+                 :locals => { :collection => @institution.projects,
+                              :icon_type => "Project",
+                              :truncate_to => truncate_length_for_boxes } -%>
+		</div>
+	</div>
 </div>
-
-

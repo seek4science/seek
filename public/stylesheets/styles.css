@@ -150,7 +150,7 @@ table.list_item .expertise {
     text-align: left;
 }
 
-.list_item #expand_button {
+table.list_item #expand_button {
     text-align: right;
     float: bottom;
 }
@@ -230,3 +230,23 @@ table.list_item .expertise {
 	float: right;
 	width: 25%;
 }
+
+
+/* customized version of styles from my_exp.css with different names */
+.contribution_section_box ul.list {
+	margin: 0 0 0.8em 0.8em;
+	text-align: left;
+}
+
+.contribution_section_box ul.list li {
+	list-style-type: none;
+	margin: 0.6em 0;
+	padding-left: 0;
+	line-height: 1.1;
+	/*border-left: 3px solid #DDDDBB;*/
+}
+
+.contribution_section_box ul.list li * {
+	vertical-align: middle;
+}
+

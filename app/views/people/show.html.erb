@@ -1,8 +1,10 @@
 <% drag_id=model_to_drag_id @person %>
 
-<div class="show_basic">
+<% truncate_length_for_boxes = 22 -%>
 
-  <h1><%= h @person.name -%></h1>
+<h1><%= h @person.name -%></h1>
+
+<div class="show_basic">
 	
   <div class="main_content_left_box">
   	<div class="box_about_actor">
@@ -20,20 +22,7 @@
 			<p>
         <%= render :partial=>"tools_list", :object => @person  %>
       </p>
-			
   	</div>
-		
-		
-		<fieldset>
-			<legend>Professional Involvement</legend>
-			<p>
-        <%= render :partial=>"show_projects", :object=>@person.projects  %>
-      </p>
-      <p>
-        <%= render :partial=>"show_institutions", :object=>@person.institutions  %>
-      </p>
-	  </fieldset>
-		
 		
 		<fieldset>
   		<legend>Contact Details</legend>
@@ -70,9 +59,35 @@
 			  	<%= help_icon("These are people that are related to you either by project or institution.") -%>
 					People I may know
 				</p>
-        <%= render :partial=>"people_i_may_know", :object=>@person.people_i_may_know %>
+        <%= render :partial => "layouts/contribution_section_box_item_list", 
+                   :locals => { :collection => @person.people_i_may_know,
+                                :icon_type => @person.class.name,
+                                :truncate_to => truncate_length_for_boxes } -%>
 			</div>
 		<% end -%>
+		
+		<div class="contribution_section_box">
+			<p class="heading">
+				<%= help_icon("Projects where #{@person.name} is involved.") -%>
+				Projects (<%= @person.projects.length -%>)
+			</p>
+			<%= render :partial => "layouts/contribution_section_box_item_list", 
+                 :locals => { :collection => @person.projects,
+                              :icon_type => "Project",
+                              :truncate_to => truncate_length_for_boxes } -%>
+		</div>
+		
+		<div class="contribution_section_box">
+			<p class="heading">
+				<%= help_icon("Institutions where #{@person.name} is a member.") -%>
+				Institutions (<%= @person.institutions.length -%>)
+			</p>
+			<%= render :partial => "layouts/contribution_section_box_item_list", 
+                 :locals => { :collection => @person.institutions,
+                              :icon_type => "flag",
+                              :truncate_to => truncate_length_for_boxes } -%>
+		</div>
+		
 	</div>
 
 

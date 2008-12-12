@@ -1,36 +1,35 @@
 <% project = project_list_item %>
 <% drag_id = model_to_drag_id(project) %>
 
-<div id="list_item">
-  
-  
-  <div id="avatar_pane">
-    
-      <% image_tag=image_tag "project_64x64.png",:size=>"50x60", :alt=>project.name %>
-      <%= link_to_draggable(image_tag, url_for(project), :id=>drag_id, :class=>"asset") %>  
-    
-  </div>
-  
-  
-  
-  <div id="details">
-    <div id="name">
-      <%= link_to h(project.name), url_for(project) %>
-    </div>
-    
-    
-    <% unless is_nil_or_empty? project.web_page %>
-      <div id="web_page">
-        <label>Web page:</label>
-        <%= link_to h(project.web_page), h(project.web_page),:popup=>true %>
-      </div>
-    <% end %>
-    
-    <% unless is_nil_or_empty? project.wiki_page %>
-      <div id="wiki_page">
-        <label>Wiki page:</label>
-        <%= link_to h(project.wiki_page), h(project.wiki_page),:popup=>true %>
-      </div>
-    <% end %>
-  </div>
+<div class="list_items_container">
+  <table class="list_item">
+  	<tr>
+  		<td class="item_avatar" style="width: 100px">
+  			<% image_tag = avatar(project, 60, true) -%>
+  	    <%= link_to_draggable(image_tag, url_for(project), :id => drag_id, :class => "asset", :title => tooltip_title_attrib(h(project.name))) -%>
+  		</td>
+			
+			<td class="item_details">
+			  <p class="name">
+			  	<% project_name = h(project.name) -%>
+					<%= project_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(project_name, project_path(project)) -%>
+			  </p>
+				
+				<% unless is_nil_or_empty? project.web_page %>
+		      <p class="web_page">
+		        <label>Web page:</label>
+		        <%= link_to h(project.web_page), h(project.web_page),:popup=>true %>
+		      </p>
+		    <% end %>
+		    
+		    <% unless is_nil_or_empty? project.wiki_page %>
+		      <p class="wiki_page">
+		        <label>Wiki page:</label>
+		        <%= link_to h(project.wiki_page), h(project.wiki_page),:popup=>true %>
+		      </p>
+		    <% end %>
+				
+			</td>
+		</tr>
+	</table>
 </div>
