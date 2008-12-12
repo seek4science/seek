@@ -6,13 +6,23 @@
   </div>
   
   <div class="contents">
-    
+
     <div id="avatar">
       <%= avatar(current_user.person, 60) -%>
     </div>
     
-    <p><%= link_to "Edit my profile", url_for(:controller=>"people", :action=>"edit", :id=>@current_user.person) %></p>
-    <p><%= link_to "Logout", logout_url %></p>
+    <div style="text-align: left; padding-left: 1em;">
+			<ul class="gadget_list">
+			  <li>
+			  	<%= icon "profile", person_path(current_user.person), nil, nil, "&nbsp;My Profile" %>
+					<span style="color: #666666; margin-left: 0.1em;">
+						<small>[ <%= link_to "edit", edit_person_path(current_user.person) -%> ]</small>
+					</span>
+				</li>
+	      <li><%= icon "logout", logout_url, nil, nil, "&nbsp;Logout" %></li>
+			</ul>
+		</div>
+		
   </div>
   
   <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
