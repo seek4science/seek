@@ -54,7 +54,7 @@
 
         <div class="expertise" style="margin-top: 0.7em;">
 
-          <div style="margin-top: 0.3em; border-left: 3px solid #365FA5;">
+          <div style="margin-top: 0.3em; border-left: 2px dotted #365FA5;">
             <p style="margin-left: 1em;">
               <label>Expertise:</label>
               <% unless person.expertise.empty? -%>
@@ -85,12 +85,16 @@
             <% unless person.institutions.empty? -%>
               <% for institution in person.institutions %>
                 <li>
-                  <%= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
+                  <% if institution.country -%>
+									  <%= flag_icon(institution.country) -%>
+									<% else -%>
+  									<%= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
+									<% end -%>
                   <%= link_to(truncate(h(institution.name), truncate_projects_institutions_length), url_for(institution), :title => tooltip_title_attrib(h(institution.name))) -%>
                 </li>
               <% end  %>
             <% else -%>
-              <li><span class="none_text">Not known</span></li>
+              <li><span class="none_text" style="margin-left: 1em;">Not known</span></li>
             <% end -%>
           </ul>
         </div>
@@ -106,7 +110,7 @@
                 </li>
               <% end  %>
             <% else -%>
-              <li><span class="none_text">Not known</span></li>
+              <li><span class="none_text" style="margin-left: 1em;">Not known</span></li>
             <% end -%>
           </ul>
         </div>

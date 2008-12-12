@@ -15,19 +15,17 @@
 					<%= project_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(project_name, project_path(project)) -%>
 			  </p>
 				
-				<% unless is_nil_or_empty? project.web_page %>
-		      <p class="web_page">
-		        <label>Web page:</label>
-		        <%= link_to h(project.web_page), h(project.web_page),:popup=>true %>
-		      </p>
-		    <% end %>
+				<% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>
+	      <p class="web_page">
+	        <label>Web page:</label>
+	        <%= "&nbsp;" + web_page_link -%>
+	      </p>
 		    
-		    <% unless is_nil_or_empty? project.wiki_page %>
-		      <p class="wiki_page">
-		        <label>Wiki page:</label>
-		        <%= link_to h(project.wiki_page), h(project.wiki_page),:popup=>true %>
-		      </p>
-		    <% end %>
+		    <% wiki_page_link = ((is_nil_or_empty? project.wiki_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.wiki_page), h(project.wiki_page),:popup=>true)) -%>
+	      <p class="wiki_page">
+	        <label>Wiki page:</label>
+	        <%= "&nbsp;" + wiki_page_link -%>
+	      </p>
 				
 			</td>
 		</tr>
