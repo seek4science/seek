@@ -137,6 +137,10 @@ module ApplicationHelper
       return "famfamfam_silk/transmit.png"
     when "denied"
       return "famfamfam_silk/exclamation.png"
+    when "institution"
+      return "famfamfam_silk/house.png"
+    when "project"
+      return "famfamfam_silk/report.png"
     else
       return nil
     end
@@ -252,6 +256,20 @@ module ApplicationHelper
               :alt => alt, 
               :size => "#{size}x#{size}",
               :class => 'framed'
+  end
+  
+  def mine?(thing)
+    return false if thing.nil?
+    return false unless logged_in?
+    
+    c_id = current_user.id.to_i
+    
+    case thing.class.name
+      when "Person"
+        return (current_user.person.id == thing.id)
+      else
+        return false
+      end
   end
   
   def fast_auto_complete_field(field_id, options={})

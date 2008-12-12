@@ -8,7 +8,7 @@ module PeopleHelper
 
   def list_item_tools_list tools
     tools.map do |t|
-      divider=tools.last==t ? "" : " | "
+      divider=tools.last==t ? "" : "&nbsp;&nbsp;|&nbsp;&nbsp;"
       link_to(h(t.name),"http://www.google.com")+divider
     end
   end

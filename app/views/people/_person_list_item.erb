@@ -1,75 +1,117 @@
 <% person=person_list_item -%>
 <% drag_id=model_to_drag_id person -%>
 
-<div id="list_item" class="list_details">
-  
-  <div id="avatar_pane">
-    
-    <div id="avatar">
-      <% image_tag = avatar(person, 60, true) -%>
-      <%= link_to_draggable(image_tag, url_for(person), :id=>drag_id, :class=>"asset", :title=>tooltip_title_attrib(h(person.name))) -%>
-    </div>
-    
-  </div>
-  
-  
-  
-  <div id="details">
-    
-    <div id="name">
-      <%=  link_to  h(person.name),url_for(person) -%>
-      <% if @current_user.person==person -%>
-        <small style="font-size:12px">[<%= link_to "edit",url_for(:id=>@current_user.person,:action=>'edit', :controller=>'people') -%>]</small>
-      <% end -%>
-    </div>
-    
-    
-    <div id="email">
-      <% unless person.email.nil? or person.email.empty? %>
-                                                              
-        <label>Email: </label>
-        <%= mail_to h(person.email) %>
-      
-      <% end  %>
-    </div>
-    
-    
-    <p>
-      <div class="box_standout">
-        <%= text_or_not_specified person.description, :description=>true %>
-      </div>
-    </p>
-    
-    
-    <% unless person.web_page.nil? or person.web_page.empty? %>
-      <div id="web_page">
-        <label>Web page:</label>
-        <%= link_to h(person.web_page), h(person.web_page),:popup=>true %>
-      </div>
-    <% end  %>
-    
-    <% unless person.phone.nil? or person.phone.empty? %>
-      <div id="phone">
-        <label>Phone:</label>
-        <%= h person.phone %>
-      </div>
-    <% end  %>
-    
-    <% unless person.skype_name.nil? or person.skype_name.empty? -%>
-      <div id="skype_name">
-        <label>Skype:</label>
-        <%= h person.skype_name %>
-      </div>
-    <% end  %>
-    
-    <% unless person.tools.empty? -%>
-      <div id="expertise">
-        <label>Tools:</label>
-        <%= list_item_tools_list person.tools %>
-      </div>
-    <% end  %>
-    
-    <%= render :partial=>"people/person_list_item_extra_details", :object=>person %>
-  </div>
-  
+<% truncate_projects_institutions_length = 25 -%>
+
+<div class="list_items_container">
+  <table class="list_item">
+  	<tr>
+  		<td class="item_avatar" style="width: 100px">
+  			<% image_tag = avatar(person, 60, true) -%>
+  	    <%= link_to_draggable(image_tag, url_for(person), :id=>drag_id, :class=>"asset", :title=>tooltip_title_attrib(h(person.name))) -%>
+  		</td>
+			
+			<td class="item_details">
+				<p class="name">
+					<% if mine? person -%>
+	          <span style="float: right; font-size: 77%;"><%= icon "edit", edit_person_path(person), nil, nil, "Edit" -%></span>
+					<% end -%>
+		      <% person_name = h(person.name) -%>
+					<%= person_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(person_name, person_path(person)) -%>
+		    </p>
+		    
+	      <div class="box_standout">
+	        <%= truncate(text_or_not_specified(person.description, :description => true), 300) %>
+	      </div>
+		    
+	      <% unless person.email.nil? or person.email.empty? %>
+			    <p class="email">
+			        <label>Email: </label>
+			        <%= mail_to h(person.email) %>
+			    </p>
+	      <% end  %>
+				
+		    <% unless person.web_page.nil? or person.web_page.empty? %>
+		      <p class="web_page">
+		        <label>Web page:</label>
+		        <%= link_to h(person.web_page), h(person.web_page),:popup=>true %>
+		      </p>
+		    <% end  %>
+		    
+		    <% unless person.phone.nil? or person.phone.empty? %>
+		      <p class="phone">
+		        <label>Phone:</label>
+		        <%= h person.phone %>
+		      </p>
+		    <% end  %>
+		    
+		    <% unless person.skype_name.nil? or person.skype_name.empty? -%>
+		      <p class="skype_name">
+		        <label>Skype:</label>
+		        <%= h person.skype_name %>
+		      </p>
+		    <% end  %>
+		    
+		    <div class="expertise" style="margin-top: 0.7em;">
+		    	<label>Areas of Expertise</label>
+	        
+					<div style="margin-top: 0.3em; border-left: 3px solid #365FA5;">
+						<p style="margin-left: 1em;">
+							<label>Tools: </label>
+							<% unless person.tools.empty? -%>
+					      <%= list_item_tools_list person.tools %>
+							<% else -%>
+							  <span class="none_text">Not known</span>
+					    <% end -%>
+						</p>
+						
+						<p style="margin-left: 1em;">
+							<label>Microorganisms: </label>
+							<% # TO BE ADDED: unless person.tools.empty? -%>
+					      <%# = list_item_tools_list person.tools %>
+							<% # else -%>
+							  <span class="none_text">Not known</span>
+					    <% # end -%>
+						</p>
+					</div>
+		    </div>
+			</td>
+			
+			<td class="item_right_table_cell" style="width: 170px;">
+				<div>
+					<p class="section_header">Institutions</p>
+					<ul>
+						<% unless person.institutions.empty? -%>
+						  <% for institution in person.institutions %>
+		            <li>
+		            	<%= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
+									<%= link_to(truncate(h(institution.name), truncate_projects_institutions_length), url_for(institution), :title => tooltip_title_attrib(h(institution.name))) -%>
+								</li>
+		          <% end  %>
+						<% else -%>
+						  <li><span class="none_text">Not known</span></li>
+						<% end -%>
+					</ul>
+				</div>
+				
+			  <div style="margin-top: 1em;">
+					<p class="section_header">Projects</p>
+					<ul>
+						<% unless person.projects.empty? -%>
+						  <% for project in person.projects %>
+		            <li>
+		            	<%= icon("project", nil, "Project", nil, "&nbsp;"); -%>
+									<%= link_to(truncate(h(project.name), truncate_projects_institutions_length), url_for(project), :title => tooltip_title_attrib(h(project.name))) -%>
+								</li>
+		          <% end  %>
+						<% else -%>
+						  <li><span class="none_text">Not known</span></li>
+						<% end -%>
+					</ul>
+				</div>
+			</td>
+  	</tr>
+  </table>
+	
+	
 </div>

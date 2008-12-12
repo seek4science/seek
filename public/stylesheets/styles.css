@@ -75,60 +75,82 @@
 	margin: 0;
 }
 
-#list_item {
-    background-color: #F0F0F0;
-    margin: 4px;
-    padding: 4px;
-    padding-left: 1em;
-    border: #999999 solid 1px;
-    font-size: 93%;
-    min-height: 90px;
+.list_items_container{
+  padding-left: 7px;
 }
 
-#list_item #avatar_pane {
-    margin: 1em 1em 1em 1em;
-    float: left;
+table.list_item {
+  width: 100%;
+  background-color: #F0F0F0;
+  margin-top: 6px;
+  padding: 1em;
+  border: #999999 solid 1px;
+  font-size: 93%;
+  min-height: 90px;
 }
 
-#list_item #avatar {
-    border: black solid 1px;   
-    max-width: 50px;  
+table.list_item p {
+	line-height: 1.0;
+	margin-top: 0.2em;
 }
 
-#list_item #name {
-    font-size: 1.5em;
+table.list_item p.section_header {
+	text-align: left;
+	font-size: 107%;
+	font-weight: bold;
+}
+
+table.list_item td {
+	vertical-align: top;
+}
+
+table.list_item .item_avatar {
+	/* styling of avatars in table listings */
+}
+
+table.list_item .item_details {
+	text-align: left;
+}
+
+table.list_item .item_right_table_cell {
+	text-align: left;
+	padding-top: 2em;
+}
+
+table.list_item .name {
+    font-size: 131%;
+    font-weight: bold;
     padding-bottom: 0.25em;
     margin-bottom: 0.25em;
     border-bottom: black dotted 1px;
 }
 
-#list_item #details {
+table.list_item .details {
     margin-left: 100px;
-    padding-left: 1em;
-    border-left: black dotted 1px;  
+    margin-right: 120px;
+    padding: 0.5em 1em;
 }
 
-#list_item ul {margin: 0;  padding: 0;}
+table.list_item ul {
+	margin: 0;  padding: 0;
+}
 
-#list_item li {
-    
+table.list_item li {
     list-style-type:none;
     margin: 0px 0px 0px 0px;
-    padding: 0 0 0 1em;
+    padding: 0;
     white-space:nowrap;
 }
 
-#list_item label {
+table.list_item label {
     font-weight: bold;
 }
 
-#list_item #expertise {
-    
-    text-align: center;
-    bottom :0px;
+table.list_item .expertise {
+    text-align: left;
 }
 
-#list_item #expand_button {
+.list_item #expand_button {
     text-align: right;
     float: bottom;
 }
