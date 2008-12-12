@@ -1,0 +1,28 @@
+<fieldset style="margin-right: 2em; padding-bottom: 0;">
+  <legend>
+		Expertise
+  	<%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
+	</legend>
+	
+	<%= text_area :expertise, :list, :rows => 5, :value => h(person.expertise_list), :style => "width: 100%;" -%>
+	<%= fast_auto_complete_field :expertise_list, :url =>expertise_list_autocomplete_path -%>
+	
+	
+	<p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+		<%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "expertise_tag_suggestions", :duration => 0.4) %>
+	</p>
+	
+	<div id="expertise_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
+	  <div id="expertise_select_tags" class="hTagcloud">
+		  <div class="popularity">
+		    <% unless @tags_expertise.blank? -%>
+		      <% tag_cloud @tags_expertise, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+		        <%= link_to tag.name, "javascript:addExpertiseListTag('#{tag.name}');", :class => css_class -%>
+		      <% end -%>
+		    <% end -%>
+		  </div>
+		</div>
+	</div>
+
+</fieldset>
+

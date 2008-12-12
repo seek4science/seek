@@ -7,6 +7,10 @@ class PeopleController < ApplicationController
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
   end
+
+  def auto_complete_for_expertise_name
+    render :json => Person.expertise_counts.map(&:name).to_json
+  end
   
   protect_from_forgery :only=>[]
   
@@ -36,6 +40,8 @@ class PeopleController < ApplicationController
   # GET /people/new.xml
   def new
     @tags_tools = Person.tool_counts
+    @tags_expertise = Person.expertise_counts
+
     @person = Person.new
 
     respond_to do |format|
@@ -47,6 +53,8 @@ class PeopleController < ApplicationController
   # GET /people/1/edit
   def edit
     @tags_tools = Person.tool_counts
+    @tags_expertise = Person.expertise_counts
+
     @person = Person.find(params[:id])
   end
 
@@ -55,10 +63,17 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
+
     if !params[:tool].nil?
       tools_list = params[:tool][:list]
       @person.tool_list=tools_list
     end
+
+    if !params[:expertise].nil?
+      expertise_list = params[:expertise][:list]
+      @person.expertise_list=expertise_list
+    end
+    
     respond_to do |format|
       if @person.save
         flash[:notice] = 'Person was successfully created.'
@@ -79,6 +94,11 @@ class PeopleController < ApplicationController
     if !params[:tool].nil?
       tools_list = params[:tool][:list]
       @person.tool_list=tools_list
+    end
+
+    if !params[:expertise].nil?
+      expertise_list = params[:expertise][:list]
+      @person.expertise_list=expertise_list
     end
     
     respond_to do |format|

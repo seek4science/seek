@@ -4,21 +4,6 @@
 <div id="expertise">
   
     <p>
-      <label>Tools:</label>
-
-      <%  if tools_list.blank? -%>
-        <span class='none_text'>Not known</span>
-      <% else %>
-
-        <% for tool in tools_list  -%>
-          <%= link_to tool.name, "http://www.google.com" -%>
-          <% unless tool==tools_list.last %>
-            |
-          <% end %>
-        <% end %>
-      <% end %>
-    </p>
-    <p>
       <label>Expertise:</label>
 
       <%  if expertise_list.blank? -%>
@@ -33,4 +18,21 @@
         <% end %>
       <% end %>
     </p>
+
+    <p>
+      <label>Tools:</label>
+
+      <%  if tools_list.blank? -%>
+        <span class='none_text'>Not known</span>
+      <% else %>
+
+        <% for tool in tools_list  -%>
+          <%= link_to tool.name, "http://www.google.com" -%>
+          <% unless tool==tools_list.last %>
+            |
+          <% end %>
+        <% end %>
+      <% end %>
+    </p>
+    
   </div>

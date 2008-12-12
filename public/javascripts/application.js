@@ -28,3 +28,23 @@ function addToolListTag(tag) {
     
     document.getElementById("tool_list").value=tool_list;
 }
+
+function addExpertiseListTag(tag) {
+    var expertise_list = document.getElementById("expertise_list").value;
+
+    //check the tag doesn't already exist
+    var expertise_arr=expertise_list.split(",")
+    for (var i = 0; i < expertise_arr.length; i++) {
+        var current_tag = trimSpaces(expertise_arr[i]);
+        if (current_tag==tag) return;
+    }
+
+    if (trimSpaces(expertise_list).length==0) {
+        expertise_list=expertise_list+tag
+    }
+    else {
+        expertise_list=expertise_list+", "+tag
+    }
+
+    document.getElementById("expertise_list").value=expertise_list;
+}

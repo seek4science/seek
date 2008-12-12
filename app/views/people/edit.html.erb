@@ -35,6 +35,11 @@
           <p>
             <%= render :partial => "select_tools", :locals=>{:person=>@person} %>
           </p>
+
+           <p>
+            <%= render :partial => "select_expertise", :locals=>{:person=>@person} %>
+          </p>
+
           <p>
             <%= f.label "Description" %>
             <%= f.text_area :description, :class=>"description", :style => "width: 90%;" %>
