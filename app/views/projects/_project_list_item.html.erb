@@ -3,31 +3,35 @@
 
 <div class="list_items_container">
   <table class="list_item">
-  	<tr>
-  		<td class="item_avatar" style="width: 100px">
-  			<% image_tag = avatar(project, 60, true) -%>
-  	    <%= link_to_draggable(image_tag, url_for(project), :id => drag_id, :class => "asset", :title => tooltip_title_attrib(h(project.name))) -%>
-  		</td>
-			
-			<td class="item_details">
-			  <p class="name">
-			  	<% project_name = h(project.name) -%>
-					<%= project_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(project_name, project_path(project)) -%>
-			  </p>
-				
-				<% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>
-	      <p class="web_page">
-	        <label>Web page:</label>
-	        <%= "&nbsp;" + web_page_link -%>
-	      </p>
-		    
-		    <% wiki_page_link = ((is_nil_or_empty? project.wiki_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.wiki_page), h(project.wiki_page),:popup=>true)) -%>
-	      <p class="wiki_page">
-	        <label>Wiki page:</label>
-	        <%= "&nbsp;" + wiki_page_link -%>
-	      </p>
-				
-			</td>
-		</tr>
-	</table>
+    <tr>
+      <td class="item_avatar" style="width: 100px">
+        <% image_tag = avatar(project, 60, true) -%>
+        <%= link_to_draggable(image_tag, url_for(project), :id => drag_id, :class => "asset", :title => tooltip_title_attrib(h(project.name))) -%>
+      </td>
+
+      <td class="item_details">
+        <p class="name">
+          <% project_name = h(project.name) -%>
+          <%= project_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(project_name, project_path(project)) -%>
+        </p>
+
+        <div class="box_standout">
+          <%= truncate(text_or_not_specified(project.description, :description => true), 300) %>
+        </div>
+
+        <% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>
+        <p class="web_page">
+          <label>Web page:</label>
+          <%= "&nbsp;" + web_page_link -%>
+        </p>
+
+        <% wiki_page_link = ((is_nil_or_empty? project.wiki_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.wiki_page), h(project.wiki_page),:popup=>true)) -%>
+        <p class="wiki_page">
+          <label>Wiki page:</label>
+          <%= "&nbsp;" + wiki_page_link -%>
+        </p>
+
+      </td>
+    </tr>
+  </table>
 </div>
