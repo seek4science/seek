@@ -1,18 +1,28 @@
-<label for="expertises_text">Tools and techniques</label>
-<%= help_icon("A comma seperated list of keywords that describe your tools and techniques.<br/>Please let the suggestions guide you, but feel free to add you own if necessary.") %>
-<br />
-<%= text_area :tool, :list, {:value=>h(person.tool_list)} %>
+<fieldset style="margin-right: 2em; padding-bottom: 0;">
+  <legend>
+		Tools and techniques
+  	<%= help_icon("A comma seperated list of keywords that describe your tools and techniques.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
+	</legend>
+	
+	<%= text_area :tool, :list, :rows => 5, :value => h(person.tool_list), :style => "width: 100%;" -%>
+	<%= fast_auto_complete_field :tool_list, :url =>tool_list_autocomplete_path -%>
+	
+	
+	<p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+		<%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "tools_tag_suggestions", :duration => 0.4) %>
+	</p>
+	
+	<div id="tools_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
+	  <div id="tools_select_tags" class="hTagcloud">
+		  <div class="popularity">
+		    <% unless @tags_tools.blank? -%>
+		      <% tag_cloud @tags_tools, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+		        <%= link_to tag.name, "javascript:addToolListTag('#{tag.name}');", :class => css_class -%>
+		      <% end -%>
+		    <% end -%>
+		  </div>
+		</div>
+	</div>
 
-<div id ="tools_select_tags" class="hTagcloud">
-  <div class="popularity">
-    <% unless @tags_tools.blank? -%>
-      <% tag_cloud @tags_tools, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-        <%= link_to tag.name, "javascript:addToolListTag('#{tag.name}');", :class => css_class -%>
-      <% end -%>
-    <% end -%>
-  </div>
-</div>
+</fieldset>
 
-
-
-<%= fast_auto_complete_field :tool_list, :url =>tool_list_autocomplete_path -%>

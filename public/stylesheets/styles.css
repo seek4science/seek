@@ -169,7 +169,6 @@ table.list_item #expand_button {
 
 .show_basic #tool_list {
     width: 22em;
-    max-height: 3em;
 }
 
 .show_basic select {
