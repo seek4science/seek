@@ -16,6 +16,6 @@ task :cruise do
   Rake::Task["db:migrate"].invoke
   Rake::Task["db:test:purge"].invoke
   Rake::Task["db:test:prepare"].invoke
-  Rake::Task["test"].invoke
+  Rake::Task["test:functionals"].invoke
   
 end
