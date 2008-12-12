@@ -6,9 +6,9 @@ module PeopleHelper
 
 
 
-  def list_item_tools_list tools
-    tools.map do |t|
-      divider=tools.last==t ? "" : "&nbsp;&nbsp;|&nbsp;&nbsp;"
+  def list_item_tags_list tags
+    tags.map do |t|
+      divider=tags.last==t ? "" : "&nbsp;&nbsp;|&nbsp;&nbsp;"
       link_to(h(t.name),"http://www.google.com")+divider
     end
   end

@@ -1,9 +1,8 @@
 <% tools_list=person.tools -%>
-<% organism_list=person.organisms -%>
+<% expertise_list=person.expertise -%>
 
 <div id="expertise">
-  <fieldset>
-    <legend>Areas of expertise</legend >
+  
     <p>
       <label>Tools:</label>
 
@@ -20,19 +19,18 @@
       <% end %>
     </p>
     <p>
-      <label>Organisms:</label>
+      <label>Expertise:</label>
 
-      <%  if organism_list.blank? -%>
+      <%  if expertise_list.blank? -%>
         <span class='none_text'>Not known</span>
       <% else %>
 
-        <% for organism in organism_list  -%>
-          <%= link_to organism.name, "http://www.google.com" -%>
-          <% unless organism==organism_list.last %>
+        <% for expertise in expertise_list  -%>
+          <%= link_to expertise.name, "http://www.google.com" -%>
+          <% unless expertise==expertise_list.last %>
             |
           <% end %>
         <% end %>
       <% end %>
     </p>
-  </fieldset>
-</div>
+  </div>
