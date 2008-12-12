@@ -35,8 +35,9 @@ class PeopleController < ApplicationController
   # GET /people/new
   # GET /people/new.xml
   def new
+    @tags_tools = Person.tool_counts
     @person = Person.new
-   
+
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @person }
