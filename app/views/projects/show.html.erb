@@ -34,7 +34,7 @@
 	<div class="main_content_right_box">
 		<div class="contribution_section_box" style="padding-top: 3em; padding-bottom: 3em;">
 		  <div id="<%= drag_id %>" class="asset"> 
-        <%= link_to_draggable(avatar(@project, 60, true), project_url(@project), :title=>tooltip_title_attrib(h(@project.name)), :id => drag_id) -%>         
+        <%= link_to_draggable(avatar(@project, 100, true), project_url(@project), :title=>tooltip_title_attrib(h(@project.name)), :id => drag_id) -%>         
       </div>
       <%= favourite_drag_element(drag_id) %>
     </div>
