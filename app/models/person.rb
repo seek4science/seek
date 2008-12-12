@@ -5,7 +5,7 @@ class Person < ActiveRecord::Base
     
     has_many :work_groups, :through=>:group_memberships
 
-    acts_as_taggable_on :tools
+    acts_as_taggable_on :tools, :organisms
     
     has_one :user
   

@@ -55,7 +55,10 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
-
+    if !params[:tool].nil?
+      tools_list = params[:tool][:list]
+      @person.tool_list=tools_list
+    end
     respond_to do |format|
       if @person.save
         flash[:notice] = 'Person was successfully created.'

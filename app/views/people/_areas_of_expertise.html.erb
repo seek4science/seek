@@ -1,0 +1,38 @@
+<% tools_list=person.tools -%>
+<% organism_list=person.organisms -%>
+
+<div id="expertise">
+  <fieldset>
+    <legend>Areas of expertise</legend >
+    <p>
+      <label>Tools:</label>
+
+      <%  if tools_list.blank? -%>
+        <span class='none_text'>Not known</span>
+      <% else %>
+
+        <% for tool in tools_list  -%>
+          <%= link_to tool.name, "http://www.google.com" -%>
+          <% unless tool==tools_list.last %>
+            |
+          <% end %>
+        <% end %>
+      <% end %>
+    </p>
+    <p>
+      <label>Organisms:</label>
+
+      <%  if organism_list.blank? -%>
+        <span class='none_text'>Not known</span>
+      <% else %>
+
+        <% for organism in organism_list  -%>
+          <%= link_to organism.name, "http://www.google.com" -%>
+          <% unless organism==organism_list.last %>
+            |
+          <% end %>
+        <% end %>
+      <% end %>
+    </p>
+  </fieldset>
+</div>
