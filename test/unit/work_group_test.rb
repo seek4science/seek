@@ -2,7 +2,7 @@ require 'test_helper'
  
 
 class WorkGroupTest < ActiveSupport::TestCase
-  fixtures :people, :projects,:institutions, :work_groups, :people_work_groups
+  fixtures :people, :projects,:institutions, :work_groups, :group_memberships
   
   def test_people
     wg=WorkGroup.find(1)
