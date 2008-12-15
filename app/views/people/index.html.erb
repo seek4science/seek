@@ -1,1 +1,6 @@
+<% if @expertise_or_tools.nil? -%>
+  
+<% else -%>
+  <h1><%= "People for '"+h(@expertise_or_tools)+"'" -%></h1>
+<% end %>
 <%= render :partial => "person_list_item", :collection=>@people %>

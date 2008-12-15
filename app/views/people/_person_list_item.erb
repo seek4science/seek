@@ -58,7 +58,7 @@
             <p style="margin-left: 1em;">
               <label>Expertise:</label>
               <% unless person.expertise.empty? -%>
-                <%= list_item_tags_list person.expertise %>
+                <%= list_item_tags_list person.expertise,:type=>:expertise %>
               <% else -%>
                 <span class="none_text">Not known</span>
               <% end -%>
@@ -67,7 +67,7 @@
             <p style="margin-left: 1em;">
               <label>Tools:</label>
               <% unless person.tools.empty? -%>
-                <%= list_item_tags_list person.tools %>
+                <%= list_item_tags_list person.tools,:type=>:tools %>
               <% else -%>
                 <span class="none_text">Not known</span>
               <% end -%>

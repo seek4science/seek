@@ -11,7 +11,7 @@
       <% else %>
 
         <% for expertise in expertise_list  -%>
-          <%= link_to expertise.name, "http://www.google.com" -%>
+          <%= link_for_tag expertise, :type=>:expertise -%>
           <% unless expertise==expertise_list.last %>
             |
           <% end %>
@@ -27,7 +27,7 @@
       <% else %>
 
         <% for tool in tools_list  -%>
-          <%= link_to tool.name, "http://www.google.com" -%>
+          <%= link_for_tag tool,:type=>:tools -%>
           <% unless tool==tools_list.last %>
             |
           <% end %>

@@ -10,7 +10,7 @@
   <div class="contents">
     <div class="hTagcloud">
       <div class="popularity">
-        <%= render :partial=>"gadgets/tag_cloud", :object=>Person.expertise_counts -%>
+        <%= render :partial=>"gadgets/tag_cloud", :object=>Person.expertise_counts, :locals=>{:type=>:expertise} -%>
       </div>
     </div>
   </div>

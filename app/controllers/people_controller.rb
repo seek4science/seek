@@ -17,7 +17,16 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    @people = Person.find(:all, :order=>:last_name)
+    if (!params[:expertise].nil?)
+      @expertise_or_tools=params[:expertise]
+      @people=Person.tagged_with(@expertise_or_tools, :on=>:expertise)
+    elsif (!params[:tools].nil?)
+      @expertise_or_tools=params[:tools]
+      @people=Person.tagged_with(@expertise_or_tools, :on=>:tools)
+    else
+      @people = Person.find(:all, :order=>:last_name)
+    end
+    
     
     respond_to do |format|
       format.html # index.html.erb
