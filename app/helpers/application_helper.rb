@@ -309,5 +309,14 @@ module ApplicationHelper
     return html
   end
 
+  def page_title controller_name, action_name
+    name=PAGE_TITLES[controller_name]
+    name ||=""
+    return "Sysmo SEEK&nbsp;"+name
+  end
+
+  private
+    PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup"}
+
   
 end
