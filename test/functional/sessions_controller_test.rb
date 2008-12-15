@@ -17,6 +17,11 @@ class SessionsControllerTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
   end
 
+  def test_title
+    get :new
+    assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
+  end
+
   def test_should_login_and_redirect
     post :create, :login => 'quentin', :password => 'test'
     assert session[:user_id]

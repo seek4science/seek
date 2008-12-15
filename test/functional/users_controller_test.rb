@@ -17,6 +17,11 @@ class UsersControllerTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
   end
 
+  def test_title
+    get :new
+    assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
+  end
+
   def test_should_allow_signup
     assert_difference 'User.count' do
       create_user
@@ -57,11 +62,11 @@ class UsersControllerTest < Test::Unit::TestCase
   
 
   
-#  def test_should_sign_up_user_with_activation_code
-#    create_user
-#    assigns(:user).reload
-#    assert_not_nil assigns(:user).activation_code
-#  end
+  #  def test_should_sign_up_user_with_activation_code
+  #    create_user
+  #    assigns(:user).reload
+  #    assert_not_nil assigns(:user).activation_code
+  #  end
 
   def test_should_activate_user
     assert_nil User.authenticate('aaron', 'test')
@@ -86,22 +91,22 @@ class UsersControllerTest < Test::Unit::TestCase
   end
   
   def test_can_edit_self
-      login_as :quentin
-      get :edit, :id=>users(:quentin)
-      assert_response :success
-      #TODO: is there a better way to test the layout used?
-      assert_select "div#myexp_sidebar" #check its using the right layout
+    login_as :quentin
+    get :edit, :id=>users(:quentin)
+    assert_response :success
+    #TODO: is there a better way to test the layout used?
+    assert_select "div#myexp_sidebar" #check its using the right layout
   end
   
   def test_cant_edit_some_else
-      login_as :quentin
-      get :edit, :id=>users(:aaron)
-      assert_redirected_to root_url
+    login_as :quentin
+    get :edit, :id=>users(:aaron)
+    assert_redirected_to root_url
   end
 
   protected
-    def create_user(options = {})
-      post :create, :user => { :login => 'quire', :email => 'quire@example.com',
-        :password => 'quire', :password_confirmation => 'quire' }.merge(options)
-    end
+  def create_user(options = {})
+    post :create, :user => { :login => 'quire', :email => 'quire@example.com',
+      :password => 'quire', :password_confirmation => 'quire' }.merge(options)
+  end
 end

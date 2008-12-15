@@ -8,6 +8,11 @@ class PeopleControllerTest < ActionController::TestCase
   def setup
     login_as(:quentin)
   end
+
+  def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
+  end
   
   def test_should_get_index
     get :index
@@ -47,8 +52,6 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, :id=> people(:two).id
     assert_redirected_to root_path
   end
-  
-  
   
   def test_can_edit_person_and_user_id_different
     #where a user_id for a person are not the same

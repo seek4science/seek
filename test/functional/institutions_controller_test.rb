@@ -10,7 +10,11 @@ class InstitutionsControllerTest < ActionController::TestCase
   def setup
     login_as(:quentin)
   end
-  
+
+  def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
+  end
   
   def test_should_get_index
     get :index

@@ -4,6 +4,11 @@ class ProjectsControllerTest < ActionController::TestCase
   
   fixtures :projects, :people, :users
   
+  def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
+  end
+
   include AuthenticatedTestHelper
   def setup
     login_as(:quentin)
