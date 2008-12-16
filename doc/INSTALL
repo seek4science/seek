@@ -1,0 +1,10 @@
+1. Copy config/database.default.yml to config/database.yml and edit accordingly
+2. rake db:migrate (preceded by rake db:create if the database doesn't already exist)
+3. rake seek:repop_cv - this prepopultes the database with a dummy user and a predefined list of tags assigned to them
+
+if using search
+
+4. make a config/environment_local.rb file, and add to it "SOLR_ENABLED=true"
+5. make sure the directories "vendor/plugins/acts_as_solr/solr/log" and "vendor/plugins/acts_as_solr/solr/tmp" exist
+6. rake solr:resolr
+7. rake solr:start to start database server
