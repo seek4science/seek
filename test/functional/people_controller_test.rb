@@ -48,9 +48,15 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
   
-  def test_cant_edit_someone_else
+  def test_non_admin_cant_edit_someone_else
+    login_as(:fred)
     get :edit, :id=> people(:two).id
     assert_redirected_to root_path
+  end
+
+  def test_admin_can_edit_others
+    get :edit, :id=>people(:two).id
+    assert_response :success
   end
   
   def test_can_edit_person_and_user_id_different

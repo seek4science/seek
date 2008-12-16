@@ -1,7 +1,7 @@
 class PeopleController < ApplicationController
   
   before_filter :login_required
-  before_filter :profile_belongs_to_current, :only=>[:edit, :update]
+  before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
   before_filter :is_user_admin_auth, :only=>[:new, :destroy]
   
   def auto_complete_for_tools_name
@@ -136,9 +136,9 @@ class PeopleController < ApplicationController
   
   private
   
-  def profile_belongs_to_current
+  def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
-    unless @person == current_user.person
+    unless @person == current_user.person || current_user.is_admin?
       error("Not the current person", "is invalid (not owner)")
       return false
     end
