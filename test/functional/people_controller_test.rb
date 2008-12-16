@@ -20,6 +20,32 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil assigns(:people)
   end
 
+  def test_index_doesnt_show_dummy
+    get :index
+    #check that a non dummy person shows as expected
+    assert_select "a",:text=>/.*Fred.*/, :count=>1
+    #check that the dummy user doens't show
+    assert_select "a",:text=>/.*Dummy.*/, :count=>0
+  end
+
+  def test_index_for_expertise_tags_doesnt_show_dummy
+    dummy=people(:dummy)
+    dummy.expertise_list="expertise"
+    dummy.save
+    get :index, :expertise=>"expertise"
+    assert_select "a",:text=>/.*Dummy.*/, :count=>0
+  end
+
+  def test_index_for_tools_tags_doesnt_show_dummy
+    dummy=people(:dummy)
+    dummy.tool_list="expertise"
+    dummy.save
+    get :index, :tools=>"expertise"
+    assert_select "a",:text=>/.*Dummy.*/, :count=>0
+  end
+
+  
+
   def test_should_get_new
     get :new
     assert_response :success

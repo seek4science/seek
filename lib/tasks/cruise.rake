@@ -16,6 +16,7 @@ task :cruise do
   Rake::Task["db:migrate"].invoke
   Rake::Task["db:test:purge"].invoke
   Rake::Task["db:test:prepare"].invoke
+  Rake::Task["seek:repop_cv"].invoke
   Rake::Task["test"].invoke
   
 end

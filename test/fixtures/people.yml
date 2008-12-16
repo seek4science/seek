@@ -20,3 +20,8 @@ fred:
         first_name: fred
         last_name: blogs
 
+dummy:
+        id: 5
+        is_dummy: true
+        first_name: DummyPerson
+

@@ -20,13 +20,14 @@ class PeopleController < ApplicationController
     if (!params[:expertise].nil?)
       @expertise_or_tools=params[:expertise]
       @people=Person.tagged_with(@expertise_or_tools, :on=>:expertise)
+      @people=@people.select{|p| !p.is_dummy}
     elsif (!params[:tools].nil?)
       @expertise_or_tools=params[:tools]
       @people=Person.tagged_with(@expertise_or_tools, :on=>:tools)
+      @people=@people.select{|p| !p.is_dummy}
     else
-      @people = Person.find(:all, :order=>:last_name)
+      @people = Person.find(:all, :order=>:last_name,:conditions=>{:is_dummy=>false})
     end
-    
     
     respond_to do |format|
       format.html # index.html.erb
