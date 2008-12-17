@@ -249,3 +249,17 @@ table.list_item #expand_button {
 	vertical-align: middle;
 }
 
+#applet_box {
+  float: left;
+  display: inline;
+  padding: 0px;
+  border: solid black 1px;
+  height: 410px;
+}
+
+#applet_box IFRAME {
+  width: 490px;
+  height: 408px;
+  background-color: #CCCCCC;
+}
+

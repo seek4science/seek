@@ -1,0 +1,493 @@
+body {
+  font-family: arial, sans-serif;
+  background-color: #FFFFFF;
+  font-size: 10px;
+/*  position: relative;*/
+ }
+
+div#container {
+/*  position: relative;*/
+  width: 800px;
+  margin: 0px auto;
+  text-align: left;
+  padding: 0px;
+  background-color: #FFFFFF;
+  border-top: solid 3px;
+  border-bottom: solid 3px;
+}
+
+div#pagetitle {
+  color: #000000;
+  font-size: 300%;
+  padding: 5px 20px;
+  text-align: center;
+/*  display: block;*/
+}
+
+div#pagesubtitle {
+  color: #000000;
+  font-size: 200%;
+  padding: 5px 20px;
+  text-align: center;
+  display: block;
+}
+
+div#logo {
+  height: 189px;
+  padding: 0px;
+  margin: 0px;
+  display: block;
+}
+
+div#navbar {
+  width: 800px;
+  height: 30px;
+  position: relative;
+  margin: 0px;
+  padding: 0px 0px 0px 0px;
+  border-bottom: solid 2px;
+  display: block;
+}
+
+div#navbar ul{
+  padding: 2px 0px 0px 0px;
+  margin: 0px;
+  position: relative;
+}
+
+div#navbar ul li{
+  display: inline;
+  list-style: none;
+  font-size: 180%;
+  text-decoration: none;
+  margin: 0;
+  padding: 0px 20px 0px 20px;
+  font-style: normal;
+  text-decoration: none;
+  color: #808080;
+}
+
+div#navbar ul li a {
+  color: #000000;
+  font-style: normal;
+  text-decoration: none;
+}
+
+div#navbar ul li a:hover {
+  color: #808080;
+  font-style: italic;
+  text-decoration: none;
+}
+
+div#servers {
+  display: inline;
+  position: absolute;
+  right: 0px;
+  padding: 0px 10px 0px 10px;
+  margin:0;
+}
+
+div#content_frame {
+  padding: 0px;
+  margin: 0px auto;
+  position: relative;
+  display: block;
+}
+
+div#content {
+  width: 800px;
+  background-color: #FFFFFF;
+  margin: 0px;
+  padding: 15px 30px 5px 10px;
+  border: none;
+  position: relative;
+  display: block;
+}
+
+div#footer {
+  font-size: 130%;
+  color: #FF9900;
+  padding: 1px 0px 2px 15px;
+}
+
+h1 {
+  font-size: 280%;
+  text-align: center
+}
+
+p {
+  font-size: 130%;
+}
+
+.instruction {
+/*  color: #FF6600;*/
+  color: black;
+  font-size: 160%;
+  display: inline;
+}
+
+.journal {
+  color: red;
+  font-weight: bold;
+  font-size: 100%;
+ }
+
+p.info_title {
+  color: red;
+  font-size: 180%;
+ }
+
+p.info_item {
+  padding-left: 20px;
+  color: black;
+  font-size: 160%;
+ }
+
+p.info_subitem {
+  padding-left: 40px;
+  color: black;
+  font-size: 160%;
+ }
+
+ul.toc {
+  font-size: 180%;
+  list-style: none;
+}
+
+.optionbox {
+  margin-bottom: 22px;
+  padding: 0px 5px 0px 5px;
+  display: block;
+ }
+
+.optionbox .optinstruction {
+  font-size: 160%;
+  display: inline;
+  width: 250px;
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
+}
+
+.SelectForm {
+  display: inline;
+  position: absolute;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  left: 250px;
+  width: 404px;
+}
+
+.selectform_label {
+  display: inline;
+  position: relative;
+  font-size: 135%;
+  margin: 0px 5px 0px 75px;
+  border: none;
+}
+
+.selectform_dropdown {
+  display: inline;
+  position: relative;
+  border: none;
+  padding-left: 0px;
+}
+
+.selectform_dropdown select {
+  width: 130px;
+}
+.selectform_textinput {
+  display: inline;
+  position: relative;
+  border: none;
+}
+
+.selectform_textinput input{
+  width: 127px;
+}
+.selectform_submit {
+  display: inline;
+  position: absolute;
+  margin: 0;
+  padding: 2px 0px 0px 0px;
+  width: 100px;
+  right: 0;
+  border: none;
+}
+
+.selectform_submit input {
+  width: 100px;
+ }
+
+#keyword_field {
+  display: inline;
+  position: relative;
+  margin: 0 0 0 0px;
+  padding: 0 0 0 0px;
+  width: 100px;
+  border: 0px;
+}
+
+#keytype_field {
+  display: inline;
+  position: relative;
+  margin: 0 0 0 0px;
+  padding: 0 0 0 0px;
+  width: 100px;
+  border: 0px;
+}
+
+#keyword_submit {
+  display: inline;
+  position: relative;
+  margin: 0 0 0 0px;
+  padding: 0 0 0 0px;
+  width: 100px;
+  border: 0px;
+}
+
+#orderby_field {
+  display: inline;
+  position: relative;
+  margin: 0 0 0 0px;
+  padding: 0 0 0 0px;
+  width: 100px;
+  border: 0px;
+}
+
+#order_field {
+  display: inline;
+  position: relative;
+  margin: 0 0 0 0px;
+  padding: 0 0 0 0px;
+  width: 100px;
+  border: 0px;
+}
+
+#selectall_submit {
+  display: inline;
+  position: relative;
+  right: 0;
+  margin: 0 0 0 0px;
+  padding: 0 0 0 0px;
+  width: 100px;
+  border: 0px;
+}
+
+/* The models returned as a result of a query are displayed in a table */
+
+div#content table
+{
+  width: 100%;
+}
+
+div#content table tr th {
+  color: red;
+  font-size: 150%;
+  text-align: left;
+}
+
+div#content table tr td {
+  font-size: 150%;
+}
+
+div#content table tr td a {
+  text-decoration: none;
+}
+
+/* tooltips */
+
+a.tooltip{
+  position:relative;
+  z-index:24; background-color:#ccc;
+  background-color: #FFFFF0;
+  text-decoration:none}
+
+a.tooltip:hover{z-index:25; background-color:#ff0}
+
+a.tooltip span{display: none}
+
+a.tooltip:hover span{
+  display:block;
+  position:absolute;
+  top:2em; left:2em; width:15em;
+  border:1px solid #0cf;
+  background-color:#cff; color:#000;
+  text-align: center;
+  padding: 5px;
+}
+
+span.tooltip{
+  position:relative;
+  z-index:24; background-color:#ccc;
+  background-color: #FFFFF0;
+  text-decoration:none}
+
+span.tooltip:hover{z-index:25; background-color:#ff0}
+
+span.tooltip {display: none}
+
+span.tooltip:hover{
+  display:block;
+  position:absolute;
+  top:2em; left:2em; width:15em;
+  border:1px solid #0cf;
+  background-color:#cff; color:#000;
+  text-align: center;
+  padding: 5px;
+}
+
+banner{
+  border-top: black 3px;
+  border-bottom: black 3px;
+  padding: 5px;
+}
+
+banner lhs_logo {
+  width: 30%;
+}
+
+banner banner_centre
+{
+  width: 40%;
+  display: block;
+}
+
+banner rhs_logo {
+  width: 30%;
+}
+
+banner banner_title {
+  color: #000000;
+  font-size: 300%;
+  padding: 5px 20px;
+  text-align: center;
+}
+
+banner banner_subtitle {
+  color: #000000;
+  font-size: 200%;
+  padding: 5px 20px;
+  text-align: center;
+}
+
+#app {
+  width: 492px;
+  height: 412px;
+}
+
+#scheme {
+  width:442px;
+  height:402px;
+}
+
+#panel {
+  width: 800px;
+  height: 200px;
+}
+
+#app_table {
+}
+
+#scheme_table {
+  font-size: 400%
+}
+
+#upload_forms form {
+/*  padding-left: 40px;
+  padding-top: 10px;*/
+  padding: 10px;
+  padding-bottom: 20px;
+  margin: 10px;
+/*  border: black 1px dashed;*/
+  color: black;
+  font-size: 160%;
+  width: 100%;
+  display: block;
+}
+
+.upload_form_descrip {
+  float: left;
+  width: 200px;
+  display: inline;
+}
+
+.upload_form_select {
+  float: left;
+/*  width: 300px;*/
+  display: inline;
+}
+
+.upload_form_submit {
+  float: left;
+  width: 100px;
+  margin-left: 5px;
+  display: inline;
+}
+
+.upload_form_submit input {
+  width: 60px;
+}
+
+#applet_box {
+  float: left;
+  display: inline;
+  padding: 0px;
+  border: solid black 1px;
+  height: 410px;
+}
+
+#applet_box IFRAME {
+  width: 490px;
+  height: 408px;
+  background-color: #CCCCCC;
+}
+
+#save_form {
+  display: inline;
+  float: left;
+  padding: 5px;
+  width: 290px;
+  height: 410px;
+}
+
+#save_form p.upload_info_item {
+  color: black;
+  font-size: 160%;
+  padding: 10px;
+  margin: 0px;
+}
+
+#save_form form {
+  font-size: 160%;
+  margin: 5px;
+  padding-bottom: 20px;
+  display: block;
+  float: left;
+}
+
+#save_form form .form_item {
+  display: block
+  margin-left: 5px;
+  margin-bottom: 20px;
+  width: 250px;
+}
+
+#save_form form .form_item .textline {
+  float: left;
+  display: inline;
+  margin-left: 5px;
+  width: 200px;
+}
+
+#save_form form .form_item .box {
+  float: right;
+  display: inline;
+  margin-left: 5px;
+}
+
+#save_form form #submit_but {
+  float: right;
+  display: inline;
+  margin-left: 10px;
+  margin-top: 20px;
+}

@@ -1,0 +1,23 @@
+<h1>Models</h1>
+
+<p>
+  <ul>
+    <li>Curien</li>
+    <li>File:<%= @path -%> </li>
+    <li><%= link_to "Evaluate in JWSOnline",:action=>"evaluate", :controller=>"models", :id=>1 -%></li>
+  </ul>
+</p>
+
+<p>
+
+  
+  <% form_for(:file,:url => {:action => 'upload_file'},
+    :html => { :multipart => true }) do |form| %>
+
+    <%= form.file_field(:uploaded_file) %>
+    <br/>
+    <%= submit_tag "Upload"  %>
+
+  <% end %>
+
+</p>
