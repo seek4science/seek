@@ -1,6 +1,7 @@
 <% if logged_in? and SOLR_ENABLED %>
   <% form_tag '/search/' do -%>
     <%= text_field_tag :query %>
+    <%= select_tag :type, "<option>All</option><option>People</option><option>Institutions</option><option>Projects</option>"  %>
   <%= submit_tag "Go"  %>
   <% end  -%>
 <% end %>
