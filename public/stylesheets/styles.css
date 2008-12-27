@@ -160,11 +160,11 @@ table.list_item #expand_button {
 }
 
 .show_basic input {
-    width: 22em;   
+     
 }
 
 #person_description  {
-    height: 10em;    
+   
 }
 
 .show_basic #tool_list {
@@ -172,10 +172,7 @@ table.list_item #expand_button {
 }
 
 .show_basic select {
-    width: 22em;
-    height: 25em;
-    min-height: 25em;
-    max-height: 25em;
+
 }
 
 .show_basic .submit  {
@@ -249,3 +246,19 @@ table.list_item #expand_button {
 	vertical-align: middle;
 }
 
+/* text style classes */
+.admin_warning {
+	color: #F00000;
+}
+
+.allowed_text {
+	font-weight: bold;
+	font-style: normal;
+	color: #00BC0C;
+}
+
+.denied_text {
+	font-weight: bold;
+	font-style: normal;
+	color: #900000;
+}

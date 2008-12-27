@@ -1,9 +1,9 @@
-<fieldset style="margin-right: 2em; padding-bottom: 0;">
-  <legend>
+<p>
+	<label for="expertise_list">
 		Expertise
-  	<%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
-	</legend>
-	
+	  <%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") -%>
+	</label>
+		
 	<%= text_area :expertise, :list, :rows => 5, :value => h(person.expertise_list), :style => "width: 100%;" -%>
 	<%= fast_auto_complete_field :expertise_list, :url =>expertise_list_autocomplete_path -%>
 	
@@ -23,6 +23,4 @@
 		  </div>
 		</div>
 	</div>
-
-</fieldset>
-
+</p>

@@ -101,6 +101,10 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
     
+    # extra check required to see if any avatar was actually selected (or it remains to be the default one)
+    avatar_id = params[:person].delete(:avatar_id).to_i
+    @person.avatar_id = ((avatar_id.kind_of?(Fixnum) && avatar_id > 0) ? avatar_id : nil)
+    
     if !params[:tool].nil?
       tools_list = params[:tool][:list]
       @person.tool_list=tools_list
@@ -109,6 +113,13 @@ class PeopleController < ApplicationController
     if !params[:expertise].nil?
       expertise_list = params[:expertise][:list]
       @person.expertise_list=expertise_list
+    end
+    
+    # some "Person" instances might not have a "User" associated with them - because the user didn't register yet
+    unless @person.user.nil?
+      @person.user.can_edit_projects = (params[:can_edit_projects] ? true : false)
+      @person.user.can_edit_institutions = (params[:can_edit_institutions] ? true : false)
+      @person.user.save
     end
     
     respond_to do |format|

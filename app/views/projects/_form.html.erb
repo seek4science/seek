@@ -1,0 +1,48 @@
+<%= f.error_messages %>
+  
+<h2>Project Details</h2>
+
+<center>
+	<div style="width: 95%;">
+		<p>
+		  <%= f.label :name -%><br />
+		  <%= f.text_field :name, :style => "width: 350px;" -%>
+		</p>
+		<p>
+		  <%= f.label :web_page -%><br />
+		  <%= f.text_field :web_page, :style => "width: 350px;" -%>
+		</p>
+		<p>
+		  <%= f.label :wiki_page -%><br />
+		  <%= f.text_field :wiki_page, :style => "width: 350px;" -%>
+		</p>
+		
+		<p>
+		  <%= f.label :description -%><br/>
+		  <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
+		</p>
+	</div>
+</center>
+
+
+<% # show avatar selection only when the project exists -%>
+<% if project -%>
+  <h2 style="margin-top: 1.5em;">Project Avatar</h2>
+	<%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => project, :form_instance => f } -%>
+<% end -%>
+
+
+<h2 style="margin-top: 2em;">Participating Institutions</h2>
+
+<center>
+	<div style="width: 95%; text-align: left;">
+	  <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making your selection from the list below.") -%>
+		<%= f.label :institution_ids, "Please select the institutions that participate in this project", :style => "line-height: 2;" -%><br/>
+	  <%= f.collection_select :institution_ids, Institution.find(:all, :order=>:name), :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
+	</div>
+</center>
+
+<p style="margin-top: 2em; text-align: center;">
+  <%= f.submit (project ? "Update" : "Create") -%>
+	or <%= link_to 'Cancel', (project ? project_path(project.id) : projects_path) -%>
+</p>

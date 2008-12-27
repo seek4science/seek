@@ -101,6 +101,8 @@ module ApplicationHelper
       return "famfamfam_silk/user_add.png"
     when "avatar"
       return "famfamfam_silk/picture.png"
+    when "avatars"
+      return "famfamfam_silk/photos.png"
     when "save"
       return "famfamfam_silk/save.png"
     when "message"
@@ -141,6 +143,10 @@ module ApplicationHelper
       return "famfamfam_silk/house.png"
     when "project"
       return "famfamfam_silk/report.png"
+    when "tick"
+      return "famfamfam_silk/tick.png"
+    when "lock"
+      return "famfamfam_silk/lock.png"
     else
       return nil
     end
@@ -195,30 +201,12 @@ module ApplicationHelper
     end
     
     case object.class.name.downcase
-      when "person"
-        # TEMP CODE: LINES IN THE FOLLOWING BLOCK WILL GET UNCOMMENTED, WHEN THE AVATAR UPLOAD WILL BE IMPLEMENTED
-        #if person.avatar?
-        #  img = image_tag avatar_url(person.picture_id, size), :title => alt, :class => 'framed'
-        #else
+      when "person", "institution", "project"
+        if object.avatar_selected?
+          img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
+        else
           img = null_avatar(object.class.name, size, alternative)
-        #end
-        # END OF TEMP CODE
-      when "institution"
-        # TEMP CODE: LINES IN THE FOLLOWING BLOCK WILL GET UNCOMMENTED, WHEN THE AVATAR UPLOAD WILL BE IMPLEMENTED
-        #if person.avatar?
-        #  img = image_tag avatar_url(person.picture_id, size), :title => alt, :class => 'framed'
-        #else
-          img = null_avatar(object.class.name, size, alternative)
-        #end
-        # END OF TEMP CODE
-      when "project"
-        # TEMP CODE: LINES IN THE FOLLOWING BLOCK WILL GET UNCOMMENTED, WHEN THE AVATAR UPLOAD WILL BE IMPLEMENTED
-        #if person.avatar?
-        #  img = image_tag avatar_url(person.picture_id, size), :title => alt, :class => 'framed'
-        #else
-          img = null_avatar(object.class.name, size, alternative)
-        #end
-        # END OF TEMP CODE
+        end
     end
     
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
@@ -233,16 +221,18 @@ module ApplicationHelper
     end
   end
   
-  # TEMP COMMENT: will be fixed and put in use, when the avatar upload feature is implemented
-  #def avatar_url(picture_id, size=200)
-  #  url_for(:controller => 'pictures',
-  #          :action => 'show',
-  #          :id => picture_id,
-  #          :size => "#{size}x#{size}")
-  #end
-  # END OF TEMP COMMENT
+  def avatar_url(avatar_for_instance, avatar_id, size=nil)
+    basic_url = eval("#{avatar_for_instance.class.name.downcase}_avatar_path(#{avatar_for_instance.id}, #{avatar_id})")
+    
+    if size
+      basic_url += "?size=#{size}"
+      basic_url += "x#{size}" if size.kind_of?(Fixnum)
+    end
+    
+    return basic_url
+  end
   
-  def null_avatar(object_class_name, size=200, alt="Anonymous")
+  def null_avatar(object_class_name, size=200, alt="Anonymous", onclick_options="")
     case object_class_name.downcase
       when "person"
         avatar_filename = "avatar.png"
@@ -255,9 +245,12 @@ module ApplicationHelper
     image_tag avatar_filename,
               :alt => alt, 
               :size => "#{size}x#{size}",
-              :class => 'framed'
+              :class => 'framed',
+              :onclick => onclick_options
   end
   
+  # this helper is to be extended to include many more types of objects that can belong to the
+  # user - for example, SOPs and others
   def mine?(thing)
     return false if thing.nil?
     return false unless logged_in?

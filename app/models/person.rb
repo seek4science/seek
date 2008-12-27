@@ -1,6 +1,19 @@
+require 'acts_as_editable'
+
 class Person < ActiveRecord::Base
   
-  
+    acts_as_editable
+    
+    validates_presence_of :name
+    # TODO: uncomment the following line if no 2 persons can have same name
+    #validates_uniqueness_of :name
+
+    
+    validates_associated :avatars
+    has_many :avatars, 
+             :as => :owner,
+             :dependent => :destroy
+    
     has_many :group_memberships
     
     has_many :work_groups, :through=>:group_memberships
@@ -59,6 +72,12 @@ class Person < ActiveRecord::Base
   
     def name
         return first_name.capitalize + " " + last_name.capitalize
+    end
+    
+    # "false" returned by this helper method won't mean that no avatars are uploaded for this person;
+    # it rather means that no avatar (other than default placeholder) was selected for the person 
+    def avatar_selected?
+      return !avatar_id.nil?
     end
   
 end

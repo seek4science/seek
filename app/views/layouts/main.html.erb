@@ -37,14 +37,14 @@
             
             <%# applying styling to error / notice messages -%>
 						<% if flash[:error] %>
-							<div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 1.5em 0.3em; line-height: 1.4;">
+							<div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
 								<%= link_to_function image_tag("close.gif", :style => "float: right;"), 
 																		 visual_effect(:toggle_slide, "error_flash", :duration => 0.3) %>
 								<%= white_list flash[:error] %>
 							</div>
 						<% end %>
     				<% if flash[:notice] %>
-							<div id="notice_flash" class="box_standout" style="color: green; font-weight: bold; margin: 1em 0.6em; line-height: 1.4;">
+							<div id="notice_flash" class="box_standout" style="color: green; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
 								<%= link_to_function image_tag("close.gif", :style => "float: right;"), 
 																		 visual_effect(:toggle_slide, "notice_flash", :duration => 0.3) %>
 								<%= white_list flash[:notice] %>
@@ -52,7 +52,7 @@
 						<% end %>
 						
 						<%# main content part of every page -%>
-            <%= yield :layout %>
+					  <%= yield :layout %>
                                                                               
                                     
           </div>

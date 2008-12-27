@@ -5,13 +5,22 @@ ActionController::Routing::Routes.draw do |map|
 
   #map.resources :profiles
 
-  map.resources :institutions
+  map.resources :institutions do |institution|
+    # avatars / pictures 'owned by' institution
+    institution.resources :avatars, :member => { :select => :get }
+  end
 
   map.resources :groups
 
-  map.resources :projects
+  map.resources :projects do |project|
+    # avatars / pictures 'owned by' project
+    project.resources :avatars, :member => { :select => :get }
+  end
 
-  map.resources :people
+  map.resources :people do |person|
+    # avatars / pictures 'owned by' person
+    person.resources :avatars, :member => { :select => :post }
+  end
   
   map.resources :expertise
   

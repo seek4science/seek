@@ -1,3 +1,10 @@
+<% if logged_in? && current_user.is_admin? -%>
+  <div style="float: left; width: 150px;">&nbsp;</div>
+	<div style="float: right; width: 150px; font-weight: bold; color: white;">
+	  <%= icon "lock", nil, "Admin mode", nil, "Admin mode" -%>
+	</div>
+<% end -%>
+
 <% if logged_in? and SOLR_ENABLED %>
   <% form_tag '/search/' do -%>
     <%= text_field_tag :query %>

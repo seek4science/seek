@@ -1,0 +1,28 @@
+<% avatar_for_object = eval("#{@avatar_for}.find(#{@avatar_for_id})") -%>
+<h1>Upload <%= @avatar_for -%> Avatar: <%= link_to avatar_for_object.name, url_for(avatar_for_object) -%></h1>
+
+<%= error_messages_for :avatar -%>
+
+<% form_tag ({:action => :create}, :multipart => true) do %>
+
+  <%= hidden_field_tag(:owner_type, @avatar_for ) -%>
+  <%= hidden_field_tag(:owner_id, @avatar_for_id ) -%>
+  
+  <!-- <%#= hidden_field_tag(:redirect_to, params[:return_to] ? params[:return_to] : user_pictures_path(current_user.id) ) -%> -->
+  <br/>
+	<p>
+    <center>
+      <b>Picture file: </b>
+	  <%= file_field 'avatar', 'image_file' %>
+	</center>
+  </p>
+	
+  <br/>
+  
+  <p>
+  	<center>
+      <%= submit_tag "Upload", :disable_with => "Uploading..." %>
+	  <!-- or <%#= link_to "Cancel", params[:return_to] ? params[:return_to] : user_pictures_path(current_user.id) -%> -->
+	</center>
+  </p>
+<% end %>

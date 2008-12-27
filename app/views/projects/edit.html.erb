@@ -1,36 +1,8 @@
-<div id ="show_basic" class="yui-b">
+<h1>Edit Project: <%= link_to h(@project.name), project_path(@project) -%></h1>
 
-<% form_for(@project) do |f| %>
-  <%= f.error_messages %>
-
-  <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </p>
-  <p>
-    <%= f.label :web_page %><br />
-    <%= f.text_field :web_page %>
-  </p>
-  <p>
-    <%= f.label :wiki_page %><br />
-    <%= f.text_field :wiki_page %>
-  </p>
-  
-    <p>
-      <%= f.label :description %><br/>
-      <%= f.text_area :description %>
-    </p>
-  
-<p>
-        <%= f.label :institutions %><br/>
-        <%= f.collection_select :institution_ids, Institution.find(:all), :id, :name, {}, {:multiple=>true} %>
-  </p>
-  <p>
-    <%= f.submit "Update" %>
-  </p>
-
-<% end %>
-<!--
-<%= link_to 'Show', @project %> 
--->
+<div class="show_basic">
+  <% form_for(@project) do |f| %>
+    <%= render :partial => "form", :locals => { :f => f, :project => @project } -%>
+  <% end %>
 </div>
+

@@ -1,8 +1,8 @@
-<fieldset style="margin-right: 2em; padding-bottom: 0;">
-  <legend>
+<p>
+	<label for="tool_list">
 		Tools and techniques
   	<%= help_icon("A comma seperated list of keywords that describe your tools and techniques.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
-	</legend>
+	</label>
 	
 	<%= text_area :tool, :list, :rows => 5, :value => h(person.tool_list), :style => "width: 100%;" -%>
 	<%= fast_auto_complete_field :tool_list, :url =>tool_list_autocomplete_path -%>
@@ -23,6 +23,5 @@
 		  </div>
 		</div>
 	</div>
-
-</fieldset>
+</p>
 

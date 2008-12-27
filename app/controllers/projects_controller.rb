@@ -63,7 +63,10 @@ class ProjectsController < ApplicationController
   def update
     @project = Project.find(params[:id])
     #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
-      
+    
+    # extra check required to see if any avatar was actually selected (or it remains to be the default one)
+    avatar_id = params[:project].delete(:avatar_id).to_i
+    @project.avatar_id = ((avatar_id.kind_of?(Fixnum) && avatar_id > 0) ? avatar_id : nil)
     
     respond_to do |format|
       if @project.update_attributes(params[:project])

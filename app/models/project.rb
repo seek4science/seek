@@ -1,4 +1,17 @@
+require 'acts_as_editable'
+
 class Project < ActiveRecord::Base
+  
+  acts_as_editable
+  
+  validates_presence_of :name
+  validates_uniqueness_of :name
+  
+  validates_associated :avatars
+  has_many :avatars, 
+           :as => :owner,
+           :dependent => :destroy
+  
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
 
@@ -24,6 +37,12 @@ class Project < ActiveRecord::Base
       wg.people.each {|p| res << p unless res.include? p}
     end
     return res
+  end
+  
+  # "false" returned by this helper method won't mean that no avatars are uploaded for this project;
+  # it rather means that no avatar (other than default placeholder) was selected for the project 
+  def avatar_selected?
+    return !avatar_id.nil?
   end
   
 end

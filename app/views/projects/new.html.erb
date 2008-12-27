@@ -1,35 +1,7 @@
+<h1>New Project</h1>
 
-<div class="yui-b show_basic">
-  
+<div class="show_basic">
   <% form_for(@project) do |f| %>
-    <%= f.error_messages %>
-  
-    <p>
-      <%= f.label :name %><br />
-      <%= f.text_field :name %>
-    </p>
-    <p>
-      <%= f.label :web_page %><br />
-      <%= f.text_field :web_page %>
-    </p>
-    <p>
-      <%= f.label :wiki_page %><br />
-      <%= f.text_field :wiki_page %>
-    </p>
-  
-    <p>
-      <%= f.label :description %><br/>
-      <%= f.text_area :description %>
-    </p>
-  
-    <p>
-      <%= f.label :institutions %><br/>
-      <%= f.collection_select :institutions, Institution.find(:all, :order=>:name), :id, :name, {}, {:multiple=>true}%>
-    </p>
-  
-    <p>
-      <%= f.submit "Create" %>
-    </p>
+    <%= render :partial => "form", :locals => { :f => f, :project => nil } -%>
   <% end %>
 </div>
-<%= link_to 'Back', projects_path %>
