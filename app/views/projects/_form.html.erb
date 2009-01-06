@@ -25,8 +25,8 @@
 </center>
 
 
-<% # show avatar selection only when the project exists -%>
-<% if project -%>
+<% # show avatar selection only when the project exists AND when current user is allowed to edit it -%>
+<% if project && (mine?(project) || project.can_be_edited_by?(current_user)) -%>
   <h2 style="margin-top: 1.5em;">Project Avatar</h2>
 	<%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => project, :form_instance => f } -%>
 <% end -%>
