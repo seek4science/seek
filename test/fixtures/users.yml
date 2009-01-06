@@ -9,6 +9,8 @@ quentin:
   activated_at: <%= 5.days.ago.to_s :db %> 
   person_id: 1
   is_admin: true
+  can_edit_projects: true
+  can_edit_institutions: true
 
 aaron:
   id: 2

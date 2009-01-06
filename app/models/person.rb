@@ -68,10 +68,14 @@ class Person < ActiveRecord::Base
         res=[]
         work_groups.collect {|wg| res << wg.project unless res.include?(wg.project) }
         return res
-    end
+    end    
   
     def name
-        return first_name.capitalize + " " + last_name.capitalize
+        firstname=first_name
+        firstname||=""
+        lastname=last_name
+        lastname||=""
+        return firstname.capitalize + " " + lastname.capitalize
     end
     
     # "false" returned by this helper method won't mean that no avatars are uploaded for this person;
