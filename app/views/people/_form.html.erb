@@ -106,6 +106,6 @@
 <% end -%>
 
 <p style="text-align: center; margin-top: 1.5em;">
-  <%= f.submit (person ? "Update" : "Create") -%>
+  <%= f.submit(person ? "Update" : "Create") -%>
 	or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path) -%>
 </p>

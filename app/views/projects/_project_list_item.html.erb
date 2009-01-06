@@ -18,7 +18,7 @@
         </p>
 
         <div class="box_standout">
-          <%= truncate(text_or_not_specified(project.description, :description => true), 300) %>
+          <%= truncate(text_or_not_specified(project.description, :description => true), :length=>300) %>
         </div>
 
         <% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>
@@ -47,7 +47,7 @@
 									<% else -%>
   									<%= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
 									<% end -%>
-                  <%= link_to(truncate(h(institution.name), truncate_projects_institutions_length), url_for(institution), :title => tooltip_title_attrib(h(institution.name))) -%>
+                  <%= link_to(truncate(h(institution.name), :length=>truncate_projects_institutions_length), url_for(institution), :title => tooltip_title_attrib(h(institution.name))) -%>
                 </li>
               <% end  %>
             <% else -%>
