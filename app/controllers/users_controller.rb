@@ -17,7 +17,7 @@ class UsersController < ApplicationController
         # uncomment at your own risk
         # reset_session
         @user = User.new(params[:user])
-        @user.person=Person.new(params[:person])
+        @user.person=Person.new(params[:person])        
     
         @user.save
     
