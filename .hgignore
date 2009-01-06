@@ -1,8 +1,6 @@
 syntax: glob
 *.svn
-db/test.sqlite3
-db/development.sqlite3
-db/production.sqlite3
+db/*.sqlite3
 db/schema.rb
 config/environment_local.rb
 config/database.yml
