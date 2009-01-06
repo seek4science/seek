@@ -1,44 +1,7 @@
-<div  class="yui-b show_basic">
-  <% form_for @person do |f| %>
-    <%= f.error_messages %>
+<h1>New Person</h1>
 
-    <div id="first_name">
-      <%= f.label :first_name %><br />
-      <%= f.text_field :first_name %>
-    </div>
-    <div id="last_name">
-      <%= f.label :last_name %><br />
-      <%= f.text_field :last_name %>
-    </div>
-    <div id="email">
-      <%= f.label :email %><br />
-      <%= f.text_field :email %>
-    </div>
-    <div id="phone_number">
-      <%= f.label :phone %><br />
-      <%= f.text_field :phone %>
-    </div>
-    <div id="skype_name">
-      <%= f.label :skype_name %><br />
-      <%= f.text_field :skype_name %>
-    </div>
-    <div id="web_page">
-      <%= f.label :web_page %><br />
-      <%= f.text_field :web_page %>
-    </div>
-
-
-    <p>
-      <%= render :partial => "select_tools", :locals=>{:person=>@person} %>
-    </p>
-
-    <%= render :partial =>"work_groups", :locals=>{:person=>@person}%>
-
-
-
-
-    <%= f.submit "Create" %>
-
-  <% end %>
-
+<div class="show_basic">
+	<% form_for @person do |f| %>
+	  <%= render :partial => "form", :locals => { :f => f, :person => nil } -%>
+	<% end -%>
 </div>
