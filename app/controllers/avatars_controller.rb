@@ -185,7 +185,7 @@ class AvatarsController < ApplicationController
       else
         # project / institution was found - now check if current user has permissions to edit/select/destroy avatars:
         # only selected members AND admins can do so
-        unless @avatar_for_instance.can_be_edited_by?(current_user)
+        unless @avatar_owner_instance.can_be_edited_by?(current_user)
           flash[:error] = "You can only view and, possibly, manage avatars of #{pluralize @avatar_for.downcase}, where you are a member of."
           redirect_to url_for(@avatar_owner_instance)
           return false

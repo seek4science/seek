@@ -7,14 +7,14 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :institutions do |institution|
     # avatars / pictures 'owned by' institution
-    institution.resources :avatars, :member => { :select => :get }
+    institution.resources :avatars, :member => { :select => :post }
   end
 
   map.resources :groups
 
   map.resources :projects do |project|
     # avatars / pictures 'owned by' project
-    project.resources :avatars, :member => { :select => :get }
+    project.resources :avatars, :member => { :select => :post }
   end
 
   map.resources :people do |person|
