@@ -25,3 +25,14 @@ dummy:
         is_dummy: true
         first_name: DummyPerson
 
+no_first_name:
+        id: 6
+        is_dummy: false
+        last_name: lastname
+        
+no_last_name:
+        id: 7
+        is_dummy: false
+        first_name: firstname
+
+

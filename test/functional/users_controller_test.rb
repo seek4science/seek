@@ -25,7 +25,7 @@ class UsersControllerTest < Test::Unit::TestCase
   def test_should_allow_signup
     assert_difference 'User.count' do
       create_user
-      assert_response :redirect
+      assert_response :success
     end
   end
 
@@ -56,11 +56,9 @@ class UsersControllerTest < Test::Unit::TestCase
   def test_should_not_require_email_on_signup
     assert_difference 'User.count' do
       create_user(:email => nil)
-      assert_response :redirect
+      assert_response :success
     end
   end
-  
-
   
   #  def test_should_sign_up_user_with_activation_code
   #    create_user

@@ -29,7 +29,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_should_create_institution
     assert_difference('Institution.count') do
-      post :create, :institution => { }
+      post :create, :institution => {:name=>"test" }
     end
 
     assert_redirected_to institution_path(assigns(:institution))

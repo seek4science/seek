@@ -30,4 +30,16 @@ class PersonTest < ActiveSupport::TestCase
       p.first_name="Tom"
       assert_equal "Tom Jones", p.name
   end
+
+  def test_capitalization_with_nil_last_name
+    p=people(:no_first_name)
+    assert_equal " Lastname",p.name
+  end
+
+  def test_capitalization_with_nil_first_name
+    p=people(:no_last_name)
+    assert_equal "Firstname ",p.name
+  end
+
+
 end
