@@ -1,0 +1,111 @@
+<%= f.error_messages %>
+		
+<h2>Personal Information & Contact Details</h2>
+
+<table style="width: 100%;" class="box_simple">
+	<tr>
+		<td style="width: 45%;">
+			<center>
+				<div style="width: 90%;">
+					<p>
+            <%= f.label :first_name -%><br />
+            <%= f.text_field :first_name, :style => "width: 100%;" -%>
+				  </p>
+					
+					<p>
+			      <%= f.label :last_name %><br />
+            <%= f.text_field :last_name, :style => "width: 100%;" %>
+					</p>
+			  
+			    <p>
+			    	<%= f.label :email %><br />
+            <%= f.text_field :email, :style => "width: 100%;" %>
+				  </p>
+				</div>
+			</center>
+		</td>
+		<td style="width: 45%;">
+      <center>
+			  <div style="width: 90%">
+					<p>
+						<%= f.label :phone %><br />
+            <%= f.text_field :phone, :style => "width: 100%;" %>
+					</p>
+		  
+		      <p>
+		      	<%= f.label :skype_name %><br />
+            <%= f.text_field :skype_name, :style => "width: 100%;" %>
+		      </p>
+				
+				  <p>
+					  <%= f.label :web_page %><br />
+            <%= f.text_field :web_page, :style => "width: 100%;" %>
+				  </p>
+		    </div>
+			</center>
+		</td>
+	</tr>
+</table>
+<% if mine?(person) %>
+  <p>
+	  <%= icon "lock", url_for({:controller=>:users, :action=>:edit, :id=>person.user}), "Change login details", nil, "Change login details" -%>
+	</p>
+<% end -%>
+
+
+<% # show avatar selection only when the project exists AND when current user is allowed to edit it -%>
+<% if person && (mine?(person) || person.can_be_edited_by?(current_user)) -%>
+	<h2 style="margin-top: 1.5em;">Profile Avatar</h2>
+	<%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => person, :form_instance => f } -%>
+<% end -%>
+
+
+<h2 style="margin-top: 1.5em;">About You & Your Areas of Expertise</h2>
+
+<center>
+	<div style="width: 95%;">
+		<p>
+      <%= f.label "Description" %><br/>
+      <%= f.text_area :description, :class=>"description", :rows => 3, :style => "width: 85%;" -%>
+    </p>
+	</div>
+</center>
+
+<table style="width: 100%;">
+	<tr style="vertical-align: top;">
+		<td style="width: 45%;">
+			<center>
+				<div style="width: 90%;">
+					<%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
+				</div>
+			</center>
+		</td>
+		<td style="width: 45%;">
+      <center>
+			  <div style="width: 90%">
+					<%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
+		    </div>
+			</center>
+		</td>
+	</tr>
+</table>
+
+
+<% if current_user.is_admin? -%>
+  <h2 style="margin-top: 1.5em;">Choose Project / Institution&nbsp;&nbsp;&nbsp;<span class="admin_warning">(This section is visible only to admins)</span></h2>
+	<%= render :partial => "work_groups", :locals=> { :person => (person ? person : Person.new) } -%>
+	
+	<% # only makes sense to display these settings when the person has "user" associated with it; -%>
+	<% # also, can only do this if the person is not an admin, too - because admins cannot edit accounts of each other -%>
+	<% if person && person.user && (mine?(person) || !person.user.is_admin?) -%>
+		<p style="line-height: 1.8;">
+			<label for="can_edit_projects" style="font-weight: normal;"><%= check_box_tag "can_edit_projects", true, (person.user.can_edit_projects || person.user.is_admin?) -%>Allow this person to edit <b>projects</b> they work in.</label><br/> 
+			<label for="can_edit_institutions" style="font-weight: normal;"><%= check_box_tag "can_edit_institutions", true, (person.user.can_edit_institutions || person.user.is_admin?) -%>Allow this person to edit <b>institutions</b> they work in.</label>
+		</p>
+	<% end -%>
+<% end -%>
+
+<p style="text-align: center; margin-top: 1.5em;">
+  <%= f.submit (person ? "Update" : "Create") -%>
+	or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path) -%>
+</p>
