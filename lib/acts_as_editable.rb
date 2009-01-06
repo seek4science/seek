@@ -27,13 +27,13 @@ module Sergey
               # authorised to admins if the "person" doesn't have a user or the associated user is not an admin 
               return(subject.is_admin? && (self.user.nil? || !self.user.is_admin?))
             when "Project"
-              # authorised to admins and people within the project
+              # authorised to admins and selected people within the project
               return(subject.is_admin? || (self.people.include?(subject) && subject.can_edit_projects))
             when "Institution"
-              # authorised to admins and people within the project
+              # authorised to admins and selected people within the project
               return(subject.is_admin? || (self.people.include?(subject) && subject.can_edit_institutions))
             else
-              # don't know what that is, not authorised
+              # don't know what kind of object that is, not authorised
               return false
           end
         end

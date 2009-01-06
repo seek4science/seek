@@ -7,8 +7,7 @@
 
   <%= hidden_field_tag(:owner_type, @avatar_for ) -%>
   <%= hidden_field_tag(:owner_id, @avatar_for_id ) -%>
-  
-  <!-- <%#= hidden_field_tag(:redirect_to, params[:return_to] ? params[:return_to] : user_pictures_path(current_user.id) ) -%> -->
+  <%= hidden_field_tag(:return_to, params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})")) -%>
   <br/>
 	<p>
     <center>
@@ -22,7 +21,7 @@
   <p>
   	<center>
       <%= submit_tag "Upload", :disable_with => "Uploading..." %>
-	  <!-- or <%#= link_to "Cancel", params[:return_to] ? params[:return_to] : user_pictures_path(current_user.id) -%> -->
+	    or <%= link_to "Cancel", params[:return_to] ? params[:return_to] : eval("#{@avatar_for.downcase}_avatars_path(#{@avatar_for_id})") -%>
 	</center>
   </p>
 <% end %>

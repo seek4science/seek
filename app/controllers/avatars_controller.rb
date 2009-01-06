@@ -36,11 +36,9 @@ class AvatarsController < ApplicationController
         
         flash[:notice] = 'Avatar was successfully uploaded.'
         
-        #format.html { redirect_to pictures_url(@picture.user_id) }
         # updated to take account of possibly various locations from where this method can be called,
         # so multiple redirect options are possible -> now return link is passed as a parameter
-        #format.html { redirect_to params[:redirect_to] }
-        format.html { redirect_back_or_default(person_path(current_user.person)) }
+        format.html { redirect_to params[:return_to] }
       else
         # "create" action was already called once; render it again
         @avatar = Avatar.new
@@ -111,18 +109,20 @@ class AvatarsController < ApplicationController
   # GET /avatars/1/select -> denied by before_filter
   def select
     if @avatar.select!
-      # IN CONTRAST TO myExperiment SysMO WILL NOT STORE PICTURE SELECTIONS (AT LEAST FOR NOW)
+      ## IN CONTRAST TO myExperiment SysMO WILL NOT STORE PICTURE SELECTIONS (AT LEAST FOR NOW)
       # create and save picture selection record
-      #PictureSelection.create(:user => current_user, :picture => @picture)
-      # END
+      # PictureSelection.create(:user => current_user, :picture => @picture)
+      ## END
       
       respond_to do |format|
-        flash[:notice] = 'Picture was successfully selected as profile picture.'
-        format.html { redirect_back_or_default(person_path(current_user.person)) }
+        flash[:notice] = 'Profile avatar was successfully updated.'
+        format.html { redirect_to eval("#{@avatar_owner_instance.class.name.downcase}_avatars_url(#{@avatar_owner_instance.id})") }
       end
     else
-      flash[:error] = "Avatar was already selected"
-      redirect_back_or_default(person_path(current_user.person))
+      respond_to do |format|
+        flash[:error] = "Avatar was already selected."
+        format.html { redirect_to url_for(@avatar_owner_instance) }
+      end
     end
   end
   
@@ -155,7 +155,7 @@ class AvatarsController < ApplicationController
     # check that nested route is used, not a direct link
     if (@avatar_for.nil? || @avatar_for_id.nil?)
       flash[:error] = "Please use nested routes. Avatars are only available for people, projects and institutions."
-      redirect_back_or_default(person_path(current_user.person))
+      redirect_to(person_path(current_user.person))
       return false
     end
     
@@ -164,22 +164,32 @@ class AvatarsController < ApplicationController
       @avatar_owner_instance = eval("#{@avatar_for}.find(#{@avatar_for_id})")
     rescue ActiveRecord::RecordNotFound
       flash[:error] = "Could not find #{@avatar_for.downcase} specified in the URL."
-      redirect_back_or_default(person_path(current_user.person))
+      redirect_to(person_path(current_user.person))
       return false
     end
   end
   
   
   def find_avatar_auth
-    unless @avatar_for.downcase == "person"
-      # project / institution was found - now check if current user has permissions to view / edit avatars
-      # TODO: security check to be implemented
-    else
-      # for people, users can only view own avatars - and "person" for current user should exist anyway
-      unless current_user.person.id.to_i == @avatar_for_id.to_i
-        flash[:error] = "You can only view and manage your own avatars."
-        redirect_back_or_default(person_path(current_user.person))
-        return false
+    # can show avatars to anyone (given that avatar ID belongs to the avatar owner in the URL);
+    # for all other actions some validation is required
+    unless self.action_name.to_s == "show"
+      if @avatar_for.downcase == "person"
+        # for people, users can only edit/select/destroy own avatars - and "person" for current user should exist anyway;
+        # (admins can access other people avatars too, provided that the person which is about to be changed is not admin themself)
+        unless @avatar_for_id.to_i == current_user.person.id.to_i || @avatar_owner_instance.can_be_edited_by?(current_user)
+          flash[:error] = "You can only view and manage your own avatars, but not ones of other users."
+          redirect_to(person_path(current_user.person))
+          return false
+        end
+      else
+        # project / institution was found - now check if current user has permissions to edit/select/destroy avatars:
+        # only selected members AND admins can do so
+        unless @avatar_for_instance.can_be_edited_by?(current_user)
+          flash[:error] = "You can only view and, possibly, manage avatars of #{pluralize @avatar_for.downcase}, where you are a member of."
+          redirect_to url_for(@avatar_owner_instance)
+          return false
+        end
       end
     end
     
@@ -189,7 +199,7 @@ class AvatarsController < ApplicationController
       @avatar = Avatar.find( params[:id], :conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id } )
     rescue ActiveRecord::RecordNotFound
       flash[:error] = "Avatar not found or belongs to a different #{@avatar_for.downcase}."
-      redirect_back_or_default(person_path(current_user.person))
+      redirect_to(person_path(current_user.person))
       return false
     end
     
@@ -197,7 +207,16 @@ class AvatarsController < ApplicationController
   
   
   def find_avatars
-    @avatars = Avatar.find(:all, :conditions => { :owner_type => @avatar_owner_instance.class.name, :owner_id => @avatar_owner_instance.id })
+    # all avatars for current object are only shown to the owner of the object OR to any admin (if the object is not an admin themself);
+    # also, show avatars to all members of a project/institution
+    if current_user.is_admin? || (@avatar_owner_instance.class.name = "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) || 
+                             (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.people.include?(current_user))
+      @avatars = Avatar.find(:all, :conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id })
+    else
+      flash[:error] = "You can only view avatars that belong to you or any projects/institutions where you are a member of."
+      redirect_to(person_path(current_user.person))
+      return false
+    end
   end
   
   

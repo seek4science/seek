@@ -3,8 +3,7 @@
 <p>
   <ul class="sectionIcons">
 	  <li><%= icon("avatars", all_avatars_link(avatar_for_instance), nil, nil, "Manage Avatars") -%></li>
-		<!--<li><%#= icon('avatar', new_avatar_link(avatar_for_instance) + "?return_to=" + edit_profile_path(current_user.id), nil, nil, 'Upload New Profile Pic') -%></li>-->
-		<li><%= icon('avatar', new_avatar_link(avatar_for_instance), nil, nil, 'Upload New Avatar') -%></li>
+		<li><%= icon('avatar', new_avatar_link(avatar_for_instance) + "?return_to=" + eval("edit_#{object_type}_path(#{avatar_for_instance.id})"), nil, nil, 'Upload New Avatar') -%></li>
 	</ul>
 		
 	<p class="box_standout" style="text-align: center; padding: 0.3em 0.5em; margin: 1.5em 0 1em 0;">
