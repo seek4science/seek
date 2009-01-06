@@ -10,7 +10,7 @@
 					<% else -%>
 					  <%= flag_icon(item.country) -%>
 					<% end -%>
-          <%= link_to truncate(h(item.name), truncate_to), url_for(item), :title => tooltip_title_attrib(h(item.name)) -%>
+          <%= link_to truncate(h(item.name), :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(h(item.name)) -%>
         </li>
       <% end  %>
     </ul>
