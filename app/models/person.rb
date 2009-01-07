@@ -21,9 +21,16 @@ class Person < ActiveRecord::Base
     acts_as_taggable_on :tools, :expertise
     
     has_one :user
+
+    
   
     acts_as_solr(:fields => [ :first_name, :last_name ]) if SOLR_ENABLED
   
+    def self.userless_people
+      p=Person.find(:all)
+      return p.select{|person| person.user.nil?}
+    end
+
     def validates_associated(*associations)
         associations.each do |association|
             class_eval do

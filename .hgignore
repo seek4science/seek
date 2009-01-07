@@ -13,7 +13,7 @@ nbproject/*
 config/environment_local.rb
 filestore/*
 tmp/avatars/*
-
+debug.log
 
 syntax: regexp
 \.orig$
