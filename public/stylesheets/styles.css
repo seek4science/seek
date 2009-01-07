@@ -230,7 +230,7 @@ table.list_item #expand_button {
 
 /* customized version of styles from my_exp.css with different names */
 .contribution_section_box ul.list {
-	margin: 0 0 0.8em 0.8em;
+	margin: 0 0 0 0.8em;
 	text-align: left;
 }
 

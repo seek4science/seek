@@ -33,6 +33,9 @@ module ApplicationHelper
     image_tag "folds/unfold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
   end
   
+  def collapse_image(margin_left="0.3em")
+    image_tag "folds/fold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
+  end
   
   def icon(method, url=nil, alt=nil, url_options={}, label=method.humanize, remote=false)
 
@@ -181,6 +184,20 @@ module ApplicationHelper
     else
       return ''
     end
+  end
+  
+  def list_item_with_icon(icon_type, item, truncate_to)
+    list_item = "<li>"
+    
+    unless icon_type.downcase == "flag"
+      list_item += icon(icon_type.downcase, nil, icon_type.camelize, nil, "")
+    else
+      list_item += flag_icon(item.country)
+    end
+    list_item += link_to truncate(h(item.name), :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(h(item.name))
+    list_item += "</li>"
+    
+    return list_item
   end
   
   # A generic method to produce avatars for entities of all kinds.

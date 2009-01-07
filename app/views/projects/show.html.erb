@@ -50,6 +50,7 @@
 			</p>
 			<%= render :partial => "layouts/contribution_section_box_item_list", 
                  :locals => { :collection => @project.institutions,
+                              :collection_name => "institutions_involved",
                               :icon_type => "flag",
                               :truncate_to => truncate_length_for_boxes } -%>
 		</div>
@@ -61,6 +62,7 @@
 			</p>
 			<%= render :partial => "layouts/contribution_section_box_item_list", 
                  :locals => { :collection => @project.people,
+                              :collection_name => "people_working_within",
                               :icon_type => "Person",
                               :truncate_to => truncate_length_for_boxes } -%>
 		</div>

@@ -82,6 +82,7 @@
 				</p>
         <%= render :partial => "layouts/contribution_section_box_item_list", 
                    :locals => { :collection => @person.people_i_may_know,
+                                :collection_name => "people_i_may_know",
                                 :icon_type => @person.class.name,
                                 :truncate_to => truncate_length_for_boxes } -%>
 			</div>
@@ -94,6 +95,7 @@
 			</p>
 			<%= render :partial => "layouts/contribution_section_box_item_list", 
                  :locals => { :collection => @person.projects,
+                              :collection_name => "projects_i_am_involved_in",
                               :icon_type => "Project",
                               :truncate_to => truncate_length_for_boxes } -%>
 		</div>
@@ -105,6 +107,7 @@
 			</p>
 			<%= render :partial => "layouts/contribution_section_box_item_list", 
                  :locals => { :collection => @person.institutions,
+                              :collection_name => "member_of_institutions",
                               :icon_type => "flag",
                               :truncate_to => truncate_length_for_boxes } -%>
 		</div>
