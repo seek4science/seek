@@ -24,7 +24,7 @@ class UsersController < ApplicationController
         if @user.errors.empty?
             @user.activate
             self.current_user = @user
-            redirect_to(url_for(:controller=>"people", :action=>"edit", :id=>@user.person))
+            redirect_to(select_people_path)
             flash[:notice] = "Thanks for signing up!"
         else
             render :action => 'new'
@@ -47,9 +47,8 @@ class UsersController < ApplicationController
   
     def update
         @user = User.find(params[:id])
-      
-        @user.attributes=params[:user]
-      
+        @user.person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?
+        @user.attributes=params[:user]        
         respond_to do |format| 
             if @user.save
                 format.html { redirect_to person_path(@user.person) }

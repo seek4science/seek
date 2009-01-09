@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   
   
   belongs_to :person
-  validates_associated :person
+  #validates_associated :person
   
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password

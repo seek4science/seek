@@ -17,7 +17,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :avatars, :member => { :select => :post }
   end
 
-  map.resources :people do |person|
+  map.resources :people, :collection=>{:select=>:get} do |person|
     # avatars / pictures 'owned by' person
     person.resources :avatars, :member => { :select => :post }
   end

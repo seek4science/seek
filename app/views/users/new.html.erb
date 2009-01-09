@@ -55,24 +55,7 @@
 							</center>
 	    			</div>
 	    		</td>
-					<td style="width: 50%;">
-						<div class="box_simple">
-	    				<% fields_for @user.person do |pf| %>
-					      <center>
-								  <div style="width: 90%">
-										<p><label for="person_first_name"><b>First name</b></label><br/>
-							      <%= pf.text_field :first_name, :style => "width: 100%;" %></p>
-							  
-							      <p><label for="person_last_name"><b>Last name</b></label><br/>
-							      <%= pf.text_field :last_name, :style => "width: 100%;" %></p>
-							    <% end %>
-									
-									<p><label for="user_email"><b>Email address</b></label><br/>
-							    <%= f.text_field :email, :style => "width: 100%;" %></p>
-							  </div>
-							</center>
-	    			</div>
-					</td>
+					
 	    	</tr>
 	    </table>
 			

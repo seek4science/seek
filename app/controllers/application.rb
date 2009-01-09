@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { redirect_to root_url }
     end
-  end
+  end  
   
   # See ActionController::Base for details 
   # Uncomment this to filter the contents of submitted sensitive data parameters

@@ -1,11 +1,6 @@
-<% if logged_in?  %>
+<% if logged_in? && !current_user.person.nil? %>
 <div>
   <ul class="tabnav">
-    <!-- Home tab 
-    <li <%= (["home"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-      <%= link_to "Home", url_for(:controller=>'home') -%>
-      </li>
-      -->
     <!-- People tab -->
     <li <%= (["people"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
       <%= link_to "People", people_url -%>

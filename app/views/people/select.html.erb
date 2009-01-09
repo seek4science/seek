@@ -1,0 +1,11 @@
+<div class="show_basic">
+  <% form_for current_user do |f| -%>
+    <%= f.collection_select(:person_id, @userless_people, :id, :name) -%><br/>
+    <%= f.submit("Select") -%>
+  <% end -%>
+
+  <br/>
+
+  <%= link_to "I am not in this list", new_person_path %>
+</div>
+

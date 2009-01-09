@@ -2,7 +2,9 @@ class PeopleController < ApplicationController
   
   before_filter :login_required
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
-  before_filter :is_user_admin_auth, :only=>[:new, :destroy]
+  before_filter :is_user_admin_auth, :only=>[:destroy]
+  before_filter :is_user_admin_or_personless, :only=>:new
+  
   
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
@@ -55,7 +57,7 @@ class PeopleController < ApplicationController
     @person = Person.new
 
     respond_to do |format|
-      format.html # new.html.erb
+      format.html { render :action=>"new",:layout=>"logged_out" }
       format.xml  { render :xml => @person }
     end
   end
@@ -66,6 +68,15 @@ class PeopleController < ApplicationController
     @tags_expertise = Person.expertise_counts
 
     @person = Person.find(params[:id])
+  end
+
+  #GET /people/select
+  #
+  #Page for after registration that allows you to select yourself from a list of
+  #people yet to be assigned.
+  def select
+    @userless_people=Person.userless_people
+    render :action=>"select",:layout=>"logged_out"
   end
 
 
@@ -84,13 +95,17 @@ class PeopleController < ApplicationController
       @person.expertise_list=expertise_list
     end
     
+    if (current_user.person.nil?)
+      current_user.person=@person
+    end
+    
     respond_to do |format|
-      if @person.save
+      if @person.save && current_user.save
         flash[:notice] = 'Person was successfully created.'
         format.html { redirect_to(@person) }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => "new",:layout=>"logged_out" }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
@@ -155,5 +170,12 @@ class PeopleController < ApplicationController
       return false
     end
   end
-  
+
+  def is_user_admin_or_personless
+    unless current_user.is_admin? || current_user.person.nil?
+      error("You do not have permission to create new people","Is invalid (not admin)")
+      return false
+    end
+  end
+ 
 end
