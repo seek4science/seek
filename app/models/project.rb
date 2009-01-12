@@ -44,5 +44,16 @@ class Project < ActiveRecord::Base
   def avatar_selected?
     return !avatar_id.nil?
   end
+
+  def includes_userless_people?
+    peeps=people
+    return peeps.size>0 && !(peeps.find{|p| p.user.nil?}).nil?
+  end
+
+  # Returns a list of projects that contain people that do not have users assigned to them
+  def self.with_userless_people
+    p=Project.find(:all, :include=>:work_groups)
+    return p.select { |proj| proj.includes_userless_people? }
+  end
   
 end

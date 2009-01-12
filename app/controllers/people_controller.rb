@@ -75,7 +75,7 @@ class PeopleController < ApplicationController
   #Page for after registration that allows you to select yourself from a list of
   #people yet to be assigned.
   def select
-    @userless_people=Person.userless_people
+    @userless_projects=Project.with_userless_people
     render :action=>"select",:layout=>"logged_out"
   end
 

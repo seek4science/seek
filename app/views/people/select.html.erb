@@ -1,8 +1,10 @@
 <div class="show_basic">
-  <% form_for current_user do |f| -%>
-    <%= f.collection_select(:person_id, @userless_people, :id, :name) -%><br/>
-    <%= f.submit("Select") -%>
-  <% end -%>
+  <div id="project_list">
+    
+  </div>
+  <div id="people_list" style="display:none">
+    
+  </div>
 
   <br/>
 

@@ -1,18 +1,18 @@
 <% if logged_in? && !current_user.person.nil? %>
-<div>
-  <ul class="tabnav">
-    <!-- People tab -->
-    <li <%= (["people"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-      <%= link_to "People", people_url -%>
+  <div>
+    <ul class="tabnav">
+      <!-- People tab -->
+      <li <%= (["people"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
+        <%= link_to "People", people_url -%>
       </li>
-    <!-- Projects tab -->
-    <li <%= (["projects"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-      <%= link_to "Projects", projects_url -%>
+      <!-- Projects tab -->
+      <li <%= (["projects"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
+        <%= link_to "Projects", projects_url -%>
       </li>
-    <!-- Institutions tab -->
-    <li <%= (["institutions"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-      <%= link_to "Institutions", institutions_url -%>
+      <!-- Institutions tab -->
+      <li <%= (["institutions"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
+        <%= link_to "Institutions", institutions_url -%>
       </li>
-  </ul>
-</div>
+    </ul>
+  </div>
 <% end  %>

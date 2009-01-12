@@ -22,6 +22,8 @@ aaron:
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
   person_id: 2
   is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
 fred:
   id: 3
@@ -33,4 +35,6 @@ fred:
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a 
   person_id: 4
   is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
