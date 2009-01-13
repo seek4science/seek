@@ -31,5 +31,18 @@ class ProjectTest < ActiveSupport::TestCase
     p4 = projects(:four)
     assert !projects.include?(p4), "Project :four should not be included as it does not contain any people"
   end
+
+  def test_userless_people
+    proj1=projects(:one)
+    assert_not_nil proj1.userless_people
+    assert proj1.userless_people.size>0
+    p3=people(:three)
+    assert proj1.userless_people.include?(p3),"Project :one should include person :three as a userless person"
+
+    proj2=projects(:two)
+    assert_not_nil proj2.userless_people, "Even though a project does not contain userless people, it should return an empty list, not nil"
+    assert_equal 0,proj2.userless_people.size,"Project :two should contain NO userless people"
+    
+  end
   
 end

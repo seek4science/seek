@@ -1,12 +1,14 @@
-<script type="text/javascript">
-  <%= render :partial=>"project_selected", :type=>:rjs %>
-</script>
-
 <div class="show_basic">
   <div id="project_list">
     <%= select_tag "project_id",
       options_for_select(@userless_projects.collect {|p| [p.name,p.id]}),      
-      {:onchange=>"show_people_for_project()"}
+      {:onchange=>remote_function(
+        :update=>:people_list,
+        :url=>{:action=>"userless_project_selected_ajax"},
+        :with=>"'project_id='+this.value",
+        :before=>"$('people_list').innerHTML='..updating..'"
+        )
+      }
     -%>
   </div>
   <div id="people_list">

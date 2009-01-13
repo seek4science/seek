@@ -45,6 +45,11 @@ class Project < ActiveRecord::Base
     return !avatar_id.nil?
   end
 
+  # provides a list of people that are said to be members of this project, but are not associated with any user
+  def userless_people
+    people.select{|p| p.user.nil?}
+  end
+
   def includes_userless_people?
     peeps=people
     return peeps.size>0 && !(peeps.find{|p| p.user.nil?}).nil?

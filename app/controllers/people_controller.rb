@@ -161,6 +161,15 @@ class PeopleController < ApplicationController
     end
   end
   
+  def userless_project_selected_ajax
+    project_id=params[:project_id]
+    proj=Project.find(project_id)
+    @people=proj.userless_people
+
+    render :partial=>"userless_people_list",:locals=>{:people=>@people}
+    
+  end
+
   private
   
   def profile_belongs_to_current_or_is_admin

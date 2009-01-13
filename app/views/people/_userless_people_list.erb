@@ -1,0 +1,6 @@
+<% form_for current_user do |f| %>
+
+    <%= f.collection_select(:person_id, people, :id, :name)   %>
+
+
+<% end %>
