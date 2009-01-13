@@ -1,6 +1,27 @@
-<% form_for current_user do |f| %>
+<script type="text/javascript">
+    function person_selected(id) {
+      if (id) {
+        $('person_list_submit').disabled=false
+      }
+      else {
+        $('person_list_submit').disabled=true
+      }
+    }
+  </script>
 
-    <%= f.collection_select(:person_id, people, :id, :name)   %>
+
+<% form_for current_user do |f| -%>
+
+    <%= f.collection_select(
+      :person_id,
+      people,
+      :id,
+      :name,
+      {:include_blank=>"Select yourself.."},
+      {:onchange=>"person_selected(this.value)"})
+    -%>
+
+    <%=f.submit("Select",:disabled=>true,:id=>"person_list_submit")%>
 
 
-<% end %>
+<% end -%>

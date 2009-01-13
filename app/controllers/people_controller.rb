@@ -163,10 +163,14 @@ class PeopleController < ApplicationController
   
   def userless_project_selected_ajax
     project_id=params[:project_id]
-    proj=Project.find(project_id)
-    @people=proj.userless_people
+    unless project_id=="0"
+      proj=Project.find(project_id)
+      @people=proj.userless_people
 
-    render :partial=>"userless_people_list",:locals=>{:people=>@people}
+      render :partial=>"userless_people_list",:locals=>{:people=>@people}
+    else
+      render :text=>""
+    end
     
   end
 
