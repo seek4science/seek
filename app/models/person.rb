@@ -5,9 +5,6 @@ class Person < ActiveRecord::Base
     acts_as_editable
     
     validates_presence_of :name
-    # TODO: uncomment the following line if no 2 persons can have same name
-    #validates_uniqueness_of :name
-
     
     validates_associated :avatars
     has_many :avatars, 
@@ -21,8 +18,6 @@ class Person < ActiveRecord::Base
     acts_as_taggable_on :tools, :expertise
     
     has_one :user
-
-    
   
     acts_as_solr(:fields => [ :first_name, :last_name ]) if SOLR_ENABLED
   

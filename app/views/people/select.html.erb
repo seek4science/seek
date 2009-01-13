@@ -1,9 +1,16 @@
+<script type="text/javascript">
+  <%= render :partial=>"project_selected", :type=>:rjs %>
+</script>
+
 <div class="show_basic">
   <div id="project_list">
-    
+    <%= select_tag "project_id",
+      options_for_select(@userless_projects.collect {|p| [p.name,p.id]}),      
+      {:onchange=>"show_people_for_project()"}
+    -%>
   </div>
-  <div id="people_list" style="display:none">
-    
+  <div id="people_list">
+
   </div>
 
   <br/>

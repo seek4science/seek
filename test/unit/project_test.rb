@@ -9,8 +9,7 @@ class ProjectTest < ActiveSupport::TestCase
     n_wg=WorkGroup.find(:all).size
     p=Project.find(2)
     assert_equal 1,p.work_groups.size
-    
-    #TODO why are there people there?, there are no people fixtures declared above
+        
     p.work_groups.first.people=[]
     p.save!
     p.destroy
