@@ -1,6 +1,7 @@
 class PeopleController < ApplicationController
   
   before_filter :login_required,:except=>[:select,:userless_project_selected_ajax]
+  before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>:new
@@ -190,6 +191,13 @@ class PeopleController < ApplicationController
       error("You do not have permission to create new people","Is invalid (not admin)")
       return false
     end
+  end
+
+  def current_user_exists
+    if !current_user
+      redirect_to("/")
+    end
+    !!current_user
   end
  
 end
