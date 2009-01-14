@@ -76,6 +76,7 @@ class PeopleController < ApplicationController
   #people yet to be assigned.
   def select
     @userless_projects=Project.with_userless_people
+    @userless_projects.sort!{|a,b|a.name<=>b.name}
     render :action=>"select",:layout=>"logged_out"
   end
 
@@ -166,7 +167,7 @@ class PeopleController < ApplicationController
     unless project_id=="0"
       proj=Project.find(project_id)
       @people=proj.userless_people
-
+      @people.sort!{|a,b| a.last_name<=>b.last_name}
       render :partial=>"userless_people_list",:locals=>{:people=>@people}
     else
       render :text=>""
