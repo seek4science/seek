@@ -89,7 +89,7 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(params[:person])
-
+    redirect_action="new"
     if !params[:tool].nil?
       tools_list = params[:tool][:list]
       @person.tool_list=tools_list
@@ -102,6 +102,10 @@ class PeopleController < ApplicationController
     
     if (current_user.person.nil?)
       current_user.person=@person
+      @userless_projects=Project.with_userless_people
+      @userless_projects.sort!{|a,b|a.name<=>b.name}
+
+      redirect_action="select"
     end
     
     respond_to do |format|
@@ -110,7 +114,7 @@ class PeopleController < ApplicationController
         format.html { redirect_to(@person) }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
       else
-        format.html { render :action => "new",:layout=>"logged_out" }
+        format.html { render :action => redirect_action,:layout=>"logged_out" }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
