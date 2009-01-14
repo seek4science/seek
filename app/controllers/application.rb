@@ -19,6 +19,18 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #Overridden from restful_authentication
+  #Does a second check that there is a profile assigned to the user, and if not goes to the profile
+  #selection page (GET people/select)
+  def authorized?
+    if super
+      redirect_to(select_people_path) if current_user.person.nil?
+      true
+    else
+      false
+    end
+  end
+
   def is_current_user_auth
     begin
       @user = User.find(params[:id], :conditions => ["id = ?", current_user.id])
@@ -49,7 +61,7 @@ class ApplicationController < ActionController::Base
     respond_to do |format|
       format.html { redirect_to root_url }
     end
-  end  
+  end
   
   # See ActionController::Base for details 
   # Uncomment this to filter the contents of submitted sensitive data parameters
