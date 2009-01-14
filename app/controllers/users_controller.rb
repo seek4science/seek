@@ -25,7 +25,6 @@ class UsersController < ApplicationController
             @user.activate
             self.current_user = @user
             redirect_to(select_people_path)
-            flash[:notice] = "Thanks for signing up!"
         else
             render :action => 'new'
         end

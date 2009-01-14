@@ -14,27 +14,53 @@
 </script>
 
 <div class="show_basic">
-  <div id="project_list">
-    <%= select_tag "project_id",
-      options_for_select([["Select project..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
-      {:onchange=>remote_function(
-        :update=>:people_list,
-        :url=>{:action=>"userless_project_selected_ajax"},
-        :with=>"'project_id='+this.value",
-        :before=>"show_ajax_loader()"
-      )
-    }
-    -%>
+  <div id="profile_selection">
+    <h1>Profile selection</h1>
+    <center>
+      <p class="box_infotext" style="text-align:center">
+        If you are a member of Sysmo, then you should already have a basic profile.<br/>
+        Please select a project you are a member of to begin finding your profile.<br/><br/>
+        If you are not a Sysmo member, or cannot find your project, then proceed to create a new profile by clicking the link below.
+      </p>
+      <br/>
+      <div id="project_list">
+        <%= select_tag "project_id",
+          options_for_select([["Select project..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
+          {:onchange=>remote_function(
+            :update=>:people_list,
+            :url=>{:action=>"userless_project_selected_ajax"},
+            :with=>"'project_id='+this.value",
+            :before=>"show_ajax_loader()"
+          )
+        }
+        -%>
+      </div>
+
+
+
+      <div id="people_list">
+
+      </div>
+    </center>
+    <br/>
+
+    <%= link_to_function "Create new profile" do |page|
+      page.visual_effect :toggle_blind, "profile_selection"
+      page.visual_effect :toggle_blind, "profile_creation"
+    end -%>
   </div>
 
-  
 
-  <div id="people_list">
-    <%= render :partial=>"userless_people_list", :locals=>{:people=>[]} %>
+  <div id="profile_creation" style="display:none">
+    <h1>New profile</h1>
+    <% form_for @person do |f| %>
+      <%= render :partial => "form", :locals => { :f => f, :person => nil } -%>
+    <% end -%>
+    <%= link_to_function "Select existing profile" do |page|
+      page.visual_effect :toggle_blind, "profile_selection"
+      page.visual_effect :toggle_blind, "profile_creation"
+    end -%>
   </div>
 
-  <br/>
-
-  <%= link_to "I am not a member of a Sysmo Project, or am not in the list", new_person_path %>
 </div>
 

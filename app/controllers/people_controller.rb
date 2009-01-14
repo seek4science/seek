@@ -74,10 +74,13 @@ class PeopleController < ApplicationController
   #GET /people/select
   #
   #Page for after registration that allows you to select yourself from a list of
-  #people yet to be assigned.
+  #people yet to be assigned, or create a new one if you don't exist
   def select
     @userless_projects=Project.with_userless_people
     @userless_projects.sort!{|a,b|a.name<=>b.name}
+
+    @person = Person.new
+
     render :action=>"select",:layout=>"logged_out"
   end
 

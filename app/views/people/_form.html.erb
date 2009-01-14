@@ -59,37 +59,37 @@
   <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => person, :form_instance => f } -%>
 <% end -%>
 
+<% if person %>
+  <h2 style="margin-top: 1.5em;">About You & Your Areas of Expertise</h2>
 
-<h2 style="margin-top: 1.5em;">About You & Your Areas of Expertise</h2>
+  <center>
+    <div style="width: 95%;">
+      <p>
+        <%= f.label "Description" %><br/>
+        <%= f.text_area :description, :class=>"description", :rows => 3, :style => "width: 85%;" -%>
+      </p>
+    </div>
+  </center>
 
-<center>
-  <div style="width: 95%;">
-    <p>
-      <%= f.label "Description" %><br/>
-      <%= f.text_area :description, :class=>"description", :rows => 3, :style => "width: 85%;" -%>
-    </p>
-  </div>
-</center>
-
-<table style="width: 100%;">
-  <tr style="vertical-align: top;">
-    <td style="width: 45%;">
-      <center>
-        <div style="width: 90%;">
-          <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
-        </div>
-      </center>
-    </td>
-    <td style="width: 45%;">
-      <center>
-        <div style="width: 90%">
-          <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
-        </div>
-      </center>
-    </td>
-  </tr>
-</table>
-
+  <table style="width: 100%;">
+    <tr style="vertical-align: top;">
+      <td style="width: 45%;">
+        <center>
+          <div style="width: 90%;">
+            <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
+          </div>
+        </center>
+      </td>
+      <td style="width: 45%;">
+        <center>
+          <div style="width: 90%">
+            <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
+          </div>
+        </center>
+      </td>
+    </tr>
+  </table>
+<% end %>
 
 <% if current_user.is_admin? -%>
   <h2 style="margin-top: 1.5em;">Choose Project / Institution&nbsp;&nbsp;&nbsp;<span class="admin_warning">(This section is visible only to admins)</span></h2>
