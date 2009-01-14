@@ -1,7 +1,11 @@
 <br/>
 <p class="box_infotext" style="text-align:center">
   Please now select yourself from the list of people below, and then click OK.<br/>
-  If you do not appear in this list, then you will need to create a new profile by clicking the link below.
+  If you do not appear in this list, then you will need to then proceed to <b>
+          <%= link_to_function "create new profile" do |page|
+            page.visual_effect :toggle_blind, "profile_selection"
+            page.visual_effect :toggle_blind, "profile_creation"
+          end -%>.</b>.
 </p>
 <br/>
 <% form_for current_user do |f| -%>
