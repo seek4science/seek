@@ -3,6 +3,7 @@ class PeopleController < ApplicationController
   before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
+  before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>:new
   
@@ -145,10 +146,12 @@ class PeopleController < ApplicationController
     end
     
     # some "Person" instances might not have a "User" associated with them - because the user didn't register yet
-    unless @person.user.nil?
-      @person.user.can_edit_projects = (params[:can_edit_projects] ? true : false)
-      @person.user.can_edit_institutions = (params[:can_edit_institutions] ? true : false)
-      @person.user.save
+    if current_user.is_admin?
+      unless @person.user.nil?
+        @person.user.can_edit_projects = (params[:can_edit_projects] ? true : false)
+        @person.user.can_edit_institutions = (params[:can_edit_institutions] ? true : false)
+        @person.user.save
+      end
     end
     
     respond_to do |format|
@@ -194,6 +197,14 @@ class PeopleController < ApplicationController
     @person=Person.find(params[:id])
     unless @person == current_user.person || current_user.is_admin?
       error("Not the current person", "is invalid (not owner)")
+      return false
+    end
+  end
+
+  def profile_is_not_another_admin_except_me
+    @person=Person.find(params[:id])
+    if !@person.user.nil? && @person.user!=current_user && @person.user.is_admin?
+      error("Cannot edit another Admins profile","is invalid(another admin)")
       return false
     end
   end
