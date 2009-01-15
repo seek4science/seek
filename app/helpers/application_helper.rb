@@ -17,7 +17,7 @@ module ApplicationHelper
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else
       res = h(text)
-      res = simple_format(res) if options[:description]==true
+      res = simple_format(res) if options[:description]==true || options[:address]==true
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true
       res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
