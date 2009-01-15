@@ -52,8 +52,8 @@ class PeopleController < ApplicationController
   # GET /people/new
   # GET /people/new.xml
   def new
-    @tags_tools = Person.tool_counts
-    @tags_expertise = Person.expertise_counts
+    @tags_tools = Person.tool_counts.sort{|a,b| a.name<=>b.name}
+    @tags_expertise = Person.expertise_counts.sort{|a,b| a.name<=>b.name}
 
     @person = Person.new
 
@@ -65,8 +65,8 @@ class PeopleController < ApplicationController
 
   # GET /people/1/edit
   def edit
-    @tags_tools = Person.tool_counts
-    @tags_expertise = Person.expertise_counts
+    @tags_tools = Person.tool_counts.sort{|a,b| a.name<=>b.name}
+    @tags_expertise = Person.expertise_counts.sort{|a,b| a.name<=>b.name}
 
     @person = Person.find(params[:id])
   end

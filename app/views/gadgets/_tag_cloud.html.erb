@@ -1,4 +1,6 @@
-<% tags=tag_cloud %>
+<% tags=tag_cloud
+   tags.sort!{|a,b| a.name<=>b.name}
+%>
 
 <% unless tags.blank? -%>
   <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
