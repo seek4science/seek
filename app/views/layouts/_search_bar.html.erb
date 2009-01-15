@@ -5,7 +5,7 @@
 	</div>
 <% end -%>
 
-<% if logged_in? and SOLR_ENABLED %>
+<% if SOLR_ENABLED && logged_in? && current_user.person %>
   <% form_tag '/search/' do -%>
     <%= text_field_tag :query %>
     <%= select_tag :type, "<option>All</option><option>People</option><option>Institutions</option><option>Projects</option>"  %>
