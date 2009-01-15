@@ -1,11 +1,8 @@
-<script type="text/javascript">
-  
-</script>
 
 <div class="show_basic">
   <div id="profile_selection">
     <%= render :partial=>"profile_selection" -%>
-  </div>  
+  </div>
 
   <div id="profile_creation" style="display:none">
     <%= render :partial=>"profile_creation" %>
@@ -14,3 +11,9 @@
 
 </div>
 
+<% if @userless_projects.blank? || !error_messages_for(:person).empty? %>
+  <script type="text/javascript">
+    $("profile_creation").style.display="block"
+    $("profile_selection").style.display="none"
+  </script>
+<% end %>

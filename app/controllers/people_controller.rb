@@ -77,8 +77,7 @@ class PeopleController < ApplicationController
   #people yet to be assigned, or create a new one if you don't exist
   def select
     @userless_projects=Project.with_userless_people
-    @userless_projects.sort!{|a,b|a.name<=>b.name}
-
+    @userless_projects.sort!{|a,b|a.name<=>b.name}    
     @person = Person.new
 
     render :action=>"select",:layout=>"logged_out"
@@ -100,10 +99,16 @@ class PeopleController < ApplicationController
       @person.expertise_list=expertise_list
     end
     
-    if (current_user.person.nil?)
+    if (current_user.person.nil?) #indicates a profile is being created during the registration process
       current_user.person=@person
       @userless_projects=Project.with_userless_people
       @userless_projects.sort!{|a,b|a.name<=>b.name}
+      is_member=params[:sysmo_member]
+
+      if (is_member)
+        member_details=params[:sysmo_member_details]
+        #FIXME: do something with the details if they have been indicated as being a sysmo member
+      end
 
       redirect_action="select"
     end
@@ -113,7 +118,7 @@ class PeopleController < ApplicationController
         flash[:notice] = 'Person was successfully created.'
         format.html { redirect_to(@person) }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
-      else
+      else        
         format.html { render :action => redirect_action,:layout=>"logged_out" }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
       end
