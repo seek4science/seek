@@ -1,0 +1,45 @@
+<script type="text/javascript">
+  function person_selected(id) {
+    if (id) {
+      $('person_list_submit').disabled=false;
+    }
+    else {
+      $('person_list_submit').disabled=true;
+    }
+  }
+
+  function show_ajax_loader() {
+    $('people_list').innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
+  }
+</script>
+
+<h1>Profile selection</h1>
+<center>
+  <p class="box_infotext" style="text-align:center">
+    If you are a member of Sysmo, then you should already have a basic profile.<br/>
+    Please select a project you are a member of to begin finding your profile.<br/><br/>
+    If you are not a Sysmo member, or cannot find your project, then proceed to <b>
+      <%= link_to_function "create new profile" do |page|
+        page.visual_effect :toggle_blind, "profile_selection"
+        page.visual_effect :toggle_blind, "profile_creation"
+      end -%>.</b>
+  </p>
+  <br/>
+  <div id="project_list">
+    <%= select_tag "project_id",
+      options_for_select([["Select project..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
+      {:onchange=>remote_function(
+        :update=>:people_list,
+        :url=>{:action=>"userless_project_selected_ajax"},
+        :with=>"'project_id='+this.value",
+        :before=>"show_ajax_loader()"
+      )
+    }
+    -%>
+  </div>
+
+  <div id="people_list">
+
+  </div>
+</center>
+<br/>
