@@ -30,7 +30,7 @@ class PeopleController < ApplicationController
       @people=Person.tagged_with(@expertise_or_tools, :on=>:tools)
       @people=@people.select{|p| !p.is_dummy}
     else
-      @people = Person.find(:all, :page=>{:size=>10,:current=>params[:page]}, :order=>:last_name,:conditions=>{:is_dummy=>false})
+      @people = Person.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name,:conditions=>{:is_dummy=>false})
     end
     
     respond_to do |format|

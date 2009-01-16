@@ -1,9 +1,13 @@
 <% if @expertise_or_tools.nil? -%>
-  
+
 <% else -%>
   <h1><%= "People for '"+h(@expertise_or_tools)+"'" -%></h1>
 <% end %>
 
-<%= render :partial => "layouts/paginate", :locals => { :collection => @people } %>
+
+<% if @people.public_methods.include?("page_count") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate", :locals => { :collection => @people } -%>
+<% end %>
 
 <%= render :partial => "person_list_item", :collection=>@people %>

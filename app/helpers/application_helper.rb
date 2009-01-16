@@ -352,6 +352,7 @@ module ApplicationHelper
     html
   end
 
+
   private
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search"}
 

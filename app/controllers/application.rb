@@ -62,6 +62,11 @@ class ApplicationController < ActionController::Base
       format.html { redirect_to root_url }
     end
   end
+
+  #The default for the number items in a page when paginating
+  def default_items_per_page
+    7
+  end
   
   # See ActionController::Base for details 
   # Uncomment this to filter the contents of submitted sensitive data parameters

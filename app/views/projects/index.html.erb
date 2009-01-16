@@ -1,2 +1,6 @@
-<!--<%= link_to 'New Project', new_project_path %>-->
+<% if @projects.public_methods.include?("page_count") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate", :locals => { :collection => @projects } -%>
+<% end %>
+
 <%= render :partial=>"project_list_item", :collection=>@projects %>
