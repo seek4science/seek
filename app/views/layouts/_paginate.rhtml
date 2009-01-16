@@ -6,7 +6,7 @@
 	    	    <%= link_to '&#171; previous', { :page => collection.previous_page } %>
 	    	 </li>
 	  <% else -%>
-         <li class="disablepage">&#171; previous</li>
+         <li class="disabledpage">&#171; previous</li>
 	  <% end -%>
  
     <% last_page = 0 -%>
@@ -26,7 +26,7 @@
         <%=  link_to 'next &#187;', { :page => collection.next_page } %>
      </li>
     <% else -%>
-      <li class="disablepage">next &#187;</li>
+      <li class="disabledpage">next &#187;</li>
     <% end -%>
   </ul>
 </div>

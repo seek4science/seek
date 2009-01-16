@@ -930,26 +930,26 @@ table.contributable:hover {
 .pagination a {
 	padding: 2px 5px 2px 5px;
 	margin: 2px;
-	border: 1px solid #317eff;
+	border: 1px solid #456AAA;
 	text-decoration: none; /* no underline */
-	color: #179032;
+	color: #456AAA;
 }
 
 .pagination a:hover,.pagination a:active {
 	border: 1px solid #CE0434;
-	color: #179032;
+	color: #CE0434;
 }
 
 .pagination .currentpage {
 	padding: 2px 5px 2px 5px;
 	margin: 2px;
-	border: 1px solid #179032;
+	border: 1px solid #456AAA;
 	font-weight: bold;
-	background-color: #179032;
+	background-color: #456AAA;
 	color: #FFF;
 }
 
-.pagination .disabledpage {
+.pagination .disabledpage {    
 	padding: 2px 5px 2px 5px;
 	margin: 2px;
 	border: 1px solid #EEE;
