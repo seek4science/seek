@@ -3,4 +3,7 @@
 <% else -%>
   <h1><%= "People for '"+h(@expertise_or_tools)+"'" -%></h1>
 <% end %>
+
+<%= render :partial => "layouts/paginate", :locals => { :collection => @people } %>
+
 <%= render :partial => "person_list_item", :collection=>@people %>

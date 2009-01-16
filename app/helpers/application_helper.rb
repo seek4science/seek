@@ -218,12 +218,12 @@ module ApplicationHelper
     end
     
     case object.class.name.downcase
-      when "person", "institution", "project"
-        if object.avatar_selected?
-          img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
-        else
-          img = null_avatar(object.class.name, size, alternative)
-        end
+    when "person", "institution", "project"
+      if object.avatar_selected?
+        img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
+      else
+        img = null_avatar(object.class.name, size, alternative)
+      end
     end
     
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
@@ -251,19 +251,19 @@ module ApplicationHelper
   
   def null_avatar(object_class_name, size=200, alt="Anonymous", onclick_options="")
     case object_class_name.downcase
-      when "person"
-        avatar_filename = "avatar.png"
-      when "institution"
-        avatar_filename = "institution_64x64.png"
-      when "project"
-        avatar_filename = "project_64x64.png"
+    when "person"
+      avatar_filename = "avatar.png"
+    when "institution"
+      avatar_filename = "institution_64x64.png"
+    when "project"
+      avatar_filename = "project_64x64.png"
     end
     
     image_tag avatar_filename,
-              :alt => alt, 
-              :size => "#{size}x#{size}",
-              :class => 'framed',
-              :onclick => onclick_options
+      :alt => alt,
+      :size => "#{size}x#{size}",
+      :class => 'framed',
+      :onclick => onclick_options
   end
   
   # this helper is to be extended to include many more types of objects that can belong to the
@@ -275,11 +275,11 @@ module ApplicationHelper
     c_id = current_user.id.to_i
     
     case thing.class.name
-      when "Person"
-        return (current_user.person.id == thing.id)
-      else
-        return false
-      end
+    when "Person"
+      return (current_user.person.id == thing.id)
+    else
+      return false
+    end
   end
   
   def fast_auto_complete_field(field_id, options={})
@@ -325,8 +325,35 @@ module ApplicationHelper
     return "Sysmo SEEK&nbsp;"+name
   end
 
+  # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/
+  def windowed_pagination_links(pagingEnum, options)
+    link_to_current_page = options[:link_to_current_page]
+    always_show_anchors = options[:always_show_anchors]
+    padding = options[:window_size]
+
+    current_page = pagingEnum.page
+    html = ''
+
+    #Calculate the window start and end pages
+    padding = padding < 0 ? 0 : padding
+    first = pagingEnum.page_exists?(current_page  - padding) ? current_page - padding : 1
+    last = pagingEnum.page_exists?(current_page + padding) ? current_page + padding : pagingEnum.last_page
+
+    # Print start page if anchors are enabled
+    html << yield(1) if always_show_anchors and not first == 1
+
+    # Print window pages
+    first.upto(last) do |page|
+      (current_page == page && !link_to_current_page) ? html << page : html << yield(page)
+    end
+
+    # Print end page if anchors are enabled
+    html << yield(pagingEnum.last_page) if always_show_anchors and not last == pagingEnum.last_page
+    html
+  end
+
   private
-    PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search"}
 
   
 end
