@@ -150,6 +150,8 @@ module ApplicationHelper
       return "famfamfam_silk/tick.png"
     when "lock"
       return "famfamfam_silk/lock.png"
+    when "no_user"
+      return "famfamfam_silk/link_break.png"
     else
       return nil
     end

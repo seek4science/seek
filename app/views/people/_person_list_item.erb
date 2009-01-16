@@ -13,9 +13,13 @@
 
       <td class="item_details">
         <p class="name">
-          <% if mine? person -%>
-            <span style="float: right; font-size: 77%;"><%= icon "edit", edit_person_path(person), nil, nil, "Edit" -%></span>
-          <% end -%>
+
+          <span style="float: right; font-size: 77%;">
+            <% if mine? person -%>
+              <%= icon "edit", edit_person_path(person), nil, nil, "Edit" -%>
+            <% end -%>
+            <%= no_user_for_admins_img person %>
+          </span>
           <% person_name = h(person.name) -%>
           <%= person_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(person_name, person_path(person)) -%>
         </p>
@@ -86,10 +90,10 @@
               <% for institution in person.institutions %>
                 <li>
                   <% if institution.country -%>
-									  <%= flag_icon(institution.country) -%>
-									<% else -%>
-  									<%= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
-									<% end -%>
+                    <%= flag_icon(institution.country) -%>
+                  <% else -%>
+                    <%= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
+                  <% end -%>
                   <%= link_to(truncate(h(institution.name), :length=>truncate_projects_institutions_length), url_for(institution), :title => tooltip_title_attrib(h(institution.name))) -%>
                 </li>
               <% end  %>
