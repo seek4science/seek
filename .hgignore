@@ -14,6 +14,7 @@ config/environment_local.rb
 filestore/*
 tmp/avatars/*
 debug.log
+.project
 
 syntax: regexp
 \.orig$
