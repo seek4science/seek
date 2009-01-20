@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 class InstitutionsControllerTest < ActionController::TestCase
  
   
-  fixtures :institutions, :users, :people
+  fixtures :institutions, :users, :people, :work_groups, :group_memberships
   
   include AuthenticatedTestHelper
   
@@ -56,5 +56,33 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to institutions_path
+  end
+
+  #Checks that the edit option is availabe to the user
+  #with can_edit_project set and he belongs to that project
+  def test_user_can_edit
+    login_as(:can_edit)
+    get :show, :id=>institutions(:two)
+    assert_select "a",:text=>/Edit Institution/,:count=>1
+
+    get :edit, :id=>institutions(:two)
+    assert_response :success
+  end
+
+  def test_user_cant_edit_project
+    login_as(:cant_edit)
+    get :show, :id=>institutions(:two)
+    assert_select "a",:text=>/Edit Institution/,:count=>0
+
+    get :edit, :id=>institutions(:two)
+    assert_response :redirect
+  end
+
+  def test_admin_can_edit
+    get :show, :id=>institutions(:two)
+    assert_select "a",:text=>/Edit Institution/,:count=>1
+
+    get :edit, :id=>institutions(:two)
+    assert_response :success
   end
 end
