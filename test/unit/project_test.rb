@@ -44,5 +44,23 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 0,proj2.userless_people.size,"Project :two should contain NO userless people"
     
   end
+
+  def test_can_be_edited_by
+    u=users(:can_edit)
+    p=projects(:three)
+    assert p.can_be_edited_by?(u),"Project :three should be editable by user :can_edit"
+
+    p=projects(:four)
+    assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :can_edit as he is not a member"
+
+    u=users(:quentin)
+    assert p.can_be_edited_by?(u),"Project :three should be editable by user :quentin as he's an admin"
+  end
+
+  def test_cant_be_edited_by
+    u=users(:cant_edit)
+    p=projects(:three)
+    assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
+  end
   
 end
