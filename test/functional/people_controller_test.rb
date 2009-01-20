@@ -23,7 +23,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_index_doesnt_show_dummy
     get :index
     #check that a non dummy person shows as expected
-    assert_select "a",:text=>/.*Fred.*/, :count=>1
+    assert_select "a",:text=>/.*Fred.*/
     #check that the dummy user doens't show
     assert_select "a",:text=>/.*Dummy.*/, :count=>0
   end

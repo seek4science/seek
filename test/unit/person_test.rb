@@ -54,5 +54,20 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal "Firstname ",p.name
   end
 
+  def test_double_firstname_capitalised
+    p=people(:double_firstname)
+    assert_equal "Fred David Bloggs", p.name
+  end
+
+  def test_double_lastname_capitalised
+    p=people(:double_lastname)
+    assert_equal "Fred Smith Jones",p.name
+  end
+
+  def test_double_barrelled_lastname_capitalised
+    p=people(:double_barrelled_lastname)
+    assert_equal "Fred Smith-Jones",p.name
+  end
+
 
 end

@@ -35,4 +35,22 @@ no_last_name:
         is_dummy: false
         first_name: firstname
 
+double_firstname:
+        id: 8
+        is_dummy: false
+        first_name: Fred David
+        last_name: Bloggs
+
+double_lastname:
+        id: 9
+        is_dummy: false
+        first_name: Fred
+        last_name: Smith Jones
+
+double_barrelled_lastname:
+        id: 10
+        is_dummy: false
+        first_name: Fred
+        last_name: Smith-Jones
+
 
