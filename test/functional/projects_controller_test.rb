@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectsControllerTest < ActionController::TestCase
   
-  fixtures :projects, :people, :users
+  fixtures :projects, :people, :users, :work_groups, :group_memberships
   
   def test_title
     get :index
@@ -44,7 +44,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   def test_should_update_project
-    put :update, :id => projects(:four).id, :project => { }
+    put :update, :id => projects(:four).id, :project => valid_project
     assert_redirected_to project_path(assigns(:project))
   end
 
@@ -54,5 +54,43 @@ class ProjectsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to projects_path
+  end
+
+
+  #Checks that the edit option is availabe to the user
+  #with can_edit_project set and he belongs to that project
+  def test_user_can_edit_project
+    login_as(:can_edit)
+    get :show, :id=>projects(:three)
+    assert_select "a",:text=>/Edit Project/,:count=>1
+    assert_select "a",:text=>/\[Change\]/,:count=>1
+
+    get :edit, :id=>projects(:three)
+    assert_response :success
+  end
+
+  def test_user_cant_edit_project
+    login_as(:cant_edit)
+    get :show, :id=>projects(:three)
+    assert_select "a",:text=>/Edit Project/,:count=>0
+    assert_select "a",:text=>/\[Change\]/,:count=>0
+
+    get :edit, :id=>projects(:three)
+    assert_response :redirect
+  end
+
+  def test_admin_can_edit
+    get :show, :id=>projects(:one)
+    assert_select "a",:text=>/Edit Project/,:count=>1
+    assert_select "a",:text=>/\[Change\]/,:count=>1
+
+    get :edit, :id=>projects(:one)
+    assert_response :success
+  end
+
+  private
+
+  def valid_project
+    return {}
   end
 end

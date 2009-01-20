@@ -28,7 +28,7 @@ module Sergey
               return(subject.is_admin? && (self.user.nil? || !self.user.is_admin?))
             when "Project"
               # authorised to admins and selected people within the project
-              return(subject.is_admin? || (self.people.include?(subject) && subject.can_edit_projects))
+              return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_projects))
             when "Institution"
               # authorised to admins and selected people within the project
               return(subject.is_admin? || (self.people.include?(subject) && subject.can_edit_institutions))

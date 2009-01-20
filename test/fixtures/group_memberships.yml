@@ -19,3 +19,11 @@ four:
 five:
         person_id: 2
         work_group_id: 4
+
+six:
+        person_id: 11
+        work_group_id: 4
+
+seven:
+        person_id: 12
+        work_group_id: 4

@@ -53,4 +53,16 @@ double_barrelled_lastname:
         first_name: Fred
         last_name: Smith-Jones
 
+cant_edit:
+        id: 11
+        is_dummy: false
+        first_name: Cant
+        last_name: Edit
+
+can_edit:
+        id: 12
+        is_dummy: false
+        first_name: Can
+        last_name: Edit
+
 

@@ -1,7 +1,8 @@
 class ProjectsController < ApplicationController
   
   before_filter :login_required
-  before_filter :is_user_admin_auth, :except=>[:index, :show]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit,:update]
+  before_filter :editable_by_user, :only=>[:edit,:update]
   
   # GET /projects
   # GET /projects.xml
@@ -89,6 +90,16 @@ class ProjectsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(projects_url) }
       format.xml  { head :ok }
+    end
+  end
+
+  private
+
+  def editable_by_user
+    @project = Project.find(params[:id])
+    unless current_user.is_admin? || @project.can_be_edited_by?(current_user)
+      error("Insufficient priviledged", "is invalid (insufficient_priviledges)")
+      return false
     end
   end
 end
