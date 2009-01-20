@@ -36,6 +36,7 @@ class Project < ActiveRecord::Base
     work_groups.each do |wg|
       wg.people.each {|p| res << p unless res.include? p}
     end
+    #TODO: write a test to check they are ordered
     return res.sort{|a,b| a.last_name <=> b.last_name}
   end
   
