@@ -68,7 +68,8 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :edit, :id=>institutions(:two)
     assert_response :success
 
-    #TODO: Test for update
+    put :update, :id=>institutions(:two).id,:institution=>{}
+    assert_redirected_to institution_path(assigns(:institution))
   end
 
   def test_user_cant_edit_project
@@ -89,7 +90,8 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :edit, :id=>institutions(:two)
     assert_response :success
 
-    #TODO: Test for update
+    put :update, :id=>institutions(:two).id,:institution=>{}
+    assert_redirected_to institution_path(assigns(:institution))
   end
 
 end

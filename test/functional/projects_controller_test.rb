@@ -68,7 +68,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :edit, :id=>projects(:three)
     assert_response :success
 
-    #TODO: Test for update
+    put :update, :id=>projects(:three).id,:project=>{}
+    assert_redirected_to project_path(assigns(:project))
   end
 
   def test_user_cant_edit_project
@@ -91,7 +92,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :edit, :id=>projects(:one)
     assert_response :success
 
-    #TODO: Test for update
+    put :update, :id=>projects(:three).id,:project=>{}
+    assert_redirected_to project_path(assigns(:project))
   end
 
   private
