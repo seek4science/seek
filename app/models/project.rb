@@ -36,7 +36,7 @@ class Project < ActiveRecord::Base
     work_groups.each do |wg|
       wg.people.each {|p| res << p unless res.include? p}
     end
-    return res
+    return res.sort{|a,b| a.last_name <=> b.last_name}
   end
   
   # "false" returned by this helper method won't mean that no avatars are uploaded for this project;
