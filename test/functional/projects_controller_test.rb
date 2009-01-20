@@ -67,6 +67,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :edit, :id=>projects(:three)
     assert_response :success
+
+    #TODO: Test for update
   end
 
   def test_user_cant_edit_project
@@ -77,6 +79,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :edit, :id=>projects(:three)
     assert_response :redirect
+
+    #TODO: Test for update
   end
 
   def test_admin_can_edit
@@ -86,6 +90,8 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :edit, :id=>projects(:one)
     assert_response :success
+
+    #TODO: Test for update
   end
 
   private

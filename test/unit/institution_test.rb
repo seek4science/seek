@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class InstitutionTest < ActiveSupport::TestCase
-  fixtures :institutions,:projects,:work_groups
+  fixtures :institutions,:projects,:work_groups,:users,:group_memberships, :people
   # Replace this with your real tests.
   def test_delete_inst_deletes_workgroup
     n_wg = WorkGroup.find(:all).size
@@ -16,4 +16,21 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal (n_inst-1),Institution.find(:all).size
     assert_equal (n_wg-1), WorkGroup.find(:all).size, "the workgroup should also have been destroyed"
   end
+
+  def test_can_be_edited_by
+    u=users(:can_edit)
+    i=institutions(:two)
+    assert i.can_be_edited_by?(u),"Institution :two should be editable by user :can_edit"
+
+    i=institutions(:one)
+    assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :can_edit as he is not a member"
+
+    u=users(:quentin)
+    assert i.can_be_edited_by?(u),"Institution :one should be editable by user :quentin as he's an admin"
+
+    u=users(:cant_edit)
+    i=institutions(:two)
+    assert !i.can_be_edited_by?(u),"Institution :two should not be editable by user :cant_edit"
+  end
+  
 end

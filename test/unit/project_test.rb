@@ -55,9 +55,7 @@ class ProjectTest < ActiveSupport::TestCase
 
     u=users(:quentin)
     assert p.can_be_edited_by?(u),"Project :three should be editable by user :quentin as he's an admin"
-  end
 
-  def test_cant_be_edited_by
     u=users(:cant_edit)
     p=projects(:three)
     assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
