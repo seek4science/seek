@@ -73,11 +73,13 @@ class Person < ActiveRecord::Base
     end    
   
     def name
-        firstname=first_name
+        firstname=first_name 
         firstname||=""
         lastname=last_name
         lastname||=""
-        return firstname.capitalize + " " + lastname.capitalize
+        #capitalize, including double barrelled names
+        #TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
+        return firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}
     end
     
     # "false" returned by this helper method won't mean that no avatars are uploaded for this person;
