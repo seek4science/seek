@@ -3,5 +3,5 @@
 <%= render :partial=>"search_result_item", :collection=>@results %>
 <% else  %>
   <br/><br/>
-  <div id="no_result" class="yui-b"><%= "No results for '<b>"+@query+"</b>'" %></div>
+  <div id="no_result" class="yui-b"><%= "No results for '<b>"+@search_query+"</b>'" %></div>
 <% end %>
