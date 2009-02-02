@@ -1,0 +1,20 @@
+fishing_quentin:
+  tag: fishing
+  taggable_id: 1
+  tagger_id: 1
+  taggable_type: "Person"
+  context: "expertise"
+
+golf_quentin:
+  tag: golf
+  taggable_id: 1
+  tagger_id: 1
+  taggable_type: "Person"
+  context: "expertise"
+
+golf_aaron:
+  tag: golf
+  taggable_id: 2
+  tagger_id: 2
+  taggable_type: "Person"
+  context: "expertise"

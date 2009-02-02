@@ -4,6 +4,8 @@
 
 <% unless tags.blank? -%>
   <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-    <%= link_for_tag tag,:type=>type, :class => css_class -%>
+    
+    <%= link_for_tag tag,:type=>type, :class => css_class -%>    
+
   <% end -%>
 <% end -%>

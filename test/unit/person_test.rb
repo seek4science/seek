@@ -1,12 +1,21 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
-  fixtures :people, :projects,:institutions, :work_groups, :group_memberships,:users
+  fixtures :people, :projects,:institutions, :work_groups, :group_memberships,:users, :tags,:taggings
   
   # Replace this with your real tests.
   def test_work_groups
     p=people(:one)
     assert_equal 2,p.work_groups.size
+  end
+
+  def test_expertise
+    p=people(:one)
+    assert_equal 2, p.expertise.size
+
+    p=people(:two)
+    assert_equal 1, p.expertise.size
+    assert_equal "golf",p.expertise[0].name
   end
   
   def test_institutions
