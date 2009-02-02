@@ -29,6 +29,27 @@ function addToolListTag(tag) {
     document.getElementById("tool_list").value=tool_list;
 }
 
+function addOrganismListTag(tag) {
+
+    var organisms_list = document.getElementById("organism_list").value;
+
+    //check the tag doesn't already exist
+    var expertise_arr=organisms_list.split(",")
+    for (var i = 0; i < expertise_arr.length; i++) {
+        var current_tag = trimSpaces(expertise_arr[i]);
+        if (current_tag==tag) return;
+    }
+
+    if (trimSpaces(organisms_list).length==0) {
+        organisms_list=organisms_list+tag
+    }
+    else {
+        organisms_list=organisms_list+", "+tag
+    }
+
+    document.getElementById("organism_list").value=organisms_list;
+}
+
 function addExpertiseListTag(tag) {
     var expertise_list = document.getElementById("expertise_list").value;
 

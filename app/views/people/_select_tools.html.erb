@@ -6,8 +6,7 @@
 	
 	<%= text_area :tool, :list, :rows => 5, :value => h(person.tool_list), :style => "width: 100%;" -%>
 	<%= fast_auto_complete_field :tool_list, :url =>tool_list_autocomplete_path -%>
-	
-	
+		
 	<p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
 		<%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "tools_tag_suggestions", :duration => 0.4) %>
 	</p>
@@ -23,5 +22,6 @@
 		  </div>
 		</div>
 	</div>
+    
 </p>
 

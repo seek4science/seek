@@ -1,0 +1,26 @@
+<p>
+  <label for="organisms_list">
+    Organisms
+    <%= help_icon("A comma seperated list of keywords that define your organisms.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
+  </label>
+
+  <%= text_area :organism, :list, :rows => 5, :value => h(project.organism_list), :style => "width: 90%;" -%>
+  <%= fast_auto_complete_field :organism_list, :url =>organism_list_autocomplete_path -%>
+
+  <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+    <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "organisms_tag_suggestions", :duration => 0.4) %>
+  </p>
+
+  <div id="organisms_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
+    <div id="organisms_select_tags" class="hTagcloud">
+      <div class="popularity">
+        <% unless @tags_organisms.blank? -%>
+          <% tag_cloud @tags_organisms, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+            <%= link_to tag.name, "javascript:addOrganismListTag('#{tag.name}');", :class => css_class -%>
+          <% end -%>
+        <% end -%>
+      </div>
+    </div>
+  </div>
+  
+</p>

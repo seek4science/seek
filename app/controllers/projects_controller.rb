@@ -3,7 +3,12 @@ class ProjectsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit,:update]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  
+
+
+  def auto_complete_for_organism_name
+    render :json => Project.organism_counts.map(&:name).to_json
+  end
+
   # GET /projects
   # GET /projects.xml
   def index
@@ -29,6 +34,9 @@ class ProjectsController < ApplicationController
   # GET /projects/new
   # GET /projects/new.xml
   def new
+
+    @tags_organisms = Project.organism_counts.sort{|a,b| a.name<=>b.name}
+
     @project = Project.new
 
     respond_to do |format|
@@ -39,6 +47,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
+    @tags_organisms = Project.organism_counts.sort{|a,b| a.name<=>b.name}
     @project = Project.find(params[:id])
   end
 
@@ -46,6 +55,11 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = Project.new(params[:project])
+
+    if !params[:orgamism].nil?
+      organism_list = params[:organism][:list]
+      @project.organism_list=organism_list
+    end
 
     respond_to do |format|
       if @project.save
@@ -64,6 +78,12 @@ class ProjectsController < ApplicationController
   def update
     @project = Project.find(params[:id])
     #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
+
+    #update tags for organism
+    if !params[:organism].nil?
+      organism_list = params[:organism][:list]
+      @project.organism_list=organism_list
+    end
     
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:project].delete(:avatar_id).to_i

@@ -62,6 +62,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.tool_list_autocomplete '/tool_list_autocomplete', :controller=>'people', :action=>'auto_complete_for_tools_name'
   map.expertise_list_autocomplete '/expertise_list_autocomplete', :controller=>'people', :action=>'auto_complete_for_expertise_name'
+  map.organism_list_autocomplete '/organism_list_autocomplete',:controller=>'projects',:action=>'auto_complete_for_organism_name'
   
   map.signup  '/signup', :controller => 'users',   :action => 'new' 
   map.login  '/login',  :controller => 'sessions', :action => 'new'

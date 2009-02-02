@@ -6,10 +6,6 @@ module PeopleHelper
 
 
   def link_for_tag tag, options={}
-
-    if tag.count<=1
-      "" #don't display tags that only have 1 association (with the dummy user)
-    else
       link=people_url
       if (options[:type]==:expertise)
         link=people_url(:expertise=>tag.name)
@@ -18,9 +14,6 @@ module PeopleHelper
         link=people_url(:tools=>tag.name)
       end
       link_to h(tag.name), link, :class=>options[:class]
-    
-    end
-
   end
 
   def list_item_tags_list tags,options={}
