@@ -1,7 +1,9 @@
-<% if @expertise_or_tools.nil? -%>
+<% if @expertise -%>
+  <h2><%= "People with expertise in '"+h(@expertise)+"' ... " -%></h2>
+<% end %>
 
-<% else -%>
-  <h1><%= "People for '"+h(@expertise_or_tools)+"'" -%></h1>
+<% if @tools -%>
+  <h2><%= "People with experience in '"+h(@tools)+"' ... " -%></h2>
 <% end %>
 
 

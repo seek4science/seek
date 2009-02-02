@@ -22,12 +22,12 @@ class PeopleController < ApplicationController
   # GET /people.xml
   def index
     if (!params[:expertise].nil?)
-      @expertise_or_tools=params[:expertise]
-      @people=Person.tagged_with(@expertise_or_tools, :on=>:expertise)
+      @expertise=params[:expertise]
+      @people=Person.tagged_with(@expertise, :on=>:expertise)
       @people=@people.select{|p| !p.is_dummy}
     elsif (!params[:tools].nil?)
-      @expertise_or_tools=params[:tools]
-      @people=Person.tagged_with(@expertise_or_tools, :on=>:tools)
+      @tools=params[:tools]
+      @people=Person.tagged_with(@tools, :on=>:tools)
       @people=@people.select{|p| !p.is_dummy}
     else
       @people = Person.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name,:conditions=>{:is_dummy=>false})
