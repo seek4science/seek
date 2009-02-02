@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
   
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :taggings, :tags
   
   #checks that the dependent work_groups are destoryed when the project s
   def test_delete_work_groups_when_project_deleted
@@ -17,6 +17,12 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal n_wg-1,WorkGroup.find(:all).size
     wg=WorkGroup.find(:all).first
     assert_same 1,wg.project_id
+  end
+
+  def test_organsim_tag
+    p=projects(:one)
+    assert_equal 1,p.organisms.size
+    assert_equal "worm",p.organisms[0].name
   end
 
   def test_projects_with_userless_people

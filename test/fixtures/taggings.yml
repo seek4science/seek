@@ -18,3 +18,10 @@ golf_aaron:
   tagger_id: 2
   taggable_type: "Person"
   context: "expertise"
+
+worm_organism:
+  tag: worm
+  taggable_id: 1
+  tagger_id: 1
+  taggable_type: "Project"
+  context: "organisms"
