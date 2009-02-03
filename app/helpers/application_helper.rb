@@ -354,6 +354,26 @@ module ApplicationHelper
     html
   end
 
+  def link_for_tag tag, options={}
+      link=people_url
+      if (options[:type]==:expertise)
+        link=people_url(:expertise=>tag.name)
+      end
+      if (options[:type]==:tools)
+        link=people_url(:tools=>tag.name)
+      end
+      if (options[:type]==:organisms)
+        link=projects_url(:organisms=>tag.name)
+      end
+      link_to h(tag.name), link, :class=>options[:class]
+  end
+
+  def list_item_tags_list tags,options={}
+    tags.map do |t|
+      divider=tags.last==t ? "" : "&nbsp;&nbsp;|&nbsp;&nbsp;"
+      link_for_tag(t,options)+divider
+    end
+  end
 
   private
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search"}

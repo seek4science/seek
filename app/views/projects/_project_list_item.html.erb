@@ -33,6 +33,22 @@
           <%= "&nbsp;" + wiki_page_link -%>
         </p>
 
+        <div class="organisms" style="margin-top: 0.7em;">
+
+          <div style="margin-top: 0.3em; border-left: 2px dotted #365FA5;">
+            <p style="margin-left: 1em;">
+              <label>Organisms:</label>
+              <% unless project.organisms.empty? -%>
+                <%= list_item_tags_list project.organisms,:type=>:organisms %>
+              <% else -%>
+                <span class="none_text">Not known</span>
+              <% end -%>
+            </p>
+
+
+          </div>
+        </div>
+
       </td>
 
       <td class="item_right_table_cell" style="width: 170px;">
@@ -55,8 +71,6 @@
             <% end -%>
           </ul>
         </div>
-
-        
       </td>
 
     </tr>

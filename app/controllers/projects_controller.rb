@@ -12,12 +12,19 @@ class ProjectsController < ApplicationController
   # GET /projects
   # GET /projects.xml
   def index
-    @projects = Project.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:name)
+    
+    if (!params[:organisms].nil?)
+      @organisms=params[:organisms]
+      @projects=Project.tagged_with(@organisms,:on=>:organisms)
+    else
+      @projects = Project.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:name)
+    end
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @projects }
     end
+    
   end
 
   # GET /projects/1

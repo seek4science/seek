@@ -37,7 +37,9 @@
 	        <%= text_or_not_specified(@project.description, :description=>true) %>
 	      </div>
       <p>
+        <%= render :partial=>"organisms_tags", :object=>@project.organisms %>
   	</div>
+
 	</div>
 	
 	<div class="main_content_right_box">

@@ -1,16 +1,14 @@
-
-
-<div class="myexperiment_gadget" id="expertise_tag_cloud">
+<div class="myexperiment_gadget" id=<%=  "#{type}_tag_cloud" %> >
   <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
 
   <div class="header">
-    Expertise
+    <%= title %>
   </div>
 
   <div class="contents">
     <div class="hTagcloud">
       <div class="popularity">
-        <%= render :partial=>"gadgets/tag_cloud", :object=>Person.expertise_counts, :locals=>{:type=>:expertise} -%>
+        <%= render :partial=>"gadgets/tag_cloud", :object=>tag_cloud_gadget, :locals=>{:type=>type.to_sym} -%>
       </div>
     </div>
   </div>
