@@ -4,7 +4,7 @@ tags.sort!{|a,b| a.name<=>b.name}
 
 <% unless tags.blank? -%>
   <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-    <% if tag.count>1 -%>
+    <% if show_tag?(tag) -%>
       <%= link_for_tag tag,:type=>type, :class => css_class -%>
     <% end -%>
   <% end -%>

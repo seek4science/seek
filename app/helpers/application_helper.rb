@@ -354,6 +354,10 @@ module ApplicationHelper
     html
   end
 
+  def show_tag?(tag)
+    tag.taggings.size>1 || (tag.taggings.size==1 && tag.taggings[0].taggable_id)
+  end
+
   def link_for_tag tag, options={}
       link=people_url
       if (options[:type]==:expertise)

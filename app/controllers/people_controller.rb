@@ -23,14 +23,12 @@ class PeopleController < ApplicationController
   def index
     if (!params[:expertise].nil?)
       @expertise=params[:expertise]
-      @people=Person.tagged_with(@expertise, :on=>:expertise)
-      @people=@people.select{|p| !p.is_dummy}
+      @people=Person.tagged_with(@expertise, :on=>:expertise)      
     elsif (!params[:tools].nil?)
       @tools=params[:tools]
-      @people=Person.tagged_with(@tools, :on=>:tools)
-      @people=@people.select{|p| !p.is_dummy}
+      @people=Person.tagged_with(@tools, :on=>:tools)      
     else
-      @people = Person.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name,:conditions=>{:is_dummy=>false})
+      @people = Person.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name)
     end
     
     respond_to do |format|

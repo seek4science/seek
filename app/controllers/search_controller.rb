@@ -12,15 +12,13 @@ class SearchController < ApplicationController
     @results=[]
     case(type)
     when("people")
-      @results = Person.multi_solr_search(@search_query, :limit=>100, :models=>[Person]).results if (SOLR_ENABLED and !@search_query.nil? and !@search_query.strip.empty?)
-      @results = @results.select{|r| (!r.instance_of?(Person) || !r.is_dummy?)}
+      @results = Person.multi_solr_search(@search_query, :limit=>100, :models=>[Person]).results if (SOLR_ENABLED and !@search_query.nil? and !@search_query.strip.empty?)      
     when("institutions")
       @results = Institution.multi_solr_search(@search_query, :limit=>100, :models=>[Institution]).results if (SOLR_ENABLED and !@search_query.nil? and !@search_query.strip.empty?)
     when("projects")
       @results = Project.multi_solr_search(@search_query, :limit=>100, :models=>[Project]).results if (SOLR_ENABLED and !@search_query.nil? and !@search_query.strip.empty?)
     else
-      @results = Person.multi_solr_search(@search_query, :limit=>100, :models=>[Person, Project, Institution]).results if (SOLR_ENABLED and !@search_query.nil? and !@search_query.strip.empty?)
-      @results = @results.select{|r| (!r.instance_of?(Person) || !r.is_dummy?)}
+      @results = Person.multi_solr_search(@search_query, :limit=>100, :models=>[Person, Project, Institution]).results if (SOLR_ENABLED and !@search_query.nil? and !@search_query.strip.empty?)      
     end
     
     

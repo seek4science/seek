@@ -20,48 +20,37 @@ fred:
         first_name: fred
         last_name: blogs
 
-dummy:
-        id: 5
-        is_dummy: true
-        first_name: DummyPerson
 
 no_first_name:
         id: 6
-        is_dummy: false
         last_name: lastname
         
 no_last_name:
-        id: 7
-        is_dummy: false
+        id: 7        
         first_name: firstname
 
 double_firstname:
-        id: 8
-        is_dummy: false
+        id: 8        
         first_name: Fred David
         last_name: Bloggs
 
 double_lastname:
-        id: 9
-        is_dummy: false
+        id: 9        
         first_name: Fred
         last_name: Smith Jones
 
 double_barrelled_lastname:
-        id: 10
-        is_dummy: false
+        id: 10        
         first_name: Fred
         last_name: Smith-Jones
 
 cant_edit:
-        id: 11
-        is_dummy: false
+        id: 11        
         first_name: Cant
         last_name: Edit
 
 can_edit:
         id: 12
-        is_dummy: false
         first_name: Can
         last_name: Edit
 
