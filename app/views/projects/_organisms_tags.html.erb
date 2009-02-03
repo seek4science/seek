@@ -1,0 +1,18 @@
+<div id="organisms">
+
+    <p>
+      <label>Organisms:</label>
+
+      <%  if organisms_tags.blank? -%>
+        <span class='none_text'>Not known</span>
+      <% else %>
+
+        <% for organism in organisms_tags  -%>
+          <%= link_for_tag organism, :type=>:organism -%>
+          <% unless organism==organisms_tags.last %>
+            |
+          <% end %>
+        <% end %>
+      <% end %>
+    </p>
+</div>
