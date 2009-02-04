@@ -1,3 +1,7 @@
+<% if @organisms -%>
+  <h2><%= "Projects involved with the organism '"+h(@organisms)+"' ... " -%></h2>
+<% end %>
+
 <% if @projects.public_methods.include?("page_count") %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "layouts/paginate", :locals => { :collection => @projects } -%>
