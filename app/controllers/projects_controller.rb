@@ -63,7 +63,7 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new(params[:project])
 
-    if !params[:orgamism].nil?
+    if !params[:organism].nil?
       organism_list = params[:organism][:list]
       @project.organism_list=organism_list
     end
