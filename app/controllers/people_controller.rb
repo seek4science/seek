@@ -107,6 +107,7 @@ class PeopleController < ApplicationController
       if (is_member)
         member_details=params[:sysmo_member_details]
         #FIXME: do something with the details if they have been indicated as being a sysmo member
+        Mailer.deliver_contact_admin_new_user_no_profile member_details,@person
       end
 
       redirect_action="select"
