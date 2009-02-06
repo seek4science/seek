@@ -38,8 +38,7 @@ class SessionsController < ApplicationController
           
           format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == '/') ? redirect_to(root_url) : redirect_to(return_to_url) }
         end
-      end
-            
+      end            
     else
       flash[:error] = "Invalid login"
       redirect_to :action => 'new'

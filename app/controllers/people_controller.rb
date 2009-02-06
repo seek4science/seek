@@ -113,15 +113,17 @@ class PeopleController < ApplicationController
     
     respond_to do |format|
       if @person.save && current_user.save
-
-        if_sysmo_member||=false
-        Mailer.deliver_contact_admin_new_user_no_profile member_details,current_user,base_host if is_sysmo_member
-
-        Mailer.deliver_signup(current_user,base_host)
-        
-        flash[:notice] = 'Person was successfully created.'
-        format.html { redirect_to(@person) }
-        format.xml  { render :xml => @person, :status => :created, :location => @person }
+        if (current_user.person == @person)
+          if_sysmo_member||=false
+          Mailer.deliver_contact_admin_new_user_no_profile(member_details,current_user,base_host) if is_sysmo_member
+          Mailer.deliver_signup(current_user,base_host)
+          flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
+          format.html { redirect_to logout_path }
+        else
+          flash[:notice] = 'Person was successfully created.'
+          format.html { redirect_to(@person) }
+          format.xml  { render :xml => @person, :status => :created, :location => @person }
+        end
       else        
         format.html { render :action => redirect_action,:layout=>"logged_out" }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
