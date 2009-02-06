@@ -15,6 +15,10 @@ class ApplicationController < ActionController::Base
   def set_no_layout
     self.class.layout nil
   end
+
+  def base_host
+    request.host_with_port
+  end
   
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do

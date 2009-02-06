@@ -99,15 +99,13 @@ class PeopleController < ApplicationController
     end
     
     if (current_user.person.nil?) #indicates a profile is being created during the registration process
-      current_user.person=@person
+      current_user.person=@person      
       @userless_projects=Project.with_userless_people
       @userless_projects.sort!{|a,b|a.name<=>b.name}
-      is_member=params[:sysmo_member]
+      is_sysmo_member=params[:sysmo_member]
 
-      if (is_member)
-        member_details=params[:sysmo_member_details]
-        #FIXME: do something with the details if they have been indicated as being a sysmo member
-        Mailer.deliver_contact_admin_new_user_no_profile member_details,@person
+      if (is_sysmo_member)
+        member_details=params[:sysmo_member_details]               
       end
 
       redirect_action="select"
@@ -115,6 +113,12 @@ class PeopleController < ApplicationController
     
     respond_to do |format|
       if @person.save && current_user.save
+
+        if_sysmo_member||=false
+        Mailer.deliver_contact_admin_new_user_no_profile member_details,current_user,base_host if is_sysmo_member
+
+        Mailer.deliver_signup(current_user,base_host)
+        
         flash[:notice] = 'Person was successfully created.'
         format.html { redirect_to(@person) }
         format.xml  { render :xml => @person, :status => :created, :location => @person }

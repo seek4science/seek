@@ -21,8 +21,7 @@ class UsersController < ApplicationController
     
         @user.save
     
-        if @user.errors.empty?
-            @user.activate
+        if @user.errors.empty?            
             self.current_user = @user
             redirect_to(select_people_path)
         else
@@ -56,7 +55,5 @@ class UsersController < ApplicationController
             end 
         end  
     end
-    
-    
 
 end

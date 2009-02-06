@@ -1,0 +1,12 @@
+Hi <%= @name %>,
+
+Thank you for registering with Sysmo SEEK.
+
+Your username is: <%= @username %> and you are <%= @name %>.
+
+To confirm your email address and activate your account, please follow the link below (you might need to copy/paste it into your browser):
+
+<%= activate_url(:activation_code=>@activation_code, :host=>@host) %>
+
+- The Sysmo-DB Team
+

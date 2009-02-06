@@ -1,3 +1,9 @@
-Mailer#contact_admin
+Hi Admin,
 
-Find me in app/views/mailer/contact_admin.erb
+The new user <%= @person.name %>, Person: <%= @person.id %>, User.id: <%= @user.id %> just signed up and indicated that they were a non
+listed Sysmo project member. He/She left the following details about their project:
+
+<%= @details %>
+
+For the person details: <%= person_url(@person, :host=>@host) %>
+-- end --

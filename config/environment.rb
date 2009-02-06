@@ -44,7 +44,7 @@ Rails::Initializer.run do |config|
     RAILS_DEFAULT_LOGGER.level = Logger::WARN
     RAILS_DEFAULT_LOGGER.warn(
       "Rails Error: Unable to access log file. Please ensure that log/#{RAILS_ENV}.log exists and is chmod 0666. " +
-      "The log level has been raised to WARN and the output directed to STDERR until the problem is fixed."
+        "The log level has been raised to WARN and the output directed to STDERR until the problem is fixed."
     )
   end
 
@@ -79,9 +79,7 @@ Rails::Initializer.run do |config|
   # this will make the Authorization module available throughout the codebase
   require 'authorization'
   
-  
-  load 'config/environment_local.rb' if FileTest.exist?('config/environment_local.rb')
-  SOLR_ENABLED=false unless Object.const_defined?("SOLR_ENABLED")
-
 end
+
+load 'config/environment_local.rb' if FileTest.exist?('config/environment_local.rb')
 
