@@ -1,0 +1,7 @@
+<div class="contribution_aftertitle">
+	<b>Created at:</b> <%= resource.asset.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+	<% unless resource.asset.created_at == resource.asset.updated_at -%>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		<b>Last updated: </b><%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+	<% end -%>
+</div>

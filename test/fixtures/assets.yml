@@ -1,0 +1,10 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+ one:
+   contributor_type: 'User'
+   contributor_id:   1
+   project_id:       1
+   resource_type:    'Sop'
+   resource_id:      1
+   #policy_id:
+           

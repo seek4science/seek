@@ -1,7 +1,11 @@
 require 'digest/sha1'
+require 'acts_as_contributor'
+
 class User < ActiveRecord::Base
   
-  
+  acts_as_contributor
+  # TODO uncomment the following line when SOPs are implemented
+  # has_many :sops, :as => :contributor
   
   belongs_to :person
   #validates_associated :person
@@ -28,6 +32,7 @@ class User < ActiveRecord::Base
   attr_accessible :login, :email, :password, :password_confirmation
   
   has_many :favourites
+  has_many :favourite_groups, :dependent => :destroy
 
   # Activates the user in the database.
   def activate
@@ -90,6 +95,11 @@ class User < ActiveRecord::Base
   # Returns true if the user has just been activated.
   def recently_activated?
     @activated
+  end
+  
+  # performs a simple conversion from an array of user's project instances into a hash { <project_id> => <project_name>, [...] }
+  def generate_own_project_id_name_hash
+    return Hash[*self.person.projects.collect{|p|; [p.id, p.name];}.flatten]
   end
 
   protected

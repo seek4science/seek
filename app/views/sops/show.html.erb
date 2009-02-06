@@ -1,0 +1,77 @@
+<ul class="sectionIcons">
+	<% #if mine?(@sop) -%>
+		<li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
+	<%# end -%>
+	<%# if @sop.authorized?("destroy", current_user) -%>
+		<li><%= icon('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
+	<%# end -%>
+</ul>
+
+<h1 class="contribution_title">SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
+
+<%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @sop } -%>
+
+<div class="show_basic">
+	<div class="contribution_left_box">
+		<div class="contribution_version_box">
+			<div class="contribution_version_inner_box">
+				<p>
+				    <b>Title:</b>
+				    <span class="title"><%=h @sop.title -%></span>
+				</p>
+				
+				<p>
+				    <b>File name:</b>
+				    <%=h @sop.original_filename -%>
+				</p>
+				
+				<p>
+				    <b>Format:</b>
+				    <%=h @sop.content_type -%>
+				</p>
+				
+				<br/>
+				
+				<h3>
+					<%= help_icon("This section shows the overall description for this SOP") -%>
+					Description
+				</h3>
+				
+				<% unless @sop.description.blank? -%>
+					<div class="contribution_description">
+						<%= simple_format(white_list(@sop.description)) -%>
+					</div>
+				<% else -%>
+					<p class="none_text">
+						Not set
+					</p>
+				<% end -%>
+				
+				<br/>
+				
+				<h3>
+					<%= help_icon("This section provides links to the download(s) for this SOP") -%>
+					Download
+				</h3>
+				
+				<%# if @sop.authorized?("download", current_user) -%>
+					<ul class="sectionIcons">
+						<li><%= icon('sop', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
+					</ul>
+				<%# else -%>
+					<p class="none_text">
+						THIS WILL BE FIXED WHEN AUTHORIZATION IS IMPLEMENTED
+						You cannot download this File
+					</p>
+				<%# end -%>
+			</div>
+		
+		</div>
+	
+	</div>
+	
+	<div class="contribution_right_box">
+		<%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @sop } -%>
+	</div>
+	
+</div>

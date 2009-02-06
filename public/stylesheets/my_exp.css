@@ -1495,7 +1495,6 @@ div.auto_complete ul strong.highlight {
 
 .box_editing {
 	padding: 0.5em; 
-	background-color: #FFFFFF;
 	border-left: 5px solid #0066CC;
 	padding-left: 0.8em;
 	margin-left: 0.8em;
@@ -1503,6 +1502,7 @@ div.auto_complete ul strong.highlight {
 
 .box_editing_inner {
 	padding: 0.5em;
+	border: 1px solid #9BCDFF;
 	background-color: #DDEEFF;
 }
 

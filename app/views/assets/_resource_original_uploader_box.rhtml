@@ -1,0 +1,13 @@
+<div class="contribution_section_box" style="padding: 0.5em 0 1em 0;">
+	<p class="heading">
+		<%= help_icon("The original uploader is the person who uploaded/created this #{resource.class.name} and who manages it.") -%>
+		Original Uploader
+	</p>
+	<p>
+		<% resource_contributor = resource.asset.contributor.person -%>
+		<% resource_contributor_name = h(resource_contributor.name) -%>
+		<% resource_contributor_url = url_for(resource_contributor) -%>
+		<%= avatar(resource_contributor, 100, false, resource_contributor_url, resource_contributor_name, true) -%>
+		<br/><%= link_to(resource_contributor_name, resource_contributor_url) -%>
+	</p>
+</div>

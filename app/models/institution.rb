@@ -33,4 +33,11 @@ class Institution < ActiveRecord::Base
     return !avatar_id.nil?
   end
   
+  
+  # get a listing of all known institutions
+  def self.get_all_institutions_listing
+    institutions = Institution.find(:all)
+    return institutions.collect { |i| [i.name, i.id] }
+  end
+  
 end

@@ -1,18 +1,24 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :sops, :member => { :download => :get }
+
+  map.resources :assets
+
   map.resources :users
 
   map.resource :session
 
   #map.resources :profiles
 
-  map.resources :institutions do |institution|
+  map.resources :institutions, 
+    :collection => { :request_all => :get } do |institution|
     # avatars / pictures 'owned by' institution
     institution.resources :avatars, :member => { :select => :post }
   end
 
   map.resources :groups
 
-  map.resources :projects do |project|
+  map.resources :projects, 
+    :collection => { :request_institutions => :get } do |project|
     # avatars / pictures 'owned by' project
     project.resources :avatars, :member => { :select => :post }
   end
@@ -69,6 +75,13 @@ ActionController::Routing::Routes.draw do |map|
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'  
   
   map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil
+  
+  # used by the "sharing" form to get settings from an existing policy 
+  map.request_policy_settings '/policies/request_settings', :controller => 'policies', :action => 'send_policy_data'
+  
+  # routes for favourite
+  map.new_favourite_group '/favourite_groups/new_popup', :controller => 'favourite_groups', :action => 'new_popup', :conditions => { :method => :post }
+  map.edit_favourite_group '/favourite_groups/:id/edit_popup', :controller => 'favourite_groups', :action => 'edit_popup', :conditions => { :method => :post }
   
   map.root :controller=>"home"
 

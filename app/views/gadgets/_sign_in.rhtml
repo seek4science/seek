@@ -9,7 +9,11 @@
   
   <div class="contents">
     <% form_tag session_path do %>
-      <div class="box1">
+      <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
+      <%= hidden_field_tag "called_from[action]", controller.action_name -%>
+      <%= hidden_field_tag "called_from[id]", params[:id] -%>
+			
+			<div class="box1">
 	  	<p class="label">
           Login:
 	  	</p>

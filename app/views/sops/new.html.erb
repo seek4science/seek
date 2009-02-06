@@ -1,0 +1,41 @@
+<%= javascript_include_tag "sharing.js" -%>
+
+<h1>New SOP</h1>
+
+<div class="show_basic">
+  <% form_tag({:action => :create}, :multipart => true) do -%>
+    <%= error_messages_for :sop -%>
+
+	  <center>
+	  	<div style="width: 60%;">
+	  		<p>
+			    <b>File to upload:&nbsp;</b>
+			    <%= file_field :sop, :data -%>
+			  </p>
+				
+		    <p style="margin-top: 1.5em;">
+			  	<b>Title:</b><br/>
+					<% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
+					<%= text_field_tag 'sop[title]', sop_title_value, :style => "width: 100%;" -%>
+			  </p>
+				
+		    <p style="margin-top: 0.5em;">
+		    	<b>Description:</b><br/>
+					<% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
+					<%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 5 -%>
+		    </p>
+	  
+	 			<%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP", :project_hash => current_user.generate_own_project_id_name_hash } -%>
+	  	</div>
+		</center>
+		
+		
+		<p style="margin: 2.5em 0 0 0;">
+  		<%= render :partial => "assets/sharing_form" -%>
+		</p>
+		
+	  <p style="text-align: center;">
+	    <%= submit_tag "Upload and Save", :disable_with => "Uploading and Saving..." -%> or <%= link_to 'Cancel', sops_path -%> 
+	  </p>
+	<% end -%>	
+</div>

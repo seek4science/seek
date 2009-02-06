@@ -1,5 +1,9 @@
-<%= render :partial=>"gadgets/who_am_i"  -%>
-<%= render :partial=>"gadgets/favourites"  -%>
+<% if logged_in? -%>
+	<%= render :partial => "gadgets/who_am_i" -%>
+  <%= render :partial=>"gadgets/favourites"  -%>
+<% else -%>
+  <%= render :partial => "gadgets/sign_in" -%>
+<% end -%>
 
 <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.expertise_counts, :locals=>{:type=>"expertise",:title=>"Expertise"} %>
 <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.tool_counts, :locals=>{:type=>"tools",:title=>"Tools and Techniques"} %>
