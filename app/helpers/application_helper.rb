@@ -70,6 +70,8 @@ module ApplicationHelper
       return "famfamfam_silk/arrow_up.png"
     when "arrow_down"
       return "famfamfam_silk/arrow_down.png"
+    when "arrow_right", "next"
+      return "famfamfam_silk/arrow_right.png"
     when "new"
       return "redmond_studio/add_16.png"
     when "download"
@@ -152,6 +154,12 @@ module ApplicationHelper
       return "famfamfam_silk/lock.png"
     when "no_user"
       return "famfamfam_silk/link_break.png"
+    when "sop"
+      return "famfamfam_silk/page.png"
+    when "sops"
+      return "famfamfam_silk/page_copy.png"
+    when "spinner"
+      return "ajax-loader.gif"
     else
       return nil
     end
@@ -201,6 +209,37 @@ module ApplicationHelper
     
     return list_item
   end
+  
+  
+  def contributor(contributor, avatar=false, size=100, you_text=false)
+    return nil unless contributor
+    
+    if contributor.class.name == "User"
+      # this string will output " (you) " for current user next to the display name, when invoked with 'you_text == true'
+      you_string = (you_text && logged_in? && user.id == current_user.id) ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ""
+      contributor_person = contributor.person
+      contributor_name = h(contributor_person.name)
+      contributor_url = person_path(contributor_person.id)
+      contributor_name_link = link_to(contributor_name, contributor_url)
+      
+      if avatar
+        result = avatar(contributor_person, size, false, contributor_url, contributor_name, false)
+        result += "<p style='margin: 0; text-align: center;'>#{contributor_name_link}#{you_string}</p>"
+        return result
+      else
+        return (contributor_name_link + you_string)
+      end
+    # other types might be supported
+    # elsif contributortype.to_s == "Network"
+      #network = Network.find(:first, :select => "id, title", :conditions => ["id = ?", contributorid])
+      #return nil unless network
+      #
+      #return title(network)
+    else
+      return nil
+    end
+  end
+  
   
   # A generic method to produce avatars for entities of all kinds.
   #
@@ -377,6 +416,18 @@ module ApplicationHelper
       divider=tags.last==t ? "" : "&nbsp;&nbsp;|&nbsp;&nbsp;"
       link_for_tag(t,options)+divider
     end
+  end
+
+  
+    def create_new_favourite_group_popup_link
+    return link_to_remote_redbox("create_new_f_group", 
+                                 { :url => new_favourite_group_url,
+                                   :id => "create_new_f_group_redbox",
+                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" } #, 
+                                 #{ :style => options[:style], 
+                                 #  :alt => options[:tooltip_text], 
+                                 #  :title => tooltip_title_attrib(options[:tooltip_text]) }
+   )
   end
 
   private

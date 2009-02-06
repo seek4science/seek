@@ -1,0 +1,40 @@
+<%= javascript_include_tag "sharing.js" %>
+
+<ul class="sectionIcons">
+	<li><%= icon('sop', sop_path(@sop), 'Return to SOP', nil, 'Return to SOP') -%></li>
+	<li><%= icon('sops', sops_path, 'View all SOPs', nil, 'View all SOPs') -%></li>
+</ul>
+
+<h1>Editing SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
+
+<div class="show_basic">
+	<% form_for(@sop) do |f| %>
+	  <%= f.error_messages %>
+	  
+	  <center>
+	  	<div style="width: 60%;">
+		    <p style="margin-top: 1.5em;">
+			  	<b>Title:</b><br/>
+					<%= f.text_field :title, :style => "width: 100%;" -%>
+			  </p>
+				
+		    <p style="margin-top: 0.5em;">
+		    	<b>Description:</b><br/>
+					<%= f.text_area :description, :style => "width: 100%;", :rows => 5 -%>
+		    </p>
+				
+				<%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",
+                                                                       :selected_project_id => @sop.asset.project_id,
+                                                                       :project_hash => current_user.generate_own_project_id_name_hash } -%>
+	  	</div>
+	  </center>
+	  
+		<p style="margin: 2.5em 0 0 0;">
+  		<%= render :partial => "assets/sharing_form" -%>
+		</p>
+		
+	  <p style="text-align: center;">
+	    <%= f.submit "Update", :disable_with => "Updating..." -%> or <%= link_to "Cancel", sop_path(@sop) -%>
+	  </p>
+	<% end %>
+</div>

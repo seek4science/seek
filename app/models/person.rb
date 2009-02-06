@@ -25,6 +25,17 @@ class Person < ActiveRecord::Base
       p=Person.find(:all)
       return p.select{|person| person.user.nil?}
     end
+    
+    
+    # get a list of people with their email for autocomplete fields
+    def self.get_all_as_json
+      all_people = Person.find(:all, :order => "ID asc")
+      names_emails = all_people.collect{ |p| {"id" => p.id,
+                                              "name" => p.first_name + " " + p.last_name, 
+                                              "email" => (p.email.blank? ? "unknown" : p.email) } }
+      return names_emails.to_json
+    end
+    
 
     def validates_associated(*associations)
         associations.each do |association|

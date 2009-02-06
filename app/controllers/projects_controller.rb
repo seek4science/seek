@@ -1,7 +1,10 @@
+require 'white_list_helper'
+
 class ProjectsController < ApplicationController
+  include WhiteListHelper
   
   before_filter :login_required
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit,:update]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update]
 
 
@@ -117,6 +120,35 @@ class ProjectsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(projects_url) }
       format.xml  { head :ok }
+    end
+  end
+  
+  
+  # returns a list of institutions for a project in JSON format
+  def request_institutions
+    # listing institutions for a project is public data, but still
+    # we require login to protect from unwanted requests
+    
+    project_id = white_list(params[:id])
+    institution_list = nil
+    
+    begin
+      project = Project.find(project_id)
+      institution_list = project.get_institutions_listing
+      success = true
+    rescue ActiveRecord::RecordNotFound
+      # project wasn't found
+      success = false
+    end
+    
+    respond_to do |format|
+      format.json {
+        if success
+          render :json => {:status => 200, :institution_list => institution_list }
+        else
+          render :json => {:status => 404, :error => "Couldn't find Project with ID #{project_id}."}
+        end
+      }
     end
   end
 

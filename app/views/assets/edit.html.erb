@@ -1,0 +1,12 @@
+<h1>Editing asset</h1>
+
+<% form_for(@asset) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @asset %> |
+<%= link_to 'Back', assets_path %>

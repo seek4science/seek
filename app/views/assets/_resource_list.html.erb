@@ -1,0 +1,13 @@
+<% odd_row = false -%>
+
+<% unless collection.empty? -%>
+  <div class="list_items_container">
+  	<% collection.each do |item| -%>
+		  <% # TODO implement: if authorized?("show", nil, item, current_user) -%>
+			  <% odd_row = !odd_row -%>
+				<%= render :partial => "#{item.class.name.pluralize.downcase}/table", :locals => { :resource => item, :odd_row => odd_row } -%>
+			<% # end -%>
+		<% end -%>
+	</div>
+<% end -%>
+

@@ -1,7 +1,10 @@
+require 'white_list_helper'
+
 class InstitutionsController < ApplicationController
+  include WhiteListHelper
   
   before_filter :login_required
-  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit,:update]
+  before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_all]
   before_filter :editable_by_user, :only=>[:edit,:update]
   
   # GET /institutions
@@ -89,6 +92,23 @@ class InstitutionsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(institutions_url) }
       format.xml  { head :ok }
+    end
+  end
+
+  
+  # returns a list of all institutions in JSON format
+  def request_all
+    # listing all institutions is public data, but still
+    # we require login to protect from unwanted requests
+    
+    institution_id = white_list(params[:id])
+    institution_list = Institution.get_all_institutions_listing
+    
+    
+    respond_to do |format|
+      format.json {
+        render :json => {:status => 200, :institution_list => institution_list }
+      }
     end
   end
 

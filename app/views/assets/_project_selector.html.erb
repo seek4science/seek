@@ -1,0 +1,20 @@
+<% # this partial expects the following parameters to be set: -%>
+<% # - "resource_type" - type (string value required) of the current resource -%>
+<% # - project_hash - hash in a form of { <project_id> => <project_name>, [...] } of all projects that the current user is a member of -%>
+<% # - selected_project_id - ID of the project the resource is currently associated with; skip this parameter for a "new" resource -%>
+
+<% selected_project_id ||= 0 -%>
+
+<% unless project_hash.empty? -%>
+	<div style="margin: 1.5em 0 1em 0; text-align: left;">
+	  <%= image_tag method_to_icon_filename("spinner"), :id => "policy_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
+		<%= help_icon("Please choose a project to associate this #{resource_type} with.<br/><br/><b>\"Load sharing defaults\"</b> button will reset any sharing<br/>options to default options set by a PAL for selected project.<br/>This will discard any changes you might have made.") -%>
+		Associate this <%= resource_type -%> with the following project:<br/>
+		<select name="<%=resource_type.downcase-%>[project_id]" id="project_selector" style="width: 250px; vertical-align: middle; margin: 0.3em 0;">
+		  <% project_hash.each do |p| -%>
+			  <option value="<%= p[0] -%>" <%= "selected='selected'" if p[0] == selected_project_id -%>><%= h(p[1]) -%></option>
+			<% end -%>
+		</select>
+		<input type="button" value="Load sharing defaults" onclick="javascript:loadDefaultProjectPolicy($('project_selector').options[$('project_selector').selectedIndex].value);" style="vertical-align: middle; margin-left: 0.3em; width: 170px;"/>
+	</div>
+<% end -%>

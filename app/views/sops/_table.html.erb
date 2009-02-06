@@ -1,0 +1,50 @@
+<% # this should be set by the caller, this is an extra check -%>
+<% odd_row ||= false -%>
+ 
+<table class="list_item">       
+	<tr class="<%= odd_row ? "odd_row" : "even_row" -%>">
+		<td style="width: 125px;">
+			<p style="margin-top:0; padding-top:0; text-align: center;"><b>Uploader:</b></p>
+			<center><%= contributor(resource.asset.contributor, true, 60) -%></center>
+		</td>
+		
+	  <td style="text-align: left;">
+			<p class="title">
+				<%= icon "sop", nil, nil, nil, '' -%>
+				<% title = h(resource.title) -%>
+				<%= link_to(title, sop_path(resource)) -%>
+			</p>
+			
+			<p style="font-size: 85%; margin-top: 0; padding-top: 0;">
+				<b>Created:</b> <%= resource.asset.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+				<% unless resource.asset.created_at == resource.asset.updated_at -%>
+					|	<b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+				<% end %>
+				<% unless resource.asset.last_used_at.nil? -%>
+					|	<b>Last used:</b> <%= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+				<% end -%>
+			</p>
+			
+			<div class="desc" style="font-size: 85%;">
+				<% unless resource.description.blank? -%>
+		  		<%= truncate(white_list(resource.description), 500) -%>
+			  <% else -%>
+					<span class="none_text">No description</span>	
+				<% end -%>
+			</div>
+			
+			<p style="font-size:85%;"><b>Format: </b><%= h(resource.content_type) -%></p>
+		</td>
+	
+		<td class="actions" style="width: 80px;">
+	    <%= icon "show", sop_path(resource), nil, nil, "View" -%>
+		  <% #if blob.authorized?("download", current_user) -%>
+			  <%= icon "download", download_sop_path(resource) -%>
+			<% #end -%>
+	    <% #if mine?(blob) %>
+			  <%= icon "manage", edit_sop_path(resource), nil, nil, "Manage" -%>
+			<% #end -%>
+	  </td>
+		
+	</tr>
+</table>

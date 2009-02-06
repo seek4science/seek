@@ -12,6 +12,19 @@ class Project < ActiveRecord::Base
            :as => :owner,
            :dependent => :destroy
   
+  # can't destroy the assets, because these might be valuable even in the absence of the parent project
+  has_many :assets, :dependent => :nullify
+  
+  # a default policy belonging to the project; this is set by a project PAL
+  # if the project gets deleted, the default policy needs to be destroyed too
+  # (no links to the default policy will be made from elsewhere; instead, when
+  #  necessary, deep copies of it will be made to ensure that all settings get
+  #  fully copied and assigned to belong to owners of assets, where identical policy
+  #  is to be used)
+  belongs_to :default_policy, 
+             :class_name => 'Policy',
+             :dependent => :destroy
+  
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
 
@@ -60,6 +73,13 @@ class Project < ActiveRecord::Base
   def self.with_userless_people
     p=Project.find(:all, :include=>:work_groups)
     return p.select { |proj| proj.includes_userless_people? }
+  end
+  
+  
+  # get a listing of institutions for this project
+  def get_institutions_listing
+    workgroups_for_project = WorkGroup.find(:all, :conditions => {:project_id => self.id})
+    return workgroups_for_project.collect { |w| [w.institution.name, w.institution.id, w.id] }
   end
   
 end

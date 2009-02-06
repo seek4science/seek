@@ -1,0 +1,18 @@
+<h1>Listing assets</h1>
+
+<table>
+  <tr>
+  </tr>
+
+<% for asset in @assets %>
+  <tr>
+    <td><%= link_to 'Show', asset %></td>
+    <td><%= link_to 'Edit', edit_asset_path(asset) %></td>
+    <td><%= link_to 'Destroy', asset, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New asset', new_asset_path %>

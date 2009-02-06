@@ -1,0 +1,2 @@
+module SopsHelper
+end
