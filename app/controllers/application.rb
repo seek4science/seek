@@ -36,6 +36,13 @@ class ApplicationController < ActionController::Base
     else
       false
     end
+  end 
+
+  def is_user_activated
+    if ACTIVATION_REQUIRED && current_user && !current_user.active?
+      error("Activation of this account it required for gaining full access","Activation required?")      
+      false
+    end
   end
 
   def is_current_user_auth
@@ -57,6 +64,12 @@ class ApplicationController < ActionController::Base
       error("Admin rights required", "is invalid (not admin)")
       return false
     end
+  end
+
+  def logout_user
+    self.current_user.forget_me if logged_in?
+    cookies.delete :auth_token
+    session[:user_id]=nil
   end
   
   private

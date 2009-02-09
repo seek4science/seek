@@ -1,13 +1,19 @@
 class Mailer < ActionMailer::Base
-  
+  helper UsersHelper
+
   def admin_emails
-    #TODO: fetch from database
-    ['stuzart@gmail.com']
+    begin
+      admins=User.find(:all,:conditions=>{:is_admin=>true}, :include=>:person)
+      admins.map { |a| a.person.email_with_name }
+    rescue
+      @@logger.error("Error determining admin email addresses")
+      ["sowen@cs.man.ac.uk"]
+    end
   end
 
   def signup(user,base_host)
     subject     'Sysmo SEEK account activation'
-    recipients  user.person.email
+    recipients  user.person.email_with_name
     from        ''
     sent_on     Time.now
 

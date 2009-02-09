@@ -4,11 +4,12 @@ class MailerTest < ActionMailer::TestCase
   fixtures :users, :people
 
   test "signup" do
-    @expected.subject = 'Mailer#signup'
+    @expected.subject = 'Sysmo SEEK account activation'
+    @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.body    = read_fixture('signup')
     @expected.date    = Time.now
 
-    assert_equal @expected.encoded, Mailer.create_signup(@expected.date).encoded
+    assert_equal @expected.encoded, Mailer.create_signup(users(:aaron),"http://localhost").encoded
   end
 
   test "forgot_password" do

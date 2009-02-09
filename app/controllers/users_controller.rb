@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   
   layout "logged_out", :except=>[:edit]
     
-  before_filter :is_current_user_auth, :only=>[:edit, :update]
+  before_filter :is_current_user_auth, :only=>[:edit, :update]  
   
   # render new.rhtml
   def new
@@ -22,6 +22,7 @@ class UsersController < ApplicationController
     @user.save
     
     if @user.errors.empty?
+      @user.activate unless ACTIVATION_REQUIRED
       self.current_user = @user
       redirect_to(select_people_path)
     else
@@ -34,9 +35,13 @@ class UsersController < ApplicationController
     if logged_in? && !current_user.active?
       current_user.activate
       flash[:notice] = "Signup complete!"
+      redirect_to current_user.person
+    else
+      redirect_back_or_default('/')
     end
-    redirect_back_or_default('/')
   end
+
+
   
   def edit
     @user = User.find(params[:id])
@@ -44,23 +49,33 @@ class UsersController < ApplicationController
   end
   
   def update
+
     @user = User.find(params[:id])
     @user.person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?
     @user.attributes=params[:user]
+
     respond_to do |format|
+      
       if @user.save
         #user has associated himself with a person, so activation email can now be sent
-        unless (params[:user][:person_id]).nil?
+        if !current_user.active?
           Mailer.deliver_signup(@user,base_host)
           flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
-          redirect_to :controller=>:session, :action=>:new
+          logout_user
+          format.html { redirect_to :action=>"activation_required" }
         else
-          format.html { redirect_to person_path(@user.person) }
-        end
+          flash[:notice]="Your account details have been updated"
+          format.html { redirect_to person_path(@user.person) } 
+        end        
       else
         format.html { render :action => 'edit' }
       end
     end
+    
+  end
+
+  def activation_required
+    
   end
 
 end

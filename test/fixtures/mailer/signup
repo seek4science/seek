@@ -1,3 +1,11 @@
-Mailer#signup
+Hi Aaron Spiggle,
 
-Find me in app/views/mailer/signup.erb
+Thank you for registering with Sysmo SEEK.
+
+Your username is: aaron and you are Aaron Spiggle.
+
+To confirm your email address and activate your account, please follow the link below (you might need to copy/paste it into your browser):
+
+http://http://localhost/activate/8f24789ae988411ccf33ab0c30fe9106fab32e9a
+
+- The Sysmo-DB Team

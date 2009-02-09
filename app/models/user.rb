@@ -100,7 +100,7 @@ class User < ActiveRecord::Base
   # performs a simple conversion from an array of user's project instances into a hash { <project_id> => <project_name>, [...] }
   def generate_own_project_id_name_hash
     return Hash[*self.person.projects.collect{|p|; [p.id, p.name];}.flatten]
-  end
+  end  
 
   protected
     # before filter 

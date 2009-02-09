@@ -1,7 +1,7 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
  
-  layout 'logged_out'
+  layout 'logged_out'  
   
   # render new.rhtml
   def new
@@ -40,16 +40,17 @@ class SessionsController < ApplicationController
         end
       end            
     else
-      flash[:error] = "Invalid login"
+      flash[:error] = "Invalid login"      
       redirect_to :action => 'new'
     end
   end
 
-  def destroy
+  def destroy    
     self.current_user.forget_me if logged_in?
     cookies.delete :auth_token
     reset_session
     flash[:notice] = "You have been logged out."
     redirect_back_or_default('/')
   end
+  
 end
