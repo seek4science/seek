@@ -15,6 +15,10 @@ class ApplicationController < ActionController::Base
   def set_no_layout
     self.class.layout nil
   end
+
+  def base_host
+    request.host_with_port
+  end
   
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
@@ -30,6 +34,13 @@ class ApplicationController < ActionController::Base
       redirect_to(select_people_path) if current_user.person.nil?
       true
     else
+      false
+    end
+  end 
+
+  def is_user_activated
+    if ACTIVATION_REQUIRED && current_user && !current_user.active?
+      error("Activation of this account it required for gaining full access","Activation required?")      
       false
     end
   end
@@ -53,6 +64,12 @@ class ApplicationController < ActionController::Base
       error("Admin rights required", "is invalid (not admin)")
       return false
     end
+  end
+
+  def logout_user
+    self.current_user.forget_me if logged_in?
+    cookies.delete :auth_token
+    session[:user_id]=nil
   end
   
   private

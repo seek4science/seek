@@ -53,6 +53,11 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal "Tom Jones", p.name
   end
 
+  def test_email_with_name
+    p=people(:one)
+    assert_equal("Quentin Jones <quentin@email.com>",p.email_with_name)
+  end
+  
   def test_capitalization_with_nil_last_name
     p=people(:no_first_name)
     assert_equal " Lastname",p.name

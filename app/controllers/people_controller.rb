@@ -1,11 +1,11 @@
 class PeopleController < ApplicationController
   
-  before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
+  before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]  
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
-  before_filter :is_user_admin_or_personless, :only=>:new
+  before_filter :is_user_admin_or_personless, :only=>[:new]
   
   
   def auto_complete_for_tools_name
@@ -98,15 +98,14 @@ class PeopleController < ApplicationController
       @person.expertise_list=expertise_list
     end
     
-    if (current_user.person.nil?) #indicates a profile is being created during the registration process
-      current_user.person=@person
+    if (current_user.person.nil?) #indicates a profile is being created during the registration process      
+      current_user.person=@person      
       @userless_projects=Project.with_userless_people
       @userless_projects.sort!{|a,b|a.name<=>b.name}
-      is_member=params[:sysmo_member]
+      is_sysmo_member=params[:sysmo_member]
 
-      if (is_member)
-        member_details=params[:sysmo_member_details]
-        #FIXME: do something with the details if they have been indicated as being a sysmo member
+      if (is_sysmo_member)
+        member_details=params[:sysmo_member_details]               
       end
 
       redirect_action="select"
@@ -114,9 +113,19 @@ class PeopleController < ApplicationController
     
     respond_to do |format|
       if @person.save && current_user.save
-        flash[:notice] = 'Person was successfully created.'
-        format.html { redirect_to(@person) }
-        format.xml  { render :xml => @person, :status => :created, :location => @person }
+        if (!current_user.active?)
+          if_sysmo_member||=false
+          Mailer.deliver_contact_admin_new_user_no_profile(member_details,current_user,base_host) if is_sysmo_member
+          Mailer.deliver_signup(current_user,base_host)          
+          flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"          
+          logout_user
+          format.html {redirect_to :controller=>"users",:action=>"activation_required"}
+        else
+          flash[:notice] = 'Person was successfully created.'
+          format.html { redirect_to(@person) }
+          format.xml  { render :xml => @person, :status => :created, :location => @person }
+        end
+        
       else        
         format.html { render :action => redirect_action,:layout=>"logged_out" }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }

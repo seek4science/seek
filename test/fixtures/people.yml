@@ -4,11 +4,13 @@ one:
         id: 1
         first_name: quentin
         last_name: jones
+        email: quentin@email.com
 
 two:
         id: 2
         first_name: aaron
-        last_name: last_name
+        last_name: spiggle
+        email: aaron@email.com
 
 three:
         id: 3

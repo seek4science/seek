@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :assets
 
-  map.resources :users
+  map.resources :users, :collection=>{:activation_required=>:get}
 
   map.resource :session
 
