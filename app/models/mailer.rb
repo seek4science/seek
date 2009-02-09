@@ -29,6 +29,15 @@ class Mailer < ActionMailer::Base
     body       :greeting => 'Hi,'
   end
 
+  def welcome(user,base_host)
+    subject    'Welcome to Sysmo SEEK'
+    recipients user.person.email_with_name
+    from       ''
+    sent_on    Time.now
+    
+    body       :name=>user.person.name,:person=>user.person, :host=>base_host
+  end
+
   def contact_admin_new_user_no_profile(details,user,base_host)
     
     subject    'Sysmo Member signed up'

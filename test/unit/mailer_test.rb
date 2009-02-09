@@ -9,7 +9,7 @@ class MailerTest < ActionMailer::TestCase
     @expected.body    = read_fixture('signup')
     @expected.date    = Time.now
 
-    assert_equal @expected.encoded, Mailer.create_signup(users(:aaron),"http://localhost").encoded
+    assert_equal @expected.encoded, Mailer.create_signup(users(:aaron),"localhost").encoded
   end
 
   test "forgot_password" do
@@ -27,6 +27,15 @@ class MailerTest < ActionMailer::TestCase
 
     #FIXME: commented out test while works in progress
     #assert_equal @expected.encoded, Mailer.create_contact_admin_new_user_no_profile("test message",people(:one)).encoded
+  end
+
+  test "welcome" do
+    @expected.subject = 'Welcome to Sysmo SEEK'
+    @expected.body = read_fixture('welcome')
+    @expected.date = Time.now
+    @expected.to = "Quentin Jones <quentin@email.com>"
+
+    assert_equal @expected.encoded, Mailer.create_welcome(users(:quentin),"localhost").encoded
   end
 
 end
