@@ -419,14 +419,14 @@ module ApplicationHelper
   end
 
   
-    def create_new_favourite_group_popup_link
-    return link_to_remote_redbox("create_new_f_group", 
+  def create_new_favourite_group_popup_link
+    return link_to_remote_redbox("Create new favourite group", 
                                  { :url => new_favourite_group_url,
                                    :id => "create_new_f_group_redbox",
-                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" } #, 
-                                 #{ :style => options[:style], 
-                                 #  :alt => options[:tooltip_text], 
-                                 #  :title => tooltip_title_attrib(options[:tooltip_text]) }
+                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" }, 
+                                 { #:style => options[:style], 
+                                   :alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text], 
+                                   :title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
    )
   end
 

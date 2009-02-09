@@ -514,6 +514,71 @@ function addProjectInstitution() {
 
 
 
+// ***************  Favourite Groups  *****************
+
+function addMembersToFavouriteGroup() {
+	var selIDs = getRecognizedSelectedIDs();
+	
+	if(selIDs == "") {
+		// no people to add
+		alert("Please choose people to add to your favourite group!");
+	}
+	else {
+		// some people to add - known that don't have duplicates
+		// within the new list, but some entries in the new list
+		// may replicate those in the main member list: check this
+		var duplicates_found = false;
+		
+		for(var i = 0; i < selIDs.length; i++) {
+		  // TODO add people to the list
+			alert(selIDs[i]);
+		}
+			
+	  if(duplicates_found) {
+			alert("Some of the people added successfully, but some duplicates were encountered - these were skipped.");
+		}
+	}
+}
+
+
+function postFavouriteGroupData() {
+  $('fav_group_loading_spinner').style.display = "inline";
+  
+  request = new Ajax.Request("/people", 
+                             { method: 'post',
+                               parameters: {val: $('my_hidden_field').value},
+                               onSuccess: function(transport){       
+                                 $('fav_group_loading_spinner').style.display = "none";
+                                 alert('success');
+                                 // "true" parameter to evalJSON() activates sanitization of input
+                                 var data = transport.responseText.evalJSON(true);
+                                 
+                                 alert(data);
+                                 
+                                 //if (data.status == 200) {
+                                 //  msg = data.found_exact_match ? 'Default policy found and loaded' : 'Couldn\'t find default policy for this Project,\nsystem defaults loaded instead.'
+                                 //  alert(msg);
+                                   
+                                 //  receivedPolicySettings = data;
+                                   
+                                 //  parsePolicyJSONData(data);
+                                 //  updateSharingSettings();
+                                 //}
+                                 //else {
+                                 //  error_status = data.status;
+                                 //  error_message = data.error
+                                 //  alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
+                                 //}
+                               },
+                               onFailure: function(transport){
+                                 $('fav_group_loading_spinner').style.display = "none";
+                                 alert('Something went wrong, please try again...'); 
+                               }    
+                             });
+
+}
+
+
 // ********************************************************
 
 function trimSpaces(str) {

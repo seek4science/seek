@@ -1,3 +1,6 @@
+// Init - preload "loading" spinner image
+(new Image()).src='/images/redbox_spinner.gif';
+
 
 var RedBox = {
 
@@ -80,7 +83,7 @@ var RedBox = {
 		var arrayPageSize = this.getPageSize();    
 		var arrayPageScroll = this.getPageScroll();
 		
-		var boxTop = arrayPageScroll[1] + arrayPageSize[3] / 3;
+		var boxTop = arrayPageScroll[1] + arrayPageSize[3] / 6;
 		$(window_id).style.top = boxTop + "px";
   },
   
