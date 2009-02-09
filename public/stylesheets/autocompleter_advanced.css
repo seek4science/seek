@@ -8,8 +8,15 @@
 html[xmlns] .clearfix{display:block;}
 * html .clearfix{height:1%;}
 
+/* any text field that needs to look like the "To" field should use this class */
+#facebook .to_field_identical{border:1px solid #8496ba; padding: 3px 4px;}
+
+/* classes to style the suggestion menu entries */
+#facebook li div.main_text{  }
+#facebook li div.hint_text{ color: #777777; }
+
 #facebook div.tokenizer{border:1px solid #8496ba;}
-#facebook div.tokenizer{width:355px;}
+#facebook div.tokenizer{ }
 
 /* autcompleter.advancedlocal css */
 .tokenizer{min-height:5px;padding:0px 0px 3px 3px;width:100%;background:#fff;font-size:11px;}
@@ -55,8 +62,8 @@ div.tokenizer .token:hover span.x,
 div.tokenizer .token:hover span.x_hover{background-image:url('/images/autocompleter_tokens/token_x.gif');background-position:4px 2px;cursor:pointer;display:inline;padding:0px 6px 0px 5px;}
 div.tokenizer.tokenizer_locked .token span.x,
 div.tokenizer.tokenizer_locked .token span.x_hover{display:none;}
-div.autocomplete {  position:absolute;  width:355px;  background-color:white;  border:1px solid #888;  margin-top:-2px;  padding:0px;}
+div.autocomplete {  position:absolute;  background-color:white;  border:1px solid #888;  margin-top:-2px;  padding:0px;}
 div.autocomplete ul {  list-style-type:none;margin:0px; padding:0px;}
 div.autocomplete ul li.selected { background-color: #ffb; }
-div.autocomplete ul li {  list-style-type:none;  display:block;  margin:0;  padding:2px; border-top: 1px dotted #666666; cursor:pointer;}
+div.autocomplete ul li {  text-align: left; list-style-type:none;  display:block;  margin:0;  padding:2px; border-top: 1px dotted #666666; cursor:pointer;}
 /* end of autcompleter.advancedlocal css */

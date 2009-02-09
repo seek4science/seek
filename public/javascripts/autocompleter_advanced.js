@@ -115,6 +115,9 @@ var HINT_FIELD = null;
 var ID_FIELD = null;
 var SUGGESTIONS_ARRAY = null;
 
+var HIDDEN_INPUT = null;
+
+
 validate_item = function(item) {
   // this method is only called for unrecognized items,
   // hence can return 'false' immediately if no unrecognized
@@ -231,12 +234,12 @@ onKeyPress: function(event) {
         case Event.KEY_RIGHT:
             return;
             case Event.KEY_UP:
-            this.markPrevious();
+            this.markPreviousMod();
             this.render();
             Event.stop(event);
             return;
             case Event.KEY_DOWN:
-            this.markNext();
+            this.markNextMod();
             this.render();
             Event.stop(event);
             return;
@@ -288,6 +291,45 @@ onKeyPress: function(event) {
 
     },
 
+
+/* 
+ * The following block of code was taken from:
+ * http://blog.gilluminate.com/2009/01/20/scriptaculous-autocomplete-page-jump-using-arrow-keys/
+ * 
+ * This is meant to fix a bug in Scriptaculous which causes the whole page to jump when arrow keys
+ * are used to make selections in the auto complete box.
+*/
+
+// START OF BLOCK
+    
+markPreviousMod: function() {
+  if(this.index > 0) {this.index--;}
+  else {
+    this.index = this.entryCount-1;
+    this.update.scrollTop = this.update.scrollHeight;
+  }
+  selection = this.getEntry(this.index);
+  selection_top = selection.offsetTop;
+  if(selection_top < this.update.scrollTop) {
+    this.update.scrollTop = this.update.scrollTop-selection.offsetHeight;
+  }
+},
+
+markNextMod: function() {
+  if(this.index < this.entryCount-1) {this.index++;}
+  else {
+    this.index = 0;
+    this.update.scrollTop = 0;
+  }
+  selection = this.getEntry(this.index);
+  selection_bottom = selection.offsetTop+selection.offsetHeight;
+  if(selection_bottom > this.update.scrollTop+this.update.offsetHeight) {
+    this.update.scrollTop = this.update.scrollTop+selection.offsetHeight;
+  }
+},
+
+// END OF BLOCK
+
 setOptions: function(options) {
         this.options = Object.extend({
             choices: 10,
@@ -317,8 +359,8 @@ setOptions: function(options) {
                         if (foundPos == 0 && elem_name.length != entry.length) {
                             var value = "<strong>" + elem_name.substr(0, entry.length) + "</strong>" + elem_name.substr(entry.length);
                             ret.push(
-                            "<li value='" + i + "'>" + "<div>" + value + "</div>"
-                            + (HINT_FIELD ? ("<div>" + elem[HINT_FIELD] + "</div>") : "") + "</li>"
+                            "<li value='" + i + "'>" + "<div class='main_text'>" + value + "</div>"
+                            + (HINT_FIELD ? ("<div class='hint_text'>" + elem[HINT_FIELD] + "</div>") : "") + "</li>"
                             );
                             break;
 
@@ -329,8 +371,8 @@ setOptions: function(options) {
                                 foundPos + entry.length)
 
                                 partial.push(
-                                "<li value='" + i + "'>" + "<div>" + value + "</div>"
-                                + (HINT_FIELD ? ("<div>" + elem[HINT_FIELD] + "</div>") : "") + "</li>"
+                                "<li value='" + i + "'>" + "<div class='main_text'>" + value + "</div>"
+                                + (HINT_FIELD ? ("<div class='hint_text'>" + elem[HINT_FIELD] + "</div>") : "") + "</li>"
                                 );
                                 break;
 
@@ -362,6 +404,7 @@ HiddenInput = Class.create({
         this.element = $(element);
         this.auto_complete = auto_complete;
         this.token;
+        HIDDEN_INPUT = this;
         Event.observe(this.element, 'keydown', this.onKeyPress.bindAsEventListener(this));
 
     },
@@ -423,6 +466,7 @@ HiddenInput = Class.create({
     onclick: function(event) {
         if (this.detect(event) && !this.selected) {
             this.select();
+            Event.stop(event); // added to prevent page scroll on mouse clicks
 
         } else {
             this.deselect();
@@ -448,35 +492,45 @@ HiddenInput = Class.create({
 
 
 addContactToList = function(item) {
-    $('autocomplete_input').value = "";
+  // clear the input anyway
+  $('autocomplete_input').value = "";
+  
+  var value_to_add = SUGGESTIONS_ARRAY[Element.readAttribute(item,'value')][ID_FIELD];
+  
+  // check if such value is not yet added, allow action
+  if(notYetAdded(value_to_add)) {  
     var token = Builder.node('a', {
         "class": 'token',
         href: "#",
         tabindex: "-1"
-    },
-    Builder.node('span', 
-    Builder.node('span', 
-    Builder.node('span', 
-    Builder.node('span', {},
-    [Builder.node('input', { type: "hidden", name: "selected_ids[]",
+      },
+      Builder.node('span', 
+      Builder.node('span', 
+      Builder.node('span', 
+      Builder.node('span', {},
+      [Builder.node('input', { type: "hidden", name: "selected_ids[]",
         // NEXT LINE REPLACED TO SUBMIT REQUIRED FIELD OF THE SELECTED OBJECTS, INSTEAD OF BEING FIXED TO EMAILS
         //value: item.lastChild.innerHTML
-        value: contacts[Element.readAttribute(item,'value')][ID_FIELD]
-    }),
-    // NEXT LINE REPLACED TO SET TOKEN LABEL TO 'SEARCH_FIELD' CONTENTS INSTEAD OF 'name' AS HARD-CODED SELECTION
-	  contacts[Element.readAttribute(item,'value')][SEARCH_FIELD],
+        value: value_to_add
+      }),
+      // NEXT LINE REPLACED TO SET TOKEN LABEL TO 'SEARCH_FIELD' CONTENTS INSTEAD OF 'name' AS HARD-CODED SELECTION
+	    SUGGESTIONS_ARRAY[Element.readAttribute(item,'value')][SEARCH_FIELD],
         Builder.node('span',{"class":'x',onmouseout:"this.className='x'",onmouseover:"this.className='x_hover'",
         onclick:"this.parentNode.parentNode.parentNode.parentNode.parentNode.remove(true); return false;"}," ")
         ]
-    )
-    )
-    )   
-    )
-	);  
-	// NEXT LINE IS COMMENTED OUT, BECAUSE IT WAS MAKING ERRORS IN InternetExplorer 
-	//$(token).down(4).next().innerHTML = "&nbsp;";
- 	new Token(token,hidden_input);
-   $('autocomplete_display').insert({before:token});
+      )
+      )
+      )   
+      )
+	  );  
+	  // NEXT LINE IS COMMENTED OUT, BECAUSE IT WAS MAKING ERRORS IN InternetExplorer 
+	  //$(token).down(4).next().innerHTML = "&nbsp;";
+ 	  new Token(token,HIDDEN_INPUT);
+    $('autocomplete_display').insert({before:token});
+  }
+  else {
+    alert('You have already added this value!');
+  }
 }
 
 
@@ -499,7 +553,7 @@ addUnrecognizedItemToList = function(item) {
    );  
   // NEXT LINE IS COMMENTED OUT, BECAUSE IT WAS MAKING ERRORS IN InternetExplorer
 	//$(token).down(4).next().innerHTML = "&nbsp;";
-   new Token(token,hidden_input);
+   new Token(token,HIDDEN_INPUT);
    $('autocomplete_display').insert({before:token});
 }
 
@@ -514,6 +568,19 @@ function getRecognizedSelectedIDs(){
     res[i] = x[i].value;
   
   return(res);
+}
+
+
+function notYetAdded(value) {
+  var added_values = getRecognizedSelectedIDs();
+  
+  for(var i = 0; i < added_values.length; i++)
+    if(added_values[i] == value) {
+      return(false);
+      break;
+    }
+  
+  return(true);
 }
 
 
@@ -557,7 +624,7 @@ function prepopulateTextField(item_id_array) {
    <label for="autocomplete_display">To:</label>
   
 	<div>
-    <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('autocomplete_input').focus()">
+    <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('autocomplete_input').focus()" style="width: 355px;">
       <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="hidden_input" tabindex="-1"></span>
       
       <div id="autocomplete_display" class="tokenizer_input">
