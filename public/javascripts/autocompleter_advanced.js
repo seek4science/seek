@@ -560,6 +560,8 @@ addUnrecognizedItemToList = function(item) {
 
 // *****************************************************
 
+// gets an array of item IDs that are currently selected as tokens in the
+// autocomplete field
 function getRecognizedSelectedIDs(){
   var x=document.getElementsByName("selected_ids[]");
   
@@ -571,6 +573,21 @@ function getRecognizedSelectedIDs(){
 }
 
 
+// removes any tokens currently present in the autocomplete text field
+function deleteAllTokens() {
+  var x=$$('a.token');
+  count = x.length;
+  
+  for(var i = count - 1; i >= 0; i--) {
+    x[i].remove();
+  }
+  
+  return(count);
+}
+
+
+// checks if the item with ID == "value" is currently added into the
+// autocomplete text_field
 function notYetAdded(value) {
   var added_values = getRecognizedSelectedIDs();
   
@@ -584,6 +601,8 @@ function notYetAdded(value) {
 }
 
 
+// translates IDs of the items from "item_array" into their corresponding indexes in that
+// array itself
 function itemIDsToJsonArrayIDs(item_id_array) {
   // array to store the "translated" IDs into the integer IDs of the SUGGESTIONS_ARRAY
   var suggestions_array_ids = new Array();
@@ -604,6 +623,15 @@ function itemIDsToJsonArrayIDs(item_id_array) {
 }
 
 
+// returns a value specified by key "key_name" of an element with
+// ID == "json_array_id" from  "item_array"
+function getValueFromJsonArray(json_array_id, key_name) {
+  return(SUGGESTIONS_ARRAY[json_array_id][key_name]);
+}
+
+
+// prepopulates the autocomplete text box with tokens containing
+// items which have item IDs in "item_id_array"
 function prepopulateTextField(item_id_array) {
   var suggestions_array_ids = itemIDsToJsonArrayIDs(item_id_array);
   

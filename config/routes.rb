@@ -30,6 +30,10 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :expertise
   
+  map.resources :favourite_groups,
+    :collection => { :new => :post,
+                     :edit => :post }
+  
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
@@ -78,10 +82,6 @@ ActionController::Routing::Routes.draw do |map|
   
   # used by the "sharing" form to get settings from an existing policy 
   map.request_policy_settings '/policies/request_settings', :controller => 'policies', :action => 'send_policy_data'
-  
-  # routes for favourite
-  map.new_favourite_group '/favourite_groups/new_popup', :controller => 'favourite_groups', :action => 'new_popup', :conditions => { :method => :post }
-  map.edit_favourite_group '/favourite_groups/:id/edit_popup', :controller => 'favourite_groups', :action => 'edit_popup', :conditions => { :method => :post }
   
   map.root :controller=>"home"
 

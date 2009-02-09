@@ -266,6 +266,9 @@
   GET_INSTITUTIONS_LINK = '<%= request_institutions_projects_path -%>';
   GET_ALL_INSTITUTIONS_LINK = '<%= request_all_institutions_path -%>';
 	
+	CREATE_FAVOURITE_GROUP_LINK = '<%= favourite_groups_path -%>';
+	
+	
 	<% @policy.permissions.each do |p| -%>
 	  <% case p.contributor_type; when "FavouriteGroup", "Person", "Project", "Institution" -%>
 		  <% unless p.contributor_type == "FavouriteGroup" && [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name) -%>

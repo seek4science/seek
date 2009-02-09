@@ -1,6 +1,11 @@
 class FavouriteGroup < ActiveRecord::Base
-  validates_uniqueness_of :name
-  validates_presence_of   :access_type
+  validates_presence_of :name
+  
+  # allow same group names, but only if these belong to different users
+  validates_uniqueness_of :name, :scope => :user_id
+  
+  has_many :favourite_group_memberships, :dependent => :destroy
+  
   
   # constants containing names of white/black list groups;
   # these groups are to be stored per user within favourite_groups table -

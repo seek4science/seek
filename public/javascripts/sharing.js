@@ -19,12 +19,17 @@ GET_POLICY_DEFAULTS_LINK = null;
 GET_INSTITUTIONS_LINK = null;
 GET_ALL_INSTITUTIONS_LINK = null;
 
+CREATE_FAVOURITE_GROUP_LINK = null;
+
+
 var policy_settings = new Object();
 var permissions_for_set = {};
 var permission_settings = new Array();
 
 var receivedPolicySettings = null;
 var receivedProjectInstitutions = null;
+
+var currentFavouriteGroupSettings = {};
 
 
 function init_sharing() {
@@ -516,12 +521,43 @@ function addProjectInstitution() {
 
 // ***************  Favourite Groups  *****************
 
-function addMembersToFavouriteGroup() {
+function updateGroupMembers() {
+  // iterate through all currently selected members and display them
+  
+  var group_members = '';
+  
+  for(id in currentFavouriteGroupSettings) {
+    //alert(id + "\n" + currentFavouriteGroupSettings[id]);
+    member_name = getValueFromJsonArray(itemIDsToJsonArrayIDs([id])[0], 'name');
+    group_members += member_name
+                  + '&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(currentFavouriteGroupSettings[id]) +')</span>' 
+                  + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' 
+                  + '[<a href="" onclick="javascript:deleteGroupMember('+ id +'); return(false);">delete</a>]</small><br/>';
+  }
+    
+  // remove the last line break
+  if(group_members.length > 0) {
+    group_members = group_members.slice(0,-5);
+  }
+  
+  
+  // update the page
+  if(group_members.length == 0) {
+    $('group_member_list').innerHTML = '<span class="none_text">No one</span>';
+  }
+  else {
+    $('group_member_list').innerHTML = group_members;
+  }
+}
+
+
+function addGroupMembers() {
 	var selIDs = getRecognizedSelectedIDs();
 	
 	if(selIDs == "") {
 		// no people to add
 		alert("Please choose people to add to your favourite group!");
+		return(false);
 	}
 	else {
 		// some people to add - known that don't have duplicates
@@ -530,49 +566,105 @@ function addMembersToFavouriteGroup() {
 		var duplicates_found = false;
 		
 		for(var i = 0; i < selIDs.length; i++) {
-		  // TODO add people to the list
-			alert(selIDs[i]);
+		  id = parseInt(selIDs[i]);
+		  if(currentFavouriteGroupSettings[id] == null)
+		    currentFavouriteGroupSettings[id] = parseInt($('group_access_type_select').options[$('group_access_type_select').selectedIndex].value);
+		  else
+		    duplicates_found = true;
 		}
 			
 	  if(duplicates_found) {
 			alert("Some of the people added successfully, but some duplicates were encountered - these were skipped.");
 		}
+		
+		
+		// remove all tokens from autocomplete text box and update the current selection list 
+		deleteAllTokens();
+		updateGroupMembers();
+		
+  	return(!duplicates_found);
 	}
 }
 
 
-function postFavouriteGroupData() {
+function deleteGroupMember(member_id) {
+  delete currentFavouriteGroupSettings[member_id];
+  updateGroupMembers();
+}
+
+
+function postFavouriteGroupData(new_group) {
+  // check if the name is present
+  if($('group_name').value.length == 0) {
+    alert('Please specify the name for this group');
+    $('group_name').focus();
+    return(false);
+  }
+  
+  
+  // check if no tokens remain in the autocomplete text box
+  if(getRecognizedSelectedIDs() != "") {
+    alert('You didn\'t press "Add" link to add members from the autocomplete field');
+    $('autocomplete_input').focus();
+    return(false);
+  }
+  
+  
+  // check if some members are added
+  var count = 0;
+  for(id in currentFavouriteGroupSettings)
+    count++;
+  
+  if(count == 0) {
+    alert('Please add members to this group');
+    $('autocomplete_input').focus();
+    return(false);
+  }
+  
+  
   $('fav_group_loading_spinner').style.display = "inline";
   
-  request = new Ajax.Request("/people", 
+  request = new Ajax.Request(CREATE_FAVOURITE_GROUP_LINK, 
                              { method: 'post',
-                               parameters: {val: $('my_hidden_field').value},
+                               parameters: {favourite_group_name: $('group_name').value,
+                                            favourite_group_members: Object.toJSON(currentFavouriteGroupSettings)},
                                onSuccess: function(transport){       
                                  $('fav_group_loading_spinner').style.display = "none";
-                                 alert('success');
+                                 
                                  // "true" parameter to evalJSON() activates sanitization of input
                                  var data = transport.responseText.evalJSON(true);
                                  
-                                 alert(data);
-                                 
-                                 //if (data.status == 200) {
-                                 //  msg = data.found_exact_match ? 'Default policy found and loaded' : 'Couldn\'t find default policy for this Project,\nsystem defaults loaded instead.'
-                                 //  alert(msg);
+                                 if (data.status == 200) {
+                                   // reload list of favourite groups
+                                   $('favourite_group_select').options.length = 0;
+                                   for(var i = 0; i < data.favourite_groups.length; i++) {
+                                     $('favourite_group_select').options[i] = new Option(data.favourite_groups[i][0], data.favourite_groups[i][1]);
+                                   }
                                    
-                                 //  receivedPolicySettings = data;
-                                   
-                                 //  parsePolicyJSONData(data);
-                                 //  updateSharingSettings();
-                                 //}
-                                 //else {
-                                 //  error_status = data.status;
-                                 //  error_message = data.error
-                                 //  alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
-                                 //}
+                                   // if this is creation of a new group and need to share with it, add it to
+                                   // "shared_with" list
+                                   if(new_group && $('group_sharing_required').checked) {
+                                     addContributor(data.group_class_name, data.group_name, data.group_id, DETERMINED_BY_GROUP);
+                                     RedBox.close();
+                                     return(true);
+                                   }
+                                   else {
+                                     // do nothing else, close the modal popup window
+                                     RedBox.close();
+                                     return(true);
+                                   }
+                                 }
+                                 else {
+                                   error_status = data.status;
+                                   error_message = data.error
+                                   alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
+                                   return(false);
+                                 }
                                },
                                onFailure: function(transport){
                                  $('fav_group_loading_spinner').style.display = "none";
-                                 alert('Something went wrong, please try again...'); 
+                                 alert('Something went wrong, please try again...');
+                                 return(false); 
                                }    
                              });
 
