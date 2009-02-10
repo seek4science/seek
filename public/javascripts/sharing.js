@@ -20,6 +20,7 @@ GET_INSTITUTIONS_LINK = null;
 GET_ALL_INSTITUTIONS_LINK = null;
 
 CREATE_FAVOURITE_GROUP_LINK = null;
+UPDATE_FAVOURITE_GROUP_LINK = null;
 
 
 var policy_settings = new Object();
@@ -627,9 +628,11 @@ function postFavouriteGroupData(new_group) {
   
   $('fav_group_loading_spinner').style.display = "inline";
   
-  request = new Ajax.Request(CREATE_FAVOURITE_GROUP_LINK, 
+  request_link = (new_group ? CREATE_FAVOURITE_GROUP_LINK : UPDATE_FAVOURITE_GROUP_LINK)
+  request = new Ajax.Request(request_link, 
                              { method: 'post',
-                               parameters: {favourite_group_name: $('group_name').value,
+                               parameters: {id: $('f_group_id').value,  // empty ID will be submitted on "create" action, but it doesn't make a difference
+                                            favourite_group_name: $('group_name').value,
                                             favourite_group_members: Object.toJSON(currentFavouriteGroupSettings)},
                                onSuccess: function(transport){       
                                  $('fav_group_loading_spinner').style.display = "none";

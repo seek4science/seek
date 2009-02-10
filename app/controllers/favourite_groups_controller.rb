@@ -4,7 +4,7 @@ class FavouriteGroupsController < ApplicationController
   include WhiteListHelper
   
   before_filter :login_required
-  before_filter :find_favourite_group, :only => [ :edit ]
+  before_filter :find_favourite_group, :only => [ :edit, :update ]
   before_filter :set_no_layout, :only => [ :new, :edit ]
   
   protect_from_forgery :except => [:create, :update, :delete]
@@ -61,6 +61,14 @@ class FavouriteGroupsController < ApplicationController
     respond_to do |format|
       format.js # edit_popup.html.erb
     end
+  end
+  
+  def update
+    puts "==========================="
+    puts "update action"
+    
+    group_name = white_list(params[:favourite_group_name])
+    already_exists = FavouriteGroup.find(:first, :conditions => { :name => group_name, :user_id => current_user.id })
   end
   
   

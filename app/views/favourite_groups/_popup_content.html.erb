@@ -10,6 +10,8 @@
 	<center>
 		<div class="body">
 			<div id="facebook" class="clearfix">
+				<%= hidden_field_tag "f_group_id", @f_group.id -%>
+				
 				<label for="group_name"><strong>Group Name:</strong></label>
 				<%= text_field_tag "group_name", @f_group.name, :class => "to_field_identical", :style => "width: 300px; margin-left: 0.3em; vertical-align: middle;" -%>
 				<br/>
@@ -60,10 +62,12 @@
 						
 				</fieldset>
 				
-				<div style="text-align: left; margin-bottom: 1.3em;">
-					<%= check_box_tag "group_sharing_required", "1", true -%>
-					<label for="group_sharing_required">Share with this group when it is created</label>
-				</div>
+				<% if action_create -%>
+					<div style="text-align: left; margin-bottom: 1.3em;">
+						<%= check_box_tag "group_sharing_required", "1", true -%>
+						<label for="group_sharing_required">Share with this group when it is created</label>
+					</div>
+				<% end -%>
 				  
 			</div>
 			
@@ -92,7 +96,7 @@
 				
 			</script>
 	
-			<%= submit_tag "Create this group", :style => "width: 150px;", :onclick => "javascript: postFavouriteGroupData(true); return(false);" -%>
+			<%= submit_tag ((action_create ? "Create" : "Update") + " this group"), :style => "width: 150px;", :onclick => "javascript: postFavouriteGroupData(#{action_create}); return(false);" -%>
 			<input type="button" value="Cancel" style="width: 150px;" onclick="javascript: RedBox.close(); return(false);" />
 		</div>
 	</center>
