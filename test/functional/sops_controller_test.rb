@@ -22,7 +22,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should create sop" do
     assert_difference('Sop.count') do
-      post :create, :sop => { }
+      post :create, :sop => {:data=>fixture_file_upload('files/little_file.txt'), :title=>"test" }
     end
 
     assert_redirected_to sop_path(assigns(:sop))
@@ -39,7 +39,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should update sop" do
-    put :update, :id => sops(:one).id, :sop => { }
+    put :update, :id => sops(:one).id, :sop => {:title=>"test" }
     assert_redirected_to sop_path(assigns(:sop))
   end
 

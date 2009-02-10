@@ -11,5 +11,5 @@
 
 one:
   id: 1
-  data: <%= load_blob_data('file_picture.png') -%>
+  data: <%= load_blob_data('file_picture.png') %>
              
