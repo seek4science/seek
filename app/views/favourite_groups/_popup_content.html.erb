@@ -81,6 +81,15 @@
 						validation_type: "only_suggested"
 			  });
 			  var hidden_input = new HiddenInput('hidden_input',typeahead);
+				
+				
+				// ---------------------------------------------------------
+				// prepopulate list of people in the group on page load
+				<% @f_group.favourite_group_memberships.each do |memb| -%>
+				  currentFavouriteGroupSettings[<%= memb.person_id -%>] = <%= memb.access_type -%>;
+				<% end -%>
+				updateGroupMembers();
+				
 			</script>
 	
 			<%= submit_tag "Create this group", :style => "width: 150px;", :onclick => "javascript: postFavouriteGroupData(true); return(false);" -%>

@@ -49,7 +49,7 @@ class FavouriteGroupsController < ApplicationController
         if created
           render :json => {:status => 200, :group_class_name => new_group.class.name, :group_name => new_group.name, :group_id => new_group.id, :favourite_groups => users_favourite_groups }
         elsif already_exists
-          render :json => {:status => 403, :error_message => "You already have a favourite group with such name." }
+          render :json => {:status => 403, :error_message => "You already have a favourite group with such name.\nPlease change it and try again." }
         else
           render :json => {:status => 500, :error_message => "Couldn't create favourite group." }
         end
@@ -71,8 +71,6 @@ class FavouriteGroupsController < ApplicationController
     
     if f_group
       @f_group = f_group
-      puts "================="
-      puts @f_group.name
     else
       respond_to do |format|
         flash[:error] = "You are not authorized to perform this action"
