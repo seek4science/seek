@@ -64,11 +64,79 @@ class FavouriteGroupsController < ApplicationController
   end
   
   def update
-    puts "==========================="
-    puts "update action"
-    
     group_name = white_list(params[:favourite_group_name])
-    already_exists = FavouriteGroup.find(:first, :conditions => { :name => group_name, :user_id => current_user.id })
+    found = FavouriteGroup.find(:first, :conditions => { :name => group_name, :user_id => current_user.id })
+    
+    # if the found group with the same is the current one - that's fine; otherwise - can't rename a group with such new name 
+    unless found.nil?
+      already_exists = (found.id != @f_group.id)
+    else
+      already_exists = false
+    end
+    
+    unless already_exists
+      # SYNCHRONIZE GROUP MEMBERS
+      changes_made = false
+      group_members = ActiveSupport::JSON.decode(white_list(params[:favourite_group_members]))
+
+      # first delete any old memberships that are no longer valid
+      @f_group.favourite_group_memberships.each do |memb|
+        unless group_members[memb.person_id.to_s]
+          memb.destroy
+          changes_made = true
+        end
+      end
+      # this is required to leave the association of @f_group with its memberships in the correct state; otherwise exception is thrown
+      @f_group.reload if changes_made
+      
+      
+      # update the remaining old memberships if the access type has changed for them
+      @f_group.favourite_group_memberships.each do |memb|
+        unless memb.access_type == group_members[memb.person_id.to_s]
+          memb.access_type = group_members[memb.person_id.to_s]
+          memb.save!
+          changes_made = true
+        end
+      end
+      
+      # now add any remaining new memberships
+      group_members.each do |new_memb|
+        person_id = new_memb[0].to_i
+        person_access_type = new_memb[1]
+        unless (found = FavouriteGroupMembership.find(:first, :conditions => { :person_id => person_id, :favourite_group_id => @f_group.id }))
+          FavouriteGroupMembership.create(:person_id => person_id, :access_type => person_access_type, :favourite_group_id => @f_group.id)
+          changes_made = true
+        end
+      end
+      
+      
+      # UPDATE THE GROUP
+      unless @f_group.name == group_name
+        @f_group.name = group_name
+        changes_made = true
+      end
+      
+      
+      # CHECK IF THE MAIN GROUP RECORD NEEDS TO BE RESAVED
+      if changes_made
+        @f_group.save
+      end
+    
+    
+      # ..also while results of this are being sent back, send the updated favourite group list for current user
+      users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+    end
+    
+    
+    respond_to do |format|
+      format.json {
+        unless already_exists
+          render :json => {:status => 200, :group_class_name => @f_group.class.name, :group_name => @f_group.name, :group_id => @f_group.id, :favourite_groups => users_favourite_groups }
+        else already_exists
+          render :json => {:status => 403, :error_message => "You already have a favourite group with such name.\nPlease change it and try again." }
+        end
+      }
+    end
   end
   
   

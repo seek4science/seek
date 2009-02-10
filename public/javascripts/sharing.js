@@ -293,7 +293,11 @@ function deleteContributor(contributor_type, contributor_id) {
   permissions_for_set[contributor_type]--;
   
   // remove the actual record for the contributor
-  permission_settings[contributor_type].splice(contributor_id, 1);
+  for(var i = 0; i < permission_settings[contributor_type].length; i++)
+    if(permission_settings[contributor_type][i][1] == contributor_id) {
+      permission_settings[contributor_type].splice(i, 1);
+      break;
+    }
   
   // update the page
   updateCustomSharingSettings();
@@ -655,7 +659,13 @@ function postFavouriteGroupData(new_group) {
                                      return(true);
                                    }
                                    else {
-                                     // do nothing else, close the modal popup window
+                                     // if the group was in the "shared_with" list do the following:
+                                     // - remove / re-add current group + refresh the "shared_with" list in case any of the favourite group names have changed;
+                                     // - then close the modal popup window
+                                     if(! checkContributorNotInList(data.group_class_name, data.group_id)) {
+                                       deleteContributor(data.group_class_name, data.group_id);
+                                       addContributor(data.group_class_name, data.group_name, data.group_id, DETERMINED_BY_GROUP);
+                                     }
                                      RedBox.close();
                                      return(true);
                                    }
