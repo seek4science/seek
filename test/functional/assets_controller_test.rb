@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class AssetsControllerTest < ActionController::TestCase
+
+  fixtures :assets
+
   test "should get index" do
     get :index
     assert_response :success
