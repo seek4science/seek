@@ -63,11 +63,23 @@ class FavouriteGroupsController < ApplicationController
     end
   end
   
+  
   private
   
   def find_favourite_group
-    # TODO replace with a proper "find"
-    @f_group = FavouriteGroup.new
+    f_group = FavouriteGroup.find(params[:id], :conditions => { :user_id => current_user.id } )
+    
+    if f_group
+      @f_group = f_group
+      puts "================="
+      puts @f_group.name
+    else
+      respond_to do |format|
+        flash[:error] = "You are not authorized to perform this action"
+        format.html { redirect_to person_path(current_user.person) }
+      end
+      return false
+    end
   end
   
 end
