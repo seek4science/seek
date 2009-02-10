@@ -17,7 +17,7 @@ aaron:
   email: aaron@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
-  created_at: <%= 1.days.ago.to_s :db %>
+  created_at: <%= 1.days.ago.to_s :db %>  
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
   person_id: 2
   is_admin: false
@@ -59,6 +59,19 @@ can_edit:
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
   person_id: 12
+  is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
+
+#a user that is not activated and has no profile associated
+part_registered:
+  id: 6
+  login: part_registered
+  email: fred@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
   is_admin: false
   can_edit_projects: true
   can_edit_institutions: true

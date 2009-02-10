@@ -5,9 +5,10 @@ class SessionsController < ApplicationController
   
   # render new.rhtml
   def new
+    
   end
 
-  def create
+  def create    
     self.current_user = User.authenticate(params[:login], params[:password])
     if logged_in?
       if params[:remember_me] == "1"
@@ -17,7 +18,7 @@ class SessionsController < ApplicationController
       #if the person has registered but has not yet selected a profile then go to the select person page
       #otherwise login normally
       if current_user.person.nil?
-          redirect_to(select_people_path)
+        redirect_to(select_people_path)
       else
         respond_to do |format|
           flash[:notice] = "Logged in successfully"
@@ -40,8 +41,22 @@ class SessionsController < ApplicationController
         end
       end            
     else
-      flash[:error] = "Invalid login"      
-      redirect_to :action => 'new'
+      #check if user is part way through registration processes      
+      user=User.find_by_login(params[:login])      
+      if !user.nil? && !user.active? && user.authenticated?(params[:password])
+        if (user.person.nil?)
+          flash[:notice]="You need to continue selecting a profile"
+          session[:user_id]=user.id
+          redirect_to select_people_path
+        else
+          flash[:error]="You still need to activate your account. You should have been sent a validation email."
+          redirect_to :action=>"new"
+        end
+      else
+        flash[:error] = "Invalid login"
+        redirect_to :action => 'new'
+      end
+      
     end
   end
 

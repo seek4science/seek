@@ -51,7 +51,7 @@ class SessionsControllerTest < Test::Unit::TestCase
     post :create, :login => 'quentin', :password => 'test', :remember_me => "0"
     assert_nil @response.cookies["auth_token"]
   end
-  
+
   def test_should_delete_token_on_logout
     login_as :quentin
     get :destroy
@@ -78,6 +78,28 @@ class SessionsControllerTest < Test::Unit::TestCase
     @request.cookies["auth_token"] = auth_token('invalid_auth_token')
     get :new
     assert !@controller.send(:logged_in?)
+  end
+
+  def test_non_validated_user_should_redirect_to_new_with_message
+    post :create, :login => 'aaron', :password => 'test'
+    assert !session[:user_id]
+    assert_redirected_to :action=>"new"
+    assert_not_nil flash.now[:error]
+    assert flash.now[:error].include?("need to activate")
+  end
+
+  def test_partly_registed_user_should_redirect_to_select
+    post :create, :login => 'part_registered', :password => 'test'
+    assert session[:user_id]
+    assert_equal users(:part_registered).id,session[:user_id]
+    assert_not_nil flash.now[:notice]
+    assert_redirected_to select_people_path
+  end
+  
+  def test_invalid_user_should_not_login
+    post :create, :login => 'fred', :password => 'blogs'
+    assert !session[:user_id]
+    assert_redirected_to :action => "new"
   end
 
   protected
