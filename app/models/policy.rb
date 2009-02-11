@@ -118,10 +118,12 @@ class Policy < ActiveRecord::Base
     
     
     # now add any remaining new memberships
-    contributor_types.each do |contributor_type|
-      new_permission_data["#{contributor_type}"].each do |p|
-        unless (found = Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}))
-          Permission.create(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"], :policy_id => policy.id)
+    if contributor_types && contributor_types.length > 0
+      contributor_types.each do |contributor_type|
+        new_permission_data["#{contributor_type}"].each do |p|
+          unless (found = Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}))
+            Permission.create(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"], :policy_id => policy.id)
+          end
         end
       end
     end
