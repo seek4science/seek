@@ -13,6 +13,11 @@
 <input type="hidden" id="const_downloading" value="<%= Policy::DOWNLOADING -%>">
 <input type="hidden" id="const_editing" value="<%= Policy::EDITING -%>">
 
+
+<% # this hidden input will submit all permission data with the form -%>
+<%= hidden_field_tag "sharing[permissions][contributor_types]", "" -%>
+<%= hidden_field_tag "sharing[permissions][values]", "" -%>
+
 <% # @resource_type -%>
 <% # @favourite_groups -%>
 <% # @all_projects -%>
@@ -141,6 +146,7 @@
 						<td style="width: 50%;">
 						  <div class="box_editing_inner2" style="height: 130px;">
 						  	<p style="margin: 1em 0; padding: 0; line-height: 1; font-weight: bold; text-align: center;">
+									<%= image_tag method_to_icon_filename("spinner"), :id => "f_group_deleting_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
 								  <%= help_icon("Select from your favourite groups.") -%>
 									My Favourite Groups
 								</p>
@@ -158,7 +164,10 @@
 								<ul style="text-align: left; margin: 1em 0 0.5em 2em;">
 									<!-- TODO : activate links -->
 									<li id="edit_f_group_li" style="list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit() -%></li>
-									<li id="create_f_group_li" style="list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_new() -%></li>
+									<li id="delete_f_group_li" style="list-style-type: disc; padding: 0;">
+									  <%= link_to "Delete selected favourite group", delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
+									</li>
+									<li id="create_f_group_li" style="list-style-type: disc; padding: 0.5em 0 0 0;"><%= favourite_group_popup_link_action_new() -%></li>
 								</ul>
 						  </div>
 						</td>

@@ -242,7 +242,7 @@ function updateCustomSharingSettings() {
       shared_with += '<b>' + contributor_type + '</b>: ' + permission_settings[contributor_type][i][0]
                            + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>' 
                            + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' 
-                           + '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ i +'); return(false);">delete</a>]</small><br/>';
+                           + '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">delete</a>]</small><br/>';
     }
     
   // remove the last line break
@@ -258,6 +258,31 @@ function updateCustomSharingSettings() {
   else {
     $('shared_with_list').innerHTML = shared_with;
   }
+  
+  
+  // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
+  $('sharing_permissions_contributor_types').value = "";
+  $('sharing_permissions_values').value = "";
+  
+  for(contributor_type in permissions_for_set) {
+    // assemble all permission data for current contributor type in a hash
+    if(permission_settings[contributor_type].length > 0) {
+	    $('sharing_permissions_contributor_types').value += "\"" + contributor_type + "\", ";
+	    $('sharing_permissions_values').value += "\"" + contributor_type + "\"" + ": {"
+	    
+	    for(var i = 0; i < permission_settings[contributor_type].length; i++) {
+	      $('sharing_permissions_values').value += permission_settings[contributor_type][i][1] + ": {\"access_type\": " + permission_settings[contributor_type][i][2] + "}, ";
+	    }
+	    
+	    // "-2" in slice() required to remove the last joining comma and space from hash 
+	    $('sharing_permissions_values').value = $('sharing_permissions_values').value.slice(0,-2);
+	    $('sharing_permissions_values').value += "}, ";
+	  }
+  }
+  
+  // "-2" in slice() required to remove the last joining comma and space from arrays 
+  $('sharing_permissions_values').value = "{" + $('sharing_permissions_values').value.slice(0,-2) + "}";
+  $('sharing_permissions_contributor_types').value = "[" + $('sharing_permissions_contributor_types').value.slice(0,-2) + "]";
 }
 
 
@@ -693,11 +718,68 @@ function postFavouriteGroupData(new_group) {
 }
 
 
+function deleteSelectedFavouriteGroup() {
+  var warning_msg = 'Are you sure you want to delete this group?\n\nPlease note that it will be deleted permanently and'
+                  + ' any assets shared with that group will no longer be accessible to its former members';
+  
+  if( ! confirm(warning_msg) ) {
+    return(false);
+  }
+  
+  
+  $('f_group_deleting_spinner').style.display = "inline";
+  
+  delete_link = $('delete_f_group_li').firstDescendant().href;
+  request = new Ajax.Request(delete_link, 
+                             { method: 'delete',
+                               parameters: {},
+                               onSuccess: function(transport){       
+                                 $('f_group_deleting_spinner').style.display = "none";
+                                 
+                                 // "true" parameter to evalJSON() activates sanitization of input
+                                 var data = transport.responseText.evalJSON(true);
+                                 
+                                 if (data.status == 200) {
+                                   // reload list of favourite groups
+                                   $('favourite_group_select').options.length = 0;
+                                   for(var i = 0; i < data.favourite_groups.length; i++) {
+                                     $('favourite_group_select').options[i] = new Option(data.favourite_groups[i][0], data.favourite_groups[i][1]);
+                                   }
+                                   
+                                   
+                                   // check if deleted group was in "shared_with" list - if so, remove it & refresh list
+                                   if(! checkContributorNotInList(data.group_class_name, data.group_id)) {
+                                     deleteContributor(data.group_class_name, data.group_id);
+                                   } 
+                                   
+                                   alert('Favourite group deleted successfully'); 
+                                   return(true);
+                                 }
+                                 else {
+                                   error_status = data.status;
+                                   error_message = data.error_message;
+                                   alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
+                                   return(false);
+                                 }
+                               },
+                               onFailure: function(transport){
+                                 $('f_group_deleting_spinner').style.display = "none";
+                                 alert('Something went wrong, please try again...');
+                                 return(false); 
+                               }    
+                             });
+  
+}
+
+
 // links to RedBox popups are very complex and need to be generated by Ruby code
 // at the server side; however, for 'edit' / 'delete' links ID of the favourite
 // group is required, hence a JavaScript helper is needed to add this ID to the URL
 // at runtime at client side
 function replaceFavouriteGroupRedboxActionURL() {
+  
+  // **************** EDIT LINK ******************
+  
   var search_str = 'parameters:';
   var search_str_id = '\'id\': \'';
   var search_str_auth_token = '\'authenticity_token=\' + encodeURIComponent(\'';
@@ -736,7 +818,18 @@ function replaceFavouriteGroupRedboxActionURL() {
 	
 	// set the replaced HTML
 	main_ancestor_element.innerHTML = replace_string;
-
+  
+  
+  // **************** DELETE LINK ******************
+  // read the old url and extract the base part
+  var old_delete_url = $('delete_f_group_li').firstDescendant().href;
+  var last_idx_to_use = old_delete_url.lastIndexOf('/') + 1; // -1 to compensate for the removed slash
+  var delete_url_base = old_delete_url.substring(0, last_idx_to_use);
+  
+  // set the new url
+  $('delete_f_group_li').firstDescendant().href = delete_url_base + parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value);
+  
+  
   return(true);
 }
 

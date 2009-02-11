@@ -36,7 +36,7 @@ ActionController::Routing::Routes.draw do |map|
   map.create_favourite_group '/favourite_groups/create', :controller => 'favourite_groups', :action => 'create', :conditions => { :method => :post }
   map.edit_favourite_group '/favourite_groups/edit', :controller => 'favourite_groups', :action => 'edit', :conditions => { :method => :post }
   map.update_favourite_group '/favourite_groups/update', :controller => 'favourite_groups', :action => 'update', :conditions => { :method => :post }
-  map.delete_favourite_group '/favourite_groups/delete', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
+  map.delete_favourite_group '/favourite_groups/:id', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
   
   # The priority is based upon order of creation: first created -> highest priority.
 

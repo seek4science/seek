@@ -4,10 +4,10 @@ class FavouriteGroupsController < ApplicationController
   include WhiteListHelper
   
   before_filter :login_required
-  before_filter :find_favourite_group, :only => [ :edit, :update ]
+  before_filter :find_favourite_group, :only => [ :edit, :update, :destroy ]
   before_filter :set_no_layout, :only => [ :new, :edit ]
   
-  protect_from_forgery :except => [:create, :update, :delete]
+  protect_from_forgery :except => [:create, :update, :destroy]
   
   
   def new
@@ -135,6 +135,25 @@ class FavouriteGroupsController < ApplicationController
         else already_exists
           render :json => {:status => 403, :error_message => "You already have a favourite group with such name.\nPlease change it and try again." }
         end
+      }
+    end
+  end
+  
+  
+  def destroy
+    # these parameters will be needed for the client-side processing
+    class_name = @f_group.class.name
+    group_name = @f_group.name
+    group_id = @f_group.id
+    @f_group.destroy
+    
+    
+    # ..also while results of this are being sent back, send the updated favourite group list for current user
+    users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
+      
+    respond_to do |format|
+      format.json {
+        render :json => {:status => 200, :group_class_name => class_name, :group_name => group_name, :group_id => group_id, :favourite_groups => users_favourite_groups }
       }
     end
   end

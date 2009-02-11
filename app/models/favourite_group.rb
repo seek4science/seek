@@ -5,6 +5,7 @@ class FavouriteGroup < ActiveRecord::Base
   validates_uniqueness_of :name, :scope => :user_id
   
   has_many :favourite_group_memberships, :dependent => :destroy
+  has_many :permissions, :as => :contributor, :dependent => :destroy
   
   
   # constants containing names of white/black list groups;

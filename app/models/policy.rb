@@ -35,6 +35,10 @@ class Policy < ActiveRecord::Base
   EDITING = 3               # downloading, viewing and editing
   OWNER = 4                 # any actions that owner of the asset can perform (including "destroy"ing)
   
+  
+  # "true" value for flag-type fields
+  TRUE_VALUE = 1
+  FALSE_VALUE = 0
   # *****************************************************************************
   
   
@@ -46,38 +50,83 @@ class Policy < ActiveRecord::Base
     # goes wrong and a revert would be needed at some point
     last_saved_policy = nil
     
+    # obtain parameters from params[] hash
+    sharing_scope = params[:sharing][:sharing_scope].to_i
+    access_type = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::NO_ACCESS : params[:sharing]["access_type_#{sharing_scope}"])
+    use_custom_sharing = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : params[:sharing]["include_custom_sharing_#{sharing_scope}"])
+    use_whitelist = params[:sharing][:use_whitelist]
+    use_blacklist = params[:sharing][:use_blacklist]
+    
     
     # PROCESS THE POLICY FIRST
     unless resource.asset.policy
       #last_saved_policy = Policy._default(current_user, nil) # second parameter ensures that this policy is not applied anywhere
       
+      
       policy = Policy.new(:name => 'auto',
                           :contributor_type => 'User',
                           :contributor_id => current_user.id,
-                          :sharing_scope => 0, # TODO get this from parameter hash
-                          :access_type => 0, # TODO
-                          :use_custom_sharing => false, # TODO
-                          :use_whitelist => false, # TODO
-                          :use_blacklist => false) # TODO
+                          :sharing_scope => sharing_scope,
+                          :access_type => access_type,
+                          :use_custom_sharing => use_custom_sharing,
+                          :use_whitelist => use_whitelist,
+                          :use_blacklist => use_blacklist)
       resource.asset.policy = policy  # by doing this the new policy object is saved implicitly too
       resource.asset.save
     else
        policy = resource.asset.policy
        #last_saved_policy = policy.clone # clone required, not 'dup' (which still works through reference, so the values in both get changed anyway - which is not what's needed here)
        
-       policy.sharing_scope = 1 # TODO set all attributes into policy
-       policy.access_type = 1 # TODO
-       policy.use_custom_sharing = true # TODO
-       policy.use_whitelist = true # TODO
-       policy.use_blacklist = true # TODO
+       policy.sharing_scope = sharing_scope
+       policy.access_type = access_type
+       policy.use_custom_sharing = use_custom_sharing
+       policy.use_whitelist = use_whitelist
+       policy.use_blacklist = use_blacklist
        policy.save
     end
     
     
     # NOW PROCESS THE PERMISSIONS
-    # TODO
-    # TODO
+    # policy of an asset; pemissions will be applied to it
+    policy = resource.asset.policy
     
+    # read the permission data from params[]
+    contributor_types = ActiveSupport::JSON.decode(params[:sharing][:permissions][:contributor_types])
+    new_permission_data = ActiveSupport::JSON.decode(params[:sharing][:permissions][:values])
+    
+    
+    # --- Synchronise All Permissions for the Policy ---
+    # first delete any old memberships that are no longer valid
+    changes_made = false
+    policy.permissions.each do |p|
+      unless (new_permission_data["#{p.contributor_type}"] && new_permission_data["#{p.contributor_type}"][p.contributor_id])
+        p.destroy
+        changes_made = true
+      end
+    end
+    # this is required to leave the association of "policy" with its permissions in the correct state; otherwise exception is thrown
+    policy.reload if changes_made
+    
+    
+    # update the remaining old permissions if the access type has changed for them
+    policy.permissions.each do |p|
+      unless p.access_type == new_permission_data["#{p.contributor_type}"][p.contributor_id]["access_type"].to_i
+        p.access_type = new_permission_data["#{p.contributor_type}"][p.contributor_id]["access_type"].to_i
+        p.save!
+      end
+    end
+    
+    
+    # now add any remaining new memberships
+    contributor_types.each do |contributor_type|
+      new_permission_data["#{contributor_type}"].each do |p|
+        unless (found = Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}))
+          Permission.create(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"], :policy_id => policy.id)
+        end
+      end
+    end
+    
+    # --- Synchronisation is Finished ---
     
     # returns some message in case of errors (or empty string in case of success)
     return error_msg

@@ -431,7 +431,7 @@ module ApplicationHelper
   end
   
   def favourite_group_popup_link_action_edit
-    return link_to_remote_redbox("Edit favourite group", 
+    return link_to_remote_redbox("Edit selected favourite group", 
                                  { :url => edit_favourite_group_url,
                                    :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" }, 
                                  { #:style => options[:style],
