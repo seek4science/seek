@@ -1,0 +1,8 @@
+--- 
+cwd: .
+log_file: log/mongrel.log
+port: "9050"
+environment: production
+address: 130.88.193.108
+pid_file: tmp/pids/mongrel.pid
+servers: 6
