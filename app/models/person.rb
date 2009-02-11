@@ -19,7 +19,7 @@ class Person < ActiveRecord::Base
     
   has_one :user
   
-  acts_as_solr(:fields => [ :first_name, :last_name ]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools ]) if SOLR_ENABLED
   
   def self.userless_people
     p=Person.find(:all)

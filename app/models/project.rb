@@ -30,7 +30,7 @@ class Project < ActiveRecord::Base
 
   acts_as_taggable_on :organisms
   
-  acts_as_solr(:fields => [ :name ]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :name , :organisms]) if SOLR_ENABLED
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|
