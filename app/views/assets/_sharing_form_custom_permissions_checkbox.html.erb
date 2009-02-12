@@ -3,7 +3,7 @@
 <% # 2) sharing_scope - sharing scope in the current policy -%>
 <% # 2) use_custom_sharing - flag denoting, whether this checkbox should appear checked or not -%>
 
-<div id="include_custom_sharing_div_<%= custom_sharing_cb_for_scope -%>" style="display: <%= (custom_sharing_cb_for_scope == sharing_scope && use_custom_sharing) ? "block" : "none"-%>;">
+<div id="include_custom_sharing_div_<%= custom_sharing_cb_for_scope -%>" style="display: <%= (custom_sharing_cb_for_scope == sharing_scope) ? "block" : "none"-%>;">
 	<label for="include_custom_sharing_<%= custom_sharing_cb_for_scope -%>">
 		<input type="checkbox" name="sharing[include_custom_sharing_<%= custom_sharing_cb_for_scope -%>]" id="include_custom_sharing_<%= custom_sharing_cb_for_scope -%>" style="margin: 0 0.3em 0 2em;"
 		       value="1" <%= "checked='checked'" if (custom_sharing_cb_for_scope == sharing_scope && use_custom_sharing) -%> onclick="javascript:setCustomSharingDivVisibility(<%= custom_sharing_cb_for_scope -%>);" />

@@ -43,12 +43,18 @@ class SopsController < ApplicationController
     if (params[:sop][:data]).blank?
       respond_to do |format|
         flash.now[:error] = "Please select a file to upload."
-        format.html { render :action => "new" }
+        format.html { 
+          set_parameters_for_sharing_form()
+          render :action => "new" 
+        }
       end
     elsif (params[:sop][:data]).size == 0
       respond_to do |format|
         flash.now[:error] = "The file that you have selected is empty. Please check your selection and try again!"
-        format.html { render :action => "new" }
+        format.html { 
+          set_parameters_for_sharing_form()
+          render :action => "new" 
+        }
       end
     else
       # create new SOP and content blob - non-empty file was selected
@@ -80,7 +86,10 @@ class SopsController < ApplicationController
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
           end
         else
-          format.html { render :action => "new" }
+          format.html { 
+            set_parameters_for_sharing_form()
+            render :action => "new" 
+          }
         end
       end
     end
@@ -110,7 +119,10 @@ class SopsController < ApplicationController
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
           end
       else
-        format.html { render :action => "edit" }
+        format.html { 
+          set_parameters_for_sharing_form()
+          render :action => "edit" 
+        }
       end
     end
   end

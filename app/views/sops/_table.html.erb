@@ -1,5 +1,6 @@
 <% # this should be set by the caller, this is an extra check -%>
 <% odd_row ||= false -%>
+<% narrow_view ||= false -%>
  
 <table class="list_item">       
 	<tr class="<%= odd_row ? "odd_row" : "even_row" -%>">
@@ -15,13 +16,16 @@
 				<%= link_to(title, sop_path(resource)) -%>
 			</p>
 			
-			<p style="font-size: 85%; margin-top: 0; padding-top: 0;">
+			<p style="font-size:85%; margin-top: 0.3em; padding-top: 0;"><b>Associated project: </b><%= (resource.asset.project ? link_to(h(resource.asset.project.name), project_path(resource.asset.project.id)) : "<span class='none_text'>None</span>" ) -%></p>
+			<p style="font-size: 85%; margin-top: 0.4em;">
 				<b>Created:</b> <%= resource.asset.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
 				<% unless resource.asset.created_at == resource.asset.updated_at -%>
-					|	<b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+					<%= narrow_view ? "<br/>" : " | " -%>
+					<b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
 				<% end %>
 				<% unless resource.asset.last_used_at.nil? -%>
-					|	<b>Last used:</b> <%= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+				  <%= narrow_view ? "<br/>" : " | " -%>
+					<b>Last used:</b> <%= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
 				<% end -%>
 			</p>
 			
@@ -38,12 +42,12 @@
 	
 		<td class="actions" style="width: 80px;">
 	    <%= icon "show", sop_path(resource), nil, nil, "View" -%>
-		  <% #if blob.authorized?("download", current_user) -%>
+		  <% if Authorization.is_authorized?("download", nil, resource, current_user) -%>
 			  <%= icon "download", download_sop_path(resource) -%>
-			<% #end -%>
-	    <% #if mine?(blob) %>
+			<% end -%>
+	    <% if Authorization.is_authorized?("manage", nil, resource, current_user) -%>
 			  <%= icon "manage", edit_sop_path(resource), nil, nil, "Manage" -%>
-			<% #end -%>
+			<% end -%>
 	  </td>
 		
 	</tr>

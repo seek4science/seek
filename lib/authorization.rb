@@ -308,7 +308,7 @@ module Authorization
         action = 'edit'
       when 'download', 'named_download', 'launch', 'submit_job'
         action = 'download'
-      when 'destroy', 'destroy_item'
+      when 'destroy', 'destroy_item', 'manage'
         action = 'destroy'
       when 'execute'
         # action is available only(?) for runners at the moment;
