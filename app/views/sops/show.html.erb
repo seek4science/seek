@@ -1,10 +1,12 @@
+<% truncate_length_for_boxes = 22 -%>
+
 <ul class="sectionIcons">
-	<% #if mine?(@sop) -%>
+	<% if Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
 		<li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
-	<%# end -%>
-	<%# if @sop.authorized?("destroy", current_user) -%>
+	<% end -%>
+	<% if Authorization.is_authorized?("destroy", nil, @sop, current_user) -%>
 		<li><%= icon('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
-	<%# end -%>
+	<% end -%>
 </ul>
 
 <h1 class="contribution_title">SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
@@ -54,16 +56,15 @@
 					Download
 				</h3>
 				
-				<%# if @sop.authorized?("download", current_user) -%>
+				<% if Authorization.is_authorized?("download", nil, @sop, current_user) -%>
 					<ul class="sectionIcons">
 						<li><%= icon('sop', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
 					</ul>
-				<%# else -%>
+				<% else -%>
 					<p class="none_text">
-						THIS WILL BE FIXED WHEN AUTHORIZATION IS IMPLEMENTED
-						You cannot download this File
+						You do not have permissions to download this SOP.
 					</p>
-				<%# end -%>
+				<% end -%>
 			</div>
 		
 		</div>
@@ -72,6 +73,7 @@
 	
 	<div class="contribution_right_box">
 		<%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @sop } -%>
+		<%= render :partial => "assets/resource_associated_with_box", :locals => { :resource => @sop, :truncate_to => truncate_length_for_boxes } -%>
 	</div>
 	
 </div>

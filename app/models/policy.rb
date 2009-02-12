@@ -94,6 +94,13 @@ class Policy < ActiveRecord::Base
     contributor_types = ActiveSupport::JSON.decode(params[:sharing][:permissions][:contributor_types])
     new_permission_data = ActiveSupport::JSON.decode(params[:sharing][:permissions][:values])
     
+    # NB! if "use_custom_sharing" is not set after the policy data was processed - this means that there can be
+    # no more permissions: and any existing ones should be deleted; the line below ensures that the synchronisation
+    # mechanism will "think" that no permission selections were made and all old ones need to be removed 
+    unless (policy.use_custom_sharing == true || policy.use_custom_sharing == Policy::TRUE_VALUE)
+      new_permission_data = {}
+    end
+    
     
     # --- Synchronise All Permissions for the Policy ---
     # first delete any old memberships that are no longer valid
@@ -120,9 +127,11 @@ class Policy < ActiveRecord::Base
     # now add any remaining new memberships
     if contributor_types && contributor_types.length > 0
       contributor_types.each do |contributor_type|
-        new_permission_data["#{contributor_type}"].each do |p|
-          unless (found = Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}))
-            Permission.create(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"], :policy_id => policy.id)
+        if new_permission_data.has_key?(contributor_type)
+          new_permission_data["#{contributor_type}"].each do |p|
+            unless (found = Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}))
+              Permission.create(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"], :policy_id => policy.id)
+            end
           end
         end
       end

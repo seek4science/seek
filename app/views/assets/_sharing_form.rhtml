@@ -158,7 +158,7 @@
 									<%= select_tag "favourite_group_select", f_group_select_options, :onchange => "javascript: replaceFavouriteGroupRedboxActionURL(); return(false);", :style => "width: 82%; vertical-align: middle; margin-right: 0.4em;", :disabled => (favourite_groups.blank?) -%>
 									
 									<%= link_to "Add", "", :id => "add_f_group_link", :style => "font-weight: bold; vertical-align: middle;", :disabled => (favourite_groups.blank?),
-                      :onclick => "javascript: if(this.disabled) return(false); addContributor('FavouriteGroup', $('favourite_group_select').options[$('favourite_group_select').selectedIndex].text, parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value), #{Policy::DETERMINED_BY_GROUP}); return(false);" -%>
+                      :onclick => "javascript: if($('favourite_group_select').disabled) return(false); addContributor('FavouriteGroup', $('favourite_group_select').options[$('favourite_group_select').selectedIndex].text, parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value), #{Policy::DETERMINED_BY_GROUP}); return(false);" -%>
 								</p>
 								
 								<ul style="text-align: left; margin: 1em 0 0.5em 2em;">
