@@ -1,5 +1,5 @@
 --- 
-cwd: .
+cwd: /home/sowen/development/seek-hub-demo/
 log_file: log/mongrel.log
 port: "9050"
 environment: production
