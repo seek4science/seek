@@ -4,9 +4,13 @@ class Person < ActiveRecord::Base
   
   acts_as_editable
     
-  validates_presence_of :name
-    
+  validates_presence_of :name,:email
+
+  validates_format_of :email,:with=>%r{^(?:[_a-z0-9-]+)(\.[_a-z0-9-]+)*@([a-z0-9-]+)(\.[a-zA-Z0-9\-\.]+)*(\.[a-z]{2,4})$}i
+  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+
   validates_associated :avatars
+  
   has_many :avatars,
     :as => :owner,
     :dependent => :destroy

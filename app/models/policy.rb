@@ -10,6 +10,7 @@ class Policy < ActiveRecord::Base
            :order => "created_at ASC"
   
   validates_presence_of :contributor, :sharing_scope, :access_type
+
   validates_numericality_of :sharing_scope, :access_type
   
   

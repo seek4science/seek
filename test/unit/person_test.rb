@@ -83,5 +83,49 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal "Fred Smith-Jones",p.name
   end
 
+  def test_valid
+    p=people(:one)
+    assert p.valid?
+    p.email=nil
+    assert !p.valid?
+
+    p.email="sdf"
+    assert !p.valid?
+
+    p.email="sdf@"
+    assert !p.valid?
+
+    p.email="sdf@com"
+    assert !p.valid?
+
+    p.email="sdaf@sdf.com"
+    assert p.valid?
+
+    p.web_page=nil
+    assert p.valid?
+
+    p.web_page=""
+    assert p.valid?
+
+    p.web_page="sdfsdf"
+    assert !p.valid?
+
+    p.web_page="http://google.com"
+    assert p.valid?
+
+    p.web_page="https://google.com"
+    assert p.valid?
+
+    p.web_page="http://google.com/fred"
+    assert p.valid?
+
+    p.web_page="http://google.com/fred?param=bob"
+    assert p.valid?
+
+    p.web_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
+    assert p.valid?
+  end
+
+
 
 end
