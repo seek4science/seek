@@ -84,6 +84,22 @@
 
       <td class="item_right_table_cell" style="width: 170px;">
         <div>
+          <p class="section_header">Projects</p>
+          <ul>
+            <% unless person.projects.empty? -%>
+              <% for project in person.projects %>
+                <li>
+                  <%= icon("project", nil, "Project", nil, "&nbsp;"); -%>
+                  <%= link_to(truncate(h(project.name), :length=>truncate_projects_institutions_length), url_for(project), :title => tooltip_title_attrib(h(project.name))) -%>
+                </li>
+              <% end  %>
+            <% else -%>
+              <li><span class="none_text" style="margin-left: 1em;">Not known</span></li>
+            <% end -%>
+          </ul>
+        </div>
+
+        <div style="margin-top: 1em;">
           <p class="section_header">Institutions</p>
           <ul>
             <% unless person.institutions.empty? -%>
@@ -101,22 +117,7 @@
               <li><span class="none_text" style="margin-left: 1em;">Not known</span></li>
             <% end -%>
           </ul>
-        </div>
 
-        <div style="margin-top: 1em;">
-          <p class="section_header">Projects</p>
-          <ul>
-            <% unless person.projects.empty? -%>
-              <% for project in person.projects %>
-                <li>
-                  <%= icon("project", nil, "Project", nil, "&nbsp;"); -%>
-                  <%= link_to(truncate(h(project.name), :length=>truncate_projects_institutions_length), url_for(project), :title => tooltip_title_attrib(h(project.name))) -%>
-                </li>
-              <% end  %>
-            <% else -%>
-              <li><span class="none_text" style="margin-left: 1em;">Not known</span></li>
-            <% end -%>
-          </ul>
         </div>
       </td>
     </tr>
