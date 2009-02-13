@@ -4,24 +4,21 @@ one:
   id: 1
   name: Institution1
   address: MyText
-  city: MyString
-  web_page: MyString
+  city: MyString  
   country: MyString
 
 two:
   id: 2
   name: Institution2
   address: MyText
-  city: MyString
-  web_page: MyString
+  city: MyString  
   country: MyString
 
 three:
   id: 3
   name: Institution3
   address: MyText
-  city: MyString
-  web_page: MyString
+  city: MyString  
   country: MyString
 
 #an institution not associated with any workgroups or people
@@ -29,6 +26,5 @@ four:
   id: 4
   name: Institution4
   address: MyText
-  city: MyString
-  web_page: MyString
+  city: MyString  
   country: MyString

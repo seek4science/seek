@@ -32,5 +32,45 @@ class InstitutionTest < ActiveSupport::TestCase
     i=institutions(:two)
     assert !i.can_be_edited_by?(u),"Institution :two should not be editable by user :cant_edit"
   end
+
+  def test_valid
+    i=institutions(:one)
+    assert i.valid?
+
+    i.name=nil
+    assert !i.valid?
+
+    i.name=""
+    assert !i.valid?
+
+    i.name="Name"
+    assert i.valid?
+
+    i.web_page=nil
+    assert i.valid?
+
+    i.web_page=""
+    assert i.valid?
+
+    i.web_page="sdfsdf"
+    assert !i.valid?
+
+    i.web_page="http://google.com"
+    assert i.valid?
+
+    i.web_page="https://google.com"
+    assert i.valid?
+
+    i.web_page="http://google.com/fred"
+    assert i.valid?
+
+    i.web_page="http://google.com/fred?param=bob"
+    assert i.valid?
+
+    i.web_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
+    assert i.valid?
+
+
+  end
   
 end

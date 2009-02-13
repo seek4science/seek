@@ -5,9 +5,11 @@ class Institution < ActiveRecord::Base
   acts_as_editable
   
   validates_presence_of :name
-  validates_uniqueness_of :name
-  
+  validates_uniqueness_of :name  
   validates_associated :avatars
+
+  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+
   has_many :avatars, 
            :as => :owner,
            :dependent => :destroy
