@@ -759,44 +759,6 @@ ul.breadcrumb_list a:hover {
 
 /* end css newsfeed */
 
-.fieldWithErrors {
-	padding: 2px;
-	background-color: red;
-	display: table;
-}
-
-#errorExplanation {
-	width: 400px;
-	border: 2px solid #c00;
-	padding: 0.5empx;
-	margin-bottom: 1.5em;
-	background-color: #F5F5F5;
-}
-
-#errorExplanation h2 {
-	text-align: left;
-	font-weight: bold;
-	padding: 5px 5px 5px 15px;
-	font-size: 93%;
-	margin: 0;
-	background-image: none;
-	background-color: #c00;
-	border: none;
-	color: #fff;
-}
-
-#errorExplanation p {
-	font-size: 93%;
-	color: #333;
-	margin-bottom: 0;
-	margin-top: 0.5em;
-	padding: 5px;
-}
-
-#errorExplanation ul li {
-	font-size: 93%;
-	list-style: square;
-}
 
 div.uploadStatus {
 	margin: 5px;
