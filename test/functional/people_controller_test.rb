@@ -27,7 +27,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_should_create_person
     assert_difference('Person.count') do
-      post :create, :person => {:first_name=>"test" }
+      post :create, :person => {:first_name=>"test",:email=>"test@test.com" }
     end
 
     assert_redirected_to person_path(assigns(:person))

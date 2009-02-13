@@ -3,24 +3,20 @@
 one:
   id: 1
   name: Project1
-  web_page: MyString
-  wiki_page: MyString
+  web_page: "http://www.goggle.com"
+  wiki_page: "http://www.goggle.com"
 
 two:
   id: 2
   name: Project2
-  web_page: MyString
-  wiki_page: MyString
+  
 
 three:
   id: 3
   name: Project3
-  web_page: MyString
-  wiki_page: MyString
-
+  
 #a project not associated with any Workgroups or People
 four:
   id: 4
   name: Project4
-  web_page: MyString
-  wiki_page: MyString
+  

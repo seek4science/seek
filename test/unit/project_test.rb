@@ -66,5 +66,66 @@ class ProjectTest < ActiveSupport::TestCase
     p=projects(:three)
     assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
   end
+
+  def test_valid
+    p=projects(:one)    
+
+    p.web_page=nil
+    assert p.valid?
+
+    p.web_page=""
+    assert p.valid?
+
+    p.web_page="sdfsdf"
+    assert !p.valid?
+
+    p.web_page="http://google.com"
+    assert p.valid?
+
+    p.web_page="https://google.com"
+    assert p.valid?
+
+    p.web_page="http://google.com/fred"
+    assert p.valid?
+
+    p.web_page="http://google.com/fred?param=bob"
+    assert p.valid?
+
+    p.web_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
+    assert p.valid?
+
+    p.wiki_page=nil
+    assert p.valid?
+
+    p.wiki_page=""
+    assert p.valid?
+
+    p.wiki_page="sdfsdf"
+    assert !p.valid?
+
+    p.wiki_page="http://google.com"
+    assert p.valid?
+
+    p.wiki_page="https://google.com"
+    assert p.valid?
+
+    p.wiki_page="http://google.com/fred"
+    assert p.valid?
+
+    p.wiki_page="http://google.com/fred?param=bob"
+    assert p.valid?
+
+    p.wiki_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
+    assert p.valid?
+
+    p.name=nil
+    assert !p.valid?
+
+    p.name=""
+    assert !p.valid?
+
+    p.name="fred"
+    assert p.valid?
+  end
   
 end
