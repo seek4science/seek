@@ -26,16 +26,25 @@
   </p>
   <br/>
   <div id="project_list">
-    <%= select_tag "project_id",
-      options_for_select([["Select project..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
-      {:onchange=>remote_function(
-        :update=>:people_list,
-        :url=>{:action=>"userless_project_selected_ajax"},
-        :with=>"'project_id='+this.value",
-        :before=>"show_ajax_loader()"
-      )
-    }
-    -%>
+    <% if @userless_projects.blank? -%>
+      <p class="box_infotext"  style="text-align:center">
+        There are no available profiles to select from. You should <b><%= link_to_function "create your own" do |page|
+        page.visual_effect :toggle_blind, "profile_selection"
+        page.visual_effect :toggle_blind, "profile_creation"
+      end -%>.</b>
+      </p>
+    <% else %>
+      <%= select_tag "project_id",
+        options_for_select([["Select project..",0]]|@userless_projects.collect {|p| [p.name,p.id]}),
+        {:onchange=>remote_function(
+          :update=>:people_list,
+          :url=>{:action=>"userless_project_selected_ajax"},
+          :with=>"'project_id='+this.value",
+          :before=>"show_ajax_loader()"
+        )
+      }
+      -%>
+    <% end %>
   </div>
 
   <div id="people_list">

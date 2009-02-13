@@ -76,7 +76,15 @@ class PeopleController < ApplicationController
   #people yet to be assigned, or create a new one if you don't exist
   def select
     @userless_projects=Project.with_userless_people
-    @userless_projects.sort!{|a,b|a.name<=>b.name}    
+
+    #strip out project with no people with email addresses
+    #TODO: can be made more efficient by putting into a direct query in Project.with_userless_people - but not critical as this is only used during registration
+    @userless_projects = @userless_projects.select do |proj|
+      !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
+    end
+
+    @userless_projects.sort!{|a,b|a.name<=>b.name}
+
     @person = Person.new
 
     render :action=>"select",:layout=>"logged_out"
@@ -189,7 +197,8 @@ class PeopleController < ApplicationController
     project_id=params[:project_id]
     unless project_id=="0"
       proj=Project.find(project_id)
-      @people=proj.userless_people
+      #ignore people with no email address
+      @people=proj.userless_people.select{|person| !person.email.blank? }
       @people.sort!{|a,b| a.last_name<=>b.last_name}
       render :partial=>"userless_people_list",:locals=>{:people=>@people}
     else

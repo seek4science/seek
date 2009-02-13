@@ -82,6 +82,7 @@ class Project < ActiveRecord::Base
     people.select{|p| p.user.nil?}
   end
 
+
   def includes_userless_people?
     peeps=people
     return peeps.size>0 && !(peeps.find{|p| p.user.nil?}).nil?
