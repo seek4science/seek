@@ -22,7 +22,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should create sop" do
     assert_difference('Sop.count') do
-      post :create, :sop => {:data=>fixture_file_upload('files/little_file.txt'), :title=>"test" }
+      post :create, :sop => {:data=>fixture_file_upload('files/little_file.txt'),:title=>"test"},:sharing=>valid_sharing
     end
 
     assert_redirected_to sop_path(assigns(:sop))
@@ -39,7 +39,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should update sop" do
-    put :update, :id => sops(:one).id, :sop => {:title=>"test" }
+    put :update, :id => sops(:one).id, :sop => {:title=>"Test2"}, :sharing=>valid_sharing
     assert_redirected_to sop_path(assigns(:sop))
   end
 
@@ -49,5 +49,17 @@ class SopsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to sops_path
+  end
+
+  private
+ 
+
+  def valid_sharing
+    {
+      :use_whitelist=>"0",
+      :user_blacklist=>"0",
+      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
+      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
+    }
   end
 end
