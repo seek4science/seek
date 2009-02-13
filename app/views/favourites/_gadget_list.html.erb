@@ -1,4 +1,19 @@
-<% for fav in Favourite.find_all_by_user_id(current_user.id) %>
-   <%= fav_image_tag(fav) %>
-   
+<%
+favourites=Favourite.find_all_by_user_id(current_user.id)
+%>
+<% if favourites.empty? %>
+  <span class="none_text" style="vertical-align:middle;height:100%;">
+    Drag an icon here to remember for future reference.<br/>    
+  </span>
+<% else %>
+  <% for fav in favourites %>
+    <%= fav_image_tag(fav) %>
+
+  <% end %>
 <% end %>
+
+<%= drop_receiving_element("yui-main",
+  :accept=>"favourite",
+  :url=>{:controller=>'favourites', :action=>'delete'},
+  :before => "Element.show('fav_ajax-loader')",
+  :complete => "Element.hide('fav_ajax-loader');") %>
