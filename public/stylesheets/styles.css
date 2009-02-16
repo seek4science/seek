@@ -46,15 +46,6 @@
     text-align:right;
 }
 
-#footer {
-    border:dashed gray 1px;
-    height: 6em;
-    position: relative;
-    width: 100%;
-    text-align: center;
-    vertical-align: center;
-}
-
 #main_pane {
     padding-right: 1em;
     padding-left: 0.5em;

@@ -30,7 +30,7 @@
           <%= render :partial=>"layouts/search_bar" %>
         </div>
       </div>
-      <div id="bd">
+      <div id="bd" style="min-height:45em">
         <div id="yui-main"> 
             <%# applying styling to error / notice messages -%>
 						<% if flash[:error] %>
@@ -51,6 +51,9 @@
 						<%# main content part of every page -%>
             <%= yield :layout %>
         </div>
+      </div>
+      <div id="ft">
+        <%= render :partial=>"layouts/footer" %>
       </div>
       
     </div>

@@ -1,3 +1,42 @@
-<div id="footer">
-  FOOTER
+<p class="copyright">
+  Copyright (c) 2008 - 2009
+  <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %>
+  and
+  <%= link_to "EML Research gGmbH", "http://www.eml-research.de/", :target => '_blank' %>
+</p>
+
+<% if logged_in? -%>
+<div>
+  <table>
+    <tr>
+      <td class="left">
+        <p><%= link_to "Front Page", "/" %></p>
+        <p><%= link_to "About Sysmo-DB", "http://www.sysmo-db.org", :target => '_blank' %></p>
+        <p><%= link_to "The Sysmo Project", "http://www.sysmo.net" %> </p>
+      </td>
+      <td class="middle">
+        <p><%= link_to "Taverna Workflow Workbench", "http://www.mygrid.org.uk/tools/taverna/", :target => '_blank' %></p>
+        <p><%= link_to "JWS Online", "http://jjj.biochem.sun.ac.za/", :target => '_blank' %></p>
+        <p><%= link_to "SABIO-RK","http://sabio.villa-bosch.de/webservice.jsp",:target=>'_blank' %>
+        <br/>
+      </td>
+      <td class="middle">
+        <p>Particular credit to</p>
+        <p><%= link_to image_tag("MyExperiment_logo.png",:title=>"myExperiment",:alt=>"myExperiment",:width=>"150"), "http://www.myExperiment.org", :target => '_blank' %></p>
+        <p><%= link_to "The myGrid team", "http://www.mygrid.org.uk", :target => '_blank' %></p>
+      </td>
+      <td class="right">
+        <p>Powered by:</p>
+        <%= link_to image_tag('rails.png'), "http://www.rubyonrails.com", :target => '_blank' %>
+
+        <p style="margin-top: 0.2em;">
+          Icons:
+          <br/>
+          <b><%= link_to "Silk icon set 1.3", "http://www.famfamfam.com/lab/icons/silk/", :target => '_blank' %></b>
+        </p>
+      </td>
+    </tr>
+  </table>
 </div>
+<% end -%>
+

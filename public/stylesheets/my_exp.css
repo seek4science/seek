@@ -165,18 +165,19 @@ li {
 	margin-bottom: 3em;
 }
 
+
 #myexp_sidebar {
 	padding: 0 0.5em 0 0.5em;
 	background-color: #456AAA;
 	border-left: 0px solid #DEDEDE;
-	border-width: 0 0 1px 1px;
+	border-width: 0 0 1px 1px;  
 }
 
 /* Begin Footer styles */
 
 #ft {
 	margin: 2em 0;
-	border: 0px dotted #999999;
+	border: 2px solid #999999;
 	border-width: 1px 0 1px 0;
 	color: #333333;
 	background-image: url('/images/footer-bg.png');
@@ -188,13 +189,13 @@ li {
 #ft .copyright {
 	text-align: center;
 	font-weight: bold;
-	font-size: 93%;
+	font-size: 83%;
 	padding: 0.5em;
 }
 
 #ft table {
 	width: 100%;
-	border-top: 1px dotted #999999;
+	border-top: 1px solid #999999;
 	border-spacing: 0;
 	margin: 0;
 }
@@ -219,14 +220,14 @@ li {
 	width: 325px; 
 	text-align: left;
 	font-size: 93%;
-	border-left: 1px dotted #999999;
+	border-left: 1px solid #999999;
 }
 
 #ft .right {
 	width: 150px; 
 	text-align: center;
 	font-size: 77%; 
-	border-left: 1px dotted #999999;
+	border-left: 1px solid #999999;
 }
 
 #ft .right p {
