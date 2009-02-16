@@ -139,107 +139,107 @@
 				  Select from the options below and click "Add" to apply
 					your choices and add collaborators to your current selection:
 				</p>
+
 				
-				<table style="width: 100%;">
-					<tr style="vertical-align: top;">
-						<!-- favourite groups -->
-						<td style="width: 50%;">
-						  <div class="box_editing_inner2" style="height: 130px;">
-						  	<p style="margin: 1em 0; padding: 0; line-height: 1; font-weight: bold; text-align: center;">
-									<%= image_tag method_to_icon_filename("spinner"), :id => "f_group_deleting_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
-								  <%= help_icon("Select from your favourite groups.") -%>
-									My Favourite Groups
-								</p>
-								
-								<p style="margin: 1.8em 0 0 0; padding: 0; line-height: 1; text-align: center;">
-									<% favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id) -%>
-									<% f_group_select_options = (favourite_groups.blank? ? "<option value=\"\">You don't have any favourite groups</option>" : options_for_select(favourite_groups)) -%>
-									
-									<%= select_tag "favourite_group_select", f_group_select_options, :onchange => "javascript: replaceFavouriteGroupRedboxActionURL(); return(false);", :style => "width: 82%; vertical-align: middle; margin-right: 0.4em;", :disabled => (favourite_groups.blank?) -%>
-									
-									<%= link_to "Add", "", :id => "add_f_group_link", :style => "font-weight: bold; vertical-align: middle;", :disabled => (favourite_groups.blank?),
-                      :onclick => "javascript: if($('favourite_group_select').disabled) return(false); addContributor('FavouriteGroup', $('favourite_group_select').options[$('favourite_group_select').selectedIndex].text, parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value), #{Policy::DETERMINED_BY_GROUP}); return(false);" -%>
-								</p>
-								
-								<ul style="text-align: left; margin: 1em 0 0.5em 2em;">
-									<li id="edit_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit() -%></li>
-									<li id="delete_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;">
-									  <%= link_to "Delete selected favourite group", delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
-									</li>
-									<li id="create_f_group_li" style="list-style-type: disc; padding: 0.5em 0 0 0;"><%= favourite_group_popup_link_action_new() -%></li>
-								</ul>
-						  </div>
-						</td>
-						
-						<!-- projects / institutions -->
-						<td style="width: 50%;">
-						 <div class="box_editing_inner2" style="height: 130px;">
-						  	<p style="margin: 1em 0 0 0; padding: 0; line-height: 1; font-weight: bold; text-align: center;">
-									<%= help_icon("Select a project / institution.") -%>
-									Projects and Institutions
-								</p>
-							
-								<p style="margin: 0.6em 0; padding: 0; line-height: 1; font-weight: bold; text-align: center;">
-									<% right_arrow_image = method_to_icon_filename("arrow_right") -%>
-								  
-									<span class="note_text" id="proj_select_step_1">Step 1</span>
-									<%= image_tag right_arrow_image, :style => "vertical-align: middle; padding: 0 0.8em;" -%>
-									
-									<span class="note_text_disabled" id="proj_select_step_2">Step 2</span>
-									<%= image_tag right_arrow_image, :style => "vertical-align: middle; padding: 0 0.8em;" -%>
-	
-									<span class="note_text_disabled" id="proj_select_step_3">Step 3</span>
-								</p>
-								
-								<center>
-									<div style="width: 95%; text-align: left; margin-top: 2em;">
-										<input type="hidden" id="proj_select_step_index" value="1">
-										
-										<!-- step 1 -->
-										<div id="proj_select_step_div_1" style="display: block; margin: 0; padding: 0;">
-  										<%= image_tag method_to_icon_filename("spinner"), :id => "institutions_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
-										  <span class="note_text" style="line-height: 1.5;">Step 1:</span> Select a project
-										  <%= select("proj_project", "select", 
-                                 Project.find(:all).collect {|p| [ p.name, p.id ] },
-                                 {:include_blank => 'All Projects @ Institution (from Step 2)'}, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%>	
-										</div>
-										
-										<!-- step 2 -->
-										<div id="proj_select_step_div_2" style="display: none; margin: 0; padding: 0;">
-										  <span class="note_text" style="line-height: 1.5;">Step 2:</span> Select scope of the project
-										  <%= select_tag("proj_institution_select", nil, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%>	
-										</div>
-										
-										<!-- step 3 -->
-										<div id="proj_select_step_div_3" style="display: none; margin: 0; padding: 0;">
-										  <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
-											
-											<select name="proj_access_type_select" id="proj_access_type_select" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-											  <option value="<%= Policy::VIEWING -%>" >Viewing only</option>
-											  <option value="<%= Policy::DOWNLOADING -%>" >Viewing and downloading only</option>
-											  <option value="<%= Policy::EDITING -%>" >Viewing, downloading and editing</option>
-											</select>	
-										</div>
-										
-															 
-										<p style="margin: 0; padding: 0; line-height: 1; font-weight: bold; text-align: right;">
-										  <span id="proj_select_prev_link" style="display: none; float: left;">
-											  <%= link_to "< Previous step", "", :onclick => "javascript: projectInstitutionStepAction(-1); return(false);", :style => "font-weight: bold;" -%>
-										  </span>
-											<span id="proj_select_next_link" style="display: inline; float: right;">
-											  <%= link_to "Next step >", "", :onclick => "javascript: projectInstitutionStepAction(1); return(false);", :style => "font-weight: bold;" -%>
-										  </span>
-											<span id="proj_select_add_link" style="display: none; float: right;">
-											  <%= link_to "Add", "", :onclick => "javascript: addProjectInstitution(); return(false);", :style => "font-weight: bold;" -%>
-										  </span>
-										</p>
-									</div>
-								</center>
-								
-						  </div>
-						</td>
-					</tr>
-				</table>
+				<!-- favourite groups -->
+				<div class="fold" style="width: 70%; margin: 0.6em 0;">
+
+				  <div class="foldTitle">
+				    <%= image_tag method_to_icon_filename("spinner"), :id => "f_group_deleting_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
+						<%= help_icon("Here you can choose your favourite groups to share this #{@resource_type} with.") -%>
+				    Favourite Groups
+				  </div>
+				
+				  <div class="foldContent" style="display: none; background-color: #F2F2F2;">
+            <p style="margin: 1em 0 0 0; padding: 0; line-height: 1; text-align: center;">
+              <% favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id) -%>
+              <% f_group_select_options = (favourite_groups.blank? ? "<option value=\"\">You don't have any favourite groups</option>" : options_for_select(favourite_groups)) -%>
+              
+              <%= select_tag "favourite_group_select", f_group_select_options, :onchange => "javascript: replaceFavouriteGroupRedboxActionURL(); return(false);", :style => "width: 82%; vertical-align: middle; margin-right: 0.4em;", :disabled => (favourite_groups.blank?) -%>
+              
+              <%= link_to "Add", "", :id => "add_f_group_link", :style => "font-weight: bold; vertical-align: middle;", :disabled => (favourite_groups.blank?),
+                  :onclick => "javascript: if($('favourite_group_select').disabled) return(false); addContributor('FavouriteGroup', $('favourite_group_select').options[$('favourite_group_select').selectedIndex].text, parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value), #{Policy::DETERMINED_BY_GROUP}); return(false);" -%>
+            </p>
+            
+            <ul style="text-align: left; margin: 1em 0 0.5em 3.2em;">
+              <li id="edit_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit() -%></li>
+              <li id="delete_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;">
+                <%= link_to "Delete selected favourite group", delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
+              </li>
+              <li id="create_f_group_li" style="list-style-type: disc; padding: 0.5em 0 0 0;"><%= favourite_group_popup_link_action_new() -%></li>
+            </ul>
+					</div>
+				</div>
+				
+				
+				<!-- projects / institutions -->
+				<div class="fold" style="width: 70%; margin: 0.6em 0;">
+
+          <div class="foldTitle">
+            <%= help_icon("Here you can choose projects, institutions and workgroups to share this #{@resource_type} with.") -%>
+            Projects and Institutions
+          </div>
+        
+          <div class="foldContent" style="display: none; background-color: #F2F2F2; padding-bottom: 1.3em;">
+            <p style="margin: 0.6em 0; padding: 0; line-height: 1; font-weight: bold; text-align: center;">
+              <% right_arrow_image = method_to_icon_filename("arrow_right") -%>
+              
+              <span class="note_text" id="proj_select_step_1">Step 1</span>
+              <%= image_tag right_arrow_image, :style => "vertical-align: middle; padding: 0 0.8em;" -%>
+              
+              <span class="note_text_disabled" id="proj_select_step_2">Step 2</span>
+              <%= image_tag right_arrow_image, :style => "vertical-align: middle; padding: 0 0.8em;" -%>
+
+              <span class="note_text_disabled" id="proj_select_step_3">Step 3</span>
+            </p>
+            
+            <center>
+              <div style="width: 95%; text-align: left; margin-top: 2em;">
+                <input type="hidden" id="proj_select_step_index" value="1">
+                
+                <!-- step 1 -->
+                <div id="proj_select_step_div_1" style="display: block; margin: 0; padding: 0;">
+                  <%= image_tag method_to_icon_filename("spinner"), :id => "institutions_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
+                  <span class="note_text" style="line-height: 1.5;">Step 1:</span> Select a project
+                  <%= select("proj_project", "select", 
+                             Project.find(:all).collect {|p| [ p.name, p.id ] },
+                             {:include_blank => 'All Projects @ Institution (from Step 2)'}, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%> 
+                </div>
+                
+                <!-- step 2 -->
+                <div id="proj_select_step_div_2" style="display: none; margin: 0; padding: 0;">
+                  <span class="note_text" style="line-height: 1.5;">Step 2:</span> Select scope of the project
+                  <%= select_tag("proj_institution_select", nil, {:style => "width: 100%; vertical-align: middle; margin: 0.3em 0;"}) -%> 
+                </div>
+                
+                <!-- step 3 -->
+                <div id="proj_select_step_div_3" style="display: none; margin: 0; padding: 0;">
+                  <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
+                  
+                  <select name="proj_access_type_select" id="proj_access_type_select" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
+                    <option value="<%= Policy::VIEWING -%>" >Viewing only</option>
+                    <option value="<%= Policy::DOWNLOADING -%>" >Viewing and downloading only</option>
+                    <option value="<%= Policy::EDITING -%>" >Viewing, downloading and editing</option>
+                  </select> 
+                </div>
+                
+                           
+                <p style="margin: 0; padding: 0; line-height: 1; font-weight: bold; text-align: right;">
+                  <span id="proj_select_prev_link" style="display: none; float: left;">
+                    <%= link_to "< Previous step", "", :onclick => "javascript: projectInstitutionStepAction(-1); return(false);", :style => "font-weight: bold;" -%>
+                  </span>
+                  <span id="proj_select_next_link" style="display: inline; float: right;">
+                    <%= link_to "Next step >", "", :onclick => "javascript: projectInstitutionStepAction(1); return(false);", :style => "font-weight: bold;" -%>
+                  </span>
+                  <span id="proj_select_add_link" style="display: none; float: right;">
+                    <%= link_to "Add", "", :onclick => "javascript: addProjectInstitution(); return(false);", :style => "font-weight: bold;" -%>
+                  </span>
+                </p>
+              </div>
+            </center>
+          </div>
+        </div>
+				
 			</div>
 		</div>
 		
@@ -253,7 +253,7 @@
 			  - "white list", who always get full access
 			</label>
 			<!-- TODO : activate each step -->
-			<span>&nbsp;&nbsp;[ <%= link_to "edit", "/" -%> ]</span>
+			<span>&nbsp;&nbsp;[ <%= link_to "edit", "/", :onclick => "alert('This function will be implemented shortly.'); return(false);" -%> ]</span>
 		</p>
 		<p>
 			<label for="cb_use_blacklist">
@@ -261,7 +261,7 @@
 			  - "black list", who have no access at all
 			</label>
 			<!-- TODO : activate each step -->
-			<span>&nbsp;&nbsp;[ <%= link_to "edit", "/" -%> ]</span>
+			<span>&nbsp;&nbsp;[ <%= link_to "edit", "/", :onclick => "alert('This function will be implemented shortly.'); return(false);" -%> ]</span>
 	  </p>
 		
   </div>
@@ -279,7 +279,7 @@
 	
 	
 	<% @policy.permissions.each do |p| -%>
-	  <% case p.contributor_type; when "FavouriteGroup", "Person", "Project", "Institution" -%>
+	  <% case p.contributor_type; when "FavouriteGroup", "Person", "Project", "Institution", "WorkGroup" -%>
 		  <% unless p.contributor_type == "FavouriteGroup" && [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name) -%>
 			  if('<%= p.contributor_type -%>' in permissions_for_set)
 				  permissions_for_set['<%= p.contributor_type -%>']++;
@@ -288,7 +288,14 @@
 					permission_settings['<%= p.contributor_type -%>'] = new Array();
 				}
 				
-				<% contributor_name = (p.contributor_type == "Person" ? (p.contributor.first_name + " " + p.contributor.last_name) : p.contributor.name) -%>
+				<% if p.contributor_type == "Person" -%>
+				  <% contributor_name = (p.contributor.first_name + " " + p.contributor.last_name) -%>
+				<% elsif p.contributor_type == "WorkGroup" -%>
+				  <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
+				<% else -%>
+				  <% contributor_name = p.contributor.name -%>
+				<% end -%>
+				
 				// add current values into the associative array of permissions:
         // first index is the category of contributor type of the permission, the second - consecutive
         // number of occurrences of permissions for such type of contributor
