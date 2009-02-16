@@ -84,7 +84,6 @@ class PeopleController < ApplicationController
     end
 
     @userless_projects.sort!{|a,b|a.name<=>b.name}
-
     @person = Person.new
 
     render :action=>"select",:layout=>"logged_out"
