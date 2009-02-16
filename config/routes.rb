@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :assets
 
-  map.resources :users, :collection=>{:activation_required=>:get}
+  map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
 
   map.resource :session
 
@@ -83,6 +83,7 @@ ActionController::Routing::Routes.draw do |map|
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'  
   
   map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil
+  map.forgot_password '/forgot_password',:controller=>'users',:action=>'forgot_password'
   
   # used by the "sharing" form to get settings from an existing policy 
   map.request_policy_settings '/policies/request_settings', :controller => 'policies', :action => 'send_policy_data'

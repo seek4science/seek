@@ -20,13 +20,13 @@ class Mailer < ActionMailer::Base
     body        :username=>user.login, :name=>user.person.name, :activation_code=>user.activation_code, :host=>base_host
   end
 
-  def forgot_password(sent_at = Time.now)
-    subject    'Mailer#forgot_password'
-    recipients ''
+  def forgot_password(user,base_host)
+    subject    'Sysmo SEEK - Password reset'
+    recipients user.person.email_with_name
     from       ''
-    sent_on    sent_at
+    sent_on    Time.now
     
-    body       :greeting => 'Hi,'
+    body       :username=>user.login, :name=>user.person.name, :reset_code => user.reset_password_code, :host=>base_host
   end
 
   def welcome(user,base_host)

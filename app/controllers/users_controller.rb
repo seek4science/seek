@@ -42,6 +42,57 @@ class UsersController < ApplicationController
     end
   end
 
+  def reset_password
+    user = User.find_by_reset_password_code(params[:reset_code])
+
+    respond_to do |format|
+      if user
+        if user.reset_password_code_until && Time.now < user.reset_password_code_until
+          user.reset_password_code = nil
+          user.reset_password_code_until = nil
+          if user.save
+            self.current_user = user
+            if logged_in?
+              flash[:notice] = "You can reset your password here"
+              format.html { redirect_to(:action => "edit", :id => user.id) }
+            else
+              flash[:error] = "An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here."
+              format.html { render :action => "forgot_password" }
+            end
+          end
+        else
+          flash[:error] = "Your password reset code has expired"
+          format.html { redirect_to(:controller => "session", :action => "new") }
+        end
+      else
+        flash[:error] = "Invalid password reset code"
+        format.html { redirect_to(:controller => "session", :action => "new") }
+      end
+    end 
+  end
+
+  def forgot_password    
+    if request.get?
+      # forgot_password.rhtml
+    elsif request.post?      
+      user = User.find_by_login(params[:login])
+
+      respond_to do |format|
+        if user && user.person && !user.person.email.blank?
+          user.reset_password_code_until = 1.day.from_now
+          user.reset_password_code =  Digest::SHA1.hexdigest( "#{user.email}#{Time.now.to_s.split(//).sort_by {rand}.join}" )
+          user.save!
+          Mailer.deliver_forgot_password(user, base_host)
+          flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
+          format.html { render :action => "forgot_password" }
+        else
+          flash[:error] = "Invalid login: #{params[:login]}" if !user
+          flash[:error] = "Unable to send you an email, as this information isn't available for #{params[:login]}" if user && (!user.person || user.person.email.blank?)
+          format.html { render :action => "forgot_password" }
+        end
+      end
+    end
+  end
 
   
   def edit

@@ -126,6 +126,14 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
+  def test_email_unique
+    p=people(:one)
+    newP=Person.new(:first_name=>"Fred",:email=>p.email)
+    assert !newP.valid?,"Should not be valid as email is not unique"
+    newP.email="zxczxc@zxczxczxc.com"
+    assert newP.valid?
+  end
+
 
 
 end

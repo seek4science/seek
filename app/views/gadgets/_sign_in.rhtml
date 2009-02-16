@@ -26,11 +26,12 @@
 	  	<p>
       	  <%= password_field_tag 'password', nil, :class => 'field', :style => "width: 140px;" %>
 	  	</p>
-	  	<!-- Uncomment this if you want this functionality
+	  	
 		<p class="label">
-      	  Remember me: <%#= check_box_tag 'remember_me' %>
+      	  Remember me: <%= check_box_tag 'remember_me' %>
         </p>
-		-->
+
+		
 	  </div>
 	    
       <p>
@@ -43,12 +44,11 @@
       <b>Need an account?</b><br />
       <b><%= link_to "Sign up", signup_url %></b>
     </p>
-		
-	<!-- Potentially can be useful in future
-	<p style="margin-top: 0.6em; font-size: 93%;">
-		<b><%#= link_to "Forgot Password?", url_for(:controller => "users", :action => "forgot_password") %></b>
-	</p>
-	-->
+    <br/>
+    <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 83%;">
+      <b><%= link_to "Forgotten password?", forgot_password_url %></b>
+    </p>
+
   </div>
   
   <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
