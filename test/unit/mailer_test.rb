@@ -13,11 +13,15 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "forgot_password" do
-    @expected.subject = 'Mailer#forgot_password'
+    @expected.subject = 'Sysmo SEEK - Password reset'
+    @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.body    = read_fixture('forgot_password')
     @expected.date    = Time.now
 
-    assert_equal @expected.encoded, Mailer.create_forgot_password(@expected.date).encoded
+    u=users(:aaron)
+    u.reset_password_code_until = 1.day.from_now
+    u.reset_password_code="fred"
+    assert_equal @expected.encoded, Mailer.create_forgot_password(users(:aaron),"localhost").encoded
   end
 
   test "contact_admin_new_user_no_profile" do
