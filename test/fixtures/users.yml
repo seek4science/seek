@@ -73,7 +73,7 @@ part_registered:
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
   is_admin: false
-  can_edit_projects: true
-  can_edit_institutions: true
+  can_edit_projects: false
+  can_edit_institutions: false
 
 

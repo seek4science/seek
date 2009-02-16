@@ -61,4 +61,10 @@ not_registered:
         first_name: Fred
         email: test@test.com
 
+pal:
+        id: 14
+        first_name: A Pal
+        email: test@test.com
+        is_pal: true
+
 
