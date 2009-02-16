@@ -100,6 +100,23 @@ class UsersControllerTest < Test::Unit::TestCase
     login_as :quentin
     get :edit, :id=>users(:aaron)
     assert_redirected_to root_url
+  end  
+
+  def test_associated_with_person
+    login_as :part_registered
+    u=users(:part_registered)
+    p=people(:not_registered)
+    post :update, :id=>u.id,:user=>{:id=>u.id,:person_id=>p.id}
+    assert_nil flash[:error]
+    assert_equal p,User.find(u.id).person
+  end
+
+  def test_update_password
+    login_as :quentin
+    u=users(:quentin)
+    post :update, :id=>u.id, :user=>{:id=>u.id,:password=>"mmmmm",:password_confirmation=>"mmmmm"}
+    assert_nil flash[:error]
+    assert User.authenticate("quentin","mmmmm")
   end
 
   protected

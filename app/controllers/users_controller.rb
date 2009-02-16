@@ -49,20 +49,18 @@ class UsersController < ApplicationController
     render :action=>:edit, :layout=>"main"
   end
   
-  def update
-
+  def update    
     @user = User.find(params[:id])
-    person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?
-
-    person_already_associcated=!person.user.nil?
     
-    @user.person=person if !person.nil? && !person_already_associcated
+    person=Person.find(params[:user][:person_id]) unless (params[:user][:person_id]).nil?        
+    
+    @user.person=person if !person.nil?
     
     @user.attributes=params[:user]
 
     respond_to do |format|
       
-      if @user.save && !person_already_associcated
+      if @user.save
         #user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
           Mailer.deliver_signup(@user,base_host)
@@ -73,8 +71,7 @@ class UsersController < ApplicationController
           flash[:notice]="Your account details have been updated"
           format.html { redirect_to person_path(@user.person) } 
         end        
-      else
-        flash[:error]="That person has already been associated with a user" if person_already_associcated
+      else        
         format.html { render :action => 'edit' }
       end
     end

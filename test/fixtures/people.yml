@@ -56,4 +56,9 @@ can_edit:
         first_name: Can
         last_name: Edit
 
+not_registered:
+        id: 13
+        first_name: Fred
+        email: test@test.com
+
 
