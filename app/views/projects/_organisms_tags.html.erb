@@ -1,5 +1,6 @@
 <div id="organisms">
 
+
     <p>
       <label>Organisms:</label>
 
@@ -8,7 +9,7 @@
       <% else %>
 
         <% for organism in organisms_tags  -%>
-          <%= link_for_tag organism, :type=>:organism -%>
+          <%= link_for_tag organism, :type=>:organisms -%>
           <% unless organism==organisms_tags.last %>
             |
           <% end %>
