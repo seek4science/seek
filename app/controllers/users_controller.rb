@@ -53,7 +53,7 @@ class UsersController < ApplicationController
           if user.save
             self.current_user = user
             if logged_in?
-              flash[:notice] = "You can reset your password here"
+              flash[:notice] = "You can change your password here"
               format.html { redirect_to(:action => "edit", :id => user.id) }
             else
               flash[:error] = "An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here."
