@@ -4,6 +4,7 @@ class FavouriteGroup < ActiveRecord::Base
   # allow same group names, but only if these belong to different users
   validates_uniqueness_of :name, :scope => :user_id
   
+  belongs_to :user
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :permissions, :as => :contributor, :dependent => :destroy
   
@@ -15,6 +16,15 @@ class FavouriteGroup < ActiveRecord::Base
   BLACKLIST_NAME = "__blacklist__"
   WHITELIST_NAME = "__whitelist__"
   
+  # defaults for access types in BLACKLIST and WHITELIST groups
+  BLACKLIST_ACCESS_TYPE = Policy::NO_ACCESS
+  WHITELIST_ACCESS_TYPE = Policy::DOWNLOADING
+  
+  
+  # check if current favourite group is a blacklist or whitelist
+  def is_whitelist_or_blacklist?
+    return [FavouriteGroup::BLACKLIST_NAME, FavouriteGroup::WHITELIST_NAME].include?(self.name)
+  end
   
   # return all favourite group [name, id] pairs for a particular user
   def self.get_all_without_blacklists_and_whitelists(user_id)

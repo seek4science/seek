@@ -19,4 +19,13 @@ three:
 four:
   id: 4
   name: Project4
-  
+
+
+# ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
+
+myexperiment_project:
+  name: "myExperiment"
+
+
+sysmo_project:
+  name: "SysMO"

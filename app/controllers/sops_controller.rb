@@ -224,6 +224,8 @@ class SopsController < ApplicationController
     # ..other
     @resource_type = "SOP"
     @favourite_groups = current_user.favourite_groups
+    
+    @all_people_as_json = Person.get_all_as_json
     # TODO
     # find all projects and their IDs
     

@@ -5,6 +5,9 @@
 
 /* Improvements to the code made for SysMO:
 
+- fully refactored code to allow several advanced autocompleters on the same page
+  (the way this was implemented originally would not give any opportunity for this);
+
 - refactored code so it's not tailored specifically for email input anymore;
   (IDs of the recognised objects are submitted instead of "emails") 
 
@@ -17,6 +20,9 @@ selected from the suggestion list are submitted in params[:ids];
 - unrecognised input is dealt with separately; it first is validated according
 to the selected validation type (the code now accepts a new parameter "validation_type");
 (please see 'usage' below for details)
+
+- bug-fix: whole page was jumping upwards-downwards when arrow keys ('up' or 'down') were pressed
+  on a page with advanced autocompleter on it;
 
 - bug-fix: "comma" after unsuccessfully validated unrecognised items was echoed
 and prevented further suggestions; now it's not echoed anymore and further
@@ -50,9 +56,13 @@ suggestion show properly;
  *
  *
  * Syntax for the constructor:
- * new Autocompleter.LocalAdvanced(id_of_text_field, id_of_div_to_populate, item_array, item_ids_to_prepopulate, options), where parameters mean:
- * -- id_of_text_field - id of the monitored text field;
- * -- id_of_div_to_populate - id of the autocompletion menu;
+ * new Autocompleter.LocalAdvanced(id_of_autocompleter, id_of_text_field, id_of_display_field, id_of_div_to_populate, item_array, item_ids_to_prepopulate, options), where parameters mean:
+ * -- id_of_autocompleter - string that represents a unique identifier of this autocompleter;
+ *                          this value is especially required when a page has several instances of an autocompleter -
+ *                          these IDs are then used to allow JavaScript to perform actions with the relevant 'active' autocompleter only 
+ * -- id_of_text_field - id of the monitored text field (see example at the end of the file);
+ * -- id_of_display_field - id of the div that will hold and display curently selected "tokens" (see example at the end of the file);
+ * -- id_of_div_to_populate - id of the autocompletion menu (see example at the end of the file);
  * -- item_array - JSON array of hashes containing values to lookup for the autocomplete menu; it should be in the following format:
  *                 [ ..., { key1: value1, key2: value2, ... }, ...]; each hash in this array should have several attributes for each item -
  *                 generally 3 attributes for every item are needed: "search_field" to look up on, "hint field" to display second line
@@ -83,11 +93,11 @@ suggestion show properly;
  *                these MUST be set for all items in the "item_array"; "id_field" can be the same as "search_field" if
  *                values in "search_field" are unique (e.g.: "id" for any object, or "tag" for tags - if these can't be duplicated);
  *                these values will be submitted with the form containing the autocomplete field (or can be collected with JavaScript from
- *                ALL elements on the page which have their name set to "selected_ids[]").
+ *                ALL elements on the page which have their name set to "<id_of_autocompleter>_selected_ids[]").
  *
  *    -	validation_type: type of validation to perform on new input values that are not recognised by searching though
  *                       "item_array" data; successfully validated new entries will be submitted with the form
- *                       (or can be collected with JavaScript from ALL elements on the page which have their name set to "unrecognized_items[]");
+ *                       (or can be collected with JavaScript from ALL elements on the page which have their name set to "<id_of_autocompleter>_unrecognized_items[]");
  *                       validation is initiated when comma is pressed in the input text field; 
  *                       
  *                       so far the following types defined -
@@ -98,6 +108,12 @@ suggestion show properly;
  *                       ** "email": new objects will have to comply with email validation rules to be
  *                                   turned into "tokens" (suggested items are also allowed);
  *                       - (OPTIONAL: this can be omitted, then "any" will be used by default);
+ *
+ *
+ * NOTE: the code will also *assume availability* of an associative array called "autocompleters", which has an
+ *       element for every Advanced Autocompleter on the current page: these elements are accessed by <id_of_autocompleter>
+ *       string value as a key and *MUST* contain a pointer to the instance of the autocompleter which has corresponding ID;
+ *       (please see example at the end of the file).
 */
 
 
@@ -109,58 +125,39 @@ suggestion show properly;
 (new Image()).src='/images/autocompleter_tokens/token_x.gif';
 
 
-var VALIDATION_TYPE = "any";
-var SEARCH_FIELD = null;
-var HINT_FIELD = null;
-var ID_FIELD = null;
-var SUGGESTIONS_ARRAY = null;
-
-var HIDDEN_INPUT = null;
-
-
-validate_item = function(item) {
-  // this method is only called for unrecognized items,
-  // hence can return 'false' immediately if no unrecognized
-  // items are allowed
-  switch(VALIDATION_TYPE) {
-    case "any":
-      // no validation is required for such type
-      return(true);
-      break;
-    case "only_suggested":
-      return(false);
-      break;
-    case "email":
-      var regexEmail = /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
-      return regexEmail.test(item);
-      break;
-    
-  }  
-}
-
 Autocompleter.LocalAdvanced = Class.create(Autocompleter.Base, {
-    initialize: function(element, update, array, prepopulate_array, options) {
-        this.baseInitialize(element, update, options);
+    initialize: function(autocompleter_id, element, display_element, update, array, prepopulate_array, options) {
+        this.autocompleter_id = autocompleter_id;
+				
+				this.baseInitialize(element, update, options);
         this.options.array = array;
         
+				this.display_element = $(display_element);
+				this.hidden_input = null;
+				
         // this is set with an external parameter and defines the type of validation 
         // that the objects that are typed into the text box have to undergo
-        VALIDATION_TYPE = options.validation_type;
+        this.VALIDATION_TYPE = "any";
+				this.VALIDATION_TYPE = options.validation_type;
         
         // the field by which the suggestion lookup is to be made; and one to be displayed in
         // the text box as a label of the "token"
-        SEARCH_FIELD = options.search_field;
+        this.SEARCH_FIELD = null;
+				this.SEARCH_FIELD = options.search_field;
         
         // defines the field to fetch the values for the clarification
         // (i.e. 'search field' could be Name, but 'hint field' email to disambiguate findings)
-        HINT_FIELD = options.hint_field;
+        this.HINT_FIELD = null;
+				this.HINT_FIELD = options.hint_field;
         
         // the field to fetch the values that will be submitted as a result of selection of
         // suggested objects (e.g. ID of something or any other unique field within "item_array")
-        ID_FIELD = options.id_field;
+        this.ID_FIELD = null;
+				this.ID_FIELD = options.id_field;
         
         // makes the supplied array of suggestions available everywhere
-        SUGGESTIONS_ARRAY = array;
+				this.SUGGESTIONS_ARRAY = null;
+				this.SUGGESTIONS_ARRAY = array;
         
         this.wrapper = $(this.element.parentNode);
 
@@ -182,8 +179,13 @@ Autocompleter.LocalAdvanced = Class.create(Autocompleter.Base, {
 		}  
 		this.options.onHide = function(element, update){ update.hide() };
 	    
+	  
     // PREPOPULATE THE TEXT FIELD WITH GIVEN SELECTION
-    prepopulateTextField(prepopulate_array)
+    // this will be done when associated hidden input is created as well -
+    // this is because no "tokens" can be created until the associated
+    // hidden input is initialized;
+    // hence, just store the parameters for later use
+		this.prepopulate_array = prepopulate_array;
     },
 getUpdatedChoices: function() {
         this.updateChoices(this.options.selector(this));
@@ -250,8 +252,8 @@ onKeyPress: function(event) {
             (Prototype.Browser.WebKit > 0 && event.keyCode == 0) || event.keyCode == 44 /* , comma */ ||  event.keyCode == 188 ) {
                 var unrecognized_item = this.element.value.strip().sub(',', '')
                 //recognise the item format
-                if (validate_item(unrecognized_item)) {
-                    addUnrecognizedItemToList(unrecognized_item);
+                if (this.validate_item(unrecognized_item)) {
+                    this.addUnrecognizedItemToList(unrecognized_item);
                     Event.stop(event);
                 } 
                 this.element.value = "";
@@ -348,7 +350,8 @@ setOptions: function(options) {
                 for (var i = 0; i < instance.options.array.length && 
                 ret.length < instance.options.choices; i++) {
 
-                    var elem = instance.options.array[i];
+                    var self_id = instance.autocompleter_id;
+										var elem = instance.options.array[i];
                     var elem_name = elem[instance.options.search_field];
                     var foundPos = instance.options.ignoreCase ? 
                     elem_name.toLowerCase().indexOf(entry.toLowerCase()) : 
@@ -359,8 +362,8 @@ setOptions: function(options) {
                         if (foundPos == 0 && elem_name.length != entry.length) {
                             var value = "<strong>" + elem_name.substr(0, entry.length) + "</strong>" + elem_name.substr(entry.length);
                             ret.push(
-                            "<li value='" + i + "'>" + "<div class='main_text'>" + value + "</div>"
-                            + (HINT_FIELD ? ("<div class='hint_text'>" + elem[HINT_FIELD] + "</div>") : "") + "</li>"
+                            "<li name='" + self_id + "' value='" + i + "'>" + "<div class='main_text'>" + value + "</div>"
+                            + (instance.HINT_FIELD ? ("<div class='hint_text'>" + elem[instance.HINT_FIELD] + "</div>") : "") + "</li>"
                             );
                             break;
 
@@ -371,8 +374,8 @@ setOptions: function(options) {
                                 foundPos + entry.length)
 
                                 partial.push(
-                                "<li value='" + i + "'>" + "<div class='main_text'>" + value + "</div>"
-                                + (HINT_FIELD ? ("<div class='hint_text'>" + elem[HINT_FIELD] + "</div>") : "") + "</li>"
+                                "<li name='" + self_id + "' value='" + i + "'>" + "<div class='main_text'>" + value + "</div>"
+                                + (instance.HINT_FIELD ? ("<div class='hint_text'>" + elem[instance.HINT_FIELD] + "</div>") : "") + "</li>"
                                 );
                                 break;
 
@@ -396,15 +399,188 @@ setOptions: function(options) {
         },
         options || {});
 
+    },
+		
+// NEWLY ADDED INSTANCE METHODS
+
+validate_item: function(item) {
+  // this method is only called for unrecognized items,
+  // hence can return 'false' immediately if no unrecognized
+  // items are allowed
+  switch(this.VALIDATION_TYPE) {
+    case "any":
+      // no validation is required for such type
+      return(true);
+      break;
+    case "only_suggested":
+      return(false);
+      break;
+    case "email":
+      var regexEmail = /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
+      return regexEmail.test(item);
+      break;
+    
+  }  
+},
+
+// adds a token to the display list and creates a hidden input to hold the relevant return value
+// for a selected item
+addContactToList: function(item) {
+	// clear the input anyway
+  this.element.value = "";
+  
+  var value_to_add = this.SUGGESTIONS_ARRAY[Element.readAttribute(item,'value')][this.ID_FIELD];
+  
+  // check if such value is not yet added, allow action
+  if(this.notYetAdded(value_to_add)) {  
+    var token = Builder.node('a', {
+        "class": 'token',
+        "name": this.autocompleter_id,
+        href: "#",
+        tabindex: "-1"
+      },
+      Builder.node('span', 
+      Builder.node('span', 
+      Builder.node('span', 
+      Builder.node('span', {},
+      [Builder.node('input', { type: "hidden", name: this.autocompleter_id + "_selected_ids[]",
+        // NEXT LINE REPLACED TO SUBMIT REQUIRED FIELD OF THE SELECTED OBJECTS, INSTEAD OF BEING FIXED TO EMAILS
+        //value: item.lastChild.innerHTML
+        value: value_to_add
+      }),
+      // NEXT LINE REPLACED TO SET TOKEN LABEL TO 'SEARCH_FIELD' CONTENTS INSTEAD OF 'name' AS HARD-CODED SELECTION
+      this.SUGGESTIONS_ARRAY[Element.readAttribute(item,'value')][this.SEARCH_FIELD],
+        Builder.node('span',{"class":'x',onmouseout:"this.className='x'",onmouseover:"this.className='x_hover'",
+        onclick:"this.parentNode.parentNode.parentNode.parentNode.parentNode.remove(true); return false;"}," ")
+        ]
+      )
+      )
+      )   
+      )
+    );  
+    // NEXT LINE IS COMMENTED OUT, BECAUSE IT WAS MAKING ERRORS IN InternetExplorer 
+    //$(token).down(4).next().innerHTML = "&nbsp;";
+    new Token(token,this.hidden_input);
+    this.display_element.insert({before:token});
+  }
+  else {
+    alert('You have already added this value!');
+  }
+},
+
+addUnrecognizedItemToList: function(item) {
+/*   $('autocomplete_input').value = "";*/
+   var token = Builder.node('a',{"class":'token',"name":this.autocompleter_id,href:"#",tabindex:"-1"},
+       Builder.node('span',
+       Builder.node('span',
+       Builder.node('span',
+       Builder.node('span',{},[
+           Builder.node('input',{type:"hidden", name: this.autocompleter_id + "_unrecognized_items[]",value: item} ) ,
+           item,
+           Builder.node('span',{"class":'x',onmouseout:"this.className='x'",onmouseover:"this.className='x_hover'",
+           onclick:"this.parentNode.parentNode.parentNode.parentNode.parentNode.remove(true); return false;"}," ")
+           ]
+       )
+       )
+       )   
+       )
+   );  
+  // NEXT LINE IS COMMENTED OUT, BECAUSE IT WAS MAKING ERRORS IN InternetExplorer
+  //$(token).down(4).next().innerHTML = "&nbsp;";
+   new Token(token,this.hidden_input);
+   this.display_element.insert({before:token});
+},
+
+// checks if the item with ID == "value" is currently added into the
+// autocomplete text_field
+notYetAdded: function(value) {
+  var added_values = this.getRecognizedSelectedIDs();
+  
+  for(var i = 0; i < added_values.length; i++)
+    if(added_values[i] == value) {
+      return(false);
+      break;
     }
+  
+  return(true);
+},
+
+// gets an array of item IDs that are currently selected as tokens in the
+// autocomplete field
+getRecognizedSelectedIDs: function(){
+  var x=document.getElementsByName(this.autocompleter_id + "_selected_ids[]");
+  
+  var res = new Array;
+  for(var i = 0; i < x.length; i++)
+    res[i] = x[i].value;
+  
+  return(res);
+},
+
+// removes any tokens currently present in the autocomplete text field for the current autocompleter
+deleteAllTokens: function() {
+  var x=$$('a.token');
+  count = x.length;
+  
+  for(var i = count - 1; i >= 0; i--) {
+    if(Element.readAttribute(x[i],'name') == this.autocompleter_id)
+      x[i].remove();
+  }
+  
+  return(count);
+},
+
+// translates IDs of the items from "item_array" into their corresponding indexes in that
+// array itself
+itemIDsToJsonArrayIDs: function(item_id_array) {
+  // array to store the "translated" IDs into the integer IDs of the this.SUGGESTIONS_ARRAY
+  var suggestions_array_ids = new Array();
+  var cnt = 0;
+  
+  var i = 0;
+  while((i < this.SUGGESTIONS_ARRAY.length) && (cnt < item_id_array.length)) {
+    if(this.SUGGESTIONS_ARRAY[i][this.ID_FIELD] == item_id_array[cnt]) {
+      suggestions_array_ids[cnt] = i;
+      cnt++;
+    }
+    else {
+      i++;
+    }
+  }
+  
+  return(suggestions_array_ids);
+},
+
+
+// returns a value specified by key "key_name" of an element with
+// ID == "json_array_id" from  "item_array"
+getValueFromJsonArray: function(json_array_id, key_name) {
+  return(this.SUGGESTIONS_ARRAY[json_array_id][key_name]);
+},
+
+
+// prepopulates the autocomplete token display text box with tokens containing
+// items which have item IDs in "item_id_array"
+prepopulateAutocompleterDisplayWithTokens: function(item_id_array) {
+  var suggestions_array_ids = this.itemIDsToJsonArrayIDs(item_id_array);
+  
+  var item = null;
+  for(var i = 0; i < suggestions_array_ids.length; i++) {
+    item = new Element('a', { 'value': suggestions_array_ids[i] });
+    this.addContactToList(item);
+  }
+}
 
 });
+
+
 HiddenInput = Class.create({
     initialize: function(element, auto_complete) {
         this.element = $(element);
         this.auto_complete = auto_complete;
+        this.auto_complete.hidden_input = this;
+        this.auto_complete.prepopulateAutocompleterDisplayWithTokens(this.auto_complete.prepopulate_array);
         this.token;
-        HIDDEN_INPUT = this;
         Event.observe(this.element, 'keydown', this.onKeyPress.bindAsEventListener(this));
 
     },
@@ -491,199 +667,56 @@ HiddenInput = Class.create({
 });
 
 
-addContactToList = function(item) {
-  // clear the input anyway
-  $('autocomplete_input').value = "";
-  
-  var value_to_add = SUGGESTIONS_ARRAY[Element.readAttribute(item,'value')][ID_FIELD];
-  
-  // check if such value is not yet added, allow action
-  if(notYetAdded(value_to_add)) {  
-    var token = Builder.node('a', {
-        "class": 'token',
-        href: "#",
-        tabindex: "-1"
-      },
-      Builder.node('span', 
-      Builder.node('span', 
-      Builder.node('span', 
-      Builder.node('span', {},
-      [Builder.node('input', { type: "hidden", name: "selected_ids[]",
-        // NEXT LINE REPLACED TO SUBMIT REQUIRED FIELD OF THE SELECTED OBJECTS, INSTEAD OF BEING FIXED TO EMAILS
-        //value: item.lastChild.innerHTML
-        value: value_to_add
-      }),
-      // NEXT LINE REPLACED TO SET TOKEN LABEL TO 'SEARCH_FIELD' CONTENTS INSTEAD OF 'name' AS HARD-CODED SELECTION
-	    SUGGESTIONS_ARRAY[Element.readAttribute(item,'value')][SEARCH_FIELD],
-        Builder.node('span',{"class":'x',onmouseout:"this.className='x'",onmouseover:"this.className='x_hover'",
-        onclick:"this.parentNode.parentNode.parentNode.parentNode.parentNode.remove(true); return false;"}," ")
-        ]
-      )
-      )
-      )   
-      )
-	  );  
-	  // NEXT LINE IS COMMENTED OUT, BECAUSE IT WAS MAKING ERRORS IN InternetExplorer 
-	  //$(token).down(4).next().innerHTML = "&nbsp;";
- 	  new Token(token,HIDDEN_INPUT);
-    $('autocomplete_display').insert({before:token});
-  }
-  else {
-    alert('You have already added this value!');
-  }
+addAction = function(item) {
+	autocompleter_id = Element.readAttribute(item,'name');
+	autocompleters[autocompleter_id].addContactToList(item);
 }
-
-
-addUnrecognizedItemToList = function(item) {
-/*   $('autocomplete_input').value = "";*/
-   var token = Builder.node('a',{"class":'token',href:"#",tabindex:"-1"},
-       Builder.node('span',
-       Builder.node('span',
-       Builder.node('span',
-       Builder.node('span',{},[
-           Builder.node('input',{type:"hidden",name:"unrecognized_items[]",value: item} ) ,
-           item,
-           Builder.node('span',{"class":'x',onmouseout:"this.className='x'",onmouseover:"this.className='x_hover'",
-           onclick:"this.parentNode.parentNode.parentNode.parentNode.parentNode.remove(true); return false;"}," ")
-           ]
-       )
-       )
-       )   
-       )
-   );  
-  // NEXT LINE IS COMMENTED OUT, BECAUSE IT WAS MAKING ERRORS IN InternetExplorer
-	//$(token).down(4).next().innerHTML = "&nbsp;";
-   new Token(token,HIDDEN_INPUT);
-   $('autocomplete_display').insert({before:token});
-}
-
-
-// *****************************************************
-
-// gets an array of item IDs that are currently selected as tokens in the
-// autocomplete field
-function getRecognizedSelectedIDs(){
-  var x=document.getElementsByName("selected_ids[]");
-  
-  var res = new Array;
-  for(var i = 0; i < x.length; i++)
-    res[i] = x[i].value;
-  
-  return(res);
-}
-
-
-// removes any tokens currently present in the autocomplete text field
-function deleteAllTokens() {
-  var x=$$('a.token');
-  count = x.length;
-  
-  for(var i = count - 1; i >= 0; i--) {
-    x[i].remove();
-  }
-  
-  return(count);
-}
-
-
-// checks if the item with ID == "value" is currently added into the
-// autocomplete text_field
-function notYetAdded(value) {
-  var added_values = getRecognizedSelectedIDs();
-  
-  for(var i = 0; i < added_values.length; i++)
-    if(added_values[i] == value) {
-      return(false);
-      break;
-    }
-  
-  return(true);
-}
-
-
-// translates IDs of the items from "item_array" into their corresponding indexes in that
-// array itself
-function itemIDsToJsonArrayIDs(item_id_array) {
-  // array to store the "translated" IDs into the integer IDs of the SUGGESTIONS_ARRAY
-  var suggestions_array_ids = new Array();
-  var cnt = 0;
-  
-  var i = 0;
-  while((i < SUGGESTIONS_ARRAY.length) && (cnt < item_id_array.length)) {
-    if(SUGGESTIONS_ARRAY[i][ID_FIELD] == item_id_array[cnt]) {
-      suggestions_array_ids[cnt] = i;
-      cnt++;
-    }
-    else {
-      i++;
-    }
-  }
-  
-  return(suggestions_array_ids);
-}
-
-
-// returns a value specified by key "key_name" of an element with
-// ID == "json_array_id" from  "item_array"
-function getValueFromJsonArray(json_array_id, key_name) {
-  return(SUGGESTIONS_ARRAY[json_array_id][key_name]);
-}
-
-
-// prepopulates the autocomplete text box with tokens containing
-// items which have item IDs in "item_id_array"
-function prepopulateTextField(item_id_array) {
-  var suggestions_array_ids = itemIDsToJsonArrayIDs(item_id_array);
-  
-  var item = null;
-  for(var i = 0; i < suggestions_array_ids.length; i++) {
-    item = new Element('a', { 'value': suggestions_array_ids[i] });
-    addContactToList(item);
-  }
-}
-
 
 
 // ************************************************************************************************************************************
 
-/* Example of simple HTML page using the Autocompleter Advanced: 
+/* Example of simple HTML page using the Advanced Autocompleter: 
 
 <div id="facebook" class="clearfix">
-   <label for="autocomplete_display">To:</label>
+  <label for="ip_autocomplete_display">To:</label>
   
-	<div>
-    <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('autocomplete_input').focus()" style="width: 355px;">
-      <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="hidden_input" tabindex="-1"></span>
-      
-      <div id="autocomplete_display" class="tokenizer_input">
-         <input type="text" size="1" tabindex="" id="autocomplete_input" />
-      </div>                                                                          
-    </div>
-    <div id="autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 358px; height: auto; overflow-y: hidden;display:none">
-       <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>                       
-    </div>  
-  </div>
-</div>
+  <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('ip_autocomplete_input').focus();" style="width: 340px;">
+    <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="ip_hidden_input" tabindex="-1" ></span>
     
+    <div id="ip_autocomplete_display" class="tokenizer_input">
+      <input type="text" size="1" tabindex="" id="ip_autocomplete_input" />
+    </div>
+  </div>
+  <div id="ip_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 343px; height: auto; overflow-y: hidden;display:none">
+    <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>                       
+  </div> 
+
+  <br/>
+  <a href="" onclick="alert(autocompleters[individual_people_autocompleter_id].getRecognizedSelectedIDs());return(false);">Show all 'id_field' values from selected tokens</a>
+</div>
+  
+  
 <script type="text/javascript">
   var contacts = [ {'name': 'John Smith', 'email': 'john@smith.com', 'id': '1' },
 	                 {'name': 'Joe Bloggs', 'email': 'joe@bloggs.org', 'id': '78' },
 									 {'name': 'Mike Peters', 'email': 'mike@peters.co.uk', 'id': '131' }  ];
 	var prepopulate_with = [1,131];
-
-  var typeahead = new Autocompleter.LocalAdvanced('autocomplete_input', 'autocomplete_populate', contacts, prepopulate_with, {                                                  
-      frequency: 0.1,
-      updateElement: addContactToList,
-      search_field: "name",
-			hint_field: "email",
-			id_field: "id",
-			validation_type: "only_suggested"
+  
+  var individual_people_autocompleter_id = 'ip_autocompleter';
+  var individual_people_autocompleter = new Autocompleter.LocalAdvanced(
+  individual_people_autocompleter_id, 'ip_autocomplete_input', 'ip_autocomplete_display', 'ip_autocomplete_populate', contacts, prepopulate_with, {                                                  
+       frequency: 0.1,
+       updateElement: addAction,
+       search_field: "name",
+       hint_field: "email",
+       id_field: "id",
+       validation_type: "only_suggested"
   });
-  var hidden_input = new HiddenInput('hidden_input',typeahead);
+  var hidden_input = new HiddenInput('ip_hidden_input',individual_people_autocompleter);
+
+  var autocompleters = new Array();
+  autocompleters[individual_people_autocompleter_id] = individual_people_autocompleter;
 </script>
 
-<br/>
-<a href="" onclick="alert(getRecognizedSelectedIDs());return(false);">Show all 'id_field' values from selected tokens</a>
-    
 */
 

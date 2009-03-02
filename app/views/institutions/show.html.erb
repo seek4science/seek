@@ -25,7 +25,7 @@
 			<fieldset>
   			<legend>Location</legend>
 				<p class="country">
-		      <label>Country: </label><%= text_or_not_specified @institution.country, :flag=>true -%>
+		      <label>Country: </label><%= text_or_not_specified @institution.country, :link_as_country => true -%>
 		    </p>
 				
 				<p class="city">

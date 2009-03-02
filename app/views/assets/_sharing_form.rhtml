@@ -54,7 +54,10 @@
 		
 		<!-- private -->
 	  <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
-    	<input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
+    	<input type="hidden" name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
+			<input type="hidden" name="sharing[include_custom_sharing_<%= Policy::PRIVATE -%>]" value="0">
+			
+			<input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
             value="<%= Policy::PRIVATE -%>" type="radio" onclick="javascript:setSharingElementVisibility(<%= Policy::PRIVATE -%>);" />
         - Keep this <%= @resource_type -%> private.
 		</label></p>
@@ -216,7 +219,7 @@
                 <div id="proj_select_step_div_3" style="display: none; margin: 0; padding: 0;">
                   <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
                   
-                  <select name="proj_access_type_select" id="proj_access_type_select" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
+                  <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
                     <option value="<%= Policy::VIEWING -%>" >Viewing only</option>
                     <option value="<%= Policy::DOWNLOADING -%>" >Viewing and downloading only</option>
                     <option value="<%= Policy::EDITING -%>" >Viewing, downloading and editing</option>
@@ -224,7 +227,7 @@
                 </div>
                 
                            
-                <p style="margin: 0; padding: 0; line-height: 1; font-weight: bold; text-align: right;">
+                <p style="margin: 0; padding: 0.3em 0 0 0; line-height: 1; font-weight: bold; text-align: right;">
                   <span id="proj_select_prev_link" style="display: none; float: left;">
                     <%= link_to "< Previous step", "", :onclick => "javascript: projectInstitutionStepAction(-1); return(false);", :style => "font-weight: bold;" -%>
                   </span>
@@ -232,13 +235,88 @@
                     <%= link_to "Next step >", "", :onclick => "javascript: projectInstitutionStepAction(1); return(false);", :style => "font-weight: bold;" -%>
                   </span>
                   <span id="proj_select_add_link" style="display: none; float: right;">
-                    <%= link_to "Add", "", :onclick => "javascript: addProjectInstitution(); return(false);", :style => "font-weight: bold;" -%>
-                  </span>
-                </p>
+                    <ul style="margin-left: 1.2em; text-align: left;">
+                    	<li style="list-style-type: disc; padding: 0.3em 0;">
+										    <%= link_to "Add immediately", "", :onclick => "javascript: addProjectInstitution(); return(false);", :style => "font-weight: bold; padding: 0;" -%>
+                      </li>
+										  <li style="list-style-type: disc; padding: 0;">
+										    <div id="work_group_parent_span"><%= workgroup_member_review_popup_link() -%></div>
+										  </li>
+									  </ul>
+									</span>
+								</p>
+								<div class="clearer"></div>
               </div>
             </center>
           </div>
         </div>
+				
+				<!-- individual people -->
+        <div class="fold" style="width: 70%; margin: 0.6em 0;">
+
+          <div class="foldTitle">
+            <%= help_icon("Here you can individual people to share this #{@resource_type} with.") -%>
+            Individual People
+          </div>
+        
+          <div class="foldContent" style="display: none; background-color: #F2F2F2; padding-bottom: 1.3em;">
+			       <div id="facebook" class="clearfix">
+	  
+			          <p style="text-align: justify;">
+			            Please type names of people to share this <%= @resource_type -%> with into the box below - suggestions will be displayed as you type.
+			            Select access rights from drop-down menu; these will be applied to all chosen people.
+			            Clicking "Add" will add selected people to the list. 
+			          </p>
+			          
+			          <table>
+			            <tr>
+			              <td class="box_editing_inner">
+			                <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('ip_autocomplete_input').focus();" style="width: 340px;">
+			                  <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="ip_hidden_input" tabindex="-1" ></span>
+			                  
+			                  <div id="ip_autocomplete_display" class="tokenizer_input">
+			                     <input type="text" size="1" tabindex="" id="ip_autocomplete_input" />
+			                  </div>
+			                </div>
+			                <div id="ip_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 343px; height: auto; overflow-y: hidden;display:none">
+			                   <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>                       
+			                </div>
+			              
+			                <select name="individual_people_access_type_select" id="individual_people_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;">
+			                  <option value="<%= Policy::NO_ACCESS -%>" >no access</option>
+												<option value="<%= Policy::VIEWING -%>" >viewing only</option>
+			                  <option value="<%= Policy::DOWNLOADING -%>" >viewing and downloading only</option>
+			                  <option value="<%= Policy::EDITING -%>" >viewing, downloading and editing</option>
+			                </select>
+			              </td>
+			              
+			              <td style="padding-left: 0.7em; vertical-align: middle;">
+			                <span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: addIndividualPeople(); return(false);" -%></span>
+			              </td>
+			            </tr>
+			          </table>
+			      </div>
+			      
+			      
+			      <script type="text/javascript">
+			        var people_list = <%= @all_people_as_json -%>;
+			        var prepopulate_with = [];
+			      
+							var individual_people_autocompleter = new Autocompleter.LocalAdvanced(
+							    individual_people_autocompleter_id, 'ip_autocomplete_input', 'ip_autocomplete_display', 'ip_autocomplete_populate', people_list, prepopulate_with, {                                                  
+				            frequency: 0.1,
+				            updateElement: addAction,
+				            search_field: "name",
+				            hint_field: "email",
+				            id_field: "id",
+				            validation_type: "only_suggested"
+			        });
+			        var hidden_input = new HiddenInput('ip_hidden_input',individual_people_autocompleter);
+							
+							autocompleters[individual_people_autocompleter_id] = individual_people_autocompleter;
+			      </script>
+					</div>
+				</div>
 				
 			</div>
 		</div>
@@ -252,17 +330,50 @@
 				<input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_whitelist]" id="cb_use_whitelist" <%= "checked='checked'" if @use_whitelist -%> />
 			  - "white list", who always get full access
 			</label>
-			<!-- TODO : activate each step -->
-			<span>&nbsp;&nbsp;[ <%= link_to "edit", "/", :onclick => "alert('This function will be implemented shortly.'); return(false);" -%> ]</span>
+		  <% white_lst = current_user.get_whitelist -%>
+		  <%= hidden_field_tag "#{FavouriteGroup::WHITELIST_NAME}_group_id", (white_lst ? white_lst.id : "none") -%>
+			<span>&nbsp;&nbsp;[ 
+				<span id="<%= FavouriteGroup::WHITELIST_NAME -%>_edit_span" style="display: <%= white_lst ? "inline" : "none" -%>;">
+					<%= link_to "edit", "/", :onclick => "editWhitelistBlacklist('#{FavouriteGroup::WHITELIST_NAME}'); return(false);" -%>
+				</span>
+				<% unless white_lst -%>
+				  <span id="<%= FavouriteGroup::WHITELIST_NAME -%>_create_span">
+					  <%= link_to "create", "/", :onclick => "createWhitelistBlacklist('#{FavouriteGroup::WHITELIST_NAME}'); return(false);" -%>
+					</span>
+				<% end -%>
+			 ]</span>
+			 <%= image_tag method_to_icon_filename("spinner"), :id => "#{FavouriteGroup::WHITELIST_NAME}_creation_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
 		</p>
 		<p>
 			<label for="cb_use_blacklist">
 				<input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_blacklist]" id="cb_use_blacklist" <%= "checked='checked'" if @use_blacklist -%> />
 			  - "black list", who have no access at all
 			</label>
-			<!-- TODO : activate each step -->
-			<span>&nbsp;&nbsp;[ <%= link_to "edit", "/", :onclick => "alert('This function will be implemented shortly.'); return(false);" -%> ]</span>
+		  <% black_lst = current_user.get_blacklist -%>
+		  <%= hidden_field_tag "#{FavouriteGroup::BLACKLIST_NAME}_group_id", (black_lst ? black_lst.id : "none") -%>
+			<span>&nbsp;&nbsp;[ 
+				<span id="<%= FavouriteGroup::BLACKLIST_NAME -%>_edit_span" style="display: <%= black_lst ? "inline" : "none" -%>;">
+					<%= link_to "edit", "/", :onclick => "editWhitelistBlacklist('#{FavouriteGroup::BLACKLIST_NAME}'); return(false);" -%>
+				</span>
+				<% unless black_lst -%>
+				  <span id="<%= FavouriteGroup::BLACKLIST_NAME -%>_create_span">
+					  <%= link_to "create", "/", :onclick => "createWhitelistBlacklist('#{FavouriteGroup::BLACKLIST_NAME}'); return(false);" -%>
+					</span>
+				<% end -%>
+			 ]</span>
+			 <%= image_tag method_to_icon_filename("spinner"), :id => "#{FavouriteGroup::BLACKLIST_NAME}_creation_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
 	  </p>
+		<div style="display: none;">
+		  <% # this DIV is to hold the 'redbox' links generated by a method in application_helper, -%>
+		  <% # these will be "clicked" by javascript, because hidden divs that are present in the -%>
+		  <% # generated code causes IE to break layout by inserting extra line break otherwise -%>
+			<div id="<%= FavouriteGroup::WHITELIST_NAME -%>_redbox_link_div">
+  			<%= whitelist_blacklist_edit_popup_link(FavouriteGroup::WHITELIST_NAME) -%>
+			</div>
+			<div id="<%= FavouriteGroup::BLACKLIST_NAME -%>_redbox_link_div">	
+  			<%= whitelist_blacklist_edit_popup_link(FavouriteGroup::BLACKLIST_NAME) -%>
+			</div>
+		</div>
 		
   </div>
 </div>
@@ -276,6 +387,8 @@
 	
 	CREATE_FAVOURITE_GROUP_LINK = '<%= create_favourite_group_path -%>';
 	UPDATE_FAVOURITE_GROUP_LINK = '<%= update_favourite_group_path -%>';
+	
+	REVIEW_WORK_GROUP_LINK = '<%= review_work_group_path("type", "id", "access_type") -%>';
 	
 	
 	<% @policy.permissions.each do |p| -%>

@@ -1,29 +1,46 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-        person_id: 1
-        work_group_id: 1
+  person_id: 1
+  work_group_id: 1
 
 two:
-        person_id: 2
-        work_group_id: 2
+  person_id: 2
+  work_group_id: 2
 
 three:
-        person_id: 3
-        work_group_id: 1
+  person_id: 3
+  work_group_id: 1
 
 four:
-        person_id: 1
-        work_group_id: 3
+  person_id: 1
+  work_group_id: 3
 
 five:
-        person_id: 2
-        work_group_id: 4
+  person_id: 2
+  work_group_id: 4
 
 six:
-        person_id: 11
-        work_group_id: 4
+  person_id: 11
+  work_group_id: 4
 
 seven:
-        person_id: 12
-        work_group_id: 4
+  person_id: 12
+  work_group_id: 4
+
+
+# ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
+
+person_for_owner_of_my_first_sop_in_myexp_project:
+  person: person_for_owner_of_my_first_sop
+  work_group: myexperiment_project_workgroup
+
+
+person_for_owner_of_fully_public_policy_in_ebi_institution:
+  person: person_for_owner_of_fully_public_policy
+  work_group: ebi_inst_workgroup
+
+
+random_userless_person_in_sysmo_at_manchester_uni_workgroup:
+  person: random_userless_person
+  work_group: sysmo_at_manchester_uni_workgroup

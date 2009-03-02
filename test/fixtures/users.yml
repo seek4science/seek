@@ -77,3 +77,53 @@ part_registered:
   can_edit_institutions: false
 
 
+# ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
+
+owner_of_my_first_sop:
+  person: person_for_owner_of_my_first_sop
+  login: owner_of_my_first_sop_login
+  email: asset_owner@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+owner_of_fully_public_policy:
+  person: person_for_owner_of_fully_public_policy
+  login: owner_of_fully_public_policy_login
+  email: someone_elses_policy_owner@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+owner_of_complex_permissions_policy:
+  login: owner_of_complex_permissions_policy_login
+  email: owner_of_complex_policy@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+owner_of_a_sop_with_complex_permissions:
+  login: owner_of_a_sop_with_complex_permissions_login
+  email: complex_permission_owner@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false

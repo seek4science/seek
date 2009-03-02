@@ -18,7 +18,7 @@
 				<% unless is_nil_or_empty? institution.country %>
 		      <p class="country">
 		        <label>Country: </label>
-		        <%= h institution.country %>&nbsp;<%= flag_icon(institution.country) %>
+		        <%= text_or_not_specified institution.country, :link_as_country => true -%>
 		      </p>
 		    <% end %>
 		    

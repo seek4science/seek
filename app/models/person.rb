@@ -89,6 +89,17 @@ class Person < ActiveRecord::Base
     work_groups.collect {|wg| res << wg.project unless res.include?(wg.project) }
     return res
   end
+  
+  def locations
+    # infer all person's locations from the institutions where the person is member of
+    locations = self.institutions.collect { |i| i.country unless i.country.blank? }
+    
+    # make sure this list is unique and (if any institutions didn't have a country set) that 'nil' element is deleted
+    locations = locations.uniq
+    locations.delete(nil)
+    
+    return locations
+  end
 
   def email_with_name
     name + " <" + email + ">"

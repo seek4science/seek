@@ -331,11 +331,11 @@ module Authorization
         when "Sop" #, "Datafile", "Spreadsheet", etc
           # "find_by_sql" works faster itself PLUS only a subset of all fields is selected;
           # this is the most frequent query to be executed, hence needs to be optimised
-          found_instance = Asset.find_by_sql "SELECT contributor_id, contributor_type, policy_id FROM assets WHERE resource_id=#{thing_id} AND resource_type='#{thing_type}'"
+          found_instance = Asset.find_by_sql "SELECT id, contributor_id, contributor_type, policy_id FROM assets WHERE resource_id=#{thing_id} AND resource_type='#{thing_type}'"
           found_instance = (found_instance.empty? ? nil : found_instance[0]) # if nothing was found - nil; otherwise - first match
         when "Asset"
           # fairly possible that it's going to be an asset itself, not a resource
-          found_instance = Asset.find(thing_id)
+          found_instance = Asset.find(thing_id, :select => "id, contributor_id, contributor_type, policy_id")
         else
           # unknown type
           return nil
@@ -380,7 +380,7 @@ module Authorization
     access_rights = Authorization.get_person_access_rights_in_favourite_group(person_id, [blacklist_owner_user_id, FavouriteGroup::BLACKLIST_NAME])
     
     # found value should be an expected one
-    return (!access_rights.nil? && access_rights == Policy::DETERMINED_BY_GROUP)
+    return (!access_rights.nil? && access_rights == FavouriteGroup::BLACKLIST_ACCESS_TYPE)
   end
   
   
@@ -389,7 +389,7 @@ module Authorization
     access_rights = Authorization.get_person_access_rights_in_favourite_group(person_id, [whitelist_owner_user_id, FavouriteGroup::WHITELIST_NAME])
     
     # found value should be an expected one 
-    return (!access_rights.nil? && access_rights == Policy::DETERMINED_BY_GROUP)
+    return (!access_rights.nil? && access_rights == FavouriteGroup::WHITELIST_ACCESS_TYPE)
   end
   
   
@@ -397,7 +397,9 @@ module Authorization
   # if "group_type" and "group_id" are supplied as NIL, the method will check if the Person with ID(person_id)
   # belongs to any work groups / projects / institutions
   def Authorization.is_member?(person_id, group_type, group_id)
-    if group_type == "WorkGroup"
+    if group_type == "FavouriteGroup"
+      member = FavouriteGroup.find_by_sql "SELECT id FROM favourite_group_memberships WHERE person_id=#{person_id} and favourite_group_id=#{group_id}"
+    elsif group_type == "WorkGroup"
       member = GroupMembership.find_by_sql "SELECT id FROM group_memberships WHERE person_id=#{person_id} AND work_group_id=#{group_id}"
     elsif group_type == "Project" || group_type == "Institution"
       query =  "SELECT g_memb.id FROM group_memberships g_memb JOIN work_groups wg ON g_memb.work_group_id = wg.id "
@@ -418,7 +420,7 @@ module Authorization
     return nil if user_id == 0
     
     begin
-      user = User.find(:first, :conditions => ["id = ?", user_id])
+      user = User.find(:first, :conditions => ["id = ?", user_id], :select => "person_id")
       return user
     rescue ActiveRecord::RecordNotFound
       # user not found, "nil" for anonymous user will be returned
@@ -491,19 +493,22 @@ module Authorization
   # 2) favourite_group - an ID of the favourite group to check OR 
   #                      an array with 2 elements: [<id_of_the_user_who_is_owner_of_that_group>, <favourite_group_name>]
   def Authorization.get_person_access_rights_in_favourite_group(person_id, favourite_group)
+    # initialize variable to hold return value
+    found = []
+    
     if favourite_group.kind_of?(Fixnum)
       # if an ID of the favourite group is supplied, can use a direct query 
       found = FavouriteGroupMembership.find_by_sql "SELECT access_type FROM favourite_group_memberships WHERE person_id=#{person_id} AND favourite_group_id=#{favourite_group}"
-    else
-      # "favourite_group" doesn't contain an integer ID of the group, so it should be an array
-      #  with an ID of the owner (user) of that group and a string containing its name;
+    elsif favourite_group.kind_of?(Array) && favourite_group.length == 2 && favourite_group[0].kind_of?(Fixnum) && favourite_group[1].kind_of?(String)
+      # "favourite_group" doesn't contain an integer ID of the group; parameter type check for second option passed;
+      # so "favourite_group" should be an array with an ID of the owner (user) of that group and a string containing its name;
       #
       # names of favourite groups are *unique* so can use a join and one result will always be yielded
       found = FavouriteGroupMembership.find_by_sql "SELECT access_type FROM favourite_group_memberships g_memb JOIN favourite_groups g ON g.id = g_memb.favourite_group_id WHERE g_memb.person_id=#{person_id} AND g.user_id=#{favourite_group[0]} AND g.name='#{favourite_group[1]}'"
     end
     
-    # access_type code returned; if nothing found, return NIL 
-    # (NIL is illegal value for "access_type", hence can be used)
+    # access_type code returned; if nothing found (or nothing processed because of illegal parameter values), return NIL 
+    # (NIL is illegal value for "access_type", hence can be used to return a 'not found' result)
     return (found.length == 0 ? nil : found[0].access_type)
   end
   

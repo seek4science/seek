@@ -12,4 +12,9 @@
 one:
   id: 1
   data: <%= load_blob_data('file_picture.png') %>
-             
+  
+  
+# ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
+
+content_blob_with_little_file:
+  data: <%= load_blob_data('little_file.txt') %>

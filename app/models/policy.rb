@@ -200,6 +200,27 @@ class Policy < ActiveRecord::Base
   end
   
   
+  # translates access type codes into human-readable form
+  def self.get_access_type_wording(access_type)
+    case access_type
+      when Policy::DETERMINED_BY_GROUP
+        return "individual access rights for each member"
+      when Policy::NO_ACCESS
+        return "no access"
+      when Policy::VIEWING
+        return "viewing only"
+      when Policy::DOWNLOADING
+        return "viewing and downloading only"
+      when Policy::EDITING
+        return "viewing, downloading and editing"
+      when Policy::OWNER
+        return "owner access rights"
+      else
+        return "invalid access type"
+    end
+  end
+  
+  
   # extracts the "settings" of the policy, discarding other information
   # (e.g. contributor, creation time, etc.)
   def get_settings

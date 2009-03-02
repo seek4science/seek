@@ -30,13 +30,19 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :expertise
   
-  
+  # browsing by countries
+  map.country '/countries/:country_name', :controller => 'countries', :action => 'show'  
+
   # favourite groups
   map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }
   map.create_favourite_group '/favourite_groups/create', :controller => 'favourite_groups', :action => 'create', :conditions => { :method => :post }
   map.edit_favourite_group '/favourite_groups/edit', :controller => 'favourite_groups', :action => 'edit', :conditions => { :method => :post }
   map.update_favourite_group '/favourite_groups/update', :controller => 'favourite_groups', :action => 'update', :conditions => { :method => :post }
   map.delete_favourite_group '/favourite_groups/:id', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
+  
+  # review members of workgroup (also of a project / institution) popup
+  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }
+  
   
   # The priority is based upon order of creation: first created -> highest priority.
 

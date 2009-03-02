@@ -44,18 +44,22 @@
 		
 		
 		<h2 style="margin-top: 3em;">Project Assets</h2>
-		<div class="tabber">
-			<% project_asset_hash = @project.classified_assets -%>
-			<% project_asset_hash.each_key do |resource_type| -%>
-				<% visible_resource_type = resource_type.titleize.pluralize -%>
-				<% unless (resources = project_asset_hash[resource_type]).nil? || resources.empty? -%>
-					<div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
-				    <h3><%= "#{visible_resource_type} (#{resources.length})" -%></h3>
-						<%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => true } -%>
-				  </div>
+		<% project_asset_hash = @project.classified_assets -%>
+		<% unless project_asset_hash.empty? -%>
+  		<div class="tabber">
+				<% project_asset_hash.each_key do |resource_type| -%>
+					<% visible_resource_type = resource_type.titleize.pluralize -%>
+					<% unless (resources = project_asset_hash[resource_type]).nil? || resources.empty? -%>
+						<div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
+					    <h3><%= "#{visible_resource_type} (#{resources.length})" -%></h3>
+							<%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => true } -%>
+					  </div>
+					<% end -%>
 				<% end -%>
-			<% end -%>
-		</div>
+		  </div>
+		<% else -%>
+		  <span class="none_text">There are no assets that are associated with this Project.</span>
+		<% end -%>
 	</div>
 	
 	<div class="main_content_right_box">

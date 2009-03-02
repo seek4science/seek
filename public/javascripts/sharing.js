@@ -22,6 +22,14 @@ GET_ALL_INSTITUTIONS_LINK = null;
 CREATE_FAVOURITE_GROUP_LINK = null;
 UPDATE_FAVOURITE_GROUP_LINK = null;
 
+REVIEW_WORK_GROUP_LINK = null;
+
+
+// declarations for autocompleters
+var f_group_autocompleter_id = 'f_group_autocompleter';
+var individual_people_autocompleter_id = 'ip_autocompleter';
+// associative array that holds all instances of autocompleters on a page
+var autocompleters = new Array();
 
 var policy_settings = new Object();
 var permissions_for_set = {};
@@ -359,7 +367,8 @@ function addContributor(contributor_type, contributor_name, contributor_id, acce
 	  updateCustomSharingSettings();
 	}
 	else {
-	  alert('Already in the list!');
+	  alert('The following entity was not added (already in the list):\n\n' + 
+	        contributor_type + ': ' + contributor_name);
 	}
 }
 
@@ -367,11 +376,13 @@ function addContributor(contributor_type, contributor_name, contributor_id, acce
 function checkContributorNotInList(contributor_type, contributor_id) {
   rtn = true;
   
-  for(var i = 0; i < permission_settings[contributor_type].length; i++)
-    if(permission_settings[contributor_type][i][1] == contributor_id) {
-      rtn = false;
-      break;
-    }
+  if(permission_settings[contributor_type]) {
+	  for(var i = 0; i < permission_settings[contributor_type].length; i++)
+	    if(permission_settings[contributor_type][i][1] == contributor_id) {
+	      rtn = false;
+	      break;
+	    }
+	}
   
   return(rtn);
 }
@@ -448,6 +459,7 @@ function projectInstitutionStepAction(step_increment) {
         break;
         
       case 3:
+        replaceReviewWorkGroupURL();
         updateProjectInstitutionVisibility(new_step_idx);
         break;
     }
@@ -513,7 +525,7 @@ function loadInstitutionsForProject(project_id, project_name) {
 }
 
 
-function addProjectInstitution() {
+function determineProjectInstitutionSelection() {
   project_id = $('proj_project_select').options[$('proj_project_select').selectedIndex].value;
   institution_id = $('proj_institution_select').options[$('proj_institution_select').selectedIndex].value;
   access_type = parseInt($('proj_access_type_select').options[$('proj_access_type_select').selectedIndex].value);
@@ -541,13 +553,69 @@ function addProjectInstitution() {
       if(receivedProjectInstitutions.institution_list[i][1] == institution_id)
         add_id = receivedProjectInstitutions.institution_list[i][2];
   }
+
+  var result = new Array();
+  result['type'] = add_type;
+  result['name'] = add_name;
+  result['id'] = add_id;
+  result['access_type'] = access_type;
+  
+  return(result);
+}
+
+
+function addProjectInstitution() {
+  var selection = determineProjectInstitutionSelection();
+  add_type = selection['type'];
+  add_name = selection['name'];
+  add_id = selection['id'];
+  access_type = selection['access_type'];
   
   // add to list and update..
   addContributor(add_type, add_name, add_id, access_type);
   // ..and reset this section to run from new
   $('proj_select_step_index').value = 1;
+  $('proj_project_select').selectedIndex = 0;
+  $('proj_access_type_select').selectedIndex = 0;
   updateProjectInstitutionVisibility(1);
 }
+
+
+function addProjectInstitutionReviewed() {
+  // add the originally selected project / institution / workgroup
+  originally_selected_project_institution = determineProjectInstitutionSelection();
+  add_type = originally_selected_project_institution['type'];
+  add_name = originally_selected_project_institution['name'];
+  add_id = originally_selected_project_institution['id'];
+  access_type = originally_selected_project_institution['access_type'];
+  addContributor(add_type, add_name, add_id, access_type);
+  
+  // add individual access permissions if any of the selections for members 
+  // differ from originally selected access type
+  search_str = 'work_group_access_rights_select_person_';
+  
+  all_selects = $$('select');
+  for(var i = 0; i < all_selects.length; i++) {
+    if(all_selects[i].id.substr(0, search_str.length) == search_str) {
+      cur_access_type = parseInt(all_selects[i].value);
+      
+      // only add person, corresponding to current 'select' element if access type differs from original selection
+      if(cur_access_type != access_type) {
+	      cur_id = parseInt(all_selects[i].id.substr(search_str.length));
+	      addContributor('Person', $('work_group_member_person_'+cur_id).innerHTML, cur_id, cur_access_type);
+	    }
+    }
+  }
+  
+  // reset this section to run from new
+  $('proj_select_step_index').value = 1;
+  $('proj_project_select').selectedIndex = 0;
+  $('proj_access_type_select').selectedIndex = 0;
+  updateProjectInstitutionVisibility(1);
+  
+  RedBox.close();
+}
+
 
 
 
@@ -560,10 +628,12 @@ function updateGroupMembers() {
   
   for(id in currentFavouriteGroupSettings) {
     //alert(id + "\n" + currentFavouriteGroupSettings[id]);
-    member_name = getValueFromJsonArray(itemIDsToJsonArrayIDs([id])[0], 'name');
+    member_name = autocompleters[f_group_autocompleter_id].getValueFromJsonArray(autocompleters[f_group_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
     group_members += member_name
                   + '&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(currentFavouriteGroupSettings[id]) +')</span>' 
                   + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' 
+                  + '[<a href="" onclick="javascript:editGroupMember('+ id +', ' + currentFavouriteGroupSettings[id] + '); return(false);">edit</a>]</small>'
+                  + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
                   + '[<a href="" onclick="javascript:deleteGroupMember('+ id +'); return(false);">delete</a>]</small><br/>';
   }
     
@@ -584,7 +654,7 @@ function updateGroupMembers() {
 
 
 function addGroupMembers() {
-	var selIDs = getRecognizedSelectedIDs();
+	var selIDs = autocompleters[f_group_autocompleter_id].getRecognizedSelectedIDs();
 	
 	if(selIDs == "") {
 		// no people to add
@@ -612,7 +682,7 @@ function addGroupMembers() {
 		
 		// reset selection, remove all tokens from autocomplete text box and update the current selection list 
 		$('group_access_type_select').selectedIndex = 0;
-		deleteAllTokens();
+		autocompleters[f_group_autocompleter_id].deleteAllTokens();
 		updateGroupMembers();
 		
   	return(!duplicates_found);
@@ -620,9 +690,30 @@ function addGroupMembers() {
 }
 
 
-function deleteGroupMember(member_id) {
-  delete currentFavouriteGroupSettings[member_id];
+function deleteGroupMember(person_id) {
+  delete currentFavouriteGroupSettings[person_id];
   updateGroupMembers();
+}
+
+
+function editGroupMember(person_id, access_type) {
+  if(autocompleters[f_group_autocompleter_id].getRecognizedSelectedIDs() != "")
+    if(! confirm('This will replace any people in the "Add members" section that were not yet added as favourite group members.\n\nAre you sure you want to proceed?'))
+      return(false);
+  
+  // no "tokens" are present in the 'autocomplete display' field OR the user has agreed to reset their selection --
+  // remove the clicked person from the list..    
+  delete currentFavouriteGroupSettings[person_id];
+  updateGroupMembers();
+  
+  // ..remove any 'tokens' from 'autocomplete display' field and add the current person there (along with their selected access type)
+  autocompleters[f_group_autocompleter_id].deleteAllTokens();
+  autocompleters[f_group_autocompleter_id].prepopulateAutocompleterDisplayWithTokens([person_id]);
+  for(var i = 0; i < $('group_access_type_select').options.length; i++)
+    if(parseInt($('group_access_type_select').options[i].value) == access_type) {
+      $('group_access_type_select').selectedIndex = i;
+      break;
+    }
 }
 
 
@@ -636,9 +727,9 @@ function postFavouriteGroupData(new_group) {
   
   
   // check if no tokens remain in the autocomplete text box
-  if(getRecognizedSelectedIDs() != "") {
+  if(autocompleters[f_group_autocompleter_id].getRecognizedSelectedIDs() != "") {
     alert('You didn\'t press "Add" link to add members from the autocomplete field');
-    $('autocomplete_input').focus();
+    $('f_group_autocomplete_input').focus();
     return(false);
   }
   
@@ -648,9 +739,8 @@ function postFavouriteGroupData(new_group) {
   for(id in currentFavouriteGroupSettings)
     count++;
   
-  if(count == 0) {
-    alert('Please add members to this group');
-    $('autocomplete_input').focus();
+  if(count == 0 && !confirm('There are no members in this group now.\n\nDo you want to proceed?')) {
+    $('f_group_autocomplete_input').focus();
     return(false);
   }
   
@@ -856,6 +946,178 @@ function replaceFavouriteGroupRedboxActionURL() {
   // set the new url
   $('delete_f_group_li').firstDescendant().href = delete_url_base + parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value);
   
+  
+  return(true);
+}
+
+
+// links to RedBox popups are very complex and need to be generated by Ruby code
+// at the server side; however, for 'review workgroup member permissions' link ID and type of
+// work group is required, hence a JavaScript helper is needed to add this ID / type to the URL
+// at runtime at client side (when 'next' / 'prev' steps links are activated)
+function replaceReviewWorkGroupURL() {
+	// get current project / institution / workgroup selection
+	proj_inst_selection = determineProjectInstitutionSelection();
+	
+	// remove "__type__/__id__/__access_type__" from the end of the search string
+	var last_idx_to_use = REVIEW_WORK_GROUP_LINK.lastIndexOf('/');
+  var search_string = REVIEW_WORK_GROUP_LINK.substring(0, last_idx_to_use);
+  
+  last_idx_to_use = search_string.lastIndexOf('/');
+  search_string = search_string.substring(0, last_idx_to_use);
+  
+  last_idx_to_use = search_string.lastIndexOf('/');
+  search_string = search_string.substring(0, last_idx_to_use);
+	
+  var parent_element = $('work_group_parent_span');
+	var parent_element_html = parent_element.innerHTML;
+  
+  last_idx_to_use = parent_element_html.indexOf(search_string) + search_string.length;
+  var last_idx_to_replace = parent_element_html.indexOf('\'', last_idx_to_use);
+  
+  var replace_string = parent_element_html.substring(0,last_idx_to_use) + 
+		                   '/' + proj_inst_selection['type'] + '/' + proj_inst_selection['id'] + '/' + proj_inst_selection['access_type'] +
+								       parent_element_html.substr(last_idx_to_replace);
+	
+  parent_element.innerHTML = replace_string;
+}
+
+
+
+// ***************  Individual People  *****************
+
+function addIndividualPeople() {
+  var selIDs = autocompleters[individual_people_autocompleter_id].getRecognizedSelectedIDs();
+  
+  if(selIDs == "") {
+    // no people to add
+    alert("Please choose people to share with!");
+    return(false);
+  }
+  else {
+    // some people to add - known that don't have duplicates
+    // within the new list, but some entries in the new list
+    // may replicate those in the main member list: check this
+    var duplicates_found = false;
+    
+    for(var i = 0; i < selIDs.length; i++) {
+      id = parseInt(selIDs[i]);
+			access_type = parseInt($('individual_people_access_type_select').options[$('individual_people_access_type_select').selectedIndex].value);
+      person_name = autocompleters[individual_people_autocompleter_id].getValueFromJsonArray(autocompleters[individual_people_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
+			addContributor('Person', person_name, id, access_type);
+		}
+      
+    // reset selection, remove all tokens from autocomplete text box and update the current selection list 
+    $('individual_people_access_type_select').selectedIndex = 0;
+    autocompleters[individual_people_autocompleter_id].deleteAllTokens();
+    
+    return(true);
+  }
+}
+
+
+// ***************  Whitelist / Blacklist  *****************
+
+// will create new whitelist/blacklist (based on 'grp_name' parameter) and
+// automatically cause the 'edit' action on that group afterwards
+function createWhitelistBlacklist(grp_name) {
+  alert('This is the first time you have requested to edit this group.\n' +
+        'It doesn\'t exist yet and will be created first. After that you\n' +
+        'will automatically see another screen that will allow you to add\n' +
+        'people to this group.');
+  
+  
+  $(grp_name + '_creation_spinner').style.display = "inline";
+  
+  request = new Ajax.Request(CREATE_FAVOURITE_GROUP_LINK, 
+                             { method: 'post',
+                               parameters: {favourite_group_name: grp_name,
+                                            favourite_group_members: "{}"},
+                               onSuccess: function(transport){
+                                 $(grp_name + '_creation_spinner').style.display = "none";
+                                 
+                                 // "true" parameter to evalJSON() activates sanitization of input
+                                 var data = transport.responseText.evalJSON(true);
+                                 
+                                 if (data.status == 200) {
+                                   // whitelist/blacklist was created successfully.. 
+                                   // ..replace 'create' link with 'update' one
+                                   $(grp_name + '_create_span').style.display = "none";
+                                   $(grp_name + '_edit_span').style.display = "inline";
+                                   
+                                   // ..set the ID of the new group to allow calling 'edit' action on it
+                                   $(grp_name + '_group_id').value = data.group_id;
+                                   
+                                   // ..now need to show the RedBox popup to allow adding members to the new group
+                                   editWhitelistBlacklist(grp_name);
+                                   return(true);
+                                 }
+                                 else if (data.status == 403) {
+                                   // this value is returned by us when duplicate group name was found
+                                   alert(data.error_message);
+                                   return(false);
+                                 }
+                                 else {
+                                   error_status = data.status;
+                                   error_message = data.error_message;
+                                   alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
+                                   return(false);
+                                 }
+                               },
+                               onFailure: function(transport){
+                                 $(grp_name + '_creation_spinner').style.display = "none";
+                                 alert('Something went wrong, please try again...');
+                                 return(false); 
+                               }    
+                             });
+  
+}
+
+
+function editWhitelistBlacklist(grp_name) {
+  replaceWhitelistBlacklistRedboxURL(grp_name);
+  $(grp_name + '_edit_redbox').onclick();
+  return(true);
+}
+
+
+// links to RedBox popups are very complex and need to be generated by Ruby code
+// at the server side; however, for 'edit' / 'delete' links ID of the favourite
+// group is required, hence a JavaScript helper is needed to add this ID to the URL
+// at runtime at client side
+function replaceWhitelistBlacklistRedboxURL(grp_name) {
+  
+  var search_str = 'parameters:';
+  var search_str_id = '\'id\': \'';
+  var search_str_auth_token = '\'authenticity_token=\' + encodeURIComponent(\'';
+  
+  var new_id = parseInt($(grp_name + '_group_id').value);
+  
+  var parameters = {};
+	parameters['id'] = new_id;
+	
+	
+  var main_ancestor_element = $(grp_name + '_redbox_link_div');
+	var main_element_html = main_ancestor_element.innerHTML;
+    
+  var first_str_index_to_replace = main_element_html.indexOf(search_str) + search_str.length;
+	
+	if(main_element_html.substr(first_str_index_to_replace, search_str_auth_token.length) == search_str_auth_token) {
+	  var authenticity_token_start_index = main_element_html.indexOf(search_str_auth_token, first_str_index_to_replace) + search_str_auth_token.length;
+		parameters['authenticity_token'] = main_element_html.substr(authenticity_token_start_index, 40); // length of authenticity token is always 40 characters
+		
+		var last_str_index_to_replace = main_element_html.indexOf(')', authenticity_token_start_index) + 1; // 1 is the length of the ')' bracket
+		
+    var replace_string = main_element_html.substring(0,first_str_index_to_replace) + 
+		                     Object.toJSON(parameters).replace(/\"/g, '\'') + // replace all double quotes with single ones in the JSON representation of "parameters" hash
+								         main_element_html.substr(last_str_index_to_replace); 
+	
+	  // set the replaced HTML
+	  main_ancestor_element.innerHTML = replace_string;
+	}
+	else {
+	  // do nothing, because ID of the whitelist/blacklist won't change and it was set once already
+	}
   
   return(true);
 }

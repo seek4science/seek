@@ -101,6 +101,16 @@ class User < ActiveRecord::Base
   def generate_own_project_id_name_hash
     return Hash[*self.person.projects.collect{|p|; [p.id, p.name];}.flatten]
   end  
+  
+  # returns a 'whitelist' favourite group for the user (or 'nil' if not found)
+  def get_whitelist
+    return FavouriteGroup.find(:first, :conditions => { :user_id => self.id, :name => FavouriteGroup::WHITELIST_NAME } )
+  end
+  
+  # returns a 'blacklist' favourite group for the user (or 'nil' if not found)
+  def get_blacklist
+    return FavouriteGroup.find(:first, :conditions => { :user_id => self.id, :name => FavouriteGroup::BLACKLIST_NAME } )
+  end
 
   protected
     # before filter 

@@ -2,7 +2,12 @@
 	<div class="head">
 		<%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
 		<span style="vertical-align:middle;">
-			<%= action_create ? "Create New" : "Edit" -%> Favourite Group
+			<%= action_create ? "Create New" : "Edit" -%> 
+			<% if @f_group.is_whitelist_or_blacklist? -%>
+			  <%= (@f_group.name == FavouriteGroup::WHITELIST_NAME) ? "\"White List\"" : "\"Black List\"" -%>
+			<% else -%>
+			  Favourite Group
+			<% end -%>
 			<%= image_tag method_to_icon_filename("spinner"), :id => "fav_group_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
 		</span>
 	</div>
@@ -12,9 +17,14 @@
 			<div id="facebook" class="clearfix">
 				<%= hidden_field_tag "f_group_id", @f_group.id -%>
 				
-				<label for="group_name"><strong>Group Name:</strong></label>
-				<%= text_field_tag "group_name", @f_group.name, :class => "to_field_identical", :style => "width: 300px; margin-left: 0.3em; vertical-align: middle;" -%>
-				<br/>
+				<% unless @f_group.is_whitelist_or_blacklist? -%>
+					<label for="group_name"><strong>Group Name:</strong></label>
+					<%= text_field_tag "group_name", @f_group.name, :class => "to_field_identical", :style => "width: 300px; margin-left: 0.3em; vertical-align: middle;" -%>
+					<br/>
+				<% else -%>
+				  <% # don't need to display the name of whitelist / blacklist group, but still need submission of it -%>
+					<%= hidden_field_tag "group_name", @f_group.name -%>
+			  <% end -%>
 				
 				
 				<p style="font-weight: bold; text-align: center; margin-top: 1.3em;">
@@ -29,33 +39,41 @@
 				  <p style="text-align: justify;">
 	          Please type names of people to add to this group into the box below - suggestions will be displayed as you type.
 						Select access rights from drop-down menu; these will be applied to all chosen people.
-						Clicking	"Add" will add selected people as group members. 
+						Clicking "Add" will add selected people as group members. 
 	        </p>
 					
 					
 					<table>
 						<tr>
 							<td class="box_editing_inner">
-								<div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('autocomplete_input').focus()" style="width: 340px;">
-				          <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="hidden_input" tabindex="-1" ></span>
-				          
-				          <div id="autocomplete_display" class="tokenizer_input">
-				             <input type="text" size="1" tabindex="" id="autocomplete_input" />
-				          </div>
-				        </div>
-				        <div id="autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 343px; height: auto; overflow-y: hidden;display:none">
-				           <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>                       
-				        </div>
+								<div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('f_group_autocomplete_input').focus();" style="width: 340px;">
+                  <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="f_group_hidden_input" tabindex="-1" ></span>
+                  
+                  <div id="f_group_autocomplete_display" class="tokenizer_input">
+                     <input type="text" size="1" tabindex="" id="f_group_autocomplete_input" />
+                  </div>
+                </div>
+                <div id="f_group_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 343px; height: auto; overflow-y: hidden;display:none">
+                   <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>                       
+                </div>
 							
-						  	<select name="group_access_type_select" id="group_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;">
-								  <option value="<%= Policy::VIEWING -%>" >viewing only</option>
-								  <option value="<%= Policy::DOWNLOADING -%>" >viewing and downloading only</option>
-								  <option value="<%= Policy::EDITING -%>" >viewing, downloading and editing</option>
+						  	<select name="group_access_type_select" id="group_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;" <%= "disabled" if @f_group.is_whitelist_or_blacklist? -%>>
+								  <% unless @f_group.is_whitelist_or_blacklist? -%>
+										<option value="<%= Policy::VIEWING -%>" >viewing only</option>
+									  <option value="<%= Policy::DOWNLOADING -%>" >viewing and downloading only</option>
+									  <option value="<%= Policy::EDITING -%>" >viewing, downloading and editing</option>
+									<% else -%>
+									  <% if @f_group.name == FavouriteGroup::BLACKLIST_NAME -%>
+										  <option value="<%= FavouriteGroup::BLACKLIST_ACCESS_TYPE -%>" ><%= Policy.get_access_type_wording(FavouriteGroup::BLACKLIST_ACCESS_TYPE) -%></option>
+										<% elsif @f_group.name == FavouriteGroup::WHITELIST_NAME -%>
+										  <option value="<%= FavouriteGroup::WHITELIST_ACCESS_TYPE -%>" ><%= Policy.get_access_type_wording(FavouriteGroup::WHITELIST_ACCESS_TYPE) -%></option>
+										<% end -%>
+									<% end -%>
 								</select>
 							</td>
 							
               <td style="padding-left: 0.7em; vertical-align: middle;">
-								<span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: if(!addGroupMembers()) { $('autocomplete_input').focus(); };return(false);" -%></span>
+								<span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: if(!addGroupMembers()) { $('f_group_autocomplete_input').focus(); };return(false);" -%></span>
 							</td>
 						</tr>
 					</table>
@@ -73,18 +91,21 @@
 			
 			
 			<script type="text/javascript">
-				var contacts = <%= Person.get_all_as_json -%>;
+				var people_list = <%= Person.get_all_as_json -%>;
 				var prepopulate_with = [];
 			
-			  var typeahead = new Autocompleter.LocalAdvanced('autocomplete_input', 'autocomplete_populate', contacts, prepopulate_with, {                                                  
-			      frequency: 0.1,
-			      updateElement: addContactToList,
-			      search_field: "name",
-						hint_field: "email",
-						id_field: "id",
-						validation_type: "only_suggested"
-			  });
-			  var hidden_input = new HiddenInput('hidden_input',typeahead);
+				var f_group_autocompleter = new Autocompleter.LocalAdvanced(
+				    f_group_autocompleter_id, 'f_group_autocomplete_input', 'f_group_autocomplete_display', 'f_group_autocomplete_populate', people_list, prepopulate_with, {                                                  
+	            frequency: 0.1,
+	            updateElement: addAction,
+	            search_field: "name",
+	            hint_field: "email",
+	            id_field: "id",
+	            validation_type: "only_suggested"
+        });
+        var hidden_input = new HiddenInput('f_group_hidden_input',f_group_autocompleter);
+				
+				autocompleters[f_group_autocompleter_id] = f_group_autocompleter;
 				
 				
 				// ---------------------------------------------------------

@@ -1,11 +1,37 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
- one:
-   id: 1
-   contributor_type: 'User'
-   contributor_id:   1
-   project_id:       1
-   resource_type:    'Sop'
-   resource_id:      1
-   #policy_id:
-           
+one:
+  id: 1
+  contributor_type: 'User'
+  contributor_id:   1
+  project_id:       1
+  resource_type:    'Sop'
+  resource_id:      1
+  #policy_id:
+  
+  
+# ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
+
+asset_of_my_first_sop:
+  contributor: owner_of_my_first_sop (User)
+  project: nil # not linked to any project for now
+  resource: my_first_sop (Sop)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: nil # this is to be defined
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+asset_of_a_sop_with_complex_permissions:
+  contributor: owner_of_a_sop_with_complex_permissions (User)
+  project: nil # not linked to any project for now
+  resource: sop_with_complex_permissions (Sop)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: policy_with_complex_permissions
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+  
