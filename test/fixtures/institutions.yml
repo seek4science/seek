@@ -42,3 +42,7 @@ ebi_inst:
 
 amsterdam_uni_inst:
   name: "University of Amsterdam"
+
+
+empty_inst:
+  name: "empty institution with no members..."

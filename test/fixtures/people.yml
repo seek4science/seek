@@ -102,3 +102,8 @@ random_userless_person:
 person_not_associated_with_any_projects:
   first_name: "not"
   last_name: "associated"
+
+
+person_to_associate_with_sops_owning_users:
+  first_name: "person"
+  last_name: "place_holder"

@@ -16,6 +16,11 @@ class SopsController < ApplicationController
 
   # GET /sops/1
   def show
+    # update timestamp in the current SOP record 
+    # (this will also trigger timestamp update in the corresponding Asset)
+    @sop.last_used_at = Time.now
+    @sop.save
+    
     respond_to do |format|
       format.html # show.html.erb
     end
@@ -23,6 +28,11 @@ class SopsController < ApplicationController
   
   # GET /sops/1;download
   def download
+    # update timestamp in the current SOP record 
+    # (this will also trigger timestamp update in the corresponding Asset)
+    @sop.last_used_at = Time.now
+    @sop.save
+    
     send_data @sop.content_blob.data, :filename => @sop.original_filename, :content_type => @sop.content_type, :disposition => 'attachment'
   end
 
@@ -104,6 +114,9 @@ class SopsController < ApplicationController
       [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
         params[:sop].delete(column_name)
       end
+    
+      # update 'last_used_at' timestamp on the SOP
+      params[:sop][:last_used_at] = Time.now
     end
     
     respond_to do |format|

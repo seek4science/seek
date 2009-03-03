@@ -145,6 +145,7 @@ owner_of_custom_permissions_only_policy:
 
 
 owner_of_complex_permissions_policy:
+  person: person_to_associate_with_sops_owning_users
   login: owner_of_complex_permissions_policy_login
   email: owner_of_complex_policy@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
@@ -157,6 +158,7 @@ owner_of_complex_permissions_policy:
 
 
 owner_of_a_sop_with_complex_permissions:
+  person: person_to_associate_with_sops_owning_users
   login: owner_of_a_sop_with_complex_permissions_login
   email: complex_permission_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd

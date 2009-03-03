@@ -25,10 +25,10 @@ four:
 
 myexperiment_project_workgroup:
   project: myexperiment_project
-  institution: nil
+  institution: empty_inst
 
 ebi_inst_workgroup:
-  project: nil
+  project: empty_project
   institution: ebi_inst
 
 sysmo_at_manchester_uni_workgroup:

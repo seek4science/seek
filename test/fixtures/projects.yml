@@ -29,3 +29,7 @@ myexperiment_project:
 
 sysmo_project:
   name: "SysMO"
+
+
+empty_project:
+  name: "empty project with no members..."
