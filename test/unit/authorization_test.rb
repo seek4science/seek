@@ -324,7 +324,151 @@ class AuthorizationTest < ActiveSupport::TestCase
   
   
   
+  # ****************************************************************************
+  # this section tests integration of individual helpers in Authorization module
+  # ****************************************************************************
+  
   # testing: authorized_by_policy?(policy, thing_asset, action, user_id, user_person_id)
-  # TODO
+  
+  # 'everyone' policy
+  def test_authorized_by_policy_fully_public_policy_anonymous_user
+    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), assets(:asset_of_a_sop_with_fully_public_policy), "download", nil, nil)
+    assert res, "policy with sharing_scope = 'Policy::EVERYONE' wouldn't allow not logged in users to perform 'download' where it should allow even 'edit'"
+  end
+  
+  def test_authorized_by_policy_fully_public_policy_registered_user
+    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), assets(:asset_of_a_sop_with_fully_public_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    assert res, "policy with sharing_scope = 'Policy::EVERYONE' wouldn't allow registered user to perform 'download' where it should allow even 'edit'"
+  end
+  
+  def test_authorized_by_policy_fully_public_policy_sysmo_user
+    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), assets(:asset_of_a_sop_with_fully_public_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
+    assert res, "policy with sharing_scope = 'Policy::EVERYONE' wouldn't allow SysMO user to perform 'download' where it should allow even 'edit'"
+  end
+  
+  # 'all registered users' policy
+  def test_authorized_by_policy_all_registered_users_policy_anonymous_user
+    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), assets(:asset_of_a_sop_with_all_registered_users_policy), "download", nil, nil)
+    assert (!res), "policy with sharing_scope = 'Policy::ALL_REGISTERED_USERS' would allow not logged in users to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_all_registered_users_policy_registered_user
+    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), assets(:asset_of_a_sop_with_all_registered_users_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    assert res, "policy with sharing_scope = 'Policy::ALL_REGISTERED_USERS' wouldn't allow registered user to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_all_registered_users_policy_sysmo_user
+    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), assets(:asset_of_a_sop_with_all_registered_users_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
+    assert res, "policy with sharing_scope = 'Policy::ALL_REGISTERED_USERS' wouldn't allow SysMO user to perform allowed action"
+  end
+  
+  # 'all SysMO users' policy
+  def test_authorized_by_policy_all_sysmo_users_policy_anonymous_user
+    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), assets(:asset_of_a_sop_with_all_sysmo_users_policy), "download", nil, nil)
+    assert (!res), "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' would allow not logged in users to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_all_sysmo_users_policy_registered_user
+    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), assets(:asset_of_a_sop_with_all_sysmo_users_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    assert (!res), "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' would allow registered user to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_all_sysmo_users_policy_sysmo_user
+    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), assets(:asset_of_a_sop_with_all_sysmo_users_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
+    assert res, "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' wouldn't allow SysMO user to perform allowed action"
+  end
+  
+  # 'custom permissions only' policy
+  def test_authorized_by_policy_custom_permissions_only_policy_anonymous_user
+    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), assets(:asset_of_a_sop_with_custom_permissions_policy), "download", nil, nil)
+    assert (!res), "policy with sharing_scope = 'Policy::CUSTOM_PERMISSIONS_ONLY' would allow not logged in users to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_custom_permissions_only_policy_registered_user
+    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), assets(:asset_of_a_sop_with_custom_permissions_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    assert (!res), "policy with sharing_scope = 'Policy::CUSTOM_PERMISSIONS_ONLY' would allow registered user to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_custom_permissions_only_policy_sysmo_user
+    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), assets(:asset_of_a_sop_with_custom_permissions_policy), "download", users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
+    assert (!res), "policy with sharing_scope = 'Policy::CUSTOM_PERMISSIONS_ONLY' would allow SysMO user to perform allowed action"
+  end
+  
+  # 'private' policy
+  def test_authorized_by_policy_private_policy_anonymous_user
+    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), assets(:asset_of_my_first_sop), "download", nil, nil)
+    assert (!res), "policy with sharing_scope = 'Policy::PRIVATE' would allow not logged in users to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_private_policy_registered_user
+    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), assets(:asset_of_my_first_sop), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    assert (!res), "policy with sharing_scope = 'Policy::PRIVATE' would allow registered user to perform allowed action"
+  end
+  
+  def test_authorized_by_policy_private_policy_sysmo_user
+    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), assets(:asset_of_my_first_sop), "download", users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
+    assert (!res), "policy with sharing_scope = 'Policy::PRIVATE' would allow SysMO user to perform allowed action"
+  end
+  
+  
+  
+  # ****************************************************************************
+  # This section is dedicated to test the main method of the module:
+  #     is_authorized?(action_name, thing_type, thing, user=nil)
+  # ****************************************************************************
+  
+  # testing combinations of types of input parameters
+
+  # various incorrect input parameters
+  def test_is_authorized_invalid_action
+    res = Authorization.is_authorized?("bad_action_name_that_will_never_be_used", nil, assets(:asset_of_my_first_sop), nil)
+    assert (!res), "invalid action name was processed and permission to execute action granted"
+  end
+  
+  def test_is_authorized_blank_thing_type_only_id_supplied
+    res = Authorization.is_authorized?("view", nil, assets(:asset_of_my_first_sop).id, nil)
+    assert (!res), "permission to execute action granted for a 'thing' with no type (only ID) provided"
+  end
+  
+  def test_is_authorized_both_thing_parameters_blank
+    res = Authorization.is_authorized?("view", nil, nil, nil)
+    assert (!res), "permission to execute action granted for a 'thing' with no type / ID supplied"
+  end
+  
+  
+  # testing that asset owners can destroy (plus verifying different options fur submitting the 'thing' and the 'user')
+  
+  # checking that owner of the asset can destroy it
+  # ('thing' supplied as type = 'nil' plus actual instance of the thing)
+  def test_is_authorized_thing_as_instance
+    res = Authorization.is_authorized?("destroy", nil, assets(:asset_of_my_first_sop), users(:owner_of_my_first_sop))
+    assert res, "owner of the asset (supplied as instance) was denied destroying the asset"
+  end
+  
+  # checking that owner of the asset can destroy it
+  # ('thing' supplied as type plus ID of the thing)
+  def test_is_authorized_thing_as_type_and_id
+    res = Authorization.is_authorized?("destroy", assets(:asset_of_my_first_sop).class.name, assets(:asset_of_my_first_sop).id, users(:owner_of_my_first_sop))
+    assert res, "owner of the asset (supplied as type + ID) was denied destroying the asset"
+  end
+  
+  # checking that owner of the asset can destroy it
+  # ('user' was supplied as an instance in all previous test cases, now checking that can submit an ID if necessary)
+  def test_is_authorized_thing_as_type_and_id_user_as_id
+    res = Authorization.is_authorized?("destroy", assets(:asset_of_my_first_sop).class.name, assets(:asset_of_my_first_sop).id, users(:owner_of_my_first_sop).id)
+    assert res, "owner (supplied as ID) of the asset (supplied as type + ID) was denied destroying the asset"
+  end
+  
+  
+  # testing that policy admin can destroy, too (and that asset owner, who is not policy admin, also can destroy)
+  def test_is_authorized_policy_admin_can_destroy
+    res = Authorization.is_authorized?("destroy", nil, sops(:sop_with_complex_permissions), users(:owner_of_complex_permissions_policy))
+    assert res, "owner of asset's policy couldn't destroy the asset"
+  end
+  
+  def test_is_authorized_owner_who_is_not_policy_admin_can_destroy
+    res = Authorization.is_authorized?("destroy", nil, sops(:sop_with_complex_permissions), users(:owner_of_a_sop_with_complex_permissions))
+    assert res, "owner of asset who isn't its policy admin couldn't destroy the asset"
+  end
   
 end

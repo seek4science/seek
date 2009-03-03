@@ -21,6 +21,10 @@ class Policy < ActiveRecord::Base
   # have their integer values increased along with the access they provide
   # (so, for example, "editing" should have greated value than "viewing")
   
+  # In other words, this means that for both(!) sharing_scope and access_type 
+  # constants it is crucial that order of these (imposed by their integer values)
+  # is preserved
+  
   # sharing_scope
   PRIVATE = 0
   CUSTOM_PERMISSIONS_ONLY = 1

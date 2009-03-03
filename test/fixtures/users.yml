@@ -105,6 +105,45 @@ owner_of_fully_public_policy:
   can_edit_institutions: false
 
 
+owner_of_download_for_all_registered_users_policy:
+  person: person_for_owner_of_download_for_all_registered_users_policy
+  login: owner_of_download_for_all_registered_users_policy_login
+  email: all_registered_policy_owner@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+owner_of_editing_for_all_sysmo_users_policy:
+  person: person_for_owner_of_editing_for_all_sysmo_users_policy
+  login: owner_of_editing_for_all_sysmo_users_policy_login
+  email: all_sysmo_policy_owner@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+owner_of_custom_permissions_only_policy:
+  person: person_for_owner_of_custom_permissions_only_policy
+  login: owner_of_custom_permissions_only_policy_login
+  email: owner_of_custom_permissions_only_policy@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
 owner_of_complex_permissions_policy:
   login: owner_of_complex_permissions_policy_login
   email: owner_of_complex_policy@example.com
@@ -120,6 +159,19 @@ owner_of_complex_permissions_policy:
 owner_of_a_sop_with_complex_permissions:
   login: owner_of_a_sop_with_complex_permissions_login
   email: complex_permission_owner@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+registered_user_with_no_projects:
+  person: person_not_associated_with_any_projects
+  login: registered_user_with_no_projects
+  email: registered_user_with_no_projects@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>

@@ -79,6 +79,21 @@ person_for_owner_of_fully_public_policy:
   last_name: "FullyPublicPolicy"
 
 
+person_for_owner_of_download_for_all_registered_users_policy:
+  first_name: "OwnerOf"
+  last_name: "DownloadForAllRegisteredUsersPolicy"
+
+
+person_for_owner_of_editing_for_all_sysmo_users_policy:
+  first_name: "OwnerOf"
+  last_name: "EditingForAllSysMOUsersPolicy"
+
+
+person_for_owner_of_custom_permissions_only_policy:
+  first_name: "OwnerOf"
+  last_name: "CustomPermissionsOnlyPolicy"
+
+
 random_userless_person:
   first_name: "random"
   last_name: "person"

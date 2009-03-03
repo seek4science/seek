@@ -12,6 +12,42 @@ private_policy_for_asset_of_my_first_sop:
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
+custom_permissions_only_policy:
+  contributor: owner_of_custom_permissions_only_policy (User)
+  name: "auto"
+  sharing_scope: <%= Policy::CUSTOM_PERMISSIONS_ONLY %>
+  access_type: <%= Policy::NO_ACCESS %>
+  use_custom_sharing: true
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+editing_for_all_sysmo_users_policy:
+  contributor: owner_of_editing_for_all_sysmo_users_policy (User)
+  name: "auto"
+  sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
+  access_type: <%= Policy::EDITING %>
+  use_custom_sharing: false
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+download_for_all_registered_users_policy:
+  contributor: owner_of_download_for_all_registered_users_policy (User)
+  name: "auto"
+  sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
+  access_type: <%= Policy::DOWNLOADING %>
+  use_custom_sharing: false
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
 fully_public_policy:
   contributor: owner_of_fully_public_policy (User)
   name: "auto"

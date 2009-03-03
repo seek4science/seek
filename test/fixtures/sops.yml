@@ -23,10 +23,58 @@ my_first_sop:
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 
+sop_with_fully_public_policy:
+  contributor: owner_of_fully_public_policy (User)
+  title: "SOP with fully public policy"
+  description: "This is a SOP attached to asset with a fully public policy."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_with_all_registered_users_policy:
+  contributor: owner_of_download_for_all_registered_users_policy (User)
+  title: "SOP with all registered users policy"
+  description: "This is a SOP attached to asset with a policy for all registered users."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_with_all_sysmo_users_policy:
+  contributor: owner_of_editing_for_all_sysmo_users_policy (User)
+  title: "SOP with all sysmo users policy"
+  description: "This is a SOP attached to asset with a policy for all SysMO users."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_with_custom_permissions_policy:
+  contributor: owner_of_custom_permissions_only_policy (User)
+  title: "SOP with custom permissions only policy"
+  description: "This is a SOP attached to asset with a policy for custom permissions only."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
 sop_with_complex_permissions:
   contributor: owner_of_my_first_sop (User)
-  title: "My First Favourite SOP"
-  description: "This is the very first proper sop in the test fixtures."
+  title: "SOP with complex permissions"
+  description: "This is a SOP for complex tests of permissions."
   original_filename: "little_file.txt"
   content_type: "text/plain"
   content_blob: content_blob_with_little_file

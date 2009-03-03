@@ -158,9 +158,18 @@ module Authorization
           unless user_instance
             user_instance = get_user(user_id)
             
-            # if the user instance wasn't found - user instance must have been deleted
+            # if the user instance wasn't found - user instance must have been deleted;
+            # OR
+            # if person_id is unknown for the found user instance (some kind of error must have happened - log this)
             # --> use public ("guest") settings in this case
-            if user_instance.nil?
+            if user_instance.nil? || user_instance.person_id.nil? || user_instance.person_id == 0
+              # make sure to log the error of 'person_id' being unknown or user_instance not found
+              if user_instance.nil?
+                @@logger.error("UNEXPECTED ERROR - Authorization module: Couldn't find user instance: user ID = #{user_id}")
+              else
+                @@logger.error("UNEXPECTED ERROR - Authorization module: User instance doesn't have a valid person_id: user ID = #{user_id}; person_id = #{user_instance.person_id}")
+              end
+              
               return authorized_by_policy?(policy, thing_asset, action, nil, nil)
             else
               user_person_id = user_instance.person_id
@@ -420,7 +429,7 @@ module Authorization
     return nil if user_id == 0
     
     begin
-      user = User.find(:first, :conditions => ["id = ?", user_id], :select => "person_id")
+      user = User.find(:first, :conditions => ["id = ?", user_id], :select => "id, person_id")
       return user
     rescue ActiveRecord::RecordNotFound
       # user not found, "nil" for anonymous user will be returned
@@ -542,6 +551,8 @@ module Authorization
   
   
   # checks whether "user" is authorized for "action" on "thing"
+  # (this mainly tests different kinds of 'public' / 'limited public' permissions,
+  #  because individual permissions are defined not in the Policy, but in Permissions) 
   def Authorization.authorized_by_policy?(policy, thing_asset, action, user_id, user_person_id)
     is_authorized = false
     
