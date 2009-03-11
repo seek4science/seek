@@ -161,6 +161,10 @@ module ApplicationHelper
       return "famfamfam_silk/page_copy.png"
     when "spinner"
       return "ajax-loader.gif"
+    when "expand"
+      "folds/fold.png"
+    when "collapse"
+      "folds/unfold.png"
     else
       return nil
     end
@@ -409,7 +413,7 @@ module ApplicationHelper
       if (options[:type]==:organisms)
         link=projects_url(:organisms=>tag.name)
       end
-      link_to h(tag.name), link, :class=>options[:class]
+      link_to h(truncate(tag.name,:length=>30)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style]
   end
 
   def list_item_tags_list tags,options={}

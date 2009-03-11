@@ -1,11 +1,33 @@
-<% tags=tag_cloud
-tags.sort!{|a,b| a.name<=>b.name}
+<%
+all_tags=tag_cloud
+show_tags=tag_cloud.sort{|a,b| b.count<=>a.count}[0..9]
+hidden_class="#{type}_tag_hidden"
+hidden_tags=all_tags.size != show_tags.size
 %>
 
-<% unless tags.blank? -%>
-  <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+<% unless all_tags.blank? -%>
+  <% tag_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
     <% if show_tag?(tag) -%>
-      <%= link_for_tag tag,:type=>type, :class => css_class -%>
+      <%
+        hidden_tag=!show_tags.include?(tag)
+        tag_class="#{css_class}"
+        tag_class << " #{hidden_class}" if hidden_tag
+        style= hidden_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
+      %>
+      <%= link_for_tag tag,:type=>type, :class => tag_class,:style=>"#{style}" -%>
+
     <% end -%>
   <% end -%>
+
+  <% if hidden_tags -%>
+    <div class="expand_collapse_tags_button">
+      <%= link_to_function image_tag("folds/unfold.png") do |page|
+        page.select(".#{hidden_class}").each do |el|
+          el.toggle
+        end
+      end
+    %>
+    </div>
+  <% end -%>
+
 <% end -%>

@@ -434,9 +434,19 @@ ul.tabbernav li.tabberactive a:hover
 }
 .tabberlive#tab2 {
 }
+
 .tabberlive#tab2 .tabbertab {
  height:200px;
  overflow:auto;
 }
 
 /* END Tabber tab styles */
+
+/* Colapsable tags */
+
+.expand_collapse_tags_button {
+    width:100%;
+    text-align:right;
+}
+
+/* END Collapsable tags */
