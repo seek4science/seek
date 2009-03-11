@@ -172,7 +172,7 @@ owner_of_a_sop_with_complex_permissions:
 
 registered_user_with_no_projects:
   person: person_not_associated_with_any_projects
-  login: registered_user_with_no_projects
+  login: registered_user_with_no_projects_login
   email: registered_user_with_no_projects@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
@@ -181,3 +181,70 @@ registered_user_with_no_projects:
   is_admin: false
   can_edit_projects: false
   can_edit_institutions: false
+
+
+test_user_only_in_whitelist:
+  person: person_for_test_user_only_in_whitelist
+  login: test_user_only_in_whitelist_login
+  email: test_user_only_in_whitelist@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+test_user_only_in_blacklist:
+  person: person_for_test_user_only_in_blacklist
+  login: test_user_only_in_blacklist_login
+  email: test_user_only_in_blacklist@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+sysmo_user_in_blacklist:
+  person: person_for_sysmo_user_in_blacklist
+  login: sysmo_user_in_blacklist_login
+  email: sysmo_user_in_blacklist@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+sysmo_user_both_in_blacklist_and_whitelist:
+  person: person_for_sysmo_user_both_in_blacklist_and_whitelist
+  login: sysmo_user_both_in_blacklist_and_whitelist_login
+  email: sysmo_user_both_in_blacklist_and_whitelist@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+
+random_registered_user_who_wants_to_access_different_things:
+  person: person_for_random_registered_user_who_wants_to_access_different_things
+  login: random_registered_user_who_wants_to_access_different_things_login
+  email: random_registered_user_who_wants_to_access_different_things@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+
+

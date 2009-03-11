@@ -5,9 +5,13 @@ class AvatarsController < ApplicationController
   before_filter :find_avatars, :only => [ :index ]
   before_filter :find_avatar_auth, :only => [ :show, :select, :edit, :update, :destroy ]
   
+  protect_from_forgery :except => [ :new ]
+  
   # GET /people/1/avatars/new
   # GET /people/new
   def new
+    store_unsaved_person_proj_inst_data_to_session
+    
     @avatar = Avatar.new
   end
   
@@ -38,7 +42,7 @@ class AvatarsController < ApplicationController
         
         # updated to take account of possibly various locations from where this method can be called,
         # so multiple redirect options are possible -> now return link is passed as a parameter
-        format.html { redirect_to params[:return_to] }
+        format.html { redirect_to(params[:return_to] + "?use_unsaved_session_data=true") }
       else
         # "create" action was already called once; render it again
         @avatar = Avatar.new
@@ -244,6 +248,37 @@ class AvatarsController < ApplicationController
   
   def full_cache_path(avatar, size=nil) 
     cache_path(avatar, size, true) 
+  end
+  
+  
+  # this helper will store to session full form data of edited Person / Project / Institution
+  # to allow users to go to "upload new avatar" screen without loosing any new data
+  # that wasn't yet saved
+  def store_unsaved_person_proj_inst_data_to_session
+    data_hash = {}
+    
+    # all types will have main part of information in the generic form
+    data_hash["#{@avatar_for.downcase}".to_sym] = params["#{@avatar_for.downcase}".to_sym]
+    data_hash["#{@avatar_for.downcase}".to_sym][:avatar_id] = nil if data_hash["#{@avatar_for.downcase}".to_sym][:avatar_id].to_i == 0
+    
+    # collect any additional type-specific data from params
+    case @avatar_for
+      when "Person"
+        data_hash[:tool] = params[:tool]
+        data_hash[:expertise] = params[:expertise]
+        data_hash[:can_edit_projects] = params[:can_edit_projects]
+        data_hash[:can_edit_institutions] = params[:can_edit_institutions]
+        
+      when "Project"
+        data_hash[:organism] = params[:organism]
+        
+      when "Institution"
+        # no specific data to store for institutions so far
+        
+    end
+    
+    # store all collected data to session
+    session["unsaved_#{@avatar_for}_#{@avatar_for_id}".to_sym] = data_hash
   end
   
 end

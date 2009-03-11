@@ -44,22 +44,11 @@
 		
 		
 		<h2 style="margin-top: 3em;">Project Assets</h2>
-		<% project_asset_hash = @project.classified_assets -%>
-		<% unless project_asset_hash.empty? -%>
-  		<div class="tabber">
-				<% project_asset_hash.each_key do |resource_type| -%>
-					<% visible_resource_type = resource_type.titleize.pluralize -%>
-					<% unless (resources = project_asset_hash[resource_type]).nil? || resources.empty? -%>
-						<div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
-					    <h3><%= "#{visible_resource_type} (#{resources.length})" -%></h3>
-							<%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => true } -%>
-					  </div>
-					<% end -%>
-				<% end -%>
-		  </div>
-		<% else -%>
-		  <span class="none_text">There are no assets that are associated with this Project.</span>
-		<% end -%>
+		<% # get, classify and authorize all assets for this project -%>
+		<% project_asset_hash = Asset.classify_and_authorize(@project.assets, true, current_user) -%>
+		<%= render :partial => "assets/asset_listing_tabbed_by_class", :locals => { :asset_hash => project_asset_hash, 
+                                                                               :narrow_view => true,
+                                                                               :authorization_already_done => true } -%>
 	</div>
 	
 	<div class="main_content_right_box">

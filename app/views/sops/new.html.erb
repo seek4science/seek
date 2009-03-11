@@ -35,7 +35,7 @@
 		</p>
 		
 	  <p style="text-align: center;">
-	    <%= submit_tag "Upload and Save", :disable_with => "Uploading and Saving..." -%> or <%= link_to 'Cancel', sops_path -%> 
+	    <%= submit_tag "Upload and Save", :id => "new_sop_submit_btn", :onclick => "javascript: validateNewSopFields(); return(false);" -%> or <%= link_to 'Cancel', sops_path -%> 
 	  </p>
 	<% end -%>	
 </div>

@@ -18,7 +18,7 @@ asset_of_my_first_sop:
   resource: my_first_sop (Sop)
   #source:  # these values are not used at the moment (Feb 2009)
   #quality: # these values are not used at the moment (Feb 2009)
-  policy: nil # this is to be defined
+  policy: private_policy_for_asset_of_my_first_sop
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
@@ -82,3 +82,28 @@ asset_of_a_sop_with_fully_public_policy:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+asset_of_a_sop_with_private_policy_and_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  project: nil # not linked to any project for now
+  resource: sop_with_private_policy_and_custom_sharing (Sop)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: private_policy_with_custom_sharing
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+asset_of_a_sop_with_public_download_and_no_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  project: nil # not linked to any project for now
+  resource: sop_with_public_download_and_no_custom_sharing (Sop)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: public_download_with_no_custom_sharing
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+

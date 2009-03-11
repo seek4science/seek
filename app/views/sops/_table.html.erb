@@ -23,10 +23,13 @@
 					<%= narrow_view ? "<br/>" : " | " -%>
 					<b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
 				<% end %>
-				<% unless resource.asset.last_used_at.nil? -%>
-				  <%= narrow_view ? "<br/>" : " | " -%>
-					<b>Last used:</b> <%= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-				<% end -%>
+				
+				<!-- commented out, only because this probably is not very important in listing, but occupies much space
+				<% # unless resource.asset.last_used_at.nil? -%>
+				  <% #= narrow_view ? "<br/>" : " | " -%>
+					<b>Last used:</b> <% #= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+				<% # end -%>
+				-->
 			</p>
 			
 			<div class="desc" style="font-size: 85%;">
@@ -47,6 +50,8 @@
 			<% end -%>
 	    <% if Authorization.is_authorized?("manage", nil, resource, current_user) -%>
 			  <%= icon "manage", edit_sop_path(resource), nil, nil, "Manage" -%>
+			<% elsif Authorization.is_authorized?("edit", nil, resource, current_user) -%>
+			  <%= icon "edit", edit_sop_path(resource), nil, nil, "Edit" -%>
 			<% end -%>
 	  </td>
 		

@@ -5,7 +5,7 @@ private_policy_for_asset_of_my_first_sop:
   name: "auto"
   sharing_scope: <%= Policy::PRIVATE %>
   access_type: <%= Policy::NO_ACCESS %>
-  use_custom_sharing: false
+  use_custom_sharing: true
   use_whitelist: false
   use_blacklist: false
   created_at: <%= 2.days.ago.to_s :db %>
@@ -18,8 +18,8 @@ custom_permissions_only_policy:
   sharing_scope: <%= Policy::CUSTOM_PERMISSIONS_ONLY %>
   access_type: <%= Policy::NO_ACCESS %>
   use_custom_sharing: true
-  use_whitelist: false
-  use_blacklist: false
+  use_whitelist: true
+  use_blacklist: true
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -30,8 +30,8 @@ editing_for_all_sysmo_users_policy:
   sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
   access_type: <%= Policy::EDITING %>
   use_custom_sharing: false
-  use_whitelist: false
-  use_blacklist: false
+  use_whitelist: true
+  use_blacklist: true
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
@@ -41,7 +41,7 @@ download_for_all_registered_users_policy:
   name: "auto"
   sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
   access_type: <%= Policy::DOWNLOADING %>
-  use_custom_sharing: false
+  use_custom_sharing: true
   use_whitelist: false
   use_blacklist: false
   created_at: <%= 2.days.ago.to_s :db %>
@@ -65,6 +65,30 @@ policy_with_complex_permissions:
   name: "auto"
   sharing_scope: <%= Policy::EVERYONE %>
   access_type: <%= Policy::EDITING %>
+  use_custom_sharing: false
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+private_policy_with_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  name: "auto"
+  sharing_scope: <%= Policy::CUSTOM_PERMISSIONS_ONLY %>
+  access_type: <%= Policy::NO_ACCESS %>
+  use_custom_sharing: true
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+public_download_with_no_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  name: "auto"
+  sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
+  access_type: <%= Policy::DOWNLOADING %>
   use_custom_sharing: false
   use_whitelist: false
   use_blacklist: false

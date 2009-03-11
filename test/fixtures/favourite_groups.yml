@@ -19,3 +19,53 @@ blacklist_for_owner_of_a_sop_with_complex_permissions:
   name: <%= FavouriteGroup::BLACKLIST_NAME %>
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
+
+
+whitelist_for_owner_of_my_first_sop:
+  user: owner_of_my_first_sop
+  name: <%= FavouriteGroup::WHITELIST_NAME %>
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+whitelist_for_owner_of_custom_permissions_only_policy:
+  user: owner_of_custom_permissions_only_policy
+  name: <%= FavouriteGroup::WHITELIST_NAME %>
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+blacklist_for_owner_of_custom_permissions_only_policy:
+  user: owner_of_custom_permissions_only_policy
+  name: <%= FavouriteGroup::BLACKLIST_NAME %>
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+whitelist_for_owner_of_editing_for_all_sysmo_users_policy:
+  user: owner_of_editing_for_all_sysmo_users_policy
+  name: <%= FavouriteGroup::WHITELIST_NAME %>
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+blacklist_for_owner_of_editing_for_all_sysmo_users_policy:
+  user: owner_of_editing_for_all_sysmo_users_policy
+  name: <%= FavouriteGroup::BLACKLIST_NAME %>
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+test_fav_group_for_owner_of_download_for_all_registered_users_policy:
+  user: owner_of_download_for_all_registered_users_policy
+  name: "Test Fav Group"
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+
+best_fav_group_for_owner_of_editing_for_all_sysmo_users_policy:
+  user: owner_of_editing_for_all_sysmo_users_policy
+  name: "Best Fav Group"
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+

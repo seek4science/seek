@@ -57,19 +57,6 @@ class Project < ActiveRecord::Base
     return res.sort{|a,b| a.last_name <=> b.last_name}
   end
   
-  # returns a hash containing all assets that are associated with this project;
-  # keys in the hash are the class names of the resources
-  def classified_assets
-    results = {}
-    
-    self.assets.each do |asset|
-      res = asset.resource
-      results[res.class.name] = [] unless results[res.class.name]
-      results[res.class.name] << res
-    end
-    
-    return results
-  end
   
   # "false" returned by this helper method won't mean that no avatars are uploaded for this project;
   # it rather means that no avatar (other than default placeholder) was selected for the project 

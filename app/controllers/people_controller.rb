@@ -68,6 +68,35 @@ class PeopleController < ApplicationController
     @tags_expertise = Person.expertise_counts.sort{|a,b| a.name<=>b.name}
 
     @person = Person.find(params[:id])
+    
+    possible_unsaved_data = "unsaved_#{@person.class.name}_#{@person.id}".to_sym
+    if session[possible_unsaved_data]
+      # if user was redirected to this 'edit' page from avatar upload page - use session
+      # data; alternatively, user has followed some other route - hence, unsaved session
+      # data is most probably not relevant anymore
+      if params[:use_unsaved_session_data]
+        # NB! these parameters are admin settings and regular users won't (and MUST NOT)
+        # be able to use these; admins on the other hand are most likely to never change
+        # any avatars - therefore, it's better to hide these attributes so they never get
+        # updated from the session
+        #
+        # this was also causing a bug: when "upload new avatar" pressed, then new picture
+        # uploaded and redirected back to edit profile page; at this poing *new* records
+        # in the DB for person's work group memberships would already be created, which is an
+        # error (if the following 3 lines are ever to be removed, the bug needs investigation)
+        session[possible_unsaved_data][:person].delete(:work_group_ids)
+        session[possible_unsaved_data].delete(:can_edit_projects)
+        session[possible_unsaved_data].delete(:can_edit_institutions)
+        
+        # update those attributes of a person that we want to be updated from the session
+        @person.attributes = session[possible_unsaved_data][:person]
+        @person.tool_list = session[possible_unsaved_data][:tool][:list]
+        @person.expertise_list = session[possible_unsaved_data][:expertise][:list]
+      end
+      
+      # clear the session data anyway
+      session[possible_unsaved_data] = nil
+    end
   end
 
   #GET /people/select

@@ -1,0 +1,26 @@
+<% # this partial will display a dynamically generated view of all assets from a collection; -%>
+<% # different types of assets will be placed in different tabs based on their class; -%>
+<% # the partial requires 3 parameters to be defined: -%>
+<% # - asset_hash: a hash of all asset instances, where keys are asset class names and values are arrays of asset instances of that class -%>
+<% # - narrow_view: type of the partial to use for asset listings: 'false' to use the same partial with much info as on SOPs listing page -%>
+<% #                                                               'true' to use a partial with fewer information; suitable for 'show' pages for people/projects -%>
+<% # - authorization_already_done: boolean value indicating whether all items in the collection have already been authorized for the current user to view or not -%>
+
+<% narrow_view ||= false -%>
+<% authorization_already_done ||= false -%>
+
+<% unless asset_hash.empty? -%>
+	<div class="tabber">
+		<% asset_hash.each_key do |resource_type| -%>
+			<% visible_resource_type = resource_type.titleize.pluralize -%>
+			<% unless (resources = asset_hash[resource_type]).nil? || resources.empty? -%>
+				<div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
+			    <h3><%= "#{visible_resource_type} (#{resources.length})" -%></h3>
+					<%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => authorization_already_done } -%>
+			  </div>
+			<% end -%>
+		<% end -%>
+  </div>
+<% else -%>
+  <span class="none_text">No assets (or none that are visible to you).</span>
+<% end -%>

@@ -153,6 +153,10 @@ module Authorization
           # hence "destroy" actions are not authorized below this point
           return false if action == "destroy"
           
+          # sharing scope set to PRIVATE means that this asset isn't shared with anyone, and by
+          # this point we already know that current user isn't the owner / policy admin of the asset
+          return false if policy.sharing_scope == Policy::PRIVATE
+          
           
           # for any further checks, person_id of the user that is being authorized is needed
           unless user_instance
@@ -178,8 +182,8 @@ module Authorization
           
           # ******************* Checking Whitelist / Blacklist *******************
           # if using whitelist / blacklist allowed in policy, check if the user's person belongs to them;
-          # blacklist denies any access, whitelist allows any access up to to editing (but the action
-          # is already known not to be of the "destroy"/"owner" category - so anything else is allowed)
+          # blacklist denies any access, whitelist allows any access up to the level defined in FavouriteGroup
+          # model (FavouriteGroup::WHITELIST_ACCESS_TYPE)
           #
           # this should only be carried out if the asset belongs to a User, not a Project or something else
           # (otherwise it doesn't make sense for those other types to have "favourite" groups, including
@@ -190,7 +194,7 @@ module Authorization
             end
             
             if policy.use_whitelist
-              return true if Authorization.is_person_in_whitelist?(user_person_id, thing_asset.contributor_id)
+              return true if Authorization.is_person_in_whitelist?(user_person_id, thing_asset.contributor_id) && Authorization.access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
             end
           end
           
@@ -244,24 +248,27 @@ module Authorization
           return true if authorized_by_policy
           
 
-          # ******************* Checking Group Permissions *******************
-          # not authorized by policy, check the group permissions -- the ones
-          # attached to "thing's" policy and belonging to the groups, where
-          # "user" is a member of - i.e. all Projects, Institutions, WorkGroups
-          #
-          # these cannot limit what is allowed by policy settings, only give more access rights 
-          authorized_by_group_permissions = false
-          group_permissions = get_group_permissions(policy_id)
-          
-          unless group_permissions.empty?
-            group_permissions.each do |p|
-              # check if this permission is applicable to the "user" - i.e. to the user's person
-              if access_type_allows_action?(action, p.access_type) && is_member?(user_person_id, p.contributor_type, p.contributor_id)
-                authorized_by_group_permissions = true
-                break
+          # only do custom permission checking if the policy is known to have any  
+          if policy.use_custom_sharing
+            # ******************* Checking Group Permissions *******************
+            # not authorized by policy, check the group permissions -- the ones
+            # attached to "thing's" policy and belonging to the groups, where
+            # "user" is a member of - i.e. all Projects, Institutions, WorkGroups
+            #
+            # these cannot limit what is allowed by policy settings, only give more access rights 
+            authorized_by_group_permissions = false
+            group_permissions = get_group_permissions(policy_id)
+            
+            unless group_permissions.empty?
+              group_permissions.each do |p|
+                # check if this permission is applicable to the "user" - i.e. to the user's person
+                if access_type_allows_action?(action, p.access_type) && is_member?(user_person_id, p.contributor_type, p.contributor_id)
+                  authorized_by_group_permissions = true
+                  break
+                end
               end
+              return authorized_by_group_permissions if authorized_by_group_permissions
             end
-            return authorized_by_group_permissions if authorized_by_group_permissions
           end
           
           # user permissions, policy settings and group permissions didn't give the

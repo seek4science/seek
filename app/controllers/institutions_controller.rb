@@ -43,6 +43,20 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1/edit
   def edit
     @institution = Institution.find(params[:id])
+    
+    possible_unsaved_data = "unsaved_#{@institution.class.name}_#{@institution.id}".to_sym
+    if session[possible_unsaved_data]
+      # if user was redirected to this 'edit' page from avatar upload page - use session
+      # data; alternatively, user has followed some other route - hence, unsaved session
+      # data is most probably not relevant anymore
+      if params[:use_unsaved_session_data]
+        # update those attributes of the institution that we want to be updated from the session
+        @institution.attributes = session[possible_unsaved_data][:institution]
+      end
+      
+      # clear the session data anyway
+      session[possible_unsaved_data] = nil
+    end
   end
 
   # POST /institutions

@@ -26,6 +26,10 @@ module Mib
           # a virtual attribute to keep the associated project_id temporary
           # (until it's saved into the corresponding asset in the after_save callback)
           attr_accessor :project_id
+          
+          # a set of virtual attributes (temporary - same as above) to transfer the data about source and
+          # quality of the asset from the new resource into corresponding asset during creation
+          attr_accessor :source_type, :source_id, :quality
                   
           after_save :save_asset_record
 
@@ -35,7 +39,8 @@ module Mib
           include Mib::Acts::Resource::InstanceMethods
           
           before_create do |res|
-            res.asset = Asset.new(:contributor_id => res.contributor_id, :contributor_type => res.contributor_type, :resource => res)
+            res.asset = Asset.new(:contributor_id => res.contributor_id, :contributor_type => res.contributor_type, :resource => res,
+                                  :source_type => res.source_type, :source_id => res.source_id, :quality => res.quality)
           end
         end
       end
@@ -49,6 +54,21 @@ module Mib
         #  contribution.authorized?(action_name, contributor)
         #end
         
+        # this method will save the resource, but will not cause 'updated_at' field to receive new value of Time.now
+        def save_without_timestamping
+          class << self
+            def record_timestamps; false; end
+          end
+    
+          save
+    
+          class << self
+            remove_method :record_timestamps
+          end
+        end
+
+
+
         # the owner of the asset record for this resource
         def owner?(c_utor)
           contribution.owner?(c_utor)
@@ -75,8 +95,9 @@ private
         def save_asset_record
           if(parent_asset = self.asset)
             parent_asset.project_id = self.project_id unless self.project_id.nil?
+            parent_asset.updated_at = self.updated_at
             parent_asset.last_used_at = self.last_used_at
-            parent_asset.save
+            parent_asset.save_without_timestamping
           else
             logger.error("CRITICAL ERROR: 'asset' object is missing for a resource: (#{self.class.name}, #{self.id}")
           end

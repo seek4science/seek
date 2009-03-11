@@ -107,3 +107,29 @@ person_not_associated_with_any_projects:
 person_to_associate_with_sops_owning_users:
   first_name: "person"
   last_name: "place_holder"
+
+
+person_for_test_user_only_in_whitelist:
+  first_name: "TestAccessor"
+  last_name: "OnlyInWhitelist"
+
+
+person_for_test_user_only_in_blacklist:
+  first_name: "TestAccessor"
+  last_name: "OnlyInBlacklist"
+
+
+person_for_sysmo_user_in_blacklist:
+  first_name: "SysMO-User"
+  last_name: "InBlacklist"
+
+
+person_for_sysmo_user_both_in_blacklist_and_whitelist:
+  first_name: "SysMO-User"
+  last_name: "InWhitelistAndBlacklist"
+
+
+person_for_random_registered_user_who_wants_to_access_different_things:
+  first_name: "Registered-User"
+  last_name: "WantsToAccessManyThingsAndHasSomePermissions"
+

@@ -51,6 +51,10 @@ class Policy < ActiveRecord::Base
     # this method will return an error message is something goes wrong (empty string in case of success)
     error_msg = ""
     
+    # if no data about sharing is contained in params[], it should be some user (not the onwer!)
+    # who is editing the asset - no need to do anything with policy / permissions: return success
+    return error_msg unless params[:sharing]
+    
     # this variable will hold current settings of the policy in case something
     # goes wrong and a revert would be needed at some point
     last_saved_policy = nil

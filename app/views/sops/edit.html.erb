@@ -1,5 +1,8 @@
 <%= javascript_include_tag "sharing.js" %>
 
+<% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
+
+
 <ul class="sectionIcons">
 	<li><%= icon('sop', sop_path(@sop), 'Return to SOP', nil, 'Return to SOP') -%></li>
 	<li><%= icon('sops', sops_path, 'View all SOPs', nil, 'View all SOPs') -%></li>
@@ -23,15 +26,22 @@
 					<%= f.text_area :description, :style => "width: 100%;", :rows => 5 -%>
 		    </p>
 				
-				<%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",
-                                                                       :selected_project_id => @sop.asset.project_id,
-                                                                       :project_hash => current_user.generate_own_project_id_name_hash } -%>
+				<% # only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+				<% if current_user_authorized_to_manage -%>
+				  <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",
+                                                                         :selected_project_id => @sop.asset.project_id,
+                                                                         :project_hash => current_user.generate_own_project_id_name_hash,
+                                                                         :disable_project_select => true } -%>
+				<% end -%>
 	  	</div>
 	  </center>
 	  
-		<p style="margin: 2.5em 0 0 0;">
-  		<%= render :partial => "assets/sharing_form" -%>
-		</p>
+		<% # only the owner should be able to change sharing permissions -%>
+		<% if current_user_authorized_to_manage -%>
+			<p style="margin: 2.5em 0 0 0;">
+	  		<%= render :partial => "assets/sharing_form" -%>
+			</p>
+		<% end -%>
 		
 	  <p style="text-align: center;">
 	    <%= f.submit "Update", :disable_with => "Updating..." -%> or <%= link_to "Cancel", sop_path(@sop) -%>

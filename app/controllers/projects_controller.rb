@@ -59,6 +59,32 @@ class ProjectsController < ApplicationController
   def edit
     @tags_organisms = Project.organism_counts.sort{|a,b| a.name<=>b.name}
     @project = Project.find(params[:id])
+    
+    possible_unsaved_data = "unsaved_#{@project.class.name}_#{@project.id}".to_sym
+    if session[possible_unsaved_data]
+      # if user was redirected to this 'edit' page from avatar upload page - use session
+      # data; alternatively, user has followed some other route - hence, unsaved session
+      # data is most probably not relevant anymore
+      if params[:use_unsaved_session_data]
+        # NB! these parameters are admin settings and can *occasionally* be used by super-users -
+        # regular users won't (and MUST NOT) be able to use these; it's not likely for admins
+        # or super-users to modify these along with participating institutions - therefore,
+        # it's better not to update these from session
+        #
+        # this was also causing a bug: when "upload new avatar" pressed, then new picture
+        # uploaded and redirected back to edit profile page; at this poing *new* records
+        # in the DB for institutions that participate in this project would already be created, which is an
+        # error (if the following line is ever to be removed, the bug needs investigation)
+        session[possible_unsaved_data][:project].delete(:institution_ids)
+        
+        # update those attributes of a project that we want to be updated from the session
+        @project.attributes = session[possible_unsaved_data][:project]
+        @project.organism_list = session[possible_unsaved_data][:organism][:list]
+      end
+      
+      # clear the session data anyway
+      session[possible_unsaved_data] = nil
+    end
   end
 
   # POST /projects

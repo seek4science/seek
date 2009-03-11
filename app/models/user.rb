@@ -33,6 +33,9 @@ class User < ActiveRecord::Base
   
   has_many :favourites
   has_many :favourite_groups, :dependent => :destroy
+  
+  # can't destroy the assets, because these might be valuable even in the absence of the parent project
+  has_many :assets, :as => :contributor, :dependent => :nullify
 
   # Activates the user in the database.
   def activate

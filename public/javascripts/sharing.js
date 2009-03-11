@@ -1122,6 +1122,28 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
   return(true);
 }
 
+// ***************  Resource Upload Validation  *****************
+
+function validateNewSopFields() {
+  if($('sop_data').value.length == 0) {
+    alert("Please specify the name of the file to upload!");
+    $('sop_data').focus();
+    return(false);
+  }
+  
+  if($('sop_title').value.length == 0) {
+    alert("Please specify the title for the new SOP!");
+    $('sop_title').focus();
+    return(false);
+  }
+  
+  // filename and title set - can submit
+  $('new_sop_submit_btn').disabled = true;
+  $('new_sop_submit_btn').value = "Uploading and Saving...";
+  $('new_sop_submit_btn').form.submit();
+  return(true);
+}
+
 // ********************************************************
 
 function trimSpaces(str) {

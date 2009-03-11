@@ -4,6 +4,7 @@ one:
   id: 1
   contributor_type: 'User'
   contributor_id:   1
+  title: 'one'
   original_filename: 'test_filename.txt'
   content_type: 'text/plain'
   content_blob_id: 1
@@ -75,6 +76,30 @@ sop_with_complex_permissions:
   contributor: owner_of_my_first_sop (User)
   title: "SOP with complex permissions"
   description: "This is a SOP for complex tests of permissions."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_with_private_policy_and_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP with private policy and custom sharing"
+  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false'; all settings are private and 'use_custom_sharing' as 'true'."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_with_public_download_and_no_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP with public download and no custom sharing"
+  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false'; public download available, but no custom permissions - 'use_custom_sharing' is 'false'."
   original_filename: "little_file.txt"
   content_type: "text/plain"
   content_blob: content_blob_with_little_file

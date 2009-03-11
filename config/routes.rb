@@ -12,7 +12,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :institutions, 
     :collection => { :request_all => :get } do |institution|
     # avatars / pictures 'owned by' institution
-    institution.resources :avatars, :member => { :select => :post }
+    institution.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
   map.resources :groups
@@ -20,12 +20,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :projects, 
     :collection => { :request_institutions => :get } do |project|
     # avatars / pictures 'owned by' project
-    project.resources :avatars, :member => { :select => :post }
+    project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
   map.resources :people, :collection=>{:select=>:get} do |person|
     # avatars / pictures 'owned by' person
-    person.resources :avatars, :member => { :select => :post }
+    person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
   
   map.resources :expertise

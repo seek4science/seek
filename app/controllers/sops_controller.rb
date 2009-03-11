@@ -16,10 +16,13 @@ class SopsController < ApplicationController
 
   # GET /sops/1
   def show
+    # store timestamp of the previous last usage
+    @last_used_before_now = @sop.last_used_at
+    
     # update timestamp in the current SOP record 
     # (this will also trigger timestamp update in the corresponding Asset)
     @sop.last_used_at = Time.now
-    @sop.save
+    @sop.save_without_timestamping
     
     respond_to do |format|
       format.html # show.html.erb
@@ -31,7 +34,7 @@ class SopsController < ApplicationController
     # update timestamp in the current SOP record 
     # (this will also trigger timestamp update in the corresponding Asset)
     @sop.last_used_at = Time.now
-    @sop.save
+    @sop.save_without_timestamping
     
     send_data @sop.content_blob.data, :filename => @sop.original_filename, :content_type => @sop.content_type, :disposition => 'attachment'
   end
@@ -39,7 +42,12 @@ class SopsController < ApplicationController
   # GET /sops/new
   def new
     respond_to do |format|
-      format.html # new.html.erb
+      if Authorization.is_member?(current_user.person_id, nil, nil)
+        format.html # new.html.erb
+      else
+        flash[:error] = "You are not authorized to upload new SOPs. Only members of known projects, institutions or work groups are allowed to create new content."
+        format.html { redirect_to sops_path }
+      end
     end
   end
 
@@ -79,7 +87,14 @@ class SopsController < ApplicationController
       params[:sop][:original_filename] = (params[:sop][:data]).original_filename
       data = params[:sop][:data].read
       params[:sop].delete('data')
-   
+      
+      # store source and quality of the new SOP (this will be kept in the corresponding asset object eventually)
+      # TODO set these values to something more meaningful, if required for SOPs
+      params[:sop][:source_type] = "upload"
+      params[:sop][:source_id] = nil
+      params[:sop][:quality] = nil
+      
+      
       @sop = Sop.new(params[:sop])
       @sop.content_blob = ContentBlob.new(:data => data)
 
@@ -117,6 +132,13 @@ class SopsController < ApplicationController
     
       # update 'last_used_at' timestamp on the SOP
       params[:sop][:last_used_at] = Time.now
+      
+      # update 'contributor' of the SOP to current user (this under no circumstances should update
+      # 'contributor' of the corresponding Asset: 'contributor' of the Asset is the "owner" of this
+      # SOP, e.g. the original uploader who has unique rights to manage this SOP; 'contributor' of the
+      # SOP on the other hand is merely the last user to edit it)
+      params[:sop][:contributor_type] = current_user.class.name
+      params[:sop][:contributor_id] = current_user.id
     end
     
     respond_to do |format|
@@ -196,7 +218,7 @@ class SopsController < ApplicationController
     policy_type = ""
     
     # obtain a policy to use
-    if defined?(@sop)
+    if defined?(@sop) && @sop.asset
       if (policy = @sop.asset.policy)
         # SOP exists and has a policy associated with it - normal case
         policy_type = "asset"
