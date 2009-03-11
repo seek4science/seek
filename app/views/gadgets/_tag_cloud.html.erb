@@ -21,10 +21,17 @@ hidden_tags=all_tags.size != show_tags.size
 
   <% if hidden_tags -%>
     <div class="expand_collapse_tags_button">
-      <%= link_to_function image_tag("folds/unfold.png") do |page|
+      <%
+           button_images=image_tag("folds/unfold.png",:id=>"toggle_#{type}_button_down") + 
+             image_tag("folds/fold.png",:id=>"toggle_#{type}_button_up",:style=>"display:none;")
+    %>
+      <%=link_to_function( button_images) do |page|
         page.select(".#{hidden_class}").each do |el|
           el.toggle
         end
+        
+        page.toggle "toggle_#{type}_button_down"
+        page.toggle "toggle_#{type}_button_up"
       end
     %>
     </div>
