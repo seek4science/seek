@@ -1,7 +1,7 @@
 
 <% if !@results.blank? %>
-  <% project_asset_hash = Asset.classify_and_authorize(@results, true, current_user) -%>
-  <%= render :partial => "assets/asset_listing_tabbed_by_class", :locals => { :asset_hash => project_asset_hash,
+  <% resource_hash = classify_for_tabs @results -%>
+  <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => resource_hash,
     :narrow_view => true,
     :authorization_already_done => true } -%>
 <% end %>

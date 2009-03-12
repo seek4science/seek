@@ -26,8 +26,7 @@ class Asset < ActiveRecord::Base
         next unless Authorization.is_authorized?("show", nil, asset, user_to_authorize)
       end
       
-      res = asset.resource if asset.public_methods.include?("resource")
-      res ||= asset
+      res = asset.resource
       results[res.class.name] = [] unless results[res.class.name]
       results[res.class.name] << res
     end
