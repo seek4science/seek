@@ -9,10 +9,10 @@ hidden_tags=all_tags.size != show_tags.size
   <% tag_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
     <% if show_tag?(tag) -%>
       <%
-        hidden_tag=!show_tags.include?(tag)
+        hide_tag=!show_tags.include?(tag)
         tag_class="#{css_class}"
-        tag_class << " #{hidden_class}" if hidden_tag
-        style= hidden_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
+        tag_class << " #{hidden_class}" if hide_tag
+        style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
       %>
       <%= link_for_tag tag,:type=>type, :class => tag_class,:style=>"#{style}" -%>
 
