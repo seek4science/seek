@@ -34,7 +34,13 @@
   		<%= render :partial => "assets/sharing_form" -%>
 		</p>
 		
-	  <p style="text-align: center;">
+		<p style="margin: 0;">
+		  <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",
+                                                                     :existing_attributions => nil,
+                                                                     :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
+		</p>
+		
+	  <p style="text-align: center; margin-top: 1.5em;">
 	    <%= submit_tag "Upload and Save", :id => "new_sop_submit_btn", :onclick => "javascript: validateNewSopFields(); return(false);" -%> or <%= link_to 'Cancel', sops_path -%> 
 	  </p>
 	<% end -%>	

@@ -1,0 +1,100 @@
+<% # This partial is expecting 2 parameters to be defined: -%>
+<% # - resource_type - type of resource for which the attributions form is displayed (required because various types of resources have different requirements for attributions) -%>
+<% # - existing_attributions - collection of existing attributions for the current resource -%>
+
+
+<!-- Attributions -->
+
+<% # this hidden input will submit all permission data with the form -%>
+<%= hidden_field_tag "attributions", "" -%>
+
+<% case resource_type.downcase; when "sop" -%>
+  <% resource_type_attributed_to_types = "SOPs" -%>
+<% else -%>
+  <% resource_type_attributed_to_types = "THIS MUST BE A NEW TYPE OF RESOURCE FOR WHICH ATTRIBUTIONS ARE INTRODUCED - ADD IT HERE" -%>
+<% end -%>
+
+
+<div class="fold">
+
+  <div class="foldTitle">
+    <%= help_icon("Here you attribute this #{resource_type} to other #{resource_type_attributed_to_types}.") -%>
+    Attributions
+  </div>
+
+  <div id="attributions_fold_content" class="foldContent" style="display: block;">
+
+    <div class="box_infotext">
+    	<p>
+    		Here you can record attributions to other <%= resource_type_attributed_to_types -%> if any were used in creation of this <%= resource_type -%>.
+			</p>
+		</div>
+
+		<p style="font-weight: bold; margin-top: 1.5em;">
+		  If this <%= resource_type %> is based on any existing <%= resource_type_attributed_to_types -%>, please list them below
+		</p>
+		
+		<div class="box_editing" style="padding-left: 1em; font-size: 93%;">
+			<p style="color: #666666;">
+			  So far you have specified the following attributions:
+			</p>
+      <p id="attributed_to_list" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text" id="attributed_to_text">Loading...</span>
+      </p>
+			
+			<p style="margin-top: 1em;">
+				Please type titles of <%= resource_type_attributed_to_types -%> into the box below - suggestions will be displayed as you type.
+			  Select resources that you want to attribute to and click "Add" to add selected items to the list.
+			</p>
+			
+			<table id="facebook" class="clearfix">
+	      <tr>
+	        <td>
+	          <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('attributions_autocomplete_input').focus();" style="width: 400px;">
+	            <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="attributions_hidden_input" tabindex="-1" ></span>
+	            
+	            <div id="attributions_autocomplete_display" class="tokenizer_input">
+	               <input type="text" size="1" tabindex="" id="attributions_autocomplete_input" />
+	            </div>
+	          </div>
+	          <div id="attributions_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+	             <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>                       
+	          </div>
+	        </td>
+	        
+	        <td style="padding-left: 0.7em; vertical-align: middle;">
+	          <span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: addAttributions(); return(false);" -%></span>
+	        </td>
+	      </tr>
+	    </table>
+			
+			<script type="text/javascript">
+        var suggestion_list = <%= attribution_suggestions -%>;
+        var prepopulate_with = [];
+      
+				var attributions_autocompleter = new Autocompleter.LocalAdvanced(
+				    attributions_autocompleter_id, 'attributions_autocomplete_input', 'attributions_autocomplete_display', 'attributions_autocomplete_populate', suggestion_list, prepopulate_with, {                                                  
+	            frequency: 0.1,
+	            updateElement: addAction,
+	            search_field: "title",
+	            hint_field: "contributor",
+	            id_field: "id",
+	            validation_type: "only_suggested"
+        });
+        var hidden_input = new HiddenInput('attributions_hidden_input', attributions_autocompleter);
+				
+				autocompleters[attributions_autocompleter_id] = attributions_autocompleter;
+      </script>
+			
+		</div>
+		
+  </div>
+</div>
+
+
+<script type="text/javascript">
+	
+	// TODO : load values from existing attributions
+  
+	updateAttributionSettings();
+</script>
