@@ -26,6 +26,8 @@ class Person < ActiveRecord::Base
     
   has_one :user
   
+  has_many :relationships, :as => :subject, :dependent => :destroy
+  
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools ]) if SOLR_ENABLED
   
   def self.userless_people

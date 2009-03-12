@@ -106,3 +106,51 @@ sop_with_public_download_and_no_custom_sharing:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_that_uses_whitelist_blacklist_and_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP that uses whitelist, blacklist and custom sharing"
+  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'true' and 'use_custom_sharing' set to 'true' as well."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_for_test_with_workgroups:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP that is to be used only for tests with workgroups"
+  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_for_test_with_workgroups_no_custom_sharing:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP that is to be used only for tests with workgroups - no custom sharing"
+  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'false'."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+sop_for_test_with_projects_institutions:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP that is to be used only for tests with projects / institutions."
+  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>

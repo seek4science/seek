@@ -70,3 +70,15 @@ person_for_owner_of_my_first_sop_in_best_fav_group_for_owner_of_editing_for_all_
   person: person_for_owner_of_my_first_sop
   favourite_group: best_fav_group_for_owner_of_editing_for_all_sysmo_users_policy
   access_type: <%= Policy::NO_ACCESS %>
+
+
+person_for_owner_of_custom_permissions_only_policy_in_whitelist_for_owner_of_my_first_sop:
+  person: person_for_owner_of_custom_permissions_only_policy
+  favourite_group: whitelist_for_owner_of_my_first_sop
+  access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
+
+
+person_not_associated_with_any_projects_in_blacklist_for_owner_of_my_first_sop:
+  person: person_not_associated_with_any_projects
+  favourite_group: blacklist_for_owner_of_my_first_sop
+  access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>

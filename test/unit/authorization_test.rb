@@ -42,17 +42,6 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
   
   
-  
-  # testing: get_policy(policy_id, thing_asset)
-  # TODO
-  
-  
-  
-  # testing: get_default_policy(thing_asset)
-  # TODO
-  
-  
-  
   # testing: is_owner?(user_id, thing_asset)
   
   # checks real owner ('contributor' of both SOP and corresponding asset)
@@ -636,7 +625,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
   
   
-  # testing custom permissions
+  # testing individual user permissions
   
   # someone not in whitelist / blacklist; action not allowed by policy; individual permissions exists to allow it; "use_custom_sharing" flag set to 'false'
   def test_custom_permissions_when_use_custom_sharing_set_to_false_but_individual_permissions_exist
@@ -728,6 +717,62 @@ class AuthorizationTest < ActiveSupport::TestCase
     # ..and that these won't get used, because "sharing_scope" is set to Policy::PRIVATE, even though "use_custom_sharing" flag is set to true
     res = Authorization.is_authorized?("view", nil, sops(:my_first_sop), users(:registered_user_with_no_projects))
     assert (!res), "test user should not have been allowed to 'view' the SOP even having the individual permission and use_custom_sharing is set to true - this should have been denied by sharing_scope == Policy::PRIVATE"
+  end
+  
+  # check that if the user is in the blacklist/whitelist, individual permissions will be used appropriately
+  # (i.e. that blacklist has precedence over individual permissions, but whitelist doesn't -- 
+  #  therefore, if someone is in the whitelist, but that wouldn't authorize the action, further checks will be made)
+  def test_blacklist_has_precedence_over_individual_permissions
+    temp = sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.policy.use_blacklist
+    assert temp, "policy for test SOP should use blacklist"
+    
+    temp = sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.policy.use_custom_sharing
+    assert temp, "policy for test SOP should use custom sharing"
+    
+    # verify that test user is in the blacklist
+    temp = Authorization.is_person_in_blacklist?(users(:registered_user_with_no_projects).person.id, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.contributor.id)
+    assert temp, "test person should have been in the blacklist of the sop owner"
+    
+    # verify that test user has an individual permission, too
+    # (this has to give more access than the general policy settings) 
+    permissions = Authorization.get_person_permissions(users(:registered_user_with_no_projects).person.id, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.policy.id)
+    assert (permissions.length == 1), "expected to have one permission in that policy for the test person, not #{permissions.length}"
+    assert (permissions[0].access_type > sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.policy.access_type), "expected that the permission would give the test user more access than general policy settings"
+    
+    # verify that individual permission will not be used, because blacklist has precedence
+    res = Authorization.is_authorized?("download", nil, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:registered_user_with_no_projects))
+    assert (!res), "test user shouldn't have been allowed to 'download' the SOP even having the individual permission and use_custom_sharing is set to true - blacklist membership should have had precedence"
+    
+    # in fact, even 'viewing' allowed by general policy settings shouldn't be allowed because of the blacklist
+    res = Authorization.is_authorized?("view", nil, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:registered_user_with_no_projects))
+    assert (!res), "test user shouldn't have been allowed to 'view' the SOP - blacklist membership should have denied this"
+  end
+  
+  def test_whitelist_doesnt_have_precedence_over_individual_permissions
+    temp = sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.policy.use_whitelist
+    assert temp, "policy for test SOP should use whitelist"
+    
+    temp = sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.policy.use_custom_sharing
+    assert temp, "policy for test SOP should use custom sharing"
+    
+    # verify that test user is in the whitelist
+    temp = Authorization.is_person_in_whitelist?(users(:owner_of_custom_permissions_only_policy).person.id, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.contributor.id)
+    assert temp, "test person should have been in the whitelist of the sop owner"
+    
+    # verify that test user has an individual permission, too
+    # (this has to give more access than membership in the whitelist for this test case to make sense:
+    #  whitelist has to allow at most to download, but the test individual permission - to edit) 
+    permissions = Authorization.get_person_permissions(users(:owner_of_custom_permissions_only_policy).person.id, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).asset.policy.id)
+    assert (permissions.length == 1), "expected to have one permission in that policy for the test person, not #{permissions.length}"
+    assert (permissions[0].access_type > FavouriteGroup::WHITELIST_ACCESS_TYPE), "expected that the permission would give the test user more access than membership in the whitelist"
+    
+    # verify that being in whitelist wouldn't authorize the action
+    temp = Authorization.access_type_allows_action?("edit", FavouriteGroup::WHITELIST_ACCESS_TYPE)
+    assert (!temp), "whitelist solely shouldn't allow 'editing' otherwise this test case doesn't make sense"
+    
+    # verify that individual permission will be used, because whitelist doesn't have precedence
+    res = Authorization.is_authorized?("edit", nil, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:owner_of_custom_permissions_only_policy))
+    assert res, "test user should have been allowed to 'edit' the SOP having the individual permission and use_custom_sharing is set to true - whitelist membership should not have had precedence"
   end
   
   
@@ -882,16 +927,146 @@ class AuthorizationTest < ActiveSupport::TestCase
   # testing group permissions
   
   # no specific permissions; action not allowed by policy; allowed by a group permission for 'WorkGroup'; "use_custom_permissions" flat set to 'true'
-  # TODO
+  def test_group_permissions_will_allow_action
+    # check that policy flags are set correctly
+    temp = sops(:sop_for_test_with_workgroups).asset.policy.use_whitelist
+    assert (!temp), "'use_whitelist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_workgroups).asset.policy.use_blacklist
+    assert (!temp), "'use_blacklist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_workgroups).asset.policy.use_custom_sharing
+    assert temp, "'use_custom_sharing' flag should be set to 'true' for this test"
+    
+    # verify that action wouldn't be allowed by policy
+    temp = Authorization.authorized_by_policy?(sops(:sop_for_test_with_workgroups).asset.policy, sops(:sop_for_test_with_workgroups).asset, "download", 
+                                               users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
+    assert (!temp), "policy of the test SOP shouldn't have allowed 'download' of that asset"
+    
+    # verify that group permissions exist
+    permissions = Authorization.get_group_permissions(sops(:sop_for_test_with_workgroups).asset.policy.id)
+    assert (permissions.length == 1), "expected to have one permission for workgroups in that policy, not #{permissions.length}"
+    assert (permissions[0].contributor_type == "WorkGroup"), "expected to have permission for 'WorkGroup'"
+    assert (permissions[0].access_type == Policy::DOWNLOADING), "expected that the permission would give the test user download access to the test SOP"
+    
+    # verify that test user is a member of the group in the permission
+    temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person.id, permissions[0].contributor_type, permissions[0].contributor_id)
+    
+    # verify that group permissions work and access is granted
+    res = Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_workgroups), users(:owner_of_fully_public_policy))
+    assert res, "test user should have been allowed to 'download' the SOP - because of group permission"
+  end
   
   # no specific permissions; action not allowed by policy; allowed by a group permission for 'WorkGroup'; "use_custom_permissions" flat set to 'false'
-  # TODO
+  def test_group_permissions_could_allow_action_but_use_custom_sharing_set_to_false
+    # check that policy flags are set correctly
+    temp = sops(:sop_for_test_with_workgroups_no_custom_sharing).asset.policy.use_whitelist
+    assert (!temp), "'use_whitelist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_workgroups_no_custom_sharing).asset.policy.use_blacklist
+    assert (!temp), "'use_blacklist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_workgroups_no_custom_sharing).asset.policy.use_custom_sharing
+    assert (!temp), "'use_custom_sharing' flag should be set to 'false' for this test"
+    
+    # verify that action wouldn't be allowed by policy
+    temp = Authorization.authorized_by_policy?(sops(:sop_for_test_with_workgroups_no_custom_sharing).asset.policy, sops(:sop_for_test_with_workgroups_no_custom_sharing).asset, "download", 
+                                               users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
+    assert (!temp), "policy of the test SOP shouldn't have allowed 'download' of that asset"
+    
+    # verify that group permissions exist
+    permissions = Authorization.get_group_permissions(sops(:sop_for_test_with_workgroups_no_custom_sharing).asset.policy.id)
+    assert (permissions.length == 1), "expected to have one permission for workgroups in that policy, not #{permissions.length}"
+    assert (permissions[0].contributor_type == "WorkGroup"), "expected to have permission for 'WorkGroup'"
+    assert (permissions[0].access_type == Policy::DOWNLOADING), "expected that the permission would give the test user download access to the test SOP"
+    
+    # verify that test user is a member of the group in the permission
+    temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person.id, permissions[0].contributor_type, permissions[0].contributor_id)
+    
+    # verify that group permissions won't be applied and access is still prohibited
+    res = Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_workgroups_no_custom_sharing), users(:owner_of_fully_public_policy))
+    assert (!res), "test user shouldn't have been allowed to 'download' the SOP - because group permission shouldn't be applied when 'use_custom_sharing' is set to 'false'"
+    
+    # viewing should still be allowed by the policy
+    res = Authorization.is_authorized?("view", nil, sops(:sop_for_test_with_workgroups_no_custom_sharing), users(:owner_of_fully_public_policy))
+    assert res, "test user should have been allowed to 'view' the SOP - because of policy settings"
+  end
   
   # no specific permissions; action not allowed by policy; allowed by a group permission for 'Project'; "use_custom_permissions" flat set to 'true'
-  # TODO
+  def test_group_permissions_shared_with_project
+    # check that policy flags are set correctly
+    temp = sops(:sop_for_test_with_projects_institutions).asset.policy.use_whitelist
+    assert (!temp), "'use_whitelist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_projects_institutions).asset.policy.use_blacklist
+    assert (!temp), "'use_blacklist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_projects_institutions).asset.policy.use_custom_sharing
+    assert temp, "'use_custom_sharing' flag should be set to 'true' for this test"
+    
+    # verify that action wouldn't be allowed by policy
+    temp = Authorization.authorized_by_policy?(sops(:sop_for_test_with_projects_institutions).asset.policy, sops(:sop_for_test_with_projects_institutions).asset, "edit", 
+                                               users(:owner_of_download_for_all_registered_users_policy).id, users(:owner_of_download_for_all_registered_users_policy).person.id)
+    assert (!temp), "policy of the test SOP shouldn't have allowed 'edit' of that asset"
+    
+    # verify that group permissions exist
+    permissions = Authorization.get_group_permissions(sops(:sop_for_test_with_projects_institutions).asset.policy.id)
+    assert (permissions.length == 2), "expected to have 2 permission for workgroups in that policy, not #{permissions.length}"
+    if permissions[0].contributor_type == "Project"
+      perm = permissions[0]
+    elsif permissions[1].contributor_type == "Project"
+      perm = permissions[1]
+    else
+      perm = nil
+    end
+    assert (!perm.nil?), "couldn't find correct permission for the test"
+    assert (perm.access_type == Policy::EDITING), "expected that the permission would give the test user edit access to the test SOP"
+    
+    # verify that test user is a member of the project in the permission
+    temp = Authorization.is_member?(users(:owner_of_download_for_all_registered_users_policy).person.id, perm.contributor_type, perm.contributor_id)
+    
+    # verify that group permissions work and access is granted
+    res = Authorization.is_authorized?("edit", nil, sops(:sop_for_test_with_projects_institutions), users(:owner_of_download_for_all_registered_users_policy))
+    assert res, "test user should have been allowed to 'download' the SOP - because of group permission: shared with test user's project"
+  end
   
   # no specific permissions; action not allowed by policy; allowed by a group permission for 'Institution'; "use_custom_permissions" flat set to 'true'
-  # TODO
+  def test_group_permissions_shared_with_institution
+    # check that policy flags are set correctly
+    temp = sops(:sop_for_test_with_projects_institutions).asset.policy.use_whitelist
+    assert (!temp), "'use_whitelist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_projects_institutions).asset.policy.use_blacklist
+    assert (!temp), "'use_blacklist' flag should be set to 'false' for this test"
+    
+    temp = sops(:sop_for_test_with_projects_institutions).asset.policy.use_custom_sharing
+    assert temp, "'use_custom_sharing' flag should be set to 'true' for this test"
+    
+    # verify that action wouldn't be allowed by policy
+    temp = Authorization.authorized_by_policy?(sops(:sop_for_test_with_projects_institutions).asset.policy, sops(:sop_for_test_with_projects_institutions).asset, "download", 
+                                               users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
+    assert (!temp), "policy of the test SOP shouldn't have allowed 'download' of that asset"
+    
+    # verify that group permissions exist
+    permissions = Authorization.get_group_permissions(sops(:sop_for_test_with_projects_institutions).asset.policy.id)
+    assert (permissions.length == 2), "expected to have 2 permission for workgroups in that policy, not #{permissions.length}"
+    if permissions[0].contributor_type == "Institution"
+      perm = permissions[0]
+    elsif permissions[1].contributor_type == "Institution"
+      perm = permissions[1]
+    else
+      perm = nil
+    end
+    assert (!perm.nil?), "couldn't find correct permission for the test"
+    assert (perm.access_type == Policy::DOWNLOADING), "expected that the permission would give the test user download access to the test SOP"
+    
+    # verify that test user is a member of the institution in the permission
+    temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person.id, perm.contributor_type, perm.contributor_id)
+    
+    # verify that group permissions work and access is granted
+    res = Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_projects_institutions), users(:owner_of_fully_public_policy))
+    assert res, "test user should have been allowed to 'download' the SOP - because of group permission: shared with test user's institution"
+  end
   
   
   # testing anonymous users
