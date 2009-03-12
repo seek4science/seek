@@ -25,6 +25,12 @@ class SearchController < ApplicationController
 
     @results = select_authorised @results
     
+    if @results.empty?
+      flash[:notice]="No matches found for '<b>#{@search_query}</b>'."
+    else
+      flash[:notice]="#{@results.size} #{@results.size==1 ? 'match' : 'matches'} found for '<b>#{@search_query}</b>'."
+    end
+    
   end
 
   private
