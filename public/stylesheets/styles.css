@@ -376,7 +376,7 @@ ul.tabbernav li a
 	margin-left: 3px;
 	border: 1px solid #CCC;
 	border-bottom: none;
-	background: #E9F7CC;
+	background: #ccccff;
 	text-decoration: none;
 }
 
@@ -385,7 +385,7 @@ ul.tabbernav li a:link { color: #333; }
 ul.tabbernav li a:hover
 {
 	color: #000;
-	background: #BFE76F;
+	background: #3173ff;
 	border-color: #CCC;
 }
 

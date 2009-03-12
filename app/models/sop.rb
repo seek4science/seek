@@ -5,9 +5,7 @@ class Sop < ActiveRecord::Base
   
   validates_presence_of :title
   
-  # TODO add indexing by SOLR
-  #acts_as_solr(:fields => [:title, :local_name, :body, :content_type, :uploader],
-  #             :include => [ :comments ]) if SOLR_ENABLE
+  acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED
   
   belongs_to :content_blob,
              :dependent => :destroy

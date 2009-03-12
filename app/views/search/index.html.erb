@@ -1,7 +1,8 @@
 
-<% if !is_nil_or_empty? @results %>
-<%= render :partial=>"search_result_item", :collection=>@results %>
-<% else  %>
-  <br/><br/>
-  <div id="no_result" class="yui-b"><%= "No results for '<b>"+@search_query+"</b>'" %></div>
+<% if !@results.blank? %>
+  <% resource_hash = classify_for_tabs @results -%>
+  <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => resource_hash,
+    :narrow_view => true,
+    :authorization_already_done => true } -%>
 <% end %>
+
