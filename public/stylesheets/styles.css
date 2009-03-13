@@ -87,9 +87,9 @@ table.list_item {
   margin-top: 6px;
   padding: 1em;
   border: #999999 solid 1px;
-	border-collapse: collapse;
+  border-collapse: collapse;
   font-size: 93%;
-  min-height: 90px;
+  min-height: 90px;  
 }
 
 table.list_item tr.odd_row {
@@ -161,10 +161,11 @@ table.list_item td {
 
 table.list_item .item_avatar {
 	/* styling of avatars in table listings */
+    min-width: 100px;
 }
 
 table.list_item .item_details {
-	text-align: left;
+	text-align: left;    
 }
 
 table.list_item .item_right_table_cell {
@@ -203,12 +204,9 @@ table.list_item label {
 
 table.list_item .expertise {
     text-align: left;
+    border-left: 2px dotted #365FA5;
 }
 
-table.list_item #expand_button {
-    text-align: right;
-    float: bottom;
-}
 
 .show_basic {
     padding-left: 2em;
