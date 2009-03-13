@@ -201,7 +201,9 @@ module ApplicationHelper
     end
   end
   
-  def list_item_with_icon(icon_type, item, truncate_to)
+  # text in "caption" will be used to display the item next to the icon;
+  # if "caption" is nil, item.name will be used by default
+  def list_item_with_icon(icon_type, item, caption, truncate_to)
     list_item = "<li>"
     
     unless icon_type.downcase == "flag"
@@ -209,7 +211,8 @@ module ApplicationHelper
     else
       list_item += flag_icon(item.country)
     end
-    list_item += link_to truncate(h(item.name), :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(h(item.name))
+    item_caption = h(caption.blank? ? item.name : caption)
+    list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(item_caption)
     list_item += "</li>"
     
     return list_item

@@ -6,7 +6,7 @@
 <% unless is_nil_or_empty? collection -%>
 		<ul class="list">
       <% for item in collection.first(main_section_length) -%>
-				<%= list_item_with_icon(icon_type, item, truncate_to) -%>
+				<%= list_item_with_icon(icon_type, item, nil, truncate_to) -%>
       <% end  %>
     </ul>
 		
@@ -19,7 +19,7 @@
 			<div style="display: none; margin: 0; padding: 0;" id="more_items_<%= collection_name -%>">
 				<ul class="list">
 		      <% for item in collection[main_section_length..(collection.length-1)] -%>
-		      	<%= list_item_with_icon(icon_type, item, truncate_to) -%>
+		      	<%= list_item_with_icon(icon_type, item, nil, truncate_to) -%>
 		      <% end  %>
 		    </ul>
 				

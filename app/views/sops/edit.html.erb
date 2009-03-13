@@ -44,7 +44,7 @@
 			
 			<p style="margin: 0;">
 			  <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
-	                                                                     :existing_attributions => Authorization.authorize_collection("show", @sop.attributions, current_user),
+	                                                                     :existing_attributions => Authorization.authorize_collection("show", @sop.attributions_objects, current_user),
 	                                                                     :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
 			</p>
 		<% end -%>

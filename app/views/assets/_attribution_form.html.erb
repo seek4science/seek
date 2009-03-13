@@ -1,6 +1,6 @@
 <% # This partial is expecting 3 parameters to be defined: -%>
 <% # - resource_type - type of resource for which the attributions form is displayed (required because various types of resources have different requirements for attributions) -%>
-<% # - existing_attributions - collection of existing attributions for the current resource -%>
+<% # - existing_attributions - collection of existing attributions for the current resource (this should be collection of resources - NOT collection of records of Attribution class) -%>
 <% # - attribution_suggestions - JSON array of data to be used to generate autocompleter suggestions -%>
 
 
@@ -96,9 +96,9 @@
 <script type="text/javascript">
 	// recreate internal store of attributions..
 	<% existing_attributions.each do |a| -%>
-	  attr_type = '<%= a.object_type -%>';
-		attr_id = <%= a.object_id -%>;
-		attr_title = autocompleters[attributions_autocompleter_id].getValueFromJsonArray(autocompleters[attributions_autocompleter_id].itemIDsToJsonArrayIDs([attr_id])[0], 'title');
+	  attr_type = '<%= a.class.name -%>';
+		attr_id = <%= a.id -%>;
+		attr_title = '<%= a.title -%>';
 		
 		attribution_settings.push([attr_type, attr_title, attr_id]);
 	<% end -%>

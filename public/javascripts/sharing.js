@@ -1230,7 +1230,7 @@ function addAttribution(attributable_type, attributable_title, attributable_id) 
 	}
 	else {
 	  alert('The following entity was not added (already in the list of attributions):\n\n' + 
-	        attributable_type + ': ' + attributable_name);
+	        attributable_type + ': ' + attributable_title);
 	}
 }
 

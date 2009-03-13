@@ -78,6 +78,7 @@
 	<div class="contribution_right_box">
 		<%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @sop } -%>
 		<%= render :partial => "assets/resource_associated_with_box", :locals => { :resource => @sop, :truncate_to => truncate_length_for_boxes } -%>
+	  <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @sop, :attributed_to => Authorization.authorize_collection("show", @sop.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
 	</div>
 	
 </div>

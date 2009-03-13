@@ -1,0 +1,57 @@
+<% # This partial expects 3 parameters to be defined: -%>
+<% # - resource - instance of resource for which the attributions are displayed -%>
+<% # - attributed_to - *pre-authorized* collection of items to which the resource is attributed -%>
+<% # - truncate_to - length of the texts after which truncation is activated -%>
+
+<% main_list_section_length = 5 -%>
+<% collection_name = "attributions_list_for_resource" %>
+
+<div class="contribution_section_box">
+	
+	<p class="heading" style="margin-bottom: 0; padding-bottom: 0;">
+		<%= help_icon("What other assets is this one based on?") -%>
+		Attributions <span class="count_text">(<%= attributed_to.length -%>)</span>
+		<a name="attributions"></a>
+		<% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
+			<p style="text-align: middle; margin: 0; padding: 0;"><small>[ <%= link_to "edit", eval("edit_#{resource.class.name.downcase}_path(#{resource.id})") %> ]</small></p>
+		<% end %>
+	</p>
+
+	<% unless attributed_to.blank? -%>
+		<ul class="list">
+      <% for item in attributed_to.first(main_list_section_length) -%>
+				<% if item -%>
+				  <%= list_item_with_icon(item.class.name.downcase, item, item.title, truncate_to) -%>
+				<% else -%>
+				  <li><font class="none_text">Private item</font></li>
+				<% end -%>
+      <% end  %>
+    </ul>
+		
+		<% # if a collection has more than "main_list_section_length" items an "expand" link is provided which opens up the rest of the items -%>
+		<% if attributed_to.length > main_list_section_length -%>
+		  <p id="more_link_<%= collection_name -%>" style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+				<%= link_to_function("More" + expand_image("0.3em")) do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
+			</p>
+			
+			<div style="display: none; margin: 0; padding: 0;" id="more_items_<%= collection_name -%>">
+				<ul class="list">
+		      <% for item in attributed_to[main_list_section_length..(attributed_to.length-1)] -%>
+		      	<% if item -%>
+						  <%= list_item_with_icon(item.class.name.downcase, item, item.title, truncate_to) -%>
+						<% else -%>
+						  <li><font class="none_text">Private item</font></li>
+						<% end -%>
+		      <% end -%>
+		    </ul>
+				
+			  <p id="less_link_<%= collection_name -%>" style="display: none; font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+					<%= link_to_function("Less" + collapse_image("0.3em")) do |page|; page.toggle "more_link_#{collection_name}", "more_items_#{collection_name}", "less_link_#{collection_name}"; end; -%>
+				</p>
+			</div>
+		<% end -%>
+	<% else -%>
+	  <p class="none_text">None</p>
+	<% end  -%>
+	
+</div>

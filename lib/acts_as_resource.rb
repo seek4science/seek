@@ -55,10 +55,11 @@ module Mib
       end
       
       module InstanceMethods
-        # TODO decide if useful to keep such method OR everything will be made through Auth module
-        #def authorized?(action_name, contributor=nil)
-        #  contribution.authorized?(action_name, contributor)
-        #end
+        # this method will take attributions' association and return a collection of resources,
+        # to which the current resource is attributed
+        def attributions_objects
+          self.attributions.collect { |a| a.object }
+        end
         
         # this method will save the resource, but will not cause 'updated_at' field to receive new value of Time.now
         def save_without_timestamping
