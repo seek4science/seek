@@ -161,6 +161,7 @@ table.list_item td {
 
 table.list_item .item_avatar {
 	/* styling of avatars in table listings */
+    width: 100px;
     min-width: 100px;
 }
 
@@ -202,9 +203,10 @@ table.list_item label {
     font-weight: bold;
 }
 
-table.list_item .expertise {
+table.list_item .tags {
     text-align: left;
-    border-left: 2px dotted #365FA5;
+    border-left: 1px dotted #365FA5;
+    margin-top: 0.7em;    
 }
 
 

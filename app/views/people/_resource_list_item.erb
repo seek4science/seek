@@ -56,13 +56,12 @@
           </p>
         <% end  %>
 
-        <div class="expertise" style="margin-top: 0.7em;">
-
+        <div class="tags">
           <div style="margin-top: 0.3em;">
             <p style="margin-left: 1em;">
               <label>Expertise:</label>
               <% unless person.expertise.empty? -%>
-                <%= list_item_tags_list person.expertise,:type=>:expertise,:truncate_length=>150 %>
+                <%= list_item_tags_list person.expertise,:type=>:expertise %>
               <% else -%>
                 <span class="none_text">Not known</span>
               <% end -%>
