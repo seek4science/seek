@@ -58,11 +58,11 @@
 
         <div class="expertise" style="margin-top: 0.7em;">
 
-          <div style="margin-top: 0.3em; border-left: 2px dotted #365FA5;">
+          <div style="margin-top: 0.3em;">
             <p style="margin-left: 1em;">
               <label>Expertise:</label>
               <% unless person.expertise.empty? -%>
-                <%= list_item_tags_list person.expertise,:type=>:expertise %>
+                <%= list_item_tags_list person.expertise,:type=>:expertise,:truncate_length=>150 %>
               <% else -%>
                 <span class="none_text">Not known</span>
               <% end -%>
@@ -71,7 +71,7 @@
             <p style="margin-left: 1em;">
               <label>Tools:</label>
               <% unless person.tools.empty? -%>
-                <%= list_item_tags_list person.tools,:type=>:tools %>
+                <%= list_item_tags_list person.tools,:type=>:tools,:truncate_length=>150 %>
               <% else -%>
                 <span class="none_text">Not known</span>
               <% end -%>

@@ -407,6 +407,8 @@ module ApplicationHelper
 
   def link_for_tag tag, options={}
       link=people_url
+      length=options[:truncate_length]
+      length||=30
       if (options[:type]==:expertise)
         link=people_url(:expertise=>tag.name)
       end
@@ -416,7 +418,7 @@ module ApplicationHelper
       if (options[:type]==:organisms)
         link=projects_url(:organisms=>tag.name)
       end
-      link_to h(truncate(tag.name,:length=>30)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.name)
+      link_to h(truncate(tag.name,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.name)
   end
 
   def list_item_tags_list tags,options={}
