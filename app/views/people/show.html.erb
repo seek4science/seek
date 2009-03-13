@@ -18,38 +18,45 @@
 
   <div class="main_content_left_box">
     <div class="box_about_actor">
+      
+
+      <p>
+        <b>Name:</b> <%= h @person.name %>
+      </p>
+
       <% if mine?(@person) -%>
         <p>
           <b>Login name :</b> <%= h @person.user.login %> <span class='none_text'>(Only visible to you)</span>
         </p>
+        <p>
+          <b>Seek ID :</b> <%= @person.id %>
+        </p>
       <% end %>
-      <p>
-        <b>Name:</b> <%= h @person.name %>
-      </p>      
+
       <p>
         <b>About me:</b>
         <div id="description" class="box_standout">
           <%= text_or_not_specified(@person.description, :description=>true) %>
         </div>
       </p>
-			
-			<p>
-    		<% locations = @person.locations -%>
-				<% unless locations.empty? -%>
-				  <table>
-				  	<tr>
-				  		<td style="padding: 0; vertical-align: top;"><b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b></td>
-							<td style="padding: 0; text-align: left;"><ul>
-								<% locations.each do |l| -%>
-								  <li><%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%></li>
-								<% end -%>
-							</ul></td>
-				  	</tr>
-				  </table>
-				<% else -%>
-				  <b>Location:</b> <span class="none_text">unknown</span>
-				<% end -%>
-			</p>
+
+      <p>
+        <% locations = @person.locations -%>
+        <% unless locations.empty? -%>
+          <table>
+            <tr>
+              <td style="padding: 0; vertical-align: top;"><b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b></td>
+              <td style="padding: 0; text-align: left;"><ul>
+                  <% locations.each do |l| -%>
+                    <li><%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%></li>
+                  <% end -%>
+              </ul></td>
+            </tr>
+          </table>
+        <% else -%>
+          <b>Location:</b> <span class="none_text">unknown</span>
+        <% end -%>
+      </p>
 
       <p>
         <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person}  %>
@@ -89,14 +96,14 @@
         <p>No "user" instance detected for this person. User has not registered yet.</p>
       <% end -%>
     <% end -%>
-    
-		
-		<h2 style="margin-top: 4em;">My Assets</h2>
-		<% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-		<% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
-		<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
-                                                                               :narrow_view => true,
-                                                                               :authorization_already_done => true } -%>
+
+
+    <h2 style="margin-top: 4em;">My Assets</h2>
+    <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
+    <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
+      :narrow_view => true,
+      :authorization_already_done => true } -%>
   </div>
 
 
