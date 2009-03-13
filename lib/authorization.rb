@@ -314,6 +314,28 @@ module Authorization
   end
 
 
+  # convenience method which iterates through an array of items performing authorization on
+  # each for given user instance and action name
+  def Authorization.authorize_collection(action_name, item_array, user)
+    # check first if the action that is being executed is known - not authorized otherwise
+    action = categorize_action(action_name)
+    return [] unless action
+    
+    # if there are no items or the array is nil, return empty array
+    return [] if item_array.blank?
+    
+    # otherwise perform authorization for every item
+    authorized_items = item_array.collect do |item|
+      Authorization.is_authorized?(action, nil, item, user) ? item : nil
+    end
+    
+    # not authorized items have been turned into NILs - remove these
+    authorized_items.delete(nil)
+    
+    return authorized_items
+  end
+  
+
   private
 
   def Authorization.categorize_action(action_name)

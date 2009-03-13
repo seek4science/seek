@@ -29,7 +29,7 @@ class Sop < ActiveRecord::Base
           "contributor" => "by " +
                            (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : p.first_name) + " " +
                            (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : p.last_name),
-          "type" => "SOP"} ) :
+          "type" => self.name } ) :
         nil }
     
     sops_with_contributors.delete(nil)

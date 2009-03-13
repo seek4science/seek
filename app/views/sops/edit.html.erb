@@ -28,7 +28,7 @@
 				
 				<% # only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
 				<% if current_user_authorized_to_manage -%>
-				  <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",
+				  <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
                                                                          :selected_project_id => @sop.asset.project_id,
                                                                          :project_hash => current_user.generate_own_project_id_name_hash,
                                                                          :disable_project_select => true } -%>
@@ -40,6 +40,12 @@
 		<% if current_user_authorized_to_manage -%>
 			<p style="margin: 2.5em 0 0 0;">
 	  		<%= render :partial => "assets/sharing_form" -%>
+			</p>
+			
+			<p style="margin: 0;">
+			  <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
+	                                                                     :existing_attributions => Authorization.authorize_collection("show", @sop.attributions, current_user),
+	                                                                     :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
 			</p>
 		<% end -%>
 		

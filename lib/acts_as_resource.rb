@@ -23,9 +23,11 @@ module Mib
                   :as => :resource,
                   :dependent => :destroy
           
-          # both 'subject' and 'object' associations are needed because of attributions
-          has_many :relationships, :as => :subject, :dependent => :destroy
-          has_many :relationships, :as => :object,  :dependent => :destroy
+          has_many :attributions, 
+                   :class_name => 'Relationship',
+                   :as => :subject,
+                   :conditions => { :predicate => Relationship::ATTRIBUTED_TO },
+                   :dependent => :destroy
           
           # a virtual attribute to keep the associated project_id temporary
           # (until it's saved into the corresponding asset in the after_save callback)

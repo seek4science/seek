@@ -25,7 +25,8 @@
 					<%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 5 -%>
 		    </p>
 	  
-	 			<%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP", :project_hash => current_user.generate_own_project_id_name_hash } -%>
+	 			<%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
+                                                                       :project_hash => current_user.generate_own_project_id_name_hash } -%>
 	  	</div>
 		</center>
 		
@@ -35,7 +36,7 @@
 		</p>
 		
 		<p style="margin: 0;">
-		  <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",
+		  <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
                                                                      :existing_attributions => nil,
                                                                      :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
 		</p>
