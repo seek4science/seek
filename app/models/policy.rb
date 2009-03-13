@@ -100,8 +100,13 @@ class Policy < ActiveRecord::Base
     policy = resource.asset.policy
     
     # read the permission data from params[]
-    contributor_types = ActiveSupport::JSON.decode(params[:sharing][:permissions][:contributor_types])
-    new_permission_data = ActiveSupport::JSON.decode(params[:sharing][:permissions][:values])
+    unless params[:sharing][:permissions].blank?
+      contributor_types = ActiveSupport::JSON.decode(params[:sharing][:permissions][:contributor_types])
+      new_permission_data = ActiveSupport::JSON.decode(params[:sharing][:permissions][:values])
+    else
+      contributor_types = []
+      new_permission_data = {}
+    end
     
     # NB! if "use_custom_sharing" is not set after the policy data was processed - this means that there can be
     # no more permissions: and any existing ones should be deleted; the line below ensures that the synchronisation

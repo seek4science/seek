@@ -1179,8 +1179,10 @@ function updateAttributionSettings() {
     attr_type = attribution_settings[i][0];
     attr_title = attribution_settings[i][1];
     attr_id = attribution_settings[i][2];
+    attr_contributor = autocompleters[attributions_autocompleter_id].getValueFromJsonArray(autocompleters[attributions_autocompleter_id].itemIDsToJsonArrayIDs([attr_id])[0], 'contributor');
     
     attributed_to += '<b>' + attr_type + '</b>: ' + attr_title
+                           + "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + attr_contributor + ")</span>"
                            + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' 
                            + '[<a href="" onclick="javascript:deleteAttribution(\''+ attr_type +'\', '+ attr_id +'); return(false);">delete</a>]</small><br/>';
     

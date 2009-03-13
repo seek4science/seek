@@ -21,7 +21,9 @@
 		<ul class="list">
       <% for item in attributed_to.first(main_list_section_length) -%>
 				<% if item -%>
-				  <%= list_item_with_icon(item.class.name.downcase, item, item.title, truncate_to) -%>
+				  <% item_type = item.class.name -%>
+					<% tooltip_txt = "<b>#{item_type}:</b> \"#{item.title}\" by #{item.asset.contributor.person.first_name} #{item.asset.contributor.person.last_name}" -%>
+				  <%= list_item_with_icon(item_type.downcase, item, item.title, truncate_to, tooltip_txt) -%>
 				<% else -%>
 				  <li><font class="none_text">Private item</font></li>
 				<% end -%>
