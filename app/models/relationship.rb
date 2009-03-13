@@ -27,7 +27,7 @@ class Relationship < ActiveRecord::Base
   
   # 
   def self.create_or_update_attributions(resource, attributions_from_params)
-    received_attributions = ActiveSupport::JSON.decode(attributions_from_params) 
+    received_attributions = (attributions_from_params.blank? ? [] : ActiveSupport::JSON.decode(attributions_from_params)) 
     
     # build a more convenient hash structure with attribution parameters
     # (this will be classified by resource type)

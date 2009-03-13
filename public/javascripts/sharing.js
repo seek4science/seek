@@ -1128,15 +1128,19 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
 
 // ***************  Resource Upload Validation  *****************
 
-function validateNewSopFields() {
-  if($('sop_data').value.length == 0) {
-    alert("Please specify the name of the file to upload!");
-    $('sop_data').focus();
-    return(false);
-  }
+function validateSopFields(is_new_file) {
+  // only make this test if that's a new SOP
+  if(is_new_file) {
+	  if($('sop_data').value.length == 0) {
+	    alert("Please specify the name of the file to upload!");
+	    $('sop_data').focus();
+	    return(false);
+	  }
+	}
   
+  // other tests are applicable to both editing and creating new SOP
   if($('sop_title').value.length == 0) {
-    alert("Please specify the title for the new SOP!");
+    alert("Please specify the title for the SOP!");
     $('sop_title').focus();
     return(false);
   }
@@ -1152,9 +1156,9 @@ function validateNewSopFields() {
   }
   
   // filename and title set - can submit
-  $('new_sop_submit_btn').disabled = true;
-  $('new_sop_submit_btn').value = "Uploading and Saving...";
-  $('new_sop_submit_btn').form.submit();
+  $('sop_submit_btn').disabled = true;
+  $('sop_submit_btn').value = (is_new_file ? "Uploading and Saving..." : "Updating...");
+  $('sop_submit_btn').form.submit();
   return(true);
 }
 
