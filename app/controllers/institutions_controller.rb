@@ -6,7 +6,8 @@ class InstitutionsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_all]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  
+
+
   # GET /institutions
   # GET /institutions.xml
   def index
@@ -134,5 +135,9 @@ class InstitutionsController < ApplicationController
       error("Insufficient priviledged", "is invalid (insufficient_priviledges)")
       return false
     end
+  end
+
+  def default_items_per_page
+    12 #can be larger for institutions since the item size is smaller
   end
 end
