@@ -5,6 +5,13 @@
 <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
   <ul class="sectionIcons">
     <li><%= icon('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%></li>
+
+    <% if mine?(@person) -%>
+      <li>
+        <%= icon "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Change password", nil, "Change password" -%>
+      </li>
+    <% end -%>
+
     <% if current_user.is_admin? -%>
       <li><%= icon "destroy", person_path(@person), "Delete Person", { :confirm => 'Are you sure?', :method => :delete }, "Delete Person" -%>
     <% end -%>

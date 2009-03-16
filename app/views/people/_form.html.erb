@@ -1,3 +1,5 @@
+
+
 <%= f.error_messages %>
 
 <h2>Personal Information & Contact Details</h2>
@@ -46,12 +48,14 @@
     </td>
   </tr>
 </table>
-<% if mine?(person) %>
-  <p>
-    <%= icon "lock", url_for({:controller=>:users, :action=>:edit, :id=>person.user}), "Change login details", nil, "Change login details" -%>
-  </p>
-<% end -%>
-
+<br/>
+<% if mine?(@person) -%>
+  <ul class="sectionIcons">
+    <li>
+      <%= icon "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Change password", nil, "Change password" -%>
+    </li>
+  </ul>
+<% end %>
 
 <% # show avatar selection only when the project exists AND when current user is allowed to edit it -%>
 <% if person && (mine?(person) || person.can_be_edited_by?(current_user)) -%>
