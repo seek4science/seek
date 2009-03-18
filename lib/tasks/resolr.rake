@@ -6,5 +6,6 @@ namespace :solr do
     Person.find(:all).map do |w| w.solr_save end
     Project.find(:all).map do |w| w.solr_save end
     Institution.find(:all).map do |w| w.solr_save end
+    Sop.find(:all).map do |w| w.solr_save end
   end
 end
