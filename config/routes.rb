@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :experiments
+
   map.resources :sops, :member => { :download => :get }
 
   map.resources :assets

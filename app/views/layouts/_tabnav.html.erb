@@ -17,6 +17,11 @@
 			<li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1.5em;">
         <%= link_to "SOPs", sops_url -%>
       </li>
+
+      <!-- Experiments tab -->
+      <li <%= (["experiments"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1.5em;">
+        <%= link_to "Experiments", experiments_url -%>
+      </li>
     </ul>
   </div>
 <% end  %>
