@@ -1,0 +1,75 @@
+<script>
+
+  function show_ajax_loader() {
+    $('assay_list_collection').innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
+  }
+
+</script>
+<%= f.error_messages %>
+
+<p>
+  <%= f.label :title %>
+  <%= f.text_field :title %>
+</p>
+
+<p>
+  <%= f.label :description %>
+  <%= f.text_area :description %>
+</p>
+
+
+<p>
+  <%= f.label :topic %>
+  <%= select_tag "topic_id",
+    options_for_select([["Select topic..",0]]|Topic.find(:all).collect {|t| [t.title,t.id]}),
+    {:onchange=>remote_function(
+      :update=>:assay_list_collection,
+      :url=>{:action=>"topic_selected_ajax"},
+      :with=>"'topic_id='+this.value",
+      :before=>"show_ajax_loader()"
+    )
+  }
+  -%>
+</p>
+
+<div id="assay_list_collection">
+  
+</div>
+<script>
+  function copy_selected_assay() {
+    selected_option_index=$("possible_assays").selectedIndex
+    selected_option=$("possible_assays").options[selected_option_index]
+    target_select=$("experiment_assay_ids")
+    target_select[target_select.length]=selected_option
+  }
+
+  function copy_selected_sop() {
+    selected_option_index=$("possible_sops").selectedIndex
+    selected_option=$("possible_sops").options[selected_option_index]
+    target_select=$("experiment_sop_ids")
+    target_select[target_select.length]=selected_option
+  }
+
+</script>
+<%= link_to_function ">>>","copy_selected_assay();" %>
+
+<div id="collected_assays">
+  <%= f.label :assays %>
+  <%= f.collection_select :assay_ids,@experiment.assays,:id,:title,{},:multiple=>true %>
+</div>
+
+<div id="sop_list_collection">
+  <%= f.label :sops %>
+  <%= select_tag :possible_sops,options_for_select( authorised_sops.collect{|s| [s.title,s.id]} ) %>
+</div>
+
+<div id="collected_sops">
+  <%= f.label :sops %>
+  <%= f.collection_select :sop_ids,@experiment.sops,:id,:title,{},:multiple=>true %>
+</div>
+
+<%= link_to_function ">>>","copy_selected_sop();" %>
+<p style="margin-top: 2em; text-align: center;">
+  <%= f.submit(experiment ? "Update" : "Create") -%>
+  or <%= link_to 'Cancel', (experiment ? experiment_path(experiment.id) : experiments_path) -%>
+</p>

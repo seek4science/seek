@@ -2,7 +2,7 @@ class CreateExperiments < ActiveRecord::Migration
   def self.up
     create_table :experiments do |t|
       t.string :title
-      t.integer :assay_id
+      t.string :description      
 
       t.timestamps
     end

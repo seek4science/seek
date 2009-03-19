@@ -1,0 +1,26 @@
+<% experiment ||= resource_list_item %>
+
+<h3> <%= h(experiment.title) %>  </h3>
+
+
+<% if !experiment.assays.blank? -%>
+  <% for assay in experiment.assays %>
+  
+  <p>
+    <label>Assay</label>
+    <%= h assay.title %>
+  </p>
+
+  <% end %>
+
+<% else -%>
+
+  <p>
+    No Assay Defined
+  </p>
+
+<% end -%>
+
+
+<%= link_to "Show",experiment_path(experiment) %>
+<%= link_to "Edit",edit_experiment_path(experiment) %>

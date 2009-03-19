@@ -1,0 +1,18 @@
+<h3> <%= h(@experiment.title) %> </h3>
+
+<% for sop in @experiment.sops %>
+
+<br/>
+<%= "Sop title=#{sop.title}" %>
+
+<% end %>
+
+<% for assay in @experiment.assays %>
+
+<br/>
+<%= "Assay title=#{assay.title}" %>
+
+<% end %>
+
+<br/>
+<%= link_to "Edit",edit_experiment_path(@experiment) %>

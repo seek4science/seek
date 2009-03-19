@@ -1,0 +1,7 @@
+<h1>New experiment</h1>
+
+<div class="show_basic">
+	<% form_for @experiment do |f| %>
+	  <%= render :partial => "form", :locals => { :f => f, :experiment => nil } -%>
+	<% end -%>
+</div>
