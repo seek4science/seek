@@ -1,7 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  title: MyString
-
-two:
-  title: MyString
+metabolomics_topic:
+  title: Metabolomics Topic
+  project: sysmo_project

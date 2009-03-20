@@ -1,7 +1,4 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  title: MyString
-
-two:
-  title: MyString
+catabolic_response:
+  title: Catabolic Response

@@ -1,9 +1,4 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-one:
-  title: MyString
-  assay_id: 1
-
-two:
-  title: MyString
-  assay_id: 1
+metabolomics_exp:
+  assay: metabolomics
+  experiment_type: catabolic_response
+  title: A Metabolomics Experiment
