@@ -3,6 +3,8 @@ class CreateAssays < ActiveRecord::Migration
     create_table :assays do |t|
       t.string :title      
       t.string :description
+      t.integer :topic_id
+      t.integer :assay_type_id
 
       t.timestamps
     end
