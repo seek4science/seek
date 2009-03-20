@@ -13,4 +13,19 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
   end
 
+  test "admin tab not visible to non admin" do
+    login_as(:aaron)
+    get :index
+    assert_response :success
+    assert_select ".tabnav li a",:text=>"Admin",:count=>0
+  end
+
+  test "admin tab visible to admin" do
+    login_as(:quentin)
+    get :index
+    assert_response :success
+    assert_select ".tabnav li a",:text=>"Admin",:count=>1
+  end
+
+
 end
