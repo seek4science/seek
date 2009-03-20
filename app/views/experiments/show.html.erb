@@ -1,5 +1,8 @@
 <h3> <%= h(@experiment.title) %> </h3>
 
+<br/>
+
+<%= "Experiment Type=#{@experiment.experiment_type.title}" %>
 <% for sop in @experiment.sops %>
 
 <br/>
@@ -7,10 +10,10 @@
 
 <% end %>
 
-<% for assay in @experiment.assays %>
+<% if @experiment.assay %>
 
 <br/>
-<%= "Assay title=#{assay.title}" %>
+<%= "Assay title=#{@experiment.assay.title}" %>
 
 <% end %>
 

@@ -33,7 +33,10 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :expertise
   
   # browsing by countries
-  map.country '/countries/:country_name', :controller => 'countries', :action => 'show'  
+  map.country '/countries/:country_name', :controller => 'countries', :action => 'show'
+
+  # page for admin tasks
+  map.admin '/admin/', :controller=>'admin',:action=>'show'
 
   # favourite groups
   map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }

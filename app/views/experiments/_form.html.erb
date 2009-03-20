@@ -17,11 +17,16 @@
   <%= f.text_area :description %>
 </p>
 
+<p>
+  <%= f.label :experiment_type %>
+  <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title %>
+</p>
 
 <p>
   <%= f.label :topic %>
+  <% topic_value=experiment ?experiment.assay.topic.id : 0 %>
   <%= select_tag "topic_id",
-    options_for_select([["Select topic..",0]]|Topic.find(:all).collect {|t| [t.title,t.id]}),
+    options_for_select([["Select topic..",0]]|Topic.find(:all).collect {|t| [t.title,t.id]},topic_value),
     {:onchange=>remote_function(
       :update=>:assay_list_collection,
       :url=>{:action=>"topic_selected_ajax"},
@@ -33,15 +38,12 @@
 </p>
 
 <div id="assay_list_collection">
-  
+  <% if experiment && experiment.assay -%>
+    <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>experiment.assay.topic,:selected=>experiment.assay.id} %>
+  <% end -%>
 </div>
 <script>
-  function copy_selected_assay() {
-    selected_option_index=$("possible_assays").selectedIndex
-    selected_option=$("possible_assays").options[selected_option_index]
-    target_select=$("experiment_assay_ids")
-    target_select[target_select.length]=selected_option
-  }
+
 
   function copy_selected_sop() {
     selected_option_index=$("possible_sops").selectedIndex
@@ -51,12 +53,7 @@
   }
 
 </script>
-<%= link_to_function ">>>","copy_selected_assay();" %>
 
-<div id="collected_assays">
-  <%= f.label :assays %>
-  <%= f.collection_select :assay_ids,@experiment.assays,:id,:title,{},:multiple=>true %>
-</div>
 
 <div id="sop_list_collection">
   <%= f.label :sops %>

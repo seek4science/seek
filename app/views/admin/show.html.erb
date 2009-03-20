@@ -1,0 +1,14 @@
+<h1> Administration </h1>
+
+<%= link_to "New Project",new_project_path %>
+<br/>
+<%= link_to "New Institution", new_institution_path %>
+
+<br/>
+<h3>Create Topic</h3>
+<% form_for @topic,:url=>{:action=>"create_topic"} do |f| %>
+  <%= f.label :title %><br/>
+  <%= f.text_field :title %><br/>
+  <%= f.submit "Create" %>
+
+<% end %>

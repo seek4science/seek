@@ -64,7 +64,7 @@ class ExperimentsController < ApplicationController
 
   end
 
-  def topic_selected_ajax
+  def topic_selected_ajax    
     if params[:topic_id] && params[:topic_id]!="0"
       topic=Topic.find(params[:topic_id])
       render :partial=>"assay_list",:locals=>{:topic=>topic}

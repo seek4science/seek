@@ -3,15 +3,13 @@
 <h3> <%= h(experiment.title) %>  </h3>
 
 
-<% if !experiment.assays.blank? -%>
-  <% for assay in experiment.assays %>
+<% if experiment.assay -%>
   
   <p>
     <label>Assay</label>
-    <%= h assay.title %>
+    <%= h experiment.assay.title %>
   </p>
 
-  <% end %>
 
 <% else -%>
 
