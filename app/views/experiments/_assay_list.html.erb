@@ -1,5 +1,12 @@
 <% selected ||= 0 %>
-<label>Assay</label>
-<%=
-  select_tag :experiment_assay_id,options_for_select(topic.assays.collect{|a| [a.title,a.id]},selected),{:name=>"experiment[assay_id]"}
+<%
+  topics=[["Select an assay ..",0]]
+  topics = topics | topic.assays.collect{|a| ["#{a.description}",a.id]} unless topic.nil?
 %>
+
+  <%=
+    select_tag :experiment_assay_id,
+               options_for_select(topics,selected),
+               {:name=>"experiment[assay_id]",:disabled=>topic.nil?}
+  %>
+

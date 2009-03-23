@@ -2,46 +2,6 @@
   function show_ajax_loader(element) {
     $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
   }
-</script>
-<%= f.error_messages %>
-
-<p>
-  <%= f.label :title %>
-  <%= f.text_field :title %>
-</p>
-
-<p>
-  <%= f.label :description %>
-  <%= f.text_area :description %>
-</p>
-
-<p>
-  <%= f.label :experiment_type %>
-  <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title %>
-</p>
-
-<p>
-  <%= f.label :topic %>
-  <% topic_value=@experiment.assay ? @experiment.assay.topic.id : 0 %>
-  <%= select_tag "topic_id",
-    options_for_select([["Select topic..",0]]|Topic.find(:all).collect {|t| [t.title,t.id]},topic_value),
-    {:onchange=>remote_function(
-      :update=>:assay_list_collection,
-      :url=>{:action=>"topic_selected_ajax"},
-      :with=>"'topic_id='+this.value",
-      :before=>"show_ajax_loader('assay_list_collection')"
-    )
-  }
-  -%>
-</p>
-
-<div id="assay_list_collection">
-  <% if @experiment.assay -%>
-    <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>@experiment.assay.topic,:selected=>@experiment.assay.id} %>
-  <% end -%>
-</div>
-<script>
-
 
   function copy_selected_sop() {
     selected_option_index=$("possible_sops").selectedIndex
@@ -51,6 +11,88 @@
   }
 
 </script>
+<%= error_messages_for :experiment %>
+
+
+<center>
+  <div style="width: 60%;">
+
+    <p style="margin-top: 1.5em;">
+      <b>Title:</b><br/>
+      <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
+      <%= f.text_field :title,:style=>"width: 100%;" %>
+    </p>
+
+    <p style="margin-top: 0.5em;">
+      <b>Description:</b><br/>
+      <%= f.text_area :description,:style => "width: 100%;", :rows => 5 %>
+    </p>
+
+  </div>
+</center>
+
+
+<h2>Experiment details</h2>
+
+<table style="width: 100%;" class="box_simple">
+  <tr>
+    <td style="width: 45%;">
+
+      <div style="width: 90%;">
+        <p>
+          <%= f.label :experiment_type %><br/>
+          <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title %>
+        </p>
+      </div>
+
+    </td>
+    <td>
+      
+      <p>
+        <%= f.label :topic %><br/>
+        <% topic_value=@experiment.assay ? @experiment.assay.topic.id : 0 %>
+        <%= select_tag "topic_id",
+          options_for_select([["Select topic..",0]]|Topic.find(:all).collect {|t| [t.title,t.id]},topic_value),
+          {:onchange=>remote_function(
+            :update=>:assay_list_collection,
+            :url=>{:action=>"topic_selected_ajax"},
+            :with=>"'topic_id='+this.value",
+            :before=>"show_ajax_loader('assay_list_collection')"
+          )
+        }
+        -%><br/>
+      </p>
+      <p>
+        <%= label_tag :assay %><br/>
+        <span id="assay_list_collection">
+
+          <% if @experiment.assay -%>
+            <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>@experiment.assay.topic,:selected=>@experiment.assay.id} %>
+          <% else %>
+            <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>nil,:selected=>nil} %>
+          <% end -%>
+
+        </span>
+      </p>
+
+    </td>
+  </tr>
+  <tr>
+    <td>
+
+    </td>
+    <td>
+
+    </td>
+  </tr>
+
+
+</table>
+
+
+
+
+
 
 
 <div id="sop_list_collection">
@@ -64,6 +106,9 @@
 </div>
 
 <%= link_to_function ">>>","copy_selected_sop();" %>
+
+
+
 <p style="margin-top: 2em; text-align: center;">
   <%= f.submit(action==:edit ? "Update" : "Create") -%>
   or <%= link_to 'Cancel', (@experiment.id ? experiment_path(@experiment.id) : experiments_path) -%>

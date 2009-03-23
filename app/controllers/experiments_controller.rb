@@ -69,7 +69,7 @@ class ExperimentsController < ApplicationController
       topic=Topic.find(params[:topic_id])
       render :partial=>"assay_list",:locals=>{:topic=>topic}
     else
-      render :text=>""
+      render :partial=>"assay_list",:locals=>{:topic=>nil}
     end
   end
   
