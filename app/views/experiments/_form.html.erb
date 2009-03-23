@@ -1,9 +1,7 @@
-<script>
-
-  function show_ajax_loader() {
-    $('assay_list_collection').innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
+<script type="text/javascript">
+  function show_ajax_loader(element) {
+    $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
   }
-
 </script>
 <%= f.error_messages %>
 
@@ -31,7 +29,7 @@
       :update=>:assay_list_collection,
       :url=>{:action=>"topic_selected_ajax"},
       :with=>"'topic_id='+this.value",
-      :before=>"show_ajax_loader()"
+      :before=>"show_ajax_loader('assay_list_collection')"
     )
   }
   -%>
