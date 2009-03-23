@@ -18,94 +18,108 @@
   <div style="width: 60%;">
 
     <p style="margin-top: 1.5em;">
-      <b>Title:</b><br/>
-      <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
+      <%= f.label "Title *" %><br/>
       <%= f.text_field :title,:style=>"width: 100%;" %>
     </p>
 
     <p style="margin-top: 0.5em;">
-      <b>Description:</b><br/>
+      <%= f.label :description %><br/>
       <%= f.text_area :description,:style => "width: 100%;", :rows => 5 %>
     </p>
 
+    <p>
+      <%= f.label "Experimentalist(s)" %>
+      <%= f.text_field :experimentalist,:style=>"width: 100%;" %>
+    </p>
+
+    <p>
+      <%= f.label :project %><br/>
+      <%
+      selected_project=0
+      selected_project=project_from_assay(@experiment.assay) if @experiment.assay
+    %>
+      <%=
+      select_tag :project_id,
+        options_for_select([["Select project ..",0]]|current_user.person.projects.collect{|p| [h(p.name),p.id]},selected_project),
+        {:onchange=>remote_function(
+          :url=>{:action=>"project_selected_ajax"},
+          :with=>"'project_id='+this.value",
+          :before=>"show_ajax_loader('topic_collection');show_ajax_loader('assay_list_collection')"
+        ),:style=>"width:100%"
+
+      }
+    %>
+    </p>
   </div>
 </center>
 
 
-<h2>Experiment details</h2>
+<br/>
 
-<table style="width: 100%;" class="box_simple">
-  <tr>
-    <td style="width: 45%;">
+<div class="fold">
+  <div class="foldTitle">
+    Experiment details
+  </div>
+  <div class="foldContent">
 
-      <div style="width: 90%;">
-        <p>
-          <%= f.label :experiment_type %><br/>
-          <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title %>
-        </p>
-      </div>
-
-    </td>
-    <td>
-      
-      <p>
-        <%= f.label :topic %><br/>
-        <% topic_value=@experiment.assay ? @experiment.assay.topic.id : 0 %>
-        <%= select_tag "topic_id",
-          options_for_select([["Select topic..",0]]|Topic.find(:all).collect {|t| [t.title,t.id]},topic_value),
-          {:onchange=>remote_function(
-            :update=>:assay_list_collection,
-            :url=>{:action=>"topic_selected_ajax"},
-            :with=>"'topic_id='+this.value",
-            :before=>"show_ajax_loader('assay_list_collection')"
-          )
-        }
-        -%><br/>
-      </p>
-      <p>
-        <%= label_tag :assay %><br/>
-        <span id="assay_list_collection">
-
-          <% if @experiment.assay -%>
-            <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>@experiment.assay.topic,:selected=>@experiment.assay.id} %>
-          <% else %>
-            <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>nil,:selected=>nil} %>
-          <% end -%>
-
-        </span>
-      </p>
-
-    </td>
-  </tr>
-  <tr>
-    <td>
-
-    </td>
-    <td>
-
-    </td>
-  </tr>
+    <p>
+      <%= f.label :experiment_type %><br/>
+      <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title,{},{:style=>"width:82%"} %>
+    </p>
 
 
-</table>
+    <p>
+      <%= f.label :topic %><br/>
+      <span id="topic_collection">
+        <% if @experiment.assay -%>
+          <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>topics_from_assay(@experiment.assay)} %>
+        <% else -%>
+          <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>[]} %>
+        <% end -%>
+      </span>
+      <br/>
+    </p>
+    <p>
+      <%= label_tag "Assay *" %><br/>
+      <span id="assay_list_collection">
 
+        <% if @experiment.assay -%>
+          <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>@experiment.assay.topic,:selected=>@experiment.assay.id} %>
+        <% else %>
+          <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>nil,:selected=>nil} %>
+        <% end -%>
 
-
-
-
-
-
-<div id="sop_list_collection">
-  <%= f.label :sops %>
-  <%= select_tag :possible_sops,options_for_select( authorised_sops.collect{|s| [s.title,s.id]} ) %>
+      </span>
+    </p>
+  </div>
 </div>
 
-<div id="collected_sops">
-  <%= f.label :sops %>
-  <%= f.collection_select :sop_ids,@experiment.sops,:id,:title,{},:multiple=>true %>
+<div class="fold">
+
+  <div class="foldTitle">Sops</div>
+  <div class="foldContent">
+
+    <div id="sop_list_collection">
+      <%= f.label :available_sops %><br/>
+      <%= select_tag :possible_sops,options_for_select( authorised_sops.collect{|s| [s.title,s.id]} ),:style => "width: 82%;" %>
+      <b><%= link_to_function "Add","copy_selected_sop();" %></b>
+    </div>
+    <br/>
+    <div id="collected_sops">
+      <%= f.label :assigned_sops %><br/>
+      <%= f.collection_select :sop_ids,@experiment.sops,:id,:title,{},:multiple=>true,:style => "width: 82%;height:10em;" %>
+    </div>
+  </div>
 </div>
 
-<%= link_to_function ">>>","copy_selected_sop();" %>
+
+
+
+
+
+
+
+
 
 
 

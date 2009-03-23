@@ -1,0 +1,11 @@
+<% topic_value=(@experiment && @experiment.assay) ? @experiment.assay.topic.id : 0 %>
+<% topic_options = [["Select topic..",0]]|topics.collect{|t| [h(t.title),t.id]} %>
+<%= select_tag "topic_id",
+  options_for_select(topic_options,topic_value),
+  {:onchange=>remote_function(
+    :update=>:assay_list_collection,
+    :url=>{:action=>"topic_selected_ajax"},
+    :with=>"'topic_id='+this.value",
+    :before=>"show_ajax_loader('assay_list_collection')"
+  ),:style=>"width:82%",:disabled=>(topics.nil? || topics.empty?)
+} -%>
