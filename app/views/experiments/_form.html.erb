@@ -24,7 +24,7 @@
 
 <p>
   <%= f.label :topic %>
-  <% topic_value=experiment ?experiment.assay.topic.id : 0 %>
+  <% topic_value=@experiment.assay ? @experiment.assay.topic.id : 0 %>
   <%= select_tag "topic_id",
     options_for_select([["Select topic..",0]]|Topic.find(:all).collect {|t| [t.title,t.id]},topic_value),
     {:onchange=>remote_function(
@@ -38,8 +38,8 @@
 </p>
 
 <div id="assay_list_collection">
-  <% if experiment && experiment.assay -%>
-    <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>experiment.assay.topic,:selected=>experiment.assay.id} %>
+  <% if @experiment.assay -%>
+    <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>@experiment.assay.topic,:selected=>@experiment.assay.id} %>
   <% end -%>
 </div>
 <script>
@@ -67,6 +67,6 @@
 
 <%= link_to_function ">>>","copy_selected_sop();" %>
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(experiment ? "Update" : "Create") -%>
-  or <%= link_to 'Cancel', (experiment ? experiment_path(experiment.id) : experiments_path) -%>
+  <%= f.submit(action==:edit ? "Update" : "Create") -%>
+  or <%= link_to 'Cancel', (@experiment.id ? experiment_path(@experiment.id) : experiments_path) -%>
 </p>
