@@ -467,7 +467,8 @@ module ApplicationHelper
 
   def new_topic_to_project_popup_link project_id
     return link_to_remote_redbox("New topic",
-    {:url=>new_topic_url(:project_id=>project_id),:failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+    {:url=>new_topic_url(:project_id=>project_id),
+      :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
     {:id => "create_new_topic_redbox"}
     )
   end

@@ -11,37 +11,37 @@ function addSelectedSop() {
     id=selected_option.value
 
     if(checkSopNotInList(id)) {
-	  addSop(title,id);
-      updateSops();
-	}
-	else {
-	  alert('The following Sop had already been added:\n\n' +
-	        title);
-	}    
+        addSop(title,id);
+        updateSops();
+    }
+    else {
+        alert('The following Sop had already been added:\n\n' +
+            title);
+    }
 }
 
 function checkSopNotInList(sop_id) {
-  rtn = true;
+    rtn = true;
   
-  for(var i = 0; i < sops.length; i++)
-	  if(sops[i][1] == sop_id) {
-	    rtn = false;
-	    break;
-	  }
+    for(var i = 0; i < sops.length; i++)
+        if(sops[i][1] == sop_id) {
+            rtn = false;
+            break;
+        }
   
-  return(rtn);
+    return(rtn);
 }
 
 function deleteSop(id) {
     // remove the actual record for the attribution
-  for(var i = 0; i < sops.length; i++)
-    if(sops[i][1] == id) {
-      sops.splice(i, 1);
-      break;
-    }
+    for(var i = 0; i < sops.length; i++)
+        if(sops[i][1] == id) {
+            sops.splice(i, 1);
+            break;
+        }
 
-  // update the page
-  updateSops();
+    // update the page
+    updateSops();
 }
 
 function updateSops() {

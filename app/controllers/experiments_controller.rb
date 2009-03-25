@@ -2,6 +2,8 @@ class ExperimentsController < ApplicationController
   
   before_filter :login_required
 
+  before_filter :set_no_layout, :only => [ :new_topic ]
+
   def index
     @experiments=Experiment.find(:all)
 
@@ -54,6 +56,10 @@ class ExperimentsController < ApplicationController
     project=Project.find(params[:project_id])
     @topic=Topic.new
     @topic.project=project
+
+    respond_to do |format|
+      format.js # new_popup.html.erb
+    end
   end
 
   def create
