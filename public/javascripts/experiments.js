@@ -60,13 +60,10 @@ function updateSops() {
         sop_ids.push(id)
     }
 
-    
-
     // remove the last line break
     if(sop_text.length > 0) {
         sop_text = sop_text.slice(0,-5);
     }
-
 
     // update the page
     if(sop_text.length == 0) {
@@ -75,7 +72,9 @@ function updateSops() {
     else {
         $('sop_to_list').innerHTML = sop_text;
     }
+
     clearSopList();
+
     select=$('experiment_sop_ids')
     for (i=0;i<sop_ids.length;i++) {
         id=sop_ids[i]
@@ -88,8 +87,7 @@ function updateSops() {
         }
         catch (ex) {
             select.add(o,null);
-        }
-        
+        }        
     }
 }
 

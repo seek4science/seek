@@ -41,11 +41,6 @@
   <div class="foldContent">
 
     <p>
-      <%= f.label :experiment_type %><br/>
-      <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title,{},{:style=>"width:82%"} %>
-    </p>
-
-    <p>
       <%= f.label :project %><br/>
       <%
       selected_project=0
@@ -87,6 +82,12 @@
 
       </span>
     </p>
+
+    <p>
+      <%= f.label :experiment_type %><br/>
+      <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title,{},{:style=>"width:82%"} %>
+    </p>
+
   </div>
 </div>
 
@@ -98,7 +99,7 @@
     
     <br/>
     <p style="color: #666666;">
-      So far you have specified the following Sops for this experiment:
+      The following Sops are used as part of this experiment:
     </p>
     <p id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
       <span class="none_text" id="sops">Loading...</span>
