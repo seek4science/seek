@@ -83,7 +83,13 @@ function updateSops() {
         o.value=id
         o.text=id
         o.selected=true
-        select.add(o,null)
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+        
     }
 }
 
