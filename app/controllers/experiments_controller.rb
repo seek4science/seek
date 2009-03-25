@@ -27,6 +27,7 @@ class ExperimentsController < ApplicationController
   # PUT /institutions/1.xml
   def update
     @experiment=Experiment.find(params[:id])
+    
 
     respond_to do |format|
       if @experiment.update_attributes(params[:experiment])
@@ -50,8 +51,8 @@ class ExperimentsController < ApplicationController
   end
 
   def create
-    @experiment = Experiment.new(params[:experiment])
-
+    @experiment = Experiment.new(params[:experiment])    
+    
     respond_to do |format|
       if @experiment.save
         format.html { redirect_to(@experiment) }
