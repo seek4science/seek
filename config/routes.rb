@@ -44,6 +44,9 @@ ActionController::Routing::Routes.draw do |map|
   map.edit_favourite_group '/favourite_groups/edit', :controller => 'favourite_groups', :action => 'edit', :conditions => { :method => :post }
   map.update_favourite_group '/favourite_groups/update', :controller => 'favourite_groups', :action => 'update', :conditions => { :method => :post }
   map.delete_favourite_group '/favourite_groups/:id', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
+
+  map.new_topic 'experiments/new_topic',:controller=>"experiments",:action=>'new_topic',:conditions=> {:method=>:post}
+  map.create_topic 'experiments/create_topic',:controller=>"experiments",:action=>'create_topic',:conditions=> {:method=>:post}
   
   # review members of workgroup (also of a project / institution) popup
   map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }

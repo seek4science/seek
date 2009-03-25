@@ -1,5 +1,6 @@
 <% topic_value=(@experiment && @experiment.assay) ? @experiment.assay.topic.id : 0 %>
 <% topic_options = [["Select topic..",0]]|topics.collect{|t| [h(t.title),t.id]} %>
+<% project_id||=nil %>
 <%= select_tag "topic_id",
   options_for_select(topic_options,topic_value),
   {:onchange=>remote_function(
@@ -9,3 +10,7 @@
     :before=>"show_ajax_loader('assay_list_collection')"
   ),:style=>"width:82%",:disabled=>(topics.nil? || topics.empty?)
 } -%>
+
+<% if project_id && project_id!="0" -%>
+  <%= new_topic_to_project_popup_link project_id %>
+<% end -%>

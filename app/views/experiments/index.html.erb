@@ -1,3 +1,7 @@
-<%= link_to "New Experiment",new_experiment_path %>
+<ul class="sectionIcons">
+	<li><%= icon "experiment", new_experiment_path, "New Experiment", nil, "New Experiment" %></li>
+	<!-- <li><%#= icon "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
+</ul>
+
 
 <%= render :partial => "resource_list_item", :collection=>@experiments %>

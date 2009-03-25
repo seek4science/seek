@@ -50,6 +50,12 @@ class ExperimentsController < ApplicationController
 
   end
 
+  def new_topic
+    project=Project.find(params[:project_id])
+    @topic=Topic.new
+    @topic.project=project
+  end
+
   def create
     @experiment = Experiment.new(params[:experiment])    
     
@@ -81,7 +87,7 @@ class ExperimentsController < ApplicationController
     end
     topics||=[]
     render :update do |page|
-      page.replace_html "topic_collection",:partial=>"topic_list",:locals=>{:topics=>topics}
+      page.replace_html "topic_collection",:partial=>"topic_list",:locals=>{:topics=>topics,:project_id=>params[:project_id]}
       page.replace_html "assay_list_collection",:partial=>"experiments/assay_list",:locals=>{:topic=>nil,:selected=>nil}
     end
   end
