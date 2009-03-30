@@ -117,6 +117,8 @@
 
 <script type="text/javascript">
 
+var CREATE_TOPIC_LINK = "<%= create_topic_url %>";
+
 <% @experiment.sops.each do |s| -%>
     sop_id = <%= s.id -%>;
     sop_title = '<%= s.title -%>';
@@ -125,14 +127,6 @@
 
    updateSops();
 </script>
-
-
-
-
-
-
-
-
 
 
 <p style="margin-top: 2em; text-align: center;">

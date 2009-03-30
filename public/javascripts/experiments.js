@@ -4,10 +4,26 @@ function addSop(title,id) {
     sops.push([title,id])
 }
 
-function postTopicData(form) {
-    alert(form)
+function postTopicData() {
+    request = new Ajax.Request(CREATE_TOPIC_LINK,
+    {
+        method: 'post',
+        parameters: {
+            id: $('topic_id').value,  // empty ID will be submitted on "create" action, but it doesn't make a difference
+            title: $('title').value,
+            project_id: $('project_id').value
+            },
+        onSuccess: function(transport){
+            RedBox.close();
+            return (true);
+        },
+        onFailure: function(transport){
+            alert('Something went wrong, please try again...');
+            return(false);
+        }
+    });
 
-  }
+}
 
 function addSelectedSop() {
     selected_option_index=$("possible_sops").selectedIndex

@@ -4,6 +4,8 @@ class ExperimentsController < ApplicationController
 
   before_filter :set_no_layout, :only => [ :new_topic ]
 
+  protect_from_forgery :except=>[:create_topic]
+
   def index
     @experiments=Experiment.find(:all)
 
@@ -77,6 +79,18 @@ class ExperimentsController < ApplicationController
 
   end
 
+  def create_topic
+    id=params[:id]
+    title=params[:title]
+    project_id=params[:project_id]
+    project=Project.find(project_id)
+    
+    raise Exception.new("Person not a member of the project passed") if !current_user.person.projects.include?(project)
+    topic=Topic.new(:title=>title,:project=>project)
+    topic.save!
+    render :text=>""
+  end
+
   def topic_selected_ajax    
     if params[:topic_id] && params[:topic_id]!="0"
       topic=Topic.find(params[:topic_id])
@@ -89,7 +103,7 @@ class ExperimentsController < ApplicationController
   def project_selected_ajax
     if params[:project_id] && params[:project_id]!=0
       topics=Topic.find(:all,:conditions=>{:project_id=>params[:project_id]})
-      topics=topics.select{|t| !t.assays.blank?}
+      #topics=topics.select{|t| !t.assays.blank?}
     end
     topics||=[]
     render :update do |page|

@@ -15,15 +15,15 @@
     <div class="body">
 
       Project: <%= @topic.project.name %><br/>
-      <% form_for @topic,:url=>create_topic_path,:html=>{:id=>'ttt_ttt_topic_form'} do |f| %>
 
+        <%= hidden_field_tag :project_id,@topic.project.id %>
 
-        <%= f.label :title %><br/>
-        <%= f.text_field :title %><br/>
+        <%= label_tag :title %><br/>
+        <%= text_field_tag :title %><br/>
 
-        <%= f.submit "Create",:onclick=>"postTopicData($('ttt_ttt_topic_form'));return(false);" %>
+        <%= submit_tag "Create",:onclick=>"postTopicData();return(false);" %>
         <input type="button" value="Cancel" style="width: 150px;" onclick="javascript: RedBox.close(); return(false);" />
-      <% end -%>
+      
     </div>
   </center>
   

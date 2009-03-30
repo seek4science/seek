@@ -89,5 +89,7 @@ class Project < ActiveRecord::Base
     workgroups_for_project = WorkGroup.find(:all, :conditions => {:project_id => self.id})
     return workgroups_for_project.collect { |w| [w.institution.name, w.institution.id, w.id] }
   end
+
+  
   
 end
