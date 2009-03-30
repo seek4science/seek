@@ -4,6 +4,11 @@ function addSop(title,id) {
     sops.push([title,id])
 }
 
+function postTopicData(form) {
+    alert(form)
+
+  }
+
 function addSelectedSop() {
     selected_option_index=$("possible_sops").selectedIndex
     selected_option=$("possible_sops").options[selected_option_index]

@@ -1,29 +1,30 @@
+<script type="text/javascript">
 
+  
+
+</script>
 
 <div id="redbox_contents_div" class="redbox_contents" style="width:400px;">
   <div class="head">
     <%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
     <span style="vertical-align:middle;">
-			New Topic
-		</span>
+      New Topic
+    </span>
   </div>
   <center>
-    <div class="body">      
+    <div class="body">
 
       Project: <%= @topic.project.name %><br/>
-      <% remote_form_for @topic,:url=>create_topic_url do |f| %>
-        
+      <% form_for @topic,:url=>create_topic_path,:html=>{:id=>'ttt_ttt_topic_form'} do |f| %>
+
 
         <%= f.label :title %><br/>
         <%= f.text_field :title %><br/>
-        
-        <%= f.submit "Create" %>
+
+        <%= f.submit "Create",:onclick=>"postTopicData($('ttt_ttt_topic_form'));return(false);" %>
         <input type="button" value="Cancel" style="width: 150px;" onclick="javascript: RedBox.close(); return(false);" />
       <% end -%>
     </div>
   </center>
-
-
-
+  
 </div>
-
