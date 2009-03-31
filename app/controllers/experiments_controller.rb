@@ -88,7 +88,9 @@ class ExperimentsController < ApplicationController
     raise Exception.new("Person not a member of the project passed") if !current_user.person.projects.include?(project)
     topic=Topic.new(:title=>title,:project=>project)
     topic.save!
-    render :text=>""
+    respond_to do |format|
+      format.json { render :json=>{:status=>200,:new_topic=>[topic.id,topic.title]} }
+    end
   end
 
   def topic_selected_ajax    

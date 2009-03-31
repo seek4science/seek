@@ -12,8 +12,12 @@ function postTopicData() {
             id: $('topic_id').value,  // empty ID will be submitted on "create" action, but it doesn't make a difference
             title: $('title').value,
             project_id: $('project_id').value
-            },
+        },
         onSuccess: function(transport){
+            var data = transport.responseText.evalJSON(true);
+            if (data.status==200){                
+                addNewTopic(data.new_topic);
+            }
             RedBox.close();
             return (true);
         },
@@ -23,6 +27,13 @@ function postTopicData() {
         }
     });
 
+}
+
+function addNewTopic(new_topic) {    
+    selectObj=$('topic_id');
+    selectObj.options[select.options.length]=new Option(new_topic[1],new_topic[0],false,true);
+    selectObj.disabled=false;
+    selectObj.onchange();
 }
 
 function addSelectedSop() {
