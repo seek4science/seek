@@ -2,9 +2,9 @@ class ExperimentsController < ApplicationController
   
   before_filter :login_required
 
-  before_filter :set_no_layout, :only => [ :new_topic ]
+  before_filter :set_no_layout, :only => [ :new_topic,:new_assay ]
 
-  protect_from_forgery :except=>[:create_topic]
+  protect_from_forgery :except=>[:create_topic,:create_assay]
 
   def index
     @experiments=Experiment.find(:all)
@@ -23,7 +23,7 @@ class ExperimentsController < ApplicationController
     @experiment=Experiment.find(params[:id])
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@experiment.to_xml }
+      format.xml { render :xml=>@experiment.to_xml }
     end
   end
 
@@ -61,6 +61,16 @@ class ExperimentsController < ApplicationController
 
     respond_to do |format|
       format.js # new_popup.html.erb
+    end
+  end
+
+  def new_assay
+    topic=Topic.find(params[:topic_id])
+    @assay=Assay.new
+    @assay.topic=topic
+
+    respond_to do |f|
+      f.js
     end
   end
 

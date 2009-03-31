@@ -1,12 +1,16 @@
 <% selected ||= 0 %>
 <%
-  assays=[["Select an assay ..",0]]
-  assays = assays | topic.assays.collect{|a| ["#{a.description}",a.id]} unless topic.nil?
+assays=[["Select an assay ..",0]]
+assays = assays | topic.assays.collect{|a| ["#{a.description}",a.id]} unless topic.nil?
 %>
 
-  <%=
-    select_tag :experiment_assay_id,
-               options_for_select(assays,selected),
-               {:name=>"experiment[assay_id]",:style=>"width:82%",:disabled=>(assays.size<=1)}
-  %>
+<%=
+select_tag :experiment_assay_id,
+  options_for_select(assays,selected),
+  {:name=>"experiment[assay_id]",:style=>"width:82%",:disabled=>(assays.size<=1)}
+%>
+
+<% if topic -%>
+  <%= new_assay_to_topic_popup_link topic.id %>
+<% end -%>
 

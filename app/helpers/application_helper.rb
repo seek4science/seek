@@ -464,14 +464,6 @@ module ApplicationHelper
       #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
     )
   end
-
-  def new_topic_to_project_popup_link project_id
-    return link_to_remote_redbox("New topic",
-    {:url=>new_topic_url(:project_id=>project_id),
-      :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
-    {:id => "create_new_topic_redbox"}
-    )
-  end
   
   # the parameter must be the *standard* name of the whitelist or blacklist (depending on the link that needs to be produced)
   # (standard names are defined in FavouriteGroup model)

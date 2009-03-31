@@ -47,6 +47,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.new_topic 'experiments/new_topic',:controller=>"experiments",:action=>'new_topic',:conditions=> {:method=>:post}
   map.create_topic 'experiments/create_topic',:controller=>"experiments",:action=>'create_topic',:conditions=> {:method=>:post}
+
+  map.new_assay 'experiments/new_assay',:controller=>"experiments",:action=>'new_assay',:conditions=> {:method=>:post}
+  map.create_assay 'experiments/create_assay',:controller=>"experiments",:action=>'create_assay',:conditions=> {:method=>:post}
   
   # review members of workgroup (also of a project / institution) popup
   map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }
