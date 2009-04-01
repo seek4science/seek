@@ -7,16 +7,15 @@ class ExperimentTest < ActiveSupport::TestCase
     exp=experiments(:metabolomics_exp)
     assert_equal "A Metabolomics Experiment",exp.title
 
-    assert_not_nil exp.assay
-    assert_not_nil exp.assay.topic
-    assert_not_nil exp.assay.topic.project
+    assert_not_nil exp.assays
+    assert_equal 1,exp.assays.size    
+    assert_not_nil exp.topic.project
 
-    assert_equal "Metabolomics Assay",exp.assay.title
-    assert_equal "Metabolomics Topic",exp.assay.topic.title
-    assert_equal projects(:sysmo_project),exp.assay.topic.project
+    assert_equal "Metabolomics Assay",exp.assays.first.title    
+    assert_equal projects(:sysmo_project),exp.topic.project
 
     assert_equal experiment_types(:catabolic_response),exp.experiment_type
-    assert_equal assay_types(:metabolomics),exp.assay.assay_type
+    assert_equal assay_types(:metabolomics),exp.assays.first.assay_type
     
     
   end

@@ -1,4 +1,5 @@
-metabolomics_exp:
-  assay: metabolomics
+metabolomics_exp:  
   experiment_type: catabolic_response
   title: A Metabolomics Experiment
+  assays: metabolomics
+  topic: metabolomics_topic

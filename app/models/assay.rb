@@ -1,7 +1,6 @@
 class Assay < ActiveRecord::Base
 
-  has_many :experiments
-  belongs_to :topic
+  has_and_belongs_to_many :experiments
   belongs_to :assay_type
   
   def description

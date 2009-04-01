@@ -1,8 +1,9 @@
 class Experiment < ActiveRecord::Base
 
 
-  belongs_to :assay
+  has_and_belongs_to_many :assays
   belongs_to :experiment_type
+  belongs_to :topic
   
   belongs_to :person_responible, :class_name => "Person"
 
