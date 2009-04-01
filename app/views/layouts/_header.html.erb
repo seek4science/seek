@@ -1,3 +1,16 @@
-<%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo"),
-  root_path %>
 
+
+<% if RAILS_ENV=="development" -%>
+  <table><tr><td>
+        <h1 style="color:red;">Development Mode</h1>
+      </td><td>
+        <%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo"),
+          root_path %>
+      </td>
+    </tr>
+  </table>
+<% else -%>
+
+  <%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo"),
+    root_path %>
+<% end -%>
