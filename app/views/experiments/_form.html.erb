@@ -3,7 +3,7 @@
 <script type="text/javascript">
   function show_ajax_loader(element) {
     $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
-  }  
+  }
 
 </script>
 <%= error_messages_for :experiment %>
@@ -43,8 +43,7 @@
     <p>
       <%= f.label :project %><br/>
       <%
-      selected_project=0
-      selected_project=@experiment.topic.project if @experiment.topic
+      selected_project=@experiment.topic ? @experiment.topic.project.id : 0
     %>
       <%=
       select_tag :project_id,
@@ -62,11 +61,13 @@
     <p>
       <%= f.label :topic %><br/>
       <span id="topic_collection">
-        <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>[]} %>
+        <% topics = @experiment.topic ? @experiment.topic.project.topics : [] %>
+
+        <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>topics} %>
       </span>
       <br/>
     </p>
-    
+
 
   </div>
 </div>
@@ -76,7 +77,7 @@
 
 <script type="text/javascript">
 
-var CREATE_TOPIC_LINK = "<%= create_topic_url %>";
+  var CREATE_TOPIC_LINK = "<%= create_topic_url %>";
 
 
 </script>

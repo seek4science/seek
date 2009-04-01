@@ -5,7 +5,7 @@
 
     <br/>
     <p style="color: #666666;">
-      The following Assays are used as part of this experiment:
+      The following Assays are related to this experiment:
     </p>
     <p id="assay_to_list" class="box_editing_inner" style="line-height: 1.5;">
       <span class="none_text" id="sops">Loading...</span>
@@ -14,7 +14,7 @@
     <br/>
     <div id="assay_list_collection">
       <%= f.label :available_assays %><br/>
-      <%= select_tag :possible_assays,options_for_select( Assay.find(:all).collect{|a| [a.title,a.id]} ),:style => "width: 82%;" %>
+      <%= select_tag :possible_assays,options_for_select( Assay.find(:all).collect{|a| [h("#{a.title} (#{a.assay_type.title})"),a.id]} ),:style => "width: 82%;" %>
       <b><%= link_to_function "Add","addSelectedAssay(); return(false);" %></b>
     </div>
 
