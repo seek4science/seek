@@ -1,0 +1,35 @@
+<div class="fold">
+
+  <div class="foldTitle">Sops</div>
+  <div class="foldContent">
+
+    <br/>
+    <p style="color: #666666;">
+      The following Sops are used as part of this experiment:
+    </p>
+    <p id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
+      <span class="none_text" id="sops">Loading...</span>
+    </p>
+    <%= f.collection_select :sop_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" %>
+    <br/>
+    <div id="sop_list_collection">
+      <%= f.label :available_sops %><br/>
+      <%= select_tag :possible_sops,options_for_select( authorised_sops.collect{|s| [s.title,s.id]} ),:style => "width: 82%;" %>
+      <b><%= link_to_function "Add","addSelectedSop(); return(false);" %></b>
+    </div>
+
+  </div>
+</div>
+
+
+<script type="text/javascript">
+<% @experiment.sops.each do |s| -%>
+    sop_id = <%= s.id -%>;
+    sop_title = '<%= s.title -%>';
+    addSop(sop_title,sop_id);
+<% end -%>
+
+  updateSops();
+</script>
+
+

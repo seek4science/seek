@@ -2,18 +2,20 @@
 
 <br/>
 
-<%= "Experiment Type=#{@experiment.experiment_type.title}" %>
+
 <% for sop in @experiment.sops %>
 
-<br/>
-<%= "Sop title=#{sop.title}" %>
+  <br/>
+  <%= "Sop title=#{sop.title}" %>
 
 <% end %>
+<br/>
 
-<% if @experiment.assay %>
+<%= "Topic: #{@experiment.topic.title}" if @experiment.topic %>
 
 <br/>
-<%= "Assay title=#{@experiment.assay.title}" %>
+<% for assay in @experiment.assays %>
+  <%= "Assay title=#{assay.title}" %>
 
 <% end %>
 

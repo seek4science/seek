@@ -1,15 +1,14 @@
 var sops=new Array();
+var assays=new Array();
 
-function addSop(title,id) {
-    sops.push([title,id])
-}
+
 
 function postTopicData() {
     request = new Ajax.Request(CREATE_TOPIC_LINK,
     {
         method: 'post',
         parameters: {
-            id: $('topic_id').value,  // empty ID will be submitted on "create" action, but it doesn't make a difference
+            id: $('experiment_topic_id').value,  // empty ID will be submitted on "create" action, but it doesn't make a difference
             title: $('title').value,
             project_id: $('project_id').value
         },
@@ -30,10 +29,14 @@ function postTopicData() {
 }
 
 function addNewTopic(new_topic) {    
-    selectObj=$('topic_id');
+    selectObj=$('experiment_topic_id');
     selectObj.options[select.options.length]=new Option(new_topic[1],new_topic[0],false,true);
     selectObj.disabled=false;
     selectObj.onchange();
+}
+
+function addSop(title,id) {
+    sops.push([title,id])
 }
 
 function addSelectedSop() {
@@ -42,7 +45,7 @@ function addSelectedSop() {
     title=selected_option.text
     id=selected_option.value
 
-    if(checkSopNotInList(id)) {
+    if(checkNotInList(id,sops)) {
         addSop(title,id);
         updateSops();
     }
@@ -52,16 +55,23 @@ function addSelectedSop() {
     }
 }
 
-function checkSopNotInList(sop_id) {
+function checkNotInList(id,list) {
     rtn = true;
   
-    for(var i = 0; i < sops.length; i++)
-        if(sops[i][1] == sop_id) {
+    for(var i = 0; i < list.length; i++)
+        if(list[i][1] == id) {
             rtn = false;
             break;
         }
   
     return(rtn);
+}
+
+function clearList(name) {
+    select=$(name)
+    while(select.length>0) {
+        select.remove(select.options[0])
+    }
 }
 
 function deleteSop(id) {
@@ -105,7 +115,7 @@ function updateSops() {
         $('sop_to_list').innerHTML = sop_text;
     }
 
-    clearSopList();
+    clearList('experiment_sop_ids');
 
     select=$('experiment_sop_ids')
     for (i=0;i<sop_ids.length;i++) {
@@ -123,9 +133,84 @@ function updateSops() {
     }
 }
 
-function clearSopList() {
-    select=$('experiment_sop_ids')
-    while(select.length>0) {
-        select.remove(select.options[0])
+
+
+//Assays
+function addSelectedAssay() {
+    selected_option_index=$("possible_assays").selectedIndex
+    selected_option=$("possible_assays").options[selected_option_index]
+    title=selected_option.text
+    id=selected_option.value
+
+    if(checkNotInList(id,assays)) {
+        addAssay(title,id);
+        updateAssays();
     }
+    else {
+        alert('The following Assay had already been added:\n\n' +
+            title);
+    }
+}
+
+function deleteAssay(id) {
+    // remove the actual record for the attribution
+    for(var i = 0; i < assays.length; i++)
+        if(assays[i][1] == id) {
+            assays.splice(i, 1);
+            break;
+        }
+
+    // update the page
+    updateAssays();
+}
+
+function updateAssays() {
+    assay_text=''
+    type="Assay"
+    assay_ids=new Array();
+
+    for (var i=0;i<assays.length;i++) {
+        assay=assays[i]
+        title=assay[0]
+        id=assay[1]
+        assay_text += '<b>' + type + '</b>: ' + title
+        //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
+        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '[<a href="" onclick="javascript:deleteAssay('+id+'); return(false);">delete</a>]</small><br/>';
+        assay_ids.push(id)
+    }
+
+    // remove the last line break
+    if(assay_text.length > 0) {
+        assay_text = assay_text.slice(0,-5);
+    }
+
+    // update the page
+    if(assay_text.length == 0) {
+        $('assay_to_list').innerHTML = '<span class="none_text">No assays</span>';
+    }
+    else {
+        $('assay_to_list').innerHTML = assay_text;
+    }
+
+    clearList('experiment_assay_ids');
+
+    select=$('experiment_assay_ids')
+    for (i=0;i<assay_ids.length;i++) {
+        id=assay_ids[i]
+        o=document.createElement('option')
+        o.value=id
+        o.text=id
+        o.selected=true
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+    }
+}
+
+function addAssay(title,id) {
+    assays.push([title,id])
 }

@@ -114,13 +114,11 @@ class ExperimentsController < ApplicationController
 
   def project_selected_ajax
     if params[:project_id] && params[:project_id]!=0
-      topics=Topic.find(:all,:conditions=>{:project_id=>params[:project_id]})
-      #topics=topics.select{|t| !t.assays.blank?}
+      topics=Topic.find(:all,:conditions=>{:project_id=>params[:project_id]})      
     end
     topics||=[]
     render :update do |page|
-      page.replace_html "topic_collection",:partial=>"topic_list",:locals=>{:topics=>topics,:project_id=>params[:project_id]}
-      page.replace_html "assay_list_collection",:partial=>"experiments/assay_list",:locals=>{:topic=>nil,:selected=>nil}
+      page.replace_html "topic_collection",:partial=>"topic_list",:locals=>{:topics=>topics,:project_id=>params[:project_id]}      
     end
   end
   

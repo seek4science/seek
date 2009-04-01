@@ -1,24 +1,6 @@
-<% experiment ||= resource_list_item %>
+<% experiment=resource_list_item %>
 
-<h3> <%= h(experiment.title) %>  </h3>
-
-
-<% if experiment.assay -%>
-  
-  <p>
-    <label>Assay</label>
-    <%= h experiment.assay.title %>
-  </p>
-
-
-<% else -%>
-
-  <p>
-    No Assay Defined
-  </p>
-
-<% end -%>
-
+<h2><%= "#{experiment.title}" %></h2>
 
 <%= link_to "Show",experiment_path(experiment) %>
 <%= link_to "Edit",edit_experiment_path(experiment) %>

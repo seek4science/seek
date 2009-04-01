@@ -44,7 +44,7 @@
       <%= f.label :project %><br/>
       <%
       selected_project=0
-      selected_project=project_from_assay(@experiment.assay) if @experiment.assay
+      selected_project=@experiment.topic.project if @experiment.topic
     %>
       <%=
       select_tag :project_id,
@@ -52,7 +52,7 @@
         {:onchange=>remote_function(
           :url=>{:action=>"project_selected_ajax"},
           :with=>"'project_id='+this.value",
-          :before=>"show_ajax_loader('topic_collection');show_ajax_loader('assay_list_collection')"
+          :before=>"show_ajax_loader('topic_collection')"
         ),:style=>"width:82%"
 
       }
@@ -62,70 +62,23 @@
     <p>
       <%= f.label :topic %><br/>
       <span id="topic_collection">
-        <% if @experiment.assay -%>
-          <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>topics_from_assay(@experiment.assay)} %>
-        <% else -%>
-          <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>[]} %>
-        <% end -%>
+        <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>[]} %>
       </span>
       <br/>
     </p>
-    <p>
-      <%= label_tag "Assay *" %><br/>
-      <span id="assay_list_collection">
-
-        <% if @experiment.assay -%>
-          <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>@experiment.assay.topic,:selected=>@experiment.assay.id} %>
-        <% else %>
-          <%= render :partial=>"experiments/assay_list",:locals=>{:topic=>nil,:selected=>nil} %>
-        <% end -%>
-
-      </span>
-    </p>
-
-    <p>
-      <%= f.label :experiment_type %><br/>
-      <%= f.collection_select :experiment_type_id,ExperimentType.find(:all),:id,:title,{},{:style=>"width:82%"} %>
-    </p>
+    
 
   </div>
 </div>
+<%= render :partial=>"assay_selection",:locals=>{:f=>f} %>
+<%= render :partial=>"sop_selection",:locals=>{:f=>f} %>
 
-
-<div class="fold">
-
-  <div class="foldTitle">Sops</div>
-  <div class="foldContent">
-    
-    <br/>
-    <p style="color: #666666;">
-      The following Sops are used as part of this experiment:
-    </p>
-    <p id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
-      <span class="none_text" id="sops">Loading...</span>
-    </p>
-    <%= f.collection_select :sop_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" %>
-    <br/>
-    <div id="sop_list_collection">
-      <%= f.label :available_sops %><br/>
-      <%= select_tag :possible_sops,options_for_select( authorised_sops.collect{|s| [s.title,s.id]} ),:style => "width: 82%;" %>
-      <b><%= link_to_function "Add","addSelectedSop(); return(false);" %></b>
-    </div>
-    
-  </div>
-</div>
 
 <script type="text/javascript">
 
 var CREATE_TOPIC_LINK = "<%= create_topic_url %>";
 
-<% @experiment.sops.each do |s| -%>
-    sop_id = <%= s.id -%>;
-    sop_title = '<%= s.title -%>';
-    addSop(sop_title,sop_id);
-<% end -%>
 
-   updateSops();
 </script>
 
 
