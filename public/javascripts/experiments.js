@@ -31,8 +31,7 @@ function postTopicData() {
 function addNewTopic(new_topic) {    
     selectObj=$('experiment_topic_id');
     selectObj.options[select.options.length]=new Option(new_topic[1],new_topic[0],false,true);
-    selectObj.disabled=false;
-    selectObj.onchange();
+    selectObj.disabled=false;    
 }
 
 function addSop(title,id) {
