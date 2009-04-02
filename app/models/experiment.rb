@@ -1,6 +1,8 @@
 class Experiment < ActiveRecord::Base
 
 
+  has_one :project, :through=>:topic
+
   has_and_belongs_to_many :assays
   belongs_to :experiment_type
   belongs_to :topic
@@ -10,5 +12,6 @@ class Experiment < ActiveRecord::Base
   has_and_belongs_to_many :sops  
   
   validates_presence_of :title
+  validates_presence_of :topic
   
 end

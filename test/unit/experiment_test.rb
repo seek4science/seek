@@ -19,4 +19,23 @@ class ExperimentTest < ActiveSupport::TestCase
     
     
   end
+
+  test "project from topc" do
+    exp=experiments(:metabolomics_exp)
+    assert_equal projects(:sysmo_project), exp.project
+  end
+
+  test "validation" do
+    e=Experiment.new(:title=>"title",:topic=>topics(:metabolomics_topic))
+    assert e.valid?
+
+    e.title=nil
+    assert !e.valid?
+    e.title
+    assert !e.valid?
+
+    e=Experiment.new(:title=>"title",:topic=>topics(:metabolomics_topic))
+    e.topic=nil
+    assert !e.valid?
+  end
 end

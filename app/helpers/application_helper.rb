@@ -249,6 +249,8 @@ module ApplicationHelper
       return nil
     end
   end
+
+  
   
   
   # A generic method to produce avatars for entities of all kinds.

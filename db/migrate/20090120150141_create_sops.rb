@@ -1,4 +1,5 @@
 class CreateSops < ActiveRecord::Migration
+  
   def self.up
     create_table :sops do |t|
       t.column :contributor_type,  :string

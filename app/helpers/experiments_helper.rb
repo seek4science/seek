@@ -28,4 +28,15 @@ module ExperimentsHelper
     )
   end
 
+  # generates the HTML to display the project avatar and named link
+  def related_project_avatar project
+    project_title = h(project.name)
+    project_url = project_path(project)
+    image_tag=avatar(project,60,false,project_url,project_title,false)
+    project_link=link_to project_title, project_url, :alt=>project_title
+
+
+    return image_tag + "<p style='margin: 0; text-align: center;'>#{project_link}</p>"
+  end
+
 end
