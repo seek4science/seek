@@ -1,0 +1,2 @@
+module AssaysHelper
+end

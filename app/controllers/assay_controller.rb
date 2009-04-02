@@ -1,2 +1,0 @@
-class AssayController < ApplicationController
-end
