@@ -17,4 +17,5 @@ module SearchHelper
 
     return results
   end
+  
 end

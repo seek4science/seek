@@ -1,17 +1,14 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :experiments
-
-  map.resources :sops, :member => { :download => :get }
+  
+  map.resources :assays
 
   map.resources :assets
 
-  map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
+  map.resources :experiments
 
-  map.resource :session
+  map.resources :expertise
 
-  #map.resources :profiles
-
-  map.resources :institutions, 
+  map.resources :institutions,
     :collection => { :request_all => :get } do |institution|
     # avatars / pictures 'owned by' institution
     institution.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
@@ -19,18 +16,23 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :groups
 
-  map.resources :projects, 
+  map.resources :people, :collection=>{:select=>:get} do |person|
+    # avatars / pictures 'owned by' person
+    person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
+  end
+
+  map.resources :projects,
     :collection => { :request_institutions => :get } do |project|
     # avatars / pictures 'owned by' project
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :people, :collection=>{:select=>:get} do |person|
-    # avatars / pictures 'owned by' person
-    person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
-  end
+  map.resources :sops, :member => { :download => :get }
+
+  map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
+
+  map.resource :session    
   
-  map.resources :expertise
   
   # browsing by countries
   map.country '/countries/:country_name', :controller => 'countries', :action => 'show'

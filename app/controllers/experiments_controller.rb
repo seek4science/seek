@@ -3,6 +3,7 @@ class ExperimentsController < ApplicationController
   before_filter :login_required
 
   before_filter :set_no_layout, :only => [ :new_topic,:new_assay ]
+  before_filter :is_user_admin_auth, :only=>[:destroy]
 
   protect_from_forgery :except=>[:create_topic,:create_assay]
 
@@ -24,6 +25,18 @@ class ExperimentsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml { render :xml=>@experiment.to_xml }
+    end
+  end
+
+  # DELETE /experiments/1
+  # DELETE /experiments/1.xml
+  def destroy
+    @experiment = Experiment.find(params[:id])
+    @experiment.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(experiments_url) }
+      format.xml  { head :ok }
     end
   end
 
@@ -102,6 +115,8 @@ class ExperimentsController < ApplicationController
       format.json { render :json=>{:status=>200,:new_topic=>[topic.id,topic.title]} }
     end
   end
+
+
 
   def topic_selected_ajax    
     if params[:topic_id] && params[:topic_id]!="0"

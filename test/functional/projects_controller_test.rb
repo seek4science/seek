@@ -34,26 +34,34 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_project
-    get :show, :id => projects(:four).id
+    get :show, :id => projects(:four)
     assert_response :success
   end
 
   def test_should_get_edit
-    get :edit, :id => projects(:four).id
+    get :edit, :id => projects(:four)
     assert_response :success
   end
 
   def test_should_update_project
-    put :update, :id => projects(:four).id, :project => valid_project
+    put :update, :id => projects(:four), :project => valid_project
     assert_redirected_to project_path(assigns(:project))
   end
 
   def test_should_destroy_project
     assert_difference('Project.count', -1) do
-      delete :destroy, :id => projects(:four).id
+      delete :destroy, :id => projects(:four)
     end
 
     assert_redirected_to projects_path
+  end
+
+  def test_non_admin_should_not_destroy_project
+    login_as(:aaron)
+    assert_no_difference('Project.count') do
+      delete :destroy, :id => projects(:four)
+    end
+    
   end
 
 
