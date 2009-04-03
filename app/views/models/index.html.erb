@@ -1,0 +1,42 @@
+<h1>Listing models</h1>
+
+<table>
+  <tr>
+    <th>Contributor type</th>
+    <th>Contributor</th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Original filename</th>
+    <th>Content blob</th>
+    <th>Content type</th>
+    <th>Model type</th>
+    <th>Model format</th>
+    <th>Recommended environment</th>
+    <th>Result graph</th>
+    <th>Last used at</th>
+  </tr>
+
+<% for model in @models %>
+  <tr>
+    <td><%=h model.contributor_type %></td>
+    <td><%=h model.contributor_id %></td>
+    <td><%=h model.title %></td>
+    <td><%=h model.description %></td>
+    <td><%=h model.original_filename %></td>
+    <td><%=h model.content_blob_id %></td>
+    <td><%=h model.content_type %></td>
+    <td><%=h model.model_type %></td>
+    <td><%=h model.model_format %></td>
+    <td><%=h model.recommended_environment_id %></td>
+    <td><%=h model.result_graph %></td>
+    <td><%=h model.last_used_at %></td>
+    <td><%= link_to 'Show', model %></td>
+    <td><%= link_to 'Edit', edit_model_path(model) %></td>
+    <td><%= link_to 'Destroy', model, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New model', new_model_path %>

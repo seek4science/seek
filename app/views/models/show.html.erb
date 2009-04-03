@@ -1,0 +1,63 @@
+<p>
+  <b>Contributor type:</b>
+  <%=h @model.contributor_type %>
+</p>
+
+<p>
+  <b>Contributor:</b>
+  <%=h @model.contributor_id %>
+</p>
+
+<p>
+  <b>Title:</b>
+  <%=h @model.title %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%=h @model.description %>
+</p>
+
+<p>
+  <b>Original filename:</b>
+  <%=h @model.original_filename %>
+</p>
+
+<p>
+  <b>Content blob:</b>
+  <%=h @model.content_blob_id %>
+</p>
+
+<p>
+  <b>Content type:</b>
+  <%=h @model.content_type %>
+</p>
+
+<p>
+  <b>Model type:</b>
+  <%=h @model.model_type %>
+</p>
+
+<p>
+  <b>Model format:</b>
+  <%=h @model.model_format %>
+</p>
+
+<p>
+  <b>Recommended environment:</b>
+  <%=h @model.recommended_environment_id %>
+</p>
+
+<p>
+  <b>Result graph:</b>
+  <%=h @model.result_graph %>
+</p>
+
+<p>
+  <b>Last used at:</b>
+  <%=h @model.last_used_at %>
+</p>
+
+
+<%= link_to 'Edit', edit_model_path(@model) %> |
+<%= link_to 'Back', models_path %>

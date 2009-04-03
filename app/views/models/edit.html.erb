@@ -1,0 +1,60 @@
+<h1>Editing model</h1>
+
+<% form_for(@model) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :contributor_type %><br />
+    <%= f.text_field :contributor_type %>
+  </p>
+  <p>
+    <%= f.label :contributor_id %><br />
+    <%= f.text_field :contributor_id %>
+  </p>
+  <p>
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </p>
+  <p>
+    <%= f.label :description %><br />
+    <%= f.text_area :description %>
+  </p>
+  <p>
+    <%= f.label :original_filename %><br />
+    <%= f.text_field :original_filename %>
+  </p>
+  <p>
+    <%= f.label :content_blob_id %><br />
+    <%= f.text_field :content_blob_id %>
+  </p>
+  <p>
+    <%= f.label :content_type %><br />
+    <%= f.text_field :content_type %>
+  </p>
+  <p>
+    <%= f.label :model_type %><br />
+    <%= f.text_field :model_type %>
+  </p>
+  <p>
+    <%= f.label :model_format %><br />
+    <%= f.text_field :model_format %>
+  </p>
+  <p>
+    <%= f.label :recommended_environment_id %><br />
+    <%= f.text_field :recommended_environment_id %>
+  </p>
+  <p>
+    <%= f.label :result_graph %><br />
+    <%= f.text_area :result_graph %>
+  </p>
+  <p>
+    <%= f.label :last_used_at %><br />
+    <%= f.datetime_select :last_used_at %>
+  </p>
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @model %> |
+<%= link_to 'Back', models_path %>
