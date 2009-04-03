@@ -1,4 +1,6 @@
 class SopsController < ApplicationController
+  #FIXME: re-add REST for each of the core methods
+  
   before_filter :login_required, :except => [ :index, :show, :download ]
   
   before_filter :find_sops, :only => [ :index ]

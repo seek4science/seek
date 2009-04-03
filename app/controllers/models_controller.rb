@@ -1,5 +1,6 @@
 class ModelsController < ApplicationController
-
+  #FIXME: re-add REST for each of the core methods
+  
   before_filter :login_required, :except => [ :index, :show, :download ]
 
   before_filter :find_models, :only => [ :index ]
@@ -10,11 +11,8 @@ class ModelsController < ApplicationController
   # GET /models
   # GET /models.xml
   def index
-    @models = Model.find(:all)
-
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @models }
     end
   end
 
@@ -49,7 +47,7 @@ class ModelsController < ApplicationController
 
   # GET /models/1/edit
   def edit
-    @model = Model.find(params[:id])
+    
   end
 
   # POST /models
