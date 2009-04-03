@@ -11,6 +11,8 @@
 
 <% case resource_type.downcase; when "sop" -%>
   <% resource_type_attributed_to_types = "SOPs" -%>
+  <% when "model" -%>
+  <% resource_type_attributed_to_types = "MODELs" -%>
 <% else -%>
   <% resource_type_attributed_to_types = "THIS MUST BE A NEW TYPE OF RESOURCE FOR WHICH ATTRIBUTIONS ARE INTRODUCED - ADD IT HERE" -%>
 <% end -%>

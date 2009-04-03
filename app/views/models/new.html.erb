@@ -1,59 +1,48 @@
-<h1>New model</h1>
+<%= javascript_include_tag "sharing.js" -%>
 
-<% form_for(@model) do |f| %>
-  <%= f.error_messages %>
+<h1>New Model</h1>
 
-  <p>
-    <%= f.label :contributor_type %><br />
-    <%= f.text_field :contributor_type %>
-  </p>
-  <p>
-    <%= f.label :contributor_id %><br />
-    <%= f.text_field :contributor_id %>
-  </p>
-  <p>
-    <%= f.label :title %><br />
-    <%= f.text_field :title %>
-  </p>
-  <p>
-    <%= f.label :description %><br />
-    <%= f.text_area :description %>
-  </p>
-  <p>
-    <%= f.label :original_filename %><br />
-    <%= f.text_field :original_filename %>
-  </p>
-  <p>
-    <%= f.label :content_blob_id %><br />
-    <%= f.text_field :content_blob_id %>
-  </p>
-  <p>
-    <%= f.label :content_type %><br />
-    <%= f.text_field :content_type %>
-  </p>
-  <p>
-    <%= f.label :model_type %><br />
-    <%= f.text_field :model_type %>
-  </p>
-  <p>
-    <%= f.label :model_format %><br />
-    <%= f.text_field :model_format %>
-  </p>
-  <p>
-    <%= f.label :recommended_environment_id %><br />
-    <%= f.text_field :recommended_environment_id %>
-  </p>
-  <p>
-    <%= f.label :result_graph %><br />
-    <%= f.text_area :result_graph %>
-  </p>
-  <p>
-    <%= f.label :last_used_at %><br />
-    <%= f.datetime_select :last_used_at %>
-  </p>
-  <p>
-    <%= f.submit "Create" %>
-  </p>
-<% end %>
+<div class="show_basic">
+  <% form_tag({:action => :create}, :multipart => true) do -%>
+    <%= error_messages_for :model -%>
 
-<%= link_to 'Back', models_path %>
+	  <center>
+	  	<div style="width: 60%;">
+	  		<p>
+			    <b>File to upload:&nbsp;</b>
+			    <%= file_field :model, :data -%>
+			  </p>
+
+		    <p style="margin-top: 1.5em;">
+			  	<b>Title:</b><br/>
+					<% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
+					<%= text_field_tag 'model[title]', model_title_value, :style => "width: 100%;" -%>
+			  </p>
+
+		    <p style="margin-top: 0.5em;">
+		    	<b>Description:</b><br/>
+					<% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
+					<%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 5 -%>
+		    </p>
+
+	 			<%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",   # this is only for presentation, not for any processing
+                                                                       :project_hash => current_user.generate_own_project_id_name_hash } -%>
+	  	</div>
+		</center>
+
+
+		<p style="margin: 2.5em 0 0 0;">
+  		<%= render :partial => "assets/sharing_form" -%>
+		</p>
+
+		<p style="margin: 0;">
+		  <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+                                                                     :existing_attributions => [],
+                                                                     :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
+		</p>
+
+	  <p style="text-align: center; margin-top: 1.5em;">
+	    <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%> or <%= link_to 'Cancel', models_path -%>
+	  </p>
+	<% end -%>
+</div>
