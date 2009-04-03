@@ -13,5 +13,7 @@ class Experiment < ActiveRecord::Base
   
   validates_presence_of :title
   validates_presence_of :topic
+
+  acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
   
 end
