@@ -1,63 +1,84 @@
-<p>
-  <b>Contributor type:</b>
-  <%=h @model.contributor_type %>
-</p>
+<% truncate_length_for_boxes = 22 -%>
 
-<p>
-  <b>Contributor:</b>
-  <%=h @model.contributor_id %>
-</p>
+<ul class="sectionIcons">
+  <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
+    <li><%= icon('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
+  <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
+    <% # this is not owner, but current user can edit -%>
+    <li><%= icon('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%></li>
+  <% end -%>
 
-<p>
-  <b>Title:</b>
-  <%=h @model.title %>
-</p>
+  <% if Authorization.is_authorized?("destroy", nil, @model, current_user) -%>
+    <li><%= icon('destroy', model_path(@model), nil, { :confirm => 'This deletes the Model and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%></li>
+  <% end -%>
+</ul>
 
-<p>
-  <b>Description:</b>
-  <%=h @model.description %>
-</p>
+<h1 class="contribution_title">Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
 
-<p>
-  <b>Original filename:</b>
-  <%=h @model.original_filename %>
-</p>
+<%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @model } -%>
 
-<p>
-  <b>Content blob:</b>
-  <%=h @model.content_blob_id %>
-</p>
+<div class="show_basic">
+  <div class="contribution_left_box">
+    <div class="contribution_version_box">
+      <div class="contribution_version_inner_box">
+        <p>
+          <b>Title:</b>
+          <span class="title"><%=h @model.title -%></span>
+        </p>
 
-<p>
-  <b>Content type:</b>
-  <%=h @model.content_type %>
-</p>
+        <p>
+          <b>File name:</b>
+          <%=h @model.original_filename -%>
+        </p>
 
-<p>
-  <b>Model type:</b>
-  <%=h @model.model_type %>
-</p>
+        <p>
+          <b>Format:</b>
+          <%=h @model.content_type -%>
+        </p>
 
-<p>
-  <b>Model format:</b>
-  <%=h @model.model_format %>
-</p>
+        <br/>
 
-<p>
-  <b>Recommended environment:</b>
-  <%=h @model.recommended_environment_id %>
-</p>
+        <h3>
+          <%= help_icon("This section shows the overall description for this Model") -%>
+          Description
+        </h3>
 
-<p>
-  <b>Result graph:</b>
-  <%=h @model.result_graph %>
-</p>
+        <% unless @model.description.blank? -%>
+          <div class="contribution_description">
+            <%= simple_format(white_list(@model.description)) -%>
+          </div>
+        <% else -%>
+          <p class="none_text">
+            Not set
+          </p>
+        <% end -%>
 
-<p>
-  <b>Last used at:</b>
-  <%=h @model.last_used_at %>
-</p>
+        <br/>
 
+        <h3>
+          <%= help_icon("This section provides links to the download(s) for this Model") -%>
+          Download
+        </h3>
 
-<%= link_to 'Edit', edit_model_path(@model) %> |
-<%= link_to 'Back', models_path %>
+        <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
+          <ul class="sectionIcons">
+            <li><%= icon('model', download_model_url, "Download Model", nil, "Download Model") -%></li>
+          </ul>
+        <% else -%>
+          <p class="none_text">
+            You do not have permissions to download this Model.
+          </p>
+        <% end -%>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="contribution_right_box">
+    <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @model } -%>
+    <%= render :partial => "assets/resource_associated_with_box", :locals => { :resource => @model, :truncate_to => truncate_length_for_boxes } -%>
+    <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @model, :attributed_to => Authorization.authorize_collection("show", @model.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
+  </div>
+
+</div>

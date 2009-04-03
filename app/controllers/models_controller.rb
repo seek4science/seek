@@ -21,11 +21,16 @@ class ModelsController < ApplicationController
   # GET /models/1
   # GET /models/1.xml
   def show
-    @model = Model.find(params[:id])
+     # store timestamp of the previous last usage
+    @last_used_before_now = @model.last_used_at
+
+    # update timestamp in the current SOP record
+    # (this will also trigger timestamp update in the corresponding Asset)
+    @model.last_used_at = Time.now
+    @model.save_without_timestamping
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @model }
     end
   end
 
@@ -113,6 +118,16 @@ class ModelsController < ApplicationController
         end
       end
     end
+  end
+
+  # GET /models/1;download
+  def download
+    # update timestamp in the current Model record
+    # (this will also trigger timestamp update in the corresponding Asset)
+    @model.last_used_at = Time.now
+    @model.save_without_timestamping
+
+    send_data @model.content_blob.data, :filename => @model.original_filename, :content_type => @model.content_type, :disposition => 'attachment'
   end
 
   # PUT /models/1
