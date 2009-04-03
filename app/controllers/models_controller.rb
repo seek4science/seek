@@ -22,7 +22,7 @@ class ModelsController < ApplicationController
      # store timestamp of the previous last usage
     @last_used_before_now = @model.last_used_at
 
-    # update timestamp in the current SOP record
+    # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
     @model.save_without_timestamping
@@ -131,16 +131,43 @@ class ModelsController < ApplicationController
   # PUT /models/1
   # PUT /models/1.xml
   def update
-    @model = Model.find(params[:id])
+    # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
+    if params[:model]
+      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
+        params[:model].delete(column_name)
+      end
+
+      # update 'last_used_at' timestamp on the Model
+      params[:model][:last_used_at] = Time.now
+
+      # update 'contributor' of the Model to current user (this under no circumstances should update
+      # 'contributor' of the corresponding Asset: 'contributor' of the Asset is the "owner" of this
+      # Model, e.g. the original uploader who has unique rights to manage this Model; 'contributor' of the
+      # MOdel on the other hand is merely the last user to edit it)
+      params[:model][:contributor_type] = current_user.class.name
+      params[:model][:contributor_id] = current_user.id
+    end
 
     respond_to do |format|
       if @model.update_attributes(params[:model])
-        flash[:notice] = 'Model was successfully updated.'
-        format.html { redirect_to(@model) }
-        format.xml  { head :ok }
+        # the Model was updated successfully, now need to apply updated policy / permissions settings to it
+        policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
+
+        # update attributions
+        Relationship.create_or_update_attributions(@model, params[:attributions])
+
+        if policy_err_msg.blank?
+            flash[:notice] = 'Model metadata was successfully updated.'
+            format.html { redirect_to model_path(@model) }
+          else
+            flash[:notice] = "Model metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+            format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+          end
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @model.errors, :status => :unprocessable_entity }
+        format.html {
+          set_parameters_for_sharing_form()
+          render :action => "edit"
+        }
       end
     end
   end
