@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ModelsControllerTest < ActionController::TestCase
 
-  fixtures :models,:recomended_model_environments
+  fixtures :models,:recommended_model_environments
   
   test "should get index" do
     get :index
@@ -17,32 +17,37 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "should create model" do
     assert_difference('Model.count') do
-      post :create, :model => { }
+      post :create, :model => valid_model
     end
 
     assert_redirected_to model_path(assigns(:model))
   end
 
   test "should show model" do
-    get :show, :id => models(:one).id
+    get :show, :id => models(:teusink).id
     assert_response :success
   end
 
   test "should get edit" do
-    get :edit, :id => models(:one).id
+    get :edit, :id => models(:teusink).id
     assert_response :success
   end
 
   test "should update model" do
-    put :update, :id => models(:one).id, :model => { }
+    put :update, :id => models(:teusink).id, :model => { }
     assert_redirected_to model_path(assigns(:model))
   end
 
   test "should destroy model" do
     assert_difference('Model.count', -1) do
-      delete :destroy, :id => models(:one).id
+      delete :destroy, :id => models(:teusink).id
     end
 
     assert_redirected_to models_path
   end
+
+  def valid_model
+    { :title=>"Test" }
+  end
+  
 end
