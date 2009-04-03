@@ -23,18 +23,18 @@
       </li>
 
       <!-- Models tab -->
-      <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1.5em;">
+      <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
         <%= link_to "Models", models_url -%>
       </li>
 
       <!-- Experiments tab -->
-      <li <%= (["experiments"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1.5em;">
+      <li <%= (["experiments"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
         <%= link_to "Experiments", experiments_url -%>
       </li>
 
       <% if current_user.is_admin? -%>
         <!-- Admin tab -->
-        <li <%= (["admin"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1.5em;">
+        <li <%= (["admin"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 8.5em;">
           <%= link_to "Admin", admin_url -%>
         </li>
       <% end -%>
