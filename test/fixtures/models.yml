@@ -1,29 +1,16 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  contributor_type: MyString
+teusink:
+  contributor_type: 'User'
   contributor_id: 1
-  title: MyString
-  description: MyText
-  original_filename: MyString
-  content_blob_id: 1
-  content_type: MyString
-  model_type: MyString
-  model_format: MyString
-  recommended_environment_id: 1
-  result_graph: MyText
+  title: Teusink
+  description: Teusink from JWS Online
+  original_filename: Teusink.xml
+  content_blob: teusink_blob
+  content_type: text/xml
+  model_type: JWS
+  model_format: SBML
+  recommended_environment: jws
+  result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
 
-two:
-  contributor_type: MyString
-  contributor_id: 1
-  title: MyString
-  description: MyText
-  original_filename: MyString
-  content_blob_id: 1
-  content_type: MyString
-  model_type: MyString
-  model_format: MyString
-  recommended_environment_id: 1
-  result_graph: MyText
-  last_used_at: 2009-04-03 11:09:18

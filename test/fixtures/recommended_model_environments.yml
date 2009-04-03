@@ -1,7 +1,10 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  environment: MyString
+copasi:
+    title: Copasi
 
-two:
-  environment: MyString
+jws:
+    title: JWS Online
+
+matlab:
+    title: Matlab

@@ -18,3 +18,6 @@ one:
 
 content_blob_with_little_file:
   data: <%= load_blob_data('little_file.txt') %>
+
+teusink_blob:
+  data: <%= load_blob_data('Teusink.xml') %>
