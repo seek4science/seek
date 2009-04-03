@@ -42,7 +42,7 @@
     <p>
       <%= f.label :project %><br/>
       <%
-      selected_project=@experiment.topic ? @experiment.topic.project.id : 0
+      selected_project=@experiment.topic ? @experiment.project.id : 0
     %>
       <%=
       select_tag :project_id,
@@ -60,7 +60,7 @@
     <p>
       <%= f.label :topic %><br/>
       <span id="topic_collection">
-        <% topics = @experiment.topic ? @experiment.topic.project.topics : [] %>
+        <% topics = @experiment.topic ? @experiment.project.topics : [] %>
 
         <%= render :partial=>"experiments/topic_list",:locals=>{:topics=>topics} %>
       </span>
@@ -70,6 +70,7 @@
 
   </div>
 </div>
+
 <%= render :partial=>"assays/assay_selection",:locals=>{:f=>f} %>
 <%= render :partial=>"sop_selection",:locals=>{:f=>f} %>
 
@@ -77,7 +78,6 @@
 <script type="text/javascript">
 
   var CREATE_TOPIC_LINK = "<%= create_topic_url %>";
-
 
 </script>
 
