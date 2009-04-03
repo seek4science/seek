@@ -2,7 +2,13 @@ require 'test_helper'
 
 class ModelsControllerTest < ActionController::TestCase
 
-  fixtures :models,:recommended_model_environments
+  fixtures :models,:recommended_model_environments,:assets,:users,:people,:projects,:policies
+
+  include AuthenticatedTestHelper
+  
+  def setup
+    login_as(:quentin)
+  end
   
   test "should get index" do
     get :index
@@ -17,7 +23,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "should create model" do
     assert_difference('Model.count') do
-      post :create, :model => valid_model
+      post :create, :model => valid_model, :sharing=>valid_sharing
     end
 
     assert_redirected_to model_path(assigns(:model))
@@ -47,7 +53,16 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model
-    { :title=>"Test" }
+    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt')}
+  end
+
+  def valid_sharing
+    {
+      :use_whitelist=>"0",
+      :user_blacklist=>"0",
+      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
+      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
+    }
   end
   
 end

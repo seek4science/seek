@@ -247,4 +247,15 @@ random_registered_user_who_wants_to_access_different_things:
   can_edit_projects: false
   can_edit_institutions: false
 
+model_owner:
+  person: person_for_model_owner
+  login: model_owner
+  email: asset_owner@example.com
+  salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
+  crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
+  created_at: <%= 1.days.ago.to_s :db %>
+  activation_code: nil
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
 
