@@ -47,9 +47,8 @@
         </p>
 
         <p>
-          <b>Prefered execution/visulation environment:</b>
-          <% env= @model.recommended_environment ? h(@model.recommended_environment.title) : "<span class='none_text'>Unknown</span>" %>
-          <%= env %>
+          <b>Prefered execution/visulation environment:</b>          
+          <%= model_environment_text @model %>
         </p>
 
         <br/>
