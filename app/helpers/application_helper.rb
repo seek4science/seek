@@ -10,6 +10,7 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>" if is_nil_or_empty?(list)
   end
   
+
   def text_or_not_specified text, options = {}
     if text.nil? or text.chomp.empty?
       not_specified_text="Not specified"

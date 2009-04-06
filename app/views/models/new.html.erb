@@ -6,43 +6,72 @@
   <% form_tag({:action => :create}, :multipart => true) do -%>
     <%= error_messages_for :model -%>
 
-	  <center>
-	  	<div style="width: 60%;">
-	  		<p>
-			    <b>File to upload:&nbsp;</b>
-			    <%= file_field :model, :data -%>
-			  </p>
+    <center>
+      <div style="width: 60%;">
+        <p>
+          <b>File to upload:&nbsp;</b>
+          <%= file_field :model, :data -%>
+        </p>
 
-		    <p style="margin-top: 1.5em;">
-			  	<b>Title:</b><br/>
-					<% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
-					<%= text_field_tag 'model[title]', model_title_value, :style => "width: 100%;" -%>
-			  </p>
+        <p style="margin-top: 1.5em;">
+          <b>Title:</b><br/>
+          <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
+          <%= text_field_tag 'model[title]', model_title_value, :style => "width: 100%;" -%>
+        </p>
 
-		    <p style="margin-top: 0.5em;">
-		    	<b>Description:</b><br/>
-					<% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
-					<%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 5 -%>
-		    </p>
+        <p style="margin-top: 0.5em;">
+          <b>Description:</b><br/>
+          <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
+          <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 5 -%>
+        </p>
 
-	 			<%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",   # this is only for presentation, not for any processing
-                                                                       :project_hash => current_user.generate_own_project_id_name_hash } -%>
-	  	</div>
-		</center>
+        <p>
+          <b>Model type:</b><br/>
+          <% type_value = (params[:model].blank? || params[:model][:model_type].blank?) ? nil : params[:model][:model_type] %>
+          <%= text_field_tag 'model[model_type]', type_value, :size=>5 %>
+        </p>
+
+        <p>
+          <b>Model format:</b><br/>
+          <% format_value = (params[:model].blank? || params[:model][:model_format].blank?) ? nil : params[:model][:model_format] %>
+          <%= text_field_tag 'model[model_format]', format_value, :size=>5 %>
+        </p>
+
+        <%
+          environment_options=[['Unknown',0]]|RecommendedModelEnvironment.find(:all).collect{|e| [h(e.title),e.id]}
+        %>
+        <p>
+          <b>Preferred execution/visualisation environment:</b>
+        <%= select_tag 'model[recommended_environment_id]',
+          options_for_select(environment_options,0),
+          {
+            :style=>"width:82%",
+            :name=>"experiment[topic_id]"
+          }
+        %>
+        </p>
+        
+        <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",   # this is only for presentation, not for any processing
+          :project_hash => current_user.generate_own_project_id_name_hash } -%>
+
+        
+        
+      </div>
+    </center>
 
 
-		<p style="margin: 2.5em 0 0 0;">
-  		<%= render :partial => "assets/sharing_form" -%>
-		</p>
+    <p style="margin: 2.5em 0 0 0;">
+      <%= render :partial => "assets/sharing_form" -%>
+    </p>
 
-		<p style="margin: 0;">
-		  <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-                                                                     :existing_attributions => [],
-                                                                     :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
-		</p>
+    <p style="margin: 0;">
+      <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+        :existing_attributions => [],
+        :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
+    </p>
 
-	  <p style="text-align: center; margin-top: 1.5em;">
-	    <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%> or <%= link_to 'Cancel', models_path -%>
-	  </p>
-	<% end -%>
+    <p style="text-align: center; margin-top: 1.5em;">
+      <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%> or <%= link_to 'Cancel', models_path -%>
+    </p>
+  <% end -%>
 </div>

@@ -36,6 +36,22 @@
           <%=h @model.content_type -%>
         </p>
 
+        <p>
+          <b>Model type:</b>
+          <%= text_or_not_specified @model.model_type %>
+        </p>
+
+        <p>
+          <b>Model format:</b>
+          <%= text_or_not_specified @model.model_format %>
+        </p>
+
+        <p>
+          <b>Prefered execution/visulation environment:</b>
+          <% env= @model.recommended_environment ? h(@model.recommended_environment.title) : "<span class='none_text'>Unknown</span>" %>
+          <%= env %>
+        </p>
+
         <br/>
 
         <h3>
