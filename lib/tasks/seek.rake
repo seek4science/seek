@@ -1,5 +1,8 @@
 require 'rubygems'
 require 'rake'
+require 'model_execution'
+
+include ModelExecution
 
 namespace :seek do
   task(:repop_cv=>:environment) do
@@ -37,5 +40,12 @@ namespace :seek do
       end
     end
 
+  end
+
+  task(:jws_test=>:environment) do
+    m=Model.find(1)
+    puts m.title
+
+    puts jws_execution_applet m
   end
 end

@@ -1,7 +1,9 @@
+require 'model_execution'
+
 class ModelsController < ApplicationController
   #FIXME: re-add REST for each of the core methods
 
-  #include ModelExcecution
+  include ModelExecution
 
   before_filter :find_models, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create ]
@@ -18,8 +20,8 @@ class ModelsController < ApplicationController
   end
 
   def execute
-    #@applet= jws_execution_applet @model
-    
+    @applet= jws_execution_applet @model
+    puts @applet
   end
 
   # GET /models/1
