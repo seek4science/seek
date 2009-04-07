@@ -47,7 +47,7 @@
         </p>
 
         <p>
-          <b>Prefered execution/visulation environment:</b>          
+          <b>Prefered execution/visulation environment:</b>
           <%= model_environment_text @model %>
         </p>
 
@@ -71,6 +71,26 @@
         <br/>
 
         <h3>
+          <%= help_icon("This section provides the ability to run a Model") %>
+          Run
+        </h3>
+        <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
+          <ul class="sectionIcons">
+            <% if model_jws_online_compatible? @model %>
+              <li><%= icon('model', execute_model_url(@model), "Execute on JWS Online", {:method=>:post}, "Execute on JWS Online") -%></li>
+            <% else %>
+              <p class="none_text">
+                This model is not compatible with JWS Online.
+              </p>
+            <% end %>
+          </ul>
+        <% else -%>
+          <p class="none_text">
+            You do not have permissions to run this Model.
+          </p>
+        <% end -%>
+
+        <h3>
           <%= help_icon("This section provides links to the download(s) for this Model") -%>
           Download
         </h3>
@@ -84,6 +104,10 @@
             You do not have permissions to download this Model.
           </p>
         <% end -%>
+
+        <br/>
+
+
       </div>
 
     </div>

@@ -1,14 +1,28 @@
+<%= stylesheet_link_tag 'jws' %>
+
 <h1> Administration </h1>
 
 <%= link_to "New Project",new_project_path %>
 <br/>
 <%= link_to "New Institution", new_institution_path %>
 
-<br/>
-<h3>Create Topic</h3>
-<% form_for @topic,:url=>{:action=>"create_topic"} do |f| %>
-  <%= f.label :title %><br/>
-  <%= f.text_field :title %><br/>
-  <%= f.submit "Create" %>
 
-<% end %>
+
+<center>
+<div id="applet_box">
+
+<!--	    <IFRAME src="http://jjj.biochem.sun.ac.za/webMathematica/upload/jjjLoadUpload.jsp?fun=%22JWS%60teusink%60%22&mfile=%22C:\\Program Files\\Apache Software Foundation\\Tomcat 5.5\\webapps\\webMathematica\\upload\\tmp\\teusink
+.m%22"
+	      frameborder="0" bgcolor="#CCCCCC"  align="left"  scrolling="no"></IFRAME> -->
+<!--	    <IFRAME src="http://jjj.biochem.sun.ac.za/webMathematica/Examples/jjjLoad.jsp?fun=%22JWS%60teusink%60%22&mfile=%22C:\\Program Files\\Apache Software Foundation\\Tomcat 5.5\\webapps\\webMathematica\\upload\\tmp\\teusink
+.m%22"
+	      frameborder="0" bgcolor="#CCCCCC"  align="left"  scrolling="no"></IFRAME> -->
+	    <IFRAME src="http://jjj.biochem.sun.ac.za/webMathematica/Examples/jjjLoad.jsp?fun=%22JWS%60teusink%60%22"
+	      frameborder="0" bgcolor="#CCCCCC"  align="left"  scrolling="no"></IFRAME>
+
+
+
+
+
+</div>
+</center>

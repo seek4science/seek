@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :models, :member => { :download => :get }
+  map.resources :models, :member => { :download => :get, :execute=>:post }
 
   
   map.resources :assays

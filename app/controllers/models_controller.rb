@@ -1,5 +1,7 @@
 class ModelsController < ApplicationController
-  #FIXME: re-add REST for each of the core methods      
+  #FIXME: re-add REST for each of the core methods
+
+  #include ModelExcecution
 
   before_filter :find_models, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create ]
@@ -13,6 +15,11 @@ class ModelsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
     end
+  end
+
+  def execute
+    #@applet= jws_execution_applet @model
+    
   end
 
   # GET /models/1
@@ -206,6 +213,9 @@ class ModelsController < ApplicationController
 
   def find_model_auth
     begin
+      action=action_name
+      action="download" if action=="execute"
+      
       model = Model.find(params[:id])
 
       if Authorization.is_authorized?(action_name, nil, model, current_user)
