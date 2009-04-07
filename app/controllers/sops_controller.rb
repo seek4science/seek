@@ -11,6 +11,7 @@ class SopsController < ApplicationController
   
   # GET /sops
   def index
+    @sops=Authorization.authorize_collection("show",@sops,current_user)
     respond_to do |format|
       format.html # index.html.erb
     end
@@ -184,8 +185,7 @@ class SopsController < ApplicationController
   
   def find_sops
     found = Sop.find(:all, 
-                     :order => "title",
-                     :page => { :size => default_items_per_page, :current => params[:page] })
+                     :order => "title")
     
     # this is only to make sure that actual binary data isn't sent if download is not
     # allowed - this is to increase security & speed of page rendering;

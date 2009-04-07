@@ -8,4 +8,4 @@
   <%= render :partial => "layouts/paginate", :locals => { :collection => @sops } -%>
 <% end %>
 
-<%= render :partial => "assets/resource_list", :locals => { :collection => @sops } %>
+<%= render :partial => "assets/resource_list", :locals => { :collection => @sops, :authorization_for_showing_already_done=>true } %>

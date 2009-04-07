@@ -9,6 +9,7 @@ class ModelsController < ApplicationController
   # GET /models
   # GET /models.xml
   def index
+    @models=Authorization.authorize_collection("show",@models,current_user)
     respond_to do |format|
       format.html # index.html.erb
     end
@@ -17,7 +18,7 @@ class ModelsController < ApplicationController
   # GET /models/1
   # GET /models/1.xml
   def show
-     # store timestamp of the previous last usage
+    # store timestamp of the previous last usage
     @last_used_before_now = @model.last_used_at
 
     # update timestamp in the current Model record
@@ -184,10 +185,13 @@ class ModelsController < ApplicationController
 
   protected
 
+  def default_items_per_page
+    return 2
+  end
+
   def find_models
     found = Model.find(:all,
-                     :order => "title",
-                     :page => { :size => default_items_per_page, :current => params[:page] })
+                     :order => "title")
 
     # this is only to make sure that actual binary data isn't sent if download is not
     # allowed - this is to increase security & speed of page rendering;
@@ -196,7 +200,7 @@ class ModelsController < ApplicationController
       model.content_blob.data = nil unless Authorization.is_authorized?("download", nil, model, current_user)
     end
 
-    @models = found
+    @models = found    
   end
 
 

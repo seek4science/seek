@@ -8,4 +8,4 @@
   <%= render :partial => "layouts/paginate", :locals => { :collection => @models } -%>
 <% end %>
 
-<%= render :partial => "assets/resource_list", :locals => { :collection => @models } %>
+<%= render :partial => "assets/resource_list", :locals => { :collection => @models, :authorization_for_showing_already_done=>true } %>
