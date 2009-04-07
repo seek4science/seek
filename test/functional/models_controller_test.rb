@@ -2,12 +2,12 @@ require 'test_helper'
 
 class ModelsControllerTest < ActionController::TestCase
 
-  fixtures :models,:recommended_model_environments,:assets,:users,:people,:projects,:policies
+  fixtures :all
 
   include AuthenticatedTestHelper
   
   def setup
-    login_as(:quentin)
+    login_as(:model_owner)
   end
   
   test "should get index" do
@@ -16,8 +16,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:models)
   end
 
-  test "should get new" do
-    get :new
+  test "should get new" do    
+    get :new    
     assert_response :success
   end
 

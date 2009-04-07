@@ -1,8 +1,7 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 teusink:
-  contributor_type: 'User'
-  contributor_id: 1
+  contributor: model_owner (User)
   title: Teusink
   description: Teusink from JWS Online
   original_filename: Teusink.xml

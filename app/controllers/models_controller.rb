@@ -1,7 +1,5 @@
 class ModelsController < ApplicationController
-  #FIXME: re-add REST for each of the core methods
-  
-  before_filter :login_required, :except => [ :index, :show, :download ]
+  #FIXME: re-add REST for each of the core methods      
 
   before_filter :find_models, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create ]

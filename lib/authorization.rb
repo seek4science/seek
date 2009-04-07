@@ -12,6 +12,9 @@ module Authorization
   
   @@logger = RAILS_DEFAULT_LOGGER
 
+  #the types of Assets supported by the Authorization module
+  ASSET_TYPES=["Sop","Model","Asset"]
+
   # 1) action_name - name of the action that is about to happen with the "thing"
   # 2) thing_type - class name of the thing that needs to be authorized;
   #                 use NIL as a value of this parameter if an instance of the object to be authorized is supplied as "thing";
@@ -84,7 +87,7 @@ module Authorization
     # (only do this for object types that are known to require authorization)
     #
     # this is required to get "policy_id" for policy-based authorized objects (like SOPs / spreadsheets / datafiles / assets)
-    if (thing_asset.nil? && ["Sop", "Asset"].include?(thing_type)) 
+    if (thing_asset.nil? && ASSET_TYPES.include?(thing_type))
       
       found_thing = find_thing(thing_type, thing_id)
       
@@ -93,7 +96,7 @@ module Authorization
         @@logger.error("UNEXPECTED ERROR - Couldn't find object to be authorized:(#{thing_type}, #{thing_id}); action: #{action_name}; user: #{user_id}")
         return false
       else
-        if ["Sop", "Asset"].include?(thing_type)
+        if ASSET_TYPES.include?(thing_type)
           # "assets" are only found for these types of object (and the assets themself),
           # for all the rest - use instances
           thing_asset = found_thing
@@ -114,7 +117,7 @@ module Authorization
     is_authorized = false
     
     case thing_type
-      when "Sop", "Asset"
+      when ASSET_TYPES.find{|el| el==thing_type}
         unless user_id.nil?
           # ******************* Checking Owner *******************
           # access is authorized and no further checks required in two cases:
@@ -370,7 +373,7 @@ module Authorization
     
     begin
       case thing_type
-        when "Sop" #, "Datafile", "Spreadsheet", etc
+        when ASSET_TYPES.find{|el| el!="Asset" && el==thing_type} #, "Datafile", "Spreadsheet", etc
           # "find_by_sql" works faster itself PLUS only a subset of all fields is selected;
           # this is the most frequent query to be executed, hence needs to be optimised
           found_instance = Asset.find_by_sql "SELECT id, contributor_id, contributor_type, policy_id FROM assets WHERE resource_id=#{thing_id} AND resource_type='#{thing_type}'"
@@ -643,5 +646,7 @@ module Authorization
         return false
     end
   end
+
+
   
 end
