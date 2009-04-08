@@ -3,7 +3,7 @@
 
 require "uri"
 require "net/http"
-require 'Multipart'
+require 'multipart'
 
 module ModelExecution
 
@@ -13,9 +13,26 @@ module ModelExecution
   def jws_execution_applet model
     url="http://jjj.biochem.sun.ac.za/webMathematica/upload/upload_stuart.jsp"
 
-    part=Multipart.new({:upfile=>"c:/Users/sowen/Desktop/Teusink.xml"})
+    filepath=store_data_to_tmp model
+
+    part=Multipart.new({:upfile=>filepath})
 
     return part.post(url)
+  end
+
+  def store_data_to_tmp model
+        
+    rootpath="#{RAILS_ROOT}/tmp/models"
+    FileUtils.mkdir_p(rootpath)
+    
+    filename="model-#{model.id}-#{Time.now.to_i}-#{model.original_filename}"
+    filename="#{rootpath}/#{filename}"
+
+    model_data=model.content_blob.data
+    File.open(filename, "wb+") { |f| f.write(model_data) }
+    
+    return filename
+
   end
 
 end

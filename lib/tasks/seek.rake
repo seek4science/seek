@@ -43,7 +43,7 @@ namespace :seek do
   end
 
   task(:jws_test=>:environment) do
-    m=Model.find(1)
+    m=Model.find(9)
     puts m.title
 
     puts jws_execution_applet m
