@@ -10,6 +10,7 @@ module ModelExecution
   #Handles the creation of the applet for running on JWS Online. Requires access to JWS Online, and posts the content
   #of the file and extractes the applet HTML from the response.
   #
+  # Curl equivalent may be: curl -F upfile=@/home/sowen/Desktop/Teusink.xml  http://jjj.biochem.sun.ac.za/webMathematica/upload/upload_stuart.jsp
   def jws_execution_applet model
     url="http://jjj.biochem.sun.ac.za/webMathematica/upload/upload_stuart.jsp"
 
