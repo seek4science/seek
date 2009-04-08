@@ -51,27 +51,27 @@
 
       </td>
 
-      <td class="item_right_table_cell" style="width: 170px;">
-        <div>
-          <p class="section_header">Institutions</p>
-          <ul>
-            <% unless project.institutions.empty? -%>
-              <% for institution in project.institutions %>
-                <li>
-                  <% if institution.country -%>
-									  <%= flag_icon(institution.country) -%>
-									<% else -%>
-  									<%= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
-									<% end -%>
-                  <%= link_to(truncate(h(institution.name), :length=>truncate_projects_institutions_length), url_for(institution), :title => tooltip_title_attrib(h(institution.name))) -%>
-                </li>
-              <% end  %>
-            <% else -%>
-              <li><span class="none_text" style="margin-left: 1em;">Not known</span></li>
-            <% end -%>
-          </ul>
-        </div>
-      </td>
+      <%#*<td class="item_right_table_cell" style="width: 170px;">%>
+        <%#*<div>%>
+          <%#*<p class="section_header">Institutions</p>%>
+          <%#*<ul>%>
+            <%# unless project.institutions.empty? -%>
+              <%# for institution in project.institutions %>
+                <%#*<li>%>
+                  <%# if institution.country -%>
+									  <%#= flag_icon(institution.country) -%>
+									<%# else -%>
+  									<%#= icon("institution", nil, "Institution", nil, "&nbsp;"); -%>
+									<%# end -%>
+                  <%#= link_to(truncate(h(institution.name), :length=>truncate_projects_institutions_length), url_for(institution), :title => tooltip_title_attrib(h(institution.name))) -%>
+                <%#*</li>%>
+              <%# end  %>
+            <%# else -%>
+              <%#*<li><span class="none_text" style="margin-left: 1em;">Not known</span></li>%>
+            <%# end -%>
+          <%#*</ul>%>
+        <%#*</div>%>
+      <%#*</td>%>
 
     </tr>
   </table>
