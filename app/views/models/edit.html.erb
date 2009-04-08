@@ -41,7 +41,7 @@
         environment_value= @model.recommended_environment ? @model.recommended_environment.id : 0
       %>
         <p>
-          <b>Preferred execution/visualisation environment:</b>
+          <b>Preferred execution or visualisation environment:</b>
           <%= select_tag 'model[recommended_environment_id]',
             options_for_select(environment_options,environment_value),
             {
