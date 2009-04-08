@@ -1,0 +1,25 @@
+<center>
+  <% if @error_details -%>
+    <p>
+      There was an error submitting this model to JWS Online.
+      <%= link_to_function "Show error details ..." do |page|
+        page.visual_effect :toggle_blind, "jws_error"
+      end -%>
+    </p>
+    <p>
+      Its possible your model is not compatible with JWS Online, but if you are sure that it is you can
+      <%= link_to_remote "try again",
+          :url=>execute_model_url(@model),
+          :method=>:post,
+          :before=>"$('execute_model').innerHTML=" + render(:partial=>"contacting_jws_online")
+        -%>
+    </p>
+
+    <div id="jws_error" style="display:none;">
+      <%= @error_details %>
+    </div>
+
+  <% else %>
+    <%= @applet.body -%>
+  <% end -%>
+</center>

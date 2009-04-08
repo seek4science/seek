@@ -8,8 +8,10 @@ module ModelsHelper
     return !model.recommended_environment.nil? && model.recommended_environment.title.downcase=="jws online"
   end
 
-  def get_jws_online_applet model
-    
+  def execute_model_label
+    icon_filename=method_to_icon_filename("execute")
+
+    return '<span class="icon">' + image_tag(icon_filename,:alt=>"Execute",:title=>"Execute") + ' Execute model</span>';
   end
 
 end

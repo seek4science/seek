@@ -1,0 +1,34 @@
+<h3>
+  <%= help_icon("This section provides the ability to run a Model") %>
+  Run
+</h3>
+<% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
+
+  <ul class="sectionIcons">
+    <% if model_jws_online_compatible? @model %>      
+      
+      <li>
+        <%= link_to_remote execute_model_label,
+          :url=>execute_model_url(@model),
+          :method=>:post,
+          :before=>"Effect.BlindDown('execute_model');$('execute_model_button').hide();",
+          :html=>{:id=>"execute_model_button"}
+          
+        -%>
+      </li>
+
+      <div id="execute_model" style="display:none;" >
+        <%= render :partial=>"contacting_jws_online" %>
+      </div>
+    <% else %>
+      <p class="none_text">
+        This model is not compatible with JWS Online.
+      </p>
+    <% end %>
+  </ul>
+
+<% else -%>
+  <p class="none_text">
+    You do not have permissions to run this Model.
+  </p>
+<% end -%>

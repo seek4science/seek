@@ -21,7 +21,15 @@ class ModelsController < ApplicationController
 
   def execute
     @applet= jws_execution_applet @model
-    puts @applet
+    
+    if @applet.instance_of?(Net::HTTPInternalServerError)      
+      @error_details=@applet.body.gsub(/<head\>.*<\/head>/,"")
+    end
+
+    render :update do |page|
+      page.replace_html "execute_model",:partial=>"execute_applet"
+    end
+
   end
 
   # GET /models/1
