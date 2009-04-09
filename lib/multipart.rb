@@ -12,14 +12,14 @@ class Multipart
     @file_names.each do |param_name, filepath|
       pos = filepath.rindex('/')
       filename = filepath[pos + 1, filepath.length - pos]
-      parts << StringPart.new ( "--" + boundary + "\r\n" +
+      parts << StringPart.new( "--" + boundary + "\r\n" +
           "Content-Disposition: form-data; name=\"" + param_name.to_s + "\"; filename=\"" + filename + "\"\r\n" +
           "Content-Type: video/x-msvideo\r\n\r\n")
       stream = File.open(filepath, "rb")
       streams << stream
-      parts << StreamPart.new (stream, File.size(filepath))
+      parts << StreamPart.new(stream, File.size(filepath))
     end
-    parts << StringPart.new ( "\r\n--" + boundary + "--\r\n" )
+    parts << StringPart.new( "\r\n--" + boundary + "--\r\n" )
 
     post_stream = MultipartStream.new( parts )
 
@@ -48,8 +48,8 @@ class StreamPart
     @size
   end
 
-  def read ( offset, how_much )
-    @stream.read ( how_much )
+  def read( offset, how_much )
+    @stream.read( how_much )
   end
 end
 
@@ -103,7 +103,7 @@ class MultipartStream
     if how_much_next_part > 0
       @part_no += 1
       @part_offset = 0
-      next_part = read ( how_much_next_part )
+      next_part = read( how_much_next_part )
       current_part + if next_part
         next_part
       else
