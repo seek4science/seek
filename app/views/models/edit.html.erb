@@ -53,7 +53,7 @@
 
         <% # only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
         <% if current_user_authorized_to_manage -%>
-          <%= render :partial => "assets/project_selector", :locals => { :resource_type => "MODEL",  # this is only for presentation, not for any processing
+          <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
             :selected_project_id => @model.asset.project_id,
             :project_hash => current_user.generate_own_project_id_name_hash,
             :disable_project_select => true } -%>

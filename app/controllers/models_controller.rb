@@ -291,7 +291,7 @@ class ModelsController < ApplicationController
     @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
 
     # ..other
-    @resource_type = "MODEL"
+    @resource_type = "Model"
     @favourite_groups = current_user.favourite_groups
 
     @all_people_as_json = Person.get_all_as_json
