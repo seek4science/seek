@@ -29,6 +29,18 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to model_path(assigns(:model))
   end
 
+  test "should create with preferred environment" do
+    assert_difference('Model.count') do
+      model=valid_model
+      model[:recommended_environment_id]=recommended_model_environments(:jws).id
+      post :create, :model => model, :sharing=>valid_sharing
+    end
+
+    m=assigns(:model)
+    assert m
+    assert_equal "JWS Online",m.recommended_environment.title
+  end
+
   test "should show model" do
     get :show, :id => models(:teusink).id
     assert_response :success
@@ -51,6 +63,8 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert_redirected_to models_path
   end
+
+
 
   def valid_model
     { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt')}
