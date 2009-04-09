@@ -2,7 +2,7 @@
 #applet_box {  
   display: inline;
   padding: 0px;
-  border: solid black 1px;
+  border: double black 1px;
   height: 410px;
 }
 
@@ -19,6 +19,13 @@
 
 #jws_error {
     overflow:scroll;
+}
+
+#jws_logo {
+    width:380px;
+    padding-top: 0.5em;
+    padding-bottom: 1em;
+
 }
 
 
