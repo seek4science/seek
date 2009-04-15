@@ -11,7 +11,7 @@ module ModelsHelper
   def execute_model_label
     icon_filename=method_to_icon_filename("execute")
 
-    return '<span class="icon">' + image_tag(icon_filename,:alt=>"Simulate",:title=>"Simulate") + ' Simulate model</span>';
+    return '<span class="icon">' + image_tag(icon_filename,:alt=>"Run",:title=>"Run") + ' Run model</span>';
   end
 
 end
