@@ -135,7 +135,7 @@ class AvatarsController < ApplicationController
   def determine_avatar_owner
     avatar_for = nil
     id = nil
-    
+
     if params[:person_id]
       avatar_for = "Person"
       id = params[:person_id]
@@ -258,7 +258,7 @@ class AvatarsController < ApplicationController
     data_hash = {}
     
     # all types will have main part of information in the generic form
-    data_hash["#{@avatar_for.downcase}".to_sym] = params["#{@avatar_for.downcase}".to_sym]
+    data_hash["#{@avatar_for.downcase}".to_sym] = params["#{@avatar_for.downcase}".to_sym]    
     data_hash["#{@avatar_for.downcase}".to_sym][:avatar_id] = nil if data_hash["#{@avatar_for.downcase}".to_sym][:avatar_id].to_i == 0
     
     # collect any additional type-specific data from params

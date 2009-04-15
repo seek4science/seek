@@ -2,8 +2,8 @@
 
 <p>
   <ul class="sectionIcons">
-	  <li><%= icon("avatars", all_avatars_link(avatar_for_instance), nil, nil, "Manage Avatars") -%></li>
-		<li><%= icon('avatar', new_avatar_link(avatar_for_instance), nil, {:onclick => "store_and_submit_unsaved_data(this, '#{controller.action_name}_#{object_type}_#{avatar_for_instance.id}'); return(false);"}, 'Upload New Avatar') -%></li>
+	  <li><%= icon("avatars", all_avatars_link(avatar_for_instance), nil, nil, "Manage Pictures") -%></li>
+		<li><%= icon('avatar', new_avatar_link(avatar_for_instance), nil, {:onclick => "store_and_submit_unsaved_data(this, '#{controller.action_name}_#{object_type}_#{avatar_for_instance.id}'); return(false);"}, 'Upload New Picture') -%></li>
 	</ul>
 		
 	<p class="box_standout" style="text-align: center; padding: 0.3em 0.5em; margin: 1.5em 0 1em 0;">
