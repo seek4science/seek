@@ -5,78 +5,74 @@
 <% if mine?(@project) || @project.can_be_edited_by?(current_user) -%>
   <ul class="sectionIcons">
     <li><%= icon('edit', edit_project_path(@project), "Edit Project Details", nil, 'Edit Project Details')%></li>
-		<% if current_user.is_admin? -%>
-		  <li><%= icon "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%>
-		<% end -%>
+    <% if current_user.is_admin? -%>
+      <li><%= icon "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%>
+    <% end -%>
   </ul>
 <% end -%>
 
 <h1><%= h @project.name -%></h1>
 
 <div class="show_basic">
-	
+
   <div class="main_content_left_box">
-  	<div class="box_about_actor">
-  		<div class="web_page">
+
+    <div class="box_about_actor">
+      <div class="web_page">
         <p>
           <label>Web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
         </p>
       </div>
-      
+
       <div class="wiki_page">
         <p>
           <label>Wiki page:</label>
           <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
         </p>
       </div>
-      
-      <p style="margin-top: 1em;">
-      	<b>About the project:</b>
-	      <div id="description" class="box_standout">
-	        <%= text_or_not_specified(@project.description, :description=>true) %>
-	      </div>
-      </p>
-			<p>
+
+      <p>
         <%= render :partial=>"organisms_tags", :object=>@project.organisms %>
-		  </p>
-  	</div>
-		
-		
-		<h2 style="margin-top: 3em;">Project Assets</h2>
-		<% # get, classify and authorize all assets for this project -%>
-		<% project_asset_hash = Asset.classify_and_authorize(@project.assets, true, current_user) -%>
-		<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => project_asset_hash,
-                                                                               :narrow_view => true,
-                                                                               :authorization_already_done => true } -%>
-	</div>
-	
-	<div class="main_content_right_box">
+      </p>
+      
+    </div>
+  </div>
+  <div class="main_content_right_box">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
-		
-		<div class="contribution_section_box">
-			<p class="heading">
-				<%= help_icon("Institutions which are involved in this project.") -%>
-				Institutions (<%= @project.institutions.length -%>)
-			</p>
-			<%= render :partial => "layouts/contribution_section_box_item_list", 
-                 :locals => { :collection => @project.institutions,
-                              :collection_name => "institutions_involved",
-                              :icon_type => "flag",
-                              :truncate_to => truncate_length_for_boxes } -%>
-		</div>
-		
-		<div class="contribution_section_box">
-			<p class="heading">
-				<%= help_icon("People working within this project.") -%>
-				People (<%= @project.people.length -%>)
-			</p>
-			<%= render :partial => "layouts/contribution_section_box_item_list", 
-                 :locals => { :collection => @project.people,
-                              :collection_name => "people_working_within",
-                              :icon_type => "Person",
-                              :truncate_to => truncate_length_for_boxes } -%>
-		</div>
-		
-	</div>
+  </div>
+  <div style="clear:both;">
+
+    <p style="margin-top: 1em;">
+      <b>About the project:</b>
+      <div id="description" class="box_standout">
+        <%= text_or_not_specified(@project.description, :description=>true) %>
+      </div>
+    </p>
+
+
+
+    <h2 style="margin-top: 3em;">Associated to <%= h(@project.name) %> </h2>
+    <% # get, classify and authorize all assets for this project -%>
+    <% project_asset_hash = Asset.classify_and_authorize(@project.assets, true, current_user) -%>
+    <% project_asset_hash.merge!(classify_for_tabs(@project.people)) -%>
+    <% project_asset_hash.merge!(classify_for_tabs(@project.institutions)) -%>
+
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => project_asset_hash,
+      :narrow_view => true,
+      :authorization_already_done => true } -%>
+  </div>
+
+
+
+
+
+
+
+
+
+
 </div>
+
+
+
