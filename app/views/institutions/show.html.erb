@@ -4,67 +4,53 @@
 
 
 <% if mine?(@institution) || @institution.can_be_edited_by?(current_user) -%>
-	<ul class="sectionIcons">
-	  <li><%= icon('edit', edit_institution_path(@institution), "Edit Institution Details", nil, 'Edit Institution Details') -%></li>
-	  <% if current_user.is_admin? -%>
-		  <li><%= icon "destroy", institution_path(@institution), "Delete Institution", { :confirm => 'Are you sure?', :method => :delete }, "Delete Institution" -%>
-		<% end -%>
-	</ul>
+  <ul class="sectionIcons">
+    <li><%= icon('edit', edit_institution_path(@institution), "Edit Institution Details", nil, 'Edit Institution Details') -%></li>
+    <% if current_user.is_admin? -%>
+      <li><%= icon "destroy", institution_path(@institution), "Delete Institution", { :confirm => 'Are you sure?', :method => :delete }, "Delete Institution" -%>
+    <% end -%>
+  </ul>
 <% end %>
 
 <h1><%= h @institution.name -%></h1>
 
 <div class="show_basic">
-	
+
   <div class="main_content_left_box">
-  	<div class="box_about_actor">
+
+    <div class="box_about_actor">
       <p class="web_page">
-  			<label>Web page: </label><%= text_or_not_specified(@institution.web_page, :external_link=>true) -%>
+        <label>Web page: </label><%= text_or_not_specified(@institution.web_page, :external_link=>true) -%>
       </p>
-			
-			<fieldset>
-  			<legend>Location</legend>
-				<p class="country">
-		      <label>Country: </label><%= text_or_not_specified @institution.country, :link_as_country => true -%>
-		    </p>
-				
-				<p class="city">
-	        <label>City: </label><%= text_or_not_specified @institution.city %>
-	      </p>
-	      
-	      <p class="address">
-	        <label>Address: </label><%= text_or_not_specified @institution.address, :address=>true %>
-	      </p>
-  		</fieldset>
-      
-  	</div>
-	</div>
-	
-	<div class="main_content_right_box">
-		<%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution, :drag_id => drag_id } -%>
-		
-		<div class="contribution_section_box">
-			<p class="heading">
-				<%= help_icon("People working in #{@institution.name}.") -%>
-			  People (<%= @institution.people.length -%>)
-			</p>
-			<%= render :partial => "layouts/contribution_section_box_item_list", 
-                 :locals => { :collection => @institution.people,
-                              :collection_name => "people_working_in",
-                              :icon_type => "Person",
-                              :truncate_to => truncate_length_for_boxes } -%>
-		</div>
-		
-		<div class="contribution_section_box">
-			<p class="heading">
-				<%= help_icon("Projects that are undertaken by #{@institution.name}.") -%>
-			  Projects (<%= @institution.projects.length -%>)
-			</p>
-			<%= render :partial => "layouts/contribution_section_box_item_list", 
-                 :locals => { :collection => @institution.projects,
-                              :collection_name => "projects_undertaken_by",
-                              :icon_type => "Project",
-                              :truncate_to => truncate_length_for_boxes } -%>
-		</div>
-	</div>
+
+
+      <p class="country">
+        <label>Country: </label><%= text_or_not_specified @institution.country, :link_as_country => true -%>
+      </p>
+
+      <p class="city">
+        <label>City: </label><%= text_or_not_specified @institution.city %>
+      </p>
+
+      <p class="address">
+        <label>Address: </label><%= text_or_not_specified @institution.address, :address=>true %>
+      </p>
+
+    </div>
+
+  </div>
+
+  <div class="main_content_right_box">
+    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution, :drag_id => drag_id } -%>
+  </div>
+
+  <div style="clear:both;">
+    <h2 style="margin-top: 4em;">Associated with '<%= h(@institution.name) -%>' </h2>
+    <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
+    <% institution_hash = classify_for_tabs(@institution.projects) %>
+    <% institution_hash.merge!(classify_for_tabs(@institution.people)) %>
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => institution_hash,
+      :narrow_view => true,
+      :authorization_already_done => true } -%>
+  </div>
 </div>
