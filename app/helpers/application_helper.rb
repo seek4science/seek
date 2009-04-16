@@ -384,6 +384,7 @@ module ApplicationHelper
   def page_title controller_name, action_name
     name=PAGE_TITLES[controller_name]
     name ||=""
+    name += " (Development)" if RAILS_ENV=="development"
     return "Sysmo SEEK&nbsp;"+name
   end
 
@@ -491,7 +492,7 @@ module ApplicationHelper
   end
   
   private
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","experiments"=>"Experiments"}
 
   
 end
