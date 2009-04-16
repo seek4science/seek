@@ -54,24 +54,9 @@ function addSelectedSop() {
     }
 }
 
-function checkNotInList(id,list) {
-    rtn = true;
-  
-    for(var i = 0; i < list.length; i++)
-        if(list[i][1] == id) {
-            rtn = false;
-            break;
-        }
-  
-    return(rtn);
-}
 
-function clearList(name) {
-    select=$(name)
-    while(select.length>0) {
-        select.remove(select.options[0])
-    }
-}
+
+
 
 function deleteSop(id) {
     // remove the actual record for the attribution

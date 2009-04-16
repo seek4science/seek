@@ -11,6 +11,17 @@ module PeopleHelper
     end
   end
 
-  
+  def discipline_list person
+    unless person.disciplines.empty?
+      text=""
+      person.disciplines.each do |d|
+        text += h(d.title)
+        text += ", " unless person.disciplines.last==d
+      end
+    else
+      text="<span class='none_text'>Not known</span>"
+    end
+    return text
+  end
   
 end

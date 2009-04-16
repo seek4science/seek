@@ -25,7 +25,7 @@
 
   <div class="main_content_left_box">
     <div class="box_about_actor">
-      
+
       <p>
         <b>Name:</b> <%= h @person.name %>
       </p>
@@ -60,8 +60,12 @@
             </tr>
           </table>
         <% else -%>
-          <b>Location:</b> <span class="none_text">unknown</span>
+          <b>Location:</b> <span class="none_text">Not known</span>
         <% end -%>
+      </p>
+
+      <p>        
+        <b>Disciplines:</b> <%= discipline_list(@person) %>
       </p>
 
       <p>

@@ -1,4 +1,4 @@
-
+<%= javascript_include_tag "people.js" %>
 
 <%= f.error_messages %>
 
@@ -49,31 +49,23 @@
   </tr>
 </table>
 <br/>
-<% if mine?(@person) -%>
-  <ul class="sectionIcons">
-    <li>
-      <%= icon "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Change password", nil, "Change password" -%>
-    </li>
-  </ul>
-<% end %>
 
-<% # show avatar selection only when the project exists AND when current user is allowed to edit it -%>
-<% if person && (mine?(person) || person.can_be_edited_by?(current_user)) -%>
-  <h2 style="margin-top: 1.5em;">Personal Picture</h2>
-  <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => person, :form_instance => f } -%>
-<% end -%>
 
 <% if person %>
   <h2 style="margin-top: 1.5em;">About You & Your Areas of Expertise</h2>
+
+ 
 
   <center>
     <div style="width: 95%;">
       <p>
         <%= f.label "Description" %><br/>
-        <%= f.text_area :description, :class=>"description", :rows => 3, :style => "width: 85%;" -%>
+        <%= f.text_area :description, :class=>"description", :rows => 5, :style => "width: 100%;" -%>
       </p>
     </div>
   </center>
+
+   <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %>
 
   <table style="width: 100%;">
     <tr style="vertical-align: top;">
@@ -94,6 +86,13 @@
     </tr>
   </table>
 <% end %>
+
+<% # show avatar selection only when the project exists AND when current user is allowed to edit it -%>
+<% if person && (mine?(person) || person.can_be_edited_by?(current_user)) -%>
+  <h2 style="margin-top: 1.5em;">Personal Picture</h2>
+  <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => person, :form_instance => f } -%>
+<% end -%>
+
 
 <% if current_user.is_admin? -%>
   <h2 style="margin-top: 1.5em;">Choose Project / Institution&nbsp;&nbsp;&nbsp;<span class="admin_warning">(This section is visible only to admins)</span></h2>
