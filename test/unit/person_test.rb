@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
-  fixtures :people, :projects,:institutions, :work_groups, :group_memberships,:users, :tags,:taggings
+  fixtures :people, :projects,:institutions, :work_groups, :group_memberships,:users, :tags,:taggings,:disciplines
   
   # Replace this with your real tests.
   def test_work_groups
@@ -134,6 +134,12 @@ class PersonTest < ActiveSupport::TestCase
     assert newP.valid?
   end
 
+  def test_disciplines
+    p=people(:modeller_person)
+    assert_equal 2,p.disciplines.size
+    assert p.disciplines.include?(disciplines(:modeller))
+    assert p.disciplines.include?(disciplines(:experimentalist))
+  end
 
 
 end
