@@ -55,9 +55,15 @@
             <%= h person.skype_name %>
           </p>
         <% end  %>
+        <p class="disciplines">
+          <label>Disciplines:</label>
+          <%= discipline_list(person) %>
+        </p>
 
         <div class="tags">
           <div style="margin-top: 0.3em;">
+
+
             <p style="margin-left: 1em;">
               <label>Expertise:</label>
               <% unless person.expertise.empty? -%>
