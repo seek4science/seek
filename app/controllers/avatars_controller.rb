@@ -256,6 +256,8 @@ class AvatarsController < ApplicationController
   # that wasn't yet saved
   def store_unsaved_person_proj_inst_data_to_session
     data_hash = {}
+
+    return if params["#{@avatar_for.downcase}".to_sym].nil?
     
     # all types will have main part of information in the generic form
     data_hash["#{@avatar_for.downcase}".to_sym] = params["#{@avatar_for.downcase}".to_sym]    
@@ -264,6 +266,7 @@ class AvatarsController < ApplicationController
     # collect any additional type-specific data from params
     case @avatar_for
       when "Person"
+        data_hash[:description] = params[:description]
         data_hash[:tool] = params[:tool]
         data_hash[:expertise] = params[:expertise]
         data_hash[:can_edit_projects] = params[:can_edit_projects]

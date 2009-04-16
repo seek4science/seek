@@ -1,6 +1,5 @@
 <% avatar_can_be_edited_by_current_user = mine?(@avatar_owner_instance) || @avatar_owner_instance.can_be_edited_by?(current_user) -%>
 
-
 <ul class="sectionIcons">
 	<li><%= icon(@avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance), nil, nil, 'Return to Profile')%></li>
   <% if avatar_can_be_edited_by_current_user -%>

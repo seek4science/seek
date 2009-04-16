@@ -1,8 +1,17 @@
 require 'test_helper'
 
 class AvatarsControllerTest < ActionController::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  
+  fixtures :people,:users,:avatars
+
+  include AuthenticatedTestHelper
+  
+  def setup
+    login_as(:quentin)
+  end
+
+  test "show new" do
+    get :new, :person_id=>people(:one).id
+    assert_response :success
   end
 end
