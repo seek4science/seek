@@ -36,7 +36,6 @@ module WorkGroupsHelper
         options << last_project unless last_project.nil?
         last_project=ProjectType.new(wg.project)
       end
-      puts "Project: #{wg.project.name}, Institution: #{wg.institution.name}"
       last_project << WorkGroupOption.new(wg.id, wg.institution.name)
     end
     
