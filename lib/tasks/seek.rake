@@ -33,13 +33,25 @@ namespace :seek do
       unless item.blank?
         item=item.chomp
         if Project.organism_counts.find{|tag| tag.name==item}.nil?
-        tag=Tag.new(:name=>item)
-        taggable=Tagging.new(:tag=>tag, :context=>"organisms",:taggable_type=>"Project")
-        taggable.save!
+          tag=Tag.new(:name=>item)
+          taggable=Tagging.new(:tag=>tag, :context=>"organisms",:taggable_type=>"Project")
+          taggable.save!
         end
       end
     end
 
   end
+
+  desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
+  task :xmi => :environment do
+    require 'lib/uml_dumper.rb'
+    File.open("db/schema.xml", "w") do |file|
+      ActiveRecord::UmlDumper.dump(ActiveRecord::Base.connection, file)
+    end
+    puts "Done. Schema XMI created as db/schema.xml."
+  end
+
+
+
   
 end
