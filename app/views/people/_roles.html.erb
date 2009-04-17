@@ -1,0 +1,23 @@
+<div class="fold">
+  <div class="foldTitle">
+    Roles
+  </div>
+  <div class="foldContent">
+    <ul class="groups">
+      <% for group in @person.group_memberships -%>
+        <li>
+          <label><%= h group.work_group.description -%></label>
+          <ul class="roles">
+            <% unless group.roles.empty? -%>
+              <% for role in group.roles -%>
+                <li><%= role.name %></li>
+              <% end -%>
+            <% else -%>
+              <li><span class="none_text">No roles defined</span></li>
+            <% end -%>
+          </ul>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

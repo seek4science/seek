@@ -54,8 +54,6 @@
 <% if person %>
   <h2 style="margin-top: 1.5em;">About You & Your Areas of Expertise</h2>
 
- 
-
   <center>
     <div style="width: 95%;">
       <p>
@@ -85,6 +83,8 @@
       </td>
     </tr>
   </table>
+
+  <%= render :partial=>"roles",:locals=>{:editable=>true} %>
 <% end %>
 
 <% # show avatar selection only when the project exists AND when current user is allowed to edit it -%>

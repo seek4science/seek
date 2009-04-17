@@ -107,6 +107,7 @@
       <% end -%>
     <% end -%>
 
+    <%= render :partial=>"people/roles" %>
 
     <h2 style="margin-top: 4em;">Associated with '<%= h(@person.name) -%>' </h2>
     <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
