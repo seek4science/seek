@@ -140,3 +140,6 @@ person_for_model_owner:
 modeller_person:
   first_name: "Modeller"
   disciplines: modeller,experimentalist
+
+person_without_group:
+  first_name: "Lonely"

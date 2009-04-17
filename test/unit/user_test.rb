@@ -3,9 +3,30 @@ require File.dirname(__FILE__) + '/../test_helper'
 class UserTest < Test::Unit::TestCase
   # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead.
   # Then, you can remove it from this and the functional test.
+  
   include AuthenticatedTestHelper
   fixtures :users
 
+  def test_without_profile
+    without_profile=User.without_profile
+    without_profile.each do |u|
+      assert u.person.nil?
+    end
+    assert without_profile.include?(users(:part_registered))
+    assert !without_profile.include?(users(:aaron))
+
+    aaron=users(:aaron)
+    aaron.person=nil
+    aaron.save!
+
+    without_profile=User.without_profile
+    without_profile.each do |u|
+      assert u.person.nil?
+    end
+    assert without_profile.include?(users(:part_registered))
+    assert without_profile.include?(users(:aaron))
+  end
+  
   def test_not_activated
     not_activated=User.not_activated
     not_activated.each do |u|

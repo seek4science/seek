@@ -9,6 +9,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2,p.work_groups.size
   end
 
+  def test_without_group
+    without_group=Person.without_group
+    without_group.each do |p|
+      assert_equal 0,p.group_memberships.size
+    end
+    assert !without_group.include?(people(:one))
+    assert without_group.include?(people(:person_without_group))
+  end
+
   def test_expertise
     p=people(:one)
     assert_equal 2, p.expertise.size
