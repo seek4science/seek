@@ -64,7 +64,7 @@
         <% end -%>
       </p>
 
-      <p>        
+      <p>
         <b>Disciplines:</b> <%= discipline_list(@person) %>
       </p>
 
@@ -93,6 +93,20 @@
     </fieldset>
 
 
+
+
+    <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
+
+    <h2 style="margin-top: 4em;">Associated with '<%= h(@person.name) -%>' </h2>
+    <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
+    <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
+    <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
+    <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
+      :narrow_view => true,
+      :authorization_already_done => true } -%>
+
+
     <% # show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <% # this is because it's not needed then: admins can see everything anyway -%>
     <% if current_user.is_admin? && @person.user && !@person.user.is_admin? -%>
@@ -106,17 +120,7 @@
         <p>No "user" instance detected for this person. User has not registered yet.</p>
       <% end -%>
     <% end -%>
-
-    <%= render :partial=>"people/roles" %>
-
-    <h2 style="margin-top: 4em;">Associated with '<%= h(@person.name) -%>' </h2>
-    <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
-    <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
-    <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
-    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
-      :narrow_view => true,
-      :authorization_already_done => true } -%>
+    
   </div>
 
 
@@ -162,6 +166,7 @@
     </div>
 
   </div>
+
 
 
 

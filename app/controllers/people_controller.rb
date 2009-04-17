@@ -200,13 +200,29 @@ class PeopleController < ApplicationController
     end
     
     respond_to do |format|
-      if @person.update_attributes(params[:person])
+      if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
+
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  def set_group_membership_role_ids person,params
+    #FIXME: Consider updating to Rails 2.3 and use Nested forms to handle this more cleanly.
+    prefix="group_membership_role_ids_"
+    person.group_memberships.each do |gr|
+      key=prefix+gr.id.to_s
+      gr.roles.clear
+      if params[key.to_sym]
+        params[key.to_sym].each do |r|
+          r=Role.find(r)
+          gr.roles << r
+        end
       end
     end
   end

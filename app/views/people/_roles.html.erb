@@ -4,20 +4,52 @@
   </div>
   <div class="foldContent">
     <ul class="groups">
-      <% for group in @person.group_memberships -%>
+      <% for group_membership in @person.group_memberships -%>
         <li>
-          <label><%= h group.work_group.description -%></label>
+          <label><%= h group_membership.work_group.description -%></label>
+          <% if editable -%>
+            <%=  link_to_function "[edit]","startRolesEdit(#{group_membership.id});return(false);",:id=>"edit_link_#{group_membership.id}" %>
+          <% end -%>
           <ul class="roles">
-            <% unless group.roles.empty? -%>
-              <% for role in group.roles -%>
-                <li><%= role.name %></li>
+            <div id="roles_<%= group_membership.id -%>">
+              <% unless group_membership.roles.empty? -%>
+                <% for role in group_membership.roles -%>
+
+
+                  <% if editable -%>
+                    <script type="text/javascript">
+                      addRole(<%= group_membership.id %>,'<%= role.name %>',<%= role.id %>);
+                    </script>
+                  <% else -%>
+                    <li>
+                      <%= role.name %>
+                    </li>
+                  <% end -%>
+
+                <% end -%>
+              <% else -%>
+                <li>
+                  <span class="none_text">No roles defined</span>
+                </li>
               <% end -%>
-            <% else -%>
-              <li><span class="none_text">No roles defined</span></li>
+            </div>
+            <% if editable -%>
+              <div id="edit_roles_<%= group_membership.id %>" style="display:none;">
+                <%= render :partial=>"edit_roles",:locals=>{:group_membership=>group_membership} %>
+              </div>
             <% end -%>
           </ul>
         </li>
+
+        <% if editable -%>
+          <script type="text/javascript">
+            updateRoles(false,<%= group_membership.id %> );
+          </script>
+        <% end -%>
+
       <% end %>
     </ul>
   </div>
 </div>
+
+
