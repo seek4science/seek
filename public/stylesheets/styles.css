@@ -1,31 +1,31 @@
 
 
 #errorExplanation {
-	width: 95%;
-	border: 2px solid #c00;
-	padding: 0.5em;
-	margin-bottom: 1.5em;
-	background-color: #F5F5F5;
+    width: 95%;
+    border: 2px solid #c00;
+    padding: 0.5em;
+    margin-bottom: 1.5em;
+    background-color: #F5F5F5;
     text-align:left;
 }
 
 #errorExplanation h2 {
-	text-align: left;
-	font-weight: bold;
-	padding: 5px 5px 5px 15px;
-	font-size: 93%;
-	margin: 0;
-	background-image: none;
-	background-color: #c00;
-	border: none;
-	color: #fff;
+    text-align: left;
+    font-weight: bold;
+    padding: 5px 5px 5px 15px;
+    font-size: 93%;
+    margin: 0;
+    background-image: none;
+    background-color: #c00;
+    border: none;
+    color: #fff;
 }
 
 #errorExplanation p {	
-	color: #333;
-	margin-bottom: 0;
-	margin-top: 0.5em;
-	padding: 5px;
+    color: #333;
+    margin-bottom: 0;
+    margin-top: 0.5em;
+    padding: 5px;
 }
 
 #errorExplanation ul {
@@ -38,7 +38,7 @@
 }
 
 .fieldWithErrors {	
-	border: solid 2px red;
+    border: solid 2px red;
 }
 
 #header {
@@ -69,109 +69,109 @@
 }
 
 .tabnav {
-	text-align: left;
-	font-weight: bolder;
-	font-size: 108%;
-	padding: 4px 0;
-	padding-left: 2em;
-	margin: 0;
+    text-align: left;
+    font-weight: bolder;
+    font-size: 108%;
+    padding: 4px 0;
+    padding-left: 2em;
+    margin: 0;
 }
 
 .list_items_container{
-  padding-left: 7px;
+    padding-left: 7px;
 }
 
 table.list_item {
-  width: 100%;
-  background-color: #F0F0F0;
-  margin-top: 6px;
-  padding: 1em;
-  border: #999999 solid 1px;
-  border-collapse: collapse;
-  font-size: 93%;
-  min-height: 90px;  
+    width: 100%;
+    background-color: #F0F0F0;
+    margin-top: 6px;
+    padding: 1em;
+    border: #999999 solid 1px;
+    border-collapse: collapse;
+    font-size: 93%;
+    min-height: 90px;
 }
 
 table.list_item tr.odd_row {
-	background-color: #F5F5F5;
+    background-color: #F5F5F5;
 }
 
 table.list_item tr.even_row {
-	background-color: #EEEEEE;
+    background-color: #EEEEEE;
 }
 
 table.list_item tr td.actions {
-	text-align: left;
+    text-align: left;
 }
 
 table.list_item tr td.actions a {
-	display: block;
-	border-bottom: 0px solid #999999;
-	margin-bottom: 0.3em;
-	font-size: 85%;
-	font-weight: normal;
+    display: block;
+    border-bottom: 0px solid #999999;
+    margin-bottom: 0.3em;
+    font-size: 85%;
+    font-weight: normal;
 }
 
 table.list_item .desc {
-	border: 1px dotted #999999;
-	margin: 0.2em 0;
-	padding: 0.4em 0.6em;
-	background-color: #FFFFCC;
-	text-align: left;
-	line-height: 1.3;
-	overflow: hidden;
+    border: 1px dotted #999999;
+    margin: 0.2em 0;
+    padding: 0.4em 0.6em;
+    background-color: #FFFFCC;
+    text-align: left;
+    line-height: 1.3;
+    overflow: hidden;
 }
 
 table.list_item .standout {
-	border: 1px dotted #999999;
-	margin: 0.2em 0;
-	padding: 0.5em 0.6em;
-	background-color: #FFFFCC;
-	text-align: left;
-	line-height: 1;
-	font-size: 93%;
-	font-weight: bold;
-	color: #333333;
+    border: 1px dotted #999999;
+    margin: 0.2em 0;
+    padding: 0.5em 0.6em;
+    background-color: #FFFFCC;
+    text-align: left;
+    line-height: 1;
+    font-size: 93%;
+    font-weight: bold;
+    color: #333333;
 }
 
 
 
 table.list_item p {
-	line-height: 1.0;
-	margin-top: 0.2em;
+    line-height: 1.0;
+    margin-top: 0.2em;
 }
 
 table.list_item p.title {
-	margin-top: 0;
-	padding-top: 0;
-	margin-bottom: 0.2em;
-	font-weight: bold;
-	font-size: 108%;
+    margin-top: 0;
+    padding-top: 0;
+    margin-bottom: 0.2em;
+    font-weight: bold;
+    font-size: 108%;
 }
 
 table.list_item p.section_header {
-	text-align: left;
-	font-size: 107%;
-	font-weight: bold;
+    text-align: left;
+    font-size: 107%;
+    font-weight: bold;
 }
 
 table.list_item td {
-	vertical-align: top;
+    vertical-align: top;
 }
 
 table.list_item .item_avatar {
-	/* styling of avatars in table listings */
+    /* styling of avatars in table listings */
     width: 100px;
     min-width: 100px;
 }
 
 table.list_item .item_details {
-	text-align: left;    
+    text-align: left;
 }
 
 table.list_item .item_right_table_cell {
-	text-align: left;
-	padding-top: 2em;
+    text-align: left;
+    padding-top: 2em;
 }
 
 table.list_item .name {
@@ -189,7 +189,7 @@ table.list_item .details {
 }
 
 table.list_item ul {
-	margin: 0;  padding: 0;
+    margin: 0;  padding: 0;
 }
 
 table.list_item li {
@@ -206,7 +206,7 @@ table.list_item label {
 table.list_item .tags {
     text-align: left;
     border-left: 1px dotted #365FA5;
-    margin-top: 0.7em;    
+    margin-top: 0.7em;
 }
 
 
@@ -215,11 +215,11 @@ table.list_item .tags {
 }
 
 .show_basic input {
-     
+
 }
 
 #person_description  {
-   
+
 }
 
 .show_basic #tool_list {
@@ -247,7 +247,7 @@ table.list_item .tags {
 }
 
 .fold label {
-	font-weight: normal;
+    font-weight: normal;
 }
 
 .show_basic #name p {
@@ -258,7 +258,7 @@ table.list_item .tags {
 .show_basic ul {margin: 0;  padding: 0;}
 
 .show_basic li {
-    
+
     list-style-type:none;
     margin: 0px 0px 0px 0px;
     padding: 0 0 0 1em;
@@ -273,150 +273,150 @@ table.list_item .tags {
 /* boxes */
 
 .box_about_actor {
-	/* reserved for potential styling of the box containing personal information about actor */
+    /* reserved for potential styling of the box containing personal information about actor */
 }
 
 .main_content_left_box {
-	float: left;
-	width: 73.5%;
+    float: left;
+    width: 73.5%;
 }
 
 .main_content_right_box {
-	float: right;
-	width: 25%;
+    float: right;
+    width: 25%;
 }
 
 
 /* customized version of styles from my_exp.css with different names */
 .contribution_section_box ul.list {
-	margin: 0 0 0 0.8em;
-	text-align: left;
+    margin: 0 0 0 0.8em;
+    text-align: left;
 }
 
 .contribution_section_box ul.list li {
-	list-style-type: none;
-	margin: 0.6em 0;
-	padding-left: 0;
-	line-height: 1.1;
-	/*border-left: 3px solid #DDDDBB;*/
+    list-style-type: none;
+    margin: 0.6em 0;
+    padding-left: 0;
+    line-height: 1.1;
+    /*border-left: 3px solid #DDDDBB;*/
 }
 
 .contribution_section_box ul.list li * {
-	vertical-align: middle;
+    vertical-align: middle;
 }
 
 /* text style classes */
 .admin_warning {
-	color: #F00000;
+    color: #F00000;
 }
 
 .allowed_text {
-	font-weight: bold;
-	font-style: normal;
-	color: #00BC0C;
+    font-weight: bold;
+    font-style: normal;
+    color: #00BC0C;
 }
 
 .denied_text {
-	font-weight: bold;
-	font-style: normal;
-	color: #900000;
+    font-weight: bold;
+    font-style: normal;
+    color: #900000;
 }
 
 .note_text_disabled {
-	font-size: 93%;
-	font-weight: bold;
-	color: #666666;
+    font-size: 93%;
+    font-weight: bold;
+    color: #666666;
 }
 
 
 /* BEGIN Tabber tab styles */
 
 /*--------------------------------------------------
-  REQUIRED to hide the non-active tab content.
-  But do not hide them in the print stylesheet!
-  --------------------------------------------------*/
+REQUIRED to hide the non-active tab content.
+But do not hide them in the print stylesheet!
+--------------------------------------------------*/
 .tabberlive .tabbertabhide {
-	display: none;
+    display: none;
 }
 
 /*--------------------------------------------------
-  .tabber = before the tabber interface is set up
-  .tabberlive = after the tabber interface is set up
-  --------------------------------------------------*/
+.tabber = before the tabber interface is set up
+.tabberlive = after the tabber interface is set up
+--------------------------------------------------*/
 .tabber {
 }
 
 .tabberlive {
-	margin-top: 1em;
+    margin-top: 1em;
 }
 
 /*--------------------------------------------------
-  ul.tabbernav = the tab navigation list
-  li.tabberactive = the active tab
-  --------------------------------------------------*/
+ul.tabbernav = the tab navigation list
+li.tabberactive = the active tab
+--------------------------------------------------*/
 ul.tabbernav
 {
-	margin: 0;
-	padding: 3px 0;
-	border-bottom: 1px solid #CCC;
-	font-weight: bold;
-	font-size: 108%;
+    margin: 0;
+    padding: 3px 0;
+    border-bottom: 1px solid #CCC;
+    font-weight: bold;
+    font-size: 108%;
 }
 
 ul.tabbernav li
 {
-	list-style: none;
-	margin: 0;
-	display: inline;
+    list-style: none;
+    margin: 0;
+    display: inline;
 }
 
 ul.tabbernav li a
 {
-	padding: 3px 0.5em;
-	margin-left: 3px;
-	border: 1px solid #CCC;
-	border-bottom: none;
-	background: #ccccff;
-	text-decoration: none;
+    padding: 3px 0.5em;
+    margin-left: 3px;
+    border: 1px solid #CCC;
+    border-bottom: none;
+    background: #ccccff;
+    text-decoration: none;
 }
 
 ul.tabbernav li a:link { color: #333; }
 
 ul.tabbernav li a:hover
 {
-	color: #000;
-	background: #3173ff;
-	border-color: #CCC;
+    color: #000;
+    background: #3173ff;
+    border-color: #CCC;
 }
 
 ul.tabbernav li.tabberactive a
 {
-	background-color: #fff;
-	border-bottom: 1px solid #fff;
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
 }
 
 ul.tabbernav li.tabberactive a:hover
 {
-	color: #000;
-	background: white;
-	border-bottom: 1px solid white;
+    color: #000;
+    background: white;
+    border-bottom: 1px solid white;
 }
 
 /*--------------------------------------------------
-  .tabbertab = the tab content
-  Add style only after the tabber interface is set up (.tabberlive)
-  --------------------------------------------------*/
+.tabbertab = the tab content
+Add style only after the tabber interface is set up (.tabberlive)
+--------------------------------------------------*/
 .tabberlive .tabbertab {
-	margin-right: 0.3em;
-	
+    margin-right: 0.3em;
+
 }
 
 /* If desired, hide the heading since a heading is provided by the tab */
 .tabberlive .tabbertab h3 {
-	display: none;
+    display: none;
 }
 .tabberlive .tabbertab h3 {
- display:none;
+    display:none;
 }
 
 /* Example of using an ID to set different styles for the tabs on the page */
@@ -426,8 +426,8 @@ ul.tabbernav li.tabberactive a:hover
 }
 
 .tabberlive#tab2 .tabbertab {
- height:200px;
- overflow:auto;
+    height:200px;
+    overflow:auto;
 }
 
 /* END Tabber tab styles */
@@ -440,3 +440,5 @@ ul.tabbernav li.tabberactive a:hover
 }
 
 /* END Collapsable tags */
+
+

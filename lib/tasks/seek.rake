@@ -2,8 +2,6 @@ require 'rubygems'
 require 'rake'
 require 'model_execution'
 
-include ModelExecution
-
 namespace :seek do
   task(:repop_cv=>:environment) do
     
@@ -50,8 +48,5 @@ namespace :seek do
     end
     puts "Done. Schema XMI created as doc/data_models/schema.xmi."
   end
-
-
-
   
 end
