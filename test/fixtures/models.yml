@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+teusink:
+  contributor: model_owner (User)
+  title: Teusink
+  description: Teusink from JWS Online
+  original_filename: Teusink.xml
+  content_blob: teusink_blob
+  content_type: text/xml
+  model_type: JWS
+  model_format: SBML
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+

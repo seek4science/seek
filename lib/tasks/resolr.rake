@@ -7,5 +7,7 @@ namespace :solr do
     Project.find(:all).map do |w| w.solr_save end
     Institution.find(:all).map do |w| w.solr_save end
     Sop.find(:all).map do |w| w.solr_save end
+    Model.find(:all).map do |w| w.solr_save end
+    Experiment.find(:all).map do |w| w.solr_save end
   end
 end

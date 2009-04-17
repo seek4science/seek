@@ -1,0 +1,31 @@
+
+#applet_box {  
+  display: inline;
+  padding: 0px;
+  border: double black 1px;
+  height: 410px;
+}
+
+#applet_box IFRAME {
+  width: 490px;
+  height: 408px;
+  background-color: #CCCCCC;
+}
+
+#execute_model {
+    width: 490px;
+    height: 408px;
+}
+
+#jws_error {
+    overflow:scroll;
+}
+
+#jws_logo {
+    width:380px;
+    padding-top: 0.5em;
+    padding-bottom: 1em;
+
+}
+
+

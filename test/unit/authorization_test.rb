@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AuthorizationTest < ActiveSupport::TestCase
-  fixtures :users, :people, :assets, :sops, :policies, :permissions, :favourite_groups, :favourite_group_memberships, :projects, :institutions, :work_groups, :group_memberships
+  fixtures :all
   
   # ************************************************************************
   # this section tests individual helper methods within Authorization module
@@ -41,6 +41,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert_nil found, "return value should have been 'nil'"
   end
   
+  def test_find_thing_helper_for_model
+    found = Authorization.find_thing(assets(:asset_for_model).class.name, assets(:asset_for_model).id)
+    
+    assert found.class.name == "Asset", "returned instance is not of class 'Asset'"
+    assert found.id == assets(:asset_for_model).id, "id of found Asset is not correct"
+  end
+
   
   # testing: is_owner?(user_id, thing_asset)
   
@@ -48,6 +55,12 @@ class AuthorizationTest < ActiveSupport::TestCase
   def test_is_owner_real_owner
     res = Authorization.is_owner?(users(:owner_of_my_first_sop).id, assets(:asset_of_my_first_sop))
     
+    assert res, "real owner of the asset wasn't considered as such"
+  end
+
+  def test_is_owner_of_model
+    res = Authorization.is_owner?(users(:model_owner).id, assets(:asset_for_model))
+
     assert res, "real owner of the asset wasn't considered as such"
   end
   
@@ -334,6 +347,16 @@ class AuthorizationTest < ActiveSupport::TestCase
     res = Authorization.authorized_by_policy?(policies(:fully_public_policy), assets(:asset_of_a_sop_with_fully_public_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
     assert res, "policy with sharing_scope = 'Policy::EVERYONE' wouldn't allow SysMO user to perform 'download' where it should allow even 'edit'"
   end
+
+  def test_authorized_for_model
+    res = Authorization.authorized_by_policy?(policies(:policy_for_test_with_projects_institutions),assets(:asset_for_model),"view",users(:model_owner).id,people(:person_for_model_owner).id)
+    assert res, "model_owner should be able to view his own model"
+  end
+
+  def test_not_authorized_for_model
+    res = Authorization.authorized_by_policy?(policies(:policy_for_test_with_projects_institutions),assets(:asset_for_model),"download",users(:quentin).id,users(:quentin).person.id)
+    assert !res, "Quentin should not be able to download that model"
+  end
   
   # 'all registered users' policy
   def test_authorized_by_policy_all_registered_users_policy_anonymous_user
@@ -417,6 +440,16 @@ class AuthorizationTest < ActiveSupport::TestCase
   def test_is_authorized_blank_thing_type_only_id_supplied
     res = Authorization.is_authorized?("view", nil, assets(:asset_of_my_first_sop).id, nil)
     assert (!res), "permission to execute action granted for a 'thing' with no type (only ID) provided"
+  end
+
+  def test_is_authorized_for_model
+    res = Authorization.is_authorized?("view", "Model", models(:teusink), users(:model_owner))
+    assert res, "model_owner should be able to view his own model"
+  end
+
+  def test_is_not_authorized_for_model
+    res = Authorization.is_authorized?("view", "Model", models(:teusink), users(:quentin))
+    assert res, "Quentin should not be able to view his model_owner's model"
   end
   
   def test_is_authorized_both_thing_parameters_blank

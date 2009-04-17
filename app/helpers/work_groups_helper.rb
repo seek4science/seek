@@ -22,18 +22,24 @@ module WorkGroupsHelper
   def work_group_groups_for_selection
     
     options = []
-    proj_type=nil
-    work_groups = WorkGroup.find(:all)
-    work_groups=work_groups.sort_by{|wg| wg.project.name }
-    work_groups.each do |wg|
-      if (proj_type.nil? or proj_type.project != wg.project)
-        options << proj_type unless proj_type.nil?
-        proj_type=ProjectType.new(wg.project)
-      end
-      proj_type << WorkGroupOption.new(wg.id, wg.institution.name)
+    last_project=nil
+    work_groups = WorkGroup.find(:all,:include=>[:project,:institution])
+
+    work_groups = work_groups.sort do |a,b|
+      x=a.project.name <=> b.project.name
+      x=a.institution.name <=> b.institution.name if x.zero?
+      x
     end
     
-    options << proj_type unless proj_type.nil?
+    work_groups.each do |wg|
+      if (last_project.nil? or last_project.project != wg.project)
+        options << last_project unless last_project.nil?
+        last_project=ProjectType.new(wg.project)
+      end
+      last_project << WorkGroupOption.new(wg.id, wg.institution.name)
+    end
+    
+    options << last_project unless last_project.nil?
  
     return options   
   end

@@ -44,7 +44,7 @@ class AvatarsController < ApplicationController
 
     respond_to do |format|
       if @avatar.save
-        flash[:notice] = 'Avatar was successfully created.'
+        flash[:notice] = 'Picture was successfully created.'
         format.html { redirect_to(@avatar) }
         format.xml  { render :xml => @avatar, :status => :created, :location => @avatar }
       else
@@ -61,7 +61,7 @@ class AvatarsController < ApplicationController
 
     respond_to do |format|
       if @avatar.update_attributes(params[:avatar])
-        flash[:notice] = 'Avatar was successfully updated.'
+        flash[:notice] = 'Picture was successfully updated.'
         format.html { redirect_to(@avatar) }
         format.xml  { head :ok }
       else

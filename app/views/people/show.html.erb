@@ -25,7 +25,7 @@
 
   <div class="main_content_left_box">
     <div class="box_about_actor">
-      
+
       <p>
         <b>Name:</b> <%= h @person.name %>
       </p>
@@ -60,8 +60,12 @@
             </tr>
           </table>
         <% else -%>
-          <b>Location:</b> <span class="none_text">unknown</span>
+          <b>Location:</b> <span class="none_text">Not known</span>
         <% end -%>
+      </p>
+
+      <p>        
+        <b>Disciplines:</b> <%= discipline_list(@person) %>
       </p>
 
       <p>
@@ -104,9 +108,11 @@
     <% end -%>
 
 
-    <h2 style="margin-top: 4em;">My Assets</h2>
+    <h2 style="margin-top: 4em;">Associated with '<%= h(@person.name) -%>' </h2>
     <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
     <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
+    <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
+    <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
     <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
       :narrow_view => true,
       :authorization_already_done => true } -%>

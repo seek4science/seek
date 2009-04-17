@@ -133,3 +133,10 @@ person_for_random_registered_user_who_wants_to_access_different_things:
   first_name: "Registered-User"
   last_name: "WantsToAccessManyThingsAndHasSomePermissions"
 
+person_for_model_owner:
+  first_name: "Model"
+  last_name: "Owner"
+
+modeller_person:
+  first_name: "Modeller"
+  disciplines: modeller,experimentalist

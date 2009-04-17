@@ -3,12 +3,12 @@
 <ul class="sectionIcons">
 	<li><%= icon(@avatar_owner_instance.class.name.downcase, url_for(@avatar_owner_instance), nil, nil, 'Return to Profile')%></li>
   <% if avatar_can_be_edited_by_current_user -%>
-    <li><%= icon('avatar', new_avatar_link(@avatar_owner_instance), nil, nil, 'Upload New Avatar')%></li>
+    <li><%= icon('avatar', new_avatar_link(@avatar_owner_instance), nil, nil, 'Upload New Picture')%></li>
   <% end %>
 </ul>
 
 
-<h1><%= @avatar_for -%> Avatars: <%= link_to @avatar_owner_instance.name, url_for(@avatar_owner_instance) -%></h1>
+<h1><%= @avatar_for -%> Pictures: <%= link_to @avatar_owner_instance.name, url_for(@avatar_owner_instance) -%></h1>
 
 <% unless @avatars.empty? %>
 
@@ -31,7 +31,7 @@
 			<% if avatar_can_be_edited_by_current_user -%>
 				<% avatar_link = avatar_url(@avatar_owner_instance, avatar.id) -%>
 				<% unless avatar.selected? -%>
-					<%= icon "avatar", avatar_link + "/select", nil, { :method => :post }, "Set as Main Avatar" -%>
+					<%= icon "avatar", avatar_link + "/select", nil, { :method => :post }, "Set as Main Picture" -%>
 				<% end -%>
 			<% end -%>
 			<% # "enlarge" option is shown to everyone -%>

@@ -1,17 +1,16 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :experiments
+  map.resources :models, :member => { :download => :get, :execute=>:post }
 
-  map.resources :sops, :member => { :download => :get }
+  
+  map.resources :assays
 
   map.resources :assets
 
-  map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
+  map.resources :experiments
 
-  map.resource :session
+  map.resources :expertise
 
-  #map.resources :profiles
-
-  map.resources :institutions, 
+  map.resources :institutions,
     :collection => { :request_all => :get } do |institution|
     # avatars / pictures 'owned by' institution
     institution.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
@@ -19,21 +18,29 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :groups
 
-  map.resources :projects, 
+  map.resources :people, :collection=>{:select=>:get} do |person|
+    # avatars / pictures 'owned by' person
+    person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
+  end
+
+  map.resources :projects,
     :collection => { :request_institutions => :get } do |project|
     # avatars / pictures 'owned by' project
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :people, :collection=>{:select=>:get} do |person|
-    # avatars / pictures 'owned by' person
-    person.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
-  end
+  map.resources :sops, :member => { :download => :get }
+
+  map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
+
+  map.resource :session    
   
-  map.resources :expertise
   
   # browsing by countries
-  map.country '/countries/:country_name', :controller => 'countries', :action => 'show'  
+  map.country '/countries/:country_name', :controller => 'countries', :action => 'show'
+
+  # page for admin tasks
+  map.admin '/admin/', :controller=>'admin',:action=>'show'
 
   # favourite groups
   map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }
@@ -41,6 +48,12 @@ ActionController::Routing::Routes.draw do |map|
   map.edit_favourite_group '/favourite_groups/edit', :controller => 'favourite_groups', :action => 'edit', :conditions => { :method => :post }
   map.update_favourite_group '/favourite_groups/update', :controller => 'favourite_groups', :action => 'update', :conditions => { :method => :post }
   map.delete_favourite_group '/favourite_groups/:id', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
+
+  map.new_topic 'experiments/new_topic',:controller=>"experiments",:action=>'new_topic',:conditions=> {:method=>:post}
+  map.create_topic 'experiments/create_topic',:controller=>"experiments",:action=>'create_topic',:conditions=> {:method=>:post}
+
+  map.new_assay 'experiments/new_assay',:controller=>"experiments",:action=>'new_assay',:conditions=> {:method=>:post}
+  map.create_assay 'experiments/create_assay',:controller=>"experiments",:action=>'create_assay',:conditions=> {:method=>:post}
   
   # review members of workgroup (also of a project / institution) popup
   map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }

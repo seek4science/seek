@@ -135,7 +135,7 @@ class AvatarsController < ApplicationController
   def determine_avatar_owner
     avatar_for = nil
     id = nil
-    
+
     if params[:person_id]
       avatar_for = "Person"
       id = params[:person_id]
@@ -213,7 +213,6 @@ class AvatarsController < ApplicationController
   def find_avatars
     # all avatars for current object are only shown to the owner of the object OR to any admin (if the object is not an admin themself);
     # also, show avatars to all members of a project/institution
-    puts @avatar_owner_instance
     if current_user.is_admin? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) ||
                              (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.people.include?(current_user))
       @avatars = Avatar.find(:all, :conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id })
@@ -256,14 +255,17 @@ class AvatarsController < ApplicationController
   # that wasn't yet saved
   def store_unsaved_person_proj_inst_data_to_session
     data_hash = {}
+
+    return if params["#{@avatar_for.downcase}".to_sym].nil?
     
     # all types will have main part of information in the generic form
-    data_hash["#{@avatar_for.downcase}".to_sym] = params["#{@avatar_for.downcase}".to_sym]
+    data_hash["#{@avatar_for.downcase}".to_sym] = params["#{@avatar_for.downcase}".to_sym]    
     data_hash["#{@avatar_for.downcase}".to_sym][:avatar_id] = nil if data_hash["#{@avatar_for.downcase}".to_sym][:avatar_id].to_i == 0
     
     # collect any additional type-specific data from params
     case @avatar_for
       when "Person"
+        data_hash[:description] = params[:description]
         data_hash[:tool] = params[:tool]
         data_hash[:expertise] = params[:expertise]
         data_hash[:can_edit_projects] = params[:can_edit_projects]

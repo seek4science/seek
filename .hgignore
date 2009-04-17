@@ -13,6 +13,7 @@ nbproject/*
 config/environment_local.rb
 filestore/*
 tmp/avatars/*
+tmp/models/*
 debug.log
 .project
 

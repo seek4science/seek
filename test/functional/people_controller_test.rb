@@ -80,12 +80,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_not_current_user_doesnt_show_seek_id
     get :show, :id=> people(:two)
     assert_select ".box_about_actor p",:text=>/Seek ID :/, :count=>0
-  end
-
-  def test_current_user_does_show_link_to_change_password
-      get :edit, :id => people(:one)
-      assert_select "a", :text=>"Change password", :count=>1
-  end
+  end  
 
   def test_should_update_person
     put :update, :id => people(:one), :person => { }

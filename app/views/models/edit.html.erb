@@ -1,0 +1,81 @@
+<%= javascript_include_tag "sharing.js" %>
+
+<% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @model, current_user) -%>
+
+
+<ul class="sectionIcons">
+  <li><%= icon('model', model_path(@model), 'Return to Model', nil, 'Return to Model') -%></li>
+  <li><%= icon('models', models_path, 'View all Models', nil, 'View all Models') -%></li>
+</ul>
+
+<h1>Editing Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
+
+<div class="show_basic">
+  <% form_for(@model) do |f| %>
+    <%= f.error_messages %>
+
+    <center>
+      <div style="width: 60%;">
+        <p style="margin-top: 1.5em;">
+          <b>Title:</b><br/>
+          <%= f.text_field :title, :style => "width: 100%;" -%>
+        </p>
+
+        <p style="margin-top: 0.5em;">
+          <b>Description:</b><br/>
+          <%= f.text_area :description, :style => "width: 100%;", :rows => 5 -%>
+        </p>
+
+        <p>
+          <b>Model type:</b><br/>
+          <%= f.text_field :model_type, :size=>5 %>
+        </p>
+
+        <p>
+          <b>Model format:</b><br/>
+          <%= f.text_field :model_format, :size=>5 %>
+        </p>
+
+        <%
+        environment_options=[['Unknown',0]]|RecommendedModelEnvironment.find(:all).collect{|e| [h(e.title),e.id]}
+        environment_value= @model.recommended_environment ? @model.recommended_environment.id : 0
+      %>
+        <p>
+          <b>Preferred execution or visualisation environment:</b>
+          <%= select_tag 'model[recommended_environment_id]',
+            options_for_select(environment_options,environment_value),
+            {
+            :style=>"width:82%",
+            :name=>"model[recommended_environment_id]"
+          }
+        %>
+        </p>
+
+        <% # only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+        <% if current_user_authorized_to_manage -%>
+          <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+            :selected_project_id => @model.asset.project_id,
+            :project_hash => current_user.generate_own_project_id_name_hash,
+            :disable_project_select => true } -%>
+        <% end -%>
+      </div>
+    </center>
+
+    <% # only the owner should be able to change sharing permissions -%>
+    <% if current_user_authorized_to_manage -%>
+      <p style="margin: 2.5em 0 0 0;">
+        <%= render :partial => "assets/sharing_form" -%>
+      </p>
+
+      <p style="margin: 0;">
+        <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+          :existing_attributions => Authorization.authorize_collection("show", @model.attributions_objects, current_user),
+          :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
+      </p>
+    <% end -%>
+
+    <p style="text-align: center;">
+      <%= f.submit "Update", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(false); return(false);"  -%> or <%= link_to "Cancel", model_path(@model) -%>
+    </p>
+  <% end %>
+</div>

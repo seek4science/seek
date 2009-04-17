@@ -154,3 +154,15 @@ asset_of_a_sop_for_test_with_projects_institutions:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+
+
+asset_for_model:
+  contributor: model_owner (User)
+  project: nil # not linked to any project for now
+  resource: teusink (Model)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: policy_for_test_with_projects_institutions
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>

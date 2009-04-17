@@ -21,8 +21,12 @@ class SearchController < ApplicationController
       @results = Project.multi_solr_search(downcase_query, :limit=>100, :models=>[Project]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     when ("sops")
       @results = Project.multi_solr_search(downcase_query, :limit=>100, :models=>[Sop]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
+    when ("experiments")
+      @results = Project.multi_solr_search(downcase_query, :limit=>100, :models=>[Experiment]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
+    when ("models")
+      @results = Project.multi_solr_search(downcase_query, :limit=>100, :models=>[Model]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     else
-      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
+      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Experiment]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     end
 
     @results = select_authorised @results
@@ -35,7 +39,9 @@ class SearchController < ApplicationController
     
   end
 
+
   private
+  
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
   def select_authorised collection

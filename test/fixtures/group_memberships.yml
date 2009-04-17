@@ -59,3 +59,7 @@ person_for_sysmo_user_both_in_blacklist_and_whitelist_in_sysmo_at_manchester_uni
 person_for_owner_of_download_for_all_registered_users_policy_in_sysmo_at_manchester_uni_workgroup:
   person: person_for_owner_of_download_for_all_registered_users_policy
   work_group: sysmo_at_manchester_uni_workgroup
+
+group_for_model_owner:
+  person: person_for_model_owner
+  work_group: sysmo_at_manchester_uni_workgroup

@@ -13,6 +13,8 @@ class Person < ActiveRecord::Base
   validates_uniqueness_of :email
 
   validates_associated :avatars
+
+  has_and_belongs_to_many :disciplines
   
   has_many :avatars,
     :as => :owner,

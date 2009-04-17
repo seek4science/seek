@@ -25,7 +25,11 @@ class Relationship < ActiveRecord::Base
   # **********************************************************************
   
   
-  # 
+  # this method is to be invoked on create / update of resources to create OR
+  # synchronise any attributions that should be attached to the resource;
+  # it will make sure that if some attributions are to have the same data as
+  # before, then these will not get deleted (and re-created afterwards, but
+  # will be kept intact in first place)
   def self.create_or_update_attributions(resource, attributions_from_params)
     received_attributions = (attributions_from_params.blank? ? [] : ActiveSupport::JSON.decode(attributions_from_params)) 
     

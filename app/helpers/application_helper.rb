@@ -10,6 +10,7 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>" if is_nil_or_empty?(list)
   end
   
+
   def text_or_not_specified text, options = {}
     if text.nil? or text.chomp.empty?
       not_specified_text="Not specified"
@@ -159,8 +160,18 @@ module ApplicationHelper
       return "famfamfam_silk/page.png"
     when "sops"
       return "famfamfam_silk/page_copy.png"
+    when "model"
+      return "famfamfam_silk/calculator.png"
+    when "models"
+      return "famfamfam_silk/calculator.png"
+    when "experiment"
+      return "famfamfam_silk/page.png"
+    when "execute"
+      return "famfamfam_silk/lightning.png"
     when "spinner"
       return "ajax-loader.gif"
+    when "large-spinner"
+      return "ajax-loader-large.gif"
     when "expand"
       "folds/fold.png"
     when "collapse"
@@ -189,8 +200,6 @@ module ApplicationHelper
     else
       code = country if CountryCodes.valid_code?(country)
     end
-    
-    #puts "code = " + code
     
     unless code.nil? or code.empty?
       return image_tag("famfamfam_flags/#{code.downcase}.png",
@@ -237,8 +246,8 @@ module ApplicationHelper
       else
         return (contributor_name_link + you_string)
       end
-    # other types might be supported
-    # elsif contributortype.to_s == "Network"
+      # other types might be supported
+      # elsif contributortype.to_s == "Network"
       #network = Network.find(:first, :select => "id, title", :conditions => ["id = ?", contributorid])
       #return nil unless network
       #
@@ -247,6 +256,8 @@ module ApplicationHelper
       return nil
     end
   end
+
+  
   
   
   # A generic method to produce avatars for entities of all kinds.
@@ -371,6 +382,7 @@ module ApplicationHelper
   def page_title controller_name, action_name
     name=PAGE_TITLES[controller_name]
     name ||=""
+    name += " (Development)" if RAILS_ENV=="development"
     return "Sysmo SEEK&nbsp;"+name
   end
 
@@ -406,19 +418,19 @@ module ApplicationHelper
   end
 
   def link_for_tag tag, options={}
-      link=people_url
-      length=options[:truncate_length]
-      length||=150
-      if (options[:type]==:expertise)
-        link=people_url(:expertise=>tag.name)
-      end
-      if (options[:type]==:tools)
-        link=people_url(:tools=>tag.name)
-      end
-      if (options[:type]==:organisms)
-        link=projects_url(:organisms=>tag.name)
-      end
-      link_to h(truncate(tag.name,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.name)
+    link=people_url
+    length=options[:truncate_length]
+    length||=150
+    if (options[:type]==:expertise)
+      link=people_url(:expertise=>tag.name)
+    end
+    if (options[:type]==:tools)
+      link=people_url(:tools=>tag.name)
+    end
+    if (options[:type]==:organisms)
+      link=projects_url(:organisms=>tag.name)
+    end
+    link_to h(truncate(tag.name,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.name)
   end
 
   def list_item_tags_list tags,options={}
@@ -430,55 +442,55 @@ module ApplicationHelper
 
   def favourite_group_popup_link_action_new
     return link_to_remote_redbox("Create new favourite group", 
-                                 { :url => new_favourite_group_url,
-                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" }, 
-                                 { #:style => options[:style],
-                                   :id => "create_new_f_group_redbox",
-                                   :onclick => "javascript: currentFavouriteGroupSettings = {};" }#,
-                                   #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text], 
-                                   #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-   )
+      { :url => new_favourite_group_url,
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+      { #:style => options[:style],
+        :id => "create_new_f_group_redbox",
+        :onclick => "javascript: currentFavouriteGroupSettings = {};" }#,
+      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+    )
   end
   
   def favourite_group_popup_link_action_edit
     return link_to_remote_redbox("Edit selected favourite group", 
-                                 { :url => edit_favourite_group_url,
-                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" }, 
-                                 { #:style => options[:style],
-                                   :id => "edit_existing_f_group_redbox",
-                                   :onclick => "javascript: currentFavouriteGroupSettings = {};" } #,
-                                   #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text], 
-                                   #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-   )
+      { :url => edit_favourite_group_url,
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+      { #:style => options[:style],
+        :id => "edit_existing_f_group_redbox",
+        :onclick => "javascript: currentFavouriteGroupSettings = {};" } #,
+      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+    )
   end
   
   def workgroup_member_review_popup_link
     return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>", 
-                                 { :url => review_work_group_url("type", "id", "access_type"),
-                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" }, 
-                                 { #:style => options[:style],
-                                   :id => "review_work_group_redbox" } #,
-                                   #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text], 
-                                   #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-   )
+      { :url => review_work_group_url("type", "id", "access_type"),
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+      { #:style => options[:style],
+        :id => "review_work_group_redbox" } #,
+      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+    )
   end
   
   # the parameter must be the *standard* name of the whitelist or blacklist (depending on the link that needs to be produced)
   # (standard names are defined in FavouriteGroup model)
   def whitelist_blacklist_edit_popup_link(f_group_name)
     return link_to_remote_redbox("edit", 
-                                 { :url => edit_favourite_group_url,
-                                   :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" }, 
-                                 { #:style => options[:style],
-                                   :id => "#{f_group_name}_edit_redbox",
-                                   :onclick => "javascript: currentFavouriteGroupSettings = {};" } #,
-                                   #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text], 
-                                   #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-   )
+      { :url => edit_favourite_group_url,
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+      { #:style => options[:style],
+        :id => "#{f_group_name}_edit_redbox",
+        :onclick => "javascript: currentFavouriteGroupSettings = {};" } #,
+      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+    )
   end
   
   private
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","experiments"=>"Experiments"}
 
   
 end

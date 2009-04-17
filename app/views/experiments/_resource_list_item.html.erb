@@ -1,0 +1,78 @@
+<% experiment=resource_list_item %>
+
+<div class="list_items_container">
+  <table class="list_item">
+    <tr>
+      
+      <td class="item_avatar" style="width: 100px">
+        <p style="margin-top:0; padding-top:1.5em; text-align: center;"><b>Project:</b></p>
+        <br/>
+        <center>
+          <%= related_project_avatar(experiment.project) -%>
+        </center>
+
+      </td>
+
+      <td class="item_details">
+        <p class="name">
+
+          <span style="float: right; font-size: 77%;">
+            <% if mine? experiment -%>
+              <%= icon "edit", edit_experiment_path(experiment), nil, nil, "Edit" -%>
+            <% end -%>
+          </span>
+          <%= link_to h(experiment.title),experiment_path(experiment) %>
+        </p>
+
+        <div class="box_standout">
+          <%= truncate(text_or_not_specified(experiment.description, :description => true), :length=>300) %>
+        </div>
+
+
+        <p class="topic">
+          <label>Topic: </label>
+          <%= h(experiment.topic.title) %>
+        </p>
+
+        <div class="assays">
+          <div style="margin-top: 0.3em;">
+            <p style="margin-left: 1em;">
+              <%= render :partial=>"experiments/simple_assay_list",:locals=>{:assays=>experiment.assays} %>
+            </p>
+
+
+          </div>
+        </div>
+
+        <div>
+          <label>Sops:</label>
+          <ul>
+            <% unless experiment.sops.empty? -%>
+              <% for sop in experiment.sops -%>
+                <% if Authorization.is_authorized?("show", "Sop", sop, current_user) -%>
+                  <li>
+                    <%= icon "sop", nil, nil, nil, '' -%>
+                    <% title = h(sop.title) -%>
+                    <%= link_to(truncate(title,:length=>300), sop_path(sop), :alt=>title, :title=>title) -%>
+                  </li>
+                <% else -%>
+                  <li><font class="none_text">Private item</font></li>
+                <% end -%>
+              <% end -%>
+            <% else -%>
+              <li><span class="none_text" style="margin-left: 1em;">None</span></li>
+            <% end -%>
+          </ul>
+        </div>
+
+      </td>
+
+      
+        
+
+     
+    </tr>
+  </table>
+
+
+</div>

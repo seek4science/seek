@@ -19,17 +19,17 @@
         <center>
           <div style="width: 90%;">
             <p>
-              <%= f.label :first_name -%><br />
+              <font style="color: #FF0000;">*</font> <%= f.label :first_name -%><br />
               <%= f.text_field :first_name, :style => "width: 100%;" -%>
             </p>
 
             <p>
-              <%= f.label :last_name %><br />
+              <font style="color: #FF0000;">*</font> <%= f.label :last_name %><br />
               <%= f.text_field :last_name, :style => "width: 100%;" %>
             </p>
 
             <p>
-              <%= f.label :email %><br />
+              <font style="color: #FF0000;">*</font> <%= f.label :email %><br />
               <%= f.text_field :email, :style => "width: 100%;" %>
             </p>
           </div>

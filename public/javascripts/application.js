@@ -69,3 +69,22 @@ function addExpertiseListTag(tag) {
 
     document.getElementById("expertise_list").value=expertise_list;
 }
+
+function checkNotInList(id,list) {
+    rtn = true;
+
+    for(var i = 0; i < list.length; i++)
+        if(list[i][1] == id) {
+            rtn = false;
+            break;
+        }
+
+    return(rtn);
+}
+
+function clearList(name) {
+    select=$(name)
+    while(select.length>0) {
+        select.remove(select.options[0])
+    }
+}

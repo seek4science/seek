@@ -1,0 +1,18 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+metabolomics:
+  title: Metabalomics
+
+proteomics:
+  title: Proteomics
+
+parent:
+  title: Parent
+
+child1:
+  title: Child1
+  parent_assay_type: parent
+
+child2:
+  title: Child2
+  parent_assay_type: parent

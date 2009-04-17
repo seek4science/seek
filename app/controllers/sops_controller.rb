@@ -1,4 +1,6 @@
 class SopsController < ApplicationController
+  #FIXME: re-add REST for each of the core methods
+  
   before_filter :login_required, :except => [ :index, :show, :download ]
   
   before_filter :find_sops, :only => [ :index ]
@@ -9,6 +11,7 @@ class SopsController < ApplicationController
   
   # GET /sops
   def index
+    @sops=Authorization.authorize_collection("show",@sops,current_user)
     respond_to do |format|
       format.html # index.html.erb
     end
@@ -182,8 +185,7 @@ class SopsController < ApplicationController
   
   def find_sops
     found = Sop.find(:all, 
-                     :order => "title",
-                     :page => { :size => default_items_per_page, :current => params[:page] })
+                     :order => "title")
     
     # this is only to make sure that actual binary data isn't sent if download is not
     # allowed - this is to increase security & speed of page rendering;
@@ -266,9 +268,7 @@ class SopsController < ApplicationController
     @resource_type = "SOP"
     @favourite_groups = current_user.favourite_groups
     
-    @all_people_as_json = Person.get_all_as_json
-    # TODO
-    # find all projects and their IDs
+    @all_people_as_json = Person.get_all_as_json    
     
   end
   

@@ -1,0 +1,10 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+copasi:
+    title: Copasi
+
+jws:
+    title: JWS Online
+
+matlab:
+    title: Matlab
