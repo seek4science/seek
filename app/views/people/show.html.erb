@@ -35,9 +35,39 @@
           <b>Login name :</b> <%= h @person.user.login %> <span class='none_text'>(Only visible to you)</span>
         </p>
         <p>
-          <b>Seek ID :</b> <%= @person.id %>
+          <b>Seek ID :</b> <%= @person.id %> <span class='none_text'>(Only visible to you)</span>
         </p>
       <% end %>
+
+
+
+      <p>
+        <% locations = @person.locations -%>
+        <% unless locations.empty? -%>
+          <table>
+            <tr>
+              <td style="padding: 0; vertical-align: top;"><b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b></td>
+              <td style="padding: 0; text-align: left;"><ul>
+                  <% locations.each do |l| -%>
+                    <li><%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%></li>
+                  <% end -%>
+              </ul></td>
+            </tr>
+          </table>
+        <% else -%>
+          <b>Location:</b> <span class="none_text">Not known</span>
+        <% end -%>
+      </p>
+
+      <p>
+        <b>Disciplines:</b> <%= discipline_list(@person) %>
+      </p>
+
+      <p>
+        <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person}  %>
+      </p>
+
+
     </div>
   </div>
 
@@ -49,87 +79,72 @@
   </div>
 
   <div style="clear:both;">
-
+    <br/>
+    <hr/>
+    
     <p>
       <b>About me:</b>
       <div id="description" class="box_standout">
         <%= text_or_not_specified(@person.description, :description=>true) %>
       </div>
     </p>
+
+    <br/>
     
-    <p>
-      <% locations = @person.locations -%>
-      <% unless locations.empty? -%>
-        <table>
-          <tr>
-            <td style="padding: 0; vertical-align: top;"><b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b></td>
-            <td style="padding: 0; text-align: left;"><ul>
-                <% locations.each do |l| -%>
-                  <li><%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%></li>
-                <% end -%>
-            </ul></td>
-          </tr>
-        </table>
-      <% else -%>
-        <b>Location:</b> <span class="none_text">Not known</span>
-      <% end -%>
-    </p>
+    <div class="fold">
+      <div class="foldTitle">Contact details</div>
+      <div class="foldContent" style="display:none;">
+        <p>
+          <div id="web_page">
+            <p><label for="web_page">Web page:</label> <%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
+          </div>
 
-    <p>
-      <b>Disciplines:</b> <%= discipline_list(@person) %>
-    </p>
+          <div id="email">
+            <p><label for="email">Email:</label> <%= text_or_not_specified(@person.email, :email=>true) %></p>
+          </div>
 
-    <p>
-      <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person}  %>
-    </p>
+          <div id="skype">
+            <p><label for="email">Skype:</label> <%= text_or_not_specified(@person.skype_name) %></p>
+          </div>
 
-    <fieldset>
-      <legend>Contact Details</legend>
-      <div id="web_page">
-        <p><label for="web_page">Web page:</label> <%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
+          <div id="phone">
+            <p><label for="phone">Phone:</label> <%= text_or_not_specified(@person.phone) %></p>
+          </div>
+        </p>
       </div>
-
-      <div id="email">
-        <p><label for="email">Email:</label> <%= text_or_not_specified(@person.email, :email=>true) %></p>
-      </div>
-
-      <div id="skype">
-        <p><label for="email">Skype:</label> <%= text_or_not_specified(@person.skype_name) %></p>
-      </div>
-
-      <div id="phone">
-        <p><label for="phone">Phone:</label> <%= text_or_not_specified(@person.phone) %></p>
-      </div>
-    </fieldset>
-
+    </div>
 
 
 
     <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
 
-    <h2 style="margin-top: 4em;">Associated with '<%= h(@person.name) -%>' </h2>
-    <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
-    <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
-    <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
-    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
-      :narrow_view => true,
-      :authorization_already_done => true } -%>
+    <div class="fold">
+      <div class="foldTitle">Items related to <%= h @person.name %> </div>
+      <div class="foldContent" style="display:none;">
+        <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
+        <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
+        <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
+        <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
+        <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
+          :narrow_view => true,
+          :authorization_already_done => true } -%>
 
 
-    <% # show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
-    <% # this is because it's not needed then: admins can see everything anyway -%>
-    <% if current_user.is_admin? && @person.user && !@person.user.is_admin? -%>
-      <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
-      <% if @person.user -%>
-        <ul>
-          <li>Editing <b>projects</b>, where this person is involved: <%= @person.user.can_edit_projects ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
-          <li>Editing <b>institutions</b>, where this person works with: <%= @person.user.can_edit_institutions ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
-        </ul>
-      <% else -%>
-        <p>No "user" instance detected for this person. User has not registered yet.</p>
-      <% end -%>
-    <% end -%>
+        <% # show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
+        <% # this is because it's not needed then: admins can see everything anyway -%>
+        <% if current_user.is_admin? && @person.user && !@person.user.is_admin? -%>
+          <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
+          <% if @person.user -%>
+            <ul>
+              <li>Editing <b>projects</b>, where this person is involved: <%= @person.user.can_edit_projects ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
+              <li>Editing <b>institutions</b>, where this person works with: <%= @person.user.can_edit_institutions ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
+            </ul>
+          <% else -%>
+            <p>No "user" instance detected for this person. User has not registered yet.</p>
+          <% end -%>
+        <% end -%>
+      </div>
+    </div>
 
   </div>
 
