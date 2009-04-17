@@ -4,5 +4,7 @@
 <b><%= link_to_function "Add","addSelectedRole(#{group_membership.id});return(false);" %></b>
 <br/>
 <%= link_to_function "Done","stopRolesEdit(#{group_membership.id});return(false);" %>
-<hr/>
+
+
+
 <%= select_tag "group_membership_role_ids_#{group_membership.id}",[],:multiple=>true,:style=>"display:none;" %>

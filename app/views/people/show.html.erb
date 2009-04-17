@@ -38,40 +38,50 @@
           <b>Seek ID :</b> <%= @person.id %>
         </p>
       <% end %>
-
-      <p>
-        <b>About me:</b>
-        <div id="description" class="box_standout">
-          <%= text_or_not_specified(@person.description, :description=>true) %>
-        </div>
-      </p>
-
-      <p>
-        <% locations = @person.locations -%>
-        <% unless locations.empty? -%>
-          <table>
-            <tr>
-              <td style="padding: 0; vertical-align: top;"><b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b></td>
-              <td style="padding: 0; text-align: left;"><ul>
-                  <% locations.each do |l| -%>
-                    <li><%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%></li>
-                  <% end -%>
-              </ul></td>
-            </tr>
-          </table>
-        <% else -%>
-          <b>Location:</b> <span class="none_text">Not known</span>
-        <% end -%>
-      </p>
-
-      <p>
-        <b>Disciplines:</b> <%= discipline_list(@person) %>
-      </p>
-
-      <p>
-        <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person}  %>
-      </p>
     </div>
+  </div>
+
+
+
+
+  <div class="main_content_right_box">
+    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @person, :drag_id => drag_id } -%>
+  </div>
+
+  <div style="clear:both;">
+
+    <p>
+      <b>About me:</b>
+      <div id="description" class="box_standout">
+        <%= text_or_not_specified(@person.description, :description=>true) %>
+      </div>
+    </p>
+    
+    <p>
+      <% locations = @person.locations -%>
+      <% unless locations.empty? -%>
+        <table>
+          <tr>
+            <td style="padding: 0; vertical-align: top;"><b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b></td>
+            <td style="padding: 0; text-align: left;"><ul>
+                <% locations.each do |l| -%>
+                  <li><%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%></li>
+                <% end -%>
+            </ul></td>
+          </tr>
+        </table>
+      <% else -%>
+        <b>Location:</b> <span class="none_text">Not known</span>
+      <% end -%>
+    </p>
+
+    <p>
+      <b>Disciplines:</b> <%= discipline_list(@person) %>
+    </p>
+
+    <p>
+      <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person}  %>
+    </p>
 
     <fieldset>
       <legend>Contact Details</legend>
@@ -120,54 +130,7 @@
         <p>No "user" instance detected for this person. User has not registered yet.</p>
       <% end -%>
     <% end -%>
-    
-  </div>
-
-
-  <div class="main_content_right_box">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @person, :drag_id => drag_id } -%>
-
-    <% if current_user.person.id == @person.id && !is_nil_or_empty?(@person.people_i_may_know) -%>
-      <div class="contribution_section_box">
-        <p class="heading">
-          <%= help_icon("These are people that are related to you either by project or institution.") -%>
-          People I may know
-        </p>
-        <%= render :partial => "layouts/contribution_section_box_item_list",
-          :locals => { :collection => @person.people_i_may_know,
-          :collection_name => "people_i_may_know",
-          :icon_type => @person.class.name,
-          :truncate_to => truncate_length_for_boxes } -%>
-      </div>
-    <% end -%>
-
-    <div class="contribution_section_box">
-      <p class="heading">
-        <%= help_icon("Projects where #{@person.name} is involved.") -%>
-        Projects (<%= @person.projects.length -%>)
-      </p>
-      <%= render :partial => "layouts/contribution_section_box_item_list",
-        :locals => { :collection => @person.projects,
-        :collection_name => "projects_i_am_involved_in",
-        :icon_type => "Project",
-        :truncate_to => truncate_length_for_boxes } -%>
-    </div>
-
-    <div class="contribution_section_box">
-      <p class="heading">
-        <%= help_icon("Institutions where #{@person.name} is a member.") -%>
-        Institutions (<%= @person.institutions.length -%>)
-      </p>
-      <%= render :partial => "layouts/contribution_section_box_item_list",
-        :locals => { :collection => @person.institutions,
-        :collection_name => "member_of_institutions",
-        :icon_type => "flag",
-        :truncate_to => truncate_length_for_boxes } -%>
-    </div>
 
   </div>
-
-
-
 
 </div>
