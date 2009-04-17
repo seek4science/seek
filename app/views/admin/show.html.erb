@@ -1,10 +1,14 @@
 <%= stylesheet_link_tag 'jws' %>
 
 <h1> Administration </h1>
-
-<%= link_to "New Project",new_project_path %>
-<br/>
-<%= link_to "New Institution", new_institution_path %>
-
-
+<div style="padding-left:2em;">
+  <h2>Create things ...</h2>
+  <p>
+    <%= link_to "Create an Institution", new_institution_path %>
+    <br/>
+    <%= link_to "Create a Project",new_project_path %>
+    <br/>
+    <%= link_to "Create a Profile", new_person_path %>
+  </p>
+</div>
 

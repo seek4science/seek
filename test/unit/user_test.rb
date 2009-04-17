@@ -6,6 +6,15 @@ class UserTest < Test::Unit::TestCase
   include AuthenticatedTestHelper
   fixtures :users
 
+  def test_not_activated
+    not_activated=User.not_activated
+    not_activated.each do |u|
+      assert !u.active?
+    end
+    assert not_activated.include?(users(:aaron))
+    assert !not_activated.include?(users(:quentin))
+  end
+
   def test_should_create_user
     assert_difference 'User.count' do
       user = create_user

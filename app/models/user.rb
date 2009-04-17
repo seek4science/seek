@@ -37,6 +37,8 @@ class User < ActiveRecord::Base
   # can't destroy the assets, because these might be valuable even in the absence of the parent project
   has_many :assets, :as => :contributor, :dependent => :nullify
 
+  named_scope :not_activated,:conditions=>['activation_code IS NOT NULL']
+
   # Activates the user in the database.
   def activate
     @activated = true
