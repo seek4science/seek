@@ -9,6 +9,7 @@ class CreateDataFiles < ActiveRecord::Migration
       t.string :content_type
       t.integer :content_blob_id
       t.integer :experiment_id
+      t.integer :template_id
 
       t.datetime :last_used_at
 

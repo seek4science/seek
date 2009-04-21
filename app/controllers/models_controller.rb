@@ -5,6 +5,8 @@ class ModelsController < ApplicationController
 
   include ModelExecution
 
+  before_filter :login_required
+
   before_filter :find_models, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create ]
 
