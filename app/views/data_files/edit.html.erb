@@ -1,0 +1,50 @@
+<%= javascript_include_tag "sharing.js" %>
+
+<% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @data_file, current_user) -%>
+
+
+<ul class="sectionIcons">
+  <li><%= icon('data_file', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%></li>
+  <li><%= icon('data_files', data_files_path, 'View all Data files', nil, 'View all Data files') -%></li>
+</ul>
+
+<h1>Editing Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
+
+<div class="show_basic">
+  <% form_for(@data_file) do |f| %>
+    <%= f.error_messages %>
+
+    <center>
+      <div style="width: 60%;">
+        <p style="margin-top: 1.5em;">
+          <b>Title:</b><br/>
+          <%= f.text_field :title, :style => "width: 100%;" -%>
+        </p>
+
+        <p style="margin-top: 0.5em;">
+          <b>Description:</b><br/>
+          <%= f.text_area :description, :style => "width: 100%;", :rows => 5 -%>
+        </p>
+
+      </div>
+    </center>
+
+    <% # only the owner should be able to change sharing permissions -%>
+    <% if current_user_authorized_to_manage -%>
+      <p style="margin: 2.5em 0 0 0;">
+        <%= render :partial => "assets/sharing_form" -%>
+      </p>
+
+      <p style="margin: 0;">
+        <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
+          :existing_attributions => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user),
+          :attribution_suggestions => DataFile.get_all_as_json(current_user) } -%>
+      </p>
+    <% end -%>
+    
+
+    <p style="text-align: center;">
+      <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(false); return(false);"  -%> or <%= link_to "Cancel", data_file_path(@data_file) -%>
+    </p>
+  <% end %>
+</div>

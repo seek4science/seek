@@ -1196,6 +1196,40 @@ function validateModelFields(is_new_file) {
   return(true);
 }
 
+function validateDataFileFields(is_new_file) {
+    // only make this test if that's a new Model
+  if(is_new_file) {
+	  if($('data_file_data').value.length == 0) {
+	    alert("Please specify the name of the file to upload!");
+	    $('data_file_data').focus();
+	    return(false);
+	  }
+	}
+
+  // other tests are applicable to both editing and creating new Model
+  if($('data_file_title').value.length == 0) {
+    alert("Please specify the title for the Data file!");
+    $('data_file_title').focus();
+    return(false);
+  }
+
+  // check if no tokens remain in the attributions autocompleter
+  // (only do this if the fold with attributions is expanded)
+  if($('attributions_fold_content').style.display == "block" &&
+     autocompleters[attributions_autocompleter_id].getRecognizedSelectedIDs() != "")
+  {
+    alert('You didn\'t press "Add" link to add items in the attributions autocomplete field.');
+    $('attributions_autocomplete_input').focus();
+    return(false);
+  }
+
+  // filename and title set - can submit
+  $('data_file_submit_btn').disabled = true;
+  $('data_file_submit_btn').value = (is_new_file ? "Uploading and Saving..." : "Updating...");
+  $('data_file_submit_btn').form.submit();
+  return(true);
+}
+
 
 // ***************  Attributions  *****************
 

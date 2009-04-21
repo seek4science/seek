@@ -33,6 +33,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should get edit" do
+    get :edit, :id => data_files(:picture).id
+    assert_response :success
+  end
+
+  test "should update data file" do
+    put :update, :id => data_files(:picture).id, :data_file => { }
+    assert_redirected_to data_file_path(assigns(:data_file))
+  end
+
   private
 
   def valid_data_file
