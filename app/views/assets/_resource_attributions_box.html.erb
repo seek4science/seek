@@ -13,7 +13,7 @@
 		Attributions <span class="count_text">(<%= attributed_to.length -%>)</span>
 		<a name="attributions"></a>
 		<% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
-			<p style="text-align: middle; margin: 0; padding: 0;"><small>[ <%= link_to "edit", eval("edit_#{resource.class.name.downcase}_path(#{resource.id})") %> ]</small></p>
+			<p style="text-align: middle; margin: 0; padding: 0;"><small>[ <%= link_to "edit", eval("edit_#{resource.class.name.underscore}_path(#{resource.id})") %> ]</small></p>
 		<% end %>
 	</p>
 
@@ -23,7 +23,7 @@
 				<% if item -%>
 				  <% item_type = item.class.name -%>
 					<% tooltip_txt = "<b>#{item_type}:</b> \"#{item.title}\" by #{item.asset.contributor.person.first_name} #{item.asset.contributor.person.last_name}" -%>
-				  <%= list_item_with_icon(item_type.downcase, item, item.title, truncate_to, tooltip_txt) -%>
+				  <%= list_item_with_icon(item_type.underscore, item, item.title, truncate_to, tooltip_txt) -%>
 				<% else -%>
 				  <li><font class="none_text">Private item</font></li>
 				<% end -%>
@@ -40,7 +40,7 @@
 				<ul class="list">
 		      <% for item in attributed_to[main_list_section_length..(attributed_to.length-1)] -%>
 		      	<% if item -%>
-						  <%= list_item_with_icon(item.class.name.downcase, item, item.title, truncate_to) -%>
+						  <%= list_item_with_icon(item.class.name.underscore, item, item.title, truncate_to) -%>
 						<% else -%>
 						  <li><font class="none_text">Private item</font></li>
 						<% end -%>

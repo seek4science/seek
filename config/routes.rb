@@ -1,12 +1,10 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :data_files
-
-  map.resources :models, :member => { :download => :get, :execute=>:post }
-
   
   map.resources :assays
 
   map.resources :assets
+
+  map.resources :data_files, :member => {:download => :get}
 
   map.resources :experiments
 
@@ -19,6 +17,8 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :groups
+
+  map.resources :models, :member => { :download => :get, :execute=>:post }
 
   map.resources :people, :collection=>{:select=>:get} do |person|
     # avatars / pictures 'owned by' person

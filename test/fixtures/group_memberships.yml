@@ -35,26 +35,21 @@ person_for_owner_of_my_first_sop_in_myexp_project:
   person: person_for_owner_of_my_first_sop
   work_group: myexperiment_project_workgroup
 
-
 person_for_owner_of_fully_public_policy_in_ebi_institution:
   person: person_for_owner_of_fully_public_policy
   work_group: ebi_inst_workgroup
-
 
 random_userless_person_in_sysmo_at_manchester_uni_workgroup:
   person: random_userless_person
   work_group: sysmo_at_manchester_uni_workgroup
 
-
 person_for_sysmo_user_in_blacklist_in_sysmo_at_manchester_uni_workgroup:
   person: person_for_sysmo_user_in_blacklist
   work_group: sysmo_at_manchester_uni_workgroup
 
-
 person_for_sysmo_user_both_in_blacklist_and_whitelist_in_sysmo_at_manchester_uni_workgroup:
   person: person_for_sysmo_user_both_in_blacklist_and_whitelist
   work_group: sysmo_at_manchester_uni_workgroup
-
 
 person_for_owner_of_download_for_all_registered_users_policy_in_sysmo_at_manchester_uni_workgroup:
   person: person_for_owner_of_download_for_all_registered_users_policy
@@ -62,4 +57,8 @@ person_for_owner_of_download_for_all_registered_users_policy_in_sysmo_at_manches
 
 group_for_model_owner:
   person: person_for_model_owner
+  work_group: sysmo_at_manchester_uni_workgroup
+
+group_for_datafile_owner:
+  person: person_for_datafile_owner
   work_group: sysmo_at_manchester_uni_workgroup

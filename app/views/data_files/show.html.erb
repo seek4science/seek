@@ -1,0 +1,92 @@
+
+
+<% truncate_length_for_boxes = 22 -%>
+
+<ul class="sectionIcons">
+  <% if Authorization.is_authorized?("manage", nil, @data_file, current_user) -%>
+    <li><%= icon('manage', edit_data_file_path(@data_file), nil, nil, 'Manage Data file') -%></li>
+  <% elsif Authorization.is_authorized?("edit", nil, @data_file, current_user) -%>
+    <% # this is not owner, but current user can edit -%>
+    <li><%= icon('edit', edit_data_file_path(@data_file), nil, nil, 'Edit Data file') -%></li>
+  <% end -%>
+
+  <% if Authorization.is_authorized?("destroy", nil, @data_file, current_user) -%>
+    <li><%= icon('destroy', data_file_path(@data_file), nil, { :confirm => 'This deletes the Data file and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%></li>
+  <% end -%>
+</ul>
+
+<h1 class="contribution_title">Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
+
+<%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @data_file } -%>
+
+<div class="show_basic">
+  <div class="contribution_left_box">
+    <div class="contribution_version_box">
+      <div class="contribution_version_inner_box">
+        <p>
+          <b>Title:</b>
+          <span class="title"><%=h @data_file.title -%></span>
+        </p>
+
+        <p>
+          <b>File name:</b>
+          <%=h @data_file.original_filename -%>
+        </p>
+
+        <p>
+          <b>Format:</b>
+          <%=h @data_file.content_type -%>
+        </p>
+
+        
+
+        <br/>
+
+        <h3>
+          <%= help_icon("This section shows the overall description for this Data file") -%>
+          Description
+        </h3>
+
+        <% unless @data_file.description.blank? -%>
+          <div class="contribution_description">
+            <%= simple_format(white_list(@data_file.description)) -%>
+          </div>
+        <% else -%>
+          <p class="none_text">
+            Not set
+          </p>
+        <% end -%>
+
+        <br/>
+
+        <h3>
+          <%= help_icon("This section provides links to the download(s) for this Data file") -%>
+          Download
+        </h3>
+
+        <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
+          <ul class="sectionIcons">
+            <li><%= icon('data_file', download_data_file_url, "Download Data file", nil, "Download Data file") -%></li>
+          </ul>
+        <% else -%>
+          <p class="none_text">
+            You do not have permissions to download this Data file.
+          </p>
+        <% end -%>
+
+        <br/>
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="contribution_right_box">
+    <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @data_file } -%>
+    <%= render :partial => "assets/resource_associated_with_box", :locals => { :resource => @data_file, :truncate_to => truncate_length_for_boxes } -%>
+    <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @data_file, :attributed_to => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
+  </div>
+
+</div>

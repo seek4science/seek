@@ -63,6 +63,10 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     assert res, "real owner of the asset wasn't considered as such"
   end
+
+  def test_is_owner_of_datafile
+    res = Authorization.is_owner?(users(:datafile_owner).id, assets(:asset_for_datafile))
+  end
   
   # checks not an owner
   def test_is_owner_random_user

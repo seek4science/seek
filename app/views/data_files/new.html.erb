@@ -1,0 +1,47 @@
+<%= javascript_include_tag "sharing.js" -%>
+
+<h1>New Data file</h1>
+
+<div class="show_basic">
+  <% form_tag({:action => :create}, :multipart => true) do -%>
+    <%= error_messages_for :data_file -%>
+
+    <center>
+      <div style="width: 60%;">
+        
+        <p>
+          <b>File to upload:&nbsp;</b>
+          <%= file_field :data_file, :data -%>
+        </p>
+
+        <p style="margin-top: 1.5em;">
+          <b>Title:</b><br/>
+          <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
+          <%= text_field_tag 'data_file[title]', data_file_title_value, :style => "width: 100%;" -%>
+        </p>
+
+        <p style="margin-top: 0.5em;">
+          <b>Description:</b><br/>
+          <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
+          <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 5 -%>
+        </p>
+        
+      </div>
+    </center>
+
+
+    <p style="margin: 2.5em 0 0 0;">
+      <%= render :partial => "assets/sharing_form" -%>
+    </p>
+
+    <p style="margin: 0;">
+      <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
+        :existing_attributions => [],
+        :attribution_suggestions => DataFile.get_all_as_json(current_user) } -%>
+    </p>
+
+    <p style="text-align: center; margin-top: 1.5em;">
+      <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
+    </p>
+  <% end -%>
+</div>
