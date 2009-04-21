@@ -9,6 +9,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2,p.work_groups.size
   end
 
+  def test_registered
+    registered=Person.registered
+    registered.each do |p|
+      assert_not_nil p.user
+    end
+    assert registered.include?(people(:one))
+    assert !registered.include?(people(:person_without_user))
+  end
+
   def test_without_group
     without_group=Person.without_group
     without_group.each do |p|

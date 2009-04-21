@@ -147,3 +147,6 @@ modeller_person:
 
 person_without_group:
   first_name: "Lonely"
+
+person_without_user:
+  first_name: "Userless"

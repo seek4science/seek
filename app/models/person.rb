@@ -31,6 +31,10 @@ class Person < ActiveRecord::Base
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools ]) if SOLR_ENABLED
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
+  named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
+  
+  #FIXME: change userless_people to use this scope - unit tests
+  named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
   
   def self.userless_people
     p=Person.find(:all)
