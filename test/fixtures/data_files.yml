@@ -1,21 +1,9 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-one:
-  contributor_type: MyString
-  contributor_id: 1
-  title: MyString
-  description: MyText
-  original_filename: MyString
-  content_type: MyString
-  content_blob_id: 1
-  experiment_id: 1
-
-two:
-  contributor_type: MyString
-  contributor_id: 1
-  title: MyString
-  description: MyText
-  original_filename: MyString
-  content_type: MyString
-  content_blob_id: 1
-  experiment_id: 1
+picture:
+  contributor: datafile_owner (User)
+  title: Picture
+  description: A picture
+  original_filename: file_pictuer.png
+  content_blob: picture_blob
+  content_type: text/png
+  last_used_at: 2009-04-03 11:09:18
+  experiment: metabolomics_exp

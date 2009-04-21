@@ -137,6 +137,10 @@ person_for_model_owner:
   first_name: "Model"
   last_name: "Owner"
 
+person_for_datafile_owner:
+  first_name: "Datafile"
+  last_name: "Owner"
+
 modeller_person:
   first_name: "Modeller"
   disciplines: modeller,experimentalist

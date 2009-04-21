@@ -21,3 +21,6 @@ content_blob_with_little_file:
 
 teusink_blob:
   data: <%= load_blob_data('Teusink.xml') %>
+
+picture_blob:
+  data: <%= load_blob_data('file_picture.png') %>
