@@ -1,5 +1,3 @@
-<%= stylesheet_link_tag 'jws' %>
-
 <h1> Administration </h1>
 <div style="padding-left:2em;">
   <h2>Create things ...</h2>
@@ -12,3 +10,12 @@
   </p>
 </div>
 
+<div style="padding-left:2em;">
+
+  <%= render :partial=>"users_details",:locals=>{:users=>User.without_profile,:title=>"Users without profiles" } %>
+  
+  <%= render :partial=>"users_details",:locals=>{:users=>User.not_activated,:title=>"Non activated users" } %>
+
+  <%= render :partial=>"users_details",:locals=>{:users=>Person.without_group.collect{|p| p.user},:title=>"People not in groups" } %>
+
+</div>

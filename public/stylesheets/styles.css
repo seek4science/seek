@@ -442,3 +442,26 @@ Add style only after the tabber interface is set up (.tabberlive)
 /* END Collapsable tags */
 
 
+ul#user_details  {    
+    margin: 4px 4px 4px 4px;
+    padding: 4px 4px 4px 4px;
+    border: solid 1px black;
+    list-style: none;
+    width: 14em;
+    text-align: left;
+    background-color:silver;
+}
+
+ul#users_details li {
+    list-style-type: none;
+}
+
+ul#user_details li {
+    font-size: 11px;
+    list-style-type: none;
+}
+
+
+ul#users_details ul.profile {
+
+}
