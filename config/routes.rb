@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :data_files
+
   map.resources :models, :member => { :download => :get, :execute=>:post }
 
   
