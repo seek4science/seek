@@ -1,7 +1,7 @@
-<% # drop-down with a selection of access type; expected parameters: -%>
-<% # 1) access_type_selector_for_scope - sharing scope of the radio button with scope selection, to which this select element refers -%>
-<% # 2) sharing_scope - active sharing_scope for the current policy -%>
-<% # 3) access_type - active access_type for the current policy -%>
+<%# drop-down with a selection of access type; expected parameters: -%>
+<%# 1) access_type_selector_for_scope - sharing scope of the radio button with scope selection, to which this select element refers -%>
+<%# 2) sharing_scope - active sharing_scope for the current policy -%>
+<%# 3) access_type - active access_type for the current policy -%>
 
 <select name="sharing[access_type_<%= access_type_selector_for_scope -%>]" id="access_type_select_<%= access_type_selector_for_scope -%>" style="width: 220px; vertical-align: middle; margin: 0.3em 0;">
   <option value="<%= Policy::VIEWING -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::VIEWING) -%>>viewing only</option>

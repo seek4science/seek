@@ -1,12 +1,12 @@
-<% # This partial is expecting 3 parameters to be defined: -%>
-<% # - resource_type - type of resource for which the attributions form is displayed (required because various types of resources have different requirements for attributions) -%>
-<% # - existing_attributions - collection of existing attributions for the current resource (this should be collection of resources - NOT collection of records of Attribution class) -%>
-<% # - attribution_suggestions - JSON array of data to be used to generate autocompleter suggestions -%>
+<%# This partial is expecting 3 parameters to be defined: -%>
+<%# - resource_type - type of resource for which the attributions form is displayed (required because various types of resources have different requirements for attributions) -%>
+<%# - existing_attributions - collection of existing attributions for the current resource (this should be collection of resources - NOT collection of records of Attribution class) -%>
+<%# - attribution_suggestions - JSON array of data to be used to generate autocompleter suggestions -%>
 
 
 <!-- Attributions -->
 
-<% # this hidden input will submit all permission data with the form -%>
+<%# this hidden input will submit all permission data with the form -%>
 <%= hidden_field_tag "attributions", "" -%>
 
 <% case resource_type.downcase; when "sop" -%>

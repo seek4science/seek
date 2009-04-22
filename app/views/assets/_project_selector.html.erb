@@ -1,8 +1,8 @@
-<% # this partial expects the following parameters to be set: -%>
-<% # - "resource_type" - type (string value required) of the current resource -%>
-<% # - project_hash - hash in a form of { <project_id> => <project_name>, [...] } of all projects that the current user is a member of -%>
-<% # - selected_project_id - ID of the project the resource is currently associated with; skip this parameter for a "new" resource -%>
-<% # - disable_project_select - selection should only be available on 'new' action, but not on 'edit'; this parameter has a default of "false" -%>
+<%# this partial expects the following parameters to be set: -%>
+<%# - "resource_type" - type (string value required) of the current resource -%>
+<%# - project_hash - hash in a form of { <project_id> => <project_name>, [...] } of all projects that the current user is a member of -%>
+<%# - selected_project_id - ID of the project the resource is currently associated with; skip this parameter for a "new" resource -%>
+<%# - disable_project_select - selection should only be available on 'new' action, but not on 'edit'; this parameter has a default of "false" -%>
 
 <% selected_project_id ||= 0 -%>
 <% disable_project_select ||= false -%>

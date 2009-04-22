@@ -6,7 +6,7 @@
   <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
     <li><%= icon('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
-    <% # this is not owner, but current user can edit -%>
+    <%# this is not owner, but current user can edit -%>
     <li><%= icon('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%></li>
   <% end -%>
 

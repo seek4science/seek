@@ -1,4 +1,4 @@
-<% # this should be set by the caller, this is an extra check -%>
+<%# this should be set by the caller, this is an extra check -%>
 <% resource=resource_list_item %>
 <% odd_row ||= false -%>
 <% narrow_view ||= false -%>
@@ -26,10 +26,10 @@
 				<% end %>
 				
 				<!-- commented out, only because this probably is not very important in listing, but occupies much space
-				<% # unless resource.asset.last_used_at.nil? -%>
-				  <% #= narrow_view ? "<br/>" : " | " -%>
-					<b>Last used:</b> <% #= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-				<% # end -%>
+				<%# unless resource.asset.last_used_at.nil? -%>
+				  <%#= narrow_view ? "<br/>" : " | " -%>
+					<b>Last used:</b> <%#= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+				<%# end -%>
 				-->
 			</p>
 			

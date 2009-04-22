@@ -34,7 +34,7 @@
 					<%= icon "avatar", avatar_link + "/select", nil, { :method => :post }, "Set as Main Picture" -%>
 				<% end -%>
 			<% end -%>
-			<% # "enlarge" option is shown to everyone -%>
+			<%# "enlarge" option is shown to everyone -%>
 			<%= icon "show", avatar_url(@avatar_owner_instance, avatar.id, "large"), nil, nil, "Enlarge" -%>
 			<% if avatar_can_be_edited_by_current_user -%>
 				<%= icon "destroy", avatar_link, nil, { :confirm => 'Are you sure?', :method => :delete }, "Delete" -%>

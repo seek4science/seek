@@ -4,7 +4,7 @@
 	<% if Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
 		<li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
 	<% elsif Authorization.is_authorized?("edit", nil, @sop, current_user) -%>
-	  <% # this is not owner, but current user can edit -%>
+	  <%# this is not owner, but current user can edit -%>
 		<li><%= icon('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
 	<% end -%>
 	

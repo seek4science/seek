@@ -121,7 +121,7 @@
     <div class="fold">
       <div class="foldTitle">Items related to <%= h @person.name %> </div>
       <div class="foldContent" style="display:none;">
-        <% # get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
+        <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
         <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
         <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
         <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
@@ -130,8 +130,8 @@
           :authorization_already_done => true } -%>
 
 
-        <% # show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
-        <% # this is because it's not needed then: admins can see everything anyway -%>
+        <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
+        <%# this is because it's not needed then: admins can see everything anyway -%>
         <% if current_user.is_admin? && @person.user && !@person.user.is_admin? -%>
           <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
           <% if @person.user -%>

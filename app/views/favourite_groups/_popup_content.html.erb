@@ -22,7 +22,7 @@
 					<%= text_field_tag "group_name", @f_group.name, :class => "to_field_identical", :style => "width: 300px; margin-left: 0.3em; vertical-align: middle;" -%>
 					<br/>
 				<% else -%>
-				  <% # don't need to display the name of whitelist / blacklist group, but still need submission of it -%>
+				  <%# don't need to display the name of whitelist / blacklist group, but still need submission of it -%>
 					<%= hidden_field_tag "group_name", @f_group.name -%>
 			  <% end -%>
 				

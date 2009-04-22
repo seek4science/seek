@@ -53,7 +53,7 @@
 
 
     <h2 style="margin-top: 3em;">Associated with '<%= h(@project.name) %>' </h2>
-    <% # get, classify and authorize all assets for this project -%>
+    <%# get, classify and authorize all assets for this project -%>
     <% project_asset_hash = Asset.classify_and_authorize(@project.assets, true, current_user) -%>
     <% project_asset_hash.merge!(classify_for_tabs(@project.people)) -%>
     <% project_asset_hash.merge!(classify_for_tabs(@project.institutions)) -%>

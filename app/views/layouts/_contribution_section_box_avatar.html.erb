@@ -1,6 +1,6 @@
-<% # this partial expects 2 local to be declared -- -%>
-<% # 1) "object" for which the avatar is displayed (object.name() method should be available for any supplied object); -%>
-<% # 2) "drag_id" - id for dragging-dropping avatar into "favourites" gadget; -%>
+<%# this partial expects 2 local to be declared -- -%>
+<%# 1) "object" for which the avatar is displayed (object.name() method should be available for any supplied object); -%>
+<%# 2) "drag_id" - id for dragging-dropping avatar into "favourites" gadget; -%>
 
 <% if object.instance_of?(Person) -%>
   <span style="float:right;padding-top:0.5em;padding-right:0.5em;"><%= no_user_for_admins_img object %></span>
