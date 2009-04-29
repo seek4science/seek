@@ -34,20 +34,15 @@ class StudyTest < ActiveSupport::TestCase
     assert study.sops.include?(sops(:sop_for_test_with_workgroups))
   end
 
-  test "without investigation" do
-    study = studies(:study_without_investigation_or_assays)
-    assert_nil study.investigation
-    assert_nil study.project
-  end
-
   test "person responisble" do
     study=studies(:metabolomics_study)
     assert_equal people(:person_without_group),study.person_responsible
   end
 
-  test "project from topic" do
+  test "project from investigation" do
     study=studies(:metabolomics_study)
     assert_equal projects(:sysmo_project), study.project
+    assert_not_nil study.project.name
   end
 
   test "validation" do

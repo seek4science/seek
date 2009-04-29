@@ -8,7 +8,8 @@ class StudiesController < ApplicationController
   protect_from_forgery :except=>[:create_investigation,:create_assay]
 
   def index
-    @studys=Study.find(:all)
+    
+    @studies=Study.find(:all)
 
     respond_to do |format|
       format.html # index.html.erb

@@ -3,12 +3,14 @@
 <div class="list_items_container">
   <table class="list_item">
     <tr>
-
+    <%= puts study.title %>
       <td class="item_avatar" style="width: 100px">
         <p style="margin-top:0; padding-top:1.5em; text-align: center;"><b>Project:</b></p>
         <br/>
         <center>
+          <% if study.project -%>
           <%= related_project_avatar(study.project) -%>
+          <% end -%>
         </center>
 
       </td>
@@ -21,7 +23,7 @@
               <%= icon "edit", edit_study_path(study), nil, nil, "Edit" -%>
             <% end -%>
           </span>
-          <%= link_to h(study.title),experiment_path(study) %>
+          <%= link_to h(study.title),study_path(study) %>
         </p>
 
         <div class="box_standout">
@@ -30,7 +32,7 @@
 
 
         <p class="investigation">
-          <label>Topic: </label>
+          <label>Investigation: </label>
           <%= h(study.investigation.title) %>
         </p>
 

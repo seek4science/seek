@@ -930,9 +930,8 @@ table.contributable:hover {
 }
 
 .sectionIcons {
-	margin: 2em 0 1em 0;
-	font-size: 85%;
-	font-weight: bold;
+	margin: 1em 0 0.5em 0;
+	font-size: 70%;
 	text-align: center;
 }
 
@@ -966,7 +965,7 @@ table.contributable:hover {
 	line-height: 1.0;
 	text-decoration: none;
 	border: 1px solid #BBBBBB;
-	background-color: #EEF6FF;
+	background-color: #FEF6FF;
 }
 
 .sectionIcons li a:hover {
