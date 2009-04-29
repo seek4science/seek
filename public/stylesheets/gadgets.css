@@ -33,17 +33,17 @@
 .myexperiment_gadget .header {
 	min-height: 20px;
 	border: #CCCCCC 0px solid;
+    border-bottom: #AAAAEE 1px solid;
 	border-width: 0 1px 1px 1px;
 	border-bottom-color: #CCCCCC;
 	background-image: url('/images/gadget-hd-bg.png');
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #EEEEEE;
-	padding: 0 0.5em 0.2em 0.5em;
+	padding: 0.2em 0.2em 0.2em 0.2em;
 	text-align: center;
 	vertical-align: middle;
 	font-weight: bold;
-	
 }
 
 .myexperiment_gadget .header p {
