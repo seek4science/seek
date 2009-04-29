@@ -1,7 +1,8 @@
 require 'test_helper'
 
 class StudyTest < ActiveSupport::TestCase
-  fixtures :studies,:assays,:investigations,:projects,:technology_types,:assay_types,:people
+  
+  fixtures :studies,:assays,:investigations,:projects,:technology_types,:assay_types,:people,:sops
 
   test "associations" do
     study=studies(:metabolomics_study)
@@ -11,12 +12,26 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal 1,study.assays.size
     assert_not_nil study.investigation.project
 
-    assert_equal "Metabolomics Assay",study.assays.first.title
+    assert study.assays.include?(assays(:metabolomics_assay))
+    
     assert_equal projects(:sysmo_project),study.investigation.project
     
     assert_equal assay_types(:metabolomics),study.assays.first.assay_type
 
+  end
 
+  test "sops through assays" do
+    study=studies(:metabolomics_study)
+    assert_equal 2,study.sops.size
+    assert study.sops.include?(sops(:my_first_sop))
+    assert study.sops.include?(sops(:sop_with_fully_public_policy))
+    
+    #study with 2 assays that have overlapping sops. Checks that the sops aren't dupliced.
+    study=studies(:study_with_overlapping_assay_sops)
+    assert_equal 3,study.sops.size
+    assert study.sops.include?(sops(:my_first_sop))
+    assert study.sops.include?(sops(:sop_with_fully_public_policy))
+    assert study.sops.include?(sops(:sop_for_test_with_workgroups))
   end
 
   test "without investigation" do
@@ -24,7 +39,6 @@ class StudyTest < ActiveSupport::TestCase
     assert_nil study.investigation
     assert_nil study.project
   end
-
 
   test "person responisble" do
     study=studies(:metabolomics_study)
