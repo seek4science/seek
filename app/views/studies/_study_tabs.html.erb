@@ -1,0 +1,6 @@
+<h2 style="margin-top: 3em;">Experiment Assets</h2>
+		<%# get, classify and authorize all assets for this project -%>
+		<% experiment_asset_hash = Asset.classify_and_authorize([], true, current_user) -%>
+		<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => experiment_asset_hash,
+                                                                               :narrow_view => true,
+                                                                               :authorization_already_done => true } -%>

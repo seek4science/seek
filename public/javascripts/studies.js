@@ -1,10 +1,8 @@
 var sops=new Array();
 var assays=new Array();
 
-
-
 function postInvestigationData() {
-    request = new Ajax.Request(CREATE_TOPIC_LINK,
+    request = new Ajax.Request(CREATE_INVESTIGATION_LINK,
     {
         method: 'post',
         parameters: {
@@ -14,9 +12,11 @@ function postInvestigationData() {
         },
         onSuccess: function(transport){
             var data = transport.responseText.evalJSON(true);
+            
             if (data.status==200){                
-                addNewTopic(data.new_topic);
+                addNewInvestigation(data.new_investigation);
             }
+            alert("about to close");
             RedBox.close();
             return (true);
         },

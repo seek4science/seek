@@ -1,8 +1,8 @@
 class StudiesController < ApplicationController
 
-   before_filter :login_required
+  before_filter :login_required
 
-  before_filter :set_no_layout, :only => [ :new_study,:new_assay ]
+  before_filter :set_no_layout, :only => [ :new_investigation,:new_assay ]
   before_filter :is_user_admin_auth, :only=>[:destroy]
 
   protect_from_forgery :except=>[:create_investigation,:create_assay]
