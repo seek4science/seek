@@ -5,6 +5,8 @@ class Study < ActiveRecord::Base
 
   has_one :project, :through=>:investigation
 
+  belongs_to :person_responsible, :class_name => "Person"
+
 
   validates_presence_of :title
   validates_presence_of :investigation

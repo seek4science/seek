@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class StudyTest < ActiveSupport::TestCase
-  fixtures :studies,:assays,:investigations,:projects,:technology_types,:assay_types
+  fixtures :studies,:assays,:investigations,:projects,:technology_types,:assay_types,:people
 
   test "associations" do
     study=studies(:metabolomics_study)
@@ -17,6 +17,11 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal assay_types(:metabolomics),study.assays.first.assay_type
 
 
+  end
+
+  test "person responisble" do
+    study=studies(:metabolomics_study)
+    assert_equal people(:person_without_group),study.person_responsible
   end
 
   test "project from topic" do

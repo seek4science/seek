@@ -2,3 +2,4 @@ metabolomics_study:
   title: A Metabolomics Study
   assays: metabolomics
   investigation: metabolomics_investigation
+  person_responsible: person_without_group
