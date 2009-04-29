@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class InvestigationTest < ActiveSupport::TestCase
+  
   fixtures :all
 
   test "associations" do
