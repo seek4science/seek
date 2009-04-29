@@ -1,0 +1,10 @@
+<script type="text/javascript">
+  var CREATE_INVESTIGATION_PATH='<%= create_investigation_path %>';
+</script>
+<h1>New experiment</h1>
+
+<div class="show_basic">
+	<% form_for @study do |f| %>
+	  <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+	<% end -%>
+</div>

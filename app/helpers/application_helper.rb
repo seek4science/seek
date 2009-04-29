@@ -166,7 +166,7 @@ module ApplicationHelper
       return "famfamfam_silk/calculator.png"
     when "data_file","data_files"
       return "famfamfam_silk/database.png"
-    when "experiment"
+    when "study"
       return "famfamfam_silk/page.png"
     when "execute"
       return "famfamfam_silk/lightning.png"

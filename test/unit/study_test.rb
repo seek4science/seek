@@ -19,6 +19,13 @@ class StudyTest < ActiveSupport::TestCase
 
   end
 
+  test "without investigation" do
+    study = studies(:study_without_investigation_or_assays)
+    assert_nil study.investigation
+    assert_nil study.project
+  end
+
+
   test "person responisble" do
     study=studies(:metabolomics_study)
     assert_equal people(:person_without_group),study.person_responsible

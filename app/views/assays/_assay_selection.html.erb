@@ -23,7 +23,7 @@
 
 
 <script type="text/javascript">
-<% @experiment.assays.each do |s| -%>
+<% @study.assays.each do |s| -%>
     assay_id = <%= s.id -%>;
     assay_title = '<%= s.title -%>';
     addAssay(assay_title,assay_id);

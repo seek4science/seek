@@ -3,3 +3,8 @@ metabolomics_study:
   assays: metabolomics
   investigation: metabolomics_investigation
   person_responsible: person_without_group
+
+study_without_investigation_or_assays:
+  title: No investigation
+  person_responsible: person_without_group
+

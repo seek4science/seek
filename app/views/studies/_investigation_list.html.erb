@@ -1,0 +1,14 @@
+<% investigation_value=(@study && @study.investigation) ? @study.investigation.id : 0 %>
+<% investigation_options = [["Select investigation..",0]]|investigations.collect{|t| [h(t.title),t.id]} %>
+<% project_id||=nil %>
+<%= select_tag :study_investigation_id,
+  options_for_select(investigation_options,investigation_value),
+  {
+    :style=>"width:82%",:disabled=>(investigations.nil? || investigations.empty?),
+    :name=>"study[investigation_id]"
+  }
+-%>
+
+<% if project_id && project_id!="0" -%>
+  <%= new_investigation_to_project_popup_link project_id %>
+<% end -%>

@@ -55,11 +55,11 @@ ActionController::Routing::Routes.draw do |map|
   map.update_favourite_group '/favourite_groups/update', :controller => 'favourite_groups', :action => 'update', :conditions => { :method => :post }
   map.delete_favourite_group '/favourite_groups/:id', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
 
-  map.new_topic 'experiments/new_topic',:controller=>"experiments",:action=>'new_topic',:conditions=> {:method=>:post}
-  map.create_topic 'experiments/create_topic',:controller=>"experiments",:action=>'create_topic',:conditions=> {:method=>:post}
+  map.new_investigation 'studies/new_investigation',:controller=>"studies",:action=>'new_investigation',:conditions=> {:method=>:post}
+  map.create_investigation 'experiments/create_investigation',:controller=>"studies",:action=>'create_investigation',:conditions=> {:method=>:post}
 
-  map.new_assay 'experiments/new_assay',:controller=>"experiments",:action=>'new_assay',:conditions=> {:method=>:post}
-  map.create_assay 'experiments/create_assay',:controller=>"experiments",:action=>'create_assay',:conditions=> {:method=>:post}
+  map.new_assay 'studies/new_assay',:controller=>"studies",:action=>'new_assay',:conditions=> {:method=>:post}
+  map.create_assay 'studies/create_assay',:controller=>"studies",:action=>'create_assay',:conditions=> {:method=>:post}
   
   # review members of workgroup (also of a project / institution) popup
   map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }

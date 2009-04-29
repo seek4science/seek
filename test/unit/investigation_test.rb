@@ -11,4 +11,5 @@ class InvestigationTest < ActiveSupport::TestCase
     assert inv.studies.include?(studies(:metabolomics_study))
     
   end
+  
 end

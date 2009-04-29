@@ -1,0 +1,51 @@
+<% study=resource_list_item %>
+
+<div class="list_items_container">
+  <table class="list_item">
+    <tr>
+
+      <td class="item_avatar" style="width: 100px">
+        <p style="margin-top:0; padding-top:1.5em; text-align: center;"><b>Project:</b></p>
+        <br/>
+        <center>
+          <%= related_project_avatar(study.project) -%>
+        </center>
+
+      </td>
+
+      <td class="item_details">
+        <p class="name">
+
+          <span style="float: right; font-size: 77%;">
+            <% if mine? study -%>
+              <%= icon "edit", edit_study_path(study), nil, nil, "Edit" -%>
+            <% end -%>
+          </span>
+          <%= link_to h(study.title),experiment_path(study) %>
+        </p>
+
+        <div class="box_standout">
+          <%= truncate(text_or_not_specified(study.description, :description => true), :length=>300) %>
+        </div>
+
+
+        <p class="investigation">
+          <label>Topic: </label>
+          <%= h(study.investigation.title) %>
+        </p>
+
+        <div class="assays">
+          <div style="margin-top: 0.3em;">
+            <p style="margin-left: 1em;">
+              <%= render :partial=>"studies/simple_assay_list",:locals=>{:assays=>study.assays} %>
+            </p>
+          </div>
+        </div>
+
+      </td>
+      
+    </tr>
+  </table>
+
+
+</div>
