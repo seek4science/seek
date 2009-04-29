@@ -1,0 +1,2 @@
+module InvestigationsHelper
+end

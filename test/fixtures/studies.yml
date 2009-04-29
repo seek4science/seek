@@ -1,0 +1,4 @@
+metabolomics_study:  
+  title: A Metabolomics Study
+  assays: metabolomics
+  investigation: metabolomics_investigation
