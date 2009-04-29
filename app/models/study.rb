@@ -8,9 +8,10 @@ class Study < ActiveRecord::Base
 
   belongs_to :person_responsible, :class_name => "Person"
 
-
   validates_presence_of :title
   validates_presence_of :investigation
+
+  validates_uniqueness_of :title
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
 

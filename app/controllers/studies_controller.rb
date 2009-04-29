@@ -99,9 +99,13 @@ class StudiesController < ApplicationController
 
     raise Exception.new("Person not a member of the project") if !current_user.person.projects.include?(project)
     investigation=Investigation.new(:title=>title,:project=>project)
-    investigation.save!
+    
     respond_to do |format|
-      format.json { render :json=>{:status=>200,:new_investigation=>[investigation.id,investigation.title]} }
+      if investigation.save
+        format.json { render :json=>{:status=>200,:new_investigation=>[investigation.id,investigation.title]} }
+      else
+        format.json { render :json=>{:status=>406,:error_messages=>investigation.errors.full_messages }}
+      end
     end
   end
 

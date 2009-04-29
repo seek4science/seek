@@ -15,12 +15,15 @@ function postInvestigationData() {
             
             if (data.status==200){                
                 addNewInvestigation(data.new_investigation);
+                RedBox.close();
             }
-            alert("about to close");
-            RedBox.close();
+            if (data.status==406) {
+                $('error_messages').innerHTML=data.error_messages
+            }
+            
             return (true);
         },
-        onFailure: function(transport){
+        onFailure: function(transport){            
             alert('Something went wrong, please try again...');
             return(false);
         }

@@ -8,20 +8,27 @@
   <center>
     <div class="body">
 
-      Project: <%= @investigation.project.name %><br/>
+      <span id="error_messages"></span>
 
-        <%= hidden_field_tag :project_id,@investigation.project.id %>
 
-        <%= label_tag :title %><br/>
-        <%= text_field_tag :title %><br/>
+      Creating a new investigation for the project <b>'<%= h(@investigation.project.name) %>'</b>
 
-        <%= label_tag :description %>
-        <%= text_area_tag :description %>
+      <%= hidden_field_tag :project_id,@investigation.project.id %>
 
-        <%= submit_tag "Create",:onclick=>"postInvestigationData();return(false);" %>
-        <input type="button" value="Cancel" style="width: 150px;" onclick="javascript: RedBox.close(); return(false);" />
       
+        <p>
+          <%= label_tag :title %><br/>
+          <%= text_field_tag :title,'',:size=>42 %>
+        </p>
+        <p>
+          <%= label_tag :description %><br/>
+          <%= text_area_tag :description,'',:cols=>40,:rows=>5 %>
+        </p>
+
+      <input type="button" value="Cancel" onclick="javascript: RedBox.close(); return(false);" />
+      <%= submit_tag "Create",:onclick=>"postInvestigationData();return(false);" %>
+
     </div>
   </center>
-  
+
 </div>
