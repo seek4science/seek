@@ -18,7 +18,7 @@ class Project < ActiveRecord::Base
 
   has_many :investigations
   has_many :studies, :through=>:investigations
-  
+
   # can't destroy the assets, because these might be valuable even in the absence of the parent project
   has_many :assets, :dependent => :nullify
   
@@ -59,7 +59,6 @@ class Project < ActiveRecord::Base
     #TODO: write a test to check they are ordered
     return res.sort{|a,b| a.last_name <=> b.last_name}
   end
-  
   
   # "false" returned by this helper method won't mean that no avatars are uploaded for this project;
   # it rather means that no avatar (other than default placeholder) was selected for the project 
