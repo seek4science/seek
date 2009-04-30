@@ -1,31 +1,33 @@
+<%= javascript_include_tag "studies.js"  %>
 
 <%= f.error_messages -%>
 
-<center>
 
 
-
-  <p>
-    <%= f.label :title -%><br/>
-    <%= f.text_field :title,:size=>52 -%>
-  </p>
-
-  <p>
-    <%= f.label :description -%><br/>
-    <%= f.text_area :description,:cols=>50,:rows=>5 -%>
-  </p>
-
-  <p>
-    <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %>
-  </p>
-
-
-
-
-</center>
 <p>
-  <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} %>
+  <%= f.label :title -%><br/>
+  <%= f.text_field :title,:size=>52 -%>
 </p>
+
+<p>
+  <%= f.label :description -%><br/>
+  <%= f.text_area :description,:cols=>50,:rows=>5 -%>
+</p>
+
+<div class="fold">
+  <div class="foldTitle">Assay type</div>
+  <div class="foldContent">
+    <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %>
+  </div>
+</div>
+
+
+<div class="fold">
+  <div class="foldTitle">Assay SOPs</div>
+  <div class="foldContent">
+    <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} %>
+  </div>
+</div>
 
 
 

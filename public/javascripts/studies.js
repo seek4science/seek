@@ -57,11 +57,7 @@ function addSelectedSop() {
     }
 }
 
-
-
-
-
-function deleteSop(id) {
+function removeSop(id) {
     // remove the actual record for the attribution
     for(var i = 0; i < sops.length; i++)
         if(sops[i][1] == id) {
@@ -85,7 +81,7 @@ function updateSops() {
         sop_text += '<b>' + type + '</b>: ' + title
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:deleteSop('+id+'); return(false);">delete</a>]</small><br/>';
+        + '[<a href="" onclick="javascript:removeSop('+id+'); return(false);">remove</a>]</small><br/>';
         sop_ids.push(id)
     }
 
@@ -102,9 +98,9 @@ function updateSops() {
         $('sop_to_list').innerHTML = sop_text;
     }
 
-    clearList('experiment_sop_ids');
+    clearList('assay_sop_ids');
 
-    select=$('experiment_sop_ids')
+    select=$('assay_sop_ids')
     for (i=0;i<sop_ids.length;i++) {
         id=sop_ids[i]
         o=document.createElement('option')
