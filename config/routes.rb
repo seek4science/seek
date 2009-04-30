@@ -2,15 +2,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :investigations
 
   map.resources :studies
-
   
   map.resources :assays
 
   map.resources :assets
 
-  map.resources :data_files, :member => {:download => :get}
-
-  map.resources :experiments
+  map.resources :data_files, :member => {:download => :get}  
 
   map.resources :expertise
 
@@ -39,8 +36,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
 
-  map.resource :session    
-  
+  map.resource :session      
   
   # browsing by countries
   map.country '/countries/:country_name', :controller => 'countries', :action => 'show'

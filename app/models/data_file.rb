@@ -14,7 +14,7 @@ class DataFile < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED
 
-  belongs_to :experiment
+  #FIXME: associate with assay
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
