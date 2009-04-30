@@ -30,6 +30,15 @@
 
 </div>
 
+<script type="text/javascript">
+<% @assay.sops.each do |s| -%>
+    sop_id = <%= s.id -%>;
+    sop_title = '<%= s.title -%>';
+    addSop(sop_title,sop_id);
+<% end -%>
+
+  updateSops();
+</script>
 
 
 
