@@ -17,6 +17,7 @@ class Project < ActiveRecord::Base
            :dependent => :destroy
 
   has_many :investigations
+  has_many :studies, :through=>:investigations
   
   # can't destroy the assets, because these might be valuable even in the absence of the parent project
   has_many :assets, :dependent => :nullify
