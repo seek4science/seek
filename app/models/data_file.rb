@@ -12,9 +12,7 @@ class DataFile < ActiveRecord::Base
   belongs_to :content_blob,
              :dependent => :destroy
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED
-
-  #FIXME: associate with assay
+  acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED  
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
