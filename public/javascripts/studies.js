@@ -139,7 +139,7 @@ function addSelectedAssay() {
     }
 }
 
-function deleteAssay(id) {
+function removeAssay(id) {
     // remove the actual record for the attribution
     for(var i = 0; i < assays.length; i++)
         if(assays[i][1] == id) {
@@ -163,7 +163,7 @@ function updateAssays() {
         assay_text += '<b>' + type + '</b>: ' + title
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:deleteAssay('+id+'); return(false);">delete</a>]</small><br/>';
+        + '[<a href="" onclick="javascript:removeAssay('+id+'); return(false);">remove</a>]</small><br/>';
         assay_ids.push(id)
     }
 

@@ -1,0 +1,14 @@
+
+<p class="title">
+  <%= h sop.title %>
+</p>
+
+<p class="project">
+  Project: <%= h sop.asset.project.name %>
+</p>
+<p class="author">
+  Author: <%= h sop.contributor.person.name %>
+</p>
+<p class="description">
+  <%= truncate(h(sop.description),:length=>400) %>
+</p>

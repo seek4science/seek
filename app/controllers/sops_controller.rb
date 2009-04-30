@@ -17,6 +17,13 @@ class SopsController < ApplicationController
     end
   end
 
+  def sop_preview_ajax
+    
+    render :update do |page|
+      page.replace_html "sop_preview",:partial=>"sop_preview",:locals=>{:sop=>@sop}
+    end
+  end
+
   # GET /sops/1
   def show
     # store timestamp of the previous last usage
@@ -201,8 +208,12 @@ class SopsController < ApplicationController
   def find_sop_auth
     begin
       sop = Sop.find(params[:id])
-      
-      if Authorization.is_authorized?(action_name, nil, sop, current_user)
+
+      #FIXME: dont hard-code the handling of show_sop_preview
+      action_for_auth=action_name
+      action_for_auth="show" if action_for_auth=="sop_preview_ajax"
+
+      if Authorization.is_authorized?(action_for_auth, nil, sop, current_user)
         @sop = sop
       else
         respond_to do |format|

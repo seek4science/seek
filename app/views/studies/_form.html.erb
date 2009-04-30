@@ -1,11 +1,6 @@
 <%= javascript_include_tag "studies.js" %>
 
-<script type="text/javascript">
-  function show_ajax_loader(element) {
-    $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
-  }
 
-</script>
 <%= error_messages_for :study %>
 
 

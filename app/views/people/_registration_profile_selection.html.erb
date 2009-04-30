@@ -7,10 +7,7 @@
       $('person_list_submit').disabled=true;
     }
   }
-
-  function show_ajax_loader() {
-    $('people_list').innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
-  }
+  
 </script>
 
 <h1>Profile selection</h1>
@@ -40,7 +37,7 @@
           :update=>:people_list,
           :url=>{:action=>"userless_project_selected_ajax"},
           :with=>"'project_id='+this.value",
-          :before=>"show_ajax_loader()"
+          :before=>"show_ajax_loader('people_list')"
         )
       }
       -%>

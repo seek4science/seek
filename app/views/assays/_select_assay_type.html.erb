@@ -1,0 +1,3 @@
+
+<%= f.label :assay_type %><br/>
+<%= f.select :assay_type,AssayType.find(:all).collect{|a| [a.title,a.id]} %>

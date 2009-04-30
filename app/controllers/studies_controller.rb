@@ -72,11 +72,9 @@ class StudiesController < ApplicationController
     @investigation.project=project
 
     respond_to do |format|
-      format.js # new_popup.html.erb
+      format.js 
     end
   end
-
-
 
   def create
     @study = Study.new(params[:study])

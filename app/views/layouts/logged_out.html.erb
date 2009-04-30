@@ -10,16 +10,22 @@
     <%= stylesheet_link_tag 'my_exp' %>
     <%= stylesheet_link_tag 'gadgets' %>
     <%= stylesheet_link_tag 'styles'  %>
-    
-		<%= javascript_include_tag :defaults %>
+
+    <%= javascript_include_tag :defaults %>
     <%= javascript_include_tag "boxover.js" %>
     <%= javascript_include_tag 'scriptaculous.js'  %>
+
+    <script type="text/javascript">
+      function show_ajax_loader(element) {
+        $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
+      }
+    </script>
   </head>
-  
-  
-  
+
+
+
   <body>
-    
+
     <div id="doc2" class="yui-t2">
       <div id="hd">
         <div id="header">
@@ -31,32 +37,32 @@
         </div>
       </div>
       <div id="bd" style="min-height:45em">
-        <div id="yui-main"> 
-            <%# applying styling to error / notice messages -%>
-						<% if flash[:error] %>
-							<div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
-								<%= link_to_function image_tag("close.gif", :style => "float: right;"), 
-																		 visual_effect(:toggle_slide, "error_flash", :duration => 0.3) %>
-								<%= white_list flash[:error] %>
-							</div>
-						<% end %>
-    				<% if flash[:notice] %>
-							<div id="notice_flash" class="box_standout" style="color: green; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
-								<%= link_to_function image_tag("close.gif", :style => "float: right;"), 
-																		 visual_effect(:toggle_slide, "notice_flash", :duration => 0.3) %>
-								<%= white_list flash[:notice] %>
-							</div>
-						<% end %>
-						
-						<%# main content part of every page -%>
-            <%= yield :layout %>
+        <div id="yui-main">
+          <%# applying styling to error / notice messages -%>
+          <% if flash[:error] %>
+            <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
+              <%= link_to_function image_tag("close.gif", :style => "float: right;"),
+                visual_effect(:toggle_slide, "error_flash", :duration => 0.3) %>
+              <%= white_list flash[:error] %>
+            </div>
+          <% end %>
+          <% if flash[:notice] %>
+            <div id="notice_flash" class="box_standout" style="color: green; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
+              <%= link_to_function image_tag("close.gif", :style => "float: right;"),
+                visual_effect(:toggle_slide, "notice_flash", :duration => 0.3) %>
+              <%= white_list flash[:notice] %>
+            </div>
+          <% end %>
+
+          <%# main content part of every page -%>
+          <%= yield :layout %>
         </div>
       </div>
       <div id="ft">
         <%= render :partial=>"layouts/footer" %>
       </div>
-      
+
     </div>
-    
+
   </body>
 </html>

@@ -1,0 +1,23 @@
+
+<div class="yui-g">
+  <div class="yui-u first">
+    <%= label_tag :sops %><br/>
+
+    <%= f.select :sops,
+      [["Select Sop ...",0]]|authorised_sops_for_user.collect{|s| [truncate(h(s.title),:length=>50),s.id]},{},
+      {:onchange=>remote_function(
+        :url=>{:action=>"sop_preview_ajax",:controller=>"sops"},
+        :with=>"'id='+this.value",
+        :before=>"show_ajax_loader('sop_preview')"
+      )
+    } -%>
+  </div>
+
+  <div id="sop_preview" class="yui-u">
+    <center>SOP preview</center>
+  </div>
+
+</div>
+
+
+

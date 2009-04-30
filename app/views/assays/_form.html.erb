@@ -1,0 +1,35 @@
+
+<%= f.error_messages -%>
+
+<center>
+
+
+
+  <p>
+    <%= f.label :title -%><br/>
+    <%= f.text_field :title,:size=>52 -%>
+  </p>
+
+  <p>
+    <%= f.label :description -%><br/>
+    <%= f.text_area :description,:cols=>50,:rows=>5 -%>
+  </p>
+
+  <p>
+    <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %>
+  </p>
+
+
+
+
+</center>
+<p>
+  <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} %>
+</p>
+
+
+
+<p style="margin-top: 2em; text-align: center;" >
+  <%= f.submit(action==:edit ? "Update" : "Create") -%>
+  or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>
+</p>

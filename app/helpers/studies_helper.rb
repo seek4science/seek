@@ -3,7 +3,7 @@ module StudiesHelper
 
 
   def new_investigation_to_project_popup_link project_id
-    return link_to_remote_redbox("New investigation",
+    return link_to_remote_redbox("Create",
       {:url=>new_investigation_url(:project_id=>project_id),
         :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
       {:id => "create_new_investigation_redbox"}

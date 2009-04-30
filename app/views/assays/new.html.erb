@@ -1,0 +1,8 @@
+
+<h1>New assay</h1>
+
+<div class="show_basic">
+	<% form_for @assay do |f| %>
+	  <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+	<% end -%>
+</div>

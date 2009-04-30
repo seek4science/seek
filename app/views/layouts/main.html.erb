@@ -10,6 +10,13 @@
     <%= javascript_include_tag :defaults,'boxover.js','scriptaculous.js', 'redbox.js', 'autocompleter_advanced.js' %>
 
     <%= stylesheet_link_tag 'reset-fonts-grids', 'base-min', 'my_exp', 'gadgets', 'acts_as_taggable_stylesheet', 'styles', 'fast_auto_complete', 'redbox', 'autocompleter_advanced', :cache=>'css_cached'%>
+
+    <script type="text/javascript">
+      function show_ajax_loader(element) {
+        $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%> ;
+      }
+    </script>
+    
   </head>
 
 
@@ -44,7 +51,7 @@
                 <%= white_list flash[:notice] %>
               </div>
             <% end %>
-            
+
             <%# main content part of every page -%>
             <%= yield :layout %>
 
