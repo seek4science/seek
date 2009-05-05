@@ -11,7 +11,7 @@
     </p>
     <br/>
     <%= label_tag :sops %><br/>
-    <%= f.collection_select :sop_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" %>
+    
 
     <%= select_tag :possible_sops,
       options_for_select([["Select Sop ...",0]]|authorised_sops_for_user.collect{|s| [truncate(h(s.title),:length=>32),s.id]}),
@@ -21,6 +21,7 @@
         :before=>"show_ajax_loader('sop_preview')"
       )
     } -%>
+    <%= f.collection_select :sop_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" -%>
     <b><%= link_to_function "Add","addSelectedSop(); return(false);" %></b>
   </div>
 
