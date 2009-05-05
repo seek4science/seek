@@ -89,7 +89,7 @@
   </div>
 
   <%= render :partial=>"roles",:locals=>{:editable=>true} -%>
-  
+
 <% end %>
 
 
@@ -111,12 +111,22 @@
 
   <%# only makes sense to display these settings when the person has "user" associated with it; -%>
   <%# also, can only do this if the person is not an admin, too - because admins cannot edit accounts of each other -%>
-  <% if person && person.user && (mine?(person) || !person.user.is_admin?) -%>
-    <p style="line-height: 1.8;">
-      <label for="can_edit_projects" style="font-weight: normal;"><%= check_box_tag "can_edit_projects", true, (person.user.can_edit_projects || person.user.is_admin?) -%>Allow this person to edit <b>projects</b> they work in.</label><br/>
-      <label for="can_edit_institutions" style="font-weight: normal;"><%= check_box_tag "can_edit_institutions", true, (person.user.can_edit_institutions || person.user.is_admin?) -%>Allow this person to edit <b>institutions</b> they work in.</label>
-    </p>
-  <% end -%>
+  <p style="line-height: 1.8;">
+    <% if person && person.user && (mine?(person) || !person.user.is_admin?) -%>
+      <label for="can_edit_projects" style="font-weight: normal;">
+        <%= check_box_tag "can_edit_projects", true, (person.user.can_edit_projects || person.user.is_admin?) -%>Allow this person to edit <b>projects</b> they work in.
+      </label><br/>
+      <label for="can_edit_institutions" style="font-weight: normal;">
+        <%= check_box_tag "can_edit_institutions", true, (person.user.can_edit_institutions || person.user.is_admin?) -%>Allow this person to edit <b>institutions</b> they work in.
+      </label><br/>
+    <% end -%>
+    <% if current_user.is_admin? -%>
+      <label for="is_pal" style="font-weight: normal;">
+        <%= f.check_box :is_pal -%>
+        This person is a certified <b>SysMo-DB PAL</b>
+      </label>
+    <% end -%>
+  </p>
 <% end -%>
 
 <p style="text-align: center; margin-top: 1.5em;">

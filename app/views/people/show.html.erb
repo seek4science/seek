@@ -1,7 +1,5 @@
 <% drag_id=model_to_drag_id @person %>
 
-<% truncate_length_for_boxes = 22 -%>
-
 <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
   <ul class="sectionIcons">
     <li><%= icon('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%></li>
@@ -81,7 +79,7 @@
   <div style="clear:both;">
     <br/>
     <hr/>
-    
+
     <p>
       <b>About me:</b>
       <div id="description" class="box_standout">
@@ -90,7 +88,7 @@
     </p>
 
     <br/>
-    
+
     <div class="fold">
       <div class="foldTitle">Contact details</div>
       <div class="foldContent" style="display:none;">
@@ -114,8 +112,6 @@
       </div>
     </div>
 
-
-
     <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
 
     <div class="fold">
@@ -128,23 +124,25 @@
         <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
           :narrow_view => true,
           :authorization_already_done => true } -%>
-
-
-        <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
-        <%# this is because it's not needed then: admins can see everything anyway -%>
-        <% if current_user.is_admin? && @person.user && !@person.user.is_admin? -%>
-          <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
-          <% if @person.user -%>
-            <ul>
-              <li>Editing <b>projects</b>, where this person is involved: <%= @person.user.can_edit_projects ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
-              <li>Editing <b>institutions</b>, where this person works with: <%= @person.user.can_edit_institutions ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
-            </ul>
-          <% else -%>
-            <p>No "user" instance detected for this person. User has not registered yet.</p>
-          <% end -%>
-        <% end -%>
       </div>
     </div>
+
+
+    <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
+    <%# this is because it's not needed then: admins can see everything anyway -%>
+    <% if current_user.is_admin?  -%>
+      <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
+      <ul>
+        <%= "<li>This person is a SysMo-DB PAL<li>" if @person.is_pal?  %>
+        <% if @person.user -%>
+          <li>Editing <b>projects</b>, where this person is involved: <%= @person.user.can_edit_projects ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
+          <li>Editing <b>institutions</b>, where this person works with: <%= @person.user.can_edit_institutions ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
+        <% else -%>
+          <li class="none_text">No "user" instance detected for this person. User has not registered yet.</li>
+        <% end -%>
+      </ul>
+    <% end -%>
+
 
   </div>
 
