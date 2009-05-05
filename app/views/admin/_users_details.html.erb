@@ -1,12 +1,21 @@
+<%
+people||=nil
+collection= !people.nil? ? people : users
+%>
 <div class="fold">
-  <div class="foldTitle"><%= "#{title} [#{users.size}]" %></div>
+  <div class="foldTitle"><%= "#{title} [#{collection.size}]" %></div>
   <div class="foldContent" style="display:none;">
     <ul id="users_details">
 
-      <% for u in users %>
-        <li>
-          <%= render :partial=>"user_details",:locals=>{:user=>u} %>
-        </li>
+      <% for el in collection -%>
+        <%  if el.instance_of?(Person) -%>
+            <%= render :partial=>"profile_details",:locals=>{:profile=>el} %>
+        <% else -%>
+          <li>
+            <%= render :partial=>"user_details",:locals=>{:user=>el} %>
+          </li>
+
+        <% end -%>
       <% end -%>
     </ul>
   </div>

@@ -1,0 +1,17 @@
+<%
+user=profile.user
+-%>
+
+<ul id="user_details">
+  <% if user -%>
+    <li>User ID:<%= user.id %></li>
+    <li>Login: <%= h user.login  %></li>
+  <% else -%>
+      <span class='none_text'>No associated user</span>
+  <% end -%>
+  <li class="profile">
+
+    <%= link_to h(profile.name),profile %>
+
+  </li>
+</ul>
