@@ -3,33 +3,38 @@
 <%= f.error_messages -%>
 
 
+<center>
+  <div style="width: 60%;">
+    <p>
+      <%= f.label :title -%><br/>
+      <%= f.text_field :title,:size=>52 -%>
+    </p>
 
-<p>
-  <%= f.label :title -%><br/>
-  <%= f.text_field :title,:size=>52 -%>
-</p>
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :description,:cols=>50,:rows=>10 -%>
+    </p>
+  </div>
+</center>
 
-<p>
-  <%= f.label :description -%><br/>
-  <%= f.text_area :description,:cols=>50,:rows=>5 -%>
-</p>
 
+<p style="margin: 1em 0 0 0;">
 <div class="fold">
   <div class="foldTitle">Assay type</div>
   <div class="foldContent">
     <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %>
   </div>
 </div>
+</p>
 
-
+<p style="margin: 1em 0 0 0;">
 <div class="fold">
   <div class="foldTitle">Assay SOPs</div>
   <div class="foldContent">
     <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} %>
   </div>
 </div>
-
-
+</p>
 
 <p style="margin-top: 2em; text-align: center;" >
   <%= f.submit(action==:edit ? "Update" : "Create") -%>

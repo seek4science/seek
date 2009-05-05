@@ -4,7 +4,7 @@ class SopsController < ApplicationController
   before_filter :login_required, :except => [ :index, :show, :download ]
   
   before_filter :find_sops, :only => [ :index ]
-  before_filter :find_sop_auth, :except => [ :index, :new, :create ]
+  before_filter :find_sop_auth, :except => [ :index, :new, :create,:sop_preview_ajax ]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
@@ -18,9 +18,17 @@ class SopsController < ApplicationController
   end
 
   def sop_preview_ajax
-    
+
+    if params[:id] && params[:id]!="0"
+      @sop=Sop.find(params[:id])
+    end
+        
     render :update do |page|
-      page.replace_html "sop_preview",:partial=>"sop_preview",:locals=>{:sop=>@sop}
+      if @sop && Authorization.is_authorized?("show", nil, @sop, current_user)
+        page.replace_html "sop_preview",:partial=>"sop_preview",:locals=>{:sop=>@sop}
+      else
+        page.replace_html "sop_preview",:text=>"No Sop is selected, or authorised to show."
+      end
     end
   end
 
@@ -163,12 +171,12 @@ class SopsController < ApplicationController
         Relationship.create_or_update_attributions(@sop, params[:attributions])
         
         if policy_err_msg.blank?
-            flash[:notice] = 'SOP metadata was successfully updated.'
-            format.html { redirect_to sop_path(@sop) }
-          else
-            flash[:notice] = "SOP metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
-          end
+          flash[:notice] = 'SOP metadata was successfully updated.'
+          format.html { redirect_to sop_path(@sop) }
+        else
+          flash[:notice] = "SOP metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
+        end
       else
         format.html { 
           set_parameters_for_sharing_form()
@@ -192,7 +200,7 @@ class SopsController < ApplicationController
   
   def find_sops
     found = Sop.find(:all, 
-                     :order => "title")
+      :order => "title")
     
     # this is only to make sure that actual binary data isn't sent if download is not
     # allowed - this is to increase security & speed of page rendering;
@@ -208,10 +216,6 @@ class SopsController < ApplicationController
   def find_sop_auth
     begin
       sop = Sop.find(params[:id])
-
-      #FIXME: dont hard-code the handling of show_sop_preview
-      action_for_auth=action_name
-      action_for_auth="show" if action_for_auth=="sop_preview_ajax"
 
       if Authorization.is_authorized?(action_for_auth, nil, sop, current_user)
         @sop = sop

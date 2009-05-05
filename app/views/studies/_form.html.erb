@@ -54,10 +54,10 @@
 
     <p>
       <%= f.label :investigation %><br/>
-      <span id="investigation_collection">
+      <div id="investigation_collection">
         <% investigations = @study.project ? @study.project.investigations : [] -%>
         <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>investigations} -%>
-      </span>
+      </div>
       <br/>
     </p>
 
