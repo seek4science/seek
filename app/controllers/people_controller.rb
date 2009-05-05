@@ -6,6 +6,7 @@ class PeopleController < ApplicationController
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
+  before_filter :auth_params,:only=>[:update,:create]
   
   
   def auto_complete_for_tools_name
@@ -177,6 +178,7 @@ class PeopleController < ApplicationController
     @person.disciplines.clear if params[:discipline_ids].nil?
 
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
+    
     avatar_id = params[:person].delete(:avatar_id).to_i
     @person.avatar_id = ((avatar_id.kind_of?(Fixnum) && avatar_id > 0) ? avatar_id : nil)
     
@@ -201,7 +203,6 @@ class PeopleController < ApplicationController
     
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
-
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -283,6 +284,13 @@ class PeopleController < ApplicationController
       redirect_to("/")
     end
     !!current_user
+  end
+
+  #checks the params attributes and strips those that cannot be set by non-admins, or other policy
+  def auth_params
+    if !current_user.is_admin?
+      params[:person].delete(:is_pal) if params[:person]
+    end
   end
  
 end
