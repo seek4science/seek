@@ -217,7 +217,7 @@ class SopsController < ApplicationController
     begin
       sop = Sop.find(params[:id])
 
-      if Authorization.is_authorized?(action_for_auth, nil, sop, current_user)
+      if Authorization.is_authorized?(action_name, nil, sop, current_user)
         @sop = sop
       else
         respond_to do |format|
