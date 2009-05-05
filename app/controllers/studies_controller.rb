@@ -4,6 +4,7 @@ class StudiesController < ApplicationController
 
   before_filter :set_no_layout, :only => [ :new_investigation,:new_assay ]
   before_filter :is_user_admin_auth, :only=>[:destroy]
+  before_filter :is_project_member,:only=>[:create,:new]
 
   protect_from_forgery :except=>[:create_investigation,:create_assay]
 
@@ -19,6 +20,9 @@ class StudiesController < ApplicationController
 
   def new
     @study = Study.new
+    respond_to do |format|
+      format.html
+    end
   end
 
   def edit
@@ -133,4 +137,12 @@ class StudiesController < ApplicationController
 
   end
 
+  def is_project_member
+
+    if !Authorization.is_member?(current_user.person_id, nil, nil)
+      flash[:error] = "You are not authorized to create new Studies. Only members of known projects, institutions or work groups are allowed to create new content."
+      redirect_to studies_path
+    end
+    
+  end
 end
