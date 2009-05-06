@@ -2,7 +2,7 @@
 
   function newAsset() {
     selected_model=$('model_type').value;
-    alert(selected_model);
+    
     if (selected_model == "model") {
       location.href = "<%= new_model_path -%>";
     }
