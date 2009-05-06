@@ -15,813 +15,858 @@
   <UML:Namespace.ownedElement>
     <UML:Model xmi.id="UMLModel.6" name="Design Model">
       <UML:Namespace.ownedElement>
-        <UML:Class xmi.id="UMLClass.177" name="assay_types" participant="UMLAssociationEnd.19">
+        <UML:Class xmi.id="UMLClass.186" name="assay_types" participant="UMLAssociationEnd.19">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.179' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.181' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.182' name='parent_assay_type_id' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.184' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.185' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.188' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.190' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.192' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.193' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.187" name="assays" participant="UMLAssociationEnd.18 UMLAssociationEnd.21 UMLAssociationEnd.28">
+        <UML:Class xmi.id="UMLClass.195" name="assays" participant="UMLAssociationEnd.18 UMLAssociationEnd.21 UMLAssociationEnd.28 UMLAssociationEnd.31 UMLAssociationEnd.37">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.188' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.189' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.190' name='description' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.191' name='assay_type_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.192' name='parent_assay_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.193' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.194' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.196' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.197' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.198' name='description' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.199' name='assay_type_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.200' name='parent_assay_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.201' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.202' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.196" name="assays_experiments" participant="UMLAssociationEnd.24 UMLAssociationEnd.27">
+        <UML:Class xmi.id="UMLClass.204" name="assays_experiments" participant="UMLAssociationEnd.24 UMLAssociationEnd.27">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.197' name='experiment_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.198' name='assay_id' type='X.178'/>
+            <UML:Attribute xmi.id='UMLAttribute.205' name='experiment_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.206' name='assay_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.200" name="assets" participant="UMLAssociationEnd.30 UMLAssociationEnd.33 UMLAssociationEnd.36 UMLAssociationEnd.39 UMLAssociationEnd.42 UMLAssociationEnd.94">
+        <UML:Class xmi.id="UMLClass.208" name="assays_sops" participant="UMLAssociationEnd.30 UMLAssociationEnd.33">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.201' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.202' name='contributor_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.203' name='contributor_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.204' name='project_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.205' name='resource_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.206' name='resource_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.207' name='source_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.208' name='source_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.209' name='quality' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.210' name='policy_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.211' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.212' name='updated_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.213' name='last_used_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.209' name='assay_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.210' name='sop_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.215" name="avatars" participant="UMLAssociationEnd.45 UMLAssociationEnd.112 UMLAssociationEnd.124 UMLAssociationEnd.139">
+        <UML:Class xmi.id="UMLClass.212" name="assays_studies" participant="UMLAssociationEnd.36 UMLAssociationEnd.39">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.216' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.217' name='owner_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.218' name='owner_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.219' name='original_filename' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.220' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.221' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.213' name='assay_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.214' name='study_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.223" name="content_blobs" participant="UMLAssociationEnd.52 UMLAssociationEnd.118 UMLAssociationEnd.154">
+        <UML:Class xmi.id="UMLClass.216" name="assets" participant="UMLAssociationEnd.42 UMLAssociationEnd.45 UMLAssociationEnd.48 UMLAssociationEnd.51 UMLAssociationEnd.54 UMLAssociationEnd.91">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.224' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.226' name='data' type='X.225'/>
+            <UML:Attribute xmi.id='UMLAttribute.217' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.218' name='contributor_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.219' name='contributor_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.220' name='project_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.221' name='resource_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.222' name='resource_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.223' name='source_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.224' name='source_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.225' name='quality' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.226' name='policy_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.227' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.228' name='updated_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.229' name='last_used_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.228" name="data_files" participant="UMLAssociationEnd.48 UMLAssociationEnd.51 UMLAssociationEnd.54 UMLAssociationEnd.57">
+        <UML:Class xmi.id="UMLClass.231" name="avatars" participant="UMLAssociationEnd.57 UMLAssociationEnd.109 UMLAssociationEnd.124 UMLAssociationEnd.139">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.229' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.230' name='contributor_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.231' name='contributor_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.232' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.234' name='description' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.235' name='original_filename' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.236' name='content_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.237' name='content_blob_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.238' name='experiment_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.239' name='template_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.240' name='last_used_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.241' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.242' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.232' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.233' name='owner_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.234' name='owner_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.235' name='original_filename' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.236' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.237' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.244" name="disciplines" participant="UMLAssociationEnd.61">
+        <UML:Class xmi.id="UMLClass.239" name="content_blobs" participant="UMLAssociationEnd.64 UMLAssociationEnd.118 UMLAssociationEnd.154">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.245' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.246' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.247' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.248' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.240' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.242' name='data' type='X.241'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.250" name="disciplines_people" participant="UMLAssociationEnd.60 UMLAssociationEnd.63">
+        <UML:Class xmi.id="UMLClass.244" name="data_files" participant="UMLAssociationEnd.60 UMLAssociationEnd.63 UMLAssociationEnd.66">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.251' name='discipline_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.252' name='person_id' type='X.178'/>
+            <UML:Attribute xmi.id='UMLAttribute.245' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.246' name='contributor_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.247' name='contributor_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.248' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.250' name='description' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.251' name='original_filename' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.252' name='content_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.253' name='content_blob_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.254' name='template_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.255' name='last_used_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.256' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.257' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.254" name="experiment_types" participant="UMLAssociationEnd.67">
+        <UML:Class xmi.id="UMLClass.259" name="disciplines" participant="UMLAssociationEnd.70">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.255' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.256' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.257' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.258' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.260' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.261' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.262' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.263' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.260" name="experiments" participant="UMLAssociationEnd.25 UMLAssociationEnd.55 UMLAssociationEnd.66 UMLAssociationEnd.69 UMLAssociationEnd.72 UMLAssociationEnd.75 UMLAssociationEnd.79">
+        <UML:Class xmi.id="UMLClass.265" name="disciplines_people" participant="UMLAssociationEnd.69 UMLAssociationEnd.72">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.261' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.262' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.263' name='description' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.264' name='experiment_type_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.265' name='topic_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.266' name='experimentalist' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.267' name='begin_date' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.268' name='person_responsible_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.269' name='organism_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.270' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.271' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.266' name='discipline_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.267' name='person_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.273" name="experiments_sops" participant="UMLAssociationEnd.78 UMLAssociationEnd.81">
+        <UML:Class xmi.id="UMLClass.269" name="experiments_sops" participant="UMLAssociationEnd.75 UMLAssociationEnd.78">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.274' name='experiment_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.275' name='sop_id' type='X.178'/>
+            <UML:Attribute xmi.id='UMLAttribute.270' name='experiment_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.271' name='sop_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.277" name="favourite_group_memberships" participant="UMLAssociationEnd.84 UMLAssociationEnd.87">
+        <UML:Class xmi.id="UMLClass.273" name="favourite_group_memberships" participant="UMLAssociationEnd.81 UMLAssociationEnd.84">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.278' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.279' name='person_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.280' name='favourite_group_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.282' name='access_type' type='X.281'/>
-            <UML:Attribute xmi.id='UMLAttribute.283' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.284' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.274' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.275' name='person_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.276' name='favourite_group_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.278' name='access_type' type='X.277'/>
+            <UML:Attribute xmi.id='UMLAttribute.279' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.280' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.286" name="favourite_groups" participant="UMLAssociationEnd.88 UMLAssociationEnd.90">
+        <UML:Class xmi.id="UMLClass.282" name="favourite_groups" participant="UMLAssociationEnd.85 UMLAssociationEnd.87">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.287' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.288' name='user_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.289' name='name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.290' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.291' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.283' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.284' name='user_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.285' name='name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.286' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.287' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.293" name="favourites" participant="UMLAssociationEnd.93 UMLAssociationEnd.96">
+        <UML:Class xmi.id="UMLClass.289" name="favourites" participant="UMLAssociationEnd.90 UMLAssociationEnd.93">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.294' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.295' name='asset_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.296' name='user_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.297' name='model_name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.298' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.299' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.290' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.291' name='asset_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.292' name='user_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.293' name='model_name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.294' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.295' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.301" name="group_memberships" participant="UMLAssociationEnd.99 UMLAssociationEnd.102 UMLAssociationEnd.106">
+        <UML:Class xmi.id="UMLClass.297" name="group_memberships" participant="UMLAssociationEnd.96 UMLAssociationEnd.99 UMLAssociationEnd.103">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.302' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.303' name='person_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.304' name='work_group_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.305' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.306' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.298' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.299' name='person_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.300' name='work_group_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.301' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.302' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.308" name="group_memberships_roles" participant="UMLAssociationEnd.105 UMLAssociationEnd.108">
+        <UML:Class xmi.id="UMLClass.304" name="group_memberships_roles" participant="UMLAssociationEnd.102 UMLAssociationEnd.105">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.309' name='group_membership_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.310' name='role_id' type='X.178'/>
+            <UML:Attribute xmi.id='UMLAttribute.305' name='group_membership_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.306' name='role_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.312" name="institutions" participant="UMLAssociationEnd.111 UMLAssociationEnd.172">
+        <UML:Class xmi.id="UMLClass.308" name="institutions" participant="UMLAssociationEnd.108 UMLAssociationEnd.181">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.313' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.314' name='name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.315' name='address' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.316' name='city' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.317' name='web_page' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.318' name='country' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.319' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.320' name='updated_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.321' name='avatar_id' type='X.178'/>
+            <UML:Attribute xmi.id='UMLAttribute.309' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.310' name='name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.311' name='address' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.312' name='city' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.313' name='web_page' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.314' name='country' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.315' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.316' name='updated_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.317' name='avatar_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.323" name="models" participant="UMLAssociationEnd.114 UMLAssociationEnd.117 UMLAssociationEnd.120">
+        <UML:Class xmi.id="UMLClass.319" name="investigations" participant="UMLAssociationEnd.111 UMLAssociationEnd.157">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.324' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.325' name='contributor_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.326' name='contributor_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.327' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.328' name='description' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.329' name='original_filename' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.330' name='content_blob_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.331' name='content_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.332' name='model_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.333' name='model_format' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.334' name='recommended_environment_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.335' name='result_graph' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.336' name='last_used_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.337' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.338' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.320' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.321' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.322' name='description' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.323' name='project_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.324' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.325' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.340" name="people" participant="UMLAssociationEnd.64 UMLAssociationEnd.85 UMLAssociationEnd.100 UMLAssociationEnd.123 UMLAssociationEnd.126 UMLAssociationEnd.169">
+        <UML:Class xmi.id="UMLClass.327" name="models" participant="UMLAssociationEnd.114 UMLAssociationEnd.117 UMLAssociationEnd.120">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.341' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.342' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.343' name='updated_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.344' name='first_name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.345' name='last_name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.346' name='email' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.347' name='phone' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.348' name='skype_name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.349' name='web_page' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.350' name='description' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.351' name='avatar_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.352' name='status_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.354' name='is_pal' type='X.353'/>
+            <UML:Attribute xmi.id='UMLAttribute.328' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.329' name='contributor_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.330' name='contributor_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.331' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.332' name='description' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.333' name='original_filename' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.334' name='content_blob_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.335' name='content_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.336' name='model_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.337' name='model_format' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.338' name='recommended_environment_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.339' name='result_graph' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.340' name='last_used_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.341' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.342' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.356" name="permissions" participant="UMLAssociationEnd.129 UMLAssociationEnd.132">
+        <UML:Class xmi.id="UMLClass.344" name="people" participant="UMLAssociationEnd.73 UMLAssociationEnd.82 UMLAssociationEnd.97 UMLAssociationEnd.123 UMLAssociationEnd.126 UMLAssociationEnd.178">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.357' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.358' name='contributor_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.359' name='contributor_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.360' name='policy_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.361' name='access_type' type='X.281'/>
-            <UML:Attribute xmi.id='UMLAttribute.362' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.363' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.345' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.346' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.347' name='updated_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.348' name='first_name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.349' name='last_name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.350' name='email' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.351' name='phone' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.352' name='skype_name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.353' name='web_page' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.354' name='description' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.355' name='avatar_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.356' name='status_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.358' name='is_pal' type='X.357'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.365" name="policies" participant="UMLAssociationEnd.43 UMLAssociationEnd.133 UMLAssociationEnd.135">
+        <UML:Class xmi.id="UMLClass.360" name="permissions" participant="UMLAssociationEnd.129 UMLAssociationEnd.132">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.366' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.367' name='contributor_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.368' name='contributor_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.369' name='name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.370' name='sharing_scope' type='X.281'/>
-            <UML:Attribute xmi.id='UMLAttribute.371' name='access_type' type='X.281'/>
-            <UML:Attribute xmi.id='UMLAttribute.372' name='use_custom_sharing' type='X.353'/>
-            <UML:Attribute xmi.id='UMLAttribute.373' name='use_whitelist' type='X.353'/>
-            <UML:Attribute xmi.id='UMLAttribute.374' name='use_blacklist' type='X.353'/>
-            <UML:Attribute xmi.id='UMLAttribute.375' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.376' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.361' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.362' name='contributor_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.363' name='contributor_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.364' name='policy_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.365' name='access_type' type='X.277'/>
+            <UML:Attribute xmi.id='UMLAttribute.366' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.367' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.378" name="projects" participant="UMLAssociationEnd.34 UMLAssociationEnd.138 UMLAssociationEnd.141 UMLAssociationEnd.166 UMLAssociationEnd.175">
+        <UML:Class xmi.id="UMLClass.369" name="policies" participant="UMLAssociationEnd.55 UMLAssociationEnd.133 UMLAssociationEnd.135">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.379' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.380' name='name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.381' name='web_page' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.382' name='wiki_page' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.383' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.384' name='updated_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.385' name='description' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.386' name='avatar_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.387' name='default_policy_id' type='X.178'/>
+            <UML:Attribute xmi.id='UMLAttribute.370' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.371' name='contributor_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.372' name='contributor_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.373' name='name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.374' name='sharing_scope' type='X.277'/>
+            <UML:Attribute xmi.id='UMLAttribute.375' name='access_type' type='X.277'/>
+            <UML:Attribute xmi.id='UMLAttribute.376' name='use_custom_sharing' type='X.357'/>
+            <UML:Attribute xmi.id='UMLAttribute.377' name='use_whitelist' type='X.357'/>
+            <UML:Attribute xmi.id='UMLAttribute.378' name='use_blacklist' type='X.357'/>
+            <UML:Attribute xmi.id='UMLAttribute.379' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.380' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.389" name="recommended_model_environments" participant="">
+        <UML:Class xmi.id="UMLClass.382" name="projects" participant="UMLAssociationEnd.46 UMLAssociationEnd.112 UMLAssociationEnd.138 UMLAssociationEnd.141 UMLAssociationEnd.175 UMLAssociationEnd.184">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.390' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.391' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.392' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.393' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.383' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.384' name='name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.385' name='web_page' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.386' name='wiki_page' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.387' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.388' name='updated_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.389' name='description' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.390' name='avatar_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.391' name='default_policy_id' type='X.187'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.395" name="relationships" participant="UMLAssociationEnd.144 UMLAssociationEnd.147">
+        <UML:Class xmi.id="UMLClass.393" name="recommended_model_environments" participant="">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.396' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.397' name='subject_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.398' name='subject_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.399' name='predicate' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.400' name='object_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.401' name='object_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.402' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.403' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.394' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.395' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.396' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.397' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.405" name="roles" participant="UMLAssociationEnd.109">
+        <UML:Class xmi.id="UMLClass.399" name="relationships" participant="UMLAssociationEnd.144 UMLAssociationEnd.147">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.406' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.407' name='name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.408' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.409' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.400' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.401' name='subject_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.402' name='subject_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.403' name='predicate' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.404' name='object_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.405' name='object_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.406' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.407' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.411" name="schema_migrations" participant="">
+        <UML:Class xmi.id="UMLClass.409" name="roles" participant="UMLAssociationEnd.106">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.412' name='version' type='X.180'/>
+            <UML:Attribute xmi.id='UMLAttribute.410' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.411' name='name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.412' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.413' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.414" name="sops" participant="UMLAssociationEnd.82 UMLAssociationEnd.150 UMLAssociationEnd.153">
+        <UML:Class xmi.id="UMLClass.415" name="schema_migrations" participant="">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.415' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.416' name='contributor_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.417' name='contributor_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.418' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.419' name='description' type='X.233'/>
-            <UML:Attribute xmi.id='UMLAttribute.420' name='original_filename' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.421' name='content_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.422' name='content_blob_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.423' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.424' name='updated_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.425' name='last_used_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.416' name='version' type='X.189'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.427" name="taggings" participant="UMLAssociationEnd.156 UMLAssociationEnd.159 UMLAssociationEnd.162">
+        <UML:Class xmi.id="UMLClass.418" name="sops" participant="UMLAssociationEnd.34 UMLAssociationEnd.79 UMLAssociationEnd.150 UMLAssociationEnd.153">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.428' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.429' name='tag_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.430' name='taggable_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.431' name='tagger_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.432' name='tagger_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.433' name='taggable_type' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.434' name='context' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.435' name='created_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.419' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.420' name='contributor_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.421' name='contributor_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.422' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.423' name='description' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.424' name='original_filename' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.425' name='content_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.426' name='content_blob_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.427' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.428' name='updated_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.429' name='last_used_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.437" name="tags" participant="UMLAssociationEnd.157">
+        <UML:Class xmi.id="UMLClass.431" name="studies" participant="UMLAssociationEnd.40 UMLAssociationEnd.156 UMLAssociationEnd.159 UMLAssociationEnd.162">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.438' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.439' name='name' type='X.180'/>
+            <UML:Attribute xmi.id='UMLAttribute.432' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.433' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.434' name='description' type='X.249'/>
+            <UML:Attribute xmi.id='UMLAttribute.435' name='investigation_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.436' name='experimentalists' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.437' name='begin_date' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.438' name='person_responsible_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.439' name='organism_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.440' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.441' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.441" name="topics" participant="UMLAssociationEnd.70 UMLAssociationEnd.165">
+        <UML:Class xmi.id="UMLClass.443" name="taggings" participant="UMLAssociationEnd.165 UMLAssociationEnd.168 UMLAssociationEnd.171">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.442' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.443' name='title' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.444' name='project_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.445' name='description' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.446' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.447' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.444' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.445' name='tag_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.446' name='taggable_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.447' name='tagger_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.448' name='tagger_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.449' name='taggable_type' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.450' name='context' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.451' name='created_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.449" name="users" participant="UMLAssociationEnd.91 UMLAssociationEnd.97 UMLAssociationEnd.168">
+        <UML:Class xmi.id="UMLClass.453" name="tags" participant="UMLAssociationEnd.166">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.450' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.451' name='login' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.452' name='email' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.454' name='crypted_password' type='X.453'/>
-            <UML:Attribute xmi.id='UMLAttribute.455' name='salt' type='X.453'/>
-            <UML:Attribute xmi.id='UMLAttribute.456' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.457' name='updated_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.458' name='remember_token' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.459' name='remember_token_expires_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.460' name='activation_code' type='X.453'/>
-            <UML:Attribute xmi.id='UMLAttribute.461' name='activated_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.462' name='person_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.463' name='is_admin' type='X.353'/>
-            <UML:Attribute xmi.id='UMLAttribute.464' name='can_edit_projects' type='X.353'/>
-            <UML:Attribute xmi.id='UMLAttribute.465' name='can_edit_institutions' type='X.353'/>
-            <UML:Attribute xmi.id='UMLAttribute.466' name='reset_password_code' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.467' name='reset_password_code_until' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.454' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.455' name='name' type='X.189'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.469" name="work_groups" participant="UMLAssociationEnd.103 UMLAssociationEnd.171 UMLAssociationEnd.174">
+        <UML:Class xmi.id="UMLClass.457" name="technology_types" participant="">
           <UML:Classifier.feature>
-            <UML:Attribute xmi.id='UMLAttribute.470' name='id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.471' name='name' type='X.180'/>
-            <UML:Attribute xmi.id='UMLAttribute.472' name='institution_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.473' name='project_id' type='X.178'/>
-            <UML:Attribute xmi.id='UMLAttribute.474' name='created_at' type='X.183'/>
-            <UML:Attribute xmi.id='UMLAttribute.475' name='updated_at' type='X.183'/>
+            <UML:Attribute xmi.id='UMLAttribute.458' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.459' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.460' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.461' name='updated_at' type='X.191'/>
           </UML:Classifier.feature>
         </UML:Class>
-        <UML:Class xmi.id="UMLClass.477" name="parent_assays" participant="UMLAssociationEnd.22"/>
-        <UML:Class xmi.id="UMLClass.479" name="contributors" participant="UMLAssociationEnd.31 UMLAssociationEnd.49 UMLAssociationEnd.115 UMLAssociationEnd.130 UMLAssociationEnd.136 UMLAssociationEnd.151"/>
-        <UML:Class xmi.id="UMLClass.481" name="resources" participant="UMLAssociationEnd.37"/>
-        <UML:Class xmi.id="UMLClass.483" name="sources" participant="UMLAssociationEnd.40"/>
-        <UML:Class xmi.id="UMLClass.485" name="owners" participant="UMLAssociationEnd.46"/>
-        <UML:Class xmi.id="UMLClass.487" name="templates" participant="UMLAssociationEnd.58"/>
-        <UML:Class xmi.id="UMLClass.489" name="person_responsibles" participant="UMLAssociationEnd.73"/>
-        <UML:Class xmi.id="UMLClass.491" name="organisms" participant="UMLAssociationEnd.76"/>
-        <UML:Class xmi.id="UMLClass.493" name="recommended_environments" participant="UMLAssociationEnd.121"/>
-        <UML:Class xmi.id="UMLClass.495" name="statuses" participant="UMLAssociationEnd.127"/>
-        <UML:Class xmi.id="UMLClass.497" name="default_policies" participant="UMLAssociationEnd.142"/>
-        <UML:Class xmi.id="UMLClass.499" name="subjects" participant="UMLAssociationEnd.145"/>
-        <UML:Class xmi.id="UMLClass.501" name="objects" participant="UMLAssociationEnd.148"/>
-        <UML:Class xmi.id="UMLClass.503" name="taggables" participant="UMLAssociationEnd.160"/>
-        <UML:Class xmi.id="UMLClass.505" name="taggers" participant="UMLAssociationEnd.163"/>
+        <UML:Class xmi.id="UMLClass.463" name="topics" participant="UMLAssociationEnd.174">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id='UMLAttribute.464' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.465' name='title' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.466' name='project_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.467' name='description' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.468' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.469' name='updated_at' type='X.191'/>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="UMLClass.471" name="users" participant="UMLAssociationEnd.88 UMLAssociationEnd.94 UMLAssociationEnd.177">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id='UMLAttribute.472' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.473' name='login' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.474' name='email' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.476' name='crypted_password' type='X.475'/>
+            <UML:Attribute xmi.id='UMLAttribute.477' name='salt' type='X.475'/>
+            <UML:Attribute xmi.id='UMLAttribute.478' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.479' name='updated_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.480' name='remember_token' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.481' name='remember_token_expires_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.482' name='activation_code' type='X.475'/>
+            <UML:Attribute xmi.id='UMLAttribute.483' name='activated_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.484' name='person_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.485' name='is_admin' type='X.357'/>
+            <UML:Attribute xmi.id='UMLAttribute.486' name='can_edit_projects' type='X.357'/>
+            <UML:Attribute xmi.id='UMLAttribute.487' name='can_edit_institutions' type='X.357'/>
+            <UML:Attribute xmi.id='UMLAttribute.488' name='reset_password_code' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.489' name='reset_password_code_until' type='X.191'/>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="UMLClass.491" name="work_groups" participant="UMLAssociationEnd.100 UMLAssociationEnd.180 UMLAssociationEnd.183">
+          <UML:Classifier.feature>
+            <UML:Attribute xmi.id='UMLAttribute.492' name='id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.493' name='name' type='X.189'/>
+            <UML:Attribute xmi.id='UMLAttribute.494' name='institution_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.495' name='project_id' type='X.187'/>
+            <UML:Attribute xmi.id='UMLAttribute.496' name='created_at' type='X.191'/>
+            <UML:Attribute xmi.id='UMLAttribute.497' name='updated_at' type='X.191'/>
+          </UML:Classifier.feature>
+        </UML:Class>
+        <UML:Class xmi.id="UMLClass.499" name="parent_assays" participant="UMLAssociationEnd.22"/>
+        <UML:Class xmi.id="UMLClass.501" name="experiments" participant="UMLAssociationEnd.25 UMLAssociationEnd.76"/>
+        <UML:Class xmi.id="UMLClass.503" name="contributors" participant="UMLAssociationEnd.43 UMLAssociationEnd.61 UMLAssociationEnd.115 UMLAssociationEnd.130 UMLAssociationEnd.136 UMLAssociationEnd.151"/>
+        <UML:Class xmi.id="UMLClass.505" name="resources" participant="UMLAssociationEnd.49"/>
+        <UML:Class xmi.id="UMLClass.507" name="sources" participant="UMLAssociationEnd.52"/>
+        <UML:Class xmi.id="UMLClass.509" name="owners" participant="UMLAssociationEnd.58"/>
+        <UML:Class xmi.id="UMLClass.511" name="templates" participant="UMLAssociationEnd.67"/>
+        <UML:Class xmi.id="UMLClass.513" name="recommended_environments" participant="UMLAssociationEnd.121"/>
+        <UML:Class xmi.id="UMLClass.515" name="statuses" participant="UMLAssociationEnd.127"/>
+        <UML:Class xmi.id="UMLClass.517" name="default_policies" participant="UMLAssociationEnd.142"/>
+        <UML:Class xmi.id="UMLClass.519" name="subjects" participant="UMLAssociationEnd.145"/>
+        <UML:Class xmi.id="UMLClass.521" name="objects" participant="UMLAssociationEnd.148"/>
+        <UML:Class xmi.id="UMLClass.523" name="person_responsibles" participant="UMLAssociationEnd.160"/>
+        <UML:Class xmi.id="UMLClass.525" name="organisms" participant="UMLAssociationEnd.163"/>
+        <UML:Class xmi.id="UMLClass.527" name="taggables" participant="UMLAssociationEnd.169"/>
+        <UML:Class xmi.id="UMLClass.529" name="taggers" participant="UMLAssociationEnd.172"/>
                 <UML:Association xmi.id="UMLAssociation.20">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.18" type="UMLClass.187"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.19" isNavigable="false" type="UMLClass.177"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.18" type="UMLClass.195"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.19" isNavigable="false" type="UMLClass.186"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.23">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.21" type="UMLClass.187"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.22" isNavigable="false" type="UMLClass.477"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.21" type="UMLClass.195"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.22" isNavigable="false" type="UMLClass.499"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.26">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.24" type="UMLClass.196"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.25" isNavigable="false" type="UMLClass.260"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.24" type="UMLClass.204"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.25" isNavigable="false" type="UMLClass.501"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.29">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.27" type="UMLClass.196"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.28" isNavigable="false" type="UMLClass.187"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.27" type="UMLClass.204"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.28" isNavigable="false" type="UMLClass.195"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.32">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.30" type="UMLClass.200"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.31" isNavigable="false" type="UMLClass.479"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.30" type="UMLClass.208"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.31" isNavigable="false" type="UMLClass.195"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.35">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.33" type="UMLClass.200"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.34" isNavigable="false" type="UMLClass.378"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.33" type="UMLClass.208"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.34" isNavigable="false" type="UMLClass.418"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.38">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.36" type="UMLClass.200"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.37" isNavigable="false" type="UMLClass.481"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.36" type="UMLClass.212"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.37" isNavigable="false" type="UMLClass.195"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.41">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.39" type="UMLClass.200"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.40" isNavigable="false" type="UMLClass.483"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.39" type="UMLClass.212"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.40" isNavigable="false" type="UMLClass.431"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.44">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.42" type="UMLClass.200"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.43" isNavigable="false" type="UMLClass.365"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.42" type="UMLClass.216"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.43" isNavigable="false" type="UMLClass.503"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.47">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.45" type="UMLClass.215"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.46" isNavigable="false" type="UMLClass.485"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.45" type="UMLClass.216"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.46" isNavigable="false" type="UMLClass.382"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.50">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.48" type="UMLClass.228"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.49" isNavigable="false" type="UMLClass.479"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.48" type="UMLClass.216"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.49" isNavigable="false" type="UMLClass.505"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.53">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.51" type="UMLClass.228"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.52" isNavigable="false" type="UMLClass.223"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.51" type="UMLClass.216"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.52" isNavigable="false" type="UMLClass.507"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.56">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.54" type="UMLClass.228"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.55" isNavigable="false" type="UMLClass.260"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.54" type="UMLClass.216"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.55" isNavigable="false" type="UMLClass.369"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.59">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.57" type="UMLClass.228"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.58" isNavigable="false" type="UMLClass.487"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.57" type="UMLClass.231"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.58" isNavigable="false" type="UMLClass.509"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.62">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.60" type="UMLClass.250"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.61" isNavigable="false" type="UMLClass.244"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.60" type="UMLClass.244"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.61" isNavigable="false" type="UMLClass.503"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.65">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.63" type="UMLClass.250"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.64" isNavigable="false" type="UMLClass.340"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.63" type="UMLClass.244"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.64" isNavigable="false" type="UMLClass.239"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.68">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.66" type="UMLClass.260"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.67" isNavigable="false" type="UMLClass.254"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.66" type="UMLClass.244"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.67" isNavigable="false" type="UMLClass.511"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.71">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.69" type="UMLClass.260"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.70" isNavigable="false" type="UMLClass.441"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.69" type="UMLClass.265"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.70" isNavigable="false" type="UMLClass.259"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.74">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.72" type="UMLClass.260"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.73" isNavigable="false" type="UMLClass.489"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.72" type="UMLClass.265"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.73" isNavigable="false" type="UMLClass.344"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.77">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.75" type="UMLClass.260"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.76" isNavigable="false" type="UMLClass.491"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.75" type="UMLClass.269"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.76" isNavigable="false" type="UMLClass.501"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.80">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.78" type="UMLClass.273"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.79" isNavigable="false" type="UMLClass.260"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.78" type="UMLClass.269"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.79" isNavigable="false" type="UMLClass.418"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.83">
                   <UML:Association.connection>
                     <UML:AssociationEnd xmi.id="UMLAssociationEnd.81" type="UMLClass.273"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.82" isNavigable="false" type="UMLClass.414"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.82" isNavigable="false" type="UMLClass.344"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.86">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.84" type="UMLClass.277"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.85" isNavigable="false" type="UMLClass.340"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.84" type="UMLClass.273"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.85" isNavigable="false" type="UMLClass.282"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.89">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.87" type="UMLClass.277"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.88" isNavigable="false" type="UMLClass.286"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.87" type="UMLClass.282"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.88" isNavigable="false" type="UMLClass.471"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.92">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.90" type="UMLClass.286"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.91" isNavigable="false" type="UMLClass.449"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.90" type="UMLClass.289"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.91" isNavigable="false" type="UMLClass.216"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.95">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.93" type="UMLClass.293"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.94" isNavigable="false" type="UMLClass.200"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.93" type="UMLClass.289"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.94" isNavigable="false" type="UMLClass.471"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.98">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.96" type="UMLClass.293"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.97" isNavigable="false" type="UMLClass.449"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.96" type="UMLClass.297"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.97" isNavigable="false" type="UMLClass.344"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.101">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.99" type="UMLClass.301"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.100" isNavigable="false" type="UMLClass.340"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.99" type="UMLClass.297"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.100" isNavigable="false" type="UMLClass.491"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.104">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.102" type="UMLClass.301"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.103" isNavigable="false" type="UMLClass.469"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.102" type="UMLClass.304"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.103" isNavigable="false" type="UMLClass.297"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.107">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.105" type="UMLClass.308"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.106" isNavigable="false" type="UMLClass.301"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.105" type="UMLClass.304"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.106" isNavigable="false" type="UMLClass.409"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.110">
                   <UML:Association.connection>
                     <UML:AssociationEnd xmi.id="UMLAssociationEnd.108" type="UMLClass.308"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.109" isNavigable="false" type="UMLClass.405"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.109" isNavigable="false" type="UMLClass.231"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.113">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.111" type="UMLClass.312"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.112" isNavigable="false" type="UMLClass.215"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.111" type="UMLClass.319"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.112" isNavigable="false" type="UMLClass.382"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.116">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.114" type="UMLClass.323"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.115" isNavigable="false" type="UMLClass.479"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.114" type="UMLClass.327"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.115" isNavigable="false" type="UMLClass.503"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.119">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.117" type="UMLClass.323"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.118" isNavigable="false" type="UMLClass.223"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.117" type="UMLClass.327"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.118" isNavigable="false" type="UMLClass.239"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.122">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.120" type="UMLClass.323"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.121" isNavigable="false" type="UMLClass.493"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.120" type="UMLClass.327"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.121" isNavigable="false" type="UMLClass.513"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.125">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.123" type="UMLClass.340"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.124" isNavigable="false" type="UMLClass.215"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.123" type="UMLClass.344"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.124" isNavigable="false" type="UMLClass.231"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.128">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.126" type="UMLClass.340"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.127" isNavigable="false" type="UMLClass.495"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.126" type="UMLClass.344"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.127" isNavigable="false" type="UMLClass.515"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.131">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.129" type="UMLClass.356"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.130" isNavigable="false" type="UMLClass.479"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.129" type="UMLClass.360"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.130" isNavigable="false" type="UMLClass.503"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.134">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.132" type="UMLClass.356"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.133" isNavigable="false" type="UMLClass.365"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.132" type="UMLClass.360"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.133" isNavigable="false" type="UMLClass.369"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.137">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.135" type="UMLClass.365"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.136" isNavigable="false" type="UMLClass.479"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.135" type="UMLClass.369"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.136" isNavigable="false" type="UMLClass.503"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.140">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.138" type="UMLClass.378"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.139" isNavigable="false" type="UMLClass.215"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.138" type="UMLClass.382"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.139" isNavigable="false" type="UMLClass.231"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.143">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.141" type="UMLClass.378"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.142" isNavigable="false" type="UMLClass.497"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.141" type="UMLClass.382"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.142" isNavigable="false" type="UMLClass.517"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.146">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.144" type="UMLClass.395"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.145" isNavigable="false" type="UMLClass.499"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.144" type="UMLClass.399"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.145" isNavigable="false" type="UMLClass.519"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.149">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.147" type="UMLClass.395"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.148" isNavigable="false" type="UMLClass.501"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.147" type="UMLClass.399"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.148" isNavigable="false" type="UMLClass.521"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.152">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.150" type="UMLClass.414"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.151" isNavigable="false" type="UMLClass.479"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.150" type="UMLClass.418"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.151" isNavigable="false" type="UMLClass.503"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.155">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.153" type="UMLClass.414"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.154" isNavigable="false" type="UMLClass.223"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.153" type="UMLClass.418"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.154" isNavigable="false" type="UMLClass.239"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.158">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.156" type="UMLClass.427"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.157" isNavigable="false" type="UMLClass.437"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.156" type="UMLClass.431"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.157" isNavigable="false" type="UMLClass.319"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.161">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.159" type="UMLClass.427"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.160" isNavigable="false" type="UMLClass.503"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.159" type="UMLClass.431"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.160" isNavigable="false" type="UMLClass.523"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.164">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.162" type="UMLClass.427"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.163" isNavigable="false" type="UMLClass.505"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.162" type="UMLClass.431"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.163" isNavigable="false" type="UMLClass.525"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.167">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.165" type="UMLClass.441"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.166" isNavigable="false" type="UMLClass.378"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.165" type="UMLClass.443"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.166" isNavigable="false" type="UMLClass.453"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.170">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.168" type="UMLClass.449"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.169" isNavigable="false" type="UMLClass.340"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.168" type="UMLClass.443"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.169" isNavigable="false" type="UMLClass.527"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.173">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.171" type="UMLClass.469"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.172" isNavigable="false" type="UMLClass.312"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.171" type="UMLClass.443"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.172" isNavigable="false" type="UMLClass.529"/>
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Association xmi.id="UMLAssociation.176">
                   <UML:Association.connection>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.174" type="UMLClass.469"/>
-                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.175" isNavigable="false" type="UMLClass.378"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.174" type="UMLClass.463"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.175" isNavigable="false" type="UMLClass.382"/>
+                  </UML:Association.connection>
+                </UML:Association>
+                <UML:Association xmi.id="UMLAssociation.179">
+                  <UML:Association.connection>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.177" type="UMLClass.471"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.178" isNavigable="false" type="UMLClass.344"/>
+                  </UML:Association.connection>
+                </UML:Association>
+                <UML:Association xmi.id="UMLAssociation.182">
+                  <UML:Association.connection>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.180" type="UMLClass.491"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.181" isNavigable="false" type="UMLClass.308"/>
+                  </UML:Association.connection>
+                </UML:Association>
+                <UML:Association xmi.id="UMLAssociation.185">
+                  <UML:Association.connection>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.183" type="UMLClass.491"/>
+                    <UML:AssociationEnd xmi.id="UMLAssociationEnd.184" isNavigable="false" type="UMLClass.382"/>
                   </UML:Association.connection>
                 </UML:Association>
         <UML:Stereotype xmi.id="X.14" name="designModel" extendedElement="UMLModel.6"/>
       </UML:Namespace.ownedElement>
     </UML:Model>
-    <UML:DataType xmi.id='X.453' name='string(40)'/>
-    <UML:DataType xmi.id='X.225' name='binary(2147483647)'/>
-    <UML:DataType xmi.id='X.353' name='boolean'/>
-    <UML:DataType xmi.id='X.178' name='integer'/>
-    <UML:DataType xmi.id='X.281' name='integer(1)'/>
-    <UML:DataType xmi.id='X.233' name='text'/>
-    <UML:DataType xmi.id='X.183' name='datetime'/>
-    <UML:DataType xmi.id='X.180' name='string'/>
+    <UML:DataType xmi.id='X.475' name='string(40)'/>
+    <UML:DataType xmi.id='X.241' name='binary(2147483647)'/>
+    <UML:DataType xmi.id='X.357' name='boolean'/>
+    <UML:DataType xmi.id='X.187' name='integer'/>
+    <UML:DataType xmi.id='X.277' name='integer(1)'/>
+    <UML:DataType xmi.id='X.249' name='text'/>
+    <UML:DataType xmi.id='X.191' name='datetime'/>
+    <UML:DataType xmi.id='X.189' name='string'/>
   </UML:Namespace.ownedElement>
 </UML:Model>
 <UML:Diagram xmi.id="UMLClassDiagram.7" name="Main" diagramType="ClassDiagram" toolName="Rational Rose 98" owner="UMLModel.6">
   <UML:Diagram.element>
-    <UML:DiagramElement xmi.id="UMLClassView.486" geometry="900, 2100, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.485"/>
-    <UML:DiagramElement xmi.id="UMLClassView.410" geometry="300, 1500, 20, 20" style="AutomaticResize=1" subject="UMLClass.405"/>
-    <UML:DiagramElement xmi.id="UMLClassView.307" geometry="500, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.301"/>
-    <UML:DiagramElement xmi.id="UMLClassView.285" geometry="700, 700, 20, 20" style="AutomaticResize=1" subject="UMLClass.277"/>
-    <UML:DiagramElement xmi.id="UMLClassView.272" geometry="1300, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.260"/>
-    <UML:DiagramElement xmi.id="UMLClassView.253" geometry="500, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.250"/>
-    <UML:DiagramElement xmi.id="UMLClassView.504" geometry="300, 2700, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.503"/>
-    <UML:DiagramElement xmi.id="UMLClassView.492" geometry="700, 2300, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.491"/>
-    <UML:DiagramElement xmi.id="UMLClassView.436" geometry="100, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.427"/>
-    <UML:DiagramElement xmi.id="UMLClassView.276" geometry="300, 700, 20, 20" style="AutomaticResize=1" subject="UMLClass.273"/>
-    <UML:DiagramElement xmi.id="UMLClassView.186" geometry="100, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.177"/>
-    <UML:DiagramElement xmi.id="UMLClassView.488" geometry="1300, 2100, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.487"/>
-    <UML:DiagramElement xmi.id="UMLClassView.440" geometry="500, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.437"/>
-    <UML:DiagramElement xmi.id="UMLClassView.413" geometry="700, 1500, 20, 20" style="AutomaticResize=1" subject="UMLClass.411"/>
-    <UML:DiagramElement xmi.id="UMLClassView.292" geometry="1100, 700, 20, 20" style="AutomaticResize=1" subject="UMLClass.286"/>
-    <UML:DiagramElement xmi.id="UMLClassView.249" geometry="100, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.244"/>
-    <UML:DiagramElement xmi.id="UMLClassView.214" geometry="1300, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.200"/>
-    <UML:DiagramElement xmi.id="UMLClassView.496" geometry="100, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.495"/>
-    <UML:DiagramElement xmi.id="UMLClassView.494" geometry="1100, 2300, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.493"/>
-    <UML:DiagramElement xmi.id="UMLClassView.478" geometry="700, 1900, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.477"/>
-    <UML:DiagramElement xmi.id="UMLClassView.448" geometry="900, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.441"/>
-    <UML:DiagramElement xmi.id="UMLClassView.388" geometry="500, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.378"/>
-    <UML:DiagramElement xmi.id="UMLClassView.222" geometry="300, 300, 20, 20" style="AutomaticResize=1" subject="UMLClass.215"/>
-    <UML:DiagramElement xmi.id="UMLClassView.195" geometry="500, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.187"/>
-    <UML:DiagramElement xmi.id="UMLClassView.482" geometry="100, 2100, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.481"/>
-    <UML:DiagramElement xmi.id="UMLClassView.404" geometry="1300, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.395"/>
-    <UML:DiagramElement xmi.id="UMLClassView.259" geometry="900, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.254"/>
-    <UML:DiagramElement xmi.id="UMLClassView.484" geometry="500, 2100, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.483"/>
-    <UML:DiagramElement xmi.id="UMLClassView.480" geometry="1100, 1900, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.479"/>
-    <UML:DiagramElement xmi.id="UMLClassView.476" geometry="300, 1900, 20, 20" style="AutomaticResize=1" subject="UMLClass.469"/>
-    <UML:DiagramElement xmi.id="UMLClassView.243" geometry="1100, 300, 20, 20" style="AutomaticResize=1" subject="UMLClass.228"/>
-    <UML:DiagramElement xmi.id="UMLClassView.506" geometry="700, 2700, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.505"/>
-    <UML:DiagramElement xmi.id="UMLClassView.500" geometry="900, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.499"/>
-    <UML:DiagramElement xmi.id="UMLClassView.498" geometry="500, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.497"/>
-    <UML:DiagramElement xmi.id="UMLClassView.490" geometry="300, 2300, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.489"/>
-    <UML:DiagramElement xmi.id="UMLClassView.468" geometry="1300, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.449"/>
-    <UML:DiagramElement xmi.id="UMLClassView.394" geometry="900, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.389"/>
-    <UML:DiagramElement xmi.id="UMLClassView.364" geometry="1100, 1100, 20, 20" style="AutomaticResize=1" subject="UMLClass.356"/>
-    <UML:DiagramElement xmi.id="UMLClassView.355" geometry="700, 1100, 20, 20" style="AutomaticResize=1" subject="UMLClass.340"/>
-    <UML:DiagramElement xmi.id="UMLClassView.502" geometry="1300, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.501"/>
-    <UML:DiagramElement xmi.id="UMLClassView.426" geometry="1100, 1500, 20, 20" style="AutomaticResize=1" subject="UMLClass.414"/>
-    <UML:DiagramElement xmi.id="UMLClassView.377" geometry="100, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.365"/>
-    <UML:DiagramElement xmi.id="UMLClassView.322" geometry="1300, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.312"/>
-    <UML:DiagramElement xmi.id="UMLClassView.311" geometry="900, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.308"/>
-    <UML:DiagramElement xmi.id="UMLClassView.227" geometry="700, 300, 20, 20" style="AutomaticResize=1" subject="UMLClass.223"/>
-    <UML:DiagramElement xmi.id="UMLClassView.339" geometry="300, 1100, 20, 20" style="AutomaticResize=1" subject="UMLClass.323"/>
-    <UML:DiagramElement xmi.id="UMLClassView.300" geometry="100, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.293"/>
-    <UML:DiagramElement xmi.id="UMLClassView.199" geometry="900, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.196"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.507" geometry="300, 100, 400, 0" subject="UMLAssociation.20"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.508" geometry="600, 1000, 200, 1800" subject="UMLAssociation.23"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.509" geometry="1100, 300, 400, 400" subject="UMLAssociation.26"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.510" geometry="700, 100, 400, 0" subject="UMLAssociation.29"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.511" geometry="1200, 1000, 200, 1800" subject="UMLAssociation.32"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.512" geometry="900, 700, 800, 1200" subject="UMLAssociation.35"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.513" geometry="700, 1100, 1200, 2000" subject="UMLAssociation.38"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.514" geometry="900, 1100, 800, 2000" subject="UMLAssociation.41"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.515" geometry="700, 700, 1200, 1200" subject="UMLAssociation.44"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.516" geometry="600, 1200, 600, 1800" subject="UMLAssociation.47"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.517" geometry="1100, 1100, 0, 1600" subject="UMLAssociation.50"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.518" geometry="900, 300, 400, 0" subject="UMLAssociation.53"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.519" geometry="1200, 400, 200, 200" subject="UMLAssociation.56"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.520" geometry="1200, 1200, 200, 1800" subject="UMLAssociation.59"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.521" geometry="300, 500, 400, 0" subject="UMLAssociation.62"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.522" geometry="600, 800, 200, 600" subject="UMLAssociation.65"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.523" geometry="1100, 500, 400, 0" subject="UMLAssociation.68"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.524" geometry="1100, 1100, 400, 1200" subject="UMLAssociation.71"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.525" geometry="800, 1400, 1000, 1800" subject="UMLAssociation.74"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.526" geometry="1000, 1400, 600, 1800" subject="UMLAssociation.77"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.527" geometry="800, 600, 1000, 200" subject="UMLAssociation.80"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.528" geometry="700, 1100, 800, 800" subject="UMLAssociation.83"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.529" geometry="700, 900, 0, 400" subject="UMLAssociation.86"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.530" geometry="900, 700, 400, 0" subject="UMLAssociation.89"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.531" geometry="1200, 1200, 200, 1000" subject="UMLAssociation.92"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.532" geometry="700, 500, 1200, 800" subject="UMLAssociation.95"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.533" geometry="700, 1300, 1200, 800" subject="UMLAssociation.98"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.534" geometry="600, 1000, 200, 200" subject="UMLAssociation.101"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.535" geometry="400, 1400, 200, 1000" subject="UMLAssociation.104"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.536" geometry="700, 900, 400, 0" subject="UMLAssociation.107"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.537" geometry="600, 1200, 600, 600" subject="UMLAssociation.110"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.538" geometry="800, 600, 1000, 600" subject="UMLAssociation.113"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.539" geometry="700, 1500, 800, 800" subject="UMLAssociation.116"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.540" geometry="500, 700, 400, 800" subject="UMLAssociation.119"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.541" geometry="700, 1700, 800, 1200" subject="UMLAssociation.122"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.542" geometry="500, 700, 400, 800" subject="UMLAssociation.125"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.543" geometry="400, 1800, 600, 1400" subject="UMLAssociation.128"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.544" geometry="1100, 1500, 0, 800" subject="UMLAssociation.131"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.545" geometry="600, 1200, 1000, 200" subject="UMLAssociation.134"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.546" geometry="600, 1600, 1000, 600" subject="UMLAssociation.137"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.547" geometry="400, 800, 200, 1000" subject="UMLAssociation.140"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.548" geometry="500, 1900, 0, 1200" subject="UMLAssociation.143"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.549" geometry="1100, 1900, 400, 1200" subject="UMLAssociation.146"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.550" geometry="1300, 1900, 0, 1200" subject="UMLAssociation.149"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.551" geometry="1100, 1700, 0, 400" subject="UMLAssociation.152"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.552" geometry="900, 900, 400, 1200" subject="UMLAssociation.155"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.553" geometry="300, 1700, 400, 0" subject="UMLAssociation.158"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.554" geometry="200, 2200, 200, 1000" subject="UMLAssociation.161"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.555" geometry="400, 2200, 600, 1000" subject="UMLAssociation.164"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.556" geometry="700, 1500, 400, 400" subject="UMLAssociation.167"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.557" geometry="1000, 1400, 600, 600" subject="UMLAssociation.170"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.558" geometry="800, 1400, 1000, 1000" subject="UMLAssociation.173"/>
-    <UML:DiagramElement xmi.id="UMLAssociationView.559" geometry="400, 1600, 200, 600" subject="UMLAssociation.176"/>
+    <UML:DiagramElement xmi.id="UMLClassView.510" geometry="1100, 2300, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.509"/>
+    <UML:DiagramElement xmi.id="UMLClassView.502" geometry="900, 2100, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.501"/>
+    <UML:DiagramElement xmi.id="UMLClassView.442" geometry="500, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.431"/>
+    <UML:DiagramElement xmi.id="UMLClassView.414" geometry="700, 1500, 20, 20" style="AutomaticResize=1" subject="UMLClass.409"/>
+    <UML:DiagramElement xmi.id="UMLClassView.303" geometry="500, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.297"/>
+    <UML:DiagramElement xmi.id="UMLClassView.281" geometry="700, 700, 20, 20" style="AutomaticResize=1" subject="UMLClass.273"/>
+    <UML:DiagramElement xmi.id="UMLClassView.268" geometry="1300, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.265"/>
+    <UML:DiagramElement xmi.id="UMLClassView.528" geometry="500, 2900, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.527"/>
+    <UML:DiagramElement xmi.id="UMLClassView.526" geometry="100, 2900, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.525"/>
+    <UML:DiagramElement xmi.id="UMLClassView.452" geometry="900, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.443"/>
+    <UML:DiagramElement xmi.id="UMLClassView.272" geometry="300, 700, 20, 20" style="AutomaticResize=1" subject="UMLClass.269"/>
+    <UML:DiagramElement xmi.id="UMLClassView.194" geometry="100, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.186"/>
+    <UML:DiagramElement xmi.id="UMLClassView.512" geometry="100, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.511"/>
+    <UML:DiagramElement xmi.id="UMLClassView.456" geometry="1300, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.453"/>
+    <UML:DiagramElement xmi.id="UMLClassView.417" geometry="1100, 1500, 20, 20" style="AutomaticResize=1" subject="UMLClass.415"/>
+    <UML:DiagramElement xmi.id="UMLClassView.288" geometry="1100, 700, 20, 20" style="AutomaticResize=1" subject="UMLClass.282"/>
+    <UML:DiagramElement xmi.id="UMLClassView.264" geometry="900, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.259"/>
+    <UML:DiagramElement xmi.id="UMLClassView.230" geometry="700, 300, 20, 20" style="AutomaticResize=1" subject="UMLClass.216"/>
+    <UML:DiagramElement xmi.id="UMLClassView.516" geometry="900, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.515"/>
+    <UML:DiagramElement xmi.id="UMLClassView.514" geometry="500, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.513"/>
+    <UML:DiagramElement xmi.id="UMLClassView.500" geometry="500, 2100, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.499"/>
+    <UML:DiagramElement xmi.id="UMLClassView.470" geometry="700, 1900, 20, 20" style="AutomaticResize=1" subject="UMLClass.463"/>
+    <UML:DiagramElement xmi.id="UMLClassView.392" geometry="900, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.382"/>
+    <UML:DiagramElement xmi.id="UMLClassView.238" geometry="1100, 300, 20, 20" style="AutomaticResize=1" subject="UMLClass.231"/>
+    <UML:DiagramElement xmi.id="UMLClassView.203" geometry="500, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.195"/>
+    <UML:DiagramElement xmi.id="UMLClassView.506" geometry="300, 2300, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.505"/>
+    <UML:DiagramElement xmi.id="UMLClassView.408" geometry="300, 1500, 20, 20" style="AutomaticResize=1" subject="UMLClass.399"/>
+    <UML:DiagramElement xmi.id="UMLClassView.508" geometry="700, 2300, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.507"/>
+    <UML:DiagramElement xmi.id="UMLClassView.504" geometry="1300, 2100, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.503"/>
+    <UML:DiagramElement xmi.id="UMLClassView.498" geometry="100, 2100, 20, 20" style="AutomaticResize=1" subject="UMLClass.491"/>
+    <UML:DiagramElement xmi.id="UMLClassView.326" geometry="300, 1100, 20, 20" style="AutomaticResize=1" subject="UMLClass.319"/>
+    <UML:DiagramElement xmi.id="UMLClassView.258" geometry="500, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.244"/>
+    <UML:DiagramElement xmi.id="UMLClassView.215" geometry="300, 300, 20, 20" style="AutomaticResize=1" subject="UMLClass.212"/>
+    <UML:DiagramElement xmi.id="UMLClassView.530" geometry="900, 2900, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.529"/>
+    <UML:DiagramElement xmi.id="UMLClassView.524" geometry="1100, 2700, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.523"/>
+    <UML:DiagramElement xmi.id="UMLClassView.520" geometry="300, 2700, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.519"/>
+    <UML:DiagramElement xmi.id="UMLClassView.518" geometry="1300, 2500, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.517"/>
+    <UML:DiagramElement xmi.id="UMLClassView.490" geometry="1100, 1900, 20, 20" style="AutomaticResize=1" subject="UMLClass.471"/>
+    <UML:DiagramElement xmi.id="UMLClassView.398" geometry="1300, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.393"/>
+    <UML:DiagramElement xmi.id="UMLClassView.368" geometry="100, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.360"/>
+    <UML:DiagramElement xmi.id="UMLClassView.359" geometry="1100, 1100, 20, 20" style="AutomaticResize=1" subject="UMLClass.344"/>
+    <UML:DiagramElement xmi.id="UMLClassView.211" geometry="1300, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.208"/>
+    <UML:DiagramElement xmi.id="UMLClassView.522" geometry="700, 2700, 20, 20" style="LineColor.Red=28,LineColor.Green=28,LineColor.Blue=28,FillColor.Red=185,FillColor.Green=185,FillColor.Blue=185,AutomaticResize=1" subject="UMLClass.521"/>
+    <UML:DiagramElement xmi.id="UMLClassView.430" geometry="100, 1700, 20, 20" style="AutomaticResize=1" subject="UMLClass.418"/>
+    <UML:DiagramElement xmi.id="UMLClassView.381" geometry="500, 1300, 20, 20" style="AutomaticResize=1" subject="UMLClass.369"/>
+    <UML:DiagramElement xmi.id="UMLClassView.318" geometry="1300, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.308"/>
+    <UML:DiagramElement xmi.id="UMLClassView.307" geometry="900, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.304"/>
+    <UML:DiagramElement xmi.id="UMLClassView.243" geometry="100, 500, 20, 20" style="AutomaticResize=1" subject="UMLClass.239"/>
+    <UML:DiagramElement xmi.id="UMLClassView.462" geometry="300, 1900, 20, 20" style="AutomaticResize=1" subject="UMLClass.457"/>
+    <UML:DiagramElement xmi.id="UMLClassView.343" geometry="700, 1100, 20, 20" style="AutomaticResize=1" subject="UMLClass.327"/>
+    <UML:DiagramElement xmi.id="UMLClassView.296" geometry="100, 900, 20, 20" style="AutomaticResize=1" subject="UMLClass.289"/>
+    <UML:DiagramElement xmi.id="UMLClassView.207" geometry="900, 100, 20, 20" style="AutomaticResize=1" subject="UMLClass.204"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.531" geometry="300, 100, 400, 0" subject="UMLAssociation.20"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.532" geometry="500, 1100, 0, 2000" subject="UMLAssociation.23"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.533" geometry="900, 1100, 0, 2000" subject="UMLAssociation.26"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.534" geometry="700, 100, 400, 0" subject="UMLAssociation.29"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.535" geometry="900, 100, 800, 0" subject="UMLAssociation.32"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.536" geometry="700, 900, 1200, 1600" subject="UMLAssociation.35"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.537" geometry="400, 200, 200, 200" subject="UMLAssociation.38"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.538" geometry="400, 1000, 200, 1400" subject="UMLAssociation.41"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.539" geometry="1000, 1200, 600, 1800" subject="UMLAssociation.44"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.540" geometry="800, 800, 200, 1000" subject="UMLAssociation.47"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.541" geometry="500, 1300, 400, 2000" subject="UMLAssociation.50"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.542" geometry="700, 1300, 0, 2000" subject="UMLAssociation.53"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.543" geometry="600, 800, 200, 1000" subject="UMLAssociation.56"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.544" geometry="1100, 1300, 0, 2000" subject="UMLAssociation.59"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.545" geometry="900, 1300, 800, 1600" subject="UMLAssociation.62"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.546" geometry="300, 500, 400, 0" subject="UMLAssociation.65"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.547" geometry="300, 1500, 400, 2000" subject="UMLAssociation.68"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.548" geometry="1100, 500, 400, 0" subject="UMLAssociation.71"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.549" geometry="1200, 800, 200, 600" subject="UMLAssociation.74"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.550" geometry="600, 1400, 600, 1400" subject="UMLAssociation.77"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.551" geometry="200, 1200, 200, 1000" subject="UMLAssociation.80"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.552" geometry="900, 900, 400, 400" subject="UMLAssociation.83"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.553" geometry="900, 700, 400, 0" subject="UMLAssociation.86"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.554" geometry="1100, 1300, 0, 1200" subject="UMLAssociation.89"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.555" geometry="400, 600, 600, 600" subject="UMLAssociation.92"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.556" geometry="600, 1400, 1000, 1000" subject="UMLAssociation.95"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.557" geometry="800, 1000, 600, 200" subject="UMLAssociation.98"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.558" geometry="300, 1500, 400, 1200" subject="UMLAssociation.101"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.559" geometry="700, 900, 400, 0" subject="UMLAssociation.104"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.560" geometry="800, 1200, 200, 600" subject="UMLAssociation.107"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.561" geometry="1200, 600, 200, 600" subject="UMLAssociation.110"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.562" geometry="600, 1200, 600, 200" subject="UMLAssociation.113"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.563" geometry="1000, 1600, 600, 1000" subject="UMLAssociation.116"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.564" geometry="400, 800, 600, 600" subject="UMLAssociation.119"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.565" geometry="600, 1800, 200, 1400" subject="UMLAssociation.122"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.566" geometry="1100, 700, 0, 800" subject="UMLAssociation.125"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.567" geometry="1000, 1800, 200, 1400" subject="UMLAssociation.128"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.568" geometry="700, 1700, 1200, 800" subject="UMLAssociation.131"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.569" geometry="300, 1300, 400, 0" subject="UMLAssociation.134"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.570" geometry="900, 1700, 800, 800" subject="UMLAssociation.137"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.571" geometry="1000, 800, 200, 1000" subject="UMLAssociation.140"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.572" geometry="1100, 1900, 400, 1200" subject="UMLAssociation.143"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.573" geometry="300, 2100, 0, 1200" subject="UMLAssociation.146"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.574" geometry="500, 2100, 400, 1200" subject="UMLAssociation.149"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.575" geometry="700, 1900, 1200, 400" subject="UMLAssociation.152"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.576" geometry="100, 1100, 0, 1200" subject="UMLAssociation.155"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.577" geometry="400, 1400, 200, 600" subject="UMLAssociation.158"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.578" geometry="800, 2200, 600, 1000" subject="UMLAssociation.161"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.579" geometry="300, 2300, 400, 1200" subject="UMLAssociation.164"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.580" geometry="1100, 1700, 400, 0" subject="UMLAssociation.167"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.581" geometry="700, 2300, 400, 1200" subject="UMLAssociation.170"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.582" geometry="900, 2300, 0, 1200" subject="UMLAssociation.173"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.583" geometry="800, 1600, 200, 600" subject="UMLAssociation.176"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.584" geometry="1100, 1500, 0, 800" subject="UMLAssociation.179"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.585" geometry="700, 1500, 1200, 1200" subject="UMLAssociation.182"/>
+    <UML:DiagramElement xmi.id="UMLAssociationView.586" geometry="500, 1700, 800, 800" subject="UMLAssociation.185"/>
   </UML:Diagram.element>
 </UML:Diagram>
 </XMI.content>
