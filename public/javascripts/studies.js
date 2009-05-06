@@ -18,7 +18,8 @@ function postInvestigationData() {
                 RedBox.close();
             }
             if (data.status==406) {
-                $('error_messages').innerHTML=data.error_messages
+                $('errorExplanation').innerHTML=data.error_messages;
+                $('errorExplanation').show();
             }
             
             return (true);

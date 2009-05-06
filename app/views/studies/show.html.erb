@@ -24,7 +24,7 @@
       <div class="investigation">
         <p>
           <label>Investigation:</label>
-          <%= text_or_not_specified(@study.investigation.title) %>
+          <%= link_to h(@study.investigation.title),@study.investigation %>
         </p>
       </div>
 

@@ -23,7 +23,7 @@
       <ul>
         <% for study in @assay.studies -%>
           <li>
-            <%=  "#{link_to h(study.title),study} for the Investigation - #{h(study.investigation.title)}" %>
+            <%=  "#{link_to h(study.title),study} for the Investigation - #{link_to h(study.investigation.title),study.investigation}" %>
           </li>
         <% end -%>
       </ul>
