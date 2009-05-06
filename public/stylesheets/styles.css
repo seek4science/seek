@@ -484,3 +484,8 @@ ul#user_details li {
     line-height: 1.3;
     overflow: hidden;
 }
+
+.foldContent {
+    padding-top:0.5em;
+    background-color: #FCFCFF;
+}

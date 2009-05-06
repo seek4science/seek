@@ -17,7 +17,7 @@ function addSelectedDiscipline() {
     }
 }
 
-function deleteDiscipline(id) {
+function removeDiscipline(id) {
     
     for(var i = 0; i < disciplines.length; i++)
         if(disciplines[i][1] == id) {
@@ -41,7 +41,7 @@ function updateDisciplines() {
         discipline_text += '<b>' + type + '</b>: ' + title
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:deleteDiscipline('+id+'); return(false);">delete</a>]</small><br/>';
+        + '[<a href="" onclick="javascript:removeDiscipline('+id+'); return(false);">remove</a>]</small><br/>';
         discipline_ids.push(id)
     }
 
@@ -84,7 +84,7 @@ function addRole(group_membership_id,title,id) {
     roles.push([group_membership_id,title,id])
 }
 
-function deleteRole(group_id,id) {
+function removeRole(group_id,id) {
 
     for(var i = 0; i < roles.length; i++)
         if(roles[i][2] == id && roles[i][0]==group_id) {
@@ -109,7 +109,7 @@ function updateRoles(editable,group_id) {
 
             role_text += title
             if (editable) {
-                role_text += '&nbsp;&nbsp;<small style="vertical-align: middle;">[<a href="" onclick="javascript:deleteRole('+group_id+','+id+'); return(false);">delete</a>]</small><br/>';
+                role_text += '&nbsp;&nbsp;<small style="vertical-align: middle;">[<a href="" onclick="javascript:removeRole('+group_id+','+id+'); return(false);">remove</a>]</small><br/>';
             }
             else {
                 role_text += ", "

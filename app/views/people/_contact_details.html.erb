@@ -1,0 +1,22 @@
+<div class="fold">
+      <div class="foldTitle">Contact details</div>
+      <div id="contact_details" class="foldContent">
+        
+          <div id="web_page">
+            <p><label for="web_page">Web page:</label> <%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
+          </div>
+
+          <div id="email">
+            <p><label for="email">Email:</label> <%= text_or_not_specified(@person.email, :email=>true) %></p>
+          </div>
+
+          <div id="skype">
+            <p><label for="email">Skype:</label> <%= text_or_not_specified(@person.skype_name) %></p>
+          </div>
+
+          <div id="phone">
+            <p><label for="phone">Phone:</label> <%= text_or_not_specified(@person.phone) %></p>
+          </div>
+        
+      </div>
+    </div>

@@ -27,7 +27,7 @@
       <p>
         <b>Name:</b> <%= h @person.name %>
       </p>
-
+      
       <% if mine?(@person) -%>
         <p>
           <b>Login name :</b> <%= h @person.user.login %> <span class='none_text'>(Only visible to you)</span>
@@ -89,34 +89,13 @@
 
     <br/>
 
-    <div class="fold">
-      <div class="foldTitle">Contact details</div>
-      <div class="foldContent" style="display:none;">
-        <p>
-          <div id="web_page">
-            <p><label for="web_page">Web page:</label> <%= text_or_not_specified(@person.web_page, :external_link=>true) %></p>
-          </div>
-
-          <div id="email">
-            <p><label for="email">Email:</label> <%= text_or_not_specified(@person.email, :email=>true) %></p>
-          </div>
-
-          <div id="skype">
-            <p><label for="email">Skype:</label> <%= text_or_not_specified(@person.skype_name) %></p>
-          </div>
-
-          <div id="phone">
-            <p><label for="phone">Phone:</label> <%= text_or_not_specified(@person.phone) %></p>
-          </div>
-        </p>
-      </div>
-    </div>
+    <%= render :partial=>"people/contact_details" %>
 
     <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
 
     <div class="fold">
       <div class="foldTitle">Items related to <%= h @person.name %> </div>
-      <div class="foldContent" style="display:none;">
+      <div class="foldContent">
         <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
         <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
         <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
