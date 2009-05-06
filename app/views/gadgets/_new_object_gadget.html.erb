@@ -1,3 +1,30 @@
+<script type="text/javascript">
+
+  function newAsset() {
+    selected_model=$('model_type').value;
+    alert(selected_model);
+    if (selected_model == "model") {
+      location.href = "<%= new_model_path -%>";
+    }
+    else if (selected_model == "sop") {
+      location.href = "<%= new_sop_path -%>";
+    }
+    else if (selected_model == "assay") {
+      location.href = "<%= new_assay_path -%>";
+    }
+    else if (selected_model == "investigation") {
+      location.href = "<%= new_investigation_path -%>";
+    }
+    else if (selected_model == "study") {
+      location.href = "<%= new_study_path -%>";
+    }
+    else if (selected_model == "data_file") {
+      location.href = "<%= new_data_file_path -%>";
+    }
+  }
+  
+</script>
+
 <% unless current_user.person.work_groups.empty? -%>
   <div id="new_asset" class="myexperiment_gadget">
     <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
@@ -7,9 +34,9 @@
     </div>
 
     <div class="contents">
-      <div style="text-align: left; padding-left: 1em;">
+      <div style="text-align: left; padding-left: 0.5em;">
         <ul class="gadget_list">
-          <form onsubmit="newAsset();return false">
+          <form onsubmit="newAsset();return(false)">
             <%= new_creatable_selection %>
             <%= submit_tag "Go" %>
           </form>
@@ -20,3 +47,4 @@
     <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
   </div>
 <% end -%>
+

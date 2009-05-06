@@ -6,7 +6,7 @@ module ApplicationHelper
   def creatable_classes
     #FIXME: make these discovered automatically.
     #FIXME: very bad method name
-    [Model,DataFile,Sop,Study]
+    [Model,DataFile,Sop,Study,Assay]
 
   end
 
@@ -21,8 +21,7 @@ module ApplicationHelper
   
   def empty_list_li_text list
     return "<li><div class='none_text'> None specified</div></li>" if is_nil_or_empty?(list)
-  end
-  
+  end  
 
   def text_or_not_specified text, options = {}
     if text.nil? or text.chomp.empty?
