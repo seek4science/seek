@@ -1,3 +1,12 @@
+<ul class="sectionIcons">
+  <% if user_can_edit_assay? @assay -%>
+    <li><%= icon('edit', edit_assay_path(@assay), "Edit Assay Details", nil, 'Edit Assay Details') -%></li>
+  <% end -%>
+  <% if user_can_delete_assay? @assay -%>
+    <li><%= icon('destroy', assay_path(@assay), "Delete Assay", { :confirm => 'Are you sure?', :method => :delete }, "Delete Assay") -%></li>
+  <% end -%>
+</ul>
+
 <h1><%= h @assay.title -%></h1>
 
 <div class="show_basic">

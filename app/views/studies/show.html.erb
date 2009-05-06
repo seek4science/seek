@@ -2,7 +2,7 @@
 
 
 <ul class="sectionIcons">
-  <li><%= icon('edit', edit_study_path(@study), "Edit Study Details", nil, 'Edit Study Details')%></li>
+  <li><%= icon('edit', edit_study_path(@study), "Edit Study Details", nil, 'Edit Study Details') -%></li>
   <% if current_user.is_admin? -%>
     <li><%= icon "destroy", study_path(@study), "Delete Study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>
   <% end -%>
@@ -12,7 +12,7 @@
 
 <div class="show_basic">
 
-  <div class="main_content_left_box">
+  
     <div class="box_about_actor">
       <div class="project">
         <p>
@@ -41,6 +41,6 @@
 
     </div>
 
-    <%= render :partial=>"study_tabs" %>
-  </div>
+    <%= render :partial=>"studies/study_tabs" %>
+  
 </div>

@@ -1,0 +1,21 @@
+<h1><%= h @investigation.title -%></h1>
+
+<div class="show_basic">
+  
+  <p>
+    <b>Project:</b> <%= link_to h(@investigation.project.name),@investigation.project %>    
+  </p>
+
+  <p>
+    <b>Description:</b>
+    <div id="description" class="box_standout">
+      <%= text_or_not_specified(@investigation.description, :description=>true) %>
+    </div>
+  </p>
+
+
+  <%= render :partial=>"investigations/investigation_tabs" -%>
+
+  
+
+</div>

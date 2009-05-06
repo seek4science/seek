@@ -1,0 +1,8 @@
+<h2 style="margin-top: 3em;">Assets related to this investigation</h2>
+
+<% investigation_asset_hash = classify_for_tabs(@investigation.studies) -%>
+<% investigation_asset_hash.merge!(Asset.classify_and_authorize(@investigation.assets, true, current_user)) -%>
+
+<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => investigation_asset_hash,
+  :narrow_view => true,
+  :authorization_already_done => true } -%>
