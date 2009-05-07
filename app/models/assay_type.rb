@@ -1,4 +1,6 @@
 class AssayType < ActiveRecord::Base
-  belongs_to :parent_assay_type, :class_name=>"AssayType"
-  has_many :child_assay_types, :class_name=>"AssayType",:foreign_key=>"parent_assay_type_id"
+  
+  has_and_belongs_to_many :children, :class_name=>"AssayType",:join_table=>"assay_types_edges",:foreign_key=>"parent_id",:association_foreign_key=>"child_id"
+  has_and_belongs_to_many :parents, :class_name=>"AssayType",:join_table=>"assay_types_edges",:foreign_key=>"child_id",:association_foreign_key=>"parent_id"
+
 end

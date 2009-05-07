@@ -6,6 +6,20 @@ metabolomics:
 proteomics:
   title: Proteomics
 
-parent:
-  title: Parent
+parent1:
+  title: Parent1
+  children: child1,child2,child3
 
+parent2:
+  title: Parent2
+  children: child3
+
+  
+child1:
+  title: Child1
+
+child2:
+  title: Child2
+
+child3:
+  title: Child3
