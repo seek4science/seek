@@ -27,10 +27,21 @@ class PeopleController < ApplicationController
       @people=Person.tagged_with(@expertise, :on=>:expertise)      
     elsif (!params[:tools].nil?)
       @tools=params[:tools]
-      @people=Person.tagged_with(@tools, :on=>:tools)      
+      @people=Person.tagged_with(@tools, :on=>:tools)
+    elsif (params[:discipline_id])
+      @discipline=Discipline.find(params[:discipline_id])
+      #FIXME: strips out the disciplines that don't match
+      @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id],:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name)
+    elsif (params[:role_id])
+      @role=Role.find(params[:role_id])
+      @people=Person.find(:all,:include=>[:group_memberships], :order=>:last_name)
+      #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
+      @people=@people.select{|p| !(p.group_memberships & @role.group_memberships).empty?}
     else
       @people = Person.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name)
     end
+
+
     
     respond_to do |format|
       format.html # index.html.erb

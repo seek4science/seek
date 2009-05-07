@@ -23,6 +23,7 @@ class Person < ActiveRecord::Base
   has_many :group_memberships
     
   has_many :work_groups, :through=>:group_memberships
+  has_many :roles, :through=>:group_memberships
 
   acts_as_taggable_on :tools, :expertise
     

@@ -22,7 +22,7 @@
                     </script>
                   <% else -%>
                     <li>
-                      <%= role.name %>
+                      <%= link_to h(role.name),people_path(:role_id=>role.id) %>
                     </li>
                   <% end -%>
 
