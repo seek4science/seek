@@ -1,0 +1,104 @@
+genomics:
+  title: genomics
+  children: comparative_genomics,DNA_sequencing,genotyping,primer_design,SNP_detection  
+
+comparative_genomics:
+  title: comparative_genomics
+
+DNA_sequencing:
+  title: DNA_sequencing
+
+genotyping:
+  title: genotyping
+
+primer_design:
+  title: primer_design
+
+SNP_detection:
+  title: SNP_detection
+
+#---------------------------
+metabolomics:
+  title: metabolomics
+  children: cell_growth_optimisation,metabolite_profiling,metabonomics
+
+cell_growth_optimisation:
+  title: cell_growth_optimisation
+
+metabolite_profiling:
+  title: metabolite_profiling
+  children: catabolic_response,glucose_pulse
+
+catabolic_response:
+  title: catabolic_response
+
+glucose_pulse:
+  title: glucose_pulse
+
+metabonomics:
+  title: metabonomics
+
+#-------------------------------
+
+proteomics:
+  title: proteomics
+  children: immune_precipitation,translational_modification,protein-protein_interaction,protein_expression_profiling,protein_identification,protein_structural_analysis
+
+immune_precipitation:
+  title: immune_precipitation
+
+post-translational_modification:
+  title: post-translational_modification
+
+protein-protein_interaction:
+  title: protein-protein_interaction
+
+protein_expression_profiling:
+  title: protein_expression_profiling
+
+protein_identification:
+  title: protein_identification
+  children: protein_purification
+
+protein_purification:
+  title: protein_purification
+
+protein_structural_analysis:
+  title: protein_structural_analysis
+
+#----------------------------------
+
+single_cell:
+  title: single_cell
+  children: FRAP
+
+FRAP:
+  title: FRAP
+
+#-----------------------------------
+
+transcriptomics:
+  title: transcriptomics
+  children: Comparative_genomic_hybridization,gene_expression_profiling,methylation_profiling,microRNA_profiling,RNAi,tiling_path
+
+Comparative_genomic_hybridization:
+  title: Comparative_genomic_hybridization
+
+gene_expression_profiling:
+  title: gene_expression_profiling
+  children: cDNA_microarray
+
+cDNA_microarray:
+  title: cDNA_microarray
+
+methylation_profiling:
+  title: methylation_profiling
+
+microRNA_profiling:
+  title: microRNA_profiling
+
+RNAi:
+  title: RNAi
+
+tiling_path:
+  title: tiling_path
