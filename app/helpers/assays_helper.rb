@@ -12,16 +12,17 @@ module AssaysHelper
   end
 
   
-  def assay_type_select_tag form
+  def assay_type_select_tag form,selected_id=nil
 
-    roots=AssayType.to_tree
+    roots=AssayType.to_tree.sort{|a,b| a.title.downcase <=> b.title.downcase}
     options=[]
     roots.each do |root|
       options << [root.title,root.id]
       options = options | child_select_options(root,1)
     end
-    
-    form.select "assay_type_id",options
+
+    selected_id ||= roots.first.id
+    form.select "assay_type_id",options,:selected=>selected_id
 
   end
 
@@ -30,7 +31,7 @@ module AssaysHelper
   def child_select_options parent,depth=0
     result = []
     unless parent.children.empty?
-      parent.children.each do |child|
+      parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
         result << ["---"*depth + child.title,child.id]
         result = result | child_select_options(child,depth+1) if child.has_children?
       end
