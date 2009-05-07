@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayTypeTest < ActiveSupport::TestCase
-  fixtures :assay_types
+  fixtures :assay_types,:assays
 
 #  test "parent and child" do
 #    parent=assay_types(:parent)
@@ -39,6 +39,17 @@ class AssayTypeTest < ActiveSupport::TestCase
 
   end
 
+  test "to tree" do
+    roots=AssayType.to_tree
+    assert_equal 4,roots.size
+    assert roots.include?(assay_types(:metabolomics))
+    assert roots.include?(assay_types(:proteomics))
+    assert roots.include?(assay_types(:parent1))
+    assert roots.include?(assay_types(:parent2))
+
+
+  end
+
   test "two parents" do
 
     c1=AssayType.new(:title=>"Child")
@@ -65,6 +76,13 @@ class AssayTypeTest < ActiveSupport::TestCase
 
   end
 
+  test "parents not empty" do
+    child1=assay_types(:child1)
+    assert !child1.parents.empty?
+
+    assert !AssayType.find(child1.id).parents.empty?
+  end
+
   test "parent and child fixtures" do
     
     parent1=assay_types(:parent1)
@@ -80,6 +98,28 @@ class AssayTypeTest < ActiveSupport::TestCase
     assert_equal 1,child2.parents.size
     assert_equal 2,child3.parents.size
 
+  end
+
+  test "has_children" do
+    parent=assay_types(:metabolomics)
+    assert !parent.has_children?
+    parent=assay_types(:parent1)
+    assert parent.has_children?
+  end
+
+  test "has_parents" do
+    child=assay_types(:metabolomics)
+    assert !child.has_parents?
+    child=assay_types(:child1)
+    assert child.has_parents?
+  end
+
+  test "assays association" do
+    a1=assay_types(:parent1)
+    assert a1.assays.empty?
+    a2=assay_types(:metabolomics)
+    assert a2.assays.include?(assays(:metabolomics_assay))
+    assert a2.assays.include?(assays(:metabolomics_assay2))
   end
   
 end
