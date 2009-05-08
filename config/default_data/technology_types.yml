@@ -1,0 +1,78 @@
+genomics_technologies:
+  title: genomics_technologies
+  children: qPRC
+
+qPCR:
+  title: qPCR
+
+#----------------------------------------------------
+
+metabolomics_technology:
+  title: metabolomics_technology
+  children: chemostat,gas_chromatography,HPLC,Mass_Spectormetry,UPLC
+
+chemostat:
+  title: chemostat
+
+gas_chromatography:
+  title: gas_chromatography
+
+HPLC:
+  title: HPLC
+
+Mass_Spectormetry:
+  title: Mass_Spectormetry
+  children: liquid_chromatography-tandem_mass_spectrometry
+
+liquid_chromatography-tandem_mass_spectrometry:
+  title: liquid_chromatography-tandem_mass_spectrometry
+
+UPLC:
+  title: UPLC
+
+#----------------------------------------------------
+
+proteomics_technologies:
+  title: proteomics_technologies
+  children: 2-hybrid_system,2D_gel_electrophoresis,NMR,surface_plasmon_resonance,HPLC,Mass_Spectormetry
+
+2-hybrid_system:
+  title: 2-hybrid_system
+
+2D_gel_electrophoresis:
+  title: 2D_gel_electrophoresis
+
+NMR:
+  title: NMR
+
+surface_plasmon_resonance:
+  title: surface_plasmon_resonance
+
+
+#----------------------------------------------------
+
+transcriptomics_technologies:
+  title: transcriptomics_technologies
+  children: microarray,qRT-PCR
+
+microarray:
+  title: microarray
+  children: cDNA_microarray,ChIP-on-chip,custom_Array,DNA_Methylation,miRNA_microarray
+
+cDNA_microarray:
+  title: cDNA_microarray
+
+ChIP-on-chip:
+  title: ChIP-on-chip
+
+custom_Array:
+  title: custom_Array
+
+DNA_Methylation:
+  title: DNA_Methylation
+
+miRNA_microarray:
+  title: miRNA_microarray
+
+qRT-PCR:
+  title: qRT-PCR
