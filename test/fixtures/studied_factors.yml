@@ -7,7 +7,7 @@ one:
   end_value: 1.5
   unit_id: 1
   time_point: 1
-  data_file_id: 1
+  
 
 two:
   measured_item_id: MyString
@@ -16,4 +16,4 @@ two:
   end_value: 1.5
   unit_id: 1
   time_point: 1
-  data_file_id: 1
+  

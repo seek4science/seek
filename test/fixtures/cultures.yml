@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  organism_id: 1
+  study_id: 1
+  date_at_sampling: 2009-05-08 15:01:56
+  culture_start_date: 2009-05-08 15:01:56
+  age_at_sampling: 1
+
+two:
+  organism_id: 1
+  study_id: 1
+  date_at_sampling: 2009-05-08 15:01:56
+  culture_start_date: 2009-05-08 15:01:56
+  age_at_sampling: 1
