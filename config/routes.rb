@@ -1,4 +1,12 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :created_datas
+
+  map.resources :measured_items
+
+  map.resources :studied_factors
+
+  map.resources :experimental_conditions
+
   
   map.resources :investigations
 

@@ -1,0 +1,2 @@
+class StudiedFactorsController < ApplicationController
+end

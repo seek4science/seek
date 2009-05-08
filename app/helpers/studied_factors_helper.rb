@@ -1,0 +1,2 @@
+module StudiedFactorsHelper
+end

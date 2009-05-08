@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  status: MyString
+  person_id: 1
+  data_file_id: 1
+  assay_id: 1
+
+two:
+  status: MyString
+  person_id: 1
+  data_file_id: 1
+  assay_id: 1

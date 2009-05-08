@@ -1,0 +1,2 @@
+class ExperimentalConditionsController < ApplicationController
+end
