@@ -2,7 +2,7 @@
 
   function newAsset() {
     selected_model=$('model_type').value;
-    
+
     if (selected_model == "model") {
       location.href = "<%= new_model_path -%>";
     }
@@ -22,7 +22,7 @@
       location.href = "<%= new_data_file_path -%>";
     }
   }
-  
+
 </script>
 
 <% unless current_user.person.work_groups.empty? -%>
@@ -32,9 +32,9 @@
     <div class="header">
       New or upload
     </div>
-
+  
     <div class="contents">
-      <div style="text-align: left; padding-left: 0.5em;">
+      <div style="text-align: center; padding-left: 0.5em;">
         <ul class="gadget_list">
           <form onsubmit="newAsset();return(false)">
             <%= new_creatable_selection %>

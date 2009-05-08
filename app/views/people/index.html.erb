@@ -6,6 +6,14 @@
   <h2><%= "People with experience in '"+h(@tools)+"' ... " -%></h2>
 <% end %>
 
+<% if @discipline -%>
+  <h2><%= "People with the discipline '#{h(@discipline.title)}'" %></h2>
+<%  end -%>
+
+<% if @role -%>
+  <h2><%= "People with the role '#{h(@role.name)}'" %></h2>
+<% end -%>
+
 
 <% if @people.public_methods.include?("page_count") %>
   <!-- only do the page links if the collection supports it -->

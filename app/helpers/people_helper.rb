@@ -15,7 +15,7 @@ module PeopleHelper
     unless person.disciplines.empty?
       text=""
       person.disciplines.each do |d|
-        text += h(d.title)
+        text += link_to(h(d.title),people_path(:discipline_id=>d.id))
         text += ", " unless person.disciplines.last==d
       end
     else
