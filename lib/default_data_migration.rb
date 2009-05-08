@@ -6,8 +6,7 @@ class DefaultDataMigration < ActiveRecord::Migration
 
   def self.up
     down
-    table_name=model_class_name.pluralize.underscore
-    puts "Data directory=#{self.default_data_directory}, model_class_name=#{model_class_name}, table name=#{table_name}"
+    table_name=model_class_name.pluralize.underscore    
     Fixtures.create_fixtures(self.default_data_directory, table_name)
   end
 
