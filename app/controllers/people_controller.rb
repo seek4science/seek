@@ -32,6 +32,8 @@ class PeopleController < ApplicationController
       @discipline=Discipline.find(params[:discipline_id])
       #FIXME: strips out the disciplines that don't match
       @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id],:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name)
+      #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
+      @people=@people.collect{|p| Person.find(p.id)}
     elsif (params[:role_id])
       @role=Role.find(params[:role_id])
       @people=Person.find(:all,:include=>[:group_memberships], :order=>:last_name)
