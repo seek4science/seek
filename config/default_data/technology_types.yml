@@ -1,5 +1,5 @@
 genomics_technologies:
-  title: genomics_technologies
+  title: genomics technologies
   children: qPRC
 
 qPCR:
@@ -8,24 +8,24 @@ qPCR:
 #----------------------------------------------------
 
 metabolomics_technology:
-  title: metabolomics_technology
+  title: metabolomics technology
   children: chemostat,gas_chromatography,HPLC,Mass_Spectormetry,UPLC
 
 chemostat:
   title: chemostat
 
 gas_chromatography:
-  title: gas_chromatography
+  title: gas chromatography
 
 HPLC:
   title: HPLC
 
 Mass_Spectormetry:
-  title: Mass_Spectormetry
+  title: Mass Spectormetry
   children: liquid_chromatography-tandem_mass_spectrometry
 
 liquid_chromatography-tandem_mass_spectrometry:
-  title: liquid_chromatography-tandem_mass_spectrometry
+  title: liquid chromatography-tandem mass spectrometry
 
 UPLC:
   title: UPLC
@@ -33,26 +33,26 @@ UPLC:
 #----------------------------------------------------
 
 proteomics_technologies:
-  title: proteomics_technologies
+  title: proteomics technologies
   children: 2-hybrid_system,2D_gel_electrophoresis,NMR,surface_plasmon_resonance,HPLC,Mass_Spectormetry
 
 2-hybrid_system:
-  title: 2-hybrid_system
+  title: 2-hybrid system
 
 2D_gel_electrophoresis:
-  title: 2D_gel_electrophoresis
+  title: 2D gel electrophoresis
 
 NMR:
   title: NMR
 
 surface_plasmon_resonance:
-  title: surface_plasmon_resonance
+  title: surface plasmon resonance
 
 
 #----------------------------------------------------
 
 transcriptomics_technologies:
-  title: transcriptomics_technologies
+  title: transcriptomics technologies
   children: microarray,qRT-PCR
 
 microarray:
@@ -60,19 +60,19 @@ microarray:
   children: cDNA_microarray,ChIP-on-chip,custom_Array,DNA_Methylation,miRNA_microarray
 
 cDNA_microarray:
-  title: cDNA_microarray
+  title: cDNA microarray
 
 ChIP-on-chip:
   title: ChIP-on-chip
 
 custom_Array:
-  title: custom_Array
+  title: custom Array
 
 DNA_Methylation:
-  title: DNA_Methylation
+  title: DNA Methylation
 
 miRNA_microarray:
-  title: miRNA_microarray
+  title: miRNA microarray
 
 qRT-PCR:
   title: qRT-PCR

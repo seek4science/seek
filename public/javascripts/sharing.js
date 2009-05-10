@@ -254,7 +254,7 @@ function updateCustomSharingSettings() {
       shared_with += '<b>' + contributor_type + '</b>: ' + permission_settings[contributor_type][i][0]
                            + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>' 
                            + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' 
-                           + '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">delete</a>]</small><br/>';
+                           + '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">remove</a>]</small><br/>';
     }
     
   // remove the last line break
@@ -638,7 +638,7 @@ function updateGroupMembers() {
                   + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' 
                   + '[<a href="" onclick="javascript:editGroupMember('+ id +', ' + currentFavouriteGroupSettings[id] + '); return(false);">edit</a>]</small>'
                   + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
-                  + '[<a href="" onclick="javascript:deleteGroupMember('+ id +'); return(false);">delete</a>]</small><br/>';
+                  + '[<a href="" onclick="javascript:deleteGroupMember('+ id +'); return(false);">remove</a>]</small><br/>';
   }
     
   // remove the last line break
@@ -1251,7 +1251,7 @@ function updateAttributionSettings() {
     attributed_to += '<b>' + attr_type + '</b>: ' + attr_title
                            + "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + attr_contributor + ")</span>"
                            + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' 
-                           + '[<a href="" onclick="javascript:deleteAttribution(\''+ attr_type +'\', '+ attr_id +'); return(false);">delete</a>]</small><br/>';
+                           + '[<a href="" onclick="javascript:deleteAttribution(\''+ attr_type +'\', '+ attr_id +'); return(false);">remove</a>]</small><br/>';
     
     attributed_to_arr.push([attr_type, attr_id]);
   }

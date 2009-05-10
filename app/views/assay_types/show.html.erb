@@ -1,0 +1,20 @@
+<h1><%= h @assay_type.title %></h1>
+
+<% if @assay_type.has_parents? -%>
+  <label>Parents:</label>
+  <% for parent_type in @assay_type.parents  -%>
+    <%= link_to h(parent_type.title), parent_type %>
+    <%= " | " unless @assay_type.parents.last==parent_type %>
+  <% end -%>
+<% end -%>
+<br/>
+<% if @assay_type.has_children? -%>
+  <label>Children:</label>
+  <% for child_type in @assay_type.children  -%>
+    <%= link_to h(child_type.title), child_type %>
+    <%= " | " unless @assay_type.children.last==child_type %>
+  <% end -%>
+<% end -%>
+
+<h2>Related assays</h2>
+<%= render :partial=>"assay_types/assay",:collection=>@assay_type.get_child_assays %>

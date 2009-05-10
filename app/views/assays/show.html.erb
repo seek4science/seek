@@ -21,7 +21,7 @@
   </p>
 
   <p id="assay_type">
-    <b>Assay type:</b><%= h(@assay.assay_type.title) %>
+    <b>Assay type: </b><%= link_to h(@assay.assay_type.title), @assay.assay_type %>
   </p>
 
   <p>
@@ -42,16 +42,17 @@
   <p>
     <b>SOPs:</b><br/>
 
-    <% if @assay.sops.empty? -%>
-      <span class="none_text">No SOPs are associated with this assay</span>
-    <% else -%>
-      <ul>
+    <ul>
+      <% if Authorization.authorize_collection("show",@assay.sops,current_user).empty? -%>
+        <li class="none_text">No SOPs, or none that are visible to you.</li>
+      <% else -%>
+
         <% for sop in @assay.sops -%>
           <li><%=  link_to h(sop.title),sop,:title=>tooltip_title_attrib(h(sop.description),1000) %></li>
 
         <% end -%>
-      </ul>
-    <% end -%>
+      <% end -%>
+    </ul>
 
   </p>
 
