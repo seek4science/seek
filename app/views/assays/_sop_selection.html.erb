@@ -19,10 +19,10 @@
         :url=>{:action=>"sop_preview_ajax",:controller=>"sops"},
         :with=>"'id='+this.value",
         :before=>"show_ajax_loader('sop_preview')"
-      )
+      )+";check_show_add();return(false);"
     } -%>
     <%= f.collection_select :sop_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" -%>
-    <b><%= link_to_function "Add","addSelectedSop(); return(false);" %></b>
+    <b><%= link_to_function "Add","addSelectedSop(); return(false);",:id=>"add_sop_link" %></b>
   </div>
 
   <div id="sop_preview" class="yui-u">
@@ -39,6 +39,20 @@
 <% end -%>
 
   updateSops();
+
+
+  function check_show_add() {
+    i=$('possible_sops').selectedIndex;
+    selected_id=$('possible_sops').options[i].value;    
+    if (selected_id=='0') {
+      $('add_sop_link').hide();
+    }
+    else {
+      $('add_sop_link').show();
+    }
+  }
+
+  check_add();
 </script>
 
 
