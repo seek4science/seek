@@ -4,12 +4,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :assay_types
 
   map.resources :measured_items
-
-  map.resources :studied_factors  
   
   map.resources :investigations
 
-  map.resources :studies
+  map.resources :studies do |study|
+    study.resources :studied_factors
+  end
   
   map.resources :assays
 
