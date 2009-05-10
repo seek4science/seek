@@ -5,10 +5,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :measured_items
 
-  map.resources :studied_factors
-
-  map.resources :experimental_conditions
-
+  map.resources :studied_factors  
   
   map.resources :investigations
 
@@ -43,7 +40,9 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :sops, :member => { :download => :get }
+  map.resources :sops, :member => { :download => :get } do |sop|
+    sop.resources :experimental_conditions
+  end
 
   map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
 

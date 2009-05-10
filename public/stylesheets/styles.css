@@ -488,3 +488,35 @@ ul#user_details li {
     padding-top:0.5em;
     background-color: #FCFCFF;
 }
+
+ul.conditions_or_factors {    
+    
+}
+
+ul.conditions_or_factors li {        
+    list-style-type:none;
+}
+ul.condition_or_factor_row {
+    clear:both;
+}
+ul.condition_or_factor_row li {
+    float:left;
+    padding: 0 1em 0.25em 1em;
+    text-align:left;
+    border-bottom: dotted #999999 1px;
+}
+ul.condition_or_factor_row li#measured_item {
+    width:20em;
+}
+
+ul.condition_or_factor_row li#unit {
+    width:10em;
+}
+
+ul.condition_or_factor_row li#range {
+    width:10em;
+}
+
+ul.heading {
+    font-weight:bolder;
+}

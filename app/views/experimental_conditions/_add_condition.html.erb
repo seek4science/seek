@@ -1,0 +1,29 @@
+
+<% remote_form_for :experimental_condition,@experimental_condition,
+  :url=>sop_experimental_conditions_path(:sop_id=>@sop,:id=>@new_condition),
+  :before=>"$('experimental_condition_submit').disabled=true;",
+  :loaded=>"$('experimental_condition_submit').disabled=false;",
+  :html=>{:method=>:post} do |f| -%>
+
+  <table>
+    <tr>
+    <th>Measured item</th>
+    <th>Unit</th>
+    <th>Start value</th>
+    <th>End value</th>
+  </tr>
+    <tr>
+      <td><%=  f.collection_select :measured_item_id, MeasuredItem.find(:all),:id,:title %></td>
+    
+      <td><%=  f.collection_select :unit_id, Unit.find(:all),:id,:symbol %></td>
+    
+      <td><%= f.text_field :start_value,:size=>4 %></td>
+    
+      <td><%= f.text_field :end_value,:size=>4 %></td>
+
+      <td><%= f.submit "Add" %></td>
+    </tr>
+
+  </table>
+
+<% end -%>

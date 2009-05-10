@@ -54,7 +54,14 @@
 				<% end -%>
 				
 				<br/>
-				
+
+                <h3>
+                  <%= help_icon("These are the experimental conditions related to this sop") %>
+                  Experimental Conditions
+                </h3>
+                  <%= link_to "Experimental conditions",sop_experimental_conditions_path(@sop) %>
+				<br/>
+
 				<h3>
 					<%= help_icon("This section provides links to the download(s) for this SOP") -%>
 					Download

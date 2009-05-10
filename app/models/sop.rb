@@ -12,6 +12,8 @@ class Sop < ActiveRecord::Base
   
   belongs_to :content_blob,
              :dependent => :destroy
+
+  has_many :experimental_conditions
   
   # TODO
   # add all required validations here
