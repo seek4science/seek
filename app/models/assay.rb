@@ -3,7 +3,7 @@ class Assay < ActiveRecord::Base
   has_and_belongs_to_many :studies
   has_and_belongs_to_many :sops
   
-  belongs_to :assay_type
+  belongs_to :assay_type  
 
   validates_presence_of :title
   validates_uniqueness_of :title

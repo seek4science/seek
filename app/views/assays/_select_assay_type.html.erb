@@ -1,3 +1,3 @@
 
-<%= f.label :assay_type %>*<br/>
-<%= assay_type_select_tag f,selected_id= @assay.assay_type.nil? ? nil : @assay.assay_type.id %>
+<%= f.label "Assay type *" %><br/><br/>
+<%= ontology_select_tag f,AssayType,"assay_type_id",selected_id= @assay.assay_type.nil? ? nil : @assay.assay_type.id %>
