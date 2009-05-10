@@ -12,35 +12,35 @@
 
 <div class="show_basic">
 
-  
-    <div class="box_about_actor">
-      <div class="project">
-        <p>
-          <label>Belongs to the project:</label>
-          <%= link_to h(@study.project.name),project_path(@study.project)  %>
-        </p>
-      </div>
 
-      <div class="investigation">
-        <p>
-          <label>Investigation:</label>
-          <%= link_to h(@study.investigation.title),@study.investigation %>
-        </p>
-      </div>
-
-      <p style="margin-top: 1em;">
-        <b>About the study:</b>
-        <div id="description" class="box_standout">
-          <%= text_or_not_specified(@study.description, :description=>true) %>
-        </div>
-      </p>
-
+  <div class="box_about_actor">
+    <div class="project">
       <p>
-        <%= render :partial=>"studies/simple_assay_list",:locals=>{:assays=>@study.assays} %>
+        <label>Belongs to the project:</label>
+        <%= link_to h(@study.project.name),project_path(@study.project)  %>
       </p>
-
     </div>
 
-    <%= render :partial=>"studies/study_tabs" %>
-  
+    <div class="investigation">
+      <p>
+        <label>Investigation:</label>
+        <%= link_to h(@study.investigation.title),@study.investigation %>
+      </p>
+    </div>
+
+    <div class="assays">
+      <%= render :partial=>"studies/simple_assay_list",:locals=>{:assays=>@study.assays} %>
+    </div>
+
+    <p style="margin-top: 1em;">
+      <b>About the study:</b>
+      <div id="description" class="box_standout">
+        <%= text_or_not_specified(@study.description, :description=>true) %>
+      </div>
+    </p>
+
+  </div>
+
+  <%= render :partial=>"studies/study_tabs" %>
+
 </div>
