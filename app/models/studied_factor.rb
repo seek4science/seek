@@ -4,9 +4,9 @@ class StudiedFactor < ActiveRecord::Base
   belongs_to :factor_type
   belongs_to :measured_item
   belongs_to :unit
-  belongs_to :study
+  belongs_to :data_file
 
-  validates_presence_of :unit,:measured_item,:start_value,:study
+  validates_presence_of :unit,:measured_item,:start_value,:data_file
 
   def range_text
     #TODO: write test

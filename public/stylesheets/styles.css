@@ -489,34 +489,53 @@ ul#user_details li {
     background-color: #FCFCFF;
 }
 
-ul.conditions_or_factors {    
-    
+table.conditions_or_factors {
+    border: dotted #999999 1px;
+    margin-top: 1em;
 }
 
 ul.conditions_or_factors li {        
-    list-style-type:none;
+    list-style-type:none;    
 }
+
 ul.condition_or_factor_row {
     clear:both;
+    font-size:smaller;
 }
+
 ul.condition_or_factor_row li {
     float:left;
     padding: 0 1em 0.25em 1em;
     text-align:left;
     border-bottom: dotted #999999 1px;
+    min-height: 1.5em;
 }
+
 ul.condition_or_factor_row li#measured_item {
-    width:20em;
+    width:15em;
 }
 
 ul.condition_or_factor_row li#unit {
-    width:10em;
+    width:13em;
 }
 
 ul.condition_or_factor_row li#range {
     width:10em;
 }
 
-ul.heading {
+ul.condition_or_factor_row li#time_point {
+    width:3em;
+}
+
+ul.condition_or_factor_row li#standard_deviation {
+    width:5em;
+}
+
+ul.condition_or_factor_row li#delete {
+    width:2em;
+}
+
+ul.heading li {
     font-weight:bolder;
+    min-height: 4em;
 }

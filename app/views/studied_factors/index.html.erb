@@ -1,5 +1,5 @@
-<h1>
-  <%= "Factors studied for '#{link_to h(@study.title),@study}'" %>
+  <h1>
+  <%= "Factors studied for '#{link_to h(@data_file.title),@data_file}'" %>
 </h1>
 
 <div id="edit_on">
@@ -18,7 +18,7 @@
   <%= link_to_function "Stop editing" do |page|
     page.visual_effect :fade,"add_factor"
     page["edit_on"].toggle
-    page["edit_off"].toggle    
+    page["edit_off"].toggle
     page.select('li.destroy_studied_factor').each do |el|
       el.toggle
     end
@@ -36,6 +36,11 @@
 
     <li>
       <ul class="condition_or_factor_row heading">
+
+        <li id="time_point">
+          Time point
+        </li>
+
         <li id="measured_item">
           Item measured
         </li>
@@ -45,11 +50,15 @@
         <li id="unit">
           Unit
         </li>
+        <li id="standard_deviation">
+          SD
+        </li>
+        
       </ul>
     </li>
 
     <div id="studied_factors_rows">
-      <%= render :partial=>"factor_row",:collection=>@study.studied_factors %>
+      <%= render :partial=>"factor_row",:collection=>@data_file.studied_factors %>
     </div>
   </ul>
 

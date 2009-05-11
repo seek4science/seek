@@ -1,18 +1,18 @@
 class StudiedFactorsController < ApplicationController
   before_filter :login_required
-  before_filter :find_study
+  before_filter :find_data_file_auth
   before_filter :create_new_studied_factor, :only=>[:index]
 
   def index
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@study.studied_factors}
+      format.xml {render :xml=>@data_file.studied_factors}
     end
   end
 
   def create
     @studied_factor=StudiedFactor.new(params[:studied_factor])
-    @studied_factor.study=@study
+    @studied_factor.data_file=@data_file
 
     render :update do |page|
       if @studied_factor.save
@@ -39,20 +39,31 @@ class StudiedFactorsController < ApplicationController
 
   private
 
-  def find_study
+  def find_data_file_auth
     begin
-      @study = Study.find(params[:study_id])
+      data_file = DataFile.find(params[:data_file_id])
+      the_action=action_name
+      the_action="edit" if the_action=="destroy" #we are not destroying the sop, just editing its exp conditions
+      if Authorization.is_authorized?(the_action, nil, data_file, current_user)
+        @data_file = data_file
+      else
+        respond_to do |format|
+          flash[:error] = "You are not authorized to perform this action"
+          format.html { redirect_to sops_path }
+        end
+        return false
+      end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
-        flash[:error] = "Couldn't find the Study"
-        format.html { redirect_to studies_path }
+        flash[:error] = "Couldn't find the Data file"
+        format.html { redirect_to data_files_path }
       end
       return false
     end
   end
 
   def create_new_studied_factor
-    @studied_factor=StudiedFactor.new(:study=>@study)
+    @studied_factor=StudiedFactor.new(:data_file=>@data_file)
   end
 
 

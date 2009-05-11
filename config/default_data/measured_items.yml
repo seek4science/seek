@@ -1,5 +1,71 @@
 glucose_concentration:
   title: glucose concentration
 
-growth_rate:
-  title: growth rate
+activation_constant:
+  title: activation constant
+
+concentration:
+  title: concentration
+
+dry_biomass_concentration:
+  title: dry biomass concentration
+
+enzymatic_activity:
+  title: enzymatic activity
+
+hill_coefficient:
+  title: hill_coefficient
+
+hill_constant:
+  title: hill constant
+
+ec50:
+  title: ec50
+
+half_maximal_inhibitory_concentration:
+  title: IC50
+
+catalytic_rate_constant:
+  title: catalytic rate constant
+
+inhibitory_constant:
+  title: inhibitory constant
+
+michaelis_constant:
+  title: michaelis constant
+
+pressure:
+  title: pressure
+
+acidity:
+  title: acidity
+
+acid_dissociation_constant:
+  title: acid dissociation constant
+
+gas_flow_rate:
+  title: gas flow rate
+
+kinetic_constant:
+  title: kinetic constant
+
+specific concentration:
+  title: specific concentration
+
+stiring_rate:
+  title: stiring rate
+
+temperature:
+  title: temperature
+
+maximal_velocity:
+  title: maximal velocity
+
+molecular_weight:
+  title: molecular weight
+
+time:
+  title: time
+
+amount:
+  title: amount

@@ -7,15 +7,15 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :investigations
 
-  map.resources :studies do |study|
-    study.resources :studied_factors
-  end
+  map.resources :studies
   
   map.resources :assays
 
   map.resources :assets
 
-  map.resources :data_files, :member => {:download => :get}  
+  map.resources :data_files, :member => {:download => :get}  do |data_file|
+    data_file.resources :studied_factors
+  end
 
   map.resources :expertise
 
