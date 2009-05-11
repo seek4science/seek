@@ -1,17 +1,2 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  measured_item_id: 1
-  condition_type_id: 1
-  start_value: 1.5
-  end_value: 1.5
-  unit_id: 1
-  sop_id: 1
-
-two:
-  measured_item_id: 1
-  condition_type_id: 1
-  start_value: 1.5
-  end_value: 1.5
-  unit_id: 1
-  sop_id: 1

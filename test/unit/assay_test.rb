@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayTest < ActiveSupport::TestCase
-  fixtures :assays,:sops,:assay_types
+  fixtures :assays,:sops,:assay_types,:technology_types
 
   test "sops association" do
     assay=assays(:metabolomics_assay)
@@ -12,7 +12,10 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    assay=Assay.new(:title=>"test",:assay_type=>assay_types(:metabolomics))
+    assay=Assay.new(:title=>"test",
+      :assay_type=>assay_types(:metabolomics),
+      :technology_type=>technology_types(:gas_chromatography))
+    
     assert assay.valid?
 
     assay.title=""
@@ -26,6 +29,10 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.title="test"
     assay.assay_type=nil
+    assert !assay.valid?
+
+    assay.assay_type=assay_types(:metabolomics)
+    assay.technology_type=nil
     assert !assay.valid?
     
   end

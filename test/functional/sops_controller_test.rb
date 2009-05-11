@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SopsControllerTest < ActionController::TestCase
   
-  fixtures :sops, :assets, :content_blobs, :people, :users
+  fixtures :sops, :assets, :content_blobs, :people, :users, :experimental_conditions
   
   include AuthenticatedTestHelper
   def setup
