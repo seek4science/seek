@@ -50,7 +50,10 @@ module ApplicationHelper
   def collapse_image(margin_left="0.3em")
     image_tag "folds/fold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
-  
+
+  def image method,options={}
+    image_tag(method_to_icon_filename(method),options)
+  end
   def icon(method, url=nil, alt=nil, url_options={}, label=method.humanize, remote=false)
 
     if (label == 'Destroy')
