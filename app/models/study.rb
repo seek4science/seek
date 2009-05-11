@@ -2,6 +2,7 @@ class Study < ActiveRecord::Base
 
   belongs_to :investigation
   has_and_belongs_to_many :assays
+  has_many :studied_factors
 
   has_one :project, :through=>:investigation
   
@@ -24,5 +25,7 @@ class Study < ActiveRecord::Base
     end
     return sops
   end
+
+  
 
 end

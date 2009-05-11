@@ -1,8 +1,8 @@
 
-<% remote_form_for :experimental_condition,@experimental_condition,
-  :url=>sop_experimental_conditions_path(:sop_id=>@sop,:id=>@experimental_condition),
-  :before=>"$('experimental_condition_submit').disabled=true;",
-  :loaded=>"$('experimental_condition_submit').disabled=false;",
+<% remote_form_for :studied_factor,@studied_factor,
+  :url=>study_studied_factors_path(:study_id=>@study,:id=>@studied_factor),
+  :before=>"$('studied_factor_submit').disabled=true;",
+  :loaded=>"$('studied_factor_submit').disabled=false;",
   :html=>{:method=>:post} do |f| -%>
 
   <table>

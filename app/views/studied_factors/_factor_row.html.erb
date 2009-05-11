@@ -1,0 +1,27 @@
+<% show_delete||=false %>
+<% studied_factor=factor_row -%>
+<li id="studied_factor_row_<%= studied_factor.id -%>" >
+  <ul class="condition_or_factor_row">
+    <li id="measured_item">
+      <%= h studied_factor.measured_item.title %>
+    </li>
+    
+    <li id="range">
+      <%= h studied_factor.range_text %>
+    </li>
+    
+    <li id="unit">
+      <%= h studied_factor.unit.symbol %>
+    </li>
+
+    
+    <% style="display:none;" unless show_delete %>
+    <li class="destroy_studied_factor" style="<%= style %>">
+       <%=  link_to_remote "Delete",
+         :url => { :action => "destroy", :id => studied_factor.id,:study_id=>studied_factor.study.id },
+         :confirm=>"Are you sure?",:method=>:delete
+       -%>
+    </li>
+    
+  </ul>
+</li>

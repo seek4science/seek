@@ -1,7 +1,7 @@
 class ExperimentalConditionsController < ApplicationController
   before_filter :login_required
   before_filter :find_and_auth_sop  
-  before_filter :create_new_condition
+  before_filter :create_new_condition, :only=>[:index]
 
   def index
     respond_to do |format|
@@ -44,8 +44,9 @@ class ExperimentalConditionsController < ApplicationController
   def find_and_auth_sop
     begin
       sop = Sop.find(params[:sop_id])
-
-      if Authorization.is_authorized?(action_name, nil, sop, current_user)
+      the_action=action_name
+      the_action="edit" if the_action=="destroy" #we are not destroying the sop, just editing its exp conditions
+      if Authorization.is_authorized?(the_action, nil, sop, current_user)
         @sop = sop
       else
         respond_to do |format|
