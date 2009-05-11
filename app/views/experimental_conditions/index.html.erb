@@ -1,0 +1,46 @@
+<h1>
+  <%= "Experimental conditions for '#{link_to h(@sop.title),@sop}'" %>
+</h1>
+<% if Authorization.is_authorized?("edit",nil,@sop,current_user) -%>
+  <div id="edit_on">
+    <%= link_to_function image(method_to_icon_filename("edit")) do |page|
+      page.visual_effect :appear,"add_condition"
+      page["edit_on"].toggle
+      page["edit_off"].toggle
+      page.select('li.destroy_experimental_condition').each do |el|
+        el.toggle
+      end
+    end
+    -%>
+  </div>
+
+  <div id="edit_off" style="display:none;">
+    <%= link_to_function "Stop editing" do |page|
+      page.visual_effect :fade,"add_condition"
+      page["edit_on"].toggle
+      page["edit_off"].toggle
+      page.select('li.destroy_experimental_condition').each do |el|
+        el.toggle
+      end
+    end
+    -%>
+  </div>
+<% end -%>
+
+<center>
+
+  <div id="add_condition" style="display:none;">
+    <%= render :partial=>"add_condition" %>
+  </div>
+
+  <ul id="experimental_conditions" class="conditions_or_factors">
+
+    <%= render :partial=>"condition_row_headings" %>
+
+    <div id="experimental_conditions_rows">
+      <%= render :partial=>"condition_row",:collection=>@sop.experimental_conditions %>
+    </div>
+  </ul>
+
+
+</center>

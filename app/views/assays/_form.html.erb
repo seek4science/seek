@@ -20,9 +20,10 @@
 
 <p style="margin: 1em 0 0 0;">
 <div class="fold">
-  <div class="foldTitle">Assay type</div>
+  <div class="foldTitle">Assay and technology type</div>
   <div class="foldContent">
-    <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %>
+    <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %><br/>
+    <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
   </div>
 </div>
 </p>

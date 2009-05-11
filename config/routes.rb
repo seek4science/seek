@@ -3,6 +3,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :assay_types
 
+  map.resources :technology_types
+
   map.resources :measured_items
   
   map.resources :investigations
