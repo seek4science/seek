@@ -1,0 +1,24 @@
+<% if Authorization.is_authorized?("view",nil,@sop,current_user) -%>
+
+  <% if Authorization.is_authorized?("edit",nil,@sop,current_user) -%>
+    <ul class="sectionIcons">
+      <li><%= icon('manage', sop_experimental_conditions_path(@sop), nil, nil, 'Manage') -%></li>
+    </ul>
+  <% end -%>
+
+  <br/>
+
+  <% unless @sop.experimental_conditions.empty? -%>
+    <ul class="conditions_and_factors">
+      <%= render :partial=>"experimental_conditions/condition_row_headings" %>
+      <%= render :partial=>"experimental_conditions/condition_row",:collection=>@sop.experimental_conditions %>
+    </ul>
+  <% else -%>
+    <span class="none_text">No experimental conditions for this Sop yet</span>
+  <% end -%>
+
+  <div style="clear:both;">&nbsp;</div>
+
+
+
+<% end -%>

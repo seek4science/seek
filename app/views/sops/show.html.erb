@@ -59,7 +59,7 @@
                   <%= help_icon("These are the experimental conditions related to this sop") %>
                   Experimental Conditions
                 </h3>
-                  <%= link_to "Experimental conditions",sop_experimental_conditions_path(@sop) %>
+                  <%= render :partial=>"sops/simple_experimental_conditions_list" %>                  
 				<br/>
 
 				<h3>
