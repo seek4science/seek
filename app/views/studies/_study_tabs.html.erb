@@ -1,7 +1,4 @@
-<h2 style="margin-top: 3em;">Items related to this study</h2>
+<% study_resource_hash = Asset.classify_and_authorize(@study.sops.collect{|sop| sop.asset  }, true, current_user) -%>
+<% study_resource_hash.merge!(classify_for_tabs(@study.assays)) -%>
 
-<% study_asset_hash = Asset.classify_and_authorize(@study.sops.collect{|sop| sop.asset  }, true, current_user) -%>
-
-<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => study_asset_hash,
-  :narrow_view => true,
-  :authorization_already_done => true } -%>
+<%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@study.title,:item_hash=>study_resource_hash} %>

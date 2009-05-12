@@ -1,0 +1,6 @@
+<h2 style="margin-top: 3em;">
+  Items related to <span style="font-weight:bolder;"><%= h(item_name) -%></span>.
+</h2>
+<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => item_hash,
+  :narrow_view => true,
+  :authorization_already_done => true } -%>

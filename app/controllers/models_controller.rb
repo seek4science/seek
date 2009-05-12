@@ -18,6 +18,7 @@ class ModelsController < ApplicationController
     @models=Authorization.authorize_collection("show",@models,current_user)
     respond_to do |format|
       format.html # index.html.erb
+      format.xml { render :xml=>@models}
     end
   end
 

@@ -27,7 +27,7 @@
       <p>
         <b>Name:</b> <%= h @person.name %>
       </p>
-      
+
       <% if mine?(@person) -%>
         <p>
           <b>Login name :</b> <%= h @person.user.login %> <span class='none_text'>(Only visible to you)</span>
@@ -93,19 +93,12 @@
 
     <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
 
-    <div class="fold">
-      <div class="foldTitle">Items related to <%= h @person.name %> </div>
-      <div class="foldContent">
-        <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-        <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
-        <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
-        <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
-        <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => persons_asset_hash,
-          :narrow_view => true,
-          :authorization_already_done => true } -%>
-      </div>
-    </div>
-
+    <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
+    <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
+    <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
+    <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
+    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@person.name,:item_hash=>persons_asset_hash} %>
+    
 
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>

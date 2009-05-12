@@ -84,14 +84,11 @@
     <%= render :partial=>"sops/simple_experimental_conditions_list" %>
     <br/>
 
-
-    <h2 style="margin-top: 3em;">Items related to this Sop</h2>
+   
     <%# get, classify and authorize all assets for this project -%>
     <% sop_asset_hash = classify_for_tabs([@sop.asset.project]) -%>
 
-    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => sop_asset_hash,
-      :narrow_view => true,
-      :authorization_already_done => true } -%>
+    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@sop.title,:item_hash=>sop_asset_hash} %>
 
   </div>
 

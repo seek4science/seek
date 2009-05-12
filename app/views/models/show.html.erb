@@ -88,13 +88,9 @@
   <div style="clear:both;">
     <%= render :partial=>"execute" %>
 
-    <h2 style="margin-top: 3em;">Items related to this Model</h2>
-    <%# get, classify and authorize all assets for this project -%>
-    <% model_asset_hash = classify_for_tabs(@model.asset.project.nil? ? [] : [@model.asset.project]) -%>
-
-    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => model_asset_hash,
-      :narrow_view => true,
-      :authorization_already_done => true } -%>
+ 
+    <% model_resource_hash = classify_for_tabs(@model.asset.project.nil? ? [] : [@model.asset.project]) -%>
+    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@model.title,:item_hash=>model_resource_hash} %>
   </div>
 
 </div>

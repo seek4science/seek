@@ -45,12 +45,10 @@
   </div>
 
   <div style="clear:both;">
-    <h2 style="margin-top: 4em;">Associated with '<%= h(@institution.name) -%>' </h2>
+    
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <% institution_hash = classify_for_tabs(@institution.projects) %>
-    <% institution_hash.merge!(classify_for_tabs(@institution.people)) %>
-    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => institution_hash,
-      :narrow_view => true,
-      :authorization_already_done => true } -%>
+    <% institution_resource_hash = classify_for_tabs(@institution.projects) %>
+    <% institution_resource_hash.merge!(classify_for_tabs(@institution.people)) %>
+    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@institution.name,:item_hash=>institution_resource_hash} %>
   </div>
 </div>
