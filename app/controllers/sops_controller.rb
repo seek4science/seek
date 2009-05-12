@@ -14,6 +14,7 @@ class SopsController < ApplicationController
     @sops=Authorization.authorize_collection("show",@sops,current_user)
     respond_to do |format|
       format.html # index.html.erb
+      format.xml { render :xml=>@sops}
     end
   end
 

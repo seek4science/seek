@@ -7,6 +7,14 @@ class DataFilesController < ApplicationController
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
 
+  def index
+    @data_files=Authorization.authorize_collection("show",@data_files,current_user)
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml { render :xml=>@data_files}
+    end
+  end
+
 
   def new
     respond_to do |format|
