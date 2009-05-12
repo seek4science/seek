@@ -13,7 +13,7 @@
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @sop, current_user) -%>
-    <li><%= icon('sop', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
+    <li><%= icon('download', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
   <% else -%>
     <li>
       <%=  help_icon("You do not have permission to download this Sop, but you are interested you can request permission from the owner.") %>

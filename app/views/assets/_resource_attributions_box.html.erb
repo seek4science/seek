@@ -9,11 +9,11 @@
 <div class="contribution_section_box">
 	
 	<p class="heading" style="margin-bottom: 0; padding-bottom: 0;">
-		<%= help_icon("What other assets is this one based on?") -%>
+		<%= help_icon("What other assets have influenced this one?") -%>
 		Attributions <span class="count_text">(<%= attributed_to.length -%>)</span>
 		<a name="attributions"></a>
 		<% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
-			<p style="text-align: middle; margin: 0; padding: 0;"><small>[ <%= link_to "edit", eval("edit_#{resource.class.name.underscore}_path(#{resource.id})") %> ]</small></p>
+			<p style="text-align:center; margin: 0; padding: 0;"><small>[ <%= link_to "edit", eval("edit_#{resource.class.name.underscore}_path(#{resource.id})") %> ]</small></p>
 		<% end %>
 	</p>
 

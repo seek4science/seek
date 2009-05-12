@@ -15,7 +15,7 @@
 
   <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
     <li>
-      <%= icon('data_file', download_data_file_url, "Download Data file", nil, "Download Data file") -%>
+      <%= icon('download', download_data_file_url, "Download Data file", nil, "Download Data file") -%>
     </li>
   <% else -%>
     <li>
