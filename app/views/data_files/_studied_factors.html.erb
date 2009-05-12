@@ -1,0 +1,34 @@
+
+<% if Authorization.is_authorized?("view",nil,@data_file,current_user) -%>
+
+  <% if Authorization.is_authorized?("edit",nil,@data_file,current_user) -%>
+    <ul class="sectionIcons">
+      <li><%= icon('manage', data_file_studied_factors_path(@data_file), nil, nil, 'Manage') -%></li>
+    </ul>
+  <% end -%>
+
+  <br/>
+  
+  <div id="studied_factors">
+    <% unless @data_file.studied_factors.empty? -%>
+      <ul class="conditions_and_factors">
+        <%= render :partial=>"studied_factors/factor_row_headings" %>
+        <%= render :partial=>"studied_factors/factor_row",:collection=>@data_file.studied_factors %>
+      </ul>
+    <% else -%>
+      <span class="none_text">No factors studied for this Data file.</span>
+    <% end -%>
+  </div>
+
+  <div style="clear:both;">&nbsp;</div>
+
+
+
+<% end -%>
+
+
+
+
+
+
+

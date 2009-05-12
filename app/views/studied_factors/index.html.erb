@@ -1,9 +1,9 @@
-  <h1>
+<h1>
   <%= "Factors studied for '#{link_to h(@data_file.title),@data_file}'" %>
 </h1>
 
 <div id="edit_on">
-  <%= link_to_function "Start editing" do |page|
+  <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Start editing",:alt=>"Start editing") do |page|
     page.visual_effect :appear,"add_factor"
     page["edit_on"].toggle
     page["edit_off"].toggle
@@ -15,7 +15,7 @@
 </div>
 
 <div id="edit_off" style="display:none;">
-  <%= link_to_function "Stop editing" do |page|
+  <%= link_to_function image(("edit-off"),:style=>"margin-left:4em;",:title=>"Stop editing",:alt=>"Stop editing") do |page|
     page.visual_effect :fade,"add_factor"
     page["edit_on"].toggle
     page["edit_off"].toggle
@@ -34,28 +34,7 @@
 
   <ul id="studied_factors" class="conditions_or_factors">
 
-    <li>
-      <ul class="condition_or_factor_row heading">
-
-        <li id="time_point">
-          Time point
-        </li>
-
-        <li id="measured_item">
-          Item measured
-        </li>
-        <li id="range">
-          Range or value
-        </li>
-        <li id="unit">
-          Unit
-        </li>
-        <li id="standard_deviation">
-          SD
-        </li>
-        
-      </ul>
-    </li>
+    <%= render :partial=>"factor_row_headings" %>
 
     <div id="studied_factors_rows">
       <%= render :partial=>"factor_row",:collection=>@data_file.studied_factors %>

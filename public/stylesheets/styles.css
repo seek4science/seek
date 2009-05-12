@@ -500,7 +500,6 @@ ul.conditions_or_factors li {
 
 ul.condition_or_factor_row {
     clear:both;
-    font-size:smaller;
 }
 
 ul.condition_or_factor_row li {
@@ -508,23 +507,19 @@ ul.condition_or_factor_row li {
     padding: 0 1em 0.25em 1em;
     text-align:left;
     border-bottom: dotted #999999 1px;
-    min-height: 1.5em;
+    min-height: 2em;
 }
 
 ul.condition_or_factor_row li#measured_item {
     width:15em;
 }
 
-ul.condition_or_factor_row li#unit {
-    width:13em;
-}
-
-ul.condition_or_factor_row li#range {
-    width:10em;
+ul.condition_or_factor_row li#values {
+    width:15em;
 }
 
 ul.condition_or_factor_row li#time_point {
-    width:3em;
+    width:5em;
 }
 
 ul.condition_or_factor_row li#standard_deviation {
@@ -532,10 +527,15 @@ ul.condition_or_factor_row li#standard_deviation {
 }
 
 ul.condition_or_factor_row li#delete {
-    width:2em;
+    width:1em;
 }
 
 ul.heading li {
     font-weight:bolder;
     min-height: 4em;
+}
+
+.show_basic div#studied_factors {
+    max-height:30em;
+    overflow:auto;
 }

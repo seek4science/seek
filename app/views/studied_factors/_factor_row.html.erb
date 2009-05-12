@@ -10,13 +10,9 @@
       <%= h studied_factor.measured_item.title %>
     </li>
     
-    <li id="range">
-      <%= h studied_factor.range_text %>
-    </li>
-    
-    <li id="unit">
-      <%= h studied_factor.unit.symbol %>
-    </li>
+    <li id="values">
+      <%= "#{h studied_factor.range_text} #{studied_factor.unit.symbol}" %>
+    </li>       
 
     <li id="standard_deviation">
       <%= h studied_factor.standard_deviation %>
@@ -27,7 +23,7 @@
     
     <% style="display:none;" unless show_delete %>
     <li id="delete" class="destroy_studied_factor" style="<%= style %>">
-       <%=  link_to_remote "Delete",
+       <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete factor studied"),
          :url => { :action => "destroy", :id => studied_factor.id,:data_file_id=>studied_factor.data_file.id },
          :confirm=>"Are you sure?",:method=>:delete
        -%>

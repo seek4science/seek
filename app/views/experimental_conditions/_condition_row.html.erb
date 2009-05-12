@@ -6,18 +6,15 @@
       <%= h exp_condition.measured_item.title %>
     </li>
     
-    <li id="range">
-      <%= h exp_condition.range_text %>
+    <li id="values">
+      <%= "#{h exp_condition.range_text} #{exp_condition.unit.symbol}" %>
     </li>
-    
-    <li id="unit">
-      <%= h exp_condition.unit.symbol %>
-    </li>
+        
 
     <% if Authorization.is_authorized?("edit",exp_condition.sop,current_user) -%>
     <% style="display:none;" unless show_delete %>
     <li class="destroy_experimental_condition" style="<%= style %>">
-       <%=  link_to_remote "Delete",
+       <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete experimental condition"),
          :url => { :action => "destroy", :id => exp_condition.id,:sop_id=>exp_condition.sop.id },
          :confirm=>"Are you sure?",:method=>:delete
        -%>

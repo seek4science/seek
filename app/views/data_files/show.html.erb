@@ -1,5 +1,4 @@
 
-
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
@@ -19,79 +18,64 @@
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @data_file } -%>
 
+<hr/>
+
 <div class="show_basic">
-  <div class="contribution_left_box">
-    <div class="contribution_version_box">
-      <div class="contribution_version_inner_box">
-        <p>
-          <b>Title:</b>
-          <span class="title"><%=h @data_file.title -%></span>
-        </p>
+  <div class="main_content_left_box">
+    <div class="box_about_actor">
+      <p>
+        <label>File name:</label>
+        <%=h @data_file.original_filename -%>
+      </p>
 
-        <p>
-          <b>File name:</b>
-          <%=h @data_file.original_filename -%>
-        </p>
+      <p>
+        <label>Format:</label>
+        <%=h @data_file.content_type -%>
+      </p>
+      <br/>
 
-        <p>
-          <b>Format:</b>
-          <%=h @data_file.content_type -%>
-        </p>
-
-        <p>
-          <b>Factors studied:</b>
-          <%=link_to "Factors studied",data_file_studied_factors_path(@data_file)-%>
-        </p>
-
-        
-
-        <br/>
-
-        <h3>
-          <%= help_icon("This section shows the overall description for this Data file") -%>
-          Description
-        </h3>
+      <p>
+        <b>Description:</b>
 
         <% unless @data_file.description.blank? -%>
-          <div class="contribution_description">
+          <div class="box_standout">
             <%= simple_format(white_list(@data_file.description)) -%>
           </div>
         <% else -%>
           <p class="none_text">
-            Not set
+            No description.
           </p>
         <% end -%>
+      </p>
 
-        <br/>
-
-        <h3>
-          <%= help_icon("This section provides links to the download(s) for this Data file") -%>
-          Download
-        </h3>
-
-        <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
-          <ul class="sectionIcons">
-            <li><%= icon('data_file', download_data_file_url, "Download Data file", nil, "Download Data file") -%></li>
-          </ul>
-        <% else -%>
-          <p class="none_text">
-            You do not have permissions to download this Data file.
-          </p>
-        <% end -%>
-
-        <br/>
-
-
-      </div>
 
     </div>
-
   </div>
-
-  <div class="contribution_right_box">
+  <div class="main_content_right_box">
     <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @data_file } -%>
-    <%= render :partial => "assets/resource_associated_with_box", :locals => { :resource => @data_file, :truncate_to => truncate_length_for_boxes } -%>
     <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @data_file, :attributed_to => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
+  </div>
+  <div style="clear:both;">
+
+    <p>
+      <h2>Factors studied:</h2>
+      <%= render :partial=>"data_files/studied_factors" %>
+    </p>
+    <p>
+
+      <h2>Download:</h2>
+
+
+      <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
+        <ul class="sectionIcons">
+          <li><%= icon('data_file', download_data_file_url, "Download Data file", nil, "Download Data file") -%></li>
+        </ul>
+      <% else -%>
+        <p class="none_text">
+          You do not have permissions to download this Data file.
+        </p>
+      <% end -%>
+    </p>
   </div>
 
 </div>
