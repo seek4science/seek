@@ -1,0 +1,43 @@
+<% assay = resource_list_item %>
+
+
+<div class="list_items_container">
+  <table class="list_item">
+    <tr>
+
+
+      <td class="item_details">
+        <p class="name">
+          <%= link_to h(assay.title),assay %>
+        </p>
+
+        <div class="box_standout">
+          <%= truncate(text_or_not_specified(assay.description, :description => true), :length=>300) %>
+        </div>
+
+        <p class="assay_type">
+          <label>Assay type:</label>
+          <%= link_to h(assay.assay_type.title.capitalize),assay.assay_type %>          
+        </p>
+        <p class="technology_type">
+          <label>Technology type:</label>
+          <%= link_to h(assay.technology_type.title.capitalize),assay.technology_type %>
+        </p>
+
+        <p class="studies">
+          <label>Studies: </label>
+          <%= studies_link_list assay.studies %>
+        </p>
+
+        <p class="Sops">
+          <label>Sops: </label>
+          <%= sops_link_list assay.sops,true,200 %>
+        </p>
+
+      </td>
+
+    </tr>
+  </table>
+
+
+</div>

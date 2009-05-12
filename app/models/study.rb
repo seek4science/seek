@@ -25,6 +25,10 @@ class Study < ActiveRecord::Base
     return sops
   end
 
+  def title
+    super.capitalize
+  end
+
   
 
 end

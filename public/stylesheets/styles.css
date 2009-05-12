@@ -539,3 +539,7 @@ ul.heading li {
     max-height:30em;
     overflow:auto;
 }
+
+div.ontology_nav {
+    padding-left: 3em;
+}

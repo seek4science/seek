@@ -15,4 +15,6 @@ module AssaysHelper
     return assay.studies.empty?
   end
 
+
+
 end

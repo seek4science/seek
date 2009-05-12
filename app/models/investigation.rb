@@ -14,5 +14,9 @@ class Investigation < ActiveRecord::Base
     end
     return assets
   end
+
+  def title
+    super.capitalize
+  end
   
 end

@@ -1,20 +1,28 @@
-<h1><%= h @assay_type.title %></h1>
+<h1>Assay type '<%= h @assay_type.title %>'</h1>
 
-<% if @assay_type.has_parents? -%>
-  <label>Parents:</label>
-  <% for parent_type in @assay_type.parents  -%>
-    <%= link_to h(parent_type.title), parent_type %>
-    <%= " | " unless @assay_type.parents.last==parent_type %>
+<div class="ontology_nav">
+
+  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents"}) -%>
+  <% if @assay_type.has_parents? -%>
+    <% for parent_type in @assay_type.parents  -%>
+      <%= link_to h(parent_type.title), parent_type %>
+      <%= " | " unless @assay_type.parents.last==parent_type %>
+    <% end -%>
+  <% else -%>
+    <span class="none_text">No parent terms</span>
   <% end -%>
-<% end -%>
-<br/>
-<% if @assay_type.has_children? -%>
-  <label>Children:</label>
-  <% for child_type in @assay_type.children  -%>
-    <%= link_to h(child_type.title), child_type %>
-    <%= " | " unless @assay_type.children.last==child_type %>
+  <br/>
+
+  <%= image("arrow_down",{:title=>"Children",:alt=>"Children"}) -%>
+  <% if @assay_type.has_children? -%>
+    <% for child_type in @assay_type.children  -%>
+      <%= link_to h(child_type.title), child_type %>
+      <%= " | " unless @assay_type.children.last==child_type %>
+    <% end -%>
+  <% else -%>
+    <span class="none_text">No child terms</span>
   <% end -%>
-<% end -%>
+</div>
 
 <h2>Related assays</h2>
-<%= render :partial=>"assay_types/assay",:collection=>@assay_type.get_child_assays %>
+<%= render :partial=>"assays/resource_list_item",:collection=>@assay_type.get_child_assays %>

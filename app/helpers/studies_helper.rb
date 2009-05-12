@@ -34,4 +34,17 @@ module StudiesHelper
     items.sort{|a,b| a.title <=> b.title}
   end
 
+  def studies_link_list studies,sorted=true
+    
+    return "<span class='none_text'>Not associated with any studies</span>" if studies.empty?
+
+    result=""
+    studies=studies.sort{|a,b| a.title<=>b.title} if sorted
+    studies.each do |study|
+      result += link_to h(study.title.capitalize),study
+      result + " | " unless study=studies.last
+    end
+    return result
+  end
+
 end

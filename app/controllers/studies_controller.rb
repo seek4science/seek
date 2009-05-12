@@ -20,6 +20,8 @@ class StudiesController < ApplicationController
 
   def new
     @study = Study.new
+    @study.assays << Assay.find(params[:assay_id]) if params[:assay_id]
+    
     respond_to do |format|
       format.html
     end

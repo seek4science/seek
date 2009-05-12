@@ -16,6 +16,10 @@ class AssayType < ActiveRecord::Base
     return result
   end
 
+  def title
+    super.capitalize
+  end
+
   private
 
 
