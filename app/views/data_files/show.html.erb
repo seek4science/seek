@@ -10,7 +10,7 @@
   <% end -%>
 
   <% if Authorization.is_authorized?("destroy", nil, @data_file, current_user) -%>
-    <li><%= icon('destroy', data_file_path(@data_file), nil, { :confirm => 'This deletes the Data file and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%></li>
+    <li><%= icon('destroy', data_file_path(@data_file), nil, { :confirm => 'This deletes the Data file and all metadata. Are you sure?', :method => :delete }, 'Delete Data file') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
@@ -26,11 +26,12 @@
 
 </ul>
 
+<hr/>
+
 <h1 class="contribution_title">Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @data_file } -%>
 
-<hr/>
 
 <div class="show_basic">
   <div class="main_content_left_box">
