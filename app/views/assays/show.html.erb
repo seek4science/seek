@@ -30,40 +30,7 @@
     <b>Technology type: </b><%= link_to h(@assay.technology_type.title), @assay.technology_type %>
   </p>
 
-  <p>
-    <b>Studies:</b>
-    <% if @assay.studies.empty? -%>
-      <span class="none_text">
-        No Studies are associated with this assay )
-      </span>
-      
-    <% else -%>
-      <ul>
-        <% for study in @assay.studies -%>
-          <li>
-            <%=  "#{link_to h(study.title),study} for the Investigation - #{link_to h(study.investigation.title),study.investigation}" %>
-          </li>
-        <% end -%>
-      </ul>
-    <% end -%>
-  </p>
-
-  <p>
-    <b>SOPs:</b><br/>
-
-    <ul>
-      <% if Authorization.authorize_collection("show",@assay.sops,current_user).empty? -%>
-        <li class="none_text">No SOPs, or none that are visible to you.</li>
-      <% else -%>
-
-        <% for sop in @assay.sops -%>
-          <li><%=  link_to h(sop.title),sop,:title=>tooltip_title_attrib(h(sop.description),1000) %></li>
-
-        <% end -%>
-      <% end -%>
-    </ul>
-
-  </p>
+  <%= render :partial=>"assays/assay_tabs",:object=>@assay %>
 
 </div>
 

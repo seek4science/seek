@@ -14,6 +14,14 @@
 
 
   <div class="box_about_actor">
+
+    <div class="investigation">
+      <p>
+        <label>Investigation:</label>
+        <%= link_to h(@study.investigation.title),@study.investigation %>
+      </p>
+    </div>
+
     <div class="project">
       <p>
         <label>Belongs to the project:</label>
@@ -21,10 +29,14 @@
       </p>
     </div>
 
-    <div class="investigation">
+    <div>
       <p>
-        <label>Investigation:</label>
-        <%= link_to h(@study.investigation.title),@study.investigation %>
+        <label>Person responsible:</label>
+        <% if @study.person_responsible -%>
+          <%= link_to h(@study.person_responsible.name),@study.person_responsible %>
+        <% else -%>
+          <span class="none_text">Not specified</span>
+        <% end -%>
       </p>
     </div>
 

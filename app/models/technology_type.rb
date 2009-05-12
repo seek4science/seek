@@ -16,9 +16,6 @@ class TechnologyType < ActiveRecord::Base
     end
     return result
   end
-
-  def title
-    super.capitalize
-  end
+ 
 
 end

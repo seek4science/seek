@@ -1,0 +1,29 @@
+<% investigation = resource_list_item %>
+
+
+<div class="list_items_container">
+  <table class="list_item">
+    <tr>
+
+
+      <td class="item_details">
+        <p class="title">
+          <%= link_to h(investigation.title),assay %>
+        </p>
+
+        <div class="box_standout">
+          <%= truncate(text_or_not_specified(investigation.description, :description => true), :length=>300) %>
+        </div>        
+
+        <p class="studies">
+          <label>Studies: </label>
+          <%= studies_link_list investigation.studies %>
+        </p>        
+
+      </td>
+
+    </tr>
+  </table>
+
+
+</div>

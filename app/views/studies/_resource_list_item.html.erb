@@ -8,7 +8,7 @@
         <br/>
         <center>
           <% if study.project -%>
-          <%= related_project_avatar(study.project) -%>
+            <%= related_project_avatar(study.project) -%>
           <% end -%>
         </center>
 
@@ -34,6 +34,16 @@
           <label>Investigation: </label>
           <%= link_to h(study.investigation.title),study.investigation %>
         </p>
+        <div>
+          <p class="person">
+            <label>Person responsible:</label>
+            <% if study.person_responsible -%>
+              <%= link_to h(study.person_responsible.name),study.person_responsible %>
+            <% else -%>
+              <span class="none_text">Not specified</span>
+            <% end -%>
+          </p>
+        </div>
 
         <div class="assays">
           <div style="margin-top: 0.3em;">
@@ -44,7 +54,7 @@
         </div>
 
       </td>
-      
+
     </tr>
   </table>
 

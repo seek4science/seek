@@ -24,8 +24,6 @@
   <% end -%>
 </ul>
 
-<hr/>
-
 <h1 class="contribution_title">Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @model } -%>
@@ -92,13 +90,11 @@
 
     <h2 style="margin-top: 3em;">Items related to this Model</h2>
     <%# get, classify and authorize all assets for this project -%>
-    <% sop_asset_hash = classify_for_tabs([@model.asset.project]) -%>
+    <% model_asset_hash = classify_for_tabs(@model.asset.project.nil? ? [] : [@model.asset.project]) -%>
 
-    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => sop_asset_hash,
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => model_asset_hash,
       :narrow_view => true,
       :authorization_already_done => true } -%>
   </div>
-
-
 
 </div>

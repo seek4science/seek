@@ -1,0 +1,9 @@
+<h2 style="margin-top: 3em;">Items related to this assay</h2>
+
+<% assay_asset_hash = Asset.classify_and_authorize(@assay.sops.collect{|sop| sop.asset  }, true, current_user) -%>
+<% assay_asset_hash.merge!(classify_for_tabs(@assay.studies)) -%>
+
+
+<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => assay_asset_hash,
+  :narrow_view => true,
+  :authorization_already_done => true } -%>

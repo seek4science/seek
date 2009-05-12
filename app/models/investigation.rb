@@ -7,6 +7,8 @@ class Investigation < ActiveRecord::Base
   validates_presence_of :project
   validates_uniqueness_of :title
 
+  acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
+
   def assets
     assets=[]
     studies.each do |study|
@@ -15,8 +17,5 @@ class Investigation < ActiveRecord::Base
     return assets
   end
 
-  def title
-    super.capitalize
-  end
   
 end
