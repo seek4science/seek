@@ -12,7 +12,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :assay_type
   validates_presence_of :technology_type
 
-  acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
+  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type]) if SOLR_ENABLED
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
