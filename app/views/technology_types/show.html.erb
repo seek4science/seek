@@ -1,0 +1,28 @@
+<h1>Technology type '<%= h @technology_type.title %>'</h1>
+
+<div class="ontology_nav">
+
+  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents"}) -%>
+  <% if @technology_type.has_parents? -%>
+    <% for parent_type in @technology_type.parents  -%>
+      <%= link_to h(parent_type.title), parent_type %>
+      <%= " | " unless @technology_type.parents.last==parent_type %>
+    <% end -%>
+  <% else -%>
+    <span class="none_text">No parent terms</span>
+  <% end -%>
+  <br/>
+
+  <%= image("arrow_down",{:title=>"Children",:alt=>"Children"}) -%>
+  <% if @technology_type.has_children? -%>
+    <% for child_type in @technology_type.children  -%>
+      <%= link_to h(child_type.title), child_type %>
+      <%= " | " unless @technology_type.children.last==child_type %>
+    <% end -%>
+  <% else -%>
+    <span class="none_text">No child terms</span>
+  <% end -%>
+</div>
+
+<h2>Related assays</h2>
+<%= render :partial=>"assays/resource_list_item",:collection=>@technology_type.get_child_assays %>

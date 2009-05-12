@@ -21,7 +21,7 @@ HPLC:
   title: HPLC
 
 Mass_Spectormetry:
-  title: Mass Spectormetry
+  title: Mass Spectrometry
   children: liquid_chromatography-tandem_mass_spectrometry
 
 liquid_chromatography-tandem_mass_spectrometry:
