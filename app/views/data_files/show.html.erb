@@ -12,6 +12,18 @@
   <% if Authorization.is_authorized?("destroy", nil, @data_file, current_user) -%>
     <li><%= icon('destroy', data_file_path(@data_file), nil, { :confirm => 'This deletes the Data file and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%></li>
   <% end -%>
+
+  <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
+    <li>
+      <%= icon('data_file', download_data_file_url, "Download Data file", nil, "Download Data file") -%>
+    </li>
+  <% else -%>
+    <li>
+      <%=  help_icon("You do not have permission to download this file, but you are interested you can request permission from the owner.") %>
+      <%= icon('sop',"javascript:alert('not yet implemented')","Request file",nil,"Request file") %>
+    </li>
+  <% end -%>
+
 </ul>
 
 <h1 class="contribution_title">Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
@@ -61,21 +73,7 @@
       <h2>Factors studied:</h2>
       <%= render :partial=>"data_files/studied_factors" %>
     </p>
-    <p>
 
-      <h2>Download:</h2>
-
-
-      <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
-        <ul class="sectionIcons">
-          <li><%= icon('data_file', download_data_file_url, "Download Data file", nil, "Download Data file") -%></li>
-        </ul>
-      <% else -%>
-        <p class="none_text">
-          You do not have permissions to download this Data file.
-        </p>
-      <% end -%>
-    </p>
   </div>
 
 </div>

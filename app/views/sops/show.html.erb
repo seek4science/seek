@@ -1,91 +1,103 @@
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
-	<% if Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
-		<li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
-	<% elsif Authorization.is_authorized?("edit", nil, @sop, current_user) -%>
-	  <%# this is not owner, but current user can edit -%>
-		<li><%= icon('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
-	<% end -%>
-	
-	<% if Authorization.is_authorized?("destroy", nil, @sop, current_user) -%>
-		<li><%= icon('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
-	<% end -%>
+  <% if Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
+    <li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
+  <% elsif Authorization.is_authorized?("edit", nil, @sop, current_user) -%>
+    <%# this is not owner, but current user can edit -%>
+    <li><%= icon('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
+  <% end -%>
+
+  <% if Authorization.is_authorized?("destroy", nil, @sop, current_user) -%>
+    <li><%= icon('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
+  <% end -%>
+
+  <% if Authorization.is_authorized?("download", nil, @sop, current_user) -%>
+    <li><%= icon('sop', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
+  <% else -%>
+    <li>
+      <%=  help_icon("You do not have permission to download this Sop, but you are interested you can request permission from the owner.") %>
+      <%= icon('sop',"javascript:alert('not yet implemented')","Request file",nil,"Request file") %>
+    </li>
+  <% end -%>
 </ul>
+
+<hr/>
 
 <h1 class="contribution_title">SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @sop } -%>
 
+
 <div class="show_basic">
-	<div class="contribution_left_box">
-		<div class="contribution_version_box">
-			<div class="contribution_version_inner_box">
-				<p>
-				    <b>Title:</b>
-				    <span class="title"><%=h @sop.title -%></span>
-				</p>
-				
-				<p>
-				    <b>File name:</b>
-				    <%=h @sop.original_filename -%>
-				</p>
-				
-				<p>
-				    <b>Format:</b>
-				    <%=h @sop.content_type -%>
-				</p>
-				
-				<br/>
-				
-				<h3>
-					<%= help_icon("This section shows the overall description for this SOP") -%>
-					Description
-				</h3>
-				
-				<% unless @sop.description.blank? -%>
-					<div class="contribution_description">
-						<%= simple_format(white_list(@sop.description)) -%>
-					</div>
-				<% else -%>
-					<p class="none_text">
-						Not set
-					</p>
-				<% end -%>
-				
-				<br/>
+  <div class="main_content_left_box">
+    <div class="box_about_actor">
+      <p>
+        <b>Title:</b>
+        <span class="title"><%=h @sop.title -%></span>
+      </p>
 
-                <h3>
-                  <%= help_icon("These are the experimental conditions related to this sop") %>
-                  Experimental Conditions
-                </h3>
-                  <%= render :partial=>"sops/simple_experimental_conditions_list" %>                  
-				<br/>
+      <p>
+        <b>File name:</b>
+        <%=h @sop.original_filename -%>
+      </p>
 
-				<h3>
-					<%= help_icon("This section provides links to the download(s) for this SOP") -%>
-					Download
-				</h3>
-				
-				<% if Authorization.is_authorized?("download", nil, @sop, current_user) -%>
-					<ul class="sectionIcons">
-						<li><%= icon('sop', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
-					</ul>
-				<% else -%>
-					<p class="none_text">
-						You do not have permissions to download this SOP.
-					</p>
-				<% end -%>
-			</div>
-		
-		</div>
-	
-	</div>
-	
-	<div class="contribution_right_box">
-		<%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @sop } -%>
-		<%= render :partial => "assets/resource_associated_with_box", :locals => { :resource => @sop, :truncate_to => truncate_length_for_boxes } -%>
-	  <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @sop, :attributed_to => Authorization.authorize_collection("show", @sop.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
-	</div>
-	
+      <p>
+        <b>Format:</b>
+        <%=h @sop.content_type -%>
+      </p>
+
+      <br/>
+
+      <p>
+
+        <b>Description</b>
+
+
+        <% unless @sop.description.blank? -%>
+          <div class="box_standout">
+            <%= simple_format(white_list(@sop.description)) -%>
+          </div>
+        <% else -%>
+          <p class="none_text">
+            No description
+          </p>
+        <% end -%>
+
+      </p>
+
+    </div>
+  </div>
+
+  <div class="main_content_right_box">
+    <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @sop } -%>
+    <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @sop, :attributed_to => Authorization.authorize_collection("show", @sop.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
+  </div>
+
+  <div style="clear:both;">
+
+
+
+
+
+    <h2>      
+      Experimental Conditions
+    </h2>
+    <%= render :partial=>"sops/simple_experimental_conditions_list" %>
+    <br/>
+
+
+    <h2 style="margin-top: 3em;">Items related to this Sop</h2>
+    <%# get, classify and authorize all assets for this project -%>
+    <% sop_asset_hash = classify_for_tabs([@sop.asset.project]) -%>
+
+    <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => sop_asset_hash,
+      :narrow_view => true,
+      :authorization_already_done => true } -%>
+
+  </div>
+
+
+
+
 </div>

@@ -2,7 +2,7 @@
 
   <% if Authorization.is_authorized?("edit",nil,@sop,current_user) -%>
     <ul class="sectionIcons">
-      <li><%= icon('manage', sop_experimental_conditions_path(@sop), nil, nil, 'Manage') -%></li>
+      <li><%= icon('edit', sop_experimental_conditions_path(@sop), nil, nil, 'Edit experimental conditions') -%></li>
     </ul>
   <% end -%>
 
@@ -14,7 +14,7 @@
       <%= render :partial=>"experimental_conditions/condition_row",:collection=>@sop.experimental_conditions %>
     </ul>
   <% else -%>
-    <span class="none_text">No experimental conditions for this Sop yet</span>
+    <span class="none_text">There are no experimental conditions for this Sop.</span>
   <% end -%>
 
   <div style="clear:both;">&nbsp;</div>
