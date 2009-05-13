@@ -102,4 +102,8 @@ percent:
   symbol: %
   comment: percentage
 
+acidity:
+  symbol: pH
+  comment: pH
+
 
