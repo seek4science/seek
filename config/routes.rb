@@ -63,7 +63,7 @@ ActionController::Routing::Routes.draw do |map|
   map.update_favourite_group '/favourite_groups/update', :controller => 'favourite_groups', :action => 'update', :conditions => { :method => :post }
   map.delete_favourite_group '/favourite_groups/:id', :controller => 'favourite_groups', :action => 'destroy', :conditions => { :method => :delete }
 
-  map.new_investigation 'studies/new_investigation',:controller=>"studies",:action=>'new_investigation',:conditions=> {:method=>:post}
+  map.new_investigation_redbox 'studies/new_investigation_redbox',:controller=>"studies",:action=>'new_investigation_redbox',:conditions=> {:method=>:post}
   map.create_investigation 'experiments/create_investigation',:controller=>"studies",:action=>'create_investigation',:conditions=> {:method=>:post}
   
   

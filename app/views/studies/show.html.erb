@@ -2,10 +2,17 @@
 
 
 <ul class="sectionIcons">
-  <li><%= icon('edit', edit_study_path(@study), "Edit Study Details", nil, 'Edit Study Details') -%></li>
+  <li>
+    <%= icon('edit', edit_study_path(@study), "Edit Study Details", nil, 'Edit Study Details') -%>
+  </li>
   <% if current_user.is_admin? -%>
-    <li><%= icon "destroy", study_path(@study), "Delete Study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>
+    <li>
+      <%= icon "destroy", study_path(@study), "Delete Study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>
+    </li>
   <% end -%>
+  <li>
+    <%= icon('new', edit_study_path(@study), "Create a new assay for this study", nil, 'Create a new assay for this study') -%>
+  </li>
 </ul>
 
 <h1><%= h @study.title -%></h1>

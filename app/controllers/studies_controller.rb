@@ -2,7 +2,7 @@ class StudiesController < ApplicationController
 
   before_filter :login_required
 
-  before_filter :set_no_layout, :only => [ :new_investigation,:new_assay ]
+  before_filter :set_no_layout, :only => [ :new_investigation_redbox,:new_assay ]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_project_member,:only=>[:create,:new]
 
@@ -72,7 +72,7 @@ class StudiesController < ApplicationController
 
   end
 
-  def new_investigation
+  def new_investigation_redbox
     project=Project.find(params[:project_id])
     @investigation=Investigation.new
     @investigation.project=project
