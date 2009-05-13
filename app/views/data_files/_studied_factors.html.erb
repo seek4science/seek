@@ -3,7 +3,7 @@
 
   <% if Authorization.is_authorized?("edit",nil,@data_file,current_user) -%>
     <ul class="sectionIcons">
-      <li><%= icon('manage', data_file_studied_factors_path(@data_file), nil, nil, 'Manage factors studied') -%></li>
+      <li><%= icon('edit', data_file_studied_factors_path(@data_file), nil, nil, 'Edit factors studied') -%></li>
     </ul>
   <% end -%>
 
