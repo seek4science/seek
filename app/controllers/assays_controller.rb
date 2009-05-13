@@ -39,6 +39,7 @@ class AssaysController < ApplicationController
 
   def update
     @assay=Assay.find(params[:id])
+    synchronise_created_datas(params[:data_file_ids])
 
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
@@ -73,5 +74,26 @@ class AssaysController < ApplicationController
       end
     end
   end
+
+  private
+
+  def synchronise_created_datas data_file_ids
+    for_removal=[]
+    for_addition=[]
+
+    data_files= data_file_ids ? DataFile.find(data_file_ids) : []
+    
+    for created_data in @assay.created_datas
+      for_removal << created_data if !data_files.include?(created_data.data_file)
+    end
+
+    for data_file in data_files
+      for_addition << CreatedData.new(:data_file=>data_file,:person=>current_user.person) if !@assay.data_files.include?(data_file)
+    end
+
+    @assay.created_datas = @assay.created_datas - for_removal
+    @assay.created_datas = @assay.created_datas | for_addition
+  end
+
 
 end

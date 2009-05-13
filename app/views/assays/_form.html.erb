@@ -30,24 +30,21 @@
 </center>
 
 
-<p style="margin: 1em 0 0 0;">
-  <div class="fold">
-    <div class="foldTitle">Assay and technology type</div>
-    <div class="foldContent">
-      <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %><br/>
-      <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
-    </div>
-  </div>
+<h2>Assay and technology types</h2>
+<p id="assay_types">
+  <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %><br/>
+  <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
 </p>
 
-<p style="margin: 1em 0 0 0;">
-  <div class="fold">
-    <div class="foldTitle">Assay SOPs</div>
-    <div class="foldContent">
-      <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} %>
-    </div>
-  </div>
-</p>
+<h2>Assay SOPs</h2>
+
+<%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} -%>
+
+
+<% if action == :edit -%>
+  <h2>Data files</h2>
+  <%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f} -%>
+<% end -%>
 
 <p style="margin-top: 2em; text-align: center;" >
   <%= f.submit(action==:edit ? "Update" : "Create") -%>

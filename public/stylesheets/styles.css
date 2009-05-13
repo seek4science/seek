@@ -484,6 +484,30 @@ ul#user_details li {
     overflow: hidden;
 }
 
+#data_file_preview {
+    width: 20em;
+    max-height: 25em;
+    background-color: #EEEEEE;
+    display: inline-block;
+    padding: 1em 1em 1em 1em;
+    border: 1px solid #999999;
+}
+
+#data_file_preview p.title {
+    font-weight: bolder;
+    text-align:center;
+}
+
+#data_file_preview p.description {
+    border: 1px dotted #999999;
+    margin: 0.2em 0;
+    padding: 0.4em 0.6em;
+    background-color: #FFFFCC;
+    text-align: left;
+    line-height: 1.3;
+    overflow: hidden;
+}
+
 .foldContent {
     padding-top:0.5em;
     background-color: #FCFCFF;    
@@ -542,4 +566,8 @@ ul.heading li {
 
 div.ontology_nav {
     padding-left: 3em;
+}
+
+p#assay_types label {
+    width: 20em;
 }

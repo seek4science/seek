@@ -16,6 +16,8 @@ class Model < ActiveRecord::Base
 
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
 
+  has_many :created_datas
+
   # get a list of Models with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
   #

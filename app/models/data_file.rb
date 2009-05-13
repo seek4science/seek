@@ -4,6 +4,8 @@ class DataFile < ActiveRecord::Base
 
   acts_as_resource
 
+  has_one :created_data
+
   validates_presence_of :title
 
   has_many :studied_factors

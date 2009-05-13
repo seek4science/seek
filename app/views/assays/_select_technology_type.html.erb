@@ -1,2 +1,2 @@
-<%= f.label "Technology type *" %><br/><br/>
+<%= f.label "Technology type *: " %>
 <%= ontology_select_tag f,TechnologyType,"technology_type_id",selected_id= @assay.technology_type.nil? ? nil : @assay.technology_type.id %>

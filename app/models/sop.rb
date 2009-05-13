@@ -16,10 +16,7 @@ class Sop < ActiveRecord::Base
   has_many :experimental_conditions
 
   has_one :culture
-  has_one :organism,:through=>:culture
-  
-  # TODO
-  # add all required validations here
+  has_one :organism,:through=>:culture  
   
   
   # get a list of SOPs with their original uploaders - for autocomplete fields

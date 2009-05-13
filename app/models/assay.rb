@@ -6,6 +6,9 @@ class Assay < ActiveRecord::Base
   belongs_to :assay_type
   belongs_to :technology_type
 
+  has_many :created_datas
+  has_many :data_files,:through=>:created_datas
+
   validates_presence_of :title
   validates_uniqueness_of :title
 

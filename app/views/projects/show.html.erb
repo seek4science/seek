@@ -35,21 +35,19 @@
       <p>
         <%= render :partial=>"organisms_tags", :object=>@project.organisms %>
       </p>
-      
+
     </div>
   </div>
   <div class="main_content_right_box">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
   </div>
   <div style="clear:both;">
-
     <p style="margin-top: 1em;">
       <b>About the project:</b>
       <div id="description" class="box_standout">
         <%= text_or_not_specified(@project.description, :description=>true) %>
       </div>
     </p>
-
 
     <%# get, classify and authorize all assets for this project -%>
     <% project_resource_hash = Asset.classify_and_authorize(@project.assets, true, current_user) -%>
@@ -58,6 +56,7 @@
     <% project_resource_hash.merge!(classify_for_tabs(@project.studies)) -%>
 
     <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@project.name,:item_hash=>project_resource_hash} %>
+
   </div>
 </div>
 
