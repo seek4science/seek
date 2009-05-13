@@ -1,6 +1,7 @@
 class AssaysController < ApplicationController
 
   before_filter :login_required
+  before_filter :is_project_member,:only=>[:create,:new]
   
   def new
     @assay=Assay.new

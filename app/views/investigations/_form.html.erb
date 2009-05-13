@@ -1,0 +1,27 @@
+<%= f.error_messages -%>
+
+<center>
+  <div style="width: 60%;">
+    <p>
+      <%= f.label :title-%>*<br/>
+      <%= f.text_field :title,:size=>52 -%>
+    </p>
+
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :description,:cols=>50,:rows=>10 -%>
+    </p>
+
+    <p>
+      <%= f.label :project -%><br/>
+      <%= f.collection_select :project_id,current_user.person.projects,:id,:name %>
+    </p>
+  </div>
+</center>
+
+
+<p style="margin-top: 2em; text-align: center;" >
+  <%= f.submit(action==:edit ? "Update" : "Create") -%>
+  or <%= link_to 'Cancel', (@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>
+</p>
+

@@ -139,12 +139,5 @@ class StudiesController < ApplicationController
 
   end
 
-  def is_project_member
-
-    if !Authorization.is_member?(current_user.person_id, nil, nil)
-      flash[:error] = "You are not authorized to create new Studies. Only members of known projects, institutions or work groups are allowed to create new content."
-      redirect_to studies_path
-    end
-    
-  end
+  
 end

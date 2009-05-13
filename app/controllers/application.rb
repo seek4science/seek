@@ -74,6 +74,15 @@ class ApplicationController < ActionController::Base
   
   private
 
+  def is_project_member
+
+    if !Authorization.is_member?(current_user.person_id, nil, nil)
+      flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
+      redirect_to studies_path
+    end
+
+  end
+
   def error(notice, message)
     flash[:error] = notice
     (err = User.new.errors).add(:id, message)
