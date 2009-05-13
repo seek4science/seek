@@ -11,7 +11,7 @@
     </li>
   <% end -%>
   <li>
-    <%= icon('new', edit_study_path(@study), "Create a new assay for this study", nil, 'Create a new assay for this study') -%>
+    <%= icon('new', new_assay_path(:study_id=>@study), "Create a new assay for this study", nil, 'Create a new assay for this study') -%>
   </li>
 </ul>
 

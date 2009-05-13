@@ -5,6 +5,7 @@ class AssaysController < ApplicationController
   
   def new
     @assay=Assay.new
+    @assay.studies << Study.find(params[:study_id]) if params[:study_id]
 
     respond_to do |format|
       format.html

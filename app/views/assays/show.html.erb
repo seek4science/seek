@@ -23,6 +23,10 @@
     </div>
   </p>
 
+  <p id="studies">
+    <b>Associated studies: </b><%= studies_link_list @assay.studies %>
+  </p>
+
   <p id="assay_type">
     <b>Assay type: </b><%= link_to h(@assay.assay_type.title), @assay.assay_type %>
   </p>

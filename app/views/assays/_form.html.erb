@@ -5,6 +5,18 @@
 
 <center>
   <div style="width: 60%;">
+
+    <% if !@assay.studies.empty? -%>
+      <%= f.hidden_field :study_ids -%>
+      <p>
+        <%= label_tag "Associated studies: " %>
+        <% for study in @assay.studies -%>
+          <%= h study.title.capitalize -%>
+          <%= ", " unless study==@assay.studies.last -%>
+        <% end -%>
+      </p>
+    <% end -%>
+
     <p>
       <%= f.label :title-%>*<br/>
       <%= f.text_field :title,:size=>52 -%>
@@ -19,22 +31,22 @@
 
 
 <p style="margin: 1em 0 0 0;">
-<div class="fold">
-  <div class="foldTitle">Assay and technology type</div>
-  <div class="foldContent">
-    <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %><br/>
-    <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
+  <div class="fold">
+    <div class="foldTitle">Assay and technology type</div>
+    <div class="foldContent">
+      <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %><br/>
+      <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
+    </div>
   </div>
-</div>
 </p>
 
 <p style="margin: 1em 0 0 0;">
-<div class="fold">
-  <div class="foldTitle">Assay SOPs</div>
-  <div class="foldContent">
-    <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} %>
+  <div class="fold">
+    <div class="foldTitle">Assay SOPs</div>
+    <div class="foldContent">
+      <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} %>
+    </div>
   </div>
-</div>
 </p>
 
 <p style="margin-top: 2em; text-align: center;" >
