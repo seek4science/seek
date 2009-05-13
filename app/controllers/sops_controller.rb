@@ -26,7 +26,7 @@ class SopsController < ApplicationController
         
     render :update do |page|
       if @sop && Authorization.is_authorized?("show", nil, @sop, current_user)
-        page.replace_html "sop_preview",:partial=>"sop_preview",:locals=>{:sop=>@sop}
+        page.replace_html "sop_preview",:partial=>"assets/resource_preview",:locals=>{:resource=>@sop}
       else
         page.replace_html "sop_preview",:text=>"No Sop is selected, or authorised to show."
       end

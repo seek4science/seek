@@ -29,6 +29,7 @@ module ApplicationHelper
       not_specified_text="No description set" if options[:description]==true
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else
+      text=truncate(text,:length=>options[:length]) if options[:length]
       res = h(text)
       res = simple_format(res) if options[:description]==true || options[:address]==true
       res=mail_to(res) if options[:email]==true

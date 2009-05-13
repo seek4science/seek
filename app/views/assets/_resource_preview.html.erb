@@ -1,0 +1,21 @@
+<% unless resource.nil? -%>
+  <div title='<%= tooltip_title_attrib(h(resource.description),1000) %>'>
+    <p class="title">
+      <%= h resource.title %>
+    </p>
+
+    <% unless resource.asset.project.nil? -%>
+      <p class="project">
+        Project: <%= h resource.asset.project.name %>
+      </p>
+    <% end -%>
+    <p class="author">
+      Author: <%= h resource.contributor.person.name %>
+    </p>
+
+    <div class="box_standout">
+      <%= text_or_not_specified(resource.description,:description=>true,:length=>400) %>
+    </div>
+
+  </div>
+<% end -%>

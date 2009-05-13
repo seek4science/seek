@@ -21,7 +21,7 @@
 		<% end -%>
 		<br/>
 		
-		<select name="<%=resource_type.downcase-%>[project_id]" id="project_selector" <%= "disabled" if disable_project_select -%> style="width: 250px; vertical-align: middle; margin: 0.3em 0;">
+		<select name="<%=resource_type.underscore -%>[project_id]" id="project_selector" <%= "disabled" if disable_project_select -%> style="width: 250px; vertical-align: middle; margin: 0.3em 0;">
 		  <% project_hash.each do |p| -%>
 			  <option value="<%= p[0] -%>" <%= "selected='selected'" if p[0] == selected_project_id -%>><%= h(p[1]) -%></option>
 			<% end -%>
