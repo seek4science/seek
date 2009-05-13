@@ -486,9 +486,7 @@ ul#user_details li {
 
 .foldContent {
     padding-top:0.5em;
-    background-color: #FCFCFF;
-    max-height: 30em;
-    overflow:auto;
+    background-color: #FCFCFF;    
 }
 
 table.conditions_or_factors {

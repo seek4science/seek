@@ -14,6 +14,9 @@ class Sop < ActiveRecord::Base
              :dependent => :destroy
 
   has_many :experimental_conditions
+
+  has_one :culture
+  has_one :organism,:through=>:culture
   
   # TODO
   # add all required validations here
