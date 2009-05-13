@@ -24,7 +24,8 @@ class AssaysController < ApplicationController
 
   def create
     @assay = Assay.new(params[:assay])
-
+    synchronise_created_datas(params[:data_file_ids])
+    
     respond_to do |format|
       if @assay.save
         flash[:notice] = 'Assay was successfully created.'

@@ -40,11 +40,8 @@
 
 <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} -%>
 
-
-<% if action == :edit -%>
-  <h2>Data files</h2>
-  <%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f} -%>
-<% end -%>
+<h2>Data files</h2>
+<%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f} -%>
 
 <p style="margin-top: 2em; text-align: center;" >
   <%= f.submit(action==:edit ? "Update" : "Create") -%>

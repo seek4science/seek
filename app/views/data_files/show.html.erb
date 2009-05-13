@@ -74,5 +74,9 @@
     </p>
 
   </div>
+  
+
+  <% data_file_resource_hash = classify_for_tabs(@data_file.assays) %>
+  <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@data_file.title,:item_hash=>data_file_resource_hash} %>
 
 </div>

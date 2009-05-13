@@ -4,7 +4,9 @@ class DataFile < ActiveRecord::Base
 
   acts_as_resource
 
-  has_one :created_data
+  has_many :created_datas
+
+  has_many :assays,:through=>:created_datas
 
   validates_presence_of :title
 
