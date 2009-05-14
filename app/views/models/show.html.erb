@@ -49,7 +49,7 @@
       <p>
         <b>Organism:</b>
         <% if @model.organism -%>
-          <%=h @model.organism.title -%>
+          <%= organism_link_to @model.organism -%>
         <% else -%>
           <span class="none_text">Not specified</span>
         <% end -%>

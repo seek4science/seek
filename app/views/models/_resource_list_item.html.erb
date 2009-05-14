@@ -23,6 +23,15 @@
       </p>
 
       <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
+        <b>Organism:</b>
+        <% if resource.organism -%>
+          <%=organism_link_to resource.organism -%>
+        <% else -%>
+          <span class="none_text">Unknown</span>
+        <% end -%>
+      </p>
+
+      <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
         <b>Model type:</b> <%= text_or_not_specified resource.model_type %>
         <%= narrow_view ? "<br/>" : " | " -%>
         <b>Model format:</b> <%= text_or_not_specified resource.model_format %>

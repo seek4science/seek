@@ -48,9 +48,9 @@
       <p>
         <b>Organism:</b>
         <% if @sop.organism -%>
-          <%=h @sop.organism.title -%>
+          <%=organism_link_to @sop.organism -%>
         <% else -%>
-          <span class="none_text">Not specified</span>
+          <span class="none_text">Unknown</span>
         <% end -%>
       </p>
 
