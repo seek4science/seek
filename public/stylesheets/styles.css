@@ -571,3 +571,11 @@ div.ontology_nav {
 p#assay_types label {
     width: 20em;
 }
+
+#header_text {
+    font-size:larger;
+    text-align:center;   
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+    margin: 1em 1em 1em 1em;    
+}
