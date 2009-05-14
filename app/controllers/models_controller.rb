@@ -231,7 +231,7 @@ class ModelsController < ApplicationController
       
       model = Model.find(params[:id])
 
-      if Authorization.is_authorized?(action_name, nil, model, current_user)
+      if Authorization.is_authorized?(action, nil, model, current_user)
         @model = model
       else
         respond_to do |format|
