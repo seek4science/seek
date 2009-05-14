@@ -3,9 +3,14 @@
 	<!-- <li><%#= icon "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
 </ul>
 
-<% if @models.public_methods.include?("page_count") %>
+<% if @data_files.public_methods.include?("page_count") %>
   <!-- only do the page links if the collection supports it -->
   <%= render :partial => "layouts/paginate", :locals => { :collection => @data_files } -%>
 <% end %>
 
 <%= render :partial => "assets/resource_list", :locals => { :collection => @data_files, :authorization_for_showing_already_done=>true } %>
+
+<% if @data_files.public_methods.include?("page_count") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate", :locals => { :collection => @data_files } -%>
+<% end %>
