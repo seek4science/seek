@@ -37,7 +37,7 @@
     </center>
 
     <p>
-      <%= render :partial => "sops/select_organism" -%>
+      <%= render :partial => "organisms/select_organism",:locals=>{:model=>Sop} -%>
     </p>
 
     <%# only the owner should be able to change sharing permissions -%>

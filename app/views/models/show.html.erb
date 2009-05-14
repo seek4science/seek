@@ -47,6 +47,15 @@
       </p>
 
       <p>
+        <b>Organism:</b>
+        <% if @model.organism -%>
+          <%=h @model.organism.title -%>
+        <% else -%>
+          <span class="none_text">Not specified</span>
+        <% end -%>
+      </p>
+
+      <p>
         <b>Model type:</b>
         <%= text_or_not_specified @model.model_type %>
       </p>

@@ -12,6 +12,8 @@ class Model < ActiveRecord::Base
   belongs_to :content_blob,
              :dependent => :destroy
 
+  belongs_to :organism
+
   acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED
 
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"

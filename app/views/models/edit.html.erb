@@ -61,6 +61,10 @@
       </div>
     </center>
 
+    <p>
+      <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
+    </p>
+
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>
       <p style="margin: 2.5em 0 0 0;">
