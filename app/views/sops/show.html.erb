@@ -45,13 +45,19 @@
         <%=h @sop.content_type -%>
       </p>
 
+      <p>
+        <b>Organism:</b>
+        <% if @sop.organism -%>
+          <%=h @sop.organism.title -%>
+        <% else -%>
+          <span class="none_text">Not specified</span>
+        <% end -%>
+      </p>
+
       <br/>
 
       <p>
-
         <b>Description</b>
-
-
         <% unless @sop.description.blank? -%>
           <div class="box_standout">
             <%= simple_format(white_list(@sop.description)) -%>
@@ -61,8 +67,10 @@
             No description
           </p>
         <% end -%>
-
       </p>
+
+
+
 
     </div>
   </div>
@@ -78,13 +86,13 @@
 
 
 
-    <h2>      
+    <h2>
       Experimental Conditions
     </h2>
     <%= render :partial=>"sops/simple_experimental_conditions_list" %>
     <br/>
 
-   
+
     <%# get, classify and authorize all assets for this project -%>
     <% sop_asset_hash = classify_for_tabs([@sop.asset.project]) -%>
 

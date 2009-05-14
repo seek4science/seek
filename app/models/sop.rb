@@ -8,15 +8,14 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
   
-  acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_title]) if SOLR_ENABLED
   
   belongs_to :content_blob,
              :dependent => :destroy
 
   has_many :experimental_conditions
 
-  has_one :culture
-  has_one :organism,:through=>:culture  
+  belongs_to :organism
   
   
   # get a list of SOPs with their original uploaders - for autocomplete fields
@@ -40,6 +39,10 @@ class Sop < ActiveRecord::Base
     sops_with_contributors.delete(nil)
     
     return sops_with_contributors.to_json
+  end
+
+  def organism_title
+    organism.nil? ? "" : organism.title
   end
   
 end

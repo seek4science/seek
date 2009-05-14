@@ -29,7 +29,10 @@
                                                                        :project_hash => current_user.generate_own_project_id_name_hash } -%>
 	  	</div>
 		</center>
-		
+
+        <p>
+          <%= render :partial => "sops/select_organism" -%>
+        </p>
 		
 		<p style="margin: 2.5em 0 0 0;">
   		<%= render :partial => "assets/sharing_form" -%>
