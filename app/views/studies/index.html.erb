@@ -4,4 +4,14 @@
     <li><%= icon "new", new_investigation_path, "New investigation", nil, "New investigation" %></li>
 </ul>
 
+<% if @studies.public_methods.include?("page_count") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate", :locals => { :collection => @studies } -%>
+<% end %>
+
 <%= render :partial => "resource_list_item", :collection=>@studies %>
+
+<% if @studies.public_methods.include?("page_count") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate", :locals => { :collection => @studies } -%>
+<% end %>
