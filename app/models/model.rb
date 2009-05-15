@@ -14,7 +14,7 @@ class Model < ActiveRecord::Base
 
   belongs_to :organism
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if SOLR_ENABLED
 
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
 
@@ -41,6 +41,10 @@ class Model < ActiveRecord::Base
     models_with_contributors.delete(nil)
 
     return models_with_contributors.to_json
+  end
+
+  def organism_name
+    organism.title unless organism.nil?
   end
   
 end
