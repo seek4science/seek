@@ -153,6 +153,16 @@ class DataFilesController < ApplicationController
     end
   end
 
+  # GET /sops/1;download
+  def download
+    # update timestamp in the current SOP record
+    # (this will also trigger timestamp update in the corresponding Asset)
+    @data_file.last_used_at = Time.now
+    @data_file.save_without_timestamping
+
+    send_data @data_file.content_blob.data, :filename => @data_file.original_filename, :content_type => @data_file.content_type, :disposition => 'attachment'
+  end
+
   def data_file_preview_ajax
 
     if params[:id] && params[:id]!="0"
