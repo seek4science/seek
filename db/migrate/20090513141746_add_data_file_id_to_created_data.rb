@@ -5,7 +5,7 @@ class AddDataFileIdToCreatedData < ActiveRecord::Migration
   end
 
   def self.down
-    remove_column :created_datas,:data_file_ids
+    remove_column :created_datas,:data_file_id
   end
 
 end
