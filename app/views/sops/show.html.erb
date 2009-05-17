@@ -45,14 +45,14 @@
         <%=h @sop.content_type -%>
       </p>
 
-      <p>
-        <b>Organism:</b>
-        <% if @sop.organism -%>
-          <%=organism_link_to @sop.organism -%>
-        <% else -%>
-          <span class="none_text">Unknown</span>
-        <% end -%>
-      </p>
+      <%#*<p>%>
+        <%#*<b>Organism:</b>%>
+        <%# if @sop.organism -%>
+          <%#=organism_link_to @sop.organism -%>
+        <%# else -%>
+          <%#*<span class="none_text">Unknown</span>%>
+        <%# end -%>
+      <%#*</p>%>
 
       <br/>
 

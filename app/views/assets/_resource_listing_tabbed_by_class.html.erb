@@ -13,6 +13,7 @@
 	<div class="tabber">
 		<% asset_hash.each_key do |resource_type| -%>
 			<% visible_resource_type = resource_type.titleize.pluralize -%>
+            <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
 			<% unless (resources = asset_hash[resource_type]).nil? || resources.empty? -%>
 				<div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
 			    <h3><%= "#{visible_resource_type} (#{resources.length})" -%></h3>

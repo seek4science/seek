@@ -21,14 +21,14 @@
         <b>Associated project: </b><%= (resource.asset.project ? link_to(h(resource.asset.project.name), project_path(resource.asset.project.id)) : "<span class='none_text'>None</span>" ) -%>
       </p>
 
-      <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
-        <b>Organism:</b>
-        <% if resource.organism -%>
-          <%=organism_link_to resource.organism -%>
-        <% else -%>
-          <span class="none_text">Unknown</span>
-        <% end -%>
-      </p>
+      <%#*<p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">%>
+        <%#*<b>Organism:</b>%>
+        <%# if resource.organism -%>
+          <%#=organism_link_to resource.organism -%>
+        <%# else -%>
+          <%#*<span class="none_text">Unknown</span>%>
+        <%# end -%>
+      <%#*</p>%>
 
       <p style="font-size: 85%; margin-top: 0.4em;">
         <b>Created:</b> <%= resource.asset.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>

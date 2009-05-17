@@ -2,11 +2,11 @@ class StudiesController < ApplicationController
 
   before_filter :login_required
 
-  before_filter :set_no_layout, :only => [ :new_investigation_redbox,:new_assay ]
+  #before_filter :set_no_layout, :only => [ :new_investigation_redbox,:new_assay ]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_project_member,:only=>[:create,:new]
 
-  protect_from_forgery :except=>[:create_investigation,:create_assay]
+  #protect_from_forgery :except=>[:create_investigation,:create_assay]
 
   def index
     
