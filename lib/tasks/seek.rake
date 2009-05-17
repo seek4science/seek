@@ -1,8 +1,20 @@
 require 'rubygems'
 require 'rake'
 require 'model_execution'
+require 'active_record/fixtures'
 
 namespace :seek do
+
+  task(:assay_types=>:environment) do
+    AssayType.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_types")
+  end
+
+  task(:technology_types=>:environment) do
+    TechnologyType.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "technology_types")
+  end
+
   task(:repop_cv=>:environment) do
     
     File.open('config/expertise.list').each do |item|

@@ -1,3 +1,7 @@
+assay types:
+  title: assay types
+  children: genomics,metabolomics,proteomics,single_cell,transcriptomics
+
 genomics:
   title: genomics
   children: comparative_genomics,DNA_sequencing,genotyping,primer_design,SNP_detection  
