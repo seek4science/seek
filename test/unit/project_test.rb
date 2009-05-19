@@ -19,6 +19,11 @@ class ProjectTest < ActiveSupport::TestCase
     assert_same 1,wg.project_id
   end
 
+  def test_title_alias_for_name
+    p=projects(:sysmo_project)
+    assert_equal p.name,p.title
+  end
+
   def test_organsim_tag
     p=projects(:one)
     assert_equal 1,p.organisms.size

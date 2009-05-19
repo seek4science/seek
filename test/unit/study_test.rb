@@ -15,6 +15,7 @@ class StudyTest < ActiveSupport::TestCase
     assert study.assays.include?(assays(:metabolomics_assay))
     
     assert_equal projects(:sysmo_project),study.investigation.project
+    assert_equal projects(:sysmo_project),study.project
     
     assert_equal assay_types(:metabolomics),study.assays.first.assay_type
 

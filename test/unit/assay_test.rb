@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayTest < ActiveSupport::TestCase
-  fixtures :assays,:sops,:assay_types,:technology_types
+  fixtures :assays,:sops,:assay_types,:technology_types,:projects,:studies,:investigations
 
   test "sops association" do
     assay=assays(:metabolomics_assay)
@@ -9,6 +9,12 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:my_first_sop))
     assert assay.sops.include?(sops(:sop_with_fully_public_policy))
 
+  end
+
+  test "related projects" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 1,assay.projects.size
+    assert_equal projects(:sysmo_project),assay.projects.first
   end
 
   test "validation" do
