@@ -11,3 +11,8 @@ metabolomics_assay2:
   assay_type: metabolomics
   technology_type: gas_chromatography
   sops: my_first_sop,sop_for_test_with_workgroups
+
+assay_with_2_projects:
+  title: Assay with 2 projects
+  assay_type: metabolomics
+  technology_type: gas_chromatography

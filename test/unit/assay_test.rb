@@ -17,6 +17,13 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal projects(:sysmo_project),assay.projects.first
   end
 
+  test "multiple_related_projects" do
+    assay=assays(:assay_with_2_projects)
+    assert_equal 2,assay.projects.size
+    assert assay.projects.include?(projects(:sysmo_project))
+    assert assay.projects.include?(projects(:moses_project))
+  end
+
   test "validation" do
     assay=Assay.new(:title=>"test",
       :assay_type=>assay_types(:metabolomics),

@@ -8,3 +8,13 @@ study_with_overlapping_assay_sops:
   title: A study
   investigation: metabolomics_investigation
   assays: metabolomics_assay, metabolomics_assay2
+
+moses_study:
+  title: Moses study
+  investigation: moses_investigation
+  assays: assay_with_2_projects
+
+sysmo_study:
+  title: Sysmo study
+  investigation: metabolomics_investigation
+  assays: assay_with_2_projects

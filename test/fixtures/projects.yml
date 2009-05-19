@@ -26,6 +26,9 @@ four:
 myexperiment_project:
   name: "myExperiment"
 
+moses_project:
+  name: "Moses"
+
 
 sysmo_project:
   name: "SysMO"
