@@ -5,5 +5,5 @@ He/She left the following details about their project:
 
 "test message"
 
-For the person details: http://localhost/people/1, whose email address is <a href="mailto:quentin@email.com">quentin@email.com</a>.
+For the person details: http://localhost/people/1, whose email address is quentin@email.com .
 -- end --
