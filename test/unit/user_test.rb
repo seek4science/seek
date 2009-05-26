@@ -26,6 +26,12 @@ class UserTest < Test::Unit::TestCase
     assert without_profile.include?(users(:part_registered))
     assert without_profile.include?(users(:aaron))
   end
+
+  def test_admins_named_scope
+    admins=User.admins
+    assert_equal 1,admins.size
+    assert admins.include?(users(:quentin))
+  end
   
   def test_not_activated
     not_activated=User.not_activated

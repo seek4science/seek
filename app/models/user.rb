@@ -39,6 +39,7 @@ class User < ActiveRecord::Base
 
   named_scope :not_activated,:conditions=>['activation_code IS NOT NULL']
   named_scope :without_profile,:conditions=>['person_id IS NULL']
+  named_scope :admins,:conditions=>['is_admin = 1 ']
 
   # Activates the user in the database.
   def activate
