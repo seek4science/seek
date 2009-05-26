@@ -579,3 +579,15 @@ p#assay_types label {
     padding-bottom: 1.5em;
     margin: 1em 1em 1em 1em;    
 }
+
+div#more_info {
+    display:inline-block;
+}
+
+div#more_info ul li {
+    list-style-image: none;
+    list-style-type: disc;
+    list-style-position:outside;
+    margin-left: 2em;
+}
+
