@@ -10,6 +10,11 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_types")
   end
 
+  task(:disciplines=>:environment) do
+    Discipline.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "disciplines")
+  end
+
   task(:organisms=>:environment) do
     Organism.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "organisms")
