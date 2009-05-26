@@ -1,3 +1,9 @@
-Mailer#contact_admin
+Hi Admin,
 
-Find me in app/views/mailer/contact_admin.erb
+The new user Quentin Jones just signed up and indicated that they were not listed as a Sysmo project member.
+He/She left the following details about their project:
+
+"test message"
+
+For the person details: http://localhost/people/1, whose email address is <a href="mailto:quentin@email.com">quentin@email.com</a>.
+-- end --

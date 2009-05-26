@@ -25,12 +25,13 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "contact_admin_new_user_no_profile" do
-    @expected.subject = 'Mailer#contact_admin'
+    @expected.subject = 'Sysmo Member signed up'
     @expected.body    = read_fixture('contact_admin_new_user_no_profile')
     @expected.date    = Time.now
+    @expected.to = "Quentin Jones <quentin@email.com>"
 
-    #FIXME: commented out test while works in progress
-    #assert_equal @expected.encoded, Mailer.create_contact_admin_new_user_no_profile("test message",people(:one)).encoded
+    assert_equal @expected.encoded, 
+      Mailer.create_contact_admin_new_user_no_profile("test message",users(:quentin),"localhost").encoded
   end
 
   test "welcome" do
