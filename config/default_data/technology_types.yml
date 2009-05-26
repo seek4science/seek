@@ -1,3 +1,7 @@
+technology:
+  title: technology
+  children: genomics_technologies,metabolomics_technology,proteomics_technologies,transcriptomics_technologies
+
 genomics_technologies:
   title: genomics technologies
   children: qPRC
@@ -8,7 +12,7 @@ qPCR:
 #----------------------------------------------------
 
 metabolomics_technology:
-  title: metabolomics technology
+  title: metabolomics technologies
   children: chemostat,gas_chromatography,HPLC,Mass_Spectormetry,UPLC
 
 chemostat:

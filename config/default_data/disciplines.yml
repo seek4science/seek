@@ -1,0 +1,11 @@
+modeller:
+  id: 1
+  title: Modeller
+
+experimentalist:
+  id: 2
+  title: Experimentalist
+
+bioinformatician:
+  id: 3
+  title: Bioinformatician

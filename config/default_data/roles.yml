@@ -1,0 +1,23 @@
+member:
+  id: 1
+  name: Member
+
+vice coordinator:
+  id: 2
+  name: Vice Coordinator
+
+project coordinator:
+  id: 3
+  name: Project Coordinator
+
+student:
+  id: 4
+  name: Student
+
+postdoc:
+  id: 5
+  name: Postdoc
+
+pal:
+  id: 6
+  name: Sysmo-DB Pal

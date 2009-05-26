@@ -23,4 +23,13 @@ class Assay < ActiveRecord::Base
     "#{title} (#{type})"
   end
 
+  def projects
+    
+    projects=[]
+    studies.each do |study|
+      projects << study.project unless projects.include? study.project
+    end
+    return projects
+  end
+
 end

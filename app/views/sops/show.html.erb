@@ -17,7 +17,7 @@
   <% else -%>
     <li>
       <%=  help_icon("You do not have permission to download this Sop, but you are interested you can request permission from the owner.") %>
-      <%= icon('sop',"javascript:alert('not yet implemented')","Request file",nil,"Request file") %>
+      <%= icon('sop',"javascript:alert('Unable to send emails')","Request file",nil,"Request file") %>
     </li>
   <% end -%>
 </ul>
@@ -45,14 +45,14 @@
         <%=h @sop.content_type -%>
       </p>
 
-      <p>
-        <b>Organism:</b>
-        <% if @sop.organism -%>
-          <%=organism_link_to @sop.organism -%>
-        <% else -%>
-          <span class="none_text">Unknown</span>
-        <% end -%>
-      </p>
+      <%#*<p>%>
+        <%#*<b>Organism:</b>%>
+        <%# if @sop.organism -%>
+          <%#=organism_link_to @sop.organism -%>
+        <%# else -%>
+          <%#*<span class="none_text">Unknown</span>%>
+        <%# end -%>
+      <%#*</p>%>
 
       <br/>
 

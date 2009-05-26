@@ -15,4 +15,12 @@ if using search
 5. make a config/environment_local.rb file, and add to it "SOLR_ENABLED=true"
 6. make sure the directories "vendor/plugins/acts_as_solr/solr/logs" and "vendor/plugins/acts_as_solr/solr/tmp" exist
 7. rake solr:start to start database server
-8. rake solr:resolr to reindex any existing data
+8. rake solr:reindex to reindex any existing data
+
+defining admin users
+
+There is no support for this in the interface.
+You need to:
+1. connect to the database using script/console,
+2. find the User that you wish to make an admin (note User, not Person, if you know the Person you can do person.user)
+3, set the is_admin flag to true. Don't forget to 'user.save'.
