@@ -10,9 +10,29 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_types")
   end
 
+  task(:organisms=>:environment) do
+    Organism.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "organisms")
+  end
+
   task(:technology_types=>:environment) do
     TechnologyType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "technology_types")
+  end
+
+  task(:recommended_model_environments=>:environment) do
+    RecommendedModelEnvironment.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "recommended_model_environments")
+  end
+
+  task(:measured_items=>:environment) do
+    MeasuredItem.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "measured_items")
+  end
+
+  task(:units=>:environment) do
+    Unit.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "units")
   end
 
   task(:repop_cv=>:environment) do
