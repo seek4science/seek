@@ -35,6 +35,11 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "units")
   end
 
+  task(:roles=>:environment) do
+    Role.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "roles")
+  end
+
   task(:repop_cv=>:environment) do
     
     File.open('config/expertise.list').each do |item|
