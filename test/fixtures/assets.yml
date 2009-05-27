@@ -177,3 +177,14 @@ asset_for_datafile:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_for_downloadable_data_file:
+  contributor: datafile_owner (User)
+  project: nil # not linked to any project for now
+  resource: downloadable_data_file (DataFile)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: download_for_all_registered_users_policy
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>

@@ -1132,5 +1132,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     res = Authorization.is_authorized?("view", nil, sops(:sop_with_public_download_and_no_custom_sharing), nil)
     assert (!res), "anonymous user shouldn't have been allowed to 'view' the SOP - policy authorizes only registered users"
   end
+
+  def test_downloadable_data_file
+    data_file=data_files(:downloadable_data_file)
+    res=Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
+    assert res,"should be downloadable by all"
+    res=Authorization.is_authorized?("edit",DataFile,data_file,users(:aaron))
+    assert !res,"should not be editable"
+  end
   
 end
