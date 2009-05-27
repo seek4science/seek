@@ -95,6 +95,18 @@ module Mib
           end
         end
 
+        def can_edit? user
+          Authorization.is_authorized? "edit",nil,self,user
+        end
+
+        def can_view? user
+          Authorization.is_authorized? "view",nil,self,user
+        end
+
+        def can_download? user
+          Authorization.is_authorized? "download",nil,self,user
+        end
+
 private
 
         # This is so that the updated_at time on the parent Asset record is in sync with the

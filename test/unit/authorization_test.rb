@@ -1137,8 +1137,20 @@ class AuthorizationTest < ActiveSupport::TestCase
     data_file=data_files(:downloadable_data_file)
     res=Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
     assert res,"should be downloadable by all"
+    assert data_file.can_download?(users(:aaron))
     res=Authorization.is_authorized?("edit",DataFile,data_file,users(:aaron))
     assert !res,"should not be editable"
+    assert !data_file.can_edit?(users(:aaron))
+  end
+
+  def test_editable_data_file
+    data_file=data_files(:editable_data_file)
+    res=Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
+    assert res,"should be downloadable by all"
+    assert data_file.can_download?(users(:aaron))
+    res=Authorization.is_authorized?("edit",DataFile,data_file,users(:aaron))
+    assert res,"should be editable"
+    assert data_file.can_edit?(users(:aaron))
   end
   
 end

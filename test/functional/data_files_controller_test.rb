@@ -38,6 +38,25 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "show should now allow factors studied edited for downloadable file" do
+    login_as(:aaron)
+    get :show, :id=>data_files(:downloadable_data_file).id
+    assert_select "a",:text=>/Edit factors studied/,:count=>0
+  end
+
+  test "show should allow factors studied edited for editable file" do
+    login_as(:aaron)
+    get :show, :id=>data_files(:editable_data_file).id
+    assert_select "a",:text=>/Edit factors studied/,:count=>1
+  end
+  
+  test "show should allow factors studied edited owner of downloadable file" do
+    login_as(:datafile_owner)
+    get :show, :id=>data_files(:downloadable_data_file).id
+    assert_select "a",:text=>/Edit factors studied/,:count=>1
+  end
+
+
   test "should update data file" do
     put :update, :id => data_files(:picture).id, :data_file => { }
     assert_redirected_to data_file_path(assigns(:data_file))
