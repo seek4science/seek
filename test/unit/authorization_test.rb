@@ -1152,5 +1152,31 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert res,"should be editable"
     assert data_file.can_edit?(users(:aaron))
   end
+
+  def test_downloadable_sop
+    sop=sops(:downloadable_sop)
+    res=Authorization.is_authorized?("download",Sop,sop,users(:aaron))
+    assert res,"Should be able to download"
+    assert sop.can_download?(users(:aaron))
+
+    assert sop.can_view? users(:aaron)
+
+    res=Authorization.is_authorized?("edit",Sop,sop,users(:aaron))
+    assert !res,"Should not be able to edit"
+    assert !sop.can_edit?(users(:aaron))
+  end
+
+  def test_editable_sop
+    sop=sops(:editable_sop)
+    res=Authorization.is_authorized?("download",Sop,sop,users(:aaron))
+    assert res,"Should be able to download"
+    assert sop.can_download?(users(:aaron))
+
+    assert sop.can_view?(users(:aaron))
+
+    res=Authorization.is_authorized?("edit",Sop,sop,users(:aaron))
+    assert res,"Should be able to edit"
+    assert sop.can_edit?(users(:aaron))
+  end
   
 end

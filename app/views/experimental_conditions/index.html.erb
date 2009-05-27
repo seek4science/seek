@@ -1,9 +1,9 @@
 <h1>
   <%= "Experimental conditions for '#{link_to h(@sop.title),@sop}'" %>
 </h1>
-<% if Authorization.is_authorized?("edit",nil,@sop,current_user) -%>
+<% if @sop.can_edit? current_user -%>
   <div id="edit_on">
-    <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Edit",:alt=>"Edit") do |page|
+    <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Start editing",:alt=>"Start editing") do |page|
       page.visual_effect :appear,"add_condition"
       page["edit_on"].toggle
       page["edit_off"].toggle

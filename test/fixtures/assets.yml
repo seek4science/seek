@@ -199,3 +199,25 @@ asset_for_editable_data_file:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_of_a_downloadable_sop:
+  contributor: owner_of_my_first_sop (User)
+  project: sysmo_project
+  resource: downloadable_sop (Sop)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: sysmo_member_download
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_of_a_editable_sop:
+  contributor: owner_of_my_first_sop (User)
+  project: sysmo_project
+  resource: editable_sop (Sop)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: sysmo_member_edit
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
