@@ -17,10 +17,12 @@
   <p>
     <b>Description:</b>
     <div id="description" class="box_standout">
-
       <%= text_or_not_specified(@assay.description, :description=>true) %>
-
     </div>
+  </p>
+
+  <p id="project">
+    <b>Project: </b> <%= projects_link_list @assay.projects %>
   </p>
 
   <p id="studies">
@@ -30,6 +32,7 @@
   <p id="assay_type">
     <b>Assay type: </b><%= link_to h(@assay.assay_type.title), @assay.assay_type %>
   </p>
+
   <p id="technology_type">
     <b>Technology type: </b><%= link_to h(@assay.technology_type.title), @assay.technology_type %>
   </p>
