@@ -4,6 +4,8 @@ class Study < ActiveRecord::Base
   has_and_belongs_to_many :assays
   
   has_one :project, :through=>:investigation
+
+  has_many :data_files,:through=>:assays
   
 
   belongs_to :person_responsible, :class_name => "Person"

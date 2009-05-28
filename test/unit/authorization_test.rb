@@ -1132,5 +1132,51 @@ class AuthorizationTest < ActiveSupport::TestCase
     res = Authorization.is_authorized?("view", nil, sops(:sop_with_public_download_and_no_custom_sharing), nil)
     assert (!res), "anonymous user shouldn't have been allowed to 'view' the SOP - policy authorizes only registered users"
   end
+
+  def test_downloadable_data_file
+    data_file=data_files(:downloadable_data_file)
+    res=Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
+    assert res,"should be downloadable by all"
+    assert data_file.can_download?(users(:aaron))
+    res=Authorization.is_authorized?("edit",DataFile,data_file,users(:aaron))
+    assert !res,"should not be editable"
+    assert !data_file.can_edit?(users(:aaron))
+  end
+
+  def test_editable_data_file
+    data_file=data_files(:editable_data_file)
+    res=Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
+    assert res,"should be downloadable by all"
+    assert data_file.can_download?(users(:aaron))
+    res=Authorization.is_authorized?("edit",DataFile,data_file,users(:aaron))
+    assert res,"should be editable"
+    assert data_file.can_edit?(users(:aaron))
+  end
+
+  def test_downloadable_sop
+    sop=sops(:downloadable_sop)
+    res=Authorization.is_authorized?("download",Sop,sop,users(:aaron))
+    assert res,"Should be able to download"
+    assert sop.can_download?(users(:aaron))
+
+    assert sop.can_view? users(:aaron)
+
+    res=Authorization.is_authorized?("edit",Sop,sop,users(:aaron))
+    assert !res,"Should not be able to edit"
+    assert !sop.can_edit?(users(:aaron))
+  end
+
+  def test_editable_sop
+    sop=sops(:editable_sop)
+    res=Authorization.is_authorized?("download",Sop,sop,users(:aaron))
+    assert res,"Should be able to download"
+    assert sop.can_download?(users(:aaron))
+
+    assert sop.can_view?(users(:aaron))
+
+    res=Authorization.is_authorized?("edit",Sop,sop,users(:aaron))
+    assert res,"Should be able to edit"
+    assert sop.can_edit?(users(:aaron))
+  end
   
 end

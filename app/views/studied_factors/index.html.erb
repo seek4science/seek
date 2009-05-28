@@ -2,29 +2,31 @@
   <%= "Factors studied for '#{link_to h(@data_file.title),@data_file}'" %>
 </h1>
 
-<div id="edit_on">
-  <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Start editing",:alt=>"Start editing") do |page|
-    page.visual_effect :appear,"add_factor"
-    page["edit_on"].toggle
-    page["edit_off"].toggle
-    page.select('li.destroy_studied_factor').each do |el|
-      el.toggle
+<% if @data_file.can_edit? current_user -%>
+  <div id="edit_on">
+    <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Start editing",:alt=>"Start editing") do |page|
+      page.visual_effect :appear,"add_factor"
+      page["edit_on"].toggle
+      page["edit_off"].toggle
+      page.select('li.destroy_studied_factor').each do |el|
+        el.toggle
+      end
     end
-  end
-  -%>
-</div>
+    -%>
+  </div>
 
-<div id="edit_off" style="display:none;">
-  <%= link_to_function image(("edit-off"),:style=>"margin-left:4em;",:title=>"Stop editing",:alt=>"Stop editing") do |page|
-    page.visual_effect :fade,"add_factor"
-    page["edit_on"].toggle
-    page["edit_off"].toggle
-    page.select('li.destroy_studied_factor').each do |el|
-      el.toggle
+  <div id="edit_off" style="display:none;">
+    <%= link_to_function image(("edit-off"),:style=>"margin-left:4em;",:title=>"Stop editing",:alt=>"Stop editing") do |page|
+      page.visual_effect :fade,"add_factor"
+      page["edit_on"].toggle
+      page["edit_off"].toggle
+      page.select('li.destroy_studied_factor').each do |el|
+        el.toggle
+      end
     end
-  end
-  -%>
-</div>
+    -%>
+  </div>
+<% end -%>
 
 <center>
 
