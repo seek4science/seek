@@ -23,13 +23,13 @@
 
         <% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>
         <p class="web_page">
-          <label>Web page:</label>
+          <label>Public Web page:</label>
           <%= "&nbsp;" + web_page_link -%>
         </p>
 
         <% wiki_page_link = ((is_nil_or_empty? project.wiki_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.wiki_page), h(project.wiki_page),:popup=>true)) -%>
         <p class="wiki_page">
-          <label>Wiki page:</label>
+          <label>Internal Web page:</label>
           <%= "&nbsp;" + wiki_page_link -%>
         </p>
 
