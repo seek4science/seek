@@ -7,7 +7,7 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
-  before_filter :set_tagging_parameters,:only=>[:edit,:create]
+  before_filter :set_tagging_parameters,:only=>[:edit,:new]
   
   
   def auto_complete_for_tools_name

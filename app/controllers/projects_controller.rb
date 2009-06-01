@@ -6,6 +6,7 @@ class ProjectsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update]
+  before_filter :set_tagging_parameters,:only=>[:edit,:new]
 
 
   def auto_complete_for_organism_name
@@ -92,10 +93,7 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new(params[:project])
 
-    if !params[:organism].nil?
-      organism_list = params[:organism][:list]
-      @project.organism_list=organism_list
-    end
+    set_organisms @project, params
 
     respond_to do |format|
       if @project.save
@@ -115,11 +113,7 @@ class ProjectsController < ApplicationController
     @project = Project.find(params[:id])
     #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
 
-    #update tags for organism
-    if !params[:organism].nil?
-      organism_list = params[:organism][:list]
-      @project.organism_list=organism_list
-    end
+    set_organisms @project, params
     
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:project].delete(:avatar_id).to_i
@@ -180,6 +174,19 @@ class ProjectsController < ApplicationController
 
   private
 
+  def set_organisms project,params
+    tags=""
+    params[:organism_autocompleter_selected_ids].each do |selected_id|
+      tag=Tag.find(selected_id)
+      tags << tag.name << ","
+    end unless params[:organism_autocompleter_selected_ids].nil?
+    params[:organism_autocompleter_unrecognized_items].each do |item|
+      tags << item << ","
+    end unless params[:organism_autocompleter_unrecognized_items].nil?
+
+    project.organism_list=tags
+  end
+
   def editable_by_user
     @project = Project.find(params[:id])
     unless current_user.is_admin? || @project.can_be_edited_by?(current_user)
@@ -187,4 +194,10 @@ class ProjectsController < ApplicationController
       return false
     end
   end
+
+  def set_tagging_parameters
+    organisms=Project.organism_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}
+    @all_organisms_as_json=organisms.to_json
+  end
+  
 end
