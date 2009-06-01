@@ -11,66 +11,35 @@ function trimSpaces(str) {
     return str;
 }
 
-function addToolListTag(tag) {
-    var tool_list = document.getElementById("tool_list").value;
-
-    //check the tag doesn't already exist
-    var tools_arr=tool_list.split(",")
-    for (var i = 0; i < tools_arr.length; i++) {
-        var current_tag = trimSpaces(tools_arr[i]);
-        if (current_tag==tag) return;
-    }
-
-    if (trimSpaces(tool_list).length==0) {
-        tool_list=tool_list+tag
-    }
-    else {
-        tool_list=tool_list+", "+tag
-    }
-    
-    document.getElementById("tool_list").value=tool_list;
+function addToolListTag(tag_id) {
+    tools_autocompleter=autocompleters['tools_autocompleter']
+    var index=tools_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
+    var item = new Element('a', { 
+        'value': index
+    });
+    tools_autocompleter.addContactToList(item);
 }
 
-function addOrganismListTag(tag) {
-
-    var organisms_list = document.getElementById("organism_list").value;
-
-    //check the tag doesn't already exist
-    var expertise_arr=organisms_list.split(",")
-    for (var i = 0; i < expertise_arr.length; i++) {
-        var current_tag = trimSpaces(expertise_arr[i]);
-        if (current_tag==tag) return;
-    }
-
-    if (trimSpaces(organisms_list).length==0) {
-        organisms_list=organisms_list+tag
-    }
-    else {
-        organisms_list=organisms_list+", "+tag
-    }
-
-    document.getElementById("organism_list").value=organisms_list;
+function addExpertiseListTag(tag_id) {
+    expertise_autocompleter=autocompleters['expertise_autocompleter']
+    var index=expertise_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
+    var item = new Element('a', {
+        'value': index
+    });
+    expertise_autocompleter.addContactToList(item);
 }
 
-function addExpertiseListTag(tag) {
-    var expertise_list = document.getElementById("expertise_list").value;
+function addOrganismListTag(tag_id) {
 
-    //check the tag doesn't already exist
-    var expertise_arr=expertise_list.split(",")
-    for (var i = 0; i < expertise_arr.length; i++) {
-        var current_tag = trimSpaces(expertise_arr[i]);
-        if (current_tag==tag) return;
-    }
-
-    if (trimSpaces(expertise_list).length==0) {
-        expertise_list=expertise_list+tag
-    }
-    else {
-        expertise_list=expertise_list+", "+tag
-    }
-
-    document.getElementById("expertise_list").value=expertise_list;
+    organism_autocompleter=autocompleters['organism_autocompleter']
+    var index=organism_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
+    var item = new Element('a', { 
+        'value': index
+    });
+    organism_autocompleter.addContactToList(item);
 }
+
+
 
 function checkNotInList(id,list) {
     rtn = true;

@@ -27,7 +27,7 @@
       <div class="popularity">
         <% unless @tags_organisms.blank? -%>
           <% tag_cloud @tags_organisms, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-            <%= link_to tag.name, "javascript:addOrganismListTag('#{tag.name}');", :class => css_class -%>
+            <%= link_to tag.name, "javascript:addOrganismListTag(#{tag.id});", :class => css_class -%>
           <% end -%>
         <% end -%>
       </div>

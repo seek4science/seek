@@ -29,7 +29,7 @@
       <div class="popularity">
         <% unless @tags_expertise.blank? -%>
           <% tag_cloud @tags_expertise, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-            <%= link_to tag.name, "javascript:addExpertiseListTag('#{tag.name}');", :class => css_class -%>
+            <%= link_to tag.name, "javascript:addExpertiseListTag(#{tag.id});", :class => css_class -%>
           <% end -%>
         <% end -%>
       </div>
