@@ -258,16 +258,26 @@ class PeopleController < ApplicationController
 
   def set_tools_and_expertise person,params
     
-    unless params[:tools_autocompleter_selected_ids].nil?
       tags=""
       params[:tools_autocompleter_selected_ids].each do |selected_id|        
         tag=Tag.find(selected_id)        
         tags << tag.name << ","
-      end
+      end unless params[:tools_autocompleter_selected_ids].nil?
+      params[:tools_autocompleter_unrecognized_items].each do |item|
+        tags << item << ","
+      end unless params[:tools_autocompleter_unrecognized_items].nil?
+
       person.tool_list=tags
-    else
-      person.tool_list=""
-    end
+    
+      tags=""
+      params[:expertise_autocompleter_selected_ids].each do |selected_id|
+        tag=Tag.find(selected_id)
+        tags << tag.name << ","
+      end unless params[:expertise_autocompleter_selected_ids].nil?
+      params[:expertise_autocompleter_unrecognized_items].each do |item|
+        tags << item << ","
+      end unless params[:expertise_autocompleter_unrecognized_items].nil?
+      person.expertise_list=tags
     
   end
   

@@ -1,3 +1,4 @@
+
 <p>
   <label for="tool_list">
     Tools and techniques
@@ -5,7 +6,7 @@
   </label>
 
   <div id="facebook" class="clearfix">
-    <div tabindex="-1" id="tool_ids" class="clearfix tokenizer" onclick="$('tools_autocomplete_input').focus();" style="width: 340px;">
+    <div tabindex="-1" id="tool_ids" class="clearfix tokenizer" onclick="$('tools_autocomplete_input').focus();">
       <span class="tokenizer_stretcher">^_^</span>
       <span class="tab_stop"><input type="text" id="tools_hidden_input" tabindex="-1" ></span>
 
@@ -13,28 +14,12 @@
         <input type="text" size="1" tabindex="" id="tools_autocomplete_input" />
       </div>
     </div>
-    <div id="tools_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 343px; height: auto; overflow-y: hidden;display:none">
+    <div id="tools_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
       <div class="typeahead_message">Type the tools you have expertise in</div>
     </div>
   </div>
 
-  <script type="text/javascript">
-    var tools_list = <%= @all_tools_as_json -%>;
-    var prepopulate_with = <%= @person.tools.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
-    var tools_autocompleter_id='tools_autocompleter'
-    var tools_autocompleter = new Autocompleter.LocalAdvanced(
-    tools_autocompleter_id, 'tools_autocomplete_input', 'tools_autocomplete_display', 'tools_autocomplete_populate', tools_list, prepopulate_with, {
-      frequency: 0.1,
-      updateElement: addAction,
-      search_field: "name",     
-      id_field: "id",
-      validation_type: "any"
-    });
-    var hidden_input = new HiddenInput('tools_hidden_input',tools_autocompleter);
 
-    var autocompleters = new Array();
-    autocompleters[tools_autocompleter_id] = tools_autocompleter;
-  </script>
 
   <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
     <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "tools_tag_suggestions", :duration => 0.4) %>
@@ -53,4 +38,23 @@
   </div>
 
 </p>
+
+
+<script type="text/javascript">
+  var tools_list = <%= @all_tools_as_json -%>;
+  var prepopulate_with = <%= @person.tools.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+  var tools_autocompleter_id='tools_autocompleter'
+  var tools_autocompleter = new Autocompleter.LocalAdvanced(
+  tools_autocompleter_id, 'tools_autocomplete_input', 'tools_autocomplete_display', 'tools_autocomplete_populate', tools_list, prepopulate_with, {
+    frequency: 0.1,
+    updateElement: addAction,
+    search_field: "name",
+    id_field: "id",
+    validation_type: "any"
+  });
+  var hidden_input = new HiddenInput('tools_hidden_input',tools_autocompleter);
+
+  var autocompleters = new Array();
+  autocompleters[tools_autocompleter_id] = tools_autocompleter;
+</script>
 

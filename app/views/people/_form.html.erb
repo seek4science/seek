@@ -66,25 +66,10 @@
     <div class="foldTitle">Knowledge and expertise</div>
     <div class="foldContent">
       <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %>
-
-      <table style="width: 100%;">
-        <tr style="vertical-align: top;">
-          <td style="width: 45%;">
-            <center>
-              <div style="width: 90%;">
-                <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
-              </div>
-            </center>
-          </td>
-          <td style="width: 45%;">
-            <center>
-              <div style="width: 90%">
-                <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
-              </div>
-            </center>
-          </td>
-        </tr>
-      </table>
+          
+      <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
+      <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
+      
     </div>
   </div>
 
