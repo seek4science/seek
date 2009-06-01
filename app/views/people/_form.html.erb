@@ -82,7 +82,7 @@
 <% if person && (mine?(person) || person.can_be_edited_by?(current_user)) -%>
   <div class="fold">
     <div class="foldTitle">Personal picture</div>
-    <div class="foldContent">
+    <div class="foldContent" style="display:none;">
       <%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => person, :form_instance => f } -%>
     </div>
   </div>
