@@ -265,7 +265,10 @@ class PeopleController < ApplicationController
         tags << tag.name << ","
       end
       person.tool_list=tags
+    else
+      person.tool_list=""
     end
+    
   end
   
   def profile_belongs_to_current_or_is_admin
