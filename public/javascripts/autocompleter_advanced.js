@@ -565,7 +565,7 @@ prepopulateAutocompleterDisplayWithTokens: function(item_id_array) {
   var suggestions_array_ids = this.itemIDsToJsonArrayIDs(item_id_array);
   
   var item = null;
-  for(var i = 0; i < suggestions_array_ids.length; i++) {
+  for(var i = 0; i < suggestions_array_ids.length; i++) {    
     item = new Element('a', { 'value': suggestions_array_ids[i] });
     this.addContactToList(item);
   }

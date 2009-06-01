@@ -1,26 +1,55 @@
 <p>
-	<label for="expertise_list">
-		Expertise
-	  <%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") -%>
-	</label>
-		
-	<%= text_area :expertise, :list, :rows => 5, :value => h(person.expertise_list), :style => "width: 100%;" -%>
-	<%= fast_auto_complete_field :expertise_list, :url =>expertise_list_autocomplete_path -%>
-	
-	
-	<p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-		<%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "expertise_tag_suggestions", :duration => 0.4) %>
-	</p>
-	
-	<div id="expertise_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
-	  <div id="expertise_select_tags" class="hTagcloud">
-		  <div class="popularity">
-		    <% unless @tags_expertise.blank? -%>
-		      <% tag_cloud @tags_expertise, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-		        <%= link_to tag.name, "javascript:addExpertiseListTag('#{tag.name}');", :class => css_class -%>
-		      <% end -%>
-		    <% end -%>
-		  </div>
-		</div>
-	</div>
+  <label for="expertise_list">
+    Expertise
+    <%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") -%>
+  </label>
+
+
+  <div id="facebook" class="clearfix">
+    <div tabindex="-1" id="expertise_ids" class="clearfix tokenizer" onclick="$('expertise_autocomplete_input').focus();">
+      <span class="tokenizer_stretcher">^_^</span>
+      <span class="tab_stop"><input type="text" id="expertise_hidden_input" tabindex="-1" ></span>
+
+      <div id="expertise_autocomplete_display" class="tokenizer_input">
+        <input type="text" size="1" tabindex="" id="expertise_autocomplete_input" />
+      </div>
+    </div>
+    <div id="expertise_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
+      <div class="typeahead_message">Type the areas you have expertise in</div>
+    </div>
+  </div>
+
+
+  <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+    <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "expertise_tag_suggestions", :duration => 0.4) %>
+  </p>
+
+  <div id="expertise_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
+    <div id="expertise_select_tags" class="hTagcloud">
+      <div class="popularity">
+        <% unless @tags_expertise.blank? -%>
+          <% tag_cloud @tags_expertise, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+            <%= link_to tag.name, "javascript:addExpertiseListTag(#{tag.id});", :class => css_class -%>
+          <% end -%>
+        <% end -%>
+      </div>
+    </div>
+  </div>
 </p>
+
+<script type="text/javascript">
+  var expertise_list = <%= @all_expertise_as_json -%>;
+  var prepopulate_with = <%= @person.expertise.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+  var expertise_autocompleter_id='expertise_autocompleter'
+  var expertise_autocompleter = new Autocompleter.LocalAdvanced(
+  expertise_autocompleter_id, 'expertise_autocomplete_input', 'expertise_autocomplete_display', 'expertise_autocomplete_populate', expertise_list, prepopulate_with, {
+    frequency: 0.1,
+    updateElement: addAction,
+    search_field: "name",
+    id_field: "id",
+    validation_type: "any"
+  });
+  var hidden_input = new HiddenInput('expertise_hidden_input',expertise_autocompleter);
+
+  autocompleters[expertise_autocompleter_id] = expertise_autocompleter;
+</script>

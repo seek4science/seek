@@ -1,5 +1,6 @@
 var disciplines=new Array();
 var roles = new Array();
+var autocompleters = new Array();
 
 function addSelectedDiscipline() {
     selected_option_index=$("possible_disciplines").selectedIndex

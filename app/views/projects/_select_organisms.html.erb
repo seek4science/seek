@@ -4,8 +4,19 @@
     <%= help_icon("A comma seperated list of keywords that define your organisms.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
   </label>
 
-  <%= text_area :organism, :list, :rows => 5, :value => h(project.organism_list), :style => "width: 90%;" -%>
-  <%= fast_auto_complete_field :organism_list, :url =>organism_list_autocomplete_path -%>
+  <div id="facebook" class="clearfix">
+    <div tabindex="-1" id="organism_ids" class="clearfix tokenizer" onclick="$('organism_autocomplete_input').focus();">
+      <span class="tokenizer_stretcher">^_^</span>
+      <span class="tab_stop"><input type="text" id="organism_hidden_input" tabindex="-1" ></span>
+
+      <div id="organism_autocomplete_display" class="tokenizer_input">
+        <input type="text" size="1" tabindex="" id="organism_autocomplete_input" />
+      </div>
+    </div>
+    <div id="organism_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
+      <div class="typeahead_message">Type organsism you work with in your project</div>
+    </div>
+  </div>
 
   <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
     <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "organisms_tag_suggestions", :duration => 0.4) %>
@@ -16,11 +27,29 @@
       <div class="popularity">
         <% unless @tags_organisms.blank? -%>
           <% tag_cloud @tags_organisms, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-            <%= link_to tag.name, "javascript:addOrganismListTag('#{tag.name}');", :class => css_class -%>
+            <%= link_to tag.name, "javascript:addOrganismListTag(#{tag.id});", :class => css_class -%>
           <% end -%>
         <% end -%>
       </div>
     </div>
   </div>
-  
-</p>  
+
+</p>
+
+<script type="text/javascript">
+  var organism_list = <%= @all_organisms_as_json -%>;
+  var prepopulate_with = <%= @project.organisms.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+  var organism_autocompleter_id='organism_autocompleter'
+  var organism_autocompleter = new Autocompleter.LocalAdvanced(
+  organism_autocompleter_id, 'organism_autocomplete_input', 'organism_autocomplete_display', 'organism_autocomplete_populate', organism_list, prepopulate_with, {
+    frequency: 0.1,
+    updateElement: addAction,
+    search_field: "name",
+    id_field: "id",
+    validation_type: "any"
+  });
+  var hidden_input = new HiddenInput('organism_hidden_input',organism_autocompleter);
+
+  var autocompleters=new Array();
+  autocompleters[organism_autocompleter_id] = organism_autocompleter;
+</script>

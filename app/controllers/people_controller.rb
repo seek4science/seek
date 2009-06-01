@@ -7,6 +7,7 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
+  before_filter :set_tagging_parameters,:only=>[:edit,:new]
   
   
   def auto_complete_for_tools_name
@@ -138,15 +139,9 @@ class PeopleController < ApplicationController
   def create
     @person = Person.new(params[:person])
     redirect_action="new"
-    if !params[:tool].nil?
-      tools_list = params[:tool][:list]
-      @person.tool_list=tools_list
-    end
 
-    if !params[:expertise].nil?
-      expertise_list = params[:expertise][:list]
-      @person.expertise_list=expertise_list
-    end
+    set_tools_and_expertise(@person, params)
+   
     
     if (current_user.person.nil?) #indicates a profile is being created during the registration process      
       current_user.person=@person      
@@ -195,15 +190,7 @@ class PeopleController < ApplicationController
     avatar_id = params[:person].delete(:avatar_id).to_i
     @person.avatar_id = ((avatar_id.kind_of?(Fixnum) && avatar_id > 0) ? avatar_id : nil)
     
-    if !params[:tool].nil?
-      tools_list = params[:tool][:list]
-      @person.tool_list=tools_list
-    end
-
-    if !params[:expertise].nil?
-      expertise_list = params[:expertise][:list]
-      @person.expertise_list=expertise_list
-    end
+    set_tools_and_expertise(@person,params)    
     
     # some "Person" instances might not have a "User" associated with them - because the user didn't register yet
     if current_user.is_admin?
@@ -268,6 +255,31 @@ class PeopleController < ApplicationController
   end
 
   private
+
+  def set_tools_and_expertise person,params
+    
+      tags=""
+      params[:tools_autocompleter_selected_ids].each do |selected_id|        
+        tag=Tag.find(selected_id)        
+        tags << tag.name << ","
+      end unless params[:tools_autocompleter_selected_ids].nil?
+      params[:tools_autocompleter_unrecognized_items].each do |item|
+        tags << item << ","
+      end unless params[:tools_autocompleter_unrecognized_items].nil?
+
+      person.tool_list=tags
+    
+      tags=""
+      params[:expertise_autocompleter_selected_ids].each do |selected_id|
+        tag=Tag.find(selected_id)
+        tags << tag.name << ","
+      end unless params[:expertise_autocompleter_selected_ids].nil?
+      params[:expertise_autocompleter_unrecognized_items].each do |item|
+        tags << item << ","
+      end unless params[:expertise_autocompleter_unrecognized_items].nil?
+      person.expertise_list=tags
+    
+  end
   
   def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
@@ -305,5 +317,12 @@ class PeopleController < ApplicationController
       params[:person].delete(:is_pal) if params[:person]
     end
   end
- 
+
+  def set_tagging_parameters
+    tools=Person.tool_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}
+    @all_tools_as_json=tools.to_json
+
+    expertise=Person.expertise_counts.sort{|a,b| a.id<=>b.id}.collect{|t|{'id'=>t.id,'name'=>t.name}}
+    @all_expertise_as_json=expertise.to_json
+  end
 end
