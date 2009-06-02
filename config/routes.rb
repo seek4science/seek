@@ -15,7 +15,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :assays
 
-  map.resources :assets
+  map.resources :assets,:member=>{:request_resource=>:post}
 
   map.resources :data_files, :member => {:download => :get}  do |data_file|
     data_file.resources :studied_factors

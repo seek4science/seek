@@ -12,6 +12,17 @@ class Mailer < ActionMailer::Base
     end
   end
 
+  def request_resource(user,resource,base_host)
+
+    subject "A Sysmo Member requested a protected file: #{resource.title}"
+    recipients resource.contributor.person.email_with_name
+    from NOREPLY_SENDER
+    reply_to user.person.email_with_name
+    sent_on Time.now
+    
+    body :owner=>resource.contributor.person,:requester=>user.person,:resource=>resource,:host=>base_host
+  end
+
   def signup(user,base_host)
     subject     'Sysmo SEEK account activation'
     recipients  user.person.email_with_name

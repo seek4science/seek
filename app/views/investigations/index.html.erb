@@ -1,0 +1,15 @@
+<ul class="sectionIcons">
+    <li><%= icon "new", new_investigation_path, "New investigation", nil, "New investigation" %></li>
+</ul>
+
+<% if @investigations.public_methods.include?("page_count") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate", :locals => { :collection => @investigations } -%>
+<% end %>
+
+<%= render :partial => "investigations/resource_list_item", :collection=>@investigations %>
+
+<% if @investigations.public_methods.include?("page_count") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate", :locals => { :collection => @investigations } -%>
+<% end %>

@@ -17,8 +17,23 @@
         <%= link_to "Institutions", institutions_url -%>
       </li>
 
+      <!-- Investigations tab -->
+      <li <%= (["investigations"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1em;">
+        <%= link_to "Investigations", investigations_url -%>
+      </li>
+
+      <!-- Studies tab -->
+      <li <%= (["studies"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
+        <%= link_to "Studies", studies_url -%>
+      </li>
+
+      <!-- Assays tab -->
+      <li <%= (["assays"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
+        <%= link_to "Assays", assays_url -%>
+      </li>
+
       <!-- SOPs tab -->
-      <li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1.5em;">
+      <li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 1em;">
         <%= link_to "SOPs", sops_url -%>
       </li>
 
@@ -27,22 +42,10 @@
         <%= link_to "Models", models_url -%>
       </li>
 
-      <!-- Studies tab -->
-      <li <%= (["studies"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-        <%= link_to "Studies", studies_url -%>
-      </li>
-
       <!-- Data tab -->
       <li <%= (["data_files"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
         <%= link_to "Data", data_files_url -%>
-      </li>
-
-      <% if current_user.is_admin? -%>
-        <!-- Admin tab -->
-        <li <%= (["admin"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> style="margin-left: 8.5em;">
-          <%= link_to "Admin", admin_url -%>
-        </li>
-      <% end -%>
+      </li>      
       
     </ul>
   </div>

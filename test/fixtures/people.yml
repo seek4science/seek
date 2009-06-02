@@ -139,6 +139,7 @@ person_for_model_owner:
 person_for_datafile_owner:
   first_name: "Datafile"
   last_name: "Owner"
+  email: "data_file_owner@email.com"
 
 modeller_person:
   first_name: "Modeller"

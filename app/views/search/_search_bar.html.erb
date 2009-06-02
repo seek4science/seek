@@ -2,10 +2,7 @@
 <% @search_type="All" unless @search_type %>
 
 <% if logged_in? && current_user.is_admin? -%>
-  <div style="float: left; width: 150px;">&nbsp;</div>
-	<div style="float: right; width: 150px; font-weight: bold; color: white;">
-	  <%= icon "lock", nil, "Admin mode", nil, "Admin mode" -%>
-	</div>
+  <%= icon "lock", admin_url, "Admin enabled", {:id=>"adminmode"}, "Admin enabled" -%>
 <% end -%>
 
 <% if SOLR_ENABLED && logged_in? && current_user.person %>
@@ -13,7 +10,7 @@
   <% form_tag '/search/' do -%>
     <%= text_field_tag :search_query, @search_query %>
     <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
-  <%= submit_tag "Go"  %>
+    <%= submit_tag "Go"  %>
   <% end  -%>
 <% end %>
 

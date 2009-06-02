@@ -1,0 +1,11 @@
+<% controller=@resource.class.name.underscore.pluralize -%>
+Hi <%= @owner.name -%>,
+
+    The Sysmo user <%= @requester.name -%>, <%= person_url(@requester,:host=>@host) -%>, has requested access to the file "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource,:host=>@host) -%>.
+
+    This file is currently not downloadable by <%= @requester.first_name.capitalize -%> according to the sharing permissions. You can modify permissions for individual people using the Custom Sharing Permissions when managing the file.
+    You can also reply to <%= @requester.first_name.capitalize -%> by replying to this email.
+
+    This is an automated email.
+
+- Sysmo-DB Team

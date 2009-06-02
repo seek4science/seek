@@ -6,7 +6,7 @@ class ProjectsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :set_tagging_parameters,:only=>[:edit,:new]
+  before_filter :set_tagging_parameters,:only=>[:edit,:new,:create,:update]
 
 
   def auto_complete_for_organism_name
@@ -185,6 +185,7 @@ class ProjectsController < ApplicationController
     end unless params[:organism_autocompleter_unrecognized_items].nil?
 
     project.organism_list=tags
+    
   end
 
   def editable_by_user
