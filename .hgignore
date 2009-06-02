@@ -16,6 +16,8 @@ tmp/avatars/*
 tmp/models/*
 debug.log
 .project
+public/javascripts/js_cached.js
+public/stylesheets/css_cached.css
 
 syntax: regexp
 \.orig$
