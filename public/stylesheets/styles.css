@@ -591,3 +591,9 @@ div#more_info ul li {
     margin-left: 2em;
 }
 
+a#adminmode {
+    color: #FFFFCC;
+    margin-right: 2em;
+    float: right;
+    font-weight:bolder;
+}

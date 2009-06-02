@@ -297,8 +297,8 @@ li {
 }
 
 .tabnav li a {
-	padding: 4px 12px;
-	margin-left: 3px;
+	padding: 3px 8px;
+	margin-left: 1px;
 	border-top: 1px solid #BBBBBB;
 	border-left: 1px solid #BBBBBB;
 	border-right: 1px solid #BBBBBB;
