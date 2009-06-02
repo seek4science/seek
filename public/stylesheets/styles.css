@@ -597,3 +597,8 @@ a#adminmode {
     float: right;
     font-weight:bolder;
 }
+
+div#requesting_resource_status {
+    font-size:medium;
+    margin: 0em 4em 0em 4em;
+}
