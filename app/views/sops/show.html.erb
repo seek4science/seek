@@ -16,8 +16,9 @@
     <li><%= icon('download', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
   <% else -%>
     <li>
-      <%=  help_icon("You do not have permission to download this Sop, but you are interested you can request permission from the owner.") %>
-      <%= icon('sop',"javascript:alert('Unable to send emails')","Request file",nil,"Request file") %>
+      <li>
+        <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@sop} %>
+      </li>
     </li>
   <% end -%>
 </ul>
@@ -46,12 +47,12 @@
       </p>
 
       <%#*<p>%>
-        <%#*<b>Organism:</b>%>
-        <%# if @sop.organism -%>
-          <%#=organism_link_to @sop.organism -%>
-        <%# else -%>
-          <%#*<span class="none_text">Unknown</span>%>
-        <%# end -%>
+      <%#*<b>Organism:</b>%>
+      <%# if @sop.organism -%>
+      <%#=organism_link_to @sop.organism -%>
+      <%# else -%>
+      <%#*<span class="none_text">Unknown</span>%>
+      <%# end -%>
       <%#*</p>%>
 
       <br/>

@@ -1,0 +1,26 @@
+<%
+resource_type=resource.class.name.humanize
+%>
+
+
+<% if EMAIL_ENABLED -%>
+
+  <div id="request_resource_button">
+    <%=  help_icon("You do not have permission to download this #{resource_type}, but if you are interested you can request permission from the owner.") %>
+    <%= link_to_remote request_request_label(resource),
+      :url=>request_resource_asset_url(:id=>resource.asset,:current_user=>current_user),
+      :method=>:post,
+      :before=>"Effect.Appear('requesting_resource_status');$('request_resource_button').hide();"
+
+    -%>
+  </div>
+
+  <div id="requesting_resource_status" style="display:none;">
+    About to request the <%= resource_type -%>  <b><%= resource.title %></b>  from <b><%= h(resource.contributor.person.name) %></b> ...
+  </div>
+
+<% else -%>
+  <%=  help_icon("You do not have permission to download this #{resource_type}, but you are interested you can request permission from the owner.") %>
+  <%= icon('sop',"javascript:alert('Unable to send emails')","Request file",nil,"Request file") -%>
+
+<% end -%>

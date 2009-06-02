@@ -18,8 +18,7 @@
     <li><%= icon('download', download_model_url, "Download Model", nil, "Download Model") -%></li>
   <% else -%>
     <li>
-      <%=  help_icon("You do not have permission to download this Model, but you are interested you can request permission from the owner.") %>
-      <%= icon('sop',"javascript:alert('Unable to send emails')","Request file",nil,"Request file") %>
+      <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@model} %>
     </li>
   <% end -%>
 </ul>
