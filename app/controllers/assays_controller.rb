@@ -3,6 +3,16 @@ class AssaysController < ApplicationController
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   
+  def index
+    @assays=Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
+
+    respond_to do |format|
+      format.html
+      format.xml {render :xml=>@assays}
+    end
+    
+  end
+
   def new
     @assay=Assay.new
     @assay.studies << Study.find(params[:study_id]) if params[:study_id]

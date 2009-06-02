@@ -5,6 +5,16 @@ class InvestigationsController < ApplicationController
   before_filter :make_investigation_and_auth,:only=>[:create]
 
 
+  def index
+    @investigations=Investigation.find(:all, :include=>:studies, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
+
+    respond_to do |format|
+      format.html
+      format.xml {render :xml=>@investigations}
+    end
+    
+  end
+
   def show
     @investigation=Investigation.find(params[:id])
 

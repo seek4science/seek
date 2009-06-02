@@ -10,7 +10,7 @@ class StudiesController < ApplicationController
 
   def index
     
-    @studies=Study.find(:all)
+    @studies=Study.find(:all,:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
 
     respond_to do |format|
       format.html # index.html.erb
