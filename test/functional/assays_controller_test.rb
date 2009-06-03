@@ -20,4 +20,16 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assay)
   end
+
+  test "should show new" do
+    get :new
+    assert_response :success
+    assert_not_nil assigns(:assay)
+  end
+
+  test "should show item with no study" do
+    get :show, :id=>assays(:assay_with_no_study)
+    assert_response :success
+    assert_not_nil assigns(:assay)
+  end
 end

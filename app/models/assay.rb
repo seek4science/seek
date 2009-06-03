@@ -26,7 +26,7 @@ class Assay < ActiveRecord::Base
   end
 
   def project
-    investigation.project
+    investigation.nil? ? nil : investigation.project
   end
 
 end

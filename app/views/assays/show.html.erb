@@ -22,7 +22,7 @@
   </p>
 
   <p id="project">
-    <b>Project: </b> <%= link_to h(@assay.project.title),@assay.project %>
+    <b>Project: </b> <%= projects_link_list [@assay.project] %>
   </p>
 
   <p id="study">

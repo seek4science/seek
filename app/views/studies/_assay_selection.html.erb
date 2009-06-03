@@ -15,7 +15,7 @@
       <br/>
       <div id="assay_list_collection">
         <%= f.label :available_assays %><br/>
-        <%= select_tag :possible_assays,options_for_select( Assay.find(:all).collect{|a| [h("#{a.title} (#{a.assay_type.title})"),a.id]} ),:style => "width: 82%;" %>
+        <%= select_tag :possible_assays,options_for_select( assays_available_for_study_association.collect{|a| [h("#{a.title} (#{a.assay_type.title})"),a.id]} ),:style => "width: 82%;" %>
         <b><%= link_to_function "Add","addSelectedAssay(); return(false);" %></b>
       </div>
 

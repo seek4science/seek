@@ -49,4 +49,10 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid?
     
   end
+
+  test "assay with no study has nil study and project" do
+    a=assays(:assay_with_no_study)
+    assert_nil a.study
+    assert_nil a.project
+  end
 end

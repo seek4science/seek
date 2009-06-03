@@ -15,6 +15,10 @@ module AssaysHelper
     return assay.study.nil?
   end
 
+  #assays that haven't already been associated with a study
+  def assays_available_for_study_association
+    Assay.find(:all,:conditions=>['study_id IS NULL'])
+  end
 
 
 end

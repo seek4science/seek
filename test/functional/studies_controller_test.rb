@@ -34,6 +34,24 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
+  test "edit should not show associated assays" do
+    get :edit, :id=>studies(:metabolomics_study)
+    assert_response :success
+    assert_select "select#possible_assays" do
+      assert_select "option",:text=>/Assay with no Study/,:count=>1
+      assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
+    end
+  end
+
+  test "new should not show associated assays" do
+    get :new
+    assert_response :success
+    assert_select "select#possible_assays" do
+      assert_select "option",:text=>/Assay with no Study/,:count=>1
+      assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
+    end
+  end
+
   test "should update" do
     s=studies(:metabolomics_study)
     assert_not_equal "test",s.title
