@@ -12,6 +12,14 @@ class InvestigationTest < ActiveSupport::TestCase
     
   end
 
+  test "assays through association" do
+    inv=investigations(:metabolomics_investigation)
+    assays=inv.assays
+    assert_not_nil assays
+    assert assays.instance_of?(Array)
+    assert assays.include?(assays(:metabolomics_assay))
+  end
+
   test "validations" do
     
     inv=Investigation.new(:title=>"Test",:project=>projects(:sysmo_project))
