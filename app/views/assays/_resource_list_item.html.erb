@@ -5,7 +5,6 @@
   <table class="list_item">
     <tr>
 
-
       <td class="item_details">
         <p class="name">
           <%= link_to h(assay.title),assay %>
@@ -25,13 +24,13 @@
         </p>
 
         <p class="studies">
-          <label>Studies: </label>
-          <%= studies_link_list assay.studies %>
+          <label>Study: </label>
+          <%= studies_link_list [assay.study] %>
         </p>
 
         <p class="projects">
           <label>Project: </label>
-          <%= projects_link_list assay.projects %>
+          <%= projects_link_list [assay.project] %>
         </p>
 
         <p class="Sops">

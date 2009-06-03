@@ -6,14 +6,11 @@
 <center>
   <div style="width: 60%;">
 
-    <% if !@assay.studies.empty? -%>
+    <% if !@assay.study.nil? -%>
       <%= f.hidden_field :study_ids -%>
       <p>
-        <%= label_tag "Associated studies: " %>
-        <% for study in @assay.studies -%>
-          <%= h study.title.capitalize -%>
-          <%= ", " unless study==@assay.studies.last -%>
-        <% end -%>
+        <%= label_tag "Associated study: " -%>
+        <%= h @assay.study.title.capitalize -%>        
       </p>
     <% end -%>
 

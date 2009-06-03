@@ -22,19 +22,19 @@
   </p>
 
   <p id="project">
-    <b>Project: </b> <%= projects_link_list @assay.projects %>
+    <b>Project: </b> <%= link_to h(@assay.project.title),@assay.project %>
   </p>
 
-  <p id="studies">
-    <b>Associated studies: </b><%= studies_link_list @assay.studies %>
+  <p id="study">
+    <b>Study: </b><%= studies_link_list [@assay.study] %>
   </p>
 
   <p id="assay_type">
-    <b>Assay type: </b><%= link_to h(@assay.assay_type.title), @assay.assay_type %>
+    <b>Assay type: </b><%= link_to h(@assay.assay_type.title), @assay.assay_type -%>
   </p>
 
   <p id="technology_type">
-    <b>Technology type: </b><%= link_to h(@assay.technology_type.title), @assay.technology_type %>
+    <b>Technology type: </b><%= link_to h(@assay.technology_type.title), @assay.technology_type -%>
   </p>
 
   <%= render :partial=>"assays/assay_tabs",:object=>@assay %>

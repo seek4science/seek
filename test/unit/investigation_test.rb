@@ -6,10 +6,8 @@ class InvestigationTest < ActiveSupport::TestCase
 
   test "associations" do
     inv=investigations(:metabolomics_investigation)
-
     assert_equal projects(:sysmo_project),inv.project
-    assert inv.studies.include?(studies(:metabolomics_study))
-    
+    assert inv.studies.include?(studies(:metabolomics_study))    
   end
 
   test "assays through association" do
@@ -17,7 +15,10 @@ class InvestigationTest < ActiveSupport::TestCase
     assays=inv.assays
     assert_not_nil assays
     assert assays.instance_of?(Array)
+    assert_equal 3,assays.size
     assert assays.include?(assays(:metabolomics_assay))
+    assert assays.include?(assays(:metabolomics_assay2))
+    assert assays.include?(assays(:metabolomics_assay3))
   end
 
   test "validations" do

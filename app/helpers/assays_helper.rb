@@ -12,7 +12,7 @@ module AssaysHelper
 
   #determines if an assay can be deleted. This is only possible if the assay has no associated studies, and the user is authorised to
   def user_can_delete_assay? assay
-    return assay.studies.empty?
+    return assay.study.nil?
   end
 
 

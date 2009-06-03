@@ -15,7 +15,7 @@ class AssaysController < ApplicationController
 
   def new
     @assay=Assay.new
-    @assay.studies << Study.find(params[:study_id]) if params[:study_id]
+    @assay.study = Study.find(params[:study_id]) if params[:study_id]
 
     respond_to do |format|
       format.html
@@ -75,11 +75,11 @@ class AssaysController < ApplicationController
   def destroy
     @assay=Assay.find(params[:id])
     respond_to do |format|
-      if @assay.studies.empty? && @assay.destroy
+      if @assay.study.nil? && @assay.destroy
         format.html { redirect_to(assays_url) }
         format.xml  { head :ok }
       else
-        flash[:error]="Unable to delete the assay" if !@assay.studies.empty?
+        flash[:error]="Unable to delete the assay" if !@assay.study.nil?
         format.html { render :action=>"show" }
         format.xml  { render :xml => @assay.errors, :status => :unprocessable_entity }
       end

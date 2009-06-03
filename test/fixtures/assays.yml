@@ -5,14 +5,21 @@ metabolomics_assay:
   assay_type: metabolomics
   technology_type: gas_chromatography
   sops: my_first_sop,sop_with_fully_public_policy
+  study: metabolomics_study
 
 metabolomics_assay2:
   title: Metabolomics Assay
   assay_type: metabolomics
   technology_type: gas_chromatography
   sops: my_first_sop,sop_for_test_with_workgroups
-
-assay_with_2_projects:
-  title: Assay with 2 projects
+  study: study_with_overlapping_assay_sops
+  
+metabolomics_assay3:
+  title: Metabolomics Assay2
   assay_type: metabolomics
   technology_type: gas_chromatography
+  sops: my_first_sop,sop_with_fully_public_policy
+  study: study_with_overlapping_assay_sops
+
+
+

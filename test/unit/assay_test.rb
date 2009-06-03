@@ -11,18 +11,18 @@ class AssayTest < ActiveSupport::TestCase
 
   end
 
-  test "related projects" do
+  test "related investigation" do
     assay=assays(:metabolomics_assay)
-    assert_equal 1,assay.projects.size
-    assert_equal projects(:sysmo_project),assay.projects.first
+    assert_not_nil assay.investigation
+    assert_equal investigations(:metabolomics_investigation),assay.investigation
   end
 
-  test "multiple_related_projects" do
-    assay=assays(:assay_with_2_projects)
-    assert_equal 2,assay.projects.size
-    assert assay.projects.include?(projects(:sysmo_project))
-    assert assay.projects.include?(projects(:moses_project))
+  test "related project" do
+    assay=assays(:metabolomics_assay)
+    assert_not_nil assay.project
+    assert_equal projects(:sysmo_project),assay.project
   end
+  
 
   test "validation" do
     assay=Assay.new(:title=>"test",
