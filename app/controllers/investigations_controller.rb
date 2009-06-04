@@ -3,7 +3,7 @@ class InvestigationsController < ApplicationController
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :make_investigation_and_auth,:only=>[:create]
-  #before_filter :investigation_auth_project,:only=>[:edit,:update]
+  before_filter :investigation_auth_project,:only=>[:edit,:update]
   
 
 
@@ -78,10 +78,18 @@ class InvestigationsController < ApplicationController
     @investigation=Investigation.new(params[:investigation])
     unless current_user.person.projects.include?(@investigation.project)
       respond_to do |format|
-          flash[:error] = "You cannot create a investigation for a project you are not a member of."
-          format.html { redirect_to studies_path }
-        end
-        return false
+        flash[:error] = "You cannot create a investigation for a project you are not a member of."
+        format.html { redirect_to studies_path }
+      end
+      return false
+    end
+  end
+
+  def investigation_auth_project
+    @investigation=Investigation.find(params[:id])
+    unless @investigation.can_edit?(current_user)
+      flash[:error] = "You cannot edit an Investigation for a project you are not a member."
+      redirect_to @investigation
     end
   end
   

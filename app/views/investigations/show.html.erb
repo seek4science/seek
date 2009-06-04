@@ -1,9 +1,17 @@
+<ul class="sectionIcons">
+  <% if @investigation.can_edit?(current_user) -%>
+    <li>
+      <%= icon('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%>
+    </li>
+  <% end -%>
+</ul>
+
 <h1><%= h @investigation.title -%></h1>
 
 <div class="show_basic">
-  
+
   <p>
-    <b>Project:</b> <%= link_to h(@investigation.project.name),@investigation.project %>    
+    <b>Project:</b> <%= link_to h(@investigation.project.name),@investigation.project %>
   </p>
 
   <p>
@@ -16,6 +24,6 @@
 
   <%= render :partial=>"investigations/investigation_tabs" -%>
 
-  
+
 
 </div>
