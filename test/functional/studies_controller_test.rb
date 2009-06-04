@@ -107,5 +107,35 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal "new title",s.title
     assert s.assays.include?(assays(:metabolomics_assay))
   end
+
+  test "no edit button in show for person not in project" do
+    login_as(:aaron)
+    get :show, :id=>studies(:metabolomics_study)
+    assert_select "a",:text=>/Edit study/,:count=>0
+  end
+
+  test "edit button in show for person in project" do
+    get :show, :id=>studies(:metabolomics_study)
+    assert_select "a",:text=>/Edit study/,:count=>1
+  end
+
+  test "study project member can't edit" do
+    login_as(:aaron)
+    s=studies(:metabolomics_study)
+    get :edit, :id=>s.id
+    assert_redirected_to study_path(s)
+    assert flash[:error]
+  end
+
+  test "study project member can't update" do
+    login_as(:aaron)
+    s=studies(:metabolomics_study)
+    put :update, :id=>s.id,:study=>{:title=>"test"}
+
+    assert_redirected_to study_path(s)
+    assert assigns(:study)
+    assert flash[:error]
+    assert_equal "A Metabolomics Study",assigns(:study).title
+  end
   
 end

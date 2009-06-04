@@ -2,9 +2,12 @@
 
 
 <ul class="sectionIcons">
-  <li>
-    <%= icon('edit', edit_study_path(@study), "Edit Study Details", nil, 'Edit Study Details') -%>
-  </li>
+  <% if @study.can_edit?(current_user) -%>
+    <li>
+      <%= icon('edit', edit_study_path(@study), "Edit study", nil, 'Edit study') -%>
+    </li>
+  <% end -%>
+  
   <% if current_user.is_admin? -%>
     <li>
       <%= icon "destroy", study_path(@study), "Delete Study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>

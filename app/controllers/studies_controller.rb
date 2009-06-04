@@ -5,6 +5,7 @@ class StudiesController < ApplicationController
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
+  before_filter :study_auth_project,:only=>[:edit,:update]
 
   def index
     
@@ -123,6 +124,14 @@ class StudiesController < ApplicationController
           return false
         end
       end
+    end
+  end
+
+  def study_auth_project
+    @study=Study.find(params[:id])
+    unless @study.can_edit?(current_user)
+      flash[:error] = "You cannot edit a Study for a project you are not a member."
+      redirect_to @study
     end
   end
   

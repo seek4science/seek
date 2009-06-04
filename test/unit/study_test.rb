@@ -2,7 +2,7 @@ require 'test_helper'
 
 class StudyTest < ActiveSupport::TestCase
   
-  fixtures :studies,:assays,:investigations,:projects,:technology_types,:assay_types,:people,:sops
+  fixtures :studies,:assays,:investigations,:projects,:technology_types,:assay_types,:people,:sops,:users
 
   test "associations" do
     study=studies(:metabolomics_study)
@@ -19,6 +19,12 @@ class StudyTest < ActiveSupport::TestCase
     
     assert_equal assay_types(:metabolomics),study.assays.first.assay_type
 
+  end
+
+  test "can_edit" do
+    study=studies(:metabolomics_study)
+    assert !study.can_edit?(users(:aaron))
+    assert study.can_edit?(users(:model_owner)) #model owner is a member of the sysmo-project
   end
 
   test "sops through assays" do
