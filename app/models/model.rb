@@ -13,10 +13,13 @@ class Model < ActiveRecord::Base
              :dependent => :destroy
 
   belongs_to :organism
-
+  belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
+  belongs_to :model_type
+  belongs_to :model_format
+  
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if SOLR_ENABLED
 
-  belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
+  
 
   has_many :created_datas
 

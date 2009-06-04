@@ -28,12 +28,12 @@
 
         <p>
           <b>Model type:</b><br/>
-          <%= f.text_field :model_type, :size=>5 %>
+          <%= f.collection_select :model_type_id,ModelType.find(:all),:id,:title,:include_blank=>"Not specified" %>
         </p>
 
         <p>
           <b>Model format:</b><br/>
-          <%= f.text_field :model_format, :size=>5 %>
+          <%= f.collection_select :model_format_id,ModelFormat.find(:all),:id,:title,:include_blank=>"Not specified" %>
         </p>
 
         <%

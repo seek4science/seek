@@ -27,14 +27,12 @@
 
         <p>
           <b>Model type:</b><br/>
-          <% type_value = (params[:model].blank? || params[:model][:model_type].blank?) ? nil : params[:model][:model_type] %>
-          <%= text_field_tag 'model[model_type]', type_value, :size=>5 %>
+          <%= collection_select :model, :model_type_id,ModelType.find(:all),:id,:title,:include_blank=>"Not specified" %>
         </p>
 
         <p>
           <b>Model format:</b><br/>
-          <% format_value = (params[:model].blank? || params[:model][:model_format].blank?) ? nil : params[:model][:model_format] %>
-          <%= text_field_tag 'model[model_format]', format_value, :size=>5 %>
+          <%= collection_select :model, :model_format_id,ModelFormat.find(:all),:id,:title,:include_blank=>"Not specified" %>
         </p>
 
         <%

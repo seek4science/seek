@@ -32,9 +32,9 @@
       </p>
 
       <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
-        <b>Model type:</b> <%= text_or_not_specified resource.model_type %>
+        <b>Model type:</b> <%= model_type_text resource.model_type %>
         <%= narrow_view ? "<br/>" : " | " -%>
-        <b>Model format:</b> <%= text_or_not_specified resource.model_format %>
+        <b>Model format:</b> <%= model_format_text resource.model_format %>
       </p>
       
       <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
@@ -47,7 +47,6 @@
           <%= narrow_view ? "<br/>" : " | " -%>
           <b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
         <% end %>
-
       </p>
 
       <div class="desc" style="font-size: 85%;">
