@@ -10,6 +10,20 @@ module ApplicationHelper
 
   end
 
+  #Classifies each result item into a hash with the class name as the key.
+  #
+  #This is to enable the resources to be displayed in the asset tabbed listing by class
+  def classify_for_tabs result_collection
+    results={}
+
+    result_collection.each do |res|
+      results[res.class.name] = [] unless results[res.class.name]
+      results[res.class.name] << res
+    end
+
+    return results
+  end
+
   #selection of assets for new asset gadget
   def new_creatable_selection
     select_tag :model_type,options_for_select(creatable_classes.collect{|c| [c.name.underscore.humanize,c.name.underscore] })
