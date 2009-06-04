@@ -32,4 +32,14 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assay)
   end
+
+  test "should create" do
+    assert_difference("Assay.count") do
+      post :create,:assay=>{:title=>"test",:organism_id=>organisms(:yeast).id,:technology_type_id=>technology_types(:gas_chromatography).id,:assay_type_id=>assay_types(:metabolomics).id}
+    end
+    a=assigns(:assay)
+    assert_redirected_to assay_path(a)
+    assert_equal organisms(:yeast),a.organism
+  end
+  
 end

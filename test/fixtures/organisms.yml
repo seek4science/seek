@@ -1,15 +1,10 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  title: MyString
-  ncbi_id: 1
-  strain: MyString
-  genotype: MyString
-  phenotype: MyString
+Saccharomyces_cerevisiae:
+  title: Saccharomyces cerevisiae
 
-two:
-  title: MyString
-  ncbi_id: 1
-  strain: MyString
-  genotype: MyString
-  phenotype: MyString
+Streptomyces_coelicolor:
+  title: Streptomyces coelicolor
+
+yeast:
+  title: yeast
