@@ -33,6 +33,16 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assay)
   end
 
+  test "should update with study" do
+    a=assays(:assay_with_no_study)
+    s=studies(:metabolomics_study)
+    put :update,:id=>a,:assay=>{:study=>s}
+    assert_redirected_to assay_path(a)
+    assert assigns(:assay)
+    assert_not_nil assigns(:assay).study
+    assert_equal s,assigns(:assay).study
+  end
+
   test "should create" do
     assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",:organism_id=>organisms(:yeast).id,:technology_type_id=>technology_types(:gas_chromatography).id,:assay_type_id=>assay_types(:metabolomics).id}

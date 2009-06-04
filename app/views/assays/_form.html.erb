@@ -6,8 +6,7 @@
 <center>
   <div style="width: 60%;">
 
-    <% if !@assay.study.nil? -%>
-      <%= f.hidden_field :study_ids -%>
+    <% if !@assay.study.nil? -%>      
       <p>
         <%= label_tag "Associated study: " -%>
         <%= h @assay.study.title.capitalize -%>        
@@ -22,6 +21,14 @@
     <p>
       <%= f.label :description -%><br/>
       <%= f.text_area :description,:cols=>50,:rows=>10 -%>
+    </p>
+
+    <p>
+      <%= f.label :study -%><br/>
+      <%
+        studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])
+      -%>
+      <%= f.collection_select :study_id,studies,:id,:title,:include_blank=>"Not specified" -%>
     </p>
   </div>
 </center>
