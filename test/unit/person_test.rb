@@ -144,6 +144,15 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?
   end
 
+  def test_email_with_capitalise_valid
+    p=people(:one)
+    assert p.valid?
+    p.email="gordon.brown@gov.uk"
+    assert p.valid?
+    p.email="Gordon.Brown@gov.uk"
+    assert p.valid?,"Capitals in email should be valid"
+  end
+
   def test_email_unique
     p=people(:one)
     newP=Person.new(:first_name=>"Fred",:email=>p.email)
