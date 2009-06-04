@@ -3,6 +3,8 @@ class InvestigationsController < ApplicationController
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :make_investigation_and_auth,:only=>[:create]
+  #before_filter :investigation_auth_project,:only=>[:edit,:update]
+  
 
 
   def index
@@ -44,6 +46,29 @@ class InvestigationsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml { render :xml=>@investigation}
+    end
+  end
+
+  def edit
+    @investigation=Investigation.find(params[:id])
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def update
+    @investigation=Investigation.find(params[:id])
+
+    respond_to do |format|
+      if @investigation.update_attributes(params[:investigation])
+        flash[:notice] = 'Study was successfully updated.'
+        format.html { redirect_to(@investigation) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @investigation.errors, :status => :unprocessable_entity }
+      end
     end
   end
 
