@@ -33,6 +33,11 @@
           <%= projects_link_list [assay.project] %>
         </p>
 
+        <p class="organism">
+          <label>Organism:</label>
+          <%= organism_link_to assay.organism %>
+        </p>
+
         <p class="Sops">
           <label>Sops: </label>
           <%= sops_link_list assay.sops,true,200 %>

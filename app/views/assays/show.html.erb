@@ -37,6 +37,10 @@
     <b>Technology type: </b><%= link_to h(@assay.technology_type.title), @assay.technology_type -%>
   </p>
 
+  <p id="organism">
+    <b>Organism:</b><%= organism_link_to @assay.organism %>
+  </p>
+
   <%= render :partial=>"assays/assay_tabs",:object=>@assay %>
 
 </div>

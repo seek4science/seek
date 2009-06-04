@@ -1,12 +1,11 @@
 class StudiesController < ApplicationController
 
   before_filter :login_required
-
-  #before_filter :set_no_layout, :only => [ :new_investigation_redbox,:new_assay ]
+  
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_project_member,:only=>[:create,:new]
-
-  #protect_from_forgery :except=>[:create_investigation,:create_assay]
+  before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
+  before_filter :study_auth_project,:only=>[:edit,:update]
 
   def index
     
@@ -70,17 +69,7 @@ class StudiesController < ApplicationController
       format.xml {render :xml=>@study.to_xml }
     end
 
-  end
-
-  def new_investigation_redbox
-    project=Project.find(params[:project_id])
-    @investigation=Investigation.new
-    @investigation.project=project
-
-    respond_to do |format|
-      format.js 
-    end
-  end
+  end  
 
   def create
     @study = Study.new(params[:study])
@@ -96,24 +85,6 @@ class StudiesController < ApplicationController
     end
 
   end
-
-  def create_investigation    
-    title=params[:title]
-    project_id=params[:project_id]
-    project=Project.find(project_id)
-
-    raise Exception.new("Person not a member of the project") if !current_user.person.projects.include?(project)
-    investigation=Investigation.new(:title=>title,:project=>project)
-    
-    respond_to do |format|
-      if investigation.save
-        format.json { render :json=>{:status=>200,:new_investigation=>[investigation.id,investigation.title]} }
-      else
-        format.json { render :json=>{:status=>406,:error_messages=>investigation.errors.full_messages }}
-      end
-    end
-  end
-
 
 
   def investigation_selected_ajax
@@ -139,5 +110,29 @@ class StudiesController < ApplicationController
 
   end
 
+  def check_assays_are_not_already_associated_with_another_study
+    assay_ids=params[:study][:assay_ids]
+    study_id=params[:id]    
+    if (assay_ids)
+      valid = !assay_ids.detect do |a_id|
+        a=Assay.find(a_id)
+        !a.study.nil? && a.study_id.to_s!=study_id
+      end
+      if !valid
+        unless valid
+          error("Cannot add an assay already associated with a Study", "is invalid (invalid Assay)")
+          return false
+        end
+      end
+    end
+  end
+
+  def study_auth_project
+    @study=Study.find(params[:id])
+    unless @study.can_edit?(current_user)
+      flash[:error] = "You cannot edit a Study for a project you are not a member."
+      redirect_to @study
+    end
+  end
   
 end

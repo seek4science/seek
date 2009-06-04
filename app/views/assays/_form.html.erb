@@ -33,6 +33,8 @@
   <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
 </p>
 
+<%= render :partial=>"organisms/select_organism",:locals=>{:model=>Assay} %>
+
 <h2>Assay SOPs</h2>
 
 <%= render :partial=>"assays/sop_selection",:locals=>{:f=>f} -%>

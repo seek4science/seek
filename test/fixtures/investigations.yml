@@ -1,3 +1,7 @@
 metabolomics_investigation:  
   title: Metabolomics Investigation
   project: sysmo_project
+
+metabolomics_investigation2:
+  title: Metabolomics Investigation2
+  project: sysmo_project

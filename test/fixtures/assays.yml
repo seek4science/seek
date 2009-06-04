@@ -6,6 +6,7 @@ metabolomics_assay:
   technology_type: gas_chromatography
   sops: my_first_sop,sop_with_fully_public_policy
   study: metabolomics_study
+  organism: Saccharomyces_cerevisiae
 
 metabolomics_assay2:
   title: Metabolomics Assay

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayTest < ActiveSupport::TestCase
-  fixtures :assays,:sops,:assay_types,:technology_types,:projects,:studies,:investigations
+  fixtures :assays,:sops,:assay_types,:technology_types,:projects,:studies,:investigations,:organisms
 
   test "sops association" do
     assay=assays(:metabolomics_assay)
@@ -9,6 +9,13 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:my_first_sop))
     assert assay.sops.include?(sops(:sop_with_fully_public_policy))
 
+  end
+
+  test "orgnanism association" do
+    assay=assays(:metabolomics_assay)
+    assert_equal organisms(:Saccharomyces_cerevisiae),assay.organism
+    assay=assays(:metabolomics_assay2)
+    assert_nil assay.organism
   end
 
   test "related investigation" do
@@ -55,4 +62,5 @@ class AssayTest < ActiveSupport::TestCase
     assert_nil a.study
     assert_nil a.project
   end
+
 end

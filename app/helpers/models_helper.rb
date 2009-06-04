@@ -14,4 +14,14 @@ module ModelsHelper
     return '<span class="icon">' + image_tag(icon_filename,:alt=>"Run",:title=>"Run") + ' Run model</span>';
   end
 
+  def model_type_text model_type
+    return "<span class='none_text'>Not specified</span>" if model_type.nil?
+    return h(model_type.title)
+  end
+
+  def model_format_text model_format
+    return "<span class='none_text'>Not specified</span>" if model_format.nil?
+    return h(model_format.title)
+  end
+
 end

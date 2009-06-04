@@ -17,7 +17,11 @@ class Investigation < ActiveRecord::Base
       assets=assets | study.sops.collect{|sop| sop.asset}
     end
     return assets
-  end  
+  end
+
+  def can_edit? user
+    user.person.projects.include?(project)
+  end
 
   
 end

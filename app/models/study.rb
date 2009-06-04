@@ -27,4 +27,8 @@ class Study < ActiveRecord::Base
     return sops
   end
 
+  def can_edit? user
+    user.person && user.person.projects.include?(project)
+  end
+
 end
