@@ -64,5 +64,6 @@ class StudyTest < ActiveSupport::TestCase
     assert !s.valid?
 
   end
+
   
 end

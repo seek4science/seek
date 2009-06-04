@@ -55,4 +55,5 @@ class AssayTest < ActiveSupport::TestCase
     assert_nil a.study
     assert_nil a.project
   end
+
 end

@@ -3,6 +3,11 @@ metabolomics_study:
   investigation: metabolomics_investigation
   person_responsible: person_without_group
 
+metabolomics_study2:
+  title: A Metabolomics Study2
+  investigation: metabolomics_investigation2
+  person_responsible: person_without_group
+
 study_with_overlapping_assay_sops:
   title: A study
   investigation: metabolomics_investigation

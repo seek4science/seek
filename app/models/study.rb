@@ -25,6 +25,6 @@ class Study < ActiveRecord::Base
       end
     end
     return sops
-  end
+  end  
 
 end
