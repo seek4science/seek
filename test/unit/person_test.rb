@@ -111,10 +111,7 @@ class PersonTest < ActiveSupport::TestCase
     assert !p.valid?
 
     p.email="sdf@"
-    assert !p.valid?
-
-    p.email="sdf@com"
-    assert !p.valid?
+    assert !p.valid?    
 
     p.email="sdaf@sdf.com"
     assert p.valid?
