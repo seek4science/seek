@@ -111,8 +111,7 @@ class StudiesController < ApplicationController
 
   def check_assays_are_not_already_associated_with_another_study
     assay_ids=params[:study][:assay_ids]
-    study_id=params[:id]
-    puts "STUDY ID TYPE=#{study_id.class.name}"
+    study_id=params[:id]    
     if (assay_ids)
       valid = !assay_ids.detect do |a_id|
         a=Assay.find(a_id)
