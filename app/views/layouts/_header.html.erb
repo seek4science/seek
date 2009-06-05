@@ -1,34 +1,33 @@
+<% cache "header" do -%>
+
+  <% if RAILS_ENV=="development" && false -%>
+    <table><tr><td>
+          <h1 style="color:red;">Development Mode</h1>
+        </td><td>
+          <%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo"),
+            root_path %>
+        </td>
+      </tr>
+    </table>
+  <% else -%>
+    <table width="100%">
+      <tr>
+        <td style="text-align:left;">
+          <%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo-DB",:height=>80),
+            root_path %>
+
+        </td>
+        <td>
+          <%= render :partial=>"layouts/header_text" -%>
+        </td>
+        <td style="text-align:right;">
+          <%= link_to image_tag("seek-logo-beta.png",:alt=>"SEEK",:title=>"SEEK"),
+            root_path %>
+        </td>
+
+      </tr>
+    </table>
 
 
-<% if RAILS_ENV=="development" && false -%>
-  <table><tr><td>
-        <h1 style="color:red;">Development Mode</h1>
-      </td><td>
-        <%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo"),
-          root_path %>
-      </td>
-    </tr>
-  </table>
-<% else -%>
-<table width="100%">
-  <tr>
-    <td style="text-align:left;">
-      <%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo-DB",:height=>80),
-    root_path %>
-      
-    </td>
-    <td>
-      <p id="header_text" class="box_standout">
-        Find and share <b>Data</b>, <b>Models</b> and <b>Processes</b> from <br/>within the <%= link_to "SysMO Consortium","http://www.sysmo.net",:popup=>true %>.
-      </p>
-    </td>
-    <td style="text-align:right;">
-      <%= link_to image_tag("seek-logo-beta.png",:alt=>"SEEK",:title=>"SEEK"),
-    root_path %>
-    </td>
-
-  </tr>
-</table>
-
-  
+  <% end -%>
 <% end -%>
