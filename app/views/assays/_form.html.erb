@@ -6,14 +6,10 @@
 <center>
   <div style="width: 60%;">
 
-    <% if !@assay.studies.empty? -%>
-      <%= f.hidden_field :study_ids -%>
+    <% if !@assay.study.nil? -%>      
       <p>
-        <%= label_tag "Associated studies: " %>
-        <% for study in @assay.studies -%>
-          <%= h study.title.capitalize -%>
-          <%= ", " unless study==@assay.studies.last -%>
-        <% end -%>
+        <%= label_tag "Associated study: " -%>
+        <%= h @assay.study.title.capitalize -%>        
       </p>
     <% end -%>
 
@@ -26,6 +22,14 @@
       <%= f.label :description -%><br/>
       <%= f.text_area :description,:cols=>50,:rows=>10 -%>
     </p>
+
+    <p>
+      <%= f.label :study -%><br/>
+      <%
+        studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])
+      -%>
+      <%= f.collection_select :study_id,studies,:id,:title,:include_blank=>"Not specified" -%>
+    </p>
   </div>
 </center>
 
@@ -35,6 +39,8 @@
   <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %><br/>
   <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
 </p>
+
+<%= render :partial=>"organisms/select_organism",:locals=>{:model=>Assay} %>
 
 <h2>Assay SOPs</h2>
 

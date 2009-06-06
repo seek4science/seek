@@ -2,6 +2,6 @@ metabolomics_investigation:
   title: Metabolomics Investigation
   project: sysmo_project
 
-moses_investigation:
-  title: Moses Investigation
-  project: moses_project
+metabolomics_investigation2:
+  title: Metabolomics Investigation2
+  project: sysmo_project

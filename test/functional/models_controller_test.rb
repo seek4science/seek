@@ -46,6 +46,11 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should show model with format and type" do
+    get :show, :id => models(:model_with_format_and_type).id
+    assert_response :success
+  end
+
   test "should get edit" do
     get :edit, :id => models(:teusink).id
     assert_response :success
@@ -54,6 +59,15 @@ class ModelsControllerTest < ActionController::TestCase
   test "should update model" do
     put :update, :id => models(:teusink).id, :model => { }
     assert_redirected_to model_path(assigns(:model))
+  end
+
+  test "should update model with model type and format" do
+    type=model_types(:ODE)
+    format=model_formats(:SBML)
+    put :update, :id => models(:teusink).id, :model => {:model_type_id=>type.id,:model_format_id=>format.id }
+    assert assigns(:model)
+    assert_equal type,assigns(:model).model_type
+    assert_equal format,assigns(:model).model_format
   end
 
   test "should destroy model" do

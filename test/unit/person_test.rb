@@ -111,10 +111,7 @@ class PersonTest < ActiveSupport::TestCase
     assert !p.valid?
 
     p.email="sdf@"
-    assert !p.valid?
-
-    p.email="sdf@com"
-    assert !p.valid?
+    assert !p.valid?    
 
     p.email="sdaf@sdf.com"
     assert p.valid?
@@ -142,6 +139,15 @@ class PersonTest < ActiveSupport::TestCase
 
     p.web_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
     assert p.valid?
+  end
+
+  def test_email_with_capitalise_valid
+    p=people(:one)
+    assert p.valid?
+    p.email="gordon.brown@gov.uk"
+    assert p.valid?
+    p.email="Gordon.Brown@gov.uk"
+    assert p.valid?,"Capitals in email should be valid"
   end
 
   def test_email_unique

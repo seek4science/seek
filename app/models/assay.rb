@@ -1,10 +1,13 @@
 class Assay < ActiveRecord::Base  
-
-  has_and_belongs_to_many :studies
+  
   has_and_belongs_to_many :sops
   
   belongs_to :assay_type
   belongs_to :technology_type
+  belongs_to :study
+  belongs_to :organism
+
+  has_one :investigation,:through=>:study  
 
   has_many :created_datas
   has_many :data_files,:through=>:created_datas
@@ -23,13 +26,8 @@ class Assay < ActiveRecord::Base
     "#{title} (#{type})"
   end
 
-  def projects
-    
-    projects=[]
-    studies.each do |study|
-      projects << study.project unless projects.include? study.project
-    end
-    return projects
+  def project
+    investigation.nil? ? nil : investigation.project
   end
 
 end

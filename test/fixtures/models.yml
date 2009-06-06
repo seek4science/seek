@@ -6,10 +6,20 @@ teusink:
   description: Teusink from JWS Online
   original_filename: Teusink.xml
   content_blob: teusink_blob
-  content_type: text/xml
-  model_type: JWS
-  model_format: SBML
+  content_type: text/xml  
   recommended_environment: jws
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
 
+model_with_format_and_type:
+  contributor: model_owner (User)
+  title: Model with format and type
+  description: Teusink from JWS Online
+  original_filename: Teusink.xml
+  content_blob: teusink_blob
+  content_type: text/xml
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  model_type: SBML
+  model_format: BioPAX

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayTest < ActiveSupport::TestCase
-  fixtures :assays,:sops,:assay_types,:technology_types,:projects,:studies,:investigations
+  fixtures :assays,:sops,:assay_types,:technology_types,:projects,:studies,:investigations,:organisms
 
   test "sops association" do
     assay=assays(:metabolomics_assay)
@@ -11,18 +11,25 @@ class AssayTest < ActiveSupport::TestCase
 
   end
 
-  test "related projects" do
+  test "orgnanism association" do
     assay=assays(:metabolomics_assay)
-    assert_equal 1,assay.projects.size
-    assert_equal projects(:sysmo_project),assay.projects.first
+    assert_equal organisms(:Saccharomyces_cerevisiae),assay.organism
+    assay=assays(:metabolomics_assay2)
+    assert_nil assay.organism
   end
 
-  test "multiple_related_projects" do
-    assay=assays(:assay_with_2_projects)
-    assert_equal 2,assay.projects.size
-    assert assay.projects.include?(projects(:sysmo_project))
-    assert assay.projects.include?(projects(:moses_project))
+  test "related investigation" do
+    assay=assays(:metabolomics_assay)
+    assert_not_nil assay.investigation
+    assert_equal investigations(:metabolomics_investigation),assay.investigation
   end
+
+  test "related project" do
+    assay=assays(:metabolomics_assay)
+    assert_not_nil assay.project
+    assert_equal projects(:sysmo_project),assay.project
+  end
+  
 
   test "validation" do
     assay=Assay.new(:title=>"test",
@@ -49,4 +56,11 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid?
     
   end
+
+  test "assay with no study has nil study and project" do
+    a=assays(:assay_with_no_study)
+    assert_nil a.study
+    assert_nil a.project
+  end
+
 end

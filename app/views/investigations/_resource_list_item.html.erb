@@ -14,7 +14,10 @@
         <div class="box_standout">
           <%= truncate(text_or_not_specified(investigation.description, :description => true), :length=>300) %>
         </div>        
-
+        <p class="project">
+          <label>Project:</label>
+          <%= projects_link_list [investigation.project] %>
+        </p>
         <p class="studies">
           <label>Studies: </label>
           <%= studies_link_list investigation.studies %>

@@ -1,7 +1,7 @@
 class Study < ActiveRecord::Base
 
   belongs_to :investigation
-  has_and_belongs_to_many :assays
+  has_many :assays
   
   has_one :project, :through=>:investigation
 
@@ -25,6 +25,10 @@ class Study < ActiveRecord::Base
       end
     end
     return sops
+  end
+
+  def can_edit? user
+    user.person && user.person.projects.include?(project)
   end
 
 end

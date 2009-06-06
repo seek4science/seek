@@ -6,7 +6,7 @@ module ProjectsHelper
   end
 
   def projects_link_list projects,sorted=true
-
+    projects=projects.select{|p| !p.nil?} #remove nil items
     return "<span class='none_text'>Not defined</span>" if projects.empty?
 
     result=""

@@ -24,31 +24,33 @@
     else if (selected_model == "investigation") {
       location.href = "<%= new_investigation_path -%>";
     }
-    
+
   }
 
 </script>
 
 <% unless current_user.person.work_groups.empty? -%>
-  <div id="new_asset" class="myexperiment_gadget">
-    <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
+  <% cache "new_object_gadget" do -%>
+    <div id="new_asset" class="myexperiment_gadget">
+      <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
 
-    <div class="header">
-      New or upload
-    </div>
-  
-    <div class="contents">
-      <div style="text-align: center; padding-left: 0.5em;">
-        <ul class="gadget_list">
-          <form onsubmit="newAsset();return(false)">
-            <%= new_creatable_selection %>
-            <%= submit_tag "Go" %>
-          </form>
-        </ul>
+      <div class="header">
+        New or upload
       </div>
-    </div>
 
-    <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
-  </div>
+      <div class="contents">
+        <div style="text-align: center; padding-left: 0.5em;">
+          <ul class="gadget_list">
+            <form onsubmit="newAsset();return(false)">
+              <%= new_creatable_selection %>
+              <%= submit_tag "Go" %>
+            </form>
+          </ul>
+        </div>
+      </div>
+
+      <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
+    </div>
+  <% end -%>
 <% end -%>
 
