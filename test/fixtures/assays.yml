@@ -22,10 +22,27 @@ metabolomics_assay3:
   sops: my_first_sop,sop_with_fully_public_policy
   study: study_with_overlapping_assay_sops
 
-assay_with_no_study:
-  title: Assay with no Study
+assay_with_just_a_study:
+  title: Assay with just a Study
   assay_type: metabolomics
   technology_type: gas_chromatography
+  study: metabolomics_study2
+
+assay_with_no_study_or_files:
+  title: Assay with no Study or files
+  assay_type: metabolomics
+  technology_type: gas_chromatography
+
+assay_with_no_study_but_has_some_files:
+  title: Assay with no Study but has some files
+  assay_type: metabolomics
+  technology_type: gas_chromatography  
+
+assay_with_no_study_but_has_some_sops:
+  title: Assay with no Study but has some sops
+  assay_type: metabolomics
+  technology_type: gas_chromatography
+  sops: my_first_sop
 
 
 

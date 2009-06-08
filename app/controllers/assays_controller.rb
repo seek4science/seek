@@ -2,6 +2,7 @@ class AssaysController < ApplicationController
 
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
+  before_filter :delete_allowed,:only=>[:destroy]
   
   def index
     @assays=Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
@@ -104,6 +105,17 @@ class AssaysController < ApplicationController
 
     @assay.created_datas = @assay.created_datas - for_removal
     @assay.created_datas = @assay.created_datas | for_addition
+  end
+
+  def delete_allowed
+    @assay=Assay.find(params[:id])
+    unless @assay.can_delete?(current_user)
+      respond_to do |format|
+        flash[:error] = "You cannot delete an assay that is linked to a Study, Data files or Sops"
+        format.html { redirect_to assays_path }
+      end
+      return false
+    end
   end
 
 

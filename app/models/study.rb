@@ -7,7 +7,6 @@ class Study < ActiveRecord::Base
 
   has_many :data_files,:through=>:assays
   
-
   belongs_to :person_responsible, :class_name => "Person"
 
   validates_presence_of :title

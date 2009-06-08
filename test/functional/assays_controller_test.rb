@@ -28,13 +28,13 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should show item with no study" do
-    get :show, :id=>assays(:assay_with_no_study)
+    get :show, :id=>assays(:assay_with_no_study_or_files)
     assert_response :success
     assert_not_nil assigns(:assay)
   end
 
   test "should update with study" do
-    a=assays(:assay_with_no_study)
+    a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
     put :update,:id=>a,:assay=>{:study=>s}
     assert_redirected_to assay_path(a)
@@ -50,6 +50,38 @@ class AssaysControllerTest < ActionController::TestCase
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
     assert_equal organisms(:yeast),a.organism
+  end
+
+  test "should delete unlinked assay" do
+    assert_difference('Assay.count', -1) do
+      delete :destroy, :id => assays(:assay_with_no_study_or_files).id
+    end
+    assert !flash[:error]
+    assert_redirected_to assays_path
+  end
+
+  test "should not delete assay with study" do
+    assert_no_difference('Assay.count') do
+      delete :destroy, :id => assays(:assay_with_just_a_study).id
+    end
+    assert flash[:error]
+    assert_redirected_to assays_path
+  end
+
+  test "should not delete assay with files" do
+    assert_no_difference('Assay.count') do
+      delete :destroy, :id => assays(:assay_with_no_study_but_has_some_files).id
+    end
+    assert flash[:error]
+    assert_redirected_to assays_path
+  end
+
+  test "should not delete assay with sops" do
+    assert_no_difference('Assay.count') do
+      delete :destroy, :id => assays(:assay_with_no_study_but_has_some_sops).id
+    end
+    assert flash[:error]
+    assert_redirected_to assays_path
   end
   
 end

@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayTest < ActiveSupport::TestCase
-  fixtures :assays,:sops,:assay_types,:technology_types,:projects,:studies,:investigations,:organisms
+  fixtures :all
 
   test "sops association" do
     assay=assays(:metabolomics_assay)
@@ -58,9 +58,16 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "assay with no study has nil study and project" do
-    a=assays(:assay_with_no_study)
+    a=assays(:assay_with_no_study_or_files)
     assert_nil a.study
     assert_nil a.project
+  end
+
+  test "can delete?" do
+    assert assays(:assay_with_no_study_or_files).can_delete?(users(:aaron))
+    assert !assays(:assay_with_just_a_study).can_delete?(users(:aaron))
+    assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:aaron))
+    assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:aaron))
   end
 
 end

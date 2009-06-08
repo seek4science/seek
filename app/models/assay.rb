@@ -30,4 +30,11 @@ class Assay < ActiveRecord::Base
     investigation.nil? ? nil : investigation.project
   end
 
+  def can_edit? user
+    project.nil? || user.person.projects.include?(project)
+  end
+
+  def can_delete? user
+    study.nil? && data_files.empty? && sops.empty?
+  end
 end

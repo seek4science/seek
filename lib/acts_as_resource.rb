@@ -107,6 +107,10 @@ module Mib
           Authorization.is_authorized? "download",nil,self,user
         end
 
+        def can_delete? user
+          Authorization.is_authorized? "destroy",nil,self,user
+        end
+
 private
 
         # This is so that the updated_at time on the parent Asset record is in sync with the

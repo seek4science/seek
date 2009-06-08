@@ -1,8 +1,8 @@
 <ul class="sectionIcons">
-  <% if user_can_edit_assay? @assay -%>
+  <% if @assay.can_edit?(current_user) -%>
     <li><%= icon('edit', edit_assay_path(@assay), "Edit Assay Details", nil, 'Edit Assay Details') -%></li>
   <% end -%>
-  <% if user_can_delete_assay? @assay -%>
+  <% if @assay.can_delete?(current_user) -%>
     <li><%= icon('destroy', assay_path(@assay), "Delete Assay", { :confirm => 'Are you sure?', :method => :delete }, "Delete Assay") -%></li>
   <% end -%>
   <li>    

@@ -4,7 +4,7 @@ class DataFile < ActiveRecord::Base
 
   acts_as_resource
 
-  has_many :created_datas
+  has_many :created_datas,:dependent=>:destroy
 
   has_many :assays,:through=>:created_datas
 

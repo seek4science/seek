@@ -38,7 +38,9 @@ class StudiesControllerTest < ActionController::TestCase
     get :edit, :id=>studies(:metabolomics_study)
     assert_response :success
     assert_select "select#possible_assays" do
-      assert_select "option",:text=>/Assay with no Study/,:count=>1
+      assert_select "option",:text=>/Assay with no Study but has some files/,:count=>1
+      assert_select "option",:text=>/Assay with no Study but has some sops/,:count=>1
+      assert_select "option",:text=>/Assay with no Study or files/,:count=>1
       assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
     end
   end
@@ -47,7 +49,9 @@ class StudiesControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select "select#possible_assays" do
-      assert_select "option",:text=>/Assay with no Study/,:count=>1
+      assert_select "option",:text=>/Assay with no Study but has some files/,:count=>1
+      assert_select "option",:text=>/Assay with no Study but has some sops/,:count=>1
+      assert_select "option",:text=>/Assay with no Study or files/,:count=>1
       assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
     end
   end
@@ -71,12 +75,12 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should create with assay" do
     assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation),:assay_ids=>[assays(:assay_with_no_study).id]}
+      post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation),:assay_ids=>[assays(:assay_with_no_study_or_files).id]}
     end
     s=assigns(:study)
     assert_redirected_to study_path(s)
     assert_equal 1,s.assays.size
-    assert s.assays.include?(assays(:assay_with_no_study))
+    assert s.assays.include?(assays(:assay_with_no_study_or_files))
     assert !flash[:error]
   end
 
