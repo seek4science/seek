@@ -602,3 +602,12 @@ div#requesting_resource_status {
     font-size:medium;
     margin: 0em 4em 0em 4em;
 }
+
+#home_intro {
+    min-height: 3em;
+    margin: 3em 7em 3em 7em;
+}
+
+div#faq {
+    margin: 0 2em 0 2em;
+}

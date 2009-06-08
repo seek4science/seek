@@ -9,6 +9,12 @@ class HomeController < ApplicationController
       format.html # index.html.erb      
     end
   end
+
+  def faq
+    respond_to do |format|
+      format.html 
+    end
+  end
   
   def select_layout
     if logged_in?
