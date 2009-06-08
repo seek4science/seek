@@ -1,0 +1,10 @@
+<% person_value=(@study && @study.person_responsible) ? @study.person_responsible.id : 0 %>
+<% people_options = [["Nobody",0]]|people.collect{|p| [h(p.name),p.id]} %>
+<% project_id||=nil %>
+<%= select_tag :study_person_responsible_id,
+  options_for_select(people_options,person_value),
+  {
+    :style=>"width:82%",:disabled=>(people.nil? || people.empty?),
+    :name=>"study[person_responsible_id]"
+  }
+-%>

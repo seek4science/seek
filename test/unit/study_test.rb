@@ -27,6 +27,17 @@ class StudyTest < ActiveSupport::TestCase
     assert study.can_edit?(users(:model_owner)) #model owner is a member of the sysmo-project
   end
 
+  #only project members can delete a study, and a study must have no assays
+  test "can delete" do
+    study=studies(:study_with_no_assays)
+    assert !study.can_delete?(users(:aaron))
+    assert study.can_delete?(users(:model_owner)) #model owner is a member of the sysmo-project
+
+    study=studies(:metabolomics_study)
+    assert !study.can_delete?(users(:aaron))
+    assert !study.can_delete?(users(:model_owner))
+  end
+
   test "sops through assays" do
     study=studies(:metabolomics_study)
     assert_equal 2,study.sops.size

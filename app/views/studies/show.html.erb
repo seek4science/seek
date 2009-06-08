@@ -7,15 +7,17 @@
       <%= icon('edit', edit_study_path(@study), "Edit study", nil, 'Edit study') -%>
     </li>
   <% end -%>
-  
-  <% if current_user.is_admin? -%>
+
+  <% if @study.can_delete?(current_user) -%>
     <li>
       <%= icon "destroy", study_path(@study), "Delete Study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>
     </li>
   <% end -%>
-  <li>
-    <%= icon('new', new_assay_path(:study_id=>@study), "Create a new assay for this study", nil, 'Create a new assay for this study') -%>
-  </li>
+  <% if current_user.person.projects.include?(@study.project) -%>
+    <li>
+      <%= icon('new', new_assay_path(:study_id=>@study), "Create a new assay for this study", nil, 'Create a new assay for this study') -%>
+    </li>
+  <% end -%>
 </ul>
 
 <h1><%= h @study.title -%></h1>

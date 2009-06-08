@@ -40,8 +40,7 @@ class Person < ActiveRecord::Base
   def self.userless_people
     p=Person.find(:all)
     return p.select{|person| person.user.nil?}
-  end
-    
+  end  
     
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json

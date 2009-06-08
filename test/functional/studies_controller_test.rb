@@ -28,6 +28,8 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
+  
+
   test "should get edit" do
     get :edit,:id=>studies(:metabolomics_study)
     assert_response :success
@@ -141,5 +143,32 @@ class StudiesControllerTest < ActionController::TestCase
     assert flash[:error]
     assert_equal "A Metabolomics Study",assigns(:study).title
   end
+
+  test "study project member can delete if no assays" do
+    assert_difference('Study.count',-1) do
+      delete :destroy, :id => studies(:study_with_no_assays).id
+    end    
+    assert !flash[:error]
+    assert_redirected_to studies_path
+  end
+
+  test "study non project member cannot delete even if no assays" do
+    login_as(:aaron)
+    assert_no_difference('Study.count') do
+      delete :destroy, :id => studies(:study_with_no_assays).id
+    end
+    assert flash[:error]
+    assert_redirected_to studies_path
+  end
+  
+  test "study project member cannot delete if assays associated" do    
+    assert_no_difference('Study.count') do
+      delete :destroy, :id => studies(:metabolomics_study).id
+    end
+    assert flash[:error]
+    assert_redirected_to studies_path
+  end
+
+
   
 end

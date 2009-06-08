@@ -1,11 +1,11 @@
 class StudiesController < ApplicationController
 
   before_filter :login_required
-  
-  before_filter :is_user_admin_auth, :only=>[:destroy]
+    
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
   before_filter :study_auth_project,:only=>[:edit,:update]
+  before_filter :delete_allowed,:only=>[:destroy]
 
   def index
     
@@ -21,6 +21,7 @@ class StudiesController < ApplicationController
     @study = Study.new
     @study.assays << Assay.find(params[:assay_id]) if params[:assay_id]
     
+
     respond_to do |format|
       format.html
     end
@@ -72,8 +73,8 @@ class StudiesController < ApplicationController
   end  
 
   def create
-    @study = Study.new(params[:study])
-
+    @study = Study.new(params[:study])    
+    
     respond_to do |format|
       if @study.save
         format.html { redirect_to(@study) }
@@ -98,14 +99,17 @@ class StudiesController < ApplicationController
 
   def project_selected_ajax
 
-    if params[:project_id] && params[:project_id]!=0
+    if params[:project_id] && params[:project_id]!="0"
       investigations=Investigation.find(:all,:conditions=>{:project_id=>params[:project_id]})
+      people=Project.find(params[:project_id]).people
     end
 
     investigations||=[]
+    people||=[]
 
     render :update do |page|
-      page.replace_html "investigation_collection",:partial=>"investigation_list",:locals=>{:investigations=>investigations,:project_id=>params[:project_id]}
+      page.replace_html "investigation_collection",:partial=>"studies/investigation_list",:locals=>{:investigations=>investigations,:project_id=>params[:project_id]}
+      page.replace_html "person_responsible_collection",:partial=>"studies/person_responsible_list",:locals=>{:people=>people,:project_id=>params[:project_id]}
     end
 
   end
@@ -132,6 +136,17 @@ class StudiesController < ApplicationController
     unless @study.can_edit?(current_user)
       flash[:error] = "You cannot edit a Study for a project you are not a member."
       redirect_to @study
+    end
+  end
+
+  def delete_allowed
+    @study=Study.find(params[:id])
+    unless @study.can_delete?(current_user)
+      respond_to do |format|
+        flash[:error] = "You cannot delete a Study related to a project or which you are not a member, or that has assays associated"
+        format.html { redirect_to studies_path }
+      end
+      return false
     end
   end
   

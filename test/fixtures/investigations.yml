@@ -5,3 +5,7 @@ metabolomics_investigation:
 metabolomics_investigation2:
   title: Metabolomics Investigation2
   project: sysmo_project
+
+investigation_with_no_assays:
+  title: Investigation with no Assays
+  project: sysmo_project

@@ -30,4 +30,9 @@ class Study < ActiveRecord::Base
     user.person && user.person.projects.include?(project)
   end
 
+  def can_delete? user
+    assays.empty? && can_edit?(user)
+  end
+
+
 end
