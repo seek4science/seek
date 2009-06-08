@@ -25,4 +25,5 @@ syntax: regexp
 \.orig\..*$
 \.chg\..*$
 \.rej$
+\Thumbs\.db$
 
