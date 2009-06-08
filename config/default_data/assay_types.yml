@@ -31,7 +31,10 @@ cell_growth_optimisation:
 
 metabolite_profiling:
   title: metabolite profiling
-  children: catabolic_response,glucose_pulse
+  children: catabolic_response,glucose_pulse, flux_balance_analysis
+
+flux_balance_analysis:
+  title: flux balanace analysis
 
 catabolic_response:
   title: catabolic response
@@ -76,9 +79,6 @@ single_cell:
   title: single cell
   children: FRAP
 
-FRAP:
-  title: FRAP
-
 #-----------------------------------
 
 transcriptomics:
@@ -90,10 +90,16 @@ Comparative_genomic_hybridization:
 
 gene_expression_profiling:
   title: gene expression profiling
-  children: cDNA_microarray
+  children: cDNA_microarray,transcriptional_profiling,translational_profiling
 
 cDNA_microarray:
   title: cDNA microarray
+
+transcriptional_profiling:
+  title: transcriptional profiling
+
+translational_profiling:
+  title: translational profiling
 
 methylation_profiling:
   title: methylation profiling
