@@ -69,6 +69,7 @@ module ApplicationHelper
   def image method,options={}
     image_tag(method_to_icon_filename(method),options)
   end
+  
   def icon(method, url=nil, alt=nil, url_options={}, label=method.humanize, remote=false)
 
     if (label == 'Destroy')
@@ -202,6 +203,8 @@ module ApplicationHelper
       return "famfamfam_silk/page.png"
     when "execute"
       return "famfamfam_silk/lightning.png"
+    when "warning"
+      return "famfamfam_silk/error.png"
     when "spinner"
       return "ajax-loader.gif"
     when "large-spinner"

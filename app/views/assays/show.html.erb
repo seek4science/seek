@@ -6,13 +6,24 @@
     <li><%= icon('destroy', assay_path(@assay), "Delete Assay", { :confirm => 'Are you sure?', :method => :delete }, "Delete Assay") -%></li>
   <% end -%>
   <%#*<li>%>
-    <%#= icon('new',new_study_path(:assay_id=>@assay),"Create a new Study",nil,'Create a new Study using this Assay') -%>
+  <%#= icon('new',new_study_path(:assay_id=>@assay),"Create a new Study",nil,'Create a new Study using this Assay') -%>
   <%#*</li>%>
 </ul>
 
 <h1><%= h @assay.title -%></h1>
 
+
+
 <div class="show_basic">
+
+  <% if @assay.study.nil? -%>
+    <div class="warning">
+      <%= image("warning") %> <b style="color:red">WARNING</b>
+      <br/>
+      <br/>
+      An Assay may be edited by anybody, regardless of project membership, until it has been associated with a Study
+    </div>
+  <% end -%>
 
   <p>
     <b>Description:</b>

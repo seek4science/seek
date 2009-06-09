@@ -52,7 +52,7 @@ class AssaysController < ApplicationController
   def update
     @assay=Assay.find(params[:id])
     synchronise_created_datas(params[:data_file_ids])
-
+    @assay.sops.clear unless params[:assay][:sop_ids]
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
         flash[:notice] = 'Assay was successfully updated.'

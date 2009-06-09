@@ -611,3 +611,10 @@ div#requesting_resource_status {
 div#faq {
     margin: 0 2em 0 2em;
 }
+
+.warning {    
+    text-align: center;
+    font-size:larger;
+    border: 1px red solid;
+    padding: 0.5em 0.5em 1em 0.5em;
+}
