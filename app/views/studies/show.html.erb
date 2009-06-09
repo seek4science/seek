@@ -10,7 +10,7 @@
 
   <% if @study.can_delete?(current_user) -%>
     <li>
-      <%= icon "destroy", study_path(@study), "Delete Study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>
+      <%= icon "destroy", study_path(@study), "Delete study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>
     </li>
   <% end -%>
   <% if current_user.person.projects.include?(@study.project) -%>

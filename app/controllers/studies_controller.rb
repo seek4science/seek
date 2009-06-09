@@ -38,7 +38,7 @@ class StudiesController < ApplicationController
   # DELETE /study/1
   # DELETE /study/1.xml
   def destroy
-    @study = Study.find(params[:id])
+    
     @study.destroy
 
     respond_to do |format|

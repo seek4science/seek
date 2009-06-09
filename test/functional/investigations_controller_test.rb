@@ -55,7 +55,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
 
-  test "investigation project member can't edit" do
+  test "non project member can't edit investigation" do
     login_as(:aaron)
     i=investigations(:metabolomics_investigation)
     get :edit, :id=>i
@@ -63,7 +63,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
-  test "investigation project member can't update" do
+  test "non project member can't update investigation" do
     login_as(:aaron)
     i=investigations(:metabolomics_investigation)
     put :update, :id=>i.id,:investigation=>{:title=>"test"}
@@ -72,6 +72,47 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert assigns(:investigation)
     assert flash[:error]
     assert_equal "Metabolomics Investigation",assigns(:investigation).title
+  end
+
+  test "should destroy investigation" do
+    assert_difference("Investigation.count",-1) do
+      delete :destroy, :id => investigations(:investigation_with_no_study).id
+    end
+    assert !flash[:error]
+    assert_redirected_to investigations_path    
+  end
+
+  test "non project member should not destroy investigation" do
+    login_as(:aaron)
+    assert_no_difference("Investigation.count") do
+      delete :destroy, :id => investigations(:investigation_with_no_study).id
+    end
+    assert flash[:error]
+    assert_redirected_to investigations_path    
+  end
+
+  test "should not destroy investigation with a study" do
+    assert_no_difference("Investigation.count") do
+      delete :destroy, :id => investigations(:metabolomics_investigation).id
+    end
+    assert flash[:error]
+    assert_redirected_to investigations_path    
+  end
+
+  test "option to delete investigation without study" do    
+    get :show,:id=>investigations(:investigation_with_no_study).id
+    assert_select "a",:text=>/Delete investigation/,:count=>1
+  end
+
+  test "no option to delete investigation with study" do
+    get :show,:id=>investigations(:metabolomics_investigation).id
+    assert_select "a",:text=>/Delete investigation/,:count=>0
+  end
+
+  test "no option to delete investigation for non project member" do
+    login_as(:aaron)
+    get :show,:id=>investigations(:investigation_with_no_study).id
+    assert_select "a",:text=>/Delete investigation/,:count=>0
   end
 
 end

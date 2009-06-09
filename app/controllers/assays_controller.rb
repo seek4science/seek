@@ -74,7 +74,7 @@ class AssaysController < ApplicationController
   end
 
   def destroy
-    @assay=Assay.find(params[:id])
+    
     respond_to do |format|
       if @assay.study.nil? && @assay.destroy
         format.html { redirect_to(assays_url) }
