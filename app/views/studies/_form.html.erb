@@ -39,7 +39,7 @@
     <p>
       <%= f.label :project %><br/>
       <%
-      selected_project=@study.project ? @study.project.id : 0
+      selected_project=@study.investigation ? @study.investigation.project.id : 0
     %>
       <%=
       select_tag :project_id,
@@ -59,7 +59,7 @@
     <p>
       <%= f.label "Person responsible" %><br/>
       <div id="person_responsible_collection">
-        <% people = @study.project ? @study.project.people : [] -%>
+        <% people = @study.investigation ? @study.investigation.project.people : [] -%>
         <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
       </div>
     </p>
