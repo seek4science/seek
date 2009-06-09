@@ -1,0 +1,21 @@
+# This is your version information.
+#
+# This is a simple plugin that makes it easy to manage the version number of your
+# Rails application. The version numbers supported by this plugin look like 
+# '2.0.1 M4 (600) of branch by coder on 2008-10-27'. 
+# 
+# The components that produced the example about would be:
+# 
+# major:        2
+# minor:        0
+# patch:        1
+# milestone:    M4
+# build:        600
+# branch:       branch
+# committer:    coder
+# build_date:   2008-10-27
+# 
+# major and minor are required. All others are optional - See readme in the app_version plugin
+
+major:        1
+minor:        0
