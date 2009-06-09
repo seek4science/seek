@@ -5,4 +5,4 @@ port: "9050"
 environment: production
 address: 212.126.215.117
 pid_file: tmp/pids/mongrel.pid
-servers: 10
+servers: 20
