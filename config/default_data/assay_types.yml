@@ -49,7 +49,7 @@ metabonomics:
 
 proteomics:
   title: proteomics
-  children: immune_precipitation,translational_modification,protein-protein_interaction,protein_expression_profiling,protein_identification,protein_structural_analysis
+  children: immune_precipitation,post-translational_modification,protein-protein_interaction,protein_expression_profiling,protein_identification,protein_structural_analysis
 
 immune_precipitation:
   title: immune precipitation
@@ -65,7 +65,7 @@ protein_expression_profiling:
 
 protein_identification:
   title: protein identification
-  children: protein purification
+  children: protein_purification
 
 protein_purification:
   title: protein purification
