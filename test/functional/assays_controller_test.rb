@@ -32,7 +32,7 @@ class AssaysControllerTest < ActionController::TestCase
     s=studies(:metabolomics_study)
     get :new,:study_id=>s
     assert_response :success
-    assert_not_nil assigns(:assay)    
+    assert_not_nil assigns(:assay)
     assert_equal s,assigns(:assay).study
   end
 
@@ -91,6 +91,15 @@ class AssaysControllerTest < ActionController::TestCase
     end
     assert flash[:error]
     assert_redirected_to assays_path
+  end
+
+  test "data file list should only include those from project" do
+    login_as(:model_owner)
+    get :new    
+    assert_select "select#possible_data_files" do
+      assert_select "option",:text=>/Sysmo Data File/,:count=>1      
+      assert_select "option",:text=>/Myexperiment Data File/,:count=>0
+    end
   end
   
 end
