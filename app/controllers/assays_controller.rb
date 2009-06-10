@@ -35,6 +35,8 @@ class AssaysController < ApplicationController
 
   def create
     @assay = Assay.new(params[:assay])
+    @assay.owner=current_user.person
+    
     synchronise_created_datas(params[:data_file_ids])
     
     respond_to do |format|

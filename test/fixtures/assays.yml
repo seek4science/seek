@@ -7,6 +7,7 @@ metabolomics_assay:
   sops: my_first_sop,sop_with_fully_public_policy
   study: metabolomics_study
   organism: Saccharomyces_cerevisiae
+  owner: person_for_model_owner
 
 metabolomics_assay2:
   title: Metabolomics Assay
@@ -14,6 +15,7 @@ metabolomics_assay2:
   technology_type: gas_chromatography
   sops: my_first_sop,sop_for_test_with_workgroups
   study: study_with_overlapping_assay_sops
+  owner: person_for_model_owner
   
 metabolomics_assay3:
   title: Metabolomics Assay2
@@ -21,28 +23,33 @@ metabolomics_assay3:
   technology_type: gas_chromatography
   sops: my_first_sop,sop_with_fully_public_policy
   study: study_with_overlapping_assay_sops
+  owner: person_for_model_owner
 
 assay_with_just_a_study:
   title: Assay with just a Study
   assay_type: metabolomics
   technology_type: gas_chromatography
   study: metabolomics_study2
+  owner: person_for_model_owner
 
 assay_with_no_study_or_files:
   title: Assay with no Study or files
   assay_type: metabolomics
   technology_type: gas_chromatography
+  owner: person_for_model_owner
 
 assay_with_no_study_but_has_some_files:
   title: Assay with no Study but has some files
   assay_type: metabolomics
-  technology_type: gas_chromatography  
+  technology_type: gas_chromatography
+  owner: person_for_model_owner
 
 assay_with_no_study_but_has_some_sops:
   title: Assay with no Study but has some sops
   assay_type: metabolomics
   technology_type: gas_chromatography
   sops: my_first_sop
+  owner: person_for_model_owner
 
 
 
