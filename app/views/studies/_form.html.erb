@@ -5,7 +5,7 @@
 
 
 <center>
-  <div style="width: 60%;">    
+  <div style="width: 60%;">
 
     <p style="margin-top: 1.5em;">
       <%= f.label "Title *" %><br/>
@@ -17,13 +17,10 @@
       <%= f.text_area :description,:style => "width: 100%;", :rows => 5 %>
     </p>
 
-   
-
     <p>
       <%= f.label "Experimentalist(s)" %>
       <%= f.text_field :experimentalists,:style=>"width: 100%;" %>
     </p>
-
 
   </div>
 </center>
@@ -35,6 +32,7 @@
     Project details
   </div>
   <div class="foldContent">
+
 
     <p>
       <%= f.label :project %><br/>
@@ -54,7 +52,14 @@
     %>
     </p>
 
-    
+    <p>
+      <%= f.label "Investigation *" %><br/>
+      <div id="investigation_collection">
+        <% investigations = @study.investigation ? @study.investigation.project.investigations : [] -%>
+        <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>investigations} -%>
+      </div>
+      <br/>
+    </p>
 
     <p>
       <%= f.label "Person responsible" %><br/>
@@ -63,13 +68,10 @@
         <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
       </div>
     </p>
-
-
+    
   </div>
-  
-</div>
 
-<%= render :partial=>"studies/investigation_and_assay_selection",:locals=>{:f=>f} %>
+</div>
 
 
 

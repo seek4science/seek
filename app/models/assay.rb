@@ -16,7 +16,8 @@ class Assay < ActiveRecord::Base
   validates_uniqueness_of :title
 
   validates_presence_of :assay_type
-  validates_presence_of :technology_type  
+  validates_presence_of :technology_type
+  validates_presence_of :study, :message=>" must be selected"
 
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type]) if SOLR_ENABLED
   

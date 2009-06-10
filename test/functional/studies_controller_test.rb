@@ -34,29 +34,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :edit,:id=>studies(:metabolomics_study)
     assert_response :success
     assert_not_nil assigns(:study)
-  end
-
-  test "edit should not show associated assays" do
-    get :edit, :id=>studies(:metabolomics_study)
-    assert_response :success
-    assert_select "select#possible_assays" do
-      assert_select "option",:text=>/Assay with no Study but has some files/,:count=>1
-      assert_select "option",:text=>/Assay with no Study but has some sops/,:count=>1
-      assert_select "option",:text=>/Assay with no Study or files/,:count=>1
-      assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
-    end
-  end
-
-  test "new should not show associated assays" do
-    get :new
-    assert_response :success
-    assert_select "select#possible_assays" do
-      assert_select "option",:text=>/Assay with no Study but has some files/,:count=>1
-      assert_select "option",:text=>/Assay with no Study but has some sops/,:count=>1
-      assert_select "option",:text=>/Assay with no Study or files/,:count=>1
-      assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
-    end
-  end
+  end  
 
   test "should update" do
     s=studies(:metabolomics_study)
@@ -73,18 +51,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
     s=assigns(:study)
     assert_redirected_to study_path(s)
-  end
-
-  test "should create with assay" do
-    assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation),:assay_ids=>[assays(:assay_with_no_study_or_files).id]}
-    end
-    s=assigns(:study)
-    assert_redirected_to study_path(s)
-    assert_equal 1,s.assays.size
-    assert s.assays.include?(assays(:assay_with_no_study_or_files))
-    assert !flash[:error]
-  end
+  end  
 
   test "should not create with assay already related to study" do
     assert_no_difference("Study.count") do

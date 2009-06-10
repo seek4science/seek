@@ -54,7 +54,11 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "should create" do
     assert_difference("Assay.count") do
-      post :create,:assay=>{:title=>"test",:organism_id=>organisms(:yeast).id,:technology_type_id=>technology_types(:gas_chromatography).id,:assay_type_id=>assay_types(:metabolomics).id}
+      post :create,:assay=>{:title=>"test",
+                            :organism_id=>organisms(:yeast).id,
+                            :technology_type_id=>technology_types(:gas_chromatography).id,
+                            :assay_type_id=>assay_types(:metabolomics).id,
+                            :study_id=>studies(:metabolomics_study).id}
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)

@@ -34,7 +34,8 @@ class AssayTest < ActiveSupport::TestCase
   test "validation" do
     assay=Assay.new(:title=>"test",
       :assay_type=>assay_types(:metabolomics),
-      :technology_type=>technology_types(:gas_chromatography))
+      :technology_type=>technology_types(:gas_chromatography),
+      :study => studies(:metabolomics_study))
     
     assert assay.valid?
 
@@ -52,6 +53,13 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid?
 
     assay.assay_type=assay_types(:metabolomics)
+
+    assert assay.valid?
+
+    assay.study=nil
+    assert !assay.valid?
+    assay.study=studies(:metabolomics_study)
+
     assay.technology_type=nil
     assert !assay.valid?
     
