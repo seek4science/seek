@@ -357,9 +357,9 @@ ul.tabbernav
 {
     margin: 0;
     padding: 3px 0;
-    border-bottom: 1px solid #CCC;
-    font-weight: bold;
-    font-size: 108%;
+    border-bottom: 1px solid #CCC;    
+    font-size: 90%;    
+    margin-left: 1em;
 }
 
 ul.tabbernav li
@@ -376,7 +376,7 @@ ul.tabbernav li a
     border: 1px solid #CCC;
     border-bottom: none;
     background: #ccccff;
-    text-decoration: none;
+    text-decoration: none;    
 }
 
 ul.tabbernav li a:link { color: #333; }
