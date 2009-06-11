@@ -618,3 +618,7 @@ div#faq {
     border: 1px red solid;
     padding: 0.5em 0.5em 1em 0.5em;
 }
+
+li.tabs_block_gap {
+    margin-left: 2em;
+}
