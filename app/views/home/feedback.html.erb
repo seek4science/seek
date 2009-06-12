@@ -1,0 +1,60 @@
+<h1>Feedback</h1>
+
+
+<div id="feedback_form">
+
+  <div class="box_standout">
+    <p>
+      Your feedback, error reports and suggestions are valuable to us.
+    </p>
+    <p>
+      Please provide a description below, and your message will be forwarded to the SysMO-DB Team.
+    </p>
+
+  </div>
+
+  <% form_tag send_feedback_url do -%>
+
+    <p>
+      <%= check_box_tag :anon,true,false, :onclick=>visual_effect(:toggle_appear,'anon_notes')  -%>
+      <%= label_tag :send_anonymously -%>
+    </p>
+
+    <div style="display:none;" class="box_standout" id="anon_notes">
+      <%= image("warning") %>
+      <p>
+        If you send anonymously, we are unable to identify the person that sent the message.
+      </p>
+      <p>
+        This means that we will not be able to contact you to discuss your feedback further.
+      </p>
+    </div>
+
+    <p>
+      <%= label_tag :subject  -%><br/>
+      <%= text_field_tag :subject,"",:size=>60 -%><br/>
+    </p>
+
+    <p>
+      <%= label_tag :details -%><br/>
+      <%= text_area_tag :details,"",:cols=>60,:rows=>15 -%>
+    </p>
+
+    <%= submit_tag "Send",:onclick=>"return check_form();" -%>
+
+  <% end -%>
+  
+</div>
+
+<script type="text/javascript">
+  function check_form() {
+    if ($('subject').value.length<1) {
+      alert("You must provide a Subject");
+      return false;
+    }
+    if ($('details').value.length<1) {
+      alert("You must provide some Details");
+      return false;
+    }
+  }
+</script>

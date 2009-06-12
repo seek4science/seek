@@ -205,6 +205,8 @@ module ApplicationHelper
       return "famfamfam_silk/lightning.png"
     when "warning"
       return "famfamfam_silk/error.png"
+    when "feedback"
+      return "famfamfam_silk/email.png"
     when "spinner"
       return "ajax-loader.gif"
     when "large-spinner"

@@ -620,3 +620,11 @@ div#faq {
 li.tabs_block_gap {
     margin-left: 2em;
 }
+
+div#feedback_form {
+    padding-left: 2em;    
+}
+
+div#feedback_form label {
+    font-weight:bolder;
+}

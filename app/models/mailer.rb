@@ -12,6 +12,16 @@ class Mailer < ActionMailer::Base
     end
   end
 
+  def feedback user,topic,details,send_anonymously,base_host
+    subject "SysMO SEEK Feedback provided - #{topic}"
+    recipients admin_emails
+    from send_anonymously ? NOREPLY_SENDER : user.person.email_with_name
+    reply_to user.person.email_with_name unless send_anonymously
+    sent_on Time.now
+
+    body :topic=>topic,:details=>details,:anon=>send_anonymously,:host=>base_host,:person=>user.person
+  end
+
   def request_resource(user,resource,base_host)
 
     subject "A Sysmo Member requested a protected file: #{resource.title}"
