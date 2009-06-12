@@ -622,9 +622,18 @@ li.tabs_block_gap {
 }
 
 div#feedback_form {
-    padding-left: 2em;    
+    padding: 0em 5em 0em 5em;
 }
 
 div#feedback_form label {
     font-weight:bolder;
+    padding-left: 2em;
+}
+
+div#feedback_form input {
+    margin-left: 2em;
+}
+
+div#feedback_form textarea {
+    margin-left: 2em;
 }

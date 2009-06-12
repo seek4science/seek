@@ -8,16 +8,23 @@
       Your feedback, error reports and suggestions are valuable to us.
     </p>
     <p>
-      Please provide a description below, and your message will be forwarded to the SysMO-DB Team.
+      Please provide the details below, and your message will be forwarded to the SysMO-DB Team.
     </p>
 
   </div>
+  <br/><br/>
 
   <% form_tag send_feedback_url do -%>
 
     <p>
-      <%= check_box_tag :anon,true,false, :onclick=>visual_effect(:toggle_appear,'anon_notes')  -%>
-      <%= label_tag :send_anonymously -%>
+      <%= label_tag :subject  -%><br/>
+      <%= text_field_tag :subject,"",:size=>60 -%><br/>
+    </p>
+
+    <p>
+      <%= label_tag :send_anonymously -%><br/>
+      <%= check_box_tag :anon,true,false, :onclick=>visual_effect(:toggle_blind,'anon_notes',:duration=>0.5)  -%>
+      
     </p>
 
     <div style="display:none;" class="box_standout" id="anon_notes">
@@ -31,19 +38,17 @@
     </div>
 
     <p>
-      <%= label_tag :subject  -%><br/>
-      <%= text_field_tag :subject,"",:size=>60 -%><br/>
-    </p>
-
-    <p>
       <%= label_tag :details -%><br/>
       <%= text_area_tag :details,"",:cols=>60,:rows=>15 -%>
     </p>
 
-    <%= submit_tag "Send",:onclick=>"return check_form();" -%>
+    <span style="float:right;padding-right:16em;">
+      <%= submit_tag "Send feedback",:onclick=>"return check_form();" -%>
+    </span>
+
 
   <% end -%>
-  
+
 </div>
 
 <script type="text/javascript">
