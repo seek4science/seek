@@ -97,6 +97,7 @@
     <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize(@person.user.assets, true, current_user) : {}) -%>
     <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
     <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
+    <% persons_asset_hash.merge!(classify_for_tabs(@person.studies)) %>
     <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@person.name,:item_hash=>persons_asset_hash} %>
     
 

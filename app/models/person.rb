@@ -22,7 +22,8 @@ class Person < ActiveRecord::Base
     
   has_many :group_memberships
     
-  has_many :work_groups, :through=>:group_memberships  
+  has_many :work_groups, :through=>:group_memberships
+  has_many :studies, :foreign_key => :person_responsible_id
 
   acts_as_taggable_on :tools, :expertise
     

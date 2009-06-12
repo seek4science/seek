@@ -257,10 +257,8 @@ table.list_item .tags {
 .show_basic ul {margin: 0;  padding: 0;}
 
 .show_basic li {
-
     list-style-type:none;
-    margin: 0px 0px 0px 0px;
-    padding: 0 0 0 1em;
+    margin: 0px 0px 0px 0px;    
     white-space:nowrap;
 }
 
