@@ -637,3 +637,10 @@ div#feedback_form input {
 div#feedback_form textarea {
     margin-left: 2em;
 }
+
+a#feedback {
+    color: #FFFFCC;
+    margin-left: 2em;
+    float: left;
+    font-weight:bolder;
+}

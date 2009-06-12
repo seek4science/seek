@@ -1,6 +1,8 @@
 <% @search_query="" unless @search_query %>
 <% @search_type="All" unless @search_type %>
 
+<%= icon("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
+
 <% if logged_in? && current_user.is_admin? -%>
   <%= icon "lock", admin_url, "Admin enabled", {:id=>"adminmode"}, "Admin enabled" -%>
 <% end -%>
