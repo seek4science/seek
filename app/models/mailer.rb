@@ -15,7 +15,7 @@ class Mailer < ActionMailer::Base
   def feedback user,topic,details,send_anonymously,base_host
     subject "SysMO SEEK Feedback provided - #{topic}"
     recipients admin_emails
-    from send_anonymously ? NOREPLY_SENDER : user.person.email_with_name
+    from NOREPLY_SENDER
     reply_to user.person.email_with_name unless send_anonymously
     sent_on Time.now
 
