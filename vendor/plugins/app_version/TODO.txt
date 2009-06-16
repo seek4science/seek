@@ -1,0 +1,18 @@
+==============
+= Deployment =
+==============
+
+===================
+= Problems & Bugs =
+===================
+fixme: Figure out how to pass the branch to the git revcount call in the erb file.
+
+====================
+= Cosmetic Changes =
+====================
+todo: Convert the readme doc to some other markup format.
+
+ =========================
+ = Refactoring & Testing =
+ =========================
+todo: Perhaps "build_date" should be called deploy_date because it is really the date of the deployment

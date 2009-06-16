@@ -96,6 +96,7 @@
 
     <%# get, classify and authorize all assets for this project -%>
     <% sop_asset_hash = classify_for_tabs([@sop.asset.project]) -%>
+    <% sop_asset_hash.merge! classify_for_tabs(@sop.assays) -%>
 
     <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@sop.title,:item_hash=>sop_asset_hash} %>
 

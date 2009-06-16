@@ -7,7 +7,6 @@ class Study < ActiveRecord::Base
 
   has_many :data_files,:through=>:assays
   
-
   belongs_to :person_responsible, :class_name => "Person"
 
   validates_presence_of :title
@@ -30,5 +29,10 @@ class Study < ActiveRecord::Base
   def can_edit? user
     user.person && user.person.projects.include?(project)
   end
+
+  def can_delete? user
+    assays.empty? && can_edit?(user)
+  end
+
 
 end

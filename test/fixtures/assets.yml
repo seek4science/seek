@@ -232,3 +232,25 @@ asset_of_a_editable_sop:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_for_sysmo_data_file:
+  contributor: model_owner (User)
+  project: sysmo_project
+  resource: sysmo_data_file (DataFile)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: sysmo_member_edit
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_for_myexp_data_file:
+  contributor: datafile_owner (User)
+  project: myexperiment_project
+  resource: myexperiment_data_file (DataFile)
+  #source:  # these values are not used at the moment (Feb 2009)
+  #quality: # these values are not used at the moment (Feb 2009)
+  policy: public_download_with_no_custom_sharing
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>

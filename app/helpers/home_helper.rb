@@ -41,12 +41,18 @@ module HomeHelper
       selected_assays << a if projects.include?(a.project)
     end
 
+    selected_investigations=[]
+    Investigation.find(:all,:order=>'updated_at DESC').each do |i|
+      selected_investigations << i if projects.include?(i.project)
+    end
+
     item_hash=classify_for_tabs(selected_people)
     item_hash.merge! classify_for_tabs(selected_models)
     item_hash.merge! classify_for_tabs(selected_sops)
     item_hash.merge! classify_for_tabs(selected_data_files)
     item_hash.merge! classify_for_tabs(selected_assays)
     item_hash.merge! classify_for_tabs(selected_studies)
+    item_hash.merge! classify_for_tabs(selected_investigations)
 
     return item_hash
 
@@ -60,6 +66,7 @@ module HomeHelper
     selected_sops=[]
     selected_assays=Assay.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE)
     selected_studies=Study.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE)
+    selected_investigations=Investigation.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE)
 
     Model.find(:all,:order=>'updated_at DESC').each do |m|
       selected_models << m if m.can_view?(current_user)
@@ -76,7 +83,6 @@ module HomeHelper
       break if selected_data_files.size>=RECENT_SIZE
     end
 
-
     item_hash=classify_for_tabs(selected_people)
     item_hash.merge! classify_for_tabs(selected_projects)
     item_hash.merge! classify_for_tabs(selected_models)
@@ -84,6 +90,7 @@ module HomeHelper
     item_hash.merge! classify_for_tabs(selected_data_files)
     item_hash.merge! classify_for_tabs(selected_assays)
     item_hash.merge! classify_for_tabs(selected_studies)
+    item_hash.merge! classify_for_tabs(selected_investigations)
 
     return item_hash
   end

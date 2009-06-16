@@ -23,5 +23,8 @@ class Investigation < ActiveRecord::Base
     user.person.projects.include?(project)
   end
 
+  def can_delete? user
+    studies.empty? && can_edit?(user)
+  end
   
 end

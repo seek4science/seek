@@ -13,6 +13,11 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
   end
 
+  test "should get feedback form" do
+    get :feedback
+    assert_response :success
+  end  
+
   test "admin link not visible to non admin" do
     login_as(:aaron)
     get :index

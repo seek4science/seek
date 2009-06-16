@@ -15,6 +15,18 @@ class MailerTest < ActionMailer::TestCase
     assert_equal @expected.encoded, Mailer.create_signup(users(:aaron),"localhost").encoded
   end
 
+  test "feedback anonymously" do
+    message=Mailer.create_feedback(users(:aaron),"Topic","Details",true,"localhost")
+    assert !message.encoded.include?("Aaron")
+    assert !message.encoded.include?("aaron@")
+  end
+
+  test "feedback non anonymously" do
+    message=Mailer.create_feedback(users(:aaron),"Topic","Details",false,"localhost")
+    assert message.encoded.include?("Aaron")
+    assert message.encoded.include?("aaron@")
+  end
+
   test "request resource" do
     @expected.subject = "A Sysmo Member requested a protected file: Picture"
     @expected.to = "Datafile Owner <data_file_owner@email.com>"

@@ -257,10 +257,8 @@ table.list_item .tags {
 .show_basic ul {margin: 0;  padding: 0;}
 
 .show_basic li {
-
     list-style-type:none;
-    margin: 0px 0px 0px 0px;
-    padding: 0 0 0 1em;
+    margin: 0px 0px 0px 0px;    
     white-space:nowrap;
 }
 
@@ -357,9 +355,9 @@ ul.tabbernav
 {
     margin: 0;
     padding: 3px 0;
-    border-bottom: 1px solid #CCC;
-    font-weight: bold;
-    font-size: 108%;
+    border-bottom: 1px solid #CCC;    
+    font-size: 90%;    
+    margin-left: 1em;
 }
 
 ul.tabbernav li
@@ -376,7 +374,7 @@ ul.tabbernav li a
     border: 1px solid #CCC;
     border-bottom: none;
     background: #ccccff;
-    text-decoration: none;
+    text-decoration: none;    
 }
 
 ul.tabbernav li a:link { color: #333; }
@@ -601,4 +599,48 @@ a#adminmode {
 div#requesting_resource_status {
     font-size:medium;
     margin: 0em 4em 0em 4em;
+}
+
+#home_intro {
+    min-height: 3em;
+    margin: 3em 7em 3em 7em;
+}
+
+div#faq {
+    margin: 0 2em 0 2em;
+}
+
+.warning {    
+    text-align: center;
+    font-size:larger;
+    border: 1px red solid;
+    padding: 0.5em 0.5em 1em 0.5em;
+}
+
+li.tabs_block_gap {
+    margin-left: 2em;
+}
+
+div#feedback_form {
+    padding: 0em 5em 0em 5em;
+}
+
+div#feedback_form label {
+    font-weight:bolder;
+    padding-left: 2em;
+}
+
+div#feedback_form input {
+    margin-left: 2em;
+}
+
+div#feedback_form textarea {
+    margin-left: 2em;
+}
+
+a#feedback {
+    color: #FFFFCC;
+    margin-left: 2em;
+    float: left;
+    font-weight:bolder;
 }

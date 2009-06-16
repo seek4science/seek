@@ -19,7 +19,20 @@ module PeopleHelper
         text += ", " unless person.disciplines.last==d
       end
     else
-      text="<span class='none_text'>Not known</span>"
+      text="<span class='none_text'>None specified</span>"
+    end
+    return text
+  end
+
+  def role_list person
+    unless person.roles.empty?
+      text=""
+      person.roles.each do |r|
+        text += link_to(h(r.title),people_path(:role_id=>r.id))
+        text += ", " unless person.roles.last==r
+      end
+    else
+      text="<span class='none_text'>None specified</span>"
     end
     return text
   end

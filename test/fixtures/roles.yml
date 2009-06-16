@@ -1,7 +1,9 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  name: MyString
+member:
+  name: Member
 
-two:  
-  name: MyString
+principle_investigator:
+  name: PI
+
+postdoc:
+  name: PostDoc

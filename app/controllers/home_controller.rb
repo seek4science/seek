@@ -9,12 +9,45 @@ class HomeController < ApplicationController
       format.html # index.html.erb      
     end
   end
+
+  def faq
+    respond_to do |format|
+      format.html 
+    end
+  end
   
   def select_layout
     if logged_in?
       return 'main'
     else
       return 'logged_out'
+    end
+  end
+
+  def feedback
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def send_feedback
+    subject=params[:subject]
+    anon=params[:anon]
+    details=params[:details]
+    
+    anon=anon=="true"
+
+    puts "Anon = #{anon}"
+
+    if subject.nil? or details.nil?
+      flash[:error]="You must provide a Subject and details"
+      render :action=>:feedback
+    else
+      if (EMAIL_ENABLED)
+        Mailer.deliver_feedback(current_user,subject,details,anon,base_host)
+      end
+      flash[:notice]="Your feedback has been delivered. Thank You."
+      redirect_to root_path
     end
   end
 

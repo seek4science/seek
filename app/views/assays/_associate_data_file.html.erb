@@ -11,7 +11,7 @@
     <%= label_tag :data_files %><br/>
 
     <%= select_tag :possible_data_files,
-      options_for_select([["Select Data file ...",0]]|authorised_data_files.collect{|s| [truncate(h(s.title),:length=>32),s.id]}),
+      options_for_select([["Select Data file ...",0]]|data_files_for_assay_association.collect{|s| [truncate(h(s.title),:length=>32),s.id]}),
       {:onchange=>remote_function(
         :url=>{:action=>"data_file_preview_ajax",:controller=>"data_files"},
         :with=>"'id='+this.value",
@@ -29,12 +29,14 @@
 </div>
 
 <script type="text/javascript">
-  
-  <% @assay.created_datas.each do |d| -%>
-      data_id = <%= d.data_file.id -%>;
-      data_title = '<%= d.data_file.title -%>';
+
+<% @assay.created_datas.each do |d| -%>
+    data_id = <%= d.data_file.id -%>;
+    data_title = '<%= d.data_file.title -%>';
+  <% if Authorization.is_authorized?("show",nil,d.data_file.asset,current_user) -%>
       addDataFile(data_title,data_id);
   <% end -%>
+<% end -%>
 
   updateDataFiles();
 

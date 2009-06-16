@@ -42,4 +42,20 @@ class InvestigationTest < ActiveSupport::TestCase
     assert !inv.valid?
 
   end
+
+  test "project member can delete with no study" do
+    investigation=investigations(:investigation_with_no_study)
+    assert investigation.can_delete?(users(:model_owner))
+  end
+
+  test "project member cant delete with study" do
+    investigation=investigations(:metabolomics_investigation)
+    assert !investigation.can_delete?(users(:model_owner))
+  end
+
+  test "non project member cant delete even with no study" do
+    investigation=investigations(:investigation_with_no_study)
+    assert !investigation.can_delete?(users(:aaron))
+  end
+  
 end

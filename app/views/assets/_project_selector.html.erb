@@ -26,6 +26,6 @@
 			  <option value="<%= p[0] -%>" <%= "selected='selected'" if p[0] == selected_project_id -%>><%= h(p[1]) -%></option>
 			<% end -%>
 		</select>
-		<input type="button" value="Load sharing defaults" onclick="javascript:loadDefaultProjectPolicy($('project_selector').options[$('project_selector').selectedIndex].value);" style="vertical-align: middle; margin-left: 0.3em; width: 170px;"/>
+		<%#*<input type="button" value="Load sharing defaults" onclick="javascript:loadDefaultProjectPolicy($('project_selector').options[$('project_selector').selectedIndex].value);" style="vertical-align: middle; margin-left: 0.3em; width: 170px;"/>%>
 	</div>
 <% end -%>

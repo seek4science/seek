@@ -1,0 +1,7 @@
+group_for_model_owner_member:
+  group_membership_id: <%= Fixtures.identify(:group_for_model_owner) %>
+  role_id: <%= Fixtures.identify(:member) %>
+
+group_for_model_owner_postdoc:
+  group_membership_id: <%= Fixtures.identify(:group_for_model_owner) %>
+  role_id: <%= Fixtures.identify(:postdoc) %>
