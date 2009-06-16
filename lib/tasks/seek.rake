@@ -89,7 +89,6 @@ namespace :seek do
         end
       end
     end
-
   end
 
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"

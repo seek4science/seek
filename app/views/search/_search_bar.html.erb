@@ -1,13 +1,15 @@
 <% @search_query="" unless @search_query %>
 <% @search_type="All" unless @search_type %>
 
-<%= icon("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
+<% if logged_in? && current_user.person -%>
+  <%= icon("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
+<% end -%>
 
 <% if logged_in? && current_user.is_admin? -%>
   <%= icon "lock", admin_url, "Admin enabled", {:id=>"adminmode"}, "Admin enabled" -%>
 <% end -%>
 
-<% if SOLR_ENABLED && logged_in? && current_user.person %>
+<% if SOLR_ENABLED && logged_in? && current_user.person -%>
 
   <% form_tag '/search/' do -%>
     <div id="search_box">
