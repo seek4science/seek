@@ -12,7 +12,7 @@ favourites=Favourite.find_all_by_user_id(current_user.id)
   <% end %>
 <% end %>
 
-<%= drop_receiving_element("yui-main",
+<%= drop_receiving_element("bd",
   :accept=>"favourite",
   :url=>{:controller=>'favourites', :action=>'delete'},
   :before => "Element.show('fav_ajax-loader')",
