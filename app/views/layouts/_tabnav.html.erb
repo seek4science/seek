@@ -24,7 +24,7 @@
 
 
       <!-- Investigations tab -->
-      <li <%= (["investigations"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
+      <li <%= (["investigations"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before">
         <%= link_to "Investigations", investigations_url -%>
       </li>
 
@@ -44,13 +44,11 @@
       </li>
 
 
-      <li class="tabs_block_gap">
-
-      </li>
+      
 
 
       <!-- Models tab -->
-      <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
+      <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"': '') %> class="tab_gap_before" >
         <%= link_to "Models", models_url -%>
       </li>
 
