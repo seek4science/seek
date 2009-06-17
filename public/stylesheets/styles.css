@@ -76,6 +76,10 @@
     margin: 0;
 }
 
+.tabnav li.tab_gap_before {
+    margin-left: 2em;
+}
+
 .list_items_container{
     padding-left: 7px;
 }
@@ -617,9 +621,7 @@ div#faq {
     padding: 0.5em 0.5em 1em 0.5em;
 }
 
-li.tabs_block_gap {
-    margin-left: 2em;
-}
+
 
 div#feedback_form {
     padding: 0em 5em 0em 5em;
