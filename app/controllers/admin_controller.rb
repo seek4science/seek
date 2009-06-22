@@ -13,7 +13,6 @@ class AdminController < ApplicationController
     width=300
     height=200
 
-
     data=created_at_data_for_model(Sop)
     dataset = GoogleChartDataset.new :data => data, :color => '0000DD'
     @sop_creation_graph = GoogleLineChart.new :width => width, :height => height, :title=>"Sop Creation"
