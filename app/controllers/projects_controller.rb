@@ -80,7 +80,7 @@ class ProjectsController < ApplicationController
         
         # update those attributes of a project that we want to be updated from the session
         @project.attributes = session[possible_unsaved_data][:project]
-        @project.organism_list = session[possible_unsaved_data][:organism][:list]
+        @project.organism_list = session[possible_unsaved_data][:organism][:list] if session[possible_unsaved_data][:organism]
       end
       
       # clear the session data anyway
