@@ -105,8 +105,10 @@ class PeopleController < ApplicationController
         
         # update those attributes of a person that we want to be updated from the session
         @person.attributes = session[possible_unsaved_data][:person]
-        @person.tool_list = session[possible_unsaved_data][:tool][:list]
-        @person.expertise_list = session[possible_unsaved_data][:expertise][:list]
+
+        #FIXME: needs updating to handle new tools and expertise tag field
+#        @person.tool_list = session[possible_unsaved_data][:tool][:list] if session[]
+#        @person.expertise_list = session[possible_unsaved_data][:expertise][:list]
       end
       
       # clear the session data anyway
