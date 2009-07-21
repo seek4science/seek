@@ -1,22 +1,20 @@
 technology:
   title: technology
-  children: genomics_technologies,metabolomics_technology,proteomics_technologies,transcriptomics_technologies
+  children: binding,chromatography, culture_growth,electrophoresis,imaging,Mass_Spectrometry,microarray,PCR,structural_methods
 
-genomics_technologies:
-  title: genomics technologies
-  children: qPRC
+binding:
+  title: binding
+  children: 2-hybrid_system,surface_plasmon_resonance
 
-qPCR:
-  title: qPCR
+2-hybrid_system:
+  title: 2-hybrid system
 
-#----------------------------------------------------
+surface_plasmon_resonance:
+  title: surface plasmon resonance
 
-metabolomics_technology:
-  title: metabolomics technologies
-  children: chemostat,gas_chromatography,HPLC,Mass_Spectormetry,UPLC
-
-chemostat:
-  title: chemostat
+chromatography:
+  title: chromatography
+  children: gas_chromatography,HPLC,UPLC
 
 gas_chromatography:
   title: gas chromatography
@@ -24,40 +22,67 @@ gas_chromatography:
 HPLC:
   title: HPLC
 
-Mass_Spectormetry:
-  title: Mass Spectrometry
-  children: liquid_chromatography-tandem_mass_spectrometry
+UPLC:
+  title: UPLC
+
+electrophoresis:
+  title: electrophoresis
+  children: capillary_electrophoresis,gel_electrophoresis
+
+capillary_electrophoresis:
+  title: capillary electrophoresis
+
+gel_electrophoresis:
+  title: gel electrophoresis
+  children: 2D_gel_electrophoresis,SDS_PAGE
+
+2D_gel_electrophoresis:
+  title: 2D gel electrophoresis
+  
+SDS_PAGE:
+  title: SDS PAGE
+
+imaging:
+  title: imaging
+  children: FRAP
+
+FRAP:
+  title: FRAP
+
+Mass_Spectrometry:
+  title: mass spectrometry
+  children: Accelerator_Mass_Spectrometry,Gas_Chromatography_Mass_Spectrometry,Inductively_Coupled_Plasma_Mass_Spectrometry,Ion_Mobility_Spectrometry_Mass_Spectrometry,Isotope_Ratio_Mass_Spectrometry,liquid_chromatography-tandem_mass_spectrometry,liquid_chromatography_Mass_Spectrometry,MALDI_TOF,SELDI_TOF,Tandem_Mass_Spectrometry
+
+Accelerator_Mass_Spectrometry:
+  title: accelerator mass spectrometry
+
+Gas_Chromatography_Mass_Spectrometry:
+  title: gas chromatography mass spectrometry
+
+Inductively_Coupled_Plasma_Mass_Spectrometry:
+  title: inductively coupled plasma mass spectrometry
+
+Ion_Mobility_Spectrometry_Mass_Spectrometry:
+  title: ion mobility spectrometry mass spectrometry
+
+Isotope_Ratio_Mass_Spectrometry:
+  title: isotope ratio mass spectrometry
 
 liquid_chromatography-tandem_mass_spectrometry:
   title: liquid chromatography-tandem mass spectrometry
 
-UPLC:
-  title: UPLC
+liquid_chromatography_Mass_Spectrometry:
+  title: liquid chromatography mass spectrometry
 
-#----------------------------------------------------
+MALDI_TOF:
+  title: MALDI TOF
 
-proteomics_technologies:
-  title: proteomics technologies
-  children: 2-hybrid_system,2D_gel_electrophoresis,NMR,surface_plasmon_resonance,HPLC,Mass_Spectormetry
+SELDI_TOF:
+  title: SELDI TOF
 
-2-hybrid_system:
-  title: 2-hybrid system
+Tandem_Mass_Spectrometry:
+  title: tandem mass spectrometry
 
-2D_gel_electrophoresis:
-  title: 2D gel electrophoresis
-
-NMR:
-  title: NMR
-
-surface_plasmon_resonance:
-  title: surface plasmon resonance
-
-
-#----------------------------------------------------
-
-transcriptomics_technologies:
-  title: transcriptomics technologies
-  children: microarray,qRT-PCR
 
 microarray:
   title: microarray
@@ -70,13 +95,28 @@ ChIP-on-chip:
   title: ChIP-on-chip
 
 custom_Array:
-  title: custom Array
+  title: custom array
 
 DNA_Methylation:
-  title: DNA Methylation
+  title: DNA methylation
 
 miRNA_microarray:
   title: miRNA microarray
 
+PCR:
+  title: PCR
+  children: qPCR,qRT-PCR
+
+qPCR:
+  title: qPCR
+
 qRT-PCR:
   title: qRT-PCR
+
+
+structural_methods:
+  title: structural methods
+  children: NMR
+
+NMR:
+  title: NMR

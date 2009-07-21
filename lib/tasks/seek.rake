@@ -5,6 +5,16 @@ require 'active_record/fixtures'
 
 namespace :seek do
 
+  task(:model_types=>:environment) do
+    ModelType.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "model_types")
+  end
+
+  task(:model_formats=>:environment) do
+    ModelFormat.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "model_formats")
+  end
+
   task(:assay_types=>:environment) do
     AssayType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_types")
@@ -79,7 +89,6 @@ namespace :seek do
         end
       end
     end
-
   end
 
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"

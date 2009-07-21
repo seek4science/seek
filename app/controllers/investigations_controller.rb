@@ -4,8 +4,7 @@ class InvestigationsController < ApplicationController
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :make_investigation_and_auth,:only=>[:create]
   before_filter :investigation_auth_project,:only=>[:edit,:update]
-  
-
+  before_filter :delete_allowed,:only=>[:destroy]
 
   def index
     @investigations=Investigation.find(:all, :include=>:studies, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
@@ -17,14 +16,21 @@ class InvestigationsController < ApplicationController
     
   end
 
+  def destroy    
+    @investigation.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(investigations_url) }
+      format.xml  { head :ok }
+    end
+  end
+
   def show
     @investigation=Investigation.find(params[:id])
-
     respond_to do |format|
       format.html
       format.xml { render :xml=> @investigation, :include=>@investigation.studies }
     end
-
   end
 
   def create
@@ -90,6 +96,17 @@ class InvestigationsController < ApplicationController
     unless @investigation.can_edit?(current_user)
       flash[:error] = "You cannot edit an Investigation for a project you are not a member."
       redirect_to @investigation
+    end
+  end
+
+  def delete_allowed
+    @investigation=Investigation.find(params[:id])
+    unless @investigation.can_delete?(current_user)
+      respond_to do |format|
+        flash[:error] = "You cannot delete an Investigation related to a project or which you are not a member, or that has studies associated"
+        format.html { redirect_to investigations_path }
+      end
+      return false
     end
   end
   

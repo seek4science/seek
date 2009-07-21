@@ -11,3 +11,7 @@ metabolomics_study2:
 study_with_overlapping_assay_sops:
   title: A study
   investigation: metabolomics_investigation
+
+study_with_no_assays:
+  title: A study with no assays
+  investigation: investigation_with_no_assays

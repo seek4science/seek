@@ -40,7 +40,7 @@ class Project < ActiveRecord::Base
 
   acts_as_taggable_on :organisms
   
-  acts_as_solr(:fields => [ :name , :organisms]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :name , :organisms, :locations]) if SOLR_ENABLED
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|
@@ -52,6 +52,17 @@ class Project < ActiveRecord::Base
     for institution in new_institutions
       institutions << institution unless institutions.include?(institution)
     end
+  end
+
+  def locations
+    # infer all project's locations from the institutions where the person is member of
+    locations = self.institutions.collect { |i| i.country unless i.country.blank? }
+
+    # make sure this list is unique and (if any institutions didn't have a country set) that 'nil' element is deleted
+    locations = locations.uniq
+    locations.delete(nil)
+
+    return locations
   end
   
   def people

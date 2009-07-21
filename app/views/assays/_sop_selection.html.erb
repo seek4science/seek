@@ -32,7 +32,10 @@
 <% @assay.sops.each do |s| -%>
     sop_id = <%= s.id -%>;
     sop_title = '<%= s.title -%>';
-    addSop(sop_title,sop_id);
+  <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
+      addSop(sop_title,sop_id);
+  <% end -%>
+
 <% end -%>
 
   updateSops();

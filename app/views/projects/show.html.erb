@@ -54,6 +54,7 @@
     <% project_resource_hash.merge!(classify_for_tabs(@project.people)) -%>
     <% project_resource_hash.merge!(classify_for_tabs(@project.institutions)) -%>
     <% project_resource_hash.merge!(classify_for_tabs(@project.studies)) -%>
+    <% project_resource_hash.merge!(classify_for_tabs(@project.investigations)) -%>    
 
     <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@project.name,:item_hash=>project_resource_hash} %>
 

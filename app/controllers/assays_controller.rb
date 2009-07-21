@@ -2,6 +2,7 @@ class AssaysController < ApplicationController
 
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
+  before_filter :delete_allowed,:only=>[:destroy]
   
   def index
     @assays=Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
@@ -34,6 +35,8 @@ class AssaysController < ApplicationController
 
   def create
     @assay = Assay.new(params[:assay])
+    @assay.owner=current_user.person
+    
     synchronise_created_datas(params[:data_file_ids])
     
     respond_to do |format|
@@ -51,7 +54,7 @@ class AssaysController < ApplicationController
   def update
     @assay=Assay.find(params[:id])
     synchronise_created_datas(params[:data_file_ids])
-
+    @assay.sops.clear unless params[:assay][:sop_ids]
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
         flash[:notice] = 'Assay was successfully updated.'
@@ -73,7 +76,7 @@ class AssaysController < ApplicationController
   end
 
   def destroy
-    @assay=Assay.find(params[:id])
+    
     respond_to do |format|
       if @assay.study.nil? && @assay.destroy
         format.html { redirect_to(assays_url) }
@@ -104,6 +107,17 @@ class AssaysController < ApplicationController
 
     @assay.created_datas = @assay.created_datas - for_removal
     @assay.created_datas = @assay.created_datas | for_addition
+  end
+
+  def delete_allowed
+    @assay=Assay.find(params[:id])
+    unless @assay.can_delete?(current_user)
+      respond_to do |format|
+        flash[:error] = "You cannot delete an assay that is linked to a Study, Data files or Sops"
+        format.html { redirect_to assays_path }
+      end
+      return false
+    end
   end
 
 

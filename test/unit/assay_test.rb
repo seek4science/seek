@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayTest < ActiveSupport::TestCase
-  fixtures :assays,:sops,:assay_types,:technology_types,:projects,:studies,:investigations,:organisms
+  fixtures :all
 
   test "sops association" do
     assay=assays(:metabolomics_assay)
@@ -34,7 +34,9 @@ class AssayTest < ActiveSupport::TestCase
   test "validation" do
     assay=Assay.new(:title=>"test",
       :assay_type=>assay_types(:metabolomics),
-      :technology_type=>technology_types(:gas_chromatography))
+      :technology_type=>technology_types(:gas_chromatography),
+      :study => studies(:metabolomics_study),
+      :owner => people(:person_for_model_owner))
     
     assert assay.valid?
 
@@ -52,15 +54,35 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid?
 
     assay.assay_type=assay_types(:metabolomics)
+
+    assert assay.valid?
+
+    assay.study=nil
+    assert !assay.valid?
+    assay.study=studies(:metabolomics_study)
+
     assay.technology_type=nil
+    assert !assay.valid?
+
+    assay.technology_type=technology_types(:gas_chromatography)
+    assert assay.valid?
+
+    assay.owner=nil
     assert !assay.valid?
     
   end
 
   test "assay with no study has nil study and project" do
-    a=assays(:assay_with_no_study)
+    a=assays(:assay_with_no_study_or_files)
     assert_nil a.study
     assert_nil a.project
+  end
+
+  test "can delete?" do
+    assert assays(:assay_with_no_study_or_files).can_delete?(users(:aaron))
+    assert !assays(:assay_with_just_a_study).can_delete?(users(:aaron))
+    assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:aaron))
+    assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:aaron))
   end
 
 end

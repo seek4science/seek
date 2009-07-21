@@ -58,6 +58,10 @@ ActionController::Routing::Routes.draw do |map|
   # page for admin tasks
   map.admin '/admin/', :controller=>'admin',:action=>'show'
 
+  #feedback form
+  map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get
+  map.send_feedback '/home/send_feedback',:controller=>'home',:action=>'send_feedback',:method=>:post
+
   # favourite groups
   map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }
   map.create_favourite_group '/favourite_groups/create', :controller => 'favourite_groups', :action => 'create', :conditions => { :method => :post }

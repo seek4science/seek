@@ -4,6 +4,12 @@
       <%= icon('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%>
     </li>
   <% end -%>
+
+  <% if @investigation.can_delete?(current_user) -%>
+    <li>
+      <%= icon "destroy", investigation_path(@investigation), "Delete investigation", { :confirm => 'Are you sure?', :method => :delete }, "Delete investigation" -%>
+    </li>
+  <% end -%>
 </ul>
 
 <h1><%= h @investigation.title -%></h1>

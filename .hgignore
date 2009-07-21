@@ -1,4 +1,5 @@
 syntax: glob
+.idea/
 *.svn
 db/*.sqlite3
 db/schema.rb
@@ -25,4 +26,5 @@ syntax: regexp
 \.orig\..*$
 \.chg\..*$
 \.rej$
+\Thumbs\.db$
 

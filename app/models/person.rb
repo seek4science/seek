@@ -23,13 +23,13 @@ class Person < ActiveRecord::Base
   has_many :group_memberships
     
   has_many :work_groups, :through=>:group_memberships
-  has_many :roles, :through=>:group_memberships
+  has_many :studies, :foreign_key => :person_responsible_id
 
   acts_as_taggable_on :tools, :expertise
     
   has_one :user
   
-  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools ]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations ]) if SOLR_ENABLED
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
@@ -41,8 +41,7 @@ class Person < ActiveRecord::Base
   def self.userless_people
     p=Person.find(:all)
     return p.select{|person| person.user.nil?}
-  end
-    
+  end  
     
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
@@ -130,6 +129,14 @@ class Person < ActiveRecord::Base
   # it rather means that no avatar (other than default placeholder) was selected for the person
   def avatar_selected?
     return !avatar_id.nil?
+  end
+
+  def roles
+    roles = []
+    group_memberships.each do |gm|
+      roles = roles | gm.roles
+    end
+    return roles
   end
   
 end

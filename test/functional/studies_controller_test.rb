@@ -28,29 +28,13 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
+  
+
   test "should get edit" do
     get :edit,:id=>studies(:metabolomics_study)
     assert_response :success
     assert_not_nil assigns(:study)
-  end
-
-  test "edit should not show associated assays" do
-    get :edit, :id=>studies(:metabolomics_study)
-    assert_response :success
-    assert_select "select#possible_assays" do
-      assert_select "option",:text=>/Assay with no Study/,:count=>1
-      assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
-    end
-  end
-
-  test "new should not show associated assays" do
-    get :new
-    assert_response :success
-    assert_select "select#possible_assays" do
-      assert_select "option",:text=>/Assay with no Study/,:count=>1
-      assert_select "option",:text=>/Metabolomics Assay2/,:count=>0
-    end
-  end
+  end  
 
   test "should update" do
     s=studies(:metabolomics_study)
@@ -67,18 +51,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
     s=assigns(:study)
     assert_redirected_to study_path(s)
-  end
-
-  test "should create with assay" do
-    assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation),:assay_ids=>[assays(:assay_with_no_study).id]}
-    end
-    s=assigns(:study)
-    assert_redirected_to study_path(s)
-    assert_equal 1,s.assays.size
-    assert s.assays.include?(assays(:assay_with_no_study))
-    assert !flash[:error]
-  end
+  end  
 
   test "should not create with assay already related to study" do
     assert_no_difference("Study.count") do
@@ -137,5 +110,32 @@ class StudiesControllerTest < ActionController::TestCase
     assert flash[:error]
     assert_equal "A Metabolomics Study",assigns(:study).title
   end
+
+  test "study project member can delete if no assays" do
+    assert_difference('Study.count',-1) do
+      delete :destroy, :id => studies(:study_with_no_assays).id
+    end    
+    assert !flash[:error]
+    assert_redirected_to studies_path
+  end
+
+  test "study non project member cannot delete even if no assays" do
+    login_as(:aaron)
+    assert_no_difference('Study.count') do
+      delete :destroy, :id => studies(:study_with_no_assays).id
+    end
+    assert flash[:error]
+    assert_redirected_to studies_path
+  end
+  
+  test "study project member cannot delete if assays associated" do    
+    assert_no_difference('Study.count') do
+      delete :destroy, :id => studies(:metabolomics_study).id
+    end
+    assert flash[:error]
+    assert_redirected_to studies_path
+  end
+
+
   
 end

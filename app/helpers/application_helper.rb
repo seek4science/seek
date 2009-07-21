@@ -69,6 +69,7 @@ module ApplicationHelper
   def image method,options={}
     image_tag(method_to_icon_filename(method),options)
   end
+  
   def icon(method, url=nil, alt=nil, url_options={}, label=method.humanize, remote=false)
 
     if (label == 'Destroy')
@@ -169,9 +170,7 @@ module ApplicationHelper
     when "history"
       return "famfamfam_silk/time.png"   
     when "news"
-      return "famfamfam_silk/newspaper.png"
-    when "feedback"
-      return "famfamfam_silk/user_comment.png"
+      return "famfamfam_silk/newspaper.png"    
     when "view-all"
       return "famfamfam_silk/table_go.png"
     when "announcement"
@@ -202,6 +201,10 @@ module ApplicationHelper
       return "famfamfam_silk/page.png"
     when "execute"
       return "famfamfam_silk/lightning.png"
+    when "warning"
+      return "famfamfam_silk/error.png"
+    when "feedback"
+      return "famfamfam_silk/email.png"
     when "spinner"
       return "ajax-loader.gif"
     when "large-spinner"
@@ -469,7 +472,7 @@ module ApplicationHelper
 
   def list_item_tags_list tags,options={}
     tags.map do |t|
-      divider=tags.last==t ? "" : "  <span class='spacer'>|</span>  "
+      divider=tags.last==t ? "" : "<span class='spacer'>,</span> "
       link_for_tag(t,options)+divider
     end
   end

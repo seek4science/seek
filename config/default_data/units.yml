@@ -1,3 +1,7 @@
+dimensionless:
+  symbol: dimensionless
+  comment: dimensionless
+
 seconds:
   symbol: s
   comment: time
@@ -18,21 +22,61 @@ min-1:
   symbol: min-1
   comment: rate
 
+sec-1:
+  symbol: sec-1
+  comment: rate
+
 litre:
   symbol: L
-  comment: volume
+  comment: litre
+
+millilitre:
+  symbol: mL
+  comment: millilitre
+
+microlitre:
+  symbol: µL
+  comment: microlitre
+
+bar:
+  symbol: bar
+  comment: headspace pressure
+
+rpm:
+  symbol: rpm
+  comment: revolutions per minute
+
+L/min:
+  symbol: L/min
+  comment: flow rate
+
+mL/min:
+  symbol: mL/min
+  comment: flow rate
 
 metre:
   symbol: m
-  comment: length
+  comment: metre
 
 gram:
   symbol: g
-  comment: mass
+  comment: gram
+
+miligram:
+  symbol: mg
+  comment: milligram
+
+microgram:
+  symbol: µg
+  comment: microgram
+
+mpicogram:
+  symbol: pg
+  comment: mpicogram
 
 celcius:
   symbol: °C
-  comment: temperature
+  comment: Celcius
 
 mol:
   symbol: mol
@@ -88,22 +132,13 @@ mmol/L_CV:
 
 µm:
   symbol: µm
-  comment: cellular size (diameter)
+  comment: micrometer
 
 a.u.:
   symbol: a.u.
   comment: arbitrary units
 
-±SD:
-  symbol: ±SD
-  comment: standard deviation
-
 percent:
   symbol: %
   comment: percentage
-
-acidity:
-  symbol: pH
-  comment: pH
-
 

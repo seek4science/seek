@@ -1,5 +1,11 @@
-<h1> Administration </h1>
+<h1> Administration <span style="font-size:smaller;"><%= "(v.#{APP_VERSION.to_s})" -%></span></h1>
+
+
+
 <div style="padding-left:2em;">
+
+  <%= link_to "Activity graphs (experimental)",url_for(:action=>"graphs",:controller=>"admin") %>
+
   <h2>Create things ...</h2>
   <p>
     <%= link_to "Create an Institution", new_institution_path %>

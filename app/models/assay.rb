@@ -6,6 +6,7 @@ class Assay < ActiveRecord::Base
   belongs_to :technology_type
   belongs_to :study
   belongs_to :organism
+  belongs_to :owner, :class_name=>"Person"
 
   has_one :investigation,:through=>:study  
 
@@ -17,6 +18,8 @@ class Assay < ActiveRecord::Base
 
   validates_presence_of :assay_type
   validates_presence_of :technology_type
+  validates_presence_of :study, :message=>" must be selected"
+  validates_presence_of :owner
 
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type]) if SOLR_ENABLED
   
@@ -30,4 +33,11 @@ class Assay < ActiveRecord::Base
     investigation.nil? ? nil : investigation.project
   end
 
+  def can_edit? user
+    project.nil? || user.person.projects.include?(project)
+  end
+
+  def can_delete? user
+    study.nil? && data_files.empty? && sops.empty?
+  end
 end

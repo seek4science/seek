@@ -13,7 +13,8 @@ class Sop < ActiveRecord::Base
   belongs_to :content_blob,
              :dependent => :destroy
 
-  has_many :experimental_conditions  
+  has_many :experimental_conditions
+  has_and_belongs_to_many :assays
   
   
   # get a list of SOPs with their original uploaders - for autocomplete fields

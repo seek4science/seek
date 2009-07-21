@@ -13,9 +13,7 @@
         <% for expertise in expertise_list  -%>
 
           <%= link_for_tag expertise, :type=>:expertise,:truncate_length=>150 -%>
-          <% unless expertise==expertise_list.last %>
-            |
-          <% end %>
+          <%= ", " unless expertise==expertise_list.last %>
         <% end %>
       <% end %>
     </p>
@@ -29,9 +27,7 @@
 
         <% for tool in tools_list  -%>
           <%= link_for_tag tool,:type=>:tools,:truncate_length=>150 -%>
-          <% unless tool==tools_list.last %>
-            |
-          <% end %>
+          <%= ", " unless tool==tools_list.last -%>
         <% end %>
       <% end %>
     </p>
