@@ -25,16 +25,6 @@ HPLC:
 UPLC:
   title: UPLC
 
-culture_growth:
-  title: culture growth
-  children: chemostat,classical_culture
-
-chemostat:
-  title: chemostat
-
-classical_culture:
-  title: classical culture
-
 electrophoresis:
   title: electrophoresis
   children: capillary_electrophoresis,gel_electrophoresis

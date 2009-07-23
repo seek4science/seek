@@ -29,7 +29,7 @@ class Person < ActiveRecord::Base
     
   has_one :user
   
-  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools ]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations ]) if SOLR_ENABLED
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
