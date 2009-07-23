@@ -2,7 +2,7 @@ require 'test_helper'
 
 class AdminControllerTest < ActionController::TestCase
 
-  fixtures :users
+  fixtures :all
 
   include AuthenticatedTestHelper
 
@@ -18,6 +18,14 @@ class AdminControllerTest < ActionController::TestCase
     get :show
     assert_response :redirect
     assert_not_nil flash[:error]
+  end
+
+  test "show graphs" do
+
+    login_as(:quentin)
+    get :graphs
+    assert_response :success
+
   end
 
   
