@@ -20,6 +20,14 @@ class AdminControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  test "show graphs" do
+
+    login_as(:quentin)
+    get :graphs
+    assert_response :success
+
+  end
+
   
 
 end

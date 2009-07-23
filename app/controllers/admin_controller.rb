@@ -2,6 +2,8 @@ class AdminController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth
 
+  use_google_charts
+
   def show
     respond_to do |format|
       format.html
