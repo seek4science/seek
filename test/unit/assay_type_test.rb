@@ -1,4 +1,4 @@
-require 'test_helper'
+require File.dirname(__FILE__) + '/../test_helper'
 
 class AssayTypeTest < ActiveSupport::TestCase
   fixtures :assay_types,:assays
