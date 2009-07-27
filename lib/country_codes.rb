@@ -1,6 +1,6 @@
 module CountryCodes
     @@codes = Hash.new
-    File.open('config/countries.tab').each do |record|
+    File.open(File.join(RAILS_ROOT, 'config', 'countries.tab')).each do |record|     
       parts = record.split("\t")
       @@codes[parts[0]] = parts[1].strip
     end
