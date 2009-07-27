@@ -1,4 +1,4 @@
-require 'test_helper'
+require File.dirname(__FILE__) + '/../test_helper'
 
 class InstitutionTest < ActiveSupport::TestCase
   fixtures :institutions,:projects,:work_groups,:users,:group_memberships, :people
