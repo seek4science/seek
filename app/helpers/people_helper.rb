@@ -1,5 +1,7 @@
 module PeopleHelper
-  
+
+  include AlphabeticalPaginationHelper
+
   def person_list_item_extra_details? person
     !(person.projects.empty? and person.institutions.empty?)  
   end

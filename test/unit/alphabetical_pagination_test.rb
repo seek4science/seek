@@ -19,6 +19,7 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
 
   def test_paginate_no_options
     @people=Person.paginate
+    assert_equal(("A".."Z").to_a, @people.pages)
     assert @people.size>0
     assert_equal "A", @people.page
     assert_not_nil @people.page_totals
@@ -31,6 +32,7 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
 
   def test_paginate_by_page
     @people=Person.paginate :page=>"B"
+    assert_equal(("A".."Z").to_a, @people.pages)
     assert @people.size>0
     assert_equal "B", @people.page
     assert_equal @people.size, @people.page_totals["B"]

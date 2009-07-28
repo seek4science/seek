@@ -8,7 +8,7 @@ module AlphabeticalPagination
       end
 
       module ClassMethods
-        def alphabetical_pagination
+        def alphabetical_pagination           
           include AlphabeticalPagination::InstanceMethods
           extend AlphabeticalPagination::SingletonMethods
         end
@@ -23,7 +23,7 @@ module AlphabeticalPagination
           options ||= {}
           page = options[:page] || "A"
           records=self.find(:all,:conditions=>["first_letter = ?",page])
-          return Collection.new(records,page,page_totals)
+          return Collection.new(records,page,PAGES,page_totals)
         end
 
         def page_totals
@@ -55,12 +55,13 @@ module AlphabeticalPagination
       end
 
   class Collection < Array
-    attr_reader :page,:page_totals
+    attr_reader :page,:page_totals,:pages
 
-    def initialize records,page,page_totals
+    def initialize records,page,pages,page_totals
       super(records)
       @page=page
       @page_totals=page_totals
+      @pages=pages
     end
   end
   
