@@ -145,8 +145,8 @@ class Person < ActiveRecord::Base
   end
 
   def update_first_letter
-    self.first_letter=last_name.first.capitalize unless last_name.nil?
-    self.first_letter=name.first.capitalize if last_name.nil?    
+    self.first_letter = strip_first_letter(last_name) unless last_name.nil?
+    self.first_letter = strip_first_letter(name) if last_name.nil?
   end
   
 end

@@ -33,6 +33,7 @@ double_firstname:
   id: 8        
   first_name: "Fred David"
   last_name: "Bloggs"
+  email: "fred_blogs@email.com"
 
 double_lastname:
   id: 9        
