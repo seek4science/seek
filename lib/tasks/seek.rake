@@ -99,5 +99,17 @@ namespace :seek do
     end
     puts "Done. Schema XMI created as doc/data_models/schema.xmi."
   end
+
+  task :update_first_letters => :environment do
+    Person.find(:all).each do |p|
+      #suppress the timestamps being recorded.
+      class << p
+        def record_timestamps
+          false
+        end
+      end
+      p.save #forces the first letter to be updated      
+    end
+  end
   
 end

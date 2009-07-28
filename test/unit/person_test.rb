@@ -139,6 +139,7 @@ class PersonTest < ActiveSupport::TestCase
 
     p.web_page="http://www.mygrid.org.uk/dev/issues/secure/IssueNavigator.jspa?reset=true&mode=hide&sorter/order=DESC&sorter/field=priority&resolution=-1&pid=10051&fixfor=10110"
     assert p.valid?
+    
   end
 
   def test_email_with_capitalise_valid
@@ -170,6 +171,18 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2, p.roles.size
     assert p.roles.include?(roles(:member))
     assert p.roles.include?(roles(:postdoc))
+  end
+
+  def test_update_first_letter
+    p=Person.new(:first_name=>"Fred",:last_name=>"Monkhouse",:email=>"blahblah@email.com")
+    assert p.valid?,"The new person should be valid"
+    p.save
+    assert_equal "M",p.first_letter
+
+    p=Person.new(:first_name=>"Freddy",:email=>"blahbddlah@email.com")
+    assert p.valid?,"The new person should be valid"
+    p.save
+    assert_equal "F",p.first_letter
   end
 
 
