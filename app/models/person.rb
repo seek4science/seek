@@ -7,7 +7,7 @@ class Person < ActiveRecord::Base
 
   before_save :update_first_letter
   
-  alphabetical_pagination
+  alphabetical_pagination 
     
   validates_presence_of :name,:email
 
@@ -145,8 +145,10 @@ class Person < ActiveRecord::Base
   end
 
   def update_first_letter
-    self.first_letter = strip_first_letter(last_name) unless last_name.nil?
-    self.first_letter = strip_first_letter(name) if last_name.nil?
+    first_letter = strip_first_letter(last_name) unless last_name.nil?
+    first_letter = strip_first_letter(name) if last_name.nil?
+    #first_letter = "Other" unless ("A".."Z").to_a.include?(first_letter)
+    self.first_letter=first_letter
   end
   
 end

@@ -101,14 +101,15 @@ namespace :seek do
   end
 
   task :update_first_letters => :environment do
-    Person.find(:all).each do |p|
+    (Person.find(:all)|Project.find(:all)|Institution.find(:all)).each do |p|
       #suppress the timestamps being recorded.
       class << p
         def record_timestamps
           false
         end
       end
-      p.save #forces the first letter to be updated      
+      p.save #forces the first letter to be updated
+      puts "Updated for #{p.class.name} : #{p.id}"
     end
   end
   

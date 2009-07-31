@@ -8,7 +8,10 @@ module AlphabeticalPagination
       end
 
       module ClassMethods
-        def alphabetical_pagination           
+        def alphabetical_pagination(options={})
+          @pages = options[:pages] || ("A".."Z").to_a
+          @field = options[:field] || "first_letter"
+
           include AlphabeticalPagination::InstanceMethods
           extend AlphabeticalPagination::SingletonMethods
         end
@@ -22,9 +25,12 @@ module AlphabeticalPagination
           options=args.pop unless args.nil?
           options ||= {}
           page = options[:page] || "A"
-          @pages = options[:pages] || ("A".."Z").to_a
-          @field = options[:field] || "first_letter"
-          records=self.find(:all,:conditions=>["#{@field} = ?",page])
+
+          if @pages.include?(page)
+            records=self.find(:all,:conditions=>["#{@field} = ?",page])
+          else
+            records=[]
+          end
           return Collection.new(records,page,@pages,page_totals)
         end
 

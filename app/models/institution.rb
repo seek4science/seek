@@ -1,8 +1,13 @@
 require 'acts_as_editable'
+require 'alphabetical_pagination'
 
 class Institution < ActiveRecord::Base
   
   acts_as_editable
+
+  before_save :update_first_letter
+
+  alphabetical_pagination
   
   validates_presence_of :name
   validates_uniqueness_of :name  
@@ -39,6 +44,10 @@ class Institution < ActiveRecord::Base
   def self.get_all_institutions_listing
     institutions = Institution.find(:all)
     return institutions.collect { |i| [i.name, i.id] }
+  end
+
+  def update_first_letter
+    self.first_letter=strip_first_letter(name)
   end
   
 end

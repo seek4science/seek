@@ -9,13 +9,12 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
   end
 
   def test_first_letter
-
     p=Person.find_by_last_name("Aardvark")
     assert_not_nil p
     assert_not_nil p.first_letter
     assert_equal "A", p.first_letter
-
   end
+  
 
   def test_paginate_no_options
     @people=Person.paginate
@@ -35,11 +34,18 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
     assert_equal(("A".."Z").to_a, @people.pages)
     assert @people.size>0
     assert_equal "B", @people.page
-    assert_equal @people.size, @people.page_totals["B"]
+    assert_equal @people.size, @people.page_totals["B"]    
     @people.each do |p|
       assert_equal "B", p.first_letter
     end
-  end  
+  end
+
+  def test_sql_injection
+    @people=Person.paginate :page=>"A or first_letter='B'"
+    assert_equal 0,@people.size
+    assert_equal(("A".."Z").to_a, @people.pages)
+    assert_equal "A or first_letter='B'", @people.page
+  end
 
   def test_handle_oslash
     p=Person.new(:last_name=>"Øyvind", :email=>"sdfkjhsdfkjhsdf@email.com")
