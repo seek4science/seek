@@ -16,20 +16,22 @@ module AlphabeticalPagination
 
       module SingletonMethods
 
-        PAGES=("A".."Z").to_a
+
 
         def paginate(*args)
           options=args.pop unless args.nil?
           options ||= {}
           page = options[:page] || "A"
-          records=self.find(:all,:conditions=>["first_letter = ?",page])
-          return Collection.new(records,page,PAGES,page_totals)
+          @pages = options[:pages] || ("A".."Z").to_a
+          @field = options[:field] || "first_letter"
+          records=self.find(:all,:conditions=>["#{@field} = ?",page])
+          return Collection.new(records,page,@pages,page_totals)
         end
 
         def page_totals
           result={}
-          ("A".."Z").each do |page|
-            result[page]=self.count(:conditions=>["first_letter = ?",page])
+          @pages.each do |page|
+            result[page]=self.count(:conditions=>["#{@field} = ?",page])
           end
           result
         end

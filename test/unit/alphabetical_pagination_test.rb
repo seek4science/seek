@@ -39,7 +39,7 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
     @people.each do |p|
       assert_equal "B", p.first_letter
     end
-  end
+  end  
 
   def test_handle_oslash
     p=Person.new(:last_name=>"Øyvind", :email=>"sdfkjhsdfkjhsdf@email.com")
