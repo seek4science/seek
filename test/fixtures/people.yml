@@ -33,6 +33,7 @@ double_firstname:
   id: 8        
   first_name: "Fred David"
   last_name: "Bloggs"
+  email: "fred_blogs@email.com"
 
 double_lastname:
   id: 9        
@@ -144,9 +145,17 @@ person_for_datafile_owner:
 modeller_person:
   first_name: "Modeller"
   disciplines: modeller,experimentalist
+  email: "modeller@email.com"
 
 person_without_group:
   first_name: "Lonely"
+  email: "lonely@email.com"
 
 person_without_user:
   first_name: "Userless"
+  email: "userless@email.com"
+
+person_for_default_page:
+  first_name: "Fred"
+  last_name: "Aardvark"
+  email: "aadvark@email.com"

@@ -11,7 +11,7 @@ class InstitutionsController < ApplicationController
   # GET /institutions
   # GET /institutions.xml
   def index
-    @institutions = Institution.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:name)
+    @institutions = Institution.paginate :page=>params[:page]
 
     respond_to do |format|
       format.html # index.html.erb

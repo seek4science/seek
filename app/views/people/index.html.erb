@@ -15,14 +15,11 @@
 <% end -%>
 
 
-<% if @people.public_methods.include?("page_count") %>
+<% if @people.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @people } -%>
+  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @people.pages, :page_totals=>@people.page_totals,:current_page=>@people.page } -%>
 <% end %>
 
 <%= render :partial => "resource_list_item", :collection=>@people %>
 
-<% if @people.public_methods.include?("page_count") %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @people } -%>
-<% end %>
+

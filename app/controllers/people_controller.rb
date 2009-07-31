@@ -32,7 +32,7 @@ class PeopleController < ApplicationController
     elsif (params[:discipline_id])
       @discipline=Discipline.find(params[:discipline_id])
       #FIXME: strips out the disciplines that don't match
-      @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id],:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name)
+      @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id], :order=>:last_name)
       #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
       @people=@people.collect{|p| Person.find(p.id)}
     elsif (params[:role_id])
@@ -41,11 +41,9 @@ class PeopleController < ApplicationController
       #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
       @people=@people.select{|p| !(p.group_memberships & @role.group_memberships).empty?}
     else
-      @people = Person.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:last_name)
+      @people=Person.paginate :page=>params[:page]
     end
 
-
-    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @people.to_xml}

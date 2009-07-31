@@ -21,7 +21,7 @@ class ProjectsController < ApplicationController
       @organisms=params[:organisms]
       @projects=Project.tagged_with(@organisms,:on=>:organisms)
     else
-      @projects = Project.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>:name)
+      @projects = Project.paginate :page=>params[:page]
     end
 
     respond_to do |format|

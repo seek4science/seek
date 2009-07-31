@@ -1,8 +1,13 @@
 require 'acts_as_editable'
+require 'alphabetical_pagination'
 
 class Person < ActiveRecord::Base
   
   acts_as_editable
+
+  before_save :update_first_letter
+  
+  alphabetical_pagination 
     
   validates_presence_of :name,:email
 
@@ -137,6 +142,13 @@ class Person < ActiveRecord::Base
       roles = roles | gm.roles
     end
     return roles
+  end
+
+  def update_first_letter
+    first_letter = strip_first_letter(last_name) unless last_name.nil?
+    first_letter = strip_first_letter(name) if last_name.nil?
+    #first_letter = "Other" unless ("A".."Z").to_a.include?(first_letter)
+    self.first_letter=first_letter
   end
   
 end

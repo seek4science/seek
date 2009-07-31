@@ -72,6 +72,12 @@ class ProjectTest < ActiveSupport::TestCase
     assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
   end
 
+  def test_update_first_letter
+    p=Project.new(:name=>"test project")
+    p.save
+    assert_equal "T",p.first_letter
+  end
+
   def test_valid
     p=projects(:one)    
 

@@ -1,13 +1,11 @@
 <!--<%= link_to 'New institution', new_institution_path %>-->
 
-<% if @institutions.public_methods.include?("page_count") %>
+<% if @institutions.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @institutions } -%>
+  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @institutions.pages, :page_totals=>@institutions.page_totals,:current_page=>@institutions.page } -%>
 <% end %>
 
 <%= render :partial=>"resource_list_item", :collection=>@institutions %>
 
-<% if @institutions.public_methods.include?("page_count") %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @institutions } -%>
-<% end %>
+
+
