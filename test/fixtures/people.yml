@@ -159,3 +159,8 @@ person_for_default_page:
   first_name: "Fred"
   last_name: "Aardvark"
   email: "aadvark@email.com"
+
+person_for_pagination_order_test:
+  first_name: "Fred"
+  last_name: "Azbo"
+  email: "azbo@email.com"

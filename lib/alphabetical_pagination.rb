@@ -4,75 +4,91 @@ but as a seperate mixin, rather than built into the will_paginate plugin
 =end
 module AlphabeticalPagination
   def self.included(base)
-        base.extend ClassMethods
+    base.extend ClassMethods
+  end
+
+  module ClassMethods
+    def alphabetical_pagination(options={})
+      @pages = options[:pages] || ("A".."Z").to_a
+      @field = options[:field] || "first_letter"
+
+      include AlphabeticalPagination::InstanceMethods
+      extend AlphabeticalPagination::SingletonMethods
+    end
+  end
+
+  module SingletonMethods
+
+
+
+    def paginate(*args)
+      options=args.pop unless args.nil?
+      options ||= {}
+      page = options[:page] || "A"
+
+      @find_options=options.except :page
+      @find_options[:conditions] ||= []
+      @find_options[:order] ||= @field
+
+      if @pages.include?(page)
+        conditions=["#{@field} = ?", page]
+        query_options = [:conditions=>conditions]
+        
+        query_options[0].merge!(options.except(:conditions,:page))
+        records=self.find(:all,*query_options)
+      else
+        records=[]
+      end
+      
+      return Collection.new(records, page, @pages, page_totals)
+    end
+
+    def page_totals
+      result={}
+      @pages.each do |page|
+        conditions=["#{@field} = ?", page]
+        result[page]=self.count(:conditions=>conditions)            
+      end
+      result
+    end
+
+  end
+
+  def combine_conditions(condition1,condition2)
+    query=[condition1[0],condition2[0]].join(" AND ")
+    args=condition1[1] + condition2[1]
+    return [query,args]
+  end
+
+  module InstanceMethods
+    #Helper to strip the first letter from the text, converting non standard A-Z characters to their equivalent, e.g Ø -> O
+    #uses some code based upon: http://github.com/grosser/sort_alphabetical/blob/9a8665d17394506c29cce51d8e22af69e2931523/lib/sort_alphabetical.rb with special handling for Ø
+    def strip_first_letter text
+
+      #handle the characters that can't be handled through normalization
+      %w[ØO].each do |s|
+        text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
       end
 
-      module ClassMethods
-        def alphabetical_pagination(options={})
-          @pages = options[:pages] || ("A".."Z").to_a
-          @field = options[:field] || "first_letter"
+      codepoints = text.mb_chars.normalize(:d).split(//u)
+      ascii=codepoints.map(&:to_s).reject{|e| e.length > 1}.join
 
-          include AlphabeticalPagination::InstanceMethods
-          extend AlphabeticalPagination::SingletonMethods
-        end
-      end
+      return ascii.first.capitalize
 
-      module SingletonMethods
-
-
-
-        def paginate(*args)
-          options=args.pop unless args.nil?
-          options ||= {}
-          page = options[:page] || "A"
-
-          if @pages.include?(page)
-            records=self.find(:all,:conditions=>["#{@field} = ?",page])
-          else
-            records=[]
-          end
-          return Collection.new(records,page,@pages,page_totals)
-        end
-
-        def page_totals
-          result={}
-          @pages.each do |page|
-            result[page]=self.count(:conditions=>["#{@field} = ?",page])
-          end
-          result
-        end
-
-      end
-
-      module InstanceMethods
-        #Helper to strip the first letter from the text, converting non standard A-Z characters to their equivalent, e.g Ø -> O
-        #uses some code based upon: http://github.com/grosser/sort_alphabetical/blob/9a8665d17394506c29cce51d8e22af69e2931523/lib/sort_alphabetical.rb with special handling for Ø
-        def strip_first_letter text
-
-          #handle the characters that can't be handled through normalization
-          %w[ØO].each do |s|
-            text.gsub!(/[#{s[0..-2]}]/,s[-1..-1])
-          end
-
-          codepoints = text.mb_chars.normalize(:d).split(//u)
-          ascii=codepoints.map(&:to_s).reject{|e| e.length > 1}.join
-          
-          return ascii.first.capitalize
-
-        end
-      end
+    end
+  end
 
   class Collection < Array
-    attr_reader :page,:page_totals,:pages
+    attr_reader :page, :page_totals, :pages
 
-    def initialize records,page,pages,page_totals
+    def initialize records, page, pages, page_totals
       super(records)
       @page=page
       @page_totals=page_totals
       @pages=pages
     end
   end
-  
+
 end
 
 ActiveRecord::Base.class_eval do

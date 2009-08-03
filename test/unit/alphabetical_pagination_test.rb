@@ -65,4 +65,26 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
     assert_equal "Y", p.first_letter    
   end
 
+  def test_extra_conditions
+    @people=Person.paginate :page=>"A",:conditions=>["last_name = ?","Aardvark"]
+    assert_equal 1,@people.size
+    assert @people.page_totals.select{|k,v| v>0}.empty?,"All of the page totals should be 0"
+
+    @people=Person.paginate :page=>"B",:conditions=>["last_name = ?","Aardvark"]
+    assert_equal 0,@people.size
+    assert_equal 1,@people.page_totals["A"]
+  end
+
+  def test_order_by
+    @people=Person.paginate :page=>"A",:order=>"last_name ASC"
+    assert @people.size>0
+    assert_equal "A", @people.page
+    assert_equal people(:person_for_default_page),@people.first
+
+    @people=Person.paginate :page=>"A",:order=>"last_name DESC"
+    assert @people.size>0
+    assert_equal "A", @people.page
+    assert_equal people(:person_for_pagination_order_test),@people.first
+  end
+
 end
