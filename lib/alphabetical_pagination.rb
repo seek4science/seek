@@ -18,32 +18,31 @@ module AlphabeticalPagination
   end
 
   module SingletonMethods
-
-
+    
+    def merge_optional_conditions(optional_conditions, page)
+      conditions= []
+      conditions << ["#{@field} = ?", page]
+      conditions << optional_conditions if optional_conditions
+      conditions=merge_conditions(*conditions)
+      return conditions
+    end
 
     def paginate(*args)
       options=args.pop unless args.nil?
       options ||= {}
       page = options[:page] || "A"
-   
+
+      records=[]
       if @pages.include?(page)
-        conditions= []
-        conditions << ["#{@field} = ?", page]
-        conditions << options[:conditions] if options[:conditions]
-        conditions=merge_conditions(*conditions)
+        conditions = merge_optional_conditions(options[:conditions], page)
         query_options = [:conditions=>conditions]
         query_options[0].merge!(options.except(:conditions,:page))                
-        records=self.find(:all,*query_options)
-      else
-        records=[]
+        records=self.find(:all,*query_options)        
       end
 
       page_totals={}
       @pages.each do |p|
-        conditions= []
-        conditions << ["#{@field} = ?", p]
-        conditions << options[:conditions] if options[:conditions]
-        conditions=merge_conditions(*conditions)
+        conditions=merge_optional_conditions(options[:conditions],p)
         query_options = [:conditions=>conditions]
         query_options[0].merge!(options.except(:conditions,:page))
         page_totals[p]=self.count(*query_options)            
@@ -51,8 +50,6 @@ module AlphabeticalPagination
       
       return Collection.new(records, page, @pages, page_totals)
     end
-
-
 
   end
 
