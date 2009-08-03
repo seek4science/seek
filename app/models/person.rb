@@ -145,8 +145,9 @@ class Person < ActiveRecord::Base
   end
 
   def update_first_letter
-    first_letter = strip_first_letter(last_name) unless last_name.nil?
-    first_letter = strip_first_letter(name) if last_name.nil?
+    no_last_name=last_name.nil? || last_name.strip.blank?
+    first_letter = strip_first_letter(last_name) unless no_last_name
+    first_letter = strip_first_letter(name) if no_last_name
     #first_letter = "Other" unless ("A".."Z").to_a.include?(first_letter)
     self.first_letter=first_letter
   end

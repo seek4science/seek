@@ -183,6 +183,18 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?,"The new person should be valid"
     p.save
     assert_equal "F",p.first_letter
+
+    p=Person.new(:first_name=>"Zebedee",:email=>"zz@email.com")
+    assert p.valid?,"The new person should be valid"
+    p.save
+    assert_equal "Z",p.first_letter
+  end
+
+  def test_update_first_letter_blank_last_name
+    p=Person.new(:first_name=>"Zebedee",:last_name=>"",:email=>"zz@email.com")
+    assert p.valid?,"The new person should be valid"
+    p.save
+    assert_equal "Z",p.first_letter    
   end
 
 

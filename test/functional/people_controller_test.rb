@@ -32,6 +32,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to person_path(assigns(:person))
+    assert_equal "T",assigns(:person).first_letter
   end
 
   def non_admin_should_not_create_pal
