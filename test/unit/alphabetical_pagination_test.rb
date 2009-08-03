@@ -68,7 +68,9 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
   def test_extra_conditions
     @people=Person.paginate :page=>"A",:conditions=>["last_name = ?","Aardvark"]
     assert_equal 1,@people.size
-    assert @people.page_totals.select{|k,v| v>0}.empty?,"All of the page totals should be 0"
+    assert(@people.page_totals.select do |k, v|
+      k!="A" && v>0
+    end.empty?,"All of the page totals should be 0")
 
     @people=Person.paginate :page=>"B",:conditions=>["last_name = ?","Aardvark"]
     assert_equal 0,@people.size

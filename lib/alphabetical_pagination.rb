@@ -26,39 +26,35 @@ module AlphabeticalPagination
       options ||= {}
       page = options[:page] || "A"
 
-      @find_options=options.except :page
-      @find_options[:conditions] ||= []
-      @find_options[:order] ||= @field
+      
 
       if @pages.include?(page)
         conditions=["#{@field} = ?", page]
+        conditions = [[conditions[0],options[:conditions][0]].join(" AND "),conditions[1],options[:conditions][1..-1]] if options[:conditions]
         query_options = [:conditions=>conditions]
-        
         query_options[0].merge!(options.except(:conditions,:page))
         records=self.find(:all,*query_options)
       else
         records=[]
       end
+
+      page_totals={}
+      @pages.each do |p|
+        conditions=["#{@field} = ?", p]
+        conditions = [[conditions[0],options[:conditions][0]].join(" AND "),conditions[1],options[:conditions][1..-1]] if options[:conditions]
+        query_options = [:conditions=>conditions]
+        query_options[0].merge!(options.except(:conditions,:page))
+        page_totals[p]=self.count(*query_options)            
+      end
       
       return Collection.new(records, page, @pages, page_totals)
     end
 
-    def page_totals
-      result={}
-      @pages.each do |page|
-        conditions=["#{@field} = ?", page]
-        result[page]=self.count(:conditions=>conditions)            
-      end
-      result
-    end
+
 
   end
 
-  def combine_conditions(condition1,condition2)
-    query=[condition1[0],condition2[0]].join(" AND ")
-    args=condition1[1] + condition2[1]
-    return [query,args]
-  end
+
 
   module InstanceMethods
     #Helper to strip the first letter from the text, converting non standard A-Z characters to their equivalent, e.g Ø -> O
