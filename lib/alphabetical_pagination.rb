@@ -31,6 +31,7 @@ module AlphabeticalPagination
       if @pages.include?(page)
         conditions=["#{@field} = ?", page]
         conditions = [[conditions[0],options[:conditions][0]].join(" AND "),conditions[1],options[:conditions][1..-1]] if options[:conditions]
+        conditions=conditions.select{|c| !(c.empty?)}
         query_options = [:conditions=>conditions]
         query_options[0].merge!(options.except(:conditions,:page))
         records=self.find(:all,*query_options)
@@ -42,6 +43,7 @@ module AlphabeticalPagination
       @pages.each do |p|
         conditions=["#{@field} = ?", p]
         conditions = [[conditions[0],options[:conditions][0]].join(" AND "),conditions[1],options[:conditions][1..-1]] if options[:conditions]
+        conditions=conditions.select{|c| !(c.empty?)}
         query_options = [:conditions=>conditions]
         query_options[0].merge!(options.except(:conditions,:page))
         page_totals[p]=self.count(*query_options)            
