@@ -25,15 +25,14 @@ module AlphabeticalPagination
       options=args.pop unless args.nil?
       options ||= {}
       page = options[:page] || "A"
-
-      
-
+   
       if @pages.include?(page)
-        conditions=["#{@field} = ?", page]
-        conditions = [[conditions[0],options[:conditions][0]].join(" AND "),conditions[1],options[:conditions][1..-1]] if options[:conditions]
-        conditions=conditions.select{|c| !(c.empty?)}
+        conditions= []
+        conditions << ["#{@field} = ?", page]
+        conditions << options[:conditions] if options[:conditions]
+        conditions=merge_conditions(*conditions)
         query_options = [:conditions=>conditions]
-        query_options[0].merge!(options.except(:conditions,:page))
+        query_options[0].merge!(options.except(:conditions,:page))                
         records=self.find(:all,*query_options)
       else
         records=[]
@@ -41,9 +40,10 @@ module AlphabeticalPagination
 
       page_totals={}
       @pages.each do |p|
-        conditions=["#{@field} = ?", p]
-        conditions = [[conditions[0],options[:conditions][0]].join(" AND "),conditions[1],options[:conditions][1..-1]] if options[:conditions]
-        conditions=conditions.select{|c| !(c.empty?)}
+        conditions= []
+        conditions << ["#{@field} = ?", p]
+        conditions << options[:conditions] if options[:conditions]
+        conditions=merge_conditions(*conditions)
         query_options = [:conditions=>conditions]
         query_options[0].merge!(options.except(:conditions,:page))
         page_totals[p]=self.count(*query_options)            

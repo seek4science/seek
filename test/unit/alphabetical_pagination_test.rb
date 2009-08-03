@@ -65,7 +65,7 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
     assert_equal "Y", p.first_letter    
   end
 
-  def test_extra_conditions
+  def test_extra_conditions_as_array
     @people=Person.paginate :page=>"A",:conditions=>["last_name = ?","Aardvark"]
     assert_equal 1,@people.size
     assert(@people.page_totals.select do |k, v|
@@ -77,7 +77,7 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
     assert_equal 1,@people.page_totals["A"]
   end
 
-  def test_extra_condition_as_sql
+  def test_extra_condition_as_array_direct
     @people=Person.paginate :page=>"A",:conditions=>["last_name = 'Aardvark'"]
     assert_equal 1,@people.size
     assert(@people.page_totals.select do |k, v|
@@ -88,6 +88,31 @@ class AlphabeticalPaginationTest < ActiveSupport::TestCase
     assert_equal 0,@people.size
     assert_equal 1,@people.page_totals["A"]
 
+  end
+
+  def test_extra_condition_as_string
+    @people=Person.paginate :page=>"A",:conditions=>"last_name = 'Aardvark'"
+    assert_equal 1,@people.size
+    assert(@people.page_totals.select do |k, v|
+      k!="A" && v>0
+    end.empty?,"All of the page totals should be 0")
+
+    @people=Person.paginate :page=>"B",:conditions=>"last_name = 'Aardvark'"
+    assert_equal 0,@people.size
+    assert_equal 1,@people.page_totals["A"]
+
+  end
+
+  def test_condition_as_hash
+    @people=Person.paginate :page=>"A",:conditions=>{:last_name=>"Aardvark"}
+    assert_equal 1,@people.size
+    assert(@people.page_totals.select do |k, v|
+      k!="A" && v>0
+    end.empty?,"All of the page totals should be 0")
+
+    @people=Person.paginate :page=>"B",:conditions=>{:last_name => "Aardvark"}
+    assert_equal 0,@people.size
+    assert_equal 1,@people.page_totals["A"]
   end
 
   def test_order_by
