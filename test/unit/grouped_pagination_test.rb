@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class AlphabeticalPaginationTest < ActiveSupport::TestCase
+class GroupedPaginationTest < ActiveSupport::TestCase
 
   fixtures :all
 

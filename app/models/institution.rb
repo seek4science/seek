@@ -1,5 +1,5 @@
 require 'acts_as_editable'
-require 'alphabetical_pagination'
+require 'grouped_pagination'
 
 class Institution < ActiveRecord::Base
   
@@ -7,7 +7,7 @@ class Institution < ActiveRecord::Base
 
   before_save :update_first_letter
 
-  alphabetical_pagination
+  grouped_pagination
   
   validates_presence_of :name
   validates_uniqueness_of :name  

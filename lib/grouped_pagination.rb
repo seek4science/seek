@@ -2,18 +2,18 @@
 Inspired by http://www.hennessynet.com/blog/?p=70
 but as a seperate mixin, rather than built into the will_paginate plugin
 =end
-module AlphabeticalPagination
+module GroupedPagination
   def self.included(base)
     base.extend ClassMethods
   end
 
   module ClassMethods
-    def alphabetical_pagination(options={})
+    def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a
       @field = options[:field] || "first_letter"
 
-      include AlphabeticalPagination::InstanceMethods
-      extend AlphabeticalPagination::SingletonMethods
+      include GroupedPagination::InstanceMethods
+      extend GroupedPagination::SingletonMethods
     end
   end
 
@@ -87,5 +87,5 @@ module AlphabeticalPagination
 end
 
 ActiveRecord::Base.class_eval do
-  include AlphabeticalPagination
+  include GroupedPagination
 end
