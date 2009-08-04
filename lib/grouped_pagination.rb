@@ -51,6 +51,7 @@ module GroupedPagination
       
       result = Collection.new(records, page, @pages, page_totals)
 
+      #jump to the first page with content if no page is specified and their is no content in the first page.
       if (result.empty? && options[:page].nil?)
         first_page_with_content = result.pages.find{|p| result.page_totals[p]>0}
         unless first_page_with_content.nil?
