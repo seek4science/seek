@@ -30,7 +30,8 @@ module GroupedPagination
     def paginate(*args)
       options=args.pop unless args.nil?
       options ||= {}
-      page = options[:page] || "A"
+
+      page = options[:page] || @pages.first
 
       records=[]
       if @pages.include?(page)
@@ -48,7 +49,17 @@ module GroupedPagination
         page_totals[p]=self.count(*query_options)            
       end
       
-      return Collection.new(records, page, @pages, page_totals)
+      result = Collection.new(records, page, @pages, page_totals)
+
+      if (result.empty? && options[:page].nil?)
+        first_page_with_content = result.pages.find{|p| result.page_totals[p]>0}
+        unless first_page_with_content.nil?
+          options[:page]=first_page_with_content
+          result=paginate(options)
+        end
+      end
+
+      result
     end
 
   end
