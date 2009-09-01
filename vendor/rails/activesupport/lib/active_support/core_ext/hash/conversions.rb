@@ -1,14 +1,6 @@
 require 'date'
-require 'active_support/core_ext/module/attribute_accessors'
 
 module ActiveSupport #:nodoc:
-  # these accessors are here because people using ActiveResource and REST to integrate with other systems
-  # have to be able to control the default behavior of rename_key. dasherize_xml is set to true to emulate
-  # existing behavior. In a future version it should be set to false by default.
-  mattr_accessor :dasherize_xml
-  mattr_accessor :camelize_xml
-  self.dasherize_xml = true
-  self.camelize_xml  = false
   module CoreExtensions #:nodoc:
     module Hash #:nodoc:
       module Conversions
@@ -151,11 +143,10 @@ module ActiveSupport #:nodoc:
         end
 
         def rename_key(key, options = {})
-          camelize  = options.has_key?(:camelize) ? options[:camelize]   : ActiveSupport.camelize_xml
-          dasherize = options.has_key?(:dasherize) ? options[:dasherize] : ActiveSupport.dasherize_xml
+          camelize = options.has_key?(:camelize) && options[:camelize]
+          dasherize = !options.has_key?(:dasherize) || options[:dasherize]
           key = key.camelize if camelize
-          key = key.dasherize if dasherize
-          key
+          dasherize ? key.dasherize : key
         end
 
         module ClassMethods
@@ -230,7 +221,7 @@ module ActiveSupport #:nodoc:
               case params.class.to_s
                 when "Hash"
                   params.inject({}) do |h,(k,v)|
-                    h[k.to_s.tr("-", "_")] = unrename_keys(v)
+                    h[k.to_s.underscore.tr("-", "_")] = unrename_keys(v)
                     h
                   end
                 when "Array"

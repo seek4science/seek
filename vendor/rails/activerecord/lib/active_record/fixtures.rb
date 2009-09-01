@@ -1,7 +1,6 @@
 require 'erb'
 require 'yaml'
 require 'csv'
-require 'zlib'
 require 'active_support/dependencies'
 require 'active_support/test_case'
 
@@ -434,7 +433,6 @@ end
 # Any fixture labeled "DEFAULTS" is safely ignored.
 
 class Fixtures < (RUBY_VERSION < '1.9' ? YAML::Omap : Hash)
-  MAX_ID = 2 ** 31 - 1
   DEFAULT_FILTER_RE = /\.ya?ml$/
 
   @@all_cached_fixtures = {}
@@ -526,10 +524,11 @@ class Fixtures < (RUBY_VERSION < '1.9' ? YAML::Omap : Hash)
     cached_fixtures(connection, table_names)
   end
 
-  # Returns a consistent, platform-independent identifier for +label+.
-  # Identifiers are positive integers less than 2^32.
+  # Returns a consistent identifier for +label+. This will always
+  # be a positive integer, and will always be the same for a given
+  # label, assuming the same OS, platform, and version of Ruby.
   def self.identify(label)
-    Zlib.crc32(label.to_s) % MAX_ID
+    label.to_s.hash.abs
   end
 
   attr_reader :table_name, :name

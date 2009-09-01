@@ -67,12 +67,10 @@ module ActiveSupport
 
     def inspect #:nodoc:
       consolidated = parts.inject(::Hash.new(0)) { |h,part| h[part.first] += part.last; h }
-      parts = [:years, :months, :days, :minutes, :seconds].map do |length|
+      [:years, :months, :days, :minutes, :seconds].map do |length|
         n = consolidated[length]
         "#{n} #{n == 1 ? length.to_s.singularize : length.to_s}" if n.nonzero?
-      end.compact
-      parts = ["0 seconds"] if parts.empty?
-      parts.to_sentence(:locale => :en)
+      end.compact.to_sentence(:locale => :en)
     end
 
     protected

@@ -29,7 +29,7 @@ begin
       printer_class = RubyProf::FlatPrinter
     end
     printer = printer_class.new(results)
-    printer.print($stderr)
+    printer.print($stderr, 0)
   rescue LoadError
     require "prof"
     $stderr.puts 'Using the old ruby-prof extension.'

@@ -23,12 +23,7 @@ module ActiveSupport
         DELETED     = "DELETED\r\n"
       end
 
-      def self.build_mem_cache(*addresses)
-        addresses = addresses.flatten
-        options = addresses.extract_options!
-        addresses = ["localhost"] if addresses.empty?
-        MemCache.new(addresses, options)
-      end
+      attr_reader :addresses
 
       # Creates a new MemCacheStore object, with the given memcached server
       # addresses. Each address is either a host name, or a host-with-port string
@@ -39,18 +34,13 @@ module ActiveSupport
       # If no addresses are specified, then MemCacheStore will connect to
       # localhost port 11211 (the default memcached port).
       def initialize(*addresses)
-        if addresses.first.respond_to?(:get)
-          @data = addresses.first
-        else
-          @data = self.class.build_mem_cache(*addresses)
-        end
+        addresses = addresses.flatten
+        options = addresses.extract_options!
+        addresses = ["localhost"] if addresses.empty?
+        @addresses = addresses
+        @data = MemCache.new(addresses, options)
 
         extend Strategy::LocalCache
-      end
-
-      # Reads multiple keys from the cache.
-      def read_multi(*keys)
-        @data.get_multi keys
       end
 
       def read(key, options = nil) # :nodoc:
@@ -130,6 +120,10 @@ module ActiveSupport
       end
 
       private
+        def expires_in(options)
+          (options && options[:expires_in]) || 0
+        end
+
         def raw?(options)
           options && options[:raw]
         end

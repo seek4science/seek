@@ -235,10 +235,7 @@ class RedirectTest < ActionController::TestCase
 
   def test_redirect_with_partial_params
     get :module_redirect
-
-    assert_deprecated do
-      assert_redirected_to :action => 'hello_world'
-    end
+    assert_redirected_to :action => 'hello_world'
   end
 
   def test_redirect_to_nil

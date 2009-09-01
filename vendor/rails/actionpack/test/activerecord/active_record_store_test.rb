@@ -27,9 +27,9 @@ class ActiveRecordStoreTest < ActionController::IntegrationTest
     end
 
     def call_reset_session
-      session[:foo]
+      session[:bar]
       reset_session
-      session[:foo] = "baz"
+      session[:bar] = "baz"
       head :ok
     end
 
@@ -86,7 +86,7 @@ class ActiveRecordStoreTest < ActionController::IntegrationTest
 
       get '/get_session_value'
       assert_response :success
-      assert_equal 'foo: "baz"', response.body
+      assert_equal 'foo: nil', response.body
 
       get '/get_session_id'
       assert_response :success

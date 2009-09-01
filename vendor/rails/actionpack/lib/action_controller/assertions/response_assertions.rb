@@ -63,10 +63,7 @@ module ActionController
 
           # Support partial arguments for hash redirections
           if options.is_a?(Hash) && @response.redirected_to.is_a?(Hash)
-            if options.all? {|(key, value)| @response.redirected_to[key] == value}
-              ::ActiveSupport::Deprecation.warn("Using assert_redirected_to with partial hash arguments is deprecated. Specify the full set arguments instead", caller)
-              return true
-            end
+            return true if options.all? {|(key, value)| @response.redirected_to[key] == value}
           end
 
           redirected_to_after_normalisation = normalize_argument_to_redirection(@response.redirected_to)
@@ -85,9 +82,6 @@ module ActionController
       #   # assert that the "new" view template was rendered
       #   assert_template "new"
       #
-      #   # assert that the "new" view template was rendered with Symbol
-      #   assert_template :new
-      #
       #   # assert that the "_customer" partial was rendered twice
       #   assert_template :partial => '_customer', :count => 2
       #
@@ -97,7 +91,7 @@ module ActionController
       def assert_template(options = {}, message = nil)
         clean_backtrace do
           case options
-           when NilClass, String, Symbol
+           when NilClass, String
             rendered = @response.rendered[:template].to_s
             msg = build_message(message,
                     "expecting <?> but rendering with <?>",
@@ -106,7 +100,7 @@ module ActionController
               if options.nil?
                 @response.rendered[:template].blank?
               else
-                rendered.to_s.match(options.to_s)
+                rendered.to_s.match(options)
               end
             end
           when Hash
@@ -129,8 +123,6 @@ module ActionController
               assert @response.rendered[:partials].empty?,
                 "Expected no partials to be rendered"
             end
-          else
-            raise ArgumentError  
           end
         end
       end

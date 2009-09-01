@@ -3,47 +3,41 @@ module ActiveSupport #:nodoc:
     module Numeric #:nodoc:
       # Enables the use of byte calculations and declarations, like 45.bytes + 2.6.megabytes
       module Bytes
-        KILOBYTE = 1024
-        MEGABYTE = KILOBYTE * 1024
-        GIGABYTE = MEGABYTE * 1024
-        TERABYTE = GIGABYTE * 1024
-        PETABYTE = TERABYTE * 1024
-        EXABYTE  = PETABYTE * 1024
-
         def bytes
           self
         end
         alias :byte :bytes
 
         def kilobytes
-          self * KILOBYTE
+          self * 1024
         end
         alias :kilobyte :kilobytes
 
         def megabytes
-          self * MEGABYTE
+          self * 1024.kilobytes
         end
         alias :megabyte :megabytes
 
         def gigabytes
-          self * GIGABYTE
+          self * 1024.megabytes 
         end
         alias :gigabyte :gigabytes
 
         def terabytes
-          self * TERABYTE
+          self * 1024.gigabytes
         end
         alias :terabyte :terabytes
-
+        
         def petabytes
-          self * PETABYTE
+          self * 1024.terabytes
         end
         alias :petabyte :petabytes
-
+        
         def exabytes
-          self * EXABYTE
+          self * 1024.petabytes
         end
         alias :exabyte :exabytes
+        
       end
     end
   end

@@ -25,8 +25,7 @@ class DispatcherTest < Test::Unit::TestCase
 
   def test_clears_dependencies_after_dispatch_if_in_loading_mode
     ActiveSupport::Dependencies.expects(:clear).once
-    # Close the response so dependencies kicks in
-    dispatch(false).last.close
+    dispatch(false)
   end
 
   def test_reloads_routes_before_dispatch_if_in_loading_mode
@@ -50,14 +49,13 @@ class DispatcherTest < Test::Unit::TestCase
     Dispatcher.any_instance.expects(:dispatch).raises('b00m')
     ActionController::Failsafe.any_instance.expects(:log_failsafe_exception)
 
-    response = nil
     assert_nothing_raised do
-      response = dispatch
+      assert_equal [
+        500,
+        {"Content-Type" => "text/html"},
+        "<html><body><h1>500 Internal Server Error</h1></body></html>"
+      ], dispatch
     end
-    assert_equal 3, response.size
-    assert_equal 500, response[0]
-    assert_equal({"Content-Type" => "text/html"}, response[1])
-    assert_match /500 Internal Server Error/, response[2].join
   end
 
   def test_prepare_callbacks
@@ -96,7 +94,7 @@ class DispatcherTest < Test::Unit::TestCase
     def dispatch(cache_classes = true)
       ActionController::Routing::RouteSet.any_instance.stubs(:call).returns([200, {}, 'response'])
       Dispatcher.define_dispatcher_callbacks(cache_classes)
-      Dispatcher.new.call({'rack.input' => StringIO.new('')})
+      Dispatcher.new.call({})
     end
 
     def assert_subclasses(howmany, klass, message = klass.subclasses.inspect)

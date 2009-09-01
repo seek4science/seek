@@ -832,7 +832,7 @@ module ActiveResource
       !new? && self.class.exists?(to_param, :params => prefix_options)
     end
 
-     # Converts the resource to an XML string representation.
+    # A method to convert the the resource to an XML string.
     #
     # ==== Options
     # The +options+ parameter is handed off to the +to_xml+ method on each
@@ -841,14 +841,7 @@ module ActiveResource
     #
     # * <tt>:indent</tt> - Set the indent level for the XML output (default is +2+).
     # * <tt>:dasherize</tt> - Boolean option to determine whether or not element names should
-    #   replace underscores with dashes. Default is <tt>true</tt>. The default can be set to <tt>false</tt>
-    #   by setting the module attribute <tt>ActiveSupport.dasherize_xml = false</tt> in an initializer. Because save
-    #   uses this method, and there are no options on save, then you will have to set the default if you don't
-    #   want underscores in element names to become dashes when the resource is saved. This is important when
-    #   integrating with non-Rails applications.
-    # * <tt>:camelize</tt> - Boolean option to determine whether or not element names should be converted
-    #   to camel case, e.g some_name to SomeName. Default is <tt>false</tt>. Like <tt>:dasherize</tt> you can
-    #   change the default by setting the module attribute <tt>ActiveSupport.camelise_xml = true</tt> in an initializer.
+    #   replace underscores with dashes (default is <tt>false</tt>).
     # * <tt>:skip_instruct</tt> - Toggle skipping the +instruct!+ call on the XML builder
     #   that generates the XML declaration (default is <tt>false</tt>).
     #
@@ -868,7 +861,8 @@ module ActiveResource
       attributes.to_xml({:root => self.class.element_name}.merge(options))
     end
 
-    # Coerces to a hash for JSON encoding.
+    # Returns a JSON string representing the model. Some configuration is
+    # available through +options+.
     #
     # ==== Options
     # The +options+ are passed to the +to_json+ method on each
@@ -892,8 +886,8 @@ module ActiveResource
     #
     #   person.to_json(:except => ["first_name"])
     #   # => {"last_name": "Smith"}
-    def as_json(options = nil)
-      attributes.as_json(options)
+    def to_json(options={})
+      attributes.to_json(options)
     end
 
     # Returns the serialized string representation of the resource in the configured

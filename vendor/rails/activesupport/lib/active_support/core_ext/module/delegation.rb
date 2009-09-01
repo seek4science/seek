@@ -108,21 +108,12 @@ class Module
 
     prefix = options[:prefix] && "#{options[:prefix] == true ? to : options[:prefix]}_"
 
-    file, line = caller.first.split(':', 2)
-    line = line.to_i
+    allow_nil = options[:allow_nil] && "#{to} && "
 
     methods.each do |method|
-      on_nil =
-        if options[:allow_nil]
-          'return'
-        else
-          %(raise "#{prefix}#{method} delegated to #{to}.#{method}, but #{to} is nil: \#{self.inspect}")
-        end
-
-      module_eval(<<-EOS, file, line)
+      module_eval(<<-EOS, "(__DELEGATION__)", 1)
         def #{prefix}#{method}(*args, &block)                           # def customer_name(*args, &block)
-          #{on_nil} if #{to}.nil?
-          #{to}.__send__(#{method.inspect}, *args, &block)  #   client && client.__send__(:name, *args, &block)
+          #{allow_nil}#{to}.__send__(#{method.inspect}, *args, &block)  #   client && client.__send__(:name, *args, &block)
         end                                                             # end
       EOS
     end
