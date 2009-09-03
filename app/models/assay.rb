@@ -22,7 +22,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
 
-  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type]) if SOLR_ENABLED
+  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organism]) if SOLR_ENABLED
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title

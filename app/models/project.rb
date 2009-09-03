@@ -45,7 +45,7 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms  
   
-  acts_as_solr(:fields => [ :name , :organisms, :locations]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :name , :locations],:include=>[:organisms]) if SOLR_ENABLED
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|

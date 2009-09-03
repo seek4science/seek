@@ -18,19 +18,23 @@
   <div class="main_content_left_box">
 
     <div class="box_about_actor">
-      <div class="web_page">
+      
         <p>
           <label>Public Web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
         </p>
-      </div>
 
-      <div class="wiki_page">
         <p>
           <label>Internal Web page:</label>
           <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
         </p>
-      </div>      
+
+        <p>
+          <label>Organisms:</label>
+          <%= organisms_link_list @project.organisms -%>
+        </p>
+
+
 
     </div>
   </div>

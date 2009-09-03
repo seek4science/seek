@@ -1,4 +1,5 @@
 <% organism_resource_hash = Asset.classify_and_authorize(@organism.models.collect{|model| model.asset  }, true, current_user) -%>
 <% organism_resource_hash.merge! classify_for_tabs(@organism.assays) -%>
+<% organism_resource_hash.merge! classify_for_tabs(@organism.projects) -%>
 
 <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@organism.title,:item_hash=>organism_resource_hash} %>
