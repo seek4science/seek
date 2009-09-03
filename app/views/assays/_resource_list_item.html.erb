@@ -38,6 +38,11 @@
           <%= organism_link_to assay.organism %>
         </p>
 
+        <p class="culture_growth_type">
+          <label>Culture growth:</label>
+          <%= model_title_or_not_specified(assay.culture_growth_type) %>
+        </p>
+
         <p class="Sops">
           <label>Sops: </label>
           <%= sops_link_list assay.sops,true,200 %>
