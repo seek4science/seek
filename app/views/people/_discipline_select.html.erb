@@ -1,6 +1,6 @@
 
 
-<center>
+<div style="text-align: center;">
   <div style="width: 95%;">
     <p>
       <%= f.label "Disciplines" %><br/>
@@ -24,10 +24,9 @@
 
       <%= f.collection_select :discipline_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" %>
 
-
     </p>
   </div>
-</center>
+</div>
 
 <script type="text/javascript">
 <% @person.disciplines.each do |d| -%>

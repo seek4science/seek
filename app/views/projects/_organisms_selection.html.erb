@@ -1,0 +1,34 @@
+<div style="text-align: center;">
+  <div style="width: 95%;">
+    <p>
+
+      <table style="width:100%;">
+        <tr>
+          <td>
+            <div id="assay_list_collection">
+              <%= f.label :available_organisms %><br/>
+              <%= select_tag :possible_organisms,options_for_select( Organism.find(:all,:order=>:title).collect{|d| [h("#{d.title}"),d.id]} ),:style => "width: 15em;" %>
+              <b><%= link_to_function "Add","addSelectedOrganism(); return(false);" %></b>
+            </div>
+          </td>
+          <td id="organism_to_list" class="box_editing_inner" style="line-height: 1.5; width:60%;text-align:left;">
+            <span class="none_text" id="organisms">Loading...</span>
+          </td>
+        </tr>
+      </table>
+
+      <%= f.collection_select :organism_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" %>
+
+    </p>
+  </div>
+</div>
+
+<script type="text/javascript">
+<% @project.organisms.each do |d| -%>
+    organism_id = <%= d.id -%>;
+    organism_title = '<%= d.title -%>';
+    addOrganism(organism_title,organism_id);
+<% end -%>
+
+  updateOrganisms();
+</script>
