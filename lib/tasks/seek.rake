@@ -5,6 +5,34 @@ require 'active_record/fixtures'
 
 namespace :seek do
 
+  task(:rebuild_project_organisms=>:environment) do
+    organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
+    puts "found #{organism_taggings.size} organism taggings"
+    organism_taggings.each do |tagging|
+      if tagging.taggable_type == "Project"
+        tag=tagging.tag
+        project=tagging.taggable
+        organism=Organism.find(:first, :conditions=>["title=?", tag.name])
+        if organism.nil?
+          puts "unable to find organism #{tag.name} required for project #{project.title}"
+        else
+          puts "adding #{organism.title} to #{project.title} "
+          class << project
+            def record_timestamps
+              false
+            end
+          end
+          project.organisms << organism unless project.organisms.include?(organism)
+          project.save!
+        end
+      else
+        puts "Tagging with id #{tagging.id} is not for Project"
+      end
+
+    end
+
+  end
+
   task(:culture_growth_types=>:environment) do
     CultureGrowthType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "culture_growth_types")
@@ -61,13 +89,13 @@ namespace :seek do
   end
 
   task(:repop_cv=>:environment) do
-    
+
     File.open('config/expertise.list').each do |item|
       unless item.blank?
         item=item.chomp
         if Person.expertise_counts.find{|tag| tag.name==item}.nil?
           tag=Tag.new(:name=>item)
-          taggable=Tagging.new(:tag=>tag, :context=>"expertise",:taggable_type=>"Person")
+          taggable=Tagging.new(:tag=>tag, :context=>"expertise", :taggable_type=>"Person")
           taggable.save!
         end
       end
@@ -78,22 +106,12 @@ namespace :seek do
         item=item.chomp
         if Person.tool_counts.find{|tag| tag.name==item}.nil?
           tag=Tag.new(:name=>item)
-          taggable=Tagging.new(:tag=>tag, :context=>"tools",:taggable_type=>"Person")
+          taggable=Tagging.new(:tag=>tag, :context=>"tools", :taggable_type=>"Person")
           taggable.save!
         end
       end
     end
-
-    File.open('config/organisms.list').each do |item|
-      unless item.blank?
-        item=item.chomp
-        if Project.organism_counts.find{|tag| tag.name==item}.nil?
-          tag=Tag.new(:name=>item)
-          taggable=Tagging.new(:tag=>tag, :context=>"organisms",:taggable_type=>"Project")
-          taggable.save!
-        end
-      end
-    end
+    
   end
 
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
@@ -117,5 +135,5 @@ namespace :seek do
       puts "Updated for #{p.class.name} : #{p.id}"
     end
   end
-  
+
 end
