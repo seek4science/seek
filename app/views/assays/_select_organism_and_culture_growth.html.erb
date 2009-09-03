@@ -1,7 +1,11 @@
 <h2>Details about growth culture</h2>
-<p>
-  <label>Organism:</label><br/>
-  <%= select :assay,:organism_id,Organism.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%><br/>
-  <label>Culture growth: </label><br/>
-  <%= select :assay, :culture_growth_type_id,CultureGrowthType.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
-</p>
+<table class="padded_table">
+  <tr>
+    <td><label>Orgnaism: </label></td>
+    <td><label>Culture growth: </label></td>
+  </tr>
+  <tr>
+    <td><%= select :assay,:organism_id,Organism.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%></td>
+    <td><%= select :assay, :culture_growth_type_id,CultureGrowthType.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%></td>
+  </tr>
+</table>

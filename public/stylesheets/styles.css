@@ -646,3 +646,8 @@ a#feedback {
     float: left;
     font-weight:bolder;
 }
+
+ table.padded_table td {
+      text-align:left;
+      padding: 4px 1em 0px 0px;
+  }

@@ -34,12 +34,21 @@
 </center>
 
 
+
 <h2>Assay and technology types</h2>
-<p id="assay_types">
-  <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %>
-  <br/>
-  <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %>
-</p>
+<table class="padded_table">
+  <tr>
+    <td><%= f.label "Assay type *: " %></td>
+    <td><%= f.label "Technology type *: " %></td>
+  </tr>
+  <tr>
+    <td><%= ontology_select_tag f,AssayType,"assay_type_id",selected_id= @assay.assay_type.nil? ? nil : @assay.assay_type.id %></td>
+    <td><%= ontology_select_tag f,TechnologyType,"technology_type_id",selected_id= @assay.technology_type.nil? ? nil : @assay.technology_type.id %></td>
+  </tr>
+</table>
+  
+
+
 
 <%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay} %>
 
