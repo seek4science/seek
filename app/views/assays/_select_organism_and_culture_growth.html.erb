@@ -1,0 +1,7 @@
+<h2>Details about growth culture</h2>
+<p>
+  <label>Organism:</label><br/>
+  <%= select :assay,:organism_id,Organism.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%><br/>
+  <label>Culture growth type:</label><br/>
+  <%= select :assay, :culture_growth_type_id,CultureGrowthType.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
+</p>

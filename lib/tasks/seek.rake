@@ -5,6 +5,11 @@ require 'active_record/fixtures'
 
 namespace :seek do
 
+  task(:culture_growth_types=>:environment) do
+    CultureGrowthType.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "culture_growth_types")
+  end
+
   task(:model_types=>:environment) do
     ModelType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "model_types")

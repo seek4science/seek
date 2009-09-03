@@ -4,6 +4,7 @@ metabolomics_assay:
   title: Metabolomics Assay  
   assay_type: metabolomics
   technology_type: gas_chromatography
+  culture_growth_type: chemostat
   sops: my_first_sop,sop_with_fully_public_policy
   study: metabolomics_study
   organism: Saccharomyces_cerevisiae

@@ -37,6 +37,10 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>" if is_nil_or_empty?(list)
   end  
 
+  def model_title_or_not_specified model
+    text=model.nil? ? nil : model.title
+    text_or_not_specified text,:capitalize=>true    
+  end
   def text_or_not_specified text, options = {}
     if text.nil? or text.chomp.empty?
       not_specified_text="Not specified"
@@ -44,6 +48,7 @@ module ApplicationHelper
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else
       text=truncate(text,:length=>options[:length]) if options[:length]
+      text.capitalize! if options[:capitalize]
       res = h(text)
       res = simple_format(res) if options[:description]==true || options[:address]==true
       res=mail_to(res) if options[:email]==true

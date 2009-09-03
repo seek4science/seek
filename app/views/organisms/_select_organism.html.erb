@@ -1,5 +1,5 @@
 <h2>Details about the organism</h2>
 <p>
-  <label>Organism:</label>
+  <label>Organism:</label><br/>
   <%= select model.class_name.underscore.to_sym,:organism_id,Organism.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
 </p>

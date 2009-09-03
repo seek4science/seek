@@ -41,15 +41,19 @@
   </p>
 
   <p id="assay_type">
-    <b>Assay type: </b><%= link_to h(@assay.assay_type.title), @assay.assay_type -%>
+    <b>Assay type: </b><%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
   </p>
 
   <p id="technology_type">
-    <b>Technology type: </b><%= link_to h(@assay.technology_type.title), @assay.technology_type -%>
+    <b>Technology type: </b><%= link_to h(@assay.technology_type.title.capitalize), @assay.technology_type -%>
   </p>
 
   <p id="organism">
-    <b>Organism:</b><%= organism_link_to @assay.organism %>
+    <b>Organism: </b><%= organism_link_to @assay.organism %>
+  </p>
+
+  <p id="culture_growth_type">
+    <b>Culture growth type: </b><%= model_title_or_not_specified(@assay.culture_growth_type) %>
   </p>
 
   <%= render :partial=>"assays/assay_tabs",:object=>@assay %>

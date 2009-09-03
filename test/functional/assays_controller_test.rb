@@ -19,6 +19,18 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, :id=>assays(:metabolomics_assay)
     assert_response :success
     assert_not_nil assigns(:assay)
+
+    assert_select "p#culture_growth_type",:text=>/Chemostat/,:count=>1
+    assert_select "p#assay_type",:text=>/Metabalomics/,:count=>1
+    assert_select "p#technology_type",:text=>/Gas chromatography/,:count=>1
+  end
+
+  test "show culture growth type not specified" do
+    get :show, :id=>assays(:metabolomics_assay2)
+    assert_response :success
+    assert_not_nil assigns(:assay)
+
+    assert_select "p#culture_growth_type",:text=>/Not specified/,:count=>1    
   end
 
   test "should show new" do

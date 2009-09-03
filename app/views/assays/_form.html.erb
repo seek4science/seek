@@ -36,11 +36,12 @@
 
 <h2>Assay and technology types</h2>
 <p id="assay_types">
-  <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %><br/>
-  <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %><br/>
+  <%= render :partial=>"assays/select_assay_type",:locals=>{:f=>f} %>
+  <br/>
+  <%= render :partial=>"assays/select_technology_type",:locals=>{:f=>f} %>
 </p>
 
-<%= render :partial=>"organisms/select_organism",:locals=>{:model=>Assay} %>
+<%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay} %>
 
 <h2>Assay SOPs</h2>
 
