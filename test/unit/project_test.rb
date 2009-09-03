@@ -22,13 +22,7 @@ class ProjectTest < ActiveSupport::TestCase
   def test_title_alias_for_name
     p=projects(:sysmo_project)
     assert_equal p.name,p.title
-  end
-
-  def test_organsim_tag
-    p=projects(:one)
-    assert_equal 1,p.organisms.size
-    assert_equal "worm",p.organisms[0].name
-  end
+  end  
 
   def test_projects_with_userless_people
     projects=Project.with_userless_people

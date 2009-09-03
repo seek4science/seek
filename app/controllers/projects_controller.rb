@@ -6,8 +6,6 @@ class ProjectsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :set_tagging_parameters,:only=>[:edit,:new,:create,:update]
-
 
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
@@ -17,12 +15,7 @@ class ProjectsController < ApplicationController
   # GET /projects.xml
   def index
     
-    if (!params[:organisms].nil?)
-      @organisms=params[:organisms]
-      @projects=Project.tagged_with(@organisms,:on=>:organisms)
-    else
-      @projects = Project.paginate :page=>params[:page]
-    end
+    @projects = Project.paginate :page=>params[:page]
 
     respond_to do |format|
       format.html # index.html.erb
@@ -46,8 +39,6 @@ class ProjectsController < ApplicationController
   # GET /projects/new.xml
   def new
 
-    @tags_organisms = Project.organism_counts.sort{|a,b| a.name<=>b.name}
-
     @project = Project.new
 
     respond_to do |format|
@@ -58,7 +49,6 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
-    @tags_organisms = Project.organism_counts.sort{|a,b| a.name<=>b.name}
     @project = Project.find(params[:id])
     
     possible_unsaved_data = "unsaved_#{@project.class.name}_#{@project.id}".to_sym
@@ -93,8 +83,6 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new(params[:project])
 
-    set_organisms @project, params
-
     respond_to do |format|
       if @project.save
         flash[:notice] = 'Project was successfully created.'
@@ -112,8 +100,6 @@ class ProjectsController < ApplicationController
   def update
     @project = Project.find(params[:id])
     #@project.work_groups.each{|wg| wg.destroy} if params[:project][:institutions].nil?
-
-    set_organisms @project, params
     
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:project].delete(:avatar_id).to_i
@@ -172,21 +158,7 @@ class ProjectsController < ApplicationController
     end
   end
 
-  private
-
-  def set_organisms project,params
-    tags=""
-    params[:organism_autocompleter_selected_ids].each do |selected_id|
-      tag=Tag.find(selected_id)
-      tags << tag.name << ","
-    end unless params[:organism_autocompleter_selected_ids].nil?
-    params[:organism_autocompleter_unrecognized_items].each do |item|
-      tags << item << ","
-    end unless params[:organism_autocompleter_unrecognized_items].nil?
-
-    project.organism_list=tags
-    
-  end
+  private  
 
   def editable_by_user
     @project = Project.find(params[:id])
@@ -196,9 +168,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def set_tagging_parameters
-    organisms=Project.organism_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}
-    @all_organisms_as_json=organisms.to_json
-  end
+
   
 end

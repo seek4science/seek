@@ -43,7 +43,7 @@ class Project < ActiveRecord::Base
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
 
-  acts_as_taggable_on :organisms
+  has_and_belongs_to_many :organisms  
   
   acts_as_solr(:fields => [ :name , :organisms, :locations]) if SOLR_ENABLED
   
