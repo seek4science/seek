@@ -33,6 +33,12 @@ namespace :seek do
 
   end
 
+  task(:list_dubious_tags=>:environment) do
+    tags=Tag.find(:all)
+    dubious=tags.select{|tag| dubious_tag?(tag.name)}
+    dubious.each{|tag| puts "#{tag.id}\t#{tag.name}" }
+  end
+
   task(:culture_growth_types=>:environment) do
     CultureGrowthType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "culture_growth_types")
@@ -134,6 +140,13 @@ namespace :seek do
       p.save #forces the first letter to be updated
       puts "Updated for #{p.class.name} : #{p.id}"
     end
+  end
+
+  private
+
+  #returns true if the tag is over 30 chars long, or contains colons, semicolons, comma's or forward slash
+  def dubious_tag?(tag)
+     tag.length>30 || [";",",",":","/"].detect{|c| tag.include?(c)}
   end
 
 end

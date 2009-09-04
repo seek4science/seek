@@ -1,0 +1,11 @@
+<% name_class=dubious_tag?(tag) ? "dubious_tag" : ""
+   name_class="unlinked_tag" if name_class.empty? and tag.taggings.size==0
+
+-%>
+<% contexts=tag.taggings.collect{|t| t.context}.uniq -%>      
+<tr>
+  <td><%= tag.id -%></td>
+  <td class="<%= name_class -%>"><%= h(tag.name) -%></td>
+  <td><%= tag.taggings.size -%></td>
+  <td><%= contexts.join(", ") -%></td>
+</tr>

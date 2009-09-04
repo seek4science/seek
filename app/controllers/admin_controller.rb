@@ -10,6 +10,10 @@ class AdminController < ApplicationController
     end
   end
 
+  def tags
+    @tags=Tag.find(:all)
+  end
+
   def graphs
 
     width=300
