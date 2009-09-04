@@ -1,8 +1,8 @@
 --- 
-cwd: /home/sowen/development/seek-hub-testing/
+cwd: /srv/rails/seek-hub-testing/
 log_file: log/mongrel.log
 port: "9050"
 environment: production
-address: 130.88.193.108
+address: 130.88.197.223
 pid_file: tmp/pids/mongrel.pid
 servers: 3
