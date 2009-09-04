@@ -38,7 +38,23 @@ class MailerTest < ActionMailer::TestCase
 
     resource=data_files(:picture)
     user=users(:aaron)
-    assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,"localhost").encoded
+    details="here are some more details"
+    assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
+  end
+
+  test "request resource no details" do
+    @expected.subject = "A Sysmo Member requested a protected file: Picture"
+    @expected.to = "Datafile Owner <data_file_owner@email.com>"
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+    @expected.date = Time.now
+
+    @expected.body = read_fixture('request_resource_no_details')
+
+    resource=data_files(:picture)
+    user=users(:aaron)
+    details=""
+    assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
   end
 
   test "forgot_password" do

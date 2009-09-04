@@ -7,12 +7,22 @@ resource_type=resource.class.name.humanize
 
   <div id="request_resource_button">
     <%=  help_icon("You do not have permission to download this #{resource_type}, but if you are interested you can request permission from the owner.") %>
-    <%= link_to_remote request_request_label(resource),
-      :url=>request_resource_asset_url(:id=>resource.asset,:current_user=>current_user),
-      :method=>:post,
-      :before=>"Effect.Appear('requesting_resource_status');$('request_resource_button').hide();"
+    <%= link_to_function request_request_label(resource),"Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');" -%>
+  </div>  
 
-    -%>
+  <div id="request_resource_form" style="display:none;">
+
+    <p>
+        Please provide some extra imformation
+    </p>
+    <% form_remote_tag :url=>request_resource_asset_url(:id=>resource.asset,:current_user=>current_user),
+                       :before=>"Effect.Appear('requesting_resource_status');$('request_resource_form').hide();" do -%>
+        <%=  text_area_tag :details,'',:cols=>50,:rows=>5 -%>        
+        <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{resource.asset.contributor.person.name}. Are you sure?" -%>
+    <% end -%>
+    </span>  
+
+
   </div>
 
   <div id="requesting_resource_status" style="display:none;">
