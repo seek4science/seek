@@ -25,7 +25,7 @@
 
 <script type="text/javascript">
 <% @project.organisms.each do |d| -%>
-    organism_id = <%= d.id -%>;
+    organism_id = '<%= d.id -%>';
     organism_title = '<%= d.title -%>';
     addOrganism(organism_title,organism_id);
 <% end -%>

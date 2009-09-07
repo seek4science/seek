@@ -359,8 +359,9 @@ Autocompleter.LocalAdvanced = Class.create(Autocompleter.Base, {
                                 ret.length < instance.options.choices; i++) {
 
                     var self_id = instance.autocompleter_id;
-                    var elem = instance.options.array[i];
+                    var elem = instance.options.array[i];                    
                     var elem_name = elem[instance.options.search_field];
+                    
                     var foundPos = instance.options.ignoreCase ?
                                    elem_name.toLowerCase().indexOf(entry.toLowerCase()) :
                                    elem_name.indexOf(entry);

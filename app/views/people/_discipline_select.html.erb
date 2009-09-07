@@ -30,7 +30,7 @@
 
 <script type="text/javascript">
 <% @person.disciplines.each do |d| -%>
-    discipline_id = <%= d.id -%>;
+    discipline_id = '<%= d.id -%>';
     discipline_title = '<%= d.title -%>';
     addDiscipline(discipline_title,discipline_id);
 <% end -%>
