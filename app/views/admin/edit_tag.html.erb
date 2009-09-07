@@ -8,7 +8,10 @@ Tagged items (<%= @tag.taggings.select{|t| !t.taggable.nil?}.size -%>):
   <% for tagging in @tag.taggings do -%>
       <% unless tagging.taggable.nil? -%>
       <li>
-        <%= tagging.taggable.name -%> (<%= tagging.taggable_type -%>), context= <%= tagging.context -%>
+        <%= link_to "#{tagging.taggable.name} ( #{tagging.taggable_type} )",tagging.taggable -%>
+        context= <%= tagging.context -%>
+
+
       </li>
       <% end -%>    
   <% end -%>
