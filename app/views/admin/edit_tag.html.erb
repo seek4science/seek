@@ -1,0 +1,16 @@
+<h3>
+  Editing tag: '<strong><%= @tag.name -%></strong>'
+</h3>
+
+
+Tagged items (<%= @tag.taggings.select{|t| !t.taggable.nil?}.size -%>):
+<ul>
+  <% for tagging in @tag.taggings do -%>
+      <% unless tagging.taggable.nil? -%>
+      <li>
+        <%= tagging.taggable.name -%> (<%= tagging.taggable_type -%>), context= <%= tagging.context -%>
+      </li>
+      <% end -%>    
+  <% end -%>
+</ul>
+

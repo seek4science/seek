@@ -1,11 +1,15 @@
 <% name_class=dubious_tag?(tag) ? "dubious_tag" : ""
-   name_class="unlinked_tag" if name_class.empty? and tag.taggings.size==0
+   name_class="unlinked_tag" if name_class.empty? and tag.taggings.select{|t| !t.taggable.nil?}.size==0
 
 -%>
 <% contexts=tag.taggings.collect{|t| t.context}.uniq -%>      
 <tr>
   <td><%= tag.id -%></td>
   <td class="<%= name_class -%>"><%= h(tag.name) -%></td>
-  <td><%= tag.taggings.size -%></td>
+  <td><%= tag.taggings.select{|t| !t.taggable.nil?}.size -%></td>
   <td><%= contexts.join(", ") -%></td>
+  <td>
+    <%= link_to "Edit",:action=>:edit_tag,:id=>tag.id %>
+    <%= link_to "Delete",{:action=>:delete_tag,:id=>tag.id},:confirm=>"Are you sure?",:method=>:post -%>
+  </td>
 </tr>
