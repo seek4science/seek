@@ -9,7 +9,9 @@
   <td><%= tag.taggings.select{|t| !t.taggable.nil?}.size -%></td>
   <td><%= contexts.join(", ") -%></td>
   <td>
-    <%= link_to "Edit",:action=>:edit_tag,:id=>tag.id %>
-    <%= link_to "Delete",{:action=>:delete_tag,:id=>tag.id},:confirm=>"Are you sure?",:method=>:post -%>
+
+    <%= link_to image("edit",:title=>"Edit"),:action=>:edit_tag,:id=>tag.id %>
+    <%= link_to image("destroy",:title=>"Delete"),{:action=>:delete_tag,:id=>tag.id},:confirm=>"Are you sure?",:method=>:post -%>
+
   </td>
 </tr>
