@@ -97,6 +97,7 @@ person_for_owner_of_custom_permissions_only_policy:
 random_userless_person:
   first_name: "random"
   last_name: "person"
+  email: "random@email.com"
 
 
 person_not_associated_with_any_projects:
@@ -164,3 +165,5 @@ person_for_pagination_order_test:
   first_name: "Fred"
   last_name: "Azbo"
   email: "azbo@email.com"
+
+

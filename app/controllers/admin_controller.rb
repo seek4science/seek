@@ -86,9 +86,10 @@ class AdminController < ApplicationController
     tag=Tag.find(params[:id])
     if request.post?
       tag.delete
-      flash[:notice]="Tag #{tag.name} deleted"
+      flash.now[:notice]="Tag #{tag.name} deleted"
+
     else
-      flash[:error]="Must be a post"
+      flash.now[:error]="Must be a post"
     end
 
     redirect_to :action=>:tags
