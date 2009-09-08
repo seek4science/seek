@@ -26,7 +26,7 @@ class Assay < ActiveRecord::Base
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
-    
+   
     "#{title} (#{type})"
   end
 
@@ -39,6 +39,6 @@ class Assay < ActiveRecord::Base
   end
 
   def can_delete? user
-    study.nil? && data_files.empty? && sops.empty?
+    can_edit?(user) && data_files.empty? && sops.empty?
   end
 end

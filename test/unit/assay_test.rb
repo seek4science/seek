@@ -79,10 +79,10 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "can delete?" do
-    assert assays(:assay_with_no_study_or_files).can_delete?(users(:aaron))
-    assert !assays(:assay_with_just_a_study).can_delete?(users(:aaron))
-    assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:aaron))
-    assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:aaron))
+    assert assays(:assay_with_no_study_or_files).can_delete?(users(:model_owner))
+    assert assays(:assay_with_just_a_study).can_delete?(users(:model_owner))
+    assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:model_owner))
+    assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:model_owner))
   end
 
 end

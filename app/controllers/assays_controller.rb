@@ -78,11 +78,11 @@ class AssaysController < ApplicationController
   def destroy
     
     respond_to do |format|
-      if @assay.study.nil? && @assay.destroy
+      if @assay.can_delete?(current_user) && @assay.destroy
         format.html { redirect_to(assays_url) }
         format.xml  { head :ok }
       else
-        flash[:error]="Unable to delete the assay" if !@assay.study.nil?
+        flash.now[:error]="Unable to delete the assay" if !@assay.study.nil?
         format.html { render :action=>"show" }
         format.xml  { render :xml => @assay.errors, :status => :unprocessable_entity }
       end

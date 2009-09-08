@@ -85,7 +85,17 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assays_path
   end
 
-  test "should not delete assay with study" do
+  test "should delete assay with study" do
+    login_as(:model_owner)
+    assert_difference('Assay.count',-1) do
+      delete :destroy, :id => assays(:assay_with_just_a_study).id
+    end
+    assert_nil flash[:error]
+    assert_redirected_to assays_path
+  end
+
+  test "should not delete assay when not project member" do
+    login_as(:aaron)
     assert_no_difference('Assay.count') do
       delete :destroy, :id => assays(:assay_with_just_a_study).id
     end
