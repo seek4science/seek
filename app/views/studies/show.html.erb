@@ -8,11 +8,8 @@
     </li>
   <% end -%>
 
-  <% if @study.can_delete?(current_user) -%>
-    <li>
-      <%= icon "destroy", study_path(@study), "Delete study", { :confirm => 'Are you sure?', :method => :delete }, "Delete Study" -%>
-    </li>
-  <% end -%>
+  <%= delete_ISA_icon @study,current_user -%>
+  
   <% if current_user.person.projects.include?(@study.project) -%>
     <li>
       <%= icon('new', new_assay_path(:study_id=>@study), "Create a new assay for this study", nil, 'Create a new assay for this study') -%>

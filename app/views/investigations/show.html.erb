@@ -5,11 +5,7 @@
     </li>
   <% end -%>
 
-  <% if @investigation.can_delete?(current_user) -%>
-    <li>
-      <%= icon "destroy", investigation_path(@investigation), "Delete investigation", { :confirm => 'Are you sure?', :method => :delete }, "Delete investigation" -%>
-    </li>
-  <% end -%>
+  <%= delete_ISA_icon @investigation,current_user -%>
 </ul>
 
 <h1><%= h @investigation.title -%></h1>

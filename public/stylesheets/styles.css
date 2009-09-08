@@ -212,6 +212,19 @@ table.list_item .tags {
     margin-top: 0.7em;
 }
 
+span.disabled_icon {
+   width: 100%;
+	padding: 0.5em 0.5em;
+	*padding: 0.2em 0.5em;
+	line-height: 1.0;
+	text-decoration: none;
+	border: 1px solid #BBBBBB;
+	background-color: #FEF6FF;
+    color: #000099;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	filter: alpha(opacity=50);
+    opacity: 0.50;
+}
 
 .show_basic {
     padding-left: 2em;

@@ -101,18 +101,18 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test "option to delete investigation without study" do    
     get :show,:id=>investigations(:investigation_with_no_study).id
-    assert_select "a",:text=>/Delete investigation/,:count=>1
+    assert_select "a",:text=>/Delete Investigation/,:count=>1
   end
 
   test "no option to delete investigation with study" do
     get :show,:id=>investigations(:metabolomics_investigation).id
-    assert_select "a",:text=>/Delete investigation/,:count=>0
+    assert_select "a",:text=>/Delete Investigation/,:count=>0
   end
 
   test "no option to delete investigation for non project member" do
     login_as(:aaron)
     get :show,:id=>investigations(:investigation_with_no_study).id
-    assert_select "a",:text=>/Delete investigation/,:count=>0
+    assert_select "a",:text=>/Delete Investigation/,:count=>0
   end
 
 end
