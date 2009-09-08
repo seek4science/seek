@@ -37,8 +37,8 @@
 
 
 <script type="text/javascript">
-    var expertise_list = '<%= @all_expertise_as_json -%>';
-    var prepopulate_with = '<%= @person.expertise.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>';
+    var expertise_list = <%= @all_expertise_as_json -%>;
+    var prepopulate_with = <%= @person.expertise.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
     var expertise_autocompleter_id = 'expertise_autocompleter'
     var expertise_autocompleter = new Autocompleter.LocalAdvanced(
             expertise_autocompleter_id, 'expertise_autocomplete_input', 'expertise_autocomplete_display', 'expertise_autocomplete_populate', expertise_list, prepopulate_with, {
