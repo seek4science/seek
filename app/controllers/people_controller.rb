@@ -7,8 +7,7 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
-  before_filter :set_tagging_parameters,:only=>[:edit,:new,:create,:update]
-  
+  before_filter :set_tagging_parameters,:only=>[:edit,:new,:create,:update]  
   
   def auto_complete_for_tools_name
     render :json => Person.tool_counts.map(&:name).to_json
@@ -154,7 +153,7 @@ class PeopleController < ApplicationController
       end
 
       redirect_action="select"
-    end
+    end       
     
     respond_to do |format|
       if @person.save && current_user.save
@@ -182,6 +181,7 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
+    old_tags=@person.tool_list + @person.expertise_list
     
     @person.disciplines.clear if params[:discipline_ids].nil?
 
@@ -200,6 +200,11 @@ class PeopleController < ApplicationController
         @person.user.save
       end
     end
+
+    new_tags=@person.tool_list + @person.expertise_list
+
+    #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
+    expire_fragment("tag_clouds") if (old_tags != new_tags)
     
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)

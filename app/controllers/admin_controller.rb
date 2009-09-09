@@ -63,13 +63,14 @@ class AdminController < ApplicationController
 
         method_sym="#{tagging.context.singularize}_list=".to_sym
 
-        taggable.send method_sym,new_tag_list
+        taggable.send method_sym, new_tag_list
 
         taggable.save
 
       end
-      
-      @tag.delete
+
+      #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
+      expire_fragment("tag_clouds")
 
       redirect_to :action=>:tags
     else
@@ -91,6 +92,9 @@ class AdminController < ApplicationController
     else
       flash.now[:error]="Must be a post"
     end
+
+    #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
+    expire_fragment("tag_clouds")
 
     redirect_to :action=>:tags
   end

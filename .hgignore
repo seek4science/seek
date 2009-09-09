@@ -20,6 +20,8 @@ debug.log
 public/javascripts/js_cached.js
 public/stylesheets/css_cached.css
 tmp/pids/*
+tmp/data.sql
+
 
 syntax: regexp
 \.orig$

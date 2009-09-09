@@ -50,7 +50,7 @@ class AdminControllerTest < ActionController::TestCase
 
 
     fishing_tag=tags(:fishing)
-    post :edit_tag, :id=>fishing_tag,:tags_autocompleter_unrecognized_items=>"microbiology, spanish"
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_unrecognized_items=>"microbiology, spanish"
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -67,22 +67,22 @@ class AdminControllerTest < ActionController::TestCase
     person.expertise_list="fishing"
     person.save!
 
-    assert_equal ["linux","ruby","fishing"],person.tool_list
+    assert_equal ["linux", "ruby", "fishing"], person.tool_list
     assert_equal ["fishing"], person.expertise_list
 
-    fishing_tag=Tag.find(:first,:conditions=>{:name=>"fishing"})
+    fishing_tag=Tag.find(:first, :conditions=>{:name=>"fishing"})
     assert_not_nil fishing_tag
 
     golf_tag_id=tags(:golf).id
-    post :edit_tag, :id=>fishing_tag,:tags_autocompleter_selected_ids=>[golf_tag_id],:tags_autocompleter_unrecognized_items=>"microbiology, spanish"
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>"microbiology, spanish"
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
     person=Person.find(person.id)
-    expected_tools=["golf","linux","ruby","microbiology","spanish"]
-    expected_expertise=["golf","microbiology","spanish"]
+    expected_tools=["golf", "linux", "ruby", "microbiology", "spanish"]
+    expected_expertise=["golf", "microbiology", "spanish"]
 
-    assert_equal expected_tools.size,person.tool_list.size
+    assert_equal expected_tools.size, person.tool_list.size
     assert_equal expected_expertise.size, person.expertise_list.size
 
     person.tool_list.each do |tool_tag|
@@ -93,20 +93,17 @@ class AdminControllerTest < ActionController::TestCase
     end
 
 
-    fishing_tag=Tag.find(:first,:conditions=>{:name=>"fishing"})
-    assert_nil fishing_tag
-    
   end
 
   test "delete_tag" do
     login_as(:quentin)
-    
+
     person=people(:random_userless_person)
     person.tool_list="fishing"
     person.expertise_list="fishing"
     person.save!
 
-    fishing_tag=Tag.find(:first,:conditions=>{:name=>"fishing"})
+    fishing_tag=Tag.find(:first, :conditions=>{:name=>"fishing"})
     assert_not_nil fishing_tag
 
     #must be a post
@@ -114,20 +111,20 @@ class AdminControllerTest < ActionController::TestCase
     assert_redirected_to :action=>:tags
     assert_not_nil flash[:error]
 
-    fishing_tag=Tag.find(:first,:conditions=>{:name=>"fishing"})
+    fishing_tag=Tag.find(:first, :conditions=>{:name=>"fishing"})
     assert_not_nil fishing_tag
 
     post :delete_tag, :id=>fishing_tag
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
-    fishing_tag=Tag.find(:first,:conditions=>{:name=>"fishing"})
+    fishing_tag=Tag.find(:first, :conditions=>{:name=>"fishing"})
     assert_nil fishing_tag
 
     person=Person.find(person.id)
-    assert_equal [],person.tool_list
-    assert_equal [],person.expertise_list
-    
+    assert_equal [], person.tool_list
+    assert_equal [], person.expertise_list
+
   end
-  
+
 end
