@@ -7,7 +7,7 @@ class UsersController < ApplicationController
   # render new.rhtml
   def new
     @user=User.new
-    @user.person=Person.new
+    
   end
 
   def create
@@ -17,7 +17,6 @@ class UsersController < ApplicationController
     # uncomment at your own risk
     # reset_session
     @user = User.new(params[:user])
-    @user.person=Person.new(params[:person])
     
     @user.save
     
