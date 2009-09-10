@@ -221,9 +221,12 @@ span.disabled_icon {
 	border: 1px solid #BBBBBB;
 	background-color: #FEF6FF;
     color: #000099;
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
-	filter: alpha(opacity=50);
-    opacity: 0.50;
+}
+
+.disabled {
+
+	filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
+    opacity: 0.50;    
 }
 
 .show_basic {

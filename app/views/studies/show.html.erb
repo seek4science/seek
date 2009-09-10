@@ -12,7 +12,7 @@
   
   <% if current_user.person.projects.include?(@study.project) -%>
     <li>
-      <%= icon('new', new_assay_path(:study_id=>@study), "Create a new assay for this study", nil, 'Create a new assay for this study') -%>
+      <%= icon('new', new_assay_path(:study_id=>@study), "Create an Assay for this study", nil, 'Create an Assay for this study') -%>
     </li>
   <% end -%>
 </ul>
