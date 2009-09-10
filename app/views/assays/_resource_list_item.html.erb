@@ -7,7 +7,7 @@
 
       <td class="item_details">
         <p class="name">
-          <%= link_to h(assay.title),assay %>
+          <%= link_to h(assay.title), assay %>
         </p>
 
         <div class="box_standout">
@@ -16,21 +16,27 @@
 
         <p class="assay_type">
           <label>Assay type:</label>
-          <%= link_to h(assay.assay_type.title.capitalize),assay.assay_type %>          
-        </p>
-        <p class="technology_type">
-          <label>Technology type:</label>
-          <%= link_to h(assay.technology_type.title.capitalize),assay.technology_type %>
+          <%= link_to h(assay.assay_type.title.capitalize), assay.assay_type %>
         </p>
 
-        <p class="studies">
-          <label>Study: </label>
-          <%= studies_link_list [assay.study] %>
+        <p class="technology_type">
+          <label>Technology type:</label>
+          <%= link_to h(assay.technology_type.title.capitalize), assay.technology_type %>
         </p>
 
         <p class="projects">
           <label>Project: </label>
           <%= projects_link_list [assay.project] %>
+        </p>
+
+        <p class="investigation">
+        <label>Investigation: </label><%= investigation_link(assay.investigation) %>
+
+        </p>
+
+        <p class="studies">
+          <label>Study: </label>
+          <%= studies_link_list [assay.study] %>
         </p>
 
         <p class="organism">
@@ -45,7 +51,7 @@
 
         <p class="Sops">
           <label>Sops: </label>
-          <%= sops_link_list assay.sops,true,200 %>
+          <%= sops_link_list assay.sops, true, 200 %>
         </p>
 
       </td>

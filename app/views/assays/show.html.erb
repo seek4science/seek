@@ -33,6 +33,11 @@
     <b>Project: </b> <%= projects_link_list [@assay.project] %>
   </p>
 
+
+  <p id="investigation">
+    <b>Investigation: </b><%= investigation_link(@assay.investigation) %>
+  </p>
+  
   <p id="study">
     <b>Study: </b><%= studies_link_list [@assay.study] %>
   </p>

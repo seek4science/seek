@@ -3,6 +3,7 @@
 <% unless @assay.study.nil? -%>
   <% assay_resource_hash.merge!(classify_for_tabs([@assay.study])) -%>
   <% assay_resource_hash.merge!(classify_for_tabs([@assay.project])) -%>
+  <% assay_resource_hash.merge!(classify_for_tabs([@assay.investigation])) -%>
 <% end -%>
 
 <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@assay.title,:item_hash=>assay_resource_hash} %>
