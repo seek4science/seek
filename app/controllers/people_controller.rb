@@ -208,6 +208,7 @@ class PeopleController < ApplicationController
     
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
+        @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -284,7 +285,6 @@ class PeopleController < ApplicationController
       end unless params[:expertise_autocompleter_unrecognized_items].nil?
       person.expertise_list=tags
 
-      
   end
   
   def profile_belongs_to_current_or_is_admin
