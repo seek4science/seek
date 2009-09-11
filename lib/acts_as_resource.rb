@@ -28,7 +28,9 @@ module Mib
                    :as => :subject,
                    :conditions => { :predicate => Relationship::ATTRIBUTED_TO },
                    :dependent => :destroy
-          
+
+          has_one :project, :through=>:asset
+
           # a virtual attribute to keep the associated project_id temporary
           # (until it's saved into the corresponding asset in the after_save callback)
           attr_accessor :project_id

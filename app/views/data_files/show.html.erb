@@ -35,10 +35,10 @@
     <div class="box_about_actor">
       <p>
         <label>Project:</label>
-        <% if @data_file.asset.project.nil? -%>
+        <% if @data_file.project.nil? -%>
           <%= text_or_not_specified nil %>
         <% else -%>
-          <%= link_to h(@data_file.asset.project.name),@data_file.asset.project %>
+          <%= link_to h(@data_file.project.name),@data_file.project %>
         <% end -%>
       </p>
       <p>
@@ -84,7 +84,7 @@
 
 
   <% data_file_resource_hash = classify_for_tabs(@data_file.assays) %>
-  <% data_file_resource_hash.merge! classify_for_tabs([@data_file.asset.project]) if @data_file.asset.project %>
+  <% data_file_resource_hash.merge! classify_for_tabs([@data_file.project]) if @data_file.project %>
   <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@data_file.title,:item_hash=>data_file_resource_hash} %>
 
 </div>

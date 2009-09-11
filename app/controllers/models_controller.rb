@@ -259,7 +259,7 @@ class ModelsController < ApplicationController
       if (policy = @model.asset.policy)
         # Model exists and has a policy associated with it - normal case
         policy_type = "asset"
-      elsif @model.asset.project && (policy = @model.asset.project.default_policy)
+      elsif @model.project && (policy = @model.project.default_policy)
         # Model exists, but policy not attached - try to use project default policy, if exists
         policy_type = "project"
       end

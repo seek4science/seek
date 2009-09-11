@@ -100,7 +100,7 @@
     <%= render :partial=>"execute" -%>
 
  
-    <% model_resource_hash = classify_for_tabs(@model.asset.project.nil? ? [] : [@model.asset.project]) -%>
+    <% model_resource_hash = classify_for_tabs(@model.project.nil? ? [] : [@model.project]) -%>
     <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@model.title,:item_hash=>model_resource_hash} %>
   </div>
 

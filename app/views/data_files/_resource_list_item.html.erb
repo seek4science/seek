@@ -19,7 +19,7 @@
 
       <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
         <b>Associated project: </b>
-        <%= (resource.asset.project ? link_to(h(resource.asset.project.name), project_path(resource.asset.project.id)) : "<span class='none_text'>None</span>" ) -%>
+        <%= (resource.project ? link_to(h(resource.project.name), project_path(resource.    project.id)) : "<span class='none_text'>None</span>" ) -%>
       </p>
       
       <p style="font-size: 85%; margin-top: 0.4em;">
