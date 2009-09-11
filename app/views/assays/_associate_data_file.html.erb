@@ -1,3 +1,49 @@
+<%
+   all_data_files=authorised_data_files.sort{|a, b| a.title<=>b.title}
+   project_data_files=all_data_files.select{|df| current_user.person.projects.include?(df.project )}
+   select_truncate_length=40;
+-%>
+
+<script type="text/javascript">
+    function toggle_data_file_list() {
+        var checked = $('include_other_project_data_files').checked;
+        var selection_box = $('possible_data_files');
+        var option;
+            
+        selection_box.options.length=0;
+
+        if (checked) {
+        <% ([["Select Data file ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= df_details[0] -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        else {
+           <% ([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= df_details[0] -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        selection_box.selectedIndex=0;
+        selection_box.onchange();
+    }
+</script>
+
+
 <div class="yui-g">
   <div class="yui-u first">
     <p style="color: #666666;">
@@ -11,7 +57,7 @@
     <%= label_tag :data_files %><br/>
 
     <%= select_tag :possible_data_files,
-      options_for_select([["Select Data file ...",0]]|data_files_for_assay_association.collect{|s| [truncate(h(s.title),:length=>32),s.id]}),
+      options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
       {:onchange=>remote_function(
         :url=>{:action=>"data_file_preview_ajax",:controller=>"data_files"},
         :with=>"'id='+this.value",
@@ -20,10 +66,12 @@
     } -%>
     <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
     <b><%= link_to_function "Add","addSelectedDataFile(); return(false);",:id=>"add_data_file_link" %></b>
+    <br/>
+    <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?
   </div>
 
   <div id="data_file_preview" class="yui-u">
-    <center>Data file preview</center>
+    <div style="text-align: center;">Data file preview</div>
   </div>
 
 </div>

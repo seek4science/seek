@@ -681,3 +681,11 @@ a#feedback {
       text-align:left;
       padding: 4px 1em 0px 0px;
   }
+
+#possible_sops {
+    width: 24em;    
+}
+
+#possible_data_files {
+    width: 24em;
+}

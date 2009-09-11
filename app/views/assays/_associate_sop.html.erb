@@ -1,58 +1,108 @@
+<%
+   all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}
+   project_sops=all_sops.select{|s| current_user.person.projects.include?(s.project )}
+   select_truncate_length=40;
+-%>
+
+<script type="text/javascript">
+    function toggle_sop_list() {
+        var checked = $('include_other_project_sops').checked;
+        var option;
+        var selection_box = $('possible_sops');
+
+        selection_box.options.length=0;
+
+        if (checked) {
+        <% ([["Select SOP ...",0]]|all_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= sop_details[0] -%>';
+            option.value = '<%= sop_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        else {
+           <% ([["Select SOP ...",0]]|project_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= sop_details[0] -%>';
+            option.value = '<%= sop_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        selection_box.selectedIndex=0;
+        selection_box.onchange();
+    }
+</script>
+
 <div class="yui-g">
   <div class="yui-u first">
     <p style="color: #666666;">
       The following Sops are involved in this assay:
     </p>
+
     <p id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
       <span class="none_text" id="sops">Loading...</span>
     </p>
     <br/>
-    <%= label_tag :sops %><br/>
+    <%= label_tag :sops %>
+    <br/>
+
 
 
     <%= select_tag :possible_sops,
-      options_for_select([["Select Sop ...",0]]|authorised_sops.collect{|s| [truncate(h(s.title),:length=>32),s.id]}),
-      {:onchange=>remote_function(
-        :url=>{:action=>"sop_preview_ajax",:controller=>"sops"},
-        :with=>"'id='+this.value",
-        :before=>"show_ajax_loader('sop_preview')"
-      )+";check_show_add_sop();return(false);"
-    } -%>
-    <%= f.collection_select :sop_ids,[],:id,:title,{},:multiple=>true,:style=>"display:none;" -%>
-    <b><%= link_to_function "Add","addSelectedSop(); return(false);",:id=>"add_sop_link" %></b>
+                   options_for_select([["Select SOP ...", 0]]|project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
+                   {:onchange=>remote_function(
+                           :url=>{:action=>"sop_preview_ajax", :controller=>"sops"},
+                           :with=>"'id='+this.value",
+                           :before=>"show_ajax_loader('sop_preview')"
+                   )+";check_show_add_sop();return(false);"
+                   } -%>
+    <%= f.collection_select :sop_ids, [], :id, :title, {}, :multiple=>true, :style=>"display:none;" -%>
+    <b><%= link_to_function "Add", "addSelectedSop(); return(false);", :id=>"add_sop_link" %></b>
+    <br/>
+    <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Include SOPs from other projects?
   </div>
 
   <div id="sop_preview" class="yui-u">
-    <center>SOP preview</center>
+    <div style="text-align: center;">SOP preview</div>
   </div>
 
 </div>
 
 <script type="text/javascript">
-<% @assay.sops.each do |s| -%>
+    <% @assay.sops.each do |s| -%>
     sop_id = <%= s.id -%>;
     sop_title = '<%= s.title -%>';
-  <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
-      addSop(sop_title,sop_id);
-  <% end -%>
+    <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
+    addSop(sop_title, sop_id);
+    <% end -%>
 
-<% end -%>
+    <% end -%>
 
-  updateSops();
+    updateSops();
 
 
-  function check_show_add_sop() {
-    i=$('possible_sops').selectedIndex;
-    selected_id=$('possible_sops').options[i].value;
-    if (selected_id=='0') {
-      $('add_sop_link').hide();
+    function check_show_add_sop() {
+        i = $('possible_sops').selectedIndex;
+        selected_id = $('possible_sops').options[i].value;
+        if (selected_id == '0') {
+            $('add_sop_link').hide();
+        }
+        else {
+            $('add_sop_link').show();
+        }
     }
-    else {
-      $('add_sop_link').show();
-    }
-  }
 
-  check_show_add_sop();
+    check_show_add_sop();
 </script>
 
 
