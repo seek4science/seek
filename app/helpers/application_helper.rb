@@ -428,6 +428,16 @@ module ApplicationHelper
     return "Sysmo SEEK&nbsp;"+name
   end
 
+  def admin_email_links
+    admins=User.admins
+    result=""
+    admins.each do |u|
+      result << mail_to(u.person.email,u.person.name)
+      result << ", " unless admins.last==u
+    end
+    return result    
+  end
+
   # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/
   def windowed_pagination_links(pagingEnum, options)
     link_to_current_page = options[:link_to_current_page]

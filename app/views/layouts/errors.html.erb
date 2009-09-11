@@ -5,7 +5,7 @@
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-  <title>We're sorry, but something went wrong (500)</title>
+  <title><%= @title -%></title>
 	<style type="text/css">
 		body { background-color: #fff; color: #666; text-align: center; font-family: arial, sans-serif; }
 		div.dialog {
@@ -17,14 +17,22 @@
 			border-bottom-color: #999;
 		}
 		h1 { font-size: 100%; color: #f00; line-height: 1.5em; }
-	</style>
+	</style>    
+
+
 </head>
 
 <body>
-  <!-- This file lives in public/500.html -->
-  <div class="dialog">
-    <h1>We're sorry, but something went wrong.</h1>
-    <p>We've been notified about this issue and we'll take a look at it shortly.</p>
-  </div>
+<%= yield -%>
+
+<div class="request_feedback">
+  <p>
+      If you feel this is an error caused by a problem with Sysmo SEEK then please send an email to somebody listed below outlining your problem, and the steps that lead to it.
+  </p>
+  <p>
+    <%= admin_email_links -%>
+  </p>
+</div>
 </body>
+
 </html>
