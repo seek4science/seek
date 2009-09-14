@@ -10,11 +10,7 @@
         <span class='none_text'>Not known</span>
       <% else %>
 
-        <% for expertise in expertise_list  -%>
-
-          <%= link_for_tag expertise, :type=>:expertise,:truncate_length=>150 -%>
-          <%= ", " unless expertise==expertise_list.last %>
-        <% end %>
+        <%= list_item_tags_list person.expertise,:type=>:expertise %>
       <% end %>
     </p>
 
@@ -24,11 +20,7 @@
       <%  if tools_list.blank? -%>
         <span class='none_text'>Not known</span>
       <% else %>
-
-        <% for tool in tools_list  -%>
-          <%= link_for_tag tool,:type=>:tools,:truncate_length=>150 -%>
-          <%= ", " unless tool==tools_list.last -%>
-        <% end %>
+        <%= list_item_tags_list person.tools,:type=>:tools %>
       <% end %>
     </p>
     
