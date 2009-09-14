@@ -345,7 +345,7 @@ module ApplicationHelper
     
     if size
       basic_url += "?size=#{size}"
-      basic_url += "x#{size}" if size.kind_of?(Fixnum)
+      basic_url += "x#{size}" if size.kind_of?(Numeric)
     end
     
     return basic_url

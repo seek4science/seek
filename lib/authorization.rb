@@ -42,12 +42,12 @@ module Authorization
     
     # if "thing" is unknown, or "thing" expresses ID of the object to be authorized, but "thing_type" is unknown - don't authorise the action
     # (this would allow, however, supplying no type, but giving the object instance as "thing" instead)
-    return false if thing.blank? || (thing_type.blank? && thing.kind_of?(Fixnum))
+    return false if thing.blank? || (thing_type.blank? && thing.kind_of?(Numeric))
     
     
     
     # some value for "thing" supplied - assume that the object exists; check if it is an instance or the ID
-    if thing.kind_of?(Fixnum)
+    if thing.kind_of?(Numeric)
       # just an ID was provided - "thing_type" is assumed to have a type then
       thing_id = thing
     elsif thing.kind_of?(Asset)
@@ -72,7 +72,7 @@ module Authorization
     elsif user == 0
       # "Authenticated System" sets current_user to 0 if not logged in (i.e. anonymous user)
       user_id = nil
-    elsif user.nil? || user.kind_of?(Fixnum)
+    elsif user.nil? || user.kind_of?(Numeric)
       # anonymous user OR only id of the user, not an instance was provided;
       user_id = user
     end
@@ -541,10 +541,10 @@ module Authorization
     # initialize variable to hold return value
     found = []
     
-    if favourite_group.kind_of?(Fixnum)
+    if favourite_group.kind_of?(Numeric)
       # if an ID of the favourite group is supplied, can use a direct query 
       found = FavouriteGroupMembership.find_by_sql "SELECT access_type FROM favourite_group_memberships WHERE person_id=#{person_id} AND favourite_group_id=#{favourite_group}"
-    elsif favourite_group.kind_of?(Array) && favourite_group.length == 2 && favourite_group[0].kind_of?(Fixnum) && favourite_group[1].kind_of?(String)
+    elsif favourite_group.kind_of?(Array) && favourite_group.length == 2 && favourite_group[0].kind_of?(Numeric) && favourite_group[1].kind_of?(String)
       # "favourite_group" doesn't contain an integer ID of the group; parameter type check for second option passed;
       # so "favourite_group" should be an array with an ID of the owner (user) of that group and a string containing its name;
       #

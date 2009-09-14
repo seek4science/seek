@@ -127,7 +127,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   def test_get_person_access_rights_in_favourite_group__parameter_option1_should_yield_viewing
     res = Authorization.get_person_access_rights_in_favourite_group(people(:person_for_owner_of_fully_public_policy).id, favourite_groups(:my_collaborators_group_for_owner_of_a_sop_with_complex_permissions).id)
     
-    assert res == Policy::VIEWING, "wrong access type returned for existing membership of a person in a favourite group"
+    assert_equal Policy::VIEWING,res, "wrong access type returned for existing membership of a person in a favourite group"
   end
   
   # supplying favourite group as an array of user_id (user = owner of the group) and group name (favourite group names are unique in a per-user manner)
