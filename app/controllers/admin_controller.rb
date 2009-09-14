@@ -69,7 +69,9 @@ class AdminController < ApplicationController
 
       end
 
-      @tag.destroy if Person.find_tagged_with(@tag.name).empty?      
+      @tag=Tag.find(params[:id])
+      
+      @tag.destroy if @tag.taggings.select{|t| !t.taggable.nil?}.empty?
 
       #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
       expire_fragment("tag_clouds")
