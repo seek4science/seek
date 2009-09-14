@@ -11,7 +11,9 @@
     <% end -%>
 
     <% if current_user.is_admin? -%>
-      <li><%= icon "destroy", person_path(@person), "Delete Person", { :confirm => 'Are you sure?', :method => :delete }, "Delete Person" -%>
+      <li>
+        <%= icon "destroy", person_path(@person), "Delete Person", { :confirm => 'Are you sure?', :method => :delete }, "Delete Person" -%>
+      </li>
     <% end -%>
   </ul>
 <% end %>
