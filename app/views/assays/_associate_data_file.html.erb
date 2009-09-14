@@ -79,7 +79,7 @@
 <script type="text/javascript">
 
 <% @assay.created_datas.each do |d| -%>
-    data_id = <%= d.data_file.id -%>;
+    data_id = '<%= d.data_file.id -%>';
     data_title = '<%= d.data_file.title -%>';
   <% if Authorization.is_authorized?("show",nil,d.data_file.asset,current_user) -%>
       addDataFile(data_title,data_id);

@@ -224,8 +224,7 @@ span.disabled_icon {
 }
 
 .disabled {
-
-	filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
+	filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );    
     opacity: 0.50;    
 }
 
@@ -233,20 +232,8 @@ span.disabled_icon {
     padding-left: 2em;
 }
 
-.show_basic input {
-
-}
-
-#person_description  {
-
-}
-
 .show_basic #tool_list {
     width: 22em;
-}
-
-.show_basic select {
-
 }
 
 .show_basic .submit  {

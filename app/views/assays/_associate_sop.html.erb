@@ -10,7 +10,7 @@
         var option;
         var selection_box = $('possible_sops');
 
-        selection_box.options.length=0;
+        selection_box.options.length=0;        
 
         if (checked) {
         <% ([["Select SOP ...",0]]|all_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
@@ -38,7 +38,7 @@
             }
         <% end -%>
         }
-        selection_box.selectedIndex=0;
+
         selection_box.onchange();
     }
 </script>
@@ -80,7 +80,7 @@
 
 <script type="text/javascript">
     <% @assay.sops.each do |s| -%>
-    sop_id = <%= s.id -%>;
+    sop_id = '<%= s.id -%>';
     sop_title = '<%= s.title -%>';
     <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
     addSop(sop_title, sop_id);
