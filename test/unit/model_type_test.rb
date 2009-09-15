@@ -1,8 +1,16 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ModelTypeTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  fixtures :model_types
+
+  test "validation" do
+    existing=model_types(:ODE)
+    m=ModelType.new(:title=>existing.title)
+
+    assert !m.valid?
+    m.title=""
+    assert !m.valid?
+    m.title="zxzxclzxczxcczx"
+    assert m.valid?
   end
 end
