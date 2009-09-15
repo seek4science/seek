@@ -27,7 +27,7 @@ class ModelsController < ApplicationController
     attribute=params[:attribute]
     if attribute=="model_type"
       update_model_type params
-    elsif attribute="model_format"
+    elsif attribute=="model_format"
       update_model_format params
     end
   end
@@ -36,7 +36,7 @@ class ModelsController < ApplicationController
     attribute=params[:attribute]
     if attribute=="model_type"
         create_model_type params
-    elsif attribute="model_format"
+    elsif attribute=="model_format"
       create_model_format params
     end
   end
