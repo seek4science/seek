@@ -10,6 +10,11 @@ module ApplicationHelper
 
   end
 
+  #returns true if the current user is associated with a profile that is marked as a PAL
+  def current_user_is_pal?
+    current_user && current_user.person && current_user.person.is_pal?
+  end
+
   #Classifies each result item into a hash with the class name as the key.
   #
   #This is to enable the resources to be displayed in the asset tabbed listing by class

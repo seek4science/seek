@@ -4,11 +4,12 @@ class ModelsController < ApplicationController
   #FIXME: re-add REST for each of the core methods
 
   include ModelExecution
+  include WhiteListHelper
 
   before_filter :login_required
 
   before_filter :find_models, :only => [ :index ]
-  before_filter :find_model_auth, :except => [ :index, :new, :create ]
+  before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata ]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
 
@@ -19,6 +20,76 @@ class ModelsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml { render :xml=>@models}
+    end
+  end
+
+  def update_model_metadata
+    attribute=params[:attribute]
+    if attribute=="model_type"
+      update_model_type params
+    end
+  end
+
+  def create_model_metadata
+    attribute=params[:attribute]
+    if attribute=="model_type"
+        create_model_type params
+    end
+  end
+
+  def update_model_type params
+    title=white_list(params[:updated_model_type])
+    id=params[:updated_model_type_id]
+    success=false
+    puts "new title=#{title}"
+    puts "id=#{id}"
+    model_type_with_matching_title=ModelType.find(:first,:conditions=>{:title=>title})
+    if model_type_with_matching_title.nil? || model_type_with_matching_title.id.to_s==id
+      m=ModelType.find(id)
+      m.title=title
+      if m.save
+        msg="OK. Model type changed to #{title}."
+        success=true
+      else
+        msg="ERROR - There was a problem changing to #{title}"
+      end
+    else
+      msg="ERROR - Another model type with #{title} already exists"
+    end
+
+     render :update do |page|
+      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
+      page.replace_html "model_type_info","#{msg}<br/>"
+      info_colour= success ? "green" : "red"
+      page << "$('model_type_info').style.color='#{info_colour}';"
+      page.visual_effect :appear, "model_type_info"
+    end
+
+  end
+
+  def create_model_type params
+    title=white_list(params[:model_type])
+    success=false
+    if ModelType.find(:first,:conditions=>{:title=>title}).nil?
+      m=ModelType.new(:title=>params[:model_type])
+      if m.save
+        msg="OK. Model type #{title} added."
+        success=true
+      else
+        msg="ERROR - There was a problem adding #{title}"
+      end
+    else
+      msg="ERROR - Model type #{title} already exists"
+    end
+
+
+    render :update do |page|
+      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
+      page.replace_html "model_type_info","#{msg}<br/>"
+      info_colour= success ? "green" : "red"
+      page << "$('model_type_info').style.color='#{info_colour}';"
+      page.visual_effect :appear, "model_type_info"
+
     end
   end
 

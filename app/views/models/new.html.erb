@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js" -%>
+<%= javascript_include_tag "sharing.js","models.js" -%>
 
 <h1>New Model</h1>
 
@@ -25,29 +25,9 @@
           <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 5 -%>
         </p>
 
-        <p>
-          <b>Model type:</b><br/>
-          <%= collection_select :model, :model_type_id,ModelType.find(:all),:id,:title,:include_blank=>"Not specified" %>
-        </p>
+        <%= render :partial=>"model_metadata" -%>
 
-        <p>
-          <b>Model format:</b><br/>
-          <%= collection_select :model, :model_format_id,ModelFormat.find(:all),:id,:title,:include_blank=>"Not specified" %>
-        </p>
-
-        <%
-          environment_options=[['Unknown',0]]|RecommendedModelEnvironment.find(:all).collect{|e| [h(e.title),e.id]}
-        %>
-        <p>
-          <b>Preferred execution or visualisation environment:</b>
-        <%= select_tag 'model[recommended_environment_id]',
-          options_for_select(environment_options,0),
-          {
-            :style=>"width:82%",
-            :name=>"model[recommended_environment_id]"
-          }
-        %>
-        </p>
+        
         
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",   # this is only for presentation, not for any processing
           :project_hash => current_user.generate_own_project_id_name_hash } -%>
