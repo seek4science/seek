@@ -27,6 +27,8 @@ class ModelsController < ApplicationController
     attribute=params[:attribute]
     if attribute=="model_type"
       update_model_type params
+    elsif attribute="model_format"
+      update_model_format params
     end
   end
 
@@ -34,6 +36,8 @@ class ModelsController < ApplicationController
     attribute=params[:attribute]
     if attribute=="model_type"
         create_model_type params
+    elsif attribute="model_format"
+      create_model_format params
     end
   end
 
@@ -71,7 +75,7 @@ class ModelsController < ApplicationController
     title=white_list(params[:model_type])
     success=false
     if ModelType.find(:first,:conditions=>{:title=>title}).nil?
-      m=ModelType.new(:title=>params[:model_type])
+      m=ModelType.new(:title=>title)
       if m.save
         msg="OK. Model type #{title} added."
         success=true
@@ -91,6 +95,62 @@ class ModelsController < ApplicationController
       page.visual_effect :appear, "model_type_info"
 
     end
+  end
+
+  def create_model_format params
+    title=white_list(params[:model_format])
+    success=false
+    if ModelFormat.find(:first,:conditions=>{:title=>title}).nil?
+      m=ModelFormat.new(:title=>title)
+      if m.save
+        msg="OK. Model format #{title} added."
+        success=true
+      else
+        msg="ERROR - There was a problem adding #{title}"
+      end
+    else
+      msg="ERROR - Another model format #{title} already exists"
+    end
+
+
+    render :update do |page|
+      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
+      page.replace_html "model_format_info","#{msg}<br/>"
+      info_colour= success ? "green" : "red"
+      page << "$('model_format_info').style.color='#{info_colour}';"
+      page.visual_effect :appear, "model_format_info"
+
+    end
+  end
+
+  def update_model_format params
+    title=white_list(params[:updated_model_format])
+    id=params[:updated_model_format_id]
+    success=false
+    puts "new title=#{title}"
+    puts "id=#{id}"
+    model_format_with_matching_title=ModelFormat.find(:first,:conditions=>{:title=>title})
+    if model_format_with_matching_title.nil? || model_format_with_matching_title.id.to_s==id
+      m=ModelFormat.find(id)
+      m.title=title
+      if m.save
+        msg="OK. Model format changed to #{title}."
+        success=true
+      else
+        msg="ERROR - There was a problem changing to #{title}"
+      end
+    else
+      msg="ERROR - Another model format with #{title} already exists"
+    end
+
+    render :update do |page|
+      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
+      page.replace_html "model_format_info","#{msg}<br/>"
+      info_colour= success ? "green" : "red"
+      page << "$('model_format_info').style.color='#{info_colour}';"
+      page.visual_effect :appear, "model_format_info"
+    end
+
   end
 
   def execute
