@@ -47,8 +47,6 @@ class ModelsController < ApplicationController
     title=white_list(params[:updated_model_type])
     id=params[:updated_model_type_id]
     success=false
-    puts "new title=#{title}"
-    puts "id=#{id}"
     model_type_with_matching_title=ModelType.find(:first,:conditions=>{:title=>title})
     if model_type_with_matching_title.nil? || model_type_with_matching_title.id.to_s==id
       m=ModelType.find(id)
@@ -128,9 +126,7 @@ class ModelsController < ApplicationController
   def update_model_format params
     title=white_list(params[:updated_model_format])
     id=params[:updated_model_format_id]
-    success=false
-    puts "new title=#{title}"
-    puts "id=#{id}"
+    success=false    
     model_format_with_matching_title=ModelFormat.find(:first,:conditions=>{:title=>title})
     if model_format_with_matching_title.nil? || model_format_with_matching_title.id.to_s==id
       m=ModelFormat.find(id)
