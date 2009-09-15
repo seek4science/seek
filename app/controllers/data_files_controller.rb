@@ -244,7 +244,7 @@ class DataFilesController < ApplicationController
       if (policy = @data_file.asset.policy)
         # Datafile exists and has a policy associated with it - normal case
         policy_type = "asset"
-      elsif @data_file.asset.project && (policy = @data_file.asset.project.default_policy)
+      elsif @data_file.project && (policy = @data_file.project.default_policy)
         # Datafile exists, but policy not attached - try to use project default policy, if exists
         policy_type = "project"
       end

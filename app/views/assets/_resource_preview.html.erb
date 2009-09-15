@@ -4,9 +4,9 @@
       <%= h resource.title %>
     </p>
 
-    <% unless resource.asset.project.nil? -%>
+    <% unless resource.project.nil? -%>
       <p class="project">
-        Project: <%= h resource.asset.project.name %>
+        Project: <%= h resource.project.name %>
       </p>
     <% end -%>
     <p class="author">

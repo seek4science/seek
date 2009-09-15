@@ -51,7 +51,7 @@ class PeopleController < ApplicationController
 
   # GET /people/1
   # GET /people/1.xml
-  def show
+  def show    
     @person = Person.find(params[:id])
 
     respond_to do |format|
@@ -188,7 +188,7 @@ class PeopleController < ApplicationController
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     
     avatar_id = params[:person].delete(:avatar_id).to_i
-    @person.avatar_id = ((avatar_id.kind_of?(Fixnum) && avatar_id > 0) ? avatar_id : nil)
+    @person.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     set_tools_and_expertise(@person,params)    
     

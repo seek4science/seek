@@ -7,7 +7,7 @@
 		Associated Project
 	</p>
 
-  <% collection = (resource.asset.project.blank? ? nil : [resource.asset.project]) -%>
+  <% collection = (resource.project.blank? ? nil : [resource.project]) -%>
   <%= render :partial => "layouts/contribution_section_box_item_list",
              :locals => { :icon_type => "project", :collection_name => "resource_associated_with",
                           :collection => collection, :truncate_to => truncate_to } -%>

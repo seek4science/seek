@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class DataFileTest < ActiveSupport::TestCase
 
-  fixtures :data_files,:users,:people,:content_blobs
+  fixtures :data_files,:users,:people,:content_blobs,:assets,:projects
 
   # Replace this with your real tests.
   test "associations" do
@@ -12,5 +12,12 @@ class DataFileTest < ActiveSupport::TestCase
     blob=content_blobs(:picture_blob)
     assert_equal blob,datafile.content_blob
     
+  end
+
+  test "project" do
+    df=data_files(:sysmo_data_file)
+    p=projects(:sysmo_project)
+    assert_equal p,df.asset.project
+    assert_equal p,df.project
   end
 end

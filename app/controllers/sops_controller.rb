@@ -244,7 +244,7 @@ class SopsController < ApplicationController
       if (policy = @sop.asset.policy)
         # SOP exists and has a policy associated with it - normal case
         policy_type = "asset"
-      elsif @sop.asset.project && (policy = @sop.asset.project.default_policy)
+      elsif @sop.project && (policy = @sop.project.default_policy)
         # SOP exists, but policy not attached - try to use project default policy, if exists
         policy_type = "project"
       end

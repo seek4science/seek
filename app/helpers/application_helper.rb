@@ -10,6 +10,11 @@ module ApplicationHelper
 
   end
 
+  #returns true if the current user is associated with a profile that is marked as a PAL
+  def current_user_is_pal?
+    current_user && current_user.person && current_user.person.is_pal?
+  end
+
   #Classifies each result item into a hash with the class name as the key.
   #
   #This is to enable the resources to be displayed in the asset tabbed listing by class
@@ -345,7 +350,7 @@ module ApplicationHelper
     
     if size
       basic_url += "?size=#{size}"
-      basic_url += "x#{size}" if size.kind_of?(Fixnum)
+      basic_url += "x#{size}" if size.kind_of?(Numeric)
     end
     
     return basic_url
@@ -426,6 +431,16 @@ module ApplicationHelper
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
     return "Sysmo SEEK&nbsp;"+name
+  end
+
+  def admin_email_links
+    admins=User.admins
+    result=""
+    admins.each do |u|
+      result << mail_to(u.person.email,u.person.name)
+      result << ", " unless admins.last==u
+    end
+    return result    
   end
 
   # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/

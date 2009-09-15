@@ -1,12 +1,14 @@
 <div id="signup" class="yui-b">  
   <% form_for @user do |f| -%>
       <%= f.error_messages %>
-      <p><label for "login">Login</label><br/>
-      <b><%= @user.login %></b>
-      <p><label for="password">New password</label><br/>
+      
+      <p><label>Login</label><br/>
+      <b><%= @user.login %></b></p>
+
+      <p><label>New password</label><br/>
       <%= f.password_field :password %></p>
   
-      <p><label for="password_confirmation">Confirm new password</label><br/>
+      <p><label>Confirm new password</label><br/>
       <%= f.password_field :password_confirmation %></p>
   
   

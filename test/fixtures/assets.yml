@@ -158,7 +158,7 @@ asset_of_a_sop_for_test_with_projects_institutions:
 
 asset_for_model:
   contributor: model_owner (User)
-  project: nil # not linked to any project for now
+  project: sysmo_project
   resource: teusink (Model)
   #source:  # these values are not used at the moment (Feb 2009)
   #quality: # these values are not used at the moment (Feb 2009)

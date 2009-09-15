@@ -2,6 +2,21 @@
 // This file is automatically included by javascript_include_tag :defaults
 
 
+var tabber_ids = new Array();
+var tabberOptions = {'onLoad':function() {
+    displayTabs();
+}};
+
+function displayTabs() {
+
+    for (var i = 0; i < tabber_ids.length; i++) {
+        var tabber_id = tabber_ids[i];
+        var spinner = tabber_id + "_spinner";
+        $(spinner).hide();
+        Effect.Appear(tabber_id, {duration : 0.5});
+    }
+}
+
 
 function trimSpaces(str) {
     while ((str.length > 0) && (str.charAt(0) == ' '))
@@ -12,17 +27,17 @@ function trimSpaces(str) {
 }
 
 function addToolListTag(tag_id) {
-    tools_autocompleter=autocompleters['tools_autocompleter']
-    var index=tools_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
-    var item = new Element('a', { 
+    tools_autocompleter = autocompleters['tools_autocompleter']
+    var index = tools_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
+    var item = new Element('a', {
         'value': index
     });
     tools_autocompleter.addContactToList(item);
 }
 
 function addExpertiseListTag(tag_id) {
-    expertise_autocompleter=autocompleters['expertise_autocompleter']
-    var index=expertise_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
+    expertise_autocompleter = autocompleters['expertise_autocompleter']
+    var index = expertise_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
     var item = new Element('a', {
         'value': index
     });
@@ -31,21 +46,20 @@ function addExpertiseListTag(tag_id) {
 
 function addOrganismListTag(tag_id) {
 
-    organism_autocompleter=autocompleters['organism_autocompleter']
-    var index=organism_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
-    var item = new Element('a', { 
+    organism_autocompleter = autocompleters['organism_autocompleter']
+    var index = organism_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
+    var item = new Element('a', {
         'value': index
     });
     organism_autocompleter.addContactToList(item);
 }
 
 
-
-function checkNotInList(id,list) {
+function checkNotInList(id, list) {
     rtn = true;
 
-    for(var i = 0; i < list.length; i++)
-        if(list[i][1] == id) {
+    for (var i = 0; i < list.length; i++)
+        if (list[i][1] == id) {
             rtn = false;
             break;
         }
@@ -54,8 +68,8 @@ function checkNotInList(id,list) {
 }
 
 function clearList(name) {
-    select=$(name)
-    while(select.length>0) {
+    select = $(name)
+    while (select.length > 0) {
         select.remove(select.options[0])
     }
 }

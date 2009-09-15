@@ -1,6 +1,8 @@
 class FavouritesController < ApplicationController
   
   before_filter :login_required
+
+  cache_sweeper :favourites_sweeper,:only=>[:add,:destroy]
   
   def add
     #FIXME validate id with a regular expression

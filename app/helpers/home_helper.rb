@@ -15,19 +15,19 @@ module HomeHelper
     
     selected_models=[]
     Model.find(:all,:order=>'updated_at DESC').each do |m|
-      selected_models << m if projects.include?(m.asset.project) && m.can_view?(current_user)
+      selected_models << m if projects.include?(m.project) && m.can_view?(current_user)
       break if selected_models.size>=RECENT_SIZE
     end
 
     selected_sops=[]
     Sop.find(:all,:order=>'updated_at DESC').each do |s|
-      selected_sops << s if projects.include?(s.asset.project) && s.can_view?(current_user)
+      selected_sops << s if projects.include?(s.project) && s.can_view?(current_user)
       break if selected_sops.size>=RECENT_SIZE
     end
     
     selected_data_files=[]
     DataFile.find(:all,:order=>'updated_at DESC').each do |df|
-      selected_data_files << df if projects.include?(df.asset.project) && df.can_view?(current_user)
+      selected_data_files << df if projects.include?(df.project) && df.can_view?(current_user)
       break if selected_data_files.size>=RECENT_SIZE
     end
 

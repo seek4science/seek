@@ -6,7 +6,7 @@
   <ul class="sectionIcons">
     <li><%= icon('edit', edit_project_path(@project), "Edit Project Details", nil, 'Edit Project Details')%></li>
     <% if current_user.is_admin? -%>
-      <li><%= icon "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%>
+      <li><%= icon "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%></li>
     <% end -%>
   </ul>
 <% end -%>
