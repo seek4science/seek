@@ -78,7 +78,165 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to models_path
   end
 
+  test "should add model type" do
+    login_as(:quentin)
+    assert_difference('ModelType.count',1) do
+      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
+    end
 
+    assert_response :success
+    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+
+  end
+
+  test "should add model type as pal" do
+    login_as(:pal_user)
+    assert_difference('ModelType.count',1) do
+      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
+    end
+
+    assert_response :success
+    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+
+  end
+
+  test "should not add model type as non pal" do
+    login_as(:aaron)
+    assert_no_difference('ModelType.count') do
+      post :create_model_metadata, :attribute=>"model_type",:model_type=>"fred"
+    end
+
+    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+
+  end
+
+  test "should not add duplicate model type" do
+    login_as(:quentin)
+    m=model_types(:ODE)
+    assert_no_difference('ModelType.count') do
+      post :create_model_metadata, :attribute=>"model_type",:model_type=>m.title
+    end
+
+  end
+
+  test "should add model format" do
+    login_as(:quentin)
+    assert_difference('ModelFormat.count',1) do
+      post :create_model_metadata, :attribute=>"model_format",:model_format=>"fred"
+    end
+
+    assert_response :success
+    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+
+  end
+
+  test "should add model format as pal" do
+    login_as(:pal_user)
+    assert_difference('ModelFormat.count',1) do
+      post :create_model_metadata, :attribute=>"model_format",:model_format=>"fred"
+    end
+
+    assert_response :success
+    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+
+  end
+
+  test "should not add model format as non pal" do
+    login_as(:aaron)
+    assert_no_difference('ModelFormat.count') do
+      post :create_model_metadata, :attribute=>"model_format",:model_format=>"fred"
+    end
+
+    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+
+  end
+
+  test "should not add duplicate model format" do
+    login_as(:quentin)
+    m=model_formats(:SBML)
+    assert_no_difference('ModelFormat.count') do
+      post :create_model_metadata, :attribute=>"model_format",:model_format=>m.title
+    end
+
+  end
+
+  test "should update model format" do
+    login_as(:quentin)
+    m=model_formats(:SBML)
+
+    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+
+    assert_no_difference('ModelFormat.count') do
+      put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
+    end
+
+    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+  end
+
+  test "should update model format as pal" do
+    login_as(:pal_user)
+    m=model_formats(:SBML)
+
+    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+
+    assert_no_difference('ModelFormat.count') do
+      put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
+    end
+
+    assert_not_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+  end
+
+  test "should not update model format as non pal" do
+    login_as(:aaron)
+    m=model_formats(:SBML)
+
+    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+
+    assert_no_difference('ModelFormat.count') do
+      put :update_model_metadata, :attribute=>"model_format",:updated_model_format=>"fred",:updated_model_format_id=>m.id
+    end
+
+    assert_nil ModelFormat.find(:first,:conditions=>{:title=>"fred"})
+  end
+
+  test "should update model type" do
+    login_as(:quentin)
+    m=model_types(:ODE)
+
+    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+
+    assert_no_difference('ModelFormat.count') do
+      put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
+    end
+
+    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+  end
+
+  test "should update model type as pal" do
+    login_as(:pal_user)
+    m=model_types(:ODE)
+
+    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+
+    assert_no_difference('ModelFormat.count') do
+      put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
+    end
+
+    assert_not_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+  end
+
+  test "should not update model type as non pal" do
+    login_as(:aaron)
+    m=model_types(:ODE)
+
+    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+
+    assert_no_difference('ModelFormat.count') do
+      put :update_model_metadata, :attribute=>"model_type",:updated_model_type=>"fred",:updated_model_type_id=>m.id
+    end
+
+    assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+  end
 
   def valid_model
     { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt')}

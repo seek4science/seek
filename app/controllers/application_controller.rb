@@ -4,11 +4,11 @@
 class ApplicationController < ActionController::Base
 
 
- if ENV['RAILS_ENV'] == "production"
+  if ENV['RAILS_ENV'] == "production"
     rescue_from ActiveRecord::RecordNotFound, ActionController::RoutingError, ActionController::UnknownController, ActionController::UnknownAction, :with => :render_404
-    rescue_from NameError,RuntimeError, :with => :render_500
- end
-  
+    rescue_from NameError, RuntimeError, :with => :render_500
+  end
+
 
   include AuthenticatedSystem
 
@@ -90,6 +90,13 @@ class ApplicationController < ActionController::Base
 
   end
 
+  def pal_or_admin_required
+    unless current_user.is_admin? || (!current_user.person.nil? && current_user.person.is_pal?)
+      error("Admin or PAL rights required", "is invalid (not admin)")
+      return false
+    end
+  end
+
   def error(notice, message)
     flash[:error] = notice
     (err = User.new.errors).add(:id, message)
@@ -106,13 +113,13 @@ class ApplicationController < ActionController::Base
 
   #Custom error pages
   def render_500
-     @title="We're sorry, but something went wrong (500)"
-    render :template=>"errors/500",:layout=>"errors"
+    @title="We're sorry, but something went wrong (500)"
+    render :template=>"errors/500", :layout=>"errors"
   end
 
   def render_404
     @title="The page you were looking for doesn't exist (404)"
-    render :template=>"errors/404",:layout=>"errors"
+    render :template=>"errors/404", :layout=>"errors"
   end
 
   # See ActionController::Base for details 

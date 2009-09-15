@@ -8,6 +8,8 @@ class ModelsController < ApplicationController
 
   before_filter :login_required
 
+  before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata ]
+
   before_filter :find_models, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata ]
 
