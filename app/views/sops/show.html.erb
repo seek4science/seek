@@ -23,7 +23,7 @@
   <% end -%>
 </ul>
 
-<h1 class="contribution_title">SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
+<h1 class="contribution_title">SOP: <%= link_to(h(@display_sop.title), sop_path(@sop)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @sop } -%>
 
@@ -33,17 +33,22 @@
     <div class="box_about_actor">
       <p>
         <b>Title:</b>
-        <span class="title"><%=h @sop.title -%></span>
+        <span class="title"><%=h @display_sop.title -%></span>
+      </p>
+
+      <p>
+        <b>Version:</b>
+        <%= @display_sop.version -%>
       </p>
 
       <p>
         <b>File name:</b>
-        <%=h @sop.original_filename -%>
+        <%=h @display_sop.original_filename -%>
       </p>
 
       <p>
         <b>Format:</b>
-        <%=h @sop.content_type -%>
+        <%=h @display_sop.content_type -%>
       </p>
 
       <%#*<p>%>
@@ -59,9 +64,9 @@
 
       <p>
         <b>Description</b>
-        <% unless @sop.description.blank? -%>
+        <% unless @display_sop.description.blank? -%>
           <div class="box_standout">
-            <%= simple_format(white_list(@sop.description)) -%>
+            <%= simple_format(white_list(@display_sop.description)) -%>
           </div>
         <% else -%>
           <p class="none_text">

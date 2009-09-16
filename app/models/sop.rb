@@ -20,7 +20,7 @@ class Sop < ActiveRecord::Base
 
 
   explicit_versioning(:version_column => "version") do
-
+    
     belongs_to :content_blob,
              :dependent => :destroy
 

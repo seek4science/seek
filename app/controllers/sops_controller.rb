@@ -3,6 +3,7 @@ class SopsController < ApplicationController
   
   before_filter :find_sops, :only => [ :index ]
   before_filter :find_sop_auth, :except => [ :index, :new, :create,:sop_preview_ajax ]
+  before_filter :find_display_sop, :only=>[:show]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
@@ -38,8 +39,10 @@ class SopsController < ApplicationController
     
     # update timestamp in the current SOP record 
     # (this will also trigger timestamp update in the corresponding Asset)
-    @sop.last_used_at = Time.now
-    @sop.save_without_timestamping
+    if @sop.instance_of?(Sop)
+      @sop.last_used_at = Time.now
+      @sop.save_without_timestamping
+    end  
     
     respond_to do |format|
       format.html # show.html.erb
@@ -210,12 +213,17 @@ class SopsController < ApplicationController
     
     @sops = found
   end
-  
+
+  def find_display_sop
+    if @sop
+      @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop
+    end
+  end
   
   def find_sop_auth
     begin
-      sop = Sop.find(params[:id])
-
+      sop = Sop.find(params[:id])             
+      
       if Authorization.is_authorized?(action_name, nil, sop, current_user)
         @sop = sop
       else
