@@ -116,7 +116,7 @@ module ApplicationHelper
     when "arrow_right", "next"
       return "famfamfam_silk/arrow_right.png"
     when "new"
-      return "redmond_studio/add_16.png"
+      return "famfamfam_silk/add.png"
     when "download"
       return "redmond_studio/arrow-down_16.png"
     when "show"
