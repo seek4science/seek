@@ -16,7 +16,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:models)
   end
 
-  test "should get new" do    
+  test "should get new" do
     get :new    
     assert_response :success
   end

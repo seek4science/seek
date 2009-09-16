@@ -60,19 +60,19 @@ not_registered:
   first_name: "Fred"
   email: "test@test.com"
 
-pal:
-  id: 14
-  first_name: "A Pal"
-  email: "test@test.com"
-  is_pal: true
+
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
+pal:
+  first_name: "A Pal"
+  email: "test@test.com"
+  is_pal: true
+
 person_for_owner_of_my_first_sop:
   first_name: "OwnerOf"
   last_name: "MyFirstSop"
-
 
 person_for_owner_of_fully_public_policy:
   first_name: "OwnerOf"
