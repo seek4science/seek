@@ -192,8 +192,16 @@ module Jits
           # from the main table (since those two entries should always have the same data).
           def sync_latest_version
             ver = versions.last
-            clone_versioned_model(self, ver)
-            ver.save
+            if (ver.nil?)
+              set_new_version
+              without_update_callbacks do
+                self.save
+              end
+              save_version_on_create
+            else
+              clone_versioned_model(self, ver)
+              ver.save
+            end            
           end
 
           # This method updates the entry in the main table with the data from the version specified,
