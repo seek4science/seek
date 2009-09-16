@@ -67,11 +67,15 @@ class AdminControllerTest < ActionController::TestCase
     person.expertise_list="fishing"
     person.save!
 
+    updated_at=person.updated_at
+
     assert_equal ["linux", "ruby", "fishing"], person.tool_list
     assert_equal ["fishing"], person.expertise_list
 
     fishing_tag=Tag.find(:first, :conditions=>{:name=>"fishing"})
     assert_not_nil fishing_tag
+
+    sleep(2) #for timestamp test
 
     golf_tag_id=tags(:golf).id
     post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>"microbiology, spanish"
@@ -84,6 +88,8 @@ class AdminControllerTest < ActionController::TestCase
 
     assert_equal expected_tools.size, person.tool_list.size
     assert_equal expected_expertise.size, person.expertise_list.size
+
+    assert_equal updated_at.to_s,person.updated_at.to_s,"timestamps were modified for taggable and shouldn't have been"
 
     person.tool_list.each do |tool_tag|
       assert expected_tools.include?(tool_tag)
