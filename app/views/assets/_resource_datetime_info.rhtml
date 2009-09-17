@@ -5,6 +5,6 @@
 	<% unless resource.asset.created_at == resource.asset.updated_at -%>
 		<br/>
 		<b>Last updated: </b><%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
-		<b>by </b><%= link_to h(resource.contributor.person.first_name + " " + resource.contributor.person.last_name), person_path(resource.contributor.person) -%>
+		<b>by </b><%= link_to h(resource.contributor.person.name), person_path(resource.contributor.person) -%>
 	<% end -%>
 </div>

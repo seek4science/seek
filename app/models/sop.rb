@@ -23,6 +23,8 @@ class Sop < ActiveRecord::Base
     
     belongs_to :content_blob,
              :dependent => :destroy
+    
+    belongs_to :contributor, :polymorphic => true
 
   end
 

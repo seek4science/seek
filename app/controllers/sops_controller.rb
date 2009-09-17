@@ -19,7 +19,7 @@ class SopsController < ApplicationController
 
   def new_version
     data = params[:data].read
-    comments=params[:revision_comments]
+    comments=params[:revision_comment]
     @sop.content_blob = ContentBlob.new(:data => data)
     @sop.content_type = params[:data].content_type
     @sop.original_filename=params[:data].original_filename
@@ -129,8 +129,7 @@ class SopsController < ApplicationController
       params[:sop][:source_type] = "upload"
       params[:sop][:source_id] = nil
       params[:sop][:quality] = nil
-      
-      
+            
       @sop = Sop.new(params[:sop])
       @sop.content_blob = ContentBlob.new(:data => data)
 
@@ -232,7 +231,7 @@ class SopsController < ApplicationController
 
   def find_display_sop
     if @sop
-      @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop
+      @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
     end
   end
   

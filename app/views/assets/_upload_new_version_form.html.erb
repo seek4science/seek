@@ -1,10 +1,10 @@
 <div id="upload_new_version_form" style="display:none">
-  <% form_tag ({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
+  <% form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
       <center>
         <div style="width: 60%;margin-top:0.75em;">
           <p>
             <b>Revision comments (optional)</b><br/>
-            <%= text_area_tag :revision_comments, nil, :size=>"55x4" -%><br/>
+            <%= text_area_tag :revision_comment, nil, :size=>"55x4" -%><br/>
             <b>File to upload:&nbsp;</b><br/>
             <%= file_field_tag :data, :size=>40 -%><br/><br/>
             <%= submit_tag "Upload", :style=>"float:right;margin-right:2em;" -%>

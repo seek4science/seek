@@ -157,7 +157,7 @@ sop_for_test_with_projects_institutions:
 
 downloadable_sop:
   contributor: owner_of_my_first_sop (User)
-  title: "SOP that is to be used only for tests with projects / institutions."
+  title: "SOP that is downloadable."
   description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
   original_filename: "little_file.txt"
   content_type: "text/plain"
@@ -168,7 +168,7 @@ downloadable_sop:
 
 editable_sop:
   contributor: owner_of_my_first_sop (User)
-  title: "SOP that is to be used only for tests with projects / institutions."
+  title: "SOP that is editable."
   description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
   original_filename: "little_file.txt"
   content_type: "text/plain"

@@ -73,6 +73,11 @@ module Jits
           find_versions(:conditions => ['version = ?', version], :limit => 1).first
         end
 
+        # Returns the most recent version
+        def latest_version
+          versions.last
+        end
+
         # Finds versions of this model.  Takes an options hash like <tt>find</tt>
         def find_versions(options = {})
           versions.find(:all, options)

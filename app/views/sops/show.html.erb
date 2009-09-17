@@ -3,7 +3,7 @@
 
 <ul class="sectionIcons">
   <% if Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
-      <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_blind, "upload_new_version_form") -%></li>
+      <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
       <li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @sop, current_user) -%>
       <%# this is not owner, but current user can edit -%>
@@ -25,7 +25,7 @@
   <% end -%>
 </ul>
 
-<%= render :partial=>"assets/upload_new_version_form",:locals=>{:resource=>@sop} -%>
+<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
 
 <h1 class="contribution_title">SOP: <%= link_to(h(@display_sop.title), sop_path(@sop)) -%></h1>
 
@@ -33,6 +33,54 @@
 
 
 <div class="show_basic">
+  <div class="contribution_left_box">
+    <div class="contribution_version_box">
+      <div class="contribution_version_selector_box">
+        <table>
+          <tbody>
+          <tr>
+            <td class="heading" style="vertical-align: top;">
+              <span><%= "Version #{@display_sop.version.to_s} #{@sop.describe_version(@display_sop.version.to_s)}" -%></span>
+              <span class="count_text">(of <%= @sop.versions.length -%>)</span>
+              <a name="versions"></a>
+            </td>
+            <td>
+              <% if @sop.version > 1 %>
+                  <b>View version: </b><%= resource_version_selection @sop, @display_sop -%>
+              <% end %>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <div id="version_info_box" style="font-size: 85%; margin: 0.6em 0.5em 0.2em 0.5em; border-top: 1px dotted #DDDDDD; padding-top: 0.4em;">
+          <p style="text-align: center;">
+            <b>Version created on:</b>
+            <span><%= @display_sop.created_at.strftime('%d/%m/%Y @ %H:%M:%S') %></span>
+            <b>by:</b>
+            <span><%= contributor @display_sop.contributor %></span>
+            <% unless @display_sop.version == 1 -%>
+            <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <span><%= link_to_function "revision comments "+image("collapse"),visual_effect(:toggle_appear,"revision_comments") -%></span>
+                <% end -%>
+          </p>
+        </div>
+
+        <div id="revision_comments" class="box_standout" style="display:none;margin-top:0.5em;">
+  <div >
+    <% if @display_sop.revision_comments %>
+        <%= white_list(@display_sop.revision_comments) -%>
+    <% else %>
+        <span class="none_text">None</span>
+    <% end %>
+    </div>
+</div>
+      </div>
+
+    </div>
+
+  </div>
+
   <div class="main_content_left_box">
 
     <div class="box_about_actor">
@@ -41,10 +89,6 @@
         <span class="title"><%= h @display_sop.title -%></span>
       </p>
 
-      <p>
-        <b>Version:</b>
-        <%= resource_version_selection @sop,@display_sop -%>
-      </p>      
 
       <p>
         <b>File name:</b>

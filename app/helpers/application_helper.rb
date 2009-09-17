@@ -79,6 +79,13 @@ module ApplicationHelper
   def image method,options={}
     image_tag(method_to_icon_filename(method),options)
   end
+
+  def info_icon_with_tooltip(info_text, delay=200)
+    return image("info",
+              :title => tooltip_title_attrib(info_text, delay),
+              :style => "vertical-align:middle;")
+  end
+
   
   def icon(method, url=nil, alt=nil, url_options={}, label=method.humanize, remote=false)
 

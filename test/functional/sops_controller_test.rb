@@ -31,7 +31,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should show sop" do
-    get :show, :id => sops(:one)
+    s=sops(:one)
+    s.save #to force versions to be created (saves writing fixtures)
+    get :show, :id => s
     assert_response :success
   end
 
@@ -54,17 +56,23 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not be able to edit exp conditions for downloadable only sop" do
-    get :show,:id=>sops(:downloadable_sop)
+    s=sops(:downloadable_sop)
+    s.save! #to force versions to be created (saves writing fixtures)
+    get :show,:id=>s
     assert_select "a",:text=>/Edit experimental conditions/,:count=>0
   end
 
   test "should be able to edit exp conditions for owners downloadable only sop" do
     login_as(:owner_of_my_first_sop)
-    get :show,:id=>sops(:downloadable_sop)
+    s=sops(:downloadable_sop)
+    s.save #to force versions to be created (saves writing fixtures)
+    get :show,:id=>s
     assert_select "a",:text=>/Edit experimental conditions/,:count=>1
   end
 
   test "should be able to edit exp conditions for editable sop" do
+    s=sops(:editable_sop)
+    s.save #to force versions to be created (saves writing fixtures)
     get :show,:id=>sops(:editable_sop)
     assert_select "a",:text=>/Edit experimental conditions/,:count=>1
   end
