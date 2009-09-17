@@ -56,11 +56,8 @@
 
       <p>
         <b>Version:</b>
-        <%= @display_sop.version -%>
-      </p>
-      <p>
-        <b>Other version:</b><%= resource_version_selection @sop -%>        
-      </p>
+        <%= resource_version_selection @sop,@display_sop -%>
+      </p>      
 
       <p>
         <b>File name:</b>
