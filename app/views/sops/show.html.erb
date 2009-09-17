@@ -33,12 +33,12 @@
 
 
 <div class="show_basic">
-  <div class="contribution_left_box">
-    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
-  </div>
+  
 
   <div class="main_content_left_box">
 
+    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
+  
     <div class="box_about_actor">
       <p>
         <b>Title:</b>
@@ -55,15 +55,6 @@
         <b>Format:</b>
         <%= h @display_sop.content_type -%>
       </p>
-
-      <%#*<p>%>
-      <%#*<b>Organism:</b>%>
-      <%# if @sop.organism -%>
-      <%#=organism_link_to @sop.organism -%>
-      <%# else -%>
-      <%#*<span class="none_text">Unknown</span>%>
-      <%# end -%>
-      <%#*</p>%>
 
       <br/>
 
@@ -89,7 +80,7 @@
     <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @sop, :attributed_to => Authorization.authorize_collection("show", @sop.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
   </div>
 
-  <div style="clear:both;">
+  <div style="clear:both;padding-top:1em;">
 
 
     <h2>
