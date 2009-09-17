@@ -1,3 +1,17 @@
+<script>
+    function validateUploadFormFields(form) {
+        if ($('data').value.length == 0) {
+            alert("Please specify the name of the file to upload!");
+            $('data').focus();
+            return(false);
+        }
+        $('new_version_submit_btn').disabled = true;
+        $('new_version_submit_btn').value = "Uploading ...";
+        $('new_version_submit_btn').form.submit();
+        return(true);
+    }
+</script>
+
 <div id="upload_new_version_form" style="display:none">
   <% form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
       <center>
@@ -7,7 +21,7 @@
             <%= text_area_tag :revision_comment, nil, :size=>"55x4" -%><br/>
             <b>File to upload:&nbsp;</b><br/>
             <%= file_field_tag :data, :size=>40 -%><br/><br/>
-            <%= submit_tag "Upload", :style=>"float:right;margin-right:2em;" -%>
+            <%= submit_tag "Upload", :id => "new_version_submit_btn", :onclick => "javascript: validateUploadFormFields(this.form); return(false);", :style=>"float:right;margin-right:2em;" -%>
           </p>
         </div>
       </center>
