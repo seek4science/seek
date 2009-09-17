@@ -25,20 +25,7 @@
   <% end -%>
 </ul>
 
-<div id="upload_new_version_form" class="show_basic" style="display:none">
-  <% form_tag ({:action=>"new_version", :id=>@sop}, :multipart => true) do -%>
-      <center>
-        <div style="width: 60%;margin-top:0.75em;">
-      <p>
-        <b>File to upload:&nbsp;</b><br/>
-        <%= file_field_tag :data,:size=>40 -%><br/>
-        <%= submit_tag "Upload" -%>
-      </p>
-            
-        </div>        
-      </center>
-  <% end -%>
-</div>
+<%= render :partial=>"assets/upload_new_version_form",:locals=>{:resource=>@sop} -%>
 
 <h1 class="contribution_title">SOP: <%= link_to(h(@display_sop.title), sop_path(@sop)) -%></h1>
 

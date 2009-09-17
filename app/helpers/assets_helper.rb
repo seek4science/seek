@@ -15,7 +15,7 @@ module AssetsHelper
       options << " selected='selected'" if v.version==displayed_resource_version.version
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
-    "<form onsubmit='showResourceVersion(this)'; return false;>"+select_tag(:resource_versions,
+    "<form onsubmit='showResourceVersion(this); return false;' style='position:inherit'>"+select_tag(:resource_versions,
                                                                             options,
                                                                             :disabled=>disabled,
                                                                             :onchange=>"showResourceVersion(this.form);"

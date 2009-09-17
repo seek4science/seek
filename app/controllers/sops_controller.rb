@@ -19,11 +19,12 @@ class SopsController < ApplicationController
 
   def new_version
     data = params[:data].read
+    comments=params[:revision_comments]
     @sop.content_blob = ContentBlob.new(:data => data)
     @sop.content_type = params[:data].content_type
     @sop.original_filename=params[:data].original_filename
     respond_to do |format|
-      if @sop.save_as_new_version
+      if @sop.save_as_new_version(comments)
         flash[:notice]="New version uploaded - now on version #{@sop.version}"
       else
         flash[:error]="Unable to save new version"          
