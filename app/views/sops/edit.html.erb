@@ -4,13 +4,13 @@
 
 
 <ul class="sectionIcons">
-  <li><%= icon('sop', sop_path(@sop), 'Return to SOP', nil, 'Return to SOP') -%></li>
-  <li><%= icon('sops', sops_path, 'View all SOPs', nil, 'View all SOPs') -%></li>
+  <li><%= icon('arrow_left', sop_path(@sop), 'Return to SOP', nil, 'Return to SOP') -%></li>   
 </ul>
 
 <h1>Editing SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>
 
 <div class="show_basic">
+  <div id="edit_form">
   <% form_for(@sop) do |f| %>
     <%= f.error_messages %>
 
@@ -57,4 +57,5 @@
       <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);"  -%> or <%= link_to "Cancel", sop_path(@sop) -%>
     </p>
   <% end %>
+    </div>
 </div>

@@ -115,6 +115,8 @@ module ApplicationHelper
       return "famfamfam_silk/arrow_down.png"
     when "arrow_right", "next"
       return "famfamfam_silk/arrow_right.png"
+    when "arrow_left", "back"
+      return "famfamfam_silk/arrow_left.png"  
     when "new"
       return "famfamfam_silk/add.png"
     when "download"
