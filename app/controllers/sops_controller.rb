@@ -3,7 +3,7 @@ class SopsController < ApplicationController
   
   before_filter :find_sops, :only => [ :index ]
   before_filter :find_sop_auth, :except => [ :index, :new, :create,:sop_preview_ajax ]
-  before_filter :find_display_sop, :only=>[:show]
+  before_filter :find_display_sop, :only=>[:show,:download]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
@@ -14,6 +14,21 @@ class SopsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml { render :xml=>@sops}
+    end
+  end
+
+  def new_version
+    data = params[:data].read
+    @sop.content_blob = ContentBlob.new(:data => data)
+    @sop.content_type = params[:data].content_type
+    @sop.original_filename=params[:data].original_filename
+    respond_to do |format|
+      if @sop.save_as_new_version
+        flash[:notice]="New version uploaded - now on version #{@sop.version}"
+      else
+        flash[:error]="Unable to save new version"          
+      end
+      format.html {redirect_to @sop }
     end
   end
 
@@ -56,7 +71,7 @@ class SopsController < ApplicationController
     @sop.last_used_at = Time.now
     @sop.save_without_timestamping
     
-    send_data @sop.content_blob.data, :filename => @sop.original_filename, :content_type => @sop.content_type, :disposition => 'attachment'
+    send_data @display_sop.content_blob.data, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'
   end
 
   # GET /sops/new

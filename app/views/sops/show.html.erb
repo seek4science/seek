@@ -1,27 +1,44 @@
+<%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
   <% if Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
-    <li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
+      <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_blind, "upload_new_version_form") -%></li>
+      <li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @sop, current_user) -%>
-    <%# this is not owner, but current user can edit -%>
-    <li><%= icon('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
+      <%# this is not owner, but current user can edit -%>
+      <li><%= icon('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("destroy", nil, @sop, current_user) -%>
-    <li><%= icon('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
+      <li><%= icon('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @sop, current_user) -%>
-    <li><%= icon('download', download_sop_url, "Download SOP", nil, "Download SOP") -%></li>
+      <li><%= icon('download', download_sop_url(:version=>@display_sop.version), "Download SOP", nil, "Download SOP") -%></li>
   <% else -%>
-    <li>
       <li>
-        <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@sop} %>
+      <li>
+        <%= render :partial=>"assets/request_resource", :locals=>{:resource=>@sop} %>
       </li>
-    </li>
+      </li>
   <% end -%>
 </ul>
+
+<div id="upload_new_version_form" class="show_basic" style="display:none">
+  <% form_tag ({:action=>"new_version", :id=>@sop}, :multipart => true) do -%>
+      <center>
+        <div style="width: 60%;margin-top:0.75em;">
+      <p>
+        <b>File to upload:&nbsp;</b><br/>
+        <%= file_field_tag :data,:size=>40 -%><br/>
+        <%= submit_tag "Upload" -%>
+      </p>
+            
+        </div>        
+      </center>
+  <% end -%>
+</div>
 
 <h1 class="contribution_title">SOP: <%= link_to(h(@display_sop.title), sop_path(@sop)) -%></h1>
 
@@ -30,25 +47,29 @@
 
 <div class="show_basic">
   <div class="main_content_left_box">
+
     <div class="box_about_actor">
       <p>
         <b>Title:</b>
-        <span class="title"><%=h @display_sop.title -%></span>
+        <span class="title"><%= h @display_sop.title -%></span>
       </p>
 
       <p>
         <b>Version:</b>
         <%= @display_sop.version -%>
       </p>
+      <p>
+        <b>Other version:</b><%= resource_version_selection @sop -%>        
+      </p>
 
       <p>
         <b>File name:</b>
-        <%=h @display_sop.original_filename -%>
+        <%= h @display_sop.original_filename -%>
       </p>
 
       <p>
         <b>Format:</b>
-        <%=h @display_sop.content_type -%>
+        <%= h @display_sop.content_type -%>
       </p>
 
       <%#*<p>%>
@@ -68,14 +89,12 @@
           <div class="box_standout">
             <%= simple_format(white_list(@display_sop.description)) -%>
           </div>
-        <% else -%>
+      <% else -%>
           <p class="none_text">
             No description
           </p>
-        <% end -%>
+      <% end -%>
       </p>
-
-
 
 
     </div>
@@ -89,9 +108,6 @@
   <div style="clear:both;">
 
 
-
-
-
     <h2>
       Experimental Conditions
     </h2>
@@ -103,11 +119,9 @@
     <% sop_asset_hash = classify_for_tabs([@sop.project]) -%>
     <% sop_asset_hash.merge! classify_for_tabs(@sop.assays) -%>
 
-    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@sop.title,:item_hash=>sop_asset_hash} %>
+    <%= render :partial=>"layouts/items_related_to", :locals=>{:item_name=>@sop.title, :item_hash=>sop_asset_hash} %>
 
   </div>
-
-
 
 
 </div>
