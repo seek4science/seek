@@ -1,0 +1,43 @@
+<div class="contribution_version_box">
+  <div class="contribution_version_selector_box">
+    <table>
+      <tbody>
+      <tr>
+        <td class="heading" style="vertical-align: top;">
+          <span><%= "Version #{displayed_resource.version.to_s} #{resource.describe_version(displayed_resource.version.to_s)}" -%></span>
+          <span class="count_text">(of <%= resource.versions.length -%>)</span>
+          <a name="versions"></a>
+        </td>
+        <td>
+          <% if @sop.version > 1 %>
+              <b>View version: </b><%= resource_version_selection resource, displayed_resource -%>
+          <% end %>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div id="version_info_box" style="font-size: 85%; margin: 0.6em 0.5em 0.2em 0.5em; border-top: 1px dotted #DDDDDD; padding-top: 0.4em;">
+      <p style="text-align: center;">
+        <b>Version created on:</b>
+        <span><%= displayed_resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S') %></span>
+        <b>by:</b>
+        <span><%= contributor displayed_resource.contributor %></span>
+        <% unless displayed_resource.version == 1 -%>
+            <span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <span><%= link_to_function "revision comments "+image("collapse"), visual_effect(:toggle_appear, "revision_comments") -%></span>
+        <% end -%>
+      </p>
+    </div>
+
+    <div id="revision_comments" class="box_standout" style="display:none;margin-top:0.5em;">
+      <div>
+        <% if displayed_resource.revision_comments %>
+            <%= white_list(displayed_resource.revision_comments) -%>
+        <% else %>
+            <span class="none_text">None</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
