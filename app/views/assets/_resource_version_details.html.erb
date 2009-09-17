@@ -32,7 +32,7 @@
 
     <div id="revision_comments" class="box_standout" style="display:none;margin-top:0.5em;">
       <div>
-        <% if !displayed_resource.revision_comments.empty? %>
+        <% if !displayed_resource.revision_comments.blank? %>
             <%= white_list(displayed_resource.revision_comments) -%>
         <% else %>
             <span class="none_text">None</span>
