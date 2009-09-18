@@ -1,7 +1,7 @@
 <script type="text/javascript">
 
   function newAsset() {
-    selected_model=$('model_type').value;
+    selected_model=$('new_asset_type').value;
 
     if (selected_model == "model") {
       location.href = "<%= new_model_path -%>";
@@ -41,7 +41,7 @@
       <div class="contents">
         <div style="text-align: center; padding-left: 0.5em;">
           <ul class="gadget_list">
-            <form onsubmit="newAsset();return(false)">
+            <form id="new_asset_form" onsubmit="newAsset();return(false)">
               <%= new_creatable_selection %>
               <%= submit_tag "Go" %>
             </form>
