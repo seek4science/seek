@@ -5,6 +5,8 @@ require 'active_record/fixtures'
 
 namespace :seek do
 
+
+
   task(:rebuild_project_organisms=>:environment) do
     organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
     puts "found #{organism_taggings.size} organism taggings"
@@ -42,62 +44,74 @@ namespace :seek do
   end
 
   task(:list_dubious_tags=>:environment) do
+    revert_fixtures_identify
     tags=Tag.find(:all)
     dubious=tags.select{|tag| dubious_tag?(tag.name)}
     dubious.each{|tag| puts "#{tag.id}\t#{tag.name}" }
   end
 
   task(:culture_growth_types=>:environment) do
+    revert_fixtures_identify
     CultureGrowthType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "culture_growth_types")
   end
 
   task(:model_types=>:environment) do
+    revert_fixtures_identify
     ModelType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "model_types")
   end
 
   task(:model_formats=>:environment) do
+    revert_fixtures_identify
     ModelFormat.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "model_formats")
   end
 
   task(:assay_types=>:environment) do
+    revert_fixtures_identify
     AssayType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_types")
   end
 
   task(:disciplines=>:environment) do
+    revert_fixtures_identify
     Discipline.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "disciplines")
   end
 
   task(:organisms=>:environment) do
+    revert_fixtures_identify
     Organism.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "organisms")
   end
 
   task(:technology_types=>:environment) do
+    revert_fixtures_identify
     TechnologyType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "technology_types")
   end
 
   task(:recommended_model_environments=>:environment) do
+    revert_fixtures_identify
     RecommendedModelEnvironment.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "recommended_model_environments")
   end
 
   task(:measured_items=>:environment) do
+    revert_fixtures_identify
     MeasuredItem.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "measured_items")
   end
 
   task(:units=>:environment) do
+    revert_fixtures_identify
     Unit.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "units")
   end
 
   task(:roles=>:environment) do
+    revert_fixtures_identify
     Role.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "roles")
   end
@@ -155,6 +169,13 @@ namespace :seek do
   #returns true if the tag is over 30 chars long, or contains colons, semicolons, comma's or forward slash
   def dubious_tag?(tag)
      tag.length>30 || [";",",",":","/"].detect{|c| tag.include?(c)}
+  end
+
+  #reverts to use pre-2.3.4 id generation to keep generated ID's consistent
+  def revert_fixtures_identify
+    def Fixtures.identify(label)
+      label.to_s.hash.abs
+    end
   end
 
 end
