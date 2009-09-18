@@ -7,9 +7,7 @@ class SopsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   def setup
     login_as(:quentin)
-  end
-
-
+  end  
 
   test "should get index" do
     get :index

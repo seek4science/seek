@@ -33,6 +33,14 @@ namespace :seek do
 
   end
 
+  task(:refresh_controlled_vocabs=>:environment) do
+    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","repop_cv","update_first_letters"]
+    other_tasks.each do |task|
+      Rake::Task[ "seek:#{task}" ].execute      
+    end
+
+  end
+
   task(:list_dubious_tags=>:environment) do
     tags=Tag.find(:all)
     dubious=tags.select{|tag| dubious_tag?(tag.name)}
