@@ -1,21 +1,27 @@
 <% unless resource.nil? -%>
-  <div title='<%= tooltip_title_attrib(h(resource.description),1000) %>'>
-    <p class="title">
-      <%= h resource.title %>
-    </p>
-
-    <% unless resource.project.nil? -%>
-      <p class="project">
-        Project: <%= h resource.project.name %>
+    <div title='<%= tooltip_title_attrib(h(resource.description), 1000) %>'>
+      <p class="title">
+        <%= h resource.title %>
       </p>
-    <% end -%>
-    <p class="author">
-      Author: <%= h resource.contributor.person.name %>
-    </p>
 
-    <div class="box_standout">
-      <%= text_or_not_specified(resource.description,:description=>true,:length=>400) %>
-    </div>
+      <% if resource.respond_to?("latest_version") -%>
+          <p class="version">
+            <strong>Latest version:</strong> <%= h resource.latest_version.version %>
+          </p>
+      <% end -%>
 
-  </div>
-<% end -%>
+          <% unless resource.project.nil? -%>
+              <p class="project">
+                <strong>Project:</strong> <%= h resource.project.name %>
+              </p>
+          <% end -%>
+          <p class="author">
+            <strong>Author:</strong> <%= h resource.contributor.person.name %>
+          </p>
+
+          <div class="box_standout">
+            <%= text_or_not_specified(resource.description, :description=>true, :length=>400,:auto_link=>true) %>
+          </div>
+
+          </div>
+      <% end -%>
