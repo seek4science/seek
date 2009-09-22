@@ -21,6 +21,8 @@ public/javascripts/js_cached.js
 public/stylesheets/css_cached.css
 tmp/pids/*
 tmp/data.sql
+.tmp*
+*~
 
 
 syntax: regexp
