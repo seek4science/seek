@@ -27,4 +27,12 @@ class Investigation < ActiveRecord::Base
     studies.empty? && can_edit?(user)
   end
   
+  def data_files
+    assays.collect{|assay| assay.data_files.collect{|df| df  }}.flatten.uniq
+  end
+  
+  def sops
+    assays.collect{|assay| assay.sops.collect{|sop| sop  }}.flatten.uniq
+  end
+  
 end

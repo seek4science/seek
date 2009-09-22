@@ -5,7 +5,7 @@ class Study < ActiveRecord::Base
   
   has_one :project, :through=>:investigation
 
-  has_many :data_files,:through=>:assays
+  #has_many :data_files,:through=>:assays
   
   belongs_to :person_responsible, :class_name => "Person"
 
@@ -17,13 +17,14 @@ class Study < ActiveRecord::Base
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
 
   def sops
-    sops=[]
-    assays.each do |a|
-      a.sops.each do |s|
-        sops << s unless sops.include?(s)
-      end
-    end
-    return sops
+    #sops=[]
+    #assays.each do |a|
+    #  a.sops.each do |s|
+    #    sops << s unless sops.include?(s)
+    #  end
+    #end
+    #return sops
+    assays.collect{|assay| assay.sops.collect{|sop| sop  }}.flatten.uniq
   end
 
   def can_edit? user
@@ -33,6 +34,9 @@ class Study < ActiveRecord::Base
   def can_delete? user
     assays.empty? && can_edit?(user)
   end
-
+  
+  def data_files
+    assays.collect{|assay| assay.data_files.collect{|df| df  }}.flatten.uniq
+  end
 
 end
