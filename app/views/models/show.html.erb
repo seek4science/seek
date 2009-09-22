@@ -77,7 +77,7 @@
 
       <% unless @model.description.blank? -%>
         <div class="box_standout">
-          <%= simple_format(white_list(@model.description)) -%>
+          <%= simple_format(auto_link(white_list(@model.description))) -%>
         </div>
       <% else -%>
         <p class="none_text">

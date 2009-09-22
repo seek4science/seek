@@ -78,7 +78,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def test_should_show_version
     s=sops(:editable_sop)
-    s.save! #to force creation of initial version (fixtures doesn't include it)
+    s.save! #to force creation of initial version (fixtures don't include it)
     old_desc=s.description
     old_desc_regexp=Regexp.new(old_desc)
 
@@ -107,7 +107,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def test_should_create_new_version
     s=sops(:editable_sop)
-    s.save! #to force creation of initial version (fixtures doesn't include it)
+    s.save! #to force creation of initial version (fixtures don't include it)
 
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
@@ -118,6 +118,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash[:notice]
     assert_nil flash[:error]
 
+    
     s=Sop.find(s.id)
     assert_equal 2,s.versions.size
     assert_equal 2,s.version
@@ -130,7 +131,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def test_should_not_create_new_version_for_downloadable_only_sop
     s=sops(:downloadable_sop)
-    s.save! #to force creation of initial version (fixtures doesn't include it)
+    s.save! #to force creation of initial version (fixtures don't include it)
 
     assert_no_difference("Sop::Version.count") do
       post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"

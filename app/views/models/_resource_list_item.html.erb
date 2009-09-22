@@ -51,7 +51,7 @@
 
       <div class="desc" style="font-size: 85%;">
         <% unless resource.description.blank? -%>
-          <%= truncate(white_list(resource.description), :length=>500) -%>
+          <%= truncate(auto_link(white_list(resource.description)), :length=>500) -%>
         <% else -%>
           <span class="none_text">No description</span>
         <% end -%>

@@ -62,7 +62,7 @@
         <b>Description</b>
         <% unless @display_sop.description.blank? -%>
           <div class="box_standout">
-            <%= simple_format(white_list(@display_sop.description)) -%>
+            <%= simple_format(auto_link(white_list(@display_sop.description))) -%>
           </div>
       <% else -%>
           <p class="none_text">
