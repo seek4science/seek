@@ -1,0 +1,20 @@
+<%= f.error_messages -%>
+
+<center>
+  <div style="width: 60%;">
+
+    <p>
+      <%= f.label :title-%>*<br/>
+      <%= f.text_field :title,:size=>52 -%>
+    </p>
+    
+    <p>
+      <%= f.label "Parents" -%>*<br/>
+      <%= ontology_multiple_select_tag f,AssayType,"id", @assay_type ? @assay_type.parents : nil, "parent_id", 10 %>
+    </p>
+  </div>
+</center>
+<p style="margin-top: 2em; text-align: center;" >
+  <%= f.submit(action==:edit ? "Update" : "Create") -%>
+  or <%= link_to 'Cancel', (manage_assay_types_path) -%>
+</p>
