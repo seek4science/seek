@@ -57,7 +57,7 @@
 
         <% unless @data_file.description.blank? -%>
           <div class="box_standout">
-            <%= simple_format(white_list(@data_file.description)) -%>
+            <%= simple_format(auto_link(white_list(@data_file.description))) -%>
           </div>
         <% else -%>
           <p class="none_text">

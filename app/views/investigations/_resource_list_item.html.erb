@@ -12,7 +12,7 @@
         </p>
 
         <div class="box_standout">
-          <%= truncate(text_or_not_specified(investigation.description, :description => true), :length=>300) %>
+          <%= truncate(text_or_not_specified(investigation.description, :description => true,:auto_link=>true), :length=>300) %>
         </div>        
         <p class="project">
           <label>Project:</label>
