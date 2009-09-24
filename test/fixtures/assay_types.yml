@@ -23,3 +23,25 @@ child2:
 
 child3:
   title: Child3
+  
+  
+assay_type_with_child_and_assay:
+  title: assay_type_with_child_and_assay
+  children: child_assay_type_with_assay
+  
+assay_type_with_child:
+  title: assay_type_with_child
+  children: child_assay_type
+  
+assay_type_with_only_child_assays:
+  title: assay_type_with_only_child_assays
+  children: child_assay_type_with_assay
+
+child_assay_type_with_assay:
+  title: child_assay_type_with_assay
+  
+child_assay_type:
+  title: child_assay_type
+
+new_parent:
+  title: new_parent

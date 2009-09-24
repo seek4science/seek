@@ -15,7 +15,15 @@ class AssayType < ActiveRecord::Base
     end
     return result
   end
-
+  
+  def get_all_descendants assay_type=self
+    result = []
+    assay_type.children.each do |child|
+      result << child
+      result = result | get_all_descendants(child) if child.has_children?
+    end
+    return result
+  end
  
   private
 

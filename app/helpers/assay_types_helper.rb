@@ -29,24 +29,40 @@ module AssayTypesHelper
     return result
   end
   
-  def ontology_multiple_select_tag type,id,selected_ids=nil,name=nil,size=10
+  def ontology_multiple_select_tag type,id,selected_items=nil,disabled_items=nil,name=nil,size=10
     name = id if name.nil?
+
     roots=type.to_tree.sort{|a,b| a.title.downcase <=> b.title.downcase}
     options=[]
     roots.each do |root|
       options << [root.title,root.id]
-      options = options | child_select_options(root,1)
+      options = options | child_multiple_select_options(root,1)
     end
     
     selected_options = []
-    selected_ids.each do |o|
+    selected_items.each do |o|
       selected_options << o.id
-    end    
-
-    #form.select name,options,{:selected=>selected_id},{:multiple => true, :size => size}
-    select_tag "#{type.name.underscore}[#{name}][]", options_for_select(options, selected_options), { :multiple => true, :size => size}
-
+    end  
     
+    disabled_options = []
+    disabled_items.each do |o|
+      disabled_options << o.id
+    end    
+    
+    #form.select name,options,{:selected=>selected_id},{:multiple => true, :size => size}
+    select_tag "#{type.name.underscore}[#{name}][]", options_for_select(options, :selected => selected_options, :disabled => disabled_options), { :multiple => true, :size => size}    
   end
+  
+  private
 
+  def child_multiple_select_options parent,depth=0
+    result = []
+    unless parent.children.empty?
+      parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
+        result << ["---"*depth + child.title,child.id]
+        result = result | child_select_options(child,depth+1) if child.has_children?
+      end
+    end
+    return result
+  end
 end
