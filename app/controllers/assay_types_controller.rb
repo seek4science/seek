@@ -78,14 +78,17 @@ class AssayTypesController < ApplicationController
     @assay_type=AssayType.find(params[:id])
     
     respond_to do |format|
-      #TODO: Make it check all child assay types for assays too.
-      if @assay_type.assays.empty?
+      if @assay_type.assays.empty? && @assay_type.get_child_assays.empty?
         @assay_type.destroy
         flash[:notice] = 'Assay type was deleted.'
         format.html { redirect_to(:action => 'manage') }
         format.xml  { head :ok }
       else
-        flash[:error]="Unabled to delete assay type due to reliance from #{@assay_type.assays.count} existing assays"
+        unless @assay_type.assays.empty?
+          flash[:error]="Unable to delete assay type due to reliance from #{@assay_type.get_child_assays.count} existing assays"
+        else
+          flash[:error]="Unable to delete assay type due to reliance from #{@assay_type.get_child_assays.count} existing assays on child assay types"
+        end
         format.html { redirect_to(:action => 'manage') }
         format.xml  { render :xml => @assay_type.errors, :status => :unprocessable_entity }
       end
