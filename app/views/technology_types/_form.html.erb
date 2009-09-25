@@ -1,0 +1,21 @@
+<%= f.error_messages -%>
+
+<center>
+  <div style="width: 60%;">
+
+    <p>
+      <%= f.label :title-%>*<br/>
+      <%= f.text_field :title,:size=>33 -%>
+    </p>
+    
+    <p>
+      <%= f.label "Parents" -%>*<br/>
+      <span style="color: #666666;"> Hold CTRL to select multiple parents</span><br/>
+      <%= ontology_multiple_select_tag TechnologyType,"id", @technology_type ? @technology_type.parents : nil, [@technology_type] + @technology_type.get_all_descendants,"parent_id", 10 %>
+    </p>
+  </div>
+</center>
+<p style="margin-top: 2em; text-align: center;" >
+  <%= f.submit(action==:edit ? "Update" : "Create") -%>
+  or <%= link_to 'Cancel', (manage_technology_types_path) -%>
+</p>
