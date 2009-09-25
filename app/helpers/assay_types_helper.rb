@@ -4,7 +4,7 @@ module AssayTypesHelper
     roots=AssayType.to_tree.sort{|a,b| a.title.downcase <=> b.title.downcase}
     list = []
     roots.each do |root|
-      list = list | child_indented_options(root,0,show_edit,show_delete,selected_id)
+      list = list + child_indented_options(root,0,show_edit,show_delete,selected_id)
     end
     
     list.collect do |item|
@@ -19,11 +19,11 @@ module AssayTypesHelper
       parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
         result << "<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + child.title + " " +
                     (show_edit ? link_to(image("edit"),edit_assay_type_url(child.id),:style=>"vertical-align:middle") : "") + " " +
-                    (show_delete ? link_to(image("destroy"),child, :confirm => 
+                    (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm => 
                       'Are you sure you want to remove this assay type?  This cannot be undone.',
-                      :method => :delete, :style=>"vertical-align:middle") : "") +
+                      :method => :delete, :style=>"vertical-align:middle") : "<span style=\"color: #666666;\">(#{child.assays.size} assays)</span>") : "") +
                     "</li>"
-        result = result | child_indented_options(child,depth+1,show_edit,show_delete,selected_id) if child.has_children?
+        result = result + child_indented_options(child,depth+1,show_edit,show_delete,selected_id) if child.has_children?
       end
     end
     return result
@@ -31,12 +31,12 @@ module AssayTypesHelper
   
   def ontology_multiple_select_tag type,id,selected_items=nil,disabled_items=nil,name=nil,size=10
     name = id if name.nil?
-
+    
     roots=type.to_tree.sort{|a,b| a.title.downcase <=> b.title.downcase}
     options=[]
     roots.each do |root|
       options << [root.title,root.id]
-      options = options | child_multiple_select_options(root,1)
+      options = options + child_multiple_select_options(root,1)
     end
     
     selected_options = []
@@ -49,18 +49,18 @@ module AssayTypesHelper
       disabled_options << o.id
     end    
     
-    #form.select name,options,{:selected=>selected_id},{:multiple => true, :size => size}
     select_tag "#{type.name.underscore}[#{name}][]", options_for_select(options, :selected => selected_options, :disabled => disabled_options), { :multiple => true, :size => size}    
   end
   
   private
-
+  
   def child_multiple_select_options parent,depth=0
     result = []
+    
     unless parent.children.empty?
       parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
         result << ["---"*depth + child.title,child.id]
-        result = result | child_select_options(child,depth+1) if child.has_children?
+        result = result + child_multiple_select_options(child,depth+1) if child.has_children?
       end
     end
     return result
