@@ -3,9 +3,9 @@ SOLR_PATH = "#{File.dirname(File.expand_path(__FILE__))}/../solr" unless defined
 
 unless defined? SOLR_PORT
   SOLR_PORT = ENV['PORT'] || case ENV['RAILS_ENV']
-              when 'test' then 8981
-              when 'production' then 8983
-              else 8983
+              when 'test' then 8881
+              when 'production' then 8883
+              else 8883
               end
 end
 
