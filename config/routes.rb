@@ -5,7 +5,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :organisms
 
-  map.resources :technology_types
+  map.resources :technology_types, :collection=>{:manage=>:get}
 
   map.resources :measured_items
   

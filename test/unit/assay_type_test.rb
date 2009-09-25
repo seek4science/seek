@@ -46,8 +46,10 @@ class AssayTypeTest < ActiveSupport::TestCase
     assert roots.include?(assay_types(:proteomics))
     assert roots.include?(assay_types(:parent1))
     assert roots.include?(assay_types(:parent2))
-
-
+    assert roots.include?(assay_types(:assay_type_with_child))
+    assert roots.include?(assay_types(:assay_type_with_child_and_assay))
+    assert roots.include?(assay_types(:assay_type_with_only_child_assays))
+    assert roots.include?(assay_types(:new_parent))
   end
 
   test "two parents" do
