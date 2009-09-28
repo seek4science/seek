@@ -30,7 +30,7 @@ require File.dirname(__FILE__) + '/instance_methods'
 require File.dirname(__FILE__) + '/common_methods'
 require File.dirname(__FILE__) + '/deprecation'
 require File.dirname(__FILE__) + '/search_results'
-
+require File.dirname(__FILE__) + '/lazy_document'
 module ActsAsSolr
   
   class Post    
@@ -42,7 +42,7 @@ module ActsAsSolr
           # for backwards compatibility
           url ||= "http://#{config[RAILS_ENV]['host']}:#{config[RAILS_ENV]['port']}/#{config[RAILS_ENV]['servlet_path']}"
         else
-          url = 'http://localhost:8983/solr'
+          url = 'http://localhost:8982/solr'
         end
         connection = Solr::Connection.new(url)
         return connection.send(request)

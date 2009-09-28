@@ -54,6 +54,10 @@ module ActsAsSolr #:nodoc:
       @solr_data[:max_score]
     end
     
+    def query_time
+      @solr_data[:query_time]
+    end
+    
     alias docs results
     alias records results
     alias num_found total
