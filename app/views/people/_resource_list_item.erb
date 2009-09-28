@@ -27,13 +27,14 @@
         <div class="box_standout">
           <%= truncate(text_or_not_specified(person.description, :description => true,:auto_link=>true), :length=>300) %>
         </div>
+        
         <% unless hide_contact_details? %>
           <% unless person.email.nil? or person.email.empty? %>
             <p class="email">
               <label>Email: </label>
               <%= mail_to h(person.email) %>
             </p>
-          <% end  %>
+          <% end %>
   
           <% unless person.web_page.nil? or person.web_page.empty? %>
             <p class="web_page">
@@ -56,6 +57,7 @@
             </p>
           <% end  %>
         <% end  %>
+        
         <p class="disciplines">
           <label>Disciplines:</label>
           <%= discipline_list(person) %>
