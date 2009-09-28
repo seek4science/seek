@@ -1,11 +1,11 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :created_datas
 
-  map.resources :assay_types
+  map.resources :assay_types, :collection=>{:manage=>:get}
 
   map.resources :organisms
 
-  map.resources :technology_types
+  map.resources :technology_types, :collection=>{:manage=>:get}
 
   map.resources :measured_items
   

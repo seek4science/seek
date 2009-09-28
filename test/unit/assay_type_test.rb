@@ -41,13 +41,15 @@ class AssayTypeTest < ActiveSupport::TestCase
 
   test "to tree" do
     roots=AssayType.to_tree
-    assert_equal 4,roots.size
+    assert_equal 8,roots.size
     assert roots.include?(assay_types(:metabolomics))
     assert roots.include?(assay_types(:proteomics))
     assert roots.include?(assay_types(:parent1))
     assert roots.include?(assay_types(:parent2))
-
-
+    assert roots.include?(assay_types(:assay_type_with_child))
+    assert roots.include?(assay_types(:assay_type_with_child_and_assay))
+    assert roots.include?(assay_types(:assay_type_with_only_child_assays))
+    assert roots.include?(assay_types(:new_parent))
   end
 
   test "two parents" do
@@ -120,6 +122,19 @@ class AssayTypeTest < ActiveSupport::TestCase
     a2=assay_types(:metabolomics)
     assert a2.assays.include?(assays(:metabolomics_assay))
     assert a2.assays.include?(assays(:metabolomics_assay2))
+  end
+  
+  test "get_all_descendants" do
+    parent_assay = AssayType.new(:title=>"Parent")
+    c1_assay = AssayType.new(:title=>"Child1")
+    c2_assay = AssayType.new(:title=>"Child2")
+    gc1_assay = AssayType.new(:title=>"GrandChild1")
+    
+    parent_assay.children << c1_assay
+    parent_assay.children << c2_assay
+    c1_assay.children << gc1_assay
+    
+    assert_equal 3,parent_assay.get_all_descendants.size   
   end
   
 end

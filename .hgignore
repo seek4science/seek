@@ -23,6 +23,7 @@ tmp/pids/*
 tmp/data.sql
 .tmp*
 *~
+solr/development/*
 
 
 syntax: regexp

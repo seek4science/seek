@@ -1,0 +1,12 @@
+<h1>Edit technology type</h1>
+
+<div class="show_basic">
+  <div style="float:left">
+    <ul><%= ontology_editor_display TechnologyType, false, false, @technology_type.id %></ul>
+  </div>      
+  <div style="float:left">
+    <% form_for @technology_type do |f| %>
+      <%= render :partial => "form", :locals => { :f => f, :action=>:edit } -%>
+    <% end -%>
+  </div>
+</div>

@@ -51,6 +51,27 @@ assay_with_no_study_but_has_some_sops:
   technology_type: gas_chromatography
   sops: my_first_sop
   owner: person_for_model_owner
+  
+assay_type_test_assay1:
+  title: assay_type_test_assay1
+  assay_type: assay_type_with_child_and_assay
+  technology_type: gas_chromatography
+  owner: person_for_model_owner
 
+assay_type_test_assay2:
+  title: assay_type_test_assay2
+  assay_type: child_assay_type_with_assay
+  technology_type: gas_chromatography
+  owner: person_for_model_owner
 
+technology_type_test_assay1:
+  title: technology_type_test_assay1
+  technology_type: technology_type_with_child_and_assay
+  assay_type: metabolomics
+  owner: person_for_model_owner
 
+technology_type_test_assay2:
+  title: technology_type_test_assay2
+  technology_type: child_technology_type_with_assay
+  assay_type: metabolomics
+  owner: person_for_model_owner
