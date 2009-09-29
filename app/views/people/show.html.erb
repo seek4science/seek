@@ -91,7 +91,7 @@
 
     <br/>
 
-    <%= render :partial=>"people/contact_details" %>
+    <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
 
     <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
 

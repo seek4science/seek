@@ -556,6 +556,13 @@ module ApplicationHelper
     )
   end
   
+  #Return whether or not to hide contact details from this user
+  #Current decided by HIDE_DETAILS flag in environment_local.rb
+  #Defaults to false
+  def hide_contact_details?
+    defined? HIDE_DETAILS ? HIDE_DETAILS : false
+  end
+  
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","experiments"=>"Experiments","data_files"=>"Data"}
   

@@ -27,34 +27,37 @@
         <div class="box_standout">
           <%= truncate(text_or_not_specified(person.description, :description => true,:auto_link=>true), :length=>300) %>
         </div>
-
-        <% unless person.email.nil? or person.email.empty? %>
-          <p class="email">
-            <label>Email: </label>
-            <%= mail_to h(person.email) %>
-          </p>
+        
+        <% unless hide_contact_details? %>
+          <% unless person.email.nil? or person.email.empty? %>
+            <p class="email">
+              <label>Email: </label>
+              <%= mail_to h(person.email) %>
+            </p>
+          <% end %>
+  
+          <% unless person.web_page.nil? or person.web_page.empty? %>
+            <p class="web_page">
+              <label>Web page:</label>
+              <%= link_to h(person.web_page), h(person.web_page),:popup=>true %>
+            </p>
+          <% end  %>
+  
+          <% unless person.phone.nil? or person.phone.empty? %>
+            <p class="phone">
+              <label>Phone:</label>
+              <%= h person.phone %>
+            </p>
+          <% end  %>
+  
+          <% unless person.skype_name.nil? or person.skype_name.empty? -%>
+            <p class="skype_name">
+              <label>Skype:</label>
+              <%= h person.skype_name %>
+            </p>
+          <% end  %>
         <% end  %>
-
-        <% unless person.web_page.nil? or person.web_page.empty? %>
-          <p class="web_page">
-            <label>Web page:</label>
-            <%= link_to h(person.web_page), h(person.web_page),:popup=>true %>
-          </p>
-        <% end  %>
-
-        <% unless person.phone.nil? or person.phone.empty? %>
-          <p class="phone">
-            <label>Phone:</label>
-            <%= h person.phone %>
-          </p>
-        <% end  %>
-
-        <% unless person.skype_name.nil? or person.skype_name.empty? -%>
-          <p class="skype_name">
-            <label>Skype:</label>
-            <%= h person.skype_name %>
-          </p>
-        <% end  %>
+        
         <p class="disciplines">
           <label>Disciplines:</label>
           <%= discipline_list(person) %>
