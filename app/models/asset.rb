@@ -16,6 +16,10 @@ class Asset < ActiveRecord::Base
   # - should_perform_filtering_if_not_authorized: boolean value which indicates if the method
   #       needs to filter out assets that are not authorized for viewing by "user_to_authorize"
   # - user_to_authorize: user for which this asset hash will be rendered in the view
+  
+  #The order in which asset tabs appear
+  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop']
+
   def self.classify_and_authorize(asset_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)
     results = {}
     
