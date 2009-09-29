@@ -21,7 +21,8 @@
     </center>
   </div>
   <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
-    <% asset_hash.keys.sort.each do |resource_type| -%>
+
+    <% Asset::ASSET_ORDER.each do |resource_type| -%>
       <% visible_resource_type = resource_type.titleize.pluralize -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
       <% unless (resources = asset_hash[resource_type]).nil? || resources.empty? -%>
