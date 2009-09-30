@@ -25,8 +25,15 @@ class SopsController < ApplicationController
     @sop.content_blob = ContentBlob.new(:data => data)
     @sop.content_type = params[:data].content_type
     @sop.original_filename=params[:data].original_filename
+    conditions = @sop.experimental_conditions
     respond_to do |format|
       if @sop.save_as_new_version(comments)
+        #Duplicate experimental conditions
+        conditions.each do |con|
+          new_con = con.clone
+          new_con.sop_version = @sop.version
+          new_con.save
+        end
         flash[:notice]="New version uploaded - now on version #{@sop.version}"
       else
         flash[:error]="Unable to save new version"          

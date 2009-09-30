@@ -15,9 +15,7 @@ class Sop < ActiveRecord::Base
   belongs_to :content_blob,
              :dependent => :destroy
 
-  has_many :experimental_conditions
   has_and_belongs_to_many :assays
-
 
   explicit_versioning(:version_column => "version") do
     
@@ -25,7 +23,10 @@ class Sop < ActiveRecord::Base
              :dependent => :destroy
     
     belongs_to :contributor, :polymorphic => true
-
+    
+    def experimental_conditions
+      ExperimentalCondition.all(:conditions => {:sop_id => self.sop_id, :sop_version => self.version})
+    end    
   end
 
   # get a list of SOPs with their original uploaders - for autocomplete fields
@@ -54,5 +55,8 @@ class Sop < ActiveRecord::Base
   def organism_title
     organism.nil? ? "" : organism.title
   end
-
+  
+  def experimental_conditions
+    ExperimentalCondition.all(:conditions => {:sop_id => self.id, :sop_version => self.version})
+  end 
 end

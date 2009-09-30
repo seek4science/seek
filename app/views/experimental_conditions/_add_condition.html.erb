@@ -22,6 +22,8 @@
       <td><%= f.text_field :end_value,:size=>4 %></td>      
 
       <td><%= f.submit "Add" %></td>
+      
+      <%= hidden_field_tag "version", @display_sop.version -%>
     </tr>
 
   </table>

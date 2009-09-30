@@ -147,6 +147,42 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  def test_should_duplicate_conditions_for_new_version
+    s=sops(:editable_sop)
+    s.save! #v1
+    condition1 = ExperimentalCondition.create(:unit => units(:gram),:measured_item => measured_items(:weight) ,
+                                           :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+    assert_difference("Sop::Version.count", 1) do
+      post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision" #v2
+    end
+    
+    assert_not_equal 0, s.find_version(1).experimental_conditions.count
+    assert_not_equal 0, s.find_version(2).experimental_conditions.count
+    assert_not_equal s.find_version(1).experimental_conditions, s.find_version(2).experimental_conditions    
+  end
+  
+  def test_adding_new_conditions_to_different_versions
+    s=sops(:editable_sop)
+    s.save! #v1
+    condition1 = ExperimentalCondition.create(:unit => units(:gram),:measured_item => measured_items(:weight) ,
+                                           :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+    assert_difference("Sop::Version.count", 1) do                                           
+      post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision" #v2
+    end
+    
+    s.find_version(2).experimental_conditions.each {|e| e.destroy}
+    assert_equal condition1, s.find_version(1).experimental_conditions.first
+    assert_equal 0, s.find_version(2).experimental_conditions.count
+
+    condition2 = ExperimentalCondition.create(:unit => units(:gram),:measured_item => measured_items(:weight) ,
+                                           :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => 2)
+
+    assert_not_equal 0, s.find_version(2).experimental_conditions.count
+    assert_equal condition2, s.find_version(2).experimental_conditions.first
+    assert_not_equal condition2, s.find_version(1).experimental_conditions.first
+    assert_equal condition1, s.find_version(1).experimental_conditions.first
+  end
+
   private
 
 

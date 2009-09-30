@@ -5,3 +5,7 @@ one:
 
 two:
   title: MyString
+
+gram:
+  symbol: g
+  comment: gram
