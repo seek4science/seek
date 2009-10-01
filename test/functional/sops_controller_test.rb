@@ -175,7 +175,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 0, s.find_version(2).experimental_conditions.count
 
     condition2 = ExperimentalCondition.create(:unit => units(:gram),:measured_item => measured_items(:weight) ,
-                                           :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => 2)
+                                           :start_value => 2, :end_value => 3, :sop_id => s.id, :sop_version => 2)
 
     assert_not_equal 0, s.find_version(2).experimental_conditions.count
     assert_equal condition2, s.find_version(2).experimental_conditions.first

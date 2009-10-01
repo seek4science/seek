@@ -13,6 +13,7 @@ class StudiedFactorsController < ApplicationController
   def create
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
+    @studied_factor.data_file_version = params[:version]
 
     render :update do |page|
       if @studied_factor.save
@@ -46,6 +47,7 @@ class StudiedFactorsController < ApplicationController
       the_action="edit" if the_action=="destroy" #we are not destroying the sop, just editing its exp conditions
       if Authorization.is_authorized?(the_action, nil, data_file, current_user)
         @data_file = data_file
+        @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"

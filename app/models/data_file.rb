@@ -1,4 +1,5 @@
 require 'acts_as_resource'
+require 'explicit_versioning'
 
 class DataFile < ActiveRecord::Base
 
@@ -10,8 +11,6 @@ class DataFile < ActiveRecord::Base
 
   validates_presence_of :title
 
-  has_many :studied_factors
-
   # allow same titles, but only if these belong to different users
   validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
@@ -19,6 +18,22 @@ class DataFile < ActiveRecord::Base
              :dependent => :destroy
 
   acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED  
+  
+  has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
+
+  explicit_versioning(:version_column => "version") do
+    
+    belongs_to :content_blob,
+             :dependent => :destroy
+    
+    belongs_to :contributor, :polymorphic => true
+    
+    has_many :created_datas,:dependent=>:destroy
+  
+    has_many :assays,:through=>:created_datas
+    
+    has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
+  end
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)

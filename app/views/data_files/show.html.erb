@@ -1,8 +1,9 @@
-
+<%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
   <% if Authorization.is_authorized?("manage", nil, @data_file, current_user) -%>
+    <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
     <li><%= icon('manage', edit_data_file_path(@data_file), nil, nil, 'Manage Data file') -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @data_file, current_user) -%>
     <%# this is not owner, but current user can edit -%>
@@ -15,7 +16,7 @@
 
   <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
     <li>
-      <%= icon('download', download_data_file_url, "Download Data file", nil, "Download Data file") -%>
+      <%= icon('download', download_data_file_url(:version=>@display_data_file.version), "Download Data file", nil, "Download Data file") -%>
     </li>
   <% else -%>
     <li>
@@ -25,6 +26,8 @@
 
 </ul>
 
+<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
+
 <h1 class="contribution_title">Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @data_file } -%>
@@ -32,6 +35,7 @@
 
 <div class="show_basic">
   <div class="main_content_left_box">
+    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
       <p>
         <label>Project:</label>
@@ -43,21 +47,21 @@
       </p>
       <p>
         <label>File name:</label>
-        <%=h @data_file.original_filename -%>
+        <%=h @display_data_file.original_filename -%>
       </p>
 
       <p>
         <label>Format:</label>
-        <%=h @data_file.content_type -%>
+        <%=h @display_data_file.content_type -%>
       </p>
       <br/>
 
       <p>
         <b>Description:</b>
 
-        <% unless @data_file.description.blank? -%>
+        <% unless @display_data_file.description.blank? -%>
           <div class="box_standout">
-            <%= simple_format(auto_link(white_list(@data_file.description))) -%>
+            <%= simple_format(auto_link(white_list(@display_data_file.description))) -%>
           </div>
         <% else -%>
           <p class="none_text">
