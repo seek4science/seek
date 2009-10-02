@@ -12,7 +12,8 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
   test "cannot edit factors studied for downloadable data file" do
     df=data_files(:downloadable_data_file)
-    get :index,:data_file_id=>df.id
+    df.save
+    get :index,{:data_file_id=>df.id, :version => df.version}
     assert_select 'img[title="Start editing"]',:count=>0
     assert_select 'div[id="edit_on"]',:count=>0
     assert_select 'div[id="edit_off"]',:count=>0
@@ -20,7 +21,8 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
   test "can edit factors studied for editable data file" do
     df=data_files(:editable_data_file)
-    get :index,:data_file_id=>df.id
+    df.save
+    get :index,{:data_file_id=>df.id, :version => df.version}
     assert_select 'img[title="Start editing"]',:count=>1
     assert_select 'div[id="edit_on"]',:count=>1
     assert_select 'div[id="edit_off"]',:count=>1

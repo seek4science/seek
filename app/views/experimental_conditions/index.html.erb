@@ -1,5 +1,5 @@
 <h1>
-  <%= "Experimental conditions for '#{link_to h(@sop.title),@sop}'" %>
+  <%= "Experimental conditions for '#{link_to h(@sop.title),sop_path(@sop, :version => @display_sop.version)}' version #{@display_sop.version}" %>
 </h1>
 <% if @sop.can_edit? current_user -%>
   <div id="edit_on">
@@ -38,7 +38,7 @@
     <%= render :partial=>"condition_row_headings" %>
 
     <div id="experimental_conditions_rows">
-      <%= render :partial=>"condition_row",:collection=>@sop.experimental_conditions %>
+      <%= render :partial=>"condition_row",:collection=>@display_sop.experimental_conditions %>
     </div>
   </ul>
 

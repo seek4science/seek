@@ -42,12 +42,16 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should show model" do
-    get :show, :id => models(:teusink).id
+    m = models(:teusink)
+    m.save
+    get :show, :id => m
     assert_response :success
   end
 
   test "should show model with format and type" do
-    get :show, :id => models(:model_with_format_and_type).id
+    m = models(:model_with_format_and_type)
+    m.save
+    get :show, :id => m
     assert_response :success
   end
 
@@ -236,6 +240,59 @@ class ModelsControllerTest < ActionController::TestCase
     end
 
     assert_nil ModelType.find(:first,:conditions=>{:title=>"fred"})
+  end
+  
+  def test_should_show_version
+    m = models(:model_with_format_and_type)
+    m.save! #to force creation of initial version (fixtures don't include it)
+    old_desc=m.description
+    old_desc_regexp=Regexp.new(old_desc)
+
+    #create new version
+    m.description="This is now version 2"
+    assert m.save_as_new_version
+    m = Model.find(m.id)
+    assert_equal 2, m.versions.size
+    assert_equal 2, m.version
+    assert_equal 1, m.versions[0].version
+    assert_equal 2, m.versions[1].version
+
+    get :show, :id=>models(:model_with_format_and_type)
+    assert_select "p", :text=>/This is now version 2/, :count=>1
+    assert_select "p", :text=>old_desc_regexp, :count=>0
+
+    get :show, :id=>models(:model_with_format_and_type), :version=>"2"
+    assert_select "p", :text=>/This is now version 2/, :count=>1
+    assert_select "p", :text=>old_desc_regexp, :count=>0
+
+    get :show, :id=>models(:model_with_format_and_type), :version=>"1"
+    assert_select "p", :text=>/This is now version 2/, :count=>0
+    assert_select "p", :text=>old_desc_regexp, :count=>1
+
+  end
+
+  def test_should_create_new_version
+    m=models(:model_with_format_and_type)
+    m.save! #to force creation of initial version (fixtures don't include it)
+
+    assert_difference("Model::Version.count", 1) do
+      post :new_version, :id=>m, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
+    end
+
+    assert_redirected_to model_path(m)
+    assert assigns(:model)
+    assert_not_nil flash[:notice]
+    assert_nil flash[:error]
+
+    
+    m=Model.find(m.id)
+    assert_equal 2,m.versions.size
+    assert_equal 2,m.version
+    assert_equal "file_picture.png",m.original_filename
+    assert_equal "file_picture.png",m.versions[1].original_filename
+    assert_equal "Teusink.xml",m.versions[0].original_filename
+    assert_equal "This is a new revision",m.versions[1].revision_comments
+
   end
 
   def valid_model

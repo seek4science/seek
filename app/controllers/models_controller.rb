@@ -12,6 +12,7 @@ class ModelsController < ApplicationController
 
   before_filter :find_models, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata ]
+  before_filter :find_display_model, :only=>[:show,:download]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
 
@@ -24,6 +25,23 @@ class ModelsController < ApplicationController
       format.xml { render :xml=>@models}
     end
   end
+
+  def new_version
+    data = params[:data].read
+    comments = params[:revision_comment]
+    @model.content_blob = ContentBlob.new(:data => data)
+    @model.content_type = params[:data].content_type
+    @model.original_filename = params[:data].original_filename
+    respond_to do |format|
+      if @model.save_as_new_version(comments)
+        flash[:notice]="New version uploaded - now on version #{@model.version}"
+      else
+        flash[:error]="Unable to save new version"          
+      end
+      format.html {redirect_to @model }
+    end
+  end
+
 
   def update_model_metadata
     attribute=params[:attribute]
@@ -352,6 +370,11 @@ class ModelsController < ApplicationController
     @models = found    
   end
 
+  def find_display_model
+    if @model
+      @display_model = params[:version] ? @model.find_version(params[:version]) : @model.latest_version
+    end
+  end
 
   def find_model_auth
     begin

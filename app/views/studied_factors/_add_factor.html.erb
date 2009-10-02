@@ -29,6 +29,8 @@
       <td><%= f.text_field :standard_deviation,:size=>4 %></td>
 
       <td><%= f.submit "Add" %></td>
+      
+      <%= hidden_field_tag "version", @display_data_file.version -%>
     </tr>
 
   </table>

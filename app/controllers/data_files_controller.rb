@@ -4,6 +4,7 @@ class DataFilesController < ApplicationController
 
   before_filter :find_data_files, :only => [ :index ]
   before_filter :find_data_file_auth, :except => [ :index, :new, :create,:data_file_preview_ajax ]
+  before_filter :find_display_data_file, :only=>[:show,:download]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
 
@@ -12,6 +13,29 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml { render :xml=>@data_files}
+    end
+  end
+  
+  def new_version
+    data = params[:data].read
+    comments=params[:revision_comment]
+    @data_file.content_blob = ContentBlob.new(:data => data)
+    @data_file.content_type = params[:data].content_type
+    @data_file.original_filename=params[:data].original_filename
+    factors = @data_file.studied_factors
+    respond_to do |format|
+      if @data_file.save_as_new_version(comments)
+        #Duplicate studied factors
+        factors.each do |f|
+          new_f = f.clone
+          new_f.data_file_version = @data_file.version
+          new_f.save
+        end
+        flash[:notice]="New version uploaded - now on version #{@data_file.version}"
+      else
+        flash[:error]="Unable to save new version"          
+      end
+      format.html {redirect_to @data_file }
     end
   end
 
@@ -207,6 +231,11 @@ class DataFilesController < ApplicationController
     @data_files = found
   end
 
+  def find_display_data_file
+    if @data_file
+      @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
+    end
+  end
 
   def find_data_file_auth
     begin

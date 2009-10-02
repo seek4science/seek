@@ -13,6 +13,7 @@ class ExperimentalConditionsController < ApplicationController
   def create    
     @experimental_condition=ExperimentalCondition.new(params[:experimental_condition])
     @experimental_condition.sop=@sop
+    @experimental_condition.sop_version = params[:version]
     
     render :update do |page|
       if @experimental_condition.save
@@ -48,6 +49,7 @@ class ExperimentalConditionsController < ApplicationController
       the_action="edit" if the_action=="destroy" #we are not destroying the sop, just editing its exp conditions
       if Authorization.is_authorized?(the_action, nil, sop, current_user)
         @sop = sop
+        @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"
