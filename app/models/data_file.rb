@@ -28,10 +28,6 @@ class DataFile < ActiveRecord::Base
     
     belongs_to :contributor, :polymorphic => true
     
-    has_many :created_datas,:dependent=>:destroy
-  
-    has_many :assays,:through=>:created_datas
-    
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
   end
 

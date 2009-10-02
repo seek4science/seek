@@ -1,9 +1,11 @@
 <%= stylesheet_link_tag 'jws' %>
+<%= javascript_include_tag "resource" -%>
 
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
   <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
+    <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
     <li><%= icon('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
     <%# this is not owner, but current user can edit -%>
@@ -15,7 +17,7 @@
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
-    <li><%= icon('download', download_model_url, "Download Model", nil, "Download Model") -%></li>
+    <li><%= icon('download', download_model_url(:version=>@display_model.version), "Download Model", nil, "Download Model") -%></li>
   <% else -%>
     <li>
       <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@model} %>
@@ -23,32 +25,37 @@
   <% end -%>
 </ul>
 
+<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
+
 <h1 class="contribution_title">Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @model } -%>
 
 <div class="show_basic">
   <div class="main_content_left_box">
+    
+    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
+    
     <div class="box_about_actor">
       <p>
         <b>Title:</b>
-        <span class="title"><%=h @model.title -%></span>
+        <span class="title"><%=h @display_model.title -%></span>
       </p>
 
       <p>
         <b>File name:</b>
-        <%=h @model.original_filename -%>
+        <%=h @display_model.original_filename -%>
       </p>
 
       <p>
         <b>Format:</b>
-        <%=h @model.content_type -%>
+        <%=h @display_model.content_type -%>
       </p>
 
       <p>
         <b>Organism:</b>
-        <% if @model.organism -%>
-          <%= organism_link_to @model.organism -%>
+        <% if @display_model.organism -%>
+          <%= organism_link_to @display_model.organism -%>
         <% else -%>
           <span class="none_text">Not specified</span>
         <% end -%>
@@ -56,35 +63,33 @@
 
       <p>
         <b>Model type:</b>
-        <%= model_type_text @model.model_type %>
+        <%= model_type_text @display_model.model_type %>
       </p>
 
       <p>
         <b>Model format:</b>
-        <%= model_format_text @model.model_format %>
+        <%= model_format_text @display_model.model_format %>
       </p>
 
       <p>
         <b>Execution or visualisation environment:</b>
-        <%= model_environment_text @model %>
+        <%= model_environment_text @display_model %>
       </p>
 
       <br/>
 
-      <label>
-        Description:
-      </label>
-
-      <% unless @model.description.blank? -%>
-        <div class="box_standout">
-          <%= simple_format(auto_link(white_list(@model.description))) -%>
-        </div>
-      <% else -%>
-        <p class="none_text">
-          No description.
-        </p>
-      <% end -%>
-      
+      <p>
+        <b>Description:</b>
+        <% unless @display_model.description.blank? -%>
+          <div class="box_standout">
+            <%= simple_format(auto_link(white_list(@display_model.description))) -%>
+          </div>
+        <% else -%>
+          <p class="none_text">
+            No description.
+          </p>
+        <% end -%>
+      </p>      
     </div>
   </div>
 
@@ -93,7 +98,7 @@
     <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @model, :attributed_to => Authorization.authorize_collection("show", @model.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
   </div>
 
-  <div style="clear:both;">
+  <div style="clear:both;padding-top:1em;">
 
     
     

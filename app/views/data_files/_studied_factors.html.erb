@@ -1,9 +1,8 @@
-
 <% if Authorization.is_authorized?("view",nil,@data_file,current_user) -%>
 
   <% if @data_file.can_edit? current_user -%>
     <ul class="sectionIcons">
-      <li><%= icon('edit', data_file_studied_factors_path(@data_file, :version => @display_data_file.version), nil, nil, 'Edit factors studied') -%></li>
+      <li><%= icon('edit', data_file_studied_factors_path(@data_file), nil, nil, 'Edit factors studied (latest version)') -%></li>
     </ul>
   <% end -%>
 
@@ -22,13 +21,4 @@
 
   <div style="clear:both;">&nbsp;</div>
 
-
-
 <% end -%>
-
-
-
-
-
-
-

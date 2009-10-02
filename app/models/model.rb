@@ -1,4 +1,5 @@
 require 'acts_as_resource'
+require 'explicit_versioning'
 
 class Model < ActiveRecord::Base
 
@@ -19,9 +20,21 @@ class Model < ActiveRecord::Base
   
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if SOLR_ENABLED
 
-  
-
   has_many :created_datas
+  
+  explicit_versioning(:version_column => "version") do
+    
+    belongs_to :content_blob,
+             :dependent => :destroy
+             
+    belongs_to :organism
+    belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
+    belongs_to :model_type
+    belongs_to :model_format
+    
+    belongs_to :contributor, :polymorphic => true
+    
+  end
 
   # get a list of Models with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
