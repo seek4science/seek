@@ -23,4 +23,4 @@ config.action_controller.perform_caching             = true
 #
 #
 SOLR_ENABLED=true
-ACTIVATION_REQUIRED=true
+ACTIONVATION_REQUIRED=false
