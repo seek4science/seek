@@ -8,9 +8,8 @@
   <div tabindex="-1" id="expertise_ids" class="clearfix tokenizer" onclick="$('expertise_autocomplete_input').focus();">
     <span class="tokenizer_stretcher">^_^</span>
     <span class="tab_stop"><input type="text" id="expertise_hidden_input" tabindex="-1"></span>
-
     <div id="expertise_autocomplete_display" class="tokenizer_input">
-      <input type="text" size="1" tabindex="" id="expertise_autocomplete_input"/>
+      <input type="text" size="1" tabindex="" id="expertise_autocomplete_input" onBlur="addLastTag();"/>
     </div>
   </div>
   <div id="expertise_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
@@ -51,4 +50,17 @@
     var hidden_input = new HiddenInput('expertise_hidden_input', expertise_autocompleter);
 
     autocompleters[expertise_autocompleter_id] = expertise_autocompleter;
+    
+    //Add the last tag entered onto the list when the element becomes unfocused.
+    //Code taken from the onKeyPress method of autocompleter_advanced.js.
+    function addLastTag(){
+      autocompleter = autocompleters['expertise_autocompleter']
+      var unrecognized_item = expertise_autocompleter.element.value.strip().sub(',', '')
+      if (expertise_autocompleter.validate_item(unrecognized_item)) {
+        autocompleter.addUnrecognizedItemToList(unrecognized_item);
+        autocompleter.element.value = "";        
+        autocompleter.set_input_size();
+        return false;
+      }
+    }   
 </script>
