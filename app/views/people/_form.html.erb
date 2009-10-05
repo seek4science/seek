@@ -65,11 +65,9 @@
   <div class="fold">
     <div class="foldTitle">Knowledge and expertise</div>
     <div class="foldContent">
-      <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %>
-<br/>
+      <%= render :partial=>"people/discipline_select",:locals=>{:f=>f} %><br/>
       <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
-      <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>      
-      
+      <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
     </div>
   </div>
 
@@ -118,3 +116,18 @@
   <%= f.submit(person ? "Update" : "Create") -%>
   or <%= link_to 'Cancel', (person ? person_path(person.id) : people_path) -%>
 </p>
+
+<script type="text/javascript">
+  //Add the last tag entered onto the list when the element becomes unfocused.
+  //Code taken from the onKeyPress method of autocompleter_advanced.js.
+  function addLastTag(autocompleter_id){
+    var autocompleter = autocompleters[autocompleter_id];
+    var unrecognized_item = autocompleter.element.value.strip().sub(',', '');
+    if (unrecognized_item.length > 0 && autocompleter.validate_item(unrecognized_item)) {
+      autocompleter.addUnrecognizedItemToList(unrecognized_item);
+      autocompleter.element.value = "";        
+      autocompleter.set_input_size();
+    }
+    return false;
+  }
+</script>
