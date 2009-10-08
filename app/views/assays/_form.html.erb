@@ -28,7 +28,7 @@
       <%
         studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])
       -%>
-      <%= f.collection_select :study_id,studies,:id,:title,:include_blank=>"Not specified" -%>
+      <%= f.select("study_id", studies.collect {|s| [ truncate(s.title, :length => 64), s.id ] }, { :include_blank => "Not specified" }) -%>
     </p>
   </div>
 </center>
