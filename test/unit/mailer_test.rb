@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../test_helper'
+require File.dirname(__FILE__) + '/../time_test_helper'
 
 class MailerTest < ActionMailer::TestCase
   fixtures :all
@@ -11,8 +12,10 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.body    = read_fixture('signup')
     
-
-    assert_equal @expected.encoded, Mailer.create_signup(users(:aaron),"localhost").encoded
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded, Mailer.create_signup(users(:aaron),"localhost").encoded
+    end
+    
   end
 
   test "feedback anonymously" do
