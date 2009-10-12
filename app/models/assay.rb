@@ -9,10 +9,16 @@ class Assay < ActiveRecord::Base
   belongs_to :organism
   belongs_to :owner, :class_name=>"Person"
 
+  has_many :assay_assets
+
   has_one :investigation,:through=>:study  
 
   has_many :created_datas
   has_many :data_files,:through=>:created_datas
+
+  has_many :assets,:through=>:assay_assets
+
+  
 
   validates_presence_of :title
   validates_uniqueness_of :title
@@ -40,5 +46,9 @@ class Assay < ActiveRecord::Base
 
   def can_delete? user
     can_edit?(user) && data_files.empty? && sops.empty?
+  end
+
+  def sops2
+    assay_assets.sops
   end
 end

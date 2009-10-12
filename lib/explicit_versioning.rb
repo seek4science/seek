@@ -198,11 +198,7 @@ module Jits
           def sync_latest_version
             ver = versions.last
             if (ver.nil?)
-              set_new_version
-              without_update_callbacks do
-                self.save
-              end
-              save_version_on_create
+              save_as_new_version
             else
               clone_versioned_model(self, ver)
               ver.save

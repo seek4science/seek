@@ -24,6 +24,7 @@ class SopTest < ActiveSupport::TestCase
     assert_equal sop.title,sop.versions.first.title
 
   end
+  
 
   def test_create_new_version
     sop=sops(:my_first_sop)

@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  assay_id: 1
+  asset_id: 1
+  version: 1
+
+two:
+  assay_id: 1
+  asset_id: 1
+  version: 1
