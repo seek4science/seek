@@ -13,8 +13,6 @@ class Assay < ActiveRecord::Base
 
   has_many :assets,:through=>:assay_assets
 
-  
-
   validates_presence_of :title
   validates_uniqueness_of :title
 
