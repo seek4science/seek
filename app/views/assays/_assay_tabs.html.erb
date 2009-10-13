@@ -1,5 +1,5 @@
-<% assay_resource_hash = Asset.classify_and_authorize(@assay.sops.collect{|sop| sop.asset  }, true, current_user) -%>
-<% assay_resource_hash.merge!(Asset.classify_and_authorize(@assay.data_files.collect{|df| df.asset  }, true, current_user)) -%>
+<% assay_resource_hash = Asset.classify_and_authorize_resources(@assay.sops, true, current_user) -%>
+<% assay_resource_hash.merge!(Asset.classify_and_authorize_resources(@assay.data_files, true, current_user)) -%>
 <% unless @assay.study.nil? -%>
   <% assay_resource_hash.merge!(classify_for_tabs([@assay.study])) -%>
   <% assay_resource_hash.merge!(classify_for_tabs([@assay.project])) -%>

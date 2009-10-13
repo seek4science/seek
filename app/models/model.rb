@@ -34,6 +34,10 @@ class Model < ActiveRecord::Base
     
     belongs_to :contributor, :polymorphic => true
     
+    def asset
+      self.model.asset
+    end
+    
   end
 
   # get a list of Models with their original uploaders - for autocomplete fields

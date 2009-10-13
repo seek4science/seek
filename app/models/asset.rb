@@ -38,6 +38,29 @@ class Asset < ActiveRecord::Base
     return results
   end
   
+  #Works same as above method except takes a list of resources, in order to work with versioned models
+  def self.classify_and_authorize_resources(resource_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)
+    results = {}
+    
+    resource_array.each do |r|
+      if should_perform_filtering_if_not_authorized
+        # if asset is not authorized for viewing by this user, just skip it
+        # (it's much faster to supply 'asset' instance instead of related resource)
+        next unless Authorization.is_authorized?("show", nil, r.asset, user_to_authorize)
+      end
+      
+      # Fix version class names to be the class name of the versioned object
+      class_name = r.class.name
+      if class_name.ends_with?("::Version")
+        class_name = class_name.split("::")[0]
+      end
+      
+      results[class_name] = [] unless results[class_name]
+      results[class_name] << r
+    end
+    
+    return results
+  end
   
   # this method will save the Asset, but will not cause 'updated_at' field to receive new value of Time.now
   def save_without_timestamping
