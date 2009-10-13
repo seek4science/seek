@@ -21,8 +21,7 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test "create implied version" do
-    sop=sops(:my_first_sop)
-    sop.save_as_new_version
+    sop=sops(:my_first_sop)    
 
     assert_equal(1,sop.version)
     assert_equal(1,sop.asset.resource.version)

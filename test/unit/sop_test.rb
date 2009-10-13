@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class SopTest < ActiveSupport::TestCase
   fixtures :all
+  
 
   test "project" do
     s=sops(:editable_sop)
@@ -26,17 +27,19 @@ class SopTest < ActiveSupport::TestCase
   end
 
   #really just to test the fixtures for versions, but may as well leave here.
-#  def test_version_from_fixtures
-#    sop_version=sop_versions(:my_first_sop_v1)
-#    assert_equals 1,sop_version.id
-#
-#    sop=sops(:my_first_sop)
-#    assert_equals sop,sop_version.sop
-#
-#    assert_equal 1,sop.version
-#    assert_equal sop.title,sop.versions.first.title
-#
-#  end
+  def test_version_from_fixtures
+    sop_version=sop_versions(:my_first_sop_v1)
+    assert_equal 1,sop_version.version
+    assert_equal users(:owner_of_my_first_sop),sop_version.contributor
+    assert_equal content_blobs(:content_blob_with_little_file),sop_version.content_blob
+
+    sop=sops(:my_first_sop)
+    assert_equal sop.id,sop_version.sop_id
+
+    assert_equal 1,sop.version
+    assert_equal sop.title,sop.versions.first.title
+
+  end
   
 
   def test_create_new_version

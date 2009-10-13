@@ -34,5 +34,7 @@ class ActiveSupport::TestCase
   # -- they do not yet inherit this setting
   #fixtures :all
 
+  set_fixture_class :sop_versions=>Sop::Version
+
   # Add more helper methods to be used by all tests here...
 end

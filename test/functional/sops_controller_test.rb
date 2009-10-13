@@ -30,25 +30,28 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should show sop" do
-    s=sops(:one)
-    s.save #to force versions to be created (saves writing fixtures)
-    get :show, :id => s
+    login_as(:owner_of_my_first_sop)
+    s=sops(:my_first_sop)
+    get :show, :id => s.id
     assert_response :success
   end
 
   test "should get edit" do
-    get :edit, :id => sops(:one)
+    login_as(:owner_of_my_first_sop)
+    get :edit, :id => sops(:my_first_sop)
     assert_response :success
   end
 
   test "should update sop" do
-    put :update, :id => sops(:one).id, :sop => {:title=>"Test2"}, :sharing=>valid_sharing
+    login_as(:owner_of_my_first_sop)
+    put :update, :id => sops(:my_first_sop).id, :sop => {:title=>"Test2"}, :sharing=>valid_sharing
     assert_redirected_to sop_path(assigns(:sop))
   end
 
   test "should destroy sop" do
+    login_as(:owner_of_my_first_sop)
     assert_difference('Sop.count', -1) do
-      delete :destroy, :id => sops(:one)
+      delete :destroy, :id => sops(:my_first_sop)
     end
 
     assert_redirected_to sops_path
@@ -56,7 +59,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should not be able to edit exp conditions for downloadable only sop" do
     s=sops(:downloadable_sop)
-    s.save! #to force versions to be created (saves writing fixtures)
+    
     get :show, :id=>s
     assert_select "a", :text=>/Edit experimental conditions/, :count=>0
   end
@@ -64,21 +67,20 @@ class SopsControllerTest < ActionController::TestCase
   test "should be able to edit exp conditions for owners downloadable only sop" do
     login_as(:owner_of_my_first_sop)
     s=sops(:downloadable_sop)
-    s.save #to force versions to be created (saves writing fixtures)
+
     get :show, :id=>s
     assert_select "a", :text=>/Edit experimental conditions/, :count=>1
   end
 
   test "should be able to edit exp conditions for editable sop" do
     s=sops(:editable_sop)
-    s.save #to force versions to be created (saves writing fixtures)
+    
     get :show, :id=>sops(:editable_sop)
     assert_select "a", :text=>/Edit experimental conditions/, :count=>1
   end
 
   def test_should_show_version
-    s=sops(:editable_sop)
-    s.save! #to force creation of initial version (fixtures don't include it)
+    s=sops(:editable_sop)    
     old_desc=s.description
     old_desc_regexp=Regexp.new(old_desc)
 
@@ -106,8 +108,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_new_version
-    s=sops(:editable_sop)
-    s.save! #to force creation of initial version (fixtures don't include it)
+    s=sops(:editable_sop)    
 
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
@@ -130,8 +131,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_not_create_new_version_for_downloadable_only_sop
-    s=sops(:downloadable_sop)
-    s.save! #to force creation of initial version (fixtures don't include it)
+    s=sops(:downloadable_sop)    
 
     assert_no_difference("Sop::Version.count") do
       post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
@@ -148,8 +148,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_duplicate_conditions_for_new_version
-    s=sops(:editable_sop)
-    s.save! #v1
+    s=sops(:editable_sop)    
     condition1 = ExperimentalCondition.create(:unit => units(:gram),:measured_item => measured_items(:weight) ,
                                            :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
@@ -162,8 +161,7 @@ class SopsControllerTest < ActionController::TestCase
   end
   
   def test_adding_new_conditions_to_different_versions
-    s=sops(:editable_sop)
-    s.save! #v1
+    s=sops(:editable_sop)    
     condition1 = ExperimentalCondition.create(:unit => units(:gram),:measured_item => measured_items(:weight) ,
                                            :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do                                           

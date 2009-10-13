@@ -47,9 +47,9 @@ class StudyTest < ActiveSupport::TestCase
     #study with 2 assays that have overlapping sops. Checks that the sops aren't dupliced.
     study=studies(:study_with_overlapping_assay_sops)
     assert_equal 3,study.sops.size
-    assert study.sops.include?(sops(:my_first_sop))
-    assert study.sops.include?(sops(:sop_with_fully_public_policy))
-    assert study.sops.include?(sops(:sop_for_test_with_workgroups))
+    assert study.sops.include?(sops(:my_first_sop).versions.first)
+    assert study.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
+    assert study.sops.include?(sops(:sop_for_test_with_workgroups).versions.first)
   end
 
   test "person responisble" do
