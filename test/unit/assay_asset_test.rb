@@ -58,10 +58,5 @@ class AssayAssetTest < ActiveSupport::TestCase
     assert_equal(assay, a.assay)    
     assert_equal(sop.find_version(2),a.versioned_resource)
   end
-
-  def test_sops
-    #FIXME needs fixtures to test properly
-    AssayAsset.sops
-  end
   
 end

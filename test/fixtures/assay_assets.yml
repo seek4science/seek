@@ -1,3 +1,41 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
+metabolomics_assay_asset1:
+  asset: asset_of_my_first_sop
+  assay: metabolomics_assay
+  version: 1
 
+metabolomics_assay_asset2:
+  asset: asset_of_a_sop_with_fully_public_policy
+  assay: metabolomics_assay
+  version: 1
+
+metabolomics_assay2_assets1:
+  asset: asset_of_my_first_sop
+  assay: metabolomics_assay2
+  version: 1
+
+metabolomics_assay2_assets2:
+  asset: asset_of_a_sop_for_test_with_workgroups
+  assay: metabolomics_assay2
+  version: 1
+
+metabolomics_assay3_asset1:
+  asset: asset_of_my_first_sop
+  assay: metabolomics_assay3
+  version: 1
+
+metabolomics_assay3_asset2:
+  asset: asset_of_a_sop_with_fully_public_policy
+  assay: metabolomics_assay3
+  version: 1
+
+assay_with_no_study_but_has_some_sops_asset:
+  asset: asset_of_my_first_sop
+  assay: assay_with_no_study_but_has_some_sops
+  version: 1
+
+assay_with_no_study_but_has_some_files_asset:
+  asset: asset_for_datafile
+  assay: assay_with_no_study_but_has_some_files
+  version: 1

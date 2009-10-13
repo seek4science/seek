@@ -24,6 +24,19 @@ class SopTest < ActiveSupport::TestCase
     assert_equal sop.title,sop.versions.first.title
 
   end
+
+  #really just to test the fixtures for versions, but may as well leave here.
+#  def test_version_from_fixtures
+#    sop_version=sop_versions(:my_first_sop_v1)
+#    assert_equals 1,sop_version.id
+#
+#    sop=sops(:my_first_sop)
+#    assert_equals sop,sop_version.sop
+#
+#    assert_equal 1,sop.version
+#    assert_equal sop.title,sop.versions.first.title
+#
+#  end
   
 
   def test_create_new_version

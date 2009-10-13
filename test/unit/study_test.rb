@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class StudyTest < ActiveSupport::TestCase
   
-  fixtures :studies,:assays,:investigations,:projects,:technology_types,:assay_types,:people,:sops,:users
+  fixtures :all
 
   test "associations" do
     study=studies(:metabolomics_study)
@@ -41,8 +41,8 @@ class StudyTest < ActiveSupport::TestCase
   test "sops through assays" do
     study=studies(:metabolomics_study)
     assert_equal 2,study.sops.size
-    assert study.sops.include?(sops(:my_first_sop))
-    assert study.sops.include?(sops(:sop_with_fully_public_policy))
+    assert study.sops.include?(sops(:my_first_sop).versions.first)
+    assert study.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
     
     #study with 2 assays that have overlapping sops. Checks that the sops aren't dupliced.
     study=studies(:study_with_overlapping_assay_sops)

@@ -6,9 +6,8 @@ class AssayTest < ActiveSupport::TestCase
   test "sops association" do
     assay=assays(:metabolomics_assay)
     assert_equal 2,assay.sops.size
-    assert assay.sops.include?(sops(:my_first_sop))
-    assert assay.sops.include?(sops(:sop_with_fully_public_policy))
-
+    assert assay.sops.include?(sops(:my_first_sop).versions.first)
+    assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
   test "orgnanism association" do
@@ -86,52 +85,12 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "assets" do
-    sops=[]
-    data_files=[]
-    sops << sops(:my_first_sop)
-    sops << sops(:sop_with_fully_public_policy)
-    data_files << data_files(:picture)
-
-    #to make them versioned
-    sops.each{|s| s.save_as_new_version}
-    data_files.each{|df| df.save_as_new_version}
-
     assay=assays(:metabolomics_assay)
-    assert_equal 0,assay.assets.size
-
-    assay.assets << sops[0].asset
-    assay.assets << sops[1].asset
-    assay.assets << data_files[0].asset
-
-    assert_equal 3,assay.assets.size
-
-  end
-
-  test "sops" do
-    sops=[]
-    data_files=[]
-    sops << sops(:my_first_sop)
-    sops << sops(:sop_with_fully_public_policy)
-    data_files << data_files(:picture)
-
-    #to make them versioned
-    sops.each{|s| s.save_as_new_version}
-    data_files.each{|df| df.save_as_new_version}
-
-    assay=Assay.new(:title=>"fred",:study=>studies(:study_with_no_assays))
-    assert_equal 0,assay.sops.size
-
-    assay.assets << sops[0].asset
-    assay.assets << sops[1].asset
-    assay.assets << data_files[0].asset
-
-    assay.save
-
-    assert_equal 2,assay.versioned_sops.size
-    assert assay.sops2.contains?(sops[0])
-    assert assay.sops2.contains?(sops[1])
     
-  end
+
+    assert_equal 2,assay.assets.size
+
+  end  
 
 
 end

@@ -16,15 +16,8 @@ class Study < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
 
-  def sops
-    #sops=[]
-    #assays.each do |a|
-    #  a.sops.each do |s|
-    #    sops << s unless sops.include?(s)
-    #  end
-    #end
-    #return sops
-    assays.collect{|assay| assay.sops.collect{|sop| sop  }}.flatten.uniq
+  def sops    
+    assays.collect{|assay| assay.sops.collect{|sop| sop}}.flatten.uniq    
   end
 
   def can_edit? user
