@@ -127,7 +127,7 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.save
 
-    assert_equal 2,assay.sops2.size
+    assert_equal 2,assay.versioned_sops.size
     assert assay.sops2.contains?(sops[0])
     assert assay.sops2.contains?(sops[1])
     

@@ -24,14 +24,14 @@ class AssayAssetTest < ActiveSupport::TestCase
     sop=sops(:my_first_sop)
     sop.save_as_new_version
 
-    assert_equal(2,sop.version)
-    assert_equal(2,sop.asset.resource.version)
+    assert_equal(1,sop.version)
+    assert_equal(1,sop.asset.resource.version)
 
     assay=assays(:metabolomics_assay)
 
     a=AssayAsset.new
     a.asset=sop.asset
-    assert_equal(2,a.asset.resource.version)
+    assert_equal(1,a.asset.resource.version)
     
     a.assay=assay
 
@@ -55,12 +55,12 @@ class AssayAssetTest < ActiveSupport::TestCase
     a.save!
 
     assert_equal(sop.asset, a.asset)
-    assert_equal(assay, a.assay)
-    assert_equal(sop.version,a.version)
+    assert_equal(assay, a.assay)    
     assert_equal(sop.find_version(2),a.versioned_resource)
   end
 
   def test_sops
+    #FIXME needs fixtures to test properly
     AssayAsset.sops
   end
   

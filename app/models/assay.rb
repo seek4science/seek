@@ -48,7 +48,8 @@ class Assay < ActiveRecord::Base
     can_edit?(user) && data_files.empty? && sops.empty?
   end
 
-  def sops2
-    assay_assets.sops
+  def versioned_sops
+    assay_assets.sops.collect{|s| s.versioned_resource}
   end
+  
 end
