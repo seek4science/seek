@@ -8,7 +8,8 @@
   	<% collection.each do |item| -%>
 		  <% if authorization_for_showing_already_done || Authorization.is_authorized?("show", nil, item, current_user) -%>
 			  <% odd_row = !odd_row -%>
-				<%= render :partial => "#{item.class.name.pluralize.underscore}/resource_list_item",:object=>item, :locals => {:odd_row => odd_row, :narrow_view => narrow_view } -%>
+        
+				<%= render :partial => "#{get_original_model_name(item).pluralize.underscore}/resource_list_item",:object=>item, :locals => {:odd_row => odd_row, :narrow_view => narrow_view } -%>
 			<% end -%>
 		<% end -%>
 	</div>

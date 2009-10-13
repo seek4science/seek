@@ -32,6 +32,9 @@ class Sop < ActiveRecord::Base
       self.sop.asset
     end
     
+    def project
+      self.asset.project
+    end    
   end
 
   # get a list of SOPs with their original uploaders - for autocomplete fields
