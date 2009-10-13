@@ -29,6 +29,10 @@ class DataFile < ActiveRecord::Base
     belongs_to :contributor, :polymorphic => true
     
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
+    
+    def asset
+      self.data_file.asset
+    end
   end
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields

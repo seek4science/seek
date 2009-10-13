@@ -27,6 +27,11 @@ class Sop < ActiveRecord::Base
     belongs_to :contributor, :polymorphic => true
     
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
+    
+    def asset
+      self.sop.asset
+    end
+    
   end
 
   # get a list of SOPs with their original uploaders - for autocomplete fields
