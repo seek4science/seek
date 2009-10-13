@@ -1,6 +1,4 @@
-class Assay < ActiveRecord::Base  
-  
-  has_and_belongs_to_many :sops
+class Assay < ActiveRecord::Base    
   
   belongs_to :assay_type
   belongs_to :technology_type
@@ -11,10 +9,7 @@ class Assay < ActiveRecord::Base
 
   has_many :assay_assets
 
-  has_one :investigation,:through=>:study  
-
-  has_many :created_datas
-  has_many :data_files,:through=>:created_datas
+  has_one :investigation,:through=>:study    
 
   has_many :assets,:through=>:assay_assets
 
@@ -48,8 +43,12 @@ class Assay < ActiveRecord::Base
     can_edit?(user) && data_files.empty? && sops.empty?
   end
 
-  def versioned_sops
+  def sops
     assay_assets.sops.collect{|s| s.versioned_resource}
+  end
+
+  def data_files
+    assay_assets.data_files.collect{|df| df.versioned_resource}
   end
   
 end

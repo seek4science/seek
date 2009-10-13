@@ -4,6 +4,8 @@ class AssayAsset < ActiveRecord::Base
   belongs_to :assay
 
   named_scope :sops,:joins=>:asset,:conditions=>['assets.resource_type = ?','Sop']
+  named_scope :data_files,:joins=>:asset,:conditions=>['assets.resource_type = ?','DataFile']
+  named_scope :models,:joins=>:asset,:conditions=>['assets.resource_type = ?','Model']
 
   before_save :check_version
 
