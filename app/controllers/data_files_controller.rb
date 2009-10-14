@@ -3,7 +3,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
 
   before_filter :find_data_files, :only => [ :index ]
-  before_filter :find_data_file_auth, :except => [ :index, :new, :create,:data_file_preview_ajax ]
+  before_filter :find_data_file_auth, :except => [ :index, :new, :create ]
   before_filter :find_display_data_file, :only=>[:show,:download]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
@@ -198,22 +198,7 @@ class DataFilesController < ApplicationController
     @data_file.save_without_timestamping
 
     send_data @data_file.content_blob.data, :filename => @data_file.original_filename, :content_type => @data_file.content_type, :disposition => 'attachment'
-  end
-
-  def data_file_preview_ajax
-
-    if params[:id] && params[:id]!="0"
-      @data_file = DataFile.find(params[:id])
-    end
-
-    render :update do |page|
-      if @data_file && Authorization.is_authorized?("show", nil, @data_file, current_user)
-        page.replace_html "data_file_preview",:partial=>"assets/resource_preview",:locals=>{:resource=>@data_file}
-      else
-        page.replace_html "data_file_preview",:text=>"No Data file is selected, or authorised to show."
-      end
-    end
-  end
+  end 
 
   protected
   

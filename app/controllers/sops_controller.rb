@@ -4,7 +4,7 @@ class SopsController < ApplicationController
   before_filter :login_required
 
   before_filter :find_sops, :only => [ :index ]
-  before_filter :find_sop_auth, :except => [ :index, :new, :create,:sop_preview_ajax ]
+  before_filter :find_sop_auth, :except => [ :index, :new, :create ]
   before_filter :find_display_sop, :only=>[:show,:download]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
@@ -42,21 +42,7 @@ class SopsController < ApplicationController
     end
   end
 
-  def sop_preview_ajax
-
-    if params[:id] && params[:id]!="0"
-      @sop=Sop.find(params[:id])
-    end
-        
-    render :update do |page|
-      if @sop && Authorization.is_authorized?("show", nil, @sop, current_user)
-        page.replace_html "sop_preview",:partial=>"assets/resource_preview",:locals=>{:resource=>@sop}
-      else
-        page.replace_html "sop_preview",:text=>"No Sop is selected, or authorised to show."
-      end
-    end
-  end
-
+  
   # GET /sops/1
   def show
     # store timestamp of the previous last usage

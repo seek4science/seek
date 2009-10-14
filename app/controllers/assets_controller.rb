@@ -1,6 +1,7 @@
 class AssetsController < ApplicationController
   # GET /assets
-  # GET /assets.xml
+  # GET /assets.xml  
+
   def index
     @assets = Asset.find(:all)
 
@@ -30,6 +31,20 @@ class AssetsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @asset }
+    end
+  end
+
+  def asset_preview_ajax
+
+    element=params[:element]
+    asset=Asset.find(params[:id])
+    
+    render :update do |page|
+      if asset && Authorization.is_authorized?("show", nil, asset.resource, current_user)
+        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>asset.resource}
+      else
+        page.replace_html element,:text=>"No Asset is selected, or authorised to show."
+      end
     end
   end
 
@@ -94,4 +109,7 @@ class AssetsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+  
+  
 end
