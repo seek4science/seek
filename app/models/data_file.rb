@@ -30,9 +30,11 @@ class DataFile < ActiveRecord::Base
     
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
     
-    def asset
-      self.data_file.asset
-    end
+    has_one :asset,
+            :primary_key => "data_file_id",
+            :foreign_key => "resource_id"
+            
+    has_one :project, :through=>:asset 
   end
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields

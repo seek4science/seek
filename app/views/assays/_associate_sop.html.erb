@@ -13,7 +13,7 @@
         selection_box.options.length=0;        
 
         if (checked) {
-        <% ([["Select SOP ...",0]]|all_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
+        <% ([["Select SOP ...",0]]|all_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |sop_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= sop_details[0] -%>';
             option.value = '<%= sop_details[1] -%>';
@@ -26,7 +26,7 @@
         <% end -%>
         }
         else {
-           <% ([["Select SOP ...",0]]|project_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
+           <% ([["Select SOP ...",0]]|project_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |sop_details| -%>
             option = document.createElement("OPTION");
             option.text = '<%= sop_details[0] -%>';
             option.value = '<%= sop_details[1] -%>';

@@ -36,7 +36,9 @@ class AssaysController < ApplicationController
   def create
     @assay = Assay.new(params[:assay])
     
-    params[:assay_sop_ids].each do |a_id|
+    sop_assets = params[:assay_sop_ids] || []
+    data_assets = params[:data_file_ids] || []
+    (sop_assets+data_assets).each do |a_id|
       @assay.assets << Asset.find(a_id)
     end    
 
@@ -58,8 +60,15 @@ class AssaysController < ApplicationController
 
   def update
     @assay=Assay.find(params[:id])
-    synchronise_created_datas(params[:data_file_ids])
+    #synchronise_created_datas(params[:data_file_ids])
     @assay.sops.clear unless params[:assay][:sop_ids]
+    
+    @assay.assets = []
+    sop_assets = params[:assay_sop_ids] || []
+    data_assets = params[:data_file_ids] || []
+    (sop_assets+data_assets).each do |a_id|
+      @assay.assets << Asset.find(a_id)
+    end    
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
         flash[:notice] = 'Assay was successfully updated.'
