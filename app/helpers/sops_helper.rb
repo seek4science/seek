@@ -16,5 +16,8 @@ module SopsHelper
     end
     return result
   end
-
+  
+  def sop_version_path(sop)
+    sop_path(sop, :version => sop.version)
+  end
 end

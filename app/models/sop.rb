@@ -28,13 +28,11 @@ class Sop < ActiveRecord::Base
     
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
     
-    def asset
-      self.sop.asset
-    end
-    
-    def project
-      self.asset.project
-    end    
+    has_one :asset,
+            :primary_key => "sop_id",
+            :foreign_key => "resource_id"
+            
+    has_one :project, :through=>:asset  
   end
 
   # get a list of SOPs with their original uploaders - for autocomplete fields

@@ -35,9 +35,14 @@ class AssaysController < ApplicationController
 
   def create
     @assay = Assay.new(params[:assay])
+    
+    params[:assay_sop_ids].each do |a_id|
+      @assay.assets << Asset.find(a_id)
+    end    
+
     @assay.owner=current_user.person
     
-    synchronise_created_datas(params[:data_file_ids])
+    #synchronise_created_datas(params[:data_file_ids])
     
     respond_to do |format|
       if @assay.save
