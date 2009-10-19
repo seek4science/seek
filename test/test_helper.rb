@@ -35,6 +35,8 @@ class ActiveSupport::TestCase
   #fixtures :all
 
   set_fixture_class :sop_versions=>Sop::Version
+  set_fixture_class :model_versions=>Model::Version
+  set_fixture_class :data_file_versions=>DataFile::Version
 
   # Add more helper methods to be used by all tests here...
 end

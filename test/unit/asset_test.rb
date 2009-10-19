@@ -8,13 +8,7 @@ class AssetTest < ActiveSupport::TestCase
     sop=sops(:my_first_sop)
     model=models(:teusink)
     data_file=data_files(:picture)
-    user=users(:owner_of_my_first_sop)
-    
-    sop.save!
-    model.save!
-    data_file.save!
-    sop.save_as_new_version
-    model.save_as_new_version
+    user=users(:owner_of_my_first_sop)        
     
     sop_version1 = sop.find_version(1)
     model_version2 = model.find_version(2)
@@ -23,7 +17,7 @@ class AssetTest < ActiveSupport::TestCase
     resource_array << model_version2
     resource_array << data_file
     
-    assert_equal 2, sop.version
+    assert_equal 1, sop.version
     assert_equal 2, model.version
     assert_equal 1, data_file.version
     

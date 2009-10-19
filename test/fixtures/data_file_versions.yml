@@ -1,4 +1,4 @@
-picture:
+picture_v1:
   contributor: datafile_owner (User)
   title: Picture
   description: A picture
@@ -6,10 +6,11 @@ picture:
   content_blob: picture_blob
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
+  data_file: picture
   version: 1
 
 
-downloadable_data_file:
+downloadable_data_file_v1:
   contributor: datafile_owner (User)
   title: Download Only
   description: A picture
@@ -17,9 +18,10 @@ downloadable_data_file:
   content_blob: picture_blob
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
+  data_file: downloadable_data_file
   version: 1
 
-editable_data_file:
+editable_data_file_v1:
   contributor: datafile_owner (User)
   title: Editable Data File
   description: A picture
@@ -27,9 +29,10 @@ editable_data_file:
   content_blob: picture_blob
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
+  data_file: editable_data_file
   version: 1
 
-sysmo_data_file:
+sysmo_data_file_v1:
   contributor: model_owner (User)
   title: Sysmo Data File
   description: A picture
@@ -37,9 +40,10 @@ sysmo_data_file:
   content_blob: picture_blob
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
+  data_file: sysmo_data_file
   version: 1
 
-myexperiment_data_file:
+myexperiment_data_file_v1:
   contributor: datafile_owner (User)
   title: Myexperiment Data File
   description: A picture
@@ -47,7 +51,5 @@ myexperiment_data_file:
   content_blob: picture_blob
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
+  data_file: myexperiment_data_file
   version: 1
-
-
-

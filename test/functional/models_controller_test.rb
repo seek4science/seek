@@ -272,8 +272,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_new_version
-    m=models(:model_with_format_and_type)
-    m.save! #to force creation of initial version (fixtures don't include it)
+    m=models(:model_with_format_and_type)    
 
     assert_difference("Model::Version.count", 1) do
       post :new_version, :id=>m, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"

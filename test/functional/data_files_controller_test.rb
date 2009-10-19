@@ -85,8 +85,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "adding_new_conditions_to_different_versions" do
-    d=data_files(:editable_data_file)
-    d.save! #v1
+    d=data_files(:editable_data_file)    
     sf = StudiedFactor.create(:unit => units(:gram),:measured_item => measured_items(:weight),
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
