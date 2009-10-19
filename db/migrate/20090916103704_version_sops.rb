@@ -6,7 +6,7 @@ class VersionSops < ActiveRecord::Migration
       false
     end
     Sop.find(:all).each do |s|      
-      s.save
+      s.save!      
     end
 
   end

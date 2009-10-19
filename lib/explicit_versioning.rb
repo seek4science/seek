@@ -281,7 +281,7 @@ module Jits
 
           # Gets the next available version for the current record, or 1 for a new record
           def next_version
-            return 1 if new_record?
+            return 1 if new_record? || versions.empty?
             (versions.calculate(:max, :version) || 0) + 1
           end
 
@@ -319,7 +319,7 @@ module Jits
           def create_versioned_table(create_table_options = {})
             # create version column in main table if it does not exist
             if !self.content_columns.find { |c| %w(version lock_version).include? c.name }
-              self.connection.add_column table_name, :version, :integer
+              self.connection.add_column table_name, :version, :integer, :default=>1
             end
 
             self.connection.create_table(versioned_table_name, create_table_options) do |t|
