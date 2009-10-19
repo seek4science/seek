@@ -181,19 +181,7 @@ namespace :seek do
       p.save #forces the first letter to be updated
       puts "Updated for #{p.class.name} : #{p.id}"
     end
-  end
-  
-  desc "Convert old experimental conditions, not linked to a specific SOP version, to link to the latest version"
-  task(:convert_experimental_conditions=>:environment) do
-    ExperimentalCondition.all.each do |ec|
-      if ec.sop_version.nil? || ec.sop_version == 0
-        puts "Converting experimental condition(ID:#{ec.id}) to link to SOP(ID:#{ec.sop_id}) version #{ec.sop.version}"
-        ec.sop_version = ec.sop.version
-        ec.save
-      end
-    end
-    puts "Done."
-  end
+  end  
 
   private
 
