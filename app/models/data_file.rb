@@ -3,11 +3,7 @@ require 'explicit_versioning'
 
 class DataFile < ActiveRecord::Base
 
-  acts_as_resource
-
-  has_many :created_datas,:dependent=>:destroy
-
-  has_many :assays,:through=>:created_datas
+  acts_as_resource  
 
   validates_presence_of :title
 
@@ -35,6 +31,10 @@ class DataFile < ActiveRecord::Base
             :foreign_key => "resource_id"
             
     has_one :project, :through=>:asset 
+  end
+
+  def assays
+    AssayAsset.find(:all,:conditions=>["asset_id = ?",self.asset.id]).collect{|a| a.assay}
   end
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields

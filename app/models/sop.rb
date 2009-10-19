@@ -14,8 +14,8 @@ class Sop < ActiveRecord::Base
 
   belongs_to :content_blob,
              :dependent => :destroy
-             
-  has_and_belongs_to_many :assays
+               
+  has_one :investigation,:through=>:study
              
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
 
@@ -33,6 +33,10 @@ class Sop < ActiveRecord::Base
             :foreign_key => "resource_id"
             
     has_one :project, :through=>:asset  
+  end
+
+  def assays
+    AssayAsset.find(:all,:conditions=>["asset_id = ?",self.asset.id]).collect{|a| a.assay}
   end
 
   # get a list of SOPs with their original uploaders - for autocomplete fields
