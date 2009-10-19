@@ -1,2 +1,0 @@
-class CreatedDatasController < ApplicationController
-end
