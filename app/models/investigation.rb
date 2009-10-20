@@ -11,13 +11,13 @@ class Investigation < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
 
-  def assets
-    assets=[]
-    studies.each do |study|
-      assets=assets | study.sops.collect{|sop| sop.asset}
-    end
-    return assets
-  end
+#  def assets
+#    assets=[]
+#    studies.each do |study|
+#      assets=assets | study.sops.collect{|sop| sop.asset}
+#    end
+#    return assets
+#  end
 
   def can_edit? user
     user.person.projects.include?(project)
@@ -28,11 +28,11 @@ class Investigation < ActiveRecord::Base
   end
   
   def data_files
-    assays.collect{|assay| assay.data_files.collect{|df| df  }}.flatten.uniq
+    assays.collect{|assay| assay.data_files}.flatten.uniq
   end
   
   def sops
-    assays.collect{|assay| assay.sops.collect{|sop| sop  }}.flatten.uniq
+    assays.collect{|assay| assay.sops}.flatten.uniq
   end
   
 end
