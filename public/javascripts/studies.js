@@ -1,6 +1,6 @@
-var sops=new Array();
+var sops_assets=new Array();
 var assays=new Array();
-var data_files=new Array();
+var data_files_assets=new Array();
 
 function postInvestigationData() {
     request = new Ajax.Request(CREATE_INVESTIGATION_LINK,
@@ -40,7 +40,7 @@ function addNewInvestigation(new_investigation) {
 }
 
 function addSop(title,id) {
-    sops.push([title,id])
+    sops_assets.push([title,id])
 }
 
 function addSelectedSop() {
@@ -49,7 +49,7 @@ function addSelectedSop() {
     title=selected_option.text
     id=selected_option.value
 
-    if(checkNotInList(id,sops)) {
+    if(checkNotInList(id,sops_assets)) {
         addSop(title,id);
         updateSops();
     }
@@ -61,9 +61,9 @@ function addSelectedSop() {
 
 function removeSop(id) {
     // remove the actual record for the attribution
-    for(var i = 0; i < sops.length; i++)
-        if(sops[i][1] == id) {
-            sops.splice(i, 1);
+    for(var i = 0; i < sops_assets.length; i++)
+        if(sops_assets[i][1] == id) {
+            sops_assets.splice(i, 1);
             break;
         }
 
@@ -76,8 +76,8 @@ function updateSops() {
     type="Sop"
     sop_ids=new Array();
 
-    for (var i=0;i<sops.length;i++) {
-        sop=sops[i]
+    for (var i=0;i<sops_assets.length;i++) {
+        sop=sops_assets[i]
         title=sop[0]
         id=sop[1]        
         sop_text += '<b>' + type + '</b>: ' + title
@@ -100,9 +100,9 @@ function updateSops() {
         $('sop_to_list').innerHTML = sop_text;
     }
 
-    clearList('assay_sop_ids');
+    clearList('assay_sop_asset_ids');
 
-    select=$('assay_sop_ids')
+    select=$('assay_sop_asset_ids')
     for (i=0;i<sop_ids.length;i++) {
         id=sop_ids[i]
         o=document.createElement('option')
@@ -120,7 +120,7 @@ function updateSops() {
 
 //Data files
 function addDataFile(title,id) {
-    data_files.push([title,id])
+    data_files_assets.push([title,id])
 }
 
 function addSelectedDataFile() {
@@ -129,7 +129,7 @@ function addSelectedDataFile() {
     title=selected_option.text
     id=selected_option.value
 
-    if(checkNotInList(id,data_files)) {
+    if(checkNotInList(id,data_files_assets)) {
         addDataFile(title,id);
         updateDataFiles();
     }
@@ -141,9 +141,9 @@ function addSelectedDataFile() {
 
 function removeDataFile(id) {
     // remove the actual record for the attribution
-    for(var i = 0; i < data_files.length; i++)
-        if(data_files[i][1] == id) {
-            data_files.splice(i, 1);
+    for(var i = 0; i < data_files_assets.length; i++)
+        if(data_files_assets[i][1] == id) {
+            data_files_assets.splice(i, 1);
             break;
         }
 
@@ -156,8 +156,8 @@ function updateDataFiles() {
     type="DataFile"
     data_file_ids=new Array();
 
-    for (var i=0;i<data_files.length;i++) {
-        data_file=data_files[i]
+    for (var i=0;i<data_files_assets.length;i++) {
+        data_file=data_files_assets[i]
         title=data_file[0]
         id=data_file[1]
         data_file_text += '<b>' + type + '</b>: ' + title
@@ -180,9 +180,9 @@ function updateDataFiles() {
         $('data_file_to_list').innerHTML = data_file_text;
     }
 
-    clearList('data_file_ids');
+    clearList('assay_data_file_asset_ids');
 
-    select=$('data_file_ids')
+    select=$('assay_data_file_asset_ids')
     for (i=0;i<data_file_ids.length;i++) {
         id=data_file_ids[i]
         o=document.createElement('option')
@@ -197,7 +197,6 @@ function updateDataFiles() {
         }
     }
 }
-
 
 
 //Assays

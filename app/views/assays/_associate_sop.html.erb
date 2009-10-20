@@ -67,7 +67,7 @@
                    )+";check_show_add_sop();return(false);"
                    } -%>
     
-    <%= select_tag "assay_sop_ids", options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+    <%= select_tag :assay_sop_asset_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
     
     <b><%= link_to_function "Add", "addSelectedSop(); return(false);", :id=>"add_sop_link" %></b>
     <br/>
