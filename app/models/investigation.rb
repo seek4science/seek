@@ -11,14 +11,6 @@ class Investigation < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
 
-#  def assets
-#    assets=[]
-#    studies.each do |study|
-#      assets=assets | study.sops.collect{|sop| sop.asset}
-#    end
-#    return assets
-#  end
-
   def can_edit? user
     user.person.projects.include?(project)
   end
