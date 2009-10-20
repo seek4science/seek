@@ -11,7 +11,7 @@ module SopsHelper
     return "<span class='none_text'>No sops or non visible to you</span>" if sops.empty?
     result=""
     sops.each do |sop|
-      result += link_to h(truncate(sop.title,:length=>max_length)), sop.class.name == "Sop" ? sop : sop_path(sop, :version => sop.version),:title=>h(sop.title)
+      result += link_to h(truncate(sop.title,:length=>max_length)), sop.class.name == "Sop" ? sop : sop_path(sop.sop, :version => sop.version),:title=>h(sop.title)
       result += " | " unless sops.last==sop
     end
     return result
