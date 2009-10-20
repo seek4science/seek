@@ -14,7 +14,7 @@
       <p class="title">
         <%= icon "sop", nil, nil, nil, '' -%>
         <% title = h(resource.title) -%>
-        <%= link_to(title, sop_path(resource)) -%>
+        <%= link_to(title, resource.class.name == "Sop" ? sop_path(resource) : sop_path(resource, :version => resource.version)) -%>
       </p>
 
       <p style="font-size: 85%; margin-top: 0.4em;">
