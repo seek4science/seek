@@ -170,7 +170,8 @@ class ModelsController < ApplicationController
   end
 
   def execute
-    @applet= jws_execution_applet @model
+    version=params[:version]
+    @applet= jws_execution_applet @model.find_version(version)
     
     if @applet.instance_of?(Net::HTTPInternalServerError)      
       @error_details=@applet.body.gsub(/<head\>.*<\/head>/,"")

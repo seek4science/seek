@@ -5,11 +5,11 @@
 <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
 
 
-  <% if model_jws_online_compatible? @model %>
+  <% if model_jws_online_compatible? @display_model %>
     <ul class="sectionIcons">
       <li>
         <%= link_to_remote execute_model_label,
-          :url=>execute_model_url(@model),
+          :url=>execute_model_url(@model,:version=>@display_model.version),
           :method=>:post,
           :before=>"Effect.BlindDown('execute_model');$('execute_model_button').hide();",
           :html=>{:id=>"execute_model_button"}
