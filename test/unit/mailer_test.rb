@@ -42,7 +42,9 @@ class MailerTest < ActionMailer::TestCase
     resource=data_files(:picture)
     user=users(:aaron)
     details="here are some more details"
-    assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
+    end
   end
 
   test "request resource no details" do
@@ -57,7 +59,9 @@ class MailerTest < ActionMailer::TestCase
     resource=data_files(:picture)
     user=users(:aaron)
     details=""
-    assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,Mailer.create_request_resource(user,resource,details,"localhost").encoded
+    end
   end
 
   test "forgot_password" do
@@ -71,7 +75,10 @@ class MailerTest < ActionMailer::TestCase
     u=users(:aaron)
     u.reset_password_code_until = 1.day.from_now
     u.reset_password_code="fred"
-    assert_equal @expected.encoded, Mailer.create_forgot_password(users(:aaron),"localhost").encoded
+    
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded, Mailer.create_forgot_password(users(:aaron),"localhost").encoded
+    end    
   end
 
   test "contact_admin_new_user_no_profile" do
@@ -82,9 +89,11 @@ class MailerTest < ActionMailer::TestCase
 
     @expected.body    = read_fixture('contact_admin_new_user_no_profile')
     
-
-    assert_equal @expected.encoded, 
-      Mailer.create_contact_admin_new_user_no_profile("test message",users(:quentin),"localhost").encoded
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded, 
+        Mailer.create_contact_admin_new_user_no_profile("test message",users(:quentin),"localhost").encoded
+    end
+    
   end
 
   test "welcome" do
@@ -95,8 +104,9 @@ class MailerTest < ActionMailer::TestCase
     
     @expected.body = read_fixture('welcome')
     
-
-    assert_equal @expected.encoded, Mailer.create_welcome(users(:quentin),"localhost").encoded
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded, Mailer.create_welcome(users(:quentin),"localhost").encoded
+    end
   end
 
 end
