@@ -90,7 +90,20 @@ class AssayTest < ActiveSupport::TestCase
 
     assert_equal 2,assay.assets.size
 
-  end  
+  end
+
+  test "sops" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 2,assay.sops.size
+    assert assay.sops.include?(sops(:my_first_sop).find_version(1))
+    assert assay.sops.include?(sops(:sop_with_fully_public_policy).find_version(1))
+  end
+
+  test "data_files" do
+    assay=assays(:assay_with_no_study_but_has_some_files)
+    assert_equal 1,assay.data_files.size
+    assert assay.data_files.include?(data_files(:picture).find_version(1))
+  end
 
 
 end
