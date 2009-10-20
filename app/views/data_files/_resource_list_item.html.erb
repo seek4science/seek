@@ -17,6 +17,10 @@
         <%= link_to(title, data_file_path(resource)) -%>
       </p>
 
+      <p style="font-size: 85%; margin-top: 0.4em;">
+        <b>Version:</b><%= resource.version -%>
+      </p>
+
       <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
         <b>Associated project: </b>
         <%= (resource.project ? link_to(h(resource.project.name), project_path(resource.    project.id)) : "<span class='none_text'>None</span>" ) -%>
