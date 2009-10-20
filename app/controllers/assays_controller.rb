@@ -36,15 +36,13 @@ class AssaysController < ApplicationController
   def create
     @assay = Assay.new(params[:assay])
     
-    sop_assets = params[:assay_sop_ids] || []
-    data_assets = params[:data_file_ids] || []
+    sop_assets = params[:assay_sop_asset_ids] || []
+    data_assets = params[:assay_data_file_asset_ids] || []
     (sop_assets+data_assets).each do |a_id|
       @assay.assets << Asset.find(a_id)
     end    
 
-    @assay.owner=current_user.person
-    
-    #synchronise_created_datas(params[:data_file_ids])
+    @assay.owner=current_user.person       
     
     respond_to do |format|
       if @assay.save
@@ -60,12 +58,12 @@ class AssaysController < ApplicationController
 
   def update
     @assay=Assay.find(params[:id])
-    #synchronise_created_datas(params[:data_file_ids])
+    
     @assay.sops.clear unless params[:assay][:sop_ids]
     
     @assay.assets = []
-    sop_assets = params[:assay_sop_ids] || []
-    data_assets = params[:data_file_ids] || []
+    sop_assets = params[:assay_sop_asset_ids] || []
+    data_assets = params[:assay_data_file_asset_ids] || []
     (sop_assets+data_assets).each do |a_id|
       @assay.assets << Asset.find(a_id)
     end    

@@ -8,8 +8,8 @@
     <%= render :partial => "gadgets/sign_in" -%>
 <% end -%>
 
-<% cache "tag_clouds" do -%>
-    <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.expertise_counts, :locals=>{:type=>"expertise", :title=>"Expertise"} %>
-    <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.tool_counts, :locals=>{:type=>"tools", :title=>"Tools and Techniques"} %>
-<% end -%>
+<%# cache "tag_clouds" do -%>
+    <%#= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.expertise_counts, :locals=>{:type=>"expertise", :title=>"Expertise"} %>
+    <%#= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.tool_counts, :locals=>{:type=>"tools", :title=>"Tools and Techniques"} %>
+<%# end -%>
 

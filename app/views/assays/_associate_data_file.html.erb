@@ -1,46 +1,46 @@
 <%
-   all_data_files=authorised_data_files.sort{|a, b| a.title<=>b.title}
-   project_data_files=all_data_files.select{|df| current_user.person.projects.include?(df.project )}
-   select_truncate_length=40;
+all_data_files=authorised_data_files.sort{|a, b| a.title<=>b.title}
+project_data_files=all_data_files.select{|df| current_user.person.projects.include?(df.project )}
+select_truncate_length=40;
 -%>
 
 <script type="text/javascript">
-    function toggle_data_file_list() {
-        var checked = $('include_other_project_data_files').checked;
-        var selection_box = $('possible_data_files');
-        var option;
+  function toggle_data_file_list() {
+    var checked = $('include_other_project_data_files').checked;
+    var selection_box = $('possible_data_files');
+    var option;
             
-        selection_box.options.length=0;
+    selection_box.options.length=0;
 
-        if (checked) {
-        <% ([["Select Data file ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= df_details[0] -%>';
-            option.value = '<%= df_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-        <% end -%>
+    if (checked) {
+<% ([["Select Data file ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
+        option = document.createElement("OPTION");
+        option.text = '<%= df_details[0] -%>';
+        option.value = '<%= df_details[1] -%>';
+        try {
+          selection_box.add(option); //for older IE version
         }
-        else {
-           <% ([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
-            option = document.createElement("OPTION");
-            option.text = '<%= df_details[0] -%>';
-            option.value = '<%= df_details[1] -%>';
-            try {
-                selection_box.add(option); //for older IE version
-            }
-            catch (ex) {
-                selection_box.add(option, null);
-            }
-        <% end -%>
+        catch (ex) {
+          selection_box.add(option, null);
         }
-        selection_box.selectedIndex=0;
-        selection_box.onchange();
+<% end -%>
     }
+    else {
+<% ([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
+        option = document.createElement("OPTION");
+        option.text = '<%= df_details[0] -%>';
+        option.value = '<%= df_details[1] -%>';
+        try {
+          selection_box.add(option); //for older IE version
+        }
+        catch (ex) {
+          selection_box.add(option, null);
+        }
+<% end -%>
+    }
+    selection_box.selectedIndex=0;
+    selection_box.onchange();
+  }
 </script>
 
 
@@ -64,7 +64,7 @@
         :before=>"show_ajax_loader('data_file_preview')"
       )+";check_show_add_data_file();return(false);"
     } -%>
-    <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+    <%= select_tag :assay_data_file_asset_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
     <b><%= link_to_function "Add","addSelectedDataFile(); return(false);",:id=>"add_data_file_link" %></b>
     <br/>
     <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?
@@ -78,11 +78,11 @@
 
 <script type="text/javascript">
 
-<% @assay.data_files.each do |data_file| -%>
-    data_id = '<%= data_file.id -%>';
-    data_title = '<%= data_file.title -%>';
+<% @assay.data_files.each do |data_file| -%>    
   <% if Authorization.is_authorized?("show",nil,data_file.asset,current_user) -%>
-      addDataFile(data_title,data_id);
+      asset_id = '<%= data_file.asset.id -%>';
+      data_title = '<%= data_file.title -%>';
+      addDataFile(data_title,asset_id);
   <% end -%>
 <% end -%>
 
