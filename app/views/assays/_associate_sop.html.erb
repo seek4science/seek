@@ -81,13 +81,12 @@
 </div>
 
 <script type="text/javascript">
-    <% @assay.sops.each do |s| -%>
-    sop_id = '<%= s.id -%>';
-    sop_title = '<%= s.title -%>';
-    <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
-    addSop(sop_title, sop_id);
-    <% end -%>
-
+    <% @assay.sops.each do |s| -%>    
+      <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
+        asset_id = '<%= s.asset.id -%>';
+        sop_title = '<%= s.title -%>';
+        addSop(sop_title, asset_id);
+      <% end -%>
     <% end -%>
 
     updateSops();
