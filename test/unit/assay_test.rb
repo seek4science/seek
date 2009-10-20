@@ -86,10 +86,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "assets" do
     assay=assays(:metabolomics_assay)
-    
-
     assert_equal 2,assay.assets.size
-
   end
 
   test "sops" do
