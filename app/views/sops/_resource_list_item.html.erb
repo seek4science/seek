@@ -14,7 +14,7 @@
       <p class="title">
         <%= icon "sop", nil, nil, nil, '' -%>
         <% title = h(resource.title) -%>
-        <%= link_to(title, resource.class.name == "Sop" ? sop_path(resource) : sop_path(resource, :version => resource.version)) -%>
+        <%= link_to(title, resource.class.name == "Sop" ? sop_path(resource) : sop_path(resource.sop, :version => resource.version)) -%>
       </p>
 
       <p style="font-size: 85%; margin-top: 0.4em;">
@@ -63,7 +63,7 @@
     <td class="actions" style="width: 80px;">
       <%= icon "show", sop_path(resource), nil, nil, "View" -%>
       <% if Authorization.is_authorized?("download", nil, resource, current_user) -%>
-        <%= icon "download", resource.class.name == "Sop" ? download_sop_path(resource) : download_sop_path(resource, :version => resource.version)-%>
+        <%= icon "download", resource.class.name == "Sop" ? download_sop_path(resource) : download_sop_path(resource.sop, :version => resource.version)-%>
       <% end -%>
       <% if Authorization.is_authorized?("manage", nil, resource, current_user) -%>
         <%= icon "manage", edit_sop_path(resource), nil, nil, "Manage" -%>
