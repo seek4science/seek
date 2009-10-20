@@ -24,6 +24,7 @@ tmp/data.sql
 .tmp*
 *~
 solr/development/*
+solr/production/*
 
 
 syntax: regexp
