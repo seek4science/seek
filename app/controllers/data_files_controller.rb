@@ -197,7 +197,7 @@ class DataFilesController < ApplicationController
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
 
-    send_data @data_file.content_blob.data, :filename => @data_file.original_filename, :content_type => @data_file.content_type, :disposition => 'attachment'
+    send_data @display_data_file.content_blob.data, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
   end 
 
   protected

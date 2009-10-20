@@ -292,7 +292,7 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping
 
-    send_data @model.content_blob.data, :filename => @model.original_filename, :content_type => @model.content_type, :disposition => 'attachment'
+    send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
   end
 
   # PUT /models/1
