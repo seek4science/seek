@@ -59,8 +59,8 @@
       <p>
         <b>Description:</b>
         <% unless @display_data_file.description.blank? -%>
-          <div class="box_standout">
-            <%= simple_format(auto_link(white_list(@display_data_file.description))) -%>
+          <div class="box_standout" id="description">
+            <%= simple_format(auto_link(white_list(@display_data_file.description),:all,:rel=>'nofollow')) -%>
           </div>
         <% else -%>
           <p class="none_text">

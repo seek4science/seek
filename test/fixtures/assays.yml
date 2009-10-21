@@ -71,3 +71,12 @@ technology_type_test_assay2:
   technology_type: child_technology_type_with_assay
   assay_type: metabolomics
   owner: person_for_model_owner
+  
+assay_with_links_in_description:
+  title: Assay with links in description
+  assay_type: metabolomics
+  technology_type: gas_chromatography  
+  owner: person_for_model_owner
+  description: Visit my site http://www.sysmo-db.org
+  study: study_with_links_in_description
+  

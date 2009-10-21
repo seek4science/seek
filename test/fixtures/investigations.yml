@@ -13,3 +13,8 @@ investigation_with_no_assays:
 investigation_with_no_study:
   title: Investigation with no Study
   project: sysmo_project
+  
+investigation_with_links_in_description:
+  title: Investigation with links in description
+  project: sysmo_project
+  description: Visit my site http://www.sysmo-db.org

@@ -15,3 +15,8 @@ study_with_overlapping_assay_sops:
 study_with_no_assays:
   title: A study with no assays
   investigation: investigation_with_no_assays
+  
+study_with_links_in_description:
+  title: Study with links in description
+  investigation: investigation_with_links_in_description
+  description: Visit my site http://www.sysmo-db.org

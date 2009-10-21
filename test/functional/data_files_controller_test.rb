@@ -104,6 +104,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_equal sf2, d.find_version(1).studied_factors.first
     assert_equal sf, d.find_version(1).studied_factors.first
   end
+  
+  def test_should_add_nofollow_to_links_in_show_page
+    get :show, :id=> data_files(:data_file_with_links_in_description)    
+    assert_select "div#description" do
+      assert_select "a[rel=nofollow]"
+    end
+  end
 
   private
 

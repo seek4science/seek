@@ -114,5 +114,12 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :show,:id=>investigations(:investigation_with_no_study).id
     assert_select "a",:text=>/Delete Investigation/,:count=>0
   end
-
+  
+  def test_should_add_nofollow_to_links_in_show_page
+    get :show, :id=> investigations(:investigation_with_links_in_description)    
+    assert_select "div#description" do
+      assert_select "a[rel=nofollow]"
+    end
+  end
+  
 end

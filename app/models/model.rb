@@ -34,6 +34,12 @@ class Model < ActiveRecord::Base
     
     belongs_to :contributor, :polymorphic => true
     
+<<<<<<< /home/finn/workspace/sysmo-db/app/models/model.rb
+    has_one :asset,
+            :primary_key => "model_id",
+            :foreign_key => "resource_id",
+            :conditions => {:resource_type => "Model"}
+=======
     has_one :asset,
             :primary_key => "model_id",
             :foreign_key => "resource_id"
@@ -42,6 +48,7 @@ class Model < ActiveRecord::Base
     def project
       asset.project
     end
+>>>>>>> /tmp/model.rb~other.sZ2aBr
     
   end
 

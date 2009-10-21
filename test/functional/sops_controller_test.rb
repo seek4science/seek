@@ -180,6 +180,13 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_equal condition2, s.find_version(1).experimental_conditions.first
     assert_equal condition1, s.find_version(1).experimental_conditions.first
   end
+  
+  def test_should_add_nofollow_to_links_in_show_page
+    get :show, :id=> sops(:sop_with_links_in_description)    
+    assert_select "div#description" do
+      assert_select "a[rel=nofollow]"
+    end
+  end
 
   private
 

@@ -28,7 +28,8 @@ class DataFile < ActiveRecord::Base
     
     has_one :asset,
             :primary_key => "data_file_id",
-            :foreign_key => "resource_id"
+            :foreign_key => "resource_id",
+            :conditions => {:resource_type => "DataFile"}
             
     #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
     def project

@@ -30,7 +30,8 @@ class Sop < ActiveRecord::Base
     
     has_one :asset,
             :primary_key => "sop_id",
-            :foreign_key => "resource_id"
+            :foreign_key => "resource_id",
+            :conditions => {:resource_type => "Sop"}
             
     #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
     def project

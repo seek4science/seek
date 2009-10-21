@@ -39,3 +39,15 @@ model_with_format_and_type_v1:
   model: model_with_format_and_type
   version: 1
 
+model_with_links_in_description_v1:
+  contributor: model_owner (User)
+  title: Links in my desc
+  description: Visit my site http://www.google.com
+  original_filename: Teusink.xml
+  content_blob: teusink_blob
+  content_type: text/xml  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  model: model_with_links_in_description
+  version: 1

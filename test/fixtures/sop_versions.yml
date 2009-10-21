@@ -191,3 +191,16 @@ editable_sop_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: editable_sop
   version: 1
+  
+sop_with_links_in_description_v1:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP that has links."
+  description: Visit my site http://www.sysmo-db.org
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+  sop: sop_with_links_in_description
+  version: 1

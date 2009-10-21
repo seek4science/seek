@@ -166,4 +166,10 @@ person_for_pagination_order_test:
   last_name: "Azbo"
   email: "azbo@email.com"
 
+person_with_links_in_description:
+  first_name: "Spam"
+  last_name: "Bot"
+  email: "spambot@spam.com"
+  description: "Visit my websites! http://www.website.com, http://www.google.com"
+  
 

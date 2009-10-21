@@ -138,8 +138,6 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert_equal ["one","two"],p.expertise_list
     assert_equal ["four","three"],p.tool_list
-
-
   end
 
   def test_should_destroy_person
@@ -148,5 +146,12 @@ class PeopleControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to people_path
+  end
+  
+  def test_should_add_nofollow_to_links_in_show_page
+    get :show, :id=> people(:person_with_links_in_description)    
+    assert_select "div#description" do
+      assert_select "a[rel=nofollow]"
+    end
   end
 end

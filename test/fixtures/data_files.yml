@@ -49,5 +49,14 @@ myexperiment_data_file:
   last_used_at: 2009-04-03 11:09:18
   version: 1
 
+data_file_with_links_in_description:
+  contributor: datafile_owner (User)
+  title: I Have Links
+  description: "Visit my site http://www.sysmo-db.org"
+  original_filename: file_pictuer.png
+  content_blob: picture_blob
+  content_type: text/png
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
 
 
