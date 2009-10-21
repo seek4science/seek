@@ -1,0 +1,9 @@
+<%= icon "show", show_resource_path(resource), nil, nil, "View" -%>
+<% if Authorization.is_authorized?("download", nil, resource, current_user) -%>
+  <%= icon "download", download_resource_path(resource) -%>
+<% end -%>
+<% if Authorization.is_authorized?("manage", nil, resource, current_user) -%>
+  <%= icon "manage", edit_resource_path(resource), nil, nil, "Manage" -%>
+<% elsif Authorization.is_authorized?("edit", nil, resource, current_user) -%>
+  <%= icon "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
+<% end -%>

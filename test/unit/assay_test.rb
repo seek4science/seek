@@ -86,7 +86,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "assets" do
     assay=assays(:metabolomics_assay)
-    assert_equal 2,assay.assets.size
+    assert_equal 3,assay.assets.size,"should be 2 sops and 1 data file"
   end
 
   test "sops" do
@@ -97,10 +97,9 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "data_files" do
-    assay=assays(:assay_with_no_study_but_has_some_files)
+    assay=assays(:metabolomics_assay)
     assert_equal 1,assay.data_files.size
     assert assay.data_files.include?(data_files(:picture).find_version(1))
   end
-
 
 end

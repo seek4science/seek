@@ -46,11 +46,16 @@ module Jits
 
           # create the dynamic versioned model
           const_set(versioned_class_name, Class.new(ActiveRecord::Base)).class_eval do
-            def self.reloadable? ; false ; end
+            def self.reloadable? ; false ; end            
           end
 
           versioned_class.set_table_name versioned_table_name
           versioned_class.belongs_to self.to_s.demodulize.underscore.to_sym,
+            :class_name  => "::#{self.to_s}",
+            :foreign_key => versioned_foreign_key
+
+          #add a generic method, independent of the model, that gets the thing being versioned.
+          versioned_class.belongs_to :parent,
             :class_name  => "::#{self.to_s}",
             :foreign_key => versioned_foreign_key
 

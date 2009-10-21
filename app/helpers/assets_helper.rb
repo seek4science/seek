@@ -32,5 +32,21 @@ module AssetsHelper
     class_name
   end
 
+  def download_resource_path(resource)
+    actual_resource = resource.class.name.include?("::Version") ? resource.parent : resource
+    version = resource.version    
+    polymorphic_path(actual_resource,:version=>version,:action=>:download)
+  end
+
+  def show_resource_path(resource)
+    actual_resource = resource.class.name.include?("::Version") ? resource.parent : resource
+    version = resource.version
+    polymorphic_path(actual_resource,:version=>version)
+  end
+
+  def edit_resource_path(resource)
+    actual_resource = resource.class.name.include?("::Version") ? resource.parent : resource    
+    edit_polymorphic_path(actual_resource)
+  end
 
 end

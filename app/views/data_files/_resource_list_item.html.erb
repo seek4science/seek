@@ -14,7 +14,7 @@
       <p class="title">
         <%= icon "data_file", nil, nil, nil, '' -%>
         <% title = h(resource.title) -%>
-        <%= link_to(title, resource.class.name == "DataFile" ? data_file_path(resource) : data_file_path(resource.data_file, :version => resource.version)) -%>
+        <%= link_to(title, show_resource_path(resource)) -%>
       </p>
 
       <p style="font-size: 85%; margin-top: 0.4em;">
@@ -31,12 +31,11 @@
         <% unless resource.asset.created_at == resource.asset.updated_at -%>          
           <b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
         <% end %>
-
       </p>
 
       <div class="desc" style="font-size: 85%;">
         <% unless resource.description.blank? -%>
-          <%= truncate(auto_link(white_list(resource.description)), :length=>500) -%>
+          <%= truncate(auto_link(white_list(resource.description),:all,:rel=>"nofollow"), :length=>500) -%>
         <% else -%>
           <span class="none_text">No description</span>
         <% end -%>
@@ -49,15 +48,7 @@
     </td>
 
     <td class="actions" style="width: 80px;">
-      <%= icon "show", data_file_path(resource), nil, nil, "View" -%>
-      <% if Authorization.is_authorized?("download", nil, resource, current_user) -%>
-        <%= icon "download", resource.class.name == "DataFile" ? download_data_file_path(resource) : download_data_file_path(resource.data_file, :version => resource.version) -%>
-      <% end -%>
-      <% if Authorization.is_authorized?("manage", nil, resource, current_user) -%>
-        <%= icon "manage", edit_data_file_path(resource), nil, nil, "Manage" -%>
-      <% elsif Authorization.is_authorized?("edit", nil, resource, current_user) -%>
-        <%= icon "edit", edit_data_file_path(resource), nil, nil, "Edit" -%>
-      <% end -%>
+      <%= render :partial=>"assets/resource_actions_td",:locals=>{:resource=>resource} %>
     </td>
 
   </tr>

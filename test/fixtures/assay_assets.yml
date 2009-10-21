@@ -10,6 +10,11 @@ metabolomics_assay_asset2:
   assay: metabolomics_assay
   version: 1
 
+metabolomics_assay_data_file_asset:
+  asset: asset_for_datafile
+  assay: metabolomics_assay
+  version: 1
+
 metabolomics_assay2_assets1:
   asset: asset_of_my_first_sop
   assay: metabolomics_assay2

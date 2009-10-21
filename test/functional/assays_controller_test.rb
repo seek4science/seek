@@ -127,5 +127,72 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select "option",:text=>/Myexperiment Data File/,:count=>0
     end
   end
+
+  test "download link for sop in tab has version" do
+    login_as(:owner_of_my_first_sop)
+    get :show,:id=>assays(:metabolomics_assay)   
+
+    assert_response :success
+    
+    assert_select "table.list_item td.actions" do
+      path=download_sop_path(sops(:my_first_sop),:version=>1)
+      assert_select "a[href=?]",path,:minumum=>1      
+    end
+  end
+
+  test "show link for sop in tab has version" do
+    login_as(:owner_of_my_first_sop)
+    get :show,:id=>assays(:metabolomics_assay)
+    assert_response :success
+    
+    assert_select "table.list_item td.actions" do
+      path=sop_path(sops(:my_first_sop),:version=>1)
+      assert_select "a[href=?]",path,:minumum=>1
+    end
+  end
+
+  test "edit link for sop in tabs" do
+    login_as(:owner_of_my_first_sop)
+    get :show,:id=>assays(:metabolomics_assay)
+    assert_response :success
+    
+    assert_select "table.list_item td.actions" do
+      path=edit_sop_path(sops(:my_first_sop))
+      assert_select "a[href=?]",path,:minumum=>1
+    end
+  end
+
+  test "download link for data_file in tabs" do
+    login_as(:owner_of_my_first_sop)
+    get :show,:id=>assays(:metabolomics_assay)
+    assert_response :success
+
+    assert_select "table.list_item td.actions" do
+      path=download_data_file_path(data_files(:picture),:version=>1)
+      assert_select "a[href=?]",path,:minumum=>1
+    end
+  end
+
+  test "show link for data_file in tabs" do
+    login_as(:owner_of_my_first_sop)
+    get :show,:id=>assays(:metabolomics_assay)
+    assert_response :success
+
+    assert_select "table.list_item td.actions" do
+      path=data_file_path(data_files(:picture),:version=>1)
+      assert_select "a[href=?]",path,:minumum=>1
+    end
+  end
+
+  test "edit link for data_file in tabs" do
+    login_as(:owner_of_my_first_sop)
+    get :show,:id=>assays(:metabolomics_assay)
+    assert_response :success
+
+    assert_select "table.list_item td.actions" do
+      path=edit_data_file_path(data_files(:picture))
+      assert_select "a[href=?]",path,:minumum=>1
+    end
+  end
   
 end
