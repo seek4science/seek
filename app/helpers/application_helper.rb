@@ -55,7 +55,7 @@ module ApplicationHelper
       text=truncate(text,:length=>options[:length]) if options[:length]
       text.capitalize! if options[:capitalize]
       res = h(text)
-      res = auto_link(res) if options[:auto_link]==true
+      res = auto_link(res, :all, :target => '_blank', :rel => 'nofollow') if options[:auto_link]==true
       res = simple_format(res) if options[:description]==true || options[:address]==true
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true
