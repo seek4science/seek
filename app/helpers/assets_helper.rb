@@ -30,6 +30,7 @@ module AssetsHelper
       class_name = class_name.split("::")[0]
     end
     class_name
-  end 
+  end
+
 
 end

@@ -28,14 +28,14 @@
 <% if can_edit -%>
 
     <span id="add_model_type_form" style="display:none;">
-    <p>
+      <p>
       <%= text_field_tag :model_type -%>
       <%= button_to_remote "Add",
                            :url=>{:action=>:create_model_metadata, :attribute=>"model_type"},
                            :with=>"$('model_type').serialize()",
                            :before=>"show_ajax_loader('model_type_selection');$('add_model_type_form').hide();"
       -%>
-    </p>
+      </p>
     </span>
 
     <span id="edit_model_type_form" style="display:none;">

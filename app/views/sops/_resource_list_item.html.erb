@@ -24,29 +24,13 @@
       <p  style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
         <b>Associated project: </b><%= (resource.project ? link_to(h(resource.project.name), project_path(resource.project.id)) : "<span class='none_text'>None</span>" ) -%>
       </p>
-
-      <%#*<p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">%>
-        <%#*<b>Organism:</b>%>
-        <%# if resource.organism -%>
-          <%#=organism_link_to resource.organism -%>
-        <%# else -%>
-          <%#*<span class="none_text">Unknown</span>%>
-        <%# end -%>
-      <%#*</p>%>
-
+      
       <p style="font-size: 85%; margin-top: 0.4em;">
         <b>Created:</b> <%= resource.asset.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% unless resource.asset.created_at == resource.asset.updated_at -%>
-          <%= narrow_view ? "<br/>" : " | " -%>
+        <% unless resource.asset.created_at == resource.asset.updated_at -%>          
           <b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
         <% end %>
-
-        <!-- commented out, only because this probably is not very important in listing, but occupies much space
-<%# unless resource.asset.last_used_at.nil? -%>
-<%#= narrow_view ? "<br/>" : " | " -%>
-                    <b>Last used:</b> <%#= resource.asset.last_used_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-<%# end -%>
-                -->
+   
       </p>
 
       <div class="desc" style="font-size: 85%;">
