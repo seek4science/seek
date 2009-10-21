@@ -20,6 +20,8 @@ class ModelTest < ActiveSupport::TestCase
     p=projects(:sysmo_project)
     assert_equal p,model.asset.project
     assert_equal p,model.project
+    assert_equal p,model.latest_version.asset.project
+    assert_equal p,model.latest_version.project
   end
 
 end

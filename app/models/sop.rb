@@ -32,7 +32,10 @@ class Sop < ActiveRecord::Base
             :primary_key => "sop_id",
             :foreign_key => "resource_id"
             
-    has_one :project, :through=>:asset  
+    #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
+    def project
+      asset.project
+    end
   end
 
   def assays

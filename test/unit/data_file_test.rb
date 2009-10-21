@@ -19,5 +19,7 @@ class DataFileTest < ActiveSupport::TestCase
     p=projects(:sysmo_project)
     assert_equal p,df.asset.project
     assert_equal p,df.project
+    assert_equal p,df.latest_version.asset.project
+    assert_equal p,df.latest_version.project
   end
 end

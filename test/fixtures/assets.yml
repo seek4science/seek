@@ -14,7 +14,7 @@ one:
 
 asset_of_my_first_sop:
   contributor: owner_of_my_first_sop (User)
-  project: nil # not linked to any project for now
+  project: sysmo_project
   resource: my_first_sop (Sop)
   #source:  # these values are not used at the moment (Feb 2009)
   #quality: # these values are not used at the moment (Feb 2009)

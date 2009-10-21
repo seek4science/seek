@@ -34,8 +34,13 @@ class Model < ActiveRecord::Base
     
     belongs_to :contributor, :polymorphic => true
     
-    def asset
-      self.model.asset
+    has_one :asset,
+            :primary_key => "model_id",
+            :foreign_key => "resource_id"
+
+    #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
+    def project
+      asset.project
     end
     
   end

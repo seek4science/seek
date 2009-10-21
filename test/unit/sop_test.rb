@@ -72,5 +72,14 @@ class SopTest < ActiveSupport::TestCase
     assert_equal "Updated Sop",sop.find_version(2).title
 
   end
+
+  def test_project_for_sop_and_sop_version_match
+    sop=sops(:my_first_sop)
+    project=projects(:sysmo_project)
+    assert_equal project,sop.project
+    assert_equal project,sop.asset.project
+    assert_equal project,sop.latest_version.asset.project
+    assert_equal project,sop.latest_version.project
+  end
   
 end
