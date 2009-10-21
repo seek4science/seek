@@ -180,7 +180,7 @@ asset_for_model_with_format_and_type:
 
 asset_for_datafile:
   contributor: datafile_owner (User)
-  project: nil # not linked to any project for now
+  project: sysmo_project
   resource: picture (DataFile)
   #source:  # these values are not used at the moment (Feb 2009)
   #quality: # these values are not used at the moment (Feb 2009)

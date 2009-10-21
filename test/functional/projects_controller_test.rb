@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectsControllerTest < ActionController::TestCase
   
-  fixtures :projects, :people, :users, :work_groups, :group_memberships
+  fixtures :all
   
   def test_title
     get :index
@@ -102,6 +102,42 @@ class ProjectsControllerTest < ActionController::TestCase
 
     put :update, :id=>projects(:three).id,:project=>{}
     assert_redirected_to project_path(assigns(:project))
+  end
+
+  test "links have nofollow in sop tabs" do
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    sop.description="http://news.bbc.co.uk"
+    sop.save!
+
+    get :show,:id=>projects(:sysmo_project)
+    assert_select "table.list_item div.desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
+    end
+  end
+
+  test "links have nofollow in data_files tabs" do
+    login_as(:owner_of_my_first_sop)
+    data_file=data_files(:picture)
+    data_file.description="http://news.bbc.co.uk"
+    data_file.save!
+
+    get :show,:id=>projects(:sysmo_project)
+    assert_select "table.list_item div.desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
+    end
+  end
+
+  test "links have nofollow in model tabs" do
+    login_as(:owner_of_my_first_sop)
+    model=models(:teusink)
+    model.description="http://news.bbc.co.uk"
+    model.save!
+
+    get :show,:id=>projects(:sysmo_project)
+    assert_select "table.list_item div.desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
+    end
   end
 
   private

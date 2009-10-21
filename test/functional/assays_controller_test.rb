@@ -194,6 +194,31 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select "a[href=?]",path,:minumum=>1
     end
   end
+
+  test "links have nofollow in sop tabs" do
+    login_as(:owner_of_my_first_sop)
+    sop_version=sops(:my_first_sop).find_version(1)
+    sop_version.description="http://news.bbc.co.uk"
+    sop_version.save!
+
+    get :show,:id=>assays(:metabolomics_assay)
+    assert_select "table.list_item div.desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
+    end
+  end
+
+  test "links have nofollow in data_files tabs" do
+    login_as(:owner_of_my_first_sop)
+    data_file_version=data_files(:picture).find_version(1)
+    data_file_version.description="http://news.bbc.co.uk"
+    data_file_version.save!
+
+    get :show,:id=>assays(:metabolomics_assay)
+    assert_select "table.list_item div.desc" do
+      assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
+    end
+  end
+
   
   def test_should_add_nofollow_to_links_in_show_page
     get :show, :id=> assays(:assay_with_links_in_description)    
