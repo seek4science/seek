@@ -1,0 +1,9 @@
+#Enable search
+SOLR_ENABLED = false
+
+#Hide contact details
+HIDE_DETAILS = false
+
+#Enable Google Analytics
+ENABLE_GOOGLE_ANALYTICS = false
+GOOGLE_ANALYTICS_TRACKER_ID = 'UA-11138999-3'
