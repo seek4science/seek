@@ -25,6 +25,7 @@ Rails::Initializer.run do |config|
   # config.gem "bj"
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
+  config.gem 'rubaidh-google_analytics', :lib => 'rubaidh/google_analytics', :source => 'http://gems.github.com'
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -88,5 +89,12 @@ load 'config/environment_local.rb' if FileTest.exist?('config/environment_local.
 EMAIL_ENABLED=false unless Object.const_defined?("EMAIL_ENABLED")
 SOLR_ENABLED=false unless Object.const_defined?("SOLR_ENABLED")
 ACTIVATION_REQUIRED=false unless Object.const_defined?("ACTIVATION_REQUIRED")
+
+# Set Google Analytics code
+if ENABLE_GOOGLE_ANALYTICS
+  Rubaidh::GoogleAnalytics.tracker_id = GOOGLE_ANALYTICS_TRACKER_ID
+else
+  Rubaidh::GoogleAnalytics.tracker_id = nil
+end
 
 
