@@ -9,7 +9,7 @@
     <div class="tags_smaller">
       <div class="hTagcloud">
         <div class="popularity">
-          <%= render :partial=>"gadgets/tag_cloud", :object=>tag_cloud_gadget, :locals=>{:type=>type.to_sym} -%>
+          <%= render :partial=>"gadgets/tag_cloud", :object=>tag_cloud_gadget, :locals=>{:type=>type.to_sym,:min_count=>4} -%>
           
         </div>
       </div>
