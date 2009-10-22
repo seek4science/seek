@@ -1,5 +1,5 @@
 <%
-all_tags=tag_cloud.select{|tag| tag.count>min_count}
+all_tags=tag_cloud.select{|tag| tag.count>=min_count}
 show_tags=tag_cloud.sort{|a,b| b.count<=>a.count}[0..9]
 puts "Showing tags - #{show_tags.size}"
 hidden_class="#{type}_tag_hidden"
