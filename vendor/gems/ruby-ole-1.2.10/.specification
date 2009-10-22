@@ -1,0 +1,97 @@
+--- !ruby/object:Gem::Specification 
+name: ruby-ole
+version: !ruby/object:Gem::Version 
+  version: 1.2.10
+platform: ruby
+authors: 
+- Charles Lowe
+autorequire: 
+bindir: bin
+cert_chain: []
+
+date: 2009-07-19 00:00:00 +01:00
+default_executable: oletool
+dependencies: []
+
+description: A library for easy read/write access to OLE compound documents for Ruby.
+email: aquasync@gmail.com
+executables: 
+- oletool
+extensions: []
+
+extra_rdoc_files: 
+- README
+- ChangeLog
+files: 
+- README
+- Rakefile
+- ChangeLog
+- data/propids.yaml
+- bin/oletool
+- lib/ole/types.rb
+- lib/ole/storage.rb
+- lib/ole/support.rb
+- lib/ole/base.rb
+- lib/ole/ranges_io.rb
+- lib/ole/file_system.rb
+- lib/ole/types/property_set.rb
+- lib/ole/types/base.rb
+- lib/ole/storage/meta_data.rb
+- lib/ole/storage/base.rb
+- lib/ole/storage/file_system.rb
+- test/test_ranges_io.rb
+- test/test_storage.rb
+- test/test_filesystem.rb
+- test/test_support.rb
+- test/test_mbat.rb
+- test/test_types.rb
+- test/test_meta_data.rb
+- test/test_property_set.rb
+- test/test_word_6.doc
+- test/test_word_97.doc
+- test/test_word_95.doc
+- test/test.doc
+- test/oleWithDirs.ole
+- test/test_SummaryInformation
+has_rdoc: true
+homepage: http://code.google.com/p/ruby-ole
+licenses: []
+
+post_install_message: 
+rdoc_options: 
+- --main
+- README
+- --title
+- ruby-ole documentation
+- --tab-width
+- "2"
+require_paths: 
+- lib
+required_ruby_version: !ruby/object:Gem::Requirement 
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      version: "0"
+  version: 
+required_rubygems_version: !ruby/object:Gem::Requirement 
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      version: "0"
+  version: 
+requirements: []
+
+rubyforge_project: ruby-ole
+rubygems_version: 1.3.5
+signing_key: 
+specification_version: 2
+summary: Ruby OLE library.
+test_files: 
+- test/test_ranges_io.rb
+- test/test_storage.rb
+- test/test_filesystem.rb
+- test/test_support.rb
+- test/test_mbat.rb
+- test/test_types.rb
+- test/test_meta_data.rb
+- test/test_property_set.rb

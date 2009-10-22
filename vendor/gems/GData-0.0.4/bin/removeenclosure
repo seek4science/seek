@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby -I../lib
+# --------------------------------------------------------------------------
+# removeenclosure - given a blog id and entry id, nuke the given enclosure
+# --------------------------------------------------------------------------
+
+require 'gdata/blogger'
+
+unless ENV['GDATA_USER'] and ENV['GDATA_PASS']
+  puts "#{$0} requires GDATA_USER and GDATA_PASS to be set"
+  exit
+end
+
+blog_id  = ARGV.first or raise "#{$0}: need a blog id and an entry id (% removeenclosure blogid entryid)"
+entry_id = ARGV[1]    or raise "#{$0}: need an entry id after the blog id (% removeenclosure blogid entryid)"
+
+blogger = GData::Blogger.new(blog_id, entry_id)
+blogger.authenticate(ENV['GDATA_USER'], ENV['GDATA_PASS'])
+blogger.remove_enclosure

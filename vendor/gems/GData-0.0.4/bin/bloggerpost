@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby -I../lib
+# --------------------------------------------------------------------------
+# bloggerpost - given a blog id, create a new post.
+# --------------------------------------------------------------------------
+
+require 'gdata/blogger'
+
+unless ENV['GDATA_USER'] and ENV['GDATA_PASS']
+  puts "#{$0} requires GDATA_USER and GDATA_PASS to be set"
+  exit
+end
+
+blog_id = ARGV.first or raise "#{$0}: need a blog id and an entry id (% addenclosure blogid entryid)"
+
+blogger = GData::Blogger.new(blog_id)
+blogger.authenticate(ENV['GDATA_USER'], ENV['GDATA_PASS'])
+
+puts blogger.entry('Testing from GData::Blogger', 'Now to clean things up')

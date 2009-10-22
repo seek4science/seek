@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby -I../lib
+# --------------------------------------------------------------------------
+# gspreadsheet - given a formula, run it in google spreadsheets and show the result
+# --------------------------------------------------------------------------
+
+require 'gdata/spreadsheet'
+
+unless ENV['GDATA_USER'] and ENV['GDATA_PASS']
+  puts "#{$0} requires GDATA_USER and GDATA_PASS to be set"
+  exit
+end
+
+formula = ARGV.first or 'sin(0.2)'
+  
+gs = GData::Spreadsheet.new('pSYwzniwpzSFfn0KFRg9oWA')
+gs.authenticate(ENV['GDATA_USER'], ENV['GDATA_PASS'])
+gs.add_to_cell formula
+puts gs.evaluate_cell('A1')
