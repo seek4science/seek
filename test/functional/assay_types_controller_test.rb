@@ -6,35 +6,42 @@ class AssayTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   test "should show manage page" do
-    login_as(:pal_user)
+    login_as(:quentin)
     get :manage
     assert_response :success
     assert_not_nil assigns(:assay_types)
   end  
   
-  test "should not show manage page for non-pal non-admin" do
+  test "should not show manage page for non-admin" do
     login_as(:cant_edit)
     get :manage
     assert flash[:error]
     assert_redirected_to root_url
-  end  
+  end
+
+  test "should not show manage page for pal" do
+    login_as(:pal_user)
+    get :manage
+    assert flash[:error]
+    assert_redirected_to root_url
+  end
   
   test "should show new" do
-    login_as(:pal_user)
+    login_as(:quentin)
     get :new
     assert_response :success
     assert_not_nil assigns(:assay_type)
   end
   
   test "should show edit" do
-    login_as(:pal_user)
+    login_as(:quentin)
     get :edit, :id=>assay_types(:assay_type_with_child).id
     assert_response :success
     assert_not_nil assigns(:assay_type)
   end
   
   test "should create" do
-    login_as(:pal_user)
+    login_as(:quentin)
     assert_difference("AssayType.count") do
       post :create,:assay_type=>{:title => "test_assay_type", :parent_id => [assay_types(:assay_type_with_child_and_assay).id]}      
     end
@@ -45,7 +52,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
   
   test "should update title" do
-    login_as(:pal_user)
+    login_as(:quentin)
     assay_type = assay_types(:child_assay_type)
     put :update, :id => assay_type.id, :assay_type => {:title => "child_assay_type_a", :parent_id => assay_type.parents.collect {|p| p.id}}
     assert assigns(:assay_type)
@@ -53,7 +60,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
   
   test "should update parents" do
-    login_as(:pal_user)
+    login_as(:quentin)
     assay_type = assay_types(:child_assay_type)
     assert_equal 1,assay_type.parents.size
     put :update,:id=>assay_type.id,:assay_type=>{:title => assay_type.title, :parent_id => (assay_type.parents.collect {|p| p.id} + [assay_types(:new_parent)])}
@@ -63,7 +70,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
   
   test "should delete assay" do
-    login_as(:pal_user)
+    login_as(:quentin)
     assay_type = AssayType.create(:title => "delete_me")
     assert_difference('AssayType.count', -1) do
       delete :destroy, :id => assay_type.id
@@ -73,7 +80,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
   
   test "should not delete assay_type with child" do
-    login_as(:pal_user)
+    login_as(:quentin)
     assert_no_difference('AssayType.count') do
       delete :destroy, :id => assay_types(:assay_type_with_child).id
     end
@@ -82,7 +89,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end 
   
   test "should not delete assay_type with assays" do
-    login_as(:pal_user)
+    login_as(:quentin)
     assert_no_difference('AssayType.count') do
       delete :destroy, :id => assay_types(:child_assay_type_with_assay).id
     end
@@ -91,7 +98,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
   
   test "should not delete assay_type with children with assays" do
-    login_as(:pal_user)
+    login_as(:quentin)
     assert_no_difference('AssayType.count') do
       delete :destroy, :id => assay_types(:assay_type_with_only_child_assays).id
     end
