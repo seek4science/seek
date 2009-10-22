@@ -1,7 +1,7 @@
 class TechnologyTypesController < ApplicationController
 
   before_filter :login_required
-  before_filter :pal_or_admin_required,:except=>[:show]
+  before_filter :is_user_admin_auth,:except=>[:show]
 
   def show
     @technology_type = TechnologyType.find(params[:id])
