@@ -89,6 +89,7 @@ load 'config/environment_local.rb' if FileTest.exist?('config/environment_local.
 EMAIL_ENABLED=false unless Object.const_defined?("EMAIL_ENABLED")
 SOLR_ENABLED=false unless Object.const_defined?("SOLR_ENABLED")
 ACTIVATION_REQUIRED=false unless Object.const_defined?("ACTIVATION_REQUIRED")
+ENABLE_GOOGLE_ANALYTICS=false unless Object.const_defined?("ENABLE_GOOGLE_ANALYTICS")
 
 # Set Google Analytics code
 if ENABLE_GOOGLE_ANALYTICS
