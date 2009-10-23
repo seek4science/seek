@@ -226,5 +226,52 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select "a[rel=nofollow]"
     end
   end
+
+  #checks that for an assay that has 2 sops and 2 datafiles, of which 1 is public and 1 private - only links to the public sops & datafiles are show
+  def test_authorization_of_sops_and_datafiles_links
+    #sanity check the fixtures are correct
+    check_fixtures_for_authorization_of_sops_and_datafiles_links
+    login_as(:model_owner)
+    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
+    get :show,:id=>assay.id
+    assert_response :success
+    
+    assert_select "div.tabbertab" do
+      assert_select "h3",:text=>"SOPs (1)",:count=>1
+      assert_select "h3",:text=>"SOPs (2)",:count=>0
+      assert_select "h3",:text=>"Data Files (1)",:count=>1
+      assert_select "h3",:text=>"Data Files (1)",:count=>1
+    end
+
+    assert_select "table.list_item" do
+      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+
+      assert_select "p.title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "td.actions a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "p.title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+      assert_select "td.actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+    end
+
+  end
+
+  def check_fixtures_for_authorization_of_sops_and_datafiles_links
+    user=users(:model_owner)
+    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
+    assert_equal 4,assay.assets.size
+    assert_equal 2,assay.sops.size
+    assert_equal 2,assay.data_files.size
+    assert assay.sops.include?(sops(:sop_with_fully_public_policy).find_version(1))
+    assert assay.sops.include?(sops(:sop_with_private_policy_and_custom_sharing).find_version(1))
+    assert assay.data_files.include?(data_files(:downloadable_data_file).find_version(1))
+    assert assay.data_files.include?(data_files(:private_data_file).find_version(1))
+
+    assert Authorization.is_authorized?("show",nil,sops(:sop_with_fully_public_policy),user)
+    assert !Authorization.is_authorized?("show",nil,sops(:sop_with_private_policy_and_custom_sharing),user)
+    assert Authorization.is_authorized?("show",nil,data_files(:downloadable_data_file),user)
+    assert !Authorization.is_authorized?("show",nil,data_files(:private_data_file),user)
+  end
   
 end

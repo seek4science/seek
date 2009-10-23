@@ -82,5 +82,10 @@ class StudyTest < ActiveSupport::TestCase
 
   end
 
+  test "study with 1 assay" do
+    study=studies(:study_with_assay_with_public_private_sops_and_datafile)
+    assert_equal 1,study.assays.size,"This study must have only one assay - do not modify its fixture"
+  end
+
   
 end

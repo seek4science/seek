@@ -143,6 +143,44 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  def test_assay_tab_doesnt_show_private_sops_or_datafiles
+    login_as(:model_owner)
+    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
+    study=studies(:study_with_assay_with_public_private_sops_and_datafile)
+    get :show,:id=>study
+    assert_response :success
+
+    assert_select "div.tabbertab" do
+      assert_select "h3",:text=>"Assays (1)",:count=>1
+      assert_select "h3",:text=>"SOPs (1)",:count=>1
+      assert_select "h3",:text=>"Data Files (1)",:count=>1
+    end
+    
+    assert_select "table.list_item" do
+      #the Assay resource_list_item
+      assert_select "p.Sops a[title=?]",sops(:sop_with_fully_public_policy).title,:count=>1
+      assert_select "p.Sops a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "p.Sops a[title=?]",sops(:sop_with_private_policy_and_custom_sharing).title,:count=>0
+      assert_select "p.Sops a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+
+      assert_select "p.Data a[title=?]",data_files(:downloadable_data_file).title,:count=>1
+      assert_select "p.Data a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "p.Data a[title=?]",data_files(:private_data_file).title,:count=>0
+      assert_select "p.Data a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0      
+
+      #the Sops and DataFiles resource_list_item
+      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+
+      assert_select "p.title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "td.actions a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "p.title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+      assert_select "td.actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+    end
+  end
+
 
   
 end

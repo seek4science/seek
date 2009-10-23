@@ -20,3 +20,8 @@ study_with_links_in_description:
   title: Study with links in description
   investigation: investigation_with_links_in_description
   description: Visit my site http://www.sysmo-db.org
+
+study_with_assay_with_public_private_sops_and_datafile:
+  title: Study with one assay and public private sops
+  investigation: investigation_with_links_in_description
+  description: Visit my site http://www.sysmo-db.org
