@@ -12,11 +12,11 @@ module PeopleHelper
   end
 
   def pal_icon person
-    person.is_pal? ? image("pal",:alt=>"Pal",:title=>"Official SysMO-DB Pal",:class=>"badge")  : ""
+    person.is_pal? ? image("pal",:alt=>"Pal",:title=>tooltip_title_attrib("Official SysMO-DB Pal"),:class=>"badge")  : ""
   end
 
   def admin_icon person
-    person.is_admin? ? image("admin",:alt=>"Admin",:title=>"Sysmo-DB Administrator",:class=>"badge") : ""
+    person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("Sysmo-DB Administrator"),:class=>"badge") : ""
   end
 
   def discipline_list person

@@ -132,5 +132,12 @@ class ProjectTest < ActiveSupport::TestCase
     p.name="fred"
     assert p.valid?
   end
-  
+
+  def test_pals
+    pal=people(:pal)
+    project=projects(:sysmo_project)
+
+    assert_equal 1,project.pals.size
+    assert project.pals.include?(pal)
+  end
 end

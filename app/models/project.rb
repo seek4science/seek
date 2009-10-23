@@ -59,6 +59,11 @@ class Project < ActiveRecord::Base
     end
   end
 
+  def pals
+    #TODO: look into doing this with a named_scope or direct query
+    people.select{|p| p.is_pal?}
+  end
+
   def locations
     # infer all project's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }
@@ -71,12 +76,13 @@ class Project < ActiveRecord::Base
   end
   
   def people
+    #TODO: look into doing this with a named_scope or direct query
     res=[]
     work_groups.each do |wg|
       wg.people.each {|p| res << p unless res.include? p}
     end
     #TODO: write a test to check they are ordered
-    return res.sort{|a,b| a.last_name <=> b.last_name}
+    return res.sort{|a,b| (a.last_name.nil? ? a.name : a.last_name) <=> (a.last_name.nil? ? a.name : a.last_name)}
   end
   
   # "false" returned by this helper method won't mean that no avatars are uploaded for this project;

@@ -17,4 +17,12 @@ module ProjectsHelper
     end
     return result
   end
+
+  def pals_link_list project
+    if project.pals.empty?
+      "<span class='none_text'>No Pals for this project</span>";
+    else
+      project.pals.collect{|p| link_to(h(p.name),p)}.join(", ")
+    end
+  end
 end

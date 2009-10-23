@@ -137,6 +137,24 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "pals displayed in show page" do
+    get :show,:id=>projects(:sysmo_project)
+    assert_select "div.box_about_actor p.pals" do
+      assert_select "label",:text=>"SysMO-DB Pals:",:count=>1
+      assert_select "a",:count=>1
+      assert_select "a[href=?]",person_path(people(:pal)),:text=>"A Pal",:count=>1
+    end
+  end
+
+  test "no pals displayed for project with no pals" do
+    get :show,:id=>projects(:myexperiment_project)
+    assert_select "div.box_about_actor p.pals" do
+      assert_select "label",:text=>"SysMO-DB Pals:",:count=>1
+      assert_select "a",:count=>0
+      assert_select "span.none_text",:text=>"No Pals for this project",:count=>1
+    end
+  end
+
   private
 
   def valid_project

@@ -62,3 +62,7 @@ group_for_model_owner:
 group_for_datafile_owner:
   person: person_for_datafile_owner
   work_group: sysmo_at_manchester_uni_workgroup
+
+group_for_pal:
+  person: pal
+  work_group: sysmo_at_manchester_uni_workgroup
