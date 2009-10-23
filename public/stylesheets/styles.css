@@ -676,3 +676,9 @@ a#feedback {
 #possible_data_files {
     width: 24em;
 }
+
+img.badge {
+    width: 55px;
+    height: 20px;
+    padding-top: 3px;
+}

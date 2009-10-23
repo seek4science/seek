@@ -3,15 +3,17 @@
 <%# 2) "drag_id" - id for dragging-dropping avatar into "favourites" gadget; -%>
 
 <% if object.instance_of?(Person) -%>
-  <span style="float:right;padding-top:0.5em;padding-right:0.5em;"><%= no_user_for_admins_img object %></span>
+  <span style="float:right;padding-top:0.5em;padding-right:0.5em;"><%= no_user_for_admins_img object %></span>  
 <% end -%>
 
 <div class="contribution_section_box" style="padding-top: 3em; padding-bottom: 3em;">  
-  <div>
+  <div>    
     <%= link_to_draggable(avatar(object, 100, true), url_for(object), :title=>tooltip_title_attrib(h(object.name)), :id => drag_id,:class=>"asset") -%>
   </div>
-  <% if mine?(object) || object.can_be_edited_by?(current_user) -%>
-    <small><%= link_to "[Change]", eval("edit_#{object.class.name.downcase}_path(#{object.id})") -%></small>
+  
+  <% if object.instance_of?(Person) -%>
+    <%= pal_icon(@person) -%>
+    <%= admin_icon(@person) -%>
   <% end -%>
   <%= favourite_drag_element(drag_id) %>
 </div>

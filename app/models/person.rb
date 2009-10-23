@@ -57,7 +57,10 @@ class Person < ActiveRecord::Base
         "email" => (p.email.blank? ? "unknown" : p.email) } }
     return names_emails.to_json
   end
-    
+
+  def is_admin?
+    !user.nil? && user.is_admin?
+  end
 
   def validates_associated(*associations)
     associations.each do |association|

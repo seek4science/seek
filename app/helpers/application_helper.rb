@@ -233,6 +233,10 @@ module ApplicationHelper
       "folds/fold.png"
     when "collapse"
       "folds/unfold.png"
+    when "pal"
+      "pal.png"
+    when "admin"
+      "admin.png"
     else
       return nil
     end

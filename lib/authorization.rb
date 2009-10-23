@@ -43,8 +43,7 @@ module Authorization
     # if "thing" is unknown, or "thing" expresses ID of the object to be authorized, but "thing_type" is unknown - don't authorise the action
     # (this would allow, however, supplying no type, but giving the object instance as "thing" instead)
     return false if thing.blank? || (thing_type.blank? && thing.kind_of?(Numeric))
-    
-    
+        
     # some value for "thing" supplied - assume that the object exists; check if it is an instance or the ID
     if thing.kind_of?(Numeric)
       # just an ID was provided - "thing_type" is assumed to have a type then
