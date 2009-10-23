@@ -70,8 +70,7 @@ class ProjectsControllerTest < ActionController::TestCase
   def test_user_can_edit_project
     login_as(:can_edit)
     get :show, :id=>projects(:three)
-    assert_select "a",:text=>/Edit Project/,:count=>1
-    assert_select "a",:text=>/\[Change\]/,:count=>1
+    assert_select "a",:text=>/Edit Project/,:count=>1    
 
     get :edit, :id=>projects(:three)
     assert_response :success
@@ -83,8 +82,7 @@ class ProjectsControllerTest < ActionController::TestCase
   def test_user_cant_edit_project
     login_as(:cant_edit)
     get :show, :id=>projects(:three)
-    assert_select "a",:text=>/Edit Project/,:count=>0
-    assert_select "a",:text=>/\[Change\]/,:count=>0
+    assert_select "a",:text=>/Edit Project/,:count=>0    
 
     get :edit, :id=>projects(:three)
     assert_response :redirect
@@ -94,8 +92,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_admin_can_edit
     get :show, :id=>projects(:one)
-    assert_select "a",:text=>/Edit Project/,:count=>1
-    assert_select "a",:text=>/\[Change\]/,:count=>1
+    assert_select "a",:text=>/Edit Project/,:count=>1    
 
     get :edit, :id=>projects(:one)
     assert_response :success
