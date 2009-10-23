@@ -1,6 +1,12 @@
 #Enable search
 SOLR_ENABLED = false
 
+#Enable email
+EMAIL_ENABLED = false
+
+#Activation, at registration time, required
+ACTIVATION_REQUIRED=false
+
 #Hide contact details
 HIDE_DETAILS = false
 
