@@ -87,11 +87,11 @@ class TechnologyTypesController < ApplicationController
         format.xml  { head :ok }
       else
         if !@technology_type.children.empty?
-          flash[:error]="Unable to delete tecnology types with children" 
+          flash[:error]="Unable to delete technology types with children" 
         elsif !@technology_type.get_child_assays.empty?
-          flash[:error]="Unable to delete tecnology type due to reliance from #{@technology_type.get_child_assays.count} existing assays on child assay types"
+          flash[:error]="Unable to delete technology type due to reliance from #{@technology_type.get_child_assays.count} existing assays on child technology types"
         elsif !@technology_type.assays.empty?
-          flash[:error]="Unable to delete tecnology type due to reliance from #{@technology_type.get_child_assays.count} existing assays"        
+          flash[:error]="Unable to delete technology type due to reliance from #{@technology_type.get_child_assays.count} existing assays"        
         end
         format.html { redirect_to(:action => 'manage') }
         format.xml  { render :xml => @technology_type.errors, :status => :unprocessable_entity }
