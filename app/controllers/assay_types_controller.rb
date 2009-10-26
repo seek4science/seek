@@ -88,7 +88,7 @@ class AssayTypesController < ApplicationController
       else
         if !@assay_type.children.empty?
           flash[:error]="Unable to delete assay types with children" 
-        elsif @assay_type.get_child_assays.empty?
+        elsif !@assay_type.get_child_assays.empty?
           flash[:error]="Unable to delete assay type due to reliance from #{@assay_type.get_child_assays.count} existing assays on child assay types"
         elsif !@assay_type.assays.empty?
           flash[:error]="Unable to delete assay type due to reliance from #{@assay_type.get_child_assays.count} existing assays"        
