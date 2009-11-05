@@ -16,7 +16,7 @@
   <%= image("arrow_down",{:title=>"Children",:alt=>"Children"}) -%>
   <% if @assay_type.has_children? -%>
     <% for child_type in @assay_type.children  -%>
-      <%= link_to h(child_type.title.capitalize), child_type %>
+      <%= link_to h(child_type.title.capitalize), child_type %> (<%= child_type.get_child_assays.count %>)
       <%= " | " unless @assay_type.children.last==child_type %>
     <% end -%>
   <% else -%>

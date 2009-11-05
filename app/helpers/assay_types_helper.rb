@@ -22,7 +22,7 @@ module AssayTypesHelper
     
     unless parent.children.empty?
       parent.children.sort{|a,b| a.title.downcase <=> b.title.downcase}.each do |child|
-        result << "<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + child.title + " " +
+        result << "<li style=\"margin-left:#{12*depth}px;#{child.id == selected_id ? "background-color: lightblue;" : ""}\">"+ (depth>0 ? "└ " : " ") + (link_to child.title, child) + " " +
                     (show_edit ? link_to(image("edit"), edit_polymorphic_path(child), {:style=>"vertical-align:middle"}) : "") + " " +
                     (show_delete ? (child.assays.size == 0 ? link_to(image("destroy"),child, :confirm => 
                       "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
