@@ -1,22 +1,16 @@
 concentration:
   title: concentration
 
-dry_biomass_concentration:
-  title: dry biomass concentration
-
 pressure:
   title: pressure
 
 PH:
   title: acidity/PH
 
-gas_flow_rate:
-  title: gas flow rate
-
 specific concentration:
   title: specific concentration
 
-stiring_rate:
+stiring rate:
   title: stiring rate
 
 temperature:
