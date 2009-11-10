@@ -10,7 +10,6 @@ class Harvester
       resource = construct_resource(item)
       populate resource
     end
-
   end
 
   def last_run

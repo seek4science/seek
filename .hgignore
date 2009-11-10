@@ -25,6 +25,7 @@ tmp/data.sql
 *~
 solr/development/*
 solr/production/*
+lib/jerm/stu_main.rb
 
 
 syntax: regexp
