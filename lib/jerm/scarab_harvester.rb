@@ -6,5 +6,9 @@ class ScarabHarvester < WebDavHarvester
   def construct_resource item
     puts item[:full_path]
   end
+
+  def key_directories
+    []
+  end
   
 end

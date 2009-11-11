@@ -18,7 +18,11 @@ class WebDavHarvester < Harvester
   end
 
   def changed_since time
-    trees = get_contents URI.parse(@base_uri),@username,@password,true
+    trees=[]
+    key_directories.each do |directory|
+      uri=URI.join(@base_uri,directory)
+      trees = trees + get_contents(uri,@username,@password,true)
+    end
     #need to split tree into a list of the final directory leaves
     items = []
     trees.each do |tree|

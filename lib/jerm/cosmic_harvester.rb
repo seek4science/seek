@@ -10,5 +10,9 @@ class CosmicHarvester < AlfrescoHarvester
     CosmicResource.new(item)    
   end
 
+  def key_directories
+    ["models","protocols","transcriptomics","metabolomics","proteomics"]
+  end
+
 
 end
