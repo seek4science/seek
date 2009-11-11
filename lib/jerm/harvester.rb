@@ -3,6 +3,8 @@
 
 class Harvester
   
+  attr_reader :base_uri
+
   def update    
     authenticate
     items = changed_since(last_run)
@@ -17,7 +19,9 @@ class Harvester
   end
 
   def populate resource
+    puts "--------------"
     puts resource.to_s
+    puts "--------------"
   end
 
 end

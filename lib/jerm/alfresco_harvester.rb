@@ -1,5 +1,5 @@
-require 'jerm/webdav_harvester'
+require 'jerm/web_dav_harvester'
 
-class AlfrescoHarvester < WebdavHarvester
+class AlfrescoHarvester < WebDavHarvester
   
 end
