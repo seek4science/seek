@@ -4,7 +4,7 @@ require 'jerm/web_dav'
 
 class WebDavHarvester < Harvester
 
-  include WebDav
+  include WebDav  
   
   def initialize username,password,base_uri
     @username=username

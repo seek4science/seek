@@ -1,7 +1,5 @@
+require 'jerm/web_dav_resource'
 
-
-class AlfrescoResource < Resource
-  def initialize item
-    @item=item    
-  end
+class AlfrescoResource < WebDavResource
+  
 end
