@@ -34,8 +34,6 @@ module WebDav
 
     content=propfind uri,user,password,1
 
-    puts content
-
     parser = XML::Parser.string(content,:encoding => XML::Encoding::UTF_8)
 
     document = parser.parse
@@ -65,13 +63,11 @@ module WebDav
 
     end
 
-    if recursive
-      found.select{|a| a[:is_directory]}.each do |dir_tuple|
+    found.select{|a| a[:is_directory]}.each do |dir_tuple|
         child_uri=uri.merge(dir_tuple[:path])
         children=get_contents child_uri,user,password,true
-        dir_tuple[:children]=children unless children.empty?
-      end
-    end
+        dir_tuple[:children]=children
+    end if recursive
     
     return found
     

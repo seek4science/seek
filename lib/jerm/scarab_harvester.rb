@@ -6,4 +6,5 @@ class ScarabHarvester < WebDavHarvester
   def construct_resource item
     puts item
   end
+  
 end
