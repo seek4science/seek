@@ -19,7 +19,6 @@ class WebDavHarvester < Harvester
 
   def changed_since time
     trees = get_contents URI.parse(@base_uri),@username,@password,true
-    puts "-- #{trees.size} --"
     #need to split tree into a list of the final directory leaves
     items = []
     trees.each do |tree|
@@ -31,10 +30,10 @@ class WebDavHarvester < Harvester
 
   def split_tree tree
     items = []
-    if !tree[:children].empty? && tree[:children][0][:is_directory]
+    if !tree[:children].nil? && !tree[:children].empty? && tree[:children][0][:is_directory]
       tree[:children].each {|i| items = items + split_tree(i)}
     else
-      items << tree unless tree[:children].empty?
+      items << tree unless tree[:children].nil? || tree[:children].empty?
     end
     return items
   end
