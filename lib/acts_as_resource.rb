@@ -112,6 +112,11 @@ module Mib
         def can_delete? user
           Authorization.is_authorized? "destroy",nil,self,user
         end
+      
+        def cache_remote_content_blob
+          self.original_filename, self.content_type = self.content_blob.cache_remote_content
+          self.save
+        end
 
 private
 

@@ -66,8 +66,16 @@ class SopsController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @sop.last_used_at = Time.now
     @sop.save_without_timestamping
-    
-    send_data @display_sop.content_blob.data, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'
+
+    #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
+    #@display_sop.last_used_at = Time.now
+    #@display_sop.save_without_timestamping
+
+    if @display_sop.content_blob.url.blank?
+      send_data @display_sop.content_blob.data, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'
+    else
+      redirect_to @display_sop.content_blob.url
+    end
   end
 
   # GET /sops/new

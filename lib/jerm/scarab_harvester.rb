@@ -1,14 +1,16 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-class ScarabHarvester < WebDavHarvester
+module Jerm
+  class ScarabHarvester < WebDavHarvester
 
-  def construct_resource item
-    puts item[:full_path]
-  end
+    def construct_resource item
+      puts item[:full_path]
+    end
 
-  def key_directories
-    []
-  end
+    def key_directories
+      []
+    end
   
+  end
 end
