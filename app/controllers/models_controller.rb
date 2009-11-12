@@ -292,7 +292,15 @@ class ModelsController < ApplicationController
     @model.last_used_at = Time.now
     @model.save_without_timestamping
 
-    send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
+    #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
+    #@display_model.last_used_at = Time.now
+    #@display_model.save_without_timestamping
+
+    if @display_model.content_blob.url.blank?
+      send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
+    else
+      redirect_to @display_model.content_blob.url
+    end
   end
 
   # PUT /models/1

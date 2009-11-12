@@ -190,14 +190,23 @@ class DataFilesController < ApplicationController
     end
   end
 
-  # GET /sops/1;download
+  # GET /data_files/1;download
   def download
-    # update timestamp in the current SOP record
+    # update timestamp in the current data file record
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
 
-    send_data @display_data_file.content_blob.data, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
+    #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
+    #@display_data_file.last_used_at = Time.now
+    #@display_data_file.save_without_timestamping
+
+    #Send data stored in database if no url specified
+    if @display_data_file.content_blob.url.blank?
+      send_data @display_data_file.content_blob.data, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
+    else #otherwise redirect to the provided download url. this will need to be changed to support authorization
+      redirect_to @display_data_file.content_blob.url
+    end
   end 
 
   protected

@@ -1,0 +1,78 @@
+=== 0.6.1.6 / 2008-10-28
+
+* 2 Bugfixes
+
+  * Fixed encoding and decoding of BigNums, negative and other large Numbers
+    http://rubyforge.org/tracker/index.php?func=detail&aid=22581&group_id=678&atid=2677
+  * Fix a bug where modifications to default columns weren't stored
+    http://rubyforge.org/forum/message.php?msg_id=61567
+
+* 1 minor enhancement
+
+  * Row#enriched_data won't return a Bogus-Date if the data isn't a Numeric
+    value
+    (Thanks to Bjørn Hjelle for the report)
+
+=== 0.6.1.5 / 2008-10-24
+
+* 2 Bugfixes
+
+  * Removed obsolete code which triggered Iconv::InvalidEncoding
+    on Systems with non-gnu Iconv:
+    http://rubyforge.org/tracker/index.php?func=detail&aid=22541&group_id=678&atid=2677
+  * Handle empty Worksheets
+    (Thanks to Charles Lowe for the Patches)
+
+=== 0.6.1.4 / 2008-10-23
+
+* 1 Bugfix
+
+  * Biff8#wide now works properly even if $KCODE=='UTF-8'
+    (Thanks to Bjørn Hjelle for the Bugreport)
+
+* 1 minor enhancement
+
+  * Read/Write functionality for Links (only URLs can be written as of now)
+
+=== 0.6.1.3 / 2008-10-21
+
+* 2 Bugfixes
+
+  * Renamed UTF8 to UTF-8 to support freebsd
+    (Thanks to Jacob Atzen for the Patch)
+  * Fixes a Bug where only the first Rowblock was read correctly if there were
+    no DBCELL records terminating the Rowblocks.
+    (Thanks to Bjørn Hjelle for the Bugreport)
+
+=== 0.6.1.2 / 2008-10-20
+
+* 2 Bugfixes
+
+  * Corrected the Font-Encoding values in Excel::Internals
+    (Thanks to Bjørn Hjelle for the Bugreport)
+  * Spreadsheet now skips Richtext-Formatting runs and Asian Phonetic 
+    Settings when reading the SST, fixing a problem where the presence of
+    Richtext could lead to an incomplete SST.
+
+=== 0.6.1.1 / 2008-10-20
+
+* 1 Bugfix
+
+  * Corrected the Manifest - included column.rb
+
+=== 0.6.1 / 2008-10-17
+
+* 3 minor enhancements
+
+  * Adds Column formatting and Worksheet#format_column
+  * Reads and writes correct Fonts (Font-indices > 3 appear to be 1-based)
+  * Reads xf data
+
+=== 0.6.0 / 2008-10-13
+
+* 1 major enhancement
+
+  * Initial upload of the shiny new Spreadsheet Gem after three weeks of
+    grueling labor in the dark binary mines of Little-Endian Biff and long
+    hours spent polishing the surfaces of documentation.
+
