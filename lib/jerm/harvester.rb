@@ -19,6 +19,8 @@ class Harvester
   end
 
   def populate resource
+    resource.populate
+    
     puts "--------------"
     puts resource.to_s
     puts "--------------"
