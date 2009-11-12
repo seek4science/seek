@@ -1,7 +1,7 @@
 module Jerm
   class MediaWikiHarvester < WikiHarvester
       
-    def authenticate
+    def update
       if @cookie.nil?
         #MediaWiki API url
         url = URI.parse(@api_uri)
@@ -12,7 +12,13 @@ module Jerm
         #Save the cookie
         @cookie = resp['set-cookie']
       end
+      items = changed_since(last_run)
+      items.each do |item|
+        resource = construct_resource(item)
+        populate resource
+      end
     end
+
     
   end
 end

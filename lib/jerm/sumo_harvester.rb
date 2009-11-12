@@ -111,7 +111,6 @@ module Jerm
                   sop_link = cell.at("a")
                   unless sop_link.nil?
                     resource_uri = complete_url(sop_link['href'], extract_base_url(uri))
-                    @sops ||= []
                     @sops << resource_uri
                   end
                 end
@@ -132,28 +131,20 @@ module Jerm
               unless (resource_uri.include?("timeline?") || resource_uri.starts_with?("#") || @searched_uris.include?(resource_uri))
                 #Remember we've visited this link
                 @searched_uris << resource_uri
-                #Get file extension
-                #extension = resource_uri.split(".").last
-                #If valid data file, remember it
-                #if FILE_EXTENSIONS.include?(extension)
                 if @section == "Attachments"
                   @data_files << resource_uri
-                else
-                  @data_files << resource_uri if e.attributes['class'] == "attachment"
+                elsif e.attributes['class'] == "attachment"
+                  @data_files << resource_uri
                 end
-                  
-                #If link wasn't a data file, but contains the word 'data' and is a wiki page, search it.
-                #elsif resource_uri.starts_with?(root_uri) && (resource_uri.include?("data") || resource_uri.include?("Data"))        
-                #  get_data(resource_uri, (level+1))
-                #end          
+      
               end        
-            end
+            end          
         end
       end
       
-      
-      #Print out what we've found
+      #If we're on a valid experiment page..
       if @valid_template
+        #Create sop resources
         unless @sops.empty?
           @sops.each do |s|
             res = Resource.new
@@ -169,6 +160,7 @@ module Jerm
           end
         end
         
+        #Create data file resources
         unless @data_files.empty?
           @data_files.each do |s|
             res = Resource.new
@@ -183,7 +175,7 @@ module Jerm
             @resources << res
           end
         end 
-  
+      #Otherwise follow other links
       else
         get_links(uri, level)
       end

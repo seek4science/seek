@@ -6,7 +6,6 @@ module Jerm
     attr_reader :base_uri
 
     def update
-      authenticate
       items = changed_since(last_run)
       items.each do |item|
         resource = construct_resource(item)
