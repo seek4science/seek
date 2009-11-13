@@ -19,16 +19,14 @@ module Jerm
     end
 
     def changed_since time
-      trees=[]
+
+      items = []
       key_directories.each do |directory|
         uri=URI.join(@base_uri,directory)
-        trees = trees + get_contents(uri,@username,@password,true)
-      end
-      #need to split tree into a list of the final directory leaves
-      items = []
-      trees.each do |tree|
-        items = items + split_tree(tree)
-      end
+        trees = get_contents(uri,@username,@password,true)
+        #need to split tree into a list of the final directory leaves
+        items += trees.collect{|tree| split_items(split_tree(tree),asset_extensions(directory))}.flatten
+      end      
     
       return items
     end
