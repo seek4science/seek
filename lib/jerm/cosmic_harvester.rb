@@ -12,8 +12,8 @@ module Jerm
     end
 
     def key_directories
-      #["models","protocols","transcriptomics","metabolomics","proteomics"]
-      ["transcriptomics"]
+      ["models","protocols","transcriptomics","metabolomics","proteomics"]
+      #["models"]
     end
 
     def meta_data_file
