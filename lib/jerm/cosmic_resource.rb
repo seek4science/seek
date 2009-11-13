@@ -20,7 +20,8 @@ module Jerm
       read_metadata(@metadata)      
     end
 
-    def read_metadata metadata_uri       
+    def read_metadata metadata_uri
+      #FIXME: will re-open the same metadata_uri multiple times here, which is inefficient. Should cache based upon the uri
       uri = URI.parse(metadata_uri)
       http=Net::HTTP.new(uri.host,uri.port)
       http.use_ssl=true if uri.scheme=="https"

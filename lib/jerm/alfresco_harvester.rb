@@ -2,25 +2,27 @@ require 'jerm/web_dav_harvester'
 
 module Jerm
   class AlfrescoHarvester < WebDavHarvester
-  
-    def changed_since time
-      super time      
+
+    def initialize username,password
+      super username,password      
+      @directories_and_types=@config['directories_and_types']
+      @base_uri=@config['base_uri']
+    end    
+
+    def key_directories
+      @directories_and_types.keys
     end
 
-    #required for where a directory contains multiple data items, with a single metadata
-    def split_items items,extensions
-      items.collect{|item| split_item(item,extensions)}
+    def meta_data_file
+      "metadata.csv"
     end
 
-    def split_item item,extensions
-      metadata=item[:children].select{|c| c[:full_path].end_with?(meta_data_file)}.first
-      if metadata.nil?
-        puts "No metadata for: " + item[:full_path]
-        return []
-      end
-      assets=item[:children].select{|c| !extensions.detect{|ext| c[:full_path].end_with?(ext)}.nil?}
-      res = assets.collect{|a| {:metadata=>metadata,:asset=>a}}
-      return res
+    def asset_extensions directory
+      @directories_and_types[directory]['ext']
+    end
+
+    def asset_type directory
+      @directories_and_types[directory]['type']
     end
 
   end
