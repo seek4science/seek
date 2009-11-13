@@ -1,4 +1,4 @@
-base_uri: "https://waals.informatik.uni-rostock.de/alfresco/webdav/Projects/Cosmic/Document+Library/Repository/"
+base_uri: "https://waals.informatik.uni-rostock.de/alfresco/webdav/Projects/BaCell-SysMo/Document+Library/Seek-Repository/"
 
 directories_and_types:
   models:
@@ -16,6 +16,3 @@ directories_and_types:
   proteomics:
     ext: [xls, xlsx]
     type: DataFile
-
-
-

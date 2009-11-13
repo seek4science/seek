@@ -27,7 +27,8 @@ module Jerm
         uri=URI.join(@base_uri,directory)
         trees = get_contents(uri,@username,@password,true)
         #need to split tree into a list of the final directory leaves
-        split_items = trees.collect{|tree| split_items(split_tree(tree),asset_extensions(directory))}.flatten
+        extensions=asset_extensions(directory)
+        split_items = trees.collect{|tree| split_items(split_tree(tree),extensions)}.flatten
         type=asset_type(directory)
         split_items.each{|i| i[:type]=type}
         items+=split_items        
