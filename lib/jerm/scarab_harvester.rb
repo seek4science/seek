@@ -5,11 +5,11 @@ module Jerm
   class ScarabHarvester < WebDavHarvester
 
     def construct_resource item
-      puts item[:full_path]
+      ScarabResource.new(item,@username,@password)
     end
 
-    def key_directories
-      []
+    def project_name
+      "Scarab"
     end
   
   end

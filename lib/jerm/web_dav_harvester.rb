@@ -13,6 +13,8 @@ module Jerm
 
       configpath=File.join(File.dirname(__FILE__),"config/#{project_name.downcase}.yml")
       @config=YAML::load_file(configpath)
+      @directories_and_types=@config['directories_and_types']
+      @base_uri=@config['base_uri']
     end
 
     def authenticate
@@ -20,8 +22,12 @@ module Jerm
       raise Exception.new("No password") if @password.nil?
     end
 
-    def changed_since time
+    def key_directories
+      @directories_and_types.keys
+    end
 
+    def changed_since time
+      #FIXME: need to actually get those changed since time
       items = []
       key_directories.each do |directory|
         uri=URI.join(@base_uri,directory)
