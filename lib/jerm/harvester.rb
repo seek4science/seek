@@ -19,11 +19,8 @@ module Jerm
     end
 
     def populate resource
-      resource.populate
-    
-      puts "--------------"
-      puts resource.to_s
-      puts "--------------"
+      resource.populate    
+      puts resource.to_s    
     end
 
   end

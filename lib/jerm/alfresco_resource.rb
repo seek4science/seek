@@ -10,6 +10,7 @@ module Jerm
       @timestamp=item[:asset][:updated_at]
       @username=username
       @password=password
+      @type=item[:type]
     end
 
   end

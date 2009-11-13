@@ -7,10 +7,9 @@ module Jerm
 
     include WebDav
   
-    def initialize username,password,base_uri
+    def initialize username,password
       @username=username
-      @password=password
-      @base_uri=base_uri
+      @password=password      
     end
 
     def authenticate
@@ -25,7 +24,10 @@ module Jerm
         uri=URI.join(@base_uri,directory)
         trees = get_contents(uri,@username,@password,true)
         #need to split tree into a list of the final directory leaves
-        items += trees.collect{|tree| split_items(split_tree(tree),asset_extensions(directory))}.flatten
+        split_items = trees.collect{|tree| split_items(split_tree(tree),asset_extensions(directory))}.flatten
+        type=asset_type(directory)
+        split_items.each{|i| i[:type]=type}
+        items+=split_items        
       end      
     
       return items

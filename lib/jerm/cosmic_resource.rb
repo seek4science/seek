@@ -4,7 +4,7 @@ require 'fastercsv'
 
 module Jerm
   class CosmicResource < AlfrescoResource
-    
+
     attr_accessor :asset
     attr_accessor :metadata
     attr_accessor :author_seek_id
@@ -30,9 +30,9 @@ module Jerm
       response = http.request(req)
       FasterCSV.parse(response.body) do |row|        
         case row[0]
-        when "ownerFirstName"
+        when "ownerFirstName","ownerFirst"
           @author_first_name=row[1]          
-        when "ownerLastName"
+        when "ownerLastName","ownerLast"
           @author_last_name=row[1]          
         when "ownerSeekId","ownerSeekID"
           @author_seek_id=row[1]          
@@ -40,7 +40,6 @@ module Jerm
           @protocol=row[1]          
         end
       end
-    end
-  
+    end  
   end
 end

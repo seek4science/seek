@@ -3,24 +3,25 @@
 
 require 'jerm/alfresco_harvester'
 require 'jerm/cosmic_resource'
+require 'yaml'
 
 module Jerm
   class CosmicHarvester < AlfrescoHarvester
 
-    DIRECTORIES_AND_TYPES = {
-      "models"=>{:ext=>["xml","xls"],:type=>"Model"},
-      "protocols"=>{:ext=>["doc","pdf"],:type=>"SOP"},
-      "transcriptomics"=>{:ext=>["xls"],:type=>"DataFile"},
-      "metabolomics"=>{:ext=>["xls"],:type=>"DataFile"},
-      "proteomics"=>{:ext=>["xls"],:type=>"DataFile"}
-    }
+    def initialize username,password      
+      super username,password
+      configpath=File.join(File.dirname(__FILE__),'config/cosmic.yml')      
+      config=YAML::load_file(configpath)
+      @directories_and_types=config['directories_and_types']
+      @base_uri=config['base_uri']
+    end
 
     def construct_resource item
       CosmicResource.new(item,@username,@password)
     end
 
     def key_directories
-      DIRECTORIES_AND_TYPES.keys      
+      @directories_and_types.keys
     end
 
     def meta_data_file
@@ -28,7 +29,11 @@ module Jerm
     end
 
     def asset_extensions directory
-      DIRECTORIES_AND_TYPES[directory][:ext]
+      @directories_and_types[directory]['ext']
+    end
+
+    def asset_type directory
+      @directories_and_types[directory]['type']
     end
   
   end
