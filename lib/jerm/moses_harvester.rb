@@ -28,11 +28,15 @@ module Jerm
     end
   
     def construct_resource(item)
-      r = Resource.new
+      r = MosesResource.new
       r.uri = item
       r.type = @file_type
       r.project = "MOSES"
       return r
+    end
+    
+    def populate(resource)
+      puts resource.uri + " - valid: " + resource.populate.to_s
     end
   
     private

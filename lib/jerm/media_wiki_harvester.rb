@@ -12,6 +12,7 @@ module Jerm
         #Save the cookie
         @cookie = resp['set-cookie']
       end
+      
       items = changed_since(last_run)
       items.each do |item|
         resource = construct_resource(item)
