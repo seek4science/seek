@@ -28,7 +28,9 @@ module Jerm
 
     def changed_since time
       #FIXME: need to actually get those changed since time
+      
       items = []
+
       key_directories.each do |directory|
         uri=URI.join(@base_uri,directory)
         trees = get_contents(uri,@username,@password,true)
@@ -38,8 +40,8 @@ module Jerm
         type=asset_type(directory)
         split_items.each{|i| i[:type]=type}
         items+=split_items        
-      end      
-    
+      end
+
       return items
     end
 

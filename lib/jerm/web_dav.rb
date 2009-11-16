@@ -7,11 +7,9 @@ require 'uri'
 require 'libxml'
 require 'openssl'
 
-module WebDav
-  
-  include LibXML
+module WebDav    
 
-  XML.default_warnings=false
+  LibXML::XML.default_warnings=false
 
   def propfind uri,user,password,depth=1    
 
@@ -32,22 +30,22 @@ module WebDav
    
     found=[]
 
-    content=propfind uri,user,password,1
+    content = propfind uri,user,password,1
 
-    parser = XML::Parser.string(content,:encoding => XML::Encoding::UTF_8)
+    parser = LibXML::XML::Parser.string(content,:encoding => LibXML::XML::Encoding::UTF_8)
 
     document = parser.parse
 
-    href_nodes=document.find("ns:response","ns:DAV:")
+    href_nodes = document.find("ns:response","ns:DAV:")
       
     href_nodes.each do |node|
 
-      unless node==href_nodes.first
+      unless node == href_nodes.first
       
         href_node=node.find_first("ns:href","ns:DAV:")
-        last_modified_node=node.find_first("*/ns:prop","ns:DAV:").find_first("ns:getlastmodified","ns:DAV:")
-        creation_date_node=node.find_first("*/ns:prop","ns:DAV:").find_first("ns:creationdate","ns:DAV:")
-        content_type_node=node.find_first("*/ns:prop","ns:DAV:").find_first("ns:getcontenttype","ns:DAV:")
+        last_modified_node = node.find_first("*/ns:prop","ns:DAV:").find_first("ns:getlastmodified","ns:DAV:")
+        creation_date_node = node.find_first("*/ns:prop","ns:DAV:").find_first("ns:creationdate","ns:DAV:")
+        content_type_node = node.find_first("*/ns:prop","ns:DAV:").find_first("ns:getcontenttype","ns:DAV:")
 
         attributes={
           :path=>href_node.inner_xml,
