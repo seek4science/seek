@@ -26,6 +26,8 @@ tmp/data.sql
 solr/development/*
 solr/production/*
 lib/jerm/stu_main.rb
+SUMO_harvester.rb
+script/finns_tests/*
 
 
 syntax: regexp
