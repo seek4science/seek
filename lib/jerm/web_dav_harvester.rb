@@ -45,6 +45,8 @@ module Jerm
       return items
     end
 
+    private
+
     def split_tree tree
       items = []
       if !tree[:children].nil? && !tree[:children].empty? && tree[:children][0][:is_directory]
