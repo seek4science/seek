@@ -1,0 +1,21 @@
+base_uri: "https://waals.informatik.uni-rostock.de/alfresco/webdav/Projects/Cosmic/Document+Library/Repository/"
+
+directories_and_types:
+  models:
+    ext: [xml]
+    type: Model
+  protocols:
+    ext: [doc, docx, pdf]
+    type: SOP
+  transcriptomics:
+    ext: [xls, xlsx]
+    type: DataFile
+  metabolomics:
+    ext: [xls, xlsx]
+    type: DataFile
+  proteomics:
+    ext: [xls, xlsx]
+    type: DataFile
+
+
+

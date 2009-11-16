@@ -1,11 +1,13 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
-require 'jerm/resource'
+require 'jerm/alfresco_resource'
 
 module Jerm
-  class WebDavResource < Resource
-    def initialize item
-      @item=item
+  class BaCellResource < AlfrescoResource
+
+    def project_name
+      "BaCell"
     end
+  
   end
 end
