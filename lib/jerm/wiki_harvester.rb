@@ -5,11 +5,7 @@ require 'net/https'
 module Jerm
   class WikiHarvester < Harvester
     
-    def initialize(user, pass)
-      super()
-      @username = user
-      @password = pass
-    end
+    
   
     protected
   

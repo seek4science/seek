@@ -8,8 +8,7 @@ module Jerm
     include WebDav
   
     def initialize username,password
-      @username=username
-      @password=password
+      super username,password
 
       configpath=File.join(File.dirname(__FILE__),"config/#{project_name.downcase}.yml")
       @config=YAML::load_file(configpath)

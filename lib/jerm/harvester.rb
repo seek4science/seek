@@ -1,10 +1,19 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
+
+require 'jerm/embedded_populator'
 module Jerm
   class Harvester
   
     attr_reader :base_uri
 
+    def initialize(user, pass)      
+      @username = user
+      @password = pass
+
+      @populator=EmbeddedPopulator.new
+    end
+    
     def update
       items = changed_since(last_run)
       items.each do |item|
@@ -18,8 +27,7 @@ module Jerm
     end
 
     def populate resource
-      resource.populate    
-      puts resource.to_s    
+      @populator.populate resource
     end
 
   end
