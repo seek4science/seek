@@ -9,10 +9,11 @@ module Jerm
     end
     
     def changed_since(date)
-      @changed_since_date = date
+      @changed_since_date = date #TODO: use this for something
       
       @visited_links = Array.new
       @resources = Array.new
+      @searched_uris = Array.new    
       
       get_links("http://sysmo-sumo.mpi-magdeburg.mpg.de/trac/wiki/LIMS/Experiments", 0)
       return @resources.uniq
@@ -35,7 +36,6 @@ module Jerm
       
       links.uniq.each do |link|
         unless @visited_links.include?(link)
-          @searched_uris = Array.new    
           @data_files = Array.new
           @sops = Array.new
           @experimenters = Array.new
@@ -76,8 +76,10 @@ module Jerm
               end
               
               general_data.each_key do |k|
-                if k.downcase.starts_with?("author")
+                if k.downcase.starts_with?("author")                  
                   @author = general_data[k]
+                  #to deal with awkward author fields like "<Name> (<Job that they did>)"                  
+                  @author = @author[0...(@author =~ (/[^-a-zA-Z ]/))].strip if @author =~ (/[^-a-zA-Z ]/)
                 elsif k.downcase.starts_with?("date")
                   @date = general_data[k]              
                 end              

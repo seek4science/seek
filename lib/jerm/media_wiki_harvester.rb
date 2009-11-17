@@ -3,8 +3,8 @@ module Jerm
       
     def update
       if @cookie.nil?
-        #MediaWiki API url
-        url = URI.parse(@api_uri)
+        #MediaWiki API url, defined in subclass for each MediaWiki
+        url = URI.parse(api_url)
       
         #Log in
         resp, data = Net::HTTP.post_form(url, {:action => "login", :lgname => @username, :lgpassword => @password})  
@@ -14,8 +14,7 @@ module Jerm
       end
       
       items = changed_since(last_run)
-      items.each do |item|
-        resource = construct_resource(item)
+      items.each do |resource|
         populate resource
       end
     end
