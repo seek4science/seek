@@ -1,59 +1,51 @@
 module Jerm
   class MosesHarvester < MediaWikiHarvester
    
-    #Valid data file extensions to be saved as data files
-    FILE_EXTENSIONS = ["xls"]
+    #URI to the data and SOP pages to start crawling from
+    BASE_DATA_FILE_URI = "http://moses.sys-bio.net/index.php/Data"
+    BASE_SOP_URI = "http://moses.sys-bio.net/index.php/Standards"
     
-    #URI to the API (for logging in)
-    API_URI = "http://moses.sys-bio.net/api.php"
+    #Valid file extensions to retrieve
+    DATA_FILE_EXTENSIONS = ['xls','xlsx']
+    SOP_EXTENSIONS = ['doc','docx','pdf']
     
-    #URI to the page to start crawling from
-    BASE_DATA_URI = "http://moses.sys-bio.net/index.php/Data"
-    
-    def initialize(user, pass)
-      super
-      @api_uri = API_URI
+    #URL to the API (for logging in)
+    def api_url
+      "http://moses.sys-bio.net/api.php"
     end
     
     def changed_since(date)
-      @changed_since_date = date
+      @changed_since_date = date #TODO: this needs to do something eventually
       
       @searched_uris = Array.new
       @results = Array.new
   
       #Start the search on the Data page
       @file_type = "DataFile"
-      get_data(BASE_DATA_URI, 0)
+      get_data(BASE_DATA_FILE_URI, 0)
+      
+      #Then get the sops
+      @file_type = "Sop"
+      get_data(BASE_SOP_URI, 0)
+      
       return @results
     end
-  
-    def construct_resource(item)
-      r = MosesResource.new
-      r.uri = item
-      r.type = @file_type
-      r.project = "MOSES"
-      return r
-    end
-    
-    def populate(resource)
-      puts resource.uri + " - valid: " + resource.populate.to_s
-    end
-  
+
     private
     
     def get_data(uri, level)    
-      #Open the page, using the cookie returned from the log in
+      #Open the page, using the cookie returned from the login
       doc = open(uri, "Cookie" => @cookie) { |f| Hpricot(f) }
-      #Examine all of the <a> tags within the content div
+      #Examine all the tags within the content div
       doc.search("/html/body/div#globalWrapper/div#column-content/div#content//").each do |e|
         case e.name
-          when "a"          
-            if e['href'].nil?
+          when "a" #For <a> tags..
+            if e['href'].nil? #If it's an anchor, remember what section we're in
               if e.attributes.size == 1 && !e['name'].nil?
                 @section = e['name']
               end
             else       
-              #sort out relative paths
+              #Turn relative paths into complete urls
               root_uri = extract_base_url(uri)
               resource_uri = complete_url(e['href'], root_uri)
               
@@ -63,9 +55,19 @@ module Jerm
                 @searched_uris << resource_uri
                 #Get file extension
                 extension = resource_uri.split(".").last
-                #If valid data file, remember it
-                if FILE_EXTENSIONS.include?(extension)
-                  @results << resource_uri
+                #If valid, set up a Resource object for the uri
+                if (@file_type == "DataFile" && DATA_FILE_EXTENSIONS.include?(extension)) ||
+                   (@file_type == "Sop" && SOP_EXTENSIONS.include?(extension))
+                  if @file_type == "DataFile"
+                    type = MosesResource
+                  else #Sops
+                    type = Resource
+                  end
+                  r = type.new
+                  r.uri = resource_uri
+                  r.type = @file_type
+                  r.project = "MOSES"
+                  @results << r
                 #If link wasn't a data file, but contains the word 'data' and is a wiki page, search it.
                 elsif resource_uri.starts_with?(root_uri) && (resource_uri.downcase.include?("data") || resource_uri.downcase.include?("standard"))        
                   get_data(resource_uri, (level+1))

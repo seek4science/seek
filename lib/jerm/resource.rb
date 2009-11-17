@@ -13,5 +13,8 @@ module Jerm
     def to_s
       "Owner: #{author_first_name} #{author_last_name}, Project: #{project}, URI: #{uri}, Type: #{type}"
     end
+    
+    def populate
+    end
   end
 end
