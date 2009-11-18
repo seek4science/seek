@@ -1,4 +1,4 @@
-require 'jerm/alfresco_resource'
+require 'alfresco_resource'
 
 module Jerm
   class CosmicResource < AlfrescoResource

@@ -1,4 +1,4 @@
-require 'jerm/web_dav_harvester'
+require 'web_dav_harvester'
 
 module Jerm
   class AlfrescoHarvester < WebDavHarvester

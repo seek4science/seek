@@ -1,6 +1,6 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
-require 'jerm/alfresco_resource'
+require 'alfresco_resource'
 
 module Jerm
   class BaCellResource < AlfrescoResource

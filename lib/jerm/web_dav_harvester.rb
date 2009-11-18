@@ -1,6 +1,6 @@
 
-require 'jerm/harvester'
-require 'jerm/web_dav'
+require 'harvester'
+require 'web_dav'
 
 module Jerm
   class WebDavHarvester < Harvester

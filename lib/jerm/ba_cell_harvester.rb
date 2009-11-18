@@ -1,8 +1,8 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-require 'jerm/alfresco_harvester'
-require 'jerm/ba_cell_resource'
+require 'alfresco_harvester'
+require 'ba_cell_resource'
 
 module Jerm
   class BaCellHarvester < AlfrescoHarvester

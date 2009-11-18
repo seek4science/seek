@@ -1,7 +1,8 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-require 'jerm/embedded_populator'
+require 'embedded_populator'
+
 module Jerm
   class Harvester
   
