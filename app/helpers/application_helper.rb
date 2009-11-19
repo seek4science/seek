@@ -46,17 +46,20 @@ module ApplicationHelper
     text=model.nil? ? nil : model.title
     text_or_not_specified text,:capitalize=>true    
   end
-  def text_or_not_specified text, options = {}
+  
+  def text_or_not_specified text, options = {}    
     if text.nil? or text.chomp.empty?
       not_specified_text="Not specified"
       not_specified_text="No description set" if options[:description]==true
       res = "<span class='none_text'>#{not_specified_text}</span>"
-    else
-      text=truncate(text,:length=>options[:length]) if options[:length]
-      text.capitalize! if options[:capitalize]
-      res = h(text)
-      res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true
+    else      
+      text.capitalize! if options[:capitalize]            
+      res=text
+      res=truncate(res,:length=>options[:length]) if options[:length]
+      res = white_list(res)
+      res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true            
       res = simple_format(res) if options[:description]==true || options[:address]==true
+      
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true
       res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true

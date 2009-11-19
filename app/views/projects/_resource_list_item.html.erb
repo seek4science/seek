@@ -18,7 +18,7 @@
         </p>
 
         <div class="box_standout">
-          <%= truncate(text_or_not_specified(project.description, :description => true,:auto_link=>true), :length=>300) %>
+          <%= text_or_not_specified(project.description, :description => true,:auto_link=>true, :length=>300) %>
         </div>
 
         <% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>

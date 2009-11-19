@@ -27,7 +27,7 @@
         </p>
 
         <div class="box_standout">
-          <%= truncate(text_or_not_specified(person.description, :description => true,:auto_link=>true), :length=>300) %>
+          <%= text_or_not_specified(person.description, :description => true,:auto_link=>true, :length=>300) %>
         </div>
         
         <% unless hide_contact_details? %>
