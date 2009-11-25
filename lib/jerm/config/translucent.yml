@@ -1,4 +1,4 @@
-base_uri: "http://kolibril.biologie.hu-berlin.de/~fkrause/publish.php"
+base_uri: 
 
 tables_and_types:
   people:
