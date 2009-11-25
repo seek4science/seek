@@ -21,11 +21,10 @@ module Jerm
   
     private
     
-     #Get links from a page and search them for experiment templates
+    #Get links from a page and search them for experiment templates
     def get_links(target, level)
       links = Array.new
   
-      #Start the search on the Data page
       doc = open(target, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("/html/body/div#main/div#content//a").each do |e|
         uri = e.attributes['href']
@@ -49,9 +48,9 @@ module Jerm
     end
     
     def get_data(uri, level)    
-      #Open the page, using the cookie returned from the log in
+      #Open the page, using the http authentication
       doc = open(uri, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
-      #Examine all of the <a> tags with class "attachment" in the content div
+      #Get all of the tags
       doc.search("/html/body/div#main/div#content//").each do |e|
         case e.name
           when "p"
