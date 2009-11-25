@@ -1,0 +1,39 @@
+base_uri: "http://kolibril.biologie.hu-berlin.de/~fkrause/publish.php"
+
+tables_and_types:
+  people:
+     type: Person
+  phpr_mat_sop:
+     type: SOP
+#  phpr_exp_2d:
+#      type: Data
+#  phpr_exp_cc:
+#      type: Data
+#phpr_exp_gfp
+#phpr_exp_growthc
+#phpr_exp_growthdt
+#phpr_exp_kinetic
+#phpr_exp_ma_sample
+#phpr_exp_ma_compare
+#phpr_exp_MicroArray
+#phpr_exp_NMR
+#phpr_exp_nmr_biosample
+#phpr_exp_nmr_experiment
+#phpr_exp_ionflux
+#phpr_exp_ppchip
+#phpr_mat_deletions
+#phpr_mat_oligonucleotide
+#phpr_mat_othermat
+#phpr_mat_plasmid
+#phpr_mat_sop
+#phpr_mat_strain
+#phpr_mod_models
+#phpr_mod_pathway
+#phpr_exp_mife
+#phpr_exp_membranepotential
+#phpr_exp_cytosolicph
+#phpr_exp_cellvolume
+#phpr_isa_investigation
+#phpr_isa_study
+#phpr_isa_assay
+#phpr_news
