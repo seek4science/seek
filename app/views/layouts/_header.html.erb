@@ -1,15 +1,6 @@
 <% cache "header" do -%>
 
-  <% if RAILS_ENV=="development" && false -%>
-    <table><tr><td>
-          <h1 style="color:red;">Development Mode</h1>
-        </td><td>
-          <%= link_to image_tag("sysmo-db-logo.png",:alt=>"www.sysmo.net",:title=>"Sysmo"),
-            root_path %>
-        </td>
-      </tr>
-    </table>
-  <% else -%>
+  
     <table width="100%">
       <tr>
         <td style="text-align:left;">
@@ -27,6 +18,5 @@
 
       </tr>
     </table>    
-
-  <% end -%>
+  
 <% end -%>

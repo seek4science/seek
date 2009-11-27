@@ -624,7 +624,7 @@ div#request_resource_form input {
 
 #home_intro {
     min-height: 3em;
-    margin: 3em 7em 3em 7em;
+    margin: 1em 2em 1em 2em;
 }
 
 div#faq {
@@ -681,4 +681,17 @@ img.badge {
     width: 55px;
     height: 20px;
     padding-top: 3px;
+}
+
+#topbar {
+	height: 20px;
+	text-align: center;
+	background-image: url('/images/searchfade-repeat.png');
+	background-repeat: repeat-x;
+	background-position: top center;
+	padding: 10px 0;
+}
+
+#topbar * {
+	vertical-align: middle;
 }
