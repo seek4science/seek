@@ -211,6 +211,16 @@ Autocompleter.LocalAdvanced = Class.create(Autocompleter.Base, {
         size = size || 20;
         this.element.setStyle({width: size + "px"});
     },
+    
+    //Modified to remove last tag that was automatically added by the blurring of the input field
+    onClick: function(event) {
+      this.wrapper.previous().token.element.remove(true); //This removes the last element
+      var element = Event.findElement(event, 'LI');
+      this.index = element.autocompleteIndex;
+      this.selectEntry();
+      this.hide();
+    },
+    
     onKeyPress: function(event) {
         //dynamically resize the input field
         var new_size = 20 + (this.element.value.length * 7);
