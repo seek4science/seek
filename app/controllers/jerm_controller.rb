@@ -5,4 +5,14 @@ class JermController < ApplicationController
   def index
     
   end
+
+  def test
+    project_id=params[:project]
+    username=params[:username]
+    password=params[:password]
+
+    @project=Project.find(project_id)
+
+    
+  end
 end

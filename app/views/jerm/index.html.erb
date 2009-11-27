@@ -1,1 +1,11 @@
 <h1>JERM Adminstration</h1>
+
+<% form_tag :action=>:test do -%>
+  Project: <%= select_tag :project,options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ) %>
+  <br/>
+  Username: <%= text_field_tag :username %>
+  <br/>
+  Password:<%= password_field_tag :password %>
+  <br/>
+  <%= submit_tag "GO!" %>
+<% end -%>
