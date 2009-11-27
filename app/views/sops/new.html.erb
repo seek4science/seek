@@ -43,6 +43,11 @@
         :existing_attributions => [],
         :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
     </p>
+    
+    <p style="margin: 0;">
+      <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
+        :existing_authors => []} -%>
+    </p>
 
     <p style="text-align: center; margin-top: 1.5em;">
       <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>

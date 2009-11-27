@@ -39,6 +39,11 @@
           :existing_attributions => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user),
           :attribution_suggestions => DataFile.get_all_as_json(current_user) } -%>
       </p>
+      
+    <p style="margin: 0;">
+      <%= render :partial => "assets/author_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
+        :existing_authors => @data_file.asset.authors} -%>
+    </p>
     <% end -%>
     
 
