@@ -32,11 +32,11 @@
 
       <% if mine?(@person) -%>
         <p>
-          <b>Login name :</b> <%= h @person.user.login %> <span class='none_text'>(Only visible to you)</span>
+          <b>Seek ID :</b> <%= @person.id %>
         </p>
         <p>
-          <b>Seek ID :</b> <%= @person.id %> <span class='none_text'>(Only visible to you)</span>
-        </p>
+          <b>Login name :</b> <%= h @person.user.login %> <span class='none_text'>(Only visible to you)</span>
+        </p>        
       <% end %>
 
 
