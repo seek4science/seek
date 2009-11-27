@@ -1,64 +1,63 @@
 /* begin css gadget base */
 
-.myexperiment_gadget {
+.sysmo_gadget {
 	margin: 0 0 0.5em 0;
 	text-align: center;
 }
 
-.myexperiment_gadget p {
+.sysmo_gadget p {
 	margin: 0;
 }
 
-.myexperiment_gadget a:hover {
+.sysmo_gadget a:hover {
 	text-decoration: none;
 }
 
-.myexperiment_gadget ul.gadget_list {
+.sysmo_gadget ul.gadget_list {
 	list-style: none;
 	padding-left: 0;
 	margin: 0.3em;
 }
 
-.myexperiment_gadget ul.gadget_list li {
+.sysmo_gadget ul.gadget_list li {
 	list-style: none;
 	padding: 0;
 	margin: 0;
 	font-size: 100%;
 }
 
-.myexperiment_gadget ul.gadget_list li * {
+.sysmo_gadget ul.gadget_list li * {
 	vertical-align: middle;
 }
 
-.myexperiment_gadget .header {
-	min-height: 20px;
+.sysmo_gadget .header {
+	min-height: 10px;
 	border: #CCCCCC 0px solid;
-    border-bottom: #AAAAEE 1px solid;
+        border-bottom: #AAAAEE 1px solid;
 	border-width: 0 1px 1px 1px;
 	border-bottom-color: #CCCCCC;
 	background-image: url('/images/gadget-hd-bg.png');
 	background-position: top;
 	background-repeat: repeat-x;
 	background-color: #EEEEEE;
-	padding: 0.2em 0.2em 0.2em 0.2em;
+	padding-bottom: 0.4em;
 	text-align: center;
-	vertical-align: middle;
-	font-weight: bold;
+	vertical-align: middle;        
 }
 
-.myexperiment_gadget .header p {
+.sysmo_gadget .header p {
 	font-weight: bold;
 	text-align: center;
 }
 
-.myexperiment_gadget .header small {
+.sysmo_gadget .header small {
 	font-size: 85%;
 	line-height: 1.4;
 	color: #333333;
 	margin: 0 0.5em;
 }
 
-.myexperiment_gadget .contents {
+.sysmo_gadget .contents {
 	border-top: none;
 	border-right: #CCCCCC 1px solid;
 	border-bottom: none;
@@ -70,11 +69,11 @@
 	background-color: #FFFFFF;
 }
 
-.myexperiment_gadget .contents p {
+.sysmo_gadget .contents p {
 	text-align: center;
 }
 
-.myexperiment_gadget .contents hr {
+.sysmo_gadget .contents hr {
 	height: 1px;
 	border-bottom: 1px dotted #999999;
 	margin: 0.7em 0;
@@ -82,12 +81,12 @@
 	padding: 0;
 }
 
-.myexperiment_gadget .contents .box1 {
+.sysmo_gadget .contents .box1 {
 	border: 1px dotted #999999;
 	padding: 0.2em 0;
 }
 
-.myexperiment_gadget .contents .label {
+.sysmo_gadget .contents .label {
 	font-size: 93%;
 	color: #333333;
 	padding: 0.2em 0;
@@ -95,13 +94,13 @@
 	margin: 0;
 }
 
-.myexperiment_gadget .contents .title {
+.sysmo_gadget .contents .title {
 	font-size: 93%;
 	font-weight: bold;
 	color: #990000;
 }
 
-.myexperiment_gadget .contents .field {
+.sysmo_gadget .contents .field {
 	border: solid 1px #CCCCCC;
 	background-color:#F0F8FF;
 	color: #333333;
@@ -109,7 +108,7 @@
 	font-size: 93%;
 }
 
-.myexperiment_gadget .sectionIcons { 
+.sysmo_gadget .sectionIcons {
 	margin: 0.5em 0;
 }
 
@@ -117,66 +116,66 @@
 
 /* begin css rounded corners - based on "Snazzy Corners" */
 
-.myexperiment_gadget .xtop, 
-.myexperiment_gadget .xbottom {
+.sysmo_gadget .xtop,
+.sysmo_gadget .xbottom {
 	display: block;
 	background: transparent;
 	font-size: 1px;
 }
 
-.myexperiment_gadget .xb1, 
-.myexperiment_gadget .xb2, 
-.myexperiment_gadget .xb3, 
-.myexperiment_gadget .xb4,
-.myexperiment_gadget .xb5, 
-.myexperiment_gadget .xb6, 
-.myexperiment_gadget .xb7 {
+.sysmo_gadget .xb1,
+.sysmo_gadget .xb2,
+.sysmo_gadget .xb3,
+.sysmo_gadget .xb4,
+.sysmo_gadget .xb5,
+.sysmo_gadget .xb6,
+.sysmo_gadget .xb7 {
 	display: block;
 	overflow: hidden;
 }
 
-.myexperiment_gadget .xb1, 
-.myexperiment_gadget .xb2, 
-.myexperiment_gadget .xb3, 
-.myexperiment_gadget .xb6, 
-.myexperiment_gadget .xb7 {
+.sysmo_gadget .xb1,
+.sysmo_gadget .xb2,
+.sysmo_gadget .xb3,
+.sysmo_gadget .xb6,
+.sysmo_gadget .xb7 {
 	height: 1px;
 }
 
-.myexperiment_gadget .xb2, 
-.myexperiment_gadget .xb3, 
-.myexperiment_gadget .xb4 {
+.sysmo_gadget .xb2,
+.sysmo_gadget .xb3,
+.sysmo_gadget .xb4 {
 	background: #DEDEDE;
 	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #CCCCCC;
 }
 
-.myexperiment_gadget .xb5, 
-.myexperiment_gadget .xb6, 
-.myexperiment_gadget .xb7 {
+.sysmo_gadget .xb5,
+.sysmo_gadget .xb6,
+.sysmo_gadget .xb7 {
 	background: #FFFFFF;
 	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #CCCCCC;
 }
 
-.myexperiment_gadget .xb1 {
+.sysmo_gadget .xb1 {
 	margin: 0 5px;
 	background: #CCCCCC;
 }
 
-.myexperiment_gadget .xb2, 
-.myexperiment_gadget .xb7 {
+.sysmo_gadget .xb2,
+.sysmo_gadget .xb7 {
 	margin: 0 3px;
 	border-width: 0 2px;
 }
 
-.myexperiment_gadget .xb3, 
-.myexperiment_gadget .xb6 {
+.sysmo_gadget .xb3,
+.sysmo_gadget .xb6 {
 	margin: 0 2px;
 }
 
-.myexperiment_gadget .xb4, 
-.myexperiment_gadget .xb5 {
+.sysmo_gadget .xb4,
+.sysmo_gadget .xb5 {
 	height: 2px;
 	margin: 0 1px;
 }
@@ -196,48 +195,3 @@
 	font-weight: bold;
 }
 
-/* end css New Object Gadget style */
-
-/* begin css User Monitor Gadget styles */
-
-#myexp_usermonitor_gadget_contents {
-	margin: 0;
-	text-align: left;
-}
-
-#myexp_usermonitor_gadget_contents .content {
-	line-height: 1.1;
-}
-
-/* begin css User Monitor Gadget styles */
-
-/* begin css Asset Manager Gadget styles */
-
-#myexp_assetmanager_gadget_contents {
-	max-height: 150px;
-	overflow: auto;
-	line-height: 1.1;
-	text-align: left;
-}
-
-#myexp_assetmanager_gadget_contents .title {
-	margin-top: 0.6em;
-	margin-bottom: 0.2em;
-	padding: 0.2em 0;
-	border-bottom: 1px dotted #999999;
-	font-weight: bold;
-}
-
-#myexp_assetmanager_gadget_contents .content {
-}
-
-#myexp_assetmanager_gadget_contents li {
-	font-size: 85%;
-	font-weight: normal;
-}
-#ajax-loader {
-    position: relative;
-    right: 0px;
-}
-
-/* end css Asset Manager Gadget styles */
