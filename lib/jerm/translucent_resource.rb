@@ -12,7 +12,7 @@ module Jerm
     end
 
     def populate
-      puts @node
+      #puts @node
     end
 
     def project_name
