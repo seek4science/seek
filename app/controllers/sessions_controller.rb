@@ -21,8 +21,6 @@ class SessionsController < ApplicationController
         redirect_to(select_people_path)
       else
         respond_to do |format|
-          flash[:notice] = "Logged in successfully"
-          
           if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
             unless params[:called_from][:id].blank?
               return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
