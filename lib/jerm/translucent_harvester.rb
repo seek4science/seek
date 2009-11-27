@@ -18,12 +18,18 @@ module Jerm
       result = []
       table_names.each do |table_name|
         xml=do_get(table_name)        
-        type=@tables_and_types[table_name]['type']        
-        parser = LibXML::XML::Parser.string(xml,:encoding => LibXML::XML::Encoding::UTF_8)
-        document = parser.parse        
-        document.find("item").each do |node|
-          result << {:node=>node,:type=>type,:table_name=>table_name}
+        type=@tables_and_types[table_name]['type']
+        begin
+          parser = LibXML::XML::Parser.string(xml,:encoding => LibXML::XML::Encoding::UTF_8)
+          document = parser.parse
+          document.find("item").each do |node|
+            result << {:node=>node,:type=>type,:table_name=>table_name}
+          end
+        rescue LibXML::XML::Error
+          puts "Error with XML from #{table_name}"
+          puts xml
         end
+
       end
       result
     end
