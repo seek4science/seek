@@ -50,7 +50,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
 
-  map.resource :session      
+  map.resource :session
+
+  map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
   
   # browsing by countries
   map.country '/countries/:country_name', :controller => 'countries', :action => 'show'
@@ -74,8 +76,7 @@ ActionController::Routing::Routes.draw do |map|
   
   
   # review members of workgroup (also of a project / institution) popup
-  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }
-  
+  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }  
   
   # The priority is based upon order of creation: first created -> highest priority.
 
