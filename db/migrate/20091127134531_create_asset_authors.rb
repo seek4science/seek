@@ -1,9 +1,8 @@
 class CreateAssetAuthors < ActiveRecord::Migration
   def self.up
-    create_table :asset_authors do |t|
+    create_table :asset_authors, :id=>false do |t|
       t.integer :asset_id
       t.integer :author_id
-      t.timestamps
     end
   end
 

@@ -34,8 +34,10 @@ class Person < ActiveRecord::Base
     
   has_one :user
   
-  has_many :asset_authors,  :foreign_key => "author_id"
-  has_many :authored_assets, :through => :asset_authors, :source => :asset
+  #has_many :asset_authors,  :foreign_key => "author_id"
+  #has_many :authored_assets, :through => :asset_authors, :source => :asset
+  
+  has_and_belongs_to_many :authored_assets, :join_table => 'asset_authors', :class_name => 'Asset', :foreign_key => 'author_id'
   
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations ]) if SOLR_ENABLED
 
