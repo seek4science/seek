@@ -144,6 +144,9 @@ class SopsController < ApplicationController
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           
+          #Add authors
+          AssetAuthor.add_or_update_author_list(@sop, params[:authors])
+          
           if policy_err_msg.blank?
             flash[:notice] = 'SOP was successfully uploaded and saved.'
             format.html { redirect_to sop_path(@sop) }
@@ -189,6 +192,9 @@ class SopsController < ApplicationController
         
         # update attributions
         Relationship.create_or_update_attributions(@sop, params[:attributions])
+        
+        #update authors
+        AssetAuthor.add_or_update_author_list(@sop, params[:authors])
         
         if policy_err_msg.blank?
           flash[:notice] = 'SOP metadata was successfully updated.'
