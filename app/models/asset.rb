@@ -3,7 +3,9 @@ class Asset < ActiveRecord::Base
   belongs_to :resource, :polymorphic => true
   belongs_to :project
   belongs_to :policy
-  belongs_to :author, :class_name => "Person"
+  
+  has_many :asset_authors
+  has_many :authors, :through => :asset_authors
 
   # TODO
   # add all required validations here

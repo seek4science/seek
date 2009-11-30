@@ -51,6 +51,11 @@
           :existing_attributions => Authorization.authorize_collection("show", @sop.attributions_objects, current_user),
           :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
       </p>
+      
+      <p style="margin: 0;">
+        <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
+          :existing_authors => @sop.asset.authors} -%>
+      </p>
     <% end -%>
 
     <p style="text-align: center;">

@@ -112,6 +112,9 @@ class DataFilesController < ApplicationController
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
 
+          #Add authors
+          AssetAuthor.add_or_update_author_list(@data_file, params[:authors])
+
           if policy_err_msg.blank?
             flash[:notice] = 'Data file was successfully uploaded and saved.'
             format.html { redirect_to data_file_path(@data_file) }
@@ -173,6 +176,9 @@ class DataFilesController < ApplicationController
 
         # update attributions
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
+        
+        #update authors
+        AssetAuthor.add_or_update_author_list(@data_file, params[:authors])
 
         if policy_err_msg.blank?
             flash[:notice] = 'Data file metadata was successfully updated.'

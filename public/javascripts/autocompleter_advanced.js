@@ -213,8 +213,11 @@ Autocompleter.LocalAdvanced = Class.create(Autocompleter.Base, {
     },
     
     //Modified to remove last tag that was automatically added by the blurring of the input field
+    //Modified further to only do the above for validation_type "any"
     onClick: function(event) {
-      this.wrapper.previous().token.element.remove(true); //This removes the last element
+      if(this.VALIDATION_TYPE == "any") {
+        this.wrapper.previous().token.element.remove(true); //This removes the last element
+      }
       var element = Event.findElement(event, 'LI');
       this.index = element.autocompleteIndex;
       this.selectEntry();

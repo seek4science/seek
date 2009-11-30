@@ -75,6 +75,11 @@
           :existing_attributions => Authorization.authorize_collection("show", @model.attributions_objects, current_user),
           :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
       </p>
+      
+      <p style="margin: 0;">
+        <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+          :existing_authors => @model.asset.authors} -%>
+      </p>
     <% end -%>
 
     <p style="text-align: center;">

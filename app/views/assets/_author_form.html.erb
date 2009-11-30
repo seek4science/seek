@@ -1,0 +1,215 @@
+<%# This partial is expecting 3 parameters to be defined: -%>
+<%# - resource_type - type of resource for which the author form is displayed (required because various types of resources have different requirements for attributions) -%>
+<%# - existing_authors - list of authors for the current resource (this should be collection of Person objects) -%>
+<%# - author_suggestions - JSON array of data to be used to generate autocompleter suggestions -%>
+
+
+<!-- Authors -->
+
+<%# this hidden input will submit all permission data with the form -%>
+<%= hidden_field_tag "authors", "" -%>
+
+<% resource_type_attributed_to_types = "Authors" -%>
+
+
+<div class="fold">
+
+  <div class="foldTitle">
+    <%= help_icon("Here you attribute this #{resource_type} to other people.") -%>
+    Authors
+  </div>
+
+  <div id="author_fold_content" class="foldContent" style="display: block;">
+
+    <p style="font-weight: bold; margin-top: 1.5em;">
+      If this <%= resource_type %> was created by someone else, please list their name below
+    </p>
+
+    <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
+      <p style="color: #666666;">
+        So far you have specified the following authors:
+      </p>
+      <p id="authors_list" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text" id="authors_text">Loading...</span>
+      </p>
+      
+      <p style="margin-top: 1em;">
+        Please type authors into the box below - suggestions will be displayed as you type.
+        Select authors that you want to attribute to and click "Add" to add them to the list.
+      </p>
+
+      <table id="facebook" class="clearfix">
+        <tr>
+          <td>
+            <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('author_autocomplete_input').focus();" style="width: 400px;">
+              <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="author_hidden_input" tabindex="-1" ></span>
+
+              <div id="author_autocomplete_display" class="tokenizer_input">
+                <input type="text" size="1" tabindex="" id="author_autocomplete_input" />
+              </div>
+            </div>
+            <div id="author_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+              <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
+            </div>
+          </td>
+
+          <td style="padding-left: 0.7em; vertical-align: middle;">
+            <span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: addAuthors(); return(false);" -%></span>
+          </td>
+        </tr>
+      </table>
+
+      <script type="text/javascript">
+        var suggestion_list = <%= Person.get_all_as_json -%>;
+        var prepopulate_with = [];
+
+        var author_autocompleter = new Autocompleter.LocalAdvanced(
+        author_autocompleter_id, 'author_autocomplete_input', 'author_autocomplete_display', 'author_autocomplete_populate', suggestion_list, prepopulate_with, {
+          frequency: 0.1,
+          updateElement: addAction,
+          search_field: "name",
+          hint_field: "email",
+          id_field: "id",
+          validation_type: "only_suggested"
+        });
+        var hidden_input = new HiddenInput('author_hidden_input', author_autocompleter);
+
+        autocompleters[author_autocompleter_id] = author_autocompleter;
+      </script>
+
+    </div>
+
+  </div>
+</div>
+
+
+<script type="text/javascript">
+// ***************  Author  *****************
+
+  // recreate internal store of authors..
+<% existing_authors.each do |a| -%>
+    author_name = '<%= a.name -%>';
+    author_id = <%= a.id -%>;
+    author_email = '<%= a.email -%>';
+
+    author_settings.push([author_name, author_email, author_id]);
+<% end -%>
+
+  // ..and update the page to make existing authors visible
+  updateAuthorSettings();
+
+
+function updateAuthorSettings() {
+    // iterate through all authors and build the "shared with" list;
+    // in the meanwhile also assemble a minimized version of the array that
+    // could be posted with the form (this won't have item titles in it)
+  
+    var authors = '';
+    var authors_arr = new Array();
+  
+    for(var i = 0; i < author_settings.length; i++) {
+        author_name = author_settings[i][0];
+        author_email = author_settings[i][1];
+        author_id = author_settings[i][2];
+            
+        authors += '<b>' + author_name + '</b>: ' + author_email
+        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '[<a href="" onclick="javascript:deleteAuthor(\''+ author_name +'\', '+ author_id +'); return(false);">remove</a>]</small><br/>';
+    
+        authors_arr.push([author_name, author_id]);
+    }
+  
+  
+    // remove the last line break
+    if(authors.length > 0) {
+        authors = authors.slice(0,-5);
+    }
+  
+  
+    // update the page
+    if(authors.length == 0) {
+        $('authors_list').innerHTML = '<span class="none_text">No authors</span>';
+    }
+    else {
+        $('authors_list').innerHTML = authors;
+    }
+  
+  
+    // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
+    $('authors').value = Object.toJSON(authors_arr);
+}
+
+
+function checkAuthorNotInList(auth_name, auth_id) {
+    rtn = true;
+  
+    for(var i = 0; i < author_settings.length; i++)
+        if(author_settings[i][0] == auth_name && author_settings[i][2] == auth_id) {
+            rtn = false;
+            break;
+        }
+  
+    return(rtn);
+}
+
+
+// adds an author to the list and updates the displayed list
+function addAuthor(auth_name, auth_email, auth_id) {
+    if(checkAuthorNotInList(auth_name, auth_id)) {
+        author_settings.push([auth_name, auth_email, auth_id]);
+    
+        // update visible page
+        updateAuthorSettings();
+    }
+    else {
+        alert('The following entity was not added (already in the list of authors):\n\n' +
+            auth_name + ': ' + auth_email);
+    }
+}
+
+
+// removes author from author list and updates the displayed list
+function deleteAuthor(auth_name, auth_id) {
+    // remove the actual record for the author
+    for(var i = 0; i < author_settings.length; i++)
+        if(author_settings[i][0] == auth_name && author_settings[i][2] == auth_id) {
+            author_settings.splice(i, 1);
+            break;
+        }
+  
+    // update the page
+    updateAuthorSettings();
+}
+
+
+function addAuthors() {
+    var selIDs = autocompleters[author_autocompleter_id].getRecognizedSelectedIDs();
+  
+    if(selIDs == "") {
+        // no authors to add
+        alert("Please choose some authors!");
+        return(false);
+    }
+    else {
+        // some authors to add - known that don't have duplicates
+        // within the new list, but some entries in the new list
+        // may replicate those in the main author list: this
+        // will be checked by addAuthor()
+    
+        for(var i = 0; i < selIDs.length; i++) {
+            id = parseInt(selIDs[i]);
+            email = autocompleters[author_autocompleter_id].getValueFromJsonArray(autocompleters[author_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
+            name = autocompleters[author_autocompleter_id].getValueFromJsonArray(autocompleters[author_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
+            addAuthor(name, email, id);
+        }
+      
+        // remove all tokens from autocomplete text box
+        autocompleters[author_autocompleter_id].deleteAllTokens();
+    
+        return(true);
+    }
+}
+
+
+// ********************************************************
+</script>

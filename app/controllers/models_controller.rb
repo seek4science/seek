@@ -267,6 +267,9 @@ class ModelsController < ApplicationController
 
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
+          
+          #Add authors
+          AssetAuthor.add_or_update_author_list(@model, params[:authors])
 
           if policy_err_msg.blank?
             flash[:notice] = 'Model was successfully uploaded and saved.'
@@ -330,6 +333,9 @@ class ModelsController < ApplicationController
 
         # update attributions
         Relationship.create_or_update_attributions(@model, params[:attributions])
+        
+        #update authors
+        AssetAuthor.add_or_update_author_list(@model, params[:authors])
 
         if policy_err_msg.blank?
             flash[:notice] = 'Model metadata was successfully updated.'
