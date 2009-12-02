@@ -53,13 +53,12 @@ module ApplicationHelper
       not_specified_text="No description set" if options[:description]==true
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
-      text.capitalize! if options[:capitalize]            
+      text.capitalize! if options[:capitalize]
       res=text
       res=truncate(res,:length=>options[:length]) if options[:length]
       res = white_list(res)
       res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true            
-      res = simple_format(res) if options[:description]==true || options[:address]==true
-      
+      res = simple_format(res) if options[:description]==true || options[:address]==true      
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true
       res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
