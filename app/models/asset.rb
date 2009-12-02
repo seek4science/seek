@@ -4,9 +4,8 @@ class Asset < ActiveRecord::Base
   belongs_to :project
   belongs_to :policy
   
-  has_many :asset_authors
-  has_many :authors, :through => :asset_authors
-
+  has_and_belongs_to_many :authors, :join_table => 'asset_authors', :class_name => 'Person', :association_foreign_key => 'author_id'
+  
   # TODO
   # add all required validations here
   

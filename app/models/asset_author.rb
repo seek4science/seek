@@ -1,6 +1,6 @@
 class AssetAuthor < ActiveRecord::Base
   belongs_to :asset
-  belongs_to :author, :class_name => "Person"
+  belongs_to :author, :class_name => 'Person'
   
   def self.add_or_update_author_list(resource, author_params)
     recieved_authors = (author_params.blank? ? [] : ActiveSupport::JSON.decode(author_params)).uniq
