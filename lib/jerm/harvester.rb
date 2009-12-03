@@ -1,7 +1,7 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-require 'embedded_populator'
+require 'jerm/embedded_populator'
 
 module Jerm
   class Harvester
@@ -17,10 +17,13 @@ module Jerm
     
     def update
       items = changed_since(last_run)
+      resources = []
       items.each do |item|
         resource = construct_resource(item)
         populate resource
+        resources << resource
       end
+      return resources
     end
 
     def last_run

@@ -8,11 +8,22 @@ class JermController < ApplicationController
 
   def test
     project_id=params[:project]
-    username=params[:username]
-    password=params[:password]
+    username=params[:name]
+    password=params[:pwd]
 
     @project=Project.find(project_id)
 
+    begin
+    harvester = Jerm::CosmicHarvester.new username,password
+    @results = harvester.update
+    rescue
+    end
+
+    render :update do |page|
+      page.replace_html :results,:partial=>"results",:object=>@results      
+    end
+
     
   end
+  
 end

@@ -1,4 +1,4 @@
-require 'web_dav_resource'
+require 'jerm/web_dav_resource'
 require 'fastercsv'
 
 module Jerm

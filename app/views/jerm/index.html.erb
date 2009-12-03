@@ -1,11 +1,26 @@
+<script type="text/javascript">
+  function harvester_initiated() {
+    $('results').innerHTML=<%= "'" + image_tag("ajax-loader-large.gif") + "'" -%>;
+  }
+</script>
+
 <h1>JERM Adminstration</h1>
 
-<% form_tag :action=>:test do -%>
+<% form_remote_tag :url=>url_for(:controller=>:jerm,:action=>:test),
+  :before=>"harvester_initiated();" do -%>
   Project: <%= select_tag :project,options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ) %>
   <br/>
-  Username: <%= text_field_tag :username %>
+  Username: <%= text_field_tag :name %>
   <br/>
-  Password:<%= password_field_tag :password %>
+  Password:<%= password_field_tag :pwd %>
   <br/>
   <%= submit_tag "GO!" %>
 <% end -%>
+
+
+<div id="results">
+  
+</div>
+
+
+
