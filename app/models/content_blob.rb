@@ -33,12 +33,22 @@ class ContentBlob < ActiveRecord::Base
       return original_filename, content_type
     end
   end
+
+  def md5sum
+    if super.nil?
+      other_changes=self.changed?
+      calculate_md5
+      #only save if there are no other changes - this is to avoid inadvertantly storing other potentially unwanted changes
+      save unless other_changes
+    end
+    super
+  end
   
   def calculate_md5
     unless self.data.nil?
-      d = Digest::MD5.new    
-      d << self.data
-      self.md5sum = d.hexdigest
+      digest = Digest::MD5.new
+      digest << self.data
+      self.md5sum = digest.hexdigest
     end
   end
   
