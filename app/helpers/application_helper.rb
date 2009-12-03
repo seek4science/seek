@@ -53,12 +53,13 @@ module ApplicationHelper
       not_specified_text="No description set" if options[:description]==true
       res = "<span class='none_text'>#{not_specified_text}</span>"
     else      
-      text.capitalize! if options[:capitalize]
+      text.capitalize! if options[:capitalize]            
       res=text
-      res=truncate(res,:length=>options[:length]) if options[:length]
       res = white_list(res)
-      res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true            
-      res = simple_format(res) if options[:description]==true || options[:address]==true      
+      res = truncate_without_splitting_words(res, options[:length])  if options[:length]
+      res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true  
+      res = simple_format(res) if options[:description]==true || options[:address]==true
+      
       res=mail_to(res) if options[:email]==true
       res=link_to(res,res,:popup=>true) if options[:external_link]==true
       res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
@@ -568,8 +569,40 @@ module ApplicationHelper
   def hide_contact_details?
     defined? HIDE_DETAILS ? HIDE_DETAILS : false
   end
+
+  # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
+  def truncate_without_splitting_words(text, length=50)
+    truncated_result = ""
+    remaining_length = length
+    stop = false
+    truncated = false
+    #lines
+    text.split("\n").each do |l|
+      #words
+      l.split(" ").each do |w|
+        #If we're going to go over the length, and we've not already
+        if (remaining_length - w.length) <= 0 && !stop
+          truncated = true
+          stop = true
+          #Decide if adding or leaving out the last word puts us closer to the desired length
+          if (remaining_length-w.length).abs < remaining_length.abs
+            truncated_result += (w + " ")
+          end
+        elsif !stop
+          truncated_result += (w + " ")
+          remaining_length -= (w.length + 1)
+        end
+      end
+      truncated_result += "\n"
+    end    
+    #Need some kind of whitespace before elipses or auto-link breaks
+    truncated_result.strip + (truncated ? "\n..." : "")
+  end  
+
   
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","experiments"=>"Experiments","data_files"=>"Data"}
+  
+  
   
 end

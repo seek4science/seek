@@ -74,7 +74,8 @@ class SopsController < ApplicationController
     if @display_sop.content_blob.url.blank?
       send_data @display_sop.content_blob.data, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'
     else
-      redirect_to @display_sop.content_blob.url
+      data_hash = @display_sop.content_blob.send_remote_data
+      send_data data_hash[:data], :filename => data_hash[:filename] || @display_sop.original_filename, :content_type => data_hash[:content_type] || @display_sop.content_type, :disposition => 'attachment'
     end
   end
 

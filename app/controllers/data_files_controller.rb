@@ -211,7 +211,8 @@ class DataFilesController < ApplicationController
     if @display_data_file.content_blob.url.blank?
       send_data @display_data_file.content_blob.data, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
     else #otherwise redirect to the provided download url. this will need to be changed to support authorization
-      redirect_to @display_data_file.content_blob.url
+      data_hash = @display_data_file.content_blob.send_remote_data
+      send_data data_hash[:data], :filename => data_hash[:filename] || @display_data_file.original_filename, :content_type => data_hash[:content_type] || @display_data_file.content_type, :disposition => 'attachment'
     end
   end 
 
