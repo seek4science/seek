@@ -14,9 +14,10 @@ class JermController < ApplicationController
     @project=Project.find(project_id)
 
     begin
-    harvester = Jerm::CosmicHarvester.new username,password
-    @results = harvester.update
+      harvester = Jerm::CosmicHarvester.new username,password
+      @results = harvester.update
     rescue
+
     end
 
     render :update do |page|
