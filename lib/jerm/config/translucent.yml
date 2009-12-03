@@ -1,8 +1,10 @@
-base_uri: 
+base_uri: "http://kolibril.biologie.hu-berlin.de/~fkrause/publish.php"
 
 tables_and_types:
   phpr_mat_sop:
     type: SOP
+  phpr_mod_models:
+    type: Model
   phpr_exp_cc:
     type: Data
   phpr_exp_gfp:
@@ -34,9 +36,7 @@ tables_and_types:
   phpr_mat_plasmid:
     type: Data
   phpr_mat_strain:
-    type: Data
-  phpr_mod_models:
-    type: Model
+    type: Data  
   phpr_mod_pathway:
     type: Data
   phpr_exp_mife:
@@ -47,8 +47,6 @@ tables_and_types:
     type: Data
   phpr_exp_cellvolume:
     type: Data
-  people:
-    type: Person
 
 
 #  phpr_isa_investigation:
@@ -59,8 +57,8 @@ tables_and_types:
 #    type: Assay
 #  phpr_news:
 #    type: News
-  people:
-     type: Person
+#  people:
+#     type: Person
 #phpr_exp_MicroArray:
 #    type: Data
 #  phpr_exp_NMR:
