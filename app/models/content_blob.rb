@@ -45,6 +45,7 @@ class ContentBlob < ActiveRecord::Base
   end
   
   def calculate_md5
+    #FIXME: only recalculate if the data has changed (should be able to do this with changes.keys.include?("data") or along those lines).
     unless self.data.nil?
       digest = Digest::MD5.new
       digest << self.data
