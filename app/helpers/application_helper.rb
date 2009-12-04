@@ -232,6 +232,8 @@ module ApplicationHelper
       return "ajax-loader.gif"
     when "large-spinner"
       return "ajax-loader-large.gif"
+    when "current"
+      return "famfamfam_silk/bullet_green.png"
     when "expand"
       "folds/fold.png"
     when "collapse"
