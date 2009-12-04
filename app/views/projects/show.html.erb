@@ -60,6 +60,7 @@
     <% project_resource_hash = Asset.classify_and_authorize(@project.assets, true, current_user) -%>
     <% project_resource_hash.merge!(classify_for_tabs(@project.people)) -%>
     <% project_resource_hash.merge!(classify_for_tabs(@project.institutions)) -%>
+    <% project_resource_hash.merge!(classify_for_tabs(@project.assays)) -%>
     <% project_resource_hash.merge!(classify_for_tabs(@project.studies)) -%>
     <% project_resource_hash.merge!(classify_for_tabs(@project.investigations)) -%>    
 
