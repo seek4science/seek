@@ -9,7 +9,7 @@
 <% end -%>
 
 <% cache "tag_clouds" do -%>
-    <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.expertise_counts, :locals=>{:type=>"expertise", :title=>"Expertise",:min_count=>5} %>
-    <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.tool_counts, :locals=>{:type=>"tools", :title=>"Tools and Techniques",:min_count=>6} %>
+    <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.expertise_counts, :locals=>{:type=>"expertise", :title=>"Expertise",:min_count=>EXPERTISE_TAG_THRESHOLD} %>
+    <%= render :partial=>"gadgets/tag_cloud_gadget", :object=>Person.tool_counts, :locals=>{:type=>"tools", :title=>"Tools and Techniques",:min_count=>TOOLS_TAG_THRESHOLD} %>
 <% end -%>
 

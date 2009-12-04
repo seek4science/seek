@@ -582,7 +582,17 @@ p#assay_types label {
     text-align:center;   
     padding-top: 1.5em;
     padding-bottom: 1.5em;
-    margin: 1em 1em 1em 1em;    
+    margin: 1em 1em 1em 1em;
+    width: 90%;
+}
+
+#header_text_main {
+    font-size:larger;
+    text-align:center;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    margin: 0.5em 0.5em 0.5em 0.5em;
+    width: 90%;
 }
 
 div#more_info {

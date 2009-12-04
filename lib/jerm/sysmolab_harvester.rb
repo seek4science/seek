@@ -125,4 +125,8 @@ module Jerm
       return res
     end
   end
+
+  def project_name
+    "SysMO-Lab"
+  end
 end

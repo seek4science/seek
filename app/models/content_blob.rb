@@ -1,5 +1,6 @@
 require 'digest/md5'
 require 'net/http'
+require 'open-uri'
 
 
 class ContentBlob < ActiveRecord::Base
@@ -14,6 +15,7 @@ class ContentBlob < ActiveRecord::Base
     unless self.url.nil?
       original_filename = ""
       content_type = ""
+      resp = ""
       uri = URI.parse(self.url)
       Net::HTTP.start(uri.host, uri.port) do |http|
         resp = http.get(uri.request_uri)
@@ -31,12 +33,51 @@ class ContentBlob < ActiveRecord::Base
       return original_filename, content_type
     end
   end
+
+  def md5sum
+    if super.nil?
+      other_changes=self.changed?
+      calculate_md5
+      #only save if there are no other changes - this is to avoid inadvertantly storing other potentially unwanted changes
+      save unless other_changes
+    end
+    super
+  end
   
   def calculate_md5
+    #FIXME: only recalculate if the data has changed (should be able to do this with changes.keys.include?("data") or along those lines).
     unless self.data.nil?
-      d = Digest::MD5.new    
-      d << self.data
-      self.md5sum = d.hexdigest
+      digest = Digest::MD5.new
+      digest << self.data
+      self.md5sum = digest.hexdigest
+    end
+  end
+  
+  #returns a hash of values to be used in send_data
+  #:data, :filename, :content_type 
+  def send_remote_data
+    unless self.url.nil?
+      filename = ""
+      content_type = ""
+      resp = ""
+      uri = URI.parse(self.url)
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        resp = http.get(uri.request_uri)
+        #This is to get filenames from RESTful uris such as example.com/1/download
+        if resp['content-disposition'] && resp['content-disposition'] =~ /attachment; filename=\".*\"/
+          filename = resp['content-disposition'].split("filename=").last.gsub(/[\\\"]/,"")
+        else
+          filename = uri.path.split("/").last
+        end
+        content_type = resp.content_type
+      end
+      if resp.code == "200" #if all was okay, send the content we got 
+        return {:data => resp.body, :filename => filename, :content_type => content_type}
+      else #if we couldn't find it, send cached data
+        return {:data => self.data}
+      end
+    else
+      return nil
     end
   end
   

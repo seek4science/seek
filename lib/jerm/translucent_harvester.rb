@@ -1,13 +1,13 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-require 'harvester'
-require 'translucent_resource'
+require 'jerm/harvester'
+require 'jerm/translucent_resource'
 
 module Jerm
   class TranslucentHarvester < Harvester
-    def initialize key
-      super "",key
+    def initialize username,key
+      super username,key
       configpath=File.join(File.dirname(__FILE__),"config/#{project_name.downcase}.yml")
       @config=YAML::load_file(configpath)
       @base_uri=@config['base_uri']
@@ -49,8 +49,8 @@ module Jerm
       req=Net::HTTP::Get.new(uri.path+"?get=#{table_name}")
 
       http.request(req).body
-    end
-
+    end    
+    
     def project_name
       "Translucent"
     end

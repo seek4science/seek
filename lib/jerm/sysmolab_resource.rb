@@ -10,6 +10,10 @@ module Jerm
       @username = user
       @password = pass
     end
-  
+
+    def populate
+
+    end
+    
   end
 end

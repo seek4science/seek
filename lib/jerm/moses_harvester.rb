@@ -81,4 +81,8 @@ module Jerm
       end
     end
   end
+
+  def project_name
+    "MOSES"
+  end
 end

@@ -1,0 +1,6 @@
+<%= "Harvested #{results.size} results" %>
+
+<table class="jerm">
+  <tr><th>Project</th><th>Type</th><th>Submitter name</th><th>Submitter SEEK ID</th><th>URI</th><th>Timestamp</th></tr>
+  <%= render :partial=>"result_line",:collection=>results %>
+</table>

@@ -302,7 +302,8 @@ class ModelsController < ApplicationController
     if @display_model.content_blob.url.blank?
       send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
     else
-      redirect_to @display_model.content_blob.url
+      data_hash = @display_model.content_blob.send_remote_data
+      send_data data_hash[:data], :filename => data_hash[:filename] || @display_model.original_filename, :content_type => data_hash[:content_type] || @display_model.content_type, :disposition => 'attachment'
     end
   end
 
