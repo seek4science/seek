@@ -7,8 +7,7 @@
   <table class="list_item">
     <tr>
       <td class="item_avatar" style="width: 100px">
-        <% image_tag = avatar(project, 60, true) -%>
-        <%= link_to_draggable(image_tag, url_for(project), :id => drag_id, :class => "asset", :title => tooltip_title_attrib(h(project.name))) -%>
+        <%= favouritable_icon(project, 60) -%>
       </td>
 
       <td class="item_details">

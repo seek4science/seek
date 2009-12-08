@@ -240,6 +240,16 @@ module ApplicationHelper
       "pal.png"
     when "admin"
       "admin.png"
+    when "pdf_file"
+      return "famfamfam_silk/page_white_acrobat.png"
+    when "xls_file"
+      return "famfamfam_silk/page_white_excel.png"
+    when "doc_file"
+      return "famfamfam_silk/page_white_word.png"
+    when "misc_file"
+      return "famfamfam_silk/page_white.png"
+    when "ppt_file"
+      return "famfamfam_silk/page_white_powerpoint.png"
     else
       return nil
     end
@@ -335,10 +345,11 @@ module ApplicationHelper
   # 6) "show_tooltip" - when set to true, text in "alt" get shown as tooltip; otherwise put in "alt" attribute
   def avatar(object, size=200, return_image_tag_only=false, url=nil, alt=nil, show_tooltip=true)
     alternative = ""
+    title = get_object_title(object)
     if show_tooltip
-      tooltip_text = (alt.nil? ? h(object.name) : alt)
+      tooltip_text = (alt.nil? ? h(title) : alt)
     else
-      alternative = (alt.nil? ? h(object.name) : alt) 
+      alternative = (alt.nil? ? h(title) : alt) 
     end
     
     case object.class.name.downcase
@@ -348,6 +359,27 @@ module ApplicationHelper
       else
         img = null_avatar(object.class.name, size, alternative)
       end
+    when "datafile", "sop"
+      img = image_tag file_type_icon_url(object),
+            :alt => alt,
+            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+    when "model"
+      img = image_tag "/images/famfamfam_silk/bricks.png",
+            :alt => alt,
+            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+    when "investigation"
+      img = image_tag "/images/famfamfam_silk/magnifier.png",
+            :alt => alt,
+            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+    when "study"
+      img = image_tag "/images/famfamfam_silk/book_open.png",
+            :alt => alt,
+            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+
+    when "assay"
+      img = image_tag "/images/famfamfam_silk/report.png",
+            :alt => alt,
+            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"      
     end
     
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
@@ -381,6 +413,12 @@ module ApplicationHelper
       avatar_filename = "institution_64x64.png"
     when "project"
       avatar_filename = "project_64x64.png"
+    when "datafile"
+      avatar_filename = "data_file.png"
+    when "model"
+      avatar_filename = "model.png"
+    when "sop"
+      avatar_filename = "sop.png"
     end
     
     image_tag avatar_filename,
@@ -599,10 +637,50 @@ module ApplicationHelper
     truncated_result.strip + (truncated ? "\n..." : "")
   end  
 
+  def file_type_icon(item)
+    url = file_type_icon_url(item)
+    image_tag url, :class => "icon"
+  end
+
+  def file_type_icon_url(item)
+    url = ""
+    case item.content_type
+      when "application/vnd.ms-excel"
+        url = method_to_icon_filename "xls_file"
+      when "application/vnd.ms-powerpoint"
+        url = method_to_icon_filename "ppt_file"
+      when "application/pdf"
+        url = method_to_icon_filename "pdf_file"
+      when "application/msword"
+        url = method_to_icon_filename "doc_file"
+      else
+        case item.original_filename[-4,4].gsub(".","")
+          when "docx","doc"
+            url = method_to_icon_filename "doc_file"   
+          when "xls"
+            url = method_to_icon_filename "xls_file"
+          when "ppt"
+            url = method_to_icon_filename "ppt_file"
+          when "pdf"
+            url = method_to_icon_filename "pdf_file"
+          else
+           url = method_to_icon_filename "misc_file"
+        end
+    end
+    return url
+  end
+  
+  def get_object_title(item)
+    title = ""
+    if ["Person", "Institution", "Project"].include? item.class.name
+      title = h(item.name)
+    else
+      title = h(item.title)
+    end
+    return title
+  end
   
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People","sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","experiments"=>"Experiments","data_files"=>"Data"}
-  
-  
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","data_files"=>"Data"}
   
 end

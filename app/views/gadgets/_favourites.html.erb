@@ -1,6 +1,4 @@
-
 <div id="favourites_gadget" class="sysmo_gadget">
-  
 
   <div class="header">
     Favourites
@@ -10,7 +8,7 @@
   </div>
   
   
-  <div id="drop_favourites" class="contents" style="min-height:100px">
+  <div id="drop_favourites" class="contents" style="min-height:100px; text-align: left">
     
     <div id="favourite_list">
       <%= render :partial=>"favourites/gadget_list" %>
@@ -23,6 +21,13 @@
     :before => "Element.show('fav_ajax-loader')",
     :complete => "Element.hide('fav_ajax-loader');")
   %>
-  
+  <%= drop_receiving_element(:drop_favourites, 
+    :accept=>"search",
+    :url=>{:controller=>'search', :action=>'save', 
+           :search_query => params[:search_query],
+           :search_type => params[:search_type]},
+    :before => "Element.show('fav_ajax-loader')",
+    :complete => "Element.hide('fav_ajax-loader');")
+  %>
   
 </div>

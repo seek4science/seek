@@ -7,3 +7,9 @@
 <% elsif Authorization.is_authorized?("edit", nil, resource, current_user) -%>
   <%= icon "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
 <% end -%>
+<!---
+<%= link_to_remote icon("favourite"), :url=>{:controller => "favourites", :action => "add", :id => model_to_drag_id(resource)},
+    :before => "Element.show('fav_ajax-loader');Element.show('fav_ajax-loader#{model_to_drag_id(resource)}')",
+    :complete => "Element.hide('fav_ajax-loader');Element.hide('fav_ajax-loader#{model_to_drag_id(resource)}');" -%>
+  <%= image_tag("ajax-loader.gif", :style => "display:none;", :alt=>"loading...",:title=>"loading...",:id=>"fav_ajax-loader#{model_to_drag_id(resource)}") %>
+---> 

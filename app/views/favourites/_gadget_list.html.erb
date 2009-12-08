@@ -1,6 +1,5 @@
-<%
-favourites=Favourite.find_all_by_user_id(current_user.id)
-%>
+<% favourites=Favourite.find_all_by_user_id(current_user.id) %>
+<% saved_searches=SavedSearch.find_all_by_user_id(current_user.id) %>
 <% if favourites.empty? %>
   <span class="none_text" style="vertical-align:middle;height:100%;">
     Drag an icon here to remember for future reference.<br/>    
@@ -8,12 +7,22 @@ favourites=Favourite.find_all_by_user_id(current_user.id)
 <% else %>
   <% for fav in favourites %>
     <%= fav_image_tag(fav) %>
-
+  <% end %>
+  <% for sav in saved_searches %>
+    <%= saved_search_image_tag(sav) %>
   <% end %>
 <% end %>
 
-<%= drop_receiving_element("bd",
+<%= drop_receiving_element("body",
   :accept=>"favourite",
   :url=>{:controller=>'favourites', :action=>'delete'},
   :before => "Element.show('fav_ajax-loader')",
-  :complete => "Element.hide('fav_ajax-loader');") %>
+  :complete => "Element.hide('fav_ajax-loader');",
+  :confirm => "Are you sure you wish to remove this favourite?") %>
+  
+<%= drop_receiving_element("body",
+  :accept=>"saved_search",
+  :url=>{:controller=>'search', :action=>'delete'},
+  :before => "Element.show('fav_ajax-loader')",
+  :complete => "Element.hide('fav_ajax-loader');",
+  :confirm => "Are you sure you wish to remove this saved search?") %>
