@@ -2,7 +2,8 @@
 
 <div class="ontology_nav">
 
-  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents"}) -%>
+
+  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
   <% if @assay_type.has_parents? -%>
     <% for parent_type in @assay_type.parents  -%>
       <%= link_to h(parent_type.title.capitalize), parent_type %>
@@ -11,9 +12,16 @@
   <% else -%>
     <span class="none_text">No parent terms</span>
   <% end -%>
+
   <br/>
 
-  <%= image("arrow_down",{:title=>"Children",:alt=>"Children"}) -%>
+
+  <%= image("current",{:title=>"Current assay type",:alt=>"Current assay type",:style=>"vertical-align:middle"}) -%>
+  <%= h @assay_type.title.capitalize -%>
+  <br/>
+
+
+  <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
   <% if @assay_type.has_children? -%>
     <% for child_type in @assay_type.children  -%>
       <%= link_to h(child_type.title.capitalize), child_type %> (<%= child_type.get_child_assays.count %>)
@@ -22,6 +30,7 @@
   <% else -%>
     <span class="none_text">No child terms</span>
   <% end -%>
+
 </div>
 
 <h2>Related assays</h2>

@@ -25,7 +25,7 @@ class Project < ActiveRecord::Base
            :dependent => :destroy
 
   has_many :investigations
-  has_many :studies, :through=>:investigations
+  has_many :studies, :through=>:investigations  
 
   # can't destroy the assets, because these might be valuable even in the absence of the parent project
   has_many :assets, :dependent => :nullify
@@ -118,5 +118,9 @@ class Project < ActiveRecord::Base
   def update_first_letter
     self.first_letter=strip_first_letter(name)
   end
-  
+
+  def assays
+    studies.collect{|s| s.assays}.flatten.uniq
+  end
+
 end

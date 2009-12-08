@@ -2,7 +2,7 @@
 
 <div class="ontology_nav">
 
-  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents"}) -%>
+  <%= image("arrow_up",{:title=>"Parents",:alt=>"Parents",:style=>"vertical-align:middle"}) -%>
   <% if @technology_type.has_parents? -%>
     <% for parent_type in @technology_type.parents  -%>
       <%= link_to h(parent_type.title.capitalize), parent_type %>
@@ -13,7 +13,11 @@
   <% end -%>
   <br/>
 
-  <%= image("arrow_down",{:title=>"Children",:alt=>"Children"}) -%>
+  <%= image("current",{:title=>"Current technology type",:alt=>"Current technology type",:style=>"vertical-align:middle"}) -%>
+  <%= h @technology_type.title.capitalize -%>
+  <br/>
+
+  <%= image("arrow_down",{:title=>"Children",:alt=>"Children",:style=>"vertical-align:middle"}) -%>
   <% if @technology_type.has_children? -%>
     <% for child_type in @technology_type.children  -%>
       <%= link_to h(child_type.title.capitalize), child_type %> (<%= child_type.get_child_assays.count %>)
