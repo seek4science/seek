@@ -5,9 +5,7 @@
 	</p>
 	<p>
 		<% resource_contributor = resource.asset.contributor.person -%>
-		<% resource_contributor_name = h(resource_contributor.name) -%>
-		<% resource_contributor_url = url_for(resource_contributor) -%>
-		<%= avatar(resource_contributor, 100, false, resource_contributor_url, resource_contributor_name, true) -%>
-		<br/><%= link_to(resource_contributor_name, resource_contributor_url) -%>
+    <%= favouritable_icon(resource_contributor, 100) -%>     
+		<%= link_to(h(resource_contributor.name), resource_contributor) -%>
 	</p>
 </div>

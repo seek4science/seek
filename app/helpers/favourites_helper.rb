@@ -1,7 +1,7 @@
 module FavouritesHelper
   def model_to_drag_id object
     model_name=object.class.to_s
-    return "drag_"+model_name+"_"+object.id.to_s
+    return "drag_"+model_name+"_"+object.id.to_s+"_"+object.object_id.to_s
   end
   
   def fav_image_tag favourite

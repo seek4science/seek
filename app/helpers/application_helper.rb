@@ -289,12 +289,14 @@ module ApplicationHelper
   def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil)
     list_item = "<li>"
     
-    unless icon_type.downcase == "flag"
-      list_item += icon(icon_type.downcase, nil, icon_type.camelize, nil, "")
-    else
+    if icon_type.downcase == "flag"
       list_item += flag_icon(item.country)
+    elsif icon_type == "data_file" || icon_type == "sop"
+      list_item += file_type_icon(item)
+    else
+      list_item += icon(icon_type.downcase, nil, icon_type.camelize, nil, "")
     end
-    item_caption = h(caption.blank? ? item.name : caption)
+    item_caption = " " + h(caption.blank? ? item.name : caption)
     list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
