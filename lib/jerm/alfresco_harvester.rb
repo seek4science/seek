@@ -1,8 +1,7 @@
-require 'web_dav_harvester'
+require 'jerm/web_dav_harvester'
 
 module Jerm
   class AlfrescoHarvester < WebDavHarvester
-
 
     def meta_data_file
       "metadata.csv"
