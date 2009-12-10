@@ -13,16 +13,14 @@
   <% end %>
 <% end %>
 
-<%= drop_receiving_element("body",
+<%= drop_receiving_element("content",
   :accept=>"favourite",
   :url=>{:controller=>'favourites', :action=>'delete'},
   :before => "Element.show('fav_ajax-loader')",
-  :complete => "Element.hide('fav_ajax-loader');",
-  :confirm => "Are you sure you wish to remove this favourite?") %>
+  :complete => "Element.hide('fav_ajax-loader');") %>
   
-<%= drop_receiving_element("body",
+<%= drop_receiving_element("content",
   :accept=>"saved_search",
   :url=>{:controller=>'search', :action=>'delete'},
   :before => "Element.show('fav_ajax-loader')",
-  :complete => "Element.hide('fav_ajax-loader');",
-  :confirm => "Are you sure you wish to remove this saved search?") %>
+  :complete => "Element.hide('fav_ajax-loader');") %>
