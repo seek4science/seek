@@ -3,17 +3,9 @@
 <div class="list_items_container">
   <table class="list_item">
     <tr>
-      <td class="item_avatar" style="width: 100px">
-        <p style="margin-top:0; padding-top:1.5em; text-align: center;"><b>Project:</b></p>
-        <br/>
-        <center>
-          <% if study.project -%>
-            <%= related_project_avatar(study.project) -%>
-          <% end -%>
-        </center>
-
+      <td style="width: 100px;">
+        <%= favouritable_icon(study, 60) -%>
       </td>
-
       <td class="item_details">
         <p class="name">
 
@@ -29,11 +21,15 @@
           <%= text_or_not_specified(study.description, :description => true,:auto_link=>true,:length=>300) %>
         </div>
 
-
+        <p class="project">
+          <label>Project:</label>
+          <%= projects_link_list [study.project] %>
+        </p>
         <p class="investigation">
           <label>Investigation: </label>
-          <%= link_to h(study.investigation.title),study.investigation %>
+          <%= investigation_link study.investigation %>
         </p>
+        
         <div>
           <p class="person">
             <label>Person responsible:</label>
@@ -57,6 +53,4 @@
 
     </tr>
   </table>
-
-
 </div>

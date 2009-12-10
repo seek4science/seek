@@ -51,6 +51,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
 
   map.resource :session
+  
+  # search and saved searches
+  map.search '/search/',:controller=>'search',:action=>'index'
+  map.save_search '/search/save',:controller=>'search',:action=>'save'
+  map.delete_search '/search/delete',:controller=>'search',:action=>'delete'
+  map.saved_search '/search/:id',:controller=>'search',:action=>'show'
+  
 
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
   

@@ -3,7 +3,7 @@
 
   <div class="header" style="padding-bottom: 0.8em;">
     <div id="avatar" style="padding-bottom: 0.3em;">
-      <%= avatar(current_user.person, 40) -%>
+      <%= favouritable_icon(current_user.person, 40) -%>
     </div>
 		<%= h current_user.person.name %>
   </div>

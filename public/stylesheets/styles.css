@@ -705,3 +705,17 @@ img.badge {
 #topbar * {
 	vertical-align: middle;
 }
+
+div.favouritable_icon {
+  position: relative;
+  margin: 5px auto;
+}
+
+div.avatar_text {
+  position: absolute;
+  text-align:center;
+  bottom: 6px;
+  font-size: smaller;  
+}
+
+

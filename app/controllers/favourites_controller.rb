@@ -9,11 +9,9 @@ class FavouritesController < ApplicationController
     split_id=params[:id].split("_")
     f=Favourite.new
     f.user=current_user
-    f.model_name=split_id[1]
-    f.asset_id=split_id[2].to_i
-    
-    if Favourite.find_by_user_id_and_model_name_and_asset_id(current_user,f.model_name,f.asset_id).nil?
-      f.save
+    resource = eval(split_id[1]).find_by_id(split_id[2].to_i)
+    f.resource = resource    
+    if Favourite.find_by_user_id_and_resource_type_and_resource_id(current_user,f.resource_type,f.resource_id).nil? && f.save
       render :update, :status=>:created do |page|
           page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
           page.visual_effect :highlight, "drop_favourites", :startcolor=>"#DDDDFF"

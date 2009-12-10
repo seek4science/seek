@@ -5,9 +5,3 @@
 #
 # two:
 #   column: value
-
-one:
-    resource_type: Project
-    resource_id: 2
-    user_id: 1
-

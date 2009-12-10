@@ -7,13 +7,12 @@
 <% end -%>
 
 <div class="contribution_section_box" style="padding-top: 3em; padding-bottom: 3em;">  
-  <div>    
-    <%= link_to_draggable(avatar(object, 100, true), url_for(object), :title=>tooltip_title_attrib(h(object.name)), :id => drag_id,:class=>"asset") -%>
+  <div>
+    <%= favouritable_icon(object, 100) -%>    
   </div>
   
   <% if object.instance_of?(Person) -%>
     <%= pal_icon(@person) -%>
     <%= admin_icon(@person) -%>
   <% end -%>
-  <%= favourite_drag_element(drag_id) %>
 </div>

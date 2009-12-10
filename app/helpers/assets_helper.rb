@@ -32,21 +32,35 @@ module AssetsHelper
     class_name
   end
 
+  #Changed these so they can cope with non-asset things such as studies, assays etc.
   def download_resource_path(resource)
-    actual_resource = resource.class.name.include?("::Version") ? resource.parent : resource
-    version = resource.version    
-    polymorphic_path(actual_resource,:version=>version,:action=>:download)
+    path = ""
+    if resource.class.name.include?("::Version")
+      path = polymorphic_path(resource.parent,:version=>resource.version,:action=>:download)
+    else
+      path = polymorphic_path(resource,:action=>:download)
+    end
+    return path
   end
 
   def show_resource_path(resource)
-    actual_resource = resource.class.name.include?("::Version") ? resource.parent : resource
-    version = resource.version
-    polymorphic_path(actual_resource,:version=>version)
+    path = ""
+    if resource.class.name.include?("::Version")
+      path = polymorphic_path(resource.parent,:version=>resource.version)
+    else
+      path = polymorphic_path(resource)
+    end
+    return path
   end
 
   def edit_resource_path(resource)
-    actual_resource = resource.class.name.include?("::Version") ? resource.parent : resource    
-    edit_polymorphic_path(actual_resource)
+    path = ""
+    if resource.class.name.include?("::Version")
+      path = edit_polymorphic_path(resource.parent)
+    else
+      path = edit_polymorphic_path(resource)
+    end
+    return path
   end
 
 end

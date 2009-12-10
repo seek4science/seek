@@ -5,24 +5,35 @@
 
 <table class="list_item">
   <tr class="<%= odd_row ? "odd_row" : "even_row" -%>">
-    <td style="width: 125px;">
-      <p style="margin-top:0; padding-top:0; text-align: center;"><b>Uploader:</b></p>
-      <center><%= contributor(resource.asset.contributor, true, 60) -%></center>
+    <td style="width: 100px;">
+      <%= favouritable_icon(resource, 60) -%>
     </td>
 
     <td style="text-align: left;">
       <p class="title">
-        <%= icon "model", nil, nil, nil, '' -%>
-        <% title = h(resource.title) -%>
-        <%= link_to(title, show_resource_path(resource)) -%>
+        <%= link_to(h(resource.title), show_resource_path(resource)) -%>
       </p>
+      
+      <p style="font-size: 85%; margin-top: 0.3em;">
+        <b>Uploaded by:</b> <%= link_to resource.asset.contributor.person.name, resource.asset.contributor.person -%>
+      </p>
+      
+      <% author_list = resource.asset.authors %>
+      <% unless author_list.empty? %>
+        <p style="font-size: 85%; margin-top: 0.3em;">
+          <b>Author<%= author_list.size > 1 ? "s" : "" -%>:</b> 
+          <% author_list.each do |author| %>
+          <%= (link_to author.name, author) + (author == author_list.last ? "" : ",") -%>
+          <% end %>
+        </p>
+      <% end %>
 
-      <p style="font-size: 85%; margin-top: 0.4em;">
-        <b>Version:</b><%= resource.version -%>
+      <p style="font-size: 85%; margin-top: 0.3em;">
+        <b>Version:</b> <%= resource.version -%>
       </p>
 
       <p style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
-        <b>Associated project: </b>
+        <b>Associated project:</b> 
         <%= (resource.project ? link_to(h(resource.project.name), project_path(resource.project.id)) : "<span class='none_text'>None</span>" ) -%>
       </p>
 
@@ -58,11 +69,6 @@
           <span class="none_text">No description</span>
         <% end -%>
       </div>
-
-      <p style="font-size:85%;">
-        <b>Format: </b>
-        <%= h(resource.content_type) -%>
-      </p>
     </td>
 
 
