@@ -42,7 +42,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def studies
-    assays.collect{|a| a.study}
+    assays.collect{|a| a.study}.uniq
   end
 
   # get a list of DataFiles with their original uploaders - for autocomplete fields
