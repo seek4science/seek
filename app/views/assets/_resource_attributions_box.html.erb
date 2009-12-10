@@ -40,7 +40,7 @@
 				<ul class="list">
 		      <% for item in attributed_to[main_list_section_length..(attributed_to.length-1)] -%>
 		      	<% if item -%>
-						  <%= list_item_with_icon(item.class.name.underscore, item, item.title, truncate_to) -%>
+              <%= list_item_with_icon(item.class.name.underscore, item, item.title, truncate_to) -%>
 						<% else -%>
 						  <li><font class="none_text">Private item</font></li>
 						<% end -%>

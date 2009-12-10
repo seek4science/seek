@@ -20,6 +20,6 @@
   <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @people.pages, :page_totals=>@people.page_totals,:current_page=>@people.page } -%>
 <% end %>
 
-<%= render :partial => "resource_list_item", :collection=>@people %>
-
-
+<div class="list_items_container">
+  <%= render :partial => "resource_list_item", :collection=>@people %>
+</div>

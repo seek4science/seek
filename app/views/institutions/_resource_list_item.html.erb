@@ -1,40 +1,38 @@
 <% institution = resource_list_item %>
 <% drag_id=model_to_drag_id institution %>
 
-<div class="list_items_container">
-  <table class="list_item">
-  	<tr>
-  		<td class="item_avatar" style="width: 100px">
-  			<%= favouritable_icon(institution, 60) -%>  	    
-  		</td>
+<table class="list_item">
+	<tr>
+		<td class="item_avatar" style="width: 100px">
+			<%= favouritable_icon(institution, 60) -%>  	    
+		</td>
+		
+		<td class="item_details">
+		  <p class="name">
+	      <% institution_name = h(institution.name) -%>
+				<%= institution_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(institution_name, institution_path(institution)) -%>
+	    </p>
 			
-			<td class="item_details">
-			  <p class="name">
-		      <% institution_name = h(institution.name) -%>
-					<%= institution_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(institution_name, institution_path(institution)) -%>
-		    </p>
-				
-				<% unless is_nil_or_empty? institution.country %>
-		      <p class="country">
-		        <label>Country: </label>
-		        <%= text_or_not_specified institution.country, :link_as_country => true -%>
-		      </p>
-		    <% end %>
-		    
-		    <% unless is_nil_or_empty? institution.city %>
-		      <p class="city">
-		        <label>City:</label>
-		        <%= h institution.city %>
-		      </p>
-		    <% end %>
-		    
-		    <% unless is_nil_or_empty? institution.web_page %>
-		      <p class="web_page">
-		        <label>Web page:</label>
-		        <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
-		      </p>
-		    <% end %>
-			</td>
-		</tr>
-	</table>
-</div>
+			<% unless is_nil_or_empty? institution.country %>
+	      <p class="country">
+	        <label>Country: </label>
+	        <%= text_or_not_specified institution.country, :link_as_country => true -%>
+	      </p>
+	    <% end %>
+	    
+	    <% unless is_nil_or_empty? institution.city %>
+	      <p class="city">
+	        <label>City:</label>
+	        <%= h institution.city %>
+	      </p>
+	    <% end %>
+	    
+	    <% unless is_nil_or_empty? institution.web_page %>
+	      <p class="web_page">
+	        <label>Web page:</label>
+	        <%= link_to h(institution.web_page), h(institution.web_page),:popup=>true %>
+	      </p>
+	    <% end %>
+		</td>
+	</tr>
+</table>

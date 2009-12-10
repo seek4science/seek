@@ -1,33 +1,28 @@
 <% investigation = resource_list_item %>
 
+<table class="list_item">
+  <tr>
+    <td style="width: 100px;">
+      <%= favouritable_icon(investigation, 60) -%>
+    </td>
+    <td class="item_details">
+      <p class="title">
+        <%= link_to h(investigation.title),investigation %>
+      </p>
 
-<div class="list_items_container">
-  <table class="list_item">
-    <tr>
-      <td style="width: 100px;">
-        <%= favouritable_icon(investigation, 60) -%>
-      </td>
-      <td class="item_details">
-        <p class="title">
-          <%= link_to h(investigation.title),investigation %>
-        </p>
+      <div class="box_standout">
+        <%= text_or_not_specified(investigation.description, :description => true,:auto_link=>true,:length=>300) %>
+      </div>        
+      <p class="project">
+        <label>Project:</label>
+        <%= projects_link_list [investigation.project] %>
+      </p>
+      <p class="studies">
+        <label>Studies: </label>
+        <%= studies_link_list investigation.studies %>
+      </p>        
 
-        <div class="box_standout">
-          <%= text_or_not_specified(investigation.description, :description => true,:auto_link=>true,:length=>300) %>
-        </div>        
-        <p class="project">
-          <label>Project:</label>
-          <%= projects_link_list [investigation.project] %>
-        </p>
-        <p class="studies">
-          <label>Studies: </label>
-          <%= studies_link_list investigation.studies %>
-        </p>        
+    </td>
 
-      </td>
-
-    </tr>
-  </table>
-
-
-</div>
+  </tr>
+</table>

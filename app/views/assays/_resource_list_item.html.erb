@@ -1,70 +1,65 @@
 <% assay = resource_list_item %>
 
+<table class="list_item">
+  <tr>
+    <td style="width: 100px;">
+      <%= favouritable_icon(assay, 60) -%>
+    </td>
+    <td class="item_details">
+      <p class="name">
+        <%= link_to h(assay.title), assay %>
+      </p>
 
-<div class="list_items_container">
-  <table class="list_item">
-    <tr>
-      <td style="width: 100px;">
-        <%= favouritable_icon(assay, 60) -%>
-      </td>
-      <td class="item_details">
-        <p class="name">
-          <%= link_to h(assay.title), assay %>
-        </p>
+      <div class="box_standout">
+        <%= text_or_not_specified(assay.description, :description => true,:auto_link=>true,:length=>300) %>
+      </div>
 
-        <div class="box_standout">
-          <%= text_or_not_specified(assay.description, :description => true,:auto_link=>true,:length=>300) %>
-        </div>
+      <p class="assay_type">
+        <label>Assay type:</label>
+        <%= link_to h(assay.assay_type.title.capitalize), assay.assay_type %>
+      </p>
 
-        <p class="assay_type">
-          <label>Assay type:</label>
-          <%= link_to h(assay.assay_type.title.capitalize), assay.assay_type %>
-        </p>
+      <p class="technology_type">
+        <label>Technology type:</label>
+        <%= link_to h(assay.technology_type.title.capitalize), assay.technology_type %>
+      </p>
 
-        <p class="technology_type">
-          <label>Technology type:</label>
-          <%= link_to h(assay.technology_type.title.capitalize), assay.technology_type %>
-        </p>
+      <p class="projects">
+        <label>Project: </label>
+        <%= projects_link_list [assay.project] %>
+      </p>
 
-        <p class="projects">
-          <label>Project: </label>
-          <%= projects_link_list [assay.project] %>
-        </p>
+      <p class="investigation">
+      <label>Investigation: </label><%= investigation_link(assay.investigation) %>
 
-        <p class="investigation">
-        <label>Investigation: </label><%= investigation_link(assay.investigation) %>
+      </p>
 
-        </p>
+      <p class="studies">
+        <label>Study: </label>
+        <%= studies_link_list [assay.study] %>
+      </p>
 
-        <p class="studies">
-          <label>Study: </label>
-          <%= studies_link_list [assay.study] %>
-        </p>
+      <p class="organism">
+        <label>Organism:</label>
+        <%= organism_link_to assay.organism %>
+      </p>
 
-        <p class="organism">
-          <label>Organism:</label>
-          <%= organism_link_to assay.organism %>
-        </p>
+      <p class="culture_growth_type">
+        <label>Culture growth:</label>
+        <%= model_title_or_not_specified(assay.culture_growth_type) %>
+      </p>
 
-        <p class="culture_growth_type">
-          <label>Culture growth:</label>
-          <%= model_title_or_not_specified(assay.culture_growth_type) %>
-        </p>
+      <p class="Sops">
+        <label>Sops: </label>
+        <%= sops_link_list assay.sops, true, 200 %>
+      </p>
 
-        <p class="Sops">
-          <label>Sops: </label>
-          <%= sops_link_list assay.sops, true, 200 %>
-        </p>
+      <p class="Data">
+        <label>Data: </label>
+        <%= data_file_link_list assay.data_files, true, 200 %>
+      </p>
 
-        <p class="Data">
-          <label>Data: </label>
-          <%= data_file_link_list assay.data_files, true, 200 %>
-        </p>
+    </td>
 
-      </td>
-
-    </tr>
-  </table>
-
-
-</div>
+  </tr>
+</table>

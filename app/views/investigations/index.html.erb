@@ -7,7 +7,9 @@
   <%= render :partial => "layouts/paginate", :locals => { :collection => @investigations } -%>
 <% end %>
 
-<%= render :partial => "investigations/resource_list_item", :collection=>@investigations %>
+<div class="list_items_container">
+  <%= render :partial => "investigations/resource_list_item", :collection=>@investigations %>
+</div>
 
 <% if @investigations.public_methods.include?("page_count") %>
   <!-- only do the page links if the collection supports it -->

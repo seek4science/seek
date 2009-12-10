@@ -3,43 +3,41 @@
 
 <% truncate_projects_institutions_length = 25 -%>
 
-<div class="list_items_container">
-  <table class="list_item">
-    <tr>
-      <td class="item_avatar" style="width: 100px">
-        <%= favouritable_icon(project, 60) -%>
-      </td>
+<table class="list_item">
+  <tr>
+    <td class="item_avatar" style="width: 100px">
+      <%= favouritable_icon(project, 60) -%>
+    </td>
 
-      <td class="item_details">
-        <p class="name">
-          <% project_name = h(project.name) -%>
-          <%= project_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(project_name, project_path(project)) -%>
-        </p>
+    <td class="item_details">
+      <p class="name">
+        <% project_name = h(project.name) -%>
+        <%= project_name.blank? ? "<span class='none_text'>Unknown</span>" : link_to(project_name, project_path(project)) -%>
+      </p>
 
-        <div class="box_standout">
-          <%= text_or_not_specified(project.description, :description => true,:auto_link=>true, :length=>300) %>
-        </div>
+      <div class="box_standout">
+        <%= text_or_not_specified(project.description, :description => true,:auto_link=>true, :length=>300) %>
+      </div>
 
-        <% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>
-        <p class="web_page">
-          <label>Public Web page:</label>
-          <%= "&nbsp;" + web_page_link -%>
-        </p>
+      <% web_page_link = ((is_nil_or_empty? project.web_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.web_page), h(project.web_page),:popup=>true)) -%>
+      <p class="web_page">
+        <label>Public Web page:</label>
+        <%= "&nbsp;" + web_page_link -%>
+      </p>
 
-        <% unless hide_contact_details? %>
-          <% wiki_page_link = ((is_nil_or_empty? project.wiki_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.wiki_page), h(project.wiki_page),:popup=>true)) -%>
-          <p class="wiki_page">
-            <label>Internal Web page:</label>
-            <%= "&nbsp;" + wiki_page_link -%>
-          </p>        
-        <% end %>
-        
-        <p class="organisms">
-          <label>Organisms:</label>
-          <%= organisms_link_list project.organisms -%>
-        </p>
-      </td>
+      <% unless hide_contact_details? %>
+        <% wiki_page_link = ((is_nil_or_empty? project.wiki_page) ? "<span class='none_text'>Not specified</span>" : (link_to h(project.wiki_page), h(project.wiki_page),:popup=>true)) -%>
+        <p class="wiki_page">
+          <label>Internal Web page:</label>
+          <%= "&nbsp;" + wiki_page_link -%>
+        </p>        
+      <% end %>
       
-    </tr>
-  </table>
-</div>
+      <p class="organisms">
+        <label>Organisms:</label>
+        <%= organisms_link_list project.organisms -%>
+      </p>
+    </td>
+    
+  </tr>
+</table>
