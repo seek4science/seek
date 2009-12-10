@@ -5,6 +5,10 @@ class Model < ActiveRecord::Base
 
   acts_as_resource
   
+  has_many :favourites, 
+           :as => :resource, 
+           :dependent => :destroy
+  
   validates_presence_of :title
   
   # allow same titles, but only if these belong to different users

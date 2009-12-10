@@ -4,6 +4,10 @@ require 'grouped_pagination'
 class Person < ActiveRecord::Base
   
   acts_as_editable
+  
+  has_many :favourites, 
+           :as => :resource, 
+           :dependent => :destroy
 
   before_save :update_first_letter
   

@@ -21,6 +21,10 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
 
+  has_many :favourites, 
+           :as => :resource, 
+           :dependent => :destroy
+
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organism]) if SOLR_ENABLED
   
   def short_description

@@ -8,6 +8,10 @@ class Investigation < ActiveRecord::Base
   validates_uniqueness_of :title
 
   has_many :assays,:through=>:studies
+  
+  has_many :favourites, 
+           :as => :resource, 
+           :dependent => :destroy
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
 

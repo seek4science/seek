@@ -31,7 +31,7 @@ class User < ActiveRecord::Base
   # anything else you want your user to change should be added here.
   attr_accessible :login, :email, :password, :password_confirmation
   
-  has_many :favourites
+  has_many :favourites, :dependent => :destroy
   has_many :favourite_groups, :dependent => :destroy
   
   # can't destroy the assets, because these might be valuable even in the absence of the parent project

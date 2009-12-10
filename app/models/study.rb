@@ -1,6 +1,7 @@
 class Study < ActiveRecord::Base
 
   belongs_to :investigation
+  
   has_many :assays
   
   has_one :project, :through=>:investigation
@@ -8,6 +9,10 @@ class Study < ActiveRecord::Base
   #has_many :data_files,:through=>:assays
   
   belongs_to :person_responsible, :class_name => "Person"
+  
+  has_many :favourites, 
+           :as => :resource, 
+           :dependent => :destroy
 
   validates_presence_of :title
   validates_presence_of :investigation
