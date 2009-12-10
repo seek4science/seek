@@ -11,6 +11,13 @@
 <h1><%= h @investigation.title -%></h1>
 
 <div class="show_basic">
+  <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
+    <b>Created at:</b> <%= @investigation.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+    <% unless @investigation.created_at == @investigation.updated_at -%>
+      <br/>
+      <b>Last updated: </b><%= @investigation.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
+    <% end -%>
+  </div>
 
   <p>
     <b>Project:</b> <%= link_to h(@investigation.project.name),@investigation.project %>

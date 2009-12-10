@@ -20,6 +20,13 @@
 <h1><%= h @study.title -%></h1>
 
 <div class="show_basic">
+  <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
+    <b>Created at:</b> <%= @study.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+    <% unless @study.created_at == @study.updated_at -%>
+      <br/>
+      <b>Last updated: </b><%= @study.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
+    <% end -%>
+  </div>
 
 
   <div class="box_about_actor">

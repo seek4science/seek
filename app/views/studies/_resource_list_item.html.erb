@@ -47,6 +47,13 @@
           </p>
         </div>
       </div>
+      
+      <p style="font-size: 85%; margin-top: 0.3em;">
+        <b>Created:</b> <%= study.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+        <% unless study.created_at == study.updated_at -%>          
+          <b>Last updated:</b> <%= study.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+        <% end %>
+      </p>
 
     </td>
 

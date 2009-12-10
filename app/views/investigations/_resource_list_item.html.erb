@@ -20,8 +20,14 @@
       <p class="studies">
         <label>Studies: </label>
         <%= studies_link_list investigation.studies %>
-      </p>        
-
+      </p>      
+      
+      <p style="font-size: 85%; margin-top: 0.3em;">
+        <b>Created:</b> <%= investigation.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+        <% unless investigation.created_at == investigation.updated_at -%>          
+          <b>Last updated:</b> <%= investigation.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+        <% end %>
+      </p>
     </td>
 
   </tr>

@@ -12,6 +12,13 @@
 
 
 <div class="show_basic">
+  <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
+    <b>Created at:</b> <%= @assay.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+    <% unless @assay.created_at == @assay.updated_at -%>
+      <br/>
+      <b>Last updated: </b><%= @assay.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
+    <% end -%>
+  </div>
 
   <% if @assay.study.nil? -%>
     <div class="warning">
