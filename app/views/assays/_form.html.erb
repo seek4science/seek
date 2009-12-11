@@ -3,9 +3,7 @@
 <%= f.error_messages -%>
 
 
-<center>
-  <div style="width: 60%;">
-
+<div style="width: 60%;">
     <% if !@assay.study.nil? -%>      
       <p>
         <%= label_tag "Associated study: " -%>
@@ -22,16 +20,20 @@
       <%= f.label :description -%><br/>
       <%= f.text_area :description,:cols=>50,:rows=>10 -%>
     </p>
-
     <p>
-      <%= f.label :study -%><br/>
-      <%
-        studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])
-      -%>
-      <%= f.select("study_id", studies.collect {|s| [ truncate(s.title, :length => 64), s.id ] }, { :include_blank => "Not specified" }) -%>
+    	<div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>      
+      <%= f.label :study -%><br/> 
+      <% studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])-%>
+			<% options = "<option value=\"\">Not specified</option>" %>
+			<% studies.each do |s| %>
+			 <% options << "<option value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
+			<% end %>      
+			<select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()">
+		    <%= options %>
+			</select>
     </p>
-  </div>
-</center>
+</div>
+
 
 
 
@@ -63,3 +65,16 @@
   <%= f.submit(action==:edit ? "Update" : "Create") -%>
   or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>
 </p>
+
+<script type="text/javascript">
+	function showTitle(text){
+    var elem = document.getElementById("full_study_title");
+		elem.style.display = '';
+		elem.innerHTML = text;
+	}
+	
+	function hideTitle(){
+		var elem = document.getElementById("full_study_title");
+		elem.style.display = 'none';
+	}
+</script>
