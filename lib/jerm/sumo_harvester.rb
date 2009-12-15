@@ -151,6 +151,8 @@ module Jerm
             res = SumoResource.new
             res.uri = s
             res.type = "Sop"
+            res.work_package = @WP
+            res.experimenters = @experimenters
             unless @author.nil?
               first_name, last_name = @author.split(" ", 2)
               res.author_first_name = first_name
@@ -166,6 +168,8 @@ module Jerm
             res = SumoResource.new
             res.uri = s
             res.type = "DataFile"
+            res.work_package = @WP
+            res.experimenters = @experimenters.uniq
             unless @author.nil?
               first_name, last_name = @author.split(" ", 2)
               res.author_first_name = first_name
