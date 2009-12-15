@@ -3,9 +3,7 @@ require 'open-uri'
 require 'net/http'
 require 'net/https'
 module Jerm
-  class WikiHarvester < Harvester
-    
-    
+  class WikiHarvester < Harvester    
   
     protected
   
