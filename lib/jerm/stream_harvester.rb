@@ -19,7 +19,7 @@ module Jerm
       
       resources = changed_since(last_run)
       resources.each do |resource|
-        puts resource.to_s
+        populate resource
       end
     end
     

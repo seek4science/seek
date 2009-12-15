@@ -6,6 +6,10 @@ module Jerm
 
     attr_accessor :username, :password
     
+    def populate
+      
+    end
+    
     def get_data
       uri = URI.parse(uri)
       http=Net::HTTP.new(uri.host,uri.port)

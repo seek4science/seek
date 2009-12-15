@@ -148,10 +148,9 @@ module Jerm
         #Create sop resources
         unless @sops.empty?
           @sops.each do |s|
-            res = Resource.new
+            res = SumoResource.new
             res.uri = s
             res.type = "Sop"
-            res.project = "SUMO"
             unless @author.nil?
               first_name, last_name = @author.split(" ", 2)
               res.author_first_name = first_name
@@ -164,10 +163,9 @@ module Jerm
         #Create data file resources
         unless @data_files.empty?
           @data_files.each do |s|
-            res = Resource.new
+            res = SumoResource.new
             res.uri = s
             res.type = "DataFile"
-            res.project = "SUMO"
             unless @author.nil?
               first_name, last_name = @author.split(" ", 2)
               res.author_first_name = first_name
