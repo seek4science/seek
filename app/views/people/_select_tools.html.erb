@@ -22,13 +22,15 @@
 </p>
 
 <div id="tools_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
-  <div id="tools_select_tags" class="hTagcloud">
-    <div class="popularity">
-      <% unless @tags_tools.blank? -%>
-        <% tag_cloud @tags_tools, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-          <%= link_to tag.name, "javascript:addToolListTag(#{tag.id});", :class => css_class -%>
-        <% end -%>
-      <% end -%>
+  <div class="tags_smaller">
+	  <div id="tools_select_tags" class="hTagcloud">
+	    <div class="popularity">
+	      <% unless @tags_tools.blank? -%>
+	        <% tag_cloud @tags_tools, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+	          <%= link_to tag.name, "javascript:addToolListTag(#{tag.id});", :class => css_class -%>
+	        <% end -%>
+	      <% end -%>
+	    </div>
     </div>
   </div>
 </div>
