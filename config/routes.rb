@@ -58,6 +58,9 @@ ActionController::Routing::Routes.draw do |map|
   map.delete_search '/search/delete',:controller=>'search',:action=>'delete'
   map.saved_search '/search/:id',:controller=>'search',:action=>'show'
   
+  #tags
+  map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
+  
 
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
   

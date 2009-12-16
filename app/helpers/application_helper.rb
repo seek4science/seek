@@ -546,6 +546,7 @@ module ApplicationHelper
     if (options[:type]==:organisms)
       link=projects_url(:organisms=>tag.name)
     end
+    link = show_tag_url(tag)
     link_to h(truncate(tag.name,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.name)
   end
 
