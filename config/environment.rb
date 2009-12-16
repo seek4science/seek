@@ -94,6 +94,7 @@ ACTIVATION_REQUIRED=false unless Object.const_defined?("ACTIVATION_REQUIRED")
 ENABLE_GOOGLE_ANALYTICS=false unless Object.const_defined?("ENABLE_GOOGLE_ANALYTICS")
 EXPERTISE_TAG_THRESHOLD=5 unless Object.const_defined?("EXPERTISE_TAG_THRESHOLD")
 TOOLS_TAG_THRESHOLD=6 unless Object.const_defined?("TOOLS_TAG_THRESHOLD")
+MERGED_TAG_THRESHOLD=5 unless Object.const_defined?("MERGED_TAG_THRESHOLD")
 
 # Set Google Analytics code
 if ENABLE_GOOGLE_ANALYTICS

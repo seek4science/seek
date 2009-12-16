@@ -1,0 +1,64 @@
+<div id="merged_tag_cloud" class="sysmo_gadget"  >
+  
+
+  <div class="header">
+    Tags
+  </div>
+
+  <div class="contents">
+    <div class="tags_smaller">
+      <div class="hTagcloud">
+        <div class="popularity">
+          <%
+          min_count = MERGED_TAG_THRESHOLD
+          tag_cloud = Person.expertise_counts + Person.tool_counts
+          all_tags=tag_cloud.select{|tag| tag.count>=min_count}
+          show_tags=tag_cloud.sort{|a,b| b.count<=>a.count}[0..9]
+          hidden_tags=all_tags.size != show_tags.size
+          hidden_class="merged_tag_hidden"
+          %>
+          
+          <% unless all_tags.blank? -%>
+            <% tag_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+              <% if show_tag?(tag) -%>
+                <%
+                  hide_tag=!show_tags.include?(tag)
+                  type = tag.taggings.first.context.to_sym                  
+                  tag_class="#{css_class}"
+                  tag_class << " #{hidden_class}" if hide_tag
+                  style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
+                %>
+                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>          
+              <% end -%>
+            <% end -%>
+          
+            <% if hidden_tags -%>
+              <div class="expand_collapse_tags_button">
+                <%
+                button_images=image_tag("folds/unfold.png",:id=>"toggle_merged_button_down") +
+                  image_tag("folds/fold.png",:id=>"toggle_merged_button_up",:style=>"display:none;")
+              %>
+                <%=link_to_function( button_images) do |page|
+                  page.select(".#{hidden_class}").each do |el|
+                    el.toggle
+                  end
+          
+                  page.toggle "toggle_merged_button_down"
+                  page.toggle "toggle_merged_button_up"
+                end
+              %>
+              </div>
+            <% end -%>
+          
+          <% end -%>
+
+          
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+
+  
+</div>
