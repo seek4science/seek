@@ -1,8 +1,7 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  measured_item_id: MyString
-  factor_type_id: 1
+  measured_item_id: MyString  
   start_value: 1.5
   end_value: 1.5
   unit_id: 1
@@ -10,8 +9,7 @@ one:
   
 
 two:
-  measured_item_id: MyString
-  factor_type_id: 1
+  measured_item_id: MyString  
   start_value: 1.5
   end_value: 1.5
   unit_id: 1
