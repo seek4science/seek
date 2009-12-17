@@ -18,6 +18,11 @@
       <b>Last updated: </b><%= @investigation.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
     <% end -%>
   </div>
+  
+  <p class="id">
+    <label>ID: </label>
+    <%= @investigation.id -%>
+  </p>
 
   <p>
     <b>Project:</b> <%= link_to h(@investigation.project.name),@investigation.project %>

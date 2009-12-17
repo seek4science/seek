@@ -15,6 +15,11 @@
         </span>
         <%= link_to h(study.title),study_path(study) %>
       </p>
+      
+      <p class="id">
+        <label>ID: </label>
+        <%= study.id -%>
+      </p>
 
       <div class="box_standout">
         <%= text_or_not_specified(study.description, :description => true,:auto_link=>true,:length=>300) %>

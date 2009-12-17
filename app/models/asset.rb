@@ -4,6 +4,10 @@ class Asset < ActiveRecord::Base
   belongs_to :project
   belongs_to :policy
   
+  has_many :assay_assets, :dependent => :destroy
+  has_many :assays, :through => :assay_assets
+  
+  
   has_and_belongs_to_many :authors, :join_table => 'asset_authors', :class_name => 'Person', :association_foreign_key => 'author_id'
   
   # TODO

@@ -9,6 +9,11 @@
       <p class="title">
         <%= link_to h(investigation.title),investigation %>
       </p>
+      
+      <p class="id">
+        <label>ID: </label>
+        <%= investigation.id -%>
+      </p>
 
       <div class="box_standout">
         <%= text_or_not_specified(investigation.description, :description => true,:auto_link=>true,:length=>300) %>
