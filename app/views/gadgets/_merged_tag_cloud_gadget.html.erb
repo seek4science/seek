@@ -11,9 +11,9 @@
         <div class="popularity">
           <%
           min_count = MERGED_TAG_THRESHOLD
-          tag_cloud = Person.expertise_counts + Person.tool_counts
-          all_tags=tag_cloud.select{|tag| tag.count>=min_count}
-          show_tags=tag_cloud.sort{|a,b| b.count<=>a.count}[0..9]
+          tag_cloud = Tag.find(:all)
+          all_tags=tag_cloud.select{|tag| tag.total>=min_count}
+          show_tags=tag_cloud.sort{|a,b| b.total<=>a.total}[0..9]
           hidden_tags=all_tags.size != show_tags.size
           hidden_class="merged_tag_hidden"
           %>

@@ -20,4 +20,8 @@ class Tag < ActiveRecord::Base
   def count
     read_attribute(:count).to_i
   end
+
+  def total
+    taggings.select{|tg| !tg.taggable.nil?}.count
+  end
 end

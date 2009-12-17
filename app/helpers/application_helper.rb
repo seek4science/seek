@@ -10,6 +10,15 @@ module ApplicationHelper
 
   end
 
+  def tag_cloud(tags, classes)
+    max_count = tags.sort_by(&:total).last.total.to_f
+
+    tags.each do |tag|
+      index = ((tag.total / max_count) * (classes.size - 1)).round
+      yield tag, classes[index]
+    end
+  end
+
   #returns true if the current user is associated with a profile that is marked as a PAL
   def current_user_is_pal?
     current_user && current_user.person && current_user.person.is_pal?
