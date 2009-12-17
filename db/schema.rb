@@ -122,7 +122,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",           :default => 1
+    t.integer  "version"
   end
 
   create_table "disciplines", :force => true do |t|
@@ -257,7 +257,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                    :default => 1
+    t.integer  "version"
   end
 
   create_table "organisms", :force => true do |t|
@@ -382,7 +382,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",           :default => 1
+    t.integer  "version"
   end
 
   create_table "studied_factors", :force => true do |t|
