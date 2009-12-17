@@ -7,14 +7,14 @@
 
   <div class="contents" style="text-align: left">
     <ul style="margin: 0 0 0 1em">
-    <% organisms = Organism.all%>
-    <% organisms[0...5].sort_by{|o| -o.assays.count - o.models.count - o.projects.count}.each do |organism| %>
+    <% organisms = Organism.all.sort_by{|o| -o.assays.count - o.models.count - o.projects.count} %>
+    <% organisms[0...5].each do |organism| %>
       <li><i><%= link_to organism.title, organism%></i></li>
     <% end %>    
     </ul> 
     <% if organisms.count > 5 %>   
       <ul id = "hidden_organisms" style="margin: 0 0 0 1em; display: none;">
-      <% organisms[5...organisms.count].sort_by{|o| -o.assays.count - o.models.count - o.projects.count}.each do |organism| %>
+      <% organisms[5...organisms.count].each do |organism| %>
         <li><i><%= link_to organism.title, organism%></i></li>
       <% end %>    
       </ul>
