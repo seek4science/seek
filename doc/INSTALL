@@ -6,7 +6,7 @@ If using mysql you will need to install the mysql gem (gem install mysql) which 
 
 1. Install the rmagic gem - gem install rmagick. This requires that ImageMagick or an equivalent is installed, along with the development libraries (probably libmagick++9-dev).
 2. Copy config/database.default.yml to config/database.yml and edit accordingly
-3. rake db:migrate (preceded by rake db:create:all if the database doesn't already exist)
+3. rake db:schema:load (preceded by rake db:create:all if the database doesn't already exist)
 4. rake seek:refresh_controlled_vocabs - this prepopultes the database with a dummy user and a predefined list of tags assigned to them
 5. To start, run script/server
 
