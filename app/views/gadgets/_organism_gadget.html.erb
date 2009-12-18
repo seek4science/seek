@@ -1,55 +1,59 @@
 <div id="organism_gadget" class="sysmo_gadget"  >
-  
+
 
   <div class="header">
     Organisms
   </div>
 
-  <div class="contents" style="text-align: left">
-    <ul style="margin: 0 0 0 1em">
-    <% organisms = Organism.all.sort_by{|o| -o.assays.count - o.models.count - o.projects.count} %>
-    <% organisms[0...5].each do |organism| %>
-      <li><i><%= link_to organism.title, organism%></i></li>
-    <% end %>    
+  <div class="contents">
+    <ul>
+      <% organisms = Organism.all.sort_by{|o| -o.assays.count - o.models.count - o.projects.count} %>
+      <% organisms[0...5].each do |organism| %>
+        <li>
+          <%= link_to organism.title, organism%>
+        </li>
+      <% end %>
     </ul> 
-    <% if organisms.count > 5 %>   
-      <ul id = "hidden_organisms" style="margin: 0 0 0 1em; <%= cookies["expanded_organism_box"] == "true" ? "" : "display: none;" -%>">
-      <% organisms[5...organisms.count].each do |organism| %>
-        <li><i><%= link_to organism.title, organism%></i></li>
-      <% end %>    
+    <% if organisms.count > 5 %>
+      <ul id = "hidden_organisms" style="<%= cookies["expanded_organism_box"] == "true" ? "" : "display: none;" -%>">
+        <% organisms[5...organisms.count].each do |organism| %>
+          <li>
+            <%= link_to h(organism.title), organism  -%>
+          </li>
+        <% end %>
       </ul>
       <div class="expand_collapse_tags_button">
-        <%= link_to_function(image_tag("folds/unfold.png"), nil, 
-                :style => cookies["expanded_organism_box"] == "true" ? "display: none;" : "", :id => "expand_organisms", 
-                :onclick => "toggleExpandOrganismsBox();")%>
-        <%= link_to_function(image_tag("folds/fold.png"), nil, 
-                :style => cookies["expanded_organism_box"] == "true" ? "" : "display: none;", :id => "collapse_organisms", 
-                :onclick => "toggleExpandOrganismsBox();")%>
+        <%= link_to_function(image_tag("folds/unfold.png"), nil,
+          :style => cookies["expanded_organism_box"] == "true" ? "display: none;" : "", :id => "expand_organisms",
+          :onclick => "toggleExpandOrganismsBox();")%>
+        <%= link_to_function(image_tag("folds/fold.png"), nil,
+          :style => cookies["expanded_organism_box"] == "true" ? "" : "display: none;", :id => "collapse_organisms",
+          :onclick => "toggleExpandOrganismsBox();")%>
       </div>
     <% end %>
   </div>
 </div>    
 
 <script type="text/javascript">
-function toggleExpandOrganismsBox () {
+  function toggleExpandOrganismsBox () {
   
-  var box_status = getCookie("expanded_organism_box");
-  var el = document.getElementById("hidden_organisms");
-  var expand_button = document.getElementById("expand_organisms");
-  var collapse_button = document.getElementById("collapse_organisms");
+    var box_status = getCookie("expanded_organism_box");
+    var el = document.getElementById("hidden_organisms");
+    var expand_button = document.getElementById("expand_organisms");
+    var collapse_button = document.getElementById("collapse_organisms");
   
-  if (box_status == "true") {
-    setCookie("expanded_organism_box",false,"","/");
-    Effect.BlindUp(el,{duration:0.2});
-    expand_button.style.display = '';
-    collapse_button.style.display = 'none';
+    if (box_status == "true") {
+      setCookie("expanded_organism_box",false,"","/");
+      Effect.BlindUp(el,{duration:0.2});
+      expand_button.style.display = '';
+      collapse_button.style.display = 'none';
+    }
+    else
+    {
+      setCookie("expanded_organism_box",true,"","/");
+      Effect.BlindDown(el,{duration:0.2});
+      expand_button.style.display = 'none';
+      collapse_button.style.display = '';
+    }
   }
-  else
-  {
-    setCookie("expanded_organism_box",true,"","/");
-    Effect.BlindDown(el,{duration:0.2});
-    expand_button.style.display = 'none';
-    collapse_button.style.display = '';
-  }  
-} 
 </script>
