@@ -8,10 +8,10 @@ class ModelsController < ApplicationController
 
   before_filter :login_required
 
-  before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata ]
+  before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
 
   before_filter :find_models, :only => [ :index ]
-  before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata ]
+  before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   before_filter :find_display_model, :only=>[:show,:download]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
@@ -42,6 +42,15 @@ class ModelsController < ApplicationController
     end
   end
 
+  def delete_model_metadata
+    attribute=params[:attribute]
+    if attribute=="model_type"
+      delete_model_type params
+    elsif attribute=="model_format"
+      delete_model_format params
+    end
+  end
+
 
   def update_model_metadata
     attribute=params[:attribute]
@@ -50,6 +59,56 @@ class ModelsController < ApplicationController
     elsif attribute=="model_format"
       update_model_format params
     end
+  end
+
+  def delete_model_type params
+    id=params[:selected_model_type_id]
+    model_type=ModelType.find(id)
+    success=false
+    if (model_type.models.empty?)
+      if model_type.delete
+        msg="OK. #{model_type.title} was successfully removed."
+        success=true
+      else
+        msg="ERROR. There was a problem removing #{model_type.title}"
+      end
+    else
+      msg="ERROR - Cannot delete #{model_type.title} because it is in use."
+    end
+
+    render :update do |page|
+      page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
+      page.replace_html "model_type_info","#{msg}<br/>"
+      info_colour= success ? "green" : "red"
+      page << "$('model_type_info').style.color='#{info_colour}';"
+      page.visual_effect :appear, "model_type_info"
+    end
+    
+  end
+
+  def delete_model_format params
+    id=params[:selected_model_format_id]
+    model_format=ModelFormat.find(id)
+    success=false
+    if (model_format.models.empty?)
+      if model_format.delete
+        msg="OK. #{model_format.title} was successfully removed."
+        success=true
+      else
+        msg="ERROR. There was a problem removing #{model_format.title}"
+      end
+    else
+      msg="ERROR - Cannot delete #{model_format.title} because it is in use."
+    end
+
+    render :update do |page|
+      page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
+      page.replace_html "model_format_info","#{msg}<br/>"
+      info_colour= success ? "green" : "red"
+      page << "$('model_format_info').style.color='#{info_colour}';"
+      page.visual_effect :appear, "model_format_info"      
+    end
+
   end
 
   def create_model_metadata
@@ -89,12 +148,13 @@ class ModelsController < ApplicationController
 
   end
 
+
   def create_model_type params
     title=white_list(params[:model_type])
     success=false
     if ModelType.find(:first,:conditions=>{:title=>title}).nil?
-      m=ModelType.new(:title=>title)
-      if m.save
+      new_model_type=ModelType.new(:title=>title)
+      if new_model_type.save
         msg="OK. Model type #{title} added."
         success=true
       else
@@ -111,6 +171,7 @@ class ModelsController < ApplicationController
       info_colour= success ? "green" : "red"
       page << "$('model_type_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_type_info"
+      page << "model_types_for_deletion.push(#{new_model_type.id});" if success
 
     end
   end
@@ -119,8 +180,8 @@ class ModelsController < ApplicationController
     title=white_list(params[:model_format])
     success=false
     if ModelFormat.find(:first,:conditions=>{:title=>title}).nil?
-      m=ModelFormat.new(:title=>title)
-      if m.save
+      new_model_format=ModelFormat.new(:title=>title)
+      if new_model_format.save
         msg="OK. Model format #{title} added."
         success=true
       else
@@ -137,6 +198,7 @@ class ModelsController < ApplicationController
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_format_info"
+      page << "model_formats_for_deletion.push(#{new_model_format.id});" if success
 
     end
   end

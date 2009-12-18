@@ -88,11 +88,11 @@ end
 
 load 'config/environment_local.rb' if FileTest.exist?('config/environment_local.rb')
 
-EMAIL_ENABLED=false unless Object.const_defined?("EMAIL_ENABLED")
-SOLR_ENABLED=false unless Object.const_defined?("SOLR_ENABLED")
-ACTIVATION_REQUIRED=false unless Object.const_defined?("ACTIVATION_REQUIRED")
-ENABLE_GOOGLE_ANALYTICS=false unless Object.const_defined?("ENABLE_GOOGLE_ANALYTICS")
-MERGED_TAG_THRESHOLD=5 unless Object.const_defined?("MERGED_TAG_THRESHOLD")
+EMAIL_ENABLED=false unless defined? EMAIL_ENABLED
+SOLR_ENABLED=false unless defined? SOLR_ENABLED
+ACTIVATION_REQUIRED=false unless defined? ACTIVATION_REQUIRED
+ENABLE_GOOGLE_ANALYTICS=false unless defined? ENABLE_GOOGLE_ANALYTICS
+MERGED_TAG_THRESHOLD=5 unless defined? MERGED_TAG_THRESHOLD
 
 # Set Google Analytics code
 if ENABLE_GOOGLE_ANALYTICS
