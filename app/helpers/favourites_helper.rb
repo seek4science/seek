@@ -11,15 +11,15 @@ module FavouritesHelper
     tiny_image = ""
     case item.class.name.downcase
       when "datafile", "sop"   
-        tiny_image = image_tag(file_type_icon_url(item), :style => "padding: 11px; border:1px solid #{item.class.name == "Sop" ? "#CCCCFF" : "#FFCCCC"};background-color:#FFFFFF;")
+        tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
       when "model"
-        tiny_image = image_tag "/images/famfamfam_silk/bricks.png", :style => "padding: 11px; border:1px solid #CCCCCC;background-color:#FFFFFF;"
+        tiny_image = image_tag "/images/famfamfam_silk/bricks.png", :class=>"fav_icon"
       when "investigation"
-        tiny_image = image_tag "/images/famfamfam_silk/magnifier.png", :style => "padding: 11px; border:1px solid #CCCCCC;background-color:#FFFFFF;"
+        tiny_image = image_tag "/images/famfamfam_silk/magnifier.png", :class=>"fav_icon"
       when "study"
-        tiny_image = image_tag "/images/famfamfam_silk/book_open.png", :style => "padding: 11px; border:1px solid #CCCCCC;background-color:#FFFFFF;"
+        tiny_image = image_tag "/images/famfamfam_silk/book_open.png", :class=>"fav_icon"
       when "assay"
-        tiny_image = image_tag "/images/famfamfam_silk/report.png", :style => "padding: 11px; border:1px solid #CCCCCC;background-color:#FFFFFF;"
+        tiny_image = image_tag "/images/famfamfam_silk/report.png", :class=>"fav_icon"
       when "person", "project", "institution"
         tiny_image = avatar(item, 32, true)
     end
@@ -36,13 +36,8 @@ module FavouritesHelper
   #an avatar with an icon in the corner to show it can be favourited
   def favouritable_icon(item, size=100)
     #the icon:
-    html = avatar(item, size, true)
-    if ["DataFile","Model","Sop","Investigation","Study","Assay"].include?(item.class.name)
-      floating_text = "<div class=\"avatar_text\" style=\"width:#{size+10}px;\">#{item.class.name.titleize}</div>"
-    else
-      floating_text = ""
-    end  
-    html = "<div style=\"width: #{size+10}px; height: #{size+10}px\" class=\"favouritable_icon\">#{html}#{floating_text}</div>"
+    html = avatar(item, size, true)    
+    html = "<div class='favouritable_icon'>#{html}</div>"
     html = link_to_draggable(html, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(item)))
     return html
   end 

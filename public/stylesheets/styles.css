@@ -727,3 +727,24 @@ div.avatar_text {
     list-style:none;
     font-style: normal;
 }
+
+img.fav_icon {
+    border: 1px solid rgb(204, 204, 255);
+    min-width: 1.5em;
+    min-height: 2em;
+    padding: 3px;
+    background-color: rgb(255, 255, 255);
+}
+
+div.favouritable_icon img {
+    padding: 2px;
+}
+
+a.asset img.avatar {
+    padding :1em;
+    border:1px solid #CCCCCC;
+    background-color: #FFFFFF;
+    min-width :3em;
+    min-height: 3em;
+}
+

@@ -252,15 +252,15 @@ module ApplicationHelper
     when "admin"
       "admin.png"
     when "pdf_file"
-      return "famfamfam_silk/page_white_acrobat.png"
+      return "file_icons/small/pdf.png"
     when "xls_file"
-      return "famfamfam_silk/page_white_excel.png"
+      return "file_icons/small/xls.png"
     when "doc_file"
-      return "famfamfam_silk/page_white_word.png"
+      return "file_icons/small/doc.png"
     when "misc_file"
-      return "famfamfam_silk/page_white.png"
+      return "file_icons/small/genericBlue.png"
     when "ppt_file"
-      return "famfamfam_silk/page_white_powerpoint.png"
+      return "file_icons/small/ppt.png"
     else
       return nil
     end
@@ -368,31 +368,31 @@ module ApplicationHelper
     case object.class.name.downcase
     when "person", "institution", "project"
       if object.avatar_selected?
-        img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
+        img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed avatar'
       else
         img = null_avatar(object.class.name, size, alternative)
       end
     when "datafile", "sop"
       img = image_tag file_type_icon_url(object),
             :alt => alt,
-            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+            :class=> "framed avatar"
     when "model"
       img = image_tag "/images/famfamfam_silk/bricks.png",
             :alt => alt,
-            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+            :class=>"framed avatar"
     when "investigation"
       img = image_tag "/images/famfamfam_silk/magnifier.png",
             :alt => alt,
-            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+            :class=>"framed avatar"
     when "study"
       img = image_tag "/images/famfamfam_silk/book_open.png",
             :alt => alt,
-            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"
+            :class=>"framed avatar"
 
     when "assay"
       img = image_tag "/images/famfamfam_silk/report.png",
             :alt => alt,
-            :style => "padding: #{(((size-8)/2)-1)}px; border:1px solid #CCCCCC; background-color: #FFFFFF;"      
+            :class => "framed avatar"
     end
     
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
