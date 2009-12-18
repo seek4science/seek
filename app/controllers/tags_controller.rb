@@ -2,7 +2,7 @@ class TagsController < ApplicationController
   def show
     @tag = Tag.find_by_id(params[:id])
     taggings = @tag.taggings
-    @tagged_objects = select_authorised taggings.collect{|tagging| tagging.taggable}
+    @tagged_objects = select_authorised taggings.collect{|tagging| tagging.taggable}.uniq
     
     if @tagged_objects.empty?
       flash.now[:notice]="No objects found with tag '<b>#{@tag.name}</b>'."
