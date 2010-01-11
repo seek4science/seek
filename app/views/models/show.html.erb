@@ -27,7 +27,7 @@
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
 
-<h1 class="contribution_title">Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
+<h1 class="contribution_title">Model: <%= link_to(h(@display_model.title), model_path(@model,:version=>@display_model.version)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @model } -%>
 

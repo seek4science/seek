@@ -4,10 +4,11 @@
 module Jerm
   class Populator
 
+    #adds a resource to the central SEEK archive, referenced by the remote URI, or creates new version if already exists.
     def populate resource
       resource.populate
-      puts resource.to_s
+      
     end
-    
+
   end
 end

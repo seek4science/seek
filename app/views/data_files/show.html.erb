@@ -28,7 +28,7 @@
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
-<h1 class="contribution_title">Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
+<h1 class="contribution_title">Data file: <%= link_to(h(@display_data_file.title), data_file_path(@data_file,:version=>@display_data_file.version)) -%></h1>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @data_file } -%>
 
