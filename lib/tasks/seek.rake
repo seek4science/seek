@@ -171,7 +171,7 @@ namespace :seek do
   end
 
   task :update_first_letters => :environment do
-    (Person.find(:all)|Project.find(:all)|Institution.find(:all)).each do |p|
+    (Person.find(:all)|Project.find(:all)|Institution.find(:all)|Model.find(:all)|DataFile.find(:all)|Sop.find(:all)|Assay.find(:all)|Study.find(:all)|Investigation.find(:all)).each do |p|
       #suppress the timestamps being recorded.
       class << p
         def record_timestamps

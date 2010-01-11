@@ -8,6 +8,7 @@ class InvestigationsController < ApplicationController
 
   def index
     @investigations=Investigation.find(:all, :include=>:studies, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
+    @investigations=Investigation.paginate :page=>params[:page]
 
     respond_to do |format|
       format.html

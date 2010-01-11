@@ -1,5 +1,6 @@
 require 'acts_as_resource'
 require 'explicit_versioning'
+require 'grouped_pagination'
 
 class DataFile < ActiveRecord::Base
 
@@ -20,6 +21,11 @@ class DataFile < ActiveRecord::Base
   acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED  
   
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
+  
+  before_save :update_first_letter
+  
+  grouped_pagination
+  
 
   explicit_versioning(:version_column => "version") do
     
@@ -70,6 +76,10 @@ class DataFile < ActiveRecord::Base
     datafiles_with_contributors.delete(nil)
 
     return datafiles_with_contributors.to_json
+  end
+  
+  def update_first_letter
+    self.first_letter = strip_first_letter(title)
   end
 
 end

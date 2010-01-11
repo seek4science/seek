@@ -10,6 +10,7 @@ class DataFilesController < ApplicationController
 
   def index
     @data_files=Authorization.authorize_collection("show",@data_files,current_user)
+    @data_files=DataFile.paginate_after_fetch(@data_files, :page=>params[:page])
     respond_to do |format|
       format.html # index.html.erb
       format.xml { render :xml=>@data_files}
