@@ -34,7 +34,9 @@ module GroupedPagination
       page = options[:page] || @pages.first
 
       records=[]
-      if @pages.include?(page)
+      if page == "all"
+        records=self.find(:all)
+      elsif @pages.include?(page)
         conditions = merge_optional_conditions(options[:conditions], page)
         query_options = [:conditions=>conditions]
         query_options[0].merge!(options.except(:conditions,:page))                
