@@ -2,17 +2,17 @@
 # and open the template in the editor.
 
 require 'alfresco_harvester'
-require 'ba_cell_resource'
+require 'ba_cell_sysmo_resource'
 
 module Jerm
-  class BaCellHarvester < AlfrescoHarvester
+  class BaCellSysmoHarvester < AlfrescoHarvester
 
     def construct_resource item
-      BaCellResource.new(item,@username,@password)
+      BaCellSysmoResource.new(item,@username,@password)
     end
 
     def project_name
-      "BaCell"
+      "BaCell-SysMO"
     end
   end
 end

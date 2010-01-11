@@ -3,10 +3,10 @@
 require 'alfresco_resource'
 
 module Jerm
-  class BaCellResource < AlfrescoResource
+  class BaCellSysmoResource < AlfrescoResource
 
     def project_name
-      "BaCell"
+      "BaCell-SysMO"
     end
   
   end
