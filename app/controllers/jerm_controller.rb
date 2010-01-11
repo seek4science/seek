@@ -39,8 +39,10 @@ class JermController < ApplicationController
     #removes hyphens from project name
     clean_project_name=project_name.gsub("-","")
     discover_harvesters if @@harvesters.nil?
-    harvester_class=@@harvesters.find do |h|      
-      h.name.downcase.include?(clean_project_name.downcase)
+    
+    harvester_class=@@harvesters.find do |h|
+      puts "comparing #{h.name.downcase} with #{clean_project_name.downcase}"
+      h.name.downcase.starts_with?("jerm::"+clean_project_name.downcase)
     end
     raise Exception.new("Unable to find Harvester for project #{project_name}") if harvester_class.nil?
     return harvester_class.new(uname,pwd)
