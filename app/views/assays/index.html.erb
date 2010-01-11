@@ -2,16 +2,11 @@
     <li><%= icon "new", new_assay_path, "New assay", nil, "New assay" %></li>
 </ul>
 
-<% if @assays.public_methods.include?("page_count") %>
+<% if @assays.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @assays } -%>
+  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @assays.pages, :page_totals=>@assays.page_totals,:current_page=>@assays.page } -%>
 <% end %>
 
 <div class="list_items_container">
   <%= render :partial => "assays/resource_list_item", :collection=>@assays %>
 </div>
-
-<% if @assays.public_methods.include?("page_count") %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @assays } -%>
-<% end %>

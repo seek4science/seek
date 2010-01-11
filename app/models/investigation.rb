@@ -1,3 +1,5 @@
+require 'grouped_pagination'
+
 class Investigation < ActiveRecord::Base
   
   belongs_to :project
@@ -14,6 +16,10 @@ class Investigation < ActiveRecord::Base
            :dependent => :destroy
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
+  
+  before_save :update_first_letter
+  
+  grouped_pagination  
 
   def can_edit? user
     user.person.projects.include?(project)
@@ -29,6 +35,10 @@ class Investigation < ActiveRecord::Base
   
   def sops
     assays.collect{|assay| assay.sops}.flatten.uniq
+  end
+  
+  def update_first_letter
+    self.first_letter = strip_first_letter(title)
   end
   
 end

@@ -1,6 +1,6 @@
 require 'acts_as_resource'
 require 'explicit_versioning'
-
+require 'grouped_pagination'
 
 class Sop < ActiveRecord::Base
   acts_as_resource
@@ -22,6 +22,11 @@ class Sop < ActiveRecord::Base
   has_one :investigation,:through=>:study
              
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
+  
+  before_save :update_first_letter
+  
+  grouped_pagination
+  
 
   explicit_versioning(:version_column => "version") do
     
@@ -77,4 +82,8 @@ class Sop < ActiveRecord::Base
   def organism_title
     organism.nil? ? "" : organism.title
   end 
+  
+  def update_first_letter
+    self.first_letter = strip_first_letter(title)
+  end
 end

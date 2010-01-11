@@ -1,3 +1,5 @@
+require 'grouped_pagination'
+
 class Assay < ActiveRecord::Base    
   
   belongs_to :assay_type
@@ -27,6 +29,10 @@ class Assay < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organism]) if SOLR_ENABLED
   
+  before_save :update_first_letter
+  
+  grouped_pagination
+  
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
    
@@ -51,6 +57,10 @@ class Assay < ActiveRecord::Base
 
   def data_files
     assay_assets.data_files.collect{|df| df.versioned_resource}
+  end
+  
+  def update_first_letter
+    self.first_letter = strip_first_letter(title)
   end
   
 end

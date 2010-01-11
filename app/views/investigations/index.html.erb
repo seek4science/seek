@@ -2,16 +2,11 @@
     <li><%= icon "new", new_investigation_path, "New investigation", nil, "New investigation" %></li>
 </ul>
 
-<% if @investigations.public_methods.include?("page_count") %>
+<% if @investigations.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @investigations } -%>
+  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @investigations.pages, :page_totals=>@investigations.page_totals,:current_page=>@investigations.page } -%>
 <% end %>
 
 <div class="list_items_container">
   <%= render :partial => "investigations/resource_list_item", :collection=>@investigations %>
 </div>
-
-<% if @investigations.public_methods.include?("page_count") %>
-  <!-- only do the page links if the collection supports it -->
-  <%= render :partial => "layouts/paginate", :locals => { :collection => @investigations } -%>
-<% end %>

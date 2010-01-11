@@ -15,6 +15,38 @@ module GroupedPagination
       include GroupedPagination::InstanceMethods
       extend GroupedPagination::SingletonMethods
     end
+    
+    def paginate_after_fetch(collection, *args)
+      options=args.pop unless args.nil?
+      options ||= {}
+      
+      page = options[:page] || @pages.first
+      
+      records=[]
+      if page == "all"
+        records=collection
+      elsif @pages.include?(page)           
+        records=collection.select {|i| i.first_letter == page}        
+      end
+
+      page_totals={}
+      @pages.each do |p|
+        page_totals[p]=collection.select {|i| i.first_letter == p}.size            
+      end
+      
+      result = Collection.new(records, page, @pages, page_totals)
+
+      #jump to the first page with content if no page is specified and their is no content in the first page.
+      if (result.empty? && options[:page].nil?)
+        first_page_with_content = result.pages.find{|p| result.page_totals[p]>0}
+        unless first_page_with_content.nil?
+          options[:page]=first_page_with_content
+          result=self.paginate_after_fetch(collection, options)
+        end
+      end
+
+      result
+    end
   end
 
   module SingletonMethods

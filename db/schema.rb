@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091216112218) do
+ActiveRecord::Schema.define(:version => 20100111153308) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -40,7 +40,8 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.integer  "study_id"
     t.integer  "organism_id"
     t.integer  "owner_id"
-    t.integer  "culture_growth_type_id", :default => 0
+    t.integer  "culture_growth_type_id",              :default => 0
+    t.string   "first_letter",           :limit => 1
   end
 
   create_table "asset_authors", :id => false, :force => true do |t|
@@ -108,6 +109,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "first_letter",      :limit => 1
   end
 
   create_table "data_files", :force => true do |t|
@@ -123,6 +125,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "version"
+    t.string   "first_letter",      :limit => 1
   end
 
   create_table "disciplines", :force => true do |t|
@@ -200,6 +203,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "first_letter", :limit => 1
   end
 
   create_table "measured_items", :force => true do |t|
@@ -239,6 +243,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
+    t.string   "first_letter",               :limit => 1
   end
 
   create_table "models", :force => true do |t|
@@ -258,6 +263,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.integer  "model_type_id"
     t.integer  "model_format_id"
     t.integer  "version"
+    t.string   "first_letter",               :limit => 1
   end
 
   create_table "organisms", :force => true do |t|
@@ -369,6 +375,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
+    t.string   "first_letter",      :limit => 1
   end
 
   create_table "sops", :force => true do |t|
@@ -383,6 +390,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.integer  "version"
+    t.string   "first_letter",      :limit => 1
   end
 
   create_table "studied_factors", :force => true do |t|
@@ -408,6 +416,7 @@ ActiveRecord::Schema.define(:version => 20091216112218) do
     t.integer  "organism_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "first_letter",          :limit => 1
   end
 
   create_table "taggings", :force => true do |t|

@@ -1,5 +1,6 @@
 require 'acts_as_resource'
 require 'explicit_versioning'
+require 'grouped_pagination'
 
 class Model < ActiveRecord::Base
 
@@ -25,6 +26,11 @@ class Model < ActiveRecord::Base
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if SOLR_ENABLED
 
   has_many :created_datas
+  
+  before_save :update_first_letter
+  
+  grouped_pagination
+  
   
   explicit_versioning(:version_column => "version") do
     
@@ -75,6 +81,10 @@ class Model < ActiveRecord::Base
 
   def organism_name
     organism.title unless organism.nil?
+  end
+  
+  def update_first_letter
+    self.first_letter = strip_first_letter(title)
   end
   
 end

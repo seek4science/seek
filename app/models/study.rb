@@ -1,3 +1,5 @@
+require 'grouped_pagination'
+
 class Study < ActiveRecord::Base
 
   belongs_to :investigation
@@ -20,6 +22,11 @@ class Study < ActiveRecord::Base
   validates_uniqueness_of :title
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
+  
+  before_save :update_first_letter
+  
+  grouped_pagination
+  
 
   def sops    
     assays.collect{|assay| assay.sops.collect{|sop| sop}}.flatten.uniq    
@@ -35,6 +42,10 @@ class Study < ActiveRecord::Base
   
   def data_files
     assays.collect{|assay| assay.data_files.collect{|df| df  }}.flatten.uniq
+  end
+  
+  def update_first_letter
+    self.first_letter = strip_first_letter(title)
   end
 
 end

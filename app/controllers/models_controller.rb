@@ -20,6 +20,7 @@ class ModelsController < ApplicationController
   # GET /models.xml
   def index
     @models=Authorization.authorize_collection("show",@models,current_user)
+    @models=Model.paginate_after_fetch(@models, :page=>params[:page])
     respond_to do |format|
       format.html # index.html.erb
       format.xml { render :xml=>@models}
