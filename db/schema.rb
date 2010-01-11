@@ -124,7 +124,7 @@ ActiveRecord::Schema.define(:version => 20100111153308) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
   end
 
@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(:version => 20100111153308) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
   end
 
@@ -389,7 +389,7 @@ ActiveRecord::Schema.define(:version => 20100111153308) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
   end
 
