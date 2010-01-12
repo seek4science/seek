@@ -5,10 +5,10 @@
     Drag an icon here to remember for future reference.<br/>    
   </span>
 <% else %>
-  <% for fav in favourites %>
+  <% favourites.sort_by{|a| Asset::ASSET_ORDER.index(a.resource_type)}.each do |fav| %>
     <%= fav_image_tag(fav) %>
   <% end %>
-  <% for sav in saved_searches %>
+  <% saved_searches.each do |sav| %>
     <%= saved_search_image_tag(sav) %>
   <% end %>
 <% end %>
