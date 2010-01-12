@@ -40,7 +40,7 @@ class PeopleController < ApplicationController
       #FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
       @people=@people.select{|p| !(p.group_memberships & @role.group_memberships).empty?}
     else
-      @people=Person.paginate :page=>params[:page]
+      @people=Person.paginate :page=>params[:page], :order=>:last_name
     end
 
     respond_to do |format|
