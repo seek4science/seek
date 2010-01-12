@@ -23,3 +23,4 @@ config.action_controller.cache_store = [:file_store, "#{RAILS_ROOT}/tmp/cache"]
 # config.action_mailer.raise_delivery_errors = false
 #
 #
+SOLR_ENABLED=true
