@@ -16,8 +16,6 @@ class FavouritesSweeper < ActionController::Caching::Sweeper
   private
 
   def expire_cache(fav)
-    id="favourites/user/#{fav.user.id}"
-    puts "Expiring Favourites Cached for '#{id}'"
-    expire_fragment(id)
+    expire_fragment("favourites/user/#{fav.user.id}")
   end
 end

@@ -1,9 +1,6 @@
 <% if logged_in? -%>
-    <%= render :partial => "gadgets/new_object_gadget" -%>
-    <% cache_id="favourites/user/#{current_user.id}"
-       puts "Cached with ID #{cache_id}"
-    -%>
-    <% cache cache_id do -%>
+    <%= render :partial => "gadgets/new_object_gadget" -%>    
+    <% cache "favourites/user/#{current_user.id}" do -%>
         <%= render :partial => "gadgets/favourites" -%>
     <% end -%>
 <% else -%>
