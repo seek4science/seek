@@ -19,6 +19,7 @@ debug.log
 public/javascripts/js_cached.js
 public/stylesheets/css_cached.css
 tmp/pids/*
+tmp/cache/*
 tmp/data.sql
 .tmp*
 *~
