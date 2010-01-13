@@ -8,7 +8,7 @@ require 'digest/sha1'
 
 module SimpleCrypt
 
-  def enc object,key
+  def encrypt object,key
     y=object.to_yaml
 
     c = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
@@ -20,7 +20,7 @@ module SimpleCrypt
     return e
   end
 
-  def dec encryption,key
+  def decrypt encryption,key
 
     c = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
     c.decrypt

@@ -1,7 +1,10 @@
 require 'acts_as_editable'
 require 'grouped_pagination'
+require 'simple_crypt'
 
 class Project < ActiveRecord::Base
+
+  include SimpleCrypt
   
   acts_as_editable
   
@@ -50,6 +53,10 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :organisms  
   
   acts_as_solr(:fields => [ :name , :description, :locations],:include=>[:organisms]) if SOLR_ENABLED
+
+  attr_accessor :site_username,:site_password
+
+  before_save :set_credentials
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|
@@ -127,4 +134,14 @@ class Project < ActiveRecord::Base
     studies.collect{|s| s.assays}.flatten.uniq
   end
 
+  def set_credentials
+    cred={:username=>site_username,:password=>site_password}
+    self.site_credentials=encrypt(cred,generate_key(GLOBAL_KEY))
+  end
+
+  def decrypt_credentials
+    cred=decrypt(site_credentials,generate_key(GLOBAL_KEY))
+    self.site_password=cred[:password]
+    self.site_username=cred[:username]
+  end
 end
