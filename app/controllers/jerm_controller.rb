@@ -14,9 +14,10 @@ class JermController < ApplicationController
     password=params[:pwd]
 
     @project=Project.find(project_id)
-
+    @project.decrypt_credentials
+    
     begin
-      harvester = construct_project_harvester(@project.title,username,password)
+      harvester = construct_project_harvester(@project.title,@project.site_username,@project.site_password)
       @results = harvester.update
     rescue Exception => @exception
       puts @exception
