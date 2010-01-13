@@ -136,11 +136,11 @@ class Project < ActiveRecord::Base
 
   def set_credentials
     cred={:username=>site_username,:password=>site_password}
-    self.site_credentials=encrypt(cred,generate_key(GLOBAL_KEY))
+    self.site_credentials=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
   end
 
   def decrypt_credentials
-    cred=decrypt(site_credentials,generate_key(GLOBAL_KEY))
+    cred=decrypt(site_credentials,generate_key(GLOBAL_PASSPHRASE))
     self.site_password=cred[:password]
     self.site_username=cred[:username]
   end
