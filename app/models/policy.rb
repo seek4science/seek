@@ -47,7 +47,7 @@ class Policy < ActiveRecord::Base
   # *****************************************************************************
   
   
-  def self.create_or_update_policy(resource, current_user, params)
+  def self.create_or_update_policy(resource, user, params)
     # this method will return an error message is something goes wrong (empty string in case of success)
     error_msg = ""
     
@@ -74,7 +74,7 @@ class Policy < ActiveRecord::Base
       
       policy = Policy.new(:name => 'auto',
                           :contributor_type => 'User',
-                          :contributor_id => current_user.id,
+                          :contributor_id => user.id,
                           :sharing_scope => sharing_scope,
                           :access_type => access_type,
                           :use_custom_sharing => use_custom_sharing,

@@ -8,11 +8,11 @@ module Jerm
   
     attr_reader :base_uri
 
-    def initialize(user, pass, populator)
+    def initialize(user, pass)
       @username = user
       @password = pass
 
-      @populator=populator
+      @populator=EmbeddedPopulator.new
     end
     
     def update
