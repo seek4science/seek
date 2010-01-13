@@ -140,8 +140,12 @@ class Project < ActiveRecord::Base
   end
 
   def decrypt_credentials
-    cred=decrypt(site_credentials,generate_key(GLOBAL_PASSPHRASE))
-    self.site_password=cred[:password]
-    self.site_username=cred[:username]
+    begin
+      cred=decrypt(site_credentials,generate_key(GLOBAL_PASSPHRASE))
+      self.site_password=cred[:password]
+      self.site_username=cred[:username]
+    rescue
+      
+    end
   end
 end

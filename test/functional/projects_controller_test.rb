@@ -172,6 +172,24 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select "select#project_institution_ids",:count=>0
   end
 
+  test "admins can edit credentials" do
+    get :edit, :id=>projects(:sysmo_project)
+    assert_response :success
+    assert_select "h2",:text=>"Remote site credentials",:count=>1
+    assert_select "input#project_site_username",:count=>1
+    assert_select "input[type='password']#project_site_password",:count=>1
+  end
+
+  test "non admins cannot edit credentials" do
+    login_as(:pal_user)
+    get :edit, :id=>projects(:sysmo_project)
+    assert_response :success
+    assert_select "h2",:text=>"Remote site credentials",:count=>0
+    assert_select "input#project_site_username",:count=>0
+    assert_select "input#project_site_password",:count=>0
+    assert_select "input[type='password']#project_site_password",:count=>0
+  end
+
   private
 
   def valid_project

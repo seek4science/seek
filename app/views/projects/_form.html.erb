@@ -45,6 +45,7 @@
 	  <%= f.collection_select :institution_ids, Institution.find(:all, :order=>:name), :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
 	</div>
 </div>
+<%= render :partial=>"site_credentials",:locals=>{:f=>f} %>
 <% end -%>
 
 <p style="margin-top: 2em; text-align: center;">
