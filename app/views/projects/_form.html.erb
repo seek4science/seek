@@ -35,7 +35,7 @@
 	<%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => project, :form_instance => f } -%>
 <% end -%>
 
-
+<% if current_user.is_admin? -%>
 <h2 style="margin-top: 2em;">Participating Institutions</h2>
 
 <div style="text-align: center;">
@@ -45,6 +45,7 @@
 	  <%= f.collection_select :institution_ids, Institution.find(:all, :order=>:name), :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
 	</div>
 </div>
+<% end -%>
 
 <p style="margin-top: 2em; text-align: center;">
   <%= f.submit(project ? "Update" : "Create") -%>

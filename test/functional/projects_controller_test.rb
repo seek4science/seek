@@ -1,6 +1,8 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectsControllerTest < ActionController::TestCase
+
+  include AuthenticatedTestHelper
   
   fixtures :all
   
@@ -8,8 +10,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :index
     assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
   end
-
-  include AuthenticatedTestHelper
+  
   def setup
     login_as(:quentin)
   end
@@ -153,6 +154,22 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select "a",:count=>0
       assert_select "span.none_text",:text=>"No Pals for this project",:count=>1
     end
+  end
+
+  test "admin can edit institutions" do
+    #quentin is an admin
+    get :edit, :id=>projects(:sysmo_project)
+    assert_response :success
+    assert_select "h2",:text=>"Participating Institutions",:count=>1
+    assert_select "select#project_institution_ids",:count=>1
+  end
+
+  test "non admin cannnot edit institutions" do
+    login_as(:pal_user)
+    get :edit, :id=>projects(:sysmo_project)
+    assert_response :success
+    assert_select "h2",:text=>"Participating Institutions",:count=>0
+    assert_select "select#project_institution_ids",:count=>0
   end
 
   private

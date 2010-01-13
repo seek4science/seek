@@ -279,8 +279,8 @@ pal_user:
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: nil
   is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
 
 
