@@ -370,31 +370,31 @@ module ApplicationHelper
     case object.class.name.downcase
     when "person", "institution", "project"
       if object.avatar_selected?
-        img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed avatar'
+        img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
       else
         img = null_avatar(object.class.name, size, alternative)
       end
     when "datafile", "sop"
       img = image_tag file_type_icon_url(object),
             :alt => alt,
-            :class=> "framed avatar"
+            :class=> "avatar framed"
     when "model"
       img = image_tag "/images/famfamfam_silk/bricks.png",
             :alt => alt,
-            :class=>"framed avatar"
+            :class=>"avatar framed"
     when "investigation"
       img = image_tag "/images/famfamfam_silk/magnifier.png",
             :alt => alt,
-            :class=>"framed avatar"
+            :class=>"avatar framed"
     when "study"
       img = image_tag "/images/famfamfam_silk/book_open.png",
             :alt => alt,
-            :class=>"framed avatar"
+            :class=>"avatar framed"
 
     when "assay"
       img = image_tag "/images/famfamfam_silk/report.png",
             :alt => alt,
-            :class => "framed avatar"
+            :class => "avatar framed"
     end
     
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
