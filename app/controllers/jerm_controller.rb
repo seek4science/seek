@@ -9,6 +9,10 @@ class JermController < ApplicationController
   end
 
   def test
+    Sop.destroy_all
+    Model.destroy_all
+    DataFile.destroy_all
+
     project_id=params[:project]
     username=params[:name]
     password=params[:pwd]
@@ -18,7 +22,9 @@ class JermController < ApplicationController
     
     begin
       harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
-      @results = harvester.update
+      @responses = harvester.update
+      response_order=[:success,:fail,:skipped]
+      @responses=@responses.sort_by{|a| response_order.index(a[:response])}
     rescue Exception => @exception
       puts @exception
     end
@@ -27,7 +33,7 @@ class JermController < ApplicationController
       if @exception
         page.replace_html :results,:partial=>"exception",:object=>@exception
       else
-        page.replace_html :results,:partial=>"results",:object=>@results
+        page.replace_html :results,:partial=>"results",:object=>@responses
       end
       
     end

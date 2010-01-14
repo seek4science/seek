@@ -15,18 +15,19 @@ module Jerm
       #FIXME: fix inconsitency between root_uri, and base_uri
       @base_uri=root_uri
 
+      #FIXME: populator type needs to be configurable, and not even sure it belongs here but perhaps better external to the Harvester.
       @populator=EmbeddedPopulator.new
     end
     
     def update
+      responses=[]
       items = changed_since(last_run)
       resources = []
       items.each do |item|
         resource = construct_resource(item)
-        populate resource
-        resources << resource
+        responses << populate(resource)        
       end
-      return resources
+      return responses
     end
 
     def last_run
@@ -34,7 +35,7 @@ module Jerm
     end
 
     def populate resource
-      @populator.populate resource
+      return @populator.populate resource
     end
 
   end

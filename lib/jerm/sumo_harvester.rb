@@ -1,12 +1,5 @@
 module Jerm
-  class SumoHarvester < WikiHarvester
-    
-    def update    
-      resources = changed_since(last_run)
-      resources.each do |resource|
-        populate resource
-      end
-    end
+  class SumoHarvester < WikiHarvester        
     
     def changed_since(date)
       @changed_since_date = date #TODO: use this for something
@@ -17,6 +10,11 @@ module Jerm
       
       get_links(@base_uri, 0)
       return @resources.uniq
+    end
+
+    def construct_resource resource
+      #already is of type Resource
+      return resource
     end
   
     private
