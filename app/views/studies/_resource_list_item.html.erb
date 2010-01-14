@@ -13,15 +13,5 @@
 <%= list_item_simple_list resource.assays, "Assays" %>
 
 <% study = resource %>
-
-<!--- This might be useful
-      <div class="assays">
-        <div style="margin-top: 0.3em;">
-          <p style="margin-left: 1em;">
-            <%= render :partial=>"studies/simple_assay_list",:locals=>{:assays=>study.assays} %>
-          </p>
-        </div>
-      </div>
---->
       
 <%= list_item_timestamp resource %>

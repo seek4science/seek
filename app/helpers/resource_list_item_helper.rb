@@ -6,7 +6,8 @@ module ResourceListItemHelper
   end
   
   def get_list_item_actions_partial resource
-    case resource.class.name
+    name = resource.class.name.split("::")[0]
+    case name
       when "DataFile","Model","Sop"
         actions_partial = "assets/resource_actions_td"
       else

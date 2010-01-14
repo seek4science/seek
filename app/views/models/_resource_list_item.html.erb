@@ -8,13 +8,13 @@
 
 <%= list_item_optional_attribute "Associated project", resource.project.try(:title), resource.project %>
 
-<%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism, "Not specified" %>
+<%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>
 
-<%= list_item_optional_attribute "Model type", resource.model_type, nil, "Not specified" %>
+<%= list_item_optional_attribute "Model type", resource.model_type.try(:title) %>
 
-<%= list_item_optional_attribute "Model format", resource.model_format, nil, "Not specified"  %>
+<%= list_item_optional_attribute "Model format", resource.model_format.try(:title) %>
 
-<%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title), nil, "Unknown"  %>
+<%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title) %>
 
 <%= list_item_timestamp resource.asset %>
 
