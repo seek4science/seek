@@ -33,22 +33,23 @@ module Jerm
         #create SOP,DataFile or Model (or other type that may be added in the future)
         begin
         resource_model=eval("#{resource.type}.new")
-        resource_model.project=project
-        resource_model.title=resource.uri
+        resource_model.project=project        
         resource_model.contributor=author.user
         #associate with ContentBlob
         resource_model.content_blob = ContentBlob.new(:url=>resource.uri)
-        resource_model.original_filename = "fred.pdf"
+        resource_model.original_filename = resource.uri.split("/").last
+        #FIXME: need to determine and set a proper title
+        resource_model.title=resource_model.original_filename
         #save it
-        #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy
+        #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
         resource_model.save!
         #assign default policy, and save the associated asset
         policy = default_policy(author,project)
         resource_model.asset.policy=policy
         resource_model.asset.save!
-        response={:response=>:success,:message=>"Successfully added"}
-        rescue Exception
-          response={:response=>:fail,:message=>"Something went wrong",:exception=>e}
+        response={:response=>:success,:message=>"Successfully added",:seek_model=>resource_model}
+        rescue Exception=>exception
+          response={:response=>:fail,:message=>"Something went wrong",:exception=>exception}
         end
       end
       return response
