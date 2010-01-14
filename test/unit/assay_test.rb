@@ -5,7 +5,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "sops association" do
     assay=assays(:metabolomics_assay)
-    assert_equal 3,assay.sops.size
+    assert_equal 2,assay.sops.size
     assert assay.sops.include?(sops(:my_first_sop).versions.first)
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
