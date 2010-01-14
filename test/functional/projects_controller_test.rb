@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/../test_helper'
+require 'libxml'
 
 class ProjectsControllerTest < ActionController::TestCase
 
@@ -188,6 +189,30 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select "input#project_site_username",:count=>0
     assert_select "input#project_site_password",:count=>0
     assert_select "input[type='password']#project_site_password",:count=>0
+  end
+
+  test "site_credentials hidden from show xml" do
+    @request.env['HTTP_ACCEPT'] = 'application/xml'
+    get :show, :id=>projects(:sysmo_project)
+    assert_response :success    
+    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
+    document = parser.parse
+    assert !document.find("//name").empty?,"There should be a field 'name'"
+    assert document.find("//site-credentials").empty?,"There should not be a field 'site-credentials'"
+    assert document.find("//site-password").empty?,"There should not be a field 'site-username'"
+    assert document.find("//site-username").empty?,"There should not be a field 'site-password'"
+  end
+
+  test "site_credentials hidden from index xml" do
+    @request.env['HTTP_ACCEPT'] = 'application/xml'
+    get :index,:page=>"all"
+    assert_response :success
+    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
+    document = parser.parse    
+    assert !document.find("//name").empty?,"There should be a field 'name'"
+    assert document.find("//site-credentials").empty?,"There should not be a field 'site-credentials'"
+    assert document.find("//site-password").empty?,"There should not be a field 'site-username'"
+    assert document.find("//site-username").empty?,"There should not be a field 'site-password'"
   end
 
   private

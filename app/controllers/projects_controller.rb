@@ -19,9 +19,8 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @projects }
-    end
-    
+      format.xml  { render :xml => @projects.to_xml(:except=>"site_credentials")  }
+    end    
   end
 
   # GET /projects/1
@@ -31,7 +30,7 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @project }
+      format.xml  { render :xml => @project.to_xml(:except=>"site_credentials") }
     end
   end
 
