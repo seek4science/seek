@@ -8,9 +8,12 @@ module Jerm
   
     attr_reader :base_uri
 
-    def initialize(user, pass)
+    def initialize(root_uri,user, pass)
       @username = user
       @password = pass
+
+      #FIXME: fix inconsitency between root_uri, and base_uri
+      @base_uri=root_uri
 
       @populator=EmbeddedPopulator.new
     end

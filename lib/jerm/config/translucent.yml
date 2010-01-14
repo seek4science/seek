@@ -1,5 +1,3 @@
-base_uri: "http://kolibril.biologie.hu-berlin.de/~fkrause/publish.php"
-
 tables_and_types:
   phpr_mat_sop:
     type: SOP

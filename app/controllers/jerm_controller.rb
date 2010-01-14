@@ -17,7 +17,7 @@ class JermController < ApplicationController
     @project.decrypt_credentials
     
     begin
-      harvester = construct_project_harvester(@project.title,@project.site_username,@project.site_password)
+      harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
       @results = harvester.update
     rescue Exception => @exception
       puts @exception
@@ -36,7 +36,7 @@ class JermController < ApplicationController
 
   private
 
-  def construct_project_harvester project_name,uname,pwd
+  def construct_project_harvester project_name,root_uri,uname,pwd
     #removes hyphens from project name
     clean_project_name=project_name.gsub("-","")
     discover_harvesters if @@harvesters.nil?
@@ -46,7 +46,7 @@ class JermController < ApplicationController
       h.name.downcase.starts_with?("jerm::"+clean_project_name.downcase)
     end
     raise Exception.new("Unable to find Harvester for project #{project_name}") if harvester_class.nil?
-    return harvester_class.new(uname,pwd)
+    return harvester_class.new(root_uri,uname,pwd)
   end
 
   def discover_harvesters

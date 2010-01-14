@@ -15,7 +15,10 @@ module Jerm
                       "https://sysmolab.wikispaces.com/space/dav/pages_html/Enterococcus+faecalis",
                       "https://sysmolab.wikispaces.com/space/dav/pages_html/Streptococcus+pyogenes"]
                       
-    
+    def initialize root_uri,username,password
+      super root_uri,username,password      
+    end
+
     def update    
       resources = changed_since(last_run)
       resources.each do |resource|
