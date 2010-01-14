@@ -2,15 +2,14 @@ syntax: glob
 .idea/
 *.svn
 db/*.sqlite3
-config/environment_local.rb
 config/database.yml
+config/initializers/seek_local.rb
 *.DS_Store
 log/*.log
 vendor/plugins/acts_as_solr/solr/tmp/*_pid
 vendor/plugins/acts_as_solr/solr/solr/data/*
 vendor/plugins/acts_as_solr/solr/logs/*
 nbproject/*
-config/environment_local.rb
 filestore/*
 tmp/avatars/*
 tmp/models/*
