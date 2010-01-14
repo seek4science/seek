@@ -32,7 +32,7 @@ module ResourceListItemHelper
         if block_given?
           value = yield(i)
         else
-          value = (link_to get_object_title(i), i)
+          value = (link_to get_object_title(i), show_resource_path(i))
         end
         html << value + (i == items.last ? "" : ", ")
       end
@@ -48,7 +48,7 @@ module ResourceListItemHelper
     else
       items = items.sort{|a,b| get_object_title(a)<=>get_object_title(b)} if sort
       items.each do |i|
-        html << (link_to h(truncate(i.title,:length=>max_length)), i.class.name.include?("::Version") ? polymorphic_path(i.parent, :version => i.version) : i,:title=>get_object_title(i))
+        html << (link_to h(truncate(i.title,:length=>max_length)), show_resource_path(i), :title=>get_object_title(i))
         html << ", " unless items.last==i
       end
     end
@@ -60,16 +60,6 @@ module ResourceListItemHelper
       value = link_to value, url
     end
     return "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
-  end
-  
-  def list_item_double_attribute attribute1, value1, url1, attribute2, value2, url2=nil
-    unless url1.nil?
-      value1 = link_to value1, url1
-    end
-    unless url2.nil?
-      value2 = link_to value2, url2
-    end
-    return "<p class=\"list_item_attribute\"><b>#{attribute1}</b>: #{value1}<b style=\"margin-left:2em\">#{attribute2}</b>: #{value2}</p>"
   end
   
   def list_item_optional_attribute attribute, value, url=nil, missing_value_text="None specified"

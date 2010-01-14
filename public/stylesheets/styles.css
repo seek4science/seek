@@ -799,15 +799,16 @@ p.list_item_attribute {
 
 div.list_item_left_column{
   float: left;
-  margin-right: 1em;
   width: 45%;  
-  border-right: 1px dotted black;
 }
 
 div.list_item_right_column{
   float: left;
   margin-right: 1em;
-  width: 45%;  
+  margin-left: 1em;
+  padding-left: 1em;
+  width: 45%;
+  border-left: 1px dotted black;  
 }
 
 div.list_item_whole_width{
