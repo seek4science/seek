@@ -10,6 +10,8 @@ RAILS_GEM_VERSION = '2.3.5' unless defined? RAILS_GEM_VERSION
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
+SOLR_ENABLED=false unless defined? SOLR_ENABLED
+
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers
@@ -80,19 +82,19 @@ Rails::Initializer.run do |config|
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
 
-  
-  # this will make the Authorization module available throughout the codebase
-  require 'authorization'
-  
+
 end
+
+# this will make the Authorization module available throughout the codebase
+require 'authorization'
 
 load 'config/environment_local.rb' if FileTest.exist?('config/environment_local.rb')
 
 EMAIL_ENABLED=false unless defined? EMAIL_ENABLED
-SOLR_ENABLED=false unless defined? SOLR_ENABLED
 ACTIVATION_REQUIRED=false unless defined? ACTIVATION_REQUIRED
 ENABLE_GOOGLE_ANALYTICS=false unless defined? ENABLE_GOOGLE_ANALYTICS
 MERGED_TAG_THRESHOLD=5 unless defined? MERGED_TAG_THRESHOLD
+GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
 # Set Google Analytics code
 if ENABLE_GOOGLE_ANALYTICS
@@ -100,5 +102,7 @@ if ENABLE_GOOGLE_ANALYTICS
 else
   Rubaidh::GoogleAnalytics.tracker_id = nil
 end
+
+
 
 

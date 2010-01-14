@@ -1,6 +1,6 @@
 <% if logged_in? -%>
-    <%= render :partial => "gadgets/new_object_gadget" -%>
-    <% cache "favourites_#{current_user.id}" do %>
+    <%= render :partial => "gadgets/new_object_gadget" -%>    
+    <% cache "favourites/user/#{current_user.id}" do -%>
         <%= render :partial => "gadgets/favourites" -%>
     <% end -%>
 <% else -%>

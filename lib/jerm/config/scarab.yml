@@ -1,5 +1,3 @@
-base_uri: "webdav://sysmo-alginate.net/Root/"
-
 directories_and_types:
   Models:
     ext: [xml]

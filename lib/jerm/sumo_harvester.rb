@@ -15,7 +15,7 @@ module Jerm
       @resources = Array.new
       @searched_uris = Array.new    
       
-      get_links("http://sysmo-sumo.mpi-magdeburg.mpg.de/trac/wiki/LIMS/Experiments", 0)
+      get_links(@base_uri, 0)
       return @resources.uniq
     end
   

@@ -7,13 +7,12 @@ module Jerm
 
     include WebDav
   
-    def initialize username,password
-      super username,password
+    def initialize root_uri,username,password
+      super root_uri,username,password
 
       configpath=File.join(File.dirname(__FILE__),"config/#{project_name.downcase}.yml")
       @config=YAML::load_file(configpath)
-      @directories_and_types=@config['directories_and_types']
-      @base_uri=@config['base_uri']
+      @directories_and_types=@config['directories_and_types']      
     end
 
     def authenticate

@@ -24,8 +24,7 @@ module Authorization
   #
   # Note: there is no method overloading in Ruby and it's a good idea to have a default "nil" value for "user";
   #       this leaves no other choice as to have (sometimes) redundant "thing_type" parameter.
-  def Authorization.is_authorized?(action_name, thing_type, thing, user=nil)
-    thing_instance = nil
+  def Authorization.is_authorized?(action_name, thing_type, thing, user=nil)    
     thing_asset = nil
     thing_id = nil
     user_instance = nil

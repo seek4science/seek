@@ -22,7 +22,30 @@ class ProjectTest < ActiveSupport::TestCase
   def test_title_alias_for_name
     p=projects(:sysmo_project)
     assert_equal p.name,p.title
-  end  
+  end
+
+  def test_set_credentials
+    p=Project.new(:title=>"test project")
+    p.site_password="12345"
+    p.site_username="fred"
+    p.save!
+    assert_not_nil p.site_credentials
+  end
+
+  def test_decrypt_credentials
+    p=projects(:sysmo_project)
+    p.site_password="12345"
+    p.site_username="fred"
+    p.save!
+
+    p=Project.find(p.id)
+    assert_nil p.site_username, "site username should be nil until requested"
+    assert_nil p.site_password, "site password should be nil until requested"
+
+    p.decrypt_credentials
+    assert_equal "fred",p.site_username
+    assert_equal "12345",p.site_password
+  end
 
   def test_projects_with_userless_people
     projects=Project.with_userless_people

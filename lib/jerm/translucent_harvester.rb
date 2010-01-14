@@ -6,11 +6,10 @@ require 'jerm/translucent_resource'
 
 module Jerm
   class TranslucentHarvester < Harvester
-    def initialize username,key
-      super username,key
+    def initialize root_uri,username,key
+      super root_uri,username,key
       configpath=File.join(File.dirname(__FILE__),"config/#{project_name.downcase}.yml")
-      @config=YAML::load_file(configpath)
-      @base_uri=@config['base_uri']
+      @config=YAML::load_file(configpath)      
       @tables_and_types=@config['tables_and_types']
     end
 
