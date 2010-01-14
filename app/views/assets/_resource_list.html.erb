@@ -1,17 +1,13 @@
 <% authorization_for_showing_already_done ||= false -%>
 <% narrow_view ||= false -%>
 
-<% odd_row = false -%>
-
 <% unless collection.empty? -%>
   <div class="list_items_container">
 
     <% collection.each do |item| -%>    
-		  <% if authorization_for_showing_already_done || Authorization.is_authorized?("show", nil, item, current_user) -%>
-			  <% odd_row = !odd_row -%>        
-				<%= render :partial => "#{get_original_model_name(item).pluralize.underscore}/resource_list_item",:object=>item, :locals => {:odd_row => odd_row, :narrow_view => narrow_view } -%>
+		  <% if authorization_for_showing_already_done || Authorization.is_authorized?("show", nil, item, current_user) -%>  
+				<%= render :partial => "layouts/resource_list_item",:object=>item -%>
 			<% end -%>
 		<% end -%>
 	</div>
 <% end -%>
-

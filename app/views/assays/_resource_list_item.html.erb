@@ -1,74 +1,31 @@
-<% assay = resource_list_item %>
+<%= list_item_title resource %>
 
-<table class="list_item">
-  <tr>
-    <td style="width: 100px;">
-      <%= favouritable_icon(assay, 60) -%>
-    </td>
-    <td class="item_details">
-      <p class="name">
-        <%= link_to h(assay.title), assay %>
-      </p>
-      
-      <p class="id">
-        <label>ID: </label>
-        <%= assay.id -%>
-      </p>
+<%= list_item_attribute "ID", resource.id %>
 
-      <div class="box_standout">
-        <%= text_or_not_specified(assay.description, :description => true,:auto_link=>true,:length=>300) %>
-      </div>
+<%= list_item_description resource.description %>
 
-      <p class="assay_type">
-        <label>Assay type:</label>
-        <%= link_to h(assay.assay_type.title.capitalize), assay.assay_type %>
-        <label style="margin-left: 1em">Technology type:</label>
-        <%= link_to h(assay.technology_type.title.capitalize), assay.technology_type %>
-      </p>
+<div class="list_item_left_column">
+<%= list_item_attribute "Assay type", resource.assay_type.title.capitalize, resource.assay_type %>
 
-      <p class="projects">
-        <label>Project: </label>
-        <%= projects_link_list [assay.project] %>
-      </p>
+<%= list_item_attribute "Technology type", resource.technology_type.title.capitalize, resource.technology_type %>
 
-      <p class="investigation">
-      <label>Investigation: </label><%= investigation_link(assay.investigation) %>
+<%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>
 
-      </p>
+<%= list_item_optional_attribute "Culture growth", resource.culture_growth_type.try(:title) %>
+</div>
 
-      <p class="studies">
-        <label>Study: </label>
-        <%= studies_link_list [assay.study] %>
-      </p>
+<div class="list_item_right_column">
+<%= list_item_attribute "Project", resource.project.title, resource.project %>
 
-      <p class="organism">
-        <label>Organism:</label>
-        <%= organism_link_to assay.organism %>
-      </p>
+<%= list_item_attribute "Investigation", resource.investigation.title, resource.investigation %>
 
-      <p class="culture_growth_type">
-        <label>Culture growth:</label>
-        <%= model_title_or_not_specified(assay.culture_growth_type) %>
-      </p>
+<%= list_item_attribute "Study", resource.study.title, resource.study %>
+</div>
 
-      <p class="Sops">
-        <label>Sops: </label>
-        <%= sops_link_list assay.sops, true, 200 %>
-      </p>
+<div class="list_item_whole_width">
+<%= list_item_authorized_list resource.sops, "SOPs", true, 200 %>
 
-      <p class="Data">
-        <label>Data: </label>
-        <%= data_file_link_list assay.data_files, true, 200 %>
-      </p>
-      
-      <p>
-        <b>Created:</b> <%= assay.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% unless assay.created_at == assay.updated_at -%>          
-          <b>Last updated:</b> <%= assay.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% end %>
-      </p>      
+<%= list_item_authorized_list resource.data_files, "Data", true, 200 %>
 
-    </td>
-
-  </tr>
-</table>
+<%= list_item_timestamp resource %>
+</div>

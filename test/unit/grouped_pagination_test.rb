@@ -146,5 +146,15 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal "A", @people.page
     assert_equal people(:person_for_pagination_order_test),@people.first
   end
-
+  
+  def test_show_all
+    @people=Person.paginate :page=>"all"
+    assert_equal Person.all.size, @people.size
+  end
+  
+  def test_post_fetch_pagination
+    sops = Sops.all
+    result = Sops.paginate_after_fetch(sops)
+    assert !result.empty? #Check there's something on the first page    
+  end
 end

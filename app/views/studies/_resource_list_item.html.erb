@@ -1,50 +1,20 @@
-<% study=resource_list_item %>
+<%= list_item_title resource %>
 
-<table class="list_item">
-  <tr>
-    <td style="width: 100px;">
-      <%= favouritable_icon(study, 60) -%>
-    </td>
-    <td class="item_details">
-      <p class="name">
+<%= list_item_attribute "ID", resource.id %>
 
-        <span style="float: right; font-size: 77%;">
-          <% if mine? study -%>
-            <%= icon "edit", edit_study_path(study), nil, nil, "Edit" -%>
-          <% end -%>
-        </span>
-        <%= link_to h(study.title),study_path(study) %>
-      </p>
-      
-      <p class="id">
-        <label>ID: </label>
-        <%= study.id -%>
-      </p>
+<%= list_item_description resource.description %>
 
-      <div class="box_standout">
-        <%= text_or_not_specified(study.description, :description => true,:auto_link=>true,:length=>300) %>
-      </div>
+<%= list_item_attribute "Project", resource.project.title, resource.project %>
 
-      <p class="project">
-        <label>Project:</label>
-        <%= projects_link_list [study.project] %>
-      </p>
-      <p class="investigation">
-        <label>Investigation: </label>
-        <%= investigation_link study.investigation %>
-      </p>
-      
-      <div>
-        <p class="person">
-          <label>Person responsible:</label>
-          <% if study.person_responsible -%>
-            <%= link_to h(study.person_responsible.name),study.person_responsible %>
-          <% else -%>
-            <span class="none_text">Not specified</span>
-          <% end -%>
-        </p>
-      </div>
+<%= list_item_attribute "Investigation", resource.investigation.title, resource.investigation %>
 
+<%= list_item_optional_attribute "Person responsible", resource.person_responsible.try(:name), resource.person_responsible, "Not specified" %>
+
+<%= list_item_simple_list resource.assays, "Assays" %>
+
+<% study = resource %>
+
+<!--- This might be useful
       <div class="assays">
         <div style="margin-top: 0.3em;">
           <p style="margin-left: 1em;">
@@ -52,15 +22,6 @@
           </p>
         </div>
       </div>
+--->
       
-      <p style="font-size: 85%; margin-top: 0.3em;">
-        <b>Created:</b> <%= study.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% unless study.created_at == study.updated_at -%>          
-          <b>Last updated:</b> <%= study.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% end %>
-      </p>
-
-    </td>
-
-  </tr>
-</table>
+<%= list_item_timestamp resource %>
