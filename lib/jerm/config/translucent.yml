@@ -1,50 +1,50 @@
 tables_and_types:
   phpr_mat_sop:
-    type: SOP
+    type: Sop
   phpr_mod_models:
     type: Model
   phpr_exp_cc:
-    type: Data
+    type: DataFile
   phpr_exp_gfp:
-    type: Data
+    type: DataFile
   phpr_exp_growthc:
-    type: Data
+    type: DataFile
   phpr_exp_growthdt:
-    type: Data
+    type: DataFile
   phpr_exp_kinetic:
-    type: Data
+    type: DataFile
   phpr_exp_ma_sample:
-    type: Data
+    type: DataFile
   phpr_exp_ma_compare:
-    type: Data
+    type: DataFile
   phpr_exp_nmr_biosample:
-    type: Data
+    type: DataFile
   phpr_exp_nmr_experiment:
-    type: Data
+    type: DataFile
   phpr_exp_ionflux:
-    type: Data
+    type: DataFile
   phpr_exp_ppchip:
-    type: Data
+    type: DataFile
   phpr_mat_deletions:
-    type: Data
+    type: DataFile
   phpr_mat_oligonucleotide:
-    type: Data
+    type: DataFile
   phpr_mat_othermat:
-    type: Data
+    type: DataFile
   phpr_mat_plasmid:
-    type: Data
+    type: DataFile
   phpr_mat_strain:
-    type: Data  
+    type: DataFile
   phpr_mod_pathway:
-    type: Data
+    type: DataFile
   phpr_exp_mife:
-    type: Data
+    type: DataFile
   phpr_exp_membranepotential:
-    type: Data
+    type: DataFile
   phpr_exp_cytosolicph:
-    type: Data
+    type: DataFile
   phpr_exp_cellvolume:
-    type: Data
+    type: DataFile
 
 
 #  phpr_isa_investigation:
