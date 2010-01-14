@@ -1,7 +1,12 @@
-<h2>Remote site credentials</h2>
+<h2>Remote site details</h2>
 <%
 @project.decrypt_credentials
 %>
+
+<p>
+  <%= f.label :location -%><br/>
+  <%= f.text_field :site_root_uri -%>
+</p>
 
 <p>
   <%= f.label :username -%><br/>

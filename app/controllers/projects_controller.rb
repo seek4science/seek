@@ -13,13 +13,11 @@ class ProjectsController < ApplicationController
 
   # GET /projects
   # GET /projects.xml
-  def index
-    
+  def index   
     @projects = Project.paginate :page=>params[:page]
-
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @projects.to_xml(:except=>"site_credentials")  }
+      format.xml  { render :xml => @projects.to_xml(:except=>["site_credentials","site_root_uri"])  }
     end    
   end
 
@@ -27,10 +25,9 @@ class ProjectsController < ApplicationController
   # GET /projects/1.xml
   def show
     @project = Project.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @project.to_xml(:except=>"site_credentials") }
+      format.xml  { render :xml => @project.to_xml(:except=>["site_credentials","site_root_uri"]) }
     end
   end
 

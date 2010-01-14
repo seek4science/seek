@@ -176,7 +176,7 @@ class ProjectsControllerTest < ActionController::TestCase
   test "admins can edit credentials" do
     get :edit, :id=>projects(:sysmo_project)
     assert_response :success
-    assert_select "h2",:text=>"Remote site credentials",:count=>1
+    assert_select "h2",:text=>"Remote site details",:count=>1
     assert_select "input#project_site_username",:count=>1
     assert_select "input[type='password']#project_site_password",:count=>1
   end
@@ -185,10 +185,23 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(:pal_user)
     get :edit, :id=>projects(:sysmo_project)
     assert_response :success
-    assert_select "h2",:text=>"Remote site credentials",:count=>0
+    assert_select "h2",:text=>"Remote site details",:count=>0
     assert_select "input#project_site_username",:count=>0
     assert_select "input#project_site_password",:count=>0
     assert_select "input[type='password']#project_site_password",:count=>0
+  end
+  
+  test "admins can edit site uri" do
+    get :edit, :id=>projects(:sysmo_project)
+    assert_response :success    
+    assert_select "input#project_site_root_uri",:count=>1
+  end
+
+  test "non admins cannot edit site root uri" do
+    login_as(:pal_user)
+    get :edit, :id=>projects(:sysmo_project)
+    assert_response :success
+    assert_select "input#project_site_root_uri",:count=>0
   end
 
   test "site_credentials hidden from show xml" do
@@ -213,6 +226,26 @@ class ProjectsControllerTest < ActionController::TestCase
     assert document.find("//site-credentials").empty?,"There should not be a field 'site-credentials'"
     assert document.find("//site-password").empty?,"There should not be a field 'site-username'"
     assert document.find("//site-username").empty?,"There should not be a field 'site-password'"
+  end
+
+  test "site_root_uri hidden from index xml" do
+    @request.env['HTTP_ACCEPT'] = 'application/xml'
+    get :index,:page=>"all"
+    assert_response :success
+    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
+    document = parser.parse
+    assert !document.find("//name").empty?,"There should be a field 'name'"
+    assert document.find("//site-root-uri").empty?,"There should not be a field 'site-root-uri'"
+  end
+
+  test "site_root_uri hidden from show xml" do
+    @request.env['HTTP_ACCEPT'] = 'application/xml'
+    get :show, :id=>projects(:sysmo_project)
+    assert_response :success
+    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
+    document = parser.parse
+    assert !document.find("//name").empty?,"There should be a field 'name'"
+    assert document.find("//site-root-uri").empty?,"There should not be a field 'site-root-uri'"
   end
 
   private
