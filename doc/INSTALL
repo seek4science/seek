@@ -4,23 +4,24 @@ Make sure you have rubygems 1.3.5 installed. This may require downloading from t
 
 If using mysql you will need to install the mysql gem (gem install mysql) which requires the mysql dev libraries to be installed.
 
-1. Install the rmagic gem - gem install rmagick. This requires that ImageMagick or an equivalent is installed, along with the development libraries (probably libmagick++9-dev).
-2. Copy config/database.default.yml to config/database.yml and edit accordingly
-3. rake db:schema:load (preceded by rake db:create:all if the database doesn't already exist)
-4. rake seek:refresh_controlled_vocabs - this prepopultes the database with a dummy user and a predefined list of tags assigned to them
-5. To start, run script/server
+- Install the rmagic gem - gem install rmagick. This requires that ImageMagick or an equivalent is installed, along with the development libraries (probably libmagick++9-dev).
+- Copy config/database.default.yml to config/database.yml and edit accordingly
+- rake db:schema:load (preceded by rake db:create:all if the database doesn't already exist)
+- make a copy of the config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb (the default settings shouldn't need changing at this point).
+- rake seek:refresh_controlled_vocabs - this prepopultes the database with a dummy user and a predefined list of tags assigned to them
+- To start, run script/server
 
 if using search
 
-5. make a config/environment_local.rb file, and add to it "SOLR_ENABLED=true"
-6. make sure the directories "vendor/plugins/acts_as_solr/solr/logs" and "vendor/plugins/acts_as_solr/solr/tmp" exist
-7. rake solr:start to start database server
-8. rake solr:reindex to reindex any existing data
+- in the config/initializers/seek_local.rb file , set "SOLR_ENABLED=true"
+- make sure the directories "vendor/plugins/acts_as_solr/solr/logs" and "vendor/plugins/acts_as_solr/solr/tmp" exist
+- rake solr:start to start database server
+-. rake solr:reindex to reindex any existing data
 
 defining admin users
 
 There is no support for this in the interface.
 You need to:
-1. connect to the database using script/console,
-2. find the User that you wish to make an admin (note User, not Person, if you know the Person you can do person.user)
-3, set the is_admin flag to true. Don't forget to 'user.save'.
+- connect to the database using script/console,
+- find the User that you wish to make an admin (note User, not Person, if you know the Person you can do person.user)
+- set the is_admin flag to true. Don't forget to 'user.save!'.
