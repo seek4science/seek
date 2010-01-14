@@ -9,8 +9,8 @@ class Project < ActiveRecord::Base
   acts_as_editable
   
   has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
+    :as => :resource,
+    :dependent => :destroy
   
   validates_presence_of :name
   validates_uniqueness_of :name
@@ -28,8 +28,8 @@ class Project < ActiveRecord::Base
   alias_attribute :title,:name
   
   has_many :avatars, 
-           :as => :owner,
-           :dependent => :destroy
+    :as => :owner,
+    :dependent => :destroy
 
   has_many :investigations
   has_many :studies, :through=>:investigations  
@@ -44,8 +44,8 @@ class Project < ActiveRecord::Base
   #  fully copied and assigned to belong to owners of assets, where identical policy
   #  is to be used)
   belongs_to :default_policy, 
-             :class_name => 'Policy',
-             :dependent => :destroy
+    :class_name => 'Policy',
+    :dependent => :destroy
   
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
@@ -135,8 +135,10 @@ class Project < ActiveRecord::Base
   end
 
   def set_credentials
-    cred={:username=>site_username,:password=>site_password}
-    self.site_credentials=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
+    unless site_username.nil? && site_password.nil?
+      cred={:username=>site_username,:password=>site_password}
+      self.site_credentials=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
+    end
   end
 
   def decrypt_credentials

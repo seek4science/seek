@@ -47,6 +47,22 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal "12345",p.site_password
   end
 
+  def test_credentials_not_updated_unless_password_and_username_provided
+    p=Project.new(:title=>"fred")
+    p.site_password="12345"
+    p.site_username="fred"
+    p.save!
+    cred=p.site_credentials
+    p=Project.find(p.id)
+    assert_equal cred,p.site_credentials
+    assert_nil p.site_password
+    assert_nil p.site_username
+    p.save!
+    assert_equal cred,p.site_credentials
+    p=Project.find(p.id)
+    assert_equal cred,p.site_credentials
+  end
+
   def test_projects_with_userless_people
     projects=Project.with_userless_people
     assert_not_nil projects, "The list should not be nil"
@@ -163,4 +179,6 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 1,project.pals.size
     assert project.pals.include?(pal)
   end
+
+
 end

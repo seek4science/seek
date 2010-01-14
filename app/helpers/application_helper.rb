@@ -235,6 +235,8 @@ module ApplicationHelper
       return "famfamfam_silk/lightning.png"
     when "warning"
       return "famfamfam_silk/error.png"
+    when "error"
+      return "famfamfam_silk/exclamation.png"
     when "feedback"
       return "famfamfam_silk/email.png"
     when "spinner"
