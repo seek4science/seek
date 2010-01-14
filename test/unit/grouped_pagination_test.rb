@@ -153,8 +153,9 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
   
   def test_post_fetch_pagination
-    sops = Sops.all
-    result = Sops.paginate_after_fetch(sops)
+    sops = Sop.all
+    sops.each {|s| s.save! if s.valid?} #Set first letters
+    result = Sop.paginate_after_fetch(sops)
     assert !result.empty? #Check there's something on the first page    
   end
 end
