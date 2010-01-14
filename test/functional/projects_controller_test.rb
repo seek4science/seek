@@ -110,7 +110,7 @@ class ProjectsControllerTest < ActionController::TestCase
     sop.save!
 
     get :show,:id=>projects(:sysmo_project)
-    assert_select "table.list_item div.desc" do
+    assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
     end
   end
@@ -122,7 +122,7 @@ class ProjectsControllerTest < ActionController::TestCase
     data_file.save!
 
     get :show,:id=>projects(:sysmo_project)
-    assert_select "table.list_item div.desc" do
+    assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
     end
   end
@@ -134,7 +134,7 @@ class ProjectsControllerTest < ActionController::TestCase
     model.save!
 
     get :show,:id=>projects(:sysmo_project)
-    assert_select "table.list_item div.desc" do
+    assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
     end
   end

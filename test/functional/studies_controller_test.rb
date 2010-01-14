@@ -156,28 +156,28 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select "h3",:text=>"Data Files (1)",:count=>1
     end
     
-    assert_select "table.list_item" do
+    assert_select "div.list_item" do
       #the Assay resource_list_item
-      assert_select "p.Sops a[title=?]",sops(:sop_with_fully_public_policy).title,:count=>1
-      assert_select "p.Sops a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
-      assert_select "p.Sops a[title=?]",sops(:sop_with_private_policy_and_custom_sharing).title,:count=>0
-      assert_select "p.Sops a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+      assert_select "p.list_item_attribute a[title=?]",sops(:sop_with_fully_public_policy).title,:count=>1
+      assert_select "p.list_item_attribute a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "p.list_item_attribute a[title=?]",sops(:sop_with_private_policy_and_custom_sharing).title,:count=>0
+      assert_select "p.list_item_attribute a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
 
-      assert_select "p.Data a[title=?]",data_files(:downloadable_data_file).title,:count=>1
-      assert_select "p.Data a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
-      assert_select "p.Data a[title=?]",data_files(:private_data_file).title,:count=>0
-      assert_select "p.Data a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0      
+      assert_select "p.list_item_attribute a[title=?]",data_files(:downloadable_data_file).title,:count=>1
+      assert_select "p.list_item_attribute a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "p.list_item_attribute a[title=?]",data_files(:private_data_file).title,:count=>0
+      assert_select "p.list_item_attribute a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0      
 
       #the Sops and DataFiles resource_list_item
-      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
-      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
-      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
-      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+      assert_select "p.list_item_title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "div.list_item_actions a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "p.list_item_title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+      assert_select "div.list_item_actions a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
 
-      assert_select "p.title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
-      assert_select "td.actions a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
-      assert_select "p.title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
-      assert_select "td.actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+      assert_select "p.list_item_title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "p.list_item_title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+      assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
     end
   end
 

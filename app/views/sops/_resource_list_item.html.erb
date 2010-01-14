@@ -1,63 +1,13 @@
-<%# this should be set by the caller, this is an extra check -%>
-<% resource=resource_list_item %>
-<% odd_row ||= false -%>
-<% narrow_view ||= false -%>
+<%= list_item_title resource %>
 
-<table class="list_item">       
-  <tr class="<%= odd_row ? "odd_row" : "even_row" -%>">
-    <td style="width: 100px;">
-      <%= favouritable_icon(resource, 60) -%>
-    </td>
+<%= list_item_attribute "Uploaded by", resource.asset.contributor.person.name, resource.asset.contributor.person %>
 
-    <td style="text-align: left;">
-      <p class="title">
-        <%= file_type_icon(resource)-%>
-        <% title = h(resource.title) -%>
-        <%= link_to(title, show_resource_path(resource)) -%>
-      </p>
-      
-      <p style="font-size: 85%; margin-top: 0.3em;">
-        <b>Uploaded by:</b> <%= link_to resource.asset.contributor.person.name, resource.asset.contributor.person -%>
-      </p>
-      
-      <% author_list = resource.asset.authors %>
-      <% unless author_list.empty? %>
-        <p style="font-size: 85%; margin-top: 0.3em;">
-          <b>Author<%= author_list.size > 1 ? "s" : "" -%>:</b> 
-          <% author_list.each do |author| %>
-          <%= (link_to author.name, author) + (author == author_list.last ? "" : ",") -%>
-          <% end %>
-        </p>
-      <% end %>
+<%= list_item_simple_list resource.asset.authors, "Author" %>
 
-      <p style="font-size: 85%; margin-top: 0.3em;">
-        <b>Version:</b> <%= resource.version -%>        
-      </p>
+<%= list_item_attribute "Version", resource.version %>
 
-      <p  style="font-size:85%; margin-top: 0.3em; padding-top: 0;">
-        <b>Associated project:</b> <%= (resource.project ? link_to(h(resource.project.name), project_path(resource.project.id)) : "<span class='none_text'>None</span>" ) -%>
-      </p>
-      
-      <p style="font-size: 85%; margin-top: 0.4em;">
-        <b>Created:</b> <%= resource.asset.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% unless resource.asset.created_at == resource.asset.updated_at -%>          
-          <b>Last updated:</b> <%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% end %>
-   
-      </p>
+<%= list_item_optional_attribute "Associated project", resource.project.try(:title), resource.project %>
 
-      <div class="desc" style="font-size: 85%;">
-        <% unless resource.description.blank? -%>
-          <%= text_or_not_specified(resource.description, :description => true,:auto_link=>true, :length=>500) -%>
-        <% else -%>
-          <span class="none_text">No description</span>
-        <% end -%>
-      </div>
-    </td>
+<%= list_item_timestamp resource.asset %>
 
-    <td class="actions" style="width: 80px;">
-      <%= render :partial=>"assets/resource_actions_td",:locals=>{:resource=>resource} %>
-    </td>
-
-  </tr>
-</table>
+<%= list_item_description resource.description %>

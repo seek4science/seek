@@ -619,7 +619,7 @@ module ApplicationHelper
   #Current decided by HIDE_DETAILS flag in environment_local.rb
   #Defaults to false
   def hide_contact_details?
-    defined? HIDE_DETAILS ? HIDE_DETAILS : false
+    (defined? HIDE_DETAILS) ? HIDE_DETAILS : false
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible

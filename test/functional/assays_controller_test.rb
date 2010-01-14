@@ -134,7 +134,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_response :success
     
-    assert_select "table.list_item td.actions" do
+    assert_select "div.list_item div.list_item_actions" do
       path=download_sop_path(sops(:my_first_sop),:version=>1)
       assert_select "a[href=?]",path,:minumum=>1      
     end
@@ -145,7 +145,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show,:id=>assays(:metabolomics_assay)
     assert_response :success
     
-    assert_select "table.list_item td.actions" do
+    assert_select "div.list_item div.list_item_actions" do
       path=sop_path(sops(:my_first_sop),:version=>1)
       assert_select "a[href=?]",path,:minumum=>1
     end
@@ -156,7 +156,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show,:id=>assays(:metabolomics_assay)
     assert_response :success
     
-    assert_select "table.list_item td.actions" do
+    assert_select "div.list_item div.list_item_actions" do
       path=edit_sop_path(sops(:my_first_sop))
       assert_select "a[href=?]",path,:minumum=>1
     end
@@ -167,7 +167,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show,:id=>assays(:metabolomics_assay)
     assert_response :success
 
-    assert_select "table.list_item td.actions" do
+    assert_select "div.list_item div.list_item_actions" do
       path=download_data_file_path(data_files(:picture),:version=>1)
       assert_select "a[href=?]",path,:minumum=>1
     end
@@ -178,7 +178,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show,:id=>assays(:metabolomics_assay)
     assert_response :success
 
-    assert_select "table.list_item td.actions" do
+    assert_select "div.list_item div.list_item_actions" do
       path=data_file_path(data_files(:picture),:version=>1)
       assert_select "a[href=?]",path,:minumum=>1
     end
@@ -189,7 +189,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show,:id=>assays(:metabolomics_assay)
     assert_response :success
 
-    assert_select "table.list_item td.actions" do
+    assert_select "div.list_item div.list_item_actions" do
       path=edit_data_file_path(data_files(:picture))
       assert_select "a[href=?]",path,:minumum=>1
     end
@@ -202,7 +202,7 @@ class AssaysControllerTest < ActionController::TestCase
     sop_version.save!
 
     get :show,:id=>assays(:metabolomics_assay)
-    assert_select "table.list_item div.desc" do
+    assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
     end
   end
@@ -214,7 +214,7 @@ class AssaysControllerTest < ActionController::TestCase
     data_file_version.save!
 
     get :show,:id=>assays(:metabolomics_assay)
-    assert_select "table.list_item div.desc" do
+    assert_select "div.list_item div.list_item_desc" do
       assert_select "a[rel=?]","nofollow",:text=>/news\.bbc\.co\.uk/,:minimum=>1
     end
   end
@@ -243,16 +243,16 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select "h3",:text=>"Data Files (1)",:count=>1
     end
 
-    assert_select "table.list_item" do
-      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
-      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
-      assert_select "p.title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
-      assert_select "td.actions a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+    assert_select "div.list_item" do
+      assert_select "p.list_item_title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "div.list_item_actions a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
+      assert_select "p.list_item_title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+      assert_select "div.list_item_actions a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
 
-      assert_select "p.title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
-      assert_select "td.actions a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
-      assert_select "p.title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
-      assert_select "td.actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+      assert_select "p.list_item_title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
+      assert_select "p.list_item_title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+      assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
     end
 
   end

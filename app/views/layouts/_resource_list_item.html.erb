@@ -1,0 +1,22 @@
+<% content_locals ||= {} %>
+<% actions_locals ||= {} %>
+<% resource = resource_list_item %>
+<% content_partial = get_list_item_content_partial(resource) %>
+<% actions_partial = get_list_item_actions_partial(resource) %>
+
+<div class="list_item">
+  <div class="list_item_avatar">
+    <%= favouritable_icon(resource, 60) -%>
+  </div>
+  <div class="list_item_content" style="width:<%= actions_partial.blank? ? "87%" : "75%" %>">
+    <%= render :partial=> content_partial,:locals=>content_locals.merge({:resource => resource}) %>
+  </div>
+  <% unless actions_partial.blank? %>
+    <div class="list_item_actions">
+      <%= render :partial=> actions_partial, :locals=>actions_locals.merge({:resource => resource}) %>
+    </div>
+  <% end %>
+</div>
+
+
+  
