@@ -112,7 +112,7 @@ class ProjectsController < ApplicationController
     @project.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     respond_to do |format|
-      if @proect.update_attributes(params[:project])
+      if @project.update_attributes(params[:project])
         
         policy_err_msg = Policy.create_or_update_default_policy(@project, current_user, params)
         
