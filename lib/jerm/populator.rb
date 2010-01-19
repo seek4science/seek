@@ -4,7 +4,13 @@
 module Jerm
   class Populator
 
-    MESSAGES={:exists=>"Already exists",:no_project=>"Unable to determine SEEK project",:no_uri=>"Location of resource missing",:no_author=>"Unable to determine the SEEK person for the author"}
+    MESSAGES={:exists=>"Already exists.",
+      :no_project=>"Unable to determine SEEK project.",
+      :no_uri=>"Location of resource missing.",
+      :no_author=>"Unable to determine the SEEK person for the author.",
+      :no_default_policy=>"Unable to determine the default policy for this project.",
+      :success=>"Successfully added."
+      }
 
     #adds a resource to the central SEEK archive, referenced by the remote URI, or creates new version if already exists.
     #returns a report:

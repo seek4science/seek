@@ -33,24 +33,30 @@ module Jerm
         elsif resource.uri.nil?
           response={:response=>:fail,:message=>MESSAGES[:no_uri]}
         else
-          #create SOP,DataFile or Model (or other type that may be added in the future)
-        
+          #create SOP,DataFile or Model (or other type that may be added in the future)        
           resource_model=eval("#{resource.type}.new")
           resource_model.contributor=author.user
           #associate with ContentBlob
           resource_model.content_blob = ContentBlob.new(:url=>resource.uri)
           resource_model.original_filename = resource.uri.split("/").last
+
           #FIXME: need to determine and set a proper title
-          resource_model.title=resource_model.original_filename
-          #save it
-          #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
-          resource_model.save!
-          resource_model.asset.project=project
-          #assign default policy, and save the associated asset
-          policy = default_policy(author,project)
-          resource_model.asset.policy=policy
-          resource_model.asset.save!
-          response={:response=>:success,:message=>"Successfully added",:seek_model=>resource_model}
+          resource_model.title=resource_model.original_filename          
+          
+          if project.default_policy.nil?
+            response={:response=>:fail,:message=>MESSAGES[:no_default_policy]}
+          else
+            #save it
+            #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
+            resource_model.save!
+            resource_model.asset.project=project
+            #assign default policy, and save the associated asset
+
+            resource_model.asset.policy=project.default_policy
+            resource_model.asset.save!
+            response={:response=>:success,:message=>MESSAGES[:success],:seek_model=>resource_model}
+          end
+          
         end
       rescue Exception=>exception
         response={:response=>:fail,:message=>"Something went wrong",:exception=>exception}
@@ -59,14 +65,15 @@ module Jerm
     end
 
     def default_policy author,project
-      Policy.new(:name => 'auto',
-        :contributor_type => 'User',
-        :contributor_id => author.user.id,
-        :sharing_scope => Policy::EVERYONE,
-        :access_type => Policy::DOWNLOADING,
-        :use_custom_sharing => false,
-        :use_whitelist => false,
-        :use_blacklist => false)
+      nil
+#      Policy.new(:name => 'auto',
+#        :contributor_type => 'User',
+#        :contributor_id => author.user.id,
+#        :sharing_scope => Policy::EVERYONE,
+#        :access_type => Policy::DOWNLOADING,
+#        :use_custom_sharing => false,
+#        :use_whitelist => false,
+#        :use_blacklist => false)
     end
   end
 end
