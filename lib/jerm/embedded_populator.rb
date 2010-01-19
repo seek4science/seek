@@ -32,8 +32,7 @@ module Jerm
       else
         #create SOP,DataFile or Model (or other type that may be added in the future)
         begin
-        resource_model=eval("#{resource.type}.new")
-        resource_model.project=project        
+        resource_model=eval("#{resource.type}.new")                
         resource_model.contributor=author.user
         #associate with ContentBlob
         resource_model.content_blob = ContentBlob.new(:url=>resource.uri)
@@ -43,6 +42,7 @@ module Jerm
         #save it
         #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
         resource_model.save!
+        resource_model.asset.project=project
         #assign default policy, and save the associated asset
         policy = default_policy(author,project)
         resource_model.asset.policy=policy
