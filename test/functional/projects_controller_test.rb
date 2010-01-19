@@ -247,6 +247,13 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !document.find("//name").empty?,"There should be a field 'name'"
     assert document.find("//site-root-uri").empty?,"There should not be a field 'site-root-uri'"
   end
+  
+  test "default policy form hidden from non-admin" do
+    login_as(:pal_user)
+    get :edit, :id=>projects(:sysmo_project)
+    assert_response :success #can see the edit page
+    assert_select "input#cb_use_blacklist",:count=>0 #but not the default policy form
+  end
 
   private
 

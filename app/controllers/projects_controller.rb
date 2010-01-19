@@ -6,6 +6,8 @@ class ProjectsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update]
+  
+  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
 
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
@@ -81,9 +83,17 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       if @project.save
-        flash[:notice] = 'Project was successfully created.'
-        format.html { redirect_to(@project) }
-        format.xml  { render :xml => @project, :status => :created, :location => @project }
+        
+        policy_err_msg = Policy.create_or_update_default_policy(@project, current_user, params)
+        
+        if policy_err_msg.blank?
+          flash[:notice] = 'Project was successfully created.'
+          format.html { redirect_to(@project) }
+          format.xml  { render :xml => @project, :status => :created, :location => @project }
+        else
+          flash[:notice] = "Project was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to :controller => 'projects', :id => @project, :action => "edit" }
+        end
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
@@ -102,10 +112,18 @@ class ProjectsController < ApplicationController
     @project.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     respond_to do |format|
-      if @project.update_attributes(params[:project])
-        flash[:notice] = 'Project was successfully updated.'
-        format.html { redirect_to(@project) }
-        format.xml  { head :ok }
+      if @proect.update_attributes(params[:project])
+        
+        policy_err_msg = Policy.create_or_update_default_policy(@project, current_user, params)
+        
+        if policy_err_msg.blank?
+          flash[:notice] = 'Project was successfully updated.'
+          format.html { redirect_to(@project) }
+          format.xml  { head :ok }
+        else
+          flash[:notice] = "Project was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to :controller => 'projects', :id => @project, :action => "edit" }
+        end
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
@@ -153,13 +171,60 @@ class ProjectsController < ApplicationController
       }
     end
   end
+  
+  protected
+  
+    def set_parameters_for_sharing_form
+    policy = nil
+    policy_type = ""
+
+    # obtain a policy to use
+    if defined?(@project)
+      if @project.default_policy
+        policy = @project.default_policy
+        policy_type = "project"
+      end
+    end
+
+    unless policy
+      # several scenarios could lead to this point:
+      # 1) this is a "new" action - no Model exists yet; use default policy:
+      #    - if current user is associated with only one project - use that project's default policy;
+      #    - if current user is associated with many projects - use system default one;
+      # 2) this is "edit" action - Model exists, but policy wasn't attached to it;
+      #    (also, Model wasn't attached to a project or that project didn't have a default policy) --
+      #    hence, try to obtain a default policy for the contributor (i.e. owner of the Model) OR system default
+      policy = Policy.system_default(current_user)
+      #Set the sharing scope to all_registered_users, instead of private, because if private only the system
+      # would be able to view the resource, which is pointless.
+      policy.sharing_scope = Policy::ALL_REGISTERED_USERS  
+      policy_type = "system"
+      
+    end
+
+    # set the parameters
+    # ..from policy
+    @policy = policy
+    @policy_type = policy_type
+    @sharing_mode = policy.sharing_scope
+    @access_mode = policy.access_type
+    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
+    @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
+    @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
+
+    # ..other
+    @resource_type = "Project"
+    @favourite_groups = current_user.favourite_groups
+
+    @all_people_as_json = Person.get_all_as_json
+  end
 
   private  
 
   def editable_by_user
     @project = Project.find(params[:id])
     unless current_user.is_admin? || @project.can_be_edited_by?(current_user)
-      error("Insufficient priviledged", "is invalid (insufficient_priviledges)")
+      error("Insufficient priviledges", "is invalid (insufficient_priviledges)")
       return false
     end
   end

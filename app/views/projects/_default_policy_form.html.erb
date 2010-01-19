@@ -1,3 +1,4 @@
+<%= javascript_include_tag "sharing.js" %>
 <!-- Sharing Permissions -->
 
 <%# initialization: required to keep javascript independent of the access type codes, to allow the use the constants instead -%>
@@ -33,25 +34,25 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can specify who can <b>view</b>, <b>download</b> and <b>edit</b> this #{@resource_type}.") -%>
-    Sharing
+    <%= help_icon("Here you can specify the project's default policy on who can <b>view</b>, <b>download</b> and <b>edit</b> project-related assets.") -%>
+    Default Policy
   </div>
 
   <div class="foldContent" style="display: block;">
 
     <div class="box_infotext">
       <p>
-        Here you can specify who can <b>view</b>, <b>download</b> and <b>edit</b> this <%= @resource_type -%>.
+        Here you can specify the project's default policy on who can <b>view</b>, <b>download</b> and <b>edit</b> project-related assets.<br/>
         <%= link_to_function "Click here" + expand_image, visual_effect(:toggle_blind, "more_info", :duration => 0.3) -%> for more information.
       </p>
 
       <div id="more_info" class="box_simple" style="display: none;">
         <p>
-          Here you may specify the People, Projects or Groups that may View and Edit the details about your <%= @resource_type -%>.<br>
+          Here you may specify the People, Projects or Groups that may View and Edit the details about project assets.<br/>
+          This policy will be applied to any resources automatically harvested by the system.<br/>
           <p>
             You may:
             <ul>
-              <li>Keep the <%= @resource_type -%> private, and only visible to yourself</li>
               <li>Share with all Sysmo project members</li>
               <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> Using custom sharing permissions you can share within your Project/Institution only,<br/> specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
             </ul>
@@ -60,24 +61,9 @@
       </div>
     </div>
 
-    <br/>
-
-    <!-- private -->
-    <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
-        <input type="hidden" name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
-        <input type="hidden" name="sharing[include_custom_sharing_<%= Policy::PRIVATE -%>]" value="0">
-
-        <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
-                                                                     value="<%= Policy::PRIVATE -%>" type="radio" onclick="javascript:setSharingElementVisibility(<%= Policy::PRIVATE -%>);" />
-        - Keep this <%= @resource_type -%> private.
-    </label></p>
-
-
-    <p style="font-weight: bold; margin-top: 1em;">Or share it with..</p>
-
-
-   
-
+    <!-- private - removed-->
+    
+    <p style="font-weight: bold; margin-top: 1em;">Share them with..</p>
 
     <!-- all registered users -->
     <p>
@@ -128,7 +114,7 @@
 
       <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
         <p style="color: #666666;">
-          So far you have selected to share this <%= @resource_type -%> with:
+          So far you have selected to share assets with:
         </p>
         <p id="shared_with_list" class="box_editing_inner" style="line-height: 1.5;">
           <span class="none_text" id="shared_with_text">Loading...</span>
@@ -146,7 +132,7 @@
 
           <div class="foldTitle">
             <%= image_tag method_to_icon_filename("spinner"), :id => "f_group_deleting_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
-            <%= help_icon("Here you can choose your favourite groups to share this #{@resource_type} with.") -%>
+            <%= help_icon("Here you can choose your favourite groups to share assets with.") -%>
             Favourite Groups
           </div>
 
@@ -260,7 +246,7 @@
             <div id="facebook" class="clearfix">
 
               <p style="text-align: justify;">
-                Please type names of people to share this <%= @resource_type -%> with into the box below - suggestions will be displayed as you type.
+                Please type names of people to share with into the box below - suggestions will be displayed as you type.
                 Select access rights from drop-down menu; these will be applied to all chosen people.
                 Clicking "Add" will add selected people to the list.
               </p>
