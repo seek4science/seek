@@ -4,7 +4,7 @@ directories_and_types:
     type: Model
   protocols:
     ext: [doc, docx, pdf]
-    type: SOP
+    type: Sop
   transcriptomics:
     ext: [xls, xlsx]
     type: DataFile
