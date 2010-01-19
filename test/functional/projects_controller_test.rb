@@ -254,6 +254,27 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success #can see the edit page
     assert_select "input#cb_use_blacklist",:count=>0 #but not the default policy form
   end
+  
+  test "changing default policy" do
+    login_as(:quentin)
+    
+    person = people(:two) #aaron
+    project = projects(:four)
+    assert_nil project.default_policy_id #check theres no policy to begin with
+    
+    #Set up the sharing param to share with one person (aaron)
+    sharing = {}
+    sharing[:permissions] = {}
+    sharing[:permissions][:contributor_types] = ActiveSupport::JSON.encode(["Person"])
+    sharing[:permissions][:values] = ActiveSupport::JSON.encode({"Person"=>{(person.id)=>{"access_type"=>0}}})                             
+    sharing[:sharing_scope] = 1
+    put :update, :id => project.id, :project => valid_project, :sharing => sharing
+
+    project = Project.find(project.id)
+    assert_redirected_to project
+    assert project.default_policy_id
+    assert Permission.find_by_policy_id(project.default_policy).contributor_id == person.id
+  end
 
   private
 
