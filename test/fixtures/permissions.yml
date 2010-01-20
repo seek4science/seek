@@ -1,11 +1,5 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-simple:
-  policy_id: 1
-  contributor_id: 1
-  access_type: 1
-  contributor_type: "Person"
-
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
