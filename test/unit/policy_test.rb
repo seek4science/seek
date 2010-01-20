@@ -7,7 +7,7 @@ class PolicyTest < ActiveSupport::TestCase
   test "deep clone" do
     policy = policies(:download_for_all_registered_users_policy)
 
-    copy = policy.deep_clone
+    copy = policy.deep_copy
     assert_equal policy.contributor,copy.contributor
     assert_equal policy.sharing_scope,copy.sharing_scope
     assert_equal policy.access_type,copy.access_type

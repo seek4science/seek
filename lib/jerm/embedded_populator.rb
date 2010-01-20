@@ -52,7 +52,7 @@ module Jerm
             resource_model.asset.project=project
             #assign default policy, and save the associated asset
 
-            resource_model.asset.policy=project.default_policy.deep_clone
+            resource_model.asset.policy=project.default_policy.deep_copy
             resource_model.asset.policy.contributor=author
             resource_model.asset.save!
             response={:response=>:success,:message=>MESSAGES[:success],:seek_model=>resource_model}
