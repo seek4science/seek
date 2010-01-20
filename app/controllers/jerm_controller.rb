@@ -1,6 +1,7 @@
 class JermController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth
+  before_filter :jerm_enabled
 
   @@harvesters=nil
 
@@ -67,5 +68,12 @@ class JermController < ApplicationController
     end
     
     @@harvesters=harvesters
+  end
+
+  def jerm_enabled
+	if (!JERM_ENABLED)
+		error("JERM is not enabled","invalid action")
+		return false
+	end
   end
 end

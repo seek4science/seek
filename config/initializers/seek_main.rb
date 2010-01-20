@@ -1,6 +1,7 @@
 # this will make the Authorization module available throughout the codebase
 require 'authorization'
 
+JERM_ENABLED=true unless defined? ENABLE_JERM
 SOLR_ENABLED=false unless defined? SOLR_ENABLED
 EMAIL_ENABLED=false unless defined? EMAIL_ENABLED
 ACTIVATION_REQUIRED=false unless defined? ACTIVATION_REQUIRED
