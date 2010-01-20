@@ -46,6 +46,12 @@ class Policy < ActiveRecord::Base
   FALSE_VALUE = 0
   # *****************************************************************************
   
+  #makes a clone of the policy, and its associated permissions. 
+  def deep_clone
+    copy=self.clone
+    self.permissions.each {|p| copy.permissions << p.clone}
+    return copy
+  end
   
   def self.create_or_update_policy(resource, user, params)
     # this method will return an error message is something goes wrong (empty string in case of success)
