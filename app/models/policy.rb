@@ -46,7 +46,7 @@ class Policy < ActiveRecord::Base
   FALSE_VALUE = 0
   # *****************************************************************************
   
-  #makes a clone of the policy, and its associated permissions. 
+  #makes a copy of the policy, and its associated permissions.
   def deep_copy
     copy=self.clone
     self.permissions.each {|p| copy.permissions << p.clone}
