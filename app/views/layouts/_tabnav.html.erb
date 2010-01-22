@@ -39,7 +39,7 @@
       </li>
 
       <!-- Models tab -->
-      <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"': '') %>
+      <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
       <%= link_to "Models", models_url -%>
     </li>
 
