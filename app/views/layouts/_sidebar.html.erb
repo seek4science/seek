@@ -1,14 +1,12 @@
 <% if logged_in? -%>
-    <%= render :partial => "gadgets/new_object_gadget" -%>    
-    <% cache "favourites/user/#{current_user.id}" do -%>
-        <%= render :partial => "gadgets/favourites" -%>
-    <% end -%>
+  <%= render :partial => "gadgets/new_object_gadget" -%>
+  <%= render :partial => "gadgets/favourites" -%>
 <% else -%>
-    <%= render :partial => "gadgets/sign_in" -%>
+  <%= render :partial => "gadgets/sign_in" -%>
 <% end -%>
 
 <% cache "tag_clouds" do -%>
-    <%= render :partial=>"gadgets/merged_tag_cloud_gadget" %>    
+  <%= render :partial=>"gadgets/merged_tag_cloud_gadget" %>
 <% end -%>
-    <%= render :partial=>"gadgets/organism_gadget" %>
+<%= render :partial=>"gadgets/organism_gadget" %>
 

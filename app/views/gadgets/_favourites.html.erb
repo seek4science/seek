@@ -7,14 +7,13 @@
     </span>
   </div>
   
-  
-  <div id="drop_favourites" class="contents" style="min-height:100px; text-align: left">
-    
+  <% cache "favourites/user/#{current_user.id}" do -%>
+  <div id="drop_favourites" class="contents" style="min-height:100px; text-align: left">    
     <div id="favourite_list">
       <%= render :partial=>"favourites/gadget_list" %>
-    </div>
-    
+    </div>    
   </div>
+  <% end -%>
   <%= drop_receiving_element(:drop_favourites, 
     :accept=>"asset",
     :url=>{:controller=>'favourites', :action=>'add'},
