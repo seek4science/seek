@@ -689,7 +689,7 @@ module ApplicationHelper
   def get_object_title(item)
     title = ""
     if ["Person", "Institution", "Project"].include? item.class.name
-      title = h(item.name)
+      title = h(item.name)          
     else
       title = h(item.title)
     end

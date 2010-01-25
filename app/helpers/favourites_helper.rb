@@ -10,18 +10,20 @@ module FavouritesHelper
     
     tiny_image = ""
     case item.class.name.downcase
-      when "datafile", "sop"   
-        tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
-      when "model"
-        tiny_image = image_tag "/images/famfamfam_silk/bricks.png", :class=>"fav_icon"
-      when "investigation"
-        tiny_image = image_tag "/images/famfamfam_silk/magnifier.png", :class=>"fav_icon"
-      when "study"
-        tiny_image = image_tag "/images/famfamfam_silk/book_open.png", :class=>"fav_icon"
-      when "assay"
-        tiny_image = image_tag "/images/famfamfam_silk/report.png", :class=>"fav_icon"
-      when "person", "project", "institution"
-        tiny_image = avatar(item, 32, true)
+    when "datafile", "sop"
+      tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
+    when "model"
+      tiny_image = image_tag "/images/famfamfam_silk/bricks.png", :class=>"fav_icon"
+    when "investigation"
+      tiny_image = image_tag "/images/famfamfam_silk/magnifier.png", :class=>"fav_icon"
+    when "study"
+      tiny_image = image_tag "/images/famfamfam_silk/book_open.png", :class=>"fav_icon"
+    when "assay"
+      tiny_image = image_tag "/images/famfamfam_silk/report.png", :class=>"fav_icon"
+    when "person", "project", "institution"
+      tiny_image = avatar(item, 32, true)
+    when "savedsearch"
+      tiny_image = image_tag "/images/famfamfam_silk/find.png", :class=>"fav_icon"
     end
     
     image_tag_code = tiny_image #avatar(item, 24, true)

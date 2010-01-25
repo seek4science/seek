@@ -15,6 +15,8 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :assays
 
+  map.resources :saved_searches
+
   map.resources :assets,:member=>{:request_resource=>:post}
 
   map.resources :data_files, :member => {:download => :get}  do |data_file|
@@ -50,13 +52,13 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :users, :collection=>{:activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
 
-  map.resource :session
+  map.resource :session  
   
   # search and saved searches
   map.search '/search/',:controller=>'search',:action=>'index'
   map.save_search '/search/save',:controller=>'search',:action=>'save'
   map.delete_search '/search/delete',:controller=>'search',:action=>'delete'
-  map.saved_search '/search/:id',:controller=>'search',:action=>'show'
+  #map.saved_search '/search/:id',:controller=>'search',:action=>'show'
   
   #tags
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'

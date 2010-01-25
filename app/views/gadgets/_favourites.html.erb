@@ -23,7 +23,7 @@
   %>
   <%= drop_receiving_element(:drop_favourites, 
     :accept=>"search",
-    :url=>{:controller=>'search', :action=>'save', 
+    :url=>{:controller=>'saved_searches', :action=>'create',
            :search_query => params[:search_query],
            :search_type => params[:search_type]},
     :before => "Element.show('fav_ajax-loader')",

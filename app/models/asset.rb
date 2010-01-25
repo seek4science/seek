@@ -7,7 +7,6 @@ class Asset < ActiveRecord::Base
   has_many :assay_assets, :dependent => :destroy
   has_many :assays, :through => :assay_assets
   
-  
   has_and_belongs_to_many :authors, :join_table => 'asset_authors', :class_name => 'Person', :association_foreign_key => 'author_id'
   
   # TODO
@@ -23,7 +22,7 @@ class Asset < ActiveRecord::Base
   # - user_to_authorize: user for which this asset hash will be rendered in the view
   
   #The order in which asset tabs appear
-  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop']
+  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop','SavedSearch']
 
   def self.classify_and_authorize(asset_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)
     results = {}
