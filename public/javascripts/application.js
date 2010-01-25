@@ -11,9 +11,11 @@ function displayTabs() {
 
     for (var i = 0; i < tabber_ids.length; i++) {
         var tabber_id = tabber_ids[i];
-        var spinner = tabber_id + "_spinner";
-        $(spinner).hide();
-        Effect.Appear(tabber_id, {duration : 0.5});
+        var spinner = $(tabber_id + "_spinner");
+        if (spinner != null) {
+          spinner.hide();
+          Effect.Appear(tabber_id, {duration : 0.5}); 
+        }
     }
 }
 
