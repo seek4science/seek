@@ -13,7 +13,7 @@ module FavouritesHelper
     when "datafile", "sop"
       tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
     when "model"
-      tiny_image = image_tag "/images/famfamfam_silk/bricks.png", :class=>"fav_icon"
+      tiny_image = image_tag "/images/crystal_project/32x32/apps/kwikdisk.png", :class=>"fav_icon"
     when "investigation"
       tiny_image = image_tag "/images/crystal_project/32x32/actions/search.png", :class=>"fav_icon"
     when "study"
