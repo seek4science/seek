@@ -15,9 +15,3 @@
   :url=>{:controller=>'favourites', :action=>'delete'},
   :before => "Element.show('fav_ajax-loader')",
   :complete => "Element.hide('fav_ajax-loader');") %>
-  
-<%= drop_receiving_element("content",
-  :accept=>"saved_search",
-  :url=>{:controller=>'saved_searches', :action=>'delete'},
-  :before => "Element.show('fav_ajax-loader')",
-  :complete => "Element.hide('fav_ajax-loader');") %>

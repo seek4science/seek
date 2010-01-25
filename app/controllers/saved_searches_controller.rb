@@ -41,21 +41,6 @@ class SavedSearchesController < ApplicationController
       end
     end
   end
-
-  def delete
-    id=params[:id].split("_")[1].to_i
-    s=SavedSearch.find(id)
-    if !s.nil? and s.user==current_user
-      s.destroy
-      render :update do |page|
-        page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
-        page.visual_effect :highlight, "drop_favourites", :startcolor=>"#DDDDFF"
-      end
-    else
-      render :update do |page|
-        page.visual_effect :highlight, "drop_favourites", :startcolor=>"#FF0000"
-      end
-    end
-  end
+  
   
 end
