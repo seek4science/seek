@@ -11,3 +11,7 @@ one:
     resource_id: 2
     user_id: 1
 
+saved_search:
+    user: pal_user
+    resource: cheese(SavedSearch)
+

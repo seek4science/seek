@@ -5,7 +5,7 @@ class FavouritesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include FavouritesHelper
   
-  fixtures :users, :favourites, :projects, :people, :institutions
+  fixtures :users, :favourites, :projects, :people, :institutions,:saved_searches
   
   def setup
     login_as(:quentin)
@@ -40,10 +40,65 @@ class FavouritesControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity
     
   end
-  
+
+  def test_add_search
+
+    assert_difference("Favourite.count",1) do
+      assert_difference("SavedSearch.count",1) do
+        xml_http_request(:put,:add,{:id=>"drag_search",:search_query=>"fred bloggs",:search_type=>"All"})
+      end
+    end
+    assert_response :success
+    fav=Favourite.last
+    assert_equal "SavedSearch",fav.resource_type
+    ss=fav.resource
+    assert_equal "fred bloggs",ss.search_query
+    assert_equal "All",ss.search_type
+    
+  end
+
+  def test_cant_add_dupicate_search
+    login_as(:pal_user)
+    assert_no_difference("Favourite.count") do
+      assert_no_difference("SavedSearch.count") do
+        xml_http_request(:put,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"All"})
+      end
+    end
+    assert_response :unprocessable_entity
+  end
+
+  def test_can_add_dupicate_search_with_different_type
+    login_as(:pal_user)
+    assert_difference("Favourite.count",1) do
+      assert_difference("SavedSearch.count",1) do
+        xml_http_request(:put,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"Assays"})
+      end
+    end
+    assert_response :success
+  end
+
+  def test_delete_saved_search
+    login_as(:pal_user)
+    assert_not_nil Favourite.find_by_resource_type("SavedSearch")
+    assert_not_nil SavedSearch.find_by_search_query("cheese")
+    
+    fav=favourites(:saved_search)
+    ss=saved_searches(:cheese)
+    id=fav.id
+    assert_difference("Favourite.count",-1) do
+      assert_difference("SavedSearch.count",-1) do
+        xml_http_request(:delete,:delete,{:id=>"fav_#{id}"})
+      end
+    end
+    assert_response :success
+    
+    assert_nil Favourite.find_by_resource_type("SavedSearch")
+    assert_nil SavedSearch.find_by_search_query("cheese")
+  end
+
   def test_valid_delete
     project = projects(:two)  
-    id="fav_"+favourites(:one).id.to_s
+    id="fav_#{favourites(:one).id}"
     xml_http_request(:delete, :delete, {:id=>id})
     assert_response :success
     fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
