@@ -3,6 +3,6 @@ class SavedSearch < ActiveRecord::Base
 
   #generates the title, for the Favourite tooltip for example.
   def title
-    "Search: '#{search_query}'"
+    "Search: '#{search_query}' (#{search_type})"
   end
 end
