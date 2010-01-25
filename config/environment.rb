@@ -27,6 +27,7 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem 'rubaidh-google_analytics', :lib => 'rubaidh/google_analytics', :source => 'http://gems.github.com'  
   config.gem 'spreadsheet'
+  config.gem 'hpricot'
   #config.gem 'libxml-ruby'
 
   # Only load the plugins named here, in the order given. By default, all plugins 
