@@ -383,7 +383,7 @@ module ApplicationHelper
             :alt => alt,
             :class=>"avatar framed"
     when "investigation"
-      img = image_tag "/images/famfamfam_silk/magnifier.png",
+      img = image_tag "/images/crystal_project/32x32/actions/search.png",
             :alt => alt,
             :class=>"avatar framed"
     when "study"

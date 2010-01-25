@@ -1,7 +1,7 @@
 <% unless params[:saved_search] %>
   <div class="show_basic">    
     <div class="box_standout">
-      <% tiny_image = image_tag "/images/famfamfam_silk/find.png", :style => "padding: 11px; border:1px solid #CCCCCC;background-color:#FFFFFF;vertical-align:middle;" %>
+      <% tiny_image = image_tag "/images/crystal_project/32x32/actions/find.png", :style => "padding: 5px; border:1px solid #CCCCCC;background-color:#FFFFFF;vertical-align:middle;" %>
       <%= link_to_draggable(tiny_image, search_path, :title=>tooltip_title_attrib("Drag to favourites to save this search"),:class=>"search", :id => "drag_search") %>
       Drag this icon over to your favourites to save this search.
     </div>
