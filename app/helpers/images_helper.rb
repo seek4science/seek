@@ -186,6 +186,8 @@ module ImagesHelper
       "project_64x64.png"
     when "institution_avatar"
       "institution_64x64.png"
+    when "saved_search"
+      "crystal_project/32x32/actions/find.png"
     else
       return nil
     end
