@@ -1,14 +1,14 @@
-<%= icon "show", show_resource_path(resource), nil, nil, "View" -%>
+<%= image_tag_for_key "show", show_resource_path(resource), nil, nil, "View" -%>
 <% if Authorization.is_authorized?("download", nil, resource, current_user) -%>
-  <%= icon "download", download_resource_path(resource) -%>
+  <%= image_tag_for_key "download", download_resource_path(resource) -%>
 <% end -%>
 <% if Authorization.is_authorized?("manage", nil, resource, current_user) -%>
-  <%= icon "manage", edit_resource_path(resource), nil, nil, "Manage" -%>
+  <%= image_tag_for_key "manage", edit_resource_path(resource), nil, nil, "Manage" -%>
 <% elsif Authorization.is_authorized?("edit", nil, resource, current_user) -%>
-  <%= icon "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
+  <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
 <% end -%>
 <!---
-<%= link_to_remote icon("favourite"), :url=>{:controller => "favourites", :action => "add", :id => model_to_drag_id(resource)},
+<%= link_to_remote image_tag_for_key("favourite"), :url=>{:controller => "favourites", :action => "add", :id => model_to_drag_id(resource)},
     :before => "Element.show('fav_ajax-loader');Element.show('fav_ajax-loader#{model_to_drag_id(resource)}')",
     :complete => "Element.hide('fav_ajax-loader');Element.hide('fav_ajax-loader#{model_to_drag_id(resource)}');" -%>
   <%= image_tag("ajax-loader.gif", :style => "display:none;", :alt=>"loading...",:title=>"loading...",:id=>"fav_ajax-loader#{model_to_drag_id(resource)}") %>

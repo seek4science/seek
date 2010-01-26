@@ -2,7 +2,7 @@
 
   <% if @data_file.can_edit? current_user -%>
     <ul class="sectionIcons">
-      <li><%= icon('edit', data_file_studied_factors_path(@data_file), nil, nil, 'Edit factors studied (latest version)') -%></li>
+      <li><%= image_tag_for_key('edit', data_file_studied_factors_path(@data_file), nil, nil, 'Edit factors studied (latest version)') -%></li>
     </ul>
   <% end -%>
 

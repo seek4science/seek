@@ -4,7 +4,7 @@
 <ul class="sectionIcons">
   <% if @study.can_edit?(current_user) -%>
     <li>
-      <%= icon('edit', edit_study_path(@study), "Edit study", nil, 'Edit study') -%>
+      <%= image_tag_for_key('edit', edit_study_path(@study), "Edit study", nil, 'Edit study') -%>
     </li>
   <% end -%>
 
@@ -12,7 +12,7 @@
   
   <% if current_user.person.projects.include?(@study.project) -%>
     <li>
-      <%= icon('new', new_assay_path(:study_id=>@study), "Create an Assay for this study", nil, 'Create an Assay for this study') -%>
+      <%= image_tag_for_key('new', new_assay_path(:study_id=>@study), "Create an Assay for this study", nil, 'Create an Assay for this study') -%>
     </li>
   <% end -%>
 </ul>

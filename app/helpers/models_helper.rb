@@ -9,7 +9,7 @@ module ModelsHelper
   end
 
   def execute_model_label
-    icon_filename=method_to_icon_filename("execute")
+    icon_filename=icon_filename_for_key("execute")
 
     return '<span class="icon">' + image_tag(icon_filename,:alt=>"Run",:title=>"Run") + ' Run model</span>';
   end

@@ -4,18 +4,18 @@
 <ul class="sectionIcons">
   <% if Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
       <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
-      <li><%= icon('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
+      <li><%= image_tag_for_key('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @sop, current_user) -%>
       <%# this is not owner, but current user can edit -%>
-      <li><%= icon('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
+      <li><%= image_tag_for_key('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("destroy", nil, @sop, current_user) -%>
-      <li><%= icon('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
+      <li><%= image_tag_for_key('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @sop, current_user) -%>
-      <li><%= icon('download', download_sop_url(:version=>@display_sop.version), "Download SOP", nil, "Download SOP") -%></li>
+      <li><%= image_tag_for_key('download', download_sop_url(:version=>@display_sop.version), "Download SOP", nil, "Download SOP") -%></li>
   <% else -%>
       <li>
       <li>

@@ -4,7 +4,7 @@
 
 
 <ul class="sectionIcons">
-  <li><%= icon('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%></li>  
+  <li><%= image_tag_for_key('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%></li>
 </ul>
 
 <h1>Editing Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>

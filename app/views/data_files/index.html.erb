@@ -1,6 +1,6 @@
 <ul class="sectionIcons">
-	<li><%= icon "new", new_data_file_path, "Upload New Datafile", nil, "Upload New Datafile" %></li>
-	<!-- <li><%#= icon "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
+	<li><%= image_tag_for_key "new", new_data_file_path, "Upload New Datafile", nil, "Upload New Datafile" %></li>
+	<!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
 </ul>
 
 <% if @data_files.public_methods.include?("page_totals") %>

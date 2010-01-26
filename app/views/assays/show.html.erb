@@ -1,6 +1,6 @@
 <ul class="sectionIcons">
   <% if @assay.can_edit?(current_user) -%>
-    <li><%= icon('edit', edit_assay_path(@assay), "Edit Assay Details", nil, 'Edit Assay Details') -%></li>
+    <li><%= image_tag_for_key('edit', edit_assay_path(@assay), "Edit Assay Details", nil, 'Edit Assay Details') -%></li>
   <% end -%>
   <%= delete_ISA_icon(@assay,current_user) %>
   

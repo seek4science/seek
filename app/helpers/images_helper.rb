@@ -5,20 +5,19 @@ module ImagesHelper
 
   def info_icon_with_tooltip(info_text, delay=200)
     return image("info",
-              :title => tooltip_title_attrib(info_text, delay),
-              :style => "vertical-align:middle;")
+      :title => tooltip_title_attrib(info_text, delay),
+      :style => "vertical-align:middle;")
   end
 
-
-  def icon(method, url=nil, alt=nil, url_options={}, label=method.humanize, remote=false)
+  def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false)
 
     if (label == 'Destroy')
       label = 'Delete';
     end
 
-    return nil unless (filename = method_to_icon_filename(method.downcase))
+    return nil unless (filename = icon_filename_for_key(key.downcase))
 
-    image_options = alt ? { :alt => alt } : { :alt => method.humanize }
+    image_options = alt ? { :alt => alt } : { :alt => key.humanize }
     img_tag = image_tag(filename, image_options)
 
     inner = img_tag;
@@ -35,8 +34,8 @@ module ImagesHelper
     return '<span class="icon">' + inner + '</span>';
   end
 
-  def method_to_icon_filename(method)
-    case (method.to_s)
+  def icon_filename_for_key(key)
+    case (key.to_s)
     when "refresh"
       return "famfamfam_silk/arrow_refresh_small.png"
     when "arrow_up"
@@ -155,9 +154,9 @@ module ImagesHelper
       return "ajax-loader-large.gif"
     when "current"
       return "famfamfam_silk/bullet_green.png"
-    when "expand"
-      "folds/fold.png"
     when "collapse"
+      "folds/fold.png"
+    when "expand"
       "folds/unfold.png"
     when "pal"
       "pal.png"
@@ -180,7 +179,7 @@ module ImagesHelper
 
 
   def help_icon(text, delay=200, extra_style="")
-    image_tag method_to_icon_filename("help"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
+    image_tag icon_filename_for_key("help"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
   end
 
   def flag_icon(country, text=country, margin_right='0.3em')
@@ -207,7 +206,7 @@ module ImagesHelper
     end
   end
 
-  # A generic method to produce avatars for entities of all kinds.
+  # A generic key to produce avatars for entities of all kinds.
   #
   # Parameters:
   # 1) object - the instance of the object which requires the avatar;
@@ -234,25 +233,25 @@ module ImagesHelper
       end
     when "datafile", "sop"
       img = image_tag file_type_icon_url(object),
-            :alt => alt,
-            :class=> "avatar framed"
+        :alt => alt,
+        :class=> "avatar framed"
     when "model"
       img = image_tag "/images/crystal_project/32x32/apps/kwikdisk.png",
-            :alt => alt,
-            :class=>"avatar framed"
+        :alt => alt,
+        :class=>"avatar framed"
     when "investigation"
       img = image_tag "/images/crystal_project/32x32/actions/search.png",
-            :alt => alt,
-            :class=>"avatar framed"
+        :alt => alt,
+        :class=>"avatar framed"
     when "study"
       img = image_tag "/images/famfamfam_silk/book_open.png",
-            :alt => alt,
-            :class=>"avatar framed"
+        :alt => alt,
+        :class=>"avatar framed"
 
     when "assay"
       img = image_tag "/images/famfamfam_silk/report.png",
-            :alt => alt,
-            :class => "avatar framed"
+        :alt => alt,
+        :class => "avatar framed"
     end
 
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
@@ -310,40 +309,40 @@ module ImagesHelper
     url = ""
     case item.content_type
       when "application/vnd.ms-excel"
-        url = method_to_icon_filename "xls_file"
+        url = icon_filename_for_key "xls_file"
       when "application/vnd.ms-powerpoint"
-        url = method_to_icon_filename "ppt_file"
+        url = icon_filename_for_key "ppt_file"
       when "application/pdf"
-        url = method_to_icon_filename "pdf_file"
+        url = icon_filename_for_key "pdf_file"
       when "application/msword"
-        url = method_to_icon_filename "doc_file"
+        url = icon_filename_for_key "doc_file"
       else
         case item.original_filename[-4,4].gsub(".","")
           when "docx","doc"
-            url = method_to_icon_filename "doc_file"
+            url = icon_filename_for_key "doc_file"
           when "xls"
-            url = method_to_icon_filename "xls_file"
+            url = icon_filename_for_key "xls_file"
           when "ppt"
-            url = method_to_icon_filename "ppt_file"
+            url = icon_filename_for_key "ppt_file"
           when "pdf"
-            url = method_to_icon_filename "pdf_file"
+            url = icon_filename_for_key "pdf_file"
           else
-           url = method_to_icon_filename "misc_file"
+           url = icon_filename_for_key "misc_file"
         end
     end
     return url
   end
 
   def expand_image(margin_left="0.3em")
-    image_tag "folds/unfold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
+    image_tag icon_filename_for_key("expand"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
   end
 
   def collapse_image(margin_left="0.3em")
-    image_tag "folds/fold.png", :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
+    image_tag icon_filename_for_key("collapse"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
 
-  def image method,options={}
-    image_tag(method_to_icon_filename(method),options)
+  def image key,options={}
+    image_tag(icon_filename_for_key(key),options)
   end
     
 end

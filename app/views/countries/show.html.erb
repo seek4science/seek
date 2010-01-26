@@ -8,7 +8,7 @@
   	<% unless @institutions.empty? -%>
 		  <% @institutions.each do |i| -%>
 			  <p style="margin-top: 1em; padding-left: 2em;">
-				  <%= icon(i.class.name.downcase, nil, i.class.name.downcase.camelize, nil, "") -%>
+				  <%= image_tag_for_key(i.class.name.downcase, nil, i.class.name.downcase.camelize, nil, "") -%>
 					<%= link_to h(i.name), institution_path(i) -%>
 					
 					<% inst_members = i.people -%>
@@ -16,7 +16,7 @@
 					  <ul style="margin-left: 3em;">
 						  <% inst_members.each do |p| -%>
 							  <li>
-							  	<%= icon(p.class.name.downcase, nil, p.class.name.downcase.camelize, nil, "") -%>
+							  	<%= image_tag_for_key(p.class.name.downcase, nil, p.class.name.downcase.camelize, nil, "") -%>
 									<%= link_to h(p.first_name + " " + p.last_name), person_path(p) -%>
 								</li>
 							<% end -%>

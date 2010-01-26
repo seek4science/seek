@@ -1,6 +1,6 @@
 <ul class="sectionIcons">
-	<li><%= icon "new", new_sop_path, "Upload New SOP", nil, "Upload New SOP" %></li>
-	<!-- <li><%#= icon "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
+	<li><%= image_tag_for_key "new", new_sop_path, "Upload New SOP", nil, "Upload New SOP" %></li>
+	<!-- <li><%#= image_tag_for_key "view-all", all_files_path, nil, nil, "View All Files" %></li> -->
 </ul>
 
 <% if @sops.public_methods.include?("page_totals") %>

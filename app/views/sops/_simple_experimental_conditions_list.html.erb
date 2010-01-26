@@ -2,7 +2,7 @@
 
   <% if @sop.can_edit? current_user -%>
     <ul class="sectionIcons">
-      <li><%= icon('edit', sop_experimental_conditions_path(@sop), nil, nil, 'Edit experimental conditions (latest version)') -%></li>
+      <li><%= image_tag_for_key('edit', sop_experimental_conditions_path(@sop), nil, nil, 'Edit experimental conditions (latest version)') -%></li>
     </ul>
   <% end -%>
 

@@ -6,18 +6,18 @@
 <ul class="sectionIcons">
   <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
     <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
-    <li><%= icon('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
+    <li><%= image_tag_for_key('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
     <%# this is not owner, but current user can edit -%>
-    <li><%= icon('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%></li>
+    <li><%= image_tag_for_key('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("destroy", nil, @model, current_user) -%>
-    <li><%= icon('destroy', model_path(@model), nil, { :confirm => 'This deletes the Model and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%></li>
+    <li><%= image_tag_for_key('destroy', model_path(@model), nil, { :confirm => 'This deletes the Model and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
-    <li><%= icon('download', download_model_url(:version=>@display_model.version), "Download Model", nil, "Download Model") -%></li>
+    <li><%= image_tag_for_key('download', download_model_url(:version=>@display_model.version), "Download Model", nil, "Download Model") -%></li>
   <% else -%>
     <li>
       <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@model} %>

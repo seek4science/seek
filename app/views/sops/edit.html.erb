@@ -4,7 +4,7 @@
 
 
 <ul class="sectionIcons">
-  <li><%= icon('arrow_left', sop_path(@sop), 'Return to SOP', nil, 'Return to SOP') -%></li>   
+  <li><%= image_tag_for_key('arrow_left', sop_path(@sop), 'Return to SOP', nil, 'Return to SOP') -%></li>
 </ul>
 
 <h1>Editing SOP: <%= link_to(h(@sop.title), sop_path(@sop)) -%></h1>

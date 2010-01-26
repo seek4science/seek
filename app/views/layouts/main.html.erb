@@ -27,8 +27,8 @@
         <% if logged_in? %>
         <div style="float:right;top: 1px;margin-left: 10px; text-align:left;">
           Logged in as  
-          <%= icon "user", current_user.person, current_user.person.name, {}, current_user.person.name -%>
-          | <%= icon "logout", logout_path, "Logout", {}, "Logout" -%>
+          <%= image_tag_for_key "user", current_user.person, current_user.person.name, {}, current_user.person.name -%>
+          | <%= image_tag_for_key "logout", logout_path, "Logout", {}, "Logout" -%>
         </div>
         <% end %>
         <div id="header">

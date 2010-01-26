@@ -4,7 +4,7 @@
 
 
 <ul class="sectionIcons">
-  <li><%= icon('arrow_left', model_path(@model), 'Return to Model', nil, 'Return to Model') -%></li>  
+  <li><%= image_tag_for_key('arrow_left', model_path(@model), 'Return to Model', nil, 'Return to Model') -%></li>
 </ul>
 
 <h1>Editing Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>

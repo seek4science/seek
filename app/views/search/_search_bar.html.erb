@@ -2,11 +2,11 @@
 <% @search_type="All" unless @search_type %>
 
 <% if logged_in? && current_user.person -%>
-  <%= icon("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
+  <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
 <% end -%>
 
 <% if logged_in? && current_user.is_admin? -%>
-  <%= icon "lock", admin_url, "Admin enabled", {:id=>"adminmode"}, "Admin enabled" -%>
+  <%= image_tag_for_key "lock", admin_url, "Admin enabled", {:id=>"adminmode"}, "Admin enabled" -%>
 <% end -%>
 
 <% if SOLR_ENABLED && logged_in? && current_user.person -%>

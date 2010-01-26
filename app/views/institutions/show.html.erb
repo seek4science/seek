@@ -5,10 +5,10 @@
 
 <% if mine?(@institution) || @institution.can_be_edited_by?(current_user) -%>
   <ul class="sectionIcons">
-    <li><%= icon('edit', edit_institution_path(@institution), "Edit Institution Details", nil, 'Edit Institution Details') -%></li>
+    <li><%= image_tag_for_key('edit', edit_institution_path(@institution), "Edit Institution Details", nil, 'Edit Institution Details') -%></li>
     <% if current_user.is_admin? -%>
       <li>
-        <%= icon "destroy", institution_path(@institution), "Delete Institution", { :confirm => 'Are you sure?', :method => :delete }, "Delete Institution" -%>
+        <%= image_tag_for_key "destroy", institution_path(@institution), "Delete Institution", { :confirm => 'Are you sure?', :method => :delete }, "Delete Institution" -%>
       </li>
     <% end -%>
   </ul>
