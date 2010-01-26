@@ -730,15 +730,10 @@ div.avatar_text {
 
 img.fav_icon {
     border: 1px solid rgb(204, 204, 255);
-<<<<<<< /home/finn/workspace/sysmo-db/public/stylesheets/styles.css
-    width: 32px;
-    height: 32px;
-=======
     min-width: 1.5em;
     min-height: 2em;
     max-width: 32px;
     max-height: 32px;
->>>>>>> /tmp/styles.css~other.rU4IK8
     padding: 3px;
     background-color: rgb(255, 255, 255);
 }
