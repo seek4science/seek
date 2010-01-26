@@ -17,7 +17,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   
 
   def test_paginate_no_options
-    @people=Person.paginate
+    @people=Person.paginate :default_page=>"first"
     assert_equal(("A".."Z").to_a, @people.pages)
     assert @people.size>0
     assert_equal "A", @people.page
@@ -81,17 +81,17 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   def test_jump_to_first_page_with_content
     #delete those with A
     Person.find(:all,:conditions=>["first_letter = ?","A"]).each {|p| p.destroy }
-    @people=Person.paginate
+    @people=Person.paginate :default_page=>"first"
     assert @people.size>0
     assert_equal "B",@people.page
 
-    @people=Person.paginate :page=>"A"
+    @people=Person.paginate :page=>"A", :default_page=>"first"
     assert_equal 0,@people.size
     assert_equal "A",@people.page
 
     #delete every person, and check it still returns the first page with empty content
     Person.find(:all).each{|x| x.destroy}
-    @people=Person.paginate
+    @people=Person.paginate  :default_page=>"first"
     assert_equal 0,@people.size
     assert_equal "A",@people.page
     
