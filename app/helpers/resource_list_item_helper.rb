@@ -16,11 +16,30 @@ module ResourceListItemHelper
     return actions_partial
   end
   
+  def get_list_item_avatar_partial resource
+    name = resource.class.name.split("::")[0]
+    case name
+      when "DataFile","Model","Sop"
+        actions_partial = "layouts/contributor_avatar"
+      else
+        actions_partial = "layouts/resource_avatar"
+    end
+    return actions_partial
+  end
+  
   def list_item_title resource, title=nil, url=nil    
     if title.nil?
       title = get_object_title(resource)
     end    
-    return "<p class=\"list_item_title\">#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>" 
+    name = resource.class.name.split("::")[0]
+    case name
+      when "DataFile","Model","Sop"
+        image = image_tag(((name == "Model") ? image("model_avatar"): (file_type_icon_url(resource))), :style => "width: 24px; height: 24px; vertical-align: middle")
+        icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+        return "<p class=\"list_item_title\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>" 
+      else
+        return "<p class=\"list_item_title\">#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>" 
+    end
   end
   
   def list_item_simple_list items, attribute
