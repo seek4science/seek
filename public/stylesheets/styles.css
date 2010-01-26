@@ -730,8 +730,8 @@ div.avatar_text {
 
 img.fav_icon {
     border: 1px solid rgb(204, 204, 255);
-    min-width: 1.5em;
-    min-height: 2em;
+    width: 32px;
+    height: 32px;
     padding: 3px;
     background-color: rgb(255, 255, 255);
 }

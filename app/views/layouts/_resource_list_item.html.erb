@@ -3,10 +3,11 @@
 <% resource = resource_list_item %>
 <% content_partial = get_list_item_content_partial(resource) %>
 <% actions_partial = get_list_item_actions_partial(resource) %>
+<% avatar_partial = get_list_item_avatar_partial(resource) %>
 
 <div class="list_item">
   <div class="list_item_avatar">
-    <%= favouritable_icon(resource, 60) -%>
+    <%= render :partial=> avatar_partial,:locals=>content_locals.merge({:resource => resource}) %>
   </div>
   <div class="list_item_content" style="width:<%= actions_partial.blank? ? "87%" : "75%" %>">
     <%= render :partial=> content_partial,:locals=>content_locals.merge({:resource => resource}) %>
