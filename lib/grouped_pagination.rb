@@ -20,11 +20,18 @@ module GroupedPagination
       options=args.pop unless args.nil?
       options ||= {}
       
-      page = options[:page] || @pages.first
+      default_page = options[:default_page] || "latest"
+      default_page = @pages.first if default_page == "first"      
+        
+      page = options[:page] || default_page
+      
+      limit = options[:limit] || 7
       
       records=[]
       if page == "all"
         records=collection
+      elsif page == "latest"
+        records=collection.sort_by{|r| r.created_at}[0...limit]
       elsif @pages.include?(page)           
         records=collection.select {|i| i.first_letter == page}        
       end
@@ -63,15 +70,22 @@ module GroupedPagination
       options=args.pop unless args.nil?
       options ||= {}
 
-      page = options[:page] || @pages.first
+      default_page = options[:default_page] || "latest"
+      default_page = @pages.first if default_page == "first"      
+        
+      page = options[:page] || default_page
+
+      limit = options[:limit] || 7
 
       records=[]
       if page == "all"
         records=self.find(:all)
+      elsif page == "latest"
+        records=self.find(:all,:order=>'updated_at DESC', :limit=>limit)
       elsif @pages.include?(page)
         conditions = merge_optional_conditions(options[:conditions], page)
         query_options = [:conditions=>conditions]
-        query_options[0].merge!(options.except(:conditions,:page))                
+        query_options[0].merge!(options.except(:conditions,:page,:default_page))                
         records=self.find(:all,*query_options)        
       end
 
@@ -79,7 +93,7 @@ module GroupedPagination
       @pages.each do |p|
         conditions=merge_optional_conditions(options[:conditions],p)
         query_options = [:conditions=>conditions]
-        query_options[0].merge!(options.except(:conditions,:page))
+        query_options[0].merge!(options.except(:conditions,:page,:default_page))
         page_totals[p]=self.count(*query_options)            
       end
       

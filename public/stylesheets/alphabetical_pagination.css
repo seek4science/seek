@@ -12,7 +12,6 @@
 
 .alphabetcal_pagination ul li {
 	display: inline;
-    padding-left: 2px;
 }
 
 .alphabetcal_pagination a {
@@ -25,7 +24,8 @@
 }
 
 .alphabetcal_pagination .current_page {
-	border: 1px solid blue;
+  background-color:#ABDBFA;
+  border:1px solid #456AAA;
 }
 
 .alphabetcal_pagination .disabled_page {	
