@@ -250,23 +250,10 @@ module ImagesHelper
       img = image_tag file_type_icon_url(object),
         :alt => alt,
         :class=> "avatar framed"
-    when "model"
-      img = image "model_avatar",
+    when "model","investigation","study","assay"
+      img = image "#{object.class.name.downcase}_avatar",
         {:alt => alt,
-        :class=>"avatar framed"}
-    when "investigation"
-      img = image "investigation_avatar",
-        {:alt => alt,
-        :class=>"avatar framed"}
-    when "study"
-      img = image "study_avatar",
-        {:alt => alt,
-        :class=>"avatar framed"}
-
-    when "assay"
-      img = image "assay_avatar",
-        {:alt => alt,
-        :class => "avatar framed"}
+        :class=>"avatar framed"}    
     end
 
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
