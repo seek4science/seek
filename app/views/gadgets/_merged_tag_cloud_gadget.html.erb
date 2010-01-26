@@ -35,8 +35,8 @@
             <% if hidden_tags -%>
               <div class="expand_collapse_tags_button">
                 <%
-                button_images=image_tag("folds/unfold.png",:id=>"toggle_merged_button_down") +
-                  image_tag("folds/fold.png",:id=>"toggle_merged_button_up",:style=>"display:none;")
+                button_images=image("expand",:id=>"toggle_merged_button_down") +
+                  image("collapse",:id=>"toggle_merged_button_up",:style=>"display:none;")
               %>
                 <%=link_to_function( button_images) do |page|
                   page.select(".#{hidden_class}").each do |el|
