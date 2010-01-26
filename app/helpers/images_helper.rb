@@ -175,7 +175,7 @@ module ImagesHelper
     when "investigation_avatar"
       "crystal_project/32x32/actions/search.png"
     when "model_avatar"
-      "crystal_project/32x32/apps/kwikdisk.png"
+      "crystal_project/48x48/apps/kwikdisk.png"
     when "study_avatar"
       "famfamfam_silk/book_open.png"
     when "assay_avatar"
