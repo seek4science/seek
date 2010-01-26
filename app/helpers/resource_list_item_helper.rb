@@ -34,7 +34,7 @@ module ResourceListItemHelper
     name = resource.class.name.split("::")[0]
     case name
       when "DataFile","Model","Sop"
-        image = image_tag(((name == "Model") ? image("model_avatar"): (file_type_icon_url(resource))), :style => "width: 24px; height: 24px; vertical-align: middle")
+        image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))), :style => "width: 24px; height: 24px; vertical-align: middle")
         icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
         return "<p class=\"list_item_title\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>" 
       else
