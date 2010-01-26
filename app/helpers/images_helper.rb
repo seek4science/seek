@@ -37,123 +37,123 @@ module ImagesHelper
   def icon_filename_for_key(key)
     case (key.to_s)
     when "refresh"
-      return "famfamfam_silk/arrow_refresh_small.png"
+      "famfamfam_silk/arrow_refresh_small.png"
     when "arrow_up"
-      return "famfamfam_silk/arrow_up.png"
+      "famfamfam_silk/arrow_up.png"
     when "arrow_down"
-      return "famfamfam_silk/arrow_down.png"
+      "famfamfam_silk/arrow_down.png"
     when "arrow_right", "next"
-      return "famfamfam_silk/arrow_right.png"
+      "famfamfam_silk/arrow_right.png"
     when "arrow_left", "back"
-      return "famfamfam_silk/arrow_left.png"
+      "famfamfam_silk/arrow_left.png"
     when "new"
-      return "famfamfam_silk/add.png"
+      "famfamfam_silk/add.png"
     when "download"
-      return "redmond_studio/arrow-down_16.png"
+      "redmond_studio/arrow-down_16.png"
     when "show"
-      return "famfamfam_silk/zoom.png"
+      "famfamfam_silk/zoom.png"
     when "edit"
-      return "famfamfam_silk/page_white_edit.png"
+      "famfamfam_silk/page_white_edit.png"
     when "edit-off"
-      return "stop_edit.png"
+      "stop_edit.png"
     when "manage"
-      return "famfamfam_silk/wrench.png"
+      "famfamfam_silk/wrench.png"
     when "destroy"
-      return "famfamfam_silk/cross.png"
+      "famfamfam_silk/cross.png"
     when "tag"
-      return "famfamfam_silk/tag_blue.png"
+      "famfamfam_silk/tag_blue.png"
     when "favourite"
-      return "famfamfam_silk/star.png"
+      "famfamfam_silk/star.png"
     when "comment"
-      return "famfamfam_silk/comment.png"
+      "famfamfam_silk/comment.png"
     when "comments"
-      return "famfamfam_silk/comments.png"
+      "famfamfam_silk/comments.png"
     when "info"
-      return "famfamfam_silk/information.png"
+      "famfamfam_silk/information.png"
     when "help"
-      return "famfamfam_silk/help.png"
+      "famfamfam_silk/help.png"
     when "confirm"
-      return "famfamfam_silk/accept.png"
+      "famfamfam_silk/accept.png"
     when "reject"
-      return "famfamfam_silk/cancel.png"
+      "famfamfam_silk/cancel.png"
     when "user", "person"
-      return "famfamfam_silk/user.png"
+      "famfamfam_silk/user.png"
     when "user-invite"
-      return "famfamfam_silk/user_add.png"
+      "famfamfam_silk/user_add.png"
     when "avatar"
-      return "famfamfam_silk/picture.png"
+      "famfamfam_silk/picture.png"
     when "avatars"
-      return "famfamfam_silk/photos.png"
+      "famfamfam_silk/photos.png"
     when "save"
-      return "famfamfam_silk/save.png"
+      "famfamfam_silk/save.png"
     when "message"
-      return "famfamfam_silk/email.png"
+      "famfamfam_silk/email.png"
     when "message_read"
-      return "famfamfam_silk/email_open.png"
+      "famfamfam_silk/email_open.png"
     when "reply"
-      return "famfamfam_silk/email_go.png"
+      "famfamfam_silk/email_go.png"
     when "message_delete"
-      return "famfamfam_silk/email_delete.png"
+      "famfamfam_silk/email_delete.png"
     when "messages_outbox"
-      return "famfamfam_silk/email_go.png"
+      "famfamfam_silk/email_go.png"
     when "file"
-      return "redmond_studio/documents_16.png"
+      "redmond_studio/documents_16.png"
     when "logout"
-      return "famfamfam_silk/door_out.png"
+      "famfamfam_silk/door_out.png"
     when "login"
-      return "famfamfam_silk/door_in.png"
+      "famfamfam_silk/door_in.png"
     when "picture"
-      return "famfamfam_silk/picture.png"
+      "famfamfam_silk/picture.png"
     when "pictures"
-      return "famfamfam_silk/photos.png"
+      "famfamfam_silk/photos.png"
     when "profile"
-      return "famfamfam_silk/user_suit.png"
+      "famfamfam_silk/user_suit.png"
     when "history"
-      return "famfamfam_silk/time.png"
+      "famfamfam_silk/time.png"
     when "news"
-      return "famfamfam_silk/newspaper.png"
+      "famfamfam_silk/newspaper.png"
     when "view-all"
-      return "famfamfam_silk/table_go.png"
+      "famfamfam_silk/table_go.png"
     when "announcement"
-      return "famfamfam_silk/transmit.png"
+      "famfamfam_silk/transmit.png"
     when "denied"
-      return "famfamfam_silk/exclamation.png"
+      "famfamfam_silk/exclamation.png"
     when "institution"
-      return "famfamfam_silk/house.png"
+      "famfamfam_silk/house.png"
     when "project"
-      return "famfamfam_silk/report.png"
+      "famfamfam_silk/report.png"
     when "tick"
-      return "famfamfam_silk/tick.png"
+      "famfamfam_silk/tick.png"
     when "lock"
-      return "famfamfam_silk/lock.png"
+      "famfamfam_silk/lock.png"
     when "no_user"
-      return "famfamfam_silk/link_break.png"
+      "famfamfam_silk/link_break.png"
     when "sop"
-      return "famfamfam_silk/page.png"
+      "famfamfam_silk/page.png"
     when "sops"
-      return "famfamfam_silk/page_copy.png"
+      "famfamfam_silk/page_copy.png"
     when "model"
-      return "famfamfam_silk/calculator.png"
+      "famfamfam_silk/calculator.png"
     when "models"
-      return "famfamfam_silk/calculator.png"
+      "famfamfam_silk/calculator.png"
     when "data_file","data_files"
-      return "famfamfam_silk/database.png"
+      "famfamfam_silk/database.png"
     when "study"
-      return "famfamfam_silk/page.png"
+      "famfamfam_silk/page.png"
     when "execute"
-      return "famfamfam_silk/lightning.png"
+      "famfamfam_silk/lightning.png"
     when "warning"
-      return "famfamfam_silk/error.png"
+      "famfamfam_silk/error.png"
     when "error"
-      return "famfamfam_silk/exclamation.png"
+      "famfamfam_silk/exclamation.png"
     when "feedback"
-      return "famfamfam_silk/email.png"
+      "famfamfam_silk/email.png"
     when "spinner"
-      return "ajax-loader.gif"
+      "ajax-loader.gif"
     when "large-spinner"
-      return "ajax-loader-large.gif"
+      "ajax-loader-large.gif"
     when "current"
-      return "famfamfam_silk/bullet_green.png"
+      "famfamfam_silk/bullet_green.png"
     when "collapse"
       "folds/fold.png"
     when "expand"
@@ -163,20 +163,35 @@ module ImagesHelper
     when "admin"
       "admin.png"
     when "pdf_file"
-      return "file_icons/small/pdf.png"
+      "file_icons/small/pdf.png"
     when "xls_file"
-      return "file_icons/small/xls.png"
+      "file_icons/small/xls.png"
     when "doc_file"
-      return "file_icons/small/doc.png"
+      "file_icons/small/doc.png"
     when "misc_file"
-      return "file_icons/small/genericBlue.png"
+      "file_icons/small/genericBlue.png"
     when "ppt_file"
-      return "file_icons/small/ppt.png"
+      "file_icons/small/ppt.png"
+    when "investigation_avatar"
+      "crystal_project/32x32/actions/search.png"
+    when "model_avatar"
+      "crystal_project/32x32/apps/kwikdisk.png"
+    when "study_avatar"
+      "famfamfam_silk/book_open.png"
+    when "assay_avatar"
+      "famfamfam_silk/report.png"
+    when "person_avatar"
+      "avatar.png"
+    when "project_avatar"
+      "project_64x64.png"
+    when "institution_avatar"
+      "institution_64x64.png"
+    when "saved_search"
+      "crystal_project/32x32/actions/find.png"
     else
       return nil
     end
   end
-
 
   def help_icon(text, delay=200, extra_style="")
     image_tag icon_filename_for_key("help"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
@@ -229,29 +244,29 @@ module ImagesHelper
       if object.avatar_selected?
         img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
       else
-        img = null_avatar(object.class.name, size, alternative)
+        img = default_avatar(object.class.name, size, alternative)
       end
     when "datafile", "sop"
       img = image_tag file_type_icon_url(object),
         :alt => alt,
         :class=> "avatar framed"
     when "model"
-      img = image_tag "/images/crystal_project/32x32/apps/kwikdisk.png",
-        :alt => alt,
-        :class=>"avatar framed"
+      img = image "model_avatar",
+        {:alt => alt,
+        :class=>"avatar framed"}
     when "investigation"
-      img = image_tag "/images/crystal_project/32x32/actions/search.png",
-        :alt => alt,
-        :class=>"avatar framed"
+      img = image "investigation_avatar",
+        {:alt => alt,
+        :class=>"avatar framed"}
     when "study"
-      img = image_tag "/images/famfamfam_silk/book_open.png",
-        :alt => alt,
-        :class=>"avatar framed"
+      img = image "study_avatar",
+        {:alt => alt,
+        :class=>"avatar framed"}
 
     when "assay"
-      img = image_tag "/images/famfamfam_silk/report.png",
-        :alt => alt,
-        :class => "avatar framed"
+      img = image "assay_avatar",
+        {:alt => alt,
+        :class => "avatar framed"}
     end
 
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
@@ -277,22 +292,9 @@ module ImagesHelper
     return basic_url
   end
 
-  def null_avatar(object_class_name, size=200, alt="Anonymous", onclick_options="")
-    case object_class_name.downcase
-    when "person"
-      avatar_filename = "avatar.png"
-    when "institution"
-      avatar_filename = "institution_64x64.png"
-    when "project"
-      avatar_filename = "project_64x64.png"
-    when "datafile"
-      avatar_filename = "data_file.png"
-    when "model"
-      avatar_filename = "model.png"
-    when "sop"
-      avatar_filename = "sop.png"
-    end
-
+  def default_avatar(object_class_name, size=200, alt="Anonymous", onclick_options="")
+    avatar_filename=icon_filename_for_key("#{object_class_name.downcase}_avatar")
+    
     image_tag avatar_filename,
       :alt => alt,
       :size => "#{size}x#{size}",

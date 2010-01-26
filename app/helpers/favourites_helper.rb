@@ -12,18 +12,12 @@ module FavouritesHelper
     case item.class.name.downcase
     when "datafile", "sop"
       tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
-    when "model"
-      tiny_image = image_tag "/images/crystal_project/32x32/apps/kwikdisk.png", :class=>"fav_icon"
-    when "investigation"
-      tiny_image = image_tag "/images/crystal_project/32x32/actions/search.png", :class=>"fav_icon"
-    when "study"
-      tiny_image = image_tag "/images/famfamfam_silk/book_open.png", :class=>"fav_icon"
-    when "assay"
-      tiny_image = image_tag "/images/famfamfam_silk/report.png", :class=>"fav_icon"
+    when "model","investigation","study","assay"
+      tiny_image = image "#{item.class.name.downcase}_avatar", :class=>"fav_icon"
     when "person", "project", "institution"
       tiny_image = avatar(item, 32, true)
     when "savedsearch"
-      tiny_image = image_tag "/images/crystal_project/32x32/actions/find.png", :class=>"fav_icon"
+      tiny_image = image "saved_search", :class=>"fav_icon"
     end
     
     image_tag_code = tiny_image #avatar(item, 24, true)
