@@ -16,7 +16,7 @@ class ProjectsController < ApplicationController
   # GET /projects
   # GET /projects.xml
   def index   
-    @projects = Project.paginate :page=>params[:page]
+    @projects = Project.paginate :page=>params[:page], :default_page => "all"
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @projects.to_xml(:except=>["site_credentials","site_root_uri"])  }
