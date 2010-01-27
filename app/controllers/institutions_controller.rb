@@ -7,6 +7,8 @@ class InstitutionsController < ApplicationController
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_all]
   before_filter :editable_by_user, :only=>[:edit,:update]
 
+  cache_sweeper :institutions_sweeper,:only=>[:update,:create,:destroy]
+
 
   # GET /institutions
   # GET /institutions.xml

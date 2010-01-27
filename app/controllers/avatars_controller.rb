@@ -4,6 +4,8 @@ class AvatarsController < ApplicationController
   before_filter :check_owner_specified
   before_filter :find_avatars, :only => [ :index ]
   before_filter :find_avatar_auth, :only => [ :show, :select, :edit, :update, :destroy ]
+
+  cache_sweeper :avatars_sweeper,:only=>[:destroy,:select,:create]
   
   protect_from_forgery :except => [ :new ]
   
@@ -31,7 +33,8 @@ class AvatarsController < ApplicationController
     end
 
     respond_to do |format|
-      if file_specified && @avatar.save
+      if file_specified && @avatar.save        
+
         # the last thing to check - if no avatar was selected for owner before (i.e. owner.avatar_id was NULL),
         # make the new avatar selected
         if @avatar.owner.avatar_id.nil?
@@ -43,6 +46,7 @@ class AvatarsController < ApplicationController
         # updated to take account of possibly various locations from where this method can be called,
         # so multiple redirect options are possible -> now return link is passed as a parameter
         format.html { redirect_to(params[:return_to] + "?use_unsaved_session_data=true") }
+
       else
         # "create" action was already called once; render it again
         @avatar = Avatar.new
@@ -118,6 +122,7 @@ class AvatarsController < ApplicationController
       # PictureSelection.create(:user => current_user, :picture => @picture)
       ## END
       
+      @avatar.save #forces a update callback, which invokes the sweeper
       respond_to do |format|
         flash[:notice] = 'Profile avatar was successfully updated.'
         format.html { redirect_to eval("#{@avatar_owner_instance.class.name.downcase}_avatars_url(#{@avatar_owner_instance.id})") }

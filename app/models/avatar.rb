@@ -39,7 +39,7 @@ class Avatar < ActiveRecord::Base
   
   
   def select!
-    unless selected?
+    unless selected?      
       owner.update_attribute :avatar_id, id
       return true
     else
