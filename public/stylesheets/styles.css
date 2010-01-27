@@ -736,6 +736,7 @@ img.fav_icon {
     max-height: 32px;
     padding: 3px;
     background-color: rgb(255, 255, 255);
+    margin-right: -1px;
 }
 
 div.favouritable_icon img {
