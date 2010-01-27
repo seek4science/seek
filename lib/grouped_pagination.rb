@@ -31,7 +31,7 @@ module GroupedPagination
       if page == "all"
         records=collection
       elsif page == "latest"
-        records=collection.sort_by{|r| r.created_at}[0...limit]
+        records=collection.sort{|x,y| y.created_at <=> x.created_at}[0...limit]
       elsif @pages.include?(page)           
         records=collection.select {|i| i.first_letter == page}        
       end
@@ -81,7 +81,7 @@ module GroupedPagination
       if page == "all"
         records=self.find(:all)
       elsif page == "latest"
-        records=self.find(:all,:order=>'updated_at DESC', :limit=>limit)
+        records=self.find(:all,:order=>'created_at DESC', :limit=>limit)
       elsif @pages.include?(page)
         conditions = merge_optional_conditions(options[:conditions], page)
         query_options = [:conditions=>conditions]
