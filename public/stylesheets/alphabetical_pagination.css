@@ -12,6 +12,7 @@
 
 .alphabetcal_pagination ul li {
 	display: inline;
+  padding: 1px 2px;
 }
 
 .alphabetcal_pagination a {
