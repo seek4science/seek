@@ -819,3 +819,10 @@ div.list_item_whole_width{
   margin-right: 1em;
   width: 90%;  
 }
+
+div#logged_in_as {
+    float:right;
+    top: 1px;
+    margin-left: 10px;
+    text-align:left;
+}
