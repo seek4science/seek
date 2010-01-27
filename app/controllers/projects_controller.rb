@@ -9,6 +9,8 @@ class ProjectsController < ApplicationController
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
 
+  cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
+
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
   end
