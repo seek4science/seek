@@ -34,4 +34,6 @@
 </div>
 
 <h2>Related assays</h2>
-<%= render :partial=>"assays/resource_list_item",:collection=>@assay_type.get_child_assays %>
+<div class="list_items_container">
+  <%= render :partial => "layouts/resource_list_item", :collection=>@assay_type.get_child_assays %>
+</div>

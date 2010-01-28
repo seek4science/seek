@@ -71,6 +71,7 @@ class ApplicationController < ActionController::Base
       error("Admin rights required", "is invalid (not admin)")
       return false
     end
+    return true
   end
 
   def logout_user
@@ -93,6 +94,16 @@ class ApplicationController < ActionController::Base
   def pal_or_admin_required
     unless current_user.is_admin? || (!current_user.person.nil? && current_user.person.is_pal?)
       error("Admin or PAL rights required", "is invalid (not admin)")
+      return false
+    end
+  end
+  
+  
+  def check_type_managing_enabled
+    if (defined? TYPE_MANAGING_ENABLED) && TYPE_MANAGING_ENABLED
+      return true
+    else
+      error("Type managing has been disabled", "...")
       return false
     end
   end
@@ -126,4 +137,5 @@ class ApplicationController < ActionController::Base
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
   filter_parameter_logging :password
+
 end
