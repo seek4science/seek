@@ -1,8 +1,7 @@
 class AssayTypesController < ApplicationController
 
   before_filter :login_required
-  before_filter :check_type_managing_enabled, :except=>[:show]
-  before_filter :is_user_admin_auth,:except=>[:show]
+  before_filter :check_allowed_to_manage_types, :except=>[:show]
 
   def show
     @assay_type = AssayType.find(params[:id])

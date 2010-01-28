@@ -99,12 +99,32 @@ class ApplicationController < ActionController::Base
   end
   
   
-  def check_type_managing_enabled
-    if (defined? TYPE_MANAGING_ENABLED) && TYPE_MANAGING_ENABLED
-      return true
-    else
-      error("Type managing has been disabled", "...")
+  def check_allowed_to_manage_types
+    unless defined? TYPE_MANAGERS
+      error("Type management disabled", "...")
       return false
+    end
+    
+    case TYPE_MANAGERS
+      when "admins"
+        if current_user.is_admin? 
+          return true
+        else
+          error("Admin rights required to manage types", "...")
+          return false
+        end
+      when "pals"
+        if current_user.is_admin? || current_user.person.is_pal? 
+          return true
+        else
+          error("Admin or PAL rights required to manage types", "...")
+          return false
+        end
+      when "users"
+        return true        
+      when "none"
+        error("Type management disabled", "...")
+        return false
     end
   end
 

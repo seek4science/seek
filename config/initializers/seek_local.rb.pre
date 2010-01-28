@@ -19,5 +19,5 @@ GOOGLE_ANALYTICS_TRACKER_ID = 'XX-XXXXXXX-X'
 
 MERGED_TAG_THRESHOLD=5
 
-#Enable admin managing of assay & technology types
-TYPE_MANAGING_ENABLED = false
+#Enable managing of assay and technology types by "admins", "pals", "users" or "none"
+TYPE_MANAGERS = "admins"
