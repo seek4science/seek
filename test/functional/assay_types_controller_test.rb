@@ -5,6 +5,12 @@ class AssayTypesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
+  test "show" do
+    login_as(:quentin)
+    get :show,:id=>assay_types(:metabolomics)
+    assert_response :success
+  end
+
   test "should show manage page" do
     login_as(:quentin)
     get :manage

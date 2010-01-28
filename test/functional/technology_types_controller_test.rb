@@ -5,6 +5,12 @@ class TechnologyTypesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
+  test "show" do
+    login_as(:quentin)
+    get :show,:id=>technology_types(:gas_chromatography)
+    assert_response :success
+  end
+
   test "should show manage page" do
     login_as(:quentin)
     get :manage

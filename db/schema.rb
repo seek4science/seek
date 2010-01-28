@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
 
   create_table "assays", :force => true do |t|
     t.string   "title"
-    t.string   "description"
+    t.text     "description"
     t.integer  "assay_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -40,12 +40,13 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
     t.integer  "study_id"
     t.integer  "organism_id"
     t.integer  "owner_id"
-    t.string   "first_letter",       :limit => 1
+    t.integer  "culture_growth_type_id",              :default => 0
+    t.string   "first_letter",           :limit => 1
   end
 
-  create_table "assays_sops", :id => false, :force => true do |t|
-    t.integer "assay_id"
-    t.integer "sop_id"
+  create_table "asset_authors", :id => false, :force => true do |t|
+    t.integer "asset_id"
+    t.integer "author_id"
   end
 
   create_table "assets", :force => true do |t|
@@ -71,28 +72,10 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
     t.datetime "updated_at"
   end
 
-  create_table "condition_types", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "condition_types_edges", :id => false, :force => true do |t|
-    t.integer "parent_id"
-    t.integer "child_id"
-  end
-
   create_table "content_blobs", :force => true do |t|
-    t.binary "data", :limit => 2147483647
-  end
-
-  create_table "created_datas", :force => true do |t|
-    t.string   "status"
-    t.integer  "person_id"
-    t.integer  "assay_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "data_file_id"
+    t.binary "data",   :limit => 2147483647
+    t.string "md5sum"
+    t.string "url"
   end
 
   create_table "culture_growth_types", :force => true do |t|
@@ -141,6 +124,7 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
   end
 
@@ -157,13 +141,13 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
 
   create_table "experimental_conditions", :force => true do |t|
     t.integer  "measured_item_id"
-    t.integer  "condition_type_id"
     t.float    "start_value"
     t.float    "end_value"
     t.integer  "unit_id"
     t.integer  "sop_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "sop_version"
   end
 
   create_table "favourite_group_memberships", :force => true do |t|
@@ -182,9 +166,9 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
   end
 
   create_table "favourites", :force => true do |t|
-    t.integer  "asset_id"
+    t.integer  "resource_id"
     t.integer  "user_id"
-    t.string   "model_name"
+    t.string   "resource_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -278,6 +262,7 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
   end
 
@@ -348,14 +333,6 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
     t.string   "site_root_uri"
   end
 
-  create_table "random_numbers", :force => true do |t|
-    t.integer  "a"
-    t.integer  "b"
-    t.string   "c"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "recommended_model_environments", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -374,6 +351,14 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
 
   create_table "roles", :force => true do |t|
     t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "saved_searches", :force => true do |t|
+    t.integer  "user_id"
+    t.text     "search_query"
+    t.text     "search_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -406,6 +391,7 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
   end
 
@@ -419,6 +405,7 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.float    "standard_deviation"
+    t.integer  "data_file_version"
   end
 
   create_table "studies", :force => true do |t|
