@@ -20,10 +20,12 @@ module Jerm
     end
 
     def update    
+      responses = [] 
       resources = changed_since(last_run)
       resources.each do |resource|
-        populate resource
+        responses << populate(resource)
       end
+      return responses
     end
     
     def changed_since(date)
@@ -53,8 +55,10 @@ module Jerm
       doc = open(target, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("//a").each do |e|
         uri = e.attributes['href']
-        uri = BASE_URL + uri unless uri.starts_with?("http")
-        links << uri
+        unless uri.starts_with?("/file/")
+          uri = BASE_URL + uri unless uri.starts_with?("http")
+          links << uri
+        end
       end
       
       links.each do |link|
@@ -76,7 +80,8 @@ module Jerm
       end
     end
     
-    def get_data(uri)    
+    def get_data(uri)
+      puts "GETTING DATA FROM: " + uri
       #Open the page, using the http authentication
       doc = open(uri, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("//").each do |e|
