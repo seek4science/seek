@@ -28,6 +28,7 @@ Rails::Initializer.run do |config|
   config.gem 'rubaidh-google_analytics', :lib => 'rubaidh/google_analytics', :source => 'http://gems.github.com'  
   config.gem 'spreadsheet'
   config.gem 'hpricot'
+  config.gem 'fastercsv', :version=>"1.5.0"
   #config.gem 'libxml-ruby'
 
   # Only load the plugins named here, in the order given. By default, all plugins 
