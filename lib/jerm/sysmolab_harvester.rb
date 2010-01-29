@@ -102,7 +102,7 @@ module Jerm
           when "a"
             if e['href'].starts_with?("/file/")
               #sort out relative paths
-              resource_uri = "https://sysmolab.wikispaces.com" + e.attributes['href']    
+              resource_uri = "https://sysmolab.wikispaces.com/space/dav/files/" + (e.attributes['href'].split("/").last)    
               unless @searched_uris.include?(resource_uri)
                 #Remember we've visited this link
                 @searched_uris << resource_uri
