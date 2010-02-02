@@ -13,18 +13,20 @@ module Jerm
 
     def populate
       valid = false
+      doc = open(self.uri, :http_basic_authentication=>[@username, @password])
+      self.timestamp = doc.last_modified
       if self.uri.ends_with?(".xls")
-        valid = parse_spreadsheet
+        valid = parse_spreadsheet(doc)
       end
       return valid
     end
     
     private 
     
-    def parse_spreadsheet
+    def parse_spreadsheet(file)
       valid = false
       filename = "temp_ss_#{self.object_id}.xls"
-      File.open(filename, 'w') {|f| f.write(open(self.uri, :http_basic_authentication=>[@username, @password]).read)}
+      File.open(filename, 'w') {|f| f.write(file.read)}
       ss = Spreadsheet.open(filename)
       sheet1 = ss.worksheet 'Metadata'
       if sheet1

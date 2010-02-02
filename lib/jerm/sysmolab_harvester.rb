@@ -29,7 +29,7 @@ module Jerm
     end
     
     def changed_since(date)
-      @changed_since_date = date #TODO: use this for something
+      @changed_since_date = date
       
       @visited_links = []
       @resources = []
@@ -81,7 +81,6 @@ module Jerm
     end
     
     def get_data(uri)
-      puts "GETTING DATA FROM: " + uri
       #Open the page, using the http authentication
       doc = open(uri, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("//").each do |e|
@@ -118,8 +117,10 @@ module Jerm
         #Create data file resources
         unless @data_files.empty?
           @data_files.uniq.each do |d|
-            res = construct_resource(d)
-            @resources << res
+            if get_last_modified_date(d) > @changed_since_date
+              res = construct_resource(d)
+              @resources << res
+            end
           end
         end 
       end
@@ -132,9 +133,20 @@ module Jerm
       res.project = "SysMO-LAB"
       return res
     end
+    
+    def get_last_modified_date(uri)
+      uri = URI.parse(uri)
+      response = nil
+      Net::HTTP.start(uri.host) {|http|
+        req = Net::HTTP::Head.new(uri.request_uri)
+        req.basic_auth @username, @password
+        response = http.request(req)
+      }
+      return response['last-modified'].to_datetime
+    end
   end
 
   def project_name
     "SysMO-Lab"
-  end
+  end  
 end
