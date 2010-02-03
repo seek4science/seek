@@ -47,7 +47,7 @@ module ResourceListItemHelper
   def list_item_simple_list items, attribute
     html = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     if items.empty?
-      html << "<span class='none_text'>None specified</span>"
+      html << "<span class='none_text'>Not specified</span>"
     else
       items.each do |i|
         if block_given?
@@ -65,7 +65,7 @@ module ResourceListItemHelper
     html = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     items = Authorization.authorize_collection("view", items, current_user,false)
     if items.empty?
-      html << "<span class='none_text'>No #{attribute.downcase} or non visible to you</span>"
+      html << "<span class='none_text'>No #{attribute} or none are visible to you</span>"
     else
       items = items.sort{|a,b| get_object_title(a)<=>get_object_title(b)} if sort
       items.each do |i|
@@ -83,7 +83,7 @@ module ResourceListItemHelper
     return "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
   end
   
-  def list_item_optional_attribute attribute, value, url=nil, missing_value_text="None specified"
+  def list_item_optional_attribute attribute, value, url=nil, missing_value_text="Not specified"
     if value.blank?
       value = "<span class='none_text'>#{missing_value_text}</span>"
     else
