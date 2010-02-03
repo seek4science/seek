@@ -2,12 +2,7 @@
 
 
 
-<div style="padding-left:2em;">
-
-  <p>
-    <%= link_to "Activity graphs (experimental)", url_for(:action=>"graphs", :controller=>"admin") %>
-  </p>
-
+<div style="padding-left:2em;"> 
   <p>
     <%= link_to "Manage tags", url_for(:action=>"tags", :controller=>"admin") %>
   </p>
@@ -24,6 +19,8 @@
 </div>
 
 <div style="padding-left:2em;">
+
+  <%= render :partial=>"stats" -%>
 
   <%= render :partial=>"users_details", :locals=>{:people=>Person.pals, :title=>"Official Sysmo PALS" } -%>
 
