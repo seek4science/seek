@@ -827,3 +827,14 @@ div#logged_in_as {
     margin-left: 10px;
     text-align:left;
 }
+
+div.hidden_list_item {
+    width: 95%;
+    background-color: #F0F0F0;
+    margin-top: 6px;
+    padding: 1em;
+    border: #999999 solid 1px;
+    border-collapse: collapse;
+    color: #999999;
+    float:left;
+}

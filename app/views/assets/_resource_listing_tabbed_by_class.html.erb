@@ -8,31 +8,43 @@
 <% tabs_id ||= "resource_list_by_class" -%>
 <% narrow_view ||= false -%>
 <% authorization_already_done ||= false -%>
+<% hidden_asset_count_hash ||= {} %>
 
 <script type="text/javascript">
   tabber_ids.push("<%= tabs_id -%>");  
 </script>
 
 
-<% unless asset_hash.empty? -%>
+<% unless asset_hash.empty? && hidden_asset_count_hash.empty?-%>
   <div id='<%= "#{tabs_id}_spinner" -%>'>
     <center>
       <%= image_tag "ajax-loader-large.gif" -%>
     </center>
   </div>
   <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
-
     <% Asset::ASSET_ORDER.each do |resource_type| -%>
       <% visible_resource_type = resource_type.titleize.pluralize -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
-      <% unless (resources = asset_hash[resource_type]).nil? || resources.empty? -%>
-        <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab">
-          <h3><%= "#{visible_resource_type} (#{resources.length})" -%></h3>
-          <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => authorization_already_done } -%>
+      <% hidden_count = hidden_asset_count_hash[resource_type.underscore.pluralize] || 0 %>
+      <% resources = asset_hash[resource_type]||[] %>
+      <% unless (resources.empty? && hidden_count < 1) %>
+        <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab"> 
+          <% unless resources.empty? %>         
+            <h3><%= "#{visible_resource_type} (#{resources.length}#{"+"+hidden_count.to_s if hidden_count > 0})" -%></h3>
+            <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => authorization_already_done } -%>
+          <% else %>
+            <h3><%= "#{visible_resource_type} (0+#{hidden_count})" -%></h3>
+          <% end %>
+          <% unless hidden_count < 1 %>
+            <div class="list_items_container">
+              <div class="hidden_list_item"><%= hidden_count -%> hidden <%= hidden_count > 1 ? "items" : "item" %></div>
+              <br style="clear:both"/>
+            </div>
+          <% end %>
         </div>
       <% end -%>
     <% end -%>
   </div>
 <% else -%>
-  <span class="none_text">No items (or none that are visible to you).</span>
+  <span class="none_text">No items.</span>
 <% end -%>

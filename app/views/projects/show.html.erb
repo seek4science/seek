@@ -57,17 +57,8 @@
     </p>
 
     <%# get, classify and authorize all assets for this project -%>
-    <% project_resource_hash = Asset.classify_and_authorize(@project.assets, true, current_user) -%>
-    <% project_resource_hash.merge!(classify_for_tabs(@project.people)) -%>
-    <% project_resource_hash.merge!(classify_for_tabs(@project.institutions)) -%>
-    <% project_resource_hash.merge!(classify_for_tabs(@project.assays)) -%>
-    <% project_resource_hash.merge!(classify_for_tabs(@project.studies)) -%>
-    <% project_resource_hash.merge!(classify_for_tabs(@project.investigations)) -%>    
-
-    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@project.name,:item_hash=>project_resource_hash} %>
-
+    <%= render :partial=>"layouts/items_related_to",:object => @project %>
+    
   </div>
+  
 </div>
-
-
-

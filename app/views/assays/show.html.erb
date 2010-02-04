@@ -70,7 +70,7 @@
     <b>Culture growth: </b><%= model_title_or_not_specified(@assay.culture_growth_type) %>
   </p>
 
-  <%= render :partial=>"assays/assay_tabs",:object=>@assay %>
+  <%= render :partial=>"layouts/items_related_to",:object => @assay %>
 
 </div>
 

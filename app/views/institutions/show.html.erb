@@ -49,8 +49,6 @@
   <div style="clear:both;">
     
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <% institution_resource_hash = classify_for_tabs(@institution.projects) %>
-    <% institution_resource_hash.merge!(classify_for_tabs(@institution.people)) %>
-    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@institution.name,:item_hash=>institution_resource_hash} %>
+    <%= render :partial=>"layouts/items_related_to",:object => @institution %>
   </div>
 </div>
