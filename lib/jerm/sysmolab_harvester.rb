@@ -118,6 +118,15 @@ module Jerm
         unless @data_files.empty?
           @data_files.uniq.each do |d|
             if get_last_modified_date(d) > @changed_since_date
+              #Ridiculous title retrieval:
+              if @file_type == "DataFile"
+                text = doc.inner_html.gsub(/<[^a](.*)>/,"").split("\n").delete_if{|a| a.blank?}
+                index = text.index(text.select{|e| e.include?(d.split("/").last)}.first)
+                @title = index.nil? ? d.split("/").last : text[index-1].strip
+              else
+                @title =  d.split("/").last
+              end
+              #Make resource
               res = construct_resource(d)
               @resources << res
             end
