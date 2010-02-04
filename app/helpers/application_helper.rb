@@ -381,8 +381,8 @@ module ApplicationHelper
         related["projects"] = classify_for_tabs([resource.project])
         related["assays"] = classify_for_tabs(resource.assays)
       when "Organism"
-        related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
-        related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size         
+        related["models"] = Asset.classify_and_authorize_resources(resource.models, true, current_user)
+        related_hidden["models"] = resource.models.size - (related["models"]["Model"] || []).size         
         related["projects"] = classify_for_tabs(resource.projects)
         related["assays"] = classify_for_tabs(resource.assays)
       when "Person"
