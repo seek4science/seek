@@ -35,20 +35,7 @@
 	<%= render :partial => "avatars/selector_hlist", :locals => { :avatar_for_instance => project, :form_instance => f } -%>
 <% end -%>
 
-<% if current_user.is_admin? -%>
-<h2 style="margin-top: 2em;">Participating Institutions</h2>
 
-<div style="text-align: center;">
-	<div style="width: 95%; text-align: left;">
-	  <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making your selection from the list below.") -%>
-		<%= f.label :institution_ids, "Please select the institutions that participate in this project", :style => "line-height: 2;" -%><br/>
-	  <%= f.collection_select :institution_ids, Institution.find(:all, :order=>:name), :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
-	</div>
-</div>
-<%= render :partial=>"remote_site_details",:locals=>{:f=>f} %>
-<br/>
-<%= render :partial=>"default_policy_form",:locals=>{:f=>f} %>
-<% end -%>
 
 <p style="margin-top: 2em; text-align: center;">
   <%= f.submit(project ? "Update" : "Create") -%>

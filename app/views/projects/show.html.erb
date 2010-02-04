@@ -6,6 +6,7 @@
   <ul class="sectionIcons">
     <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit Project Details", nil, 'Edit Project Details')%></li>
     <% if current_user.is_admin? -%>
+      <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "Project administration" -%></li>
       <li><%= image_tag_for_key "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%></li>
     <% end -%>
   </ul>
@@ -17,8 +18,7 @@
 
   <div class="main_content_left_box">
 
-    <div class="box_about_actor">
-      
+    <div class="box_about_actor">      
         <p>
           <label>Public Web page:</label>
           <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
