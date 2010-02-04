@@ -152,8 +152,8 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_select "div.tabbertab" do
       assert_select "h3",:text=>"Assays (1)",:count=>1
-      assert_select "h3",:text=>"SOPs (1)",:count=>1
-      assert_select "h3",:text=>"Data Files (1)",:count=>1
+      assert_select "h3",:text=>"SOPs (1+1)",:count=>1
+      assert_select "h3",:text=>"Data Files (1+1)",:count=>1
     end
     
     assert_select "div.list_item" do
