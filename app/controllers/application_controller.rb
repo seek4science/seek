@@ -153,6 +153,14 @@ class ApplicationController < ActionController::Base
     render :template=>"errors/404", :layout=>"errors"
   end
 
+  def download_jerm_resource resource
+      project=resource.project
+      project.decrypt_credentials
+      downloader=Jerm::DownloaderFactory.create project.name, project.site_username,project.site_password
+      data_hash = downloader.get_remote_data resource.content_blob.url
+      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
+  end
+
   # See ActionController::Base for details 
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
