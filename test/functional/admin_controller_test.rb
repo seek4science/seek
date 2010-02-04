@@ -19,14 +19,14 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_not_nil flash[:error]
   end
-
-  test "show graphs" do
-
-    login_as(:quentin)
-    get :graphs
-    assert_response :success
-
-  end
+#
+#  test "show graphs" do
+#
+#    login_as(:quentin)
+#    get :graphs
+#    assert_response :success
+#
+#  end
 
   test "editing tags visible to admin" do
     login_as(:quentin)
