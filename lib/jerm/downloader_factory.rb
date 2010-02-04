@@ -12,7 +12,7 @@ module Jerm
       configpath=File.join(File.dirname(__FILE__),"config/downloaders.yml")
       config=YAML::load_file(configpath)
       downloader_class=config[project_key(project_name)] if config
-      downloader_class ? Jerm.const_get(downloader_class).new(username,password) : HttpDownloader.new
+      downloader_class ? Jerm.const_get(downloader_class).new(username,password) : HttpDownloader.new(username,password)
     end
 
     def self.project_key project_name

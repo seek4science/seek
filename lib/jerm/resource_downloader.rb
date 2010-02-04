@@ -15,21 +15,7 @@ module Jerm
     def initialize username=nil,password=nil
       @username=username
       @password=password
-    end
-    
-    private
-
-    #handles fetching data using basic authentication. Handles http and https.
-    def basic_auth url
-      uri = URI.parse(url)
-      http=Net::HTTP.new(uri.host,uri.port)
-      http.use_ssl=true if uri.scheme=="https"
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      req = Net::HTTP::Get.new(uri.path)
-      req.basic_auth @username,@password unless @username.nil? or @password.nil?
-      response = http.request(req)
-      return {:data=>response.body}
-    end
+    end        
     
   end
 
