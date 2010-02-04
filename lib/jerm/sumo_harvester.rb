@@ -124,7 +124,7 @@ module Jerm
             unless e.attributes['href'].nil?
               resource_uri = e.attributes['href']    
               #sort out relative paths
-              resource_uri = complete_url(resource_uri, extract_base_url(uri))
+              resource_uri = complete_url(resource_uri.gsub("/attachment/","/raw-attachment/"), extract_base_url(uri))
               
               #Don't visit timeline links, anchors, or pages already visited.
               unless (resource_uri.include?("timeline?") || resource_uri.starts_with?("#") || @searched_uris.include?(resource_uri))
