@@ -96,12 +96,7 @@
     <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
 
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <% persons_asset_hash = (@person.user ? Asset.classify_and_authorize((@person.user.assets | @person.authored_assets), true, current_user) : {}) -%>
-    <% persons_asset_hash.merge!(classify_for_tabs(@person.projects)) %>
-    <% persons_asset_hash.merge!(classify_for_tabs(@person.institutions)) %>
-    <% persons_asset_hash.merge!(classify_for_tabs(@person.studies)) %>
-    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@person.name,:item_hash=>persons_asset_hash} %>
-    
+    <%= render :partial=>"layouts/items_related_to",:object => @person %>    
 
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>

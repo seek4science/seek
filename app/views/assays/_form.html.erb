@@ -24,9 +24,9 @@
     	<div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>      
       <%= f.label :study -%><br/> 
       <% studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])-%>
-			<% options = "<option value=\"\">Not specified</option>" %>
+			<% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
 			<% studies.each do |s| %>
-			 <% options << "<option value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
+			 <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
 			<% end %>      
 			<select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()">
 		    <%= options %>

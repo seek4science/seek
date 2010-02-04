@@ -1,6 +1,0 @@
-<% study_resource_hash = Asset.classify_and_authorize_resources(@study.sops, true, current_user) -%>
-<% study_resource_hash.merge!(Asset.classify_and_authorize_resources(@study.data_files, true, current_user)) -%>
-<% study_resource_hash.merge!(classify_for_tabs(@study.assays)) -%>
-<% study_resource_hash.merge!(classify_for_tabs([@study.project])) -%>
-
-<%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@study.title,:item_hash=>study_resource_hash} %>

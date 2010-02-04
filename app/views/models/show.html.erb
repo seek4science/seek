@@ -99,15 +99,12 @@
     <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @model, :attributed_to => Authorization.authorize_collection("show", @model.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
   </div>
 
-  <div style="clear:both;padding-top:1em;">
-
-    
+  <div style="clear:both;padding-top:1em;">   
     
     <%= render :partial=>"execute" -%>
-
  
-    <% model_resource_hash = classify_for_tabs(@model.project.nil? ? [] : [@model.project]) -%>
-    <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@model.title,:item_hash=>model_resource_hash} %>
+    <%= render :partial=>"layouts/items_related_to",:object => @model %>
+    
   </div>
 
 </div>

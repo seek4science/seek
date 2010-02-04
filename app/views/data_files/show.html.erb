@@ -86,10 +86,6 @@
 
   </div>
 
-
-  <% data_file_resource_hash = classify_for_tabs(@data_file.assays) %>
-  <% data_file_resource_hash.merge! classify_for_tabs(@data_file.studies) -%>
-  <% data_file_resource_hash.merge! classify_for_tabs([@data_file.project]) if @data_file.project %>
-  <%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@data_file.title,:item_hash=>data_file_resource_hash} %>
+  <%= render :partial=>"layouts/items_related_to",:object => @data_file %>
 
 </div>

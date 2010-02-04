@@ -20,14 +20,16 @@ module Jerm
     end
 
     def update    
+      responses = [] 
       resources = changed_since(last_run)
       resources.each do |resource|
-        populate resource
+        responses << populate(resource)
       end
+      return responses
     end
     
     def changed_since(date)
-      @changed_since_date = date #TODO: use this for something
+      @changed_since_date = date
       
       @visited_links = []
       @resources = []
@@ -53,8 +55,10 @@ module Jerm
       doc = open(target, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("//a").each do |e|
         uri = e.attributes['href']
-        uri = BASE_URL + uri unless uri.starts_with?("http")
-        links << uri
+        unless uri.starts_with?("/file/")
+          uri = BASE_URL + uri unless uri.starts_with?("http")
+          links << uri
+        end
       end
       
       links.each do |link|
@@ -76,7 +80,7 @@ module Jerm
       end
     end
     
-    def get_data(uri)    
+    def get_data(uri)
       #Open the page, using the http authentication
       doc = open(uri, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("//").each do |e|
@@ -97,7 +101,7 @@ module Jerm
           when "a"
             if e['href'].starts_with?("/file/")
               #sort out relative paths
-              resource_uri = "https://sysmolab.wikispaces.com" + e.attributes['href']    
+              resource_uri = "https://sysmolab.wikispaces.com/space/dav/files/" + (e.attributes['href'].split("/").last)    
               unless @searched_uris.include?(resource_uri)
                 #Remember we've visited this link
                 @searched_uris << resource_uri
@@ -113,8 +117,10 @@ module Jerm
         #Create data file resources
         unless @data_files.empty?
           @data_files.uniq.each do |d|
-            res = construct_resource(d)
-            @resources << res
+            if get_last_modified_date(d) > @changed_since_date
+              res = construct_resource(d)
+              @resources << res
+            end
           end
         end 
       end
@@ -127,9 +133,20 @@ module Jerm
       res.project = "SysMO-LAB"
       return res
     end
+    
+    def get_last_modified_date(uri)
+      uri = URI.parse(uri)
+      response = nil
+      Net::HTTP.start(uri.host) {|http|
+        req = Net::HTTP::Head.new(uri.request_uri)
+        req.basic_auth @username, @password
+        response = http.request(req)
+      }
+      return response['last-modified'].to_datetime
+    end
   end
 
   def project_name
     "SysMO-Lab"
-  end
+  end  
 end

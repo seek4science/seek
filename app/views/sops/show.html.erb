@@ -83,22 +83,15 @@
 
   <div style="clear:both;padding-top:1em;">
 
-
     <h2>
       Experimental Conditions
     </h2>
     <%= render :partial=>"sops/simple_experimental_conditions_list" %>
     <br/>
 
-
     <%# get, classify and authorize all assets for this project -%>
-    <% sop_asset_hash = classify_for_tabs([@sop.project]) -%>
-    <% sop_asset_hash.merge! classify_for_tabs(@sop.assays) -%>
-    <% sop_asset_hash.merge! classify_for_tabs(@sop.studies) -%>
-
-    <%= render :partial=>"layouts/items_related_to", :locals=>{:item_name=>@sop.title, :item_hash=>sop_asset_hash} %>
+    <%= render :partial=>"layouts/items_related_to",:object => @sop %>
 
   </div>
-
 
 </div>
