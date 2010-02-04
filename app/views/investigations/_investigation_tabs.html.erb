@@ -1,8 +1,0 @@
-<% investigation_resource_hash = Asset.classify_and_authorize_resources(@investigation.data_files, true, current_user) -%>
-<% investigation_resource_hash.merge!(Asset.classify_and_authorize_resources(@investigation.sops, true, current_user)) -%>
-
-<% investigation_resource_hash.merge!(classify_for_tabs(@investigation.studies)) -%>
-
-<% investigation_resource_hash.merge!(classify_for_tabs(@investigation.assays)) -%>
-
-<%= render :partial=>"layouts/items_related_to",:locals=>{:item_name=>@investigation.title,:item_hash=>investigation_resource_hash} %>
