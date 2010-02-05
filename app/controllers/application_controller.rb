@@ -156,8 +156,8 @@ class ApplicationController < ActionController::Base
   def download_jerm_resource resource
       project=resource.project
       project.decrypt_credentials
-      downloader=Jerm::DownloaderFactory.create project.name, project.site_username,project.site_password
-      data_hash = downloader.get_remote_data resource.content_blob.url
+      downloader=Jerm::DownloaderFactory.create project.name
+      data_hash = downloader.get_remote_data resource.content_blob.url,project.site_username,project.site_password
       send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
   end
 
