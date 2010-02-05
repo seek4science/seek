@@ -24,7 +24,7 @@ class JermController < ApplicationController
     begin
       harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
       @responses = harvester.update
-      response_order=[:success,:fail,:warning,:skipped]
+      response_order=[:success,:warning,:fail,:skipped]
       @responses=@responses.sort_by{|a| response_order.index(a[:response])}
       inform_authors if EMAIL_ENABLED
     rescue Exception => @exception
@@ -83,7 +83,7 @@ class JermController < ApplicationController
     @responses.each do |r|
       if r[:seek_model]
         resources[r[:seek_model].contributor_id] ||= []
-        resources[r[:seek_model].contributor_id] << r[:seek_model]
+        resources[r[:seek_model].contributor_id] << r
       end
     end 
     resources.each_key do |author_id|

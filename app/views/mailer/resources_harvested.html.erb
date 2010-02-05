@@ -1,0 +1,29 @@
+Hi <%= @person.name %>,
+
+This email is to inform you that several of your files have been automatically harvested by SysMO SEEK and added to the database.
+<% success_resources = @resources.select{|r| r[:response] == :success} -%>
+<% warning_resources = @resources.select{|r| r[:response] == :warning} -%>
+<% unless success_resources.empty? -%>
+
+They are as follows:
+
+<% success_resources.each do |r| -%>
+  <%= r[:seek_model].class.name.titleize + " - " + r[:seek_model].title %>
+  <%= polymorphic_url(r[:seek_model], :host=>@host) %>
+    
+<% end -%>
+<% end -%>
+<% unless warning_resources.empty? -%>
+
+The following resources were missing information:
+
+<% warning_resources.each do |r| -%>
+  <%= r[:seek_model].class.name.titleize + " - " + r[:seek_model].title %>
+  Warning: <%= r[:message] %>
+  Visit this url to edit the resource: <%= edit_polymorphic_url(r[:seek_model], :host=>@host) %>
+    
+<% end -%>
+<% end -%>
+Regards,
+
+- The Sysmo-DB Team
