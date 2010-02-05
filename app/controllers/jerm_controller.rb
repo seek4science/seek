@@ -24,7 +24,7 @@ class JermController < ApplicationController
     begin
       harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
       @responses = harvester.update
-      response_order=[:success,:fail,:skipped]
+      response_order=[:success,:fail,:warning,:skipped]
       @responses=@responses.sort_by{|a| response_order.index(a[:response])}
       inform_authors if EMAIL_ENABLED
     rescue Exception => @exception

@@ -22,8 +22,8 @@ module Jerm
     #Get links from a page and search them for experiment templates
     def get_links(target, level)
       links = Array.new
-  
-      doc = open(target, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
+      uri=URI.parse(target)
+      doc = uri.open(:http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("/html/body/div#main/div#content//a").each do |e|
         uri = e.attributes['href']
         if uri.starts_with?("/trac/wiki/LIMS/Experiments/")

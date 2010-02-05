@@ -1,27 +1,36 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
+
+require 'openssl'
 module Jerm
-  class HttpDownloader < ResourceDownloader
-    def get_remote_data url
-      return basic_auth url
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+  
+  class HttpDownloader
+    def get_remote_data url, username=nil, password=nil
+      return basic_auth url, username, password
     end
 
     private
 
     #handles fetching data using basic authentication. Handles http and https.
-    def basic_auth url
-      uri = URI.parse(url)
-      http=Net::HTTP.new(uri.host,uri.port)
-      http.use_ssl=true if uri.scheme=="https"
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      req = Net::HTTP::Get.new(uri.path)
-      req.basic_auth @username,@password unless @username.nil? or @password.nil?
-      response = http.request(req)
-      if response.code == "200"
-        #FIXME: need to handle full range of 2xx sucess responses, in particular where the response is only partial
-        return {:data=>response.body}
-      else
-        raise Exception.new("Problem fetching data from remote site - response code #{response.code}")
+    #returns a hash that contains the following:
+    # :data=> the data
+    # :content_type=> the content_type
+    # :filename => the filename
+    #
+    # throws an Exception if anything goes wrong.
+    def basic_auth url, username,password      
+      begin
+        open(url,:http_basic_authentication=>[username, password]) do |f|
+          #FIXME: need to handle full range of 2xx sucess responses, in particular where the response is only partial
+          if f.status[0] == "200"                    
+            return {:data=>f.read,:content_type=>f.content_type,:filename=>f.base_uri.path.split('/').last}
+          else
+            raise Exception.new("Problem fetching data from remote site - response code #{thing.status[0]}")
+          end
+        end        
+      rescue OpenURI::HTTPError => error
+        raise Exception.new("Problem fetching data from remote site - response code #{error.io.status[0]}")
       end
     end
     

@@ -8,11 +8,11 @@ module Jerm
   class DownloaderFactory
 
     #defaults to the HttpDownloader, unless otherwise defined in the downloaders.yml
-    def self.create project_name,username,password
+    def self.create project_name
       configpath=File.join(File.dirname(__FILE__),"config/downloaders.yml")
       config=YAML::load_file(configpath)
       downloader_class=config[project_key(project_name)] if config
-      downloader_class ? Jerm.const_get(downloader_class).new(username,password) : HttpDownloader.new(username,password)
+      downloader_class ? Jerm.const_get(downloader_class).new : HttpDownloader.new
     end
 
     def self.project_key project_name
