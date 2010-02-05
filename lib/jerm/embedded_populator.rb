@@ -17,7 +17,7 @@ module Jerm
     # {:response=>:success|:fail|:skipped,:message=>"",:exception=>Exception|nil}
     def add_as_new resource
       begin
-          
+        warning=nil
         project = Project.find(:first,:conditions=>['name = ?',resource.project])
       
         if resource.author_seek_id && resource.author_seek_id.to_i>0 #final check it that the string is a number. to_i on String returns 0 if not
@@ -38,10 +38,14 @@ module Jerm
           resource_model.contributor=author.user
           #associate with ContentBlob
           resource_model.content_blob = ContentBlob.new(:url=>resource.uri)
-          resource_model.original_filename = resource.uri.split("/").last
+          resource_model.original_filename = determine_filename(resource)
 
-          #FIXME: need to determine and set a proper title
-          resource_model.title=resource_model.original_filename          
+          title=resource.title
+          if title.blank?
+            warning = "There was no title defined, so using the filename"
+            title=resource_model.original_filename
+          end
+          resource_model.title=title
           
           if project.default_policy.nil?
             response={:response=>:fail,:message=>MESSAGES[:no_default_policy]}
@@ -55,7 +59,12 @@ module Jerm
             resource_model.asset.policy=project.default_policy.deep_copy
             resource_model.asset.policy.contributor=author
             resource_model.asset.save!
-            response={:response=>:success,:message=>MESSAGES[:success],:seek_model=>resource_model}
+            if warning
+              response={:response=>:warning,:message=>warning,:seek_model=>resource_model}
+            else
+              response={:response=>:success,:message=>MESSAGES[:success],:seek_model=>resource_model}
+            end
+            
           end
           
         end
@@ -63,6 +72,10 @@ module Jerm
         response={:response=>:fail,:message=>"Something went wrong",:exception=>exception}
       end
       return response
+    end
+
+    def determine_filename resource
+      URI.unescape(resource.uri).split("/").last
     end
 
     def default_policy author,project
