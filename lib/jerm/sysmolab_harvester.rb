@@ -5,16 +5,6 @@ require 'net/https'
 module Jerm
   class SysmolabHarvester < WikiHarvester
     
-    BASE_URL = "https://sysmolab.wikispaces.com/space/dav/pages_html"
-    
-    #Sop url
-    SOP_URL = "https://sysmolab.wikispaces.com/space/dav/pages_html/SOPs"
-    
-    #List of data file urls
-    DATA_FILE_URLS = ["https://sysmolab.wikispaces.com/space/dav/pages_html/Lactococcus+lactis",
-                      "https://sysmolab.wikispaces.com/space/dav/pages_html/Enterococcus+faecalis",
-                      "https://sysmolab.wikispaces.com/space/dav/pages_html/Streptococcus+pyogenes"]
-                      
     def initialize root_uri,username,password
       super root_uri,username,password      
     end
@@ -33,16 +23,27 @@ module Jerm
       
       @visited_links = []
       @resources = []
-      @searched_uris = []         
+      @searched_uris = []
+      
+      data_file_urls = []
+      
+      #Get DataFile starting links from the menu
+      doc = open(@base_uri + "/space.menu", :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
+      doc.search("/ul//a").each do |e|
+        uri = e.attributes['href']
+        uri = @base_uri + uri
+        data_file_urls << uri
+      end
       
       @file_type = "DataFile"
-      DATA_FILE_URLS.each do |df|
+      
+      data_file_urls.each do |df|
         @level = 1 #Data files exists on the 3rd level
         get_links(df)
       end
       
       @file_type = "Sop"
-      get_data(SOP_URL)
+      get_data(@base_uri + "/SOPs")
       
       return @resources.uniq
     end
@@ -56,7 +57,7 @@ module Jerm
       doc.search("//a").each do |e|
         uri = e.attributes['href']
         unless uri.starts_with?("/file/")
-          uri = BASE_URL + uri unless uri.starts_with?("http")
+          uri = @base_uri + uri unless uri.starts_with?("http")
           links << uri
         end
       end
