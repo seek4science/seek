@@ -27,14 +27,9 @@ module Jerm
 
     def read_metadata metadata_uri
       #FIXME: will re-open the same metadata_uri multiple times here, which is inefficient. Should cache based upon the uri
-      uri = URI.parse(metadata_uri)
-      http=Net::HTTP.new(uri.host,uri.port)
-      http.use_ssl=true if uri.scheme=="https"
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      req = Net::HTTP::Get.new(uri.path)
-      req.basic_auth @username,@password unless @username.nil? or @password.nil?
-      response = http.request(req)
-      FasterCSV.parse(response.body) do |row|
+      downloader = HttpDownloader.new
+      data=downloader.get_remote_data(metadata_uri,@username,@password)[:data]
+      FasterCSV.parse(data) do |row|
         case row[0]
         when "ownerFirstName","ownerFirst"
           @author_first_name=row[1]
