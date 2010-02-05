@@ -1,0 +1,28 @@
+<h1>Administer Project: <%= link_to h(@project.name), project_path(@project) -%></h1>
+
+<div class="show_basic">
+  <% form_for(@project) do |f| -%>
+
+    <%= javascript_include_tag "projects.js" %>
+    
+      <%= f.error_messages %>      
+
+      <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
+      <br/>
+      <%= render :partial=>"default_policy_form",:locals=>{:f=>f} %>
+
+      <h2 style="margin-top: 2em;">Participating Institutions</h2>
+
+      <div style="width: 95%; text-align: left;">
+        <%= help_icon("To select multiple institutions press & hold CTRL<br/>while making your selection from the list below.") -%>
+        <%= f.label :institution_ids, "Please select the institutions that participate in this project", :style => "line-height: 2;" -%><br/>
+        <%= f.collection_select :institution_ids, Institution.find(:all, :order=>:name), :id, :name, {}, {:style => "width: 85%; height: 200px;", :multiple=>true} -%>
+      </div>
+
+      <p style="margin-top: 2em; text-align: center;">
+        <%= f.submit("Update") -%>
+        or <%= link_to 'Cancel', project_path(@project.id) -%>
+      </p>
+    
+  <% end -%>
+</div>

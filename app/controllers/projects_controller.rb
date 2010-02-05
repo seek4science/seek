@@ -7,7 +7,7 @@ class ProjectsController < ApplicationController
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update]
   
-  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
+  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit, :admin ]
 
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
 
@@ -25,6 +25,14 @@ class ProjectsController < ApplicationController
     end    
   end
 
+  def admin
+    @project = Project.find(params[:id])
+    
+    respond_to do |format|
+      format.html # admin.html.erb
+    end
+  end
+
   # GET /projects/1
   # GET /projects/1.xml
   def show
@@ -38,12 +46,32 @@ class ProjectsController < ApplicationController
   # GET /projects/new
   # GET /projects/new.xml
   def new
-
     @project = Project.new
 
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @project }
+    possible_unsaved_data = "unsaved_#{@project.class.name}_#{@project.id}".to_sym
+    if session[possible_unsaved_data]
+      # if user was redirected to this 'edit' page from avatar upload page - use session
+      # data; alternatively, user has followed some other route - hence, unsaved session
+      # data is most probably not relevant anymore
+      if params[:use_unsaved_session_data]
+        # NB! these parameters are admin settings and can *occasionally* be used by super-users -
+        # regular users won't (and MUST NOT) be able to use these; it's not likely for admins
+        # or super-users to modify these along with participating institutions - therefore,
+        # it's better not to update these from session
+        #
+        # this was also causing a bug: when "upload new avatar" pressed, then new picture
+        # uploaded and redirected back to edit profile page; at this poing *new* records
+        # in the DB for institutions that participate in this project would already be created, which is an
+        # error (if the following line is ever to be removed, the bug needs investigation)
+        session[possible_unsaved_data][:project].delete(:institution_ids)
+
+        # update those attributes of a project that we want to be updated from the session
+        @project.attributes = session[possible_unsaved_data][:project]
+        @project.organism_list = session[possible_unsaved_data][:organism][:list] if session[possible_unsaved_data][:organism]
+      end
+
+      # clear the session data anyway
+      session[possible_unsaved_data] = nil
     end
   end
 

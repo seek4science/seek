@@ -157,52 +157,38 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  test "admin can edit institutions" do
-    #quentin is an admin
-    get :edit, :id=>projects(:sysmo_project)
-    assert_response :success
-    assert_select "h2",:text=>"Participating Institutions",:count=>1
-    assert_select "select#project_institution_ids",:count=>1
-  end
 
-  test "non admin cannnot edit institutions" do
+  test "non admin cannot administer project" do
     login_as(:pal_user)
-    get :edit, :id=>projects(:sysmo_project)
-    assert_response :success
-    assert_select "h2",:text=>"Participating Institutions",:count=>0
-    assert_select "select#project_institution_ids",:count=>0
-  end
-
-  test "admins can edit credentials" do
-    get :edit, :id=>projects(:sysmo_project)
-    assert_response :success
-    assert_select "h2",:text=>"Remote site details",:count=>1
-    assert_select "input#project_site_username",:count=>1
-    assert_select "input[type='password']#project_site_password",:count=>1
-  end
-
-  test "non admins cannot edit credentials" do
-    login_as(:pal_user)
-    get :edit, :id=>projects(:sysmo_project)
-    assert_response :success
-    assert_select "h2",:text=>"Remote site details",:count=>0
-    assert_select "input#project_site_username",:count=>0
-    assert_select "input#project_site_password",:count=>0
-    assert_select "input[type='password']#project_site_password",:count=>0
+    get :admin,:id=>projects(:sysmo_project)
+    assert_response :redirect
+    assert_not_nil flash[:error]
   end
   
-  test "admins can edit site uri" do
-    get :edit, :id=>projects(:sysmo_project)
-    assert_response :success    
-    assert_select "input#project_site_root_uri",:count=>1
+  test "admin can administer project" do    
+    get :admin,:id=>projects(:sysmo_project)
+    assert_response :success
+    assert_nil flash[:error]
   end
 
-  test "non admins cannot edit site root uri" do
+  test "non admin has no option to administer project" do
     login_as(:pal_user)
-    get :edit, :id=>projects(:sysmo_project)
-    assert_response :success
-    assert_select "input#project_site_root_uri",:count=>0
+    get :show,:id=>projects(:sysmo_project)
+    assert_select "ul.sectionIcons" do
+      assert_select "span.icon" do
+        assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>0
+      end
+    end
   end
+
+  test "admin has option to administer project" do
+    get :show,:id=>projects(:sysmo_project)
+    assert_select "ul.sectionIcons" do
+      assert_select "span.icon" do
+        assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>1
+      end
+    end
+  end  
 
   test "site_credentials hidden from show xml" do
     @request.env['HTTP_ACCEPT'] = 'application/xml'
@@ -247,13 +233,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert !document.find("//name").empty?,"There should be a field 'name'"
     assert document.find("//site-root-uri").empty?,"There should not be a field 'site-root-uri'"
   end
-  
-  test "default policy form hidden from non-admin" do
-    login_as(:pal_user)
-    get :edit, :id=>projects(:sysmo_project)
-    assert_response :success #can see the edit page
-    assert_select "input#cb_use_blacklist",:count=>0 #but not the default policy form
-  end
+    
   
   test "changing default policy" do
     login_as(:quentin)
