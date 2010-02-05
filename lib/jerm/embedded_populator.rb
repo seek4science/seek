@@ -18,6 +18,7 @@ module Jerm
     def add_as_new resource
       begin
         warning=nil
+        warning_code=0
         project = Project.find(:first,:conditions=>['name = ?',resource.project])
       
         if resource.author_seek_id && resource.author_seek_id.to_i>0 #final check it that the string is a number. to_i on String returns 0 if not
@@ -27,11 +28,11 @@ module Jerm
         end
 
         if project.nil?
-          response={:response=>:fail,:message=>MESSAGES[:no_project]}
+          response={:response=>:fail,:message=>MESSAGES[:no_project],:response_code=>RESPONSE_CODES[:no_project]}
         elsif author.nil?
-          response={:response=>:fail,:message=>MESSAGES[:no_author]}
+          response={:response=>:fail,:message=>MESSAGES[:no_author],:response_code=>RESPONSE_CODES[:no_author]}
         elsif resource.uri.nil?
-          response={:response=>:fail,:message=>MESSAGES[:no_uri]}
+          response={:response=>:fail,:message=>MESSAGES[:no_uri],:response_code=>RESPONSE_CODES[:no_uri]}
         else
           #create SOP,DataFile or Model (or other type that may be added in the future)        
           resource_model=eval("#{resource.type}.new")
@@ -40,15 +41,15 @@ module Jerm
           resource_model.content_blob = ContentBlob.new(:url=>resource.uri)
           resource_model.original_filename = determine_filename(resource)
 
-          title=resource.title
-          if title.blank?
-            warning = "There was no title defined, so using the filename"
-            title=resource_model.original_filename
+          if resource.title.blank?
+            warning = MESSAGES[:no_title]
+            warning_code=RESPONSE_CODES[:no_title]
+            resource.title=resource_model.original_filename
           end
-          resource_model.title=title
+          resource_model.title=resource.title
           
           if project.default_policy.nil?
-            response={:response=>:fail,:message=>MESSAGES[:no_default_policy]}
+            response={:response=>:fail,:message=>MESSAGES[:no_default_policy],:response_code=>RESPONSE_CODES[:no_default_policy]}
           else
             #save it
             #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
@@ -60,11 +61,10 @@ module Jerm
             resource_model.asset.policy.contributor=author
             resource_model.asset.save!
             if warning
-              response={:response=>:warning,:message=>warning,:seek_model=>resource_model}
+              response={:response=>:warning,:message=>warning,:seek_model=>resource_model,:response_code=>warning_code}
             else
-              response={:response=>:success,:message=>MESSAGES[:success],:seek_model=>resource_model}
-            end
-            
+              response={:response=>:success,:message=>MESSAGES[:success],:seek_model=>resource_model,:response_code=>RESPONSE_CODES[:success]}
+            end            
           end
           
         end
@@ -80,14 +80,14 @@ module Jerm
 
     def default_policy author,project
       nil
-#      Policy.new(:name => 'auto',
-#        :contributor_type => 'User',
-#        :contributor_id => author.user.id,
-#        :sharing_scope => Policy::EVERYONE,
-#        :access_type => Policy::DOWNLOADING,
-#        :use_custom_sharing => false,
-#        :use_whitelist => false,
-#        :use_blacklist => false)
+      #      Policy.new(:name => 'auto',
+      #        :contributor_type => 'User',
+      #        :contributor_id => author.user.id,
+      #        :sharing_scope => Policy::EVERYONE,
+      #        :access_type => Policy::DOWNLOADING,
+      #        :use_custom_sharing => false,
+      #        :use_whitelist => false,
+      #        :use_blacklist => false)
     end
   end
 end
