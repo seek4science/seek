@@ -26,9 +26,10 @@ class JermController < ApplicationController
       @responses = harvester.update
       response_order=[:success,:fail,:skipped]
       @responses=@responses.sort_by{|a| response_order.index(a[:response])}
+      inform_authors if EMAIL_ENABLED
     rescue Exception => @exception
       puts @exception
-    end
+    end  
 
     render :update do |page|
       if @exception
@@ -71,9 +72,26 @@ class JermController < ApplicationController
   end
 
   def jerm_enabled
-	if (!JERM_ENABLED)
-		error("JERM is not enabled","invalid action")
-		return false
-	end
+  	if (!JERM_ENABLED)
+  		error("JERM is not enabled","invalid action")
+  		return false
+  	end
   end
+ 
+  def inform_authors
+    resources = {}
+    @responses.each do |r|
+      if r[:seek_model]
+        resources[r[:seek_model].contributor_id] ||= []
+        resources[r[:seek_model].contributor_id] << r[:seek_model]
+      end
+    end 
+    resources.each_key do |author_id|
+      author = User.find_by_id(author_id).person
+      unless author.nil? || author.user.nil?
+        Mailer.deliver_resources_harvested(resources[author_id], author.user, base_host)
+      end
+    end
+  end
+
 end
