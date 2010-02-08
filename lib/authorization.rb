@@ -383,7 +383,8 @@ module Authorization
 
   # checks if "user" is authorized to manage this asset
   def Authorization.can_manage?(user_id, thing_asset)
-    return (!thing_asset.nil? && !thing_asset.policy.nil? && thing_asset.policy.permission_granted?(User.find(user_id).person,Policy::MANAGING))
+    return (thing_asset.contributor_type=="User" && thing_asset.contributor_id==user_id) ||
+      (!thing_asset.policy.nil? && thing_asset.policy.permission_granted?(User.find(user_id).person,Policy::MANAGING))
   end
   
   # checks if a person belongs to a blacklist of a particular user

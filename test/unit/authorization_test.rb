@@ -89,39 +89,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     res = Authorization.can_manage?(users(:owner_of_complex_permissions_policy).id, assets(:asset_of_a_sop_with_complex_permissions))
   
     assert !res, "asset's policy owner was considered to be owner of the asset itself"
-  end
-  
-  
-  
-  # testing: is_policy_admin?(policy, user_id)
-  
-  def test_is_policy_admin_no_policy_supplied
-    res = Authorization.is_policy_admin?(nil, users(:owner_of_my_first_sop).id)
-    
-    assert !res, "random user was considered to be an admin of 'nil' policy"
-  end
-  
-  def test_is_policy_admin_no_user_id_supplied
-    res = Authorization.is_policy_admin?(policies(:private_policy_for_asset_of_my_first_sop), nil)
-    
-    assert !res, "'nil' user was considered to be an admin of an existing policy"
-  end
-  
-  def test_is_policy_admin_true
-    res = Authorization.is_policy_admin?(policies(:private_policy_for_asset_of_my_first_sop), users(:owner_of_my_first_sop).id)
-    
-    assert res, "owner of a policy wasn't recognized as if it was the case"
-  end
-  
-  def test_is_policy_admin_false
-    res = Authorization.is_policy_admin?(policies(:fully_public_policy), users(:owner_of_my_first_sop).id)
-    
-    assert !res, "random existing user was recognized as an admin of a random existing policy"
-  end
-  
-  
-  
-  # testing: get_person_access_rights_in_favourite_group(person_id, favourite_group)
+  end  
   
   # supplying favourite group ID as a second parameter
   def test_get_person_access_rights_in_favourite_group__parameter_option1_should_yield_viewing
@@ -150,8 +118,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     
     assert_nil res, "test person is not in the favourite group - method should have returned NIL"
   end
-  
-  
   
   # testing: is_person_in_whitelist?(person_id, whitelist_owner_user_id)
   
@@ -495,23 +461,11 @@ class AuthorizationTest < ActiveSupport::TestCase
   
   # check that owner can't destroy an asset, when something is linked to it
   # TODO implement this check after relevant feature implemented in the Authorization module
-  
-  
-  # testing that policy admin can destroy, too (and that asset owner, who is not policy admin, also can destroy)
-  def test_is_authorized_policy_admin_can_destroy
-    temp = Authorization.is_policy_admin?(sops(:sop_with_complex_permissions).asset.policy, users(:owner_of_complex_permissions_policy).id)
-    assert temp, "test user should have been a policy admin"
-    
-    res = Authorization.is_authorized?("destroy", nil, sops(:sop_with_complex_permissions), users(:owner_of_complex_permissions_policy))
-    assert res, "owner of asset's policy couldn't destroy the asset"
-  end
+      
   
   def test_is_authorized_owner_who_is_not_policy_admin_can_destroy
     temp = Authorization.can_manage?(users(:owner_of_a_sop_with_complex_permissions).id, sops(:sop_with_complex_permissions).asset)
-    assert temp, "test user should have been the asset owner"
-    
-    temp = Authorization.is_policy_admin?(sops(:sop_with_complex_permissions).asset.policy, users(:owner_of_a_sop_with_complex_permissions).id)
-    assert !temp, "test user shouldn't have been a policy admin"
+    assert temp, "test user should have been the asset owner"        
     
     res = Authorization.is_authorized?("destroy", nil, sops(:sop_with_complex_permissions), users(:owner_of_a_sop_with_complex_permissions))
     assert res, "owner of asset who isn't its policy admin couldn't destroy the asset"

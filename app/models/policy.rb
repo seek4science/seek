@@ -52,9 +52,9 @@ class Policy < ActiveRecord::Base
     return copy
   end
 
-  #checks that there are permissions for the provided contributor, for the access_type (or lower)
+  #checks that there are permissions for the provided contributor, for the access_type (or higher)
   def permission_granted?(contributor,access_type)
-    permissions.detect{|p| p.contributor==contributor && p.access_type <= access_type}
+    permissions.detect{|p| p.contributor==contributor && p.access_type >= access_type}
   end
   
   def self.create_or_update_policy(resource, user, params)
