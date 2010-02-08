@@ -340,8 +340,8 @@ class Policy < ActiveRecord::Base
         return "viewing and downloading only"
       when Policy::EDITING
         return "viewing, downloading and editing"
-      when Policy::MANAGINGMANAGINGMANAGINGMANAGINGMANAGINGMANAGING
-        return "owner access rights"
+      when Policy::MANAGING
+        return "manage"
       else
         return "invalid access type"
     end

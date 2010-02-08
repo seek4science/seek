@@ -14,6 +14,7 @@ NO_ACCESS = null;
 VIEWING = null;
 DOWNLOADING = null;
 EDITING = null;
+MANAGING = null;
 
 GET_POLICY_DEFAULTS_LINK = null;
 GET_INSTITUTIONS_LINK = null;
@@ -59,6 +60,7 @@ function init_sharing() {
     VIEWING = parseInt($('const_viewing').value);
     DOWNLOADING = parseInt($('const_downloading').value);
     EDITING = parseInt($('const_editing').value);
+    MANAGING = parseInt($('const_managing').value);
 	
     replaceFavouriteGroupRedboxActionURL();
 }
@@ -315,6 +317,9 @@ function accessTypeTranslation(access_type) {
             break;
         case EDITING:
             txt = 'viewing, downloading and editing';
+            break;
+        case MANAGING:
+            txt = "manage"
             break;
     }
   

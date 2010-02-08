@@ -12,6 +12,7 @@
 <input type="hidden" id="const_viewing" value="<%= Policy::VIEWING -%>">
 <input type="hidden" id="const_downloading" value="<%= Policy::DOWNLOADING -%>">
 <input type="hidden" id="const_editing" value="<%= Policy::EDITING -%>">
+<input type="hidden" id="const_managing" value="<%= Policy::MANAGING -%>">
 
 
 <%# this hidden input will submit all permission data with the form -%>
@@ -284,6 +285,7 @@
                       <option value="<%= Policy::VIEWING -%>" >viewing only</option>
                       <option value="<%= Policy::DOWNLOADING -%>" >viewing and downloading only</option>
                       <option value="<%= Policy::EDITING -%>" >viewing, downloading and editing</option>
+                      <option value="<%= Policy::MANAGING -%>" >manage</option>
                     </select>
                   </td>
 
