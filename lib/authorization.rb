@@ -135,9 +135,9 @@ module Authorization
           policy_id = thing_asset.policy_id
           policy = get_policy(policy_id, thing_asset)
           return false unless policy # if policy wasn't found (and default one couldn't be applied) - error; not authorized
-          if is_policy_admin?(policy, user_id)
-            return true
-          end
+#          if is_policy_admin?(policy, user_id)
+#            return true
+#          end
           
           
           # only owners / policy admins are allowed to perform actions categorized as "destroy";
@@ -381,21 +381,18 @@ module Authorization
     return found_instance
   end
 
-
   # checks if "user" is authorized to manage this asset
   def Authorization.can_manage?(user_id, thing_asset)
-    return (thing_asset.contributor_type == 'User' && thing_asset.contributor_id == user_id)
+    return (!thing_asset.nil? && !thing_asset.policy.nil? && thing_asset.policy.permission_granted?(User.find(user_id).person,Policy::MANAGING))
   end
-  
-  
-  # checks if "user" is admin of the policy associated with the "thing"
-  def Authorization.is_policy_admin?(policy, user_id)
-    # if anonymous user or no policy provided - definitely not policy admin
-    return false unless (policy && user_id)
     
-    return(policy.contributor_type == 'User' && policy.contributor_id == user_id)
-  end
-  
+  # checks if "user" is admin of the policy associated with the "thing"
+#  def Authorization.is_policy_admin?(policy, user_id)
+#    # if anonymous user or no policy provided - definitely not policy admin
+#    return false unless (policy && user_id)
+#
+#    return(policy.contributor_type == 'User' && policy.contributor_id == user_id)
+#  end
   
   # checks if a person belongs to a blacklist of a particular user
   def Authorization.is_person_in_blacklist?(person_id, blacklist_owner_user_id)

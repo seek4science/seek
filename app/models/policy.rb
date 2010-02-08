@@ -51,6 +51,11 @@ class Policy < ActiveRecord::Base
     self.permissions.each {|p| copy.permissions << p.clone}
     return copy
   end
+
+  #checks that there are permissions for the provided contributor, for the access_type (or lower)
+  def permission_granted?(contributor,access_type)
+    permissions.detect{|p| p.contributor==contributor && p.access_type <= access_type}
+  end
   
   def self.create_or_update_policy(resource, user, params)
     # this method will return an error message is something goes wrong (empty string in case of success)
