@@ -322,10 +322,10 @@ class AuthorizationTest < ActiveSupport::TestCase
   def test_access_type_allows_action_bad_action_not_allowed
     # this method *should not* be used to used to deal with 'destroy' actions, hence 'false' is expected value
     # (instead, 'destroy' is directly allowed if someone is found to be an owner of an Asset) 
-    assert !Authorization.access_type_allows_action?("destroy", Policy::OWNER), "'destroy' action should NOT have been allowed - this is a too critical action to be handled within this method"
+    assert !Authorization.access_type_allows_action?("destroy", Policy::MANAGING), "'destroy' action should NOT have been allowed - this is a too critical action to be handled within this method"
     
     # random action shouldn't be allowed
-    assert !Authorization.access_type_allows_action?("test_action", Policy::OWNER), "unknown actions should be disabled, but was allowed in this test case"
+    assert !Authorization.access_type_allows_action?("test_action", Policy::MANAGING), "unknown actions should be disabled, but was allowed in this test case"
   end
   
   

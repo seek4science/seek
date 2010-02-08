@@ -401,7 +401,7 @@ module Authorization
     # if owner of the "thing" is the "user" then the "user" is authorized
     if thing_asset.contributor_type == 'User' && thing_asset.contributor_id == user_id
       is_authorized = true
-    ## AN OWNER COULD BE ANOTHER TYPE - EXPAND THE OPTIONS BELOW THIS LINE
+    ## AN MANAGING COULD BE ANOTHER TYPE - EXPAND THE OPTIONS BELOW THIS LINE
     #elsif thing_asset.contributor_type == 'Network'
     #  is_authorized = is_network_admin?(user_id, thing_asset.contributor_id)
     ## END

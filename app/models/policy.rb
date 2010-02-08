@@ -38,9 +38,8 @@ class Policy < ActiveRecord::Base
   VIEWING = 1               # viewing only
   DOWNLOADING = 2           # downloading and viewing
   EDITING = 3               # downloading, viewing and editing
-  OWNER = 4                 # any actions that owner of the asset can perform (including "destroy"ing)
-  
-  
+  MANAGING = 4                 # any actions that owner of the asset can perform (including "destroy"ing)
+    
   # "true" value for flag-type fields
   TRUE_VALUE = 1
   FALSE_VALUE = 0
@@ -341,7 +340,7 @@ class Policy < ActiveRecord::Base
         return "viewing and downloading only"
       when Policy::EDITING
         return "viewing, downloading and editing"
-      when Policy::OWNER
+      when Policy::MANAGINGMANAGINGMANAGINGMANAGINGMANAGINGMANAGING
         return "owner access rights"
       else
         return "invalid access type"
