@@ -122,14 +122,8 @@ module Authorization
           # ******************* Checking Owner *******************
           # access is authorized and no further checks required in two cases:
           # ** user is the owner of the "thing"
-          if is_owner?(user_id, thing_asset)
-            unless action == "destroy"
-              return true 
-            else
-              # check if nothing is linked to the "thing" and it wasn't used recently
-              # TODO
-              return true
-            end
+          if can_manage?(user_id, thing_asset)
+            return true
           end
           
           # ** user is admin of the policy associated with the "thing"
@@ -142,13 +136,7 @@ module Authorization
           policy = get_policy(policy_id, thing_asset)
           return false unless policy # if policy wasn't found (and default one couldn't be applied) - error; not authorized
           if is_policy_admin?(policy, user_id)
-            unless action == "destroy"
-              return true 
-            else
-              # check if nothing is linked to the "thing" and it wasn't used recently
-              # TODO
-              return true
-            end
+            return true
           end
           
           
@@ -394,20 +382,9 @@ module Authorization
   end
 
 
-  # checks if "user" is owner of the "thing"
-  def Authorization.is_owner?(user_id, thing_asset)
-    is_authorized = false
-
-    # if owner of the "thing" is the "user" then the "user" is authorized
-    if thing_asset.contributor_type == 'User' && thing_asset.contributor_id == user_id
-      is_authorized = true
-    ## AN MANAGING COULD BE ANOTHER TYPE - EXPAND THE OPTIONS BELOW THIS LINE
-    #elsif thing_asset.contributor_type == 'Network'
-    #  is_authorized = is_network_admin?(user_id, thing_asset.contributor_id)
-    ## END
-    end
-
-    return is_authorized
+  # checks if "user" is authorized to manage this asset
+  def Authorization.can_manage?(user_id, thing_asset)
+    return (thing_asset.contributor_type == 'User' && thing_asset.contributor_id == user_id)
   end
   
   

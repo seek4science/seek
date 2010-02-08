@@ -49,44 +49,44 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   
-  # testing: is_owner?(user_id, thing_asset)
+  # testing: can_manage?(user_id, thing_asset)
   
   # checks real owner ('contributor' of both SOP and corresponding asset)
   def test_is_owner_real_owner
-    res = Authorization.is_owner?(users(:owner_of_my_first_sop).id, assets(:asset_of_my_first_sop))
+    res = Authorization.can_manage?(users(:owner_of_my_first_sop).id, assets(:asset_of_my_first_sop))
     
     assert res, "real owner of the asset wasn't considered as such"
   end
 
   def test_is_owner_of_model
-    res = Authorization.is_owner?(users(:model_owner).id, assets(:asset_for_model))
+    res = Authorization.can_manage?(users(:model_owner).id, assets(:asset_for_model))
 
     assert res, "real owner of the asset wasn't considered as such"
   end
 
   def test_is_owner_of_datafile
-    res = Authorization.is_owner?(users(:datafile_owner).id, assets(:asset_for_datafile))
+    res = Authorization.can_manage?(users(:datafile_owner).id, assets(:asset_for_datafile))
   end
   
   # checks not an owner
   def test_is_owner_random_user
-    res = Authorization.is_owner?(users(:owner_of_fully_public_policy).id, assets(:asset_of_my_first_sop))
+    res = Authorization.can_manage?(users(:owner_of_fully_public_policy).id, assets(:asset_of_my_first_sop))
     
     assert !res, "random user was thought to be an owner of the asset"
   end
   
   # checks that last editor of SOP is not treated as owner (owner is 'contributor' of the asset, but last editor - 'contributor' in SOP)
   def test_is_owner_last_editor_isnt_owner
-    res = Authorization.is_owner?(users(:owner_of_a_sop_with_complex_permissions).id, assets(:asset_of_a_sop_with_complex_permissions))
+    res = Authorization.can_manage?(users(:owner_of_a_sop_with_complex_permissions).id, assets(:asset_of_a_sop_with_complex_permissions))
     assert res, "assertion 1/2 in this test case: real owner of the asset wasn't considered as such"
     
-    res = Authorization.is_owner?(users(:owner_of_my_first_sop).id, assets(:asset_of_a_sop_with_complex_permissions))
+    res = Authorization.can_manage?(users(:owner_of_my_first_sop).id, assets(:asset_of_a_sop_with_complex_permissions))
     assert !res, "assertion 2/2 in this test case: last editor of the asset was considered as owner"
   end
   
   # checks that owner of asset's policy (but not the asset!) wouldn't be treated as asset owner
   def test_is_owner_user_is_policy_owner_not_asset_owner
-    res = Authorization.is_owner?(users(:owner_of_complex_permissions_policy).id, assets(:asset_of_a_sop_with_complex_permissions))
+    res = Authorization.can_manage?(users(:owner_of_complex_permissions_policy).id, assets(:asset_of_a_sop_with_complex_permissions))
   
     assert !res, "asset's policy owner was considered to be owner of the asset itself"
   end
@@ -507,7 +507,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
   
   def test_is_authorized_owner_who_is_not_policy_admin_can_destroy
-    temp = Authorization.is_owner?(users(:owner_of_a_sop_with_complex_permissions).id, sops(:sop_with_complex_permissions).asset)
+    temp = Authorization.can_manage?(users(:owner_of_a_sop_with_complex_permissions).id, sops(:sop_with_complex_permissions).asset)
     assert temp, "test user should have been the asset owner"
     
     temp = Authorization.is_policy_admin?(sops(:sop_with_complex_permissions).asset.policy, users(:owner_of_a_sop_with_complex_permissions).id)
