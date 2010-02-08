@@ -1,5 +1,4 @@
 class Policy < ActiveRecord::Base
-  belongs_to :contributor, :polymorphic => true
   
   has_many :assets,
            :dependent => :nullify,
@@ -9,7 +8,7 @@ class Policy < ActiveRecord::Base
            :dependent => :destroy,
            :order => "created_at ASC"
   
-  validates_presence_of :contributor, :sharing_scope, :access_type
+  validates_presence_of :sharing_scope, :access_type
 
   validates_numericality_of :sharing_scope, :access_type
   
@@ -82,9 +81,7 @@ class Policy < ActiveRecord::Base
       #last_saved_policy = Policy._default(current_user, nil) # second parameter ensures that this policy is not applied anywhere
       
       
-      policy = Policy.new(:name => 'auto',
-                          :contributor_type => 'User',
-                          :contributor_id => user.id,
+      policy = Policy.new(:name => 'auto',                          
                           :sharing_scope => sharing_scope,
                           :access_type => access_type,
                           :use_custom_sharing => use_custom_sharing,
@@ -192,9 +189,7 @@ class Policy < ActiveRecord::Base
       #last_saved_policy = Policy._default(current_user, nil) # second parameter ensures that this policy is not applied anywhere
       
       
-      policy = Policy.new(:name => 'auto',
-                          :contributor_type => 'User',
-                          :contributor_id => user.id,
+      policy = Policy.new(:name => 'auto',                          
                           :sharing_scope => sharing_scope,
                           :access_type => access_type,
                           :use_custom_sharing => use_custom_sharing,
@@ -218,6 +213,7 @@ class Policy < ActiveRecord::Base
     # NOW PROCESS THE PERMISSIONS
     # policy of an asset; pemissions will be applied to it
     policy = project.default_policy
+
     
     # read the permission data from params[]
     unless params[:sharing][:permissions].blank?
@@ -277,7 +273,7 @@ class Policy < ActiveRecord::Base
     return error_msg
   end
   
-  # This method returns a "default" policy for a contributor
+  # This method returns a "default" policy.
   # (that is it will contain default sharing options and default 
   #  permissions, if any are applicable)
   #
@@ -285,7 +281,7 @@ class Policy < ActiveRecord::Base
   # is used without any attempt to obtain default policy of the
   # project, where an asset that is supposed to be governed by
   # the default policy would be associated with
-  def self.default(contributor, project=nil)
+  def self.default(project=nil)
     rtn = nil
     
     if project
@@ -302,12 +298,11 @@ class Policy < ActiveRecord::Base
     end
     
     # project default policy wasn't found or is not set, use system default
-    rtn = self.system_default(contributor)
+    rtn = self.system_default()
     
     return rtn
   end
-  
-  
+    
   # returns a default policy for a project
   # (all the related permissions will still be linked to the returned policy)
   def self.project_default(project)
@@ -319,9 +314,8 @@ class Policy < ActiveRecord::Base
   
   # returns a default system policy with "contributor" assigned as an admin;
   # as of now, default system policy is that assets are private to the uploader
-  def self.system_default(contributor)
-    policy = Policy.new(:name => "system default",
-                        :contributor => contributor,
+  def self.system_default()
+    policy = Policy.new(:name => "system default",                        
                         :sharing_scope => 0,
                         :access_type => 0,
                         :use_custom_sharing => false,

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100114113007) do
+ActiveRecord::Schema.define(:version => 20100208153020) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -307,8 +307,6 @@ ActiveRecord::Schema.define(:version => 20100114113007) do
   end
 
   create_table "policies", :force => true do |t|
-    t.string   "contributor_type"
-    t.integer  "contributor_id"
     t.string   "name"
     t.integer  "sharing_scope",      :limit => 1
     t.integer  "access_type",        :limit => 1

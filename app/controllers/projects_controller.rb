@@ -204,7 +204,7 @@ class ProjectsController < ApplicationController
   
   protected
   
-    def set_parameters_for_sharing_form
+  def set_parameters_for_sharing_form
     policy = nil
     policy_type = ""
 
@@ -224,7 +224,7 @@ class ProjectsController < ApplicationController
       # 2) this is "edit" action - Model exists, but policy wasn't attached to it;
       #    (also, Model wasn't attached to a project or that project didn't have a default policy) --
       #    hence, try to obtain a default policy for the contributor (i.e. owner of the Model) OR system default
-      policy = Policy.system_default(current_user)
+      policy = Policy.system_default()
       #Set the sharing scope to all_registered_users, instead of private, because if private only the system
       # would be able to view the resource, which is pointless.
       policy.sharing_scope = Policy::ALL_REGISTERED_USERS  

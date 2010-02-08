@@ -37,7 +37,7 @@ class PoliciesController < ApplicationController
         else
           # no associated default policy - use system default
           found_exact_match = false
-          policy = Policy.default(current_user)
+          policy = Policy.default()
         end
         
       rescue ActiveRecord::RecordNotFound

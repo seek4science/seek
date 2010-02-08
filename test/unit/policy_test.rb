@@ -7,8 +7,7 @@ class PolicyTest < ActiveSupport::TestCase
   test "deep clone" do
     policy = policies(:download_for_all_registered_users_policy)
 
-    copy = policy.deep_copy
-    assert_equal policy.contributor,copy.contributor
+    copy = policy.deep_copy    
     assert_equal policy.sharing_scope,copy.sharing_scope
     assert_equal policy.access_type,copy.access_type
     assert_equal policy.name,copy.name
@@ -19,7 +18,6 @@ class PolicyTest < ActiveSupport::TestCase
 
     assert policy.permissions.size>0,"needs to have custom permissions to make this test meaningful"
     assert_equal policy.permissions.size,copy.permissions.size
-
 
     policy.permissions.each_with_index do |perm,i|
       copy_perm = copy.permissions[i]

@@ -293,7 +293,7 @@ class DataFilesController < ApplicationController
         policy = proj_default
         policy_type = "project"
       else
-        policy = Policy.default(current_user)
+        policy = Policy.default()
         policy_type = "system"
       end
     end

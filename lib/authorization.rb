@@ -447,7 +447,7 @@ module Authorization
   # 2) thing_asset - Asset object for the "thing" that is being authorized;
   def Authorization.get_policy(policy_id, thing_asset)
     unless policy_id.blank?
-      select_string = 'contributor_id, contributor_type, sharing_scope, access_type, use_custom_sharing, use_whitelist, use_blacklist'
+      select_string = 'sharing_scope, access_type, use_custom_sharing, use_whitelist, use_blacklist'
       policy_array = Policy.find_by_sql "SELECT #{select_string} FROM policies WHERE policies.id=#{policy_id}"
       
       # if nothing's found, use the default policy
@@ -470,7 +470,7 @@ module Authorization
     begin
       # thing_asset is Asset, so thing_asset.contributor is the original uploader == owner of the item
       contributor = eval("#{thing_asset.contributor_type}.find(#{thing_asset.contributor_id})")
-      policy = Policy.default(contributor, thing_asset.project)
+      policy = Policy.default(thing_asset.project)
       return policy
     rescue ActiveRecord::RecordNotFound => e
       # original contributor not found, but the Asset entry still exists -
