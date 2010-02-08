@@ -29,7 +29,7 @@ Rails::Initializer.run do |config|
   config.gem 'spreadsheet'
   config.gem 'hpricot'
   config.gem 'fastercsv', :version=>"1.5.1"
-  #config.gem 'libxml-ruby'
+  config.gem 'libxml-ruby',:lib=>"libxml"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
