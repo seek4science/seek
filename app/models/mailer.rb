@@ -70,14 +70,14 @@ class Mailer < ActionMailer::Base
     body       :details=>details, :person=>user.person, :user=>user, :host=>base_host
   end
 
-  def resources_harvested(resources,user,base_host)
-    subject_text = (resources.size > 1) ? 'New resources harvested' : 'New resource harvested'
+  def resources_harvested(harvester_responses,user,base_host)
+    subject_text = (harvester_responses.size > 1) ? 'New resources harvested' : 'New resource harvested'
     subject    subject_text
     recipients user.person.email_with_name
     from       NOREPLY_SENDER
     sent_on    Time.now
     
-    body       :resources => resources, :person=>user.person, :host=>base_host
+    body       :resources => harvester_responses, :person=>user.person, :host=>base_host
   end
 
 end

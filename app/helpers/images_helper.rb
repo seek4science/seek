@@ -308,7 +308,7 @@ module ImagesHelper
       when "application/msword"
         url = icon_filename_for_key "doc_file"
       else
-        case item.original_filename[-4,4].gsub(".","")
+        case item.original_filename.split(".").last
           when "docx","doc"
             url = icon_filename_for_key "doc_file"
           when "xls"
