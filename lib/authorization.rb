@@ -385,14 +385,6 @@ module Authorization
   def Authorization.can_manage?(user_id, thing_asset)
     return (!thing_asset.nil? && !thing_asset.policy.nil? && thing_asset.policy.permission_granted?(User.find(user_id).person,Policy::MANAGING))
   end
-    
-  # checks if "user" is admin of the policy associated with the "thing"
-#  def Authorization.is_policy_admin?(policy, user_id)
-#    # if anonymous user or no policy provided - definitely not policy admin
-#    return false unless (policy && user_id)
-#
-#    return(policy.contributor_type == 'User' && policy.contributor_id == user_id)
-#  end
   
   # checks if a person belongs to a blacklist of a particular user
   def Authorization.is_person_in_blacklist?(person_id, blacklist_owner_user_id)
@@ -401,7 +393,6 @@ module Authorization
     # found value should be an expected one
     return (!access_rights.nil? && access_rights == FavouriteGroup::BLACKLIST_ACCESS_TYPE)
   end
-  
   
   # checks if a person belongs to a whitelist of a particular user
   def Authorization.is_person_in_whitelist?(person_id, whitelist_owner_user_id)

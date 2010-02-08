@@ -20,6 +20,15 @@ view_of_my_first_sop_for_person_not_associated_with_any_projects:
   policy: private_policy_for_asset_of_my_first_sop
   access_type: <%= Policy::VIEWING %>
 
+manage_of_my_first_sop_for_owner_of_my_first_sop_person:
+  contributor: person_for_owner_of_my_first_sop (Person)
+  policy: private_policy_for_asset_of_my_first_sop
+  access_type: <%= Policy::MANAGING %>
+
+manage_owner_of_my_first_sop_for_policy_for_test_with_projects_institutions:
+  contributor: person_for_owner_of_my_first_sop (Person)
+  policy: policy_for_test_with_projects_institutions
+  access_type: <%= Policy::MANAGING %>
 
 edit_of_sop_with_public_download_and_no_custom_sharing_for_person_not_associated_with_any_projects:
   contributor: person_not_associated_with_any_projects (Person)
