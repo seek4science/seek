@@ -69,7 +69,7 @@ module Jerm
           #sort out relative paths
           resource_uri = complete_url(resource_uri, BASE_URL)          
           #Don't visit timeline links, anchors, or pages already visited.
-          unless (resource_uri.include?("timeline?") || resource_uri.starts_with?("#") || @searched_uris.include?(resource_uri))
+          unless (resource_uri.include?("timeline?") || resource_uri.start_with?("#") || @searched_uris.include?(resource_uri))
             #Remember we've visited this link
             @searched_uris << resource_uri
             @valid_links << resource_uri   

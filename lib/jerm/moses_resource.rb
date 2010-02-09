@@ -8,7 +8,7 @@ module Jerm
   
     def populate
       valid = false
-      if self.uri.ends_with?(".xls")
+      if self.uri.end_with?(".xls")
         valid = parse_spreadsheet
       end
       return valid

@@ -15,7 +15,7 @@ module Jerm
       valid = false
       doc = open(self.uri, :http_basic_authentication=>[@username, @password])
       self.timestamp = doc.last_modified
-      if self.uri.ends_with?(".xls")
+      if self.uri.end_with?(".xls")
         valid = parse_spreadsheet(doc)
       end
       return valid

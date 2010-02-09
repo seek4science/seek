@@ -56,8 +56,8 @@ module Jerm
       doc = open(target, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("//a").each do |e|
         uri = e.attributes['href']
-        unless uri.starts_with?("/file/")
-          uri = @base_uri + uri unless uri.starts_with?("http")
+        unless uri.start_with?("/file/")
+          uri = @base_uri + uri unless uri.start_with?("http")
           links << uri
         end
       end
@@ -88,7 +88,7 @@ module Jerm
         case e.name
           when "span"
             if @title.blank?
-              if e.inner_html.starts_with?("<span")
+              if e.inner_html.start_with?("<span")
                 @title = e.search("/span").inner_html
                 @title = @title[0...(@title =~ (/[^-a-zA-Z ]/))].strip if @title =~ (/[^-a-zA-Z ]/)
               else
@@ -100,7 +100,7 @@ module Jerm
             @hierarchy = e.search("/span").inner_html.split(/<[^>]*>/).collect {|a| a.sub("-", "").strip}.select {|i| !i.blank?}
           #Find links to data files
           when "a"
-            if e['href'].starts_with?("/file/")
+            if e['href'].start_with?("/file/")
               #sort out relative paths
               resource_uri = "https://sysmolab.wikispaces.com/space/dav/files/" + (e.attributes['href'].split("/").last)    
               unless @searched_uris.include?(resource_uri)

@@ -26,7 +26,7 @@ module Jerm
       doc = uri.open(:http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       doc.search("/html/body/div#main/div#content//a").each do |e|
         uri = e.attributes['href']
-        if uri.starts_with?("/trac/wiki/LIMS/Experiments/")
+        if uri.start_with?("/trac/wiki/LIMS/Experiments/")
           links << complete_url(uri, extract_base_url(target))
         end      
       end
@@ -73,11 +73,11 @@ module Jerm
               end
               
               general_data.each_key do |k|
-                if k.downcase.starts_with?("author")                  
+                if k.downcase.start_with?("author")                  
                   @author = general_data[k]
                   #to deal with awkward author fields like "<Name> (<Job that they did>)"                  
                   @author = @author[0...(@author =~ (/[^-a-zA-Z ]/))].strip if @author =~ (/[^-a-zA-Z ]/)
-                elsif k.downcase.starts_with?("date")
+                elsif k.downcase.start_with?("date")
                   @date = general_data[k]              
                 end              
               end
@@ -118,7 +118,7 @@ module Jerm
           
           #Get the attached data files from the links with class 'attachment'
           when "a"
-            if @section == "path" && e.inner_html.starts_with?("WP")
+            if @section == "path" && e.inner_html.start_with?("WP")
               @WP = e.inner_html.split("WP").last.to_f / 10            
             end
             unless e.attributes['href'].nil?
@@ -127,7 +127,7 @@ module Jerm
               resource_uri = complete_url(resource_uri.gsub("/attachment/","/raw-attachment/"), extract_base_url(uri))
               
               #Don't visit timeline links, anchors, or pages already visited.
-              unless (resource_uri.include?("timeline?") || resource_uri.starts_with?("#") || @searched_uris.include?(resource_uri))
+              unless (resource_uri.include?("timeline?") || resource_uri.start_with?("#") || @searched_uris.include?(resource_uri))
                 #Remember we've visited this link
                 @searched_uris << resource_uri
                 if @section == "Attachments"

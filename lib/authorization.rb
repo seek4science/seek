@@ -52,7 +52,7 @@ module Authorization
       thing_asset = thing
       thing_type = thing_asset.resource_type
       thing_id = thing_asset.resource_id
-    elsif thing.class.name.ends_with?("::Version") && thing.respond_to?("parent") #its a ::Version, so test the parent
+    elsif thing.class.name.end_with?("::Version") && thing.respond_to?("parent") #its a ::Version, so test the parent
       thing_type = thing.parent.class.name unless thing_type.nil?
       return is_authorized?(action_name,thing_type,thing.parent,user)
     else

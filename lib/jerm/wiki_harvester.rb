@@ -9,7 +9,7 @@ module Jerm
   
     #Turn relative paths into complete urls
     def complete_url(url, base)
-      if url.starts_with?("/")
+      if url.start_with?("/")
         resource_uri = base + url
       else
         resource_uri = url

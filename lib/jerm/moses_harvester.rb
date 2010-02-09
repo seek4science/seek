@@ -50,7 +50,7 @@ module Jerm
               resource_uri = complete_url(e['href'], root_uri)
               
               #Don't visit 'edit' links, anchors, or pages already visited.
-              unless (resource_uri.starts_with?("#") || resource_uri.include?("action=edit") || resource_uri.include?("Special:Search") || @searched_uris.include?(resource_uri))
+              unless (resource_uri.start_with?("#") || resource_uri.include?("action=edit") || resource_uri.include?("Special:Search") || @searched_uris.include?(resource_uri))
                 #Remember we've visited this link
                 @searched_uris << resource_uri
                 #Get file extension
@@ -69,7 +69,7 @@ module Jerm
                   r.project = "MOSES"
                   @results << r
                 #If link wasn't a data file, but contains the word 'data' and is a wiki page, search it.
-                elsif resource_uri.starts_with?(root_uri) && (resource_uri.downcase.include?("data") || resource_uri.downcase.include?("standard"))        
+                elsif resource_uri.start_with?(root_uri) && (resource_uri.downcase.include?("data") || resource_uri.downcase.include?("standard"))        
                   get_data(resource_uri, (level+1))
                 end          
               end              

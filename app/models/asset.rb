@@ -55,7 +55,7 @@ class Asset < ActiveRecord::Base
       
       # Fix version class names to be the class name of the versioned object
       class_name = r.class.name
-      if class_name.ends_with?("::Version")
+      if class_name.end_with?("::Version")
         class_name = class_name.split("::")[0]
       end
       

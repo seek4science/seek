@@ -26,7 +26,7 @@ module AssetsHelper
   
   def get_original_model_name(model)
     class_name = model.class.name
-    if class_name.ends_with?("::Version")
+    if class_name.end_with?("::Version")
       class_name = class_name.split("::")[0]
     end
     class_name
