@@ -141,6 +141,19 @@ class UserTest < ActiveSupport::TestCase
     assert user.assets.size>0
     assert user.assets.include?(assets(:asset_of_my_first_sop))
     assert !user.assets.include?(assets(:asset_of_a_sop_with_fully_public_policy))
+
+    user=users(:model_owner)
+    assert_not_nil user.assets
+    assert user.assets.size>0
+    assert user.assets.include?(assets(:asset_for_model))
+    assert !user.assets.include?(assets(:asset_for_model_with_different_owner))
+
+    user=users(:datafile_owner)
+    assert_not_nil user.assets
+    assert user.assets.size>0
+    assert user.assets.include?(assets(:asset_for_datafile))
+    assert !user.assets.include?(assets(:asset_for_sysmo_data_file))
+
   end
 
 protected

@@ -1,10 +1,13 @@
 require 'digest/sha1'
-require 'acts_as_contributor'
 
 class User < ActiveRecord::Base
     
   belongs_to :person
   #validates_associated :person
+
+  has_many :sops, :as=>:contributor
+  has_many :data_files, :as=>:contributor
+  has_many :models,:as=>:contributor
   
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
@@ -29,8 +32,7 @@ class User < ActiveRecord::Base
   
   has_many :favourites, :dependent => :destroy
   has_many :favourite_groups, :dependent => :destroy
-   
-
+  
   named_scope :not_activated,:conditions=>['activation_code IS NOT NULL']
   named_scope :without_profile,:conditions=>['person_id IS NULL']
   named_scope :admins,:conditions=>['is_admin = ?',true],:include=>:person
@@ -44,9 +46,7 @@ class User < ActiveRecord::Base
   end
 
   def assets
-    #FIXME: this is horrible, but is to get round the removal of contributor on an Asset, and using soley the associated resource
-    #may be possible to do this with a :through
-    Asset.find(:all).select{|a| a.contributor==self}
+    (sops | models | data_files).collect{|r| r.asset}
   end
 
   def active?
