@@ -89,7 +89,7 @@ module Authorization
     # this is required to get "policy_id" for policy-based authorized objects (like SOPs / spreadsheets / datafiles / assets)
     if (thing_asset.nil? && ASSET_TYPES.include?(thing_type))
       
-      found_thing = find_thing(thing_type, thing_id)
+      found_thing = find_thing(thing_type, thing)
       
       unless found_thing
         # search didn't yield any results - the "thing" wasn't found; can't authorize unknown objects
@@ -100,13 +100,13 @@ module Authorization
           # "assets" are only found for these types of object (and the assets themself),
           # for all the rest - use instances
           thing_asset = found_thing
-        ## KEPT FOR FUTURE EXTENSION OPPORTUNITIES
-        ## the following two lines of code might be useful in future, if any types
-        ## of objects would require specific authorisation (i.e. not policy-based);
-        ## "thing_instance" will then be used to invoke the .authorized? method 
-        #else
-        #  thing_instance = found_thing
-        ## END
+          ## KEPT FOR FUTURE EXTENSION OPPORTUNITIES
+          ## the following two lines of code might be useful in future, if any types
+          ## of objects would require specific authorisation (i.e. not policy-based);
+          ## "thing_instance" will then be used to invoke the .authorized? method
+          #else
+          #  thing_instance = found_thing
+          ## END
         end
       end
     end
@@ -117,164 +117,164 @@ module Authorization
     is_authorized = false
     
     case thing_type
-      when ASSET_TYPES.find{|el| el==thing_type}
-        unless user_id.nil?
-          # ******************* Checking Owner *******************
-          # access is authorized and no further checks required in two cases:
-          # ** user is the owner of the "thing"
-          if can_manage?(user_id, thing_asset)
-            return true
-          end
+    when ASSET_TYPES.find{|el| el==thing_type}
+      unless user_id.nil?
+        # ******************* Checking Owner *******************
+        # access is authorized and no further checks required in two cases:
+        # ** user is the owner of the "thing"
+        if can_manage?(user_id, thing_asset)
+          return true
+        end
           
-          # ** user is admin of the policy associated with the "thing"
-          #    (this means that the user might not have uploaded the "thing", but
-          #     is the one managing the access permissions for it)
-          #
-          #    it's fine if policy will not be found at this step - default one will get
-          #    used further when required
-          policy_id = thing_asset.policy_id
-          policy = get_policy(policy_id, thing_asset)
-          return false unless policy # if policy wasn't found (and default one couldn't be applied) - error; not authorized
-#          if is_policy_admin?(policy, user_id)
-#            return true
-#          end
-          
-          
-          # only owners / policy admins are allowed to perform actions categorized as "destroy";
-          # hence "destroy" actions are not authorized below this point
-          return false if action == "destroy"
-          
-          # sharing scope set to PRIVATE means that this asset isn't shared with anyone, and by
-          # this point we already know that current user isn't the owner / policy admin of the asset
-          return false if policy.sharing_scope == Policy::PRIVATE
+        # ** user is admin of the policy associated with the "thing"
+        #    (this means that the user might not have uploaded the "thing", but
+        #     is the one managing the access permissions for it)
+        #
+        #    it's fine if policy will not be found at this step - default one will get
+        #    used further when required
+        policy_id = thing_asset.policy_id
+        policy = get_policy(policy_id, thing_asset)
+        return false unless policy # if policy wasn't found (and default one couldn't be applied) - error; not authorized
+        #          if is_policy_admin?(policy, user_id)
+        #            return true
+        #          end
           
           
-          # for any further checks, person_id of the user that is being authorized is needed
-          unless user_instance
-            user_instance = get_user(user_id)
+        # only owners / policy admins are allowed to perform actions categorized as "destroy";
+        # hence "destroy" actions are not authorized below this point
+        return false if action == "destroy"
+          
+        # sharing scope set to PRIVATE means that this asset isn't shared with anyone, and by
+        # this point we already know that current user isn't the owner / policy admin of the asset
+        return false if policy.sharing_scope == Policy::PRIVATE
+          
+          
+        # for any further checks, person_id of the user that is being authorized is needed
+        unless user_instance
+          user_instance = get_user(user_id)
             
-            # if the user instance wasn't found - user instance must have been deleted;
-            # OR
-            # if person_id is unknown for the found user instance (some kind of error must have happened - log this)
-            # --> use public ("guest") settings in this case
-            if user_instance.nil? || user_instance.person_id.nil? || user_instance.person_id == 0
-              # make sure to log the error of 'person_id' being unknown or user_instance not found
-              if user_instance.nil?
-                @@logger.error("UNEXPECTED ERROR - Authorization module: Couldn't find user instance: user ID = #{user_id}")
-              else
-                @@logger.error("UNEXPECTED ERROR - Authorization module: User instance doesn't have a valid person_id: user ID = #{user_id}; person_id = #{user_instance.person_id}")
-              end
-              
-              return authorized_by_policy?(policy, thing_asset, action, nil, nil)
+          # if the user instance wasn't found - user instance must have been deleted;
+          # OR
+          # if person_id is unknown for the found user instance (some kind of error must have happened - log this)
+          # --> use public ("guest") settings in this case
+          if user_instance.nil? || user_instance.person_id.nil? || user_instance.person_id == 0
+            # make sure to log the error of 'person_id' being unknown or user_instance not found
+            if user_instance.nil?
+              @@logger.error("UNEXPECTED ERROR - Authorization module: Couldn't find user instance: user ID = #{user_id}")
             else
-              user_person_id = user_instance.person_id
+              @@logger.error("UNEXPECTED ERROR - Authorization module: User instance doesn't have a valid person_id: user ID = #{user_id}; person_id = #{user_instance.person_id}")
             end
+              
+            return authorized_by_policy?(policy, thing_asset, action, nil, nil)
+          else
+            user_person_id = user_instance.person_id
           end
+        end
           
-          # ******************* Checking Whitelist / Blacklist *******************
-          # if using whitelist / blacklist allowed in policy, check if the user's person belongs to them;
-          # blacklist denies any access, whitelist allows any access up to the level defined in FavouriteGroup
-          # model (FavouriteGroup::WHITELIST_ACCESS_TYPE)
+        # ******************* Checking Whitelist / Blacklist *******************
+        # if using whitelist / blacklist allowed in policy, check if the user's person belongs to them;
+        # blacklist denies any access, whitelist allows any access up to the level defined in FavouriteGroup
+        # model (FavouriteGroup::WHITELIST_ACCESS_TYPE)
+        #
+        # this should only be carried out if the asset belongs to a User, not a Project or something else
+        # (otherwise it doesn't make sense for those other types to have "favourite" groups, including
+        #  whitelist / blacklist)
+        if thing_asset.contributor.instance_of?(User)
+          if policy.use_blacklist
+            return false if Authorization.is_person_in_blacklist?(user_person_id, thing_asset.contributor.id)
+          end
+            
+          if policy.use_whitelist
+            return true if Authorization.is_person_in_whitelist?(user_person_id, thing_asset.contributor.id) && Authorization.access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
+          end
+        end
+          
+          
+        # only do custom permission checking if the policy is known to have any
+        if policy.use_custom_sharing
+            
+          # ******************* Checking Individual Permissions *******************
+          # user is not the owner/admin of the object; action is not of "destroy" class;
+          # user's person is not found in whitelist / blacklist of the asset owner;
           #
-          # this should only be carried out if the asset belongs to a User, not a Project or something else
-          # (otherwise it doesn't make sense for those other types to have "favourite" groups, including
-          #  whitelist / blacklist)
-          if thing_asset.contributor_type == "User"
-            if policy.use_blacklist
-              return false if Authorization.is_person_in_blacklist?(user_person_id, thing_asset.contributor_id)
-            end
+          # next thing - obtain all the permissions that are relevant to the user
+          # (start with individual user permissions; group permissions will only
+          #  be considered if that is required further on)
+          user_permissions = get_person_permissions(user_person_id, policy_id)
             
-            if policy.use_whitelist
-              return true if Authorization.is_person_in_whitelist?(user_person_id, thing_asset.contributor_id) && Authorization.access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
+            
+          # individual user (person) permissions override any other settings;
+          # if several of these are found (which shouldn't be the case),
+          # all are considered, but the one with "highest" access right is
+          # used to make final decision -- that is if at least one of the
+          # user permissions allows to make the action, it will be allowed;
+          # likewise, if none of the permissions allow the action it will
+          # not be allowed
+          unless user_permissions.empty?
+            authorized_by_user_permissions = false
+            user_permissions.each do |p|
+              authorized_by_user_permissions = true if access_type_allows_action?(action, p.access_type)
             end
+            return authorized_by_user_permissions
           end
-          
-          
-          # only do custom permission checking if the policy is known to have any  
-          if policy.use_custom_sharing
-            
-            # ******************* Checking Individual Permissions *******************
-            # user is not the owner/admin of the object; action is not of "destroy" class;
-            # user's person is not found in whitelist / blacklist of the asset owner;
-            #
-            # next thing - obtain all the permissions that are relevant to the user
-            # (start with individual user permissions; group permissions will only
-            #  be considered if that is required further on)
-            user_permissions = get_person_permissions(user_person_id, policy_id)
             
             
-            # individual user (person) permissions override any other settings;
-            # if several of these are found (which shouldn't be the case),
-            # all are considered, but the one with "highest" access right is
-            # used to make final decision -- that is if at least one of the
-            # user permissions allows to make the action, it will be allowed;
-            # likewise, if none of the permissions allow the action it will
-            # not be allowed
-            unless user_permissions.empty?
-              authorized_by_user_permissions = false
-              user_permissions.each do |p|
-                authorized_by_user_permissions = true if access_type_allows_action?(action, p.access_type)
-              end
-              return authorized_by_user_permissions
+          # ******************* Checking "Favourite" Groups *******************
+          access_rights_in_favourite_groups = get_person_access_rights_from_favourite_group_permissions(user_person_id, policy_id)
+          unless access_rights_in_favourite_groups.empty?
+            authorized = false
+            access_rights_in_favourite_groups.each do |p|
+              authorized = true if access_type_allows_action?(action, p.access_type)
             end
-            
-            
-            # ******************* Checking "Favourite" Groups *******************
-            access_rights_in_favourite_groups = get_person_access_rights_from_favourite_group_permissions(user_person_id, policy_id)
-            unless access_rights_in_favourite_groups.empty?
-              authorized = false
-              access_rights_in_favourite_groups.each do |p|
-                authorized = true if access_type_allows_action?(action, p.access_type)
-              end
-              return authorized
-            end
+            return authorized
           end
+        end
           
           
-          # ******************* Checking General Policy Settings *******************
-          # no user permissions found, need to check what is allowed by policy
-          # (if no policy was found, default policy is in use instead)
-          authorized_by_policy = false
-          authorized_by_policy = authorized_by_policy?(policy, thing_asset, action, user_id, user_person_id)
-          return true if authorized_by_policy
+        # ******************* Checking General Policy Settings *******************
+        # no user permissions found, need to check what is allowed by policy
+        # (if no policy was found, default policy is in use instead)
+        authorized_by_policy = false
+        authorized_by_policy = authorized_by_policy?(policy, thing_asset, action, user_id, user_person_id)
+        return true if authorized_by_policy
           
 
-          # only do custom permission checking if the policy is known to have any  
-          if policy.use_custom_sharing
-            # ******************* Checking Group Permissions *******************
-            # not authorized by policy, check the group permissions -- the ones
-            # attached to "thing's" policy and belonging to the groups, where
-            # "user" is a member of - i.e. all Projects, Institutions, WorkGroups
-            #
-            # these cannot limit what is allowed by policy settings, only give more access rights 
-            authorized_by_group_permissions = false
-            group_permissions = get_group_permissions(policy_id)
+        # only do custom permission checking if the policy is known to have any
+        if policy.use_custom_sharing
+          # ******************* Checking Group Permissions *******************
+          # not authorized by policy, check the group permissions -- the ones
+          # attached to "thing's" policy and belonging to the groups, where
+          # "user" is a member of - i.e. all Projects, Institutions, WorkGroups
+          #
+          # these cannot limit what is allowed by policy settings, only give more access rights
+          authorized_by_group_permissions = false
+          group_permissions = get_group_permissions(policy_id)
             
-            unless group_permissions.empty?
-              group_permissions.each do |p|
-                # check if this permission is applicable to the "user" - i.e. to the user's person
-                if access_type_allows_action?(action, p.access_type) && is_member?(user_person_id, p.contributor_type, p.contributor_id)
-                  authorized_by_group_permissions = true
-                  break
-                end
+          unless group_permissions.empty?
+            group_permissions.each do |p|
+              # check if this permission is applicable to the "user" - i.e. to the user's person
+              if access_type_allows_action?(action, p.access_type) && is_member?(user_person_id, p.contributor_type, p.contributor_id)
+                authorized_by_group_permissions = true
+                break
               end
-              return authorized_by_group_permissions if authorized_by_group_permissions
             end
+            return authorized_by_group_permissions if authorized_by_group_permissions
           end
-          
-          # user permissions, policy settings and group permissions didn't give the
-          # positive result - decline the action request
-          return false
-        
-        else
-          # this is for cases where trying to authorize anonymous users;
-          # the only possible check - on public policy settings:
-          policy_id = thing_asset.policy_id
-          policy = get_policy(policy_id, thing_asset)
-          return false unless policy # if policy wasn't found (and default one couldn't be applied) - error; not authorized
-          
-          return authorized_by_policy?(policy, thing_asset, action, nil, nil)
         end
+          
+        # user permissions, policy settings and group permissions didn't give the
+        # positive result - decline the action request
+        return false
+        
+      else
+        # this is for cases where trying to authorize anonymous users;
+        # the only possible check - on public policy settings:
+        policy_id = thing_asset.policy_id
+        policy = get_policy(policy_id, thing_asset)
+        return false unless policy # if policy wasn't found (and default one couldn't be applied) - error; not authorized
+          
+        return authorized_by_policy?(policy, thing_asset, action, nil, nil)
+      end
         
       ## THE FOLLOWING FRAGMENT IS LEFT HERE TO SHOW HOW "thing_instance" MAY BE USED
       ## this could be useful when some specific object types will not require policy-
@@ -293,11 +293,11 @@ module Authorization
       #  # "action_name" used to work with original action name, rather than classification made inside the module
       #  is_authorized = thing_instance.authorized?(action_name, user)
       ## END
-      else
-        # don't recognise the kind of "thing" that is being authorized, so
-        # we don't specifically know that it needs to be blocked;
-        # therefore, allow any actions on it
-        is_authorized = true
+    else
+      # don't recognise the kind of "thing" that is being authorized, so
+      # we don't specifically know that it needs to be blocked;
+      # therefore, allow any actions on it
+      is_authorized = true
     end
     
     return is_authorized
@@ -335,55 +335,45 @@ module Authorization
 
   def Authorization.categorize_action(action_name)
     case action_name
-      when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete', 'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate', 'tag',  'items', 'statistics', 'tag_suggestions'
-        action = 'view'
-      when 'edit', 'new', 'create', 'update', 'new_version', 'create_version', 'destroy_version', 'edit_version', 'update_version', 'new_item', 'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link'
-        action = 'edit'
-      when 'download', 'named_download', 'launch', 'submit_job'
-        action = 'download'
-      when 'destroy', 'destroy_item', 'manage'
-        action = 'destroy'
-      when 'execute'
-        # action is available only(?) for runners at the moment;
-        # possibly, "launch" action for workflows should be moved into this category, too
-        action = 'execute'
-      else
-        # unknown action
-        action = nil
+    when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete', 'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate', 'tag',  'items', 'statistics', 'tag_suggestions'
+      action = 'view'
+    when 'edit', 'new', 'create', 'update', 'new_version', 'create_version', 'destroy_version', 'edit_version', 'update_version', 'new_item', 'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link'
+      action = 'edit'
+    when 'download', 'named_download', 'launch', 'submit_job'
+      action = 'download'
+    when 'destroy', 'destroy_item', 'manage'
+      action = 'destroy'
+    when 'execute'
+      # action is available only(?) for runners at the moment;
+      # possibly, "launch" action for workflows should be moved into this category, too
+      action = 'execute'
+    else
+      # unknown action
+      action = nil
     end
     
     return action
   end
 
   # check if the DB holds entry for the "thing" to be authorized 
-  def Authorization.find_thing(thing_type, thing_id)
+  def Authorization.find_thing(thing_type, thing)
     found_instance = nil
-    
-    begin
-      case thing_type
-        when ASSET_TYPES.find{|el| el!="Asset" && el==thing_type} #, "Datafile", "Spreadsheet", etc
-          # "find_by_sql" works faster itself PLUS only a subset of all fields is selected;
-          # this is the most frequent query to be executed, hence needs to be optimised
-          found_instance = Asset.find_by_sql "SELECT id, contributor_id, contributor_type, policy_id FROM assets WHERE resource_id=#{thing_id} AND resource_type='#{thing_type}'"
-          found_instance = (found_instance.empty? ? nil : found_instance[0]) # if nothing was found - nil; otherwise - first match
-        when "Asset"
-          # fairly possible that it's going to be an asset itself, not a resource
-          found_instance = Asset.find(thing_id, :select => "id, contributor_id, contributor_type, policy_id")
-        else
-          # unknown type
-          return nil
-      end
-    rescue ActiveRecord::RecordNotFound
-      # do nothing; makes sure that app won't crash when the required object is not found;
-      # the method will return "nil" anyway, so no need to take any further actions here
+        
+    if thing.respond_to?(:asset) #, "Datafile", "Spreadsheet", etc
+      # "find_by_sql" works faster itself PLUS only a subset of all fields is selected;
+      # this is the most frequent query to be executed, hence needs to be optimised
+      found_instance=thing.asset
+    elsif thing_type=="Asset" && thing.instance_of?(Asset)
+      # fairly possible that it's going to be an asset itself, not a resource
+      found_instance = thing
     end
-    
+
     return found_instance
   end
 
   # checks if "user" is authorized to manage this asset
   def Authorization.can_manage?(user_id, thing_asset)
-    return (thing_asset.contributor_type=="User" && thing_asset.contributor_id==user_id) ||
+    return (thing_asset.contributor.instance_of?(User) && thing_asset.contributor.id==user_id) ||
       (!thing_asset.policy.nil? && thing_asset.policy.permission_granted?(User.find(user_id).person,Policy::MANAGING))
   end
   
@@ -561,7 +551,7 @@ module Authorization
     # NB! currently SysMO won't support objects owned by entities other than users
     # (especially, policy checks are not agreed for these cases - however, owner tests and
     #  permission tests are possible and will be carried out)
-    unless thing_asset.contributor_type == "User"
+    unless thing_asset.resource.contributor.class.name == "User"
       return false
     end
     
@@ -578,16 +568,16 @@ module Authorization
     # potentially be allowed at all 
     if share_mode >= Policy::ALL_SYSMO_USERS && access_type_allows_action?(action, access_mode)
       case share_mode
-        when Policy::EVERYONE
-          is_authorized = true
-        when Policy::ALL_REGISTERED_USERS
-          # all logged in users are authorized
-          is_authorized = (!user_id.nil? && user_id != 0)
-        when Policy::ALL_SYSMO_USERS
-          # current user should be logged in AND be associated with some projects
-          is_authorized = (!user_id.nil? && user_id != 0) && is_member?(user_person_id, nil, nil)
+      when Policy::EVERYONE
+        is_authorized = true
+      when Policy::ALL_REGISTERED_USERS
+        # all logged in users are authorized
+        is_authorized = (!user_id.nil? && user_id != 0)
+      when Policy::ALL_SYSMO_USERS
+        # current user should be logged in AND be associated with some projects
+        is_authorized = (!user_id.nil? && user_id != 0) && is_member?(user_person_id, nil, nil)
         #else
-          # do nothing, but other modes do not authorize any public users 
+        # do nothing, but other modes do not authorize any public users
       end
     end
 
@@ -601,15 +591,15 @@ module Authorization
     return false if (action.blank? || access_type.blank?)
     
     case action
-      when "view"
-        return access_type >= Policy::VIEWING
-      when "download"
-        return access_type >= Policy::DOWNLOADING
-      when "edit"
-        return access_type >= Policy::EDITING
-      else
-        # any other type of action is not allowed by permissions
-        return false
+    when "view"
+      return access_type >= Policy::VIEWING
+    when "download"
+      return access_type >= Policy::DOWNLOADING
+    when "edit"
+      return access_type >= Policy::EDITING
+    else
+      # any other type of action is not allowed by permissions
+      return false
     end
   end
 

@@ -75,7 +75,6 @@ class Policy < ActiveRecord::Base
     use_whitelist = params[:sharing][:use_whitelist]
     use_blacklist = params[:sharing][:use_blacklist]
     
-    
     # PROCESS THE POLICY FIRST
     unless resource.asset.policy
       #last_saved_policy = Policy._default(current_user, nil) # second parameter ensures that this policy is not applied anywhere

@@ -10,7 +10,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   # testing: find_thing(thing_type, thing_id)
   
   def test_find_thing_helper_try_to_find_resource
-    found = Authorization.find_thing(sops(:my_first_sop).class.name, sops(:my_first_sop).id)
+    found = Authorization.find_thing(sops(:my_first_sop).class.name, sops(:my_first_sop))
     
     assert found.class.name == "Asset", "returned instance is not of class 'Asset'"
     assert found.id == sops(:my_first_sop).asset.id, "id of found Asset is not correct"
@@ -23,7 +23,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
   
   def test_find_thing_helper_try_to_find_asset
-    found = Authorization.find_thing(assets(:asset_of_my_first_sop).class.name, assets(:asset_of_my_first_sop).id)
+    found = Authorization.find_thing(assets(:asset_of_my_first_sop).class.name, assets(:asset_of_my_first_sop))
     
     assert found.class.name == "Asset", "returned instance is not of class 'Asset'"
     assert found.id == assets(:asset_of_my_first_sop).id, "id of found Asset is not correct"
@@ -42,7 +42,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
   
   def test_find_thing_helper_for_model
-    found = Authorization.find_thing(assets(:asset_for_model).class.name, assets(:asset_for_model).id)
+    found = Authorization.find_thing(assets(:asset_for_model).class.name, assets(:asset_for_model))
     
     assert found.class.name == "Asset", "returned instance is not of class 'Asset'"
     assert found.id == assets(:asset_for_model).id, "id of found Asset is not correct"
@@ -73,16 +73,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     res = Authorization.can_manage?(users(:owner_of_fully_public_policy).id, assets(:asset_of_my_first_sop))
     
     assert !res, "random user was thought to be an owner of the asset"
-  end
-  
-  # checks that last editor of SOP is not treated as owner (owner is 'contributor' of the asset, but last editor - 'contributor' in SOP)
-  def test_is_owner_last_editor_isnt_owner
-    res = Authorization.can_manage?(users(:owner_of_a_sop_with_complex_permissions).id, assets(:asset_of_a_sop_with_complex_permissions))
-    assert res, "assertion 1/2 in this test case: real owner of the asset wasn't considered as such"
-    
-    res = Authorization.can_manage?(users(:owner_of_my_first_sop).id, assets(:asset_of_a_sop_with_complex_permissions))
-    assert !res, "assertion 2/2 in this test case: last editor of the asset was considered as owner"
-  end
+  end    
   
   # checks that owner of asset's policy (but not the asset!) wouldn't be treated as asset owner
   def test_is_owner_user_is_policy_owner_not_asset_owner
@@ -435,62 +426,19 @@ class AuthorizationTest < ActiveSupport::TestCase
   
   # testing that asset owners can destroy (plus verifying different options fur submitting the 'thing' and the 'user')
   
-  # checking that owner of the asset can destroy it
-  # ('thing' supplied as type = 'nil' plus actual instance of the thing)
-  def test_is_authorized_thing_as_instance
-    res = Authorization.is_authorized?("destroy", nil, assets(:asset_of_my_first_sop), users(:owner_of_my_first_sop))
-    assert res, "owner of the asset (supplied as instance) was denied destroying the asset"
-  end
   
-  # checking that owner of the asset can destroy it
-  # ('thing' supplied as type plus ID of the thing)
-  def test_is_authorized_thing_as_type_and_id
-    res = Authorization.is_authorized?("destroy", assets(:asset_of_my_first_sop).class.name, assets(:asset_of_my_first_sop).id, users(:owner_of_my_first_sop))
-    assert res, "owner of the asset (supplied as type + ID) was denied destroying the asset"
-  end
-  
-  # checking that owner of the asset can destroy it
-  # ('user' was supplied as an instance in all previous test cases, now checking that can submit an ID if necessary)
-  def test_is_authorized_thing_as_type_and_id_user_as_id
-    res = Authorization.is_authorized?("destroy", assets(:asset_of_my_first_sop).class.name, assets(:asset_of_my_first_sop).id, users(:owner_of_my_first_sop).id)
-    assert res, "owner (supplied as ID) of the asset (supplied as type + ID) was denied destroying the asset"
-  end
-  
-  # check that owner can't destroy an asset, when it was recently used
-  # TODO implement this check after relevant feature implemented in the Authorization module
-  
-  # check that owner can't destroy an asset, when something is linked to it
-  # TODO implement this check after relevant feature implemented in the Authorization module
-      
   
   def test_is_authorized_owner_who_is_not_policy_admin_can_destroy
-    temp = Authorization.can_manage?(users(:owner_of_a_sop_with_complex_permissions).id, sops(:sop_with_complex_permissions).asset)
+    temp = Authorization.can_manage?(users(:owner_of_my_first_sop).id, sops(:sop_with_complex_permissions).asset)
     assert temp, "test user should have been the asset owner"        
     
-    res = Authorization.is_authorized?("destroy", nil, sops(:sop_with_complex_permissions), users(:owner_of_a_sop_with_complex_permissions))
+    res = Authorization.is_authorized?("destroy", nil, sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
     assert res, "owner of asset who isn't its policy admin couldn't destroy the asset"
   end
   
-  # check that policy admin can't destroy an asset, when it was recently used
-  # TODO implement this check after relevant feature implemented in the Authorization module
-  
-  # check that policy admin can't destroy an asset, when something is linked to it
-  # TODO implement this check after relevant feature implemented in the Authorization module
-  
-  
   # testing whitelist / blacklist
   
-  # policy.use_whitelist == true AND test person in the whitelist AND allowed action --> true
-  def test_person_in_whitelist_and_use_whitelist_set_to_true
-    temp = sops(:sop_with_custom_permissions_policy).asset.policy.use_whitelist
-    assert temp, "use_whitelist should have been set to 'true'"
-    
-    temp = Authorization.is_person_in_whitelist?(users(:test_user_only_in_whitelist).person.id, sops(:sop_with_custom_permissions_policy).asset.contributor.id)
-    assert temp, "test person should have been in the whitelist of the sop owner"
-    
-    res = Authorization.is_authorized?("download", nil, sops(:sop_with_custom_permissions_policy), users(:test_user_only_in_whitelist))
-    assert res, "download should have been authorized for a a person in the whitelist - flag to use whitelist was set"
-  end
+  
   
   # policy.use_whitelist == true AND test person in the whitelist AND not authorized action --> false (currently "edit" requires more access rights than just being in the whitelist)
   def test_person_in_whitelist_and_use_whitelist_set_to_true_but_not_authorized_action
@@ -532,26 +480,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !res, "download shouldn't have been authorized for a a person not in the whitelist - especially when flag to use whitelist wasn't set"
   end
   
-  # policy.use_blacklist == true AND test person in the blacklist --> false
-  def test_person_in_blacklist_and_use_blacklist_set_to_true
-    temp = sops(:sop_with_all_sysmo_users_policy).asset.policy.use_blacklist
-    assert temp, "use_blacklist should have been set to 'true'"
-    
-    temp = Authorization.is_member?(people(:person_for_sysmo_user_in_blacklist).id, nil, nil)
-    assert temp, "test person is associated with some SysMO projects, but was thought not to be associated with any"
-    
-    temp = Authorization.is_person_in_blacklist?(people(:person_for_sysmo_user_in_blacklist).id, sops(:sop_with_all_sysmo_users_policy).asset.contributor.id)
-    assert temp, "test person should have been in the blacklist of the sop owner"
-    
-    # "view" is used instead of "show" because that's a precondition for Authorization.access_type_allows_action?() helper - it assumes that
-    # Authorization.categorize_action() was called on the action before - and that yields "view" for "show" action
-    temp = Authorization.authorized_by_policy?(sops(:sop_with_all_sysmo_users_policy).asset.policy, sops(:sop_with_all_sysmo_users_policy).asset, "view", 
-                                               people(:person_for_sysmo_user_in_blacklist).user.id, people(:person_for_sysmo_user_in_blacklist).id)
-    assert temp, "test user is SysMO user and should have been authorized by policy"
-    
-    res = Authorization.is_authorized?("show", nil, sops(:sop_with_all_sysmo_users_policy), people(:person_for_sysmo_user_in_blacklist).user.id)
-    assert !res, "test user is SysMO user, but is also in blacklist - should not have been authorized for viewing"
-  end
+  
   
   # policy.use_blacklist == true AND test person not in the blacklist --> true
   def test_person_not_in_blacklist_and_use_blacklist_set_to_true
@@ -573,7 +502,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = sops(:sop_with_complex_permissions).asset.policy.use_blacklist
     assert !temp, "use_blacklist should have been set to 'false'"
     
-    temp = Authorization.is_person_in_blacklist?(users(:owner_of_my_first_sop).person.id, sops(:sop_with_complex_permissions).asset.contributor.id)
+    temp = Authorization.is_person_in_blacklist?(users(:owner_of_my_first_sop).person.id, users(:owner_of_a_sop_with_complex_permissions).id)
     assert temp, "test person should have been in the blacklist of the sop owner"
     
     res = Authorization.is_authorized?("view", nil, sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
@@ -764,6 +693,39 @@ class AuthorizationTest < ActiveSupport::TestCase
     # verify that individual permission will be used, because whitelist doesn't have precedence
     res = Authorization.is_authorized?("edit", nil, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:owner_of_custom_permissions_only_policy))
     assert res, "test user should have been allowed to 'edit' the SOP having the individual permission and use_custom_sharing is set to true - whitelist membership should not have had precedence"
+  end
+
+  # policy.use_blacklist == true AND test person in the blacklist --> false
+  def test_person_in_blacklist_and_use_blacklist_set_to_true
+    temp = sops(:sop_with_all_sysmo_users_policy).asset.policy.use_blacklist
+    assert temp, "use_blacklist should have been set to 'true'"
+
+    temp = Authorization.is_member?(people(:person_for_sysmo_user_in_blacklist).id, nil, nil)
+    assert temp, "test person is associated with some SysMO projects, but was thought not to be associated with any"
+
+    temp = Authorization.is_person_in_blacklist?(people(:person_for_sysmo_user_in_blacklist).id, sops(:sop_with_all_sysmo_users_policy).asset.contributor.id)
+    assert temp, "test person should have been in the blacklist of the sop owner"
+
+    # "view" is used instead of "show" because that's a precondition for Authorization.access_type_allows_action?() helper - it assumes that
+    # Authorization.categorize_action() was called on the action before - and that yields "view" for "show" action
+    temp = Authorization.authorized_by_policy?(sops(:sop_with_all_sysmo_users_policy).asset.policy, sops(:sop_with_all_sysmo_users_policy).asset, "view",
+                                               people(:person_for_sysmo_user_in_blacklist).user.id, people(:person_for_sysmo_user_in_blacklist).id)
+    assert temp, "test user is SysMO user and should have been authorized by policy"
+
+    res = Authorization.is_authorized?("show", nil, sops(:sop_with_all_sysmo_users_policy), people(:person_for_sysmo_user_in_blacklist).user.id)
+    assert !res, "test user is SysMO user, but is also in blacklist - should not have been authorized for viewing"
+  end
+
+  # policy.use_whitelist == true AND test person in the whitelist AND allowed action --> true
+  def test_person_in_whitelist_and_use_whitelist_set_to_true
+    temp = sops(:sop_with_custom_permissions_policy).asset.policy.use_whitelist
+    assert temp, "use_whitelist should have been set to 'true'"
+
+    temp = Authorization.is_person_in_whitelist?(users(:test_user_only_in_whitelist).person.id, sops(:sop_with_custom_permissions_policy).asset.contributor.id)
+    assert temp, "test person should have been in the whitelist of the sop owner"
+
+    res = Authorization.is_authorized?("download", nil, sops(:sop_with_custom_permissions_policy), users(:test_user_only_in_whitelist))
+    assert res, "download should have been authorized for a a person in the whitelist - flag to use whitelist was set"
   end
   
   
@@ -1065,13 +1027,13 @@ class AuthorizationTest < ActiveSupport::TestCase
   def test_anonymous_user_allowed_to_perform_an_action
     # it doesn't matter for this test case if any permissions exist for the policy -
     # these can't affect anonymous user; hence can only check the final result of authorization
-    
+    sop=sops(:sop_with_fully_public_policy)
     # verify that the policy really provides access to anonymous users
-    temp = sops(:sop_with_fully_public_policy).asset.policy.sharing_scope
-    temp2 = sops(:sop_with_fully_public_policy).asset.policy.access_type
+    temp = sop.asset.policy.sharing_scope
+    temp2 = sop.asset.policy.access_type
     assert temp == Policy::EVERYONE && temp2 > Policy::NO_ACCESS, "policy should provide some access for anonymous users for this test"
     
-    res = Authorization.is_authorized?("edit", nil, sops(:sop_with_fully_public_policy), nil)
+    res = Authorization.is_authorized?("edit", nil, sop, nil)
     assert res, "anonymous user should have been allowed to 'edit' the SOP - it uses fully public policy"
   end
   

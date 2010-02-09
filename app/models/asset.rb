@@ -1,5 +1,6 @@
 class Asset < ActiveRecord::Base
-  belongs_to :contributor, :polymorphic => true
+  #belongs_to :contributor, :polymorphic => true
+  
   belongs_to :resource, :polymorphic => true
   belongs_to :project
   belongs_to :policy
@@ -23,6 +24,10 @@ class Asset < ActiveRecord::Base
   
   #The order in which asset tabs appear
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop','SavedSearch']
+
+  def contributor
+    self.resource.contributor
+  end
 
   def self.classify_and_authorize(asset_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)
     results = {}
