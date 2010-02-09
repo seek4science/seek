@@ -11,8 +11,6 @@ class JermController < ApplicationController
 
   def test
     project_id=params[:project]
-    username=params[:name]
-    password=params[:pwd]
 
     @project=Project.find(project_id)
     @project.decrypt_credentials
