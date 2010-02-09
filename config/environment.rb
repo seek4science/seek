@@ -26,10 +26,10 @@ Rails::Initializer.run do |config|
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem 'rubaidh-google_analytics', :lib => 'rubaidh/google_analytics', :source => 'http://gems.github.com'  
-  config.gem 'spreadsheet'
-  config.gem 'hpricot'
+  config.gem 'spreadsheet',:version=>"0.6.4.1"
+  config.gem 'hpricot'i,:version=>"0.8.2"
   config.gem 'fastercsv', :version=>"1.5.1"
-  config.gem 'libxml-ruby',:lib=>"libxml"
+  config.gem 'libxml-ruby',:lib=>"libxml",:version=>"1.1.3"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
