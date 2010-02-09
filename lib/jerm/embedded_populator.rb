@@ -57,8 +57,7 @@ module Jerm
             resource_model.asset.project=project
             #assign default policy, and save the associated asset
 
-            resource_model.asset.policy=project.default_policy.deep_copy
-            resource_model.asset.policy.contributor=author
+            resource_model.asset.policy=project.default_policy.deep_copy            
             resource_model.asset.save!
             if warning
               response={:response=>:warning,:message=>warning,:seek_model=>resource_model,:response_code=>warning_code}

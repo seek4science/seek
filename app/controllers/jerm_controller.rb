@@ -10,10 +10,6 @@ class JermController < ApplicationController
   end
 
   def test
-    Sop.destroy_all
-    Model.destroy_all
-    DataFile.destroy_all
-
     project_id=params[:project]
     username=params[:name]
     password=params[:pwd]

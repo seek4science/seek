@@ -2,6 +2,7 @@
   <td><%= status_image(result_line[:response]) -%></td>
   <td><%= h(result_line[:response_code]) %></td>
   <td><%= h(result_line[:resource].title) -%></td>
+  <td><%= link_to "Source",result_line[:resource].uri %></td>
   <td><%= h(result_line[:resource].type) -%></td>
   <td><%= h(result_line[:resource].author_name) -%></td>
   <td><%= h(result_line[:resource].author_seek_id) -%></td>
