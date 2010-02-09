@@ -5,7 +5,7 @@ class UserTest < ActiveSupport::TestCase
   # Then, you can remove it from this and the functional test.
   
   include AuthenticatedTestHelper
-  fixtures :users
+  fixtures :users,:sops,:data_files,:models,:assets
 
   def test_without_profile
     without_profile=User.without_profile
@@ -133,6 +133,14 @@ class UserTest < ActiveSupport::TestCase
     assert_not_nil users(:quentin).remember_token
     assert_not_nil users(:quentin).remember_token_expires_at
     assert users(:quentin).remember_token_expires_at.between?(before, after)
+  end
+
+  def test_get_assets
+    user=users(:owner_of_my_first_sop)
+    assert_not_nil user.assets
+    assert user.assets.size>0
+    assert user.assets.include?(assets(:asset_of_my_first_sop))
+    assert !user.assets.include?(assets(:asset_of_a_sop_with_fully_public_policy))
   end
 
 protected

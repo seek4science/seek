@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100208153020) do
+ActiveRecord::Schema.define(:version => 20100209152517) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -50,8 +50,6 @@ ActiveRecord::Schema.define(:version => 20100208153020) do
   end
 
   create_table "assets", :force => true do |t|
-    t.string   "contributor_type"
-    t.integer  "contributor_id"
     t.integer  "project_id"
     t.string   "resource_type"
     t.integer  "resource_id"

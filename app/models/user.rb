@@ -2,11 +2,7 @@ require 'digest/sha1'
 require 'acts_as_contributor'
 
 class User < ActiveRecord::Base
-  
-  acts_as_contributor
-  # TODO uncomment the following line when SOPs are implemented
-  # has_many :sops, :as => :contributor
-  
+    
   belongs_to :person
   #validates_associated :person
   
@@ -33,9 +29,7 @@ class User < ActiveRecord::Base
   
   has_many :favourites, :dependent => :destroy
   has_many :favourite_groups, :dependent => :destroy
-  
-  # can't destroy the assets, because these might be valuable even in the absence of the parent project
-  has_many :assets, :as => :contributor, :dependent => :nullify
+   
 
   named_scope :not_activated,:conditions=>['activation_code IS NOT NULL']
   named_scope :without_profile,:conditions=>['person_id IS NULL']
@@ -47,6 +41,12 @@ class User < ActiveRecord::Base
     self.activated_at = Time.now.utc
     self.activation_code = nil
     save(false)
+  end
+
+  def assets
+    #FIXME: this is horrible, but is to get round the removal of contributor on an Asset, and using soley the associated resource
+    #may be possible to do this with a :through
+    Asset.find(:all).select{|a| a.contributor==self}
   end
 
   def active?

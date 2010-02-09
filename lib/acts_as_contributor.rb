@@ -16,16 +16,7 @@ module Mib
       end
 
       module ClassMethods
-        def acts_as_contributor
-          has_many :assets,
-                   :as => :contributor,
-                   :order => "resource_type ASC, created_at DESC",
-                   :dependent => :destroy
-
-          has_many :policies,
-                   :as => :contributor,
-                   :order => "created_at DESC",
-                   :dependent => :destroy
+        def acts_as_contributor          
 
           has_many :permissions,
                    :as => :contributor,

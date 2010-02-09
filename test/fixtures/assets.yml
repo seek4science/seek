@@ -2,12 +2,9 @@
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
-asset_of_my_first_sop:
-  #contributor: owner_of_my_first_sop (User)
+asset_of_my_first_sop:  
   project: sysmo_project
   resource: my_first_sop (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: private_policy_for_asset_of_my_first_sop
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -15,11 +12,8 @@ asset_of_my_first_sop:
 
 
 asset_of_a_sop_with_custom_permissions_policy:
-  #contributor: owner_of_custom_permissions_only_policy (User)
   project: nil # not linked to any project for now
   resource: sop_with_custom_permissions_policy (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: custom_permissions_only_policy
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -27,11 +21,8 @@ asset_of_a_sop_with_custom_permissions_policy:
 
 
 asset_of_a_sop_with_complex_permissions:
-  #contributor: owner_of_a_sop_with_complex_permissions (User)
   project: nil # not linked to any project for now
   resource: sop_with_complex_permissions (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: policy_with_complex_permissions
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -39,23 +30,17 @@ asset_of_a_sop_with_complex_permissions:
 
 
 asset_of_a_sop_with_all_sysmo_users_policy:
-  #contributor: owner_of_editing_for_all_sysmo_users_policy (User)
   project: nil # not linked to any project for now
   resource: sop_with_all_sysmo_users_policy (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: editing_for_all_sysmo_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 
-asset_of_a_sop_with_all_registered_users_policy:
-  #contributor: owner_of_download_for_all_registered_users_policy (User)
+asset_of_a_sop_with_all_registered_users_policy:  
   project: nil # not linked to any project for now
   resource: sop_with_all_registered_users_policy (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: download_for_all_registered_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -63,11 +48,8 @@ asset_of_a_sop_with_all_registered_users_policy:
 
 
 asset_of_a_sop_with_fully_public_policy:
-  #contributor: owner_of_fully_public_policy (User)
   project: nil # not linked to any project for now
   resource: sop_with_fully_public_policy (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: fully_public_policy
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -75,11 +57,8 @@ asset_of_a_sop_with_fully_public_policy:
 
 
 asset_of_a_sop_with_private_policy_and_custom_sharing:
-  #contributor: owner_of_my_first_sop (User)
   project: nil # not linked to any project for now
   resource: sop_with_private_policy_and_custom_sharing (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: private_policy_with_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -87,11 +66,8 @@ asset_of_a_sop_with_private_policy_and_custom_sharing:
 
 
 asset_of_a_sop_with_public_download_and_no_custom_sharing:
-  #contributor: owner_of_my_first_sop (User)
   project: nil # not linked to any project for now
   resource: sop_with_public_download_and_no_custom_sharing (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: public_download_with_no_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -99,11 +75,8 @@ asset_of_a_sop_with_public_download_and_no_custom_sharing:
 
 
 asset_of_a_sop_that_uses_whitelist_blacklist_and_custom_sharing:
-  #contributor: owner_of_my_first_sop (User)
   project: nil # not linked to any project for now
   resource: sop_that_uses_whitelist_blacklist_and_custom_sharing (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: whitelist_blacklist_and_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -111,11 +84,8 @@ asset_of_a_sop_that_uses_whitelist_blacklist_and_custom_sharing:
 
 
 asset_of_a_sop_for_test_with_workgroups:
-  #contributor: owner_of_my_first_sop (User)
   project: nil # not linked to any project for now
   resource: sop_for_test_with_workgroups (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: policy_for_worgroup_sharing_tests
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -123,11 +93,8 @@ asset_of_a_sop_for_test_with_workgroups:
 
 
 asset_of_a_sop_for_test_with_workgroups_no_custom_sharing:
-  #contributor: owner_of_my_first_sop (User)
   project: nil # not linked to any project for now
   resource: sop_for_test_with_workgroups_no_custom_sharing (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: policy_for_worgroup_sharing_tests_no_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -135,11 +102,8 @@ asset_of_a_sop_for_test_with_workgroups_no_custom_sharing:
 
 
 asset_of_a_sop_for_test_with_projects_institutions:
-  #contributor: owner_of_my_first_sop (User)
   project: nil # not linked to any project for now
   resource: sop_for_test_with_projects_institutions (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: policy_for_test_with_projects_institutions
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
@@ -147,143 +111,104 @@ asset_of_a_sop_for_test_with_projects_institutions:
 
 
 asset_for_model:
-  #contributor: model_owner (User)
   project: sysmo_project
   resource: teusink (Model)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: policy_for_test_with_projects_institutions
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_model_with_format_and_type:
-  #contributor: model_owner (User)
   project: nil # not linked to any project for now
   resource: model_with_format_and_type (Model)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: fully_public_policy
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_datafile:
-  #contributor: datafile_owner (User)
   project: sysmo_project
   resource: picture (DataFile)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: policy_for_test_with_projects_institutions
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_downloadable_data_file:
-  #contributor: datafile_owner (User)
   project: nil # not linked to any project for now
   resource: downloadable_data_file (DataFile)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: download_for_all_registered_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_editable_data_file:
-  #contributor: datafile_owner (User)
   project: nil # not linked to any project for now
   resource: editable_data_file (DataFile)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: editing_for_all_sysmo_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_of_a_downloadable_sop:
-  #contributor: owner_of_my_first_sop (User)
   project: sysmo_project
   resource: downloadable_sop (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: sysmo_member_download
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_of_a_editable_sop:
-  #contributor: owner_of_my_first_sop (User)
   project: sysmo_project
   resource: editable_sop (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: sysmo_member_edit
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_sysmo_data_file:
-  #contributor: model_owner (User)
   project: sysmo_project
   resource: sysmo_data_file (DataFile)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: sysmo_member_edit
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_myexp_data_file:
-  #contributor: datafile_owner (User)
   project: myexperiment_project
   resource: myexperiment_data_file (DataFile)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: public_download_with_no_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_private_data_file:
-  #contributor: datafile_owner (User)
   project: myexperiment_project
   resource: private_data_file (DataFile)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: private_policy_with_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
   
 asset_of_a_sop_with_links_in_description:
-  #contributor: owner_of_my_first_sop (User)
   project: sysmo_project
   resource: sop_with_links_in_description (Sop)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: sysmo_member_edit
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
   
 asset_of_a_data_file_with_links_in_description:
-  #contributor: owner_of_my_first_sop (User)
   project: sysmo_project
   resource: data_file_with_links_in_description (DataFile)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: sysmo_member_edit
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
   
 asset_of_a_model_with_links_in_description:
-  #contributor: owner_of_my_first_sop (User)
   project: sysmo_project
   resource: model_with_links_in_description (Model)
-  #source:  # these values are not used at the moment (Feb 2009)
-  #quality: # these values are not used at the moment (Feb 2009)
   policy: sysmo_member_edit
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>

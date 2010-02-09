@@ -47,7 +47,7 @@ module Mib
           include Mib::Acts::Resource::InstanceMethods
           
           before_create do |res|
-            res.asset = Asset.new(:contributor_id => res.contributor_id, :contributor_type => res.contributor_type, :resource => res,
+            res.asset = Asset.new(:resource => res,
                                   :source_type => res.source_type, :source_id => res.source_id, :quality => res.quality)
           end
         end
