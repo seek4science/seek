@@ -16,6 +16,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:sops)
   end
 
+
   test "should get new" do
     get :new
     assert_response :success
@@ -187,6 +188,17 @@ class SopsControllerTest < ActionController::TestCase
       assert_select "a[rel=nofollow]"
     end
   end
+
+#  def test_can_display_sop_with_no_contributor
+#    login_as(:pal_user)
+#    get :show,:id=>sops(:sop_with_no_contributor)
+#    assert_response :success
+#  end
+#
+#  def test_can_show_edit_for_sop_with_no_contributor
+#    get :edit,:id=>sops(:sop_with_no_contributor)
+#    assert_response :success
+#  end
 
   private
 

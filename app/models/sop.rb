@@ -6,8 +6,8 @@ class Sop < ActiveRecord::Base
   acts_as_resource
   
   has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
+    :as => :resource,
+    :dependent => :destroy
 
   validates_presence_of :title
 
@@ -17,7 +17,7 @@ class Sop < ActiveRecord::Base
   acts_as_solr(:fields=>[:description, :title, :original_filename]) if SOLR_ENABLED
 
   belongs_to :content_blob,
-             :dependent => :destroy
+    :dependent => :destroy
                
   has_one :investigation,:through=>:study
              
@@ -31,16 +31,16 @@ class Sop < ActiveRecord::Base
   explicit_versioning(:version_column => "version") do
     
     belongs_to :content_blob,
-             :dependent => :destroy
+      :dependent => :destroy
     
     belongs_to :contributor, :polymorphic => true
     
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
     
     has_one :asset,
-            :primary_key => "sop_id",
-            :foreign_key => "resource_id",
-            :conditions => {:resource_type => "Sop"}
+      :primary_key => "sop_id",
+      :foreign_key => "resource_id",
+      :conditions => {:resource_type => "Sop"}
             
     #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
     def project
@@ -65,14 +65,12 @@ class Sop < ActiveRecord::Base
     all_sops = Sop.find(:all, :order => "ID asc")
     sops_with_contributors = all_sops.collect{ |s|
       Authorization.is_authorized?("show", nil, s, user) ?
-              (p = s.asset.contributor.person;
-              { "id" => s.id,
-                "title" => s.title,
-                "contributor" => "by " +
-                        (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : p.first_name) + " " +
-                        (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : p.last_name),
-                "type" => self.name } ) :
-              nil }
+        (contributor = s.contributor;
+        { "id" => s.id,
+          "title" => s.title,
+          "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
+          "type" => self.name } ) :
+        nil }
 
     sops_with_contributors.delete(nil)
 

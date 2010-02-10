@@ -7,8 +7,8 @@ class Model < ActiveRecord::Base
   acts_as_resource
   
   has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
+    :as => :resource,
+    :dependent => :destroy
   
   validates_presence_of :title
   
@@ -16,7 +16,7 @@ class Model < ActiveRecord::Base
   validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
 
   belongs_to :content_blob,
-             :dependent => :destroy
+    :dependent => :destroy
 
   belongs_to :organism
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
@@ -29,13 +29,12 @@ class Model < ActiveRecord::Base
   
   before_save :update_first_letter
   
-  grouped_pagination
-  
+  grouped_pagination  
   
   explicit_versioning(:version_column => "version") do
     
     belongs_to :content_blob,
-             :dependent => :destroy
+      :dependent => :destroy
              
     belongs_to :organism
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
@@ -45,9 +44,9 @@ class Model < ActiveRecord::Base
     belongs_to :contributor, :polymorphic => true
     
     has_one :asset,
-            :primary_key => "model_id",
-            :foreign_key => "resource_id",
-            :conditions => {:resource_type => "Model"}
+      :primary_key => "model_id",
+      :foreign_key => "resource_id",
+      :conditions => {:resource_type => "Model"}
 
     #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
     def project
@@ -55,6 +54,7 @@ class Model < ActiveRecord::Base
     end
     
   end
+  
 
   # get a list of Models with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
@@ -63,14 +63,13 @@ class Model < ActiveRecord::Base
   # - user - user that performs the action; this is required for authorization
   def self.get_all_as_json(user)
     all_models = Model.find(:all, :order => "ID asc")
+
     models_with_contributors = all_models.collect{ |m|
-        Authorization.is_authorized?("show", nil, m, user) ?
-        (p = m.asset.contributor.person;
+      Authorization.is_authorized?("show", nil, m, user) ?
+        (contributor = m.contributor;
         { "id" => m.id,
           "title" => m.title,
-          "contributor" => "by " +
-                           (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : p.first_name) + " " +
-                           (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : p.last_name),
+          "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
           "type" => self.name } ) :
         nil }
 

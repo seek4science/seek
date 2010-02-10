@@ -36,7 +36,7 @@ module Jerm
         else
           #create SOP,DataFile or Model (or other type that may be added in the future)        
           resource_model=eval("#{resource.type}.new")
-          resource_model.contributor=author.user
+          #resource_model.contributor=author.user
           #associate with ContentBlob
           resource_model.content_blob = ContentBlob.new(:url=>resource.uri)
           resource_model.original_filename = determine_filename(resource)

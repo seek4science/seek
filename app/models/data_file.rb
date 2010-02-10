@@ -64,12 +64,10 @@ class DataFile < ActiveRecord::Base
     all_datafiles = DataFile.find(:all, :order => "ID asc")
     datafiles_with_contributors = all_datafiles.collect{ |d|
         Authorization.is_authorized?("show", nil, d, user) ?
-        (p = d.asset.contributor.person;
+        (contributor = d.contributor;
         { "id" => d.id,
           "title" => d.title,
-          "contributor" => "by " +
-                           (p.first_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a first name\n----\n"); "(NO FIRST NAME)") : p.first_name) + " " +
-                           (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : p.last_name),
+          "contributor" => contributor.nil? ? "" : "by " + contributor.person.name,
           "type" => self.name } ) :
         nil }
 

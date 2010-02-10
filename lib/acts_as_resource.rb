@@ -62,6 +62,8 @@ module Mib
         def attributions_objects
           self.attributions.collect { |a| a.object }
         end
+
+        
         
         # this method will save the resource, but will not cause 'updated_at' field to receive new value of Time.now
         def save_without_timestamping
