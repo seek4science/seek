@@ -24,4 +24,11 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal p,model.latest_version.project
   end
 
+  test "model with no contributor" do
+    model=models(:model_with_no_contributor)
+    assert_nil model.contributor
+    assert_nil model.asset.contributor
+  end
+
+
 end

@@ -223,3 +223,27 @@ asset_for_model_with_different_owner:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_for_model_with_no_contributor:
+  project: sysmo_project
+  resource: model_with_no_contributor (Model)
+  policy: public_download_with_no_custom_sharing
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_for_sop_with_no_contributor:
+  project: sysmo_project
+  resource: sop_with_no_contributor (Sop)
+  policy: public_download_with_no_custom_sharing
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+
+asset_for_data_file_with_no_contributor:
+  project: sysmo_project
+  resource: data_file_with_no_contributor (DataFile)
+  policy: public_download_with_no_custom_sharing
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>

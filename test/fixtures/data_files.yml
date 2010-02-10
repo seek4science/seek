@@ -68,4 +68,12 @@ data_file_with_links_in_description:
   last_used_at: 2009-04-03 11:09:18
   version: 1
 
+data_file_with_no_contributor:
+  title: Picture
+  description: A picture
+  original_filename: file_pictuer.png
+  content_blob: picture_blob
+  content_type: text/png
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
 

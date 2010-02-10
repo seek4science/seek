@@ -3,7 +3,6 @@ require File.dirname(__FILE__) + '/../test_helper'
 class SopTest < ActiveSupport::TestCase
   fixtures :all
   
-
   test "project" do
     s=sops(:editable_sop)
     p=projects(:sysmo_project)
@@ -39,8 +38,7 @@ class SopTest < ActiveSupport::TestCase
     assert_equal 1,sop.version
     assert_equal sop.title,sop.versions.first.title
 
-  end
-  
+  end  
 
   def test_create_new_version
     sop=sops(:my_first_sop)
@@ -80,6 +78,12 @@ class SopTest < ActiveSupport::TestCase
     assert_equal project,sop.asset.project
     assert_equal project,sop.latest_version.asset.project
     assert_equal project,sop.latest_version.project
+  end
+
+  test "sop with no contributor" do
+    sop=sops(:sop_with_no_contributor)
+    assert_nil sop.contributor
+    assert_nil sop.asset.contributor
   end
   
 end

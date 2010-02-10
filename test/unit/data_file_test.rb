@@ -22,4 +22,11 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal p,df.latest_version.asset.project
     assert_equal p,df.latest_version.project
   end
+
+  test "data_file with no contributor" do
+    df=data_files(:data_file_with_no_contributor)
+    assert_nil df.contributor
+    assert_nil df.asset.contributor
+  end
+
 end

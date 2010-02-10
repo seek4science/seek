@@ -49,3 +49,14 @@ model_with_different_owner:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
+
+model_with_no_contributor:
+  title: Model with no contributor
+  description: Visit my site http://www.google.com
+  original_filename: Teusink.xml
+  content_blob: teusink_blob
+  content_type: text/xml
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
