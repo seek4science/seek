@@ -10,6 +10,10 @@ class JermController < ApplicationController
   end
 
   def test
+    Sop.destroy_all
+    DataFile.destroy_all
+    Model.destroy_all
+    
     project_id=params[:project]
 
     @project=Project.find(project_id)

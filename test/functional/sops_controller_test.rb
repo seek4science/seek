@@ -119,7 +119,6 @@ class SopsControllerTest < ActionController::TestCase
     assert assigns(:sop)
     assert_not_nil flash[:notice]
     assert_nil flash[:error]
-
     
     s=Sop.find(s.id)
     assert_equal 2,s.versions.size
@@ -201,7 +200,6 @@ class SopsControllerTest < ActionController::TestCase
 #  end
 
   private
-
 
   def valid_sharing
     {

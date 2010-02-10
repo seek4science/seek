@@ -373,7 +373,7 @@ module Authorization
 
   # checks if "user" is authorized to manage this asset
   def Authorization.can_manage?(user_id, thing_asset)
-    return (thing_asset.contributor.instance_of?(User) && thing_asset.contributor.id==user_id) ||
+    return (!thing_asset.contributor.nil? && thing_asset.contributor.instance_of?(User) && thing_asset.contributor.id==user_id) ||
       (!thing_asset.policy.nil? && thing_asset.policy.permission_granted?(User.find(user_id).person,Policy::MANAGING))
   end
   
@@ -459,7 +459,7 @@ module Authorization
     # the following is slow, but given the very rare execution can be kept
     begin
       # thing_asset is Asset, so thing_asset.contributor is the original uploader == owner of the item
-      contributor = eval("#{thing_asset.contributor_type}.find(#{thing_asset.contributor_id})")
+      contributor = thing_asset.contributor
       policy = Policy.default(thing_asset.project)
       return policy
     rescue ActiveRecord::RecordNotFound => e
@@ -551,7 +551,7 @@ module Authorization
     # NB! currently SysMO won't support objects owned by entities other than users
     # (especially, policy checks are not agreed for these cases - however, owner tests and
     #  permission tests are possible and will be carried out)
-    unless thing_asset.resource.contributor.class.name == "User"
+      unless thing_asset.resource.contributor.class.name == "User"
       return false
     end
     
