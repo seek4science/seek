@@ -7,8 +7,7 @@ class StudiesController < ApplicationController
   before_filter :study_auth_project,:only=>[:edit,:update]
   before_filter :delete_allowed,:only=>[:destroy]
 
-  def index
-    
+  def index    
     @studies=Study.find(:all,:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
     @studies=Study.paginate :page=>params[:page]
 
@@ -22,7 +21,6 @@ class StudiesController < ApplicationController
     @study = Study.new
     @study.assays << Assay.find(params[:assay_id]) if params[:assay_id]
     
-
     respond_to do |format|
       format.html
     end

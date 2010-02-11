@@ -85,5 +85,13 @@ class SopTest < ActiveSupport::TestCase
     assert_nil sop.contributor
     assert_nil sop.asset.contributor
   end
+
+  test "versions destroyed as dependent" do
+    sop = sops(:my_first_sop)
+    assert_equal 1,sop.versions.size,"There should be 1 version of this SOP"   
+    assert_difference(["Sop.count","Sop::Version.count"],-1) do
+      sop.destroy
+    end    
+  end
   
 end

@@ -29,4 +29,12 @@ class DataFileTest < ActiveSupport::TestCase
     assert_nil df.asset.contributor
   end
 
+  test "versions destroyed as dependent" do
+    df=data_files(:sysmo_data_file)
+    assert_equal 1,df.versions.size,"There should be 1 version of this DataFile"
+    assert_difference(["DataFile.count","DataFile::Version.count"],-1) do
+      df.destroy
+    end
+  end
+
 end
