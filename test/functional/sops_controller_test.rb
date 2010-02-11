@@ -188,16 +188,15 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
-#  def test_can_display_sop_with_no_contributor
-#    login_as(:pal_user)
-#    get :show,:id=>sops(:sop_with_no_contributor)
-#    assert_response :success
-#  end
-#
-#  def test_can_show_edit_for_sop_with_no_contributor
-#    get :edit,:id=>sops(:sop_with_no_contributor)
-#    assert_response :success
-#  end
+  def test_can_display_sop_with_no_contributor    
+    get :show,:id=>sops(:sop_with_no_contributor)
+    assert_response :success
+  end
+
+  def test_can_show_edit_for_sop_with_no_contributor
+    get :edit,:id=>sops(:sop_with_no_contributor)
+    assert_response :success
+  end
 
   private
 

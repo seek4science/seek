@@ -123,7 +123,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     
     assert !res, "test person should have not been identified as being in the whitelist of test user"
   end
-  
+
   
   
   # testing: is_person_in_blacklist?(person_id, blacklist_owner_user_id)
@@ -1094,5 +1094,26 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert res,"Should be able to edit"
     assert sop.can_edit?(users(:aaron))
   end
-  
+
+  def test_asset_with_no_contributor
+    sop=sops(:sop_with_no_contributor) #should be editable to all those that are members of a project
+    user=users(:pal_user)
+    assert Authorization.is_authorized?("view",Sop,sop,user), "The sop with no contributor should be viewable to the pal"
+    assert Authorization.is_authorized?("edit",Sop,sop,user), "The sop with no contributor should be editable to the pal"
+    assert Authorization.is_authorized?("download",Sop,sop,user), "The sop with no contributor should be downloadable to the pal"
+    assert !Authorization.is_authorized?("manage",Sop,sop,user), "The sop with no contributor should not be managable to the pal"
+  end
+
+  def test_asset_with_no_contributor_with_managing_permission
+    sop=sops(:sop_with_no_contributor) #should be editable to all those that are members of a project
+    user=users(:pal_user)
+    assert !Authorization.is_authorized?("manage",Sop,sop,user), "The should not be managable to the pal"
+    #now add the managable
+    p=Permission.new(:contributor=>user.person,:policy_id=>sop.asset.policy.id,:access_type=>Policy::MANAGING)    
+    sop.asset.policy.permissions << p
+    sop.asset.policy.use_custom_sharing=true
+    sop.asset.policy.save!
+    
+    assert Authorization.is_authorized?("manage",Sop,sop,user), "The sop should now be managable to the pal"
+  end
 end

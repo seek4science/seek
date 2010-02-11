@@ -176,10 +176,10 @@ module Authorization
         # blacklist denies any access, whitelist allows any access up to the level defined in FavouriteGroup
         # model (FavouriteGroup::WHITELIST_ACCESS_TYPE)
         #
-        # this should only be carried out if the asset belongs to a User, not a Project or something else
+        # this should only be carried out if the asset belongs to a User (or nil to indicate uploaded by JERM), not a Project or something else
         # (otherwise it doesn't make sense for those other types to have "favourite" groups, including
         #  whitelist / blacklist)
-        if thing_asset.contributor.instance_of?(User)
+        if thing_asset.contributor.nil? || thing_asset.contributor.instance_of?(User)
           if policy.use_blacklist
             return false if Authorization.is_person_in_blacklist?(user_person_id, thing_asset.contributor.id)
           end
@@ -548,10 +548,10 @@ module Authorization
   def Authorization.authorized_by_policy?(policy, thing_asset, action, user_id, user_person_id)
     is_authorized = false
     
-    # NB! currently SysMO won't support objects owned by entities other than users
+    # NB! currently SysMO won't support objects owned by entities other than users (or nil contributor to indicate automated upload - JERM)
     # (especially, policy checks are not agreed for these cases - however, owner tests and
     #  permission tests are possible and will be carried out)
-      unless thing_asset.resource.contributor.class.name == "User"
+    unless thing_asset.contributor.nil? || thing_asset.resource.contributor.class.name == "User"
       return false
     end
     
