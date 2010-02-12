@@ -181,13 +181,29 @@ namespace :seek do
       p.save #forces the first letter to be updated
       puts "Updated for #{p.class.name} : #{p.id}"
     end
-  end  
+  end
+
+  #a 1 shot task to update the authors field for Asset retrospectively for contributors
+  task :update_authors => :environment do    
+    Asset.find(:all).each do |asset|      
+      if (asset.authors.empty? && !asset.contributor.nil?)
+        class << asset
+          def record_timestamps
+            false
+          end
+        end
+        asset.authors << asset.contributor.person
+        asset.save!
+        puts "Added author for Asset: #{asset.id}"      
+      end
+    end
+  end
 
   private
 
   #returns true if the tag is over 30 chars long, or contains colons, semicolons, comma's or forward slash
   def dubious_tag?(tag)
-     tag.length>30 || [";",",",":","/"].detect{|c| tag.include?(c)}
+    tag.length>30 || [";",",",":","/"].detect{|c| tag.include?(c)}
   end
 
   #reverts to use pre-2.3.4 id generation to keep generated ID's consistent
