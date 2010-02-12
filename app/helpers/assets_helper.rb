@@ -109,9 +109,9 @@ module AssetsHelper
         related["assays"] = classify_for_tabs(resource.assays)
       when "Person"
         if resource.user
-          assets_hash = split_assets_by_type(resource.user.assets | resource.authored_assets)
+          assets_hash = split_assets_by_type(resource.user.assets | resource.created_assets)
         else
-          assets_hash = split_assets_by_type(resource.authored_assets)
+          assets_hash = split_assets_by_type(resource.created_assets)
         end
         related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)
         related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size

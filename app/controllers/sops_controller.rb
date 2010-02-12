@@ -145,8 +145,8 @@ class SopsController < ApplicationController
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           
-          #Add authors
-          AssetAuthor.add_or_update_author_list(@sop, params[:authors])
+          #Add creators
+          AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
           
           if policy_err_msg.blank?
             flash[:notice] = 'SOP was successfully uploaded and saved.'
@@ -195,7 +195,7 @@ class SopsController < ApplicationController
         Relationship.create_or_update_attributions(@sop, params[:attributions])
         
         #update authors
-        AssetAuthor.add_or_update_author_list(@sop, params[:authors])
+        AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
         
         if policy_err_msg.blank?
           flash[:notice] = 'SOP metadata was successfully updated.'

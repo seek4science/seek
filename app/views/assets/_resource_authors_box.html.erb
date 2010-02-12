@@ -1,23 +1,23 @@
 <%# This partial expects 3 parameters to be defined: -%>
 <%# - resource - instance of resource for which the authors are displayed -%>
-<%# - authors - collection of authors to which the resource is attributed -%>
+<%# - creators - collection of creators to which the resource is attributed -%>
 <%# - truncate_to - length of the texts after which truncation is activated -%>
 
 <div class="contribution_section_box" style="padding: 0.5em 0 1em 0;">
   <p class="heading">
     <%= help_icon("The authors are the people who originally created this file.") -%>
-    Authors <span class="count_text">(<%= authors.length -%>)</span>
+    Creators <span class="count_text">(<%= creators.length -%>)</span>
     <a name="authors"></a>
     <% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
       <p style="text-align:center; margin: 0; padding: 0;"><small>[ <%= link_to "edit", edit_polymorphic_path(resource) %> ]</small></p>
     <% end %>
   </p>
   <p>
-  <% authors.each do |author| %>
-    <% if authors.count < 3 #display full avatar if not too many authors %>
-      <%= favouritable_icon(author, 80) -%>
+  <% creators.each do |creator| %>
+    <% if creator.count < 3 #display full avatar if not too many authors %>
+      <%= favouritable_icon(creator, 80) -%>
     <% end %>
-    <%= link_to(h(author.name), url_for(author)) -%><br/>
+    <%= link_to(h(creator.name), url_for(creator)) -%><br/>
   <% end %>
   </p>
 </div>

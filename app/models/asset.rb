@@ -8,7 +8,9 @@ class Asset < ActiveRecord::Base
   has_many :assay_assets, :dependent => :destroy
   has_many :assays, :through => :assay_assets
   
-  has_and_belongs_to_many :authors, :join_table => 'asset_authors', :class_name => 'Person', :association_foreign_key => 'author_id'
+  has_and_belongs_to_many :creators,:join_table => 'assets_creators', :class_name => 'Person', :association_foreign_key => 'creator_id'
+
+  alias_method :authors, :creators
   
   # TODO
   # add all required validations here

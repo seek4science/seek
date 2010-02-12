@@ -36,12 +36,9 @@ class Person < ActiveRecord::Base
 
   acts_as_taggable_on :tools, :expertise
     
-  has_one :user
+  has_one :user   
   
-  #has_many :asset_authors,  :foreign_key => "author_id"
-  #has_many :authored_assets, :through => :asset_authors, :source => :asset
-  
-  has_and_belongs_to_many :authored_assets, :join_table => 'asset_authors', :class_name => 'Asset', :foreign_key => 'author_id'
+  has_and_belongs_to_many :created_assets, :join_table => 'assets_creators', :class_name => 'Asset', :foreign_key => 'creator_id'
   
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :description ]) if SOLR_ENABLED
 

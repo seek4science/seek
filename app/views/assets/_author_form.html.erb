@@ -1,60 +1,60 @@
 <%# This partial is expecting 3 parameters to be defined: -%>
-<%# - resource_type - type of resource for which the author form is displayed (required because various types of resources have different requirements for attributions) -%>
-<%# - existing_authors - list of authors for the current resource (this should be collection of Person objects) -%>
-<%# - author_suggestions - JSON array of data to be used to generate autocompleter suggestions -%>
+<%# - resource_type - type of resource for which the creators form is displayed (required because various types of resources have different requirements for attributions) -%>
+<%# - existing_creators - list of creators for the current resource (this should be collection of Person objects) -%>
+<%# - creator_suggestions - JSON array of data to be used to generate autocompleter suggestions -%>
 
 
-<!-- Authors -->
+<!-- Creator -->
 
 <%# this hidden input will submit all permission data with the form -%>
-<%= hidden_field_tag "authors", "" -%>
+<%= hidden_field_tag "creators", "" -%>
 
-<% resource_type_attributed_to_types = "Authors" -%>
+<% resource_type_attributed_to_types = "Creators" -%>
 
 
 <div class="fold">
 
   <div class="foldTitle">
     <%= help_icon("Here you attribute this #{resource_type} to other people.") -%>
-    Authors
+    Creators
   </div>
 
-  <div id="author_fold_content" class="foldContent" style="display: block;">
+  <div id="creator_fold_content" class="foldContent" style="display: block;">
 
     <p style="font-weight: bold; margin-top: 1.5em;">
-      If this <%= resource_type %> was created by someone else, please list their name below
+      If this <%= resource_type %> was created by or together with someone else, please list their name below
     </p>
 
     <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
       <p style="color: #666666;">
-        So far you have specified the following authors:
+        So far you have specified the following creators:
       </p>
-      <p id="authors_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="authors_text">Loading...</span>
+      <p id="creators_list" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text" id="creators_text">Loading...</span>
       </p>
       
       <p style="margin-top: 1em;">
-        Please type authors into the box below - suggestions will be displayed as you type.
-        Select authors that you want to attribute to and click "Add" to add them to the list.
+        Please type creators into the box below - suggestions will be displayed as you type.
+        Select creators that you want to include and click "Add" to add them to the list.
       </p>
 
       <table id="facebook" class="clearfix">
         <tr>
           <td>
-            <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('author_autocomplete_input').focus();" style="width: 400px;">
-              <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="author_hidden_input" tabindex="-1" ></span>
+            <div tabindex="-1" id="ids" class="clearfix tokenizer" onclick="$('creator_autocomplete_input').focus();" style="width: 400px;">
+              <span class="tokenizer_stretcher">^_^</span><span class="tab_stop"><input type="text" id="creator_hidden_input" tabindex="-1" ></span>
 
-              <div id="author_autocomplete_display" class="tokenizer_input">
-                <input type="text" size="1" tabindex="" id="author_autocomplete_input" />
+              <div id="creator_autocomplete_display" class="tokenizer_input">
+                <input type="text" size="1" tabindex="" id="creator_autocomplete_input" />
               </div>
             </div>
-            <div id="author_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
+            <div id="creator_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 403px; height: auto; overflow-y: hidden;display:none">
               <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
             </div>
           </td>
 
           <td style="padding-left: 0.7em; vertical-align: middle;">
-            <span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: addAuthors(); return(false);" -%></span>
+            <span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: addCreators(); return(false);" -%></span>
           </td>
         </tr>
       </table>
@@ -63,8 +63,8 @@
         var suggestion_list = <%= Person.get_all_as_json -%>;
         var prepopulate_with = [];
 
-        var author_autocompleter = new Autocompleter.LocalAdvanced(
-        author_autocompleter_id, 'author_autocomplete_input', 'author_autocomplete_display', 'author_autocomplete_populate', suggestion_list, prepopulate_with, {
+        var creator_autocompleter = new Autocompleter.LocalAdvanced(
+        creator_autocompleter_id, 'creator_autocomplete_input', 'creator_autocomplete_display', 'creator_autocomplete_populate', suggestion_list, prepopulate_with, {
           frequency: 0.1,
           updateElement: addAction,
           search_field: "name",
@@ -72,9 +72,9 @@
           id_field: "id",
           validation_type: "only_suggested"
         });
-        var hidden_input = new HiddenInput('author_hidden_input', author_autocompleter);
+        var hidden_input = new HiddenInput('creator_hidden_input', creator_autocompleter);
 
-        autocompleters[author_autocompleter_id] = author_autocompleter;
+        autocompleters[creator_autocompleter_id] = creator_autocompleter;
       </script>
 
     </div>
@@ -84,67 +84,67 @@
 
 
 <script type="text/javascript">
-// ***************  Author  *****************
+// ***************  Creator  *****************
 
-  // recreate internal store of authors..
-<% existing_authors.each do |a| -%>
-    author_name = '<%= a.name -%>';
-    author_id = <%= a.id -%>;
-    author_email = '<%= a.email -%>';
+  // recreate internal store of creators..
+<% existing_creators.each do |c| -%>
+    creator_name = '<%= c.name -%>';
+    creator_id = <%= c.id -%>;
+    creator_email = '<%= c.email -%>';
 
-    author_settings.push([author_name, author_email, author_id]);
+    creator_settings.push([creator_name, creator_email, creator_id]);
 <% end -%>
 
-  // ..and update the page to make existing authors visible
-  updateAuthorSettings();
+  // ..and update the page to make existing creators visible
+  updateCreatorSettings();
 
 
-function updateAuthorSettings() {
-    // iterate through all authors and build the "shared with" list;
+function updateCreatorSettings() {
+    // iterate through all creators and build the "shared with" list;
     // in the meanwhile also assemble a minimized version of the array that
     // could be posted with the form (this won't have item titles in it)
   
-    var authors = '';
-    var authors_arr = new Array();
+    var creator = '';
+    var creators_arr = new Array();
   
-    for(var i = 0; i < author_settings.length; i++) {
-        author_name = author_settings[i][0];
-        author_email = author_settings[i][1];
-        author_id = author_settings[i][2];
+    for(var i = 0; i < creator_settings.length; i++) {
+        creator_name = creator_settings[i][0];
+        creator_email = creator_settings[i][1];
+        creator_id = creator_settings[i][2];
             
-        authors += '<b>' + author_name + '</b>: ' + author_email
+        creators += '<b>' + creator_name + '</b>: ' + creator_email
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:deleteAuthor(\''+ author_name +'\', '+ author_id +'); return(false);">remove</a>]</small><br/>';
+        + '[<a href="" onclick="javascript:deleteCreator(\''+ creator_name +'\', '+ creator_id +'); return(false);">remove</a>]</small><br/>';
     
-        authors_arr.push([author_name, author_id]);
+        creators_arr.push([creator_name, creator_id]);
     }
   
   
     // remove the last line break
-    if(authors.length > 0) {
-        authors = authors.slice(0,-5);
+    if(creators.length > 0) {
+        creators = creators.slice(0,-5);
     }
   
   
     // update the page
-    if(authors.length == 0) {
-        $('authors_list').innerHTML = '<span class="none_text">No authors</span>';
+    if(creator.length == 0) {
+        $('creators_list').innerHTML = '<span class="none_text">No creators</span>';
     }
     else {
-        $('authors_list').innerHTML = authors;
+        $('creators_list').innerHTML = creators;
     }
   
   
     // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
-    $('authors').value = Object.toJSON(authors_arr);
+    $('creators').value = Object.toJSON(creators_arr);
 }
 
 
-function checkAuthorNotInList(auth_name, auth_id) {
+function checkCreatorNotInList(creator_name, creator_id) {
     rtn = true;
   
-    for(var i = 0; i < author_settings.length; i++)
-        if(author_settings[i][0] == auth_name && author_settings[i][2] == auth_id) {
+    for(var i = 0; i < creator_settings.length; i++)
+        if(creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
             rtn = false;
             break;
         }
@@ -153,58 +153,58 @@ function checkAuthorNotInList(auth_name, auth_id) {
 }
 
 
-// adds an author to the list and updates the displayed list
-function addAuthor(auth_name, auth_email, auth_id) {
-    if(checkAuthorNotInList(auth_name, auth_id)) {
-        author_settings.push([auth_name, auth_email, auth_id]);
+// adds an creator to the list and updates the displayed list
+function addCreator(creator_name, creator_email, creator_id) {
+    if(checkCreatorNotInList(creator_name, creator_id)) {
+        creator_settings.push([creator_name, creator_email, creator_id]);
     
         // update visible page
-        updateAuthorSettings();
+        updateCreatorSettings();
     }
     else {
-        alert('The following entity was not added (already in the list of authors):\n\n' +
-            auth_name + ': ' + auth_email);
+        alert('The following entity was not added (already in the list of creators):\n\n' +
+            creator_name + ': ' + creator_email);
     }
 }
 
 
-// removes author from author list and updates the displayed list
-function deleteAuthor(auth_name, auth_id) {
-    // remove the actual record for the author
-    for(var i = 0; i < author_settings.length; i++)
-        if(author_settings[i][0] == auth_name && author_settings[i][2] == auth_id) {
-            author_settings.splice(i, 1);
+// removes creator from creator list and updates the displayed list
+function deleteCreator(creator_name, creator_id) {
+    // remove the actual record for the creator
+    for(var i = 0; i < creator_settings.length; i++)
+        if(creator_settings[i][0] == creator_name && creator_settings[i][2] == creator_id) {
+            creator_settings.splice(i, 1);
             break;
         }
   
     // update the page
-    updateAuthorSettings();
+    updateCreatorSettings();
 }
 
 
-function addAuthors() {
-    var selIDs = autocompleters[author_autocompleter_id].getRecognizedSelectedIDs();
+function addCreator() {
+    var selIDs = autocompleters[creator_autocompleter_id].getRecognizedSelectedIDs();
   
     if(selIDs == "") {
-        // no authors to add
-        alert("Please choose some authors!");
+        // no creators to add
+        alert("Please choose some creators!");
         return(false);
     }
     else {
-        // some authors to add - known that don't have duplicates
+        // some creators to add - known that don't have duplicates
         // within the new list, but some entries in the new list
-        // may replicate those in the main author list: this
-        // will be checked by addAuthor()
+        // may replicate those in the main creator list: this
+        // will be checked by addCreator()
     
         for(var i = 0; i < selIDs.length; i++) {
             id = parseInt(selIDs[i]);
-            email = autocompleters[author_autocompleter_id].getValueFromJsonArray(autocompleters[author_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
-            name = autocompleters[author_autocompleter_id].getValueFromJsonArray(autocompleters[author_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
-            addAuthor(name, email, id);
+            email = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'email');
+            name = autocompleters[creator_autocompleter_id].getValueFromJsonArray(autocompleters[creator_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
+            addCreator(name, email, id);
         }
       
         // remove all tokens from autocomplete text box
-        autocompleters[author_autocompleter_id].deleteAllTokens();
+        autocompleters[creator_autocompleter_id].deleteAllTokens();
     
         return(true);
     }
