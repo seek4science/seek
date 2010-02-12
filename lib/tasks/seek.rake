@@ -183,18 +183,18 @@ namespace :seek do
     end
   end
 
-  #a 1 shot task to update the authors field for Asset retrospectively for contributors
-  task :update_authors => :environment do    
+  #a 1 shot task to update the creators field for Asset retrospectively for contributors
+  task :update_creators => :environment do
     Asset.find(:all).each do |asset|      
-      if (asset.authors.empty? && !asset.contributor.nil?)
+      if (asset.creators.empty? && !asset.contributor.nil?)
         class << asset
           def record_timestamps
             false
           end
         end
-        asset.authors << asset.contributor.person
+        asset.creators << asset.contributor.person
         asset.save!
-        puts "Added author for Asset: #{asset.id}"      
+        puts "Added creator for Asset: #{asset.id}"
       end
     end
   end
