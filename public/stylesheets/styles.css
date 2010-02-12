@@ -711,7 +711,7 @@ div.favouritable_icon {
   margin: 5px auto;
 }
 
-div.avatar_text {
+.avatar_text {
   position: absolute;
   text-align:center;
   bottom: 6px;

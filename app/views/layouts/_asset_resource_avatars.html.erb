@@ -1,0 +1,19 @@
+<%
+authors = resource.asset.authors
+contributor = resource.contributor
+%>
+<div style="text-align: center">
+  <% if  !authors.empty? -%>
+    <% authors.each do |a|  -%>
+      <%=  favouritable_icon(a, 60) -%>
+    <% end -%>
+  <% end %>
+
+  <% if resource.contributor -%>
+    <% if !authors.include?(contributor.person) %>      
+        <%= favouritable_icon(resource.contributor.person, 60) -%>      
+    <% end -%>
+  <% else %>
+    <span style="font-size:smaller">Uploaded by</span><br/>JERM
+  <% end -%>
+</div>

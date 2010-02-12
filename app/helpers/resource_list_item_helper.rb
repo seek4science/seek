@@ -6,9 +6,7 @@ module ResourceListItemHelper
   end
   
   def get_list_item_actions_partial resource
-    name = resource.class.name.split("::")[0]
-    case name
-    when "DataFile","Model","Sop"
+    if resource.respond_to?("asset")
       actions_partial = "assets/resource_actions_td"
     else
       actions_partial = nil
@@ -17,10 +15,8 @@ module ResourceListItemHelper
   end
   
   def get_list_item_avatar_partial resource
-    name = resource.class.name.split("::")[0]
-    case name
-    when "DataFile","Model","Sop"
-      actions_partial = "layouts/contributor_avatar"
+    if resource.respond_to?("asset")
+      actions_partial = "layouts/asset_resource_avatars"
     else
       actions_partial = "layouts/resource_avatar"
     end
