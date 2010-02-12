@@ -13,7 +13,7 @@ contributor = resource.contributor
     <% if !authors.include?(contributor.person) %>      
         <%= favouritable_icon(resource.contributor.person, 60) -%>      
     <% end -%>
-  <% else %>
-    <span style="font-size:smaller">Uploaded by</span><br/>JERM
+  <% else %>    
+    <%= the_jerm :size=>30 -%>
   <% end -%>
 </div>

@@ -5,4 +5,16 @@ module JermHelper
     image_name=RESPONSE_STATUS_IMAGES[status]
     image(image_name)
   end
+
+  def the_jerm options={:size=>50}
+    logo_filename=icon_filename_for_key("jerm_logo")
+    size=options[:size]
+    image_tag logo_filename,
+      :alt => "The JERM",
+      :size => "#{size}x#{size}",
+      :class => 'framed',
+      :style=>"padding: 2px;",
+      :title=>"The JERM"
+  end
+  
 end

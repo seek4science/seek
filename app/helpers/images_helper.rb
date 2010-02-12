@@ -184,6 +184,8 @@ module ImagesHelper
       "crystal_project/32x32/apps/kformula.png"
     when "person_avatar"
       "avatar.png"
+    when "jerm_logo"
+      "jerm_logo.png"
     when "project_avatar"
       "project_64x64.png"
     when "institution_avatar"
