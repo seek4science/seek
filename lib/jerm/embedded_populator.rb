@@ -44,7 +44,7 @@ module Jerm
           if resource.title.blank?
             warning = MESSAGES[:no_title]
             warning_code=RESPONSE_CODES[:no_title]
-            resource.title=resource_model.original_filename
+            resource.title=generated_title(resource,author)
           end
           resource_model.title=resource.title
           
@@ -81,6 +81,12 @@ module Jerm
 
     def determine_filename resource
       URI.unescape(resource.uri).split("/").last
+    end
+
+    def generated_title resource,author
+      type=resource.type
+      type="SOP" if type.downcase=="sop"
+      "#{author.name}'s #{type.capitalize}"
     end
 
     def default_policy author,project
