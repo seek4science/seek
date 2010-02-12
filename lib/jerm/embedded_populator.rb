@@ -84,9 +84,9 @@ module Jerm
     end
 
     def generated_title resource,author
-      type=resource.type
+      type=resource.type.capitalize
       type="SOP" if type.downcase=="sop"
-      "#{author.name}'s #{type.capitalize}"
+      "#{author.name}'s #{type} #{Time.now.strftime('(%d %b %Y)')}"
     end
 
     def default_policy author,project
