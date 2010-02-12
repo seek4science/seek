@@ -31,7 +31,7 @@ REVIEW_WORK_GROUP_LINK = null;
 var f_group_autocompleter_id = 'f_group_autocompleter';
 var individual_people_autocompleter_id = 'ip_autocompleter';
 var attributions_autocompleter_id = 'attributions_autocompleter';
-var author_autocompleter_id = 'author_autocompleter';
+var creator_autocompleter_id = 'creator_autocompleter';
 // associative array that holds all instances of autocompleters on a page
 var autocompleters = new Array();
 
@@ -40,7 +40,7 @@ var permissions_for_set = {};
 var permission_settings = new Array();
 
 var attribution_settings = new Array();
-var author_settings = new Array();
+var creator_settings = new Array();
 
 var receivedPolicySettings = null;
 var receivedProjectInstitutions = null;

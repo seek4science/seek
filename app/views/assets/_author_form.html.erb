@@ -22,7 +22,7 @@
   <div id="creator_fold_content" class="foldContent" style="display: block;">
 
     <p style="font-weight: bold; margin-top: 1.5em;">
-      If this <%= resource_type %> was created by or together with someone else, please list their name below
+      If this <%= resource_type %> was created by, or together with, other SysMO members, please list their names below
     </p>
 
     <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
@@ -104,14 +104,13 @@ function updateCreatorSettings() {
     // in the meanwhile also assemble a minimized version of the array that
     // could be posted with the form (this won't have item titles in it)
   
-    var creator = '';
+    var creators = '';
     var creators_arr = new Array();
   
     for(var i = 0; i < creator_settings.length; i++) {
         creator_name = creator_settings[i][0];
         creator_email = creator_settings[i][1];
-        creator_id = creator_settings[i][2];
-            
+        creator_id = creator_settings[i][2];        
         creators += '<b>' + creator_name + '</b>: ' + creator_email
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:deleteCreator(\''+ creator_name +'\', '+ creator_id +'); return(false);">remove</a>]</small><br/>';
@@ -127,10 +126,10 @@ function updateCreatorSettings() {
   
   
     // update the page
-    if(creator.length == 0) {
+    if(creators.length == 0) {
         $('creators_list').innerHTML = '<span class="none_text">No creators</span>';
     }
-    else {
+    else {      
         $('creators_list').innerHTML = creators;
     }
   
@@ -155,7 +154,7 @@ function checkCreatorNotInList(creator_name, creator_id) {
 
 // adds an creator to the list and updates the displayed list
 function addCreator(creator_name, creator_email, creator_id) {
-    if(checkCreatorNotInList(creator_name, creator_id)) {
+    if(checkCreatorNotInList(creator_name, creator_id)) {      
         creator_settings.push([creator_name, creator_email, creator_id]);
     
         // update visible page
@@ -182,7 +181,7 @@ function deleteCreator(creator_name, creator_id) {
 }
 
 
-function addCreator() {
+function addCreators() {
     var selIDs = autocompleters[creator_autocompleter_id].getRecognizedSelectedIDs();
   
     if(selIDs == "") {
