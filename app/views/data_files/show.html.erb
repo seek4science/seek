@@ -72,11 +72,8 @@
 
     </div>
   </div>
-  <div class="main_content_right_box">
-    <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @data_file } -%>
-    <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @data_file, :authors => @data_file.asset.authors, :truncate_to => truncate_length_for_boxes } -%>
-    <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => @data_file, :attributed_to => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
-  </div>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } %>
+  
   <div style="clear:both;">
 
     <p>
