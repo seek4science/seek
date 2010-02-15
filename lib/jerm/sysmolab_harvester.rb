@@ -100,7 +100,7 @@ module Jerm
             @hierarchy = e.search("/span").inner_html.split(/<[^>]*>/).collect {|a| a.sub("-", "").strip}.select {|i| !i.blank?}
           #Find links to data files
           when "a"
-            if e['href'].start_with?("/file/")
+            if e['href'] && e['href'].start_with?("/file/")
               #sort out relative paths
               resource_uri = "https://sysmolab.wikispaces.com/space/dav/files/" + (e.attributes['href'].split("/").last)    
               unless @searched_uris.include?(resource_uri)
