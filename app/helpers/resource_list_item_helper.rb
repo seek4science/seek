@@ -57,16 +57,22 @@ module ResourceListItemHelper
     return html + "</p>"
   end  
   
-  def list_item_authorized_list items, attribute, sort=true, max_length=75
+  def list_item_authorized_list items, attribute, sort=true, max_length=75, count_hidden_items=false
     html = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
-    items = Authorization.authorize_collection("view", items, current_user,false)
+    items = Authorization.authorize_collection("view", items, current_user,count_hidden_items)
     if items.empty?
-      html << "<span class='none_text'>No #{attribute} or none are visible to you</span>"
+      html << "<span class='none_text'>No #{attribute}</span>"
     else
+      original_size = items.size
+      items = items.compact
+      hidden_item_count = original_size - items.size
       items = items.sort{|a,b| get_object_title(a)<=>get_object_title(b)} if sort
       items.each do |i|
         html << (link_to h(truncate(i.title,:length=>max_length)), show_resource_path(i), :title=>get_object_title(i))
         html << ", " unless items.last==i
+      end
+      if count_hidden_items
+        html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items":"item"}</span>"
       end
     end
     return html + "</p>"
