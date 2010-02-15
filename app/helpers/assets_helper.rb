@@ -113,31 +113,34 @@ module AssetsHelper
         else
           assets_hash = split_assets_by_type(resource.created_assets)
         end
-        related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)
-        related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
+        related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)        
         related["sops"] = Asset.classify_and_authorize_resources(assets_hash[:sops], true, current_user)
-        related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
-        related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)
-        related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
+        related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)        
         related["studies"] = classify_for_tabs(resource.studies)
         related["projects"] = classify_for_tabs(resource.projects)
         related["institutions"] = classify_for_tabs(resource.institutions)
+
+        related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
+        related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
+        related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
       when "Institution"
         related["projects"] = classify_for_tabs(resource.projects)
         related["people"] = classify_for_tabs(resource.people)
       when "Project"
         assets_hash = split_assets_by_type(resource.assets)
-        related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)
-        related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
-        related["sops"] = Asset.classify_and_authorize_resources(assets_hash[:sops], true, current_user)
-        related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
-        related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)
-        related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
+        
+        related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)        
+        related["sops"] = Asset.classify_and_authorize_resources(assets_hash[:sops], true, current_user)        
+        related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)        
         related["institutions"] = classify_for_tabs(resource.institutions)
         related["people"] = classify_for_tabs(resource.people)
         related["assays"] = classify_for_tabs(resource.assays)
         related["studies"] = classify_for_tabs(resource.studies)
         related["investigations"] = classify_for_tabs(resource.investigations)
+
+        related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
+        related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
+        related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
       else
     end
     hash = {}

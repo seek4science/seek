@@ -96,7 +96,7 @@
     <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
 
     <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <%= render :partial=>"layouts/items_related_to",:object => @person %>    
+    <%= render :partial=>"layouts/items_related_to",:object => @person %>
 
     <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
     <%# this is because it's not needed then: admins can see everything anyway -%>

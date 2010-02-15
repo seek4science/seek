@@ -73,6 +73,6 @@
 
   </div>
 
-  <%= render :partial=>"layouts/items_related_to",:object => @study %>
+  <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @study %>
 
 </div>

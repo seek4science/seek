@@ -70,7 +70,7 @@
       <b>Culture growth: </b><%= model_title_or_not_specified(@assay.culture_growth_type) %>
   </p>
 
-  <%= render :partial=>"layouts/items_related_to",:object => @assay %>
+  <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @assay %>
 
 </div>
 
