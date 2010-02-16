@@ -112,4 +112,13 @@ module ResourceListItemHelper
     return html    
   end
   
+  def list_item_contributor resource
+    if resource.contributor.nil?
+      value = "SysMO SEEK"
+    else
+      value = link_to resource.contributor.person.name, resource.contributor
+    end
+    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{value}</p>"
+  end
+  
 end
