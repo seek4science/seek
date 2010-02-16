@@ -1,5 +1,6 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
+require 'digest/md5'
 
 module Jerm
   class Populator
@@ -38,7 +39,33 @@ module Jerm
 
     #checks whether the resource already exists in the registry
     def exists? resource
-      !find_by_uri(resource.uri).nil?
+
+      exists = false
+      
+      #Check the URI doesn't exist
+      if find_by_uri(resource.uri).nil?
+        #Check the file doesn't exist
+        #FIXME: Checks project here and again in the embeddedpopulator later on.
+        project = Project.find(:first,:conditions=>['name = ?',resource.project]) #get project
+        if project.nil?
+          return false
+        end
+        project.decrypt_credentials
+        downloader = DownloaderFactory.create resource.project
+        file = downloader.get_remote_data(resource.uri,project.site_username,project.site_password)
+        unless file.nil?
+          digest = Digest::MD5.new
+          digest << file[:data]
+          md5sum = digest.hexdigest
+          exists = !ContentBlob.find(:first,:conditions=>{:md5sum=>md5sum}).nil?
+        else
+          return false
+        end
+      else
+        exists = true
+      end
+      
+      return exists
     end
 
   end

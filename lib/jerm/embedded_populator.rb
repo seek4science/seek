@@ -59,7 +59,7 @@ module Jerm
 
             resource_model.asset.policy=project.default_policy.deep_copy
             resource_model.asset.policy.use_custom_sharing = true
-            resource_model.asset.authors << author
+            resource_model.asset.creators << author
             resource_model.asset.save!
             p=Permission.new(:contributor=>author,:access_type=>Policy::MANAGING,:policy_id=>resource_model.asset.policy.id)
             p.save!
