@@ -10,9 +10,9 @@ class JermController < ApplicationController
   end
 
   def test
-    Sop.destroy_all
-    DataFile.destroy_all
-    Model.destroy_all
+   # Sop.destroy_all
+   # DataFile.destroy_all
+   # Model.destroy_all
     
     project_id=params[:project]
 
@@ -80,12 +80,14 @@ class JermController < ApplicationController
     resources = {}
     @responses.each do |r|
       if r[:seek_model]
-        resources[r[:seek_model].contributor_id] ||= []
-        resources[r[:seek_model].contributor_id] << r
+        r[:seek_model].asset.creators.each do |creator|
+          resources[creator.id] ||= []
+          resources[creator.id] << r
+        end
       end
     end 
     resources.each_key do |author_id|
-      author = User.find_by_id(author_id).person
+      author = Person.find_by_id(author_id)
       unless author.nil? || author.user.nil?
         Mailer.deliver_resources_harvested(resources[author_id], author.user, base_host)
       end
