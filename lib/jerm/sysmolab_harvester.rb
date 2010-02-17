@@ -119,15 +119,18 @@ module Jerm
         unless @data_files.empty?
           @data_files.uniq.each do |d|
             if get_last_modified_date(d) > @changed_since_date
-              title = nil
+              title, author_first_name, author_last_name = nil
               #Ridiculous title retrieval:
               if @file_type == "DataFile"
                 text = doc.inner_html.gsub(/<[^a](.*)>/,"").split("\n").delete_if{|a| a.blank?}
                 index = text.index(text.select{|e| e.include?(d.split("/").last)}.first)
                 title = index.nil? ? d.split("/").last : text[index-1].strip
+              elsif @file_type = "Sop"
+                #Get author + title from SOP URI
+                author_first_name, author_last_name, title =  d.split("/").last.gsub("+"," ").gsub("+"," ").gsub(/\.[a-zA-Z]+$/,"").split(" ", 3)                
               end
               #Make resource
-              res = construct_resource(d, title)
+              res = construct_resource(d, title, author_first_name, author_last_name)
               @resources << res
             end
           end
@@ -135,12 +138,14 @@ module Jerm
       end
     end    
     
-    def construct_resource uri, title
+    def construct_resource uri, title, author_first_name, author_last_name
       res = SysmolabResource.new(@username, @password)
       res.uri = uri
       res.type = @file_type
       res.project = "SysMO-LAB"
       res.title = title
+      res.author_first_name = author_first_name
+      res.author_last_name = author_last_name
       return res
     end
     
