@@ -71,7 +71,7 @@ module ResourceListItemHelper
         html << (link_to h(truncate(i.title,:length=>max_length)), show_resource_path(i), :title=>get_object_title(i))
         html << ", " unless items.last==i
       end
-      if count_hidden_items
+      if count_hidden_items && hidden_item_count>0
         html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items":"item"}</span>"
       end
     end
