@@ -5,7 +5,7 @@ class ProjectsController < ApplicationController
   
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
-  before_filter :editable_by_user, :only=>[:edit,:update]
+  before_filter :editable_by_user, :only=>[:edit,:update,:admin]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit, :admin ]
 
