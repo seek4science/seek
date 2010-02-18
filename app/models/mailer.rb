@@ -71,7 +71,7 @@ class Mailer < ActionMailer::Base
   end
 
   def resources_harvested(harvester_responses,user,base_host)
-    subject_text = (harvester_responses.size > 1) ? 'New resources harvested' : 'New resource harvested'
+    subject_text = (harvester_responses.size > 1) ? 'New resources registered with SEEK' : 'New resource registered with SEEK'
     subject    subject_text
     recipients user.person.email_with_name
     from       NOREPLY_SENDER
