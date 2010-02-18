@@ -114,7 +114,7 @@ module ResourceListItemHelper
   
   def list_item_contributor resource
     if resource.contributor.nil?
-      value = "JERM harvester"
+      value = jerm_harvester_name
     else
       value = link_to resource.contributor.person.name, resource.contributor
     end

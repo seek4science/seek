@@ -16,5 +16,9 @@ module JermHelper
       :style=>"padding: 2px;",
       :title=>"The JERM"
   end
+
+  def jerm_harvester_name
+    "JERM"
+  end
   
 end
