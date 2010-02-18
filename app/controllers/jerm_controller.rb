@@ -15,16 +15,23 @@ class JermController < ApplicationController
 
     @project=Project.find(project_id)
     @project.decrypt_credentials
+    if @project.site_root_uri.blank?
+      flash.now[:error]="No remote site location defined"
+    elsif @project.site_password.blank?
+      flash.now[:error]="No password has been defined"
+    else
+      begin
+        harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
+        @responses = harvester.update
+        response_order=[:success,:warning,:fail,:skipped]
+        @responses=@responses.sort_by{|a| response_order.index(a[:response])}
+        inform_authors if EMAIL_ENABLED
+      rescue Exception => @exception
+        puts @exception
+      end
+    end
     
-    begin
-      harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
-      @responses = harvester.update
-      response_order=[:success,:warning,:fail,:skipped]
-      @responses=@responses.sort_by{|a| response_order.index(a[:response])}
-      inform_authors if EMAIL_ENABLED
-    rescue Exception => @exception
-      puts @exception
-    end  
+    
 
     render :update do |page|
       if @exception

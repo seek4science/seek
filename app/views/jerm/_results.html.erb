@@ -1,6 +1,19 @@
-<%= "Harvested #{results.size} results" %>
+<% if !flash[:error] -%>
 
-<table class="jerm">
-  <tr><th>Status</th><th>Code</th><th>Title</th><th>Source</th><th>Type</th><th>Submitter name</th><th>Submitter SEEK ID</th><th>Timestamp</th><th>Message</th><th>Link</th><th>Exception</th></tr>
-  <%= render :partial=>"result_line",:collection=>results %>
-</table>
+
+  <%= "Harvested #{results.size} results" %>
+
+  <table class="jerm">
+    <tr><th>Status</th><th>Code</th><th>Title</th><th>Source</th><th>Type</th><th>Submitter name</th><th>Submitter SEEK ID</th><th>Timestamp</th><th>Message</th><th>Link</th><th>Exception</th></tr>
+    <%= render :partial=>"result_line",:collection=>results %>
+  </table>
+
+<% else -%>
+  <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">    
+    <%= white_list flash[:error] %>
+    <p>
+  It is possible that the project needs configuring: <%= link_to "Configure #{h(@project.name)}",admin_project_path(@project) %>
+</p>
+  </div>
+
+<% end -%>
