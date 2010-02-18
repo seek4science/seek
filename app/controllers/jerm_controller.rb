@@ -30,16 +30,13 @@ class JermController < ApplicationController
         puts @exception
       end
     end
-    
-    
 
     render :update do |page|
       if @exception
         page.replace_html :results,:partial=>"exception",:object=>@exception
       else
         page.replace_html :results,:partial=>"results",:object=>@responses
-      end
-      
+      end      
     end
 
   end
