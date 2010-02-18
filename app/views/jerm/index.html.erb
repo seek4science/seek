@@ -1,14 +1,36 @@
 <script type="text/javascript">
+  run_times=new Array();
+
   function harvester_initiated() {
     $('results').innerHTML=<%= "'" + image_tag("ajax-loader-large.gif") + "'" -%>;
   }
+
+  function selected_product_changed() {
+    selected=$('project').selectedIndex;
+    id=$('project').options[selected].value
+    time=run_times[id]
+    
+    $('last_ran').innerHTML="Last ran at: "+time;
+
+  }
+  
+  <% Project.find(:all).each do |p| %>
+  run_times[<%= p.id %>]="<%= p.last_jerm_run.blank? ? "Never" : p.last_jerm_run.to_s %>";
+  <% end %>
+
 </script>
+
+
 
 <h1>JERM Adminstration</h1>
 
 <% form_remote_tag :url=>url_for(:controller=>:jerm,:action=>:test),
   :before=>"harvester_initiated();" do -%>
-  Project: <%= select_tag :project,options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ) %>  
+  Project: <%= select_tag :project,
+    options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ),
+    :onchange=>"javascript: selected_product_changed()"
+  %>
+  <span id="last_ran"></span><br/>
   <%= submit_tag "GO!" %>
 <% end -%>
 

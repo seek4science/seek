@@ -25,7 +25,15 @@ class JermController < ApplicationController
         @responses = harvester.update
         response_order=[:success,:warning,:fail,:skipped]
         @responses=@responses.sort_by{|a| response_order.index(a[:response])}
+        
+        class << @project
+          def record_timestamps; false; end
+        end
+        @project.last_jerm_run=Time.now
+        @project.save
+        
         inform_authors if EMAIL_ENABLED
+
       rescue Exception => @exception
         puts @exception
       end

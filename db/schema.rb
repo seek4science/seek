@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100212150621) do
+ActiveRecord::Schema.define(:version => 20100218142426) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -327,6 +327,7 @@ ActiveRecord::Schema.define(:version => 20100212150621) do
     t.string   "first_letter",      :limit => 1
     t.string   "site_credentials"
     t.string   "site_root_uri"
+    t.datetime "last_jerm_run"
   end
 
   create_table "recommended_model_environments", :force => true do |t|
