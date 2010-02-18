@@ -28,6 +28,7 @@ class InvestigationsController < ApplicationController
 
   def show
     @investigation=Investigation.find(params[:id])
+    
     respond_to do |format|
       format.html
       format.xml { render :xml=> @investigation, :include=>@investigation.studies }

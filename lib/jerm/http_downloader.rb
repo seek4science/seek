@@ -6,7 +6,7 @@ module Jerm
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
   
   class HttpDownloader
-    def get_remote_data url, username=nil, password=nil
+    def get_remote_data url, username=nil, password=nil, type=nil
       return basic_auth url, username, password
     end
 
