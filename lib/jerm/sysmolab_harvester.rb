@@ -127,7 +127,8 @@ module Jerm
                 title = index.nil? ? nil : text[index-1].strip
               elsif @file_type == "Sop"
                 #Get author + title from SOP URI
-                author_first_name, author_last_name, title = d.split("/").last.gsub("+"," ").gsub("+"," ").gsub(/\.[a-zA-Z]+$/,"").split(" ", 3)                
+                author_first_name, author_last_name, title = d.split("/").last.gsub("+"," ").gsub("+"," ").gsub(/\.[a-zA-Z]+$/,"").split(" ", 3)  
+                title = CGI::unescape(title)
               end
               #Make resource
               res = construct_resource(d, title, author_first_name, author_last_name)
