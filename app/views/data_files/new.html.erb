@@ -10,18 +10,18 @@
       <div style="width: 60%;">
         
         <p>
-          <b>File to upload:&nbsp;</b>
+          <b>File to upload</b><span class="required">*</span>
           <%= file_field :data_file, :data -%>
         </p>
 
         <p style="margin-top: 1.5em;">
-          <b>Title:</b><br/>
+          <b>Title</b><span class="required">*</span><br/>
           <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
           <%= text_field_tag 'data_file[title]', data_file_title_value, :style => "width: 100%;" -%>
         </p>
 
         <p style="margin-top: 0.5em;">
-          <b>Description:</b><br/>
+          <b>Description</b><br/>
           <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
           <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 5 -%>
         </p>

@@ -15,9 +15,9 @@
 		<%= help_icon("#{front_part_of_msg}<br/><br/><b>\"Load sharing defaults\"</b> button will reset any sharing<br/>options to default options set by a PAL for selected project.<br/>This will discard any changes you might have made.") -%>
 		
 		<% unless disable_project_select -%>
-		  Associate this <%= resource_type -%> with the following project:
+          <b>Associate this <%= resource_type -%> with the following project</b><span class="required">*</span>
 	  <% else -%>
-		  This <%= resource_type -%> is associated with the following project:
+          <b>This <%= resource_type -%> is associated with the following project</b>
 		<% end -%>
 		<br/>
 		

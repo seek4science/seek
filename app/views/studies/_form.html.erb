@@ -8,7 +8,7 @@
   <div style="width: 60%;">
 
     <p style="margin-top: 1.5em;">
-      <%= f.label "Title *" %><br/>
+      <%= f.label :title %><span class="required">*</span><br/>
       <%= f.text_field :title,:style=>"width: 100%;" %>
     </p>
 
@@ -35,7 +35,7 @@
 
 
     <p>
-      <%= f.label :project %><br/>
+      <%= f.label :project %><span class="required">*</span><br/>
       <%
       selected_project=@study.investigation ? @study.investigation.project.id : 0
     %>
@@ -53,7 +53,7 @@
     </p>
 
     <p>
-      <%= f.label "Investigation *" %><br/>
+      <%= f.label :investigation %><span class="required">*</span><br/>
       <div id="investigation_collection">
         <% investigations = @study.investigation ? @study.investigation.project.investigations : [] -%>
         <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>investigations} -%>
