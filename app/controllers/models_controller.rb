@@ -496,21 +496,8 @@ class ModelsController < ApplicationController
     end
 
     unless policy
-      # several scenarios could lead to this point:
-      # 1) this is a "new" action - no Model exists yet; use default policy:
-      #    - if current user is associated with only one project - use that project's default policy;
-      #    - if current user is associated with many projects - use system default one;
-      # 2) this is "edit" action - Model exists, but policy wasn't attached to it;
-      #    (also, Model wasn't attached to a project or that project didn't have a default policy) --
-      #    hence, try to obtain a default policy for the contributor (i.e. owner of the Model) OR system default
-      projects = current_user.person.projects
-      if projects.length == 1 && (proj_default = projects[0].default_policy)
-        policy = proj_default
-        policy_type = "project"
-      else
         policy = Policy.default()
         policy_type = "system"
-      end
     end
 
     # set the parameters
