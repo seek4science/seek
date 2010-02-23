@@ -12,7 +12,7 @@
     <% end -%>
 
     <p>
-      <%= f.label :title-%>*<br/>
+      <%= f.label :title-%><span class="required">*</span><br/>
       <%= f.text_field :title,:size=>52 -%>
     </p>
 
@@ -21,8 +21,8 @@
       <%= f.text_area :description,:cols=>50,:rows=>10 -%>
     </p>
     <p>
-    	<div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>      
-      <%= f.label :study -%><br/> 
+      <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
+      <%= f.label :study-%><span class="required">*</span><br/>
       <% studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])-%>
 			<% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
 			<% studies.each do |s| %>
@@ -46,8 +46,8 @@
 
 <table class="padded_table">
   <tr>
-    <td><%= f.label "Assay type *: " %></td>
-    <td><%= f.label "Technology type *: " %></td>
+    <td><%= f.label "Assay type: " %></td>
+    <td><%= f.label "Technology type: " %></td>
   </tr>
   <tr>
     <td><%= ontology_select_tag f,AssayType,"assay_type_id",selected_id= @assay.assay_type.nil? ? nil : @assay.assay_type.id %></td>
