@@ -8,6 +8,7 @@ class Assay < ActiveRecord::Base
   belongs_to :study
   belongs_to :organism
   belongs_to :owner, :class_name=>"Person"
+  belongs_to :assay_class
 
   has_many :assay_assets, :dependent => :destroy
 
@@ -26,6 +27,8 @@ class Assay < ActiveRecord::Base
   has_many :favourites, 
            :as => :resource, 
            :dependent => :destroy
+           
+
 
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organism]) if SOLR_ENABLED
   

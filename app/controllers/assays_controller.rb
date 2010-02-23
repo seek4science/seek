@@ -36,6 +36,7 @@ class AssaysController < ApplicationController
 
   def create
     @assay = Assay.new(params[:assay])
+    @assay.assay_class_id = params[:assay_class]
     
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
@@ -68,6 +69,7 @@ class AssaysController < ApplicationController
     (sop_assets+data_assets).each do |a_id|
       @assay.assets << Asset.find(a_id)
     end    
+    @assay.assay_class_id = params[:assay_class]
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
         flash[:notice] = 'Assay was successfully updated.'
@@ -99,6 +101,12 @@ class AssaysController < ApplicationController
         format.html { render :action=>"show" }
         format.xml  { render :xml => @assay.errors, :status => :unprocessable_entity }
       end
+    end
+  end
+  
+  def update_types
+    render :update do |page|
+      page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
     end
   end
 
