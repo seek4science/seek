@@ -40,9 +40,19 @@ class AssaysController < ApplicationController
     
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
-    (sop_assets+data_assets).each do |a_id|
+    model_assets = params[:assay_model_asset_ids] || []
+    (sop_assets+model_assets).each do |a_id|
       @assay.assets << Asset.find(a_id)
     end    
+    data_assets.each do |text|
+      a_id, r_type = text.split(",")
+      relationship_type = RelationshipType.find_by_title(r_type)
+      assay_asset = AssayAsset.new()
+      assay_asset.assay = @assay
+      assay_asset.asset = Asset.find(a_id)
+      assay_asset.relationship_type = relationship_type      
+      assay_asset.save
+    end  
 
     @assay.owner=current_user.person       
     
@@ -66,9 +76,19 @@ class AssaysController < ApplicationController
     @assay.assets = []
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
-    (sop_assets+data_assets).each do |a_id|
+    model_assets = params[:assay_model_asset_ids] || []
+    (sop_assets+model_assets).each do |a_id|
       @assay.assets << Asset.find(a_id)
-    end    
+    end      
+    data_assets.each do |text|
+      a_id, r_type = text.split(",")
+      relationship_type = RelationshipType.find_by_title(r_type)
+      assay_asset = AssayAsset.new()
+      assay_asset.assay = @assay
+      assay_asset.asset = Asset.find(a_id)
+      assay_asset.relationship_type = relationship_type      
+      assay_asset.save
+    end   
     @assay.assay_class_id = params[:assay_class]
     respond_to do |format|
       if @assay.update_attributes(params[:assay])

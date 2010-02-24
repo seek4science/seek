@@ -57,9 +57,19 @@ class Assay < ActiveRecord::Base
   def sops
     assay_assets.sops.collect{|s| s.versioned_resource}
   end
+  
+  def models
+    assay_assets.models.collect{|m| m.versioned_resource}
+  end
 
   def data_files
-    assay_assets.data_files.collect{|df| df.versioned_resource}
+    list = []
+    assay_assets.data_files.each do |df|
+      v = df.versioned_resource
+      eval("def v.relationship_type; RelationshipType.find_by_id(#{df.relationship_type_id}); end")
+      list << v
+    end
+    list
   end
   
   def update_first_letter

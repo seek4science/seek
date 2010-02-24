@@ -35,12 +35,10 @@
 </div>
 
 
-
-
 <h2>Assay and technology types</h2>
 <%= f.label "Assay class:" %><br/>
 <%= select_tag("assay_class",options_for_select(AssayClass.all.collect {|ac| [ac.title,ac.id]}, @assay.assay_class_id),
-               :id=>"assay_class_select", #FIXME: OMG THIS IS A TOTAL MESS
+               :id=>"assay_class_select",
                :onChange=>"changeTypes()") %><br/>
 
 
@@ -61,11 +59,13 @@
 <%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay} %>
 
 <h2>Assay SOPs</h2>
-
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
 <h2>Data files</h2>
 <%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f} -%>
+
+<h2>Models</h2>
+<%= render :partial=>"assays/associate_model",:locals=>{:f=>f} -%>
 
 <p style="margin-top: 2em; text-align: center;" >
   <%= f.submit(action==:edit ? "Update" : "Create") -%>

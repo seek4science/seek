@@ -7,6 +7,8 @@ class AssayAsset < ActiveRecord::Base
   named_scope :data_files,:joins=>:asset,:conditions=>['assets.resource_type = ?','DataFile']
   named_scope :models,:joins=>:asset,:conditions=>['assets.resource_type = ?','Model']
 
+  belongs_to :relationship_type
+
   before_save :check_version
 
   def versioned_resource

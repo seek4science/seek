@@ -65,6 +65,9 @@ select_truncate_length=40;
       )+";check_show_add_data_file();return(false);"
     } -%>
     <%= select_tag :assay_data_file_asset_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+    
+    <%= label_tag "Relationship Type" %><br/>
+    <%= select_tag :data_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
     <b><%= link_to_function "Add","addSelectedDataFile(); return(false);",:id=>"add_data_file_link" %></b>
     <br/>
     <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?
@@ -82,7 +85,8 @@ select_truncate_length=40;
   <% if Authorization.is_authorized?("show",nil,data_file.asset,current_user) -%>
       asset_id = '<%= data_file.asset.id -%>';
       data_title = '<%= data_file.title -%>';
-      addDataFile(data_title,asset_id);
+      relationship_type = '<%= data_file.relationship_type.try(:title) || "None" -%>';
+      addDataFile(data_title,asset_id,relationship_type);
   <% end -%>
 <% end -%>
 

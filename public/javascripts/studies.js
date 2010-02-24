@@ -1,4 +1,5 @@
 var sops_assets=new Array();
+var models_assets=new Array();
 var assays=new Array();
 var data_files_assets=new Array();
 
@@ -119,8 +120,8 @@ function updateSops() {
 }
 
 //Data files
-function addDataFile(title,id) {
-    data_files_assets.push([title,id])
+function addDataFile(title,id,relationshipType) {
+    data_files_assets.push([title,id,relationshipType])
 }
 
 function addSelectedDataFile() {
@@ -128,9 +129,10 @@ function addSelectedDataFile() {
     selected_option=$("possible_data_files").options[selected_option_index]
     title=selected_option.text
     id=selected_option.value
+    relationshipType = $("data_relationship_type").options[$("data_relationship_type").selectedIndex].text
 
     if(checkNotInList(id,data_files_assets)) {
-        addDataFile(title,id);
+        addDataFile(title,id,relationshipType);
         updateDataFiles();
     }
     else {
@@ -154,17 +156,17 @@ function removeDataFile(id) {
 function updateDataFiles() {
     data_file_text=''
     type="DataFile"
-    data_file_ids=new Array();
 
     for (var i=0;i<data_files_assets.length;i++) {
         data_file=data_files_assets[i]
         title=data_file[0]
         id=data_file[1]
-        data_file_text += '<b>' + type + '</b>: ' + title
+        relationshipType = data_file[2]
+        relationshipText = (relationshipType == "None") ? "" : " <span style=\"color: #1465FF;\">(" + relationshipType + ")</span>"
+        data_file_text += '<b>' + type + '</b>: ' + title + relationshipText 
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small><br/>';
-        data_file_ids.push(id)
     }
 
     // remove the last line break
@@ -183,8 +185,89 @@ function updateDataFiles() {
     clearList('assay_data_file_asset_ids');
 
     select=$('assay_data_file_asset_ids')
-    for (i=0;i<data_file_ids.length;i++) {
-        id=data_file_ids[i]
+    for (i=0;i<data_files_assets.length;i++) {
+        id=data_files_assets[i][1]
+        relationshipType=data_files_assets[i][2]
+        o=document.createElement('option')
+        o.value=id + "," + relationshipType
+        o.text=id
+        o.selected=true
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+    }
+}
+
+//Models
+function addModel(title,id) {
+    models_assets.push([title,id])
+}
+
+function addSelectedModel() {
+    selected_option_index=$("possible_models").selectedIndex
+    selected_option=$("possible_models").options[selected_option_index]
+    title=selected_option.text
+    id=selected_option.value
+
+    if(checkNotInList(id,models_assets)) {
+        addModel(title,id);
+        updateModels();
+    }
+    else {
+        alert('The following Model had already been added:\n\n' +
+            title);
+    }
+}
+
+function removeModel(id) {
+    // remove the actual record for the attribution
+    for(var i = 0; i < models_assets.length; i++)
+        if(models_assets[i][1] == id) {
+            models_assets.splice(i, 1);
+            break;
+        }
+
+    // update the page
+    updateModels();
+}
+
+function updateModels() {
+    model_text=''
+    type="Model"
+    model_ids=new Array();
+
+    for (var i=0;i<models_assets.length;i++) {
+        model=models_assets[i]
+        title=model[0]
+        id=model[1]        
+        model_text += '<b>' + type + '</b>: ' + title
+        //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
+        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '[<a href="" onclick="javascript:removeModel('+id+'); return(false);">remove</a>]</small><br/>';
+        model_ids.push(id)
+    }
+
+    // remove the last line break
+    if(model_text.length > 0) {
+        model_text = model_text.slice(0,-5);
+    }
+
+    // update the page
+    if(model_text.length == 0) {
+        $('model_to_list').innerHTML = '<span class="none_text">No models</span>';
+    }
+    else {
+        $('model_to_list').innerHTML = model_text;
+    }
+
+    clearList('assay_model_asset_ids');
+
+    select=$('assay_model_asset_ids')
+    for (i=0;i<model_ids.length;i++) {
+        id=model_ids[i]
         o=document.createElement('option')
         o.value=id
         o.text=id
@@ -194,7 +277,7 @@ function updateDataFiles() {
         }
         catch (ex) {
             select.add(o,null);
-        }
+        }        
     }
 }
 

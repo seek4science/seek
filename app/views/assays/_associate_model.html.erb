@@ -1,0 +1,107 @@
+<%
+   all_models=authorised_models.sort{|a, b| a.title<=>b.title}
+   project_models=all_models.select{|s| current_user.person.projects.include?(s.project )}
+   select_truncate_length=40;
+-%>
+
+<script type="text/javascript">
+    function toggle_model_list() {
+        var checked = $('include_other_project_models').checked;
+        var option;
+        var selection_box = $('possible_models');
+
+        selection_box.options.length=0;        
+
+        if (checked) {
+        <% ([["Select Model ...",0]]|all_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |model_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= model_details[0] -%>';
+            option.value = '<%= model_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        else {
+           <% ([["Select Model ...",0]]|project_models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |model_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= model_details[0] -%>';
+            option.value = '<%= model_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+
+        selection_box.onchange();
+    }
+</script>
+
+<div class="yui-g">
+  <div class="yui-u first">
+    <p style="color: #666666;">
+      The following Models are involved in this assay:
+    </p>
+
+    <p id="model_to_list" class="box_editing_inner" style="line-height: 1.5;">
+      <span class="none_text" id="models">Loading...</span>
+    </p>
+    <br/>
+    <%= label_tag :models %>
+    <br/>
+
+
+
+    <%= select_tag :possible_models,
+                   options_for_select([["Select Model ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.asset.id]}),
+                   {:onchange=>remote_function(
+                           :url=>{:action=>"asset_preview_ajax", :controller=>"assets",:element=>"model_preview"},
+                           :with=>"'id='+this.value",
+                           :before=>"show_ajax_loader('model_preview')"
+                   )+";check_show_add_model();return(false);"
+                   } -%>
+    
+    <%= select_tag :assay_model_asset_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+    
+    <b><%= link_to_function "Add", "addSelectedModel(); return(false);", :id=>"add_model_link" %></b>
+    <br/>
+    <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Include Models from other projects?
+  </div>
+
+  <div id="model_preview" class="yui-u">
+    <div style="text-align: center;">Model preview</div>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+    <% @assay.models.each do |s| -%>    
+      <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
+        asset_id = '<%= s.asset.id -%>';
+        model_title = '<%= s.title -%>';
+        addModel(model_title, asset_id);
+      <% end -%>
+    <% end -%>
+
+    updateModels();
+
+
+    function check_show_add_model() {
+        i = $('possible_models').selectedIndex;
+        selected_id = $('possible_models').options[i].value;
+        if (selected_id == '0') {
+            $('add_model_link').hide();
+        }
+        else {
+            $('add_model_link').show();
+        }
+    }
+
+    check_show_add_model();
+</script>

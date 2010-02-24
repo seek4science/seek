@@ -23,5 +23,10 @@ module ModelsHelper
     return "<span class='none_text'>Not specified</span>" if model_format.nil?
     return h(model_format.title)
   end
+  
+  def authorised_models
+    models=Model.find(:all,:include=>:asset)
+    Authorization.authorize_collection("show",models,current_user)
+  end    
 
 end

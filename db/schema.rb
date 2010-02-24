@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100222105022) do
+ActiveRecord::Schema.define(:version => 20100224101652) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -17,6 +17,7 @@ ActiveRecord::Schema.define(:version => 20100222105022) do
     t.integer  "version"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "relationship_type_id"
   end
 
   create_table "assay_classes", :force => true do |t|
@@ -335,10 +336,18 @@ ActiveRecord::Schema.define(:version => 20100222105022) do
     t.string   "first_letter",      :limit => 1
     t.string   "site_credentials"
     t.string   "site_root_uri"
+    t.datetime "last_jerm_run"
   end
 
   create_table "recommended_model_environments", :force => true do |t|
     t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "relationship_types", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
