@@ -1,35 +1,37 @@
 module BioPortal
-
-  def self.included(mod)
-    mod.extend(ClassMethods)
-  end
-      
-  module ClassMethods
-      
-    def acts_as_bioportal(options = {}, &extension)
-      options[:base_url]="http://rest.bioontology.org/bioportal/"
-
-      extend BioPortal::SingletonMethods
-      include BioPortal::InstanceMethods
-      include BioPortal::RestAPI
+  module Acts
+    def self.included(mod)
+      mod.extend(ClassMethods)
     end
 
-  end
+    module ClassMethods
 
-  module SingletonMethods
+      def acts_as_bioportal(options = {}, &extension)
+        options[:base_url]="http://rest.bioontology.org/bioportal/"
 
-  end
+        extend BioPortal::Acts::SingletonMethods
+        include BioPortal::Acts::InstanceMethods
+        include BioPortal::RestAPI
+      end
 
-  module InstanceMethods
-    
-    require 'BioPortalRestfulCore'
-    require 'BioPortalResources'
-
-    def concept maxchildren=nil,light=nil
-      return getConcept(bioportal_ontology_version_id,bioportal_concept_uri,maxchildren,light)
     end
-    
+
+    module SingletonMethods
+
+    end
+
+    module InstanceMethods
+
+      require 'BioPortalRestfulCore'
+      require 'BioPortalResources'
+
+      def concept maxchildren=nil,light=nil
+        return getConcept(bioportal_ontology_version_id,bioportal_concept_uri,maxchildren,light)
+      end
+
+    end
   end
+  
 
   module RestAPI
     def getConcept ontology_version_id,concept_id,maxchildren=nil,light=nil
@@ -43,5 +45,5 @@ module BioPortal
 end
 
 ActiveRecord::Base.class_eval do
-  include BioPortal
+  include BioPortal::Acts
 end
