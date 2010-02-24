@@ -1,0 +1,50 @@
+<h1>Information about <%= @organism.title %></h1>
+
+<h3>BioPortal term details</h3>
+<ul>
+  <li>
+    <label>Ontology ID</label> <%= text_or_not_specified(@organism.bioportal_ontology_id) %>
+  </li>
+  <li>
+    <label>Ontology version ID</label> <%= text_or_not_specified(@organism.bioportal_ontology_version_id) %>
+  </li>
+  <li>
+    <label>Concept URI</label> <%= text_or_not_specified(@organism.bioportal_concept_uri) %>
+  </li>
+</ul>
+
+<%=
+link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:organism=>@organism}  
+%>
+
+<div id="bioportal_more">
+
+</div>
+
+<br/>
+<%= link_to_function "Edit",visual_effect(:toggle_appear,"edit_ontology") %>
+
+<div id="edit_ontology" style="display:nonde;">
+  <%  form_for(@organism) do |f| %>
+  <ul>
+    <li>
+      <label>Ontology ID</label>
+      <%= f.text_field :bioportal_ontology_id %>
+    </li>
+    <li>
+      <label>Ontology version ID</label>
+      <%= f.text_field :bioportal_ontology_version_id %>
+    </li>
+    <li>
+      <label>Concept URI</label>
+      <%= f.text_field :bioportal_concept_uri %>
+    </li>
+  </ul>
+  <%= f.submit "Update" -%>
+  <% end %>
+  
+</div>
+<br/>
+<%= link_to "Search for <b>#{@organism.title}</b>","" %>
+<br/>
+<%= link_to "Add new organism","" -%>

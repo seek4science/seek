@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :assay_types, :collection=>{:manage=>:get}
 
-  map.resources :organisms
+  map.resources :organisms, :member=>{:info=>:get}
 
   map.resources :technology_types, :collection=>{:manage=>:get}
 

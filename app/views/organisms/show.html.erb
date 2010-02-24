@@ -2,6 +2,8 @@
 
 <div class="show_basic">
 
+<%= link_to "More information about: #{@organism.title}", info_organism_path(@organism) %>
+  
 <%= render :partial=>"layouts/items_related_to",:object => @organism %>
 
 </div>

@@ -1,0 +1,11 @@
+<ul>
+  <li>
+    <label>Synonyms (<%= concept.synonyms.count -%>) </label>
+    <ul>
+      <% concept.synonyms.each do |s| %>
+      <li><%= s %></li>
+      <% end -%>
+    </ul>
+  </li>
+
+</ul>
