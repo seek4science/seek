@@ -1,7 +1,9 @@
 class OrganismsController < ApplicationController
   
   before_filter :login_required
-  before_filter :find_organism,:only=>[:show,:info]
+  before_filter :find_organism,:only=>[:show,:info,:more_ajax,:search_ajax]
+
+  include BioPortal::RestAPI
 
   def show
     respond_to do |format|
@@ -10,14 +12,23 @@ class OrganismsController < ApplicationController
     end
   end
 
-  def more_ajax
-    @organism=Organism.find(params[:organism])
+  def search_ajax
+    results,pages = search "0",@organism.title,1
+    render :update do |page|
+      if results
+        page.replace_html 'search_results',:partial=>"search_results",:object=>results
+      else
+        page.replace_html 'search_results',:text=>"Nothing found"
+      end
+    end
+  end
 
-    node = @organism.concept 1,true
+  def more_ajax
+    concept = @organism.concept 1,true
     
     render :update do |page|
-      if node
-        page.replace_html 'bioportal_more',:partial=>"concept",:object=>node
+      if concept
+        page.replace_html 'bioportal_more',:partial=>"concept",:object=>concept
       else
         page.replace_html 'bioportal_more',:text=>"Nothing found"
       end

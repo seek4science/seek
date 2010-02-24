@@ -14,7 +14,7 @@
 </ul>
 
 <%=
-link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:organism=>@organism}  
+link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:id=>@organism}
 %>
 
 <div id="bioportal_more">
@@ -45,6 +45,9 @@ link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:or
   
 </div>
 <br/>
-<%= link_to "Search for <b>#{@organism.title}</b>","" %>
+<%= link_to_remote "Search for <b>#{@organism.title}</b>",:url=>{:action=>:search_ajax,:controller=>:organisms,:id=>@organism} %>
 <br/>
+
+<div id="search_results"></div>
+
 <%= link_to "Add new organism","" -%>

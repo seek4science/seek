@@ -312,7 +312,7 @@ class BioPortalRestfulCore
       ontologies = "ontologyids=#{ontologies.join(",")}&"
         end
  
-        LOG.add :debug, BASE_URL+SEARCH_PATH.gsub("%ONT%",ontologies).gsub("%query%",search.gsub(" ","%20"))+"&isexactmatch=0&pagesize=50&pagenum=#{page}&includeproperties=0&maxnumhits=15"
+        #LOG.add :debug, BASE_URL+SEARCH_PATH.gsub("%ONT%",ontologies).gsub("%query%",search.gsub(" ","%20"))+"&isexactmatch=0&pagesize=50&pagenum=#{page}&includeproperties=0&maxnumhits=15"
     begin
      doc = REXML::Document.new(open(BASE_URL+SEARCH_PATH.gsub("%ONT%",ontologies).gsub("%query%",search.gsub(" ","%20"))+"&isexactmatch=0&pagesize=50&pagenum=#{page}&includeproperties=0&maxnumhits=15"))
     rescue Exception=>e
