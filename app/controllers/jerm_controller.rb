@@ -94,8 +94,13 @@ class JermController < ApplicationController
       end
     end 
     resources.each_key do |author|
-      unless author.nil? || author.user.nil?
-        Mailer.deliver_resources_harvested(resources[author_id], author.user, base_host) if EMAIL_ENABLED
+      begin
+        unless author.nil? || author.user.nil?
+          Mailer.deliver_resources_harvested(resources[author], author.user, base_host) if EMAIL_ENABLED
+        end
+      rescue Exception=>e
+        #FIXME: report exception back with the response
+        puts "Email failed: #{e.message}"
       end
     end
   end
