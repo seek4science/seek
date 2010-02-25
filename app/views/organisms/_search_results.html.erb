@@ -1,4 +1,18 @@
-<h3><%= search_results.size %> results found -%></h3>
+<h3><%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%></h3>
 <table>
-  <th>Ontology</th>
+  <tr><th>Ontology label</th><th>Ontology ID</th><th>Version ID</th><th>Preferred name</th></tr>
+  <% search_results.each do |result| %>
+  <tr>
+    <td><%= h(result[:ontologyDisplayLabel]) -%></td>
+    <td><%= link_to_ontology(result[:ontologyId],result[:ontologyId]) -%></td>
+    <td><%= link_to_ontology_version(result[:ontologyVersionId],result[:ontologyVersionId]) -%>
+        <%= link_to_ontology_version_visualize("Explore",result[:ontologyVersionId]) -%>
+      <%= link_to_download_ontology("Download",result[:ontologyVersionId]) -%>
+    </td>
+    <td>
+      <%= link_to_function(h(result[:preferredName]),"add_concept(#{result[:ontologyId]},#{result[:ontologyVersionId]},'#{result[:conceptId]}');") -%>
+    </td
+  </tr>
+  <% end %>
+
 </table>

@@ -50,4 +50,12 @@ link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:id
 
 <div id="search_results"></div>
 
+<script type="text/javascript">
+  function add_concept(ont_id,ont_version_id,conc_id) {
+    $('organism_bioportal_ontology_id').value=ont_id;
+    $('organism_bioportal_ontology_version_id').value=ont_version_id;
+    $('organism_bioportal_concept_uri').value=conc_id;
+  }
+  </script>
+
 <%= link_to "Add new organism","" -%>
