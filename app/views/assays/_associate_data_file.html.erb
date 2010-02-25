@@ -15,7 +15,7 @@ select_truncate_length=40;
     if (checked) {
 <% ([["Select Data file ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
         option = document.createElement("OPTION");
-        option.text = '<%= df_details[0] -%>';
+        option.text = '<%= escape_javascript(df_details[0]) -%>';
         option.value = '<%= df_details[1] -%>';
         try {
           selection_box.add(option); //for older IE version
@@ -28,7 +28,7 @@ select_truncate_length=40;
     else {
 <% ([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
         option = document.createElement("OPTION");
-        option.text = '<%= df_details[0] -%>';
+        option.text = '<%= escape_javascript(df_details[0]) -%>';
         option.value = '<%= df_details[1] -%>';
         try {
           selection_box.add(option); //for older IE version
@@ -84,8 +84,8 @@ select_truncate_length=40;
 <% @assay.data_files.each do |data_file| -%>    
   <% if Authorization.is_authorized?("show",nil,data_file.asset,current_user) -%>
       asset_id = '<%= data_file.asset.id -%>';
-      data_title = '<%= data_file.title -%>';
-      relationship_type = '<%= data_file.relationship_type.try(:title) || "None" -%>';
+      data_title = '<%= escape_javascript(data_file.title) -%>';
+      relationship_type = '<%= escape_javascript(data_file.relationship_type.try(:title) || "None") -%>';
       addDataFile(data_title,asset_id,relationship_type);
   <% end -%>
 <% end -%>

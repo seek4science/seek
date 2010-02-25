@@ -15,7 +15,7 @@
         if (checked) {
         <% ([["Select SOP ...",0]]|all_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |sop_details| -%>
             option = document.createElement("OPTION");
-            option.text = '<%= sop_details[0] -%>';
+            option.text = '<%= escape_javascript(sop_details[0]) -%>';
             option.value = '<%= sop_details[1] -%>';
             try {
                 selection_box.add(option); //for older IE version
@@ -28,7 +28,7 @@
         else {
            <% ([["Select SOP ...",0]]|project_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |sop_details| -%>
             option = document.createElement("OPTION");
-            option.text = '<%= sop_details[0] -%>';
+            option.text = '<%= escape_javascript(sop_details[0]) -%>';
             option.value = '<%= sop_details[1] -%>';
             try {
                 selection_box.add(option); //for older IE version
@@ -84,7 +84,7 @@
     <% @assay.sops.each do |s| -%>    
       <% if Authorization.is_authorized?("show",nil,s.asset,current_user) -%>
         asset_id = '<%= s.asset.id -%>';
-        sop_title = '<%= s.title -%>';
+        sop_title = '<%= escape_javascript(s.title) -%>';
         addSop(sop_title, asset_id);
       <% end -%>
     <% end -%>
