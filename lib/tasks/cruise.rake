@@ -13,7 +13,7 @@ task :cruise do
   
   Rake::Task["db:drop"].invoke
   Rake::Task["db:create"].invoke
-  Rake::Task["db:migrate"].invoke
+  Rake::Task["db:schema:load"].invoke
   Rake::Task["db:test:purge"].invoke
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:repop_cv"].invoke

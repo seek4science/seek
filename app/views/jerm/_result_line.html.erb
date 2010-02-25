@@ -6,6 +6,7 @@
   <td><%= h(result_line[:resource].type) -%></td>
   <td><%= h(result_line[:resource].author_name) -%></td>
   <td><%= h(result_line[:resource].author_seek_id) -%></td>
+  <td><%= h(result_line[:author]) -%></td>
   <td><%= h(result_line[:resource].timestamp) -%></td>
   <td><%= h(result_line[:message]) -%></td>
   <td><%= link_to("-->",url_for(result_line[:seek_model]),:popup=>true) unless result_line[:seek_model].nil? -%></td>
