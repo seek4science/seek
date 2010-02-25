@@ -32,6 +32,10 @@ module BioPortal
   
 
   module RestAPI
+    require "rexml/document"
+    require 'open-uri'
+    require 'uri'
+
     $REST_URL = "http://rest.bioontology.org/bioportal/"
     
     def get_concept ontology_version_id,concept_id,maxchildren=nil,light=nil
@@ -40,8 +44,37 @@ module BioPortal
       return BioPortalRestfulCore.getConcept(bioportal_ontology_version_id,rest_uri)
     end
 
-    def search ontologies,query,page
-      BioPortalRestfulCore.getNodeNameContains ontologies,query,page
+    def search query,options={}
+      options[:pagesize] ||= 10
+      options[:pagenum] ||= 0
+      
+      search_url="search/%QUERY%?"
+      options.keys.each {|key| search_url+="#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
+      search_url=search_url[0..-2] #chop of trailing &
+      
+      search_url=search_url.gsub("%QUERY%",URI.encode(query))
+      full_search_path=$REST_URL+search_url
+      puts full_search_path
+      doc = REXML::Document.new(open(full_search_path))
+
+      results = BioPortalRestfulCore.errorCheck(doc)
+
+      unless results.nil?
+        return results
+      end
+
+      results = []
+      doc.elements.each("*/data/page/contents"){ |element|
+        results = BioPortalRestfulCore.parseSearchResults(element)
+      }
+
+      pages = 1
+      doc.elements.each("*/data/page"){|element|
+        pages = element.elements["numPages"].get_text.value
+      }
+
+      return results,pages
+
     end
   end
     

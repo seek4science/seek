@@ -13,7 +13,7 @@ class OrganismsController < ApplicationController
   end
 
   def search_ajax
-    results,pages = search "0",@organism.title,1
+    results,pages = search @organism.title,{:isexactmatch=>1,:pagesize=>100}
     render :update do |page|
       if results
         page.replace_html 'search_results',:partial=>"search_results",:object=>results
