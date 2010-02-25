@@ -49,7 +49,7 @@ module Jerm
           resource_model.title=resource.title
           
           if project.default_policy.nil?
-            response={:response=>:fail,:message=>MESSAGES[:no_default_policy],:response_code=>RESPONSE_CODES[:no_default_policy]}
+            response={:response=>:fail,:message=>MESSAGES[:no_default_policy],:author=>author,:response_code=>RESPONSE_CODES[:no_default_policy]}
           else
             #save it
             #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
@@ -63,12 +63,10 @@ module Jerm
             resource_model.asset.save!
             p=Permission.new(:contributor=>author,:access_type=>Policy::MANAGING,:policy_id=>resource_model.asset.policy.id)
             p.save!
-#            p=Permission.new(:contributor=>Person.find(134),:access_type=>Policy::MANAGING,:policy_id=>resource_model.asset.policy.id)
-#            p.save!
             if warning
-              response={:response=>:warning,:message=>warning,:seek_model=>resource_model,:response_code=>warning_code}
+              response={:response=>:warning,:message=>warning,:author=>author,:seek_model=>resource_model,:response_code=>warning_code}
             else
-              response={:response=>:success,:message=>MESSAGES[:success],:seek_model=>resource_model,:response_code=>RESPONSE_CODES[:success]}
+              response={:response=>:success,:message=>MESSAGES[:success],:author=>author,:seek_model=>resource_model,:response_code=>RESPONSE_CODES[:success]}
             end            
           end
           

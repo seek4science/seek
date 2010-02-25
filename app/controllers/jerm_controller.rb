@@ -32,7 +32,7 @@ class JermController < ApplicationController
         @project.last_jerm_run=Time.now
         @project.save
         
-        inform_authors if EMAIL_ENABLED
+        inform_authors 
 
       rescue Exception => @exception
         puts @exception
@@ -88,15 +88,14 @@ class JermController < ApplicationController
   def inform_authors
     resources = {}
     @responses.each do |r|
-      if r[:seek_model]
-        resources[r[:seek_model].contributor_id] ||= []
-        resources[r[:seek_model].contributor_id] << r
+      if r[:seek_model] && r[:author]
+        resources[r[:author]] ||= []
+        resources[r[:author]] << r
       end
     end 
-    resources.each_key do |author_id|
-      author = User.find_by_id(author_id).person
+    resources.each_key do |author|
       unless author.nil? || author.user.nil?
-        Mailer.deliver_resources_harvested(resources[author_id], author.user, base_host)
+        Mailer.deliver_resources_harvested(resources[author_id], author.user, base_host) if EMAIL_ENABLED
       end
     end
   end
