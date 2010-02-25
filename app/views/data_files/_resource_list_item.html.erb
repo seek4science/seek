@@ -1,5 +1,6 @@
 <%= list_item_title resource %>
-<%= resource.respond_to?(:relationship_type) && resource.relationship_type ? "<span class=\"relationship_type\">#{resource.relationship_type.title}</span>" : "" -%>
+
+<%= (resource.respond_to?(:relationship_type) && resource.relationship_type) ? (list_item_attribute "Relationship Type", resource.relationship_type.title) : "" -%>
 
 <%= list_item_simple_list resource.asset.creators, "Creator" -%>
 

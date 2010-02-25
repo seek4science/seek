@@ -101,5 +101,14 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 1,assay.data_files.size
     assert assay.data_files.include?(data_files(:picture).find_version(1))
   end
+  
+  test "relationship_type attached to assay's datafiles" do
+    assay=assays(:metabolomics_assay)
+    assay.relate(assets(:asset_for_datafile), relationship_types(:test_data))
+    
+    df = assay.data_files.last
+    assert_equal data_files(:picture).latest_version, df
+    assert_equal df.relationship_type, relationship_types(:test_data) 
+  end
 
 end

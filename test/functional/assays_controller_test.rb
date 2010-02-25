@@ -255,7 +255,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
-  def check_fixtures_for_authorization_of_sops_and_datafiles_links
+  test "check_fixtures_for_authorization_of_sops_and_datafiles_links" do
     user=users(:model_owner)
     assay=assays(:assay_with_public_and_private_sops_and_datafiles)
     assert_equal 4,assay.assets.size

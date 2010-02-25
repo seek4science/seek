@@ -35,7 +35,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal "T", assigns(:person).first_letter
   end
 
-  def non_admin_should_not_create_pal
+  test "non_admin_should_not_create_pal" do
     login_as(:aaron)
     assert_difference('Person.count') do
       post :create, :person => {:first_name=>"test", :is_pal=>true, :email=>"hghg@sdfsd.com" }

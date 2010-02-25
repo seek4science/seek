@@ -46,12 +46,7 @@ class AssaysController < ApplicationController
     end    
     data_assets.each do |text|
       a_id, r_type = text.split(",")
-      relationship_type = RelationshipType.find_by_title(r_type)
-      assay_asset = AssayAsset.new()
-      assay_asset.assay = @assay
-      assay_asset.asset = Asset.find(a_id)
-      assay_asset.relationship_type = relationship_type      
-      assay_asset.save
+      @assay.relate(Asset.find(a_id), RelationshipType.find_by_title(r_type))
     end  
 
     @assay.owner=current_user.person       

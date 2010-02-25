@@ -77,4 +77,13 @@ class Assay < ActiveRecord::Base
     self.first_letter = strip_first_letter(title)
   end
   
+  #Relate an asset to this assay with a specific relationship type
+  def relate(asset, relationship_type)
+    assay_asset = AssayAsset.new()
+    assay_asset.assay = self
+    assay_asset.asset = asset
+    assay_asset.relationship_type = relationship_type      
+    assay_asset.save
+  end
+  
 end

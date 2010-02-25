@@ -513,6 +513,16 @@ ul#user_details li {
     overflow: hidden;
 }
 
+#model_preview {
+    width: 20em;
+    max-height: 25em;
+    background-color: #EEEEEE;
+    display: inline-block;
+    padding: 1em 1em 1em 1em;
+    border: 1px solid #999999;
+}
+
+
 .foldContent {
     padding-top:0.5em;
     background-color: #FCFCFF;    

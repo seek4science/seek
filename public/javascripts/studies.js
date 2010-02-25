@@ -163,7 +163,7 @@ function updateDataFiles() {
         id=data_file[1]
         relationshipType = data_file[2]
         relationshipText = (relationshipType == "None") ? "" : " <span style=\"color: #1465FF;\">(" + relationshipType + ")</span>"
-        data_file_text += '<b>' + type + '</b>: ' + title + relationshipText 
+        data_file_text += '<b>' + type + '</b>' + relationshipText + ': ' + title 
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small><br/>';
