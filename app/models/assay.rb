@@ -66,7 +66,8 @@ class Assay < ActiveRecord::Base
     list = []
     assay_assets.data_files.each do |df|
       v = df.versioned_resource
-      eval("def v.relationship_type; RelationshipType.find_by_id(#{df.relationship_type_id}); end")
+      v.class_eval("attr_accessor :relationship_type")
+      v.relationship_type = df.relationship_type
       list << v
     end
     list
