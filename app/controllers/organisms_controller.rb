@@ -12,6 +12,13 @@ class OrganismsController < ApplicationController
     end
   end
 
+  def new
+    @organism=Organism.new
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def search_ajax
     pagenum=params[:pagenum]
     pagenum||=1

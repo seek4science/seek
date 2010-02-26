@@ -31,5 +31,21 @@ module BioPortal
       link_to(h(name),BIOPORTAL_REST_BASE_URL+"/bioportal/ontologies/download/"+ontology_version_id,options,html_options)
     end
 
+    #options include
+    # - name - the name thats used as a prefix to the element names
+    # - ontology_ids - arrays of ontology_ids (an element of "all" indicates all ontologies)
+    # - no_javascript_include - if present will not include the javascript_include_tag for the bioportal_form_complete.js
+    # - value - uri,shortid or name. defaults to name
+    def bioportal_form_complete options,html_options={}
+      options[:value]||="name"
+      result = ""
+      result += javascript_include_tag("bioportal_form_complete.js") unless options[:no_javascript_include]
+
+      html_options[:class]="bp_form_complete-#{options[:ontology_ids].join(',')}-#{options[:value]}"
+      name = options[:name]
+      result += text_field_tag name,nil,html_options
+      return result
+    end
+
   end
 end
