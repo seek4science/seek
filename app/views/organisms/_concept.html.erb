@@ -1,11 +1,15 @@
 <ul>
   <li>
-    <label>Synonyms (<%= concept.synonyms.count -%>) </label>
-    <ul>
-      <% concept.synonyms.each do |s| %>
-      <li><%= s %></li>
-      <% end -%>
-    </ul>
+    <label><b>Synonyms (<%= concept.synonyms.count -%>) </b></label>
+      <%= concept.synonyms.join(", ") %>
+  </li>
+  <li>
+    <label><b>Definition (<%= concept.definitions.count -%>) </b></label>
+      <%= concept.definitions.join(", ") %>
+  </li>
+  <li>
+    <label><b>Child size</b></label>
+      <%= concept.child_size %>
   </li>
 
 </ul>

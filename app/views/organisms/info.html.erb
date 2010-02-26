@@ -14,17 +14,19 @@
 </ul>
 
 <%=
-link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:id=>@organism}
+link_to_remote "More ...",
+  :url=>{:action=>:more_ajax,:controller=>:organisms,:id=>@organism},
+  :before=>"show_ajax_loader('bioportal_more')"
 %>
 
 <div id="bioportal_more">
 
 </div>
 
-<br/>
+<br/><hr/>
 <%= link_to_function "Edit",visual_effect(:toggle_appear,"edit_ontology") %>
 
-<div id="edit_ontology" style="display:nonde;">
+<div id="edit_ontology" style="display:none;">
   <%  form_for(@organism) do |f| %>
   <ul>
     <li>
@@ -44,8 +46,11 @@ link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:id
   <% end %>
   
 </div>
-<br/>
-<%= link_to_remote "Search for <b>#{@organism.title}</b>",:url=>{:action=>:search_ajax,:controller=>:organisms,:id=>@organism} %>
+<br/><hr/>
+<%= link_to_remote "Search for <b>#{@organism.title}</b>",
+  :url=>{:action=>:search_ajax,:controller=>:organisms,:id=>@organism},
+  :before=>"show_ajax_loader('search_results')"
+%>
 <br/>
 
 <div id="search_results"></div>
@@ -55,9 +60,10 @@ link_to_remote "More ...",:url=>{:action=>:more_ajax,:controller=>:organisms,:id
     $('organism_bioportal_ontology_id').value=ont_id;
     $('organism_bioportal_ontology_version_id').value=ont_version_id;
     $('organism_bioportal_concept_uri').value=conc_id;
+    <%=  visual_effect :appear,"edit_ontology" -%>
   }
   </script>
-
+<br/><hr/>
 <%= link_to "Add a new organism",new_organism_path -%>
 
 

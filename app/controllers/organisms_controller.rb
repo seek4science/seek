@@ -34,7 +34,6 @@ class OrganismsController < ApplicationController
 
   def more_ajax
     concept = @organism.concept 1,true
-    
     render :update do |page|
       if concept
         page.replace_html 'bioportal_more',:partial=>"concept",:object=>concept
@@ -42,7 +41,6 @@ class OrganismsController < ApplicationController
         page.replace_html 'bioportal_more',:text=>"Nothing found"
       end
     end
-
   end
 
   def update
