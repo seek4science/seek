@@ -80,6 +80,3 @@ module BioPortal
     
 end
 
-ActiveRecord::Base.class_eval do
-  include BioPortal::Acts
-end
