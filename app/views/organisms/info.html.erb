@@ -26,7 +26,7 @@ link_to_remote "More ...",
 <hr/>
 
 <% if @organism.bioportal_ontology_version_id %>
-  <%= visualise_ontology @organism,:show_concept=>false %>
+  <%= link_to "Visualise",visualise_organism_path(@organism),:popup=>true %>
 <% end -%>
 
 <br/><hr/>

@@ -1,7 +1,7 @@
 class OrganismsController < ApplicationController
   
   before_filter :login_required
-  before_filter :find_organism,:only=>[:show,:info,:more_ajax,:search_ajax]
+  before_filter :find_organism,:only=>[:show,:info,:more_ajax,:search_ajax,:visualise]
 
   include BioPortal::RestAPI
 
@@ -9,6 +9,12 @@ class OrganismsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml {render :xml=>@organism}
+    end
+  end
+
+  def visualise
+    respond_to do |format|
+      format.html
     end
   end
 
