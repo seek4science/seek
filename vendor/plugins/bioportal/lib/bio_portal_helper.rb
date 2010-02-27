@@ -7,6 +7,15 @@ module BioPortal
     BIOPORTAL_BASE_URL = "http://bioportal.bioontology.org"
     BIOPORTAL_REST_BASE_URL = "http://rest.bioontology.org"
 
+    def visualise_ontology model,options={}
+      options[:show_concept]||=false
+      concept_id=nil
+      concept_id=model.bioportal_concept_uri if options[:show_concept] && !model.bioportal_concept_uri.nil?
+      ontology_id=model.bioportal_ontology_version_id
+      ontology_id ||= model.bioportal_ontology_id
+      render(:partial=>"bioportal_visualise",:locals=>{:ontology_id=>ontology_id,:concept_id=>concept_id})
+    end
+
     def link_to_concept_id name,concept_id,ontology_version_id,options={},html_options={}
       options[:popup]||=true
       link_to(h(name),BIOPORTAL_BASE_URL+"/visualize/"+ontology_version_id.to_s+"/?conceptid="+URI.encode(concept_id),options,html_options)

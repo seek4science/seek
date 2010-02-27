@@ -23,6 +23,12 @@ link_to_remote "More ...",
 
 </div>
 
+<hr/>
+
+<% if @organism.bioportal_ontology_version_id %>
+  <%= visualise_ontology @organism,:show_concept=>false %>
+<% end -%>
+
 <br/><hr/>
 <%= link_to_function "Edit",visual_effect(:toggle_appear,"edit_ontology") %>
 
