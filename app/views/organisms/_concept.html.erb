@@ -1,5 +1,9 @@
 <ul>
   <li>
+    <label><b>Label</b></label>
+      <%= concept.label %>
+  </li>
+  <li>
     <label><b>Synonyms (<%= concept.synonyms.count -%>) </b></label>
       <%= concept.synonyms.join(", ") %>
   </li>
@@ -11,5 +15,6 @@
     <label><b>Child size</b></label>
       <%= concept.child_size %>
   </li>
+  
 
 </ul>
