@@ -4,7 +4,7 @@
   <%= "Harvested #{results.size} results" %>
 
   <table class="jerm">
-    <tr><th>Status</th><th>Code</th><th>Title</th><th>Source</th><th>Type</th><th>Submitter name</th><th>Submitter SEEK ID</th><th>Timestamp</th><th>Message</th><th>Link</th><th>Exception</th></tr>
+    <tr><th>Status</th><th>Code</th><th>Title</th><th>Source</th><th>Type</th><th>Submitter name</th><th>Submitter SEEK ID</th><th>Author model</th><th>Timestamp</th><th>Message</th><th>Link</th><th>Exception</th></tr>
     <%= render :partial=>"result_line",:collection=>results %>
   </table>
 
