@@ -1,5 +1,8 @@
 module FavouritesHelper
   def model_to_drag_id object
+    if object.class.name.include?("::Version")
+      object = object.parent
+    end
     model_name=object.class.to_s
     return "drag_"+model_name+"_"+object.id.to_s+"_"+object.object_id.abs.to_s
   end
