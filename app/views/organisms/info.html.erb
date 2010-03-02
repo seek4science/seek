@@ -1,0 +1,75 @@
+<h1>Information about <%= @organism.title %></h1>
+
+<h3>BioPortal term details</h3>
+<ul>
+  <li>
+    <label>Ontology ID</label> <%= text_or_not_specified(@organism.bioportal_ontology_id) %>
+  </li>
+  <li>
+    <label>Ontology version ID</label> <%= text_or_not_specified(@organism.bioportal_ontology_version_id) %>
+  </li>
+  <li>
+    <label>Concept URI</label> <%= text_or_not_specified(@organism.bioportal_concept_uri) %>
+  </li>
+</ul>
+
+<%=
+link_to_remote "More ...",
+  :url=>{:action=>:more_ajax,:controller=>:organisms,:id=>@organism},
+  :before=>"show_ajax_loader('bioportal_more')"
+%>
+
+<div id="bioportal_more">
+
+</div>
+
+<hr/>
+
+<% if @organism.bioportal_ontology_version_id %>
+  <%= link_to "Visualise",visualise_organism_path(@organism),:popup=>true %>
+<% end -%>
+
+<br/><hr/>
+<%= link_to_function "Edit",visual_effect(:toggle_appear,"edit_ontology") %>
+
+<div id="edit_ontology" style="display:none;">
+  <%  form_for(@organism) do |f| %>
+  <ul>
+    <li>
+      <label>Ontology ID</label>
+      <%= f.text_field :bioportal_ontology_id %>
+    </li>
+    <li>
+      <label>Ontology version ID</label>
+      <%= f.text_field :bioportal_ontology_version_id %>
+    </li>
+    <li>
+      <label>Concept URI</label>
+      <%= f.text_field :bioportal_concept_uri %>
+    </li>
+  </ul>
+  <%= f.submit "Update" -%>
+  <% end %>
+  
+</div>
+<br/><hr/>
+<%= link_to_remote "Search for <b>#{@organism.title}</b>",
+  :url=>{:action=>:search_ajax,:controller=>:organisms,:id=>@organism},
+  :before=>"show_ajax_loader('search_results')"
+%>
+<br/>
+
+<div id="search_results"></div>
+
+<script type="text/javascript">
+  function add_concept(ont_id,ont_version_id,conc_id) {
+    $('organism_bioportal_ontology_id').value=ont_id;
+    $('organism_bioportal_ontology_version_id').value=ont_version_id;
+    $('organism_bioportal_concept_uri').value=conc_id;
+    <%=  visual_effect :appear,"edit_ontology" -%>
+  }
+  </script>
+<br/><hr/>
+<%= link_to "Add a new organism",new_organism_path -%>
+
+
