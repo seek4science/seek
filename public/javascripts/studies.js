@@ -91,11 +91,6 @@ function updateSops() {
     
     sop_text += '</ul>';
 
-    // remove the last line break
-    if(sop_text.length > 0) {
-        sop_text = sop_text.slice(0,-5);
-    }
-
     // update the page
     if(sop_text.length == 0) {
         $('sop_to_list').innerHTML = '<span class="none_text">No sops</span>';
@@ -175,11 +170,6 @@ function updateDataFiles() {
     
     data_file_text += '</ul>';
 
-    // remove the last line break
-    if(data_file_text.length > 0) {
-        data_file_text = data_file_text.slice(0,-5);
-    }
-
     // update the page
     if(data_file_text.length == 0) {
         $('data_file_to_list').innerHTML = '<span class="none_text">No data files</span>';
@@ -258,11 +248,6 @@ function updateModels() {
     }
     
     model_text += '</ul>';
-
-    // remove the last line break
-    if(model_text.length > 0) {
-        model_text = model_text.slice(0,-5);
-    }
 
     // update the page
     if(model_text.length == 0) {
