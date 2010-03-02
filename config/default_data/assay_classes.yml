@@ -1,0 +1,7 @@
+experimental_assay_class:
+  id: 1
+  title: Experimental Assay
+
+modelling_assay_class:
+  id: 2
+  title: Modelling Assay
