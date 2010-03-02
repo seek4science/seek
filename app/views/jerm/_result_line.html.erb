@@ -9,6 +9,26 @@
   <td><%= h(result_line[:author]) -%></td>
   <td><%= h(result_line[:resource].timestamp) -%></td>
   <td><%= h(result_line[:message]) -%></td>
+
   <td><%= link_to("-->",url_for(result_line[:seek_model]),:popup=>true) unless result_line[:seek_model].nil? -%></td>
-  <td><%= h(result_line[:exception].message) unless result_line[:exception].nil? -%></td>
+
+  <td>
+    <%=
+    unless result_line[:exception].nil?
+      link_to_function h(result_line[:exception].message),visual_effect(:toggle_appear,"exception_#{result_line[:uuid]}")
+    end
+    -%>
+  </td>
 </tr>
+
+<%  unless result_line[:exception].nil? -%>
+  <tr style="display:none;" id="exception_<%=  result_line[:uuid] -%>">
+    <td colspan="10">
+      <ul>
+        <% result_line[:exception].backtrace[0..25].each do |trace| -%>
+          <li><%= trace %></li>
+        <% end -%>
+      </ul>
+    </td>
+  </tr>
+<%  end -%>
