@@ -134,6 +134,12 @@ namespace :seek do
     Role.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "roles")
   end
+  
+  task(:assay_classes=>:environment) do
+    revert_fixtures_identify
+    AssayClass.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_classes")
+  end
 
   task(:repop_cv=>:environment) do
 

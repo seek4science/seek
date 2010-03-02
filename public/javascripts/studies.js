@@ -73,7 +73,7 @@ function removeSop(id) {
 }
 
 function updateSops() {
-    sop_text=''
+    sop_text='<ul class=\"related_asset_list\">'
     type="Sop"
     sop_ids=new Array();
 
@@ -81,12 +81,14 @@ function updateSops() {
         sop=sops_assets[i]
         title=sop[0]
         id=sop[1]        
-        sop_text += '<b>' + type + '</b>: ' + title
+        sop_text += '<li>' + title
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:removeSop('+id+'); return(false);">remove</a>]</small><br/>';
+        + '[<a href="" onclick="javascript:removeSop('+id+'); return(false);">remove</a>]</small></li>';
         sop_ids.push(id)
     }
+    
+    sop_text += '</ul>'
 
     // remove the last line break
     if(sop_text.length > 0) {
@@ -154,20 +156,23 @@ function removeDataFile(id) {
 }
 
 function updateDataFiles() {
-    data_file_text=''
-    type="DataFile"
+    data_file_text='<ul class=\"related_asset_list\">'
+    type="DataFile";
 
     for (var i=0;i<data_files_assets.length;i++) {
-        data_file=data_files_assets[i]
-        title=data_file[0]
-        id=data_file[1]
-        relationshipType = data_file[2]
-        relationshipText = (relationshipType == "None") ? "" : " <span style=\"color: #1465FF;\">(" + relationshipType + ")</span>"
-        data_file_text += '<b>' + type + '</b>' + relationshipText + ': ' + title 
+        data_file=data_files_assets[i];
+        title=data_file[0];
+        id=data_file[1];
+        relationshipType = data_file[2];
+        relationshipText = (relationshipType == "None") ? "" : " <span style=\"color: #1465FF;\">(" + relationshipType + ")</span>";
+        titleText = "<span title=\"" + title + "\">" + title.truncate(30) + "</span>"
+        data_file_text += '<li>' + titleText + relationshipText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small><br/>';
+        + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small></li>';
     }
+    
+    data_file_text += '</ul>'
 
     // remove the last line break
     if(data_file_text.length > 0) {
@@ -186,12 +191,12 @@ function updateDataFiles() {
 
     select=$('assay_data_file_asset_ids')
     for (i=0;i<data_files_assets.length;i++) {
-        id=data_files_assets[i][1]
-        relationshipType=data_files_assets[i][2]
-        o=document.createElement('option')
-        o.value=id + "," + relationshipType
-        o.text=id
-        o.selected=true
+        id=data_files_assets[i][1];
+        relationshipType=data_files_assets[i][2];
+        o=document.createElement('option');
+        o.value=id + "," + relationshipType;
+        o.text=id;
+        o.selected=true;
         try {
             select.add(o); //for older IE version
         }
@@ -203,14 +208,14 @@ function updateDataFiles() {
 
 //Models
 function addModel(title,id) {
-    models_assets.push([title,id])
+    models_assets.push([title,id]);
 }
 
 function addSelectedModel() {
-    selected_option_index=$("possible_models").selectedIndex
-    selected_option=$("possible_models").options[selected_option_index]
-    title=selected_option.text
-    id=selected_option.value
+    selected_option_index=$("possible_models").selectedIndex;
+    selected_option=$("possible_models").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
 
     if(checkNotInList(id,models_assets)) {
         addModel(title,id);
@@ -235,20 +240,22 @@ function removeModel(id) {
 }
 
 function updateModels() {
-    model_text=''
+    model_text='<ul class=\"related_asset_list\">'
     type="Model"
     model_ids=new Array();
 
     for (var i=0;i<models_assets.length;i++) {
-        model=models_assets[i]
-        title=model[0]
-        id=model[1]        
-        model_text += '<b>' + type + '</b>: ' + title
+        model=models_assets[i];
+        title=model[0];
+        id=model[1];
+        model_text += "<li>" + title
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:removeModel('+id+'); return(false);">remove</a>]</small><br/>';
-        model_ids.push(id)
+        + '[<a href="" onclick="javascript:removeModel('+id+'); return(false);">remove</a>]</small></li>';
+        model_ids.push(id);
     }
+    
+    model_text += '</ul>'
 
     // remove the last line break
     if(model_text.length > 0) {

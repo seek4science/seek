@@ -848,3 +848,9 @@ div.hidden_list_item {
     color: #999999;
     float:left;
 }
+
+ul.related_asset_list li{
+  white-space: normal;
+  list-style-type: disc; 
+  list-style-position: inside;
+}

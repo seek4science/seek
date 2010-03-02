@@ -9,8 +9,6 @@
 
 <h1><%= h @assay.title -%></h1>
 
-
-
 <div class="show_basic">
   <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
     <b>Created at:</b> <%= @assay.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
@@ -69,10 +67,45 @@
   <p id="culture_growth_type">
       <b>Culture growth: </b><%= model_title_or_not_specified(@assay.culture_growth_type) %>
   </p>
+   <style type="text/css">
+    div.data_model_relationship {
+      border: 1px dotted black;
+      background-color: #EEEEFF;
+      padding:5px
+    }
+    
+    div.data_model_relationship ul li{
+      list-style: disc;
+      list-style-position: inside;
+    }
+    
+    div.data_model_relationship span{
+      color: #1465FF;  
+    }
+  
+  </style>
 
+
+  <div class="data_model_relationship">
+  <% unless @assay.models.empty? %>
+    <b><%= @assay.models.size > 1 ? "Models" : "Model" %>:</b><br/>
+    <ul>
+    <% @assay.models.each do |m| %>
+    <li><%= link_to truncate(h(m.title), :length=>50), show_resource_path(m) %></li>
+    <% end %>
+    </ul>
+  <% end %>
+  <% unless @assay.data_files.empty? %>
+    <b>Data:</b><br/>
+    <ul>
+    <% @assay.data_files.each do |d| %>
+    <li><%= link_to truncate(h(d.title), :length=>50), show_resource_path(d) %><%= d.relationship_type ? " <span>(" + d.relationship_type.title + ")</span>" : "" %></li>
+    <% end %>
+    </ul>
+  <% end %>
+  </div>
   <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @assay %>
 
 </div>
-
 
 
