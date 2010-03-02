@@ -2,6 +2,7 @@ class OrganismsController < ApplicationController
   
   before_filter :login_required
   before_filter :find_organism,:only=>[:show,:info,:more_ajax,:search_ajax,:visualise]
+  layout "main",:except=>:visualise
 
   include BioPortal::RestAPI
 
