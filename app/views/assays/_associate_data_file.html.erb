@@ -67,7 +67,7 @@ select_truncate_length=40;
     <%= select_tag :assay_data_file_asset_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
     
     <%= label_tag "Relationship Type" %><br/>
-    <%= select_tag :data_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
+    <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
     <b><%= link_to_function "Add","addSelectedDataFile(); return(false);",:id=>"add_data_file_link" %></b>
     <br/>
     <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?

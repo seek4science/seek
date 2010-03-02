@@ -41,14 +41,14 @@ function addNewInvestigation(new_investigation) {
 }
 
 function addSop(title,id) {
-    sops_assets.push([title,id])
+    sops_assets.push([title,id]);
 }
 
 function addSelectedSop() {
-    selected_option_index=$("possible_sops").selectedIndex
-    selected_option=$("possible_sops").options[selected_option_index]
-    title=selected_option.text
-    id=selected_option.value
+    selected_option_index=$("possible_sops").selectedIndex;
+    selected_option=$("possible_sops").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
 
     if(checkNotInList(id,sops_assets)) {
         addSop(title,id);
@@ -73,22 +73,23 @@ function removeSop(id) {
 }
 
 function updateSops() {
-    sop_text='<ul class=\"related_asset_list\">'
-    type="Sop"
+    sop_text='<ul class=\"related_asset_list\">';
+    type="Sop";
     sop_ids=new Array();
 
     for (var i=0;i<sops_assets.length;i++) {
-        sop=sops_assets[i]
-        title=sop[0]
-        id=sop[1]        
-        sop_text += '<li>' + title
+        sop=sops_assets[i];
+        title=sop[0];
+        id=sop[1];
+        titleText = "<span title=\"" + title + "\">" + title.truncate(30) + "</span>";
+        sop_text += '<li>' + titleText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeSop('+id+'); return(false);">remove</a>]</small></li>';
-        sop_ids.push(id)
+        sop_ids.push(id);
     }
     
-    sop_text += '</ul>'
+    sop_text += '</ul>';
 
     // remove the last line break
     if(sop_text.length > 0) {
@@ -107,11 +108,11 @@ function updateSops() {
 
     select=$('assay_sop_asset_ids')
     for (i=0;i<sop_ids.length;i++) {
-        id=sop_ids[i]
-        o=document.createElement('option')
-        o.value=id
-        o.text=id
-        o.selected=true
+        id=sop_ids[i];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
         try {
             select.add(o); //for older IE version
         }
@@ -123,15 +124,15 @@ function updateSops() {
 
 //Data files
 function addDataFile(title,id,relationshipType) {
-    data_files_assets.push([title,id,relationshipType])
+    data_files_assets.push([title,id,relationshipType]);
 }
 
 function addSelectedDataFile() {
-    selected_option_index=$("possible_data_files").selectedIndex
-    selected_option=$("possible_data_files").options[selected_option_index]
-    title=selected_option.text
-    id=selected_option.value
-    relationshipType = $("data_relationship_type").options[$("data_relationship_type").selectedIndex].text
+    selected_option_index=$("possible_data_files").selectedIndex;
+    selected_option=$("possible_data_files").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
+    relationshipType = $("data_file_relationship_type").options[$("data_file_relationship_type").selectedIndex].text;
 
     if(checkNotInList(id,data_files_assets)) {
         addDataFile(title,id,relationshipType);
@@ -172,7 +173,7 @@ function updateDataFiles() {
         + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small></li>';
     }
     
-    data_file_text += '</ul>'
+    data_file_text += '</ul>';
 
     // remove the last line break
     if(data_file_text.length > 0) {
@@ -189,7 +190,7 @@ function updateDataFiles() {
 
     clearList('assay_data_file_asset_ids');
 
-    select=$('assay_data_file_asset_ids')
+    select=$('assay_data_file_asset_ids');
     for (i=0;i<data_files_assets.length;i++) {
         id=data_files_assets[i][1];
         relationshipType=data_files_assets[i][2];
@@ -240,22 +241,23 @@ function removeModel(id) {
 }
 
 function updateModels() {
-    model_text='<ul class=\"related_asset_list\">'
-    type="Model"
+    model_text='<ul class=\"related_asset_list\">';
+    type="Model";
     model_ids=new Array();
 
     for (var i=0;i<models_assets.length;i++) {
         model=models_assets[i];
         title=model[0];
         id=model[1];
-        model_text += "<li>" + title
+        titleText = "<span title=\"" + title + "\">" + title.truncate(30) + "</span>";
+        model_text += "<li>" + titleText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeModel('+id+'); return(false);">remove</a>]</small></li>';
         model_ids.push(id);
     }
     
-    model_text += '</ul>'
+    model_text += '</ul>';
 
     // remove the last line break
     if(model_text.length > 0) {
@@ -272,13 +274,13 @@ function updateModels() {
 
     clearList('assay_model_asset_ids');
 
-    select=$('assay_model_asset_ids')
+    select=$('assay_model_asset_ids');
     for (i=0;i<model_ids.length;i++) {
-        id=model_ids[i]
-        o=document.createElement('option')
-        o.value=id
-        o.text=id
-        o.selected=true
+        id=model_ids[i];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
         try {
             select.add(o); //for older IE version
         }
@@ -291,10 +293,10 @@ function updateModels() {
 
 //Assays
 function addSelectedAssay() {
-    selected_option_index=$("possible_assays").selectedIndex
-    selected_option=$("possible_assays").options[selected_option_index]
-    title=selected_option.text
-    id=selected_option.value
+    selected_option_index=$("possible_assays").selectedIndex;
+    selected_option=$("possible_assays").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
 
     if(checkNotInList(id,assays)) {
         addAssay(title,id);
@@ -319,19 +321,19 @@ function removeAssay(id) {
 }
 
 function updateAssays() {
-    assay_text=''
-    type="Assay"
+    assay_text='';
+    type="Assay";
     assay_ids=new Array();
 
     for (var i=0;i<assays.length;i++) {
-        assay=assays[i]
-        title=assay[0]
-        id=assay[1]
+        assay=assays[i];
+        title=assay[0];
+        id=assay[1];
         assay_text += '<b>' + type + '</b>: ' + title
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeAssay('+id+'); return(false);">remove</a>]</small><br/>';
-        assay_ids.push(id)
+        assay_ids.push(id);
     }
 
     // remove the last line break
@@ -349,13 +351,13 @@ function updateAssays() {
 
     clearList('study_assay_ids');
 
-    select=$('study_assay_ids')
+    select=$('study_assay_ids');
     for (i=0;i<assay_ids.length;i++) {
-        id=assay_ids[i]
-        o=document.createElement('option')
-        o.value=id
-        o.text=id
-        o.selected=true
+        id=assay_ids[i];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
         try {
             select.add(o); //for older IE version
         }
@@ -366,5 +368,5 @@ function updateAssays() {
 }
 
 function addAssay(title,id) {
-    assays.push([title,id])
+    assays.push([title,id]);
 }
