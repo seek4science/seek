@@ -23,6 +23,7 @@ module Jerm
           document = parser.parse
           document.find("item").each do |node|
             result << {:node=>node,:type=>type,:table_name=>table_name}
+            puts "Item found in table_name: #{table_name}"
           end
         rescue LibXML::XML::Error
           puts "Error with XML from #{table_name}"
@@ -45,7 +46,7 @@ module Jerm
       http.use_ssl=true if uri.scheme=="https"
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-      req=Net::HTTP::Get.new(uri.path+"?get=#{table_name}")
+      req=Net::HTTP::Get.new(uri.path+"?key=#{key}&get=#{table_name}")
 
       http.request(req).body
     end    

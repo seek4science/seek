@@ -46,7 +46,9 @@ module Jerm
             warning_code=RESPONSE_CODES[:no_title]
             resource.title=generated_title(resource,author)
           end
+          
           resource_model.title=resource.title
+          resource_model.description=resource.description unless resource.description.blank?
           
           if project.default_policy.nil?
             response={:response=>:fail,:message=>MESSAGES[:no_default_policy],:author=>author,:response_code=>RESPONSE_CODES[:no_default_policy]}
