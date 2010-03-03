@@ -1,15 +1,21 @@
 #Database configuration for cruise control
 development:
-  adapter: sqlite3
-  database: db/development_cc.sqlite3
-  timeout: 5000 
+  adapter: mysql
+  database: seek_development_cc
+  username: mysqluser
+  password: mysqluser
+  #socket: /var/run/mysqld/mysqld.sock 
 
 test:
-  adapter: sqlite3
-  database: db/test_cc.sqlite3
-  timeout: 5000
+  adapter: mysql
+  database: seekhub_test_cc
+  username: mysqluser
+  password: mysqluser
+  #socket: /var/run/mysqld/mysqld.sock 
 
 production:
-  adapter: sqlite3
-  database: db/production_cc.sqlite3
-  timeout: 5000
+  adapter: mysql
+  database: seekhub_production_cc
+  #database: seekhub_development
+  username: mysqluser
+  password: mysqluser
