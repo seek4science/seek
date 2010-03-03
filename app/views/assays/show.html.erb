@@ -8,7 +8,6 @@
 </ul>
 
 <h1><%= h @assay.title -%></h1>
-
 <div class="show_basic">
   <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
     <b>Created at:</b> <%= @assay.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
@@ -31,7 +30,12 @@
     <label>ID: </label>
     <%= @assay.id -%>
   </p>
-
+  
+  <p class="id">
+    <label>Class: </label>
+    <%= @assay.assay_class.title -%>
+  </p>
+  
   <p>
     <b>Description:</b>
     <div id="description" class="box_standout">

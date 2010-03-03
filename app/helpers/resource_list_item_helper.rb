@@ -17,6 +17,8 @@ module ResourceListItemHelper
   def get_list_item_avatar_partial resource
     if resource.respond_to?("asset")
       actions_partial = "layouts/asset_resource_avatars"
+    elsif resource.class.name == "Assay"
+      actions_partial = "assays/resource_avatar"
     else
       actions_partial = "layouts/resource_avatar"
     end
