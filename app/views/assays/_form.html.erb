@@ -58,14 +58,11 @@
 
 <%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay} %>
 
-<h2>Assay SOPs</h2>
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
-<h2>Data files</h2>
-<%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f} -%>
+<%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f, :resource => @assay} -%>
 
-<h2>Models</h2>
-<%= render :partial=>"assays/associate_model",:locals=>{:f=>f} -%>
+<%= render :partial=>"assays/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
 
 <p style="margin-top: 2em; text-align: center;" >
   <%= f.submit(action==:edit ? "Update" : "Create") -%>
@@ -95,11 +92,15 @@
       //Get the IDs of the Type roots to switch the select box to.
       assayTypeRoot = <%= AssayType.find_by_title("modelling assay types").try(:id) || 0 -%>;
       technologyTypeRoot = <%= TechnologyType.find_by_title("modelling technology").try(:id) || 0 -%>;
+      $('associate_model_form').style.display = '';
+      $('data_file_relationship_type_section').style.display = '';
     }
     else if (value == experimentalAssayClassID){
       //Get the IDs of the Type roots to switch the select box to.
       assayTypeRoot = <%= AssayType.find_by_title("assay types").try(:id) || 0 -%>;
       technologyTypeRoot = <%= TechnologyType.find_by_title("technology").try(:id) || 0 -%>;
+      $('associate_model_form').style.display = 'none';
+      $('data_file_relationship_type_section').style.display = 'none';
     }
     //Change AssayType form
     var assayTypeSelect = $("assay_assay_type_id");

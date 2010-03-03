@@ -84,8 +84,10 @@ module AssetsHelper
         related_hidden["sops"] = resource.sops.size - (related["sops"]["Sop"] || []).size
         related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
         related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
-        related["models"] = Asset.classify_and_authorize_resources(resource.models, true, current_user)
-        related_hidden["models"] = resource.models.size - (related["models"]["Model"] || []).size
+        if resource.assay_class_id == 2 #MODELLING ASSAY
+          related["models"] = Asset.classify_and_authorize_resources(resource.models, true, current_user)
+          related_hidden["models"] = resource.models.size - (related["models"]["Model"] || []).size
+        end
         related["studies"] = classify_for_tabs([resource.study])
         related["projects"] = classify_for_tabs([resource.project])
         related["investigations"] = classify_for_tabs([resource.investigation])

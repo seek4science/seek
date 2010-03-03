@@ -77,6 +77,7 @@
     div.data_model_relationship ul li{
       list-style: disc;
       list-style-position: inside;
+      margin-left: 5px;
     }
     
     div.data_model_relationship span{
@@ -85,25 +86,26 @@
   
   </style>
 
-
-  <div class="data_model_relationship">
-  <% unless @assay.models.empty? %>
-    <b><%= @assay.models.size > 1 ? "Models" : "Model" %>:</b><br/>
-    <ul>
-    <% @assay.models.each do |m| %>
-    <li><%= link_to truncate(h(m.title), :length=>50), show_resource_path(m) %></li>
+  <% if ((@assay.assay_class_id == 2) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY%>
+    <div class="data_model_relationship">
+    <% unless @assay.models.empty? %>
+      <b><%= @assay.models.size > 1 ? "Models" : "Model" %>:</b><br/>
+      <ul>
+      <% @assay.models.each do |m| %>
+      <li><%= link_to truncate(h(m.title), :length=>50), show_resource_path(m) %></li>
+      <% end %>
+      </ul>
     <% end %>
-    </ul>
-  <% end %>
-  <% unless @assay.data_files.empty? %>
-    <b>Data:</b><br/>
-    <ul>
-    <% @assay.data_files.each do |d| %>
-    <li><%= link_to truncate(h(d.title), :length=>50), show_resource_path(d) %><%= d.relationship_type ? " <span>(" + d.relationship_type.title + ")</span>" : "" %></li>
+    <% unless @assay.data_files.empty? %>
+      <b>Data:</b><br/>
+      <ul>
+      <% @assay.data_files.each do |d| %>
+      <li><%= link_to truncate(h(d.title), :length=>50), show_resource_path(d) %><%= d.relationship_type ? " <span>(" + d.relationship_type.title + ")</span>" : "" %></li>
+      <% end %>
+      </ul>
     <% end %>
-    </ul>
+    </div>
   <% end %>
-  </div>
   <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @assay %>
 
 </div>
