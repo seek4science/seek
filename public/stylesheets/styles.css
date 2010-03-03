@@ -838,3 +838,27 @@ div.hidden_list_item {
     color: #999999;
     float:left;
 }
+
+.contribution_title {
+    text-align: center;
+}
+
+.contribution_title {
+    border-top: solid #BBBBBB 1px;
+    border-bottom: solid #BBBBBB 1px;
+    padding-top: 0.5em;
+    background-color: #F0F0F0;
+    margin-left: 1em;
+    margin-top: 1em;
+}
+.contribution_title img {        
+    float: left;
+    margin-left: 2em;
+    padding: 2px 2px 2px 2px;
+    width: 45px;
+    vertical-align: middle;
+}
+
+.contribution_title h1 {    
+    width: 95%;
+}
