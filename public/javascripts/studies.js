@@ -73,26 +73,25 @@ function removeSop(id) {
 }
 
 function updateSops() {
-    sop_text='<ul class=\"related_asset_list\">';
-    type="Sop";
+    sop_text='<ul class="related_asset_list">';
+
     sop_ids=new Array();
 
     for (var i=0;i<sops_assets.length;i++) {
         sop=sops_assets[i];
         title=sop[0];
         id=sop[1];
-        titleText = "<span title=\"" + title + "\">" + title.truncate(30) + "</span>";
-        sop_text += '<li>' + titleText
-        //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:removeSop('+id+'); return(false);">remove</a>]</small></li>';
+        titleText = '<span title="' + title + '">' + title.truncate(30) + '</span>';
+        sop_text += '<li>' + titleText + 
+          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '[<a href=\"\" onclick=\"javascript:removeSop('+id+'); return(false);\">remove</a>]</small></li>';
         sop_ids.push(id);
     }
     
     sop_text += '</ul>';
 
     // update the page
-    if(sop_text.length == 0) {
+    if(sops_assets.length == 0) {
         $('sop_to_list').innerHTML = '<span class="none_text">No sops</span>';
     }
     else {
@@ -152,26 +151,24 @@ function removeDataFile(id) {
 }
 
 function updateDataFiles() {
-    data_file_text='<ul class=\"related_asset_list\">'
-    type="DataFile";
-
-    for (var i=0;i<data_files_assets.length;i++) {
+    data_file_text='<ul class="related_asset_list">'
+    
+    for (var i=0;i<data_files_assets.length;i++) {        
         data_file=data_files_assets[i];
         title=data_file[0];
         id=data_file[1];
         relationshipType = data_file[2];
-        relationshipText = (relationshipType == "None") ? "" : " <span style=\"color: #1465FF;\">(" + relationshipType + ")</span>";
-        titleText = "<span title=\"" + title + "\">" + title.truncate(30) + "</span>"
-        data_file_text += '<li>' + titleText + relationshipText
-        //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        relationshipText = (relationshipType == 'None') ? '' : ' <span style="color: #1465FF;">(' + relationshipType + ')</span>';
+        titleText = '<span title="' + title + '">' + title.truncate(30) + '</span>';
+        data_file_text += '<li>' + titleText + relationshipText +
+        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small></li>';
     }
     
     data_file_text += '</ul>';
 
     // update the page
-    if(data_file_text.length == 0) {
+    if(data_files_assets.length == 0) {
         $('data_file_to_list').innerHTML = '<span class="none_text">No data files</span>';
     }
     else {
@@ -231,7 +228,7 @@ function removeModel(id) {
 }
 
 function updateModels() {
-    model_text='<ul class=\"related_asset_list\">';
+    model_text='<ul class="related_asset_list">';
     type="Model";
     model_ids=new Array();
 
@@ -239,8 +236,8 @@ function updateModels() {
         model=models_assets[i];
         title=model[0];
         id=model[1];
-        titleText = "<span title=\"" + title + "\">" + title.truncate(30) + "</span>";
-        model_text += "<li>" + titleText
+        titleText = '<span title="' + title + '">' + title.truncate(30) + '</span>';
+        model_text += '<li>' + titleText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeModel('+id+'); return(false);">remove</a>]</small></li>';
@@ -250,7 +247,7 @@ function updateModels() {
     model_text += '</ul>';
 
     // update the page
-    if(model_text.length == 0) {
+    if(models_assets.length == 0) {
         $('model_to_list').innerHTML = '<span class="none_text">No models</span>';
     }
     else {

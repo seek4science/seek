@@ -49,9 +49,9 @@ select_truncate_length=40;
     <p style="color: #666666;">
       The following data files are involved in this assay:
     </p>
-    <p id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5;">
+    <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5;">
       <span class="none_text" id="data_files">Loading...</span>
-    </p>
+    </div>
     <br/>
 
     <%= label_tag :data_files %><br/>
@@ -65,7 +65,7 @@ select_truncate_length=40;
       )+";check_show_add_data_file();return(false);"
     } -%>
     <%= select_tag :assay_data_file_asset_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-    
+    <br/><br/>
     <%= label_tag "Relationship Type" %><br/>
     <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
     <b><%= link_to_function "Add","addSelectedDataFile(); return(false);",:id=>"add_data_file_link" %></b>
