@@ -39,6 +39,7 @@ module Jerm
           @section = "none"
           @title = ""
           @valid_template = false
+          @stop_search = false
           @visited_links << link
           get_data(link, (level+1))
         end
@@ -50,6 +51,7 @@ module Jerm
       doc = open(uri, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
       #Get all of the tags
       doc.search("/html/body/div#main/div#content//").each do |e|
+        break if @stop_search
         case e.name
           when "p"
             if e.attributes['class'] == "path"
@@ -78,7 +80,10 @@ module Jerm
                   #to deal with awkward author fields like "<Name> (<Job that they did>)"                  
                   @author = @author[0...(@author =~ (/[^-a-zA-Z ]/))].strip if @author =~ (/[^-a-zA-Z ]/)
                 elsif k.downcase.start_with?("date")
-                  @date = general_data[k]              
+                  @date = general_data[k]           
+                elsif k.downcase.start_with?("access")
+                  @stop_search = general_data[k].include?("NoData")
+                  @valid_template = false if @stop_search
                 end              
               end
               

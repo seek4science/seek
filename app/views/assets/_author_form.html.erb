@@ -68,7 +68,7 @@
           frequency: 0.1,
           updateElement: addAction,
           search_field: "name",
-          hint_field: "email",
+          <%= "hint_field: \"email\"," unless hide_contact_details?-%>
           id_field: "id",
           validation_type: "only_suggested"
         });
@@ -110,8 +110,12 @@ function updateCreatorSettings() {
     for(var i = 0; i < creator_settings.length; i++) {
         creator_name = creator_settings[i][0];
         creator_email = creator_settings[i][1];
-        creator_id = creator_settings[i][2];        
-        creators += '<b>' + creator_name + '</b>: ' + creator_email
+        creator_id = creator_settings[i][2];   
+        creator_email_text = "";
+        if (<%= hide_contact_details? -%> == "true") {
+          creator_email_text = ': ' + creator_email
+        }     
+        creators += '<b>' + creator_name + '</b>' + creator_email_text
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:deleteCreator(\''+ creator_name +'\', '+ creator_id +'); return(false);">remove</a>]</small><br/>';
     
