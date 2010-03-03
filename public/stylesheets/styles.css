@@ -708,7 +708,11 @@ img.badge {
 
 div.favouritable_icon {
     position: relative;
-    margin: 5px auto;
+    margin: 5px auto;    
+}
+
+.favouritable_icon img.avatar {
+    max-width: 32px;
 }
 
 .avatar_text {
@@ -849,13 +853,13 @@ div.hidden_list_item {
     text-align: center;
 }
 
-span.contribution_title_image {
+.contribution_title_image {
     float: left;
     margin-left: 1em;
+    margin-top: 1em;
 }
 
-.contribution_title_image img {    
-    padding: 2px 2px 2px 2px;
+.contribution_title_image img {        
     width: 35px;
     vertical-align: middle;
 }
