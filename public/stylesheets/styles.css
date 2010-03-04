@@ -856,3 +856,28 @@ ul.related_asset_list li{
   list-style-type: disc; 
   list-style-position: inside;
 }
+
+.contribution_title {
+    border-top: solid #BBBBBB 1px;
+    border-bottom: solid #BBBBBB 1px;
+    padding-top: 0.5em;
+    background-color: #F0F0F0;
+    margin-left: 1em;
+    margin-top: 1em;
+    text-align: center;
+}
+
+.contribution_title_image {
+    float: left;
+    margin-left: 1em;
+    margin-top: 1em;
+}
+
+.contribution_title_image img {        
+    width: 35px;
+    vertical-align: middle;
+}
+
+.contribution_title h1 {    
+    width: 100%;
+}

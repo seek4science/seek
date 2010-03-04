@@ -17,7 +17,7 @@
   <% end -%>
 </ul>
 
-<h1><%= h @study.title -%></h1>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@study} %>
 
 <div class="show_basic">
   <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">

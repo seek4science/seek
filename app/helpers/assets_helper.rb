@@ -16,14 +16,26 @@ module AssetsHelper
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
     "<form onsubmit='showResourceVersion(this); return false;' style='text-align:right;'>"+select_tag(:resource_versions,
-                                                                            options,
-                                                                            :disabled=>disabled,
-                                                                            :onchange=>"showResourceVersion(this.form);"
-
+      options,
+      :disabled=>disabled,
+      :onchange=>"showResourceVersion(this.form);"
     )+"</form>"
     
   end
-  
+   def resource_title_draggable_avatar resource
+    name = resource.class.name.split("::")[0]
+    icon=""
+    case name
+    when "DataFile","Model","Sop"
+      image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))))
+      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+    when "Assay","Investigation","Study"
+      image = image "#{resource.class.name.downcase}_avatar",{}
+      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+    end
+    return icon
+  end
+
   def get_original_model_name(model)
     class_name = model.class.name
     if class_name.end_with?("::Version")
