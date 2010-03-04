@@ -8,7 +8,8 @@ module BioPortal
       def acts_as_bioportal(options = {}, &extension)
         options[:base_url]="http://rest.bioontology.org/bioportal/"
 
-        has_one :bioportal_concept,:as=>:conceptable
+        has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
+        before_save :save_changed_concept
 
         extend BioPortal::Acts::SingletonMethods
         include BioPortal::Acts::InstanceMethods
@@ -45,15 +46,28 @@ module BioPortal
       end
 
       def ontology_id= value
+        check_concept
         self.bioportal_concept.ontology_id=value
       end
 
       def ontology_version_id= value
+        check_concept
         self.bioportal_concept.ontology_version_id=value
       end
 
       def concept_uri= value
+        check_concept
         self.bioportal_concept.concept_uri=value
+      end
+
+      private
+
+      def check_concept
+        self.bioportal_concept=BioportalConcept.new if self.bioportal_concept.nil?
+      end
+
+      def save_changed_concept
+        self.bioportal_concept.save! if !self.bioportal_concept.nil? && self.bioportal_concept.changed?
       end
 
     end
