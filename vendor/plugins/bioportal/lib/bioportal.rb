@@ -8,6 +8,12 @@ module BioPortal
       def acts_as_bioportal(options = {}, &extension)
         options[:base_url]="http://rest.bioontology.org/bioportal/"
 
+        has_one :bioportal_concept
+
+        has_one :ontolgy_id,:through=>:bioportal_concept
+        has_one :ontolgoy_version_id,:through=>:bioportal_concept
+        has_one :concept_uri,:through=>:bioportal_concept
+
         extend BioPortal::Acts::SingletonMethods
         include BioPortal::Acts::InstanceMethods
         include BioPortal::RestAPI
@@ -92,11 +98,7 @@ module BioPortal
       }
 
       return ontologies
-    end
-
-    def get_rdf_dump ontology_id
-
-    end
+    end    
 
     def get_ontology_categories
       uri=$REST_URL + "/categories"
@@ -135,11 +137,7 @@ module BioPortal
       
 
       return groups
-    end
-
-    def get_ontology
-
-    end
+    end    
 
     #options can include
     # - offset - the offet to start from

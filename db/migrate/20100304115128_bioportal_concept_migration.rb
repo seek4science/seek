@@ -3,7 +3,7 @@ class BioportalConceptMigration < ActiveRecord::Migration
     create_table :bioportal_concepts do |t|
       t.column :ontology_id, :integer
       t.column :ontology_version_id,:integer
-      t.column :concept_id,:string
+      t.column :concept_uri,:string
       t.column :cached_concept_yaml,:string
     end        
   end

@@ -7,7 +7,7 @@ class BioportalConceptTest < ActiveSupport::TestCase
     bc=BioportalConcept.new
     assert_equal 1,bc.ontology_id=1
     assert_equal 1,bc.ontology_version_id=1
-    assert_equal "zzz",bc.concept_id="zzz"
+    assert_equal "zzz",bc.concept_uri="zzz"
     assert_equal "yaml",bc.cached_concept_yaml="yaml"
 
     assert bc.save!

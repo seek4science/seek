@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100304113738) do
+ActiveRecord::Schema.define(:version => 20100304115128) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -73,7 +73,7 @@ ActiveRecord::Schema.define(:version => 20100304113738) do
   create_table "bioportal_concepts", :force => true do |t|
     t.integer "ontology_id"
     t.integer "ontology_version_id"
-    t.string  "concept_id"
+    t.string  "concept_uri"
     t.string  "cached_concept_yaml"
   end
 
@@ -279,6 +279,7 @@ ActiveRecord::Schema.define(:version => 20100304113738) do
     t.string   "phenotype"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "bioportal_concept_id"
   end
 
   create_table "organisms_projects", :id => false, :force => true do |t|
