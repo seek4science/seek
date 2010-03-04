@@ -12,8 +12,7 @@ module BioPortal
         before_save :save_changed_concept
 
         extend BioPortal::Acts::SingletonMethods
-        include BioPortal::Acts::InstanceMethods
-        include BioPortal::RestAPI
+        include BioPortal::Acts::InstanceMethods        
       end
     end
 
@@ -26,8 +25,9 @@ module BioPortal
       require 'BioPortalRestfulCore'
       require 'BioPortalResources'
 
-      def concept maxchildren=nil,light=nil
-        return get_concept(self.ontology_version_id,self.concept_uri,maxchildren,light)
+      def concept options={}
+        return nil if self.bioportal_concept.nil?
+        return self.bioportal_concept.concept_details options        
       end
 
       def ontology_id
@@ -81,8 +81,8 @@ module BioPortal
 
     $REST_URL = "http://rest.bioontology.org/bioportal"
     
-    def get_concept ontology_id,concept_id,maxchildren=nil,light=nil
-      cc=BioPortalResources::Concept.new({:ontology_id=>ontology_id,:concept_id=>concept_id},maxchildren,light)
+    def get_concept ontology_id,concept_id,options={}
+      cc=BioPortalResources::Concept.new({:ontology_id=>ontology_id,:concept_id=>concept_id},options[:maxchildren],options[:light])
       rest_uri=cc.generate_uri
       return BioPortalRestfulCore.getConcept(ontology_id,rest_uri)
     end

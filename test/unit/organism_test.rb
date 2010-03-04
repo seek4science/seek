@@ -42,4 +42,11 @@ class OrganismTest < ActiveSupport::TestCase
     assert_nil BioportalConcept.find_by_id(concept.id)
   end
 
+  test "get concept" do
+    o=organisms(:yeast_with_bioportal_concept)
+    concept=o.concept({:maxchildren=>1,:light=>1})
+    assert_not_nil concept
+    assert_not_nil o.bioportal_concept.cached_concept_yaml
+  end
+
 end

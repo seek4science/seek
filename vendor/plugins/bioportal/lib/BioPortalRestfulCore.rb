@@ -537,7 +537,7 @@ class BioPortalRestfulCore
   
 private
   
-  def self.getConcept(ontology, concept_uri)    
+    def self.getConcept(ontology, concept_uri)
     begin
 #      LOG.add :debug, "Concept retreive url"
 #      LOG.add :debug, concept_uri
