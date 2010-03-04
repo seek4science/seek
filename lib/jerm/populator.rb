@@ -1,6 +1,7 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 require 'digest/md5'
+require 'uuidtools'
 
 module Jerm
   class Populator
@@ -28,12 +29,19 @@ module Jerm
     # {:response=>:success|:fail|:skipped,:message=>"",:exception=>Exception|nil,:resource=>resource}
     def populate resource
       resource.populate
-      if !exists?(resource)
-        response=add_as_new(resource)
-      else
-        response={:response=>:skipped,:message=>MESSAGES[:exists],:response_code=>RESPONSE_CODES[:exists]}
+      begin
+        if resource.uri.nil?
+          response={:response=>:fail,:message=>"No URL to data file described"}
+        elsif !exists?(resource)
+          response=add_as_new(resource)
+        else
+          response={:response=>:skipped,:message=>MESSAGES[:exists],:response_code=>RESPONSE_CODES[:exists]}
+        end
+      rescue Exception => exception
+        response={:response=>:fail,:message=>"Something went wrong",:exception=>exception}
       end
       response[:resource]=resource
+      response[:uuid]=UUIDTools::UUID.random_create.to_s
       return response
     end
 

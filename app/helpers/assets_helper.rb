@@ -16,12 +16,26 @@ module AssetsHelper
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
     "<form onsubmit='showResourceVersion(this); return false;' style='text-align:right;'>"+select_tag(:resource_versions,
-                                                                            options,
-                                                                            :disabled=>disabled,
-                                                                            :onchange=>"showResourceVersion(this.form);"
+      options,
+      :disabled=>disabled,
+      :onchange=>"showResourceVersion(this.form);"
 
     )+"</form>"
     
+  end
+
+  def resource_title_draggable_avatar resource
+    name = resource.class.name.split("::")[0]
+    icon=""
+    case name
+    when "DataFile","Model","Sop"
+      image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))))
+      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+    when "Assay","Investigation","Study"
+      image = image "#{resource.class.name.downcase}_avatar",{}
+      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+    end
+    return icon
   end
   
   def get_original_model_name(model)
@@ -73,75 +87,75 @@ module AssetsHelper
     related_hidden = {"sops" => 0, "models" => 0, "data_files" => 0}
 
     case name
-      when "DataFile","Sop"
-        related["projects"] = classify_for_tabs([resource.project])
-        related["assays"] = classify_for_tabs(resource.assays)
-        related["studies"] = classify_for_tabs(resource.studies)
-      when "Model"
-        related["projects"] = classify_for_tabs([resource.project])
-      when "Assay"
-        related["sops"] = Asset.classify_and_authorize_resources(resource.sops, true, current_user)
-        related_hidden["sops"] = resource.sops.size - (related["sops"]["Sop"] || []).size
-        related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
-        related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
-        related["studies"] = classify_for_tabs([resource.study])
-        related["projects"] = classify_for_tabs([resource.project])
-        related["investigations"] = classify_for_tabs([resource.investigation])
-      when "Investigation"
-        related["sops"] = Asset.classify_and_authorize_resources(resource.sops, true, current_user)
-        related_hidden["sops"] = resource.sops.size - (related["sops"]["Sop"] || []).size
-        related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
-        related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
-        related["studies"] = classify_for_tabs(resource.studies)
-        related["projects"] = classify_for_tabs([resource.project])
-        related["assays"] = classify_for_tabs(resource.assays)
-      when "Study"
-        related["sops"] = Asset.classify_and_authorize_resources(resource.sops, true, current_user)
-        related_hidden["sops"] = resource.sops.size - (related["sops"]["Sop"] || []).size
-        related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
-        related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
-        related["projects"] = classify_for_tabs([resource.project])
-        related["assays"] = classify_for_tabs(resource.assays)
-      when "Organism"
-        related["models"] = Asset.classify_and_authorize_resources(resource.models, true, current_user)
-        related_hidden["models"] = resource.models.size - (related["models"]["Model"] || []).size
-        related["projects"] = classify_for_tabs(resource.projects)
-        related["assays"] = classify_for_tabs(resource.assays)
-      when "Person"
-        if resource.user
-          assets_hash = split_assets_by_type(resource.user.assets | resource.created_assets)
-        else
-          assets_hash = split_assets_by_type(resource.created_assets)
-        end
-        related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)        
-        related["sops"] = Asset.classify_and_authorize_resources(assets_hash[:sops], true, current_user)
-        related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)        
-        related["studies"] = classify_for_tabs(resource.studies)
-        related["projects"] = classify_for_tabs(resource.projects)
-        related["institutions"] = classify_for_tabs(resource.institutions)
-
-        related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
-        related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
-        related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
-      when "Institution"
-        related["projects"] = classify_for_tabs(resource.projects)
-        related["people"] = classify_for_tabs(resource.people)
-      when "Project"
-        assets_hash = split_assets_by_type(resource.assets)
-        
-        related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)        
-        related["sops"] = Asset.classify_and_authorize_resources(assets_hash[:sops], true, current_user)        
-        related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)        
-        related["institutions"] = classify_for_tabs(resource.institutions)
-        related["people"] = classify_for_tabs(resource.people)
-        related["assays"] = classify_for_tabs(resource.assays)
-        related["studies"] = classify_for_tabs(resource.studies)
-        related["investigations"] = classify_for_tabs(resource.investigations)
-
-        related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
-        related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
-        related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
+    when "DataFile","Sop"
+      related["projects"] = classify_for_tabs([resource.project])
+      related["assays"] = classify_for_tabs(resource.assays)
+      related["studies"] = classify_for_tabs(resource.studies)
+    when "Model"
+      related["projects"] = classify_for_tabs([resource.project])
+    when "Assay"
+      related["sops"] = Asset.classify_and_authorize_resources(resource.sops, true, current_user)
+      related_hidden["sops"] = resource.sops.size - (related["sops"]["Sop"] || []).size
+      related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
+      related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
+      related["studies"] = classify_for_tabs([resource.study])
+      related["projects"] = classify_for_tabs([resource.project])
+      related["investigations"] = classify_for_tabs([resource.investigation])
+    when "Investigation"
+      related["sops"] = Asset.classify_and_authorize_resources(resource.sops, true, current_user)
+      related_hidden["sops"] = resource.sops.size - (related["sops"]["Sop"] || []).size
+      related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
+      related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
+      related["studies"] = classify_for_tabs(resource.studies)
+      related["projects"] = classify_for_tabs([resource.project])
+      related["assays"] = classify_for_tabs(resource.assays)
+    when "Study"
+      related["sops"] = Asset.classify_and_authorize_resources(resource.sops, true, current_user)
+      related_hidden["sops"] = resource.sops.size - (related["sops"]["Sop"] || []).size
+      related["data_files"] = Asset.classify_and_authorize_resources(resource.data_files, true, current_user)
+      related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
+      related["projects"] = classify_for_tabs([resource.project])
+      related["assays"] = classify_for_tabs(resource.assays)
+    when "Organism"
+      related["models"] = Asset.classify_and_authorize_resources(resource.models, true, current_user)
+      related_hidden["models"] = resource.models.size - (related["models"]["Model"] || []).size
+      related["projects"] = classify_for_tabs(resource.projects)
+      related["assays"] = classify_for_tabs(resource.assays)
+    when "Person"
+      if resource.user
+        assets_hash = split_assets_by_type(resource.user.assets | resource.created_assets)
       else
+        assets_hash = split_assets_by_type(resource.created_assets)
+      end
+      related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)
+      related["sops"] = Asset.classify_and_authorize_resources(assets_hash[:sops], true, current_user)
+      related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)
+      related["studies"] = classify_for_tabs(resource.studies)
+      related["projects"] = classify_for_tabs(resource.projects)
+      related["institutions"] = classify_for_tabs(resource.institutions)
+
+      related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
+      related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
+      related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
+    when "Institution"
+      related["projects"] = classify_for_tabs(resource.projects)
+      related["people"] = classify_for_tabs(resource.people)
+    when "Project"
+      assets_hash = split_assets_by_type(resource.assets)
+        
+      related["data_files"] = Asset.classify_and_authorize_resources(assets_hash[:data_files], true, current_user)
+      related["sops"] = Asset.classify_and_authorize_resources(assets_hash[:sops], true, current_user)
+      related["models"] = Asset.classify_and_authorize_resources(assets_hash[:models], true, current_user)
+      related["institutions"] = classify_for_tabs(resource.institutions)
+      related["people"] = classify_for_tabs(resource.people)
+      related["assays"] = classify_for_tabs(resource.assays)
+      related["studies"] = classify_for_tabs(resource.studies)
+      related["investigations"] = classify_for_tabs(resource.investigations)
+
+      related_hidden["data_files"] = assets_hash[:data_files].size - (related["data_files"]["DataFile"] || []).size
+      related_hidden["sops"] = assets_hash[:sops].size - (related["sops"]["Sop"] || []).size
+      related_hidden["models"] = assets_hash[:models].size - (related["models"]["Model"] || []).size
+    else
     end
     hash = {}
     related.each_value{|res_hash| hash.merge!(res_hash) unless res_hash.empty?}
@@ -153,12 +167,12 @@ module AssetsHelper
     hash = {:data_files => [], :models => [], :sops => []}
     asset_list.each do |a|
       case a.resource_type
-        when "Sop"
-          hash[:sops] << a.resource
-        when "Model"
-          hash[:models] << a.resource
-        when "DataFile"
-          hash[:data_files] << a.resource
+      when "Sop"
+        hash[:sops] << a.resource
+      when "Model"
+        hash[:models] << a.resource
+      when "DataFile"
+        hash[:data_files] << a.resource
       end
     end
     return hash

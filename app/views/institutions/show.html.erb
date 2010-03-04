@@ -14,7 +14,7 @@
   </ul>
 <% end %>
 
-<h1><%= h @institution.name -%></h1>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@institution} %>
 
 <div class="show_basic">
 

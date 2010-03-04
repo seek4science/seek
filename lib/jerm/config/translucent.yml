@@ -3,6 +3,8 @@ tables_and_types:
     type: Sop
   phpr_mod_models:
     type: Model
+  phpr_exp_2d:
+    type: DataFile
   phpr_exp_cc:
     type: DataFile
   phpr_exp_gfp:
@@ -44,8 +46,7 @@ tables_and_types:
   phpr_exp_cytosolicph:
     type: DataFile
   phpr_exp_cellvolume:
-    type: DataFile
-
+    type: DataFile 
 
 #  phpr_isa_investigation:
 #    type: Investigation
@@ -57,7 +58,4 @@ tables_and_types:
 #    type: News
 #  people:
 #     type: Person
-#phpr_exp_MicroArray:
-#    type: Data
-#  phpr_exp_NMR:
-#    type: Data
+
