@@ -1,4 +1,4 @@
-class ActsAsTaggableOnMigration < ActiveRecord::Migration
+class BioportalConceptMigration < ActiveRecord::Migration
   def self.up
     create_table :bioportal_concepts do |t|
       t.column :ontolgoy_id, :integer

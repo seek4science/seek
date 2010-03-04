@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100218142426) do
+ActiveRecord::Schema.define(:version => 20100304112808) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -68,6 +68,13 @@ ActiveRecord::Schema.define(:version => 20100218142426) do
     t.string   "original_filename"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "bioportal_concepts", :force => true do |t|
+    t.integer "ontolgoy_id"
+    t.integer "ontolgoy_version_id"
+    t.string  "concept_id"
+    t.string  "cached_concept_yaml"
   end
 
   create_table "content_blobs", :force => true do |t|
