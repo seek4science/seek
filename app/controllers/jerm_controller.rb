@@ -9,7 +9,7 @@ class JermController < ApplicationController
     
   end
 
-  def test
+  def run
     
     project_id=params[:project]
 
