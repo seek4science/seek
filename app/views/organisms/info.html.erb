@@ -3,13 +3,13 @@
 <h3>BioPortal term details</h3>
 <ul>
   <li>
-    <label>Ontology ID</label> <%= text_or_not_specified(@organism.bioportal_ontology_id) %>
+    <label>Ontology ID</label> <%= text_or_not_specified(@organism.ontology_id) %>
   </li>
   <li>
-    <label>Ontology version ID</label> <%= text_or_not_specified(@organism.bioportal_ontology_version_id) %>
+    <label>Ontology version ID</label> <%= text_or_not_specified(@organism.ontology_version_id) %>
   </li>
   <li>
-    <label>Concept URI</label> <%= text_or_not_specified(@organism.bioportal_concept_uri) %>
+    <label>Concept URI</label> <%= text_or_not_specified(@organism.concept_uri) %>
   </li>
 </ul>
 
@@ -25,7 +25,7 @@ link_to_remote "More ...",
 
 <hr/>
 
-<% if @organism.bioportal_ontology_version_id %>
+<% if @organism.ontology_version_id %>
   <%= link_to "Visualise",visualise_organism_path(@organism),:popup=>true %>
 <% end -%>
 
@@ -37,15 +37,15 @@ link_to_remote "More ...",
   <ul>
     <li>
       <label>Ontology ID</label>
-      <%= f.text_field :bioportal_ontology_id %>
+      <%= f.text_field :ontology_id %>
     </li>
     <li>
       <label>Ontology version ID</label>
-      <%= f.text_field :bioportal_ontology_version_id %>
+      <%= f.text_field :ontology_version_id %>
     </li>
     <li>
       <label>Concept URI</label>
-      <%= f.text_field :bioportal_concept_uri %>
+      <%= f.text_field :concept_uri %>
     </li>
   </ul>
   <%= f.submit "Update" -%>
@@ -63,9 +63,9 @@ link_to_remote "More ...",
 
 <script type="text/javascript">
   function add_concept(ont_id,ont_version_id,conc_id) {
-    $('organism_bioportal_ontology_id').value=ont_id;
-    $('organism_bioportal_ontology_version_id').value=ont_version_id;
-    $('organism_bioportal_concept_uri').value=conc_id;
+    $('organism_ontology_id').value=ont_id;
+    $('organism_ontology_version_id').value=ont_version_id;
+    $('organism_concept_uri').value=conc_id;
     <%=  visual_effect :appear,"edit_ontology" -%>
   }
   </script>

@@ -27,7 +27,7 @@ module BioPortal
       require 'BioPortalResources'
 
       def concept maxchildren=nil,light=nil
-        return get_concept(bioportal_ontology_version_id,bioportal_concept_uri,maxchildren,light)
+        return get_concept(self.ontology_version_id,self.concept_uri,maxchildren,light)
       end
 
       def ontology_id
