@@ -754,7 +754,7 @@ div.favouritable_icon img {
 }
 
 a.asset img.avatar {
-    padding :1em;
+    padding :5px;
     border:1px solid #CCCCCC;
     background-color: #FFFFFF;
     min-width :3em;
