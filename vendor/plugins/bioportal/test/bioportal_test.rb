@@ -51,7 +51,7 @@ class BioportalTest < Test::Unit::TestCase
   end
 
   def test_get_concepts_for_virtual_ontology_id
-    concepts = get_concepts_for_virtual_ontology_id "1132",:limit=>"10"
+    concepts = get_concepts_for_virtual_ontology_id "1104",:limit=>"10"
     assert_not_nil concepts
     #assert !concepts.blank?
     #assert_equal 10,concepts.size

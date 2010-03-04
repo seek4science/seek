@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100224184346) do
+ActiveRecord::Schema.define(:version => 20100218142426) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -272,9 +272,6 @@ ActiveRecord::Schema.define(:version => 20100224184346) do
     t.string   "phenotype"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "bioportal_ontology_id"
-    t.integer  "bioportal_ontology_version_id"
-    t.string   "bioportal_concept_uri"
   end
 
   create_table "organisms_projects", :id => false, :force => true do |t|
