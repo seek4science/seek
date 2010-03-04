@@ -1,4 +1,5 @@
-yeast:
+yeast_concept:
   ontology_id: 1132
   ontology_version_id: 38802
-  concept_uri: "XXX:XXX"
+  concept_uri: "NCBITaxon:4932"
+  conceptable: yeast_with_bioportal_concept(Organism)

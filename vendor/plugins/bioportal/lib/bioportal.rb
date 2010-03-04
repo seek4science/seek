@@ -8,11 +8,7 @@ module BioPortal
       def acts_as_bioportal(options = {}, &extension)
         options[:base_url]="http://rest.bioontology.org/bioportal/"
 
-        has_one :bioportal_concept
-
-        has_one :ontolgy_id,:through=>:bioportal_concept
-        has_one :ontolgoy_version_id,:through=>:bioportal_concept
-        has_one :concept_uri,:through=>:bioportal_concept
+        has_one :bioportal_concept,:as=>:conceptable
 
         extend BioPortal::Acts::SingletonMethods
         include BioPortal::Acts::InstanceMethods
@@ -31,6 +27,33 @@ module BioPortal
 
       def concept maxchildren=nil,light=nil
         return get_concept(bioportal_ontology_version_id,bioportal_concept_uri,maxchildren,light)
+      end
+
+      def ontology_id
+        return nil if self.bioportal_concept.nil?
+        return self.bioportal_concept.ontology_id
+      end
+
+      def ontology_version_id
+        return nil if self.bioportal_concept.nil?
+        return self.bioportal_concept.ontology_version_id
+      end
+
+      def concept_uri
+        return nil if self.bioportal_concept.nil?
+        return self.bioportal_concept.concept_uri
+      end
+
+      def ontology_id= value
+        self.bioportal_concept.ontology_id=value
+      end
+
+      def ontology_version_id= value
+        self.bioportal_concept.ontology_version_id=value
+      end
+
+      def concept_uri= value
+        self.bioportal_concept.concept_uri=value
       end
 
     end
