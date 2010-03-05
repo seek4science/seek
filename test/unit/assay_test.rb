@@ -35,7 +35,8 @@ class AssayTest < ActiveSupport::TestCase
       :assay_type=>assay_types(:metabolomics),
       :technology_type=>technology_types(:gas_chromatography),
       :study => studies(:metabolomics_study),
-      :owner => people(:person_for_model_owner))
+      :owner => people(:person_for_model_owner),
+      :assay_class => assay_classes(:experimental_assay_class))
     
     assert assay.valid?
 

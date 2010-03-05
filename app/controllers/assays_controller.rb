@@ -36,7 +36,6 @@ class AssaysController < ApplicationController
 
   def create
     @assay = Assay.new(params[:assay])
-    @assay.assay_class_id = params[:assay_class]
     
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
@@ -84,7 +83,6 @@ class AssaysController < ApplicationController
       assay_asset.relationship_type = relationship_type      
       assay_asset.save
     end   
-    @assay.assay_class_id = params[:assay_class]
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
         flash[:notice] = 'Assay was successfully updated.'

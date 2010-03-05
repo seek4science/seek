@@ -8,6 +8,7 @@ metabolomics_assay:
   study: metabolomics_study
   organism: Saccharomyces_cerevisiae
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
 
 metabolomics_assay2:
   title: Metabolomics Assay
@@ -15,6 +16,7 @@ metabolomics_assay2:
   technology_type: gas_chromatography  
   study: study_with_overlapping_assay_sops
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
   
 metabolomics_assay3:
   title: Metabolomics Assay2
@@ -22,55 +24,64 @@ metabolomics_assay3:
   technology_type: gas_chromatography
   study: study_with_overlapping_assay_sops
   owner: person_for_model_owner
-
+  assay_class: experimental_assay_class
+  
 assay_with_just_a_study:
   title: Assay with just a Study
   assay_type: metabolomics
   technology_type: gas_chromatography
   study: metabolomics_study2
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
 
 assay_with_no_study_or_files:
   title: Assay with no Study or files
   assay_type: metabolomics
   technology_type: gas_chromatography
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
 
 assay_with_no_study_but_has_some_files:
   title: Assay with no Study but has some files
   assay_type: metabolomics
   technology_type: gas_chromatography
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
 
 assay_with_no_study_but_has_some_sops:
   title: Assay with no Study but has some sops
   assay_type: metabolomics
   technology_type: gas_chromatography  
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
   
 assay_type_test_assay1:
   title: assay_type_test_assay1
   assay_type: assay_type_with_child_and_assay
   technology_type: gas_chromatography
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
 
 assay_type_test_assay2:
   title: assay_type_test_assay2
   assay_type: child_assay_type_with_assay
   technology_type: gas_chromatography
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
 
 technology_type_test_assay1:
   title: technology_type_test_assay1
   technology_type: technology_type_with_child_and_assay
   assay_type: metabolomics
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
 
 technology_type_test_assay2:
   title: technology_type_test_assay2
   technology_type: child_technology_type_with_assay
   assay_type: metabolomics
   owner: person_for_model_owner
+  assay_class: experimental_assay_class
   
 assay_with_links_in_description:
   title: Assay with links in description
@@ -79,6 +90,7 @@ assay_with_links_in_description:
   owner: person_for_model_owner
   description: Visit my site http://www.sysmo-db.org
   study: study_with_links_in_description
+  assay_class: experimental_assay_class
 
 assay_with_public_and_private_sops_and_datafiles:
   title: Assay with 2 sops, and 2 datafiles - one of each public & private
@@ -87,4 +99,5 @@ assay_with_public_and_private_sops_and_datafiles:
   owner: owner_of_my_first_sop
   description: Visit my site http://www.sysmo-db.org
   study: study_with_assay_with_public_private_sops_and_datafile
+  assay_class: experimental_assay_class
   

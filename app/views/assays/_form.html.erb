@@ -37,7 +37,7 @@
 
 <h2>Assay and technology types</h2>
 <%= f.label "Assay class:" %><br/>
-<%= select_tag("assay_class",options_for_select(AssayClass.all.collect {|ac| [ac.title,ac.id]}, @assay.assay_class_id),
+<%= select_tag("assay[assay_class_id]",options_for_select(AssayClass.all.collect {|ac| [ac.title,ac.id]}, @assay.assay_class_id),
                :id=>"assay_class_select",
                :onChange=>"changeTypes()") %><br/>
 

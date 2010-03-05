@@ -5,3 +5,9 @@
 #
 # two:
 #   column: value
+
+experimental_assay_class:
+  title: Experimental Assay
+  
+modelling_assay_class:
+  title: Modelling Assay
