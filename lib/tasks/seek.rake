@@ -204,6 +204,24 @@ namespace :seek do
       end
     end
   end
+  
+  #Task to add default assay_class (1 - Experimental Assay) to those without one
+  task :update_assay_classes => :environment do
+    default_assay_class = AssayClass.find(1)
+    unless default_assay_class.nil?
+      count = 0
+      Assay.all.each do |assay|
+        if assay.assay_class.nil?
+          assay.assay_class = default_assay_class
+          assay.save
+          count += 1
+        end
+      end
+      puts "Done - #{count} assay classes modified."
+    else
+      puts "Couldn't find default assay class (ID:1)!"
+    end
+  end
 
   private
 
