@@ -39,7 +39,7 @@ class OrganismsController < ApplicationController
     end
   end
 
-  def more_ajax
+  def more_ajax    
     concept = @organism.concept
     render :update do |page|
       if concept

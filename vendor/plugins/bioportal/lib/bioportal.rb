@@ -78,7 +78,7 @@ module BioPortal
     require "rexml/document"
     require 'open-uri'
     require 'uri'
-    require 'xml'
+    require 'xml'    
 
     $REST_URL = "http://rest.bioontology.org/bioportal"
     
@@ -101,7 +101,7 @@ module BioPortal
         return results
       end
 
-      result = process_concepts_xml(doc).merge({:ontology_version_id=>ontology_id})
+      return process_concepts_xml(doc).merge({:ontology_version_id=>ontology_id})
     end
 
     def search query,options={}
@@ -136,9 +136,10 @@ module BioPortal
 
     end
 
-    def get_ontologies_versions
+    def get_ontology_versions
       uri=$REST_URL+"/ontologies"
-      doc = REXML::Document.new(open(uri))
+      parser = XML::Parser.io(open(uri))
+      doc = parser.parse
 
       ontologies = BioPortalRestfulCore.errorCheck(doc)
 
@@ -146,12 +147,7 @@ module BioPortal
         return ontologies
       end
 
-      ontologies = []
-      doc.elements.each("*/data/list/ontologyBean"){ |element|
-        ontologies << BioPortalRestfulCore.parseOntology(element)
-      }
-
-      return ontologies
+      return parse_ontologies_xml doc
     end    
 
     def get_ontology_categories
@@ -197,7 +193,7 @@ module BioPortal
     # - offset - the offet to start from
     # - limit - the maximum number of terms returns
     def get_concepts_for_ontology_version_id ontology_version_id,options={}
-      uri="/concepts/#{ontology_version_id}/all?"
+      uri="/concepts/#{ontology_version_id}/all"
       options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k])}&"}
       uri=uri[0..-2]
       uri=$REST_URL + uri
@@ -245,6 +241,14 @@ module BioPortal
       }      
     end
 
+    def parse_ontologies_xml doc
+      ontologies=[]
+      doc.find("/*/data/list/ontologyBean").each{ |element|
+        ontologies << parse_ontology_bean_xml(element)
+      }
+      return ontologies
+    end
+
     def process_concept_bean_xml element
       result = {}
       ["id","label","fullId","type"].each do |x|
@@ -274,6 +278,23 @@ module BioPortal
         result[:parents]=process_concept_parents(element)
       end
 
+      return result
+    end
+
+    def parse_ontology_bean_xml element
+      result = {}
+      ["id","ontologyId","displayLabel","description","abbreviation","format","versionNumber","contactName","contactEmail","statusId","isFoundry","dateCreated"].each do |x|
+        node = element.first.find("#{element.path}/#{x}")
+        result[x.to_sym] = node.first.content unless node.first.nil?
+      end
+      result[:label]=result.delete(:displayLabel)
+      result[:ontology_id]=result.delete(:ontologyId)
+      result[:version_number]=result.delete(:versionNumber)
+      result[:contact_name]=result.delete(:contactName)
+      result[:contact_email]=result.delete(:contactEmail)
+      result[:status_id]=result.delete(:statusId)
+      result[:is_foundry]=result.delete(:isFoundry)
+      result[:date_created]=result.delete(:dateCreated)
       return result
     end
 
