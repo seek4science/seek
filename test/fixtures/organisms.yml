@@ -8,3 +8,6 @@ Streptomyces_coelicolor:
 
 yeast:
   title: yeast
+
+yeast_with_bioportal_concept:
+  title: "Yeast with concept"  

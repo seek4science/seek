@@ -15,11 +15,9 @@ module Stu
           extend Stu::Acts::Ontology::SingletonMethods
           include Stu::Acts::Ontology::InstanceMethods
         end
-
       end
 
       module SingletonMethods
-
         def to_tree
           roots=[]
           all=self.find(:all,:include=>:parents)
@@ -28,7 +26,6 @@ module Stu
           end
           return roots
         end
-
       end
 
       module InstanceMethods
