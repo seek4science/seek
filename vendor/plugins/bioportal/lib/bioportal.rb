@@ -21,8 +21,7 @@ module BioPortal
     end
 
     module InstanceMethods
-
-      require 'BioPortalRestfulCore'
+      
       require 'BioPortalResources'
 
       def concept options={}
@@ -75,6 +74,7 @@ module BioPortal
   
 
   module RestAPI
+    require 'rubygems'
     require "rexml/document"
     require 'open-uri'
     require 'uri'
@@ -82,12 +82,12 @@ module BioPortal
 
     $REST_URL = "http://rest.bioontology.org/bioportal"
     
-    def get_concept ontology_id,concept_id,options={}
+    def get_concept ontology_version_id,concept_id,options={}
 
       options[:light]=(options[:light] && options[:light]!=0) ? 1 : 0
       
       concept_url="/concepts/%ID%?conceptid=%CONCEPT_ID%&"
-      concept_url=concept_url.gsub("%ID%",ontology_id.to_s)
+      concept_url=concept_url.gsub("%ID%",ontology_version_id.to_s)
       concept_url=concept_url.gsub("%CONCEPT_ID%",URI.encode(concept_id))
       options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       concept_url=concept_url[0..-2]
@@ -95,13 +95,30 @@ module BioPortal
       parser = XML::Parser.io(open(full_concept_path))
       doc = parser.parse
       
-      results = BioPortalRestfulCore.errorCheckLibXML(doc)
+      results = error_check doc
 
       unless results.nil?
         return results
       end
 
-      result = process_concepts_xml(doc).merge({:ontology_version_id=>ontology_id})
+      return process_concepts_xml(doc).merge({:ontology_version_id=>ontology_version_id})
+    end
+
+    def get_ontology_details ontology_version_id
+      url=$REST_URL+"/ontologies/#{ontology_version_id}"
+      parser = XML::Parser.io(open(url))
+      doc = parser.parse
+      
+      results = error_check doc
+
+      unless results.nil?
+        return results
+      end
+
+      doc.find("/*/data/ontologyBean").each{ |element|
+        return parse_ontology_bean_xml(element)
+      }
+      
     end
 
     def search query,options={}
@@ -114,103 +131,65 @@ module BioPortal
       
       search_url=search_url.gsub("%QUERY%",URI.encode(query))
       full_search_path=$REST_URL+search_url
-      doc = REXML::Document.new(open(full_search_path))
+      parser = XML::Parser.io(open(full_search_path))
+      doc = parser.parse
 
-      results = BioPortalRestfulCore.errorCheck(doc)
+      results = error_check doc
 
       unless results.nil?
         return results
       end
 
       results = []
-      doc.elements.each("*/data/page/contents"){ |element|
-        results = BioPortalRestfulCore.parseSearchResults(element)
+      doc.find("/*/data/page/contents/searchResultList/searchBean").each{ |element|
+        results << parse_search_result(element)
       }
 
       pages = 1
-      doc.elements.each("*/data/page"){|element|
-        pages = element.elements["numPages"].get_text.value
+      doc.find("/*/data/page").each{|element|
+        pages = element.first.find(element.path + "/numPages").first.content
       }
 
-      return results,pages
+      return results.uniq,pages
 
     end
 
-    def get_ontologies_versions
+    def get_ontology_versions
       uri=$REST_URL+"/ontologies"
-      doc = REXML::Document.new(open(uri))
+      parser = XML::Parser.io(open(uri))
+      doc = parser.parse
 
-      ontologies = BioPortalRestfulCore.errorCheck(doc)
+      ontologies = error_check doc
 
       unless ontologies.nil?
         return ontologies
       end
 
-      ontologies = []
-      doc.elements.each("*/data/list/ontologyBean"){ |element|
-        ontologies << BioPortalRestfulCore.parseOntology(element)
-      }
-
-      return ontologies
+      return parse_ontologies_xml doc
     end    
-
-    def get_ontology_categories
-      uri=$REST_URL + "/categories"
-      doc = REXML::Document.new(open(uri))
-
-      categories = BioPortalRestfulCore.errorCheck(doc)
-
-      unless categories.nil?
-        return categories
-      end
-
-      categories = []
-      doc.elements.each("*/data/list/categoryBean"){ |element|
-        categories << BioPortalRestfulCore.parseCategory(element)
-      }
-
-      return categories
-    end
-
-    def get_ontology_groups
-      uri = $REST_URL + "/groups"
-      doc = REXML::Document.new(open(uri))
-
-      groups = BioPortalRestfulCore.errorCheck(doc)
-      unless groups.nil?
-        return groups
-      end
-
-      groups = []
-
-      doc.elements.each("*/data/list/groupBean"){ |element|
-        unless element.nil?
-          groups << BioPortalRestfulCore.parseGroup(element)
-        end
-      }
-      
-
-      return groups
-    end    
+       
 
     #options can include
     # - offset - the offet to start from
     # - limit - the maximum number of terms returns
     def get_concepts_for_ontology_version_id ontology_version_id,options={}
+      options[:offset]||=0
       uri="/concepts/#{ontology_version_id}/all?"
-      options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k])}&"}
+      options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k].to_s)}&"}
       uri=uri[0..-2]
-      uri=$REST_URL + uri
-      
-      doc = REXML::Document.new(open(uri))
+      uri=$REST_URL + uri      
+      parser = XML::Parser.io(open(uri))
+      doc = parser.parse
 
-      concepts = BioPortalRestfulCore.errorCheck(doc)
+      concepts = error_check doc
       unless concepts.nil?
         return concepts
       end
 
       concepts=[]
-      #TODO: parse concept list (xml is different to single concept)
+      doc.find("/*/data/list/classBean").each{ |element|
+        concepts << process_concept_bean_xml(element)
+      }
       return concepts
       
     end
@@ -226,7 +205,7 @@ module BioPortal
       
       doc = REXML::Document.new(open(uri))
 
-      concepts = BioPortalRestfulCore.errorCheck(doc)
+      concepts = error_check doc
       unless concepts.nil?
         return concepts
       end
@@ -239,10 +218,47 @@ module BioPortal
 
     private
 
+    def error_check(doc)
+      response = nil
+      error={}
+      begin
+        doc.elements.each("org.ncbo.stanford.bean.response.ErrorStatusBean"){ |element|
+          error[:error] = true
+          error[:shortMessage] = element.elements["shortMessage"].get_text.value.strip
+          error[:longMessage] =element.elements["longMessage"].get_text.value.strip
+          response = error
+        }
+      rescue
+      end
+
+      return response
+    end
+
+    def parse_search_result element
+      search_item={}
+      search_item[:ontology_display_label]=element.first.find(element.path+"/ontologyDisplayLabel").first.content rescue nil
+      search_item[:ontology_version_id]=element.first.find(element.path+"/ontologyVersionId").first.content rescue nil
+      search_item[:ontology_id]=element.first.find(element.path+"/ontologyId").first.content rescue nil
+      search_item[:record_type]=element.first.find(element.path+"/recordType").first.content rescue nil
+      search_item[:concept_id]=element.first.find(element.path+"/conceptId").first.content rescue nil
+      search_item[:concept_id_short]=element.first.find(element.path+"/conceptIdShort").first.content rescue nil
+      search_item[:preferred_name]=element.first.find(element.path+"/preferredName").first.content rescue nil
+      search_item[:contents]=element.first.find(element.path+"/contents").first.content rescue nil
+      return search_item
+    end
+
     def process_concepts_xml doc
       doc.find("/*/data/classBean").each{ |element|
         return process_concept_bean_xml(element)
       }      
+    end
+
+    def parse_ontologies_xml doc
+      ontologies=[]
+      doc.find("/*/data/list/ontologyBean").each{ |element|
+        ontologies << parse_ontology_bean_xml(element)
+      }
+      return ontologies
     end
 
     def process_concept_bean_xml element
@@ -274,6 +290,25 @@ module BioPortal
         result[:parents]=process_concept_parents(element)
       end
 
+      return result
+    end
+
+    def parse_ontology_bean_xml element
+      result = {}
+      ["id","urn","homepage","documentation","codingScheme","isView","ontologyId","displayLabel","description","abbreviation","format","versionNumber","contactName","contactEmail","statusId","isFoundry","dateCreated"].each do |x|
+        node = element.first.find("#{element.path}/#{x}")
+        result[x.to_sym] = node.first.content unless node.first.nil?
+      end
+      result[:label]=result.delete(:displayLabel)
+      result[:ontology_id]=result.delete(:ontologyId)
+      result[:version_number]=result.delete(:versionNumber)
+      result[:contact_name]=result.delete(:contactName)
+      result[:contact_email]=result.delete(:contactEmail)
+      result[:status_id]=result.delete(:statusId)
+      result[:is_foundry]=result.delete(:isFoundry)
+      result[:date_created]=result.delete(:dateCreated)
+      result[:is_view]=result.delete(:isView)
+      result[:coding_scheme]=result.delete(:codingScheme)
       return result
     end
 

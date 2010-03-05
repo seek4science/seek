@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100304131504) do
+ActiveRecord::Schema.define(:version => 20100305151135) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -83,7 +83,7 @@ ActiveRecord::Schema.define(:version => 20100304131504) do
     t.integer "ontology_id"
     t.integer "ontology_version_id"
     t.string  "concept_uri"
-    t.string  "cached_concept_yaml"
+    t.text    "cached_concept_yaml"
     t.integer "conceptable_id"
     t.string  "conceptable_type"
   end

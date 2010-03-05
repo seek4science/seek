@@ -4,7 +4,7 @@ class BioportalConceptMigration < ActiveRecord::Migration
       t.column :ontology_id, :integer
       t.column :ontology_version_id,:integer
       t.column :concept_uri,:string
-      t.column :cached_concept_yaml,:string
+      t.column :cached_concept_yaml,:text
       t.column :conceptable_id,:integer
       t.column :conceptable_type,:string
     end        

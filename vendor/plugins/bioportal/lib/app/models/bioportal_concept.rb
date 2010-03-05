@@ -15,7 +15,7 @@ class BioportalConcept < ActiveRecord::Base
     concept = get_concept(self.ontology_version_id,self.concept_uri,options)
     update_attribute(:cached_concept_yaml, concept.to_yaml)
     
-    return concept[:label]
+    return concept
   end
 
 end
