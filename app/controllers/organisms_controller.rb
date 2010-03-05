@@ -40,7 +40,7 @@ class OrganismsController < ApplicationController
   end
 
   def more_ajax
-    concept = @organism.concept({:maxchildren=>1,:light=>true})
+    concept = @organism.concept
     render :update do |page|
       if concept
         page.replace_html 'bioportal_more',:partial=>"concept",:object=>concept

@@ -6,9 +6,7 @@ class BioportalConcept < ActiveRecord::Base
 
   belongs_to :conceptable,:polymorphic=>true
 
-  def concept_details options={}
-    options[:maxchildren]||=nil
-    options[:light]||=true
+  def concept_details options={}    
     options[:refresh]||=false
 
     refresh=options.delete(:refresh)
