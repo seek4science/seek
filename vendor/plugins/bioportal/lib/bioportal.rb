@@ -193,12 +193,13 @@ module BioPortal
     # - offset - the offet to start from
     # - limit - the maximum number of terms returns
     def get_concepts_for_ontology_version_id ontology_version_id,options={}
-      uri="/concepts/#{ontology_version_id}/all"
-      options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k])}&"}
+      options[:offset]||=0
+      uri="/concepts/#{ontology_version_id}/all?"
+      options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k].to_s)}&"}
       uri=uri[0..-2]
-      uri=$REST_URL + uri
-      
-      doc = REXML::Document.new(open(uri))
+      uri=$REST_URL + uri      
+      parser = XML::Parser.io(open(uri))
+      doc = parser.parse
 
       concepts = BioPortalRestfulCore.errorCheck(doc)
       unless concepts.nil?
@@ -206,7 +207,9 @@ module BioPortal
       end
 
       concepts=[]
-      #TODO: parse concept list (xml is different to single concept)
+      doc.find("/*/data/list/classBean").each{ |element|
+        concepts << process_concept_bean_xml(element)
+      }
       return concepts
       
     end
