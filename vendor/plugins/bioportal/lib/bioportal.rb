@@ -150,7 +150,7 @@ module BioPortal
         pages = element.first.find(element.path + "/numPages").first.content
       }
 
-      return results,pages
+      return results.uniq,pages
 
     end
 
