@@ -213,18 +213,18 @@ table.list_item .tags {
 }
 
 span.disabled_icon {
-   width: 100%;
-	padding: 0.5em 0.5em;
-	*padding: 0.2em 0.5em;
-	line-height: 1.0;
-	text-decoration: none;
-	border: 1px solid #BBBBBB;
-	background-color: #FEF6FF;
+    width: 100%;
+    padding: 0.5em 0.5em;
+    *padding: 0.2em 0.5em;
+    line-height: 1.0;
+    text-decoration: none;
+    border: 1px solid #BBBBBB;
+    background-color: #FEF6FF;
     color: #000099;
 }
 
 .disabled {
-	filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );    
+    filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
     opacity: 0.50;    
 }
 
@@ -674,10 +674,10 @@ a#feedback {
     font-weight:bolder;
 }
 
- table.padded_table td {
-      text-align:left;
-      padding: 4px 1em 0px 0px;
-  }
+table.padded_table td {
+    text-align:left;
+    padding: 4px 1em 0px 0px;
+}
 
 #possible_sops {
     width: 24em;    
@@ -694,28 +694,32 @@ img.badge {
 }
 
 #topbar {
-	height: 20px;
-	text-align: center;
-	background-image: url('/images/searchfade-repeat.png');
-	background-repeat: repeat-x;
-	background-position: top center;
-	padding: 10px 0;
+    height: 20px;
+    text-align: center;
+    background-image: url('/images/searchfade-repeat.png');
+    background-repeat: repeat-x;
+    background-position: top center;
+    padding: 10px 0;
 }
 
 #topbar * {
-	vertical-align: middle;
+    vertical-align: middle;
 }
 
 div.favouritable_icon {
-  position: relative;
-  margin: 5px auto;
+    position: relative;
+    margin: 5px auto;    
+}
+
+.favouritable_icon img.avatar {
+    max-width: 32px;
 }
 
 .avatar_text {
-  position: absolute;
-  text-align:center;
-  bottom: 6px;
-  font-size: smaller;  
+    position: absolute;
+    text-align:center;
+    bottom: 6px;
+    font-size: smaller;
 }
 
 #organism_gadget ul {
@@ -744,7 +748,7 @@ div.favouritable_icon img {
 }
 
 a.asset img.avatar {
-    padding :1em;
+    padding :5px;
     border:1px solid #CCCCCC;
     background-color: #FFFFFF;
     min-width :3em;
@@ -763,18 +767,18 @@ div.list_item {
 }
 
 div.list_item_content {
-  width: 75%;
-  float: left;
-  margin-left:1em;
+    width: 75%;
+    float: left;
+    margin-left:1em;
 }
 
 div.list_item_avatar {
-  float: left;
+    float: left;
 }
 
 div.list_item_actions {
-  float: right;
-  width: 80px;
+    float: right;
+    width: 80px;
 }
 
 div.list_item_desc {
@@ -789,36 +793,36 @@ div.list_item_desc {
 }
 
 p.list_item_title {
-  border-bottom:1px dotted black;
-  font-size:131%;
-  font-weight:bold;
-  margin-bottom:0.25em;
-  padding-bottom:0.25em;
+    border-bottom:1px dotted black;
+    font-size:131%;
+    font-weight:bold;
+    margin-bottom:0.25em;
+    padding-bottom:0.25em;
 }
 
 p.list_item_attribute {
-  font-size: 85%;
-  line-height: 1;
+    font-size: 85%;
+    line-height: 1;
 }
 
 div.list_item_left_column{
-  float: left;
-  width: 45%;  
+    float: left;
+    width: 45%;
 }
 
 div.list_item_right_column{
-  float: left;
-  margin-right: 1em;
-  margin-left: 1em;
-  padding-left: 1em;
-  width: 45%;
-  border-left: 1px dotted black;  
+    float: left;
+    margin-right: 1em;
+    margin-left: 1em;
+    padding-left: 1em;
+    width: 45%;
+    border-left: 1px dotted black;
 }
 
 div.list_item_whole_width{
-  float: left;
-  margin-right: 1em;
-  width: 90%;  
+    float: left;
+    margin-right: 1em;
+    width: 90%;
 }
 
 div#logged_in_as {
@@ -837,4 +841,29 @@ div.hidden_list_item {
     border-collapse: collapse;
     color: #999999;
     float:left;
+}
+
+.contribution_title {
+    border-top: solid #BBBBBB 1px;
+    border-bottom: solid #BBBBBB 1px;
+    padding-top: 0.5em;
+    background-color: #F0F0F0;
+    margin-left: 1em;
+    margin-top: 1em;
+    text-align: center;
+}
+
+.contribution_title_image {
+    float: left;
+    margin-left: 1em;
+    margin-top: 1em;
+}
+
+.contribution_title_image img {        
+    width: 35px;
+    vertical-align: middle;
+}
+
+.contribution_title h1 {    
+    width: 100%;
 }

@@ -26,6 +26,8 @@ class Institution < ActiveRecord::Base
   has_many :work_groups, :dependent => :destroy
   has_many :projects, :through=>:work_groups
 
+  alias_attribute :title, :name
+
   acts_as_solr(:fields => [ :name,:country ]) if SOLR_ENABLED
   
   def people

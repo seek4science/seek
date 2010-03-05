@@ -1,20 +1,31 @@
 <ul>
   <li>
     <label><b>Label</b></label>
-      <%= concept.label %>
+      <%= concept[:label] %>
   </li>
   <li>
-    <label><b>Synonyms (<%= concept.synonyms.count -%>) </b></label>
-      <%= concept.synonyms.join(", ") %>
+    <label><b>Synonyms (<%= concept[:synonyms].count -%>) </b></label>
+      <%= concept[:synonyms].join(", ") %>
   </li>
   <li>
-    <label><b>Definition (<%= concept.definitions.count -%>) </b></label>
-      <%= concept.definitions.join(", ") %>
+    <label><b>Definitions (<%= concept[:definitions].count -%>) </b></label>
+      <%= concept[:definitions].join(", ") %>
   </li>
   <li>
-    <label><b>Child size</b></label>
-      <%= concept.child_size %>
+    <label><b>Child count</b></label>
+      <%= concept[:child_count] %>
   </li>
-  
+  <li>
+    <label><b>Children</b></label>
+    <%= concept[:children].collect{|c| c[:label]}.join(", ") -%>
+  </li>
+  <li>
+    <label><b>Parent count</b></label>
+      <%= concept[:parents].count %>
+  </li>
+  <li>
+    <label><b>Parents</b></label>
+    <%= concept[:parents].collect{|c| c[:label]}.join(", ") -%>
+  </li>
 
 </ul>

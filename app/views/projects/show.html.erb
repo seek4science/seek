@@ -12,7 +12,7 @@
   </ul>
 <% end -%>
 
-<h1><%= h @project.name -%></h1>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@project} %>
 
 <div class="show_basic">
 

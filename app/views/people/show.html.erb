@@ -19,7 +19,7 @@
 <% end %>
 
 
-<h1><%= h @person.name -%></h1>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@person} %>
 
 <div class="show_basic">
 

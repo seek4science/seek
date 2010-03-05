@@ -45,6 +45,9 @@ class Person < ActiveRecord::Base
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
   named_scope :pals,:conditions=>{:is_pal=>true}
+
+  alias_attribute :title, :name
+  
   
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
@@ -67,7 +70,7 @@ class Person < ActiveRecord::Base
   def is_admin?
     !user.nil? && user.is_admin?
   end
-
+  
   def validates_associated(*associations)
     associations.each do |association|
       class_eval do

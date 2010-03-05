@@ -27,7 +27,7 @@
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
 
-<h1 class="contribution_title">SOP: <%= link_to(h(@display_sop.title), sop_path(@sop,:version=>@display_sop.version)) -%></h1>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@sop} %>
 
 <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @sop } -%>
 
