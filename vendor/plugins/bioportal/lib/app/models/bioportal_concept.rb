@@ -11,6 +11,7 @@ class BioportalConcept < ActiveRecord::Base
     options[:light]||=true
     options[:refresh]||=false
 
+    refresh=options.delete(:refresh)
     concept = get_concept(self.ontology_version_id,self.concept_uri,options)
     self.cached_concept_yaml = concept.to_yaml
     return concept

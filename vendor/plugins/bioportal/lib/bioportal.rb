@@ -78,13 +78,27 @@ module BioPortal
     require "rexml/document"
     require 'open-uri'
     require 'uri'
+    require 'xml'
 
     $REST_URL = "http://rest.bioontology.org/bioportal"
     
     def get_concept ontology_id,concept_id,options={}
-      cc=BioPortalResources::Concept.new({:ontology_id=>ontology_id,:concept_id=>concept_id},options[:maxchildren],options[:light])
-      rest_uri=cc.generate_uri
-      return BioPortalRestfulCore.getConcept(ontology_id,rest_uri)
+      concept_url="/concepts/%ID%?conceptid=%CONCEPT_ID%&"
+      concept_url=concept_url.gsub("%ID%",ontology_id.to_s)
+      concept_url=concept_url.gsub("%CONCEPT_ID%",URI.encode(concept_id))
+      options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
+      concept_url=concept_url[0..-2]
+      full_concept_path=$REST_URL+concept_url
+      parser = XML::Parser.io(open(full_concept_path))
+      doc = parser.parse
+      
+      results = BioPortalRestfulCore.errorCheckLibXML(doc)
+
+      unless results.nil?
+        return results
+      end
+
+      result = process_concepts_xml(doc).merge({:ontology_version_id=>ontology_id})
     end
 
     def search query,options={}
@@ -220,6 +234,70 @@ module BioPortal
 
     end
 
+    private
+
+    def process_concepts_xml doc
+      doc.find("/*/data/classBean").each{ |element|
+        return process_concept_bean_xml(element)
+      }      
+    end
+
+    def process_concept_bean_xml element
+      result = {}
+      ["id","label","fullId","type"].each do |x|
+        node = element.first.find("#{element.path}/#{x}")
+        result[x.to_sym] = node.first.content unless node.first.nil?
+      end
+      result[:full_id]=result.delete(:fullId) #convert to ruby style
+
+      childcount = element.first.find(element.path + "/relations/entry[string='ChildCount']/int")
+      result[:child_count] = childcount.first.content.to_i unless childcount.first.nil?
+
+      # get synonyms
+      synonyms = element.first.find(element.path + "/synonyms/string")
+      result[:synonyms] = []
+      synonyms.each do |synonym|
+        result[:synonyms] << synonym.content
+      end
+
+      definitions = element.first.find(element.path + "/definitions/string")
+      result[:definitions] = []
+      definitions.each do |definition|
+        result[:definitions] << definition.content
+      end
+
+      if (element.path == "/success/data/classBean")
+        result[:children]=process_concept_children(element)
+        result[:parents]=process_concept_parents(element)
+      end
+
+      return result
+    end
+
+    def process_concept_parents element
+      search = element.path + "/relations/entry[string='SuperClass']/list/classBean"
+      results = element.first.find(search)
+      result=[]
+      unless results.empty?
+        results.each do |child|
+          result << process_concept_bean_xml(child)
+        end
+      end
+      return result
+    end
+
+    def process_concept_children element
+      search = element.path + "/relations/entry[string='SubClass']/list/classBean"
+      results = element.first.find(search)
+      result=[]
+      unless results.empty?
+        results.each do |child|
+          result << process_concept_bean_xml(child)
+        end
+      end
+      return result
+    end
+    
   end
     
 end
