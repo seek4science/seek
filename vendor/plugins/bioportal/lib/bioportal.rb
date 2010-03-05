@@ -82,12 +82,12 @@ module BioPortal
 
     $REST_URL = "http://rest.bioontology.org/bioportal"
     
-    def get_concept ontology_id,concept_id,options={}
+    def get_concept ontology_version_id,concept_id,options={}
 
       options[:light]=(options[:light] && options[:light]!=0) ? 1 : 0
       
       concept_url="/concepts/%ID%?conceptid=%CONCEPT_ID%&"
-      concept_url=concept_url.gsub("%ID%",ontology_id.to_s)
+      concept_url=concept_url.gsub("%ID%",ontology_version_id.to_s)
       concept_url=concept_url.gsub("%CONCEPT_ID%",URI.encode(concept_id))
       options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       concept_url=concept_url[0..-2]
@@ -101,7 +101,24 @@ module BioPortal
         return results
       end
 
-      return process_concepts_xml(doc).merge({:ontology_version_id=>ontology_id})
+      return process_concepts_xml(doc).merge({:ontology_version_id=>ontology_version_id})
+    end
+
+    def get_ontology_details ontology_version_id
+      url=$REST_URL+"/ontologies/#{ontology_version_id}"
+      parser = XML::Parser.io(open(url))
+      doc = parser.parse
+      
+      results = BioPortalRestfulCore.errorCheckLibXML(doc)
+
+      unless results.nil?
+        return results
+      end
+
+      doc.find("/*/data/ontologyBean").each{ |element|
+        return parse_ontology_bean_xml(element)
+      }
+      
     end
 
     def search query,options={}
@@ -286,7 +303,7 @@ module BioPortal
 
     def parse_ontology_bean_xml element
       result = {}
-      ["id","ontologyId","displayLabel","description","abbreviation","format","versionNumber","contactName","contactEmail","statusId","isFoundry","dateCreated"].each do |x|
+      ["id","urn","homepage","documentation","codingScheme","isView","ontologyId","displayLabel","description","abbreviation","format","versionNumber","contactName","contactEmail","statusId","isFoundry","dateCreated"].each do |x|
         node = element.first.find("#{element.path}/#{x}")
         result[x.to_sym] = node.first.content unless node.first.nil?
       end
@@ -298,6 +315,8 @@ module BioPortal
       result[:status_id]=result.delete(:statusId)
       result[:is_foundry]=result.delete(:isFoundry)
       result[:date_created]=result.delete(:dateCreated)
+      result[:is_view]=result.delete(:isView)
+      result[:coding_scheme]=result.delete(:codingScheme)
       return result
     end
 
