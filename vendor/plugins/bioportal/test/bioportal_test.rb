@@ -10,7 +10,7 @@ class BioportalTest < Test::Unit::TestCase
     assert !res.empty?
     assert pages.to_i>50
     assert_equal 10,res.size
-    assert_not_nil(res.find{|r| r[:ontologyId]=="1132"})
+    assert_not_nil(res.find{|r| r[:ontology_id]=="1132"})
   end
 
   def test_get_concept
@@ -37,20 +37,6 @@ class BioportalTest < Test::Unit::TestCase
     assert_not_nil ontologies.first[:contact_email],"contact_email should be set"
     assert_not_nil ontologies.first[:format],"format should be set"
   end
-
-#  def test_get_categories
-#    categories = get_ontology_categories
-#    assert_not_nil categories
-#    assert !categories.empty?
-#    assert_not_nil categories.find{|c| c[:name]=="Plant Anatomy"}
-#  end
-
-#  def test_get_groups
-#    groups = get_ontology_groups
-#    assert_not_nil groups
-#    assert !groups.empty?
-#    assert_not_nil groups.find{|g| g[:name]=="OBO Foundry"}
-#  end
 
   def test_get_concepts_for_version_id
     concepts = get_concepts_for_ontology_version_id("38802",:limit=>"10")
