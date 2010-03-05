@@ -44,7 +44,7 @@ class OrganismTest < ActiveSupport::TestCase
 
   test "get concept" do
     o=organisms(:yeast_with_bioportal_concept)
-    concept=o.concept({:maxchildren=>5,:light=>0})
+    concept=o.concept({:maxchildren=>5,:light=>0,:refresh=>true})
     assert_not_nil concept
     assert_equal "NCBITaxon:4932",concept[:id]
     assert !concept[:synonyms].empty?
@@ -52,6 +52,7 @@ class OrganismTest < ActiveSupport::TestCase
     assert !concept[:parents].empty?
     assert_equal 38802,concept[:ontology_version_id]
     assert_not_nil o.bioportal_concept.cached_concept_yaml
-  end
+    assert_equal YAML::load(o.bioportal_concept.cached_concept_yaml),concept
+  end  
 
 end

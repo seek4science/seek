@@ -10,9 +10,12 @@ class BioportalConcept < ActiveRecord::Base
     options[:refresh]||=false
 
     refresh=options.delete(:refresh)
+
+    #TODO: handle caching of concept
     concept = get_concept(self.ontology_version_id,self.concept_uri,options)
-    self.cached_concept_yaml = concept.to_yaml
-    return concept
+    update_attribute(:cached_concept_yaml, concept.to_yaml)
+    
+    return concept[:label]
   end
 
 end

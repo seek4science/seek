@@ -84,7 +84,7 @@ module BioPortal
     
     def get_concept ontology_id,concept_id,options={}
 
-      options[:light]=options[:light] ? 1 : 0
+      options[:light]=(options[:light] && options[:light]!=0) ? 1 : 0
       
       concept_url="/concepts/%ID%?conceptid=%CONCEPT_ID%&"
       concept_url=concept_url.gsub("%ID%",ontology_id.to_s)
