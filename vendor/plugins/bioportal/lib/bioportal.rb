@@ -10,9 +10,12 @@ module BioPortal
         
         has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
         before_save :save_changed_concept
+        cattr_accessor :bioportal_base_rest_url, :bioportal_email
+
 
         #FIXME: should be a class variable, not a global variable
-        $bioportal_base_rest_url=options[:base_url]
+        self.bioportal_base_rest_url=options[:base_url]
+        self.bioportal_email=options[:email]
         
 
         extend BioPortal::Acts::SingletonMethods
@@ -29,6 +32,9 @@ module BioPortal
       require 'BioPortalResources'
 
       def concept options={}
+        
+        options[:email] ||= self.bioportal_email unless self.bioportal_email.nil?
+
         return nil if self.bioportal_concept.nil?
         return self.bioportal_concept.concept_details options        
       end
@@ -61,11 +67,7 @@ module BioPortal
       def concept_uri= value
         check_concept
         self.bioportal_concept.concept_uri=value
-      end
-
-      def bioportal_base_rest_url
-        $bioportal_base_rest_url
-      end
+      end   
 
       private
 
