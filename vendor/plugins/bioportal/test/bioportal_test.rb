@@ -21,6 +21,15 @@ class BioportalTest < Test::Unit::TestCase
     assert concept[:synonyms].include?("\"lager beer yeast\""),"synonyms should contain lager beer yeast"
   end
 
+  def test_override_base_url
+    class << self
+      def base_rest_url
+        "http://google.com/fred"
+      end
+    end
+    assert_raise(OpenURI::HTTPError) { get_concept "38802","NCBITaxon:4932",{:light=>true}  }
+  end
+
   def test_get_ontology_versions
     ontologies = get_ontology_versions
     assert_not_nil ontologies
@@ -65,12 +74,12 @@ class BioportalTest < Test::Unit::TestCase
     assert_not_nil ontology[:format],"format should be set"    
     assert_not_nil ontology[:is_view],"is_view should be set"
   end
-#
-#  def test_get_concepts_for_virtual_ontology_id
-#    concepts = get_concepts_for_virtual_ontology_id "1104",:limit=>"10"
-#    assert_not_nil concepts
-#    #assert !concepts.blank?
-#    #assert_equal 10,concepts.size
-#  end
+  #
+  #  def test_get_concepts_for_virtual_ontology_id
+  #    concepts = get_concepts_for_virtual_ontology_id "1104",:limit=>"10"
+  #    assert_not_nil concepts
+  #    #assert !concepts.blank?
+  #    #assert_equal 10,concepts.size
+  #  end
   
 end

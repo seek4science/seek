@@ -6,7 +6,8 @@ module BioPortal
 
     module ClassMethods
       def acts_as_bioportal(options = {}, &extension)
-        options[:base_url]="http://rest.bioontology.org/bioportal/"
+        options[:base_url]||="http://rest.bioontology.org/bioportal/"
+        @bioportal_options = options
 
         has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
         before_save :save_changed_concept
@@ -25,6 +26,7 @@ module BioPortal
       require 'BioPortalResources'
 
       def concept options={}
+        options = options.merge(@bioportal_options)
         return nil if self.bioportal_concept.nil?
         return self.bioportal_concept.concept_details options        
       end
@@ -80,10 +82,10 @@ module BioPortal
     require 'uri'
     require 'xml'
 
-    $REST_URL = "http://rest.bioontology.org/bioportal"
+    
     
     def get_concept ontology_version_id,concept_id,options={}
-
+      
       options[:light]=(options[:light] && options[:light]!=0) ? 1 : 0
       
       concept_url="/concepts/%ID%?conceptid=%CONCEPT_ID%&"
@@ -91,7 +93,7 @@ module BioPortal
       concept_url=concept_url.gsub("%CONCEPT_ID%",URI.encode(concept_id))
       options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       concept_url=concept_url[0..-2]
-      full_concept_path=$REST_URL+concept_url
+      full_concept_path=base_rest_url+concept_url
       parser = XML::Parser.io(open(full_concept_path))
       doc = parser.parse
       
@@ -105,7 +107,8 @@ module BioPortal
     end
 
     def get_ontology_details ontology_version_id
-      url=$REST_URL+"/ontologies/#{ontology_version_id}"
+
+      url=base_rest_url+"/ontologies/#{ontology_version_id}"
       parser = XML::Parser.io(open(url))
       doc = parser.parse
       
@@ -130,7 +133,7 @@ module BioPortal
       search_url=search_url[0..-2] #chop of trailing &
       
       search_url=search_url.gsub("%QUERY%",URI.encode(query))
-      full_search_path=$REST_URL+search_url
+      full_search_path=base_rest_url+search_url
       parser = XML::Parser.io(open(full_search_path))
       doc = parser.parse
 
@@ -155,7 +158,7 @@ module BioPortal
     end
 
     def get_ontology_versions
-      uri=$REST_URL+"/ontologies"
+      uri=base_rest_url+"/ontologies"
       parser = XML::Parser.io(open(uri))
       doc = parser.parse
 
@@ -177,7 +180,7 @@ module BioPortal
       uri="/concepts/#{ontology_version_id}/all?"
       options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k].to_s)}&"}
       uri=uri[0..-2]
-      uri=$REST_URL + uri      
+      uri=base_rest_url + uri
       parser = XML::Parser.io(open(uri))
       doc = parser.parse
 
@@ -201,7 +204,7 @@ module BioPortal
       uri="/virtual/ontology/#{virtual_ontology_id}/all?"
       options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k])}&"}
       uri=uri[0..-2]
-      uri=$REST_URL + uri
+      uri=base_rest_url + uri
       
       doc = REXML::Document.new(open(uri))
 
@@ -217,6 +220,12 @@ module BioPortal
     end
 
     private
+    
+    DEFAULT_REST_URL = "http://rest.bioontology.org/bioportal"
+
+    def base_rest_url
+      DEFAULT_REST_URL
+    end
 
     def error_check(doc)
       response = nil
