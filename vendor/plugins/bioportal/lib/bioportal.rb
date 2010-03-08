@@ -6,10 +6,14 @@ module BioPortal
 
     module ClassMethods
       def acts_as_bioportal(options = {}, &extension)
-        options[:base_url]||="http://rest.bioontology.org/bioportal/"        
-
+        options[:base_url]||="http://rest.bioontology.org/bioportal/"
+        
         has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
         before_save :save_changed_concept
+
+        #FIXME: should be a class variable, not a global variable
+        $bioportal_base_rest_url=options[:base_url]
+        
 
         extend BioPortal::Acts::SingletonMethods
         include BioPortal::Acts::InstanceMethods        
@@ -17,7 +21,7 @@ module BioPortal
     end
 
     module SingletonMethods
-
+      
     end
 
     module InstanceMethods
@@ -25,7 +29,6 @@ module BioPortal
       require 'BioPortalResources'
 
       def concept options={}
-        options = options.merge(@bioportal_options)
         return nil if self.bioportal_concept.nil?
         return self.bioportal_concept.concept_details options        
       end
@@ -58,6 +61,10 @@ module BioPortal
       def concept_uri= value
         check_concept
         self.bioportal_concept.concept_uri=value
+      end
+
+      def bioportal_base_rest_url
+        $bioportal_base_rest_url
       end
 
       private
