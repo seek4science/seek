@@ -23,7 +23,7 @@ class BioportalTest < Test::Unit::TestCase
 
   def test_override_base_url
     class << self
-      def base_rest_url
+      def bioportal_base_rest_url
         "http://google.com/fred"
       end
     end
