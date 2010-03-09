@@ -53,6 +53,13 @@ class OrganismTest < ActiveSupport::TestCase
     assert_equal 38802,concept[:ontology_version_id]
     assert_not_nil o.bioportal_concept.cached_concept_yaml
     assert_equal YAML::load(o.bioportal_concept.cached_concept_yaml),concept
-  end  
+  end
+
+  test "get ontology" do
+    o=organisms(:yeast_with_bioportal_concept)
+    ontology=o.ontology({:maxchildren=>5,:light=>0,:refresh=>true})
+    assert_not_nil ontology
+    assert_equal "1132",ontology[:ontology_id]
+  end
 
 end

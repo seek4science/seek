@@ -93,8 +93,9 @@ the editor.
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000002">bioportal_base_rest_url</a>&nbsp;&nbsp;
-      <a href="#M000001">concept_details</a>&nbsp;&nbsp;
+      <a href="#M000003">bioportal_base_rest_url</a>&nbsp;&nbsp;
+      <a href="#M000001">get_concept</a>&nbsp;&nbsp;
+      <a href="#M000002">get_ontology</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -123,11 +124,11 @@ the editor.
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000002" class="method-detail">
-        <a name="M000002"></a>
+      <div id="method-M000003" class="method-detail">
+        <a name="M000003"></a>
 
         <div class="method-heading">
-          <a href="#M000002" class="method-signature">
+          <a href="#M000003" class="method-signature">
           <span class="method-name">bioportal_base_rest_url</span><span class="method-args">()</span>
           </a>
         </div>
@@ -138,13 +139,13 @@ the base url is defined by the associated class - this overrides the method
 in the RestAPI mixin
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000002-source">
+            onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000003-source">
 <pre>
-    <span class="ruby-comment cmt"># File app/models/bioportal_concept.rb, line 22</span>
-22:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bioportal_base_rest_url</span>
-23:     <span class="ruby-identifier">conceptable</span>.<span class="ruby-identifier">bioportal_base_rest_url</span>
-24:   <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File app/models/bioportal_concept.rb, line 28</span>
+28:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bioportal_base_rest_url</span>
+29:     <span class="ruby-identifier">conceptable</span>.<span class="ruby-identifier">bioportal_base_rest_url</span>
+30:   <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -155,7 +156,7 @@ in the RestAPI mixin
 
         <div class="method-heading">
           <a href="#M000001" class="method-signature">
-          <span class="method-name">concept_details</span><span class="method-args">(options={})</span>
+          <span class="method-name">get_concept</span><span class="method-args">(options={})</span>
           </a>
         </div>
       
@@ -165,17 +166,42 @@ in the RestAPI mixin
           <div class="method-source-code" id="M000001-source">
 <pre>
     <span class="ruby-comment cmt"># File app/models/bioportal_concept.rb, line 9</span>
- 9:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">concept_details</span> <span class="ruby-identifier">options</span>={}    
+ 9:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concept</span> <span class="ruby-identifier">options</span>={}
 10:     <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:refresh</span>]<span class="ruby-operator">||=</span><span class="ruby-keyword kw">false</span>
 11: 
 12:     <span class="ruby-identifier">refresh</span>=<span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:refresh</span>)
 13: 
 14:     <span class="ruby-comment cmt">#TODO: handle caching of concept</span>
-15:     <span class="ruby-identifier">concept</span> = <span class="ruby-identifier">get_concept</span>(<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">concept_uri</span>,<span class="ruby-identifier">options</span>)
+15:     <span class="ruby-identifier">concept</span> = <span class="ruby-keyword kw">super</span>(<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">concept_uri</span>,<span class="ruby-identifier">options</span>)
 16:     <span class="ruby-identifier">update_attribute</span>(<span class="ruby-identifier">:cached_concept_yaml</span>, <span class="ruby-identifier">concept</span>.<span class="ruby-identifier">to_yaml</span>)
 17:     
 18:     <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concept</span>
 19:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000002" class="method-detail">
+        <a name="M000002"></a>
+
+        <div class="method-heading">
+          <a href="#M000002" class="method-signature">
+          <span class="method-name">get_ontology</span><span class="method-args">(options={})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000002-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/bioportal_concept.rb, line 21</span>
+21:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_ontology</span> <span class="ruby-identifier">options</span>={}
+22:     <span class="ruby-identifier">ontology</span> = <span class="ruby-identifier">get_ontology_details</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-identifier">options</span>
+23: 
+24:     <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">ontology</span>
+25:   <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>

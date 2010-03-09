@@ -6,16 +6,22 @@ class BioportalConcept < ActiveRecord::Base
 
   belongs_to :conceptable,:polymorphic=>true
 
-  def concept_details options={}    
+  def get_concept options={}
     options[:refresh]||=false
 
     refresh=options.delete(:refresh)
 
     #TODO: handle caching of concept
-    concept = get_concept(self.ontology_version_id,self.concept_uri,options)
+    concept = super(self.ontology_version_id,self.concept_uri,options)
     update_attribute(:cached_concept_yaml, concept.to_yaml)
     
     return concept
+  end
+
+  def get_ontology options={}
+    ontology = get_ontology_details self.ontology_version_id,options
+
+    return ontology
   end
 
   #the base url is defined by the associated class - this overrides the method in the RestAPI mixin

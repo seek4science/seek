@@ -46,6 +46,8 @@ concept_uri
 
 which once set allows you to call the method concept to retreive information about that concept, such as its synonyms, parents and children.
 
+and you can also call the method 'ontology' to reteive information about the ontology.
+
 More information about this can be found in the API documentation.
 
 === Using the REST API stand-alone
