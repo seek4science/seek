@@ -31,8 +31,8 @@ module ApplicationHelper
     results={}
 
     result_collection.each do |res|
-      results[res.class.name] = [] unless results[res.class.name]
-      results[res.class.name] << res
+      results[res.class.name] = {:items => [], :hidden_count => 0} unless results[res.class.name]
+      results[res.class.name][:items] << res
     end
 
     return results

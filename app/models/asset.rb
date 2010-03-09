@@ -71,6 +71,23 @@ class Asset < ActiveRecord::Base
     return results
   end
   
+  #classify and authorize a set of objects of one type
+  def self.classify_and_authorize_homogeneous_resources(resource_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)
+    results = []
+    
+    resource_array.each do |r|
+      if should_perform_filtering_if_not_authorized
+        # if asset is not authorized for viewing by this user, just skip it
+        # (it's much faster to supply 'asset' instance instead of related resource)
+        next unless Authorization.is_authorized?("show", nil, r.asset, user_to_authorize)
+      end
+      
+      results << r
+    end
+    
+    return results
+  end
+  
   # this method will save the Asset, but will not cause 'updated_at' field to receive new value of Time.now
   def save_without_timestamping
     class << self

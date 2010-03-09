@@ -14,19 +14,24 @@
   tabber_ids.push("<%= tabs_id -%>");  
 </script>
 
-
-<% unless asset_hash.empty? && hidden_asset_count_hash.empty?-%>
+<% total_count = 0 %>
+<% asset_hash.each_key {|k| total_count = asset_hash[k][:items].size + asset_hash[k][:hidden_count]} %>
+<% unless total_count == 0-%>
   <div id='<%= "#{tabs_id}_spinner" -%>'>
     <center>
       <%= image_tag "ajax-loader-large.gif" -%>
     </center>
   </div>
   <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
-    <% Asset::ASSET_ORDER.each do |resource_type| -%>
+    <% asset_hash.each_key do |resource_type| -%>
       <% visible_resource_type = resource_type.titleize.pluralize -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
-      <% hidden_count = hidden_asset_count_hash[resource_type.underscore.pluralize] || 0 %>
-      <% resources = asset_hash[resource_type]||[] %>
+      <% if asset_hash.class == Hash %>
+        <% hidden_count = asset_hash[resource_type][:hidden_count] %>
+        <% resources = asset_hash[resource_type][:items] %>
+      <% else %>
+        <% resources = asset_hash %>
+      <% end %>
       <% unless (resources.empty? && hidden_count < 1) %>
         <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab"> 
           <% unless resources.empty? %>         
