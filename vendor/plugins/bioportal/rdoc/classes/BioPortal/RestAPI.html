@@ -80,12 +80,12 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000010">get_concept</a>&nbsp;&nbsp;
-      <a href="#M000014">get_concepts_for_ontology_version_id</a>&nbsp;&nbsp;
-      <a href="#M000015">get_concepts_for_virtual_ontology_id</a>&nbsp;&nbsp;
-      <a href="#M000011">get_ontology_details</a>&nbsp;&nbsp;
-      <a href="#M000013">get_ontology_versions</a>&nbsp;&nbsp;
-      <a href="#M000012">search</a>&nbsp;&nbsp;
+      <a href="#M000019">get_concept</a>&nbsp;&nbsp;
+      <a href="#M000023">get_concepts_for_ontology_version_id</a>&nbsp;&nbsp;
+      <a href="#M000024">get_concepts_for_virtual_ontology_id</a>&nbsp;&nbsp;
+      <a href="#M000020">get_ontology_details</a>&nbsp;&nbsp;
+      <a href="#M000022">get_ontology_versions</a>&nbsp;&nbsp;
+      <a href="#M000021">search</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -120,19 +120,19 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000010" class="method-detail">
-        <a name="M000010"></a>
+      <div id="method-M000019" class="method-detail">
+        <a name="M000019"></a>
 
         <div class="method-heading">
-          <a href="#M000010" class="method-signature">
+          <a href="#M000019" class="method-signature">
           <span class="method-name">get_concept</span><span class="method-args">(ontology_version_id,concept_id,options={})</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000010-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000010-source">
+            onclick="toggleCode('M000019-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000019-source">
 <pre>
      <span class="ruby-comment cmt"># File lib/bioportal.rb, line 93</span>
  93:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concept</span> <span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-identifier">concept_id</span>,<span class="ruby-identifier">options</span>={}
@@ -162,11 +162,11 @@
         </div>
       </div>
 
-      <div id="method-M000014" class="method-detail">
-        <a name="M000014"></a>
+      <div id="method-M000023" class="method-detail">
+        <a name="M000023"></a>
 
         <div class="method-heading">
-          <a href="#M000014" class="method-signature">
+          <a href="#M000023" class="method-signature">
           <span class="method-name">get_concepts_for_ontology_version_id</span><span class="method-args">(ontology_version_id,options={})</span>
           </a>
         </div>
@@ -180,8 +180,8 @@ options can include
  - limit - the maximum number of terms returns
 </pre>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000014-source">
+            onclick="toggleCode('M000023-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000023-source">
 <pre>
      <span class="ruby-comment cmt"># File lib/bioportal.rb, line 194</span>
 194:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concepts_for_ontology_version_id</span> <span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-identifier">options</span>={}
@@ -210,11 +210,11 @@ options can include
         </div>
       </div>
 
-      <div id="method-M000015" class="method-detail">
-        <a name="M000015"></a>
+      <div id="method-M000024" class="method-detail">
+        <a name="M000024"></a>
 
         <div class="method-heading">
-          <a href="#M000015" class="method-signature">
+          <a href="#M000024" class="method-signature">
           <span class="method-name">get_concepts_for_virtual_ontology_id</span><span class="method-args">(virtual_ontology_id,options={})</span>
           </a>
         </div>
@@ -228,8 +228,8 @@ options can include
  - limit - the maximum number of terms returns
 </pre>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000015-source">
+            onclick="toggleCode('M000024-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000024-source">
 <pre>
      <span class="ruby-comment cmt"># File lib/bioportal.rb, line 219</span>
 219:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concepts_for_virtual_ontology_id</span> <span class="ruby-identifier">virtual_ontology_id</span>,<span class="ruby-identifier">options</span>={}
@@ -255,19 +255,19 @@ options can include
         </div>
       </div>
 
-      <div id="method-M000011" class="method-detail">
-        <a name="M000011"></a>
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
 
         <div class="method-heading">
-          <a href="#M000011" class="method-signature">
+          <a href="#M000020" class="method-signature">
           <span class="method-name">get_ontology_details</span><span class="method-args">(ontology_version_id,options={})</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000011-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000011-source">
+            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000020-source">
 <pre>
      <span class="ruby-comment cmt"># File lib/bioportal.rb, line 116</span>
 116:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_ontology_details</span> <span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-identifier">options</span>={}
@@ -296,19 +296,19 @@ options can include
         </div>
       </div>
 
-      <div id="method-M000013" class="method-detail">
-        <a name="M000013"></a>
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
 
         <div class="method-heading">
-          <a href="#M000013" class="method-signature">
+          <a href="#M000022" class="method-signature">
           <span class="method-name">get_ontology_versions</span><span class="method-args">(options={})</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000013-source">
+            onclick="toggleCode('M000022-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000022-source">
 <pre>
      <span class="ruby-comment cmt"># File lib/bioportal.rb, line 171</span>
 171:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_ontology_versions</span> <span class="ruby-identifier">options</span>={}
@@ -334,19 +334,19 @@ options can include
         </div>
       </div>
 
-      <div id="method-M000012" class="method-detail">
-        <a name="M000012"></a>
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
 
         <div class="method-heading">
-          <a href="#M000012" class="method-signature">
+          <a href="#M000021" class="method-signature">
           <span class="method-name">search</span><span class="method-args">(query,options={})</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000012-source">
+            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000021-source">
 <pre>
      <span class="ruby-comment cmt"># File lib/bioportal.rb, line 138</span>
 138:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">search</span> <span class="ruby-identifier">query</span>,<span class="ruby-identifier">options</span>={}
