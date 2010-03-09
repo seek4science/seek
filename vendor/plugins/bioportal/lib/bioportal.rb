@@ -101,6 +101,7 @@ module BioPortal
       concept_url=concept_url.gsub("%CONCEPT_ID%",URI.encode(concept_id))
       options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       concept_url=concept_url[0..-2]
+      
       full_concept_path=bioportal_base_rest_url+concept_url
       parser = XML::Parser.io(open(full_concept_path))
       doc = parser.parse
@@ -116,9 +117,11 @@ module BioPortal
 
     def get_ontology_details ontology_version_id,options={}
       ontologies_url="/ontologies/#{ontology_version_id}?"
+
       options.keys.each{|key| ontologies_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       ontologies_url=ontologies_url[0..-2]
       url=bioportal_base_rest_url+ontologies_url
+      
       parser = XML::Parser.io(open(url))
       doc = parser.parse
       
