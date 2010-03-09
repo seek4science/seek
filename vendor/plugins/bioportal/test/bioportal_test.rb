@@ -19,6 +19,7 @@ class BioportalTest < Test::Unit::TestCase
     assert_equal "Saccharomyces cerevisiae",concept[:label]
 
     assert concept[:synonyms].include?("\"lager beer yeast\""),"synonyms should contain lager beer yeast"
+    assert_not_nil concept[:instances],"There should be an instances field returned"
   end
 
   def test_override_base_url
