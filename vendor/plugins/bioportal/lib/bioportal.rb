@@ -315,6 +315,7 @@ module BioPortal
       if (element.path == "/success/data/classBean")
         result[:children]=process_concept_children(element)
         result[:parents]=process_concept_parents(element)
+        result[:instances]=process_instances(element)
       end
 
       return result
@@ -363,6 +364,10 @@ module BioPortal
       return result
     end
     
+    #currently not implemented, as the feature is not yet available through the rest API
+    def process_instances element
+      []
+    end
   end
     
 end
