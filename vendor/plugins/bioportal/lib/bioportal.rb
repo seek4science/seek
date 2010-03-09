@@ -5,7 +5,7 @@ module BioPortal
     end
 
     module ClassMethods
-      def acts_as_bioportal(options = {}, &extension)
+      def linked_to_bioportal(options = {}, &extension)
         options[:base_url]||="http://rest.bioontology.org/bioportal/"
         
         has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
