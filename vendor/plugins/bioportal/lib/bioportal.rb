@@ -5,7 +5,7 @@ module BioPortal
     end
 
     module ClassMethods
-      def acts_as_bioportal(options = {}, &extension)
+      def linked_to_bioportal(options = {}, &extension)
         options[:base_url]||="http://rest.bioontology.org/bioportal/"
         
         has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
@@ -32,7 +32,7 @@ module BioPortal
       require 'BioPortalResources'
 
       def concept options={}
-        
+
         options[:email] ||= self.bioportal_email unless self.bioportal_email.nil?
 
         return nil if self.bioportal_concept.nil?
@@ -101,6 +101,7 @@ module BioPortal
       concept_url=concept_url.gsub("%CONCEPT_ID%",URI.encode(concept_id))
       options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       concept_url=concept_url[0..-2]
+      
       full_concept_path=bioportal_base_rest_url+concept_url
       parser = XML::Parser.io(open(full_concept_path))
       doc = parser.parse
@@ -114,9 +115,13 @@ module BioPortal
       return process_concepts_xml(doc).merge({:ontology_version_id=>ontology_version_id})
     end
 
-    def get_ontology_details ontology_version_id
+    def get_ontology_details ontology_version_id,options={}
+      ontologies_url="/ontologies/#{ontology_version_id}?"
 
-      url=bioportal_base_rest_url+"/ontologies/#{ontology_version_id}"
+      options.keys.each{|key| ontologies_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
+      ontologies_url=ontologies_url[0..-2]
+      url=bioportal_base_rest_url+ontologies_url
+      
       parser = XML::Parser.io(open(url))
       doc = parser.parse
       
@@ -165,8 +170,13 @@ module BioPortal
 
     end
 
-    def get_ontology_versions
-      uri=bioportal_base_rest_url+"/ontologies"
+    def get_ontology_versions options={}
+      ontologies_url="/ontologies?"
+
+      options.keys.each{|key| ontologies_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
+      ontologies_url=ontologies_url[0..-2] #chop of trailing &
+      uri=bioportal_base_rest_url+ontologies_url
+      
       parser = XML::Parser.io(open(uri))
       doc = parser.parse
 
@@ -305,6 +315,7 @@ module BioPortal
       if (element.path == "/success/data/classBean")
         result[:children]=process_concept_children(element)
         result[:parents]=process_concept_parents(element)
+        result[:instances]=process_instances(element)
       end
 
       return result
@@ -353,6 +364,10 @@ module BioPortal
       return result
     end
     
+    #currently not implemented, as the feature is not yet available through the rest API
+    def process_instances element
+      []
+    end
   end
     
 end
