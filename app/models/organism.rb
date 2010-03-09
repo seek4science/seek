@@ -1,5 +1,3 @@
-require 'bioportal'
-
 class Organism < ActiveRecord::Base
 
   linked_to_bioportal :email=>"stuart.owen@manchester.ac.uk"
