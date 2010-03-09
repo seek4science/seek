@@ -18,4 +18,9 @@ class BioportalConcept < ActiveRecord::Base
     return concept
   end
 
+  #the base url is defined by the associated class - this overrides the method in the RestAPI mixin
+  def bioportal_base_rest_url
+    conceptable.bioportal_base_rest_url
+  end
+
 end
