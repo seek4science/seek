@@ -28,9 +28,7 @@ module BioPortal
     end
 
     module InstanceMethods
-      
-      require 'BioPortalResources'
-
+     
       def concept options={}
 
         options[:email] ||= self.bioportal_email unless self.bioportal_email.nil?
