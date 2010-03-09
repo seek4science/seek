@@ -32,7 +32,7 @@ module BioPortal
       require 'BioPortalResources'
 
       def concept options={}
-        
+
         options[:email] ||= self.bioportal_email unless self.bioportal_email.nil?
 
         return nil if self.bioportal_concept.nil?
@@ -114,9 +114,11 @@ module BioPortal
       return process_concepts_xml(doc).merge({:ontology_version_id=>ontology_version_id})
     end
 
-    def get_ontology_details ontology_version_id
-
-      url=bioportal_base_rest_url+"/ontologies/#{ontology_version_id}"
+    def get_ontology_details ontology_version_id,options={}
+      ontologies_url="/ontologies/#{ontology_version_id}?"
+      options.keys.each{|key| ontologies_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
+      ontologies_url=ontologies_url[0..-2]
+      url=bioportal_base_rest_url+ontologies_url
       parser = XML::Parser.io(open(url))
       doc = parser.parse
       
@@ -165,8 +167,13 @@ module BioPortal
 
     end
 
-    def get_ontology_versions
-      uri=bioportal_base_rest_url+"/ontologies"
+    def get_ontology_versions options={}
+      ontologies_url="/ontologies?"
+
+      options.keys.each{|key| ontologies_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
+      ontologies_url=ontologies_url[0..-2] #chop of trailing &
+      uri=bioportal_base_rest_url+ontologies_url
+      
       parser = XML::Parser.io(open(uri))
       doc = parser.parse
 

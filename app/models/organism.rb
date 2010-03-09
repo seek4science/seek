@@ -2,7 +2,7 @@ require 'bioportal'
 
 class Organism < ActiveRecord::Base
 
-  acts_as_bioportal
+  acts_as_bioportal :email=>"stuart.owen@manchester.ac.uk",:base_url=>"http://fred"
   
   has_many :assays
   has_many :models
