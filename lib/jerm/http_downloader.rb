@@ -19,9 +19,17 @@ module Jerm
     # :filename => the filename
     #
     # throws an Exception if anything goes wrong.
-    def basic_auth url, username,password      
+    def basic_auth url, username,password
+
+      #This block is to ensure that only urls are encoded if they need it.
+      #This is to prevent already encoded urls being re-encoded, which can lead to % being replaced with %25.
       begin
-        open(URI.encode(url),:http_basic_authentication=>[username, password]) do |f|
+        URI.parse(url)
+      rescue URI::InvalidURIError
+        url=URI.encode(url)
+      end
+      begin
+        open(url,:http_basic_authentication=>[username, password]) do |f|
           #FIXME: need to handle full range of 2xx sucess responses, in particular where the response is only partial
           if f.status[0] == "200"                    
             return {:data=>f.read,:content_type=>f.content_type,:filename=>f.base_uri.path.split('/').last}
