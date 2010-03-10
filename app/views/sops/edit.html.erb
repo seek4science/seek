@@ -15,15 +15,15 @@
     <%= f.error_messages %>
 
     <center>
-      <div style="width: 60%;">
+      <div style="width:90%">
         <p style="margin-top: 1.5em;">
           <b>Title:</b><br/>
-          <%= f.text_field :title, :style => "width: 100%;" -%>
+          <%= f.text_area :title, :style=>"width: 100%", :rows=>2 -%>
         </p>
 
         <p style="margin-top: 0.5em;">
           <b>Description:</b><br/>
-          <%= f.text_area :description, :style => "width: 100%;", :rows => 5 -%>
+          <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
         </p>
 
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>

@@ -7,7 +7,7 @@
     <%= error_messages_for :sop -%>
 
     <center>
-      <div style="width: 60%;">
+      <div style="width:90%">
         <p>
           <b>File to upload</b><span class="required">*</span>
           <%= file_field :sop, :data -%>
@@ -16,13 +16,13 @@
         <p style="margin-top: 1.5em;">
           <b>Title</b><span class="required">*</span><br/>
           <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
-          <%= text_field_tag 'sop[title]', sop_title_value, :style => "width: 100%;" -%>
+          <%= text_area_tag 'sop[title]', sop_title_value, :style => "width: 100%;", :rows=>2 -%>
         </p>
 
         <p style="margin-top: 0.5em;">
           <b>Description</b><br/>
           <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
-          <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 5 -%>
+          <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
 
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
