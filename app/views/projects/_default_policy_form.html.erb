@@ -39,7 +39,7 @@
       <div id="more_info" class="box_simple" style="display: none;">
         <p>
           Here you may specify the People, Projects or Groups that may View and Edit the details about project assets.<br/>
-          This policy will be applied to any resources automatically harvested by the system.<br/>
+          This policy will be applied to any resources automatically registered by the JERM system.<br/>
           <p>
             You may:
             <ul>
@@ -51,10 +51,18 @@
       </div>
     </div>
 
-    <!-- private - removed-->
-    
-    <p style="font-weight: bold; margin-top: 1em;">Share them with..</p>
+    <!-- private -->
+    <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
+        <input type="hidden" name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
+        <input type="hidden" name="sharing[include_custom_sharing_<%= Policy::PRIVATE -%>]" value="0">
 
+        <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
+                                                                     value="<%= Policy::PRIVATE -%>" type="radio" onclick="javascript:setSharingElementVisibility(<%= Policy::PRIVATE -%>);" />
+        - Keep this <%= @resource_type -%> private.
+    </label></p>
+
+    <p style="font-weight: bold; margin-top: 1em;">Or share it with..</p>
+    
     <!-- all registered users -->
     <p>
       <label for="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>">
