@@ -1,6 +1,11 @@
+<%
+avatar=resource_title_draggable_avatar item
+%>
 <div class="contribution_title">
-  <span class="contribution_title_image">
-    <%= resource_title_draggable_avatar item -%>
-  </span>
+  <% unless avatar.blank? -%>
+    <span class="contribution_title_image">
+      <%=  avatar -%>
+    </span>
+  <% end -%>
   <h1><%= h(item.title) -%></h1>
 </div>
