@@ -20,8 +20,6 @@ resource_type=resource.class.name.humanize
         <%=  text_area_tag :details,'',:cols=>50,:rows=>5 -%>        
         <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{resource.asset.contributor.person.name}. Are you sure?" -%>
     <% end -%>
-    </span>  
-
 
   </div>
 

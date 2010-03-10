@@ -8,6 +8,7 @@
   <td><%= h(result_line[:resource].author_seek_id) -%></td>
   <td><%= link_to(h(result_line[:author].name),person_path(result_line[:author])) unless result_line[:author].nil? -%></td>
   <td><%= h(result_line[:resource].timestamp) -%></td>
+  <td><%= h(result_line[:seek_model].content_blob.md5sum) unless result_line[:seek_model].nil? -%>  </td>
   <td><%= h(result_line[:message]) -%></td>
 
   <td><%= link_to("Go to asset",url_for(result_line[:seek_model]),:popup=>true) unless result_line[:seek_model].nil? -%></td>

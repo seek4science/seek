@@ -6,6 +6,18 @@ require 'active_record/fixtures'
 namespace :seek do
 
 
+  #updates the md5sum, and makes a local cache, for existing remote assets
+  task(:cache_remote_content_blobs=>:environment) do
+    resources = Sop.find(:all)
+    resources |= Model.find(:all)
+    resources |= DataFile.find(:all)
+    resources = resources.select{|r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && r.project}
+    
+    resources.each do |res|
+      res.cache_remote_content_blob
+    end
+  end
+
 
   task(:rebuild_project_organisms=>:environment) do
     organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
