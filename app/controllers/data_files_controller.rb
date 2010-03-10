@@ -161,13 +161,6 @@ class DataFilesController < ApplicationController
 
       # update 'last_used_at' timestamp on the DataFile
       params[:data_file][:last_used_at] = Time.now
-
-      # update 'contributor' of the Data file to current user (this under no circumstances should update
-      # 'contributor' of the corresponding Asset: 'contributor' of the Asset is the "owner" of this
-      # DataFile, e.g. the original uploader who has unique rights to manage this DataFile; 'contributor' of the
-      # Data file on the other hand is merely the last user to edit it)
-      params[:data_file][:contributor_type] = current_user.class.name
-      params[:data_file][:contributor_id] = current_user.id
     end
 
     respond_to do |format|

@@ -313,5 +313,15 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "a[rel=nofollow]"
     end
   end
+
+  def test_update_should_not_overright_contributor
+    login_as(:pal_user) #this user is a member of sysmo, and can edit this model
+    model=models(:model_with_no_contributor)
+    put :update, :id => model, :model => {:title=>"blah blah blah blah" }
+    updated_model=assigns(:model)
+    assert_redirected_to model_path(updated_model)
+    assert_equal "blah blah blah blah",updated_model.title,"Title should have been updated"
+    assert_nil updated_model.contributor,"contributor should still be nil"
+  end
   
 end
