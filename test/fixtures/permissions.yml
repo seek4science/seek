@@ -35,12 +35,10 @@ edit_of_sop_with_public_download_and_no_custom_sharing_for_person_not_associated
   policy: public_download_with_no_custom_sharing
   access_type: <%= Policy::EDITING %>
 
-
 view_of_sop_with_all_registered_users_policy_for_person_for_random_registered_user_who_wants_to_access_different_things:
   contributor: person_for_random_registered_user_who_wants_to_access_different_things (Person)
   policy: download_for_all_registered_users_policy
   access_type: <%= Policy::VIEWING %>
-
 
 sharing_sop_with_all_registered_users_policy_with_test_fav_group:
   contributor: test_fav_group_for_owner_of_download_for_all_registered_users_policy (FavouriteGroup)

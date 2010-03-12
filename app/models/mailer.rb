@@ -25,12 +25,12 @@ class Mailer < ActionMailer::Base
   def request_resource(user,resource,details,base_host)
 
     subject "A Sysmo Member requested a protected file: #{resource.title}"
-    recipients resource.contributor.person.email_with_name
+    recipients resource.managers.collect{|m| m.email_with_name}
     from NOREPLY_SENDER
     reply_to user.person.email_with_name
     sent_on Time.now
     
-    body :owner=>resource.contributor.person,:requester=>user.person,:resource=>resource,:details=>details,:host=>base_host
+    body :owners=>resource.managers,:requester=>user.person,:resource=>resource,:details=>details,:host=>base_host
   end
 
   def signup(user,base_host)

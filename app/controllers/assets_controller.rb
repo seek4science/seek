@@ -16,10 +16,12 @@ class AssetsController < ApplicationController
   def request_resource
     asset=Asset.find(params[:id])
     details=params[:details]
-    resource=asset.resource    
+    resource=asset.resource
+    
     Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    
     render :update do |page|
-      page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{asset.contributor.person.name}</b> requesting the file <b>#{h(resource.title)}</b>."
+      page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end
 

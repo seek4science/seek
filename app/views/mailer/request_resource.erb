@@ -1,5 +1,5 @@
 <% controller=@resource.class.name.underscore.pluralize -%>
-Hi <%= @owner.name -%>,
+Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
     The Sysmo user <%= @requester.name -%>, <%= person_url(@requester,:host=>@host) -%>, has requested access to the file "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource,:host=>@host) -%>.
 
