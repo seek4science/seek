@@ -66,6 +66,9 @@ module Jerm
             resource_model.asset.save!
             resource_model.project=project
             resource_model.save!
+            resource_model.reload
+            resource_model.cache_remote_content_blob
+
             p=Permission.new(:contributor=>author,:access_type=>Policy::MANAGING,:policy_id=>resource_model.asset.policy.id)
             p.save!
             if warning
