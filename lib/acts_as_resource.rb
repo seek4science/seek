@@ -132,6 +132,17 @@ module Mib
           end
         end
 
+        #returns a list of the people that can manage this file
+        #which will be the contributor, and those that have manage permissions
+        def managers
+          people=[]
+          people << self.asset.contributor.person unless self.asset.contributor.nil?
+          self.asset.policy.permissions.each do |perm|
+            people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
+          end
+          return people.uniq
+        end
+
         private
 
         # This is so that the updated_at time on the parent Asset record is in sync with the

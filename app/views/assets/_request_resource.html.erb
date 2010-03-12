@@ -3,7 +3,7 @@ resource_type=resource.class.name.humanize
 %>
 
 
-<% if EMAIL_ENABLED && !resource.contributor.nil? -%>
+<% if EMAIL_ENABLED && !resource.managers.empty? -%>
 
   <div id="request_resource_button">
     <%=  help_icon("You do not have permission to download this #{resource_type}, but if you are interested you can request permission from the owner.") %>
@@ -18,14 +18,13 @@ resource_type=resource.class.name.humanize
     <% form_remote_tag :url=>request_resource_asset_url(:id=>resource.asset,:current_user=>current_user),
                        :before=>"Effect.Appear('requesting_resource_status');$('request_resource_form').hide();" do -%>
         <%=  text_area_tag :details,'',:cols=>50,:rows=>5 -%>        
-        <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{resource.asset.contributor.person.name}. Are you sure?" -%>
+        <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{resource.managers.collect{|p| p.name}.join(", ")}. Are you sure?" -%>
     <% end -%>
 
   </div>
 
-  <div id="requesting_resource_status" style="display:none;">
-    About to request the <%= resource_type -%>  <b><%= resource.title %></b>  from <b><%= h(resource.contributor.person.name) %></b> ...
-  </div>
+  <div id="requesting_resource_status" style="display:none;">About to request access to the <%= resource_type -%> <%= resource.title %> from <%= h(resource.managers.collect{|p| p.name}.join(", ")) %> ...</div>
+  
 
 <% else -%>
   <%=  help_icon("You do not have permission to download this #{resource_type}, but you are interested you can request permission from the owner.") %>

@@ -37,4 +37,14 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
+  test "managers" do
+    df=data_files(:picture)
+    assert_not_nil df.managers
+    contributor=people(:person_for_datafile_owner)
+    manager=people(:person_for_owner_of_my_first_sop)
+    assert df.managers.include?(contributor)
+    assert df.managers.include?(manager)
+    assert !df.managers.include?(people(:person_not_associated_with_any_projects))
+  end
+
 end
