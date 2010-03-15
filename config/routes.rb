@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :publications
+
   map.resources :created_datas
 
   map.resources :assay_types, :collection=>{:manage=>:get}

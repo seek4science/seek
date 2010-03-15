@@ -20,13 +20,14 @@ public/stylesheets/css_cached.css
 tmp/pids/*
 tmp/cache/*
 tmp/data.sql
-.tmp*
+*.tmp*
 *~
 solr/development/*
 solr/production/*
 lib/jerm/stu_main.rb
 SUMO_harvester.rb
 script/finns_tests/*
+config/environment_local.rb
 
 
 syntax: regexp

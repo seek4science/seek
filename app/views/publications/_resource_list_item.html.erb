@@ -1,0 +1,11 @@
+<%= list_item_title resource %>
+
+<%= list_item_expandable_text resource.abstract %>
+
+<%= list_item_optional_attribute "Web page", h(resource.web_page), h(resource.web_page) %>    
+
+<% unless hide_contact_details? %>
+  <%= list_item_optional_attribute "Wiki page", h(resource.wiki_page), h(resource.wiki_page) %>          
+<% end %>
+      
+<%= list_item_simple_list resource.organisms, "Organisms" %>

@@ -1,5 +1,4 @@
-module ResourceListItemHelper
-  
+module ResourceListItemHelper  
   
   def get_list_item_content_partial resource
     return get_original_model_name(resource).pluralize.underscore + "/resource_list_item"
@@ -121,6 +120,26 @@ module ResourceListItemHelper
       value = link_to resource.contributor.person.name, resource.contributor
     end
     return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{value}</p>"
+  end
+  
+  def list_item_expandable_text text, length=200
+    full_text = text_or_not_specified(text, :description => true,:auto_link=>false)
+    trunc_text = text_or_not_specified(text, :description => true,:auto_link=>false, :length=>length)
+    #Don't bother with fancy stuff if not enough text to expand
+    if full_text == trunc_text
+      html = "<div class=\"list_item_desc\">"
+      html << trunc_text
+      html << "</div>"
+    else    
+      html = "<script type=\"text/javascript\">\n"
+      html << "fullResourceListItemExpandableText[#{text.object_id}] = '#{escape_javascript(full_text)}';\n"
+      html << "truncResourceListItemExpandableText[#{text.object_id}]  = '#{escape_javascript(trunc_text)}';\n"
+      html << "</script>\n"
+      html << "<div class=\"list_item_desc\"><div id=\"expandableText#{text.object_id}\">"
+      html << trunc_text
+      html << "</div>"
+      html << (link_to "(Expand)", "#", :id => "expandableLink#{text.object_id}", :onClick => "expandResourceListItemExpandableText(#{text.object_id});return false;") + "</div>"
+    end
   end
   
 end

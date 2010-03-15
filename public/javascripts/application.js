@@ -126,3 +126,19 @@ function deleteCookie(name, path, domain) {
             "; expires=Thu, 01-Jan-70 00:00:01 GMT";
     }
 }
+
+var fullResourceListItemExpandableText = new Array();
+var truncResourceListItemExpandableText = new Array();
+
+function expandResourceListItemExpandableText(objectId){
+    link = $('expandableLink'+objectId)
+    text = $('expandableText'+objectId)
+    if (link.innerHTML == '(Expand)') { //EXPAND
+      link.innerHTML = '(Collapse)';
+      text.innerHTML = fullResourceListItemExpandableText[objectId];
+    }
+    else { //COLLAPSE
+      link.innerHTML = '(Expand)';
+      text.innerHTML = truncResourceListItemExpandableText[objectId];
+    }
+}

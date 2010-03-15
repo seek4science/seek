@@ -775,12 +775,12 @@ div.list_item {
 div.list_item_content {
   width: 75%;
   float: left;
-  margin-left:2em;
+  margin-left:1em;
 }
 
 div.list_item_avatar {
   float: left;
-  width: 10%;
+  width: 11%;
   text-align: center;
 }
 
