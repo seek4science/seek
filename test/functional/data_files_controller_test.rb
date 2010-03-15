@@ -122,6 +122,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil updated_df.contributor,"contributor should still be nil"
   end
 
+  def test_show_item_attributed_to_jerm_file
+    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    df=data_files(:editable_data_file)
+    jerm_file=data_files(:data_file_with_no_contributor)
+    r=Relationship.new(:subject => df, :predicate => Relationship::ATTRIBUTED_TO, :object => jerm_file)
+    r.save!
+    df = DataFile.find(df.id)
+    assert df.attributions.collect{|a| a.object}.include?(jerm_file),"The datafile should have had the jerm file added as an attribution"
+    get :show,:id=>df
+    assert :success
+  end
+
   private
 
   def valid_data_file
