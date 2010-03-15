@@ -5,7 +5,7 @@ require 'active_record/fixtures'
 
 namespace :seek do
 
-  #updates the md5sum, and makes a local cache, for existing remote assets
+  desc 'updates the md5sum, and makes a local cache, for existing remote assets'
   task(:cache_remote_content_blobs=>:environment) do
     resources = Sop.find(:all)
     resources |= Model.find(:all)
@@ -45,6 +45,8 @@ namespace :seek do
     end
 
   end
+
+  desc 'refreshed, or creates, the standard initiali controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
     other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters"]
     other_tasks.each do |task|
