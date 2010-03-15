@@ -156,6 +156,8 @@ module Jerm
             res.type = "Sop"
             res.work_package = @WP
             res.experimenters = @experimenters
+            sop_data = parse_sop(s)
+            @title, @author = sop_data[:title], sop_data[:author]
             unless @author.nil?
               first_name, last_name = @author.split(" ", 2)
               res.author_first_name = first_name
@@ -186,5 +188,48 @@ module Jerm
         get_links(uri, level)
       end
     end
+    
+    def parse_sop(uri)
+      doc = open(uri, :http_basic_authentication=>[@username, @password]) { |f| Hpricot(f) }
+      params = {}
+      stop_search = false
+      #Get all of the tags
+      doc.search("/html/body/div#main/div#content//").each do |e|
+        break if stop_search
+        case e.name
+          when "h1"
+            unless params[:title]
+              params[:title] = e.inner_html
+              params[:title].strip!
+            end
+          when "table"
+            unless params[:author]
+              data = {}
+              rows = e.search("//tr")
+              #Make a hash with the items from the first column as the key
+              # and the items from the second column as the value
+              rows.each do |row|
+                cols = row.search("//td")
+                data[cols.first.inner_html.strip.gsub(/<(\/)?(.)>/,"")] = cols.last.inner_html.strip 
+              end 
+              
+              data.each_key do |k|
+                if k.downcase.start_with?("author")                  
+                  params[:author] = data[k].split(",").first
+                elsif k.downcase.start_with?("access")
+                  stop_search = data[k].include?("NoData")
+                end  
+              end
+            end
+        end
+      end  
+      
+      if stop_search
+        return nil
+      else
+        return params
+      end
+    end
+    
   end
 end
