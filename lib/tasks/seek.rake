@@ -5,6 +5,48 @@ require 'active_record/fixtures'
 
 namespace :seek do
 
+  desc 'updates the md5sum, and makes a local cache, for existing remote assets'
+  task(:cache_remote_content_blobs=>:environment) do
+    resources = Sop.find(:all)
+    resources |= Model.find(:all)
+    resources |= DataFile.find(:all)
+    resources = resources.select{|r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && r.project}
+    
+    resources.each do |res|
+      res.cache_remote_content_blob
+    end
+  end
+
+
+  task(:rebuild_project_organisms=>:environment) do
+    organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
+    puts "found #{organism_taggings.size} organism taggings"
+    organism_taggings.each do |tagging|
+      if tagging.taggable_type == "Project"
+        tag=tagging.tag
+        project=tagging.taggable
+        organism=Organism.find(:first, :conditions=>["title=?", tag.name])
+        if organism.nil?
+          puts "unable to find organism #{tag.name} required for project #{project.title}"
+        else
+          puts "adding #{organism.title} to #{project.title} "
+          class << project
+            def record_timestamps
+              false
+            end
+          end
+          project.organisms << organism unless project.organisms.include?(organism)
+          project.save!
+        end
+      else
+        puts "Tagging with id #{tagging.id} is not for Project"
+      end
+
+    end
+
+  end
+
+  desc 'refreshed, or creates, the standard initiali controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
     other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters"]
     other_tasks.each do |task|

@@ -32,7 +32,7 @@ class MailerTest < ActionMailer::TestCase
 
   test "request resource" do
     @expected.subject = "A Sysmo Member requested a protected file: Picture"
-    @expected.to = "Datafile Owner <data_file_owner@email.com>"
+    @expected.to = ["Datafile Owner <data_file_owner@email.com>","OwnerOf MyFirstSop <owner@sop.com>"]
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
     @expected.date = Time.now
@@ -49,7 +49,7 @@ class MailerTest < ActionMailer::TestCase
 
   test "request resource no details" do
     @expected.subject = "A Sysmo Member requested a protected file: Picture"
-    @expected.to = "Datafile Owner <data_file_owner@email.com>"
+    @expected.to = ["Datafile Owner <data_file_owner@email.com>","OwnerOf MyFirstSop <owner@sop.com>"]
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
     @expected.date = Time.now

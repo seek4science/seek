@@ -20,14 +20,14 @@ module Mib
           belongs_to :contributor, :polymorphic => true
           
           has_one :asset, 
-                  :as => :resource,
-                  :dependent => :destroy
+            :as => :resource,
+            :dependent => :destroy
           
           has_many :attributions, 
-                   :class_name => 'Relationship',
-                   :as => :subject,
-                   :conditions => { :predicate => Relationship::ATTRIBUTED_TO },
-                   :dependent => :destroy
+            :class_name => 'Relationship',
+            :as => :subject,
+            :conditions => { :predicate => Relationship::ATTRIBUTED_TO },
+            :dependent => :destroy
 
           has_one :project, :through=>:asset
 
@@ -39,8 +39,8 @@ module Mib
           # quality of the asset from the new resource into corresponding asset during creation
           attr_accessor :source_type, :source_id, :quality
                   
-          after_save :save_asset_record
-
+          after_save :save_asset_record          
+          
           class_eval do
             extend Mib::Acts::Resource::SingletonMethods
           end
@@ -48,7 +48,7 @@ module Mib
           
           before_create do |res|
             res.asset = Asset.new(:resource => res,
-                                  :source_type => res.source_type, :source_id => res.source_id, :quality => res.quality)
+              :source_type => res.source_type, :source_id => res.source_id, :quality => res.quality)
           end
         end
       end
@@ -88,8 +88,8 @@ module Mib
         # check if c_utor is the last contributor to edit metadata for this resource
         def last_editor?(c_utor)
           case self.contributor_type
-            when "User"
-              return (self.contributor_id == c_utor.id && self.contributor_type == c_utor.class.name)
+          when "User"
+            return (self.contributor_id == c_utor.id && self.contributor_type == c_utor.class.name)
             # TODO some new types of "contributors" may be added at some point - this is to cater for that in future
             # when "Network"
             #   return self.contributor.owner?(c_utor.id) if self.contributor_type.to_s
@@ -116,11 +116,34 @@ module Mib
         end
       
         def cache_remote_content_blob
-          self.original_filename, self.content_type = self.content_blob.cache_remote_content
-          self.save
+          if self.content_blob && self.content_blob.data.nil? && self.content_blob.url && self.project
+            begin
+              p=self.project
+              p.decrypt_credentials
+              downloader=Jerm::DownloaderFactory.create p.name
+              resource_type = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
+              data_hash = downloader.get_remote_data self.content_blob.url,p.site_username,p.site_password, resource_type
+              self.content_blob.data=data_hash[:data]
+              self.content_type=data_hash[:content_type]
+              self.content_blob.save
+            rescue Exception=>e
+              puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
+            end
+          end
         end
 
-private
+        #returns a list of the people that can manage this file
+        #which will be the contributor, and those that have manage permissions
+        def managers
+          people=[]
+          people << self.asset.contributor.person unless self.asset.contributor.nil?
+          self.asset.policy.permissions.each do |perm|
+            people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
+          end
+          return people.uniq
+        end
+
+        private
 
         # This is so that the updated_at time on the parent Asset record is in sync with the
         # one in the resource record (this will also update the "last_used_at" date for the same reason)

@@ -73,6 +73,7 @@ pal:
 person_for_owner_of_my_first_sop:
   first_name: "OwnerOf"
   last_name: "MyFirstSop"
+  email: "owner@sop.com"
 
 person_for_owner_of_fully_public_policy:
   first_name: "OwnerOf"
@@ -101,8 +102,9 @@ random_userless_person:
 
 
 person_not_associated_with_any_projects:
-  first_name: "not"
-  last_name: "associated"
+  first_name: "free"
+  last_name: "spirit"
+  email: "not@associated.com"
 
 
 person_to_associate_with_sops_owning_users:

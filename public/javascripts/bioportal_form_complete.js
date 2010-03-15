@@ -61,10 +61,10 @@ function setup_functions() {
 				formatItem: formatItem
 		});
 		
-		html = "<br/><input type='text' id='" + jQuery(this).attr('name') + "_bioportal_concept_id'>";
-		html += "<input type='text' id='" + jQuery(this).attr('name') + "_bioportal_ontology_id'>";
-		html += "<input type='text' id='" + jQuery(this).attr('name') + "_bioportal_full_id'>";
-		html += "<input type='text' id='" + jQuery(this).attr('name') + "_bioportal_preferred_name'>";
+		html = "<input type='hidden' id='" + jQuery(this).attr('name') + "_bioportal_concept_id'>";
+		html += "<input type='hidden' id='" + jQuery(this).attr('name') + "_bioportal_ontology_id'>";
+		html += "<input type='hidden' id='" + jQuery(this).attr('name') + "_bioportal_full_id'>";
+		html += "<input type='hidden' id='" + jQuery(this).attr('name') + "_bioportal_preferred_name'>";
 		jQuery(this).after(html);
 	});
 }

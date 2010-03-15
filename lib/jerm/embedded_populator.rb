@@ -57,12 +57,18 @@ module Jerm
             #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
             resource_model.save!
             resource_model.asset.project=project
+            
             #assign default policy, and save the associated asset
 
             resource_model.asset.policy=project.default_policy.deep_copy
             resource_model.asset.policy.use_custom_sharing = true
             resource_model.asset.creators << author
             resource_model.asset.save!
+            resource_model.project=project
+            resource_model.save!
+            resource_model.reload
+            resource_model.cache_remote_content_blob
+
             p=Permission.new(:contributor=>author,:access_type=>Policy::MANAGING,:policy_id=>resource_model.asset.policy.id)
             p.save!
             if warning

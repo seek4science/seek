@@ -112,6 +112,16 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  def test_update_should_not_overright_contributor
+    login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
+    df=data_files(:data_file_with_no_contributor)
+    put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
+    updated_df=assigns(:data_file)
+    assert_redirected_to data_file_path(updated_df)
+    assert_equal "blah blah blah blah",updated_df.title,"Title should have been updated"
+    assert_nil updated_df.contributor,"contributor should still be nil"
+  end
+
   private
 
   def valid_data_file

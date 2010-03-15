@@ -177,13 +177,6 @@ class SopsController < ApplicationController
     
       # update 'last_used_at' timestamp on the SOP
       params[:sop][:last_used_at] = Time.now
-      
-      # update 'contributor' of the SOP to current user (this under no circumstances should update
-      # 'contributor' of the corresponding Asset: 'contributor' of the Asset is the "owner" of this
-      # SOP, e.g. the original uploader who has unique rights to manage this SOP; 'contributor' of the
-      # SOP on the other hand is merely the last user to edit it)
-      params[:sop][:contributor_type] = current_user.class.name
-      params[:sop][:contributor_id] = current_user.id
     end
     
     respond_to do |format|

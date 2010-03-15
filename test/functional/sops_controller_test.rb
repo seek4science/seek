@@ -198,6 +198,16 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  def test_editing_doesnt_change_contributor
+    login_as(:pal_user) #this user is a member of sysmo, and can edit this sop
+    sop=sops(:sop_with_no_contributor)
+    put :update, :id => sop, :sop => {:title=>"blah blah blah"}, :sharing=>valid_sharing
+    updated_sop=assigns(:sop)
+    assert_redirected_to sop_path(updated_sop)
+    assert_equal "blah blah blah",updated_sop.title,"Title should have been updated"
+    assert_nil updated_sop.contributor,"contributor should still be nil"
+  end
+
   private
 
   def valid_sharing

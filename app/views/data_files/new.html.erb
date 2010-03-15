@@ -7,7 +7,7 @@
     <%= error_messages_for :data_file -%>
 
     <center>
-      <div style="width: 60%;">
+      <div style="width: 90%;">
         
         <p>
           <b>File to upload</b><span class="required">*</span>
@@ -17,13 +17,13 @@
         <p style="margin-top: 1.5em;">
           <b>Title</b><span class="required">*</span><br/>
           <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
-          <%= text_field_tag 'data_file[title]', data_file_title_value, :style => "width: 100%;" -%>
+          <%= text_area_tag 'data_file[title]', data_file_title_value, :style => "width: 100%;", :rows=>2 -%>
         </p>
 
         <p style="margin-top: 0.5em;">
           <b>Description</b><br/>
           <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
-          <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 5 -%>
+          <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
 
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "DataFile",   # this is only for presentation, not for any processing
