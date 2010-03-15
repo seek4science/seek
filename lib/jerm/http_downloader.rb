@@ -84,6 +84,8 @@ module Jerm
       data_result[:uuid]=UUIDTools::UUID.random_create.to_s
       key=generate_key url,username,password
       cached={}
+      
+      #we don't want to hold the data value in memory, this gets stored to disk
       data_result.keys.each{|k| cached[k]=data_result[k] unless k==:data}
       begin
         store_data_to_tmp data_result[:data],data_result[:uuid]
