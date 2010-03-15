@@ -6,8 +6,7 @@ module Jerm
     
     def get_remote_data url, username=nil, password=nil, type=nil
       url=url+"?format=txt" if is_sop?(type) && !url.end_with?("=txt")
-
-      data_hash = basic_auth url, username, password
+      data_hash = super(url, username, password)
       data_hash[:data] = cut_document_end(data_hash[:data]) if is_sop?(type)
       return data_hash
     end
