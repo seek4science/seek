@@ -100,9 +100,9 @@
 <script type="text/javascript">
   // recreate internal store of attributions..
 <% existing_attributions.each do |a| -%>
-    attr_type = '<%= a.class.name -%>';
+    attr_type = "<%= a.class.name -%>";
     attr_id = <%= a.id -%>;
-    attr_title = '<%= a.title -%>';
+    attr_title = "<%= h(a.title) -%>";
 
     attribution_settings.push([attr_type, attr_title, attr_id]);
 <% end -%>
