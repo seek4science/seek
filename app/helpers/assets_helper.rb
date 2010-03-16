@@ -57,6 +57,13 @@ module AssetsHelper
     return path
   end
 
+  #returns true if this permission should not be able to be removed from custom permissions
+  #it indicates that this is the management rights for the current user.
+  #the logic is that true is returned if the current_user is the contributor of this permission, unless that person is also the contributor of the asset
+  def prevent_manager_removal(resource,permission)
+    permission.access_type==Policy::MANAGING && permission.contributor==current_user.person && resource.contributor != current_user
+  end
+
   def show_resource_path(resource)
     path = ""
     if resource.class.name.include?("::Version")

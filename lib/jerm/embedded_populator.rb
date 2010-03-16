@@ -25,8 +25,7 @@ module Jerm
           author = Person.find(resource.author_seek_id)
         else
           author = Person.find(:first,:conditions=>['first_name = ? AND last_name = ?',resource.author_first_name,resource.author_last_name])
-        end
-
+        end        
         if project.nil?
           response={:response=>:fail,:message=>MESSAGES[:no_project],:response_code=>RESPONSE_CODES[:no_project]}
         elsif author.nil?
