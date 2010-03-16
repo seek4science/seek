@@ -506,6 +506,7 @@ class ModelsController < ApplicationController
     # ..other
     @resource_type = "Model"
     @favourite_groups = current_user.favourite_groups
+    @resource=@model
 
     @all_people_as_json = Person.get_all_as_json
     

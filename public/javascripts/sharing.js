@@ -255,7 +255,10 @@ function updateCustomSharingSettings() {
             shared_with += '<b>' + contributor_type + '</b>: ' + permission_settings[contributor_type][i][0]
             + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>'
             + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-            + '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">remove</a>]</small><br/>';
+            if (permission_settings[contributor_type][i].length<4 || permission_settings[contributor_type][i][3]==true) {
+                shared_with += '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">remove</a>]'
+            }
+            shared_with += '</small><br/>';
         }
     
     // remove the last line break
