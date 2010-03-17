@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class PublicationsControllerTest < ActionController::TestCase
+  
+  fixtures :all
+  
   test "should get index" do
     get :index
     assert_response :success
@@ -14,7 +17,8 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test "should create publication" do
     assert_difference('Publication.count') do
-      post :create, :publication => { }
+      post :create, :publication => {:title => "paper", :abstract => "words", :journal => "j",
+                                     :contributor => users(:quentin), :published_date => Time.now }
     end
 
     assert_redirected_to publication_path(assigns(:publication))

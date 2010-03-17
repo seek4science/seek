@@ -171,7 +171,7 @@ module AssetsHelper
     end
     
     related.each_key do |key|
-      related[key][:items].compact
+      related[key][:items] = related[key][:items].compact
     end
 
     return related
