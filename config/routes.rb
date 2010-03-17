@@ -65,7 +65,6 @@ ActionController::Routing::Routes.draw do |map|
   #tags
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
   
-
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
   
   # browsing by countries
