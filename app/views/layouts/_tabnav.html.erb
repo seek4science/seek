@@ -45,7 +45,12 @@
     <!-- SOPs tab -->
     <li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
       <%= link_to "SOPs", sops_url -%>
-    </li>    
+    </li>
+    
+    <!-- Publications tab -->
+    <li <%= (["publications"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
+      <%= link_to "Publications", publications_url -%>
+    </li>
 
   </ul>
   </div>

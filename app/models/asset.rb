@@ -23,7 +23,7 @@ class Asset < ActiveRecord::Base
   # - user_to_authorize: user for which this asset hash will be rendered in the view
   
   #The order in which asset tabs appear
-  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop','SavedSearch']
+  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch']
 
   def contributor
     self.resource.contributor

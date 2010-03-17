@@ -15,13 +15,15 @@ module ResourceListItemHelper
   
   def get_list_item_avatar_partial resource
     if resource.respond_to?("asset")
-      actions_partial = "layouts/asset_resource_avatars"
+      avatar_partial = "layouts/asset_resource_avatars"
     elsif resource.class.name == "Assay"
-      actions_partial = "assays/resource_avatar"
+      avatar_partial = "assays/resource_avatar"
+    elsif resource.class.name == "Publication"
+      avatar_partial = "layouts/contributor_avatar"
     else
-      actions_partial = "layouts/resource_avatar"
+      avatar_partial = "layouts/resource_avatar"
     end
-    return actions_partial
+    return avatar_partial
   end
   
   def list_item_title resource, title=nil, url=nil    
@@ -117,17 +119,17 @@ module ResourceListItemHelper
     if resource.contributor.nil?
       value = jerm_harvester_name
     else
-      value = link_to resource.contributor.person.name, resource.contributor
+      value = link_to resource.contributor.person.name, resource.contributor.person
     end
     return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{value}</p>"
   end
   
-  def list_item_expandable_text text, length=200
+  def list_item_expandable_text attribute, text, length=200
     full_text = text_or_not_specified(text, :description => true,:auto_link=>false)
     trunc_text = text_or_not_specified(text, :description => true,:auto_link=>false, :length=>length)
     #Don't bother with fancy stuff if not enough text to expand
     if full_text == trunc_text
-      html = "<div class=\"list_item_desc\">"
+      html = (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b>:</p>" : "") + "<div class=\"list_item_desc\">"
       html << trunc_text
       html << "</div>"
     else    
@@ -135,10 +137,13 @@ module ResourceListItemHelper
       html << "fullResourceListItemExpandableText[#{text.object_id}] = '#{escape_javascript(full_text)}';\n"
       html << "truncResourceListItemExpandableText[#{text.object_id}]  = '#{escape_javascript(trunc_text)}';\n"
       html << "</script>\n"
+      html << (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b> " : "")
+      html << (link_to "(Expand)", "#", :id => "expandableLink#{text.object_id}", :onClick => "expandResourceListItemExpandableText(#{text.object_id});return false;")
+      html << "</p>"
       html << "<div class=\"list_item_desc\"><div id=\"expandableText#{text.object_id}\">"
       html << trunc_text
       html << "</div>"
-      html << (link_to "(Expand)", "#", :id => "expandableLink#{text.object_id}", :onClick => "expandResourceListItemExpandableText(#{text.object_id});return false;") + "</div>"
+      html << "</div>"
     end
   end
   

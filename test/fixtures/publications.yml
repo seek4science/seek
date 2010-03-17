@@ -5,3 +5,17 @@
 #
 # two:
 #   column: value
+
+one:
+  title: A paper on blabla
+  abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
+  journal: JOURNAL OF SCIENCE
+  contributor: quentin (User)
+  published_date: <%= 5.days.ago.to_s :db %>  
+  
+two:
+  title: Another paper on blabla
+  abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
+  journal: JOURNAL OF SCIENCE
+  contributor: quentin (User)
+  published_date: <%= 5.days.ago.to_s :db %>  
