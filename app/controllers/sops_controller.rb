@@ -294,6 +294,7 @@ class SopsController < ApplicationController
     # ..other
     @resource_type = "SOP"
     @favourite_groups = current_user.favourite_groups
+    @resource = @sop
     
     @all_people_as_json = Person.get_all_as_json    
     

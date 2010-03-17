@@ -388,9 +388,12 @@
           permissions_for_set['<%= p.contributor_type -%>'] = 0;
           permission_settings['<%= p.contributor_type -%>'] = new Array();
         }
-
+      <% allow_removal=true -%>
       <% if p.contributor_type == "Person" -%>
-        <% contributor_name = (p.contributor.first_name + " " + p.contributor.last_name) -%>
+        <%
+          contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
+          allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
+        -%>
       <% elsif p.contributor_type == "WorkGroup" -%>
         <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
       <% else -%>
@@ -401,7 +404,7 @@
         // first index is the category of contributor type of the permission, the second - consecutive
         // number of occurrences of permissions for such type of contributor
         permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
-          ['<%= contributor_name -%>', <%= p.contributor_id -%>, <%= p.access_type -%>];
+          ['<%= contributor_name -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
     <% end -%>
   <% end -%>
 <% end -%>

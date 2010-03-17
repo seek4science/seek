@@ -291,6 +291,7 @@ class DataFilesController < ApplicationController
     # ..other
     @resource_type = "DataFile"
     @favourite_groups = current_user.favourite_groups
+    @resource = @data_file
 
     @all_people_as_json = Person.get_all_as_json
 
