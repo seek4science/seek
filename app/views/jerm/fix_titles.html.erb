@@ -1,0 +1,20 @@
+<h1>Titles</h1>
+<% form_tag :action=>"update_titles" do |f| -%>
+<%= submit_tag("Update selected") -%>
+<table class="jerm_resources">
+  <tr>
+    <th>Current Title</th><th>Proposed Title</th><th>Include?</th><th>Type</th><th>Download</th>
+  </tr>
+
+  <% for asset in @assets -%>
+  <tr>
+    <td><%=  asset.resource.title -%></td>
+    <td><%= text_field_tag "proposed_#{asset.id}",generate_resource_title(asset.resource), :size=>50 -%></td>
+    <td><%= check_box_tag "include_#{asset.id}" -%></td>
+    <td><%= asset.resource.class.name -%></td>
+    <td><%= link_to(image("download"),"http://google.com") -%></td>
+  </tr>
+  <% end -%>
+</table>
+<%= submit_tag("Update selected") -%>
+<% end -%>

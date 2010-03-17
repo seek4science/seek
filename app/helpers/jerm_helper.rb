@@ -20,5 +20,14 @@ module JermHelper
   def jerm_harvester_name
     "JERM"
   end
+
+  def generate_resource_title resource
+    filename=resource.original_filename
+    last_dot=filename.rindex(".")
+    if(!last_dot.nil? && last_dot > filename.length-6) #only handle dots close to the end
+      filename=filename[0..last_dot-1]
+    end
+    filename.gsub("_"," ").capitalize
+  end
   
 end

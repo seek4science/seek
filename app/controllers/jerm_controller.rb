@@ -9,6 +9,28 @@ class JermController < ApplicationController
     
   end
 
+  def fix_titles
+    @assets=Asset.find(:all).select{|a| a.contributor.nil? && a.resource.title.include?("'")}
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def update_titles
+    included_keys = params.keys.select{|k| k.start_with?("include_")}
+    @assets=[]
+    included_keys.each do |included|
+      asset_id=included.gsub("include_","").to_i
+      asset=Asset.find(asset_id)
+      new_title=params["proposed_#{asset_id}"]
+      asset.resource.update_attribute(:title,new_title)
+      @assets << asset
+    end
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def run
     
     project_id=params[:project]
