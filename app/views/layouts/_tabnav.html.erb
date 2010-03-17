@@ -47,12 +47,11 @@
     <li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
       <%= link_to "SOPs", sops_url -%>
     </li>
-
-    <% if current_user.is_admin? && JERM_ENABLED -%>
-      <li class="tabs_block_gap">
-
-      </li>     
-    <% end -%>
+    
+    <!-- Publications tab -->
+    <li <%= (["publications"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
+      <%= link_to "Publications", publications_url -%>
+    </li>
 
   </ul>
   </div>

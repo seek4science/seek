@@ -109,6 +109,8 @@ class PubmedQuery
       journal = article.find_first('.//Journal/ISOAbbreviation')
       params[:journal] = journal.nil? ? nil : journal.content
       
+      params[:pmid] = article.find_first('.//PMID').content
+      
       records << PubmedRecord.new(params)
     end    
     return records
