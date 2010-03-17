@@ -46,13 +46,7 @@
     <!-- SOPs tab -->
     <li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
       <%= link_to "SOPs", sops_url -%>
-    </li>
-
-    <% if current_user.is_admin? && JERM_ENABLED -%>
-      <li class="tabs_block_gap">
-
-      </li>     
-    <% end -%>
+    </li>    
 
   </ul>
   </div>
