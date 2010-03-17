@@ -8,7 +8,7 @@
   <tr>
     <td><%=  asset.resource.title -%></td>    
     <td><%= asset.resource.class.name -%></td>
-    <td><%= link_to(image("download"),"http://google.com") -%></td>
+    <td><%= link_to(image("download"),url_for(:action=>"download",:id=>asset.id,:controller=>"jerm")) -%></td>
   </tr>
   <% end -%>
 </table>

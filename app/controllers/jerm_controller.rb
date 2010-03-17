@@ -31,6 +31,11 @@ class JermController < ApplicationController
     end
   end
 
+  def download
+    asset = Asset.find(params[:id])
+    download_jerm_resource asset.resource
+  end
+
   def run
     
     project_id=params[:project]

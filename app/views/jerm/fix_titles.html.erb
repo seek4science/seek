@@ -12,7 +12,7 @@
     <td><%= text_field_tag "proposed_#{asset.id}",generate_resource_title(asset.resource), :size=>50 -%></td>
     <td><%= check_box_tag "include_#{asset.id}" -%></td>
     <td><%= asset.resource.class.name -%></td>
-    <td><%= link_to(image("download"),"http://google.com") -%></td>
+    <td><%= link_to(image("download"),url_for(:action=>"download",:id=>asset.id,:controller=>"jerm")) -%></td>
   </tr>
   <% end -%>
 </table>
