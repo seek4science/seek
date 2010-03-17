@@ -119,7 +119,7 @@ module ResourceListItemHelper
     if resource.contributor.nil?
       value = jerm_harvester_name
     else
-      value = link_to resource.contributor.person.name, resource.contributor
+      value = link_to resource.contributor.person.name, resource.contributor.person
     end
     return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{value}</p>"
   end
