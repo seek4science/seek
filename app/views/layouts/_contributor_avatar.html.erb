@@ -1,0 +1,10 @@
+<%
+contributor = resource.contributor
+%>
+<div style="text-align: center">
+  <% if resource.contributor -%>
+    <%= favouritable_icon(resource.contributor.person, 60) -%>      
+  <% else %>    
+    <%= the_jerm :size=>30 -%>
+  <% end -%>
+</div>
