@@ -87,7 +87,7 @@ module AssetsHelper
     name = resource.class.name.split("::")[0]
 
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-      "Study" => {}, "Assay" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}}
+      "Study" => {}, "Assay" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -148,6 +148,7 @@ module AssetsHelper
         related["Project"][:items] = resource.projects || []
         related["Institution"][:items] = resource.institutions || []
         related["Study"][:items] = resource.studies || []
+        related["Publication"][:items] = resource.publications || []
       when "Institution"
         related["Project"][:items] = resource.projects || []
         related["Person"][:items] = resource.people || []
@@ -164,6 +165,8 @@ module AssetsHelper
         related["Assay"][:items] = resource.assays || []
         related["Study"][:items] = resource.studies || []
         related["Investigation"][:items] = resource.investigations || []
+      when "Publication"
+        related["Person"][:items] = resource.authors || []
       else
     end
     
