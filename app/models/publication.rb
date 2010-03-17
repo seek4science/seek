@@ -4,7 +4,8 @@ class Publication < ActiveRecord::Base
   
   before_save :update_first_letter
   
-  has_many :authors
+  has_many :publication_authors, :dependent => :destroy
+  has_many :authors, :through => :publication_authors, :class_name => 'Person'
   
   validates_presence_of :title
   

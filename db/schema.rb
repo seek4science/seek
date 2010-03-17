@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100312101221) do
+ActiveRecord::Schema.define(:version => 20100317102249) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -346,6 +346,13 @@ ActiveRecord::Schema.define(:version => 20100312101221) do
     t.string   "site_credentials"
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
+  end
+
+  create_table "publication_authors", :force => true do |t|
+    t.integer  "author_id"
+    t.integer  "publication_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "publications", :force => true do |t|
