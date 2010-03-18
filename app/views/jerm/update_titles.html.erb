@@ -1,0 +1,14 @@
+<h1>Updated Titles</h1>
+<table class="jerm_resources">
+  <tr>
+    <th>New Title</th><th>Type</th><th>Download</th>
+  </tr>
+
+  <% for asset in @assets -%>
+  <tr>
+    <td><%=  asset.resource.title -%></td>    
+    <td><%= asset.resource.class.name -%></td>
+    <td><%= link_to(image("download"),url_for(:action=>"download",:id=>asset.id,:controller=>"jerm")) -%></td>
+  </tr>
+  <% end -%>
+</table>
