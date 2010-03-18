@@ -33,11 +33,7 @@ module Mib
 
           # a virtual attribute to keep the associated project_id temporary
           # (until it's saved into the corresponding asset in the after_save callback)
-          attr_accessor :project_id
-          
-          # a set of virtual attributes (temporary - same as above) to transfer the data about source and
-          # quality of the asset from the new resource into corresponding asset during creation
-          attr_accessor :source_type, :source_id, :quality
+          attr_accessor :project_id                    
                   
           after_save :save_asset_record          
           
@@ -47,8 +43,7 @@ module Mib
           include Mib::Acts::Resource::InstanceMethods
           
           before_create do |res|
-            res.asset = Asset.new(:resource => res,
-              :source_type => res.source_type, :source_id => res.source_id, :quality => res.quality)
+            res.asset = Asset.new(:resource => res)
           end
         end
       end
@@ -90,9 +85,6 @@ module Mib
           case self.contributor_type
           when "User"
             return (self.contributor_id == c_utor.id && self.contributor_type == c_utor.class.name)
-            # TODO some new types of "contributors" may be added at some point - this is to cater for that in future
-            # when "Network"
-            #   return self.contributor.owner?(c_utor.id) if self.contributor_type.to_s
           else
             # unknown type of contributor - definitely not the owner 
             return false

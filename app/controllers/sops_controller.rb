@@ -126,13 +126,7 @@ class SopsController < ApplicationController
       params[:sop][:content_type] = (params[:sop][:data]).content_type
       params[:sop][:original_filename] = (params[:sop][:data]).original_filename
       data = params[:sop][:data].read
-      params[:sop].delete('data')
-      
-      # store source and quality of the new SOP (this will be kept in the corresponding asset object eventually)
-      # TODO set these values to something more meaningful, if required for SOPs
-      params[:sop][:source_type] = "upload"
-      params[:sop][:source_id] = nil
-      params[:sop][:quality] = nil
+      params[:sop].delete('data')            
             
       @sop = Sop.new(params[:sop])
       @sop.content_blob = ContentBlob.new(:data => data)

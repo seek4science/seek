@@ -37,7 +37,7 @@ class JermController < ApplicationController
   end
 
   def run
-    
+    Sop.destroy_all
     project_id=params[:project]
 
     @project=Project.find(project_id)
