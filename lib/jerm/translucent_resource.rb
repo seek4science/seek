@@ -12,7 +12,7 @@ module Jerm
       @description=""
     end
 
-    def populate
+    def populate      
       @author_seek_id = @node.find_first("submitter").inner_xml unless @node.find_first("submitter").nil?
       if @type=="Model"
         @uri = @node.find_first("model").inner_xml unless @node.find_first("model").nil?
@@ -25,8 +25,7 @@ module Jerm
       
       @description += "Purpose: #{@node.find_first("purpose").inner_xml}\n" unless (@node.find_first("purpose").nil? || @node.find_first("purpose").blank?)
       @description += @node.find_first("descriptions").inner_xml unless @node.find_first("descriptions").nil?
-      @description += @node.find_first("description").inner_xml unless @node.find_first("description").nil?
-      
+      @description += @node.find_first("description").inner_xml unless @node.find_first("description").nil?      
     end
 
     def project_name

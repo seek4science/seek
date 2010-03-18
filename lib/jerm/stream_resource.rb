@@ -4,11 +4,7 @@
 module Jerm
   class StreamResource < Resource
 
-    attr_accessor :username, :password
-    
-    def populate
-      
-    end
+    attr_accessor :username, :password       
     
     def get_data
       uri = URI.parse(uri)

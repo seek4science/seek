@@ -21,8 +21,8 @@ module Jerm
       @uri=@asset
     end    
 
-    def populate
-      read_metadata(@metadata)
+    def populate      
+      read_metadata(@metadata)      
     end
 
     def read_metadata metadata_uri

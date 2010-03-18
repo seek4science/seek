@@ -20,7 +20,9 @@ module Jerm
       items = changed_since(last_run)
       resources = []
       items.each do |item|
-        resources << construct_resource(item)
+        resource = construct_resource(item)
+        resource.populate
+        resources << resource
       end
       return resources
     end

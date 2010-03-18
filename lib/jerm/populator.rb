@@ -36,10 +36,9 @@ module Jerm
     #adds a resource to the central SEEK archive, referenced by the remote URI, or creates new version if already exists.
     #returns a report:
     # {:response=>:success|:fail|:skipped,:message=>"",:exception=>Exception|nil,:resource=>resource}
-    def populate resource
-      resource.populate
+    def populate resource      
       begin
-        if resource.uri.nil?
+        if resource.uri.blank?
           response={:response=>:fail,:message=>"No URL to data file described"}
         elsif !exists?(resource)
           response=add_as_new(resource)

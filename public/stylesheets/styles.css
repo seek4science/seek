@@ -886,3 +886,7 @@ ul.related_asset_list li{
 .contribution_title h1 {    
     width: 100%;
 }
+
+table.jerm_results {
+    font-size: x-small;
+}

@@ -1,0 +1,35 @@
+<tr>
+  <td><%= status_image(insert_result_line[:response]) -%></td>
+  <td><%= h(insert_result_line[:response_code]) %></td>
+  <td><%= h(insert_result_line[:resource].title) -%></td>
+  <td><%= link_to "Source",insert_result_line[:resource].uri %></td>
+  <td><%= h(insert_result_line[:resource].type) -%></td>
+  <td><%= h(insert_result_line[:resource].author_name) -%></td>
+  <td><%= h(insert_result_line[:resource].author_seek_id) -%></td>
+  <td><%= link_to(h(insert_result_line[:author].name),person_path(insert_result_line[:author])) unless insert_result_line[:author].nil? -%></td>
+  <td><%= h(insert_result_line[:resource].timestamp) -%></td>
+  <td><%= h(insert_result_line[:seek_model].content_blob.md5sum) unless insert_result_line[:seek_model].nil? -%>  </td>
+  <td><%= h(insert_result_line[:message]) -%></td>
+
+  <td><%= link_to("Go to asset",url_for(insert_result_line[:seek_model]),:popup=>true) unless insert_result_line[:seek_model].nil? -%></td>
+
+  <td>
+    <%=
+    unless insert_result_line[:exception].nil?
+      link_to_function h(insert_result_line[:exception].message),visual_effect(:toggle_appear,"exception_#{insert_result_line[:uuid]}")
+    end
+    -%>
+  </td>
+</tr>
+
+<%  unless insert_result_line[:exception].nil? -%>
+  <tr style="display:none;" id="exception_<%=  insert_result_line[:uuid] -%>">
+    <td colspan="10">
+      <ul>
+        <% insert_result_line[:exception].backtrace[0..25].each do |trace| -%>
+          <li><%= trace %></li>
+        <% end -%>
+      </ul>
+    </td>
+  </tr>
+<%  end -%>

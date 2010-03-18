@@ -6,7 +6,7 @@ require 'net/http'
 module Jerm
   class MosesResource < Resource
   
-    def populate
+    def populate      
       valid = false
       if self.uri.end_with?(".xls")
         valid = parse_spreadsheet

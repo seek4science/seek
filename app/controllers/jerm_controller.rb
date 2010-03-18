@@ -5,6 +5,8 @@ class JermController < ApplicationController
 
   @@harvesters=nil
 
+  layout "no_sidebar"
+
   def index
     
   end
@@ -32,15 +34,69 @@ class JermController < ApplicationController
   end
 
   def download
-    asset = Asset.find(params[:id])
-    download_jerm_resource asset.resource
+    if params[:id]
+      asset = Asset.find(params[:id])
+      download_jerm_resource asset.resource
+    else
+      project=Project.find(params[:project])
+      uri=params[:uri]
+      type=params[:type]
+      project.decrypt_credentials
+      downloader=Jerm::DownloaderFactory.create project.name
+      data_hash = downloader.get_remote_data uri,project.site_username,project.site_password, type
+      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
+    end
   end
 
-  def fetch
-    #Sop.destroy_all
-    project_id=params[:project]
+  def insert_results
+    resources=[]
+    @project=Project.find(params[:project])
+    params.keys.each do |key|
+      if key.start_with?("title")
+        uuid=key.gsub("title_","")
+        unless params["exclude_#{uuid}"]
+          resource=Jerm::Resource.new
+          resource.title=params[key]
+          resource.project=params["project_#{uuid}"]
+          resource.description=params["description_#{uuid}"]
+          resource.author_first_name=params["first_name_#{uuid}"]
+          resource.author_last_name=params["last_name_#{uuid}"]
+          resource.author_seek_id=params["seek_id_#{uuid}"]
+          resource.type=params["type_#{uuid}"]
+          resource.uri=params["uri_#{uuid}"]
+          resource.timestamp=params["timestamp_#{uuid}"]
+          resources << resource
+        end
+      end
+    end
 
-    @project=Project.find(project_id)
+    begin
+      populator = Jerm::EmbeddedPopulator.new
+      @responses = populator.populate_collection(resources)
+      response_order=[:success,:warning,:fail,:skipped]
+
+      @responses=@responses.sort_by{|a| response_order.index(a[:response])}      
+      @project.update_attribute(:last_jerm_run,Time.now)
+
+      inform_authors
+    rescue Exception => @exception
+      puts @exception
+    end
+    
+    render :update do |page|
+      if @exception
+        page.replace_html :results,:partial=>"exception",:object=>@exception
+      else
+        page.replace_html :results,:partial=>"insert_results",:object=>@responses
+      end
+    end
+  end
+
+  
+  def fetch
+    Sop.destroy_all
+
+    @project=Project.find(params[:project])
     @project.decrypt_credentials
     if @project.site_root_uri.blank?
       flash.now[:error]="No remote site location defined"
@@ -48,24 +104,8 @@ class JermController < ApplicationController
       flash.now[:error]="No password has been defined"
     else
       begin
-        harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
-        populator = Jerm::EmbeddedPopulator.new
-
-        resources = harvester.update
-        
-        @responses = populator.populate_collection(resources)
-
-        response_order=[:success,:warning,:fail,:skipped]
-        @responses=@responses.sort_by{|a| response_order.index(a[:response])}
-        
-        class << @project
-          def record_timestamps; false; end
-        end
-        @project.last_jerm_run=Time.now
-        @project.save
-        
-        inform_authors 
-
+        harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)        
+        @resources = harvester.update
       rescue Exception => @exception
         puts @exception
       end
@@ -75,8 +115,8 @@ class JermController < ApplicationController
       if @exception
         page.replace_html :results,:partial=>"exception",:object=>@exception
       else
-        page.replace_html :results,:partial=>"results",:object=>@responses
-      end      
+        page.replace_html :results,:partial=>"fetch_results",:object=>@resources
+      end
     end
 
   end
@@ -88,7 +128,7 @@ class JermController < ApplicationController
     clean_project_name=project_name.gsub("-","")
     discover_harvesters if @@harvesters.nil?
     
-    harvester_class=@@harvesters.find do |h|      
+    harvester_class=@@harvesters.find do |h|
       h.name.downcase.start_with?("jerm::"+clean_project_name.downcase)
     end
     raise Exception.new("Unable to find Harvester for project #{project_name}") if harvester_class.nil?
@@ -110,10 +150,10 @@ class JermController < ApplicationController
   end
 
   def jerm_enabled
-  	if (!JERM_ENABLED)
-  		error("JERM is not enabled","invalid action")
-  		return false
-  	end
+    if (!JERM_ENABLED)
+      error("JERM is not enabled","invalid action")
+      return false
+    end
   end
  
   def inform_authors
@@ -123,7 +163,7 @@ class JermController < ApplicationController
         resources[r[:author]] ||= []
         resources[r[:author]] << r
       end
-    end 
+    end
     resources.each_key do |author|
       begin
         unless author.nil? || author.user.nil?
