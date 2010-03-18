@@ -14,8 +14,11 @@ module Jerm
       "#{author_first_name} #{author_last_name}"
     end
 
-    def filename      
-      return uri.split("/").last unless uri.blank?
+    def filename
+      unless uri.blank?
+        the_uri=URI.decode(self.uri) rescue self.uri
+        return the_uri.split("/").last
+      end
     end
         
   end

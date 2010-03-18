@@ -1,11 +1,11 @@
 <% if !flash[:error] -%>
 
 
-  <%= "Harvested #{results.size} results" %>
+  <%= "Processed #{insert_results.size} harvested results" %>
 
-  <table class="jerm">
+  <table class="jerm_results">
     <tr><th>Status</th><th>Code</th><th>Title</th><th>Source</th><th>Type</th><th>Submitter name</th><th>Submitter SEEK ID</th><th>Author model</th><th>Timestamp</th><th>MD5 SUM</th><th>Message</th><th>Link</th><th>Exception</th></tr>
-    <%= render :partial=>"result_line",:collection=>results %>
+    <%= render :partial=>"insert_result_line",:collection=>insert_results %>
   </table>
 
 <% else -%>

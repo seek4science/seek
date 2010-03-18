@@ -3,8 +3,10 @@
 
   <%= "Harvested #{fetch_results.size} results" %>
 
-  <% form_tag :action=>"insert_results" do |f| -%>
-    <table class="jerm" style="font-size: x-small">
+  <% form_remote_tag :url=>url_for(:controller => "jerm", :action => "insert_results") do -%>
+
+    <%= hidden_field_tag :project,@project.id %>
+    <table class="jerm_results">
       <tr><th>Exclude?</th><th>Type</th><th>Title</th><th>Filename</th><th>Description</th><th>Name</th><th>Seek ID</th></tr>
       <%= render :partial=>"fetch_result_line",:collection=>fetch_results %>
     </table>

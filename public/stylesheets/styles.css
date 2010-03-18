@@ -872,3 +872,7 @@ div.hidden_list_item {
 .contribution_title h1 {    
     width: 100%;
 }
+
+table.jerm_results {
+    font-size: x-small;
+}

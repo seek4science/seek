@@ -38,7 +38,7 @@ class JermController < ApplicationController
       asset = Asset.find(params[:id])
       download_jerm_resource asset.resource
     else
-      project=Project.find(:first,:conditions=>['name = ?',params[:project]])
+      project=Project.find(params[:project])
       uri=params[:uri]
       type=params[:type]
       project.decrypt_credentials
@@ -48,15 +48,35 @@ class JermController < ApplicationController
     end
   end
 
-  def insert
+  def insert_results
+    resources=[]
+    @project=Project.find(params[:project])
+    params.keys.each do |key|
+      if key.start_with?("title")
+        uuid=key.gsub("title_","")
+        unless params["exclude_#{uuid}"]
+          resource=Jerm::Resource.new
+          resource.title=params[key]
+          resource.project=params["project_#{uuid}"]
+          resource.description=params["description_#{uuid}"]
+          resource.author_first_name=params["first_name_#{uuid}"]
+          resource.author_last_name=params["last_name_#{uuid}"]
+          resource.author_seek_id=params["seek_id_#{uuid}"]
+          resource.type=params["type_#{uuid}"]
+          resource.uri=params["uri_#{uuid}"]
+          resource.timestamp=params["timestamp_#{uuid}"]
+          resources << resource
+        end
+      end
+    end
 
-    begin      
-      resources=[]
+    begin
+      populator = Jerm::EmbeddedPopulator.new
       @responses = populator.populate_collection(resources)
       response_order=[:success,:warning,:fail,:skipped]
 
       @responses=@responses.sort_by{|a| response_order.index(a[:response])}      
-      @project.update_attribut(:last_jerm_run,Time.now)
+      @project.update_attribute(:last_jerm_run,Time.now)
 
       inform_authors
     rescue Exception => @exception
@@ -67,7 +87,7 @@ class JermController < ApplicationController
       if @exception
         page.replace_html :results,:partial=>"exception",:object=>@exception
       else
-        page.replace_html :results,:partial=>"insert_results",:object=>@resources
+        page.replace_html :results,:partial=>"insert_results",:object=>@responses
       end
     end
   end
@@ -76,9 +96,7 @@ class JermController < ApplicationController
   def fetch
     Sop.destroy_all
 
-    project_id=params[:project]
-
-    @project=Project.find(project_id)
+    @project=Project.find(params[:project])
     @project.decrypt_credentials
     if @project.site_root_uri.blank?
       flash.now[:error]="No remote site location defined"
@@ -86,13 +104,8 @@ class JermController < ApplicationController
       flash.now[:error]="No password has been defined"
     else
       begin
-        harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
-        populator = Jerm::EmbeddedPopulator.new
-
+        harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)        
         @resources = harvester.update
-        
-        
-
       rescue Exception => @exception
         puts @exception
       end
