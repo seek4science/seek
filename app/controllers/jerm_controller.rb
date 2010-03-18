@@ -36,7 +36,7 @@ class JermController < ApplicationController
     download_jerm_resource asset.resource
   end
 
-  def run
+  def fetch
     Sop.destroy_all
     project_id=params[:project]
 
@@ -49,7 +49,12 @@ class JermController < ApplicationController
     else
       begin
         harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)
-        @responses = harvester.update
+        populator = Jerm::EmbeddedPopulator.new
+
+        resources = harvester.update
+        
+        @responses = populator.populate_collection(resources)
+
         response_order=[:success,:warning,:fail,:skipped]
         @responses=@responses.sort_by{|a| response_order.index(a[:response])}
         
