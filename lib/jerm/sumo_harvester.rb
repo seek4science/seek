@@ -1,8 +1,6 @@
 module Jerm
   class SumoHarvester < WikiHarvester        
     
-    attr_accessor :test
-    
     def changed_since(date)
       @changed_since_date = date #TODO: use this for something
       
@@ -144,11 +142,7 @@ module Jerm
                 if @section == "Attachments"
                   @data_files << resource_uri
                   @searched_uris << resource_uri
-                elsif e.attributes['class'] == "attachment" && (self.test == 1)
-                  @data_files << resource_uri
-                  @searched_uris << resource_uri
-                end
-      
+                end      
               end        
             end          
         end
