@@ -24,6 +24,15 @@ module Jerm
       :success=>0
     }
 
+    #calls populate on an enumeration of resources, and returns an enumeration of responses
+    def populate_collection resources
+      res=[]
+      resources.each do |r|
+        res << populate(r)
+      end
+      return res
+    end
+    
     #adds a resource to the central SEEK archive, referenced by the remote URI, or creates new version if already exists.
     #returns a report:
     # {:response=>:success|:fail|:skipped,:message=>"",:exception=>Exception|nil,:resource=>resource}

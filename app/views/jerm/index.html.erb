@@ -24,7 +24,7 @@
 
 <h1>JERM Adminstration</h1>
 
-<% form_remote_tag :url=>url_for(:controller=>:jerm,:action=>:run),
+<% form_remote_tag :url=>url_for(:controller=>:jerm,:action=>:fetch),
   :before=>"harvester_initiated();" do -%>
   Project: <%= select_tag :project,
     options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ),
