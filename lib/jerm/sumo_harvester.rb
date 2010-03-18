@@ -1,6 +1,8 @@
 module Jerm
   class SumoHarvester < WikiHarvester        
     
+    attr_accessor :test
+    
     def changed_since(date)
       @changed_since_date = date #TODO: use this for something
       
@@ -32,14 +34,17 @@ module Jerm
       end
       
       links.uniq.each do |link|
+        @data_files = Array.new
+        @sops = Array.new
+        @experimenters = Array.new
+        @section = "none"
+        @title = ""
+        @author = ""
+        @date = ""
+        @table = 0
+        @valid_template = false
+        @stop_search = false
         unless @visited_links.include?(link)
-          @data_files = Array.new
-          @sops = Array.new
-          @experimenters = Array.new
-          @section = "none"
-          @title = ""
-          @valid_template = false
-          @stop_search = false
           @visited_links << link
           get_data(link, (level+1))
         end
@@ -61,9 +66,10 @@ module Jerm
             @title += " " + e.inner_html
             @title.strip!
           when "h2", "h3"
-            @section = e.inner_html
+            @section = e.inner_html.strip
           when "table"
-            if @section == "General Data"
+            @table += 1
+            if @section == "General Data" || @table == 1
               @valid_template = true
               general_data = {}
               rows = e.search("//tr")
@@ -71,12 +77,12 @@ module Jerm
               # and the items from the second column as the value
               rows.each do |row|
                 cols = row.search("//td")
-                general_data[cols.first.inner_html.strip] = cols.last.inner_html.strip 
+                general_data[cols.first.inner_html.strip.downcase.gsub(/<(\/)?(.)>/,"")] = cols.last.inner_html.strip 
               end
               
               general_data.each_key do |k|
-                if k.downcase.start_with?("author")                  
-                  @author = general_data[k]
+                if k.start_with?("author")                  
+                  @author = general_data[k].strip
                   #to deal with awkward author fields like "<Name> (<Job that they did>)"                  
                   @author = @author[0...(@author =~ (/[^-a-zA-Z ]/))].strip if @author =~ (/[^-a-zA-Z ]/)
                 elsif k.downcase.start_with?("date")
@@ -114,8 +120,9 @@ module Jerm
                   #Get the URL to the SOP from the table cell
                   sop_link = cell.at("a")
                   unless sop_link.nil?
-                    resource_uri = complete_url(sop_link['href'], extract_base_url(uri))
-                    @sops << resource_uri
+                    resource_uri = complete_url(sop_link['href'], extract_base_url(uri))                    
+                    @sops << resource_uri unless @searched_uris.include?(resource_uri)
+                    @searched_uris << resource_uri
                   end
                 end
               end
@@ -134,11 +141,12 @@ module Jerm
               #Don't visit timeline links, anchors, or pages already visited.
               unless (resource_uri.include?("timeline?") || resource_uri.start_with?("#") || @searched_uris.include?(resource_uri))
                 #Remember we've visited this link
-                @searched_uris << resource_uri
                 if @section == "Attachments"
                   @data_files << resource_uri
-                elsif e.attributes['class'] == "attachment"
+                  @searched_uris << resource_uri
+                elsif e.attributes['class'] == "attachment" && (self.test == 1)
                   @data_files << resource_uri
+                  @searched_uris << resource_uri
                 end
       
               end        
@@ -150,26 +158,27 @@ module Jerm
       if @valid_template
         #Create sop resources
         unless @sops.empty?
-          @sops.each do |s|
+          @sops.uniq.each do |s|
             res = SumoResource.new
             res.uri = s
             res.type = "Sop"
             res.work_package = @WP
             res.experimenters = @experimenters
             sop_data = parse_sop(s)
-            @title, @author = sop_data[:title], sop_data[:author]
-            unless @author.nil?
-              first_name, last_name = @author.split(" ", 2)
+            title, author = sop_data[:title], sop_data[:author]
+            unless author.nil?
+              first_name, last_name = author.split(" ", 2)
               res.author_first_name = first_name
               res.author_last_name = last_name
             end
+            res.title = title
             @resources << res
           end
         end
         
         #Create data file resources
         unless @data_files.empty?
-          @data_files.each do |s|
+          @data_files.uniq.each do |s|
             res = SumoResource.new
             res.uri = s
             res.type = "DataFile"
