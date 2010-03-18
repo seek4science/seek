@@ -1,0 +1,23 @@
+<% if !flash[:error] -%>
+
+
+  <%= "Harvested #{fetch_results.size} results" %>
+
+  <% form_tag :action=>"insert_results" do |f| -%>
+    <table class="jerm" style="font-size: x-small">
+      <tr><th>Exclude?</th><th>Type</th><th>Title</th><th>Filename</th><th>Description</th><th>Name</th><th>Seek ID</th></tr>
+      <%= render :partial=>"fetch_result_line",:collection=>fetch_results %>
+    </table>
+    <%= submit_tag "Insert" -%>
+  <% end -%>
+
+<% else -%>
+  <div id="error_flash" class="box_standout" style="color: red; font-weight: bold; margin: 0.8em 0.8em; line-height: 1.4;">
+    <%= white_list flash[:error] %>
+    <p>
+      It is possible that the project needs configuring: <%= link_to "Configure #{h(@project.name)}",admin_project_path(@project) %>
+    </p>
+  </div>
+
+<% end -%>
+

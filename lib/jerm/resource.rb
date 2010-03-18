@@ -4,7 +4,7 @@
 module Jerm
   class Resource
 
-    attr_accessor :project, :uri, :author_first_name, :author_last_name,:author_seek_id,:timestamp,:type, :title, :description
+    attr_accessor :project, :uri, :author_first_name, :author_last_name,:author_seek_id,:timestamp,:type, :title, :description    
 
     def to_s
       "Owner: #{author_name} (#{author_seek_id}), Project: #{project}, URI: #{uri}, Type: #{type}, Timestamp: #{timestamp}"
@@ -12,6 +12,10 @@ module Jerm
 
     def author_name
       "#{author_first_name} #{author_last_name}"
+    end
+
+    def filename      
+      return uri.split("/").last unless uri.blank?
     end
         
   end

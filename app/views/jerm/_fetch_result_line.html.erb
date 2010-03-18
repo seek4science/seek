@@ -1,0 +1,21 @@
+<%
+uuid=UUIDTools::UUID.random_create
+%>
+<tr>
+  <td><%= check_box_tag "exclude_#{uuid}" -%></td>
+  <td><%= fetch_result_line.type -%></td>
+  <td><%= text_area_tag("title_#{uuid}",fetch_result_line.title,:cols=>50,:rows=>3) -%></td>
+  <td><%= (link_to_function(image("arrow_left"),"use_title('#{uuid}','#{generate_resource_title_from_filename(fetch_result_line.filename)}');") + "<br/>") unless fetch_result_line.filename.blank? -%>
+      <%= fetch_result_line.filename -%><br/>
+      <%= link_to(image("download"),url_for(:action=>"download",:uri=>fetch_result_line.uri,:project=>fetch_result_line.project,:type=>fetch_result_line.type,:controller=>"jerm")) unless fetch_result_line.uri.blank? -%>
+  </td>
+  <td><%= text_area_tag("description_#{uuid}",fetch_result_line.description,:cols=>50,:rows=>3)  -%></td>
+  <td>
+      <%= text_field_tag("first_name_#{uuid}",fetch_result_line.author_first_name,:size=>10)  -%>
+      <br/>
+      <%= text_field_tag("last_name_#{uuid}",fetch_result_line.author_last_name,:size=>10)  -%>
+  </td>  
+  <td><%= text_field_tag("seek_id_#{uuid}",fetch_result_line.author_seek_id,:size=>5)  -%></td>  
+</tr>
+
+

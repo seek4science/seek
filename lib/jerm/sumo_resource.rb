@@ -3,7 +3,7 @@ module Jerm
     
     attr_accessor :work_package, :experimenters
     
-    def populate
+    def populate      
       if title.blank? && type=="Sop" && uri
         extract_title_from_sop_text
       end
@@ -17,7 +17,6 @@ module Jerm
 
     #attempts to extract the title from the wiki markup
     def extract_title_from_sop_text
-
       p=Project.find(:first,:conditions=>['name = ?',project])
       if p
         p.decrypt_credentials
@@ -30,8 +29,7 @@ module Jerm
             self.title = proposed_title[2..-3] #remove the first 2, and last 2 characters (the = plus space)
           end
         end
-      end
-      
+      end      
     end
     
   end

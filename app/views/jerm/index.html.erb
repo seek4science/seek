@@ -13,10 +13,10 @@
     $('last_ran').innerHTML="Last ran at: "+time;
 
   }
-  
-  <% Project.find(:all).each do |p| %>
-  run_times[<%= p.id %>]="<%= p.last_jerm_run.blank? ? "Never" : p.last_jerm_run.to_s %>";
-  <% end %>
+
+<% Project.find(:all).each do |p| %>
+    run_times[<%= p.id %>]="<%= p.last_jerm_run.blank? ? "Never" : p.last_jerm_run.to_s %>";
+<% end %>
 
 </script>
 
@@ -29,14 +29,20 @@
   Project: <%= select_tag :project,
     options_for_select( Project.find(:all).collect{|p| [h("#{p.title}"),p.id]} ),
     :onchange=>"javascript: selected_product_changed()"
-  %>
+%>
   <span id="last_ran"></span><br/>
   <%= submit_tag "GO!" %>
 <% end -%>
 
+<script type="text/javascript">
+  function use_title(uuid,title) {
+    title_element="title_"+uuid;
+    $(title_element).value=title;
+  }
+</script>
 
 <div id="results">
-  
+
 </div>
 
 
