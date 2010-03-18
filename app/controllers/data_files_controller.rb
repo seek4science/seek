@@ -94,14 +94,7 @@ class DataFilesController < ApplicationController
       params[:data_file][:original_filename] = (params[:data_file][:data]).original_filename
       data = params[:data_file][:data].read
       params[:data_file].delete('data')
-
-      # store source and quality of the new Data file (this will be kept in the corresponding asset object eventually)
-      # TODO set these values to something more meaningful, if required for Data files
-      params[:data_file][:source_type] = "upload"
-      params[:data_file][:source_id] = nil
-      params[:data_file][:quality] = nil
-
-
+      
       @data_file = DataFile.new(params[:data_file])
       @data_file.content_blob = ContentBlob.new(:data => data)
 

@@ -311,14 +311,7 @@ class ModelsController < ApplicationController
       params[:model][:content_type] = (params[:model][:data]).content_type
       params[:model][:original_filename] = (params[:model][:data]).original_filename
       data = params[:model][:data].read
-      params[:model].delete('data')
-
-      # store source and quality of the new Model (this will be kept in the corresponding asset object eventually)
-      # TODO set these values to something more meaningful, if required for Models
-      params[:model][:source_type] = "upload"
-      params[:model][:source_id] = nil
-      params[:model][:quality] = nil
-
+      params[:model].delete('data')     
 
       @model = Model.new(params[:model])
       @model.content_blob = ContentBlob.new(:data => data)
