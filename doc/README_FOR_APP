@@ -1,2 +1,11 @@
-Use this README file to introduce your application and point to useful places in the API for learning more.
-Run "rake doc:app" to generate API documentation for your models, controllers, helpers, and libraries.
+= SYSMO-SEEK
+
+Please visit the Sysmo-DB Website[http://www.sysmo-db.org] for more information about Sysmo-SEEK and Sysmo-DB in general.
+
+== Architecture
+
+For information about the general architecture please view the Architecture[link:files/doc/ARCHITECTURE.html] document.
+
+== JERM
+
+For information about the JERM and how to extend it please view the JERM[link:files/doc/JERM.html] document.
