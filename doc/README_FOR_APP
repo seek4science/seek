@@ -1,3 +1,5 @@
+
+
 = SYSMO-SEEK
 
 Please visit the Sysmo-DB Website[http://www.sysmo-db.org] for more information about Sysmo-SEEK and Sysmo-DB in general.
@@ -17,3 +19,8 @@ For information about the JERM and how to extend it please view the JERM[link:fi
 == Credits
 
 Please read CREDITS[link:files/doc/CREDITS.html]
+
+
+Author::    Stuart Owen  (mailto:stuart.owen@manchester.ac.uk)
+Copyright:: Copyright (c) 2009 The University of Manchester UK &  EML Research gGmbH
+License::   New BSD Licence[http://www.opensource.org/licenses/bsd-license.php]
