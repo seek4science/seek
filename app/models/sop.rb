@@ -16,8 +16,7 @@ class Sop < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description, :title, :original_filename]) if SOLR_ENABLED
 
-  belongs_to :content_blob,
-    :dependent => :destroy
+  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
                
   has_one :investigation,:through=>:study
              
@@ -30,8 +29,7 @@ class Sop < ActiveRecord::Base
 
   explicit_versioning(:version_column => "version") do
     
-    belongs_to :content_blob,
-      :dependent => :destroy
+    belongs_to :content_blob
     
     belongs_to :contributor, :polymorphic => true
     

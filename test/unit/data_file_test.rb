@@ -47,4 +47,16 @@ class DataFileTest < ActiveSupport::TestCase
     assert !df.managers.include?(people(:person_not_associated_with_any_projects))
   end
 
+  test "make sure content blob is preserved after deletion" do
+    df = data_files(:picture)
+    assert_not_nil df.content_blob,"Must have an associated content blob for this test to work"
+    cb=df.content_blob
+    assert_difference("DataFile.count",-1) do
+      assert_no_difference("ContentBlob.count") do
+        df.destroy
+      end
+    end
+    assert_not_nil ContentBlob.find(cb.id)
+  end
+
 end
