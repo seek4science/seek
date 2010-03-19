@@ -1,11 +1,13 @@
 class Publication < ActiveRecord::Base
+
+  acts_as_resource
   
   grouped_pagination
   
   before_save :update_first_letter
   
-  has_many :publication_authors, :dependent => :destroy
-  has_many :authors, :through => :publication_authors, :class_name => 'Person'
+  #has_many :publication_authors, :dependent => :destroy
+  #has_many :authors, :through => :publication_authors, :class_name => 'Person'
   
   validates_presence_of :title
   
