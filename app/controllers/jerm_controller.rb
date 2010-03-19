@@ -4,6 +4,7 @@ class JermController < ApplicationController
   before_filter :jerm_enabled
 
   @@harvesters=nil
+  @@populator = Jerm::EmbeddedPopulator.new
 
   layout "no_sidebar"
 
@@ -65,14 +66,15 @@ class JermController < ApplicationController
           resource.type=params["type_#{uuid}"]
           resource.uri=params["uri_#{uuid}"]
           resource.timestamp=params["timestamp_#{uuid}"]
+          resource.duplicate=params["duplicate_#{uuid}"]
           resources << resource
         end
       end
     end
 
     begin
-      populator = Jerm::EmbeddedPopulator.new
-      @responses = populator.populate_collection(resources)
+      
+      @responses = @@populator.populate_collection(resources)
       response_order=[:success,:warning,:fail,:skipped]
 
       @responses=@responses.sort_by{|a| response_order.index(a[:response])}      
@@ -106,6 +108,7 @@ class JermController < ApplicationController
       begin
         harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)        
         @resources = harvester.update
+        @resources.each {|r| r.duplicate=@@populator.exists?(r)}
       rescue Exception => @exception
         puts @exception
       end

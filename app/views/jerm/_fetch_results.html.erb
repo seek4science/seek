@@ -1,16 +1,37 @@
 <% if !flash[:error] -%>
 
-
+  <%
+  new_resources=fetch_results.select{|r| !r.duplicate}
+  duplicate_resources=fetch_results.select{|r| r.duplicate}
+%>
   <%= "Harvested #{fetch_results.size} results" %>
 
-  <% form_remote_tag :url=>url_for(:controller => "jerm", :action => "insert_results") do -%>
-
+  <% form_remote_tag :url=>url_for(:controller => "jerm", :action => "insert_results"),:before=>"harvester_initiated();" do -%>
+    
     <%= hidden_field_tag :project,@project.id %>
+
+
+    <h2>New</h2>
     <table class="jerm_results">
       <tr><th>Exclude?</th><th>Type</th><th>Title</th><th>Filename</th><th>Description</th><th>Name</th><th>Seek ID</th></tr>
-      <%= render :partial=>"fetch_result_line",:collection=>fetch_results %>
+      <%= render :partial=>"fetch_result_line",:collection=>new_resources %>
     </table>
+
+
+
+    <h2><%= link_to_function("Existing",visual_effect(:toggle_appear,"existing_jerm_results")) -%></h2>
+
+    <div id="existing_jerm_results" style="display:none;">
+      <table class="jerm_results">
+        <tr><th>Exclude?</th><th>Type</th><th>Title</th><th>Filename</th><th>Description</th><th>Name</th><th>Seek ID</th></tr>
+        <%= render :partial=>"fetch_result_line",:collection=>duplicate_resources %>
+      </table>
+    </div>
+
     <%= submit_tag "Insert" -%>
+
+
+
   <% end -%>
 
 <% else -%>
