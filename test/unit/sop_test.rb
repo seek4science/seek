@@ -105,5 +105,18 @@ class SopTest < ActiveSupport::TestCase
     end
     assert_not_nil ContentBlob.find(cb.id)
   end
+
+  test "is restorable after destroy" do
+    sop = sops(:my_first_sop)
+    assert_difference("Sop.count",-1) do
+      sop.destroy
+    end
+    assert_nil Sop.find_by_id(sop.id)
+    assert_difference("Sop.count",1) do
+      Sop.restore_trash!(sop.id)
+    end
+    assert_not_nil Sop.find_by_id(sop.id)
+  end
+
   
 end

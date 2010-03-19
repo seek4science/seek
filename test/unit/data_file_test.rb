@@ -59,4 +59,16 @@ class DataFileTest < ActiveSupport::TestCase
     assert_not_nil ContentBlob.find(cb.id)
   end
 
+  test "is restorable after destroy" do
+    df = data_files(:picture)
+    assert_difference("DataFile.count",-1) do
+      df.destroy
+    end
+    assert_nil DataFile.find_by_id(df.id)
+    assert_difference("DataFile.count",1) do
+      DataFile.restore_trash!(df.id)
+    end
+    assert_not_nil DataFile.find_by_id(df.id)
+  end
+
 end

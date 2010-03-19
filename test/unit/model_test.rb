@@ -52,4 +52,16 @@ class ModelTest < ActiveSupport::TestCase
     assert_not_nil ContentBlob.find(cb.id)
   end
 
+  test "is restorable after destroy" do
+    model = models(:teusink)
+    assert_difference("Model.count",-1) do
+      model.destroy
+    end
+    assert_nil Model.find_by_id(model.id)
+    assert_difference("Model.count",1) do
+      Model.restore_trash!(model.id)
+    end
+    assert_not_nil Model.find_by_id(model.id)
+  end
+
 end

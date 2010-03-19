@@ -4,7 +4,8 @@ require 'grouped_pagination'
 
 class DataFile < ActiveRecord::Base
 
-  acts_as_resource  
+  acts_as_resource
+  acts_as_trashable
   
   has_many :favourites, 
            :as => :resource, 
