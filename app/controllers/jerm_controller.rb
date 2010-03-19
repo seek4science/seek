@@ -95,8 +95,7 @@ class JermController < ApplicationController
   end
 
   
-  def fetch
-    
+  def fetch    
     @project=Project.find(params[:project])
     @project.decrypt_credentials
     if @project.site_root_uri.blank?

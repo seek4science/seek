@@ -1,0 +1,31 @@
+= ActsAsTrashable
+
+This plugin is designed to reduce the risk of adding a delete function to your application by allowing you to restore records that have been destroyed.
+
+Often it makes sense to add a function to delete records so that your production database isn't polluted with bad records. However, you can quickly regret this feature should one of your users get a little trigger happy and delete something they shouldn't have. Restoring the lost data from the database can be time consuming and may not even be possible. The inspiration for this plugin was a user who didn't understand that the "reject" function deleted the data for everyone and not just from that user's view.
+
+To protect yourself, simply declare acts_as_trashable in any active record model. This will cause the record to be serialized to a trash_records table before it is deleted when you call destroy. In addition, any has_and_belongs_to_many associations or any has_many or has_one associations declared with :dependent => :destroy will also be serialized. These associations should not have acts_as_trashable (there's no harm if they do, you just end up with twice as much trash). You must run the included migration to create the trash_records table.
+
+== Restoring Records
+
+These trash records and all their associations can be restored later by calling restore! on the TrashRecord records. Calling restore! will also delete the TrashRecord. You can also call restore (without the exclamation) which will just restore the original record and associations to memory without saving to the database or deleting the trash. This can be useful if you only need to inspect the trash record or if you've changed the model since the original record was created so that requires some additional processing before it can be saved. If you have a record which cannot be restored due to validation errors, you can try calling save_without_validation on the restored record.
+
+  TrashRecord.find(id).restore.save_without_validation
+
+In many cases this should work just fine since presumably the record was valid when it was originally destroyed. When records are restored, the id values are also restored to the original values.
+
+The ActsAsTrashable::ClassMethods are mixed into your model when you call acts_as_trashable. These provide some convenience methods for restoring and emptying the trash for only a specific class.
+
+== Disabling
+
+If you wish to destroy a record without trashing it, perform the destroy inside a disable_trash block on the model (i.e. record.disable_trash{record.destroy}). Also, this plugin does not affect the delete or delete_all methods on active record. These will still delete the records directly from the database.
+
+== Keeping It Clean
+
+To keep your trash table from filling up, you can call empty_trash on TrashRecord or on any ActsAsTrashable model. These methods clear out records older than a specified number of seconds. Trashed records are compressed in the database to conserve the amount of disk space they take up.
+
+== Other Solutions
+
+Another method of solving the issue that this plugin addresses is to add a status flag on your model and consider records with the flag set to be deleted (for example see ActsAsParanoid[http://ar-paranoid.rubyforge.org/]). This is definitely a safer method of keeping the records since the data is never actually deleted. However, it presents a more complicated solution and you'll need to guard against ever accidentally showing a deleted record. The best method to use will depend on your application.
+
+Finally, this plugin has a companion plugin ActsAsRevisionable[http://actsasrevisions.rubyforge.org/] which allows you to keep a history of revisions to records each time they get updated. Using both together gives you a more robust restoration system. They are not packaged together because some applications may not have a use for the revisioning but do need the protection against accidental deletion.

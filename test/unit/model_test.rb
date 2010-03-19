@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ModelTest < ActiveSupport::TestCase
-  fixtures :models,:recommended_model_environments,:content_blobs,:assets,:projects
+  fixtures :models,:recommended_model_environments,:content_blobs,:assets,:projects,:model_versions
 
   test "assocations" do
     model=models(:teusink)
@@ -38,6 +38,30 @@ class ModelTest < ActiveSupport::TestCase
         model.destroy
       end
     end
+  end
+
+  test "make sure content blob is preserved after deletion" do
+    model = models(:teusink)
+    assert_not_nil model.content_blob,"Must have an associated content blob for this test to work"
+    cb=model.content_blob
+    assert_difference("Model.count",-1) do
+      assert_no_difference("ContentBlob.count") do
+        model.destroy
+      end
+    end
+    assert_not_nil ContentBlob.find(cb.id)
+  end
+
+  test "is restorable after destroy" do
+    model = models(:teusink)
+    assert_difference("Model.count",-1) do
+      model.destroy
+    end
+    assert_nil Model.find_by_id(model.id)
+    assert_difference("Model.count",1) do
+      Model.restore_trash!(model.id)
+    end
+    assert_not_nil Model.find_by_id(model.id)
   end
 
 end

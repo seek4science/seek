@@ -83,6 +83,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_equal 0, d.find_version(2).studied_factors.count
     assert_not_equal d.find_version(1).studied_factors, d.find_version(2).studied_factors    
   end
+
+  test "should destroy DataFile" do
+    assert_difference('DataFile.count', -1) do
+      assert_no_difference("ContentBlob.count","The ContentBlob for this DataFile should be preserved") do
+        delete :destroy, :id => data_files(:editable_data_file).id
+      end
+    end
+
+    assert_redirected_to data_files_path
+  end
   
   test "adding_new_conditions_to_different_versions" do
     d=data_files(:editable_data_file)    
