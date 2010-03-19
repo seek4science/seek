@@ -2,10 +2,18 @@
 
 Please visit the Sysmo-DB Website[http://www.sysmo-db.org] for more information about Sysmo-SEEK and Sysmo-DB in general.
 
+== Installation
+
+Please read INSTALL[link:files/doc/INSTALL.html]
+
 == Architecture
 
 For information about the general architecture please view the Architecture[link:files/doc/ARCHITECTURE.html] document.
 
-== JERM
+== JERM (Just Enough Results Model)
 
 For information about the JERM and how to extend it please view the JERM[link:files/doc/JERM.html] document.
+
+== Credits
+
+Please read CREDITS[link:files/doc/CREDITS.html]
