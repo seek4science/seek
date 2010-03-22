@@ -14,6 +14,8 @@ class Publication < ActiveRecord::Base
   
   validates_presence_of :title
   
+  has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
+  
   #belongs_to :contributor, :polymorphic => true
   
   def update_first_letter

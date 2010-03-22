@@ -1,10 +1,11 @@
 class PublicationsController < ApplicationController
 
+  ADMIN_EMAIL = "bacallf7@cs.man.ac.uk"
   
   # GET /publications
   # GET /publications.xml
   def index
-    @publications = Publication.paginate :page=>params[:page], :default_page => "all"
+    @publications = Publication.paginate :page=>params[:page]
 
     respond_to do |format|
       format.html # index.html.erb
@@ -40,11 +41,26 @@ class PublicationsController < ApplicationController
   # POST /publications
   # POST /publications.xml
   def create
-    @publication = Publication.new(params[:publication])
+    @publication = Publication.new()
+    pubmed_id = params[:publication][:pubmed_id]
+    query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
+    results = query.fetch([pubmed_id])
+    result = nil
+    unless results.empty?
+      result = results.first
+      @publication.extract_metadata(result) unless result.nil?
+    end
     @publication.contributor = current_user
-
+    
     respond_to do |format|
       if @publication.save
+        result.authors.each do |author|
+          pa = PublicationAuthor.new()
+          pa.publication = @publication
+          pa.first_name = author.first_name
+          pa.last_name = author.last_name
+          pa.save
+        end
         flash[:notice] = 'Publication was successfully created.'
         format.html { redirect_to(@publication) }
         format.xml  { render :xml => @publication, :status => :created, :location => @publication }
@@ -87,11 +103,10 @@ class PublicationsController < ApplicationController
   def fetch_preview
     @publication = Publication.new
     pubmed_id = params[:pubmed_id]
-    query = PubmedQuery.new("sysmo-seek","")
+    query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
     results = query.fetch([pubmed_id])
     unless results.empty?
       result = results.first
-      @publication = Publication.new    
       @publication.extract_metadata(result) unless result.nil?
     else
       raise "Error - No pubmed record found"

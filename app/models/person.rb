@@ -48,9 +48,6 @@ class Person < ActiveRecord::Base
 
   alias_attribute :title, :name
   
-  has_many :publication_authors, :dependent => :destroy, :foreign_key => 'author_id'
-  has_many :publications, :through => :publication_authors  
-  
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
   

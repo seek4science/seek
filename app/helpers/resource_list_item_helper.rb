@@ -5,7 +5,7 @@ module ResourceListItemHelper
   end
   
   def get_list_item_actions_partial resource
-    if ["DataFile","Model","Sop"].include?(resource.class.name)
+    if ["DataFile","Model","Sop"].include?(resource.class.name.split("::").first)
       actions_partial = "assets/resource_actions_td"
     else
       actions_partial = nil
@@ -14,7 +14,7 @@ module ResourceListItemHelper
   end
   
   def get_list_item_avatar_partial resource
-    if ["DataFile","Model","Sop","Publication"].include?(resource.class.name)
+    if ["DataFile","Model","Sop","Publication"].include?(resource.class.name.split("::").first)
       avatar_partial = "layouts/asset_resource_avatars"
     elsif resource.class.name == "Assay"
       avatar_partial = "assays/resource_avatar"

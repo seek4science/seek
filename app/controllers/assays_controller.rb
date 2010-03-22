@@ -43,15 +43,15 @@ class AssaysController < ApplicationController
     (sop_assets+model_assets).each do |a_id|
       @assay.assets << Asset.find(a_id)
     end    
-    data_assets.each do |text|
-      a_id, r_type = text.split(",")
-      @assay.relate(Asset.find(a_id), RelationshipType.find_by_title(r_type))
-    end  
 
     @assay.owner=current_user.person       
     
     respond_to do |format|
       if @assay.save
+        data_assets.each do |text|
+          a_id, r_type = text.split(",")
+          @assay.relate(Asset.find(a_id), RelationshipType.find_by_title(r_type))
+        end    
         flash[:notice] = 'Assay was successfully created.'
         format.html { redirect_to(@assay) }
         format.xml  { render :xml => @assay, :status => :created, :location => @assay }
