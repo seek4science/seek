@@ -171,7 +171,7 @@ module BioPortal
         pages = element.first.find(element.path + "/numPages").first.content
       }
 
-      return results.uniq,pages
+      return results.uniq,pages.to_i
 
     end
 
@@ -196,10 +196,11 @@ module BioPortal
        
 
     #options can include
-    # - offset - the offet to start from
-    # - limit - the maximum number of terms returns
+    # - pagenum - the offet to start from
+    # - pagesize - the maximum number of terms returns -defaults to 50
+    # returns concept_list,num_pages
     def get_concepts_for_ontology_version_id ontology_version_id,options={}
-      options[:offset]||=0
+      options[:pagenum]||=0
       uri="/concepts/#{ontology_version_id}/all?"
       options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k].to_s)}&"}
       uri=uri[0..-2]
@@ -213,16 +214,22 @@ module BioPortal
       end
 
       concepts=[]
-      doc.find("/*/data/list/classBean").each{ |element|
+      doc.find("/*/data/page/contents/classBeanResultList/classBean").each{ |element|
         concepts << process_concept_bean_xml(element)
       }
-      return concepts
+      pages = 1
+      doc.find("/*/data/page").each{|element|
+        pages = element.first.find(element.path + "/numPages").first.content
+      }
+
+      return concepts,pages.to_i
       
     end
 
     #options can include
     # - offset - the offet to start from
     # - limit - the maximum number of terms returns
+    # <em>This call is currently not implemented</em>
     def get_concepts_for_virtual_ontology_id virtual_ontology_id,options={}
       uri="/virtual/ontology/#{virtual_ontology_id}/all?"
       options.keys.each{|k|uri+="#{k}=#{URI.encode(options[k])}&"}

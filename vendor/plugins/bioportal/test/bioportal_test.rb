@@ -8,7 +8,7 @@ class BioportalTest < Test::Unit::TestCase
   def test_search
     res,pages = search "Escherichia coli",:page_size=>10
     assert !res.empty?
-    assert pages.to_i>50
+    assert pages>50
     assert_equal 10,res.size
     assert_not_nil(res.find{|r| r[:ontology_id]=="1132"})
   end
@@ -49,10 +49,11 @@ class BioportalTest < Test::Unit::TestCase
   end
 
   def test_get_concepts_for_version_id
-    concepts = get_concepts_for_ontology_version_id("38802",:limit=>"10")
+    concepts,pages = get_concepts_for_ontology_version_id("38802",:pagesize=>"10")
     assert_not_nil concepts,"concepts should not be nil"
     assert !concepts.empty?,"concepts should not be empty"
     assert_not_nil concepts.first[:label],"there should be the label set on the first concept"
+    assert pages>10,"There should be more than 10 pages"
  
     assert_equal 10,concepts.size,"there should be 10 concepts"
   end
