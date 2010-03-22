@@ -1,4 +1,43 @@
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
 
-<%= link_to 'Edit', edit_publication_path(@publication) %> |
-<%= link_to 'Back', publications_path %>
+<div class="show_basic">
+  <div class="main_content_left_box">
+    <div class="box_about_actor">
+      <p>
+        <label>Project:</label>
+        <% if @publication.project.nil? -%>
+          <%= text_or_not_specified nil %>
+        <% else -%>
+          <%= link_to h(@publication.project.name),@publication.project %>
+        <% end -%>
+      </p>
+      <p>
+        <label>Journal:</label>
+        <%=h @publication.journal -%>
+        <br/>
+        <label>Date Published:</label>
+        <%= @publication.published_date.strftime("#{@publication.published_date.day.ordinalize} %B %Y") -%>
+      </p>
+
+      <p>
+        <b>Abstract:</b>
+        <% unless @publication.abstract.blank? -%>
+          <div class="box_standout" id="description">
+            <%= simple_format(auto_link(white_list(@publication.abstract),:all,:rel=>'nofollow')) -%>
+          </div>
+        <% else -%>
+          <p class="none_text">
+            No abstract.
+          </p>
+        <% end -%>
+      </p>
+
+
+    </div>
+  </div>
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @publication } %>
+
+  <div style="clear:both;padding-top:1em;">    
+    <%= render :partial=>"layouts/items_related_to",:object => @publication %>
+  </div>
+</div>

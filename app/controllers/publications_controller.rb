@@ -26,11 +26,9 @@ class PublicationsController < ApplicationController
   # GET /publications/new
   # GET /publications/new.xml
   def new
-    @publication = Publication.new
-
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render :xml => @publication }
+      format.xml 
     end
   end
 
@@ -43,6 +41,7 @@ class PublicationsController < ApplicationController
   # POST /publications.xml
   def create
     @publication = Publication.new(params[:publication])
+    @publication.contributor = current_user
 
     respond_to do |format|
       if @publication.save
@@ -85,4 +84,20 @@ class PublicationsController < ApplicationController
     end
   end
   
+  def fetch_preview
+    @publication = Publication.new
+    pubmed_id = params[:pubmed_id]
+    query = PubmedQuery.new("sysmo-seek","")
+    results = query.fetch([pubmed_id])
+    unless results.empty?
+      result = results.first
+      @publication = Publication.new    
+      @publication.extract_metadata(result) unless result.nil?
+    else
+      raise "Error - No pubmed record found"
+    end
+    respond_to do |format|
+      format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
+    end
+  end
 end

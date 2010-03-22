@@ -1,11 +1,22 @@
-<h1>New publication</h1>
+<h1>Register Publication</h1>
 
-<% form_for(@publication) do |f| %>
-  <%= f.error_messages %>
-
-  <p>
-    <%= f.submit 'Create' %>
-  </p>
-<% end %>
-
-<%= link_to 'Back', publications_path %>
+<div class="show_basic">
+    <% form_remote_tag(:url =>fetch_preview_publications_url, 
+                       :update => {:success => 'publication_preview'}, 
+                       :success => "Element.show('publication_preview'); new Effect.Highlight('publication_preview', { duration: 1.0 });",
+                       :failure => "alert('An error occurred whilst fetching your publication. Please ensure you entered a valid PubMed ID.');", 
+                       :loading => "Element.show('spinner')",
+                       :complete => "Element.hide('spinner')") do %>
+    <p>
+      Enter the PubMed ID of your publication and click "Fetch" to retrieve information on your publication.<br/>
+      If SEEK successfully retrieves your publication, click "Register" to process to the next step.
+    </p>  
+    <p>
+      <label>PubMed ID: </label>
+      <%= text_field_tag("pubmed_id", value = nil, options = {}) %>
+      <%= submit_tag 'Fetch' %>
+      <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
+    </p>    
+  <% end %>
+  <div id="publication_preview" class="list_item" style="display:none"></div>
+</div>

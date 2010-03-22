@@ -5,7 +5,7 @@ module ResourceListItemHelper
   end
   
   def get_list_item_actions_partial resource
-    if resource.respond_to?("asset")
+    if ["DataFile","Model","Sop"].include?(resource.class.name)
       actions_partial = "assets/resource_actions_td"
     else
       actions_partial = nil
@@ -14,12 +14,10 @@ module ResourceListItemHelper
   end
   
   def get_list_item_avatar_partial resource
-    if resource.respond_to?("asset")
+    if ["DataFile","Model","Sop","Publication"].include?(resource.class.name)
       avatar_partial = "layouts/asset_resource_avatars"
     elsif resource.class.name == "Assay"
       avatar_partial = "assays/resource_avatar"
-    elsif resource.class.name == "Publication"
-      avatar_partial = "layouts/contributor_avatar"
     else
       avatar_partial = "layouts/resource_avatar"
     end
@@ -125,8 +123,8 @@ module ResourceListItemHelper
   end
   
   def list_item_expandable_text attribute, text, length=200
-    full_text = text_or_not_specified(text, :description => true,:auto_link=>false)
-    trunc_text = text_or_not_specified(text, :description => true,:auto_link=>false, :length=>length)
+    full_text = text_or_not_specified(text, :description => false,:auto_link=>false)
+    trunc_text = text_or_not_specified(text, :description => false,:auto_link=>false, :length=>length)
     #Don't bother with fancy stuff if not enough text to expand
     if full_text == trunc_text
       html = (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b>:</p>" : "") + "<div class=\"list_item_desc\">"

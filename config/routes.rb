@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :publications
+  map.resources :publications,:collection=>{:fetch_preview=>:post}
 
   map.resources :created_datas
 

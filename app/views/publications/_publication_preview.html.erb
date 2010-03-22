@@ -1,0 +1,20 @@
+<%= list_item_title publication %>
+
+<%= list_item_attribute "PubMed ID", publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{publication.pubmed_id}"%>
+
+<%= list_item_simple_list(authors, "Author") {|a| a.last_name + " " + a.first_name} -%>
+
+<%= list_item_expandable_text "Abstract", h(publication.abstract) %>
+
+<%= list_item_optional_attribute "Journal", h(publication.journal) %>
+
+<%= list_item_attribute "Date Published", publication.published_date.strftime('%d/%m/%Y') %>    
+
+<% form_for @publication do |f| %>
+  <%= f.hidden_field :pubmed_id %>
+  <%= f.hidden_field :title %>
+  <%= f.hidden_field :abstract %>
+  <%= f.hidden_field :journal %>
+  <%= f.hidden_field :published_date %>
+  <%= submit_tag 'Register' %>
+<% end %>

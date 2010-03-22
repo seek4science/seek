@@ -1,3 +1,6 @@
+require 'acts_as_resource'
+require 'grouped_pagination'
+
 class Publication < ActiveRecord::Base
 
   acts_as_resource
@@ -11,7 +14,7 @@ class Publication < ActiveRecord::Base
   
   validates_presence_of :title
   
-  belongs_to :contributor, :polymorphic => true
+  #belongs_to :contributor, :polymorphic => true
   
   def update_first_letter
     self.first_letter=strip_first_letter(title)

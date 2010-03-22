@@ -8,7 +8,7 @@ class CreatePublications < ActiveRecord::Migration
       t.string :journal
       t.string :first_letter, :limit => 1
       t.string :contributor_type
-      t.integer :contributor_id    
+      t.integer :contributor_id
       
       t.timestamps
     end

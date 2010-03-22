@@ -166,7 +166,7 @@ module AssetsHelper
         related["Study"][:items] = resource.studies || []
         related["Investigation"][:items] = resource.investigations || []
       when "Publication"
-        related["Person"][:items] = resource.authors || []
+        related["Person"][:items] = resource.asset.creators || []
       else
     end
     

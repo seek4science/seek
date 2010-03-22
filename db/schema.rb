@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100318113046) do
+ActiveRecord::Schema.define(:version => 20100319103617) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -363,6 +363,7 @@ ActiveRecord::Schema.define(:version => 20100318113046) do
     t.integer  "contributor_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.datetime "last_used_at"
   end
 
   create_table "recommended_model_environments", :force => true do |t|
