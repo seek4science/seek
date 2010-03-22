@@ -28,8 +28,7 @@ class Assay < ActiveRecord::Base
   has_many :favourites, 
            :as => :resource, 
            :dependent => :destroy
-           
-
+          
 
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organism]) if SOLR_ENABLED
   

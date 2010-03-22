@@ -1,0 +1,11 @@
+test_data:
+  title: Test data
+  description: Data used for model testing
+
+validation_data:
+  title: Validation data
+  description: Data used for validating a model
+
+produced_data:
+  title: Produced data
+  description: Data produced by a model

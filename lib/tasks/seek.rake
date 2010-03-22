@@ -41,14 +41,12 @@ namespace :seek do
       else
         puts "Tagging with id #{tagging.id} is not for Project"
       end
-
     end
-
   end
 
-  desc 'refreshed, or creates, the standard initiali controlled vocublaries'
+  desc 'refreshed, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters"]
+    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","relationship_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute      
     end
@@ -84,6 +82,12 @@ namespace :seek do
     revert_fixtures_identify
     CultureGrowthType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "culture_growth_types")
+  end
+
+  task(:relationship_types=>:environment) do
+    revert_fixtures_identify
+    RelationshipType.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "relationship_types")
   end
 
   task(:model_types=>:environment) do
