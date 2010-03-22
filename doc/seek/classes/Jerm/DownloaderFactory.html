@@ -139,13 +139,13 @@ otherwise defined in the downloaders.yml
             onclick="toggleCode('M000007-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000007-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/jerm/downloader_factory.rb, line 11</span>
-11:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create</span> <span class="ruby-identifier">project_name</span>
-12:       <span class="ruby-identifier">configpath</span>=<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-keyword kw">__FILE__</span>),<span class="ruby-value str">&quot;config/downloaders.yml&quot;</span>)
-13:       <span class="ruby-identifier">config</span>=<span class="ruby-constant">YAML</span><span class="ruby-operator">::</span><span class="ruby-identifier">load_file</span>(<span class="ruby-identifier">configpath</span>)
-14:       <span class="ruby-identifier">downloader_class</span>=<span class="ruby-identifier">config</span>[<span class="ruby-identifier">project_key</span>(<span class="ruby-identifier">project_name</span>)] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">config</span>
-15:       <span class="ruby-identifier">downloader_class</span> <span class="ruby-value">? </span><span class="ruby-constant">Jerm</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">downloader_class</span>).<span class="ruby-identifier">new</span> <span class="ruby-operator">:</span> <span class="ruby-constant">HttpDownloader</span>.<span class="ruby-identifier">new</span>
-16:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/jerm/downloader_factory.rb, line 8</span>
+ 8:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create</span> <span class="ruby-identifier">project_name</span>
+ 9:       <span class="ruby-identifier">configpath</span>=<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">dirname</span>(<span class="ruby-keyword kw">__FILE__</span>),<span class="ruby-value str">&quot;config/downloaders.yml&quot;</span>)
+10:       <span class="ruby-identifier">config</span>=<span class="ruby-constant">YAML</span><span class="ruby-operator">::</span><span class="ruby-identifier">load_file</span>(<span class="ruby-identifier">configpath</span>)
+11:       <span class="ruby-identifier">downloader_class</span>=<span class="ruby-identifier">config</span>[<span class="ruby-identifier">project_key</span>(<span class="ruby-identifier">project_name</span>)] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">config</span>
+12:       <span class="ruby-identifier">downloader_class</span> <span class="ruby-value">? </span><span class="ruby-constant">Jerm</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">downloader_class</span>).<span class="ruby-identifier">new</span> <span class="ruby-operator">:</span> <span class="ruby-constant">HttpDownloader</span>.<span class="ruby-identifier">new</span>
+13:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -165,11 +165,11 @@ otherwise defined in the downloaders.yml
             onclick="toggleCode('M000008-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000008-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/jerm/downloader_factory.rb, line 18</span>
-18:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">project_key</span> <span class="ruby-identifier">project_name</span>
-19:       <span class="ruby-identifier">clean_project_name</span>=<span class="ruby-identifier">project_name</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;-&quot;</span>,<span class="ruby-value str">&quot;&quot;</span>)
-20:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">clean_project_name</span>.<span class="ruby-identifier">underscore</span>
-21:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/jerm/downloader_factory.rb, line 15</span>
+15:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">project_key</span> <span class="ruby-identifier">project_name</span>
+16:       <span class="ruby-identifier">clean_project_name</span>=<span class="ruby-identifier">project_name</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;-&quot;</span>,<span class="ruby-value str">&quot;&quot;</span>)
+17:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">clean_project_name</span>.<span class="ruby-identifier">underscore</span>
+18:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>

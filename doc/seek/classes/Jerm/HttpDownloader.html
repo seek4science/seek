@@ -78,6 +78,17 @@
 
   <div id="contextContent">
 
+    <div id="description">
+      <p>
+Handles downloading data files from a Remote site, together with
+authentication using the provided username and password. The downloader is
+created for a given project using the <a
+href="DownloaderFactory.html">Jerm::DownloaderFactory</a>, though in most
+current cases the <a href="HttpDownloader.html">HttpDownloader</a> is
+sufficient
+</p>
+
+    </div>
 
 
    </div>
@@ -122,12 +133,12 @@
             onclick="toggleCode('M000001-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000001-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/jerm/http_downloader.rb, line 13</span>
-13:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_remote_data</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">password</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword kw">nil</span>
-14:       <span class="ruby-identifier">cached</span>=<span class="ruby-identifier">check_from_cache</span>(<span class="ruby-identifier">url</span>,<span class="ruby-identifier">username</span>,<span class="ruby-identifier">password</span>)
-15:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">cached</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">cached</span>.<span class="ruby-identifier">nil?</span>
-16:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">basic_auth</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>, <span class="ruby-identifier">password</span>
-17:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/jerm/http_downloader.rb, line 12</span>
+12:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_remote_data</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">password</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword kw">nil</span>
+13:       <span class="ruby-identifier">cached</span>=<span class="ruby-identifier">check_from_cache</span>(<span class="ruby-identifier">url</span>,<span class="ruby-identifier">username</span>,<span class="ruby-identifier">password</span>)
+14:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">cached</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">cached</span>.<span class="ruby-identifier">nil?</span>
+15:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">basic_auth</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>, <span class="ruby-identifier">password</span>
+16:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
