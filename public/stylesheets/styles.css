@@ -1,4 +1,10 @@
 
+#custom-doc {
+    margin:auto;text-align:left; /* leave unchanged */
+    width:78.77em;/* non-IE */
+    *width:76.87em;/* IE */
+    min-width:600px;/* optional but recommended */
+}
 
 #errorExplanation {
     width: 95%;
