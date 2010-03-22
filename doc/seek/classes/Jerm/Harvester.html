@@ -78,6 +78,15 @@
 
   <div id="contextContent">
 
+    <div id="description">
+      <p>
+This can be concidered an Abstract class and should be extended for you own
+<a href="Harvester.html">Harvester</a>. In you extended class you need to
+implement the methods <a href="Harvester.html#M000013">changed_since</a>
+and <a href="Harvester.html#M000012">construct_resource</a>.
+</p>
+
+    </div>
 
 
    </div>
@@ -86,6 +95,8 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
+      <a href="#M000013">changed_since</a>&nbsp;&nbsp;
+      <a href="#M000012">construct_resource</a>&nbsp;&nbsp;
       <a href="#M000011">last_run</a>&nbsp;&nbsp;
       <a href="#M000009">new</a>&nbsp;&nbsp;
       <a href="#M000010">update</a>&nbsp;&nbsp;
@@ -111,7 +122,10 @@
         <tr class="top-aligned-row context-row">
           <td class="context-item-name">base_uri</td>
           <td class="context-item-value">&nbsp;[R]&nbsp;</td>
-          <td class="context-item-desc"></td>
+          <td class="context-item-desc">
+The base URI for the Data Storage system to be Harvested.
+
+</td>
         </tr>
         </table>
       </div>
@@ -128,23 +142,26 @@
 
         <div class="method-heading">
           <a href="#M000009" class="method-signature">
-          <span class="method-name">new</span><span class="method-args">(root_uri,user, pass)</span>
+          <span class="method-name">new</span><span class="method-args">(base_uri,user, pass)</span>
           </a>
         </div>
       
         <div class="method-description">
+          <p>
+Initialized the <a href="Harvester.html">Harvester</a> with the base_uri,
+username and password.
+</p>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000009-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000009-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 11</span>
-11:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">root_uri</span>,<span class="ruby-identifier">user</span>, <span class="ruby-identifier">pass</span>)
-12:       <span class="ruby-ivar">@username</span> = <span class="ruby-identifier">user</span>
-13:       <span class="ruby-ivar">@password</span> = <span class="ruby-identifier">pass</span>
-14: 
-15:       <span class="ruby-comment cmt">#FIXME: fix inconsitency between root_uri, and base_uri</span>
-16:       <span class="ruby-ivar">@base_uri</span>=<span class="ruby-identifier">root_uri</span>      
-17:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 10</span>
+10:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">base_uri</span>,<span class="ruby-identifier">user</span>, <span class="ruby-identifier">pass</span>)
+11:       <span class="ruby-ivar">@username</span> = <span class="ruby-identifier">user</span>
+12:       <span class="ruby-ivar">@password</span> = <span class="ruby-identifier">pass</span>
+13:       
+14:       <span class="ruby-ivar">@base_uri</span>=<span class="ruby-identifier">base_uri</span>
+15:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -162,14 +179,21 @@
         </div>
       
         <div class="method-description">
+          <p>
+returns the time that this <a href="Harvester.html">Harvester</a> was last
+run, and causes only <a href="Harvester.html#M000009">new</a> resources
+since this time to be returned by <a
+href="Harvester.html#M000010">update</a>. This date is passed to <a
+href="Harvester.html#M000013">changed_since</a>.
+</p>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000011-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000011-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 30</span>
-30:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">last_run</span>
-31:       <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-value str">&quot;1 Jan 2007&quot;</span>)
-32:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 32</span>
+32:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">last_run</span>
+33:       <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-value str">&quot;1 Jan 2007&quot;</span>)
+34:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -185,6 +209,14 @@
         </div>
       
         <div class="method-description">
+          <p>
+Constructs an Enumeration of Jerm::Resources that have changed since the
+value returned by <a href="Harvester.html#M000011">last_run</a>. This
+method ties together the methods <a
+href="Harvester.html#M000013">changed_since</a> and <a
+href="Harvester.html#M000012">construct_resource</a> and is unlikely to be
+changed in your subclass.
+</p>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000010-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000010-source">
@@ -200,6 +232,67 @@
 26:       <span class="ruby-keyword kw">end</span>
 27:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">resources</span>
 28:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Protected Instance methods</h3>
+
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
+
+        <div class="method-heading">
+          <a href="#M000013" class="method-signature">
+          <span class="method-name">changed_since</span><span class="method-args">(since_date)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns an Enumeration of items changed since the <em>since_date</em>.
+These items are subsequently passed to <a
+href="Harvester.html#M000012">construct_resource</a>.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000013-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 45</span>
+45:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">changed_since</span> <span class="ruby-identifier">since_date</span>
+46:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exception</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;You need to implement this in your subclass of Harvester&quot;</span>)
+47:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
+
+        <div class="method-heading">
+          <a href="#M000012" class="method-signature">
+          <span class="method-name">construct_resource</span><span class="method-args">(item)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+This method it responsible for constructing a <a
+href="Harvester.html#M000009">new</a> <a
+href="Resource.html">Jerm::Resource</a>, based upon the information
+provided by <em>item</em>. It is entirely up to you what type is used for
+<em>item</em>, but within SysMO-DB we tend to use a Hash containg property
+value pairs.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000012-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 40</span>
+40:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">construct_resource</span> <span class="ruby-identifier">item</span>
+41:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exception</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;You need to implement this in your subclass of Harvester&quot;</span>)
+42:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
