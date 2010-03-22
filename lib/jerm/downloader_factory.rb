@@ -1,6 +1,3 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-
 module Jerm
   #Defaults to returning a HttpDownloader, unless specifed otherwise in config/downloaders.yml
   #If a different type of downloader is required, then an entry should be put into downloaders.yml with the project name (lower case and with underscores) as the key,

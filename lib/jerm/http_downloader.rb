@@ -1,12 +1,11 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-
 require 'openssl'
 require 'uuidtools'
 
 module Jerm
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE  
-  
+
+  # Handles downloading data files from a Remote site, together with authentication using the provided username and password.
+  # The downloader is created for a given project using the Jerm::DownloaderFactory, though in most current cases the HttpDownloader is sufficient
   class HttpDownloader
     @@file_cache={}
     
