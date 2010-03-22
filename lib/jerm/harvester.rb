@@ -1,5 +1,5 @@
 module Jerm
-  # This can be concidered an Abstract class and should be extended for you own Harvester. In you extended class you need to implement the
+  # This can be concidered an Abstract class and should be extended for you own Harvester. In your specialised class you need to implement the
   # methods #changed_since and #construct_resource.
   class Harvester
 
