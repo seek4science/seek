@@ -1,0 +1,14 @@
+Using the form below, you can link the authors listed in PubMed to people registered in SEEK.<br/>
+
+<table>
+  <tr>
+    <th>Author name</th>
+    <th>SEEK person</th>
+  </tr>
+  <% authors.each do |author| %>
+  <tr>    
+    <td><%= author.last_name + " " + author.first_name -%></td>
+    <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(suggested_author[author.id],project) -%></select></td>
+  </tr>
+  <% end %>
+</table>
