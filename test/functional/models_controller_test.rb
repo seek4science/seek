@@ -76,7 +76,9 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "should destroy model" do
     assert_difference('Model.count', -1) do
-      delete :destroy, :id => models(:teusink).id
+      assert_no_difference("ContentBlob.count","The ContentBlob for this Model should be preserved") do
+        delete :destroy, :id => models(:teusink).id
+      end
     end
 
     assert_redirected_to models_path

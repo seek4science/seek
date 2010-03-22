@@ -5,6 +5,7 @@ require 'grouped_pagination'
 class Model < ActiveRecord::Base
 
   acts_as_resource
+  acts_as_trashable
   
   has_many :favourites, 
     :as => :resource,
@@ -15,8 +16,7 @@ class Model < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
 
-  belongs_to :content_blob,
-    :dependent => :destroy
+  belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates    
 
   belongs_to :organism
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
@@ -33,8 +33,7 @@ class Model < ActiveRecord::Base
   
   explicit_versioning(:version_column => "version") do
     
-    belongs_to :content_blob,
-      :dependent => :destroy
+    belongs_to :content_blob      
              
     belongs_to :organism
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"

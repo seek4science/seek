@@ -93,5 +93,30 @@ class SopTest < ActiveSupport::TestCase
       sop.destroy
     end    
   end
+
+  test "make sure content blob is preserved after deletion" do
+    sop = sops(:my_first_sop)
+    assert_not_nil sop.content_blob,"Must have an associated content blob for this test to work"
+    cb=sop.content_blob
+    assert_difference("Sop.count",-1) do
+      assert_no_difference("ContentBlob.count") do
+        sop.destroy
+      end
+    end
+    assert_not_nil ContentBlob.find(cb.id)
+  end
+
+  test "is restorable after destroy" do
+    sop = sops(:my_first_sop)
+    assert_difference("Sop.count",-1) do
+      sop.destroy
+    end
+    assert_nil Sop.find_by_id(sop.id)
+    assert_difference("Sop.count",1) do
+      Sop.restore_trash!(sop.id)
+    end
+    assert_not_nil Sop.find_by_id(sop.id)
+  end
+
   
 end
