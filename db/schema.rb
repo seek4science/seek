@@ -9,11 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-<<<<<<< /home/finn/workspace/sysmo-db/db/schema.rb
-ActiveRecord::Schema.define(:version => 20100319103617) do
-=======
-ActiveRecord::Schema.define(:version => 20100319140000) do
->>>>>>> /tmp/schema.rb~other.z_nOfE
+ActiveRecord::Schema.define(:version => 20100322103210) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -350,7 +346,8 @@ ActiveRecord::Schema.define(:version => 20100319140000) do
   end
 
   create_table "publication_authors", :force => true do |t|
-    t.integer  "author_id"
+    t.string   "first_name"
+    t.string   "last_name"
     t.integer  "publication_id"
     t.datetime "created_at"
     t.datetime "updated_at"

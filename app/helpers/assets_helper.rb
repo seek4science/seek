@@ -148,7 +148,9 @@ module AssetsHelper
         related["Project"][:items] = resource.projects || []
         related["Institution"][:items] = resource.institutions || []
         related["Study"][:items] = resource.studies || []
-        related["Publication"][:items] = resource.publications || []
+        related["Publication"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:publications], true, current_user)
+        related["Publication"][:hidden_count] = assets_hash[:publications].size - (related["Publication"][:items] || []).size
+
       when "Institution"
         related["Project"][:items] = resource.projects || []
         related["Person"][:items] = resource.people || []
@@ -178,7 +180,7 @@ module AssetsHelper
   end
   
   def split_assets_by_type(asset_list)
-    hash = {:data_files => [], :models => [], :sops => []}
+    hash = {:data_files => [], :models => [], :sops => [], :publications => []}
     asset_list.each do |a|
       case a.resource_type
         when "Sop"
@@ -187,6 +189,8 @@ module AssetsHelper
           hash[:models] << a.resource
         when "DataFile"
           hash[:data_files] << a.resource
+        when "Publication"
+          hash[:publications] << a.resource
       end
     end
     return hash
