@@ -7,7 +7,7 @@
    http://developer.yahoo.com/yui/fonts/#fontsize
 */
 body {
-	background: #8e8e8e url('/images/body-bg.gif') repeat-y center;
+	background: #8e8e8e url('/images/body-bg.png') repeat-y center;
 	/* Only need to define one font here because the 
 	   YUI Fonts CSS provides a degradation path
 	   (see: http://developer.yahoo.com/yui/fonts/) */
