@@ -123,6 +123,7 @@ module AssetsHelper
       related_hidden["data_files"] = resource.data_files.size - (related["data_files"]["DataFile"] || []).size
       related["projects"] = classify_for_tabs([resource.project])
       related["assays"] = classify_for_tabs(resource.assays)
+      related["investigations"] = classify_for_tabs([resource.investigation])
     when "Organism"
       related["models"] = Asset.classify_and_authorize_resources(resource.models, true, current_user)
       related_hidden["models"] = resource.models.size - (related["models"]["Model"] || []).size
