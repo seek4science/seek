@@ -16,6 +16,7 @@ module Jerm
     #returns a report:
     # {:response=>:success|:fail|:skipped,:message=>"",:exception=>Exception|nil}
     def add_as_new resource
+	#FIXME: this method is too long 
       begin
         warning=nil
         warning_code=0
