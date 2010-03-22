@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Sat Mar 20 00:33:42 +0000 2010</td>
+      <td>Mon Mar 22 10:33:41 +0000 2010</td>
     </tr>
     </table>
   </div>
@@ -78,6 +78,45 @@ compare between different types of data and results files across SysMO.
 For more non technical background on JERM please visit <a
 href="http://www.sysmo-db.org/jerm.html">www.sysmo-db.org/jerm.html</a>
 </p>
+<h2>Harvesting</h2>
+<p>
+The term harvesting is what we use to describe the mechanism for
+interacting with remote data stores and importing, or registering, the
+assets contained there within Sysmo SEEK.
+</p>
+<p>
+There are 3 key components that need to be concidered if you wish to
+produce your own Harvester. You can find more details of each by reading
+the code documentation contained within those files.
+</p>
+<p>
+<em>Please note that these components are under active development and
+their interfaces are liable to change.</em>
+</p>
+<ul>
+<li><a href="../../classes/Jerm/Harvester.html">Jerm::Harvester</a> - This is
+the class responsible for interacting directly with the remote site and
+producing a collection of Jerm::Resources ready for insertion into SEEK.
+You wil need to implement you own version to map to your Data storage
+system.
+
+</li>
+<li><a href="../../classes/Jerm/Resource.html">Jerm::Resource</a> - This
+describes the resource to be registered with SEEK.
+
+</li>
+<li><a href="../../classes/Jerm/Populator.html">Jerm::Populator</a> - This is
+the base responsible for registering the new asset within SEEK. The current
+implementation of this is the <a
+href="../../classes/Jerm/EmbeddedPopulator.html">Jerm::EmbeddedPopulator</a>
+which interacts directly with ActiveModel and has to run within the SEEK
+rails application. A planned future implementation is the <a
+href="../../classes/Jerm/RestfulPopulator.html">Jerm::RestfulPopulator</a>
+that interacts with the SEEK Rest iterface and can run external to the SEEK
+rails application.
+
+</li>
+</ul>
 
     </div>
 
