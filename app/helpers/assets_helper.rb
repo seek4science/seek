@@ -128,6 +128,7 @@ module AssetsHelper
         related["DataFile"][:hidden_count] = resource.data_files.size - (related["DataFile"][:items] || []).size
         related["Project"][:items] << resource.project
         related["Assay"][:items] = resource.assays || []
+        related["Investigation"][:items] << resource.investigation
       when "Organism"
         related["Model"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.models, true, current_user)
         related["Model"][:hidden_count] = resource.models.size - (related["Model"][:items] || []).size
