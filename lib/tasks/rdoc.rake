@@ -21,5 +21,7 @@ namespace :doc do
     rdoc.rdoc_files.include('lib/jerm/populator.rb')
     rdoc.rdoc_files.include('lib/jerm/embedded_populator.rb')
     rdoc.rdoc_files.include('lib/jerm/restful_populator.rb')
+    rdoc.rdoc_files.include('lib/jerm/http_downloader.rb')
+    rdoc.rdoc_files.include('lib/jerm/downloader_factory.rb')
   }
 end
