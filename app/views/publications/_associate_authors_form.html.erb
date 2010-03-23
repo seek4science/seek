@@ -1,4 +1,6 @@
-Using the form below, you can link the authors listed in PubMed to people registered in SEEK.<br/>
+Using the form below, you can link the authors listed in PubMed to people registered in SEEK.<br/><br/>
+SEEK will try and suggest the correct person based on the author's name.<br/>
+If this suggestion is incorrect, please select the correct person from the dropdown menu, or choose "None" if this person isn't a member of SEEK.<br/>
 
 <table>
   <tr>
@@ -8,7 +10,7 @@ Using the form below, you can link the authors listed in PubMed to people regist
   <% authors.each do |author| %>
   <tr>    
     <td><%= author.last_name + " " + author.first_name -%></td>
-    <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(suggested_author[author.id],project) -%></select></td>
+    <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,author_associations[author.id],project) -%></select></td>
   </tr>
   <% end %>
 </table>

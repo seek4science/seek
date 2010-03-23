@@ -1,13 +1,13 @@
 module PublicationsHelper
-  def people_by_project_options(selected_person_id=nil, project_id=nil)
+  def people_by_project_options(projects, selected_person=nil, selected_project=nil)
     options = ""
     selected = false
-    Project.all.each do |project|
+    projects.each do |project|
       project_options = "<optgroup title=\"#{h project.title}\" label=\"#{h truncate(project.title)}\">"
       project.people.each do |person|        
         #'select' this person if specified to be selected, and within this project group (once and only once)
         selected_text = ""
-        if !selected && ((project_id.nil? || (project.id == project_id)) && (person.id == selected_person_id))
+        if !selected && ((selected_project.nil? || (project == selected_project)) && (person == selected_person))
           selected_text = "selected=\"selected\""
           selected = true
         end

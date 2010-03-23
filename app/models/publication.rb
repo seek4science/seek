@@ -19,7 +19,7 @@ class Publication < ActiveRecord::Base
   #belongs_to :contributor, :polymorphic => true
   
   def update_first_letter
-    self.first_letter=strip_first_letter(title)
+    self.first_letter=strip_first_letter(title.gsub(/[\[\]]/,""))
   end
   
   def extract_metadata(pubmed_record)

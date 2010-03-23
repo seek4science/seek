@@ -1,12 +1,12 @@
-<h1>Editing publication</h1>
+<h1>Associate authors</h1>
 
-<% form_for(@publication) do |f| %>
-  <%= f.error_messages %>
-
-  <p>
-    <%= f.submit 'Update' %>
-  </p>
-<% end %>
-
-<%= link_to 'Show', @publication %> |
-<%= link_to 'Back', publications_path %>
+<div class="show_basic">
+  <% form_tag publication_path(@publication), :method => :put do %>
+  
+    <%= render :partial => "associate_authors_form", :locals => {:project => @publication.project || current_user.person.projects.first, :authors => @publication.non_seek_authors, :author_associations => @author_associations} %>
+    
+    <p>
+      <%= submit_tag 'Update' %>
+    </p>
+  <% end %>
+</div>
