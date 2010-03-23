@@ -181,5 +181,15 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
+  def test_should_show_investigation_tab
+    s=studies(:metabolomics_study)
+    get :show,:id=>s
+    assert_response :success
+    assert_select "div.tabbertab" do
+      assert_select "h3",:text=>"Investigations (1)",:count=>1
+    end
+
+  end
+
   
 end
