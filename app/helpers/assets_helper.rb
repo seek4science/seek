@@ -168,8 +168,10 @@ module AssetsHelper
         related["Assay"][:items] = resource.assays || []
         related["Study"][:items] = resource.studies || []
         related["Investigation"][:items] = resource.investigations || []
+        related["Publication"][:items] = resource.publications || []
       when "Publication"
         related["Person"][:items] = resource.asset.creators || []
+        related["Project"][:items] << resource.project
       else
     end
     

@@ -27,5 +27,5 @@ class Publication < ActiveRecord::Base
     self.published_date = pubmed_record.date_published
     self.journal = pubmed_record.journal
     self.pubmed_id = pubmed_record.pmid
-  end  
+  end 
 end

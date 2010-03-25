@@ -1,7 +1,7 @@
 <ul class="sectionIcons">
   <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
   <% if Authorization.is_authorized?("edit", nil, @publication, current_user) -%>
-      <li><%= image_tag_for_key('person', edit_publication_path(@publication), nil, nil, 'Associate Authors') -%></li>
+      <li><%= image_tag_for_key('manage', edit_publication_path(@publication), nil, nil, 'Manage Publication') -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("destroy", nil, @publication, current_user) -%>

@@ -40,6 +40,8 @@ class PublicationsController < ApplicationController
 
   # GET /publications/1/edit
   def edit
+    #This is necessary due to weirdness with acts_as_resource
+    @publication.project_id = @publication.asset.project_id
   end
 
   # POST /publications
@@ -66,7 +68,7 @@ class PublicationsController < ApplicationController
           pa.save
         end
         flash[:notice] = 'Publication was successfully created.'
-        format.html { redirect_to(@publication) }
+        format.html { redirect_to(edit_publication_url(@publication)) }
         format.xml  { render :xml => @publication, :status => :created, :location => @publication }
       else
         format.html { render :action => "new" }
@@ -102,7 +104,7 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      if valid #&& @publication.update_attributes(params[:publication]) 
+      if valid && @publication.update_attributes(params[:publication]) 
         to_add.each {|a| @publication.asset.creators << a}
         to_remove.each {|a| a.destroy}
         flash[:notice] = 'Publication was successfully updated.'

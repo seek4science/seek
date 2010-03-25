@@ -3,13 +3,17 @@
   <li><%= image_tag_for_key('destroy', disassociate_authors_publication_url(@publication), "Disassociate All Authors", {:confirm => "This will clear the publication of all links to SEEK members, are you sure you wish to do this?", :method => :post}, "Disassociate All Authors") -%></li>
 </ul>
 
-<h1>Associate authors</h1>
-
-<%= error_messages_for('publication', :message => nil) %>
-
-<div class="show_basic">
+<h1>Edit publication: <%= link_to(h(@publication.title), publication_path(@publication)) -%></h1>
+<div class="show_basic">    
+  <%= error_messages_for('publication', :message => nil) %>
   <% form_tag publication_path(@publication), :method => :put do %>
+    <p>
+      <label>Project:</label><br/>
+      <%= collection_select :publication, :project_id, Project.all,:id,:name,{ :include_blank => "None" }%>
+    </p>
     
+    <h2>Associate authors</h2>  
+ 
     <% project = @publication.project || current_user.person.projects.first %>
     Using the form below, you can link the authors listed in PubMed to people registered in SEEK.<br/><br/>
     
@@ -51,7 +55,7 @@
     </div>
     
     <br style="clear: both"/>
-
+  
     <p style="text-align: center;">
       <%= submit_tag 'Update' %>
     </p>

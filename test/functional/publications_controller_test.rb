@@ -26,7 +26,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, :publication => {:pubmed_id => 3 }
     end
 
-    assert_redirected_to publication_path(assigns(:publication))
+    assert_redirected_to edit_publication_path(assigns(:publication))
   end
 
   test "should show publication" do

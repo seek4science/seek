@@ -150,4 +150,8 @@ class Project < ActiveRecord::Base
       
     end
   end
+  
+  def publications
+    assets.collect{|a| a.resource if a.resource_type == "Publication"}
+  end
 end
