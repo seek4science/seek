@@ -66,11 +66,11 @@ select_truncate_length=40;
       )+";check_show_add_data_file();return(false);"
     } -%>
     <%= select_tag :assay_data_file_asset_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-    <br/><br/>
-    <div id="data_file_relationship_type_section" style="<%= "display: none" unless resource.assay_class_id == 2 -%>"><%#MODELLING ASSAY%>
-    <%= label_tag "Relationship Type" %><br/>
-    <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
-    </div>
+    <% if show_relationships -%>
+      <br/>
+      <%= label_tag "Relationship Type" %><br/>
+      <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
+    <% end -%>
     <b><%= link_to_function "Add","addSelectedDataFile(); return(false);",:id=>"add_data_file_link" %></b>
     <br/>
     <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?
@@ -94,7 +94,6 @@ select_truncate_length=40;
 <% end -%>
 
   updateDataFiles();
-
 
   function check_show_add_data_file() {
     i=$('possible_data_files').selectedIndex;

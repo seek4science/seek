@@ -28,8 +28,6 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
-  
-
   test "should get edit" do
     get :edit,:id=>studies(:metabolomics_study)
     assert_response :success
@@ -59,8 +57,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
     s=assigns(:study)
     assert flash[:error]
-    assert_response :redirect
-        
+    assert_response :redirect        
   end
 
   test "should not update with assay already related to study" do

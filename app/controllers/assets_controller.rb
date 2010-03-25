@@ -39,13 +39,13 @@ class AssetsController < ApplicationController
   def asset_preview_ajax
 
     element=params[:element]
-    asset=Asset.find(params[:id])
+    asset=Asset.find_by_id(params[:id])
     
     render :update do |page|
       if asset && Authorization.is_authorized?("show", nil, asset.resource, current_user)
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>asset.resource}
       else
-        page.replace_html element,:text=>"No Asset is selected, or authorised to show."
+        page.replace_html element,:text=>"No Asset is selected, or is authorised to display."
       end
     end
   end

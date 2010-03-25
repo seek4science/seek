@@ -126,7 +126,13 @@ function addSelectedDataFile() {
     selected_option=$("possible_data_files").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
-    relationshipType = $("data_file_relationship_type").options[$("data_file_relationship_type").selectedIndex].text;
+    if ($("data_file_relationship_type")) {
+        relationshipType = $("data_file_relationship_type").options[$("data_file_relationship_type").selectedIndex].text;
+    }
+    else
+    {
+        relationshipType="None"
+    }
 
     if(checkNotInList(id,data_files_assets)) {
         addDataFile(title,id,relationshipType);

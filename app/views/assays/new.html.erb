@@ -1,8 +1,20 @@
-
 <h1>New assay</h1>
 
-<div class="show_basic">
-	<% form_for @assay do |f| %>
-	  <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
-	<% end -%>
-</div>
+<% unless @assay.assay_class %>
+  <div class="selection">
+    Please select the type of assay you wish to create
+    <p>
+      <%= link_to "An assay for an experiment in a wet-lab",new_assay_path(:class=>:experimental) %><br/>
+      <%= link_to "An assay for a modelling based experiment",new_assay_path(:class=>:modelling) %>
+    </p>
+  </div>
+<% else %>
+  <%
+    form_partials={:experimental=>"form_experimental",:modelling=>"form_modelling"}
+  %>
+  <div class="show_basic">
+    <% form_for @assay do |f| %>
+      <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+    <% end -%>
+  </div>
+<% end -%>

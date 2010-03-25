@@ -17,4 +17,5 @@ module AssaysHelper
     Authorization.authorize_collection("show",data_files,current_user)
   end
 
+  
 end

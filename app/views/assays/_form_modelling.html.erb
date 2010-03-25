@@ -4,34 +4,34 @@
 
 
 <div style="width: 60%;">
-  <% if !@assay.study.nil? -%>
+    <% if !@assay.study.nil? -%>      
+      <p>
+        <%= label_tag "Associated study: " -%>
+        <%= h @assay.study.title.capitalize -%>        
+      </p>
+    <% end -%>
+
     <p>
-      <%= label_tag "Associated study: " -%>
-      <%= h @assay.study.title.capitalize -%>
+      <%= f.label :title-%><span class="required">*</span><br/>
+      <%= f.text_field :title,:size=>52 -%>
     </p>
-  <% end -%>
 
-  <p>
-    <%= f.label :title-%><span class="required">*</span><br/>
-    <%= f.text_field :title,:size=>52 -%>
-  </p>
-
-  <p>
-    <%= f.label :description -%><br/>
-    <%= f.text_area :description,:cols=>50,:rows=>10 -%>
-  </p>
-  <p>
-  <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
-  <%= f.label :study-%><span class="required">*</span><br/>
-  <% studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])-%>
-  <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
-  <% studies.each do |s| %>
-    <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
-  <% end %>
-  <select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()">
-    <%= options %>
-  </select>
-</p>
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :description,:cols=>50,:rows=>10 -%>
+    </p>
+    <p>
+      <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
+      <%= f.label :study-%><span class="required">*</span><br/>
+      <% studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])-%>
+			<% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
+			<% studies.each do |s| %>
+			 <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
+			<% end %>      
+			<select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()">
+		    <%= options %>
+			</select>
+    </p>
 </div>
 
 <h2>Assay and technology types</h2>
@@ -43,20 +43,23 @@
     <td><%= f.label "Technology type: " %></td>
   </tr>
   <tr>
-    <td><%= ontology_select_tag f,AssayType,"assay_type_id",selected_id = @assay.assay_type.nil? ? nil : @assay.assay_type.id %></td>
-    <td><%= ontology_select_tag f,TechnologyType,"technology_type_id",selected_id = @assay.technology_type.nil? ? nil : @assay.technology_type.id %></td>
+    <td><%= ontology_select_tag f,AssayType,"assay_type_id",selected_id= @assay.assay_type.nil? ? nil : @assay.assay_type.id %></td>
+    <td><%= ontology_select_tag f,TechnologyType,"technology_type_id",selected_id= @assay.technology_type.nil? ? nil : @assay.technology_type.id %></td>
   </tr>
 </table>
+  
+
+
 
 <%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay} %>
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
-<%  if @assay.is_modelling? -%>
-  <%= render :partial=>"assays/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
-<% end -%>
+<%= render :partial=>"assays/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
 
-<%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
+<%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>true} -%>
+
+
 
 <p style="margin-top: 2em; text-align: center;" >
   <%= f.submit(action==:edit ? "Update" : "Create") -%>
@@ -64,16 +67,16 @@
 </p>
 
 <script type="text/javascript">
-  function showTitle(text){
+	function showTitle(text){
     var elem = document.getElementById("full_study_title");
-    elem.style.display = '';
-    elem.innerHTML = text;
-  }
+		elem.style.display = '';
+		elem.innerHTML = text;
+	}
 	
-  function hideTitle(){
-    var elem = document.getElementById("full_study_title");
-    elem.style.display = 'none';
-  }
+	function hideTitle(){
+		var elem = document.getElementById("full_study_title");
+		elem.style.display = 'none';
+	}
   
   function changeTypes(){
     var value = $("assay_class_select").value;

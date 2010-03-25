@@ -62,6 +62,16 @@ class Assay < ActiveRecord::Base
     assay_assets.models.collect{|m| m.versioned_resource}
   end
 
+  #returns true if this is a modelling class of assay
+  def is_modelling?
+    return !assay_class.nil? && assay_class.id==2
+  end
+
+  #returns true if this is an experimental class of assay
+  def is_experimental?
+    return !assay_class.nil? && assay_class.id==1
+  end
+
   def data_files
     list = []
     assay_assets.data_files.each do |df|
