@@ -9,10 +9,9 @@ class Publication < ActiveRecord::Base
   
   before_save :update_first_letter
   
-  #has_many :publication_authors, :dependent => :destroy
-  #has_many :authors, :through => :publication_authors, :class_name => 'Person'
-  
   validates_presence_of :title
+  validates_presence_of :pubmed_id
+  validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
   

@@ -1,8 +1,24 @@
+<ul class="sectionIcons">
+  <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
+  <% if Authorization.is_authorized?("edit", nil, @publication, current_user) -%>
+      <li><%= image_tag_for_key('person', edit_publication_path(@publication), nil, nil, 'Associate Authors') -%></li>
+  <% end -%>
+
+  <% if Authorization.is_authorized?("destroy", nil, @publication, current_user) -%>
+      <li><%= image_tag_for_key('destroy', publication_path(@publication), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
+  <% end -%>
+</ul>
+
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@publication} %>
 
 <div class="show_basic">
   <div class="main_content_left_box">
     <div class="box_about_actor">
+      <p>
+        <label>PubMed ID:</label>
+        <%= link_to @publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}",{:popup => true} %>
+      </p>
+      
       <p>
         <label>Project:</label>
         <% if @publication.project.nil? -%>
@@ -10,6 +26,19 @@
         <% else -%>
           <%= link_to h(@publication.project.name),@publication.project %>
         <% end -%>
+      </p>
+      <p>
+        <label>Author<%= @publication.asset.creators.size + @publication.non_seek_authors.size > 1 ? "s" : "" -%>:</label>
+        <% if @publication.asset.creators.empty? && @publication.non_seek_authors.empty? %>
+          <span class='none_text'>Not specified</span>
+        <% else %>
+          <% @publication.asset.creators.each do |author| %>
+            <%= (link_to get_object_title(author), show_resource_path(author)) + ((author == @publication.asset.creators.last) && (@publication.non_seek_authors.empty?) ? "" : ", ") %>
+          <% end %>
+          <% @publication.non_seek_authors.each do |author| %>
+            <%= author.last_name + " " + author.first_name + ((author == @publication.non_seek_authors.last) ? "" : ", ") %>
+          <% end %>
+        <% end %>
       </p>
       <p>
         <label>Journal:</label>
@@ -35,7 +64,6 @@
 
     </div>
   </div>
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @publication } %>
 
   <div style="clear:both;padding-top:1em;">    
     <%= render :partial=>"layouts/items_related_to",:object => @publication %>

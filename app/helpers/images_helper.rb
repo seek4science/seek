@@ -194,6 +194,8 @@ module ImagesHelper
       "institution_64x64.png"
     when "saved_search"
       "crystal_project/32x32/actions/find.png"
+    when "visit_pubmed"
+      "famfamfam_silk/page_white_go.png"
     else
       return nil
     end

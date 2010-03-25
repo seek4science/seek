@@ -79,9 +79,9 @@ module ResourceListItemHelper
     return html + "</p>"
   end
  
-  def list_item_attribute attribute, value, url=nil
+  def list_item_attribute attribute, value, url=nil, url_options={}
     unless url.nil?
-      value = link_to value, url
+      value = link_to value, url, url_options
     end
     return "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
   end

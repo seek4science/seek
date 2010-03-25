@@ -12,10 +12,12 @@ one:
   journal: JOURNAL OF SCIENCE
   contributor: quentin (User)
   published_date: <%= 5.days.ago.to_s :db %>  
+  pubmed_id: 5
   
 two:
   title: Another paper on blabla
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
   contributor: quentin (User)
-  published_date: <%= 5.days.ago.to_s :db %>  
+  published_date: <%= 5.days.ago.to_s :db %>
+  pubmed_id: 2
