@@ -897,10 +897,6 @@ table.jerm_results {
     font-size: x-small;
 }
 
-.assay_selection {
-    font-size: larger;
-}
-
 .assay_selection ul {    
     text-align: center;
 }
@@ -908,4 +904,6 @@ table.jerm_results {
 .assay_selection li {
     padding-top: 1em;
     list-style: none;
+    font-size: larger;
+    font-weight: bold;
 }
