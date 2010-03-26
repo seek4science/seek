@@ -472,7 +472,7 @@ ul#user_details li {
 }
 
 #sop_preview {    
-    width: 20em;
+    width: 17em;
     max-height: 25em;
     background-color: #EEEEEE;
     display: inline-block;
@@ -496,7 +496,7 @@ ul#user_details li {
 }
 
 #data_file_preview {
-    width: 20em;
+    max-width: 17em;
     max-height: 25em;
     background-color: #EEEEEE;
     display: inline-block;
@@ -520,7 +520,7 @@ ul#user_details li {
 }
 
 #model_preview {
-    width: 20em;
+    width: 17em;
     max-height: 25em;
     background-color: #EEEEEE;
     display: inline-block;
@@ -895,4 +895,17 @@ ul.related_asset_list li{
 
 table.jerm_results {
     font-size: x-small;
+}
+
+.assay_selection {
+    font-size: larger;
+}
+
+.assay_selection ul {    
+    text-align: center;
+}
+
+.assay_selection li {
+    padding-top: 1em;
+    list-style: none;
 }

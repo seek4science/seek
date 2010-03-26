@@ -1,7 +1,7 @@
 <%
 all_data_files=authorised_data_files.sort{|a, b| a.title<=>b.title}
 project_data_files=all_data_files.select{|df| current_user.person.projects.include?(df.project )}
-select_truncate_length=40;
+select_truncate_length=120;
 -%>
 
 <script type="text/javascript">
@@ -44,13 +44,13 @@ select_truncate_length=40;
 </script>
 
 
-<div class="yui-g">
+<div class="yui-gc">
   <h2>Data files</h2>
   <div class="yui-u first">
     <p style="color: #666666;">
-      The following data files are involved in this assay:
+      The following Data Files are involved in this assay:
     </p>
-    <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5;">
+    <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5">
       <span class="none_text" id="data_files">Loading...</span>
     </div>
     <br/>
@@ -59,7 +59,7 @@ select_truncate_length=40;
 
     <%= select_tag :possible_data_files,
       options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}),
-      {:onchange=>remote_function(
+      {:style=>"width:90%",:onchange=>remote_function(
         :url=>{:action=>"asset_preview_ajax",:controller=>"assets",:element=>"data_file_preview"},
         :with=>"'id='+this.value",
         :before=>"show_ajax_loader('data_file_preview')"

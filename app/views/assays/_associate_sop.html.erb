@@ -1,7 +1,7 @@
 <%
    all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}
    project_sops=all_sops.select{|s| current_user.person.projects.include?(s.project )}
-   select_truncate_length=40;
+   select_truncate_length=120;
 -%>
 
 <script type="text/javascript">
@@ -43,7 +43,7 @@
     }
 </script>
 
-<div class="yui-g">
+<div class="yui-gc">
   <h2>SOPs</h2>
   <div class="yui-u first">
     <p style="color: #666666;">
@@ -54,14 +54,12 @@
       <span class="none_text" id="sops">Loading...</span>
     </div>
     <br/>
-    <%= label_tag :sops %>
+    <%= label_tag :sops -%>
     <br/>
-
-
 
     <%= select_tag :possible_sops,
                    options_for_select([["Select SOP ...", 0]]|project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.asset.id]}),
-                   {:onchange=>remote_function(
+                   {:style=>"width:90%",:onchange=>remote_function(
                            :url=>{:action=>"asset_preview_ajax", :controller=>"assets",:element=>"sop_preview"},
                            :with=>"'id='+this.value",
                            :before=>"show_ajax_loader('sop_preview')"

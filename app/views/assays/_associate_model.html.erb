@@ -1,7 +1,7 @@
 <%
    all_models=authorised_models.sort{|a, b| a.title<=>b.title}
    project_models=all_models.select{|s| current_user.person.projects.include?(s.project )}
-   select_truncate_length=40;
+   select_truncate_length=120;
 -%>
 
 <script type="text/javascript">
@@ -43,7 +43,7 @@
     }
 </script>
 
-<div id="associate_model_form" class="yui-g">
+<div id="associate_model_form" class="yui-gc">
   <h2>Models</h2>
   <div class="yui-u first">
     <p style="color: #666666;">
@@ -61,7 +61,7 @@
 
     <%= select_tag :possible_models,
                    options_for_select([["Select Model ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.asset.id]}),
-                   {:onchange=>remote_function(
+                   {:style=>"width:90%",:onchange=>remote_function(
                            :url=>{:action=>"asset_preview_ajax", :controller=>"assets",:element=>"model_preview"},
                            :with=>"'id='+this.value",
                            :before=>"show_ajax_loader('model_preview')"
@@ -75,7 +75,7 @@
     <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Include Models from other projects?
   </div>
 
-  <div id="model_preview" class="yui-u">
+  <div id="model_preview" class="yui-u asset_preview">
     <div style="text-align: center;">Model preview</div>
   </div>
 

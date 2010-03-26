@@ -10,9 +10,13 @@ show_culture_growth ||= false
     <% end -%>
   </tr>
   <tr>
-    <td><%= select :assay,:organism_id,Organism.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%></td>
+    <td>
+      <%= select :assay,:organism_id,Organism.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
+    </td>
     <% if show_culture_growth -%>
-      <td><%= select :assay, :culture_growth_type_id,CultureGrowthType.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%></td>
+      <td>
+        <%= select :assay, :culture_growth_type_id,CultureGrowthType.find(:all,:order=>:title).collect{|o| [o.title.capitalize,o.id]},:include_blank=>"Not specified" -%>
+      </td>
     <% end -%>
   </tr>
 </table>

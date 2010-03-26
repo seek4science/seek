@@ -45,7 +45,7 @@ class AssetsController < ApplicationController
       if asset && Authorization.is_authorized?("show", nil, asset.resource, current_user)
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>asset.resource}
       else
-        page.replace_html element,:text=>"No Asset is selected, or is authorised to display."
+        page.replace_html element,:text=>"Nothing is selected to preview."
       end
     end
   end
