@@ -1,6 +1,6 @@
 <%= list_item_title resource %>
 
-<%= list_item_attribute "PubMed ID", resource.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{resource.pubmed_id}"%>
+<%= list_item_attribute "PubMed ID", resource.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{resource.pubmed_id}", {:popup => true}%>
 
 <p class="list_item_attribute">
   <b>Author<%= resource.asset.creators.size + resource.non_seek_authors.size > 1 ? "s" : "" -%>:</b>
@@ -15,6 +15,8 @@
     <% end %>
   <% end %>
 </p>
+
+<%= list_item_optional_attribute "Project", h(resource.project.try(:title)), resource.project %>
 
 <%= list_item_expandable_text "Abstract", h(resource.abstract) %>
 

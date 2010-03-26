@@ -9,17 +9,16 @@ class Publication < ActiveRecord::Base
   
   before_save :update_first_letter
   
-  #has_many :publication_authors, :dependent => :destroy
-  #has_many :authors, :through => :publication_authors, :class_name => 'Person'
-  
   validates_presence_of :title
+  validates_presence_of :pubmed_id
+  validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
   
   #belongs_to :contributor, :polymorphic => true
   
   def update_first_letter
-    self.first_letter=strip_first_letter(title)
+    self.first_letter=strip_first_letter(title.gsub(/[\[\]]/,""))
   end
   
   def extract_metadata(pubmed_record)
@@ -28,5 +27,5 @@ class Publication < ActiveRecord::Base
     self.published_date = pubmed_record.date_published
     self.journal = pubmed_record.journal
     self.pubmed_id = pubmed_record.pmid
-  end  
+  end 
 end

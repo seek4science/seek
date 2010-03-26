@@ -1,5 +1,7 @@
 <h1>Register Publication</h1>
 
+<%= error_messages_for('publication', :message => nil) %>
+
 <div class="show_basic">
     <% form_remote_tag(:url =>fetch_preview_publications_url, 
                        :update => {:success => 'publication_preview'}, 
