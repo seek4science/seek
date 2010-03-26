@@ -8,6 +8,8 @@
 
 experimental_assay_class:  
   title: Experimental Assay
+  key: EXP
   
 modelling_assay_class:  
   title: Modelling Assay
+  key: MODEL

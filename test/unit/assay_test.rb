@@ -17,6 +17,22 @@ class AssayTest < ActiveSupport::TestCase
     assert_nil assay.organism
   end
 
+  test "is_modelling" do
+    assay=assays(:metabolomics_assay)
+    assert !assay.is_modelling?
+    assay.assay_class=assay_classes(:modelling_assay_class)
+    assay.save!
+    assert assay.is_modelling?
+  end
+
+  test "is_experimental" do
+    assay=assays(:metabolomics_assay)
+    assert assay.is_experimental?
+    assay.assay_class=assay_classes(:modelling_assay_class)
+    assay.save!
+    assert !assay.is_experimental?
+  end
+
   test "related investigation" do
     assay=assays(:metabolomics_assay)
     assert_not_nil assay.investigation

@@ -1,7 +1,9 @@
 experimental_assay_class:
   id: 1
   title: Experimental Assay
+  key: EXP
 
 modelling_assay_class:
   id: 2
   title: Modelling Assay
+  key: MODEL

@@ -10,5 +10,5 @@ validation_data:
 
 produced_data:
   id: 3
-  title: Produced data
-  description: Data produced by a model
+  title: Simulation results
+  description: Data resulting from running a model simulation

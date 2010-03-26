@@ -11,7 +11,7 @@ metabolomics_assay:
   assay_class: experimental_assay_class
 
 metabolomics_assay2:
-  title: Metabolomics Assay
+  title: Metabolomics Assay2
   assay_type: metabolomics
   technology_type: gas_chromatography  
   study: study_with_overlapping_assay_sops
@@ -19,7 +19,7 @@ metabolomics_assay2:
   assay_class: experimental_assay_class
   
 metabolomics_assay3:
-  title: Metabolomics Assay2
+  title: Metabolomics Assay3
   assay_type: metabolomics
   technology_type: gas_chromatography
   study: study_with_overlapping_assay_sops

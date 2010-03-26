@@ -68,7 +68,7 @@ select_truncate_length=120;
     <%= select_tag :assay_data_file_asset_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
     <% if show_relationships -%>
       <br/>
-      <%= label_tag "Relationship of the data to the model" %><br/>
+      <%= label_tag "Relationship between the data and the model" %><br/>
       <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
     <% end -%>
     <b><%= link_to_function "Add","addSelectedDataFile(); return(false);",:id=>"add_data_file_link" %></b>

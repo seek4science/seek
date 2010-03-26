@@ -64,12 +64,12 @@ class Assay < ActiveRecord::Base
 
   #returns true if this is a modelling class of assay
   def is_modelling?
-    return !assay_class.nil? && assay_class.id==2
+    return !assay_class.nil? && assay_class.key=="MODEL"
   end
 
   #returns true if this is an experimental class of assay
   def is_experimental?
-    return !assay_class.nil? && assay_class.id==1
+    return !assay_class.nil? && assay_class.key=="EXP"
   end
 
   def data_files

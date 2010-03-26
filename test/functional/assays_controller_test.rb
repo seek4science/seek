@@ -125,31 +125,31 @@ class AssaysControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select "a[href=?]",new_assay_path(:class=>:experimental),:count=>1
-    assert_select "a",:text=>/An assay for an experiment/,:count=>1
+    assert_select "a",:text=>/An experimental assay/i,:count=>1
     assert_select "a[href=?]",new_assay_path(:class=>:modelling),:count=>1
-    assert_select "a",:text=>/An assay for a modelling/,:count=>1
+    assert_select "a",:text=>/A modelling analysis/i,:count=>1
   end
 
   test "get new with class doesn't present options for class" do
     login_as(:model_owner)
-    get :new,:class=>:experimental
+    get :new,:class=>"experimental"
     assert_response :success
     assert_select "a[href=?]",new_assay_path(:class=>:experimental),:count=>0
-    assert_select "a",:text=>/An assay for an experiment/,:count=>0
+    assert_select "a",:text=>/An experimental assay/i,:count=>0
     assert_select "a[href=?]",new_assay_path(:class=>:modelling),:count=>0
-    assert_select "a",:text=>/An assay for a modelling/,:count=>0
+    assert_select "a",:text=>/A modelling analysis/i,:count=>0
 
-    get :new,:class=>:modelling
+    get :new,:class=>"modelling"
     assert_response :success
     assert_select "a[href=?]",new_assay_path(:class=>:experimental),:count=>0
-    assert_select "a",:text=>/An assay for an experiment/,:count=>0
+    assert_select "a",:text=>/An experimental assay/i,:count=>0
     assert_select "a[href=?]",new_assay_path(:class=>:modelling),:count=>0
-    assert_select "a",:text=>/An assay for a modelling/,:count=>0
+    assert_select "a",:text=>/A modelling analysis/i,:count=>0
   end
 
   test "data file list should only include those from project" do
     login_as(:model_owner)
-    get :new,:class=>:experimental
+    get :new,:class=>"experimental"
     assert_response :success
     assert_select "select#possible_data_files" do
       assert_select "option",:text=>/Sysmo Data File/,:count=>1      
