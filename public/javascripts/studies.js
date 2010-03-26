@@ -81,7 +81,7 @@ function updateSops() {
         sop=sops_assets[i];
         title=sop[0];
         id=sop[1];
-        titleText = '<span title="' + title + '">' + title.truncate(30) + '</span>';
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         sop_text += '<li>' + titleText + 
           '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
           '[<a href=\"\" onclick=\"javascript:removeSop('+id+'); return(false);\">remove</a>]</small></li>';
@@ -165,7 +165,7 @@ function updateDataFiles() {
         id=data_file[1];
         relationshipType = data_file[2];
         relationshipText = (relationshipType == 'None') ? '' : ' <span style="color: #1465FF;">(' + relationshipType + ')</span>';
-        titleText = '<span title="' + title + '">' + title.truncate(30) + '</span>';
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         data_file_text += '<li>' + titleText + relationshipText +
         '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small></li>';
@@ -242,7 +242,7 @@ function updateModels() {
         model=models_assets[i];
         title=model[0];
         id=model[1];
-        titleText = '<span title="' + title + '">' + title.truncate(30) + '</span>';
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         model_text += '<li>' + titleText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
