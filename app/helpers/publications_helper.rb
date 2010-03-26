@@ -4,7 +4,7 @@ module PublicationsHelper
     selected = false
     projects.each do |project|
       project_options = "<optgroup title=\"#{h project.title}\" label=\"#{h truncate(project.title)}\">"
-      project.people.each do |person|        
+      project.people.sort{|a,b| a.last_name <=> b.last_name}.each do |person|        
         #'select' this person if specified to be selected, and within this project group (once and only once)
         selected_text = ""
         if !selected && ((selected_project.nil? || (project == selected_project)) && (person == selected_person))

@@ -1,6 +1,5 @@
 <ul class="sectionIcons">
   <li><%= image_tag_for_key('arrow_left', publication_path(@publication), 'Return to publication', nil, 'Return to publication') -%></li>
-  <li><%= image_tag_for_key('destroy', disassociate_authors_publication_url(@publication), "Disassociate All Authors", {:confirm => "This will clear the publication of all links to SEEK members, are you sure you wish to do this?", :method => :post}, "Disassociate All Authors") -%></li>
 </ul>
 
 <h1>Edit publication: <%= link_to(h(@publication.title), publication_path(@publication)) -%></h1>
@@ -19,7 +18,7 @@
     
     SEEK will try and suggest the correct person based on the author's name. If this suggestion is incorrect, please select the correct person from the dropdown menu, or choose "None" if this person isn't a member of SEEK.<br/><br/>
     
-    To reset the author list to the state of the original PubMed article, click the "Disassociate All Authors" button at the top.<br/>
+    To reset the author list to the state of the original PubMed article, click the "Disassociate All Authors".<br/>
     
     <div style="margin:1em; float: left; width:45%" class="box_editing_inner">
       <h4>Unassociated authors</h4>
@@ -49,10 +48,13 @@
             <li><%= (link_to get_object_title(creator), show_resource_path(creator)) %></li>
           <% end %>
         </ul>
+        <br/>
+        <ul class="sectionIcons"><li><%= image_tag_for_key('no_user', disassociate_authors_publication_url(@publication), "Disassociate All Authors", {:confirm => "This will reset the publication's links to people in SEEK, are you sure you wish to do this?", :method => :post}, "Disassociate All Authors") -%></li></ul>
       <% else %>
         <span class="none_text">No associated authors</span>
       <% end %>
     </div>
+    
     
     <br style="clear: both"/>
   

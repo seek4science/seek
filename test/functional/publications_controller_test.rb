@@ -77,6 +77,15 @@ class PublicationsControllerTest < ActionController::TestCase
 
   end
 
+  test "should update project" do
+    p = publications(:one)
+    assert p.asset.project.nil?
+    
+    put :update, :id => p.id, :author => {}, :publication => {:project_id => projects(:one).id}
+    
+    assert_equal projects(:one), assigns(:publication).asset.project
+  end
+
   test "should destroy publication" do
     assert_difference('Publication.count', -1) do
       delete :destroy, :id => publications(:one).to_param
