@@ -3,7 +3,7 @@
 <%= f.error_messages -%>
 
 
-<div style="width: 60%;">
+<div style="width: 90%;">
   <% if !@assay.study.nil? -%>
     <p>
       <%= label_tag "Associated study: " -%>
@@ -13,12 +13,12 @@
 
   <p>
     <%= f.label :title-%><span class="required">*</span><br/>
-    <%= f.text_field :title,:size=>52 -%>
+    <%= f.text_area :title,:style => "width: 100%;", :rows=>2 -%>
   </p>
 
   <p>
     <%= f.label :description -%><br/>
-    <%= f.text_area :description,:cols=>50,:rows=>10 -%>
+    <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
   </p>
   <p>
   <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
@@ -28,7 +28,7 @@
   <% studies.each do |s| %>
     <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
   <% end %>
-  <select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()">
+  <select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()" style="width:100%">
     <%= options %>
   </select>
 </p>
@@ -43,12 +43,12 @@
     <td><%= f.label "Technology type: " %></td>
   </tr>
   <tr>
-    <td><%= ontology_select_tag f,AssayType,"assay_type_id",selected_id = @assay.assay_type.nil? ? nil : @assay.assay_type.id %></td>
-    <td><%= ontology_select_tag f,TechnologyType,"technology_type_id",selected_id = @assay.technology_type.nil? ? nil : @assay.technology_type.id %></td>
+    <td style="width:50%"><%= ontology_select_tag f,AssayType,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
+    <td style="width:50%"><%= ontology_select_tag f,TechnologyType,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} %></td>
   </tr>
 </table>
 
-<%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay} %>
+<%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay,:show_culture_growth=>!@assay.is_modelling?} %>
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 

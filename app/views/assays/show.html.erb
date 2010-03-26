@@ -3,7 +3,7 @@
     <li><%= image_tag_for_key('edit', edit_assay_path(@assay), "Edit Assay Details", nil, 'Edit Assay Details') -%></li>
   <% end -%>
   <%= delete_ISA_icon(@assay,current_user) %>
-  
+
 
 </ul>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@assay} %>
@@ -12,7 +12,7 @@
     <b>Created at:</b> <%= @assay.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
     <% unless @assay.created_at == @assay.updated_at -%>
       <br/>
-      <b>Last updated: </b><%= @assay.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
+      <b>Last updated: </b><%= @assay.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
     <% end -%>
   </div>
 
@@ -24,92 +24,94 @@
       An Assay may be edited by anybody, regardless of project membership, until it has been associated with a Study
     </div>
   <% end -%>
-  
+
   <p class="id">
     <label>ID: </label>
     <%= @assay.id -%>
   </p>
-  
+
   <p class="id">
     <label>Class: </label>
     <%= @assay.assay_class.title -%>
   </p>
-  
+
   <p>
     <b>Description:</b>
-    <div id="description" class="box_standout">
-      <%= text_or_not_specified(@assay.description, :description=>true,:auto_link=>true) %>
-    </div>
-  </p>
+  <div id="description" class="box_standout">
+    <%= text_or_not_specified(@assay.description, :description=>true,:auto_link=>true) %>
+  </div>
+</p>
 
-  <p id="project">
-    <b>Project: </b> <%= projects_link_list [@assay.project] %>
-  </p>
+<p id="project">
+  <b>Project: </b> <%= projects_link_list [@assay.project] %>
+</p>
 
 
-  <p id="investigation">
-    <b>Investigation: </b><%= investigation_link(@assay.investigation) %>
-  </p>
-  
-  <p id="study">
-    <b>Study: </b><%= studies_link_list [@assay.study] %>
-  </p>
+<p id="investigation">
+  <b>Investigation: </b><%= investigation_link(@assay.investigation) %>
+</p>
 
-  <p id="assay_type">
-    <b>Assay type: </b><%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
-  </p>
+<p id="study">
+  <b>Study: </b><%= studies_link_list [@assay.study] %>
+</p>
 
-  <p id="technology_type">
-    <b>Technology type: </b><%= link_to h(@assay.technology_type.title.capitalize), @assay.technology_type -%>
-  </p>
+<p id="assay_type">
+  <b>Assay type: </b><%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
+</p>
 
-  <p id="organism">
-    <b>Organism: </b><%= organism_link_to @assay.organism %>
-  </p>
+<p id="technology_type">
+  <b>Technology type: </b><%= link_to h(@assay.technology_type.title.capitalize), @assay.technology_type -%>
+</p>
 
+<p id="organism">
+  <b>Organism: </b><%= organism_link_to @assay.organism %>
+</p>
+<% unless @assay.is_modelling? -%>
   <p id="culture_growth_type">
-      <b>Culture growth: </b><%= model_title_or_not_specified(@assay.culture_growth_type) %>
+    <b>Culture growth: </b><%= model_title_or_not_specified(@assay.culture_growth_type) %>
   </p>
-   <style type="text/css">
-    div.data_model_relationship {
-      border: 1px dotted black;
-      background-color: #EEEEFF;
-      padding:5px
-    }
-    
-    div.data_model_relationship ul li{
-      list-style: disc;
-      list-style-position: inside;
-      margin-left: 5px;
-    }
-    
-    div.data_model_relationship span{
-      color: #1465FF;  
-    }
-  
-  </style>
+<% end -%>
 
-  <% if ((@assay.assay_class_id == 2) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY%>
-    <div class="data_model_relationship">
+<style type="text/css">
+  div.data_model_relationship {
+    border: 1px dotted black;
+    background-color: #EEEEFF;
+    padding:5px
+  }
+
+  div.data_model_relationship ul li{
+    list-style: disc;
+    list-style-position: inside;
+    margin-left: 5px;
+  }
+
+  div.data_model_relationship span{
+    color: #1465FF;
+  }
+
+</style>
+
+<% if ((@assay.assay_class_id == 2) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY%>
+  <div class="data_model_relationship">
     <% unless @assay.models.empty? %>
       <b><%= @assay.models.size > 1 ? "Models" : "Model" %>:</b><br/>
       <ul>
-      <% @assay.models.each do |m| %>
-      <li><%= link_to truncate(h(m.title), :length=>50), show_resource_path(m) %></li>
-      <% end %>
+        <% @assay.models.each do |m| %>
+          <li><%= link_to truncate(h(m.title), :length=>50), show_resource_path(m) %></li>
+        <% end %>
       </ul>
     <% end %>
     <% unless @assay.data_files.empty? %>
       <b>Data:</b><br/>
       <ul>
-      <% @assay.data_files.each do |d| %>
-      <li><%= link_to truncate(h(d.title), :length=>50), show_resource_path(d) %><%= d.relationship_type ? " <span>(" + d.relationship_type.title + ")</span>" : "" %></li>
-      <% end %>
+        <% @assay.data_files.each do |d| %>
+          <li><%= link_to truncate(h(d.title), :length=>50), show_resource_path(d) %><%= d.relationship_type ? " <span>(" + d.relationship_type.title + ")</span>" : "" %></li>
+        <% end %>
       </ul>
     <% end %>
-    </div>
-  <% end %>
-  <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @assay %>
+  </div>
+<% end %>
+<%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @assay %>
 
 </div>
 

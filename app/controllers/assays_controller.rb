@@ -56,8 +56,8 @@ class AssaysController < ApplicationController
         flash[:notice] = 'Assay was successfully created.'
         format.html { redirect_to(@assay) }
         format.xml  { render :xml => @assay, :status => :created, :location => @assay }
-      else
-        format.html { render :action => "new" }
+      else        
+        format.html { render :action => "new"}
         format.xml  { render :xml => @assay.errors, :status => :unprocessable_entity }
       end
     end
