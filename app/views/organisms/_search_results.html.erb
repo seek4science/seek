@@ -1,3 +1,11 @@
+<% form_remote_tag :url=>url_for(:action=>:search_ajax,:controller=>:organisms),
+  :before=>"show_ajax_loader('search_results');" do -%>
+<%= hidden_field_tag :pagenum,pagenum  -%>
+<label>Search for:</label>&nbsp;<%= text_field_tag :search_term,search_term,:style=>"padding-left: 0.5em;padding-right:0.5em;min-width:15em;"%>
+<%= submit_tag "Go."  %>
+<% end -%>
+
+<% if !search_results.empty? -%>
 <h3><%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%></h3>
 <table>
   <tr><th>Ontology label</th><th>Ontology ID</th><th>Version ID</th><th>Concept id</th><th>Preferred name</th></tr>
@@ -19,3 +27,4 @@
   <% end %>
 
 </table>
+<% end -%>

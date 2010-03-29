@@ -1,7 +1,7 @@
 class OrganismsController < ApplicationController
   
   before_filter :login_required
-  before_filter :find_organism,:only=>[:show,:info,:more_ajax,:search_ajax,:visualise]
+  before_filter :find_organism,:only=>[:show,:info,:more_ajax,:visualise]
   layout "main",:except=>:visualise
 
   include BioPortal::RestAPI
@@ -29,10 +29,11 @@ class OrganismsController < ApplicationController
   def search_ajax
     pagenum=params[:pagenum]
     pagenum||=1
-    results,pages = search @organism.title,{:isexactmatch=>0,:pagesize=>25,:pagenum=>pagenum}
+    search_term=params[:search_term]
+    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>25,:pagenum=>pagenum}
     render :update do |page|
       if results
-        page.replace_html 'search_results',:partial=>"search_results",:object=>results,:locals=>{:pages=>pages,:pagenum=>pagenum}
+        page.replace_html 'search_results',:partial=>"search_results",:object=>results,:locals=>{:pages=>pages,:pagenum=>pagenum,:search_term=>search_term}
       else
         page.replace_html 'search_results',:text=>"Nothing found"
       end
@@ -56,7 +57,7 @@ class OrganismsController < ApplicationController
     respond_to do |format|
       if @organism.update_attributes(params[:organism])
         flash[:notice] = 'Organism was successfully updated.'
-        format.html { redirect_to(@organism) }
+        format.html { redirect_to info_organism_path(@organism) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }

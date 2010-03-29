@@ -27,5 +27,7 @@
     <label><b>Parents</b></label>
     <%= concept[:parents].collect{|c| c[:label]}.join(", ") -%>
   </li>
-
+  <li>
+    <%= link_to "Visualise",visualise_organism_path(@organism),:popup=>true %>
+  </li>
 </ul>
