@@ -5,21 +5,21 @@
 
 
 <center>
-  <div style="width: 60%;">
+  <div style="width: 90%;">
 
     <p style="margin-top: 1.5em;">
       <%= f.label :title %><span class="required">*</span><br/>
-      <%= f.text_field :title,:style=>"width: 100%;" %>
+      <%= f.text_area :title,:style => "width: 100%;", :rows=>2 %>
     </p>
 
     <p style="margin-top: 0.5em;">
       <%= f.label :description %><br/>
-      <%= f.text_area :description,:style => "width: 100%;", :rows => 5 %>
+      <%= f.text_area :description,:style => "width: 100%;", :rows => 10 %>
     </p>
 
     <p>
       <%= f.label "Experimentalist(s)" %>
-      <%= f.text_field :experimentalists,:style=>"width: 100%;" %>
+      <%= f.text_area :experimentalists,:style=>"width: 100%;",:rows=>1 %>
     </p>
 
   </div>

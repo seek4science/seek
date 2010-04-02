@@ -1,15 +1,15 @@
 <%= f.error_messages -%>
 
 <center>
-  <div style="width: 60%;">
+  <div style="width: 90%;">
     <p>
       <%= f.label :title-%><span class="required">*</span><br/>
-      <%= f.text_field :title,:size=>52 -%>
+      <%= f.text_area :title,:style => "width: 100%;", :rows=>2 -%>
     </p>
 
     <p>
       <%= f.label :description -%><br/>
-      <%= f.text_area :description,:cols=>50,:rows=>10 -%>
+      <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
     </p>
 
     <p>
