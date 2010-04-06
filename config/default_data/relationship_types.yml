@@ -1,6 +1,6 @@
-test_data:
+construction_data:
   id: 1
-  title: Test data
+  title: Construction data
   description: Data used for model testing
 
 validation_data:
