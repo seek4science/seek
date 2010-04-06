@@ -1,17 +1,21 @@
 <% favourites=Favourite.find_all_by_user_id(current_user.id) %>
-<% saved_searches=SavedSearch.find_all_by_user_id(current_user.id) %>
+<% show_as_list = false -%>
 <% if favourites.empty? %>
   <span class="none_text" style="vertical-align:middle;height:100%;">
-    Drag an icon here to remember for future reference.<br/>    
+    Drag an icon here to remember for future reference.<br/>
   </span>
 <% else %>
+  <%= "<ul class='favourites'>"  if show_as_list -%>
   <% favourites.sort_by{|a| Asset::ASSET_ORDER.index(a.resource_type)}.each do |fav| %>
-  <% if true -%>
-   <%= fav_line_tag(fav) %>
-  <% else -%>
-    <%= fav_image_tag(fav) %>
-  <% end -%>
-  <% end %>  
+    <% if show_as_list -%>
+      <li class="fav_list_item">
+        <%= fav_line_tag(fav) %>
+      </li>
+    <% else -%>
+      <%= fav_image_tag(fav) %>
+    <% end -%>
+  <% end %>
+  <%= "</ul>"  if show_as_list -%>
 <% end %>
 
 <%= drop_receiving_element("content",

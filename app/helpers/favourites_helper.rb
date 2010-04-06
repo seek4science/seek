@@ -8,7 +8,7 @@ module FavouritesHelper
   end
 
   def fav_line_tag favourite
-    fav_image_tag(favourite) + favourite.resource.title
+    fav_image_tag(favourite) + "<span class='fav_title'>#{h(favourite.resource.title)}</span>"
   end
   
   def fav_image_tag favourite
@@ -22,7 +22,11 @@ module FavouritesHelper
     when "model","investigation","study","assay"
       tiny_image = image "#{item.class.name.downcase}_avatar", :class=>"fav_icon"
     when "person", "project", "institution"
-      tiny_image = avatar(item, 32, true)
+      if (item.avatar_selected?)
+        tiny_image = image_tag avatar_url(item, item.avatar_id, 32), :alt=> h(title), :class => 'fav_icon'
+      else
+        tiny_image = default_avatar(item.class.name, 32, h(title))
+      end
     when "savedsearch"
       tiny_image = image "saved_search", :class=>"fav_icon"
     end

@@ -722,11 +722,6 @@ img.badge {
 	vertical-align: middle;
 }
 
-div.favouritable_icon {
-  position: relative;
-  margin: 5px auto;
-}
-
 .avatar_text {
   position: absolute;
   text-align:center;
@@ -742,21 +737,6 @@ div.favouritable_icon {
 #organism_gadget li {
     list-style:none;
     font-style: normal;
-}
-
-img.fav_icon {
-    border: 1px solid rgb(204, 204, 255);
-    min-width: 1.5em;
-    min-height: 2em;
-    max-width: 32px;
-    max-height: 32px;
-    padding: 3px;
-    background-color: rgb(255, 255, 255);
-    margin-right: -1px;
-}
-
-div.favouritable_icon img {
-    padding: 2px;
 }
 
 a.asset img.avatar {

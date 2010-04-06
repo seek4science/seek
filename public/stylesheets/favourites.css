@@ -1,0 +1,43 @@
+div.favouritable_icon {
+  position: relative;
+  margin: 5px auto;
+}
+
+img.fav_icon {
+    border: 1px solid rgb(204, 204, 204);
+    min-width: 1.5em;
+    min-height: 2em;
+    max-width: 32px;
+    max-height: 32px;
+    padding: 3px;
+    background-color: rgb(255, 255, 255);
+    margin-right: -1px;
+    vertical-align: middle;
+}
+
+div.favouritable_icon img {
+    padding: 2px;
+}
+
+ul.favourites {
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;    
+}
+.fav_title {
+    font-size: smaller;
+    font-weight: lighter;
+    float:right;
+    position: relative;
+    width: 100px;
+    height: 100%;
+    vertical-align: middle;
+}
+
+ul.favourites li {
+    list-style-type: none;
+}
+
+#drop_favourites {
+    max-height: 30em;
+    overflow: auto;
+}
