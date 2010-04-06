@@ -6,7 +6,11 @@
   </span>
 <% else %>
   <% favourites.sort_by{|a| Asset::ASSET_ORDER.index(a.resource_type)}.each do |fav| %>
+  <% if true -%>
+   <%= fav_line_tag(fav) %>
+  <% else -%>
     <%= fav_image_tag(fav) %>
+  <% end -%>
   <% end %>  
 <% end %>
 

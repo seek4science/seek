@@ -6,6 +6,10 @@ module FavouritesHelper
     model_name=object.class.to_s
     return "drag_"+model_name+"_"+object.id.to_s+"_"+object.object_id.abs.to_s
   end
+
+  def fav_line_tag favourite
+    fav_image_tag(favourite) + favourite.resource.title
+  end
   
   def fav_image_tag favourite
     item = favourite.resource
