@@ -9,7 +9,7 @@ class AdminController < ApplicationController
   end
 
   def tags
-    @tags=Tag.find(:all)
+    @tags=Tag.find(:all,:order=>:name)
   end  
 
   def edit_tag
