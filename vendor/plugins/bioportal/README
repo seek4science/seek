@@ -19,10 +19,10 @@ Install the plugin from https://sysmo-db.googlecode.com/hg/vendor/plugins/biopor
 
 Since the rails plugin scripts don't work happily with Mercurial, until we extract this plugin the simplest way of adding the plugin is as follows:
 
-
      cd vendor/plugins
      hg clone https://sysmo-db.googlecode.com/hg/vendor/plugins/bioportal bioportal
      rm -rf bioportal/.hg/
+     cd -
 
 
 Generate the database migration by running
