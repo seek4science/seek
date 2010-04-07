@@ -18,6 +18,12 @@ class PersonTest < ActiveSupport::TestCase
     assert !registered.include?(people(:person_without_user))
   end
 
+  def test_duplicates
+    dups=Person.duplicates
+    assert dups.include?(people(:duplicate_1))
+    assert dups.include?(people(:duplicate_2))
+  end
+
   def test_without_group
     without_group=Person.without_group
     without_group.each do |p|

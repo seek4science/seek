@@ -173,5 +173,15 @@ person_with_links_in_description:
   last_name: "Bot"
   email: "spambot@spam.com"
   description: "Visit my websites! http://www.website.com, http://www.google.com"
+
+duplicate_1:
+  first_name: "I Am"
+  last_name: "a duplicate"
+  email: "dup1@email.com"
+
+duplicate_2:
+  first_name: "I Am"
+  last_name: "a duplicate"
+  email: "dup2@email.com"
   
 
