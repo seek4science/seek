@@ -175,13 +175,13 @@ person_with_links_in_description:
   description: "Visit my websites! http://www.website.com, http://www.google.com"
 
 duplicate_1:
-  first_name: "I Am"
-  last_name: "a duplicate"
+  first_name: "I Am a"
+  last_name: "duplicate"
   email: "dup1@email.com"
 
 duplicate_2:
-  first_name: "I Am"
-  last_name: "a duplicate"
+  first_name: "I Am a"
+  last_name: "duplicate"
   email: "dup2@email.com"
   
 
