@@ -15,11 +15,19 @@ http://www.bioontology.org/wiki/index.php/BioPortal_REST_services (Rest services
 
 == Installing the plugin
 
-Download the plugin from /xxx/ (needs to be hosted seperate from SysMO)
+Install the plugin from https://sysmo-db.googlecode.com/hg/vendor/plugins/bioportal
+
+Since the rails plugin scripts don't work happily with Mercurial, until we extract this plugin the simplest way of adding the plugin is as follows:
+
+
+     cd vendor/plugins
+     hg clone https://sysmo-db.googlecode.com/hg/vendor/plugins/bioportal bioportal
+     rm -rf bioportal/.hg/
+
 
 Generate the database migration by running
 
-./script/generate bioportal_migration
+     ./script/generate bioportal_migration
 
 This generates a table that maps to the BioportalConcept entity, though you don't need to know about this in your application.
 
@@ -29,10 +37,10 @@ This generates a table that maps to the BioportalConcept entity, though you don'
 
 To link to a model in your RoR application, add the following line to your Model class
 
-class MyThing < ActiveRecord::Base
-  linked_to_bioportal :email=>"fred.bloggs@email.com"
-...
-end
+     class MyThing < ActiveRecord::Base
+       linked_to_bioportal :email=>"fred.bloggs@email.com"
+       ...
+     end
 
 adding :email is optional, but recommended as you will be notified of changes to the REST API.
 
@@ -54,35 +62,14 @@ More information about this can be found in the API documentation.
 
 by adding the include
 
-include BioPortal::RestAPI
+     include BioPortal::RestAPI
 
-you can include integration with the BioPortal within your controllers or helpers.
+you can find out more by reading BioPortal::RestAPI
 
-This currently provides the facilities:
-
-get_concept
-
-search
-
-get_ontology_details
-
-get_ontology_versions
-
-get_concepts_for_ontology_version_id
 
 === View Helpers
 
-Some view helpers are automatically injected into your application and currently provided helpers for
+Some view helpers are automatically injected into your application and you don't need to do anything to use them.
 
-link_to_concept_id 
-
-link_to_ontology
-
-link_to_ontology_version
-
-link_to_ontology_version_visualize
-
-link_to_download_ontology
-
-bioportal_form_complete
+You can find out more about these by reading about BioPortalHelper
 

@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Mar 09 13:48:35 +0000 2010</td>
+      <td>Wed Apr 07 13:53:36 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -95,14 +95,25 @@ href="http://www.bioontology.org/wiki/index.php/BioPortal_REST_services">www.bio
 <h1>Getting started</h1>
 <h2>Installing the plugin</h2>
 <p>
-Download the plugin from /xxx/ (needs to be hosted seperate from SysMO)
+Install the plugin from <a
+href="https://sysmo-db.googlecode.com/hg/vendor/plugins/bioportal">sysmo-db.googlecode.com/hg/vendor/plugins/bioportal</a>
 </p>
+<p>
+Since the rails plugin scripts don&#8216;t work happily with Mercurial,
+until we extract this plugin the simplest way of adding the plugin is as
+follows:
+</p>
+<pre>
+     cd vendor/plugins
+     hg clone https://sysmo-db.googlecode.com/hg/vendor/plugins/bioportal bioportal
+     rm -rf bioportal/.hg/
+</pre>
 <p>
 Generate the database migration by running
 </p>
-<p>
-./script/generate bioportal_migration
-</p>
+<pre>
+     ./script/generate bioportal_migration
+</pre>
 <p>
 This generates a table that maps to the <a
 href="../classes/BioportalConcept.html">BioportalConcept</a> entity, though
@@ -114,15 +125,12 @@ you don&#8216;t need to know about this in your application.
 To link to a model in your RoR application, add the following line to your
 Model class
 </p>
-<p>
-class MyThing &lt; ActiveRecord::Base
-</p>
 <pre>
-  linked_to_bioportal :email=&gt;&quot;fred.bloggs@email.com&quot;
+     class MyThing &lt; ActiveRecord::Base
+       linked_to_bioportal :email=&gt;&quot;fred.bloggs@email.com&quot;
+       ...
+     end
 </pre>
-<p>
-&#8230; end
-</p>
 <p>
 adding :email is optional, but recommended as you will be notified of
 changes to the REST API.
@@ -154,54 +162,21 @@ More information about this can be found in the API documentation.
 <p>
 by adding the include
 </p>
+<pre>
+     include BioPortal::RestAPI
+</pre>
 <p>
-include <a href="../classes/BioPortal/RestAPI.html">BioPortal::RestAPI</a>
-</p>
-<p>
-you can include integration with the <a
-href="../classes/BioPortal.html">BioPortal</a> within your controllers or
-helpers.
-</p>
-<p>
-This currently provides the facilities:
-</p>
-<p>
-get_concept
-</p>
-<p>
-search
-</p>
-<p>
-get_ontology_details
-</p>
-<p>
-get_ontology_versions
-</p>
-<p>
-get_concepts_for_ontology_version_id
+you can find out more by reading <a
+href="../classes/BioPortal/RestAPI.html">BioPortal::RestAPI</a>
 </p>
 <h3>View Helpers</h3>
 <p>
-Some view helpers are automatically injected into your application and
-currently provided helpers for
+Some view helpers are automatically injected into your application and you
+don&#8216;t need to do anything to use them.
 </p>
 <p>
-link_to_concept_id
-</p>
-<p>
-link_to_ontology
-</p>
-<p>
-link_to_ontology_version
-</p>
-<p>
-link_to_ontology_version_visualize
-</p>
-<p>
-link_to_download_ontology
-</p>
-<p>
-bioportal_form_complete
+You can find out more about these by reading about <a
+href="../classes/BioPortalHelper.html">BioPortalHelper</a>
 </p>
 
     </div>

@@ -176,35 +176,41 @@
 options can include
 </p>
 <pre>
- - offset - the offet to start from
- - limit - the maximum number of terms returns
+ - pagenum - the offet to start from
+ - pagesize - the maximum number of terms returns -defaults to 50
+ returns concept_list,num_pages
 </pre>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000025-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000025-source">
 <pre>
-     <span class="ruby-comment cmt"># File lib/bioportal.rb, line 201</span>
-201:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concepts_for_ontology_version_id</span> <span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-identifier">options</span>={}
-202:       <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:offset</span>]<span class="ruby-operator">||=</span><span class="ruby-value">0</span>
-203:       <span class="ruby-identifier">uri</span>=<span class="ruby-node">&quot;/concepts/#{ontology_version_id}/all?&quot;</span>
-204:       <span class="ruby-identifier">options</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span><span class="ruby-identifier">uri</span><span class="ruby-operator">+=</span><span class="ruby-node">&quot;#{k}=#{URI.encode(options[k].to_s)}&amp;&quot;</span>}
-205:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">uri</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>]
-206:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">bioportal_base_rest_url</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">uri</span>
-207:       <span class="ruby-identifier">parser</span> = <span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Parser</span>.<span class="ruby-identifier">io</span>(<span class="ruby-identifier">open</span>(<span class="ruby-identifier">uri</span>))
-208:       <span class="ruby-identifier">doc</span> = <span class="ruby-identifier">parser</span>.<span class="ruby-identifier">parse</span>
-209: 
-210:       <span class="ruby-identifier">concepts</span> = <span class="ruby-identifier">error_check</span> <span class="ruby-identifier">doc</span>
-211:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">concepts</span>.<span class="ruby-identifier">nil?</span>
-212:         <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>
-213:       <span class="ruby-keyword kw">end</span>
-214: 
-215:       <span class="ruby-identifier">concepts</span>=[]
-216:       <span class="ruby-identifier">doc</span>.<span class="ruby-identifier">find</span>(<span class="ruby-value str">&quot;/*/data/list/classBean&quot;</span>).<span class="ruby-identifier">each</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">element</span><span class="ruby-operator">|</span>
-217:         <span class="ruby-identifier">concepts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">process_concept_bean_xml</span>(<span class="ruby-identifier">element</span>)
-218:       }
-219:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>
-220:       
-221:     <span class="ruby-keyword kw">end</span>
+     <span class="ruby-comment cmt"># File lib/bioportal.rb, line 202</span>
+202:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concepts_for_ontology_version_id</span> <span class="ruby-identifier">ontology_version_id</span>,<span class="ruby-identifier">options</span>={}
+203:       <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:pagenum</span>]<span class="ruby-operator">||=</span><span class="ruby-value">0</span>
+204:       <span class="ruby-identifier">uri</span>=<span class="ruby-node">&quot;/concepts/#{ontology_version_id}/all?&quot;</span>
+205:       <span class="ruby-identifier">options</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span><span class="ruby-identifier">uri</span><span class="ruby-operator">+=</span><span class="ruby-node">&quot;#{k}=#{URI.encode(options[k].to_s)}&amp;&quot;</span>}
+206:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">uri</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>]
+207:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">bioportal_base_rest_url</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">uri</span>
+208:       <span class="ruby-identifier">parser</span> = <span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Parser</span>.<span class="ruby-identifier">io</span>(<span class="ruby-identifier">open</span>(<span class="ruby-identifier">uri</span>))
+209:       <span class="ruby-identifier">doc</span> = <span class="ruby-identifier">parser</span>.<span class="ruby-identifier">parse</span>
+210: 
+211:       <span class="ruby-identifier">concepts</span> = <span class="ruby-identifier">error_check</span> <span class="ruby-identifier">doc</span>
+212:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">concepts</span>.<span class="ruby-identifier">nil?</span>
+213:         <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>
+214:       <span class="ruby-keyword kw">end</span>
+215: 
+216:       <span class="ruby-identifier">concepts</span>=[]
+217:       <span class="ruby-identifier">doc</span>.<span class="ruby-identifier">find</span>(<span class="ruby-value str">&quot;/*/data/page/contents/classBeanResultList/classBean&quot;</span>).<span class="ruby-identifier">each</span>{ <span class="ruby-operator">|</span><span class="ruby-identifier">element</span><span class="ruby-operator">|</span>
+218:         <span class="ruby-identifier">concepts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">process_concept_bean_xml</span>(<span class="ruby-identifier">element</span>)
+219:       }
+220:       <span class="ruby-identifier">pages</span> = <span class="ruby-value">1</span>
+221:       <span class="ruby-identifier">doc</span>.<span class="ruby-identifier">find</span>(<span class="ruby-value str">&quot;/*/data/page&quot;</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">element</span><span class="ruby-operator">|</span>
+222:         <span class="ruby-identifier">pages</span> = <span class="ruby-identifier">element</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">element</span>.<span class="ruby-identifier">path</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;/numPages&quot;</span>).<span class="ruby-identifier">first</span>.<span class="ruby-identifier">content</span>
+223:       }
+224: 
+225:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>,<span class="ruby-identifier">pages</span>.<span class="ruby-identifier">to_i</span>
+226:       
+227:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -226,30 +232,31 @@ options can include
 <pre>
  - offset - the offet to start from
  - limit - the maximum number of terms returns
+ &lt;em&gt;This call is currently not implemented&lt;/em&gt;
 </pre>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000026-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000026-source">
 <pre>
-     <span class="ruby-comment cmt"># File lib/bioportal.rb, line 226</span>
-226:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concepts_for_virtual_ontology_id</span> <span class="ruby-identifier">virtual_ontology_id</span>,<span class="ruby-identifier">options</span>={}
-227:       <span class="ruby-identifier">uri</span>=<span class="ruby-node">&quot;/virtual/ontology/#{virtual_ontology_id}/all?&quot;</span>
-228:       <span class="ruby-identifier">options</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span><span class="ruby-identifier">uri</span><span class="ruby-operator">+=</span><span class="ruby-node">&quot;#{k}=#{URI.encode(options[k])}&amp;&quot;</span>}
-229:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">uri</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>]
-230:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">bioportal_base_rest_url</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">uri</span>
-231:       
-232:       <span class="ruby-identifier">doc</span> = <span class="ruby-constant">REXML</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">open</span>(<span class="ruby-identifier">uri</span>))
-233: 
-234:       <span class="ruby-identifier">concepts</span> = <span class="ruby-identifier">error_check</span> <span class="ruby-identifier">doc</span>
-235:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">concepts</span>.<span class="ruby-identifier">nil?</span>
-236:         <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>
-237:       <span class="ruby-keyword kw">end</span>
-238: 
-239:       <span class="ruby-identifier">concepts</span>=[]
-240:       <span class="ruby-comment cmt">#TODO: parse concept list (xml is different to single concept)</span>
-241:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>
-242: 
-243:     <span class="ruby-keyword kw">end</span>
+     <span class="ruby-comment cmt"># File lib/bioportal.rb, line 233</span>
+233:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_concepts_for_virtual_ontology_id</span> <span class="ruby-identifier">virtual_ontology_id</span>,<span class="ruby-identifier">options</span>={}
+234:       <span class="ruby-identifier">uri</span>=<span class="ruby-node">&quot;/virtual/ontology/#{virtual_ontology_id}/all?&quot;</span>
+235:       <span class="ruby-identifier">options</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span><span class="ruby-identifier">uri</span><span class="ruby-operator">+=</span><span class="ruby-node">&quot;#{k}=#{URI.encode(options[k])}&amp;&quot;</span>}
+236:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">uri</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>]
+237:       <span class="ruby-identifier">uri</span>=<span class="ruby-identifier">bioportal_base_rest_url</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">uri</span>
+238:       
+239:       <span class="ruby-identifier">doc</span> = <span class="ruby-constant">REXML</span><span class="ruby-operator">::</span><span class="ruby-constant">Document</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">open</span>(<span class="ruby-identifier">uri</span>))
+240: 
+241:       <span class="ruby-identifier">concepts</span> = <span class="ruby-identifier">error_check</span> <span class="ruby-identifier">doc</span>
+242:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">concepts</span>.<span class="ruby-identifier">nil?</span>
+243:         <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>
+244:       <span class="ruby-keyword kw">end</span>
+245: 
+246:       <span class="ruby-identifier">concepts</span>=[]
+247:       <span class="ruby-comment cmt">#TODO: parse concept list (xml is different to single concept)</span>
+248:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">concepts</span>
+249: 
+250:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -378,7 +385,7 @@ options can include
 171:         <span class="ruby-identifier">pages</span> = <span class="ruby-identifier">element</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">element</span>.<span class="ruby-identifier">path</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;/numPages&quot;</span>).<span class="ruby-identifier">first</span>.<span class="ruby-identifier">content</span>
 172:       }
 173: 
-174:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">results</span>.<span class="ruby-identifier">uniq</span>,<span class="ruby-identifier">pages</span>
+174:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">results</span>.<span class="ruby-identifier">uniq</span>,<span class="ruby-identifier">pages</span>.<span class="ruby-identifier">to_i</span>
 175: 
 176:     <span class="ruby-keyword kw">end</span>
 </pre>
