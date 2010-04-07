@@ -54,7 +54,18 @@ class Person < ActiveRecord::Base
   def self.userless_people
     p=Person.find(:all)
     return p.select{|person| person.user.nil?}
-  end  
+  end
+
+  #returns an array of Person's where the first and last name match
+  def self.duplicates
+    people=Person.all
+    dup=[]
+    people.each do |p|
+      peeps=people.select{|p2| p.name==p2.name}
+      dup = dup | peeps if peeps.count>1
+    end
+    return dup
+  end
     
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
