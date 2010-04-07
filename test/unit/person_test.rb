@@ -20,6 +20,7 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_duplicates
     dups=Person.duplicates
+    assert !dups.empty?
     assert dups.include?(people(:duplicate_1))
     assert dups.include?(people(:duplicate_2))
   end
