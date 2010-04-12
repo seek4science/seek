@@ -71,21 +71,22 @@ class AssaysController < ApplicationController
     @assay.assets = []
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
-    model_assets = params[:assay_model_asset_ids] || []
-    (sop_assets+model_assets).each do |a_id|
-      @assay.assets << Asset.find(a_id)
-    end      
-    data_assets.each do |text|
-      a_id, r_type = text.split(",")
-      relationship_type = RelationshipType.find_by_title(r_type)
-      assay_asset = AssayAsset.new()
-      assay_asset.assay = @assay
-      assay_asset.asset = Asset.find(a_id)
-      assay_asset.relationship_type = relationship_type      
-      assay_asset.save
-    end   
+    model_assets = params[:assay_model_asset_ids] || []    
+
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
+        (sop_assets+model_assets).each do |a_id|
+          @assay.assets << Asset.find(a_id)
+        end
+        data_assets.each do |text|
+          a_id, r_type = text.split(",")
+          relationship_type = RelationshipType.find_by_title(r_type)
+          assay_asset = AssayAsset.new()
+          assay_asset.assay = @assay
+          assay_asset.asset = Asset.find(a_id)
+          assay_asset.relationship_type = relationship_type
+          assay_asset.save
+        end 
         flash[:notice] = 'Assay was successfully updated.'
         format.html { redirect_to(@assay) }
         format.xml  { head :ok }
