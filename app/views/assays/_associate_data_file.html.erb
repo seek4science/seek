@@ -93,6 +93,19 @@ select_truncate_length=120;
   <% end -%>
 <% end -%>
 
+<% if params[:assay_data_file_asset_ids] %>
+  <% params[:assay_data_file_asset_ids].each do |id_and_rel_id| -%>
+    <% a_id, r_type = id_and_rel_id.split(",") %>
+    <% asset = Asset.find(a_id) %>
+    <% if Authorization.is_authorized?("show",nil,asset,current_user) -%>
+        asset_id = '<%= a_id -%>';
+        data_title = '<%= escape_javascript(asset.resource.title) -%>';
+        relationship_type = '<%= r_type -%>';
+        addDataFile(data_title, asset_id, relationship_type );
+    <% end -%>
+  <% end -%>
+<% end -%>
+
   updateDataFiles();
 
   function check_show_add_data_file() {

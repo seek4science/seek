@@ -89,6 +89,17 @@ select_truncate_length=120;
   <% end -%>
 <% end -%>
 
+<% if params[:assay_model_asset_ids] %>
+  <% params[:assay_model_asset_ids].each do |id| -%>
+    <% asset = Asset.find(id) %>
+    <% if Authorization.is_authorized?("show",nil,asset,current_user) -%>
+        asset_id = '<%= id -%>';
+        model_title = '<%= escape_javascript(asset.resource.title) -%>';
+        addModel(model_title, asset_id);
+    <% end -%>
+  <% end -%>
+<% end -%>
+
   updateModels();
 
 
