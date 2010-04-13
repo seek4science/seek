@@ -4,52 +4,57 @@
 
       <!-- People tab -->
       <li <%= (["people"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-        <%= link_to "People", people_url -%>
+        <%= link_to "People", people_path -%>
       </li>
 
       <!-- Projects tab -->
       <li <%= (["projects"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-        <%= link_to "Projects", projects_url -%>
+        <%= link_to "Projects", projects_path -%>
       </li>
 
       <!-- Institutions tab -->
       <li <%= (["institutions"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-        <%= link_to "Institutions", institutions_url -%>
+        <%= link_to "Institutions", institutions_path -%>
       </li>
 
       <!-- Investigations tab -->
       <li <%= (["investigations"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before">
-        <%= link_to "Investigations", investigations_url -%>
+        <%= link_to "Investigations", investigations_path -%>
       </li>
 
       <!-- Studies tab -->
       <li <%= (["studies"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-        <%= link_to "Studies", studies_url -%>
+        <%= link_to "Studies", studies_path -%>
       </li>
 
       <!-- Assays tab -->
       <li <%= (["assays"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-        <%= link_to "Assays", assays_url -%>
+        <%= link_to "Assays", assays_path -%>
       </li>
 
       <!-- Data tab -->
       <li <%= (["data_files"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
-        <%= link_to "Data", data_files_url -%>
+        <%= link_to "Data", data_files_path -%>
       </li>
 
       <!-- Models tab -->
       <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-      <%= link_to "Models", models_url -%>
+      <%= link_to "Models", models_path -%>
     </li>
 
     <!-- SOPs tab -->
     <li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-      <%= link_to "SOPs", sops_url -%>
+      <%= link_to "SOPs", sops_path -%>
     </li>
     
     <!-- Publications tab -->
     <li <%= (["publications"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
-      <%= link_to "Publications", publications_url -%>
+      <%= link_to "Publications", publications_path -%>
+    </li>
+
+    <!-- Forums tab -->
+    <li <%= (["forums"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
+      <%= link_to "Forums", forums_path -%>
     </li>
 
   </ul>

@@ -124,7 +124,7 @@ class User < ActiveRecord::Base
   #required for savage beast plugin
   #see http://www.williambharding.com/blog/rails/savage-beast-23-a-rails-22-23-message-forum-plugin/
   def admin?
-    false
+    is_admin?
   end
 
   def currently_online
@@ -132,7 +132,7 @@ class User < ActiveRecord::Base
   end
 
   def display_name
-    "Foo Diddly"
+    name
   end
 
   protected
