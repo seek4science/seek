@@ -30,7 +30,7 @@ class OrganismsController < ApplicationController
     pagenum=params[:pagenum]
     pagenum||=1
     search_term=params[:search_term]
-    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>25,:pagenum=>pagenum}
+    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>25,:pagenum=>pagenum,:ontologyids=>"1132"}
     render :update do |page|
       if results
         page.replace_html 'search_results',:partial=>"search_results",:object=>results,:locals=>{:pages=>pages,:pagenum=>pagenum,:search_term=>search_term}

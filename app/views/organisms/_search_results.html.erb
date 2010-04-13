@@ -12,7 +12,7 @@
   <% search_results.each do |result| %>
   <tr>
     <td><%= h(result[:ontology_display_label]) -%></td>
-    <td><%= link_to_ontology(result[:ontology_id],result[:ontologyId]) -%></td>
+    <td><%= link_to_ontology(result[:ontology_id],result[:ontology_id]) -%></td>
     <td><%= link_to_ontology_version(result[:ontology_version_id],result[:ontology_version_id]) -%>
         <%= link_to_ontology_version_visualize("Explore",result[:ontology_version_id]) -%>
       <%= link_to_download_ontology("Download",result[:ontology_version_id]) -%>
