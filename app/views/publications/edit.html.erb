@@ -13,7 +13,7 @@
     
     <h2>Associate authors</h2>  
  
-    <% project = @publication.project || current_user.person.projects.first %>
+    <% project = @publication.project %>
     Using the form below, you can link the authors listed in PubMed to people registered in SEEK.<br/><br/>
     
     SEEK will try and suggest the correct person based on the author's name. If this suggestion is incorrect, please select the correct person from the dropdown menu, or choose "None" if this person isn't a member of SEEK.<br/><br/>
