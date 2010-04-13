@@ -1,6 +1,7 @@
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
   include TagsHelper
+  include SavageBeast::ApplicationHelper
 
   #List of creatable model classes
   def creatable_classes
