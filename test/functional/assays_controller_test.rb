@@ -67,11 +67,11 @@ class AssaysControllerTest < ActionController::TestCase
   test "should create" do
     assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",
-                            :organism_id=>organisms(:yeast).id,
-                            :technology_type_id=>technology_types(:gas_chromatography).id,
-                            :assay_type_id=>assay_types(:metabolomics).id,
-                            :study_id=>studies(:metabolomics_study).id,
-                            :assay_class=>assay_classes(:experimental_assay_class)}
+        :organism_id=>organisms(:yeast).id,
+        :technology_type_id=>technology_types(:gas_chromatography).id,
+        :assay_type_id=>assay_types(:metabolomics).id,
+        :study_id=>studies(:metabolomics_study).id,
+        :assay_class=>assay_classes(:experimental_assay_class)}
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
@@ -282,6 +282,83 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
     end
 
+  end
+
+  test "associated assets aren't lost on failed validation in create" do
+    sop=sops(:sop_with_all_sysmo_users_policy)
+    model=models(:model_with_links_in_description)
+    datafile=data_files(:downloadable_data_file)
+    rel=RelationshipType.first
+    
+    assert_no_difference("Assay.count","Should not have added assay because the title is blank") do
+      assert_no_difference("AssayAsset.count","Should not have added assay assets because the assay validation failed") do
+        #title is blank, so should fail validation
+        post :create,:assay=>{
+          :title=>"",
+          :organism_id=>organisms(:yeast).id,
+          :technology_type_id=>technology_types(:gas_chromatography).id,
+          :assay_type_id=>assay_types(:metabolomics).id,
+          :study_id=>studies(:metabolomics_study).id,
+          :assay_class=>assay_classes(:modelling_assay_class)
+        },
+          :assay_sop_asset_ids=>["#{sop.asset.id}"],
+          :assay_model_asset_ids=>["#{model.asset.id}"],
+          :assay_data_file_asset_ids=>["#{datafile.asset.id},#{rel.title}"]        
+      end
+    end
+
+    #since the items are added to the UI by manipulating the DOM with javascript, we can't do assert_select on the HTML elements to check they are there.
+    #so instead check for the relevant generated lines of javascript
+    assert_select "script",:text=>/sop_title = '#{sop.title}'/,:count=>1
+    assert_select "script",:text=>/asset_id = '#{sop.asset.id}'/,:count=>1
+    assert_select "script",:text=>/model_title = '#{model.title}'/,:count=>1
+    assert_select "script",:text=>/asset_id = '#{model.asset.id}'/,:count=>1
+    assert_select "script",:text=>/data_title = '#{datafile.title}'/,:count=>1
+    assert_select "script",:text=>/asset_id = '#{datafile.asset.id}'/,:count=>1
+    assert_select "script",:text=>/relationship_type = '#{rel.title}'/,:count=>1
+    assert_select "script",:text=>/addDataFile/,:count=>1
+    assert_select "script",:text=>/addSop/,:count=>1
+    assert_select "script",:text=>/addModel/,:count=>1    
+  end
+
+  test "associated assets aren't lost on failed validation on update" do
+    assay=assays(:assay_with_links_in_description)
+
+    #remove any existing associated assets
+    assay.assets.clear
+    assay.save!
+    assay.reload
+    assert assay.sops.empty?
+    assert assay.models.empty?
+    assert assay.data_files.empty?
+
+    sop=sops(:sop_with_all_sysmo_users_policy)
+    model=models(:model_with_links_in_description)
+    datafile=data_files(:downloadable_data_file)
+    rel=RelationshipType.first
+
+    assert_no_difference("Assay.count","Should not have added assay because the title is blank") do
+      assert_no_difference("AssayAsset.count","Should not have added assay assets because the assay validation failed") do
+        #title is blank, so should fail validation
+        put :update,:id=>assay,:assay=>{:title=>"",:assay_class=>assay_classes(:modelling_assay_class)},
+          :assay_sop_asset_ids=>["#{sop.asset.id}"],
+          :assay_model_asset_ids=>["#{model.asset.id}"],
+          :assay_data_file_asset_ids=>["#{datafile.asset.id},#{rel.title}"]
+      end
+    end
+
+    #since the items are added to the UI by manipulating the DOM with javascript, we can't do assert_select on the HTML elements to check they are there.
+    #so instead check for the relevant generated lines of javascript
+    assert_select "script",:text=>/sop_title = '#{sop.title}'/,:count=>1
+    assert_select "script",:text=>/asset_id = '#{sop.asset.id}'/,:count=>1
+    assert_select "script",:text=>/model_title = '#{model.title}'/,:count=>1
+    assert_select "script",:text=>/asset_id = '#{model.asset.id}'/,:count=>1
+    assert_select "script",:text=>/data_title = '#{datafile.title}'/,:count=>1
+    assert_select "script",:text=>/asset_id = '#{datafile.asset.id}'/,:count=>1
+    assert_select "script",:text=>/relationship_type = '#{rel.title}'/,:count=>1
+    assert_select "script",:text=>/addDataFile/,:count=>1
+    assert_select "script",:text=>/addSop/,:count=>1
+    assert_select "script",:text=>/addModel/,:count=>1
   end
 
   def check_fixtures_for_authorization_of_sops_and_datafiles_links
