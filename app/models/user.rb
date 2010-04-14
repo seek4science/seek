@@ -132,7 +132,7 @@ class User < ActiveRecord::Base
   end
 
   def display_name
-    name
+    person.name
   end
 
   protected

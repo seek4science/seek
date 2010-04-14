@@ -14,6 +14,7 @@ class ForumsController < ApplicationController
       format.xml { render :xml => @forums }
     end
   end
+  
 
   def show
     respond_to do |format|
@@ -60,5 +61,6 @@ class ForumsController < ApplicationController
       @forum = params[:id] ? Forum.find(params[:id]) : Forum.new
     end
 
-    alias authorized? admin?
+  alias authorized? admin?
+  
 end

@@ -9,9 +9,11 @@
 
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
 
+    <%= stylesheet_link_tag 'savage_beast/display' -%>
+    <%= javascript_include_tag 'savage_beast/application.js' -%>
     <%= javascript_include_tag 'prototype.js','effects.js','dragdrop.js','boxover.js','scriptaculous.js','controls.js', 'redbox.js','builder.js','application.js','autocompleter_advanced.js',:cache=>'js_cached' %>
     <%= stylesheet_link_tag 'reset-fonts-grids', 'base-min', 'my_exp', 'gadgets', 'acts_as_taggable_stylesheet', 'styles', 'favourites','fast_auto_complete', 'redbox', 'autocompleter_advanced', 'alphabetical_pagination', :cache=>'css_cached'%>
-
+    
     <script type="text/javascript">
       function show_ajax_loader(element) {
         $(element).innerHTML=<%= "'"+image_tag("ajax-loader.gif")+"'" -%>;
