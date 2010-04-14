@@ -110,7 +110,7 @@ ul.talking li span
 
 ul.flat li
 {
-	background:url(/plugin_assets/savage_beast/images/small_circle.gif) no-repeat 5px 6px;
+	background:url(/images/savage_beast/small_circle.gif) no-repeat 5px 6px;
 	padding-left:15px;
 }
 ul.ways li span
@@ -323,7 +323,7 @@ td.code,
 
 .photo
 {
-	background:#aaa url(/plugin_assets/savage_beast/images/clearbits/smile.gif) no-repeat 8px 8px;
+	background:#aaa url(/images/savage_beast/clearbits/smile.gif) no-repeat 8px 8px;
 }
 
 .smallutils
@@ -636,7 +636,7 @@ p.online {margin-bottom:0;}
 img.icon
 {
 	background:#696;
-	background-image: url(/plugin_assets/savage_beast/images/clearbits/bg_rounded.gif);
+	background-image: url(/images/savage_beast/clearbits/bg_rounded.gif);
 	background-repeat: no-repeat;
 	vertical-align: bottom;
 }

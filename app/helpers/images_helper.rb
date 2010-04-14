@@ -229,6 +229,8 @@ module ImagesHelper
     end
   end
 
+  
+  
   # A generic key to produce avatars for entities of all kinds.
   #
   # Parameters:
