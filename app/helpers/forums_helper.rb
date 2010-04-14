@@ -16,4 +16,8 @@ module ForumsHelper
 			"<img src='/images/savage_beast/#{spinner}' style='display:none; vertical-align:middle;' id='#{id.to_s}_spinner'> "
 		end
 
+  def admin?
+    current_user.is_admin?
+  end
+
 end
