@@ -1,6 +1,7 @@
 div.favouritable_icon {
   position: relative;
   margin: 5px auto;
+  display: inline;
 }
 
 img.fav_icon {

@@ -887,3 +887,14 @@ table.jerm_results {
     font-size: larger;
     font-weight: bold;
 }
+
+div.avatar_list_popup {
+  margin-left:6em;
+  z-index:1;
+  padding:7px;
+  background-color:#EEEEEE;
+  border:1px solid #999999;
+  position:absolute;
+  max-width:420px;
+  text-align:center;
+}

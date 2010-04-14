@@ -154,24 +154,37 @@ class PublicationsController < ApplicationController
       #Get author by last name
       last_name_matches = Person.find_all_by_last_name(author.last_name)
       matches = last_name_matches
-      #If more than one result, refine by first initial
-      if matches.size > 1
-        first_and_last_name_matches = matches.select{|p| p.first_name.at(0).upcase == author.first_name.at(0).upcase}
-        matches = first_and_last_name_matches
-      end
-      #If that didn't work, revert
+      #If no results, try searching by normalised name, taken from grouped_pagination.rb
       if matches.size < 1
+        text = author.last_name
+        #handle the characters that can't be handled through normalization
+        %w[ØO].each do |s|
+          text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
+        end
+  
+        codepoints = text.mb_chars.normalize(:d).split(//u)
+        ascii=codepoints.map(&:to_s).reject{|e| e.length > 1}.join
+  
+        last_name_matches = Person.find_all_by_last_name(ascii)
         matches = last_name_matches
       end
-      #Try filtering by project
+      
+      #If more than one result, filter by project
       if matches.size > 1
         project_matches = matches.select{|p| p.projects.include?(project)}
-        matches = project_matches
+        if project_matches.size >= 1 #use this result unless it resulted in no matches
+          matches = project_matches
+        end
+      end      
+      
+      #If more than one result, filter by first initial
+      if matches.size > 1
+        first_and_last_name_matches = matches.select{|p| p.first_name.at(0).upcase == author.first_name.at(0).upcase}
+        if first_and_last_name_matches.size >= 1  #use this result unless it resulted in no matches
+          matches = first_and_last_name_matches
+        end
       end
-      #If that didn't work, revert
-      if matches.size < 1
-        matches = last_name_matches
-      end
+
       #Take the first match as the guess
       association[author.id] = matches.first
     end
