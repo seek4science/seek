@@ -28,6 +28,7 @@ function init() {
 	oDv.appendChild(dvBdy);
 	oDv.style.position="absolute";
 	oDv.style.visibility='hidden';
+  oDv.style.zIndex='10';
 	document.body.appendChild(oDv);	
 }
 
