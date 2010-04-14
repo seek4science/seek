@@ -1,8 +1,31 @@
+body
+{
+	margin:0;
+	padding:0;
+	background:#d7d7d7;
+	font-family:Arial, Helvetica, sans-serif;
+}
+
+a { color: #24b; }
+
 #container
 {
 	width:92%;
 	margin:0 auto;
 	min-width:760px;
+}
+
+#content
+{
+	margin:1em 0;
+	width:70%;
+	background:white;
+	padding:25px;
+	border:5px solid #bbb;
+	border-width:0 5px 5px 0;
+	float:left;
+	min-width:425px;
+	min-height:165px;
 }
 
 #right
@@ -29,8 +52,26 @@
 	font-size:0.75em;
 }
 
-#content p.subtle {
-	margin:0 0 0.5em;
+#footer
+{
+	margin:0 auto;
+	margin-bottom:1em;
+	font-family:'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+	font-size:0.75em;
+	color:#333;
+	
+	margin-left:3%;
+	width:67%;
+	min-width:545px;
+	padding:0px 15px;
+	margin-bottom:3.5em;
+}
+
+
+#content form {margin-bottom:0;}
+
+#content p.subtle { 
+	margin:0 0 0.5em; 
 	float:right;
 	}
 #content .subtle a
@@ -38,6 +79,19 @@
 	color:#999;
 	font-size:0.7em;
 }
+
+#header
+{
+	background:#111;
+	padding:10px 4%;
+	border-bottom:3px solid #999;
+}
+
+#search_box {
+  font-size:0.85em;
+}
+
+img { border-width:0; }
 
 p.pages
 {
@@ -75,6 +129,14 @@ p.sections
 	font-size:0.8em;
 }
 
+p.error
+{
+  background:#c00;
+  color:white;
+}
+
+
+
 p.sections a.action { color:#c00; }
 
 .hasfile
@@ -83,6 +145,17 @@ p.sections a.action { color:#c00; }
 	font-weight:bold;
 	margin-left:10em;
 }
+
+h1,h2,h3,h4,h5,h6
+{
+font-family:'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, sans-serif;	
+}
+
+h1 {	
+	font-size:1.3em; 
+}
+
+h1 img { vertical-align:middle; }
 
 p.subtitle
 {
@@ -93,6 +166,80 @@ p.subtitle
 	margin-top:-0.8em;
 }
 p.subtitle img { vertical-align: bottom; }
+
+h1 span { font-size:0.7em; color:#999; font-weight:normal; padding-left: 1em;}
+
+h2 {
+	font-size:1.0em; }
+
+h2 span
+{
+	color:#999;
+	font-size:0.7em;
+	margin-left:1em;
+}
+
+h3 
+{
+  padding:2px 10px 3px;
+  background:#333;
+  color:white;
+	font-size:0.70em;
+  border-bottom:1px solid #999;
+  font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+}
+
+h6 { margin-bottom:0; }
+
+pre.explain
+{
+	background:#e7e7e7;
+	padding:7px 15px;
+	border:1px solid #ccc;
+	margin:0 2em;
+}
+
+hr
+{
+	height:0;
+	border:0;
+	border-bottom:1px solid #ccc;
+	margin:1em 0;
+}
+
+#right hr { border-color:#bbb; }
+
+#monitor_topic { 
+  font-size: 12px; 
+}
+#monitor_topic .icon { 
+  background-image:none; 
+}
+
+/* footer */
+
+#footer p
+{margin:0}
+#footer p.credit
+{
+	float:right;
+	text-align:right;
+}
+#footer p.credit a.subtle
+{
+	color:#333;
+}
+#footer p.legal
+{
+	float:left;
+	margin-right:1.5em;
+}
+
+#footer p.disclaim
+{
+	float:left;
+	color:#080;
+}
 
 ul.quotes,
 ul.flat
@@ -178,6 +325,20 @@ input.primary
 
 }
 
+input.submit
+{
+	margin-right:1em;
+	float:right;
+}
+
+/* layout of paste */
+
+.pastebox
+{
+	width:100%;
+}
+
+p.private,
 #content .legend
 {
 	margin-top:0;
@@ -197,9 +358,9 @@ p.private
   color:#c00;
   font-weight:bold;
 }
-p.psmall {
-  font-size:0.7em;
-  font-weight:normal;
+p.psmall { 
+  font-size:0.7em; 
+  font-weight:normal; 
 }
 
 div.upload
@@ -258,6 +419,31 @@ p
 #news a.subtle { 	color:#ffc; font-weight:normal;}
 #news a {color:gold; font-weight:bold}
 #news p {margin:0;}
+
+
+#header img
+{
+	vertical-align:bottom;
+	margin-right:0.25em;
+}
+
+#header h1,
+#header h1 a
+{
+	font-weight:normal;
+	margin:0;
+	color:#cf4;
+	border:0;
+	text-decoration:none;
+}
+
+#header h1 .count
+{
+	color:#ddd;
+	font-size:0.6em;
+	font-weight:normal;
+	padding-left:1em;
+}
 
 #header ul#nav
 {
@@ -321,6 +507,17 @@ td.code,
 	padding-left:0.75em;
 }
 
+
+label
+{
+	font-family:'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+	color:#666;
+	font-size:0.75em;
+	font-weight:normal;
+}
+
+/* random */
+
 .photo
 {
 	background:#aaa url(/plugin_assets/savage_beast/images/clearbits/smile.gif) no-repeat 8px 8px;
@@ -340,6 +537,9 @@ td.code,
 }
 .smallutils a:hover {color:#369;}
 
+
+/* tables */
+
 table.noborder td
 {
   border:0;
@@ -356,7 +556,19 @@ table
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
 table.wide {	width:100%; }
-
+table tr th
+{
+	background:#333;
+	color:white;
+	font-size:0.8em;
+	padding:3px 10px;
+	border:1px solid #222;
+}
+table tr td
+{
+	padding:7px;
+	border:1px solid #ddd;
+}
 
 /* topics */
 
@@ -373,11 +585,11 @@ table.topics
  { font-size:0.8em; }
 table.forums tr th { font-size:0.8em; }
 table.forums tr td .title {
-	font-size:1.4em;
+	font-size:1.4em; 
 	}
 
 table.forums tr td .desc {
-margin:0.5em 0;
+margin:0.5em 0;	
 }
 table.forums tr td
 {
@@ -524,7 +736,7 @@ table.posts tr.spacer td
 }
 
 .post .author img {
-	float:left;
+	float:left; 
 	margin-right:0.5em;
 	}
 .post .author
@@ -605,7 +817,7 @@ table.posts tr.spacer td
 
 .posts .post .body blockquote p
 {
-	margin:0.5em 0;
+	margin:0.5em 0;	
 }
 
 .post .body p.topic
@@ -621,10 +833,10 @@ table.posts tr.spacer td
 /*
 table.posts .editing td {
 }
-table.posts .editing td.author {
-  background:#030;
+table.posts .editing td.author { 
+  background:#030; 
   }
-
+  
 table.posts .editing td.author * { color:#ccc; }
 table.posts .editing td.body { }
 */
@@ -654,9 +866,13 @@ img.green { background-color:#0c0;}
 /* reply */
 
 div.editbox
-{	
+{
+	background:url(/plugin_assets/savage_beast/images/reply_background.png);
 	border:2px solid #333;
-	border-width:2px 0;	
+	border-width:2px 0;
+	position:fixed;
+	bottom:0;
+	left:0;
 	width:100%;
 	padding:6px 0 7px;
 	z-index:50;
@@ -718,7 +934,7 @@ div.editbox ul.help { margin:0; }
 
 div.editbox ul.help {
   list-style-type:none; }
-
+  
 #monitor_topic a
 {
   color: #666;
