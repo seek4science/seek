@@ -31,8 +31,10 @@ class SearchController < ApplicationController
       @results = Investigation.multi_solr_search(downcase_query, :limit=>100, :models=>[Investigation]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
    when ("assays")
       @results = Assay.multi_solr_search(downcase_query, :limit=>100, :models=>[Assay]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
+   when ("publications")
+      @results = Publication.multi_solr_search(downcase_query, :limit=>100, :models=>[Publication]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     else
-      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Study,DataFile,Assay,Investigation]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
+      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Study,DataFile,Assay,Investigation, Publication]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     end
 
     @results = select_authorised @results
