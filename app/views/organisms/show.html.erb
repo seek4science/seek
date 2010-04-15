@@ -1,9 +1,12 @@
-<h1>Organism: <%= h @organism.title -%></h1>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@organism} %>
 
 <div class="show_basic">
 
-<%= link_to "More information about: #{@organism.title}", info_organism_path(@organism) %>
-  
-<%= render :partial=>"layouts/items_related_to",:object => @organism %>
+  <% if @organism.concept -%>
+  <h2>Details about this organism</h2>
+    <%= render :partial=>"layouts/bioportal_concept_details",:locals=>{:concept=>@organism.concept} -%>
+  <% end -%>
+
+  <%= render :partial=>"layouts/items_related_to",:object => @organism %>
 
 </div>
