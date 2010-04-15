@@ -1,34 +1,6 @@
 <h1>Editing <%= link_to h(@organism.title),@organism -%></h1>
 
-<h3>BioPortal term details</h3>
-<ul>
-  <li>
-    <label>Ontology ID</label> <%= text_or_not_specified(@organism.ontology_id) %>
-  </li>
-  <li>
-    <label>Ontology version ID</label> <%= text_or_not_specified(@organism.ontology_version_id) %>
-  </li>
-  <li>
-    <label>Concept URI</label> <%= text_or_not_specified(@organism.concept_uri) %>
-  </li>
-</ul>
-
-<%=
-link_to_remote "More ...",
-  :url=>{:action=>:more_ajax,:controller=>:organisms,:id=>@organism},
-  :before=>"show_ajax_loader('bioportal_more')"
-%>
-
-<div id="bioportal_more">
-
-</div>
-
-<hr/>
-
-<br/><hr/>
-<%= link_to_function "Edit",visual_effect(:toggle_appear,"edit_ontology") %>
-
-<div id="edit_ontology" style="display:none;">
+<div id="edit_ontology">
   <%  form_for(@organism) do |f| %>
     <ul>
       <li>
@@ -52,9 +24,6 @@ link_to_remote "More ...",
   <% end %>
 
 </div>
-<br/><hr/>
-
-
 
 <br/>
 <h3>Search</h3>
@@ -63,14 +32,13 @@ link_to_remote "More ...",
 </div>
 
 <script type="text/javascript">
-  function add_concept(ont_id,ont_version_id,conc_id) {
+  function add_concept(label,ont_id,ont_version_id,conc_id) {
+    $('organism_title').value=label;
     $('organism_ontology_id').value=ont_id;
     $('organism_ontology_version_id').value=ont_version_id;
     $('organism_concept_uri').value=conc_id;
 <%=  visual_effect :appear,"edit_ontology" -%>
   }
 </script>
-<br/><hr/>
-<%= link_to "Tagging example",new_organism_path -%>
 
 

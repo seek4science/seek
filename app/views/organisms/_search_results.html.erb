@@ -21,7 +21,7 @@
       <%= result[:concept_id] -%>
     </td>
     <td>
-      <%= link_to_function(h(result[:preferred_name]),"add_concept(#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id]}');") -%>
+      <%= link_to_function(h(result[:preferred_name]),"add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id]}');") -%>
     </td
   </tr>
   <% end %>

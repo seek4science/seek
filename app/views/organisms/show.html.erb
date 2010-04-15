@@ -11,8 +11,8 @@
   <% if @organism.concept -%>
   <h2>Details about this organism</h2>
     <%= render :partial=>"layouts/bioportal_concept_details",:locals=>{:concept=>@organism.concept} -%>
+    <%= link_to "Visualise ontology term",visualise_organism_path(@organism),:popup=>true %> | <%= link_to_ncbi_taxonomy_browser @organism,"NCBI taxonomy browser",:popup=>true %>
   <% end -%>
 
-  <%= render :partial=>"layouts/items_related_to",:object => @organism %>
-  <%= link_to "Visualise on BioPortal",visualise_organism_path(@organism),:popup=>true %> | <%= link_to_ncbi_taxonomy_browser @organism,"NCBI taxonomy browser",:popup=>true %>
+  <%= render :partial=>"layouts/items_related_to",:object => @organism %>  
 </div>
