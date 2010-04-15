@@ -179,7 +179,8 @@ module Authorization
         # this should only be carried out if the asset belongs to a User (or nil to indicate uploaded by JERM), not a Project or something else
         # (otherwise it doesn't make sense for those other types to have "favourite" groups, including
         #  whitelist / blacklist)
-        if thing_asset.contributor.nil? || thing_asset.contributor.instance_of?(User)
+        #FIXME: don't go into this block if the contributor is nil. Need to use the creator, or manager.
+        if !thing_asset.contributor.nil? && thing_asset.contributor.instance_of?(User)
           if policy.use_blacklist
             return false if Authorization.is_person_in_blacklist?(user_person_id, thing_asset.contributor.id)
           end
