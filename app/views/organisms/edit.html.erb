@@ -1,4 +1,4 @@
-<h1>Information about <%= @organism.title %></h1>
+<h1>Editing <%= link_to h(@organism.title),@organism -%></h1>
 
 <h3>BioPortal term details</h3>
 <ul>
@@ -31,6 +31,10 @@ link_to_remote "More ...",
 <div id="edit_ontology" style="display:none;">
   <%  form_for(@organism) do |f| %>
     <ul>
+      <li>
+        <label>Display name</label>
+        <%= f.text_field :title %>
+      </li>
       <li>
         <label>Ontology ID</label>
         <%= f.text_field :ontology_id %>

@@ -1,7 +1,8 @@
 class OrganismsController < ApplicationController
   
   before_filter :login_required
-  before_filter :find_organism,:only=>[:show,:info,:more_ajax,:visualise]
+  before_filter :is_user_admin_auth,:only=>[:edit,:update]
+  before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise]
   layout "main",:except=>:visualise
 
   include BioPortal::RestAPI
@@ -57,7 +58,7 @@ class OrganismsController < ApplicationController
     respond_to do |format|
       if @organism.update_attributes(params[:organism])
         flash[:notice] = 'Organism was successfully updated.'
-        format.html { redirect_to info_organism_path(@organism) }
+        format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -66,7 +67,7 @@ class OrganismsController < ApplicationController
     end
   end
 
-  def info
+  def edit
     respond_to do |format|
       format.html
       format.xml {render :xml=>@organism}

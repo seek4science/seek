@@ -1,3 +1,9 @@
+<% if current_user.is_admin? -%>
+  <ul class="sectionIcons">
+    <li><%= image_tag_for_key('edit', edit_organism_path(@organism), "Edit Organism", nil, 'Edit Organism') -%></li>
+  </ul>
+<% end %>
+
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@organism} %>
 
 <div class="show_basic">
