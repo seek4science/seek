@@ -6,7 +6,9 @@
 <% end %>
 
 <% end %>
-
+<div id="right">
+  <%=  yield :right %>
+</div>
 <h1 style="margin-top:0;"><%= 'Forums'[:forums_title] %></h1>
 <p class="subtitle">
 <%= feed_icon_tag "Recent Posts"[:recent_posts], all_posts_path(:format => 'rss') %>
