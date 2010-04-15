@@ -27,6 +27,8 @@ module FavouritesHelper
       else
         tiny_image = default_avatar(item.class.name, 32, h(title))
       end
+    when "organism"
+      tiny_image = image "#{item.class.name.downcase}_avatar", :class=>"fav_icon"
     when "savedsearch"
       tiny_image = image "saved_search", :class=>"fav_icon"
     end

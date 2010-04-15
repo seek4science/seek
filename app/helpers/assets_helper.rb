@@ -32,6 +32,9 @@ module AssetsHelper
     when "Assay","Investigation","Study"
       image = image "#{resource.class.name.downcase}_avatar",{}
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+    when "Organism"
+      image = image "#{resource.class.name.downcase}_avatar",{}
+      icon = link_to_draggable(image, organism_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
     end
     return icon
   end

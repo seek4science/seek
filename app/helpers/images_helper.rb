@@ -192,6 +192,8 @@ module ImagesHelper
       "project_64x64.png"
     when "institution_avatar"
       "institution_64x64.png"
+    when "organism_avatar"
+      "misc_icons/green_virus-64x64.png"
     when "saved_search"
       "crystal_project/32x32/actions/find.png"
     when "visit_pubmed"

@@ -14,5 +14,5 @@
   <% end -%>
 
   <%= render :partial=>"layouts/items_related_to",:object => @organism %>
-
+  <%= link_to "Visualise on BioPortal",visualise_organism_path(@organism),:popup=>true %> | <%= link_to_ncbi_taxonomy_browser @organism,"NCBI taxonomy browser",:popup=>true %>
 </div>

@@ -8,12 +8,6 @@
     <li>
       <label><b>Definitions (<%= concept[:definitions].count -%>) </b></label>
       <%= concept[:definitions].join(", ") %>
-    </li>
-    <li>
-      <%= link_to "Visualise on BioPortal",visualise_organism_path(@organism),:popup=>true %>
-    </li>
-    <li>
-      <%= link_to_ncbi_taxonomy_browser @organism,"Link to NCBI taxonomy browser",:popup=>true %>
-    </li>
+    </li>    
   </ul>
 </div>
