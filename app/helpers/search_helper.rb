@@ -1,7 +1,7 @@
 module SearchHelper
   
   def search_type_options
-    ["All","People","Institutions","Projects","Sops","Studies","Assays","Investigations","Models","Data files"]
+    ["All","People","Institutions","Projects","Sops","Studies","Assays","Investigations","Models","Data files", "Publications"]
   end
     
   def saved_search_image_tag saved_search

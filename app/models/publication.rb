@@ -15,6 +15,8 @@ class Publication < ActiveRecord::Base
   
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
   
+  acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
+  
   #belongs_to :contributor, :polymorphic => true
   
   def update_first_letter
