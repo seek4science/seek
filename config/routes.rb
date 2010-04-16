@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :strains
+
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post}
   
 

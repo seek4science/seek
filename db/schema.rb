@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100416125044) do
+ActiveRecord::Schema.define(:version => 20100416140944) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -480,6 +480,13 @@ ActiveRecord::Schema.define(:version => 20100416125044) do
     t.datetime "last_used_at"
     t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
+  end
+
+  create_table "strains", :force => true do |t|
+    t.string   "title"
+    t.integer  "organism_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "studied_factors", :force => true do |t|

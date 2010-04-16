@@ -367,8 +367,8 @@ function addAssay(title,id) {
     assays.push([title,id]);
 }
 
-function addOrganism(title,id) {
-    organisms.push([title,id]);
+function addOrganism(title,id,strain,culture_growth) {
+    organisms.push([title,id,strain,culture_growth]);
 }
 
 function addSelectedOrganism() {
@@ -376,15 +376,15 @@ function addSelectedOrganism() {
     selected_option=$("possible_organisms").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
+    strain=$('strain').value
 
-    if(checkNotInList(id,organisms)) {
-        addOrganism(title,id);
-        updateOrganisms();
-    }
-    else {
-        alert('The following Organism had already been added:\n\n' +
-            title);
-    }
+    selected_option_index=$('culture_growth').selectedIndex;
+    selected_option=$('culture_growth').options[selected_option_index];
+    culture_growth=selected_option.text    
+    
+    addOrganism(title,id,strain,culture_growth);
+    updateOrganisms();
+    
 }
 
 function removeOrganism(id) {
@@ -400,19 +400,23 @@ function removeOrganism(id) {
 }
 
 function updateOrganisms() {
-    organism_text='<ul class="related_asset_list">';
-
-    organism_ids=new Array();
+    organism_text='<ul class="related_asset_list">';    
 
     for (var i=0;i<organisms.length;i++) {
         organism=organisms[i];
         title=organism[0];
         id=organism[1];
-        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        strain=organism[2]
+        culture_growth=organism[3]
+        titleText = '<span title="' + title + '">' + title.truncate(100);
+        if (strain.length>0) {
+            titleText += ":"+strain
+        }
+        titleText += " ("+culture_growth+")";
+        titleText +=  '</span>';
         organism_text += '<li>' + titleText +
           '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
-          '[<a href=\"\" onclick=\"javascript:removeOrganism('+id+'); return(false);\">remove</a>]</small></li>';
-        organism_ids.push(id);
+          '[<a href=\"\" onclick=\"javascript:removeOrganism('+id+'); return(false);\">remove</a>]</small></li>';        
     }
 
     organism_text += '</ul>';
@@ -428,12 +432,16 @@ function updateOrganisms() {
     clearList('assay_organism_ids');
 
     select=$('assay_organism_ids')
-    for (i=0;i<organism_ids.length;i++) {
-        id=organism_ids[i];
+    for (i=0;i<organisms.length;i++) {
+        organism=organisms[i];
+        id=organism[1];
+        strain=organism[2]
+        culture_growth=organism[3]
         o=document.createElement('option');
         o.value=id;
         o.text=id;
         o.selected=true;
+        o.value=id + "," + strain + "," + culture_growth;
         try {
             select.add(o); //for older IE version
         }

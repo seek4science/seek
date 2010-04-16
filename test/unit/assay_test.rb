@@ -146,6 +146,37 @@ class AssayTest < ActiveSupport::TestCase
     assert_difference("AssayOrganism.count") do
       assay.associate_organism(organism)
     end
+
+    #with a culture growth
+    assay.assay_organisms.clear
+    assay.save!
+    cg=culture_growth_types(:batch)
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism,nil,cg)
+    end
+    assay.reload
+    assert_equal cg,assay.assay_organisms.first.culture_growth_type
+
+  end
+
+  test "associate organism with strain" do
+    assay=assays(:metabolomics_assay2)
+    organism=organisms(:Streptomyces_coelicolor)
+    assert_equal 0,assay.assay_organisms.count,"This test relies on this assay having no organisms"
+    assert_equal 0,organism.strains.count, "This test relies on this organism having no strains"
+
+    assert_difference("AssayOrganism.count") do
+      assert_difference("Strain.count") do
+        assay.associate_organism(organism,"ZX81")
+      end
+    end
+
+    assert_difference("AssayOrganism.count") do
+      assert_no_difference("Strain.count") do
+        assay.associate_organism(organism,"ZX81")
+      end
+    end
+
   end
 
 end
