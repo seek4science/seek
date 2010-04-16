@@ -72,8 +72,12 @@ class AssaysController < ApplicationController
     @assay=Assay.find(params[:id])
     
     @assay.sops.clear unless params[:assay][:sop_ids]
-    
+
+    #FIXME: would be better to resolve the differences, rather than keep clearing and reading the assets and organisms
     @assay.assets = []
+    @assay.assay_organisms=[]
+    
+    organisms = params[:assay_organism_ids] || []
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
     model_assets = params[:assay_model_asset_ids] || []    
@@ -91,7 +95,11 @@ class AssaysController < ApplicationController
           assay_asset.asset = Asset.find(a_id)
           assay_asset.relationship_type = relationship_type
           assay_asset.save
-        end 
+        end
+        organisms.each do |text|
+          o_id=text
+          @assay.associate_organism(o_id)
+        end
         flash[:notice] = 'Assay was successfully updated.'
         format.html { redirect_to(@assay) }
         format.xml  { head :ok }

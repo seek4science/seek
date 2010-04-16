@@ -98,6 +98,7 @@ class Assay < ActiveRecord::Base
   end
 
   #Associates and organism with the assay
+  #organism may be either an ID or Organism instance
   def associate_organism(organism)
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
     assay_organism=AssayOrganism.new
