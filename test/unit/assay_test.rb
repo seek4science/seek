@@ -167,13 +167,20 @@ class AssayTest < ActiveSupport::TestCase
 
     assert_difference("AssayOrganism.count") do
       assert_difference("Strain.count") do
-        assay.associate_organism(organism,"ZX81")
+        assay.associate_organism(organism,"FFFF")
       end
     end
 
     assert_difference("AssayOrganism.count") do
       assert_no_difference("Strain.count") do
-        assay.associate_organism(organism,"ZX81")
+        assay.associate_organism(organism,"FFFF")
+      end
+    end
+
+    organism=organisms(:yeast)
+    assert_difference("AssayOrganism.count") do
+      assert_difference("Strain.count") do
+        assay.associate_organism(organism,"FFFF")
       end
     end
 
