@@ -159,6 +159,16 @@ class AssayTest < ActiveSupport::TestCase
 
   end
 
+  test "disassociating organisms removes AssayOrganism" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 2,assay.assay_organisms.count
+    assert_difference("AssayOrganism.count",-2) do
+      assay.assay_organisms.clear
+      assay.save!
+    end
+    
+  end
+
   test "associate organism with strain" do
     assay=assays(:metabolomics_assay2)
     organism=organisms(:Streptomyces_coelicolor)
