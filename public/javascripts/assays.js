@@ -412,7 +412,9 @@ function updateOrganisms() {
         if (strain.length>0) {
             titleText += ":"+strain
         }
-        titleText += " ("+culture_growth+")";
+        if (culture_growth.length>0) {
+            titleText += " ("+culture_growth+")";
+        }
         titleText +=  '</span>';
         organism_text += '<li>' + titleText +
           '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
