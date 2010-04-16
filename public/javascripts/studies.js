@@ -2,6 +2,7 @@ var sops_assets=new Array();
 var models_assets=new Array();
 var assays=new Array();
 var data_files_assets=new Array();
+var organisms = new Array();
 
 function postInvestigationData() {
     request = new Ajax.Request(CREATE_INVESTIGATION_LINK,
@@ -364,4 +365,80 @@ function updateAssays() {
 
 function addAssay(title,id) {
     assays.push([title,id]);
+}
+
+function addOrganism(title,id) {
+    organisms.push([title,id]);
+}
+
+function addSelectedOrganism() {
+    selected_option_index=$("possible_organisms").selectedIndex;
+    selected_option=$("possible_organisms").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
+
+    if(checkNotInList(id,organisms)) {
+        addOrganism(title,id);
+        updateOrganisms();
+    }
+    else {
+        alert('The following Organism had already been added:\n\n' +
+            title);
+    }
+}
+
+function removeOrganism(id) {
+    // remove the actual record for the attribution
+    for(var i = 0; i < organism.length; i++)
+        if(organism[i][1] == id) {
+            organism.splice(i, 1);
+            break;
+        }
+
+    // update the page
+    updateOrganisms();
+}
+
+function updateOrganisms() {
+    organism_text='<ul class="related_asset_list">';
+
+    organism_ids=new Array();
+
+    for (var i=0;i<organisms.length;i++) {
+        organism=organisms[i];
+        title=organism[0];
+        id=organism[1];
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        organism_text += '<li>' + titleText +
+          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '[<a href=\"\" onclick=\"javascript:removeOrganism('+id+'); return(false);\">remove</a>]</small></li>';
+        organism_ids.push(id);
+    }
+
+    organism_text += '</ul>';
+
+    // update the page
+    if(organisms.length == 0) {
+        $('organism_to_list').innerHTML = '<span class="none_text">No organisms</span>';
+    }
+    else {
+        $('organism_to_list').innerHTML = organism_text;
+    }
+
+    clearList('assay_organism_ids');
+
+    select=$('assay_organism_ids')
+    for (i=0;i<organism_ids.length;i++) {
+        id=organism_ids[i];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+    }
 }

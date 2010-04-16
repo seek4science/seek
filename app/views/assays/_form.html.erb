@@ -48,6 +48,8 @@
   </tr>
 </table>
 
+<%= render :partial=>"assays/select_organisms" -%>
+
 <%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay,:show_culture_growth=>!@assay.is_modelling?} %>
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>

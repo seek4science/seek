@@ -1,0 +1,62 @@
+<%
+   select_truncate_length=120;
+   all_organisms = Organism.all.sort{|a,b| a.title <=> b.title}
+-%>
+<div class="yui-gc">
+  <h2>Organisms</h2>
+  <div class="yui-u first">
+    <p style="color: #666666;">
+      The assay involves the following organisms:
+    </p>
+
+    <div id="organism_to_list" class="box_editing_inner" style="line-height: 1.5;">
+      <span class="none_text" id="organisms">Loading...</span>
+    </div>
+    <br/>
+    <%= label_tag :organisms -%>
+    <br/>
+
+    <%= select_tag :possible_organisms,
+                   options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
+                   {:style=>"width:90%",:onchange=>"check_show_add_organism();return(false);"} -%>
+
+    <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+
+    <b><%= link_to_function "Add", "addSelectedOrganism(); return(false);", :id=>"add_organism_link" %></b>
+    <br/>
+  </div>
+</div>
+
+<script type="text/javascript">
+    <% @assay.organisms.each do |o| -%>
+
+        organism_id = '<%= o.id -%>';
+        organism_title = '<%= escape_javascript(o.title) -%>';
+        addOrganism(organism_title, organism_id);
+
+    <% end -%>
+
+    <% if params[:assay_organism_ids] %>
+      <% params[:assay_organism_ids].each do |id| -%>
+        <% organism = Organism.find(id) %>
+        organism_id = '<%= id -%>';
+        organism_title = '<%= escape_javascript(organism.title) -%>';
+        addOrganism(organism_title, organism_id);          
+      <% end -%>
+    <% end -%>
+
+    updateOrganisms();
+
+    function check_show_add_organism() {
+        i = $('possible_organisms').selectedIndex;
+        selected_id = $('possible_organisms').options[i].value;
+        if (selected_id == '0') {
+            $('add_organism_link').hide();
+        }
+        else {
+            $('add_organism_link').show();
+        }
+    }
+
+    check_show_add_organism();
+</script>
