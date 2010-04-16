@@ -10,13 +10,6 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
-  test "orgnanism association" do
-    assay=assays(:metabolomics_assay)
-    assert_equal organisms(:Saccharomyces_cerevisiae),assay.organism
-    assay=assays(:metabolomics_assay2)
-    assert_nil assay.organism
-  end
-
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
     assert !assay.is_modelling?
@@ -133,7 +126,7 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 2,assay.assay_organisms.count
     assert_equal 2,assay.organisms.count
     assert assay.organisms.include?(organisms(:yeast))
-    assert assay.organisms.include?(organisms(:Streptomyces_coelicolor))
+    assert assay.organisms.include?(organisms(:Saccharomyces_cerevisiae))
   end
 
   test "associate organism" do

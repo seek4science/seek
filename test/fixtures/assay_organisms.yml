@@ -1,7 +1,8 @@
 yeast:
   assay: metabolomics_assay
   organism: yeast
+  culture_growth_type: chemostat
 
-Streptomyces_coelicolor:
+Saccharomyces_cerevisiae:
   assay: metabolomics_assay
-  organism: Streptomyces_coelicolor
+  organism: Saccharomyces_cerevisiae

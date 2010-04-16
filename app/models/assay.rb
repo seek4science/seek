@@ -3,10 +3,8 @@ require 'grouped_pagination'
 class Assay < ActiveRecord::Base    
   
   belongs_to :assay_type
-  belongs_to :technology_type
-  belongs_to :culture_growth_type
-  belongs_to :study
-  belongs_to :organism
+  belongs_to :technology_type  
+  belongs_to :study  
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
   has_many :assay_organisms

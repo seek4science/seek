@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100416115655) do
+ActiveRecord::Schema.define(:version => 20100416125044) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -58,10 +58,8 @@ ActiveRecord::Schema.define(:version => 20100416115655) do
     t.datetime "updated_at"
     t.integer  "technology_type_id"
     t.integer  "study_id"
-    t.integer  "organism_id"
     t.integer  "owner_id"
-    t.integer  "culture_growth_type_id",              :default => 0
-    t.string   "first_letter",           :limit => 1
+    t.string   "first_letter",       :limit => 1
     t.integer  "assay_class_id"
   end
 
