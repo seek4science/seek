@@ -389,9 +389,9 @@ function addSelectedOrganism() {
 
 function removeOrganism(id) {
     // remove the actual record for the attribution
-    for(var i = 0; i < organism.length; i++)
-        if(organism[i][1] == id) {
-            organism.splice(i, 1);
+    for(var i = 0; i < organisms.length; i++)
+        if(organisms[i][1] == id) {
+            organisms.splice(i, 1);
             break;
         }
 
