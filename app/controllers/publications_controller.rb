@@ -67,6 +67,18 @@ class PublicationsController < ApplicationController
           pa.last_name = author.last_name
           pa.save
         end
+        
+        #Make a policy
+        policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        @publication.asset.policy = policy
+        @publication.asset.save
+        #add managers (authors + contributor)
+        @publication.asset.creators.each do |author|
+          policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => 4)
+        end
+        #Add contributor
+        @publication.asset.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => 4)
+        
         flash[:notice] = 'Publication was successfully created.'
         format.html { redirect_to(edit_publication_url(@publication)) }
         format.xml  { render :xml => @publication, :status => :created, :location => @publication }
@@ -107,6 +119,21 @@ class PublicationsController < ApplicationController
       if valid && @publication.update_attributes(params[:publication]) 
         to_add.each {|a| @publication.asset.creators << a}
         to_remove.each {|a| a.destroy}
+        
+        #Create policy if not present (should be)
+        if @publication.asset.policy.nil?
+          @publication.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+          @publication.asset.save
+        end
+        
+        #Update policy so current authors have manage permissions
+        @publication.asset.creators.each do |author|
+          @publication.asset.policy.permissions.clear
+          @publication.asset.policy.permissions << Permission.create(:contributor => author, :policy => @publication.asset.policy, :access_type => 4)
+        end      
+        #Add contributor
+        @publication.asset.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.asset.policy, :access_type => 4)
+        
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
@@ -221,6 +248,24 @@ class PublicationsController < ApplicationController
   private
   
   def fetch_publication
-    @publication = Publication.find(params[:id])
+    begin
+      publication = Publication.find(params[:id])            
+      
+      if Authorization.is_authorized?(action_name, nil, publication, current_user)
+        @publication = publication
+      else
+        respond_to do |format|
+          flash[:error] = "You are not authorized to perform this action"
+          format.html { redirect_to publications_path  }
+        end
+        return false
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        flash[:error] = "Couldn't find the publication"
+        format.html { redirect_to publications_path }
+      end
+      return false
+    end
   end
 end

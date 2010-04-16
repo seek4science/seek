@@ -13,7 +13,7 @@ module Authorization
   @@logger = RAILS_DEFAULT_LOGGER
 
   #the types of Assets supported by the Authorization module
-  ASSET_TYPES=["Sop","Model","Asset","DataFile"]
+  ASSET_TYPES=["Sop","Model","Asset","DataFile","Publication"]
 
   # 1) action_name - name of the action that is about to happen with the "thing"
   # 2) thing_type - class name of the thing that needs to be authorized;
