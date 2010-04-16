@@ -9,6 +9,7 @@ class Assay < ActiveRecord::Base
   belongs_to :organism
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
+  has_and_belongs_to_many :organisms
 
   has_many :assay_assets, :dependent => :destroy
 

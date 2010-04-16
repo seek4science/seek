@@ -9,6 +9,7 @@ metabolomics_assay:
   organism: Saccharomyces_cerevisiae
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  organisms: Streptomyces_coelicolor,yeast
 
 metabolomics_assay2:
   title: Metabolomics Assay2

@@ -128,4 +128,11 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal df.relationship_type, relationship_types(:test_data) 
   end
 
+  test "organisms association" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 2,assay.organisms.count
+    assert assay.organisms.include?(organisms(:yeast))
+    assert assay.organisms.include?(organisms(:Streptomyces_coelicolor))
+  end
+
 end
