@@ -55,8 +55,9 @@ class AssaysController < ApplicationController
           @assay.relate(Asset.find(a_id), RelationshipType.find_by_title(r_type))
         end
         organisms.each do |text|
-          o_id=text
-          @assay.associate_organism(o_id)
+          o_id,strain,culture_growth_type_text=text.split(",")
+          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+          @assay.associate_organism(o_id,strain,culture_growth)
         end
         flash[:notice] = 'Assay was successfully created.'
         format.html { redirect_to(@assay) }
