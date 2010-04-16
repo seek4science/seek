@@ -96,5 +96,14 @@ class Assay < ActiveRecord::Base
     assay_asset.relationship_type = relationship_type      
     assay_asset.save
   end
+
+  #Associates and organism with the assay
+  def associate_organism(organism)
+    organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
+    assay_organism=AssayOrganism.new
+    assay_organism.assay = self
+    assay_organism.organism = organism
+    assay_organism.save!
+  end
   
 end

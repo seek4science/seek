@@ -136,4 +136,23 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.organisms.include?(organisms(:Streptomyces_coelicolor))
   end
 
+  test "associate organism" do
+    assay=assays(:metabolomics_assay)
+    organism=organisms(:yeast)
+    #test with numeric ID
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism.id)
+    end
+
+    #with String ID
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism.id.to_s)
+    end
+
+    #with Organism object
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism)
+    end
+  end
+
 end

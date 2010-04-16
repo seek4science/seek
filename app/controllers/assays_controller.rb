@@ -37,7 +37,8 @@ class AssaysController < ApplicationController
 
   def create
     @assay = Assay.new(params[:assay])
-    
+
+    organisms = params[:assay_organism_ids] || []
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
     model_assets = params[:assay_model_asset_ids] || []
@@ -52,7 +53,11 @@ class AssaysController < ApplicationController
         data_assets.each do |text|
           a_id, r_type = text.split(",")
           @assay.relate(Asset.find(a_id), RelationshipType.find_by_title(r_type))
-        end    
+        end
+        organisms.each do |text|
+          o_id=text
+          @assay.associate_organism(o_id)
+        end
         flash[:notice] = 'Assay was successfully created.'
         format.html { redirect_to(@assay) }
         format.xml  { render :xml => @assay, :status => :created, :location => @assay }
