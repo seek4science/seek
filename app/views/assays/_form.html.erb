@@ -1,7 +1,6 @@
-<%= javascript_include_tag "studies.js"  %>
+<%= javascript_include_tag "assays.js"  %>
 
 <%= f.error_messages -%>
-
 
 <div style="width: 90%;">
   <% if !@assay.study.nil? -%>
@@ -48,7 +47,7 @@
   </tr>
 </table>
 
-<%= render :partial=>"assays/select_organism_and_culture_growth",:locals=>{:model=>Assay,:show_culture_growth=>!@assay.is_modelling?} %>
+<%= render :partial=>"assays/select_organisms" -%>
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
