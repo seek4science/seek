@@ -130,6 +130,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "organisms association" do
     assay=assays(:metabolomics_assay)
+    assert_equal 2,assay.assay_organisms.count
     assert_equal 2,assay.organisms.count
     assert assay.organisms.include?(organisms(:yeast))
     assert assay.organisms.include?(organisms(:Streptomyces_coelicolor))

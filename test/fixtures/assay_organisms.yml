@@ -1,0 +1,7 @@
+yeast:
+  assay: metabolomics_assay
+  organism: yeast
+
+Streptomyces_coelicolor:
+  assay: metabolomics_assay
+  organism: Streptomyces_coelicolor

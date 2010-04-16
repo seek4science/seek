@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100416094541) do
+ActiveRecord::Schema.define(:version => 20100416105321) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -26,6 +26,17 @@ ActiveRecord::Schema.define(:version => 20100416094541) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "key",         :limit => 10
+  end
+
+  create_table "assay_organisms", :force => true do |t|
+    t.integer  "assay_id"
+    t.integer  "organism_id"
+    t.integer  "culture_growth_type_id"
+    t.integer  "strain_id"
+    t.integer  "phenotype_id"
+    t.integer  "genotype_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "assay_types", :force => true do |t|
@@ -52,11 +63,6 @@ ActiveRecord::Schema.define(:version => 20100416094541) do
     t.integer  "culture_growth_type_id",              :default => 0
     t.string   "first_letter",           :limit => 1
     t.integer  "assay_class_id"
-  end
-
-  create_table "assays_organisms", :id => false, :force => true do |t|
-    t.integer "assay_id"
-    t.integer "organism_id"
   end
 
   create_table "assets", :force => true do |t|

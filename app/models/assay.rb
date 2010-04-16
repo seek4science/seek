@@ -9,7 +9,8 @@ class Assay < ActiveRecord::Base
   belongs_to :organism
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
-  has_and_belongs_to_many :organisms
+  has_many :assay_organisms
+  has_many :organisms, :through=>:assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
 
@@ -30,7 +31,6 @@ class Assay < ActiveRecord::Base
            :as => :resource, 
            :dependent => :destroy
           
-
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organism]) if SOLR_ENABLED
   
   before_save :update_first_letter
