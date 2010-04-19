@@ -64,8 +64,8 @@
 </p>
 
 <p id="organism">
-  <b>Organism: </b>
-<%#= organism_link_to @assay.organism %>
+  <b>Organisms: </b>
+  <%= assay_organisms_list @assay.assay_organisms %>
 </p>
 <% unless @assay.is_modelling? -%>
   <p id="culture_growth_type">
