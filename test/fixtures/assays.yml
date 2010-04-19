@@ -3,12 +3,10 @@
 metabolomics_assay:
   title: Metabolomics Assay  
   assay_type: metabolomics
-  technology_type: gas_chromatography
-  culture_growth_type: chemostat  
-  study: metabolomics_study
-  organism: Saccharomyces_cerevisiae
+  technology_type: gas_chromatography    
+  study: metabolomics_study  
   owner: person_for_model_owner
-  assay_class: experimental_assay_class
+  assay_class: experimental_assay_class  
 
 metabolomics_assay2:
   title: Metabolomics Assay2

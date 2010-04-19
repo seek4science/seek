@@ -10,13 +10,6 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
-  test "orgnanism association" do
-    assay=assays(:metabolomics_assay)
-    assert_equal organisms(:Saccharomyces_cerevisiae),assay.organism
-    assay=assays(:metabolomics_assay2)
-    assert_nil assay.organism
-  end
-
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
     assert !assay.is_modelling?
@@ -126,6 +119,81 @@ class AssayTest < ActiveSupport::TestCase
     df = assay.data_files.last
     assert_equal data_files(:picture).latest_version, df
     assert_equal df.relationship_type, relationship_types(:test_data) 
+  end
+
+  test "organisms association" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 2,assay.assay_organisms.count
+    assert_equal 2,assay.organisms.count
+    assert assay.organisms.include?(organisms(:yeast))
+    assert assay.organisms.include?(organisms(:Saccharomyces_cerevisiae))
+  end
+
+  test "associate organism" do
+    assay=assays(:metabolomics_assay)
+    organism=organisms(:yeast)
+    #test with numeric ID
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism.id)
+    end
+
+    #with String ID
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism.id.to_s)
+    end
+
+    #with Organism object
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism)
+    end
+
+    #with a culture growth
+    assay.assay_organisms.clear
+    assay.save!
+    cg=culture_growth_types(:batch)
+    assert_difference("AssayOrganism.count") do
+      assay.associate_organism(organism,nil,cg)
+    end
+    assay.reload
+    assert_equal cg,assay.assay_organisms.first.culture_growth_type
+
+  end
+
+  test "disassociating organisms removes AssayOrganism" do
+    assay=assays(:metabolomics_assay)
+    assert_equal 2,assay.assay_organisms.count
+    assert_difference("AssayOrganism.count",-2) do
+      assay.assay_organisms.clear
+      assay.save!
+    end
+    
+  end
+
+  test "associate organism with strain" do
+    assay=assays(:metabolomics_assay2)
+    organism=organisms(:Streptomyces_coelicolor)
+    assert_equal 0,assay.assay_organisms.count,"This test relies on this assay having no organisms"
+    assert_equal 0,organism.strains.count, "This test relies on this organism having no strains"
+
+    assert_difference("AssayOrganism.count") do
+      assert_difference("Strain.count") do
+        assay.associate_organism(organism,"FFFF")
+      end
+    end
+
+    assert_difference("AssayOrganism.count") do
+      assert_no_difference("Strain.count") do
+        assay.associate_organism(organism,"FFFF")
+      end
+    end
+
+    organism=organisms(:yeast)
+    assert_difference("AssayOrganism.count") do
+      assert_difference("Strain.count") do
+        assay.associate_organism(organism,"FFFF")
+      end
+    end
+
   end
 
 end

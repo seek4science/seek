@@ -2,6 +2,7 @@ var sops_assets=new Array();
 var models_assets=new Array();
 var assays=new Array();
 var data_files_assets=new Array();
+var organisms = new Array();
 
 function postInvestigationData() {
     request = new Ajax.Request(CREATE_INVESTIGATION_LINK,
@@ -364,4 +365,90 @@ function updateAssays() {
 
 function addAssay(title,id) {
     assays.push([title,id]);
+}
+
+function addOrganism(title,id,strain,culture_growth) {
+    organisms.push([title,id,strain,culture_growth]);
+}
+
+function addSelectedOrganism() {
+    selected_option_index=$("possible_organisms").selectedIndex;
+    selected_option=$("possible_organisms").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
+    strain=$('strain').value
+
+    selected_option_index=$('culture_growth').selectedIndex;
+    selected_option=$('culture_growth').options[selected_option_index];
+    culture_growth=selected_option.text    
+    
+    addOrganism(title,id,strain,culture_growth);
+    updateOrganisms();
+    
+}
+
+function removeOrganism(id) {
+    // remove the actual record for the attribution
+    for(var i = 0; i < organisms.length; i++)
+        if(organisms[i][1] == id) {
+            organisms.splice(i, 1);
+            break;
+        }
+
+    // update the page
+    updateOrganisms();
+}
+
+function updateOrganisms() {
+    organism_text='<ul class="related_asset_list">';    
+
+    for (var i=0;i<organisms.length;i++) {
+        organism=organisms[i];
+        title=organism[0];
+        id=organism[1];
+        strain=organism[2]
+        culture_growth=organism[3]
+        titleText = '<span title="' + title + '">' + title.truncate(100);
+        if (strain.length>0) {
+            titleText += ":"+strain
+        }
+        if (culture_growth.length>0) {
+            titleText += " ("+culture_growth+")";
+        }
+        titleText +=  '</span>';
+        organism_text += '<li>' + titleText +
+          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '[<a href=\"\" onclick=\"javascript:removeOrganism('+id+'); return(false);\">remove</a>]</small></li>';        
+    }
+
+    organism_text += '</ul>';
+
+    // update the page
+    if(organisms.length == 0) {
+        $('organism_to_list').innerHTML = '<span class="none_text">No organisms</span>';
+    }
+    else {
+        $('organism_to_list').innerHTML = organism_text;
+    }
+
+    clearList('assay_organism_ids');
+
+    select=$('assay_organism_ids')
+    for (i=0;i<organisms.length;i++) {
+        organism=organisms[i];
+        id=organism[1];
+        strain=organism[2]
+        culture_growth=organism[3]
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
+        o.value=id + "," + strain + "," + culture_growth;
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+    }
 }

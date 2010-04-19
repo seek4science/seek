@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+yeast1:
+  title: ZX81
+  organism: yeast
+
+yeast2:
+  title: TRS99
+  organism: yeast
+
+Saccharomyces_cerevisiae1:
+  title: ZX81
+  organism: Saccharomyces_cerevisiae

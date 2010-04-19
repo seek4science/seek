@@ -3,12 +3,12 @@ require 'grouped_pagination'
 class Assay < ActiveRecord::Base    
   
   belongs_to :assay_type
-  belongs_to :technology_type
-  belongs_to :culture_growth_type
-  belongs_to :study
-  belongs_to :organism
+  belongs_to :technology_type  
+  belongs_to :study  
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
+  has_many :assay_organisms, :dependent=>:destroy
+  has_many :organisms, :through=>:assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
 
@@ -29,7 +29,6 @@ class Assay < ActiveRecord::Base
            :as => :resource, 
            :dependent => :destroy
           
-
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organism]) if SOLR_ENABLED
   
   before_save :update_first_letter
@@ -94,6 +93,28 @@ class Assay < ActiveRecord::Base
     assay_asset.asset = asset
     assay_asset.relationship_type = relationship_type      
     assay_asset.save
+  end
+
+  #Associates and organism with the assay
+  #organism may be either an ID or Organism instance
+  #strain_title should be the String for the strain
+  #culture_growth should be the culture growth instance
+  def associate_organism(organism,strain_title=nil,culture_growth_type=nil)
+    organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
+    assay_organism=AssayOrganism.new
+    assay_organism.assay = self
+    assay_organism.organism = organism
+    strain=nil
+    if (strain_title && !strain_title.empty?)
+      strain=organism.strains.find_by_title(strain_title)
+      if strain.nil?
+        strain=Strain.new(:title=>strain_title,:organism_id=>organism.id)
+        strain.save!
+      end
+    end
+    assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
+    assay_organism.strain=strain
+    assay_organism.save!
   end
   
 end

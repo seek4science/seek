@@ -20,18 +20,18 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assay)
 
-    assert_select "p#culture_growth_type",:text=>/Chemostat/,:count=>1
+#    assert_select "p#culture_growth_type",:text=>/Chemostat/,:count=>1
     assert_select "p#assay_type",:text=>/Metabalomics/,:count=>1
     assert_select "p#technology_type",:text=>/Gas chromatography/,:count=>1
   end
 
-  test "show culture growth type not specified" do
-    get :show, :id=>assays(:metabolomics_assay2)
-    assert_response :success
-    assert_not_nil assigns(:assay)
-
-    assert_select "p#culture_growth_type",:text=>/Not specified/,:count=>1    
-  end
+#  test "show culture growth type not specified" do
+#    get :show, :id=>assays(:metabolomics_assay2)
+#    assert_response :success
+#    assert_not_nil assigns(:assay)
+#
+#    assert_select "p#culture_growth_type",:text=>/Not specified/,:count=>1
+#  end
 
   test "should show new" do
     get :new
@@ -67,7 +67,6 @@ class AssaysControllerTest < ActionController::TestCase
   test "should create" do
     assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",
-        :organism_id=>organisms(:yeast).id,
         :technology_type_id=>technology_types(:gas_chromatography).id,
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
@@ -75,7 +74,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
-    assert_equal organisms(:yeast),a.organism
+    #assert_equal organisms(:yeast),a.organism
   end
 
   test "should delete unlinked assay" do
@@ -294,8 +293,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_no_difference("AssayAsset.count","Should not have added assay assets because the assay validation failed") do
         #title is blank, so should fail validation
         post :create,:assay=>{
-          :title=>"",
-          :organism_id=>organisms(:yeast).id,
+          :title=>"",          
           :technology_type_id=>technology_types(:gas_chromatography).id,
           :assay_type_id=>assay_types(:metabolomics).id,
           :study_id=>studies(:metabolomics_study).id,
