@@ -46,7 +46,7 @@ namespace :seek do
 
   desc 'refreshed, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types"]
+    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute      
     end
@@ -76,6 +76,12 @@ namespace :seek do
     tags=Tag.find(:all)
     dubious=tags.select{|tag| dubious_tag?(tag.name)}
     dubious.each{|tag| puts "#{tag.id}\t#{tag.name}" }
+  end
+
+  task(:strains=>:environment) do
+    revert_fixtures_identify
+    Strain.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "strains")
   end
 
   task(:culture_growth_types=>:environment) do

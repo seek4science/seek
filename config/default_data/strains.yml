@@ -1,0 +1,126 @@
+K-12/MG1655:
+  id: 1
+  organism_id: 1136896071
+  title: K-12/MG1655
+
+MC4100:
+  id: 2
+  organism_id: 1136896071
+  title: MC4100
+
+168:
+  id: 3
+  organism_id: 1343284969
+  title: 168
+
+NCIB3610:
+  id: 4
+  organism_id: 1343284969
+  title: NCIB3610
+
+JW49:
+  id: 5
+  organism_id: 1343284969
+  title: JW49
+
+ATCC6633:
+  id: 6
+  organism_id: 1343284969
+  title: ATCC6633
+
+V583:
+  id: 7
+  organism_id: 666569891
+  title: V583
+
+ATCC29200:
+  id: 8
+  organism_id: 666569891
+  title: ATCC29200
+
+DS5:
+  id: 9
+  organism_id: 666569891
+  title: DS5
+
+TX0012:
+  id: 10
+  organism_id: 666569891
+  title: TX0012
+
+M49(591):
+  id: 11
+  organism_id: 172578163
+  title: M49 (591)
+
+ATCC824:
+  id: 12
+  organism_id: 354475097
+  title: ATCC824
+
+NCIMB8052:
+  id: 13
+  organism_id: 354475097
+  title: NCIMB8052
+
+DOTT1:
+  id: 14
+  organism_id: 1933753691
+  title: DOT-T1
+
+NCIMB10525:
+  id: 15
+  organism_id: 1612014136
+  title: NCIMB10525
+
+A3(2):
+  id: 16
+  organism_id: 469548385
+  title: A3 (2)
+
+M145:
+  id: 17
+  organism_id: 469548385
+  title: M145
+
+P2:
+  id: 18
+  organism_id: 551884369
+  title: P2
+
+YJM789:
+  id: 19
+  organism_id: 1269019390
+  title: YJM789
+
+FY2:
+  id: 20
+  organism_id: 1269019390
+  title: FY2 diploid
+
+FY3:
+  id: 21
+  organism_id: 1269019390
+  title: FY3 diploid
+
+YSBN1:
+  id: 22
+  organism_id: 1269019390
+  title: YSBN1 diploid
+
+YSBN2:
+  id: 23
+  organism_id: 1269019390
+  title: YSBN2 diploid
+
+CENPK113-7D:
+  id: 24
+  organism_id: 1269019390
+  title: CEN.PK113-7D haploid
+
+BY4741:
+  id: 25
+  organism_id: 1269019390
+  title: BY4741
+
+
