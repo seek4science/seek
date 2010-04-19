@@ -1,11 +1,6 @@
-
-
-<%= label_tag :strain %>
-<%= text_field_tag :strain %>
-<br/>
-<% if !@strains.empty? -%>
+<% if !existing_strains.empty? -%>
   Existing strains:
-  <% @strains.each do |strain| -%>
+  <% existing_strains.each do |strain| -%>
     <%= link_to_function h(strain.title),"setStrainTextField('#{strain.title}');" %>
   <% end -%>
 <% end -%>

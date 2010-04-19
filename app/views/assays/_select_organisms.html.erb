@@ -29,18 +29,20 @@ culture_growth_options=options_for_select(CultureGrowthType.find(:all,:order=>:t
     <%= select_tag :possible_organisms,
       options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
       {:style=>"width:90%",
-      :onchange=>remote_function(:url=>{:action=>"update_strain_tagging", :controller=>"strains",:element=>"strain_tag"},
+      :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains",:element=>"existing_strains"},
         :with=>"'organism_id='+this.value",
-        :before=>"show_ajax_loader('strain_tag')")+
-        ";check_show_add_organism();return(false);"} -%>
+        :before=>"show_ajax_loader('existing_strains')")+
+        ";check_show_add_organism();$('strain').clear();return(false);"} -%>
 
 
     <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
-    <div id="extra_organism_details">      
-      <div id="strain_tag">
+    <div id="extra_organism_details">
+      <%= label_tag :strain %>
+      <%= text_field_tag :strain %>
+      <span id="existing_strains">
 
-      </div>
+      </span>
       <br/>
       <%= label_tag :culture_growth %>
       <%= select_tag :culture_growth,culture_growth_options -%>

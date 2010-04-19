@@ -1,11 +1,11 @@
 class StrainsController < ApplicationController
 
-  before_filter :get_strains,:only=>:update_strain_tagging
+  before_filter :get_strains,:only=>:show_existing_strains
 
-  def update_strain_tagging
+  def show_existing_strains
     element=params[:element]    
     render :update do |page|
-      page.replace_html element,:partial=>"strains/strain_tagging"
+      page.replace_html element,:partial=>"strains/existing_strains",:object=>@strains
     end
   end
 
