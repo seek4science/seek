@@ -906,3 +906,8 @@ div.avatar_list_popup {
 .concept_details li {    
     display: inline-block;
 }
+
+ul.horiz_list_items li {
+    float:left;
+    padding-right: 1em;
+}

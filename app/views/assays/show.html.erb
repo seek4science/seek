@@ -67,12 +67,6 @@
   <b>Organisms: </b>
   <%= assay_organisms_list @assay.assay_organisms %>
 </p>
-<% unless @assay.is_modelling? -%>
-  <p id="culture_growth_type">
-    <b>Culture growth: </b>
-<%#= model_title_or_not_specified(@assay.culture_growth_type) %>
-  </p>
-<% end -%>
 
 <style type="text/css">
   div.data_model_relationship {
