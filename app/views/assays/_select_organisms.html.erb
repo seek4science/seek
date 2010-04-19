@@ -38,11 +38,12 @@ culture_growth_options=options_for_select(CultureGrowthType.find(:all,:order=>:t
     <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
     <div id="extra_organism_details">
+      <div id="existing_strains">
+
+      </div>
       <%= label_tag :strain %>
       <%= text_field_tag :strain %>
-      <span id="existing_strains">
-
-      </span>
+      
       <br/>
       <%= label_tag :culture_growth %>
       <%= select_tag :culture_growth,culture_growth_options -%>
