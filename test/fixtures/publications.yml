@@ -10,7 +10,8 @@ one:
   title: A paper on blabla
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
-  contributor: quentin (User)
+  contributor_id: 1
+  contributor_type: User
   published_date: <%= 5.days.ago.to_s :db %>  
   pubmed_id: 5
   
@@ -18,6 +19,7 @@ two:
   title: Another paper on blabla
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
-  contributor: quentin (User)
+  contributor_id: 1
+  contributor_type: User
   published_date: <%= 5.days.ago.to_s :db %>
   pubmed_id: 2
