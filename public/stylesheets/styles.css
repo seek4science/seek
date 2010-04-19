@@ -598,7 +598,7 @@ p#assay_types label {
     text-align:center;   
     padding-top: 1.5em;
     padding-bottom: 1.5em;
-    margin: 1em 1em 1em 1em;
+    margin: 1em 0em 1em 3em;
     width: 90%;
 }
 
@@ -607,7 +607,7 @@ p#assay_types label {
     text-align:center;
     padding-top: 0.5em;
     padding-bottom: 0.5em;
-    margin: 0.5em 0.5em 0.5em 0.5em;
+    margin: 0.5em 0em 0.5em 1.5em;
     width: 90%;
 }
 
