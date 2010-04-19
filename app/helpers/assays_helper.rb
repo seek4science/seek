@@ -17,5 +17,24 @@ module AssaysHelper
     Authorization.authorize_collection("show",data_files,current_user)
   end
 
+  def assay_organism_list_item assay_organism
+    result = link_to h(assay_organism.organism.title),assay_organism.organism
+    if assay_organism.strain
+      result += ": #{assay_organism.strain.title}"
+    end
+    if assay_organism.culture_growth_type
+      result += " (#{assay_organism.culture_growth_type.title})"
+    end
+    return result
+  end
+  def assay_organisms_list assay_organisms
+    result=""
+    assay_organisms.each do |ao|
+      result += assay_organism_list_item ao
+      result += ", " unless ao==assay_organisms.last
+    end
+    result
+  end
+
   
 end
