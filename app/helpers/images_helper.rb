@@ -180,8 +180,10 @@ module ImagesHelper
       "crystal_project/64x64/apps/mydocuments.png"
     when "study_avatar"
       "crystal_project/64x64/apps/package_editors.png"
-    when "assay_avatar"
+    when "assay_avatar","assay_experimental_avatar"
       "misc_icons/flask3-64x64.png"
+    when "assay_modelling_avatar"
+      "crystal_project/64x64/filesystems/desktop.png"
     when "model_avatar"
       "crystal_project/64x64/apps/kformula.png"
     when "person_avatar"
@@ -262,10 +264,15 @@ module ImagesHelper
       img = image_tag file_type_icon_url(object),
         :alt => alt,
         :class=> "avatar framed"
-    when "model","investigation","study","assay"
+    when "model","investigation","study"
       img = image "#{object.class.name.downcase}_avatar",
         {:alt => alt,
-        :class=>"avatar framed"}    
+        :class=>"avatar framed"}
+    when "assay"
+      type=object.is_modelling? ? "modelling" : "experimental"
+      img = image "#{object.class.name.downcase}_#{type}_avatar",
+        {:alt => alt,
+        :class=>"avatar framed"}
     end
 
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag

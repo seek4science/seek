@@ -877,16 +877,35 @@ table.jerm_results {
     font-size: x-small;
 }
 
-.assay_selection ul {    
-    text-align: center;
+.assay_selection {
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+    text-align: center;    
+    vertical-align: middle;
 }
 
-.assay_selection li {
-    padding-top: 1em;
-    list-style: none;
+
+
+p.select_assay_class {
+    text-align: center;    
     font-size: larger;
-    font-weight: bold;
+    font-weight: bold;    
+    height: 3em;
+    background-color: #DDDDDD;
+    border: solid 1px #999999;
+    margin-bottom: 1em;
+    width: 70%;
+    margin-right: auto;
+    margin-left: auto;
 }
+
+p.select_assay_class img {
+    float: left;
+    padding-left: 1em;
+    margin-top: 0.5em;
+}
+
 
 div.avatar_list_popup {
   margin-left:6em;

@@ -19,8 +19,11 @@ module FavouritesHelper
     case item.class.name.downcase
     when "datafile", "sop"
       tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
-    when "model","investigation","study","assay"
+    when "model","investigation","study"
       tiny_image = image "#{item.class.name.downcase}_avatar", :class=>"fav_icon"
+    when "assay"
+      type=item.is_modelling? ? "modelling" : "experimental"
+      tiny_image = image "#{item.class.name.downcase}_#{type}_avatar", :class=>"fav_icon"
     when "person", "project", "institution"
       if (item.avatar_selected?)
         tiny_image = image_tag avatar_url(item, item.avatar_id, 32), :alt=> h(title), :class => 'fav_icon'
