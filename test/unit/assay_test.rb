@@ -78,6 +78,13 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.owner=nil
     assert !assay.valid?
+
+    assay.owner=people(:person_for_model_owner)
+
+    #an modelling assay can be valid without a technology type
+    assay.assay_class=assay_classes(:modelling_assay_class)
+    assay.technology_type=nil
+    assert assay.valid?
     
   end
 
