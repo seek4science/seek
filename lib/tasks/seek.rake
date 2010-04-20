@@ -17,6 +17,14 @@ namespace :seek do
     end
   end
 
+  desc 'upgrades between 0.6 and 0.7'
+  task(:upgrade_live=>:environment) do
+    other_tasks=["assay_classes","update_assay_classes","strains"]
+    other_tasks.each do |task|
+      Rake::Task[ "seek:#{task}" ].execute
+    end
+  end
+
 
   task(:rebuild_project_organisms=>:environment) do
     organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
@@ -113,7 +121,7 @@ namespace :seek do
     AssayType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_types")
   end
-
+ 
   task(:disciplines=>:environment) do
     revert_fixtures_identify
     Discipline.delete_all
