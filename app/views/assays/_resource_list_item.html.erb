@@ -5,28 +5,27 @@
 <%= list_item_description resource.description %>
 
 <div class="list_item_left_column">
-<%= list_item_attribute "Assay type", resource.assay_type.title.capitalize, resource.assay_type %>
-
-<%= list_item_attribute "Technology type", resource.technology_type.title.capitalize, resource.technology_type %>
-
-<%= list_item_simple_list(resource.assay_organisms, "Organism"){|ao| assay_organism_list_item(ao)} %>
-
+  <%= list_item_attribute "Assay type", resource.assay_type.title.capitalize, resource.assay_type %>
+  <% unless resource.is_modelling? -%>
+    <%= list_item_attribute "Technology type", resource.technology_type.title.capitalize, resource.technology_type %>
+  <% end -%>
+  <%= list_item_simple_list(resource.assay_organisms, "Organism"){|ao| assay_organism_list_item(ao)} %>
 </div>
 
 <div class="list_item_right_column">
-<%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
+  <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
 
-<%= list_item_optional_attribute "Investigation", resource.investigation.try(:title), resource.investigation %>
+  <%= list_item_optional_attribute "Investigation", resource.investigation.try(:title), resource.investigation %>
 
-<%= list_item_optional_attribute "Study", resource.study.try(:title), resource.study %>
+  <%= list_item_optional_attribute "Study", resource.study.try(:title), resource.study %>
 </div>
 
 <div class="list_item_whole_width">
-<%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
+  <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
 
-<%= list_item_authorized_list resource.data_files, "Data", true, 50, true %>
+  <%= list_item_authorized_list resource.data_files, "Data", true, 50, true %>
 
-<%= list_item_authorized_list(resource.models, "Models", true, 50, true) if (resource.assay_class_id == 2) %><%#MODELLING ASSAY%>
+  <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if (resource.assay_class_id == 2) %><%#MODELLING ASSAY%>
 
-<%= list_item_timestamp resource %>
+  <%= list_item_timestamp resource %>
 </div>

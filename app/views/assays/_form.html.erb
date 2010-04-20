@@ -39,11 +39,15 @@
 <table class="padded_table">
   <tr>
     <td><%= f.label "Assay type: " %></td>
-    <td><%= f.label "Technology type: " %></td>
+    <% unless @assay.is_modelling? -%>
+      <td><%= f.label "Technology type: " %></td>
+    <% end -%>
   </tr>
   <tr>
     <td style="width:50%"><%= ontology_select_tag f,AssayType,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
-    <td style="width:50%"><%= ontology_select_tag f,TechnologyType,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} %></td>
+    <% unless @assay.is_modelling? -%>
+      <td style="width:50%"><%= ontology_select_tag f,TechnologyType,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} %></td>
+    <% end -%>
   </tr>
 </table>
 
