@@ -144,7 +144,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select "a",:text=>/An experimental assay/i,:count=>0
     assert_select "a[href=?]",new_assay_path(:class=>:modelling),:count=>0
     assert_select "a",:text=>/A modelling analysis/i,:count=>0
-  end
+  end  
 
   test "data file list should only include those from project" do
     login_as(:model_owner)

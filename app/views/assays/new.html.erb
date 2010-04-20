@@ -7,10 +7,10 @@
     <ul>
       <label>Please select the type of assay you wish to create</label>
       <li>
-        <%= link_to "An experimental assay",new_assay_path(:class=>:experimental) %>
+        <%= link_to "An experimental assay",new_assay_path(:class=>:experimental,:study_id=>params[:study_id]) %>
       </li>
       <li>
-        <%= link_to "A modelling analysis",new_assay_path(:class=>:modelling) %>
+        <%= link_to "A modelling analysis",new_assay_path(:class=>:modelling,:study_id=>params[:study_id]) %>
       </li>
     </ul>
   </div>
