@@ -19,12 +19,11 @@ namespace :seek do
 
   desc 'upgrades between 0.6 and 0.7'
   task(:upgrade_live=>:environment) do
-    other_tasks=["assay_classes","update_assay_classes","strains"]
+    other_tasks=["assay_classes","update_assay_classes","strains","graft_new_assay_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute
     end
   end
-
 
   task(:rebuild_project_organisms=>:environment) do
     organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
@@ -60,7 +59,36 @@ namespace :seek do
     end
   end
 
-  #removes any data this is not authorized to viewed by the first User
+  desc 'adds the new modelling assay types and creates a new root'
+  task(:graft_new_assay_types=>:environment) do
+    experimental=AssayType.find(628957644)
+
+    experimental.title="experimental assay type"
+    flux=AssayType.new(:title=>"fluxomics")
+    flux.save!
+    experimental.children << flux
+    experimental.save!
+
+    modelling_assay_type=AssayType.new(:title=>"modelling analysis type")
+    modelling_assay_type.save!
+
+    new_root=AssayType.new
+    new_root.title="root"
+    new_root.children << experimental
+    new_root.children << modelling_assay_type
+    new_root.save!
+
+    new_modelling_types = ["cell cycle","enzymology","gene expression","gene regulatory network","metabolic network","metabolism","signal transduction","translation"]
+    new_modelling_types.each do |title|
+      a=AssayType.new(:title=>title)
+      a.save!
+      modelling_assay_type.children << a
+    end
+    modelling_assay_type.save!
+
+  end
+
+  desc 'removes any data this is not authorized to viewed by the first User'
   task(:remove_private_data=>:environment) do
     sops=Sop.find(:all)
     private_sops=sops.select{|s| !Authorization.is_authorized?("view",nil,s,User.first)}
