@@ -5,30 +5,6 @@
 	min-width:760px;
 }
 
-#right
-{
-	margin-top:1em;
-	float:left;
-	width:19%;
-	font-family:'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, sans-serif;
-	margin-left:1.25em;
-	margin-left:3%;
-	margin-right:0;
-}
-
-#right p
-{
-	font-size:0.75em;
-}
-#right a.hidden { color:black; text-decoration:none; border-bottom:1px solid #999; }
-#right a.hidden:hover { color:blue; text-decoration:none; border-bottom:1px solid #963; }
-
-#right p.help
-{
-	font-weight:normal;
-	font-size:0.75em;
-}
-
 #content p.subtle {
 	margin:0 0 0.5em;
 	float:right;
@@ -149,13 +125,12 @@ ul.why li p strong { color:#c00; }
 a.utility
 {
 	font-weight:normal;
-	color:#c00;
-	font-size:0.8em;
+	color:blue;	
 }
 a.remove { color:#c00; }
 a.utility:hover
 {
-	color:#c00;
+	color:red;
 	text-decoration:underline;
 }
 a.subtle { color:#369; }
@@ -722,4 +697,33 @@ div.editbox ul.help {
 #monitor_topic a
 {
   color: #666;
+}
+
+.forums #right
+{
+	margin-top:1em;
+        margin-right: 1em;
+        padding-top: 0.5em;
+	float:right;
+	width:10em;	
+        border: #999999 solid 1px;
+        text-align: center;
+        background-color: white;
+}
+
+.forums #right p
+{
+	font-size:0.75em;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+
+}
+.forums #right a.hidden { color:black; text-decoration:none; border-bottom:1px solid #999; }
+.forums #right a.hidden:hover { color:blue; text-decoration:none; border-bottom:1px solid #963; }
+
+.forums #right p.help
+{
+	font-weight:normal;
+	font-size:0.75em;
 }
