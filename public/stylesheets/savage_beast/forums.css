@@ -330,7 +330,7 @@ table
 	border-collapse:collapse;
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
-table.wide {	width:100%; }
+table.wide {	width:95%; }
 
 
 /* topics */
@@ -341,42 +341,94 @@ table.wide {	width:100%; }
   width:99%;
 }
 
+.forums table
+{
+	border-collapse:collapse;
+	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+}
+.forums table.wide {	width:100%; }
+.forums table tr th
+{
+	background:#444444;
+	color:white;	
+	padding:3px 10px;
+	border:1px solid #222;
+}
+.forums table tr td
+{
+	padding:7px;
+	border:1px solid #ddd;
+}
+
 /* specific table styles */
 
-table.forums,
-table.topics
+.forums table.forums,
+.forums table.topics
  { font-size:0.8em; }
-table.forums tr th { font-size:0.8em; }
-table.forums tr td .title {
+.forums table.forums tr th { font-size:0.8em; }
+.forums table.forums tr td .title {
 	font-size:1.4em;
 	}
 
-table.forums tr td .desc {
+.forums table.forums tr td .desc {
 margin:0.5em 0;
 }
-table.forums tr td
+.forums table.forums tr td
 {
 	padding:4px 15px;
 }
-table.forums a.tiny
+.forums table.forums a.tiny
 {
 	font-size:0.8em;
 	color:#666;
 }
 
-table.forums .posts
+.forums table.forums .posts
 {
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 	color:#666;
 	font-size:0.8em;
 }
 
-table tr th.la { 	text-align:left; }
-table tr td.ca { 	text-align:center; }
-table tr td.inv { background:#eee; }
-table tr td.vat { vertical-align:top; }
+.forums table tr th.la { 	text-align:left; }
+.forums table tr td.ca { 	text-align:center; }
+.forums table tr td.inv { background:#eee; }
+.forums table tr td.vat { vertical-align:top; }
 
-table tr td.narrow { padding:2px 5px;}
+.forums table tr td.narrow { padding:2px 5px;}
+
+/* last post */
+.forums table tr td.lp {
+	font-size:0.85em;
+	color:#333; }
+.forums table tr td.lp span { color:#666; }
+.forums table tr td.lp span a { color:#369; }
+
+.forums table.topics tr td.c1
+ {	border-right:0; padding-right:2px; }
+.forums table.topics tr td.c2
+  {	border-left:0; padding-left:2px; }
+
+
+.forums table.topics tr td.c3 { border-left:0; }
+
+.forums table.forums tr td.c1 {	border-right:0; padding-right:5px; padding-top:7px; }
+.forums table.forums tr td.c2 {	border-width:1px 0; padding-left:5px; }
+.forums table.forums tr td.c3 {	border-left:0; padding-left:5px; }
+.forums table.topics tr td.stat { font-size:0.9em; }
+
+.forums table.topics tr td .flag {
+  background:#333;
+  color:white;
+  padding:1px 5px;
+  margin-right:0.5em;
+}
+
+
+.forums table.topics tr td.c2 small a,
+.crumbs small a
+{ color:#666; }
+
 
 /* users */
 
@@ -386,36 +438,7 @@ a.admin
 	font-weight:bold;
 }
 
-/* last post */
-table tr td.lp {
-	font-size:0.85em;
-	color:#333; }
-table tr td.lp span { color:#666; }
-table tr td.lp span a { color:#369; }
-
-table.topics tr td.c1
- {	border-right:0; padding-right:2px; }
- table.topics tr td.c2
-  {	border-left:0; padding-left:2px; }
-
-
-table.topics tr td.c3 { border-left:0; }
-
-table.forums tr td.c1 {	border-right:0; padding-right:5px; padding-top:7px; }
-table.forums tr td.c2 {	border-width:1px 0; padding-left:5px; }
-table.forums tr td.c3 {	border-left:0; padding-left:5px; }
-
-
-table.topics tr td.c2 small a,
-.crumbs small a
-{ color:#666; }
-table.topics tr td.stat { font-size:0.9em; }
-
-table.topics tr td .flag {
-  background:#333;
-  color:white;
-  padding:1px 5px;
-  margin-right:0.5em; }
+}
 
 /* misc */
 
@@ -477,34 +500,37 @@ div.stats .posts { float:right; text-align:right; }
 
 /* posts */
 
-table.posts
+.forums table.posts
 {
-	border-bottom:2px solid #eee;
+	border-bottom:2px solid #eee;        
 }
 
-table.posts tr td
+.forums table.posts tr td
 {
-	border:0;
+	
 }
-table.posts tr.spacer td
+.forums table.posts tr.spacer td
 {
-	font-size:1px;
+        font-size: 1px;
+        max-height: 0.5em;
 }
 
 /* fade edit links */
-.post .author .edit a
+.forums .post .author .edit a
 {
   font-size:0.7em;
   color:#666;
 }
 
-.post .author img {
+.forums .post .author img {
 	float:left;
 	margin-right:0.5em;
 	}
-.post .author
+.forums .post .author
 {
-	border-top:2px solid #eee;
+	border-top:1px solid #bbb;
+        border-bottom:1px solid #bbb;
+        border-right: 1px solid #bbb;
 	padding:5px 10px;
 	background:#eee;
 	font-weight:bold;
@@ -516,30 +542,30 @@ table.posts tr.spacer td
 	vertical-align:top;
 }
 
-.post .author .posts,
-.post .author .admin
+.forums .post .author .posts,
+.forums .post .author .admin
 {
 	display:block;
 	font-size:0.75em;
 	color:black;
 	color:#666;
 }
-.post .author a
+.forums .post .author a
 {
 	color:#333;
 	text-decoration:none;
 }
-.post .author a.threadauthor
+.forums .post .author a.threadauthor
 {
 	color:#080;
 }
-.post .author a:hover
+.forums .post .author a:hover
 {
 	color:#369;
 	text-decoration:underline;
 }
 
-.post .date
+.forums .post .date
 {
 	font-size:0.75em;
 	color:#666;
@@ -547,14 +573,15 @@ table.posts tr.spacer td
 	margin-bottom:0.5em;
 }
 
-.posts .post .body
+.forums .posts .post .body
 {
-	border-top:2px solid #eee;
+	border-top:1px solid #bbb;
+        border-bottom:1px solid #bbb;
 	font-size:0.9em;
 	padding:10px 20px;
 }
 
-.posts .post .body blockquote
+.forums .posts .post .body blockquote
 {
 	border:1px solid #cda;
 	border-left:3px solid #9a7;
@@ -564,7 +591,7 @@ table.posts tr.spacer td
 	margin-left:0;
 }
 
-.posts .post .body pre
+.forums .posts .post .body pre
 {
 	font-size:0.8em;
 	background:#eee;
@@ -576,14 +603,14 @@ table.posts tr.spacer td
 	font-family: "Monaco", "Bitstream Vera Sans Mono", "Courier New", serif;
 }
 
-.posts .post .body a:hover { color:brown; }
+.forums .posts .post .body a:hover { color:brown; }
 
-.posts .post .body blockquote p
+.forums .posts .post .body blockquote p
 {
 	margin:0.5em 0;
 }
 
-.post .body p.topic
+.forums .post .body p.topic
 {
   font-size:0.8em;
   font-weight:bold;

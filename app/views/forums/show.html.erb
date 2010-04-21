@@ -27,10 +27,6 @@
     <%= link_to 'Forums'[:forums_title], forums_path %> <span class="arrow">&rarr;</span>
   </div>
 
-  <div id="right">
-    <%=  yield :right %>
-  </div>
-
   <div class="contribution_title">
     <h1>
       <%= h @forum.name %>
@@ -58,7 +54,7 @@
         <th class="la"><%= 'Last post'[:last_post] %></th>
       </tr>
       <% for topic in @topics %>
-        <tr class="hentry">
+        <tr>
           <td style="padding:5px; width:16px;" class="c1">
             <%
             icon = "comment"
@@ -77,8 +73,7 @@
           </td>
           <td class="c2">
             <%= "Sticky"[:sticky_title]+": <strong>" if topic.sticky? %>
-            <%= topic_title_link (topic), :class => "entry-title", :rel => "bookmark" %>
-  <%#= link_to h(topic.title), topic_path(@forum, topic), :class => "entry-title", :rel => "bookmark" %>
+            <%= topic_title_link (topic), :class => "entry-title", :rel => "bookmark" %>  
             <%= "</strong>" if topic.sticky? %>
             <% if topic.paged? -%>
               <small><%= link_to 'last'[], forum_topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page) %></small>
@@ -86,8 +81,9 @@
           </td>
           <td class="ca inv stat"><%= topic.posts.size %></td>
           <td class="ca inv stat"><%= number_with_delimiter(topic.views) %></td>
-          <td class="lp">
-            <abbr class="updated" title="<%= topic.replied_at.xmlschema %>"><%= time_ago_in_words(topic.replied_at) %></abbr>
+          <td class="lp inv">
+            <%= time_ago_in_words(topic.replied_at) %>
+            <br/>
             <%= 'by {user}'[:by_user, "<span class=\"author\"><strong class=\"fn\">#{h(topic.replied_by_user.display_name)}</strong></span>"] %>
             <span><%= link_to 'view'[], forum_topic_path(:forum_id => @forum, :id => topic, :page => topic.last_page, :anchor => "posts-#{topic.last_post_id}") %></span>
           </td>

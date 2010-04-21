@@ -22,11 +22,7 @@
 
   <table border="0" cellspacing="0" cellpadding="0" class="wide forums">
     <tr>
-      <th class="la" width="70%" colspan="3"><%= 'Forum'[:forum_title] %></th>
-      <!--
-          <th width="5%">Topics</th>
-          <th width="5%">Posts</th>
-      -->
+      <th class="la" width="70%" colspan="3"><%= 'Forum'[:forum_title] %></th>      
       <th class="la" width="30%" colspan="1"><%= 'Last Post'[:last_post] %></th>
     </tr>
     <% for forum in @forums do %>
@@ -39,7 +35,7 @@
               <%= image_tag "savage_beast/clearbits/comment.gif", :class => "icon grey", :title => 'No recent activity'[:no_recent_activity] %>
             <% end %>
           </td>
-          <td class="c2 vat">
+          <td class="vat c2">
             <%= link_to h(forum.name), forum_path(forum), :class => "title" %>
             <div class="posts">
               <%= '{count} topics'[(count=forum.topics.size)==1 ? :topic_count : :topics_count, number_with_delimiter(count)] %>,
