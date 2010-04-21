@@ -28,6 +28,14 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_redirected_to edit_publication_path(assigns(:publication))
   end
+  
+  test "should create doi publication" do
+    assert_difference('Publication.count') do
+      post :create, :publication => {:doi => "10.1371/journal.pone.0004803" } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+    end
+
+    assert_redirected_to edit_publication_path(assigns(:publication))
+  end  
 
   test "should show publication" do
     get :show, :id => publications(:one).to_param
@@ -92,5 +100,12 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to publications_path
+  end
+  
+  test "shouldn't add paper with non-unique title" do
+    #PubMed version of publication already exists, so it shouldn't re-add
+    assert_no_difference('Publication.count') do
+      post :create, :publication => {:doi => "10.1093/nar/gkl320" }
+    end
   end
 end

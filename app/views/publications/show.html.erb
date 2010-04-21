@@ -1,5 +1,9 @@
 <ul class="sectionIcons">
-  <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
+  <% if !@publication.pubmed_id.nil? %>
+    <li><%= image_tag_for_key('visit_pubmed', "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}", nil, {:popup => true}, 'View Publication On PubMed') -%></li>
+  <% elsif !@publication.doi.nil? %>
+    <li><%= image_tag_for_key('visit_pubmed', "http://dx.doi.org/#{@publication.doi}", nil, {:popup => true}, 'View Publication') -%></li>
+  <% end -%>
   <% if Authorization.is_authorized?("edit", nil, @publication, current_user) -%>
       <li><%= image_tag_for_key('manage', edit_publication_path(@publication), nil, nil, 'Manage Publication') -%></li>
   <% end -%>
@@ -15,8 +19,14 @@
   <div class="main_content_left_box">
     <div class="box_about_actor">
       <p>
-        <label>PubMed ID:</label>
-        <%= link_to @publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}",{:popup => true} %>
+        <% unless @publication.pubmed_id.nil? %>
+          <label>PubMed ID:</label>
+          <%= link_to @publication.pubmed_id, "http://www.ncbi.nlm.nih.gov/pubmed/#{@publication.pubmed_id}",{:popup => true} %>
+        <% end %>
+        <% unless @publication.doi.nil? %>
+          <label>DOI:</label>
+          <%= link_to @publication.doi, "http://dx.doi.org/#{@publication.doi}",{:popup => true} %>
+        <% end %>
       </p>
       
       <p>
@@ -60,7 +70,6 @@
           </p>
         <% end -%>
       </p>
-
 
     </div>
   </div>
