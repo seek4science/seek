@@ -930,3 +930,60 @@ ul.horiz_list_items li {
     float:left;
     padding-right: 1em;
 }
+
+/* Begin Footer styles */
+
+#ft {
+	margin: 2em 0;
+	border: 2px solid #999999;
+	border-width: 1px 0 1px 0;
+	color: #333333;
+	background-image: url('/images/footer-bg.png');
+	background-position: top;
+	background-repeat: repeat-x;
+	background-color: #EEEEEE;
+}
+
+#ft .copyright {
+	text-align: center;
+	font-weight: bold;
+	padding: 0.5em;
+}
+
+#ft table {
+	width: 100%;
+	border-top: 1px solid #999999;
+	border-spacing: 0;
+	margin: 0;
+}
+
+#ft td {
+	padding: 0.8em 2em;
+	vertical-align: top;
+}
+
+#ft table p {
+	padding: 0.3em 0;
+	line-height: 1;
+}
+
+#ft .left {
+	width: 150px;
+	text-align: left;
+}
+
+#ft .middle {
+	width: 325px;
+	text-align: left;
+	border-left: 1px solid #999999;
+}
+
+#ft .right {
+	width: 150px;
+	text-align: center;
+	border-left: 1px solid #999999;
+}
+
+#ft .right p {
+	text-align: center;
+}
