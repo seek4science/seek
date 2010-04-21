@@ -4,7 +4,7 @@ class Organism < ActiveRecord::Base
   
   has_many :assay_organisms
   has_many :models
-  has_many :assays,:through=>:assay_organisms
+  has_many :assays,:through=>:assay_organisms  
   has_many :strains
   
   has_and_belongs_to_many :projects
