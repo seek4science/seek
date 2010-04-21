@@ -4,15 +4,13 @@
 
 <% unless @assay.assay_class %>
   <div class="assay_selection">
-    <ul>
-      <label>Please select the type of assay you wish to create</label>
-      <li>
-        <%= link_to "An experimental assay",new_assay_path(:class=>:experimental,:study_id=>params[:study_id]) %>
-      </li>
-      <li>
-        <%= link_to "A modelling analysis",new_assay_path(:class=>:modelling,:study_id=>params[:study_id]) %>
-      </li>
-    </ul>
+
+    <span>Please select the type of assay you wish to create</span>
+    <br/><br/><br/>
+    <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An experimental assay</p>",new_assay_path(:class=>:experimental,:study_id=>params[:study_id]) %>
+
+    <%= link_to "<p class='select_assay_class'>#{image("assay_modelling_avatar",:size=>"32x32")}A modelling analysis</p>",new_assay_path(:class=>:modelling,:study_id=>params[:study_id]) %>
+
   </div>
 <% else %>  
   <div class="show_basic">
