@@ -73,7 +73,7 @@ namespace :seek do
     modelling_assay_type.save!
 
     new_root=AssayType.new
-    new_root.title="root"
+    new_root.title="assay types"
     new_root.children << experimental
     new_root.children << modelling_assay_type
     new_root.save!

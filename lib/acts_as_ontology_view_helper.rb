@@ -6,9 +6,9 @@ module Stu
     module Ontology
       module ActsAsOntologyViewHelper
         
-        def ontology_select_tag form,type,id,selected_id=nil,html_options={}
+        def ontology_select_tag form,type,root_id,element_id,selected_id=nil,html_options={}
 
-          roots=type.to_tree.sort{|a,b| a.title.downcase <=> b.title.downcase}
+          roots=type.to_tree(root_id).sort{|a,b| a.title.downcase <=> b.title.downcase}
           options=[]
           roots.each do |root|
             options << [root.title,root.id]
@@ -17,7 +17,7 @@ module Stu
 
           selected_id ||= roots.first.id
           
-          form.select id,options,{:selected=>selected_id},html_options
+          form.select element_id,options,{:selected=>selected_id},html_options
 
         end
 

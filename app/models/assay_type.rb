@@ -24,6 +24,16 @@ class AssayType < ActiveRecord::Base
     end
     return result
   end
+
+  #FIXME: really not happy looking up by title, but will be replaced by BioPortal eventually
+  def self.experimental_assay_type_id
+    at=AssayType.find_by_title("experimental assay type").id
+  end
+
+  #FIXME: really not happy looking up by title, but will be replaced by BioPortal eventually
+  def self.modelling_assay_type_id
+    at=AssayType.find_by_title("modelling analysis type").id
+  end
  
   private
 

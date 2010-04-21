@@ -39,9 +39,15 @@ class AssayTypeTest < ActiveSupport::TestCase
 
   end
 
+  test "to tree with root" do
+    roots = AssayType.to_tree(assay_types(:experimental_assay_type).id)
+    assert_equal 1,roots.size
+    assert roots.include?(assay_types(:experimental_assay_type))
+  end
+
   test "to tree" do
     roots=AssayType.to_tree
-    assert_equal 8,roots.size
+    assert_equal 10,roots.size
     assert roots.include?(assay_types(:metabolomics))
     assert roots.include?(assay_types(:proteomics))
     assert roots.include?(assay_types(:parent1))
@@ -50,6 +56,8 @@ class AssayTypeTest < ActiveSupport::TestCase
     assert roots.include?(assay_types(:assay_type_with_child_and_assay))
     assert roots.include?(assay_types(:assay_type_with_only_child_assays))
     assert roots.include?(assay_types(:new_parent))
+    assert roots.include?(assay_types(:experimental_assay_type))
+    assert roots.include?(assay_types(:modelling_assay_type))
   end
 
   test "two parents" do
@@ -136,5 +144,14 @@ class AssayTypeTest < ActiveSupport::TestCase
     
     assert_equal 3,parent_assay.get_all_descendants.size   
   end
+
+  test "experimental assay type id" do
+    assert_not_nil AssayType.experimental_assay_type_id
+  end
+
+  test "modelling assay type id" do
+    assert_not_nil AssayType.modelling_assay_type_id
+  end
+
   
 end

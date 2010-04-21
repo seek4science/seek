@@ -18,12 +18,16 @@ module Stu
       end
 
       module SingletonMethods
-        def to_tree
+        def to_tree root_id=nil
           roots=[]
-          all=self.find(:all,:include=>:parents)
-          all.each do |o|
-            roots << o if o.parents.empty?
-          end
+          if (root_id)
+            roots << self.find(root_id)
+          else            
+            all=self.find(:all,:include=>:parents)
+            all.each do |o|
+              roots << o if o.parents.empty?
+            end
+          end          
           return roots
         end
       end

@@ -44,9 +44,10 @@
     <% end -%>
   </tr>
   <tr>
-    <td style="width:50%"><%= ontology_select_tag f,AssayType,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
+    <% root_id = @assay.is_modelling? ? AssayType.modelling_assay_type_id : AssayType.experimental_assay_type_id %>
+    <td style="width:50%"><%= ontology_select_tag f,AssayType,root_id,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
     <% unless @assay.is_modelling? -%>
-      <td style="width:50%"><%= ontology_select_tag f,TechnologyType,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} %></td>
+      <td style="width:50%"><%= ontology_select_tag f,TechnologyType,nil,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} %></td>
     <% end -%>
   </tr>
 </table>

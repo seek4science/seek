@@ -45,3 +45,9 @@ child_assay_type:
 
 new_parent:
   title: new_parent
+
+experimental_assay_type:
+  title: "experimental assay type"
+
+modelling_assay_type:
+  title: "modelling analysis type"
