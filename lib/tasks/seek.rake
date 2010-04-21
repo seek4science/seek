@@ -253,6 +253,26 @@ namespace :seek do
       puts "Couldn't find default assay class (ID:1)!"
     end
   end
+  
+  task :add_publication_policies => :environment do
+    count = 0
+    Publication.all.each do |pub|
+      if pub.asset.policy.nil?
+        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        count += 1
+        pub.asset.save
+      end
+      
+      #Update policy so current authors have manage permissions
+      pub.asset.creators.each do |author|
+        pub.asset.policy.permissions.clear
+        pub.asset.policy.permissions << Permission.create(:contributor => author, :policy => pub.asset.policy, :access_type => 4)
+      end      
+      #Add contributor
+      pub.asset.policy.permissions << Permission.create(:contributor => pub.contributor.person, :policy => pub.asset.policy, :access_type => 4)
+    end
+    puts "Done - #{count} policies for publications added."
+  end
 
   private
 
