@@ -6,7 +6,7 @@
   <% form_remote_tag(:url =>fetch_preview_publications_url, 
                      :update => {:success => 'publication_preview'}, 
                      :success => "Element.show('publication_preview'); new Effect.Highlight('publication_preview', { duration: 1.0 });",
-                     :failure => "alert('An error occurred whilst fetching your publication. Please ensure you entered a valid PubMed ID.');", 
+                     :failure => "alert('An error occurred whilst fetching your publication. Please ensure you entered a valid DOI/PubMed ID.');", 
                      :loading => "Element.show('spinner')",
                      :complete => "Element.hide('spinner')") do %>
     <p>
