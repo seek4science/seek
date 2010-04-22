@@ -1,38 +1,38 @@
-div.forums {
+.forums div.forums {
     margin-left: 0.5em;
 }
 
-#container
+.forums #container
 {
 	width:92%;
 	margin:0 auto;
 	min-width:760px;
 }
 
-#content p.subtle {
+.forums #content p.subtle {
 	margin:0 0 0.5em;
 	float:right;
 	}
-#content .subtle a
+.forums #content .subtle a
 {
 	color:#999;
 	font-size:0.7em;
 }
 
-p.pages
+.forums p.pages
 {
 	xfloat:right;
 	font-size:0.85em;
 	margin-top:1.2em;
 }
 
-span.pipe
+.forums span.pipe
 {
 	color:#999;
 	margin:0 0.15em;
 }
 
-div.news
+.forums div.news
 {
 	background:#cfc;
 	text-align:center;
@@ -43,10 +43,10 @@ div.news
 	font-size:0.7em;
 	font-weight:bold;
 }
-div.news p { margin:0; }
+.forums div.news p { margin:0; }
 
-p.notice,
-p.sections
+.forums p.notice,
+.forums p.sections
 {
 	background:#df9;
 	padding:7px 15px;
@@ -55,16 +55,16 @@ p.sections
 	font-size:0.8em;
 }
 
-p.sections a.action { color:#c00; }
+.forums p.sections a.action { color:#c00; }
 
-.hasfile
+.forums .hasfile
 {
 	color:#090;
 	font-weight:bold;
 	margin-left:10em;
 }
 
-p.subtitle
+.forums p.subtitle
 {
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 	font-size:0.9em;
@@ -72,75 +72,75 @@ p.subtitle
 	font-weight:bold;
 	padding-bottom: 1.2em;
 }
-p.subtitle img { vertical-align: bottom; }
+.forums p.subtitle img { vertical-align: bottom; }
 
-ul.quotes,
-ul.flat
+.forums ul.quotes,
+.forums ul.flat
 {
 	margin-left:0;
 	padding-left:0;
 	font-size:0.75em;
 	list-style-type:none;
 }
-ul.talking li span
+.forums ul.talking li span
 {
 	color:#666;
 	font-size:0.8em;
 }
 
-ul.flat li
+.forums ul.flat li
 {
 	background:url(/images/savage_beast/small_circle.gif) no-repeat 5px 6px;
 	padding-left:15px;
 }
-ul.ways li span
+.forums ul.ways li span
 {
 	color:#666;
 	font-size:0.9em;
 }
 
-ul.quotes
+.forums ul.quotes
 {
 	font-size:0.8em;
 }
-ul.quotes li {margin-bottom:1em; }
-ul.quotes span
+.forums ul.quotes li {margin-bottom:1em; }
+.forums ul.quotes span
 {
 	color:#666;
 	font-size:0.9em;
 }
 
 
-ul.why
+.forums ul.why
 {
 	font-family:'Lucida Grande', Arial, Helvetica, sans-serif;
 	font-size:1em;
 	line-height:1.25em;
 	margin-top:2em;
 }
-ul.why li p
+.forums ul.why li p
 {
 	margin-top:0.5em;
 	color:#666;
 	font-size:0.9em;
 }
-ul.why li p strong { color:#c00; }
+.forums ul.why li p strong { color:#c00; }
 
-a.utility
+.forums a.utility
 {
 	font-weight:normal;
 	color:blue;	
 }
-a.remove { color:#c00; }
-a.utility:hover
+.forums a.remove { color:#c00; }
+.forums a.utility:hover
 {
 	color:red;
 	text-decoration:underline;
 }
-a.subtle { color:#369; }
-a.subtle:hover { color:blue; }
+.forums a.subtle { color:#369; }
+.forums a.subtle:hover { color:blue; }
 
-div.asset
+.forums div.asset
 {
 	background:#e7e7e7;
 	padding:7px 15px;
@@ -151,37 +151,37 @@ div.asset
 	text-align:center;
 }
 
-input.primary
+.forums input.primary
 {
   font-size:1.2em;
 
 }
 
-#content .legend
+.forums #content .legend
 {
 	margin-top:0;
 	color:#999;
 	font-size:0.8em;
 }
-#content .legend span strong { color: black; }
-#content .legend span
+.forums #content .legend span strong { color: black; }
+.forums #content .legend span
 {
 	margin-right:5em;
 }
 
-p.private img { vertical-align:bottom;}
-p.private
+.forums p.private img { vertical-align:bottom;}
+.forums p.private
 {
   xcolor:white;
   color:#c00;
   font-weight:bold;
 }
-p.psmall {
+.forums p.psmall {
   font-size:0.7em;
   font-weight:normal;
 }
 
-div.upload
+.forums div.upload
 {
 	margin-top:-0.5em;
 	xbackground:#e7e7e7;
@@ -190,34 +190,34 @@ div.upload
 	xwidth:63%;
 	margin-left:0.5em;
 }
-div.upload p label { font-size:0.7em; font-weight:bold;}
-div.upload p {margin:0}
-div.upload input { margin-left:0.75em;}
-div.upload a
+.forums div.upload p label { font-size:0.7em; font-weight:bold;}
+.forums div.upload p {margin:0}
+.forums div.upload input { margin-left:0.75em;}
+.forums div.upload a
 {
 	color:#666;
 	font-size:0.8em;
 }
 
-.pastePreview pre { font-size:0.9em; }
+.forums .pastePreview pre { font-size:0.9em; }
 
-.pastePreview p
+.forums .pastePreview p
 {
 	color:#777;
 	font-size:0.7em;
 	margin:0 0 0.5em;
 }
 
-.pastePreview .when {	float:right; }
-.pastePreview .when strong {	color:black; }
+.forums .pastePreview .when {	float:right; }
+.forums .pastePreview .when strong {	color:black; }
 
-p
+.forums p
 {
 	font-family:'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, sans-serif;
 }
 
 
-#news
+.forums #news
 {
 	background:#248;
 	background:#475f30;
@@ -234,11 +234,11 @@ p
 	padding:6px 0 7px;
 	z-index:50;
 }
-#news a.subtle { 	color:#ffc; font-weight:normal;}
-#news a {color:gold; font-weight:bold}
-#news p {margin:0;}
+.forums #news a.subtle { 	color:#ffc; font-weight:normal;}
+.forums #news a {color:gold; font-weight:bold}
+.forums #news p {margin:0;}
 
-#header ul#nav
+.forums #header ul#nav
 {
 	float:right;
 	list-style-type:none;
@@ -246,7 +246,7 @@ p
 	margin-top:0.4em;
 }
 
-#header ul#nav li
+.forums #header ul#nav li
 {
 	color:gold;
 	font-family:'Lucida Grande', Verdana, Arial, Helvetica, sans-serif;
@@ -255,7 +255,7 @@ p
 	margin-left:2em;
 }
 
-#header ul#nav li a
+.forums #header ul#nav li a
 {
 	display:block;
 	float:left;
@@ -264,83 +264,83 @@ p
 	xpadding:3px 1em;
 }
 
-#header ul#nav li.login a {
+.forums #header ul#nav li.login a {
 	color:gold;
 	text-decoration: none;
 }
 
-#header ul#nav li.active a
+.forums #header ul#nav li.active a
 {
 	font-weight:bold;
 	xbackground:#222;
 	color:#ca8;
 }
 
-#header ul#nav li.hot a
+.forums #header ul#nav li.hot a
 {
 	color:orange;
 }
-#header ul#nav li.logout a
+.forums #header ul#nav li.logout a
 {
 	color:#666;
 }
 
-.line_numbers,
-.lineNumbers
+.forums .line_numbers,
+.forums .lineNumbers
 {
 	color:#999;
 	padding-right:0.5em;
 	text-align:right;
 }
-.line_numbers strong { color:#555; }
+.forums .line_numbers strong { color:#555; }
 
-td.code,
-.thePaste
+.forums td.code,
+.forums .thePaste
 {
 	padding-left:0.75em;
 }
 
-.photo
+.forums .photo
 {
 	background:#aaa url(/images/savage_beast/clearbits/smile.gif) no-repeat 8px 8px;
 }
 
-.smallutils
+.forums .smallutils
 {
 	xfloat:right;
 	margin-top:-0.5em;
 	margin-bottom:0em;
 	text-align:right;
 }
-.smallutils a
+.forums .smallutils a
 {
 	color:#666;
 	font-size:0.7em;
 }
-.smallutils a:hover {color:#369;}
+.forums .smallutils a:hover {color:#369;}
 
-table.noborder td
+.forums table.noborder td
 {
   border:0;
 }
 
-table.nopad td
+.forums table.nopad td
 {
   padding-left:0;
 }
 
-table
+.forums table
 {
 	border-collapse:collapse;
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
-table.wide {	width:95%; }
+.forums table.wide {	width:95%; }
 
 
 /* topics */
 
-#forum_description,
-#topic_body
+.forums #forum_description,
+.forums #topic_body
 {
   width:99%;
 }
@@ -430,13 +430,13 @@ margin:0.5em 0;
 
 
 .forums table.topics tr td.c2 small a,
-.crumbs small a
+.forums .crumbs small a
 { color:#666; }
 
 
 /* users */
 
-a.admin
+.forums a.admin
 {
 	color:#c00;
 	font-weight:bold;
@@ -446,16 +446,16 @@ a.admin
 
 /* misc */
 
-.button_or
+.forums .button_or
 {
   color:#333;
   padding-left:0.5em;
   font-size:0.9em;
   font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
-.button_or a { color:#009; }
+.forums .button_or a { color:#009; }
 
-form.dialog
+.forums form.dialog
 {
 	margin-top:3em;
 	background:#eee;
@@ -463,24 +463,24 @@ form.dialog
 	padding:15px;
 }
 
-form .entryhelp
+.forums form .entryhelp
 {
   font-size:0.7em;
 }
 
-form .help
+.forums form .help
 {
 	font-size:0.8em;
 }
 
-span.arrow
+.forums span.arrow
 {
 	font-weight:normal;
 	font-size:0.9em;
 	color:#999;
 }
 
-div.stats
+.forums div.stats
 {
 	margin-top:2em;
 	background:#ded;
@@ -490,18 +490,18 @@ div.stats
 	border:2px solid #393;
 	border-width:1px 0;
 }
-div.stats .posts { float:right; text-align:right; }
+.forums div.stats .posts { float:right; text-align:right; }
 
 /* breadcrumbs */
 
-.crumbs
+.forums .crumbs
 {
 	font-size:0.9em;
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
         margin-top:0.25em;
 }
-.crumbs a { color:#448; }
-.crumbs a:hover { color:red; text-decoration:none; }
+.forums .crumbs a { color:#448; }
+.forums .crumbs a:hover { color:red; text-decoration:none; }
 
 /* posts */
 
@@ -638,29 +638,29 @@ table.posts .editing td.body { }
 
 /* other stuff */
 
-p.online {margin-bottom:0;}
+.forums p.online {margin-bottom:0;}
 
-img.icon
+.forums img.icon
 {
 	background:#696;
 	background-image: url(/images/savage_beast/clearbits/bg_rounded.gif);
 	background-repeat: no-repeat;
 	vertical-align: bottom;
 }
-img.reply { float:right; }
-img.orange { background-color:darkorange; }
-img.grey { background-color:#ccc; }
-img.darkgrey { background-color:#999; }
-img.green { background-color:#0c0;}
+.forums img.reply { float:right; }
+.forums img.orange { background-color:darkorange; }
+.forums img.grey { background-color:#ccc; }
+.forums img.darkgrey { background-color:#999; }
+.forums img.green { background-color:#0c0;}
 
-.post .author .icon
+.forums .post .author .icon
 {
 	float:right;
 }
 
 /* reply */
 
-div.editbox
+.forums div.editbox
 {	
 	border:2px solid #333;
 	border-width:2px 0;	
@@ -669,15 +669,15 @@ div.editbox
 	z-index:50;
 }
 
-div.editbox .container
+.forums div.editbox .container
 {
 	width:92%;
 	margin:0 auto;
 	min-width:760px;
 }
 
-div.editbox p { margin:0.5em 0;}
-div.editbox textarea
+.forums div.editbox p { margin:0.5em 0;}
+.forums div.editbox textarea
 {
   width:100%;
 	background:white;
@@ -685,12 +685,12 @@ div.editbox textarea
 	font-size:0.8em;
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
-div.editbox .button_or a
+.forums div.editbox .button_or a
 {
   color:#ccc;
 }
-div.editbox table td { border:0; }
-div.editbox a.utility
+.forums div.editbox table td { border:0; }
+.forums div.editbox a.utility
 {
   color: #f99;
   font-size: 0.65em;
@@ -702,7 +702,7 @@ div.editbox a.utility
   margin-top: 0.2em;
 }
 
-div.editbox h5
+.forums div.editbox h5
 {
   background:#222;
   color:white;
@@ -711,22 +711,22 @@ div.editbox h5
   margin:0.2em 0 0.5em;
 }
 
-div.editbox p.help span,
-div.editbox ul.help span { color:#666; }
-div.editbox p.help,
-div.editbox ul.help
+.forums div.editbox p.help span,
+.forums div.editbox ul.help span { color:#666; }
+.forums div.editbox p.help,
+.forums div.editbox ul.help
 {
   padding:3px 10px;
   font-size:0.9em;
   color:#333;
   font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
-div.editbox ul.help { margin:0; }
+.forums div.editbox ul.help { margin:0; }
 
-div.editbox ul.help {
+.forums div.editbox ul.help {
   list-style-type:none; }
 
-#monitor_topic a
+.forums #monitor_topic a
 {
   color: #666;
 }
