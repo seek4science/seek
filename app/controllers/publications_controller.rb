@@ -235,7 +235,7 @@ class PublicationsController < ApplicationController
       end
     elsif doi
       query = DoiQuery.new(ADMIN_EMAIL)
-      result = query.fetch(pubmed_id)
+      result = query.fetch(doi)
     end      
     unless result.nil?
       result.authors.each do |author|
