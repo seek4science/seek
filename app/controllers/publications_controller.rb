@@ -161,6 +161,9 @@ class PublicationsController < ApplicationController
       pubmed_id = key
     elsif protocol == "doi"
       doi = key
+      if doi.start_with?("doi:")
+        doi = doi.gsub("doi:","")
+      end
     end
     
     result = get_data(@publication, pubmed_id, doi)

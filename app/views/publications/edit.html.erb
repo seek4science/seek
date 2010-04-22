@@ -11,6 +11,14 @@
       <%= collection_select :publication, :project_id, Project.all,:id,:name,{ :include_blank => "None" }%>
     </p>
     
+    <% if @publication.pubmed_id.nil? && @publication.doi %>
+      <p>
+        <label>Abstract:</label><br/>
+        <%= text_area(:publication, :abstract, :cols => 90, :rows => 8) %>
+      </p>
+    <% end %>
+    
+    
     <h2>Associate authors</h2>  
  
     <% project = @publication.project %>
