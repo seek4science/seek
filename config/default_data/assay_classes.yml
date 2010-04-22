@@ -5,5 +5,5 @@ experimental_assay_class:
 
 modelling_assay_class:
   id: 2
-  title: Modelling Assay
+  title: Modelling Analysis
   key: MODEL

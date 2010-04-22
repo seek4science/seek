@@ -1,11 +1,13 @@
+<%
+@assay_text=resource.is_modelling? ? "Analysis" : "Assay"
+%>
+
 <%= list_item_title resource %>
-
 <%= list_item_attribute "ID", resource.id %>
-
 <%= list_item_description resource.description %>
 
 <div class="list_item_left_column">
-  <%= list_item_attribute "Assay type", resource.assay_type.title.capitalize, resource.assay_type %>
+  <%= list_item_attribute "#{@assay_text} type", resource.assay_type.title.capitalize, resource.assay_type %>
   <% unless resource.is_modelling? -%>
     <%= list_item_attribute "Technology type", resource.technology_type.title.capitalize, resource.technology_type %>
   <% end -%>

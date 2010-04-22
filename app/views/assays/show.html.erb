@@ -1,6 +1,10 @@
+<%
+@assay_word=@assay.is_modelling? ? "Analysis" : "Assay"
+%>
+
 <ul class="sectionIcons">
   <% if @assay.can_edit?(current_user) -%>
-    <li><%= image_tag_for_key('edit', edit_assay_path(@assay), "Edit Assay Details", nil, 'Edit Assay Details') -%></li>
+    <li><%= image_tag_for_key('edit', edit_assay_path(@assay), "Edit #{@assay_word} Details", nil, "Edit #{@assay_word} Details") -%></li>
   <% end -%>
   <%= delete_ISA_icon(@assay,current_user) %>
 
@@ -56,7 +60,7 @@
 </p>
 
 <p id="assay_type">
-  <b>Assay type: </b><%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
+  <b><%= @assay_word -%> type: </b><%= link_to h(@assay.assay_type.title.capitalize), @assay.assay_type -%>
 </p>
 <% unless @assay.is_modelling? -%>
   <p id="technology_type">

@@ -1,5 +1,5 @@
 <div class="contribution_title">
-  <h1>Assay creation</h1>
+  <h1><%=  @assay.is_modelling? ? "Modelling analysis creation" : "Assay creation" -%></h1>
 </div>
 
 <% unless @assay.assay_class %>

@@ -1,3 +1,6 @@
+<%
+@assay_text=@assay.is_modelling? ? "analysis" : "assay"
+%>
 <%= javascript_include_tag "assays.js"  %>
 
 <%= f.error_messages -%>
@@ -33,12 +36,12 @@
 </p>
 </div>
 
-<h2>Assay and technology types</h2>
+<h2><%= "#{@assay_text.capitalize} types" -%></h2>
 <%= f.hidden_field :assay_class_id -%>
 
 <table class="padded_table">
   <tr>
-    <td><%= f.label "Assay type: " %></td>
+    <td><%= f.label "#{@assay_text.capitalize} type: " %></td>
     <% unless @assay.is_modelling? -%>
       <td><%= f.label "Technology type: " %></td>
     <% end -%>
