@@ -448,12 +448,12 @@ a.admin
 
 .button_or
 {
-  color:#666;
+  color:#333;
   padding-left:0.5em;
-  font-size:0.75em;
+  font-size:0.9em;
   font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
-.button_or a { color:#c00; }
+.button_or a { color:#009; }
 
 form.dialog
 {
@@ -501,7 +501,7 @@ div.stats .posts { float:right; text-align:right; }
         margin-top:0.25em;
 }
 .crumbs a { color:#448; }
-.crumbs a:hover { color:#00c; text-decoration:underline; }
+.crumbs a:hover { color:red; text-decoration:none; }
 
 /* posts */
 
@@ -717,8 +717,8 @@ div.editbox p.help,
 div.editbox ul.help
 {
   padding:3px 10px;
-  font-size:0.75em;
-  color:#ccc;
+  font-size:0.9em;
+  color:#333;
   font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
 }
 div.editbox ul.help { margin:0; }
@@ -749,8 +749,8 @@ div.editbox ul.help {
         margin-left: auto;
         margin-right: auto;
         text-align: center;
-
 }
+
 .forums #right a.hidden { color:black; text-decoration:none; border-bottom:1px solid #999; }
 .forums #right a.hidden:hover { color:blue; text-decoration:none; border-bottom:1px solid #963; }
 
