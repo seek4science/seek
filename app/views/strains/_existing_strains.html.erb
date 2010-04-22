@@ -1,8 +1,11 @@
+<% strain_links=[] %>
 <% if !existing_strains.empty? -%>
   Existing strains:
   <% existing_strains.each do |strain| -%>
-    <%= link_to_function h(strain.title),"setStrainTextField('#{strain.title}');" %>
+    <% strain_links <<  link_to_function(h(strain.title),"setStrainTextField('#{strain.title}');") %>
   <% end -%>
+  <%= strain_links.join(", ") -%>
+  <span class="none_text">(click to use, or add a new one below)</span>
 <% end -%>
 
 

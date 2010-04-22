@@ -987,3 +987,8 @@ ul.horiz_list_items li {
 #ft .right p {
 	text-align: center;
 }
+
+div#existing_strains {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}

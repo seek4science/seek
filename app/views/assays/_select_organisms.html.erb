@@ -37,7 +37,7 @@ culture_growth_options=options_for_select(CultureGrowthType.find(:all,:order=>:t
 
     <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
 
-    <div id="extra_organism_details">
+    <div id="extra_organism_details" style="display:none;">
       <div id="existing_strains">
 
       </div>
