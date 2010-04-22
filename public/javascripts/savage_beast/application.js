@@ -77,6 +77,6 @@ var ReplyForm = {
   }
 }
 
-Event.addBehavior({
-  '#search,#monitor_submit': function() { this.hide(); }
-})
+//Event.addBehavior({
+//  '#search,#monitor_submit': function() { this.hide(); }
+//})
