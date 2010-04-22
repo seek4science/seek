@@ -23,3 +23,12 @@ two:
   contributor_type: User
   published_date: <%= 5.days.ago.to_s :db %>
   pubmed_id: 2
+  
+taverna_paper_pubmed:
+  title: "Taverna: a tool for building and running workflows of services"
+  abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
+  journal: JOURNAL OF SCIENCE
+  contributor_id: 1
+  contributor_type: User
+  published_date: <%= 5.days.ago.to_s :db %>
+  pubmed_id: 16845108

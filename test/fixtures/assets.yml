@@ -261,4 +261,12 @@ asset_for_publication_two:
   policy: sysmo_member_edit
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+  
+asset_for_taverna_publication:
+  project: sysmo_project
+  resource: taverna_paper_pubmed (Publication)
+  policy: sysmo_member_edit
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>  

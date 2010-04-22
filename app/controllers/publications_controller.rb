@@ -49,15 +49,11 @@ class PublicationsController < ApplicationController
   def create
     @publication = Publication.new()
     pubmed_id = params[:publication][:pubmed_id]
-    query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
-    results = query.fetch([pubmed_id])
-    result = nil
-    unless results.empty?
-      result = results.first
-      @publication.extract_metadata(result) unless result.nil?
-    end
-    @publication.contributor = current_user
-    
+    pubmed_id = nil if pubmed_id.blank?
+    doi = params[:publication][:doi]
+    doi = nil if doi.blank?
+    result = get_data(@publication, pubmed_id, doi)
+    @publication.contributor = current_user    
     respond_to do |format|
       if @publication.save
         result.authors.each do |author|
@@ -157,15 +153,18 @@ class PublicationsController < ApplicationController
   
   def fetch_preview
     @publication = Publication.new
-    pubmed_id = params[:pubmed_id]
-    query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
-    results = query.fetch([pubmed_id])
-    unless results.empty?
-      result = results.first
-      @publication.extract_metadata(result) unless result.nil?
-    else
-      raise "Error - No pubmed record found"
+    key = params[:key]
+    protocol = params[:protocol]
+    pubmed_id = nil
+    doi = nil
+    if protocol == "pubmed"
+      pubmed_id = key
+    elsif protocol == "doi"
+      doi = key
     end
+    
+    result = get_data(@publication, pubmed_id, doi)
+
     respond_to do |format|
       format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
     end
@@ -225,12 +224,20 @@ class PublicationsController < ApplicationController
     @publication.non_seek_authors.clear
     
     #Query pubmed article to fetch authors
-    pubmed_id = @publication.pubmed_id
-    query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
-    results = query.fetch([pubmed_id])
     result = nil
-    unless results.empty?
-      result = results.first      
+    pubmed_id = @publication.pubmed_id
+    doi = @publication.doi
+    if pubmed_id
+      query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
+      results = query.fetch([pubmed_id])
+      unless results.empty?
+        result = results.first
+      end
+    elsif doi
+      query = DoiQuery.new(ADMIN_EMAIL)
+      result = query.fetch(doi)
+    end      
+    unless result.nil?
       result.authors.each do |author|
         pa = PublicationAuthor.new()
         pa.publication = @publication
@@ -266,6 +273,30 @@ class PublicationsController < ApplicationController
         format.html { redirect_to publications_path }
       end
       return false
+    end
+  end
+  
+  def get_data(publication, pubmed_id, doi=nil)
+    if !pubmed_id.nil?
+      query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
+      results = query.fetch([pubmed_id])
+      result = nil
+      unless results.empty?
+        result = results.first
+        publication.extract_pubmed_metadata(result) unless result.nil?
+        return result
+      else
+        raise "Error - No publication could be found with that PubMed ID"
+      end    
+    elsif !doi.nil?
+      query = DoiQuery.new(ADMIN_EMAIL)
+      result = query.fetch(doi)
+      unless result.nil?
+        publication.extract_doi_metadata(result)
+        return result
+      else 
+        raise "Error - No publication could be found with that DOI"
+      end  
     end
   end
 end

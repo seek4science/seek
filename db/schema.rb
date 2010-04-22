@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100416140944) do
+ActiveRecord::Schema.define(:version => 20100421100346) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -147,7 +147,7 @@ ActiveRecord::Schema.define(:version => 20100416140944) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
   end
 
@@ -294,7 +294,7 @@ ActiveRecord::Schema.define(:version => 20100416140944) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
   end
 
@@ -411,6 +411,7 @@ ActiveRecord::Schema.define(:version => 20100416140944) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
+    t.string   "doi"
   end
 
   create_table "recommended_model_environments", :force => true do |t|
@@ -478,7 +479,7 @@ ActiveRecord::Schema.define(:version => 20100416140944) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
   end
 
