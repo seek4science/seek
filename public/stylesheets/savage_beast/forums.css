@@ -67,10 +67,10 @@ p.sections a.action { color:#c00; }
 p.subtitle
 {
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
-	font-size:0.75em;
-	color:#888;
+	font-size:0.9em;
+	color:#666;
 	font-weight:bold;
-	margin-top:-0.8em;
+	padding-bottom: 1.2em;
 }
 p.subtitle img { vertical-align: bottom; }
 
@@ -403,7 +403,7 @@ margin:0.5em 0;
 
 /* last post */
 .forums table tr td.lp {
-	font-size:0.85em;
+	font-size: 1em;
 	color:#333; }
 .forums table tr td.lp span { color:#666; }
 .forums table tr td.lp span a { color:#369; }
@@ -419,7 +419,7 @@ margin:0.5em 0;
 .forums table.forums tr td.c1 {	border-right:0; padding-right:5px; padding-top:7px; }
 .forums table.forums tr td.c2 {	border-width:1px 0; padding-left:5px; }
 .forums table.forums tr td.c3 {	border-left:0; padding-left:5px; }
-.forums table.topics tr td.stat { font-size:0.9em; }
+.forums table.topics tr td.stat { font-size:1em; }
 
 .forums table.topics tr td .flag {
   background:#333;
@@ -442,7 +442,7 @@ a.admin
 	font-weight:bold;
 }
 
-}
+
 
 /* misc */
 
@@ -496,10 +496,11 @@ div.stats .posts { float:right; text-align:right; }
 
 .crumbs
 {
-	font-size:0.75em;
+	font-size:0.9em;
 	font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+        margin-top:0.25em;
 }
-.crumbs a { color:#468; }
+.crumbs a { color:#448; }
 .crumbs a:hover { color:#00c; text-decoration:underline; }
 
 /* posts */
@@ -732,14 +733,14 @@ div.editbox ul.help {
 
 .forums #right
 {
-	margin-top:1em;
+	margin-top:2em;
         margin-right: 1em;
         padding-top: 0.5em;
 	float:right;
 	width:10em;	
-        border: #999999 solid 1px;
+        border: #999 solid 1px;
         text-align: center;
-        background-color: white;
+        background-color: #fff;
 }
 
 .forums #right p
