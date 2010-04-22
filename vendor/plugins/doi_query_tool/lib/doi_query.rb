@@ -55,8 +55,8 @@ class DoiQuery
       params[:doi] = article.find_first('//doi_data/doi').content
       
       return DoiRecord.new(params)
-    rescue
-      raise "Unknown document structure"
+    rescue Exception => ex
+      raise "Unknown document structure\n#{ex.backtrace.join("\n")}"
     end
   end
   
@@ -70,8 +70,8 @@ class DoiQuery
       string = string.gsub(/xmlns=\"([^\"]*)\"/,"")    
       doc = XML::Parser.string(string).parse
       return doc
-    rescue
-      raise "There was an error fetching the given DOI"
+    rescue Exception => ex
+      raise "There was an error fetching the given DOI\n#{ex.backtrace.join("\n")}"
     end
   end
   
@@ -79,9 +79,12 @@ class DoiQuery
     if xml_date.nil?
       return nil
     else
-      day = xml_date.find_first(".//day").content
-      month = xml_date.find_first(".//month").content
-      year = xml_date.find_first(".//year").content
+      day = xml_date.find_first(".//day")
+      day = day.nil? ? "01" : day.content
+      month = xml_date.find_first(".//month")
+      month = month.nil? ? "01" : month.content
+      year = xml_date.find_first(".//year")
+      year = year.nil? ? "1970" : year.content
       date = "#{month}/#{day}/#{year}".to_date
       return date
     end
