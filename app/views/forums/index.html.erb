@@ -1,17 +1,13 @@
 <div class="forums">
-  <% content_for :right do %>
 
-    <% if admin? %>
+
+  <% if admin? %>
+    <div id="right">
       <h6><%= 'Admin'[:admin_title] %></h6>
-      <p><%= link_to 'Create New Forum'[:create_new_forum], new_forum_path, :class => "utility" %></p>      
-    <% end %>
+      <p><%= link_to 'Create New Forum'[:create_new_forum], new_forum_path, :class => "utility" %></p>
+    </div>
+  <% end -%>
 
-  <% end %>
-  
-  <div id="right">
-    <%=  yield :right %>
-  </div>
-      
   <div class="contribution_title"><h1><%= 'Forums'[:forums_title] %></h1></div>
   <p class="subtitle">
     <%= feed_icon_tag "Recent Posts"[:recent_posts], all_posts_path(:format => 'rss') %>
