@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class OrganismTest < ActiveSupport::TestCase
   
-  fixtures :organisms,:assays,:models,:bioportal_concepts
+  fixtures :organisms,:assays,:models,:bioportal_concepts,:assay_organisms,:studies
 
   test "assay association" do
     o=organisms(:Saccharomyces_cerevisiae)
@@ -10,7 +10,7 @@ class OrganismTest < ActiveSupport::TestCase
     assert_equal 1,o.assays.size
     assert o.assays.include?(a)
   end
-
+ 
   test "bioportal_link" do
     o=organisms(:yeast_with_bioportal_concept)
     assert_not_nil o.bioportal_concept,"There should be an associated bioportal concept"
