@@ -15,7 +15,7 @@
   <p>
   <% creators.each do |creator| %>
     <% if creators.count < 3 #display full avatar if not too many authors %>
-      <%= favouritable_icon(creator, 80) -%>
+      <%= favouritable_icon(creator, 80) -%><br/>
     <% end %>
     <%= link_to(h(creator.name), url_for(creator)) -%><br/>
   <% end %>
