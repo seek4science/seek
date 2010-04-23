@@ -412,7 +412,7 @@ function updateOrganisms() {
         if (strain.length>0) {
             titleText += ":"+strain
         }
-        if (culture_growth.length>0) {
+        if (culture_growth.length>0 && culture_growth!='Not specified') {
             titleText += " ("+culture_growth+")";
         }
         titleText +=  '</span>';
