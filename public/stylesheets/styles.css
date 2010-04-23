@@ -992,3 +992,7 @@ div#existing_strains {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
 }
+
+.assay_item_sup_info {
+    color: #1465FF;
+}

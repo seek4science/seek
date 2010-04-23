@@ -153,7 +153,7 @@ function updateDataFiles() {
         title=data_file[0];
         id=data_file[1];
         relationshipType = data_file[2];
-        relationshipText = (relationshipType == 'None') ? '' : ' <span style="color: #1465FF;">(' + relationshipType + ')</span>';
+        relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         data_file_text += '<li>' + titleText + relationshipText +
         '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
@@ -391,7 +391,7 @@ function updateOrganisms() {
             titleText += ":"+strain
         }
         if (culture_growth.length>0 && culture_growth!='Not specified') {
-            titleText += " ("+culture_growth+")";
+            titleText += " <span class='assay_item_sup_info'>("+culture_growth+")</span>";
         }
         titleText +=  '</span>';
         organism_text += '<li>' + titleText +

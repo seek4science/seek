@@ -59,17 +59,22 @@ culture_growth_options=options_for_select(CultureGrowthType.find(:all,:order=>:t
 <% @assay.assay_organisms.each do |o| -%>
     organism_id = '<%= o.organism.id -%>';
     organism_title = '<%= escape_javascript(o.organism.title) -%>';
-    strain = '<%= o.strain.nil? ? "" : o.strain.title -%>'
+    strain = '<%= o.strain.nil? ? "" : o.strain.title -%>';
     culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>'
     addOrganism(organism_title, organism_id, strain, culture_growth);
 <% end -%>
 
 <% if params[:assay_organism_ids] %>
-  <% params[:assay_organism_ids].each do |id| -%>
-    <% organism = Organism.find(id) %>
-      organism_id = '<%= id -%>';
+  <% params[:assay_organism_ids].each do |text| -%>
+    <% 
+    o_id,strain,culture_growth_type_text=text.split(",")
+    organism=Organism.find(o_id);
+    %>
+      organism_id = '<%= o_id -%>';
       organism_title = '<%= escape_javascript(organism.title) -%>';
-      addOrganism(organism_title, organism_id,'','');
+      strain = '<%= strain -%>';
+      culture_growth = '<%= culture_growth_type_text -%>';
+      addOrganism(organism_title, organism_id,strain,culture_growth);
   <% end -%>
 <% end -%>
 

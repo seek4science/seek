@@ -5,7 +5,7 @@
 <% unless @assay.assay_class %>
   <div class="assay_selection">
 
-    <span>Please select the type of assay you wish to create</span>
+    <span>Please select the class of assay you wish to create</span>
     <br/><br/><br/>
     <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An experimental assay</p>",new_assay_path(:class=>:experimental,:study_id=>params[:study_id]) %>
 
