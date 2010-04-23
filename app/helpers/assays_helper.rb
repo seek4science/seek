@@ -26,8 +26,9 @@ module AssaysHelper
     end
     return result
   end
-  def assay_organisms_list assay_organisms
+  def assay_organisms_list assay_organisms,none_text="Not specified"
     result=""
+    result="<span class='none_text'>#{none_text}</span>" if assay_organisms.empty?
     assay_organisms.each do |ao|
       result += assay_organism_list_item ao
       result += ", " unless ao==assay_organisms.last
