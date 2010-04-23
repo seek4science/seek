@@ -19,7 +19,7 @@ namespace :seek do
 
   desc 'upgrades between 0.6 and 0.7'
   task(:upgrade_live=>:environment) do
-    other_tasks=["assay_classes","update_assay_classes","strains","graft_new_assay_types"]
+    other_tasks=["assay_classes","update_assay_classes","strains","graft_new_assay_types","relationship_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute
     end
