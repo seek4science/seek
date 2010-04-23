@@ -387,14 +387,9 @@ function addSelectedOrganism() {
     
 }
 
-function removeOrganism(id) {
-    // remove the actual record for the attribution
-    for(var i = 0; i < organisms.length; i++)
-        if(organisms[i][1] == id) {
-            organisms.splice(i, 1);
-            break;
-        }
-
+function removeOrganism(index) {
+    // remove according to the index
+    organisms.splice(index, 1);
     // update the page
     updateOrganisms();
 }
@@ -418,7 +413,7 @@ function updateOrganisms() {
         titleText +=  '</span>';
         organism_text += '<li>' + titleText +
           '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
-          '[<a href=\"\" onclick=\"javascript:removeOrganism('+id+'); return(false);\">remove</a>]</small></li>';        
+          '[<a href=\"\" onclick=\"javascript:removeOrganism('+i+'); return(false);\">remove</a>]</small></li>';
     }
 
     organism_text += '</ul>';
