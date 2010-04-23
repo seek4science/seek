@@ -152,24 +152,42 @@ class PublicationsController < ApplicationController
   end
   
   def fetch_preview
-    @publication = Publication.new
-    key = params[:key]
-    protocol = params[:protocol]
-    pubmed_id = nil
-    doi = nil
-    if protocol == "pubmed"
-      pubmed_id = key
-    elsif protocol == "doi"
-      doi = key
-      if doi.start_with?("doi:")
-        doi = doi.gsub("doi:","")
+    begin
+      @publication = Publication.new
+      key = params[:key]
+      protocol = params[:protocol]
+      pubmed_id = nil
+      doi = nil
+      if protocol == "pubmed"
+        pubmed_id = key
+      elsif protocol == "doi"
+        doi = key
+        if doi.start_with?("doi:")
+          doi = doi.gsub("doi:","")
+        end
+      end      
+      result = get_data(@publication, pubmed_id, doi)
+    rescue
+      if protocol == "pubmed"
+        if key.match(/[0-9]+/).nil?
+          @error_text = "Please ensure the PubMed ID is entered in the correct format, e.g. <i>16845108</i>"
+        else
+          @error_text = "No publication could be found on PubMed with that ID."  
+        end
+      elsif protocol == "doi"
+        if key.match(/[0-9]+(\.)[0-9]+.*/).nil?
+          @error_text = "Please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>."
+        else
+          @error_text = "No valid publication could be found with that DOI."
+        end
+      end          
+      respond_to do |format|
+        format.html { render :partial => "publications/publication_error", :locals => { :publication => @publication, :error_text => @error_text}, :status => 500}
       end
-    end
-    
-    result = get_data(@publication, pubmed_id, doi)
-
-    respond_to do |format|
-      format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
+    else
+      respond_to do |format|
+        format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
+      end
     end
   end
   

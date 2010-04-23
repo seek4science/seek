@@ -988,6 +988,27 @@ ul.horiz_list_items li {
 	text-align: center;
 }
 
+div.error_div {
+  background-color:#F5F5F5;
+  border:2px solid #CC0000;
+  margin:0.5em 0;
+  padding:0.5em;
+  text-align:left;
+  width:95%;
+}
+
+div.error_div h2 {
+    text-align: left;
+    font-weight: bold;
+    padding: 5px 5px 5px 15px;
+    font-size: 93%;
+    margin: 0;
+    background-image: none;
+    background-color: #c00;
+    border: none;
+    color: #fff;
+}
+
 div#existing_strains {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
