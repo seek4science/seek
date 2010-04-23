@@ -958,8 +958,8 @@ ul.horiz_list_items li {
 }
 
 #ft td {
-	padding: 0.8em 2em;
-	vertical-align: top;
+	padding: 0.8em 0.5em;
+	vertical-align: middle;
 }
 
 #ft table p {
@@ -968,18 +968,36 @@ ul.horiz_list_items li {
 }
 
 #ft .left {
-	width: 150px;
+	width: 110px;
 	text-align: left;
 }
 
 #ft .middle {
-	width: 325px;
+	width: auto;
 	text-align: left;
 	border-left: 1px solid #999999;
+        text-align: center;
+}
+
+#ft .middle p{
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;    
+}
+
+#ft .middle ul {
+    text-align: center;
+    width: 100%;
+}
+
+#ft .middle li {
+    list-style: none;
+    float: left;
+    padding: 5px 5px 5px 5px;
 }
 
 #ft .right {
-	width: 150px;
+	width: 110px;
 	text-align: center;
 	border-left: 1px solid #999999;
 }
