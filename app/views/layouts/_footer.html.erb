@@ -17,18 +17,16 @@
             <p><%= link_to "The Sysmo Project", "http://www.sysmo.net" %> </p>
           </td>
           <td class="middle">
-            <p>Related projects    </p>
-            <p><%= link_to "Taverna Workflow Workbench", "http://www.mygrid.org.uk/tools/taverna/", :target => '_blank' %></p>
-            <p><%= link_to "JWS Online", "http://jjj.biochem.sun.ac.za/", :target => '_blank' %></p>
-            <p><%= link_to "SABIO-RK","http://sabio.villa-bosch.de/webservice.jsp",:target=>'_blank' %></p>
-            <p><%= link_to "ISATAB","http://isatab.sourceforge.net/",:target=>'_blank' %></p>
-            <br/>
-          </td>
-          <td class="middle">
-            <p>Particular credit to</p>
-            <p><%= link_to "The myGrid team", "http://www.mygrid.org.uk", :target => '_blank' %></p>
-            <p><%= link_to image_tag("myexperiment_logo.png",:title=>"myExperiment",:alt=>"myExperiment",:width=>"100"), "http://www.myExperiment.org", :target => '_blank' %>&nbsp;&nbsp;
-            <%= link_to image_tag("bioportal/bioportal_logo.png",:title=>"BioPortal",:alt=>"BioPortal",:width=>"100"), "http://bioportal.bioontology.org/", :target => '_blank' %></p>
+            <p>Related projects and partners</p>
+            <ul>
+              <li><%= link_to image_tag("taverna_logo.png",:title=>"Taverna workflow workbench",:alt=>"Taverna workflow workbench",:width=>"60px"), "http://www.mygrid.org.uk/tools/taverna/", :target => '_blank' %></li>
+              <li><%= link_to image_tag("myexperiment_logo.png",:title=>"myExperiment",:alt=>"myExperiment",:width=>"100px"), "http://www.myExperiment.org", :target => '_blank' %></li>
+              <li><%= link_to image_tag("jwsonline_webpic.jpg",:title=>"JWS Online",:alt=>"JWS Online",:width=>"100px"), "http://jjj.biochem.sun.ac.za/", :target => '_blank' %></li>
+              <li><%= link_to image_tag("isatab_logo.png",:title=>"ISATAB",:alt=>"ISATAB",:width=>"100px"),"http://isatab.sourceforge.net/specifications.html",:target=>'_blank' %></li>
+              <li><%= link_to image_tag("mygrid_logo.png",:title=>"myGrid",:alt=>"myGrid",:style=>"width:100px;background-color:#7589A1;"), "http://www.mygrid.org.uk", :target => '_blank' %></li>
+              <li><%= link_to image_tag("sabiork_logo.jpg",:title=>"Sabio-RK",:alt=>"Sabio-RK",:width=>"90px"),"http://sabio.villa-bosch.de/webservice.jsp",:target=>'_blank' %></li>              
+              <li><%= link_to image_tag("bioportal/bioportal_logo.png",:title=>"BioPortal",:alt=>"BioPortal",:width=>"100px"), "http://bioportal.bioontology.org/", :target => '_blank' %></li>              
+            </ul>
           </td>
           <td class="right">
             <p>Powered by:</p>
