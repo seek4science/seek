@@ -172,13 +172,13 @@ class PublicationsController < ApplicationController
         if key.match(/[0-9]+/).nil?
           @error_text = "Please ensure the PubMed ID is entered in the correct format, e.g. <i>16845108</i>"
         else
-          @error_text = "No publication could be found on PubMed with that ID."  
+          @error_text = "No publication could be found on PubMed with that ID"  
         end
       elsif protocol == "doi"
         if key.match(/[0-9]+(\.)[0-9]+.*/).nil?
-          @error_text = "Please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>."
+          @error_text = "Please ensure the DOI is entered in the correct format, e.g. <i>10.1093/nar/gkl320</i>"
         else
-          @error_text = "No valid publication could be found with that DOI."
+          @error_text = "No valid publication could be found with that DOI"
         end
       end          
       respond_to do |format|
