@@ -61,14 +61,8 @@ function addSelectedSop() {
     }
 }
 
-function removeSop(id) {
-    // remove the actual record for the attribution
-    for(var i = 0; i < sops_assets.length; i++)
-        if(sops_assets[i][1] == id) {
-            sops_assets.splice(i, 1);
-            break;
-        }
-
+function removeSop(index) {
+    sops_assets.splice(index, 1);
     // update the page
     updateSops();
 }
@@ -85,7 +79,7 @@ function updateSops() {
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         sop_text += '<li>' + titleText + 
           '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
-          '[<a href=\"\" onclick=\"javascript:removeSop('+id+'); return(false);\">remove</a>]</small></li>';
+          '[<a href=\"\" onclick=\"javascript:removeSop('+i+'); return(false);\">remove</a>]</small></li>';
         sop_ids.push(id);
     }
     
@@ -145,14 +139,8 @@ function addSelectedDataFile() {
     }
 }
 
-function removeDataFile(id) {
-    // remove the actual record for the attribution
-    for(var i = 0; i < data_files_assets.length; i++)
-        if(data_files_assets[i][1] == id) {
-            data_files_assets.splice(i, 1);
-            break;
-        }
-
+function removeDataFile(index) {
+    data_files_assets.splice(index, 1);
     // update the page
     updateDataFiles();
 }
@@ -169,7 +157,7 @@ function updateDataFiles() {
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         data_file_text += '<li>' + titleText + relationshipText +
         '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:removeDataFile('+id+'); return(false);">remove</a>]</small></li>';
+        + '[<a href="" onclick="javascript:removeDataFile('+i+'); return(false);">remove</a>]</small></li>';
     }
     
     data_file_text += '</ul>';
@@ -222,14 +210,9 @@ function addSelectedModel() {
     }
 }
 
-function removeModel(id) {
-    // remove the actual record for the attribution
-    for(var i = 0; i < models_assets.length; i++)
-        if(models_assets[i][1] == id) {
-            models_assets.splice(i, 1);
-            break;
-        }
-
+function removeModel(index) {
+    models_assets.splice(index, 1);
+    
     // update the page
     updateModels();
 }
@@ -247,7 +230,7 @@ function updateModels() {
         model_text += '<li>' + titleText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:removeModel('+id+'); return(false);">remove</a>]</small></li>';
+        + '[<a href="" onclick="javascript:removeModel('+i+'); return(false);">remove</a>]</small></li>';
         model_ids.push(id);
     }
     
