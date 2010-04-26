@@ -503,7 +503,8 @@ class ModelsController < ApplicationController
 
     @all_people_as_json = Person.get_all_as_json
     
-
+    @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
+    
   end
 
 end

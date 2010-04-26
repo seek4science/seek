@@ -248,9 +248,6 @@ class DataFilesController < ApplicationController
     end
   end
 
-  
-
-
   def set_parameters_for_sharing_form
     policy = nil
     policy_type = ""
@@ -287,7 +284,8 @@ class DataFilesController < ApplicationController
     @resource = @data_file
 
     @all_people_as_json = Person.get_all_as_json
-
+    
+    @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
 
   end
 

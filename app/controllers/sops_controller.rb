@@ -290,7 +290,9 @@ class SopsController < ApplicationController
     @favourite_groups = current_user.favourite_groups
     @resource = @sop
     
-    @all_people_as_json = Person.get_all_as_json    
+    @all_people_as_json = Person.get_all_as_json
+
+    @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
     
   end
   

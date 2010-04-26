@@ -19,7 +19,6 @@
 <%# @use_whitelist -%>
 <%# @use_blacklist -%>
 
-
 <div class="fold">
 
   <div class="foldTitle">
@@ -307,9 +306,9 @@
         </div>
 
       </div>
-    </div>
+    </div>        
 
-    <% if @resource.contributor -%>
+    <%= "<div style='display:none;'>" unless @enable_black_white_listing %>
       <p style="font-weight: bold; margin-top: 1.5em;">Also include people in my..</p>
 
       <!-- whitelist / blacklist -->
@@ -361,9 +360,9 @@
         <div id="<%= FavouriteGroup::BLACKLIST_NAME -%>_redbox_link_div">
           <%= whitelist_blacklist_edit_popup_link(FavouriteGroup::BLACKLIST_NAME) -%>
         </div>
-      </div>    
-    <% end -%>
-      
+      </div>
+
+    <%= "</div>" unless @enable_black_white_listing %>
   </div>
 </div>
 
