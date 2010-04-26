@@ -15,6 +15,52 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assays)
   end
 
+  test "should update timestamp when associating sop" do
+    assay=assays(:metabolomics_assay)
+    timestamp=assay.updated_at
+    
+    sop_asset=assets(:asset_of_a_sop_with_all_sysmo_users_policy)
+    assert !assay.assets.include?(sop_asset)
+    sleep(1)
+    put :update, :id=>assay,:assay_sop_asset_ids=>[sop_asset],:assay=>{}
+    assert_redirected_to assay_path(assay)
+    assert assigns(:assay)
+    updated_assay=Assay.find(assay.id)
+    assert updated_assay.assets.include?(sop_asset)
+    assert_not_equal timestamp,updated_assay.updated_at
+
+  end
+
+  test "should update timestamp when associating datafile" do
+    assay=assays(:metabolomics_assay)
+    timestamp=assay.updated_at
+
+    df_asset=assets(:asset_for_downloadable_data_file)
+    assert !assay.assets.include?(df_asset)
+    sleep(1)
+    put :update, :id=>assay,:assay_data_file_asset_ids=>["#{df_asset.id},Test data"],:assay=>{}
+    assert_redirected_to assay_path(assay)
+    assert assigns(:assay)
+    updated_assay=Assay.find(assay.id)
+    assert updated_assay.assets.include?(df_asset)
+    assert_not_equal timestamp,updated_assay.updated_at
+  end
+
+  test "should update timestamp when associating model" do
+    assay=assays(:metabolomics_assay)
+    timestamp=assay.updated_at
+
+    model_asset=assets(:asset_for_model)
+    assert !assay.assets.include?(model_asset)
+    sleep(1)
+    put :update, :id=>assay,:assay_model_asset_ids=>[model_asset],:assay=>{}
+    assert_redirected_to assay_path(assay)
+    assert assigns(:assay)
+    updated_assay=Assay.find(assay.id)
+    assert updated_assay.assets.include?(model_asset)
+    assert_not_equal timestamp,updated_assay.updated_at
+  end
+
   test "should show item" do
     get :show, :id=>assays(:metabolomics_assay)
     assert_response :success
