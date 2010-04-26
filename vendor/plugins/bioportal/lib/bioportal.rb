@@ -34,7 +34,11 @@ module BioPortal
         options[:email] ||= self.bioportal_email unless self.bioportal_email.nil?
 
         return nil if self.bioportal_concept.nil?
-        return self.bioportal_concept.get_concept options
+        begin
+          return self.bioportal_concept.get_concept options
+        rescue Exception=>e
+          return nil
+        end
       end
 
       def ontology options={}

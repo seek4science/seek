@@ -25,6 +25,13 @@ namespace :seek do
     end
   end
 
+  desc 're-extracts bioportal information about all organisms, overriding the cached details'
+  task(:refresh_organism_concepts=>:environment) do
+    Organism.all.each do |o|
+      o.concept({:refresh=>true})
+    end
+  end
+
   task(:rebuild_project_organisms=>:environment) do
     organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
     puts "found #{organism_taggings.size} organism taggings"
