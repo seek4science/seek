@@ -101,9 +101,7 @@ class AssaysController < ApplicationController
           o_id,strain,culture_growth_type_text=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id,strain,culture_growth)
-        end
-        @assay.updated_at = Time.now
-        @assay.save! #to force update of timestamp
+        end        
         flash[:notice] = 'Assay was successfully updated.'
         format.html { redirect_to(@assay) }
         format.xml  { head :ok }
