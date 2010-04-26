@@ -38,14 +38,14 @@
       <div id="more_info" class="box_simple" style="display: none;">
         <p>
           Here you may specify the People, Projects or Groups that may View and Edit the details about your <%= @resource_type -%>.<br>
-          <p>
-            You may:
-            <ul>
-              <li>Keep the <%= @resource_type -%> private, and only visible to yourself</li>
-              <li>Share with all Sysmo project members</li>
-              <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> By using custom sharing permissions you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
-            </ul>
-          </p>
+        <p>
+          You may:
+        <ul>
+          <li>Keep the <%= @resource_type -%> private, and only visible to yourself</li>
+          <li>Share with all Sysmo project members</li>
+          <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> By using custom sharing permissions you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
+        </ul>
+        </p>
         </p>
       </div>
     </div>
@@ -58,22 +58,22 @@
         <input type="hidden" name="sharing[include_custom_sharing_<%= Policy::PRIVATE -%>]" value="0">
 
         <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
-                                                                     value="<%= Policy::PRIVATE -%>" type="radio" onclick="javascript:setSharingElementVisibility(<%= Policy::PRIVATE -%>);" />
+                                                                              value="<%= Policy::PRIVATE -%>" type="radio" onclick="javascript:setSharingElementVisibility(<%= Policy::PRIVATE -%>);" />
         - Keep this <%= @resource_type -%> private.
-    </label></p>
+      </label></p>
 
 
     <p style="font-weight: bold; margin-top: 1em;">Or share it with..</p>
 
 
-   
+
 
 
     <!-- all registered users -->
     <p>
       <label for="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_REGISTERED_USERS -%> id="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>" name="sharing[sharing_scope]"
-              value="<%= Policy::ALL_REGISTERED_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_REGISTERED_USERS -%>);" />
+               value="<%= Policy::ALL_REGISTERED_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_REGISTERED_USERS -%>);" />
         - All registered users for
       </label>
       <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_REGISTERED_USERS,
@@ -89,7 +89,7 @@
     <p>
       <label for="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]"
-              value="<%= Policy::ALL_SYSMO_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_SYSMO_USERS -%>);" />
+               value="<%= Policy::ALL_SYSMO_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_SYSMO_USERS -%>);" />
         - All users associated with any of the SysMO projects for
       </label>
       <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
@@ -105,7 +105,7 @@
     <p>
       <label for="sharing_scope_<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::CUSTOM_PERMISSIONS_ONLY -%> id="sharing_scope_<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>" name="sharing[sharing_scope]"
-              value="<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>);" />
+               value="<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>);" />
         - Use custom sharing permissions only
       </label>
     </p>
@@ -309,60 +309,61 @@
       </div>
     </div>
 
+    <% if @resource.contributor -%>
+      <p style="font-weight: bold; margin-top: 1.5em;">Also include people in my..</p>
 
-    <p style="font-weight: bold; margin-top: 1.5em;">Also include people in my..</p>
-
-    <!-- whitelist / blacklist -->
-    <p>
-      <label for="cb_use_whitelist">
-        <input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_whitelist]" id="cb_use_whitelist" <%= "checked='checked'" if @use_whitelist -%> />
-        - "white list", who always get full access
-      </label>
-      <% white_lst = current_user.get_whitelist -%>
-      <%= hidden_field_tag "#{FavouriteGroup::WHITELIST_NAME}_group_id", (white_lst ? white_lst.id : "none") -%>
-      <span>&nbsp;&nbsp;[
-        <span id="<%= FavouriteGroup::WHITELIST_NAME -%>_edit_span" style="display: <%= white_lst ? "inline" : "none" -%>;">
-          <%= link_to "edit", "/", :onclick => "editWhitelistBlacklist('#{FavouriteGroup::WHITELIST_NAME}'); return(false);" -%>
-        </span>
-        <% unless white_lst -%>
-          <span id="<%= FavouriteGroup::WHITELIST_NAME -%>_create_span">
-            <%= link_to "create", "/", :onclick => "createWhitelistBlacklist('#{FavouriteGroup::WHITELIST_NAME}'); return(false);" -%>
+      <!-- whitelist / blacklist -->
+      <p>
+        <label for="cb_use_whitelist">
+          <input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_whitelist]" id="cb_use_whitelist" <%= "checked='checked'" if @use_whitelist -%> />
+          - "white list", who always get full access
+        </label>
+        <% white_lst = current_user.get_whitelist -%>
+        <%= hidden_field_tag "#{FavouriteGroup::WHITELIST_NAME}_group_id", (white_lst ? white_lst.id : "none") -%>
+        <span>&nbsp;&nbsp;[
+          <span id="<%= FavouriteGroup::WHITELIST_NAME -%>_edit_span" style="display: <%= white_lst ? "inline" : "none" -%>;">
+            <%= link_to "edit", "/", :onclick => "editWhitelistBlacklist('#{FavouriteGroup::WHITELIST_NAME}'); return(false);" -%>
           </span>
-        <% end -%>
-      ]</span>
-      <%= image_tag icon_filename_for_key("spinner"), :id => "#{FavouriteGroup::WHITELIST_NAME}_creation_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
-    </p>
-    <p>
-      <label for="cb_use_blacklist">
-        <input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_blacklist]" id="cb_use_blacklist" <%= "checked='checked'" if @use_blacklist -%> />
-        - "black list", who have no access at all
-      </label>
-      <% black_lst = current_user.get_blacklist -%>
-      <%= hidden_field_tag "#{FavouriteGroup::BLACKLIST_NAME}_group_id", (black_lst ? black_lst.id : "none") -%>
-      <span>&nbsp;&nbsp;[
-        <span id="<%= FavouriteGroup::BLACKLIST_NAME -%>_edit_span" style="display: <%= black_lst ? "inline" : "none" -%>;">
-          <%= link_to "edit", "/", :onclick => "editWhitelistBlacklist('#{FavouriteGroup::BLACKLIST_NAME}'); return(false);" -%>
-        </span>
-        <% unless black_lst -%>
-          <span id="<%= FavouriteGroup::BLACKLIST_NAME -%>_create_span">
-            <%= link_to "create", "/", :onclick => "createWhitelistBlacklist('#{FavouriteGroup::BLACKLIST_NAME}'); return(false);" -%>
+          <% unless white_lst -%>
+            <span id="<%= FavouriteGroup::WHITELIST_NAME -%>_create_span">
+              <%= link_to "create", "/", :onclick => "createWhitelistBlacklist('#{FavouriteGroup::WHITELIST_NAME}'); return(false);" -%>
+            </span>
+          <% end -%>
+          ]</span>
+        <%= image_tag icon_filename_for_key("spinner"), :id => "#{FavouriteGroup::WHITELIST_NAME}_creation_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
+      </p>
+      <p>
+        <label for="cb_use_blacklist">
+          <input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_blacklist]" id="cb_use_blacklist" <%= "checked='checked'" if @use_blacklist -%> />
+          - "black list", who have no access at all
+        </label>
+        <% black_lst = current_user.get_blacklist -%>
+        <%= hidden_field_tag "#{FavouriteGroup::BLACKLIST_NAME}_group_id", (black_lst ? black_lst.id : "none") -%>
+        <span>&nbsp;&nbsp;[
+          <span id="<%= FavouriteGroup::BLACKLIST_NAME -%>_edit_span" style="display: <%= black_lst ? "inline" : "none" -%>;">
+            <%= link_to "edit", "/", :onclick => "editWhitelistBlacklist('#{FavouriteGroup::BLACKLIST_NAME}'); return(false);" -%>
           </span>
-        <% end -%>
-      ]</span>
-      <%= image_tag icon_filename_for_key("spinner"), :id => "#{FavouriteGroup::BLACKLIST_NAME}_creation_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
-    </p>
-    <div style="display: none;">
-      <%# this DIV is to hold the 'redbox' links generated by a method in application_helper, -%>
-      <%# these will be "clicked" by javascript, because hidden divs that are present in the -%>
-      <%# generated code causes IE to break layout by inserting extra line break otherwise -%>
-      <div id="<%= FavouriteGroup::WHITELIST_NAME -%>_redbox_link_div">
-        <%= whitelist_blacklist_edit_popup_link(FavouriteGroup::WHITELIST_NAME) -%>
-      </div>
-      <div id="<%= FavouriteGroup::BLACKLIST_NAME -%>_redbox_link_div">
-        <%= whitelist_blacklist_edit_popup_link(FavouriteGroup::BLACKLIST_NAME) -%>
-      </div>
-    </div>
-
+          <% unless black_lst -%>
+            <span id="<%= FavouriteGroup::BLACKLIST_NAME -%>_create_span">
+              <%= link_to "create", "/", :onclick => "createWhitelistBlacklist('#{FavouriteGroup::BLACKLIST_NAME}'); return(false);" -%>
+            </span>
+          <% end -%>
+          ]</span>
+        <%= image_tag icon_filename_for_key("spinner"), :id => "#{FavouriteGroup::BLACKLIST_NAME}_creation_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle;" -%>
+      </p>
+      <div style="display: none;">
+  <%# this DIV is to hold the 'redbox' links generated by a method in application_helper, -%>
+  <%# these will be "clicked" by javascript, because hidden divs that are present in the -%>
+  <%# generated code causes IE to break layout by inserting extra line break otherwise -%>
+        <div id="<%= FavouriteGroup::WHITELIST_NAME -%>_redbox_link_div">
+          <%= whitelist_blacklist_edit_popup_link(FavouriteGroup::WHITELIST_NAME) -%>
+        </div>
+        <div id="<%= FavouriteGroup::BLACKLIST_NAME -%>_redbox_link_div">
+          <%= whitelist_blacklist_edit_popup_link(FavouriteGroup::BLACKLIST_NAME) -%>
+        </div>
+      </div>    
+    <% end -%>
+      
   </div>
 </div>
 
@@ -391,8 +392,8 @@
       <% allow_removal=true -%>
       <% if p.contributor_type == "Person" -%>
         <%
-          contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
-          allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
+        contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
+        allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
         -%>
       <% elsif p.contributor_type == "WorkGroup" -%>
         <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
