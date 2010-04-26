@@ -1,7 +1,7 @@
 class AssayAsset < ActiveRecord::Base
   
   belongs_to :asset
-  belongs_to :assay,:touch=>true
+  belongs_to :assay
 
   named_scope :sops,:joins=>:asset,:conditions=>['assets.resource_type = ?','Sop']
   named_scope :data_files,:joins=>:asset,:conditions=>['assets.resource_type = ?','DataFile']

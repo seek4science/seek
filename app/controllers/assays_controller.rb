@@ -102,6 +102,9 @@ class AssaysController < ApplicationController
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id,strain,culture_growth)
         end        
+        #FIXME: required to update timestamp. :touch=>true on AssayAsset association breaks acts_as_trashable
+        @assay.updated_at=Time.now
+        @assay.save!
         flash[:notice] = 'Assay was successfully updated.'
         format.html { redirect_to(@assay) }
         format.xml  { head :ok }
