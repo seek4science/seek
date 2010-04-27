@@ -10,17 +10,20 @@
 
   <% if @organism.concept -%>
     <h2>Details about this organism</h2>
-    <%= render :partial=>"layouts/bioportal_concept_details",:locals=>{:concept=>@organism.concept} -%>
+    <%= render :partial=>"bioportal_concept_details",:locals=>{:concept=>@organism.concept} -%>
+    <br/>
     <%= link_to "Visualise ontology term",visualise_organism_path(@organism),:popup=>true %> | <%= link_to_ncbi_taxonomy_browser @organism,"NCBI taxonomy browser",:popup=>true %>
   <% end -%>
 
   <h2>Strains</h2>
+  
   <ul class="horiz_list_items">
     <% @organism.strains.each do |strain| -%>
       <li>
         <%= h(strain.title) -%>
       </li>
-    <% end -%>
+    <% end -%>    
   </ul>
-  <%= render :partial=>"layouts/items_related_to",:object => @organism %>
+
+<%= render :partial=>"layouts/items_related_to",:object => @organism %>
 </div>

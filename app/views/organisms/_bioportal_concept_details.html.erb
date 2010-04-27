@@ -1,0 +1,9 @@
+<% unless concept[:synonyms].empty? -%>
+  <b>Synonyms (<%= concept[:synonyms].count -%>) </b>
+  <p><%= concept[:synonyms].join(", ") %></p>
+<% end -%>
+<% unless concept[:definitions].empty? -%>
+  <b>Definitions (<%= concept[:definitions].count -%>) </b>
+  <p><%= concept[:definitions].join(", ") %></p>
+<% end -%>
+
