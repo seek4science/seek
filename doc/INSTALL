@@ -1,5 +1,9 @@
 = Installation
 
+SysMO-SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
+SysMO-SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
+at http://rubyonrails.org/documentation.
+
 We recommend that you run SysMO-SEEK on a Linux system. All of the examples here describe installing on an Ubuntu or Debian system, but should be easily transferrable to other Linux systems such as Fedora.
 
 Although possible, installing and running Ruby on Rails on a Windows system is troublesome and is not covered here.
@@ -8,44 +12,53 @@ Although possible, installing and running Ruby on Rails on a Windows system is t
 
 We recommend you use ruby, version 1.8.7.
 
-MySQL server needs to be installed installed, along the development package (required to compile the MySQL rubygem). We use the Ubuntu/Debian packages _mysql-server_ and _libmysqlclient15-dev_
+MySQL server needs to be installed installed, along the development package (required to compile the MySQL rubygem). We use the Ubuntu/Debian packages <em>mysql-server</em> and <em>libmysqlclient15-dev</em>
 
-The ImageMagick libraries need to be installed, as these are required by the rmagic gem. We use the The Ubuntu/Debian package _libmagick++9-dev_
+The ImageMagick libraries need to be installed, as these are required by the rmagic gem. We use the The Ubuntu/Debian package <em>libmagick++9-dev</em>
 
-You will need a minimal build environment, as some of the ruby gems require compilation. The Ubuntu/Debian package _build-essentials_ should be sufficient
+You will need a minimal build environment, as some of the ruby gems require compilation. The Ubuntu/Debian package <em>build-essentials</em> should be sufficient
 
-SysMO-SEEK uses Lucene as its search engine, and this requires that java is installed. We use the Sun Java 1.6 package _sun-java6-jdk_
+SysMO-SEEK uses Lucene as its search engine, and this requires that java is installed. We use the Sun Java 1.6 package <em>sun-java6-jdk</em>
 
 If using Ubuntu or Debian, the following commands should install all the packages you need:
 
   sudo apt-get install ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk
 
-You now need to install rubygems (1.3.6). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download
+You now need to install rubygems (1.3.6). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
+The following commands should install rubygems for you on a Ubuntu/Debian system.
+
+  cd /tmp
+  wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.6.tgz
+  tar zfxv rubygems-1.3.6.tgz
+  cd rubygems-1.3.6/
+  sudo ruby ./setup.rb
+  cd /usr/bin/
+  sudo ln -s gem1.8 gem
+  cd -
 
 If using Ubuntu or Debian, the following commands should install all the gems you need:
 
   sudo gem install rails mysql libxml-ruby rmagick spreadsheet hpricot uuidtools fastercsv RedCloth
 
-If using mysql you will need to install the mysql gem (gem install mysql) which requires the mysql dev libraries to be installed.
+== The RAILS_ENV environment variable
 
-- Install the rmagic gem - gem install rmagick. This requires that ImageMagick or an equivalent is installed, along with the development libraries (probably libmagick++9-dev).
-- Copy config/database.default.yml to config/database.yml and edit accordingly
-- rake db:schema:load (preceded by rake db:create:all if the database doesn't already exist)
-- make a copy of the config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb (the default settings shouldn't need changing at this point).
-- rake seek:refresh_controlled_vocabs - this prepopultes the database with a dummy user and a predefined list of tags assigned to them
-- To start, run script/server
+If you are setting up SysMO-SEEK as a production environment, rather than for development, you should set the RAILS_ENV variable before proceeding
 
-if using search
+  export RAILS_ENV=production
 
-- in the config/initializers/seek_local.rb file , set "SOLR_ENABLED=true"
-- make sure the directories "vendor/plugins/acts_as_solr/solr/logs" and "vendor/plugins/acts_as_solr/solr/tmp" exist
-- rake solr:start to start database server
--. rake solr:reindex to reindex any existing data
+== Configuring the database
 
-defining admin users
+Copy config/database.default.yml to config/database.yml and edit accordingly - either MySQL or SQLite3 should work (you will need to install the <em>sqlite3-dev</em> package and the <em>sqlite3-ruby</em> gem)
 
-There is no support for this in the interface.
-You need to:
-- connect to the database using script/console,
-- find the User that you wish to make an admin (note User, not Person, if you know the Person you can do person.user)
-- set the is_admin flag to true. Don't forget to 'user.save!'.
+Run the rake tasks (the final task installs some default controlled vocubulary data)
+
+  rake db:create:all
+  rake db:schema:load
+  rake seek:seek
+
+== A quick test
+
+You can quickly check that everything is in order by running the system tests as follows
+
+  rake db:test:prepare
+  rake test
