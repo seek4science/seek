@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'rake'
+require 'rake/rdoctask'
 
 namespace :doc do
   desc "Generate documentation for key areas of the SEEK API"
