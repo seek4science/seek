@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Apr 27 14:43:53 +0100 2010</td>
+      <td>Tue Apr 27 15:02:48 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -157,6 +157,24 @@ accordingly - either MySQL or SQLite3 should work (you will need to install
 the <em>sqlite3-dev</em> package and the <em>sqlite3-ruby</em> gem)
 </p>
 <p>
+To add users to the MySQL database, first login to the database as an
+administrator (root by default) and issue a GRANT command along the lines
+of the example below (for clarity, this uses a username of
+<em>mysqluser</em> and password <em>mysqlpassword</em>. You are obviously
+recommended to use something different).
+</p>
+<pre>
+    &gt; mysql -uroot -p
+    Enter password:
+    Welcome to the MySQL monitor.  Commands end with ; or \g.
+    Your MySQL connection id is 1522
+    Server version: 5.1.37-1ubuntu5.1 (Ubuntu)
+
+    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+    mysql&gt;GRANT ALL on *.* TO 'mysqluser'@'localhost' IDENTIFIED BY 'mysqluser'
+</pre>
+<p>
 Run the rake tasks (the final task installs some default controlled
 vocubulary data)
 </p>
@@ -165,7 +183,7 @@ vocubulary data)
   rake db:schema:load
   rake seek:seek
 </pre>
-<h2>Quick sanity test</h2>
+<h2>A quick test</h2>
 <p>
 You can quickly check that everything is in order by running the system
 tests as follows
