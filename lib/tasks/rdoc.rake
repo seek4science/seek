@@ -16,7 +16,7 @@ namespace :doc do
     rdoc.rdoc_files.include('doc/CREDITS')
     rdoc.rdoc_files.include('doc/INSTALL')
     #rdoc.rdoc_files.include('app/**/*.rb')
-    
+
     rdoc.rdoc_files.include('lib/jerm/resource.rb')
     rdoc.rdoc_files.include('lib/jerm/harvester.rb')
     rdoc.rdoc_files.include('lib/jerm/populator.rb')

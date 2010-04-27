@@ -60,7 +60,7 @@ namespace :seek do
 
   desc 'refreshed, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains"]
+    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains","graft_new_assay_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute      
     end

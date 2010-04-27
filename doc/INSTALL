@@ -1,6 +1,30 @@
-We recommend you use ruby, version 1.8.7 (though 1.8.6 should still work).
+= Installation
 
-Make sure you have rubygems 1.3.5 installed. This may require downloading from the rubygems site, rather than relying on apt-get or rpm.
+We recommend that you run SysMO-SEEK on a Linux system. All of the examples here describe installing on an Ubuntu or Debian system, but should be easily transferrable to other Linux systems such as Fedora.
+
+Although possible, installing and running Ruby on Rails on a Windows system is troublesome and is not covered here.
+
+== Prerequesites
+
+We recommend you use ruby, version 1.8.7.
+
+MySQL server needs to be installed installed, along the development package (required to compile the MySQL rubygem). We use the Ubuntu/Debian packages _mysql-server_ and _libmysqlclient15-dev_
+
+The ImageMagick libraries need to be installed, as these are required by the rmagic gem. We use the The Ubuntu/Debian package _libmagick++9-dev_
+
+You will need a minimal build environment, as some of the ruby gems require compilation. The Ubuntu/Debian package _build-essentials_ should be sufficient
+
+SysMO-SEEK uses Lucene as its search engine, and this requires that java is installed. We use the Sun Java 1.6 package _sun-java6-jdk_
+
+If using Ubuntu or Debian, the following commands should install all the packages you need:
+
+  sudo apt-get install ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk
+
+You now need to install rubygems (1.3.6). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download
+
+If using Ubuntu or Debian, the following commands should install all the gems you need:
+
+  sudo gem install rails mysql libxml-ruby rmagick spreadsheet hpricot uuidtools fastercsv RedCloth
 
 If using mysql you will need to install the mysql gem (gem install mysql) which requires the mysql dev libraries to be installed.
 
