@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Apr 27 15:02:48 +0100 2010</td>
+      <td>Tue Apr 27 15:55:29 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -172,7 +172,7 @@ recommended to use something different).
 
     Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-    mysql&gt;GRANT ALL on *.* TO 'mysqluser'@'localhost' IDENTIFIED BY 'mysqluser'
+    mysql&gt; GRANT ALL on *.* TO 'mysqluser'@'localhost' IDENTIFIED BY 'mysqluser'
 </pre>
 <p>
 Run the rake tasks (the final task installs some default controlled
@@ -192,6 +192,74 @@ tests as follows
   rake db:test:prepare
   rake test
 </pre>
+<h2>Starting the server</h2>
+<p>
+You can now start the server with the command
+</p>
+<pre>
+  ./script/server
+</pre>
+<p>
+If running in production mode, you should start the server with
+</p>
+<pre>
+  ./script/server -e production
+</pre>
+<h2>Creating the Admin user</h2>
+<p>
+Once the server is running you should visit the page <a
+href="http://localhost:3000">localhost:3000</a>
+</p>
+<p>
+If there are no users present in the system (and there should not be) you
+will be requested to provide login details, and some basic information
+about your profile (you can always come back and modify this).
+</p>
+<p>
+Once created this user will become the admin user of the system.
+</p>
+<h2>Administering the system</h2>
+<p>
+Once logged in as an administrator, you will notice a link on the
+right-hand side of the tabs/search bar &quot;Admin Enabled&quot;. Selecting
+this will provide you with some admin facilities for creating new projects,
+institutions and profiles.
+</p>
+<h2>Enabling search</h2>
+<p>
+By default search is disabled. To override this (and other settings) copy
+the file <em>config/initializers/seek_local.rb.pre</em> to
+<em>config/initializers/seek_local.rb</em>
+</p>
+<pre>
+  cp config/initializers/seek_local.rb.pre config/initializers/seek_local.rb
+</pre>
+<p>
+You should then edit that file, and change the setting SOLR_ENABLED to
+true. You will need to restart your server for this to take effect.
+</p>
+<p>
+You also need to start up the background search service. This is started
+with the command
+</p>
+<pre>
+  rake solr:start
+</pre>
+<p>
+You should reindex the search database, and can do this at anytime, using
+the commmand
+</p>
+<pre>
+  rake solr:reindex
+</pre>
+<h2>Enabling Email</h2>
+<p>
+<b>TODO</b>
+</p>
+<h2>Enabling Activation</h2>
+<p>
+<b>TODO</b>
+</p>
 
     </div>
 

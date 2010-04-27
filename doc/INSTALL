@@ -75,3 +75,50 @@ You can quickly check that everything is in order by running the system tests as
 
   rake db:test:prepare
   rake test
+
+== Starting the server
+
+You can now start the server with the command
+
+  ./script/server
+
+If running in production mode, you should start the server with
+
+  ./script/server -e production
+
+== Creating the Admin user
+
+Once the server is running you should visit the page http://localhost:3000
+
+If there are no users present in the system (and there should not be) you will be requested to provide login details, and some basic information about your profile (you can always come back and modify this).
+
+Once created this user will become the admin user of the system.
+
+== Administering the system
+
+Once logged in as an administrator, you will notice a link on the right-hand side of the tabs/search bar "Admin Enabled". Selecting this will provide you with some
+admin facilities for creating new projects, institutions and profiles.
+
+== Enabling search
+
+By default search is disabled. To override this (and other settings) copy the file <em>config/initializers/seek_local.rb.pre</em> to <em>config/initializers/seek_local.rb</em>
+
+  cp config/initializers/seek_local.rb.pre config/initializers/seek_local.rb
+
+You should then edit that file, and change the setting SOLR_ENABLED to true. You will need to restart your server for this to take effect.
+
+You also need to start up the background search service. This is started with the command
+
+  rake solr:start
+
+You should reindex the search database, and can do this at anytime, using the commmand
+
+  rake solr:reindex
+
+== Enabling Email
+
+<b>TODO</b>
+
+== Enabling Activation
+
+<b>TODO</b>
