@@ -71,8 +71,7 @@ class Project < ActiveRecord::Base
   end
 
   def pals
-    #TODO: look into doing this with a named_scope or direct query
-    people.select{|p| p.is_pal?}
+    people.select{|p| p.is_pal?}.select{|p| p.project_roles(self).collect{|r| r.name}.include?("Sysmo-DB Pal")}
   end
 
   def locations
@@ -154,4 +153,12 @@ class Project < ActiveRecord::Base
   def publications
     assets.collect{|a| a.resource if a.resource_type == "Publication"}
   end
+  
+  def person_roles(person)
+    #Get intersection of all project memberships + person's memberships to find project membership
+    project_memberships = work_groups.collect{|w| w.group_memberships}.flatten
+    person_project_membership = person.group_memberships & project_memberships
+    return person_project_membership.roles
+  end 
+  
 end

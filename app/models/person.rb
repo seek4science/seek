@@ -173,5 +173,10 @@ class Person < ActiveRecord::Base
     #first_letter = "Other" unless ("A".."Z").to_a.include?(first_letter)
     self.first_letter=first_letter
   end
-  
+
+  def project_roles(project)
+    #Get intersection of all project memberships + person's memberships to find project membership
+    memberships = group_memberships.select{|g| g.work_group.project == project}
+    return memberships.collect{|m| m.roles}.flatten
+  end 
 end
