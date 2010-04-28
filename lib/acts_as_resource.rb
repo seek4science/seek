@@ -118,6 +118,7 @@ module Mib
               self.content_blob.data=data_hash[:data]
               self.content_type=data_hash[:content_type]
               self.content_blob.save
+              self.save              
             rescue Exception=>e
               puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
             end
