@@ -90,7 +90,8 @@ If running in production mode, you should start the server with
 
 Once the server is running you should visit the page http://localhost:3000
 
-If there are no users present in the system (and there should not be) you will be requested to provide login details, and some basic information about your profile (you can always come back and modify this).
+If there are no users present in the system (and there should not be at this stage) you will be requested to provide login details, and some basic information about your profile
+(you can always come back and modify the profile information and your password. You cannot modify your login name).
 
 Once created this user will become the admin user of the system.
 
