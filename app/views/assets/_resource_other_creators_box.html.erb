@@ -1,0 +1,13 @@
+<div class="contribution_section_box" style="padding: 0.5em 0 1em 0;">
+  <p class="heading">
+    <%= help_icon("Non-SEEK members who helped with the creation of this file.") -%>
+    Other Creators
+    <a name="authors"></a>
+    <% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
+      <p style="text-align:center; margin: 0; padding: 0;"><small>[ <%= link_to "edit", edit_polymorphic_path(resource) %> ]</small></p>
+    <% end %>
+  </p>
+  <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
+    <%= resource.other_creators%>
+  </div>
+</div>
