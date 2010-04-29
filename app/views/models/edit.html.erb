@@ -78,7 +78,8 @@
       
       <p style="margin: 0;">
         <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-          :existing_creators => @model.asset.creators} -%>
+          :existing_creators => @model.asset.creators,
+          :other_creators => @model.other_creators} -%>
       </p>
     <% end -%>
 
