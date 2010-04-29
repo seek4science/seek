@@ -18,15 +18,14 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   def test_index_not_logged_in
-    get :index
-    assert_response :redirect
-    assert_redirect_to :login
+    get :new
+    assert_response :success
 
     User.destroy_all #remove all users
     assert 0,User.count
-    get :index
+    get :new
     assert_response :redirect
-    assert_redirect_to :signup
+    assert_redirected_to signup_url
 
   end
 

@@ -8,7 +8,7 @@ class HomeControllerTest < ActionController::TestCase
   def test_redirected_to_login_if_not_logged_in
     get :index
     assert_response :redirect
-    assert_redirect_to :login
+    assert_redirected_to :controller => 'sessions', :action => 'new'
   end
 
   def test_title
