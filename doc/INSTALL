@@ -2,7 +2,7 @@
 
 SysMO-SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SysMO-SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
-at http://rubyonrails.org/documentation.
+at http://rubyonrails.org/documentation and there are some good guides at http://guides.rubyonrails.org/.
 
 We recommend that you run SysMO-SEEK on a Linux system. All of the examples here describe installing on an Ubuntu or Debian system, but should be easily transferrable to other Linux systems such as Fedora.
 
