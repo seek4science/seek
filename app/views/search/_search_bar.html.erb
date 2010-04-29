@@ -5,7 +5,7 @@
   <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
 <% end -%>
 
-<% if logged_in? && current_user.is_admin? -%>
+<% if logged_in? && current_user.is_admin? && current_user.person -%>
   <%= image_tag_for_key "admin", admin_path, "Admin enabled", {:id=>"adminmode"}, "Admin enabled" -%>
 <% end -%>
 
