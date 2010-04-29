@@ -12,7 +12,8 @@
     <p>
       Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br/>
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.
-    </p>  
+    </p>
+    <div id="publication_error" class="error_div" style="display:none"></div>  
     <p>
       <%= select_tag("protocol", options_for_select([["PubMed ID","pubmed"],["DOI","doi"]])) %>
       <%= text_field_tag("key") %>
@@ -20,6 +21,5 @@
       <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
     </p>    
   <% end %>
-  <div id="publication_error" class="error_div" style="display:none"></div>
   <div id="publication_preview" class="list_item" style="display:none"></div>
 </div>
