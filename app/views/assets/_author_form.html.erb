@@ -21,7 +21,7 @@
 
   <div id="creator_fold_content" class="foldContent" style="display: block;">
 
-    <p style="font-weight: bold; margin-top: 1.5em;">
+    <p style="font-weight: bold; margin-top: 0.5em;">
       If this <%= resource_type %> was created by, or together with, other SysMO members, please list their names below
     </p>
 
@@ -31,8 +31,7 @@
       </p>
       <p id="creators_list" class="box_editing_inner" style="line-height: 1.5;">
         <span class="none_text" id="creators_text">Loading...</span>
-      </p>
-      
+      </p>      
       <p style="margin-top: 1em;">
         Please type creators into the box below - suggestions will be displayed as you type.
         Select creators that you want to include and click "Add" to add them to the list.
@@ -78,7 +77,13 @@
       </script>
 
     </div>
-
+    <br/>
+    <div>
+      <p style="font-weight: bold; margin-top: 0.5em;">
+        If anyone not registered with SEEK assisted with the creation of this <%= resource_type %>, you can specify them below.</b>
+      </p>
+      <%= text_field_tag resource_type.underscore+"[other_creators]", other_creators, :size=>100 %>
+    </div>
   </div>
 </div>
 

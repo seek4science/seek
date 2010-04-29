@@ -250,7 +250,7 @@ class PublicationsController < ApplicationController
     doi = @publication.doi
     if pubmed_id
       query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
-      results = query.fetch([pubmed_id])
+      results = query.fetch(pubmed_id)
       unless results.empty?
         result = results.first
       end
@@ -300,7 +300,7 @@ class PublicationsController < ApplicationController
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
       query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
-      results = query.fetch([pubmed_id])
+      results = query.fetch(pubmed_id)
       result = nil
       unless results.empty?
         result = results.first
