@@ -26,7 +26,6 @@ class SessionsControllerTest < ActionController::TestCase
     get :new
     assert_response :redirect
     assert_redirected_to signup_url
-
   end
 
   def test_title
