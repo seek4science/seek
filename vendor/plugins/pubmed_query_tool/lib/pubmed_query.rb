@@ -12,18 +12,40 @@ class PubmedQuery
     self.email = e      
   end
   
-  #Takes either an ID, or array of IDs and retrieves the PubMed articles for each one
-  def fetch(ids, params = {})
-    params[:db] = "pubmed" unless params[:db] 
-    params[:retmode] = "xml"
-    params[:id] = (ids.class == Array ? ids.join(",") : ids) unless params[:id]
-    params[:tool] = self.tool unless params[:tool]
-    params[:email] = self.email unless params[:tool]
-    url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
+  #Takes an ID and retrieves the PubMed article for it.
+  def fetch(id, params = {})
+    begin
+      params[:db] = "pubmed" unless params[:db] 
+      params[:retmode] = "xml"
+      params[:id] = id unless params[:id]
+      params[:tool] = self.tool unless params[:tool]
+      params[:email] = self.email unless params[:tool]
+      url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
+  
+      doc = query(url)  
+      
+      return parse_articles(doc)
+    rescue
+      raise
+    end
+  end
 
-    doc = query(url)  
-    
-    return parse_articles(doc)
+  #Takes an array of IDs and retrieves the PubMed articles for each one
+  def fetch_many(ids, params = {})
+    begin
+      params[:db] = "pubmed" unless params[:db] 
+      params[:retmode] = "xml"
+      params[:id] = ids.join(",") unless params[:id]
+      params[:tool] = self.tool unless params[:tool]
+      params[:email] = self.email unless params[:tool]
+      url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
+  
+      doc = query(url)  
+      
+      return parse_articles(doc)
+    rescue
+      raise
+    end
   end
 
   #Searches pubmed and retrieves a list of pubmed IDs
@@ -82,48 +104,62 @@ class PubmedQuery
   #Takes an XML document containing a <PubmedArticleSet>, converts the contents into an array of PubmedRecord objects
   #and returns them
   def parse_articles(doc)
-    records = []
-    
-    articles = doc.find("//PubmedArticle")    
-    articles.each do |article|          
-      params = {}
+    begin
+      records = []
       
-      params[:doc] = article
-      
-      title = article.find_first('.//ArticleTitle')
-      params[:title] = title.nil? ? nil : title.content
-      
-      abstract = article.find_first('.//Abstract/AbstractText')
-      params[:abstract] = abstract.nil? ? nil : abstract.content
-      
-      params[:authors] = []
-      article.find('.//AuthorList/Author').each do |author|
-        if author["ValidYN"] == "Y"
-          last = author.find_first(".//LastName").content
-          first = author.find_first(".//ForeName").content
-          init = author.find_first(".//Initials").content
-          params[:authors] << PubmedAuthor.new(first, last, init)
+      articles = doc.find("//PubmedArticle")    
+      articles.each do |article|          
+        params = {}
+        
+        params[:doc] = article
+        
+        title = article.find_first('.//ArticleTitle')
+        params[:title] = title.nil? ? nil : title.content
+        
+        abstract = article.find_first('.//Abstract/AbstractText')
+        params[:abstract] = abstract.nil? ? nil : abstract.content
+        
+        params[:authors] = []
+        article.find('.//AuthorList/Author').each do |author|
+          if author["ValidYN"] == "Y"
+            last = author.find_first(".//LastName").content
+            first = author.find_first(".//ForeName").content
+            init = author.find_first(".//Initials").content
+            params[:authors] << PubmedAuthor.new(first, last, init)
+          end
         end
-      end
-      
-      params[:pubmed_pub_date] = parse_date(article.find_first('.//PubMedPubDate'))
-      
-      journal = article.find_first('.//Journal/ISOAbbreviation')
-      params[:journal] = journal.nil? ? nil : journal.content
-      
-      params[:pmid] = article.find_first('.//PMID').content
-      
-      records << PubmedRecord.new(params)
-    end    
-    return records
+        
+        params[:pubmed_pub_date] = parse_date(article.find_first('.//PubMedPubDate'))
+        
+        journal = article.find_first('.//Journal/ISOAbbreviation')
+        params[:journal] = journal.nil? ? nil : journal.content
+        
+        params[:pmid] = article.find_first('.//PMID').content
+        
+        records << PubmedRecord.new(params)
+      end    
+      return records
+    rescue
+      raise "Error occurred whilst extracting metadata"
+    end
   end
   
   private
   
   def query(url)
-    doc = open(url)
-    doc = XML::Parser.io(doc).parse
-    return doc
+    doc = nil
+    begin
+      doc = open(url)
+    rescue
+      raise "Couldn't connect to PubMed API"
+    else
+      begin
+        doc = XML::Parser.io(doc).parse
+        return doc
+      rescue
+        raise "Error occurred whilst parsing XML"
+      end
+    end
   end
   
   def parse_date(xml_date)
