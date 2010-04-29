@@ -254,6 +254,7 @@ asset_for_publication_one:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+  project: sysmo_project
 
 asset_for_publication_two:
   project: sysmo_project
@@ -262,6 +263,7 @@ asset_for_publication_two:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
   last_used_at: <%= 1.days.ago.to_s :db %>
+  project: sysmo_project
   
 asset_for_taverna_publication:
   project: sysmo_project
@@ -269,4 +271,5 @@ asset_for_taverna_publication:
   policy: sysmo_member_edit
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
-  last_used_at: <%= 1.days.ago.to_s :db %>  
+  last_used_at: <%= 1.days.ago.to_s :db %>
+  project: sysmo_project

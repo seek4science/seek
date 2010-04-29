@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
   
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :taggings, :tags
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :taggings, :tags, :publications, :assets
   
   #checks that the dependent work_groups are destoryed when the project s
   def test_delete_work_groups_when_project_deleted
@@ -17,6 +17,16 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal n_wg-1,WorkGroup.find(:all).size
     wg=WorkGroup.find(:all).first
     assert_same 1,wg.project_id
+  end
+
+  def test_publications
+    project=projects(:sysmo_project)
+
+    assert_equal 3,project.publications.count
+    
+    assert project.publications.include?(publications(:one))
+    assert project.publications.include?(publications(:two))
+    assert project.publications.include?(publications(:taverna_paper_pubmed))
   end
 
   def test_title_alias_for_name

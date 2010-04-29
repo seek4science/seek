@@ -152,6 +152,6 @@ class Project < ActiveRecord::Base
   end
   
   def publications
-    assets.collect{|a| a.resource if a.resource_type == "Publication"}
+    assets.collect{|a| a.resource if a.resource_type == "Publication"}.compact
   end
 end
