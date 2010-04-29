@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   
-  before_filter :login_required
+  before_filter :login_required  
   
   layout :select_layout
   
@@ -57,8 +57,7 @@ class HomeController < ApplicationController
 
   RECENT_SIZE=3
 
-  
-
+ 
 
   def classify_for_tabs result_collection
     #FIXME: this is duplicated in application_helper - but of course you can't call that from within controller

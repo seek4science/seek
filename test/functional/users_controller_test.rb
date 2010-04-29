@@ -22,6 +22,17 @@ class UsersControllerTest < ActionController::TestCase
     assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
   end
 
+  def test_system_messge_on_signup_no_users
+    get :new
+    assert_response :success
+    assert_select "p.system_message",:count=>0
+
+    User.destroy_all
+    get :new
+    assert_response :success
+    assert_select "p.system_message",:count=>1
+  end
+
   def test_should_allow_signup
     assert_difference 'User.count' do
       create_user
@@ -51,6 +62,20 @@ class UsersControllerTest < ActionController::TestCase
       assert assigns(:user).errors.on(:password_confirmation)
       assert_response :success
     end
+  end
+
+  def test_create_first_user_as_admin
+    assert_difference 'User.count' do
+      create_user
+      assert !assigns(:user).is_admin?
+    end
+
+    User.destroy_all
+    assert_difference 'User.count' do
+      create_user
+      assert assigns(:user).is_admin?
+    end
+    
   end
 
   def test_should_not_require_email_on_signup

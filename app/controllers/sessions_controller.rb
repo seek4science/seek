@@ -1,7 +1,9 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
  
-  layout 'logged_out'  
+  layout 'logged_out'
+
+  before_filter :signup_admin_if_not_users,:only=>:new
   
   # render new.rhtml
   def new
@@ -64,6 +66,14 @@ class SessionsController < ApplicationController
     reset_session
     flash[:notice] = "You have been logged out."
     redirect_back_or_default('/')
+  end
+
+
+  private
+
+  #will initiate creating an initial admin user if no users are present
+  def signup_admin_if_not_users    
+    redirect_to :signup if User.count==0
   end
   
 end

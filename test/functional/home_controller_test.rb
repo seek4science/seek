@@ -4,16 +4,21 @@ class HomeControllerTest < ActionController::TestCase
   fixtures :people, :users
 
   include AuthenticatedTestHelper
-  def setup
-    login_as(:quentin)
+
+  def test_redirected_to_login_if_not_logged_in
+    get :index
+    assert_response :redirect
+    assert_redirect_to :login
   end
 
   def test_title
+    login_as(:quentin)
     get :index
     assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
   end
 
   test "should get feedback form" do
+    login_as(:quentin)
     get :feedback
     assert_response :success
   end  

@@ -1027,3 +1027,9 @@ div#existing_strains {
 .assay_item_sup_info {
     color: #1465FF;
 }
+
+.system_message {
+    border-color: red;
+    text-align: center;
+    font-size: larger;    
+}
