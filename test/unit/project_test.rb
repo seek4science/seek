@@ -22,9 +22,8 @@ class ProjectTest < ActiveSupport::TestCase
   def test_publications
     project=projects(:sysmo_project)
 
-    assert_equal 3,project.publications.count
+    assert_equal 2,project.publications.count
     
-    assert project.publications.include?(publications(:one))
     assert project.publications.include?(publications(:two))
     assert project.publications.include?(publications(:taverna_paper_pubmed))
   end
