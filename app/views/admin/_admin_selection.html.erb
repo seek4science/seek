@@ -4,7 +4,7 @@ admins = registered_people.select{|p| p.is_admin?}
 %>
 <div class="fold">
   <div class="foldTitle">Adminstrators</div>
-  <div class="foldContent" style="display:nsone;">
+  <div class="foldContent" style="display:none;">
     <% form_tag :action=>"update_admins" do -%>
       <%= render :partial => "link_selector", :locals => {
         :resource_id => "admins",
@@ -15,7 +15,7 @@ admins = registered_people.select{|p| p.is_admin?}
         :authorization_for_showing_already_done => true } -%>
       <br style="clear:both;"/>
       <br/>
-      <div style="width:100%;text-align:right;padding-right:4em;">
+      <div style="width:100%;text-align:center;padding-right:4em;">
         <%= submit_tag "Submit" %>
       </div>
     <% end -%>
