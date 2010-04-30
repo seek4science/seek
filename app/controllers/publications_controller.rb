@@ -250,10 +250,7 @@ class PublicationsController < ApplicationController
     doi = @publication.doi
     if pubmed_id
       query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
-      results = query.fetch(pubmed_id)
-      unless results.empty?
-        result = results.first
-      end
+      result = query.fetch(pubmed_id)      
     elsif doi
       query = DoiQuery.new(ADMIN_EMAIL)
       result = query.fetch(doi)
@@ -300,11 +297,9 @@ class PublicationsController < ApplicationController
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
       query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
-      results = query.fetch(pubmed_id)
-      result = nil
-      unless results.empty?
-        result = results.first
-        publication.extract_pubmed_metadata(result) unless result.nil?
+      result = query.fetch(pubmed_id)
+      unless result.nil?
+        publication.extract_pubmed_metadata(result)
         return result
       else
         raise "Error - No publication could be found with that PubMed ID"

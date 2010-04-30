@@ -24,7 +24,7 @@ class PubmedQuery
   
       doc = query(url)  
       
-      return parse_articles(doc)
+      return parse_article(doc.find_first("//PubmedArticle"))
     rescue
       raise
     end
@@ -109,36 +109,45 @@ class PubmedQuery
       
       articles = doc.find("//PubmedArticle")    
       articles.each do |article|          
-        params = {}
-        
-        params[:doc] = article
-        
-        title = article.find_first('.//ArticleTitle')
-        params[:title] = title.nil? ? nil : title.content
-        
-        abstract = article.find_first('.//Abstract/AbstractText')
-        params[:abstract] = abstract.nil? ? nil : abstract.content
-        
-        params[:authors] = []
-        article.find('.//AuthorList/Author').each do |author|
-          if author["ValidYN"] == "Y"
-            last = author.find_first(".//LastName").content
-            first = author.find_first(".//ForeName").content
-            init = author.find_first(".//Initials").content
-            params[:authors] << PubmedAuthor.new(first, last, init)
-          end
-        end
-        
-        params[:pubmed_pub_date] = parse_date(article.find_first('.//PubMedPubDate'))
-        
-        journal = article.find_first('.//Journal/ISOAbbreviation')
-        params[:journal] = journal.nil? ? nil : journal.content
-        
-        params[:pmid] = article.find_first('.//PMID').content
-        
-        records << PubmedRecord.new(params)
+        records << parse_article(article)
       end    
       return records
+    rescue
+      raise
+    end
+  end
+  
+  #Takes a <PubmedArticle> XML block and converts the contents into a PubmedRecord object
+  def parse_article(article)
+    begin
+      params = {}
+      
+      params[:doc] = article
+      
+      title = article.find_first('.//ArticleTitle')
+      params[:title] = title.nil? ? nil : title.content
+      
+      abstract = article.find_first('.//Abstract/AbstractText')
+      params[:abstract] = abstract.nil? ? nil : abstract.content
+      
+      params[:authors] = []
+      article.find('.//AuthorList/Author').each do |author|
+        if author["ValidYN"] == "Y"
+          last = author.find_first(".//LastName").content
+          first = author.find_first(".//ForeName").content
+          init = author.find_first(".//Initials").content
+          params[:authors] << PubmedAuthor.new(first, last, init)
+        end
+      end
+      
+      params[:pubmed_pub_date] = parse_date(article.find_first('.//PubMedPubDate'))
+      
+      journal = article.find_first('.//Journal/ISOAbbreviation')
+      params[:journal] = journal.nil? ? nil : journal.content
+      
+      params[:pmid] = article.find_first('.//PMID').content
+ 
+      return PubmedRecord.new(params)
     rescue
       raise "Error occurred whilst extracting metadata"
     end
