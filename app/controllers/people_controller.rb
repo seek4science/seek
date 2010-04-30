@@ -78,8 +78,9 @@ class PeopleController < ApplicationController
 
   # GET /people/1/edit
   def edit
-    @tags_tools = Person.tool_counts.sort{|a,b| a.total<=>b.total}[0..9].sort{|a,b| a.name<=>b.name}
-    @tags_expertise = Person.expertise_counts.sort{|a,b| a.total<=>b.total}[0..9].sort{|a,b| a.name<=>b.name}
+    recommended_tag_limit = 30
+    @tags_tools = Person.tool_counts.sort{|a,b| b.total<=>a.total}[0...recommended_tag_limit].sort{|a,b| a.name<=>b.name}
+    @tags_expertise = Person.expertise_counts.sort{|a,b| b.total<=>a.total}[0...recommended_tag_limit].sort{|a,b| a.name<=>b.name}
 
     @person = Person.find(params[:id])
     

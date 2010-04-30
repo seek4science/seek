@@ -15,7 +15,7 @@ module ApplicationHelper
     max_count = tags.sort_by(&:total).last.total.to_f
 
     tags.each do |tag|
-      index = ((tag.total / max_count) * (classes.size - 1)).round
+      index = ((tag.total+1 / max_count+1) * (classes.size - 1)).round
       yield tag, classes[index]
     end
   end
