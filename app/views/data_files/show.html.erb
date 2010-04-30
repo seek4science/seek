@@ -52,7 +52,7 @@
 
       <p>
         <label>Format:</label>
-        <%=h @display_data_file.content_type -%>
+        <%=h mime_nice_name(@display_data_file.content_type) -%>
       </p>
       <br/>
 
