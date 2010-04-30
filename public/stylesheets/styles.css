@@ -1027,3 +1027,14 @@ div#existing_strains {
 .assay_item_sup_info {
     color: #1465FF;
 }
+
+
+.link_selector_buttons ul {
+    width: 100%;
+    text-align:center;
+    padding-top: 3em;
+}
+
+.link_selector_buttons ul li {
+    list-style: none;
+}
