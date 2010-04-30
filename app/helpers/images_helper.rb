@@ -176,6 +176,18 @@ module ImagesHelper
       "file_icons/small/genericBlue.png"
     when "ppt_file"
       "file_icons/small/ppt.png"
+    when "xml_file"
+      "file_icons/small/xml.png"
+    when "zip_file"
+      "file_icons/small/zip.png"
+    when "jpg_file"
+      "file_icons/small/jpg.png"
+    when "gif_file"
+      "file_icons/small/gif.png"
+    when "png_file"
+      "file_icons/small/png.png"
+    when "txt_file"
+      "file_icons/small/txt.png"
     when "investigation_avatar"
       "crystal_project/64x64/apps/mydocuments.png"
     when "study_avatar"
@@ -314,31 +326,7 @@ module ImagesHelper
   end
 
   def file_type_icon_url(item)
-    url = ""
-    case item.content_type
-      when "application/vnd.ms-excel"
-        url = icon_filename_for_key "xls_file"
-      when "application/vnd.ms-powerpoint"
-        url = icon_filename_for_key "ppt_file"
-      when "application/pdf"
-        url = icon_filename_for_key "pdf_file"
-      when "application/msword"
-        url = icon_filename_for_key "doc_file"
-      else
-        case item.original_filename.split(".").last
-          when "docx","doc"
-            url = icon_filename_for_key "doc_file"
-          when "xls"
-            url = icon_filename_for_key "xls_file"
-          when "ppt"
-            url = icon_filename_for_key "ppt_file"
-          when "pdf"
-            url = icon_filename_for_key "pdf_file"
-          else
-           url = icon_filename_for_key "misc_file"
-        end
-    end
-    return url
+    return mime_icon_url(item.content_type)
   end
 
   def expand_image(margin_left="0.3em")
