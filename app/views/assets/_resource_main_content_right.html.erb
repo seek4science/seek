@@ -2,7 +2,7 @@
 
 <div class="main_content_right_box">
   <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :creators => resource.asset.creators, :truncate_to => truncate_length_for_boxes } -%>
-  <%= render :partial => "assets/resource_other_creators_box", :locals => { :resource => resource} -%>
+  <%= render :partial => "assets/resource_other_creators_box", :locals => { :resource => resource} unless resource.other_creators.blank? -%>
   <%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => resource } -%>
   <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => resource, :attributed_to => Authorization.authorize_collection("show", resource.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
 </div>
