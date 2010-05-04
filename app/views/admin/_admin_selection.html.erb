@@ -1,0 +1,23 @@
+<%
+registered_people = Person.registered.sort_by{|p| p.last_name}
+admins = registered_people.select{|p| p.is_admin?}
+%>
+<div class="fold">
+  <div class="foldTitle">Adminstrators</div>
+  <div class="foldContent" style="display:none;">
+    <% form_tag :action=>"update_admins" do -%>
+      <%= render :partial => "link_selector", :locals => {
+        :resource_id => "admins",
+        :resource_type => "People",
+        :right_resource_type=>"Administrators",
+        :left_collection=>registered_people,
+        :right_collection=>admins,
+        :authorization_for_showing_already_done => true } -%>
+      <br style="clear:both;"/>
+      <br/>
+      <div style="width:100%;text-align:center;padding-right:4em;">
+        <%= submit_tag "Submit" %>
+      </div>
+    <% end -%>
+  </div>
+</div>

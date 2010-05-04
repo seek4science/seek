@@ -8,6 +8,23 @@ class AdminController < ApplicationController
     end
   end
 
+  def update_admins
+    admin_ids = params[:admins]
+    current_admins = Person.registered.select{|p| p.is_admin?}
+    admins = admin_ids.collect{|id| Person.find(id)}
+    current_admins.each{|ca| ca.user.is_admin=false}
+    admins.each{|a| a.user.is_admin=true}
+    (admins | current_admins).each do |admin|
+      class << admin.user
+        def record_timestamps
+          false
+        end
+      end
+      admin.user.save
+    end
+    redirect_to :action=>:show
+  end
+  
   def tags
     @tags=Tag.find(:all,:order=>:name)
   end  

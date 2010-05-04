@@ -1,7 +1,6 @@
 <h1> Administration <span style="font-size:smaller;"><%= "(v.#{APP_VERSION.to_s})" -%></span></h1>
 
 
-
 <div style="padding-left:2em;"> 
   <h2>JERM</h2>
   <p>
@@ -22,25 +21,28 @@
     <%= link_to "Create a Project", new_project_path %>
     <br/>
     <%= link_to "Create a Profile", new_person_path %>
-  </p>
+  </p>  
+  
 </div>
 
 <div style="padding-left:2em;">
 
+  <%= render :partial=>"admin_selection" -%>
+
   <%= render :partial=>"stats" -%>
 
-  <%= render :partial=>"users_details", :locals=>{:people=>Person.pals, :title=>"Official Sysmo PALS" } -%>
+  <%#= render :partial=>"users_details", :locals=>{:people=>Person.pals, :title=>"Official Sysmo PALS" } -%>
 
-  <%= render :partial=>"users_details", :locals=>{:people=>pal_mismatchces, :title=>"PAL Mismatches (where PAL flag doesn't match role)" } -%>
+  <%#= render :partial=>"users_details", :locals=>{:people=>pal_mismatchces, :title=>"PAL Mismatches (where PAL flag doesn't match role)" } -%>
 
-  <%= render :partial=>"users_details", :locals=>{:users=>Person.duplicates, :title=>"Duplicate profiles" } -%>
+  <%#= render :partial=>"users_details", :locals=>{:users=>Person.duplicates, :title=>"Duplicate profiles" } -%>
 
-  <%= render :partial=>"users_details", :locals=>{:users=>User.without_profile, :title=>"Users without profiles" } -%>
+  <%#= render :partial=>"users_details", :locals=>{:users=>User.without_profile, :title=>"Users without profiles" } -%>
 
-  <%= render :partial=>"users_details", :locals=>{:users=>User.not_activated, :title=>"Non activated users" } -%>
+  <%#= render :partial=>"users_details", :locals=>{:users=>User.not_activated, :title=>"Non activated users" } -%>
 
-  <%= render :partial=>"users_details", :locals=>{:users=>Person.without_group.registered, :title=>"People not in groups" } -%>
+  <%#= render :partial=>"users_details", :locals=>{:users=>Person.without_group.registered, :title=>"People not in groups" } -%>
 
-  <%= render :partial=>"users_details", :locals=>{:users=>User.admins, :title=>"Admin Users" } -%>
+  <%#= render :partial=>"users_details", :locals=>{:users=>User.admins, :title=>"Admin Users" } -%>
 
 </div>
