@@ -1,6 +1,6 @@
 <%
 creators = resource.asset.creators
-creators << resource.contributor.try(:person) unless (resource.class == Publication)
+(creators = creators + [resource.contributor.try(:person)]) unless (resource.class == Publication)
 creators = creators.compact.uniq
 creators_sorted_by_avatar = creators.sort_by{|p| p.avatar_id.nil? ? 1 : 0}
 %>
