@@ -125,7 +125,7 @@ You should reindex the search database, and can do this at anytime, using the co
 
   rake solr:reindex
 
-== Contacting us and other users ==
+== Contacting us and other users
 
 There is a public Google Group available for Sysmo-SEEK at http://groups.google.com/group/sysmo-seek
 
