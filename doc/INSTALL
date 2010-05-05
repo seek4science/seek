@@ -67,7 +67,7 @@ Run the rake tasks (the final task installs some default controlled vocubulary d
 
   rake db:create:all
   rake db:schema:load
-  rake seek:seek
+  rake seek:seed
 
 == A quick test
 
