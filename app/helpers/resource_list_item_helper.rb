@@ -14,8 +14,13 @@ module ResourceListItemHelper
   end
   
   def get_list_item_avatar_partial resource
-    if ["DataFile","Model","Sop","Publication"].include?(resource.class.name.split("::").first)
+    avatar_partial = ""
+    if ["DataFile","Model","Sop"].include?(resource.class.name.split("::").first)
       avatar_partial = "layouts/asset_resource_avatars"
+    elsif resource.class.name == "Publication"
+      unless resource.asset.creators.empty?
+        avatar_partial = "layouts/asset_resource_avatars"        
+      end
     elsif resource.class.name == "Assay"
       avatar_partial = "assays/resource_avatar"
     else
