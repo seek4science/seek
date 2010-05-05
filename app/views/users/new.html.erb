@@ -17,7 +17,14 @@
       If you have previously provided a login and password but didn't select or create a profile, then your details have already been stored
       and you should <b><%= link_to "login", login_url %></b> to continue the registration process.
     </p>
-    
+
+    <% if User.count == 0 -%>
+      <br/>
+      <p class="box_infotext system_message">
+        There are currently no Users defined in the system. You should now register an initial user.
+        This initial user will become the Administrator of the system.
+      </p>
+    <% end -%>
 
     <% if error_messages_for :user -%>
       <p><%= error_messages_for :user %></p>

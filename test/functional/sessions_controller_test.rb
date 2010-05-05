@@ -17,6 +17,17 @@ class SessionsControllerTest < ActionController::TestCase
     @response   = ActionController::TestResponse.new
   end
 
+  def test_index_not_logged_in
+    get :new
+    assert_response :success
+
+    User.destroy_all #remove all users
+    assert 0,User.count
+    get :new
+    assert_response :redirect
+    assert_redirected_to signup_url
+  end
+
   def test_title
     get :new
     assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1

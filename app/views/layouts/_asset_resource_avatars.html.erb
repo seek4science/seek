@@ -1,10 +1,12 @@
 <%
-creators = (resource.asset.creators + [resource.contributor.try(:person)]).compact.uniq
+creators = resource.asset.creators
+(creators = creators + [resource.contributor.try(:person)]) unless (resource.class == Publication)
+creators = creators.compact.uniq
 creators_sorted_by_avatar = creators.sort_by{|p| p.avatar_id.nil? ? 1 : 0}
 %>
 <div style="text-align: center">
   
-  <% if  !creators.empty? -%>
+  <% unless creators.empty? -%>
     <% if creators.size <= 2 %>
       <% creators.each do |a|  -%>
         <%=  favouritable_icon(a, 60) -%>
@@ -23,9 +25,7 @@ creators_sorted_by_avatar = creators.sort_by{|p| p.avatar_id.nil? ? 1 : 0}
       <a href="#" id="authorAvatarListLink<%= resource.object_id -%>" onclick="toggleAuthorAvatarList(<%= resource.object_id-%>); return false;">(Show All)</a>
     <% end %>
   <% else %>
-    <% if resource.contributor -%>
-      <%= favouritable_icon(resource.contributor.person, 60) -%>
-    <% else %>    
+    <% if !resource.contributor -%>
       <%= the_jerm :size=>30 -%>
     <% end -%>
   <% end %>
