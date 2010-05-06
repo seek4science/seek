@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed May 05 11:51:40 +0100 2010</td>
+      <td>Thu May 06 19:12:13 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -117,7 +117,13 @@ If using Ubuntu or Debian, the following commands should install all the
 packages you need:
 </p>
 <pre>
-  sudo apt-get install ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk
+  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk
+</pre>
+<p>
+For Ubuntu 10.04 (Lucid Lynx) you should use:
+</p>
+<pre>
+  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev
 </pre>
 <p>
 You now need to install rubygems (1.3.6). Rather than install through
@@ -142,7 +148,7 @@ If using Ubuntu or Debian, the following commands should install all the
 gems you need:
 </p>
 <pre>
-  sudo gem install rails mysql libxml-ruby rmagick spreadsheet hpricot uuidtools fastercsv RedCloth
+  sudo gem install rails mysql libxml-ruby rmagick spreadsheet hpricot uuidtools fastercsv RedCloth mongrel
 </pre>
 <h2>Getting the source code</h2>
 <p>
