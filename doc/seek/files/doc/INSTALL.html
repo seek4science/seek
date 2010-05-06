@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Thu Apr 29 12:00:22 +0100 2010</td>
+      <td>Wed May 05 11:51:40 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -144,6 +144,18 @@ gems you need:
 <pre>
   sudo gem install rails mysql libxml-ruby rmagick spreadsheet hpricot uuidtools fastercsv RedCloth
 </pre>
+<h2>Getting the source code</h2>
+<p>
+Our source code is stored within the <a
+href="http://code.google.com/p/sysmo-db/">Sysmo-DB Google Code
+Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
+as the version control system. For a stable version, you should check out
+according to a stable tag. Our current tag is v0.7.1, so to retrieve this
+version you should use:
+</p>
+<pre>
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.7.1 sysmo-seek
+</pre>
 <h2>The RAILS_ENV environment variable</h2>
 <p>
 If you are setting up SysMO-SEEK as a production environment, rather than
@@ -183,7 +195,7 @@ vocubulary data)
 <pre>
   rake db:create:all
   rake db:schema:load
-  rake seek:seek
+  rake seek:seed
 </pre>
 <h2>A quick test</h2>
 <p>
@@ -228,6 +240,9 @@ right-hand side of the tabs/search bar &quot;Admin Enabled&quot;. Selecting
 this will provide you with some admin facilities for creating new projects,
 institutions and profiles.
 </p>
+<p>
+Here you can also define additional adminstrator users.
+</p>
 <h2>Enabling search</h2>
 <p>
 By default search is disabled. To override this (and other settings) copy
@@ -255,13 +270,10 @@ the commmand
 <pre>
   rake solr:reindex
 </pre>
-<h2>Enabling Email</h2>
+<h2>Contacting us and other users</h2>
 <p>
-<b>TODO</b>
-</p>
-<h2>Enabling Activation</h2>
-<p>
-<b>TODO</b>
+There is a public Google Group available for Sysmo-SEEK at <a
+href="http://groups.google.com/group/sysmo-seek">groups.google.com/group/sysmo-seek</a>
 </p>
 
     </div>

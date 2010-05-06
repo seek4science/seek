@@ -1028,6 +1028,11 @@ div#existing_strains {
     color: #1465FF;
 }
 
+.system_message {
+    border-color: red;
+    text-align: center;
+    font-size: larger;    
+}
 
 .link_selector_buttons ul {
     width: 100%;

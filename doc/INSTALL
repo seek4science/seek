@@ -40,6 +40,13 @@ If using Ubuntu or Debian, the following commands should install all the gems yo
 
   sudo gem install rails mysql libxml-ruby rmagick spreadsheet hpricot uuidtools fastercsv RedCloth
 
+== Getting the source code
+
+Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. For a stable version, you should check out according to a stable tag. Our current tag is v0.7.1, so to retrieve this version you should use:
+
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.7.1 sysmo-seek
+
+
 == The RAILS_ENV environment variable
 
 If you are setting up SysMO-SEEK as a production environment, rather than for development, you should set the RAILS_ENV variable before proceeding
@@ -67,7 +74,7 @@ Run the rake tasks (the final task installs some default controlled vocubulary d
 
   rake db:create:all
   rake db:schema:load
-  rake seek:seek
+  rake seek:seed
 
 == A quick test
 
@@ -100,6 +107,8 @@ Once created this user will become the admin user of the system.
 Once logged in as an administrator, you will notice a link on the right-hand side of the tabs/search bar "Admin Enabled". Selecting this will provide you with some
 admin facilities for creating new projects, institutions and profiles.
 
+Here you can also define additional adminstrator users.
+
 == Enabling search
 
 By default search is disabled. To override this (and other settings) copy the file <em>config/initializers/seek_local.rb.pre</em> to <em>config/initializers/seek_local.rb</em>
@@ -116,10 +125,8 @@ You should reindex the search database, and can do this at anytime, using the co
 
   rake solr:reindex
 
-== Enabling Email
+== Contacting us and other users
 
-<b>TODO</b>
+There is a public Google Group available for Sysmo-SEEK at http://groups.google.com/group/sysmo-seek
 
-== Enabling Activation
 
-<b>TODO</b>
