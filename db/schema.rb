@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100508121631) do
+ActiveRecord::Schema.define(:version => 20100508134222) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -470,7 +470,7 @@ ActiveRecord::Schema.define(:version => 20100508121631) do
     t.integer  "lifespan",                      :default => 0
     t.datetime "expiry_date"
     t.boolean  "show_in_feed",                  :default => true
-    t.boolean  "email_notification",            :default => true
+    t.boolean  "email_notification",            :default => false
   end
 
   create_table "sop_versions", :force => true do |t|

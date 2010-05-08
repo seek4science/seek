@@ -10,7 +10,7 @@ class SiteAnnouncementsMigration < ActiveRecord::Migration
       t.column :lifespan,:integer,:default=>0
       t.column :expiry_date,:datetime
       t.column :show_in_feed,:boolean,:default=>true
-      t.column :email_notification,:boolean,:default=>true
+      t.column :email_notification,:boolean,:default=>false
     end
 
     create_table :site_announcement_categories do |t|

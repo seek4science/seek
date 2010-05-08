@@ -8,4 +8,26 @@ class SiteAnnouncementsController < ApplicationController
     @site_announcement=SiteAnnouncement.new
   end
 
+  def create
+    @site_announcement=SiteAnnouncement.new(params[:site_announcement])
+    respond_to do |format|
+    if @site_announcement.save
+        flash[:notice] = 'The Announcement was successfully announced.'
+        format.html { redirect_to(@site_announcement) }
+        format.xml  { render :xml => @site_announcement, :status => :created, :location => @site_announcement }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @site_announcement.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  def show
+    @site_announcement=SiteAnnouncement.find(params[:id])
+  end
+
+  def index
+    @site_announcements=SiteAnnouncement.find(:all)
+  end
+
 end
