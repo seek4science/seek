@@ -11,11 +11,15 @@ class SiteAnnouncementsMigration < ActiveRecord::Migration
       t.column :expiry_date,:datetime
       t.column :show_in_feed,:boolean,:default=>true
       t.column :email_notification,:boolean,:default=>false
+
+      t.timestamps
     end
 
     create_table :site_announcement_categories do |t|
       t.column :title, :string
       t.column :icon_key,:string
+
+      t.timestamps
     end
   end
   
