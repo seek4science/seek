@@ -75,8 +75,8 @@ class ApplicationController < ActionController::Base
     return true
   end
 
-  def can_create_announcements
-    is_user_admin_auth
+  def can_manage_announcements?
+    return current_user.is_admin?
   end
 
   def logout_user

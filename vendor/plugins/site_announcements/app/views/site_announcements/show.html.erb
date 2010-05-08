@@ -9,6 +9,30 @@
 </p>
 
 <p>
+  <label>Send email</label>
+  <%= @site_announcement.email_notification? %>
+</p>
+
+<p>
+  <label>Show in Feed</label>
+  <%= @site_announcement.show_in_feed? %>
+</p>
+
+<p>
+  <label>Headline</label>
+  <%= @site_announcement.is_headline? %>
+</p>
+
+<% if @site_announcement.is_headline? -%>
+
+  <p>
+    <label>Expires at</label>
+    <%= @site_announcement.expires_at %>
+  </p>
+
+<% end -%>
+
+<p>
   <label>Created at</label>
   <%= @site_announcement.created_at %>
 </p>
@@ -17,3 +41,7 @@
   <label>Updated at</label>
   <%= @site_announcement.created_at %>
 </p>
+
+<% if can_manage_announcements? -%>
+  <%= link_to "Edit",edit_site_announcement_path(@site_announcement) %>
+<% end -%>
