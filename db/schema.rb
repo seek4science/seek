@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100508140150) do
+ActiveRecord::Schema.define(:version => 20100508151704) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -469,8 +469,7 @@ ActiveRecord::Schema.define(:version => 20100508140150) do
     t.text     "body"
     t.integer  "site_announcement_category_id"
     t.boolean  "is_headline",                   :default => false
-    t.integer  "lifespan",                      :default => 0
-    t.datetime "expiry_date"
+    t.datetime "expires_at"
     t.boolean  "show_in_feed",                  :default => true
     t.boolean  "email_notification",            :default => false
     t.datetime "created_at"

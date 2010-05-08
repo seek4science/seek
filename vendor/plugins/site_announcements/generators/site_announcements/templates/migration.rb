@@ -6,9 +6,8 @@ class SiteAnnouncementsMigration < ActiveRecord::Migration
       t.column :title, :string
       t.column :body,:text
       t.column :site_announcement_category_id,:integer
-      t.column :is_headline,:boolean,:default=>false
-      t.column :lifespan,:integer,:default=>0
-      t.column :expiry_date,:datetime
+      t.column :is_headline,:boolean,:default=>false     
+      t.column :expires_at,:datetime
       t.column :show_in_feed,:boolean,:default=>true
       t.column :email_notification,:boolean,:default=>false
 
