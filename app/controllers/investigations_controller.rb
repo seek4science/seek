@@ -70,7 +70,7 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.update_attributes(params[:investigation])
-        flash[:notice] = 'Study was successfully updated.'
+        flash[:notice] = 'Investigation was successfully updated.'
         format.html { redirect_to(@investigation) }
         format.xml  { head :ok }
       else
