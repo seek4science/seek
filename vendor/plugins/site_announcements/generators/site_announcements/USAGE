@@ -1,8 +1,8 @@
 Description:
-    Explain the generator
+    Generates the migration required to use the site_announcements plugin
 
 Example:
-    ./script/generate site_announcements Thing
+    ./script/generate site_announcements_migration
 
     This will create:
-        what/will/it/create
+        the migration for SiteAnnouncement and SiteAnnouncementCategory
