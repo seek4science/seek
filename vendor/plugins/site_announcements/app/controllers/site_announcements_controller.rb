@@ -48,7 +48,7 @@ class SiteAnnouncementsController < ApplicationController
     @site_announcements=SiteAnnouncement.find(:all)
   end
 
-  def check_manage_announcements
+  def check_manage_announcements    
     if !can_manage_announcements?
       flash[:error] = notice
       redirect_to root_url
