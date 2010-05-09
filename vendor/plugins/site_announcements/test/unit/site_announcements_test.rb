@@ -31,6 +31,19 @@ class SiteAnnouncementsTest < ActiveSupport::TestCase
     assert_nil SiteAnnouncement.headline_announcements
   end
 
+  test "new headline comes out top" do
+    hl=SiteAnnouncement.headline_announcements
+    assert_not_nil hl
+    assert_equal "This is a headline and feed announcement",hl.title
+
+    ann=SiteAnnouncement.new(:title=>"brand new",:expires_at=>Time.now + 1.day,:is_headline=>true)
+    ann.save!
+    
+    hl=SiteAnnouncement.headline_announcements
+    assert_not_nil hl
+    assert_equal "brand new",hl.title
+  end
+
   test "feed" do
     list = SiteAnnouncement.feed_announcements
     assert_equal 2,list.size
