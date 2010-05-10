@@ -1,5 +1,5 @@
 <%
-registered_people = Person.registered.sort_by{|p| p.last_name}
+registered_people = Person.registered.sort_by{|p| (p.last_name.nil? ? p.name : p.last_name)}
 admins = registered_people.select{|p| p.is_admin?}
 %>
 <div class="fold">

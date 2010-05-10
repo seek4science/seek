@@ -75,6 +75,10 @@ class ApplicationController < ActionController::Base
     return true
   end
 
+  def can_manage_announcements?
+    return current_user.is_admin?
+  end
+
   def logout_user
     self.current_user.forget_me if logged_in?
     cookies.delete :auth_token

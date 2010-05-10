@@ -759,3 +759,8 @@ table.posts .editing td.body { }
 	font-weight:normal;
 	font-size:0.75em;
 }
+
+.forums .forum_description {
+    margin: 1em 3em 1em 3em;
+    text-align: center;    
+}
