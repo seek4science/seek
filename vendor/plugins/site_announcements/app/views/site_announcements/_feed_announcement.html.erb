@@ -1,0 +1,22 @@
+<%
+full_body=auto_link(simple_format(h(feed_announcement.body)))
+trunc_body=truncate(full_body,:length=>150,:omission=>"")
+show_more_link=full_body.size != trunc_body.size
+%>
+<li class="feed_announcement">  
+  <ul>
+    <li>
+      <span class="feed_announcement_title"><%= h(feed_announcement.title) -%></span> <span class="feed_announcement_date"><%= time_ago_in_words(feed_announcement.created_at)+" ago" -%></span>
+    </li>
+    <li>
+      <span class="feed_announcement_body">
+        <%= trunc_body -%>
+      </span>
+      <% if show_more_link -%>
+        <span class="feed_announcement_link">
+          <%=  link_to("...",feed_announcement) -%>
+        </span>
+      <% end -%>
+    </li>
+  </ul>
+</li>

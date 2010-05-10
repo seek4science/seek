@@ -8,4 +8,9 @@ module SiteAnnouncementsHelper
     return render :partial=>"site_announcements/headline_announcement",:object=>headline
   end
 
+  def site_announcements_feed limit=5
+    announcements = SiteAnnouncement.feed_announcements :limit=>limit
+    return render :partial=>"site_announcements/feed_announcements",:object=>announcements
+  end
+
 end
