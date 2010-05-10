@@ -219,18 +219,18 @@ table.list_item .tags {
 }
 
 span.disabled_icon {
-   width: 100%;
-	padding: 0.5em 0.5em;
-	*padding: 0.2em 0.5em;
-	line-height: 1.0;
-	text-decoration: none;
-	border: 1px solid #BBBBBB;
-	background-color: #FEF6FF;
+    width: 100%;
+    padding: 0.5em 0.5em;
+    *padding: 0.2em 0.5em;
+    line-height: 1.0;
+    text-decoration: none;
+    border: 1px solid #BBBBBB;
+    background-color: #FEF6FF;
     color: #000099;
 }
 
 .disabled {
-	filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );    
+    filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
     opacity: 0.50;    
 }
 
@@ -690,10 +690,10 @@ a#feedback {
     font-weight:bolder;
 }
 
- table.padded_table td {
-      text-align:left;
-      padding: 4px 1em 0px 0px;
-  }
+table.padded_table td {
+    text-align:left;
+    padding: 4px 1em 0px 0px;
+}
 
 #possible_sops {
     width: 24em;    
@@ -710,23 +710,23 @@ img.badge {
 }
 
 #topbar {
-	height: 20px;
-	text-align: center;
-	background-image: url('/images/searchfade-repeat.png');
-	background-repeat: repeat-x;
-	background-position: top center;
-	padding: 10px 0;
+    height: 20px;
+    text-align: center;
+    background-image: url('/images/searchfade-repeat.png');
+    background-repeat: repeat-x;
+    background-position: top center;
+    padding: 10px 0;
 }
 
 #topbar * {
-	vertical-align: middle;
+    vertical-align: middle;
 }
 
 .avatar_text {
-  position: absolute;
-  text-align:center;
-  bottom: 6px;
-  font-size: smaller;  
+    position: absolute;
+    text-align:center;
+    bottom: 6px;
+    font-size: smaller;
 }
 
 #organism_gadget ul {
@@ -759,20 +759,20 @@ div.list_item {
 }
 
 div.list_item_content {
-  width: 75%;
-  float: left;
-  margin-left:1em;
+    width: 75%;
+    float: left;
+    margin-left:1em;
 }
 
 div.list_item_avatar {
-  float: left;
-  width: 11%;
-  text-align: center;
+    float: left;
+    width: 11%;
+    text-align: center;
 }
 
 div.list_item_actions {
-  float: right;
-  width: 80px;
+    float: right;
+    width: 80px;
 }
 
 div.list_item_desc {
@@ -787,36 +787,36 @@ div.list_item_desc {
 }
 
 p.list_item_title {
-  border-bottom:1px dotted black;
-  font-size:131%;
-  font-weight:bold;
-  margin-bottom:0.25em;
-  padding-bottom:0.25em;
+    border-bottom:1px dotted black;
+    font-size:131%;
+    font-weight:bold;
+    margin-bottom:0.25em;
+    padding-bottom:0.25em;
 }
 
 p.list_item_attribute {
-  font-size: 85%;
-  line-height: 1;
+    font-size: 85%;
+    line-height: 1;
 }
 
 div.list_item_left_column{
-  float: left;
-  width: 45%;  
+    float: left;
+    width: 45%;
 }
 
 div.list_item_right_column{
-  float: left;
-  margin-right: 1em;
-  margin-left: 1em;
-  padding-left: 1em;
-  width: 45%;
-  border-left: 1px dotted black;  
+    float: left;
+    margin-right: 1em;
+    margin-left: 1em;
+    padding-left: 1em;
+    width: 45%;
+    border-left: 1px dotted black;
 }
 
 div.list_item_whole_width{
-  float: left;
-  margin-right: 1em;
-  width: 90%;  
+    float: left;
+    margin-right: 1em;
+    width: 90%;
 }
 
 div#logged_in_as {
@@ -838,9 +838,9 @@ div.hidden_list_item {
 }
 
 ul.related_asset_list li{
-  white-space: normal;
-  list-style-type: disc; 
-  list-style-position: inside;
+    white-space: normal;
+    list-style-type: disc;
+    list-style-position: inside;
 }
 
 .contribution_title {
@@ -908,14 +908,14 @@ p.select_assay_class img {
 
 
 div.avatar_list_popup {
-  margin-left:6em;
-  z-index:1;
-  padding:7px;
-  background-color:#EEEEEE;
-  border:1px solid #999999;
-  position:absolute;
-  max-width:420px;
-  text-align:center;
+    margin-left:6em;
+    z-index:1;
+    padding:7px;
+    background-color:#EEEEEE;
+    border:1px solid #999999;
+    position:absolute;
+    max-width:420px;
+    text-align:center;
 }
 
 ul.horiz_list_items li {
@@ -926,49 +926,49 @@ ul.horiz_list_items li {
 /* Begin Footer styles */
 
 #ft {
-	margin: 2em 0;
-	border: 2px solid #999999;
-	border-width: 1px 0 1px 0;
-	color: #333333;
-	background-image: url('/images/footer-bg.png');
-	background-position: top;
-	background-repeat: repeat-x;
-	background-color: #EEEEEE;
+    margin: 2em 0;
+    border: 2px solid #999999;
+    border-width: 1px 0 1px 0;
+    color: #333333;
+    background-image: url('/images/footer-bg.png');
+    background-position: top;
+    background-repeat: repeat-x;
+    background-color: #EEEEEE;
 }
 
 #ft .copyright {
-	text-align: center;
-	font-weight: bold;
-	padding: 0.5em;
+    text-align: center;
+    font-weight: bold;
+    padding: 0.5em;
 }
 
 #ft table {
-	width: 100%;
-	border-top: 1px solid #999999;
-	border-spacing: 0;
-	margin: 0;
+    width: 100%;
+    border-top: 1px solid #999999;
+    border-spacing: 0;
+    margin: 0;
 }
 
 #ft td {
-	padding: 0.8em 0.5em;
-	vertical-align: middle;
+    padding: 0.8em 0.5em;
+    vertical-align: middle;
 }
 
 #ft table p {
-	padding: 0.3em 0;
-	line-height: 1;
+    padding: 0.3em 0;
+    line-height: 1;
 }
 
 #ft .left {
-	width: 110px;
-	text-align: left;
+    width: 110px;
+    text-align: left;
 }
 
 #ft .middle {
-	width: auto;
-	text-align: left;
-	border-left: 1px solid #999999;
-        text-align: center;
+    width: auto;
+    text-align: left;
+    border-left: 1px solid #999999;
+    text-align: center;
 }
 
 #ft .middle p{
@@ -989,22 +989,22 @@ ul.horiz_list_items li {
 }
 
 #ft .right {
-	width: 110px;
-	text-align: center;
-	border-left: 1px solid #999999;
+    width: 110px;
+    text-align: center;
+    border-left: 1px solid #999999;
 }
 
 #ft .right p {
-	text-align: center;
+    text-align: center;
 }
 
 div.error_div {
-  background-color:#F5F5F5;
-  border:2px solid #CC0000;
-  margin:0.5em 0;
-  padding:0.5em;
-  text-align:left;
-  width:95%;
+    background-color:#F5F5F5;
+    border:2px solid #CC0000;
+    margin:0.5em 0;
+    padding:0.5em;
+    text-align:left;
+    width:95%;
 }
 
 div.error_div h2 {
@@ -1105,6 +1105,40 @@ li.announcement .announcement_seperator {
 }
 
 li.announcement .announcement_attributes {
+    font-size: x-small;
+    color: #777;
+}
+
+ul.feed_announcement_list {
+    padding: 0em;
+    font-size: x-small;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+li.feed_announcement {
+    list-style: none;
+    margin: 0 0 0 0;
+    padding: 0.2em 0 0.2em 0;
+    text-align: left;
+}
+
+li.feed_announcement .announcement_title {
+    font-weight: bold;    
+}
+
+li.feed_announcement .announcement_date {
+    font-size: smaller;
+    color: #666;
+}
+
+
+li.feed_announcement .announcement_seperator {
+    border-top: #AAA dotted 1px;
+    width: 100%;
+}
+
+li.feed_announcement .announcement_attributes {
     font-size: x-small;
     color: #777;
 }
