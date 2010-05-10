@@ -1,4 +1,4 @@
 
 <ul class="feed_announcements">
-  <%= render :partial => "feed_announcement",:collection=>feed_announcements %>
+  <%= render :partial => "feed_announcement",:collection=>feed_announcements,:locals=>{:truncate_length=>truncate_length} %>
 </ul>

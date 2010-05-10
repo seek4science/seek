@@ -1,6 +1,6 @@
 <%
 full_body=auto_link(simple_format(h(feed_announcement.body)))
-trunc_body=truncate(full_body,:length=>150,:omission=>"")
+trunc_body= truncate_length ? truncate(full_body,:length=>truncate_length,:omission=>"") : full_body
 show_more_link=full_body.size != trunc_body.size
 %>
 <li class="feed_announcement">  
