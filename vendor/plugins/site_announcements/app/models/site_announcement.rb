@@ -14,5 +14,9 @@ class SiteAnnouncement < ActiveRecord::Base
     options[:limit] ||= 5
     self.find(:all,:conditions=>(["show_in_feed = true"]),:order=>"created_at DESC",:limit=>options[:limit])
   end
+
+  def body_html
+    auto_link(simple_format(h(body)))
+  end
   
 end

@@ -14,4 +14,12 @@ module SiteAnnouncementsHelper
     return render :partial=>"site_announcements/feed_announcements",:object=>announcements,:locals=>{:truncate_length=>options[:truncate_length]}
   end
 
+  def site_announcement_attributes announcement
+    attr=[]
+    attr << "show in feed" if announcement.show_in_feed?
+    attr << "headline" if announcement.is_headline?
+    attr << "mail" if announcement.email_notification?
+    attr
+  end
+
 end
