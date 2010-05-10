@@ -133,6 +133,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def currently_logged_in
+    current_user.person
+  end
+
   def error(notice, message)
     flash[:error] = notice
     (err = User.new.errors).add(:id, message)

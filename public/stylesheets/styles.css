@@ -1083,7 +1083,11 @@ li.announcement .announcement_title {
     font-size: larger;
 }
 
-li.announcement .announcement_date {
+li.announcement .announcement_date {    
+    color: #666;
+}
+
+li.announcement .announcement_announcer {
     font-size: smaller;
     color: #666;
 }
@@ -1128,6 +1132,11 @@ li.feed_announcement .announcement_title {
 }
 
 li.feed_announcement .announcement_date {
+    font-size: smaller;
+    color: #666;
+}
+
+li.feed_announcement .announcement_announcer {
     font-size: smaller;
     color: #666;
 }

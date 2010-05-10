@@ -9,6 +9,7 @@ class SiteAnnouncementsController < ApplicationController
 
   def create
     @site_announcement=SiteAnnouncement.new(params[:site_announcement])
+    @site_announcement.announcer = currently_logged_in
     respond_to do |format|
       if @site_announcement.save
         flash[:notice] = 'The Announcement was successfully announced.'
@@ -50,7 +51,7 @@ class SiteAnnouncementsController < ApplicationController
 
   def check_manage_announcements    
     if !can_manage_announcements?
-      flash[:error] = notice
+      flash[:error] = "Admin rights required"
       redirect_to root_url
     end
   end
