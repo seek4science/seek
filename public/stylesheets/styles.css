@@ -1043,3 +1043,26 @@ div#existing_strains {
 .link_selector_buttons ul li {
     list-style: none;
 }
+
+.headline_announcement {
+    border:solid red 1px;
+    margin: 1em 2em 1em 2em;
+    text-align:center
+}
+
+.headline_announcement_title {
+    font-weight: bolder;
+    font-size: larger;
+    text-decoration: underline;
+}
+
+.headline_announcement_date {    
+    font-size: smaller;
+    color: #666666;
+}
+
+.headline_announcement_edit {
+    float: right;
+    font-size:smaller;
+    display: inline-block;
+}
