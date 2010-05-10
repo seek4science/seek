@@ -57,6 +57,10 @@
       <%= link_to "Forums", forums_path -%>
     </li>
 
+    <!-- Help tab -->
+    <li <%= (["help"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
+      <%= link_to "Help", help_documents_path -%>
+    </li>
   </ul>
   </div>
 <% end  -%>

@@ -1,0 +1,15 @@
+<% error_text ||= [] %>
+<% unless error_text.empty? %>
+  <div style="border: 1px solid red">
+  The following errors prevented your attachment being uploaded:<br/>
+  <% error_text.each do |e| %>
+    <%= e %><br/>
+  <% end %>
+  </div>
+<% end %>
+
+<ul class="bulleted_list">
+<% attachments.each do |a| %>
+  <li><%= "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})" -%></li>
+<% end %>
+</ul>   

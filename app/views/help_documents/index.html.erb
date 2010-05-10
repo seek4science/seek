@@ -5,8 +5,10 @@
 </ul>
 
 <h1>Help Index</h1>
-<div class="show_basic">
-  <ul>
+<div style="padding-left: 2em;">
+  List of topics:<br/>
+  <ul class="bulleted_list">
+    <%= "No topics found" if @help_documents.empty? %>
     <% @help_documents.each do |doc| %>
       <li><%= link_to doc.title, doc %></li>
     <% end %>

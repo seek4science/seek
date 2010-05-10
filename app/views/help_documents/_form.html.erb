@@ -1,9 +1,7 @@
 <div class="show_basic">
   <% if @preview %>
-    <h3>Preview for: <%= @help_document.title -%></h3>
-    <div style="border-bottom: 1px dotted #999;padding-bottom: 1em;">
-      <%= @help_document.body_html %>
-    </div>
+    <b>Preview for: <%= @help_document.title -%></b>
+    <%= render :partial => 'help_document', :object => @help_document %>
   <% end %>
   <% form_for @help_document, :url => {:action => action } do |f| %>
   
@@ -12,6 +10,7 @@
     <p>      
       <%= f.label :identifier %><br/>
       The identifier can only be specified on creation.<br/>
+      It will be present in URLs, eg. example.com/help/1234-example-identifier<br/>
       <%= f.text_field :identifier, :disabled => (action == :update ? 'disabled' : nil) %><br/>
     </p>
       

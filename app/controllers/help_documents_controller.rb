@@ -70,11 +70,29 @@ class HelpDocumentsController < ApplicationController
     end
   end
   
-  def preview
-    @help_document = HelpDocument.new(params[:help_document]) 
+  def destroy
+    help_document = HelpDocument.find(params[:id])
+    help_document.destroy
+    
     respond_to do |format|
-      format.html # preview.html.erb
+      format.html { redirect_to(help_documents_url) }
+      format.xml  { head :ok }
     end
+  end
+
+  def create_attachment
+    @help_document = HelpDocument.find(params[:help_attachment][:help_document_id])
+    @help_attachment = HelpAttachment.new(params[:help_attachment])
+    if @help_attachment.save
+      @error_text = []
+    else
+      @error_text = @help_attachment.errors.full_messages
+    end
+    responds_to_parent do
+      render :update do |page|
+        page.replace_html 'attachment_list', :partial => "help_documents/attachment_list", :locals => { :attachments => @help_document.attachments, :error_text => @error_text}
+      end
+    end    
   end
   
 end
