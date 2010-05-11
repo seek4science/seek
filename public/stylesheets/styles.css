@@ -1044,7 +1044,86 @@ div#existing_strains {
     list-style: none;
 }
 
+ul.bulleted_list li {
+  list-style: disc;
+  list-style-position: inside;
+}  
 
+/* HELP DOCUMENT STYLES */
+div.help_document {
+  border-bottom: 1px dotted #999999;
+  border-top: 1px dotted #999999;
+  margin: 1em 0;
+  padding: 1em 0;
+}
+
+div.help_document ol, div.help_document ul{
+  margin: 0.5em 0em 0.5em 1em;
+}
+  
+div.help_document ol li {
+  list-style: decimal;
+  list-style-position: inside;
+}
+
+div.help_document ul li {
+  list-style: disc;
+  list-style-position: inside;
+}
+
+div.help_document h1, div.help_document h2, div.help_document h3, div.help_document h4 {
+  border: none;
+  padding: 0;
+  margin: 10px 0;
+  color: #000000;
+  text-align: left;
+  background: none;
+  line-height: normal;
+  font-weight: bold;
+}
+
+div.help_document h1 {
+  font-size: 160%;
+}
+
+div.help_document h2 {
+  font-size: 140%;
+}
+
+div.help_document h3 {
+  font-size: 120%;
+}
+
+div.help_document h4 {
+  font-size: 100%;
+}
+
+div.help_upload_box {
+  padding: 0.5em 1em 1em 1em;
+  border-left: 1px solid #CCCCCC;
+  border-right: 1px solid #CCCCCC;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+div.help_upload_box form {
+  border-top: 1px dotted #CCCCCC;
+}
+
+div.help_upload_box div.image_thumbnail {
+  display: inline-block;
+  padding: 2px;
+  border: 1px solid #999999;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+div.help_upload_box div.image_thumbnail div.thumb {
+  width: 64px;
+  height: 64px;
+  display: table-cell;
+  vertical-align: middle;
+}
+/* END OF HELP DOCUMENT STYLES */
 
 .headline_announcement {
     border:solid red 1px;

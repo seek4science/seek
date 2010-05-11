@@ -3,7 +3,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post}
   
-
   map.resources :created_datas
 
   map.resources :assay_types, :collection=>{:manage=>:get}
@@ -60,7 +59,10 @@ ActionController::Routing::Routes.draw do |map|
   map.resource :session  
   
   #help pages
-  map.resources :help_documents, :as => :help
+  map.resources :help_documents, :as => :help do |h|
+    h.resources :help_attachments, :as => :attachment, :member => {:download => :get}
+    h.resources :help_images, :as => :image
+  end
   
   # search and saved searches
   map.search '/search/',:controller=>'search',:action=>'index'

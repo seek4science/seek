@@ -70,11 +70,13 @@ class HelpDocumentsController < ApplicationController
     end
   end
   
-  def preview
-    @help_document = HelpDocument.new(params[:help_document]) 
+  def destroy
+    help_document = HelpDocument.find(params[:id])
+    help_document.destroy
+    
     respond_to do |format|
-      format.html # preview.html.erb
+      format.html { redirect_to(help_documents_url) }
+      format.xml  { head :ok }
     end
   end
-  
 end
