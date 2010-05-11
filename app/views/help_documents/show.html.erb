@@ -1,0 +1,13 @@
+<ul class="sectionIcons">
+  <% if current_user.is_admin? -%>
+    <li><%= image_tag_for_key('edit', edit_help_document_path(@help_document), "Edit Page", nil, "Edit Page") -%></li>
+    <li><%= image_tag_for_key('destroy', help_document_path(@help_document), nil, { :confirm => 'Are you sure you wish to remove this page?', :method => :delete }, 'Remove') -%></li>
+  <% end -%>
+</ul>
+
+<h1><%= h @help_document.title %></h1>
+<div class="show_basic">
+  <%= link_to "Help Index", help_documents_path -%> > <%= @help_document.title -%><br/>
+  <hr style="border: solid #999 1px"/>
+  <%= @help_document.body_html %>
+</div>

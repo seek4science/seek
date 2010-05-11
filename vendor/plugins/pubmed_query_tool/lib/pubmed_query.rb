@@ -132,7 +132,8 @@ class PubmedQuery
       
       params[:authors] = []
       article.find('.//AuthorList/Author').each do |author|
-        if author["ValidYN"] == "Y"
+        #Don't add authors that are not valid, but add if they are valid or not-determined yet
+        unless author["ValidYN"] == "N" 
           last = author.find_first(".//LastName").content
           first = author.find_first(".//ForeName").content
           init = author.find_first(".//Initials").content

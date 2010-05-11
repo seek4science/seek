@@ -1,0 +1,14 @@
+<ul class="sectionIcons">
+  <% if current_user.is_admin? -%>
+    <li><%= image_tag_for_key('new', new_help_document_path, "Create New Page", nil, "Create New Page") -%></li>
+  <% end -%>
+</ul>
+
+<h1>Help Index</h1>
+<div class="show_basic">
+  <ul>
+    <% @help_documents.each do |doc| %>
+      <li><%= link_to doc.title, doc %></li>
+    <% end %>
+  </ul>
+</div>

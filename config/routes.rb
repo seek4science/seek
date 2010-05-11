@@ -59,6 +59,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :session  
   
+  #help pages
+  map.resources :help_documents, :as => :help
+  
   # search and saved searches
   map.search '/search/',:controller=>'search',:action=>'index'
   map.save_search '/search/save',:controller=>'search',:action=>'save'

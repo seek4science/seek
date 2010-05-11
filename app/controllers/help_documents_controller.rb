@@ -1,0 +1,80 @@
+class HelpDocumentsController < ApplicationController
+  
+  before_filter :login_required
+  before_filter :is_user_admin_auth, :except => [:show, :index]
+  
+  def index
+    @help_documents = HelpDocument.all
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml { render :xml=>@help_documents}
+    end
+  end
+
+  def show
+    @help_document = HelpDocument.find(params[:id])
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml { render :xml=>@help_document}
+    end
+  end
+  
+  def new
+    @help_document = HelpDocument.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @help_document }
+    end
+  end
+  
+  def edit
+    @help_document = HelpDocument.find(params[:id])
+  end
+  
+  def update
+    @help_document = HelpDocument.find(params[:id])
+    if params[:commit] == "Preview"
+      @preview = true
+      @help_document.body = params[:help_document][:body]
+      @help_document.title = params[:help_document][:title]
+    end    
+    respond_to do |format|
+      if !@preview && @help_document.update_attributes(params[:help_document])
+        format.html { redirect_to(@help_document) }
+        format.xml  { head :ok }
+      elsif @preview
+        format.html { render :action => "edit" }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @help_document.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
+  def create
+    @help_document = HelpDocument.new(params[:help_document]) 
+    if params[:commit] == "Preview"
+      @preview = true
+    end
+    respond_to do |format|
+      if !@preview && @help_document.save
+        format.html { redirect_to(@help_document) }
+        format.xml  { render :xml => @help_document, :status => :created, :location => @help_document }
+      elsif @preview
+        format.html { render :action => "new" }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @help_document.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
+  def preview
+    @help_document = HelpDocument.new(params[:help_document]) 
+    respond_to do |format|
+      format.html # preview.html.erb
+    end
+  end
+  
+end
