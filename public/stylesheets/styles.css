@@ -1085,6 +1085,7 @@ li.announcement .announcement_title {
 
 li.announcement .announcement_date {    
     color: #666;
+    font-size:smaller;
 }
 
 li.announcement .announcement_announcer {
@@ -1132,15 +1133,18 @@ li.feed_announcement .announcement_title {
 }
 
 li.feed_announcement .announcement_date {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
     font-size: smaller;
     color: #666;
 }
 
 li.feed_announcement .announcement_announcer {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
     font-size: smaller;
     color: #666;
 }
-
 
 li.feed_announcement .announcement_seperator {
     border-top: #AAA dotted 1px;
