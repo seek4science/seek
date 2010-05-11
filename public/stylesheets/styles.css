@@ -1097,4 +1097,30 @@ div.help_document h3 {
 div.help_document h4 {
   font-size: 100%;
 }
+
+div.help_upload_box {
+  padding: 0.5em 1em 1em 1em;
+  border-left: 1px solid #CCCCCC;
+  border-right: 1px solid #CCCCCC;
+  border-bottom: 1px solid #CCCCCC;
+}
+
+div.help_upload_box form {
+  border-top: 1px dotted #CCCCCC;
+}
+
+div.help_upload_box div.image_thumbnail {
+  display: inline-block;
+  padding: 2px;
+  border: 1px solid #999999;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+div.help_upload_box div.image_thumbnail div.thumb {
+  width: 64px;
+  height: 64px;
+  display: table-cell;
+  vertical-align: middle;
+}
 /* END OF HELP DOCUMENT STYLES */

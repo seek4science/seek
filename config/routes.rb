@@ -61,6 +61,7 @@ ActionController::Routing::Routes.draw do |map|
   #help pages
   map.resources :help_documents, :as => :help do |h|
     h.resources :help_attachments, :as => :attachment, :member => {:download => :get}
+    h.resources :help_images, :as => :image
   end
   
   # search and saved searches

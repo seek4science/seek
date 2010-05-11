@@ -1,0 +1,34 @@
+<% error_text ||= [] %>
+<% unless error_text.empty? %>
+  <div id="errorExplanation">
+    <h2>The following errors prevented your image being uploaded</h2>
+    <ul>
+      <% error_text.each do |e| %>
+        <% e = "The uploaded image is too large" if e[0..8] == "Size is n" %>
+        <li><%= e %></li>
+      <% end %>
+    </ul>  
+  </div> 
+<% end %>
+
+<% if images.empty? %>
+No images
+<% end %>
+<% images.each do |i| %>
+  <div class="image_thumbnail">
+    <% link_to(i.public_filename, :target => "blank") do %>
+      <div class="thumb">
+        <%= image_tag(i.public_filename(:thumb), :class => "thumb") -%>
+      </div>
+    <% end %>
+    <br/>
+    <%= link_to(image('new', :title => "Insert image", :alt => "Insert image"), "#", :onclick => "insertAtCursor('help_document_body',\"!#{i.public_filename}!\"); return false;") %>
+    <%= link_to_remote(image('destroy', :title => "Delete image", :alt => "Delete image"), 
+                       :update => "images_list", 
+                       :url => help_document_help_image_path(@help_document, i),
+                       :confirm => 'Are you sure you wish to delete this image?', 
+                       :method => :delete,
+                       :loading => "Element.show('image_spinner_#{i.id}')") %>
+    <%= image_tag "ajax-loader.gif", :id => "image_spinner_#{i.id}", :style => 'display:none;' -%>
+  </div>
+<% end %>

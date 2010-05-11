@@ -1,0 +1,16 @@
+<h2 style="margin: 0">Images</h2>
+<div id="image_box" class="help_upload_box">
+  <div id="image_list">
+    <%= render :partial => 'image_list', :locals => {:images => @help_document.images} %>
+  </div>
+  <% form_for(:help_image, :url => {:controller => :help_images, :action => :create}, :html => { :multipart => true, :target => "image_upload"}) do |f| %>
+    <p>      
+      <%= label_tag "Image" %><br/>
+      <%= f.file_field :uploaded_data %>
+    </p>
+    <%= hidden_field_tag "help_image[help_document_id]", @help_document.id %>
+    <%= submit_tag "Upload", :onclick => "Element.show('image_spinner')" %>
+    <%= image_tag "ajax-loader.gif", :id => 'image_spinner', :style => 'display:none;' -%>
+  <% end %>
+  <iframe id="image_upload" name="image_upload" style="display: none"></iframe>
+</div>

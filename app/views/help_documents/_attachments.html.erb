@@ -1,22 +1,20 @@
-<div style="margin-left: 2em">
-  <h2>Attachments</h2>
-  <div id="attachment_box">
-    <div id="attachment_list">
-      <%= render :partial => 'attachment_list', :locals => {:attachments => @help_document.attachments} %>
-    </div>
-    <% form_for(:help_attachment, :url => {:controller => :help_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload", :onclick => "Element.show('attachment_spinner')"}) do |f| %>
-      <p>      
-        <%= f.label :title %><br/>
-        <%= f.text_field :title %>
-      </p>
-      <p>      
-        <%= label_tag "Attachment" %><br/>
-        <%= f.file_field :uploaded_data, :size => 16 %>
-      </p>
-      <%= hidden_field_tag "help_attachment[help_document_id]", @help_document.id %>
-      <%= submit_tag "Upload" %>
-      <%= image_tag "ajax-loader.gif", :id => 'attachment_spinner', :style => 'display:none;' -%>
-    <% end %>
-    <iframe id="attachment_upload" name="attachment_upload" style="display: none"></iframe>
+<h2 style="margin: 0">Attachments</h2>
+<div id="attachment_box" class="help_upload_box">
+  <div id="attachment_list">
+    <%= render :partial => 'attachment_list', :locals => {:attachments => @help_document.attachments} %>
   </div>
+  <% form_for(:help_attachment, :url => {:controller => :help_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload"}) do |f| %>
+    <p>      
+      <%= f.label :title %><br/>
+      <%= f.text_field :title %>
+    </p>
+    <p>      
+      <%= label_tag "Attachment" %><br/>
+      <%= f.file_field :uploaded_data %>
+    </p>
+    <%= hidden_field_tag "help_attachment[help_document_id]", @help_document.id %>
+    <%= submit_tag "Upload", :onclick => "Element.show('attachment_spinner')" %>
+    <%= image_tag "ajax-loader.gif", :id => 'attachment_spinner', :style => 'display:none;' -%>
+  <% end %>
+  <iframe id="attachment_upload" name="attachment_upload" style="display: none"></iframe>
 </div>

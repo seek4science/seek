@@ -7,4 +7,12 @@
 <h1>Editing Page: <%= h @help_document.title %></h1>
 <%= render :partial => "form", :locals => {:action=>:update } -%>
 
-<%= render :partial => "attachments" -%>
+<div style="margin: 2em">
+  <div style="float:left; width: 47%">
+    <%= render :partial => "attachments" -%>
+  </div>
+  <div style="float:right; width: 51%">
+    <%= render :partial => "images" -%>
+  </div>
+  <br style="clear:both"/>
+</div>
