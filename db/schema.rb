@@ -148,7 +148,7 @@ ActiveRecord::Schema.define(:version => 20100508151704) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
   end
@@ -217,6 +217,14 @@ ActiveRecord::Schema.define(:version => 20100508151704) do
   create_table "group_memberships_roles", :id => false, :force => true do |t|
     t.integer "group_membership_id"
     t.integer "role_id"
+  end
+
+  create_table "help_documents", :force => true do |t|
+    t.string   "identifier"
+    t.string   "title"
+    t.text     "body"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "institutions", :force => true do |t|
@@ -297,7 +305,7 @@ ActiveRecord::Schema.define(:version => 20100508151704) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
   end
@@ -505,7 +513,7 @@ ActiveRecord::Schema.define(:version => 20100508151704) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
   end
