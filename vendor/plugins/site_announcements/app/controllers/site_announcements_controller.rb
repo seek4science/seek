@@ -1,7 +1,16 @@
 class SiteAnnouncementsController < ApplicationController
-  before_filter :login_required
+  before_filter :login_required, :except=>[:feed]
 
   before_filter :check_manage_announcements,:only=>[:new,:create,:edit,:update]
+
+  def feed
+    limit=params[:limit]
+    limit||=10
+    @site_announcements=SiteAnnouncement.feed_announcements :limit=>limit
+    respond_to do |format|
+      format.atom
+    end
+  end
 
   def new
     @site_announcement=SiteAnnouncement.new
