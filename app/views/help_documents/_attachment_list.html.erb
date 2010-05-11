@@ -1,15 +1,30 @@
 <% error_text ||= [] %>
 <% unless error_text.empty? %>
-  <div style="border: 1px solid red">
-  The following errors prevented your attachment being uploaded:<br/>
-  <% error_text.each do |e| %>
-    <%= e %><br/>
-  <% end %>
-  </div>
+  <div id="errorExplanation">
+    <h2>The following errors prevented your attachment being uploaded</h2>
+    <ul>
+      <% error_text.each do |e| %>
+        <% e = "The uploaded file is too large" if e[0..8] == "Size is n" %>
+        <li><%= e %></li>
+      <% end %>
+    </ul>  
+  </div> 
 <% end %>
 
 <ul class="bulleted_list">
+<% if attachments.empty? %>
+No attachments
+<% end %>
 <% attachments.each do |a| %>
-  <li><%= "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})" -%></li>
+  <li>
+    <%= "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})" -%>
+    <%= link_to_remote(image('destroy', :alt => "Delete attachment"), 
+                       :update => "attachments_list", 
+                       :url => help_document_help_attachment_path(@help_document, a),
+                       :confirm => 'Are you sure you wish to delete this attachment?', 
+                       :method => :delete,
+                       :loading => "Element.show('attachment_spinner_#{a.id}')") %>
+    <%= image_tag "ajax-loader.gif", :id => "attachment_spinner_#{a.id}", :style => 'display:none;' -%>
+  </li>
 <% end %>
 </ul>   
