@@ -46,9 +46,9 @@ If using Ubuntu or Debian, the following commands should install all the gems yo
 
 == Getting the source code
 
-Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. For a stable version, you should check out according to a stable tag. Our current tag is v0.7.1, so to retrieve this version you should use:
+Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. For a stable version, you should check out according to a stable tag. Our current tag is v0.7.2, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.7.1 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.7.2 sysmo-seek
 
 
 == The RAILS_ENV environment variable
