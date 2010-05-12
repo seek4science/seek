@@ -212,6 +212,8 @@ module ImagesHelper
       "crystal_project/32x32/actions/find.png"
     when "visit_pubmed"
       "famfamfam_silk/page_white_go.png"
+    when "markup"
+      "famfamfam_silk/page_white_text.png"
     when "atom_feed"
       "misc_icons/feed_icon.png"
     else

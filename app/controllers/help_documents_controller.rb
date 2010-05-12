@@ -4,10 +4,17 @@ class HelpDocumentsController < ApplicationController
   before_filter :is_user_admin_auth, :except => [:show, :index]
   
   def index
-    @help_documents = HelpDocument.all
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml { render :xml=>@help_documents}
+    if (@help_document = HelpDocument.find_by_identifier("index"))
+      respond_to do |format|
+        format.html { redirect_to(@help_document) }
+        format.xml { render :xml=>@help_document}
+      end
+    else
+      @help_documents = HelpDocument.all
+      respond_to do |format|
+        format.html # index.html.erb
+        format.xml { render :xml=>@help_documents}
+      end
     end
   end
 

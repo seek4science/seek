@@ -1,6 +1,7 @@
 <ul class="sectionIcons">
   <% if current_user.is_admin? -%>
     <li><%= image_tag_for_key('back', help_document_path(@help_document), "Return to document", nil, "Return to document") -%></li>
+    <li><%= image_tag_for_key('destroy', help_document_path(@help_document), nil, { :confirm => 'Are you sure you wish to remove this page?', :method => :delete }, 'Remove') -%></li>
   <% end -%>
 </ul>
 
@@ -8,7 +9,7 @@
 <%= render :partial => "form", :locals => {:action=>:update } -%>
 
 <div style="margin: 2em">
-  <div style="float:left; width: 47%">
+  <div style="float:left; width: 48%">
     <%= render :partial => "attachments" -%>
   </div>
   <div style="float:right; width: 51%">
