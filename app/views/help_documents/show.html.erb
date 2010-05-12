@@ -1,0 +1,18 @@
+<ul class="sectionIcons">
+  <% if current_user.is_admin? -%>
+    <li><%= image_tag_for_key('edit', edit_help_document_path(@help_document), "Edit Page", nil, "Edit Page") -%></li>
+    <li><%= image_tag_for_key('destroy', help_document_path(@help_document), nil, { :confirm => 'Are you sure you wish to remove this page?', :method => :delete }, 'Remove') -%></li>
+  <% end -%>
+</ul>
+
+<h1><%= h @help_document.title %></h1>
+<div style="padding-left: 2em;">
+  <%= link_to "Help Index", help_documents_path -%> <span style="color:#999">></span> <%= @help_document.title -%><br/>
+  <%= render :partial => 'help_document', :object => @help_document %>
+  <h2>Attachments</h2>
+  <ul class="bulleted_list">
+    <% @help_document.attachments.each do |a| %>
+    <li><%= link_to "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})", download_help_document_help_attachment_path(@help_document, a) -%></li>
+    <% end %>
+  </ul>   
+</div>

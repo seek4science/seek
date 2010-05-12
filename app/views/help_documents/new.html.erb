@@ -1,0 +1,8 @@
+<ul class="sectionIcons">
+  <% if current_user.is_admin? -%>
+    <li><%= image_tag_for_key('back', help_documents_path, "Return to index", nil, "Return to index") -%></li>
+  <% end -%>
+</ul>
+
+<h1>New Help Page</h1>
+<%= render :partial => "form", :locals => {:action=>:create } -%>

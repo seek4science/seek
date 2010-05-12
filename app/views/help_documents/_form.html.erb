@@ -1,0 +1,31 @@
+<div class="show_basic">
+  <% if @preview %>
+    <b>Preview for: <%= @help_document.title -%></b>
+    <%= render :partial => 'help_document', :object => @help_document %>
+  <% end %>
+  <% form_for @help_document, :url => {:action => action } do |f| %>
+  
+    <%= f.error_messages %><br/>
+    
+    <p>      
+      <%= f.label :identifier %><br/>
+      The identifier can only be specified on creation.<br/>
+      It will be present in URLs, eg. example.com/help/1234-example-identifier<br/>
+      <%= f.text_field :identifier, :disabled => (action == :update ? 'disabled' : nil) %><br/>
+    </p>
+      
+    <p> 
+      <%= f.label :title %><br/>
+      <%= f.text_field :title %><br/>
+    </p>  
+    
+    <p> 
+      <%= f.label :body %><br/>
+      <%= f.text_area :body, :size => "80x20" %><br/>
+    </p>  
+    
+    <%= submit_tag "Preview" %>
+    <%= submit_tag action.to_s.titleize %>
+    
+  <% end %>
+</div>
