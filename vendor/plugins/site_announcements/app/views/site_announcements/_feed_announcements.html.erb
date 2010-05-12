@@ -1,0 +1,4 @@
+
+<ul class="feed_announcement_list">
+  <%= render :partial => "site_announcements/feed_announcement",:collection=>feed_announcements,:locals=>{:truncate_length=>truncate_length,:show_seperator=>true} %>
+</ul>

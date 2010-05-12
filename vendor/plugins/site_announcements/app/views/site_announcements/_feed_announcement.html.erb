@@ -1,0 +1,11 @@
+<%
+show_seperator||=false
+%>
+<li class="feed_announcement">  
+  <span class="announcement_title"><%= link_to(h(feed_announcement.title),feed_announcement) -%></span>
+  <span class="announcement_date"><%= time_ago_in_words(feed_announcement.created_at)+" ago" -%></span>
+  <span class="announcement_announcer"> by <%= link_to h(feed_announcement.announcer.name), feed_announcement.announcer -%></span>
+  <% if show_seperator -%>
+    <div class="announcement_seperator"></div>
+  <% end -%>
+</li>

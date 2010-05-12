@@ -1,0 +1,8 @@
+Description:
+    Generates the migration required to use the site_announcements plugin
+
+Example:
+    ./script/generate site_announcements_migration
+
+    This will create:
+        the migration for SiteAnnouncement and SiteAnnouncementCategory

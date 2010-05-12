@@ -1,5 +1,11 @@
 <div id="home">
-  
+
+  <% if SiteAnnouncement.headline_announcement -%>
+    <p class="box_standout headline_announcement">
+      <%= site_annoucements_headline %>
+    </p>
+  <% end -%>
+
   <%= render :partial=>"home_intro" -%>
 
   <%= render :partial=>"recent_project_changes" -%>

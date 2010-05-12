@@ -214,6 +214,8 @@ module ImagesHelper
       "famfamfam_silk/page_white_go.png"
     when "markup"
       "famfamfam_silk/page_white_text.png"
+    when "atom_feed"
+      "misc_icons/feed_icon.png"
     else
       return nil
     end

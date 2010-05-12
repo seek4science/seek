@@ -75,6 +75,10 @@ class ApplicationController < ActionController::Base
     return true
   end
 
+  def can_manage_announcements?
+    return current_user.is_admin?
+  end
+
   def logout_user
     self.current_user.forget_me if logged_in?
     cookies.delete :auth_token
@@ -127,6 +131,10 @@ class ApplicationController < ActionController::Base
         error("Type management disabled", "...")
         return false
     end
+  end
+
+  def currently_logged_in
+    current_user.person
   end
 
   def error(notice, message)

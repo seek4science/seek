@@ -344,7 +344,11 @@ module ApplicationHelper
       title = h(item.title)
     end
     return title
-  end  
+  end
+
+  def can_manage_announcements?
+    return current_user.is_admin?
+  end
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","data_files"=>"Data","publications"=>"Publications"}
