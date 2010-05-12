@@ -6,7 +6,7 @@ module BioPortal
 
     module ClassMethods
       def linked_to_bioportal(options = {}, &extension)
-        options[:base_url]||="http://rest.bioontology.org/bioportal/"
+        options[:base_url]||="http://rest.bioontology.org/bioportal"
         
         has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
         before_save :save_changed_concept
@@ -101,8 +101,7 @@ module BioPortal
 
     
     
-    def get_concept ontology_version_id,concept_id,options={}
-      
+    def get_concept ontology_version_id,concept_id,options={}      
       options[:light]=(options[:light] && options[:light]!=0) ? 1 : 0
       
       concept_url="/concepts/%ID%?conceptid=%CONCEPT_ID%&"
@@ -111,7 +110,8 @@ module BioPortal
       options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       concept_url=concept_url[0..-2]
       
-      full_concept_path=bioportal_base_rest_url+concept_url
+      full_concept_path=bioportal_base_rest_url+concept_url      
+      
       parser = XML::Parser.io(open(full_concept_path))
       doc = parser.parse
       
