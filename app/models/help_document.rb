@@ -5,8 +5,6 @@ class HelpDocument < ActiveRecord::Base
   has_many :attachments, :class_name => "HelpAttachment", :dependent => :destroy
   has_many :images, :class_name => "HelpImage", :dependent => :destroy
   
-  attr_protected :identifier
-  
   def body_html
     doc = self.body
     #substitute "[identifier]" for links to help docs
@@ -15,7 +13,7 @@ class HelpDocument < ActiveRecord::Base
     doc = RedCloth.new(doc, [ :hard_breaks ])
     return doc.to_html
   end
-  
+
   def to_param
     "#{id}-#{identifier.parameterize}"
   end

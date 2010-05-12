@@ -1107,6 +1107,7 @@ div.help_upload_box {
 
 div.help_upload_box form {
   border-top: 1px dotted #CCCCCC;
+  margin-top: 5px;
 }
 
 div.help_upload_box div.image_thumbnail {
@@ -1122,5 +1123,29 @@ div.help_upload_box div.image_thumbnail div.thumb {
   height: 64px;
   display: table-cell;
   vertical-align: middle;
+}
+
+#help_legend {
+  padding: 0.5em;
+}
+#help_legend_toggle{
+  display: inline-block;
+  padding: 0.5em;
+}
+
+#help_legend_toggle_div {
+  width: 60%;
+  background-color: #EEF;
+  border: 1px solid #999;
+  padding: 3px;
+  margin: 5px 0;
+}
+
+#markup_toggle {
+  padding: 3px;
+  border: 1px solid #889;
+  background-color: #FFF;
+  display: inline-block;
+  margin-top: 4px;
 }
 /* END OF HELP DOCUMENT STYLES */

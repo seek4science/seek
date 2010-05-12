@@ -7,12 +7,18 @@
 
 <h1><%= h @help_document.title %></h1>
 <div style="padding-left: 2em;">
-  <%= link_to "Help Index", help_documents_path -%> <span style="color:#999">></span> <%= @help_document.title -%><br/>
+  <% if @help_document.identifier == "index" -%>
+    Help Index<br/>
+  <% else -%>
+    <%= link_to "Help Index", help_documents_path -%><span style="color:#999"> > </span> <%= @help_document.title -%><br/>  
+  <% end -%>
   <%= render :partial => 'help_document', :object => @help_document %>
-  <h2>Attachments</h2>
-  <ul class="bulleted_list">
-    <% @help_document.attachments.each do |a| %>
-    <li><%= link_to "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})", download_help_document_help_attachment_path(@help_document, a) -%></li>
-    <% end %>
-  </ul>   
+  <% unless @help_document.attachments.empty? %>
+    <h2>Attachments</h2>
+    <ul class="bulleted_list">
+      <% @help_document.attachments.each do |a| %>
+      <li><%= link_to "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})", download_help_document_help_attachment_path(@help_document, a) -%></li>
+      <% end %>
+    </ul>   
+  <% end %>
 </div>
