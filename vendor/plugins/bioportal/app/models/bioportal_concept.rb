@@ -7,12 +7,12 @@ class BioportalConcept < ActiveRecord::Base
 
   def get_concept options={}
     options[:refresh]||=false
-
+    
     refresh=options.delete(:refresh)
     
     concept = YAML::load(cached_concept_yaml) unless (refresh || cached_concept_yaml.nil?)
-    unless concept
-      concept = super(self.ontology_version_id,self.concept_uri,options)
+    unless concept      
+      concept = super(self.ontology_version_id,self.concept_uri,options)      
       update_attribute(:cached_concept_yaml, concept.to_yaml)
     end
       
