@@ -1128,7 +1128,7 @@ div.help_upload_box div.image_thumbnail div.thumb {
 #help_legend {
   padding: 0.5em;
 }
-#help_legend_toggle{
+#help_legend_toggle #page_list_toggle{
   display: inline-block;
   padding: 0.5em;
 }
@@ -1136,6 +1136,20 @@ div.help_upload_box div.image_thumbnail div.thumb {
 #help_legend_toggle_div {
   width: 60%;
   background-color: #EEF;
+  border: 1px solid #999;
+  padding: 3px;
+  margin: 5px 0;
+}
+
+#page_list {
+  padding: 0.5em;
+  border-top: 1px dotted #999;
+  margin-top: 0.5em;
+}
+
+#page_list_toggle_div {
+  width: 60%;
+  background-color: #EFE;
   border: 1px solid #999;
   padding: 3px;
   margin: 5px 0;

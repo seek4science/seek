@@ -24,6 +24,7 @@ tmp/data.sql
 *~
 solr/development/*
 solr/production/*
+solr/test/*
 lib/jerm/stu_main.rb
 SUMO_harvester.rb
 script/finns_tests/*

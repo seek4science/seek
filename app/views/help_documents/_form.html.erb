@@ -20,7 +20,8 @@
     </p>  
     
     <%= f.label :body %><br/>
-    <%= render :partial => 'legend' %><br/>
+    <%= render :partial => 'legend' %>
+    <%= render :partial => 'page_list' %>
     <%= f.text_area :body, :size => "80x20" %><br/>     
     
     <%= submit_tag "Preview" %>
