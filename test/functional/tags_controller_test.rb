@@ -15,7 +15,7 @@ class TagsControllerTest< ActionController::TestCase
   end
 
   test "dont show duplicates for same tag for expertise and tools" do
-    q=people(:one)
+    q=people(:quentin_person)
     q.tool_list="zzzzz"
     q.expertise_list="zzzzz"
     q.save!

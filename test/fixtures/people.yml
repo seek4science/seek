@@ -1,6 +1,6 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
+quentin_person:
   id: 1
   first_name: "quentin"
   last_name: "jones"
