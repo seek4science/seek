@@ -1,5 +1,8 @@
 <ul class="sectionIcons">
   <% if current_user.is_admin? -%>
+    <% if @help_document.identifier == "index" -%>
+      <li><%= image_tag_for_key('new', new_help_document_path, "Create New Page", nil, "Create New Page") -%></li>
+    <% end %>
     <li><%= image_tag_for_key('edit', edit_help_document_path(@help_document), "Edit Page", nil, "Edit Page") -%></li>
     <li><%= image_tag_for_key('destroy', help_document_path(@help_document), nil, { :confirm => 'Are you sure you wish to remove this page?', :method => :delete }, 'Remove') -%></li>
   <% end -%>

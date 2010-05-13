@@ -1128,13 +1128,13 @@ div.help_upload_box div.image_thumbnail div.thumb {
 #help_legend {
   padding: 0.5em;
 }
-#help_legend_toggle #page_list_toggle{
-  display: inline-block;
-  padding: 0.5em;
+#help_legend_toggle, #page_list_toggle{
+  display: block;
+  padding: 3px;
 }
 
 #help_legend_toggle_div {
-  width: 60%;
+  width: 45%;
   background-color: #EEF;
   border: 1px solid #999;
   padding: 3px;
@@ -1148,7 +1148,7 @@ div.help_upload_box div.image_thumbnail div.thumb {
 }
 
 #page_list_toggle_div {
-  width: 60%;
+  width: 45%;
   background-color: #EFE;
   border: 1px solid #999;
   padding: 3px;

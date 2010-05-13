@@ -68,4 +68,18 @@ class HelpDocumentsControllerTest < ActionController::TestCase
       assert_not_nil assigns(:help_document) #doc set (on show page)
     end    
   end
+  
+  test "can't change identifier" do
+    assert_no_difference('help_documents(:one).identifier.hash') do
+      put :update, :id => help_documents(:one).to_param, :help_document => {:identifier => "fish"}
+    end
+  end 
+  
+  test "shouldn't create docs with invalid identifiers" do
+    assert_no_difference('HelpDocument.count') do
+      post :create, :help_document => { :identifier => "//#[][]a", :title => "invalid1" }
+      post :create, :help_document => { :identifier => "hello/hello", :title => "invalid2" }
+      post :create, :help_document => { :identifier => "-hello", :title => "invalid3" }
+    end
+  end 
 end
