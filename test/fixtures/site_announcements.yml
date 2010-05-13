@@ -1,0 +1,4 @@
+feed:
+    title: a feed announcement
+    show_in_feed: true
+    announcer: pal (Person)
