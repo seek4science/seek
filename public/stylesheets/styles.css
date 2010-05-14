@@ -1251,3 +1251,19 @@ div.collapsable_div h2 {
   border-width: 0 0 1px 0;
   margin: 0; 
 }
+
+ul.attachments_list {
+  margin-left: 0.5em;
+}
+
+ul.attachments_list li {
+  list-style: none;
+  background-color:#EEF;
+  border: 1px solid #999999;
+  padding: 3px;
+  margin: 2px;
+}
+
+ul.attachments_list li img{
+  vertical-align: middle;
+}

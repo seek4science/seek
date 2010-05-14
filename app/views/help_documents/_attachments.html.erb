@@ -13,4 +13,5 @@
   <%= hidden_field_tag "help_attachment[help_document_id]", @help_document.id %>
   <%= submit_tag "Upload", :onclick => "Element.show('attachment_spinner')" %>
   <%= image_tag "ajax-loader.gif", :id => 'attachment_spinner', :style => 'display:none;' -%>
+  <iframe id="attachment_upload" name="attachment_upload" style="display: none"></iframe>
 <% end %>
