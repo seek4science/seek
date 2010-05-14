@@ -4,6 +4,7 @@
 
 <%= list_item_title resource %>
 <%= list_item_attribute "ID", resource.id %>
+<%= list_item_attribute "Owner", resource.owner.name, resource.owner %>
 <%= list_item_description resource.description %>
 
 <div class="list_item_left_column">
