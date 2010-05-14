@@ -1,0 +1,18 @@
+<% start_open ||= false %>
+<% object ||= nil %>
+<% locals ||= nil %>
+<% unique_id = partial.hash * locals.hash * (object.nil? ? 1 : object.hash) %>
+<% div_options ||= {} 
+   div_options[:class] ||= "collapsable_div"
+   div_options[:style] ||= "" %>
+
+<% header_options ||= {} 
+   header_options[:class] ||= ""
+   header_options[:style] ||= "" %>
+
+<div <%= tag_options div_options %>>
+  <a style="display:block" href="#" onclick="toggle_collapsable_div(<%= unique_id -%>); return false;"><h2 <%= tag_options header_options %>><img id="collapsable_div_img_<%= unique_id -%>" src="/images/folds/<%= (start_open ? "fold.png" : "unfold.png") %>" style='vertical-align: middle'/> <%= title -%></h2></a>
+  <div id="collapsable_div_<%= unique_id -%>" <%= start_open ? "" : "style=\"display: none\""%> >
+    <%= render :partial => partial, :object => object, :locals => locals %>
+  </div>
+</div>

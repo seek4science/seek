@@ -21,8 +21,9 @@
     </p>  
     
     <%= f.label :body %><br/>
-    <%= render :partial => 'legend' %>
-    <%= render :partial => 'page_list' %>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:div_options => {:style => "width: 50%"}, :header_options => {:style => "padding: 0.2em"}, :title => "Legend", :partial => 'legend'} %>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:div_options => {:style => "width: 50%"}, :header_options => {:style => "padding: 0.2em"}, :title => "List of pages", :partial => 'page_list'} %>
+    <br style="clear:both"/>    
     <%= f.text_area :body, :size => "80x20" %><br/>     
     
     <%= submit_tag "Preview" %>
@@ -30,3 +31,5 @@
     
   <% end %>
 </div>
+
+

@@ -179,3 +179,17 @@ function insertAtCursor(myField, myValue) {
     myField.value += myValue;
   }
 }
+
+
+function toggle_collapsable_div(id) {
+  var elem = $('collapsable_div_' + id);
+  var toggle_img = $('collapsable_div_img_' + id);
+  if (elem.style.display == 'none') {
+    Effect.BlindDown(('collapsable_div_' + id),{duration:0.2});
+    toggle_img.src = "/images/folds/fold.png";
+  }
+  else {
+    Effect.BlindUp(('collapsable_div_' + id),{duration:0.2});
+    toggle_img.src = "/images/folds/unfold.png";
+  }
+}

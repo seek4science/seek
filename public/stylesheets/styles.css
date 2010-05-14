@@ -1098,13 +1098,6 @@ div.help_document h4 {
   font-size: 100%;
 }
 
-div.help_upload_box {
-  padding: 0.5em 1em 1em 1em;
-  border-left: 1px solid #CCCCCC;
-  border-right: 1px solid #CCCCCC;
-  border-bottom: 1px solid #CCCCCC;
-}
-
 div.help_upload_box form {
   border-top: 1px dotted #CCCCCC;
   margin-top: 5px;
@@ -1125,40 +1118,10 @@ div.help_upload_box div.image_thumbnail div.thumb {
   vertical-align: middle;
 }
 
-#help_legend {
-  padding: 0.5em;
-}
-#help_legend_toggle, #page_list_toggle{
-  display: block;
-  padding: 3px;
-}
-
-#help_legend_toggle_div {
-  width: 45%;
-  background-color: #EEF;
-  border: 1px solid #999;
-  padding: 3px;
-  margin: 5px 0;
-}
-
-#page_list {
-  padding: 0.5em;
-  border-top: 1px dotted #999;
-  margin-top: 0.5em;
-}
-
-#page_list_toggle_div {
-  width: 45%;
-  background-color: #EFE;
-  border: 1px solid #999;
-  padding: 3px;
-  margin: 5px 0;
-}
-
 #markup_toggle {
   padding: 3px;
   border: 1px solid #889;
-  background-color: #FFF;
+  background-color: #EFE;
   display: inline-block;
   margin-top: 4px;
 }
@@ -1275,3 +1238,16 @@ li.feed_announcement .announcement_attributes {
     color: #777;
 }
 
+div.collapsable_div {
+  border: 1px solid #999;
+  margin: 3px 0;
+}
+
+div.collapsable_div div {
+  padding: 0.5em;
+}
+
+div.collapsable_div h2 {
+  border-width: 0 0 1px 0;
+  margin: 0; 
+}

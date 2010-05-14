@@ -1,26 +1,5 @@
-<script type="text/javascript">
-
-  function toggle_page_list() {
-    var elem = $('page_list');
-    var toggle_elem = $('page_list_toggle');
-    if (elem.style.display == 'none') {
-      Effect.BlindDown("page_list",{duration:0.2});
-      toggle_elem.innerHTML = 'Hide list of pages <%= escape_javascript(image('collapse', :style=>'vertical-align: middle'))-%>';
-    }
-    else {
-      Effect.BlindUp("page_list",{duration:0.2});
-      toggle_elem.innerHTML = 'Show list of pages <%= escape_javascript(image('expand', :style=>'vertical-align: middle'))-%>';
-    }
-  }
-</script>
-
-<div id="page_list_toggle_div">
-  <a id="page_list_toggle" href="#" onclick="toggle_page_list(); return false">Show list of pages <%= image 'expand', :style=>'vertical-align: middle'%></a>
-  <div id="page_list" style="display:none;">
-    <ul>
-      <% HelpDocument.all.each do |doc| %>
-        <li><%= link_to doc.identifier, doc, :target => "blank" -%> - <i><%= doc.title -%></i></li>
-      <% end %>
-    </ul>
-  </div>
-</div>
+<ul>
+  <% HelpDocument.all.each do |doc| %>
+    <li><%= link_to doc.identifier, doc, :target => "blank" -%> - <i><%= doc.title -%></i></li>
+  <% end %>
+</ul>

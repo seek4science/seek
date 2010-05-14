@@ -32,19 +32,6 @@ help_result = escape_javascript(RedCloth.new(help_text.gsub("\n","\r\n").gsub(/\
   var help_result = '<%= help_result -%>';
   var toggle = 0;
   
-  function toggle_legend() {
-    var elem = $('help_legend');
-    var toggle_elem = $('help_legend_toggle');
-    if (elem.style.display == 'none') {
-      Effect.BlindDown("help_legend",{duration:0.2});
-      toggle_elem.innerHTML = 'Hide legend <%= escape_javascript(image('collapse', :style=>'vertical-align: middle'))-%>';
-    }
-    else {
-      Effect.BlindUp("help_legend",{duration:0.2});
-      toggle_elem.innerHTML = 'Show legend <%= escape_javascript(image('expand', :style=>'vertical-align: middle'))-%>';
-    }
-  }
-  
   function switch_content() {
     var elem = $('help_legend_preview');
     var toggle_elem = $('markup_toggle');
@@ -61,16 +48,11 @@ help_result = escape_javascript(RedCloth.new(help_text.gsub("\n","\r\n").gsub(/\
   }
 </script>
 
-<div id="help_legend_toggle_div">
-  <a id="help_legend_toggle" href="#" onclick="toggle_legend(); return false">Show legend <%= image 'expand', :style=>'vertical-align: middle'%></a>
-  <div id="help_legend" style="display:none;">
-    Below is a basic reference of some of the markup usable in the help page body.<br/>
-    You can preview the output generated from the markup by clicking the link directly below.<br/>
-    <a id="markup_toggle" href="#" onclick="switch_content(); return false">Show output <%= image 'show', :style=>'vertical-align: middle'%></a>
-    <div id="help_legend_preview" class="help_document">
-      <%= help_code -%>
-      <br/>
-    </div>
-    For a full reference, visit: <a target="_blank" href="http://redcloth.org/textile/">http://redcloth.org/textile/</a>
-  </div>
+Below is a basic reference of some of the markup usable in the help page body.<br/>
+You can preview the output generated from the markup by clicking the link directly below.<br/>
+<a id="markup_toggle" href="#" onclick="switch_content(); return false">Show output <%= image 'show', :style=>'vertical-align: middle'%></a>
+<div id="help_legend_preview" class="help_document">
+  <%= help_code -%>
+  <br/>
 </div>
+For a full reference, visit: <a target="_blank" href="http://redcloth.org/textile/">http://redcloth.org/textile/</a>
