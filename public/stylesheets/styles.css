@@ -1253,7 +1253,7 @@ div.collapsable_div h2 {
 }
 
 ul.attachments_list {
-  margin-left: 0.5em;
+  margin: 0;
 }
 
 ul.attachments_list li {
