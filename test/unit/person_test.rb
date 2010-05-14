@@ -5,7 +5,7 @@ class PersonTest < ActiveSupport::TestCase
   
   # Replace this with your real tests.
   def test_work_groups
-    p=people(:one)
+    p=people(:quentin_person)
     assert_equal 2,p.work_groups.size
   end
 
@@ -14,7 +14,7 @@ class PersonTest < ActiveSupport::TestCase
     registered.each do |p|
       assert_not_nil p.user
     end
-    assert registered.include?(people(:one))
+    assert registered.include?(people(:quentin_person))
     assert !registered.include?(people(:person_without_user))
   end
 
@@ -30,12 +30,12 @@ class PersonTest < ActiveSupport::TestCase
     without_group.each do |p|
       assert_equal 0,p.group_memberships.size
     end
-    assert !without_group.include?(people(:one))
+    assert !without_group.include?(people(:quentin_person))
     assert without_group.include?(people(:person_without_group))
   end
 
   def test_expertise
-    p=people(:one)
+    p=people(:quentin_person)
     assert_equal 2, p.expertise.size
 
     p=people(:two)
@@ -44,7 +44,7 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_institutions
-    p=people(:one)
+    p=people(:quentin_person)
     assert_equal 2,p.institutions.size
     
     p=people(:two)
@@ -54,7 +54,7 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_projects
-    p=people(:one)
+    p=people(:quentin_person)
     assert_equal 2,p.projects.size
   end
   
@@ -67,19 +67,19 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:three)
     assert_not_nil(peeps.find{|person| p.id==person.id},"Person :three should be userless and therefore in the list")
 
-    p=people(:one)
+    p=people(:quentin_person)
     assert_nil(peeps.find{|person| p.id==person.id},"Person :one should have a user and not be in the list")
   end
 
   def test_name
-      p=people(:one)
+      p=people(:quentin_person)
       assert_equal "Quentin Jones", p.name
       p.first_name="Tom"
       assert_equal "Tom Jones", p.name
   end
 
   def test_email_with_name
-    p=people(:one)
+    p=people(:quentin_person)
     assert_equal("Quentin Jones <quentin@email.com>",p.email_with_name)
   end
 
@@ -114,7 +114,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_valid
-    p=people(:one)
+    p=people(:quentin_person)
     assert p.valid?
     p.email=nil
     assert !p.valid?
@@ -155,7 +155,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_email_with_capitalise_valid
-    p=people(:one)
+    p=people(:quentin_person)
     assert p.valid?
     p.email="gordon.brown@gov.uk"
     assert p.valid?
@@ -164,7 +164,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_email_unique
-    p=people(:one)
+    p=people(:quentin_person)
     newP=Person.new(:first_name=>"Fred",:email=>p.email)
     assert !newP.valid?,"Should not be valid as email is not unique"
     newP.email="zxczxc@zxczxczxc.com"

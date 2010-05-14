@@ -11,7 +11,7 @@ class AvatarsControllerTest < ActionController::TestCase
   end
 
   test "show new" do
-    get :new, :person_id=>people(:one).id
+    get :new, :person_id=>people(:quentin_person).id
     assert_response :success
   end
 end
