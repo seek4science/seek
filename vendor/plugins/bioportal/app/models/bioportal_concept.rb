@@ -36,7 +36,7 @@ class BioportalConcept < ActiveRecord::Base
   def check_cached_concept
     changed_fields = changes.keys
     
-    if changed_fields & ["ontology_id","ontology_version_id","concept_uri"]
+    if (changed_fields & ["ontology_id","ontology_version_id","concept_uri"]).empty?
       self.cached_concept_yaml=nil
     end
   end
