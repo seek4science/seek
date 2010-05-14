@@ -18,4 +18,13 @@ module ISAHelper
     return text
   end
   
+  def generate_investigation_svg investigation
+    dot=["compound = true;","node[fontsize=12];","bgcolor=white;","edge [arrowsize=1, color=black];"]
+    
+    svg=`date`
+    
+    return "svg"
+  end
+    
+  
 end

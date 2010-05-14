@@ -32,6 +32,7 @@ class InvestigationsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml { render :xml=> @investigation, :include=>@investigation.studies }
+      format.svg
     end
   end
 
