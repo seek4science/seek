@@ -52,7 +52,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 2, p.non_seek_authors.size
     assert_equal 0, p.asset.creators.size
     
-    seek_author = people(:one)
+    seek_author = people(:quentin_person)
     
     #Associate a non-seek author to a seek person
 
@@ -69,7 +69,7 @@ class PublicationsControllerTest < ActionController::TestCase
   
   test "should disassociate authors" do
     p = publications(:one)
-    p.asset.creators << people(:one)
+    p.asset.creators << people(:quentin_person)
     p.asset.creators << people(:two)
     
     assert_equal 0, p.non_seek_authors.size

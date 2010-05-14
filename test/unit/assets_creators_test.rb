@@ -20,7 +20,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     params =  ActiveSupport::JSON.encode([[creator.name, creator.id]])
     AssetsCreator.add_or_update_creator_list(resource, params)
     #Update creator
-    new_creator = people(:one)
+    new_creator = people(:quentin_person)
     params =  ActiveSupport::JSON.encode([[new_creator.name, new_creator.id]])
     AssetsCreator.add_or_update_creator_list(resource, params)
     assert_not_equal resource.asset.creators.first, creator
@@ -43,7 +43,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
   test "changing_multiple_creators" do
     resource = sops(:my_first_sop)
     #Set creators
-    creator_to_stay = people(:one)
+    creator_to_stay = people(:quentin_person)
     creator_to_remove = people(:two)
     params =  ActiveSupport::JSON.encode([[creator_to_stay.name, creator_to_stay.id],
                                           [creator_to_remove.name, creator_to_remove.id]])

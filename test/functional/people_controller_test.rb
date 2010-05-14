@@ -48,17 +48,17 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_should_show_person
-    get :show, :id => people(:one)
+    get :show, :id => people(:quentin_person)
     assert_response :success
   end
  #FIXME: This test needs looking at
  # def test_show_no_email
- #   get :show, :id => people(:one)
+ #   get :show, :id => people(:quentin_person)
  #   assert_select "div#email", false
  # end
 
   def test_should_get_edit
-    get :edit, :id => people(:one)
+    get :edit, :id => people(:quentin_person)
     assert_response :success
   end
 
@@ -102,9 +102,9 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_current_user_shows_seek_id
-    get :show, :id=> people(:one)
+    get :show, :id=> people(:quentin_person)
     assert_select ".box_about_actor p", :text=>/Seek ID :/
-    assert_select ".box_about_actor p", :text=>/Seek ID :.*#{people(:one).id}/
+    assert_select ".box_about_actor p", :text=>/Seek ID :.*#{people(:quentin_person).id}/
   end
 
   def test_not_current_user_doesnt_show_seek_id
@@ -113,7 +113,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_should_update_person
-    put :update, :id => people(:one), :person => { }
+    put :update, :id => people(:quentin_person), :person => { }
     assert_redirected_to person_path(assigns(:person))
   end
 
@@ -142,7 +142,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_should_destroy_person
     assert_difference('Person.count', -1) do
-      delete :destroy, :id => people(:one)
+      delete :destroy, :id => people(:quentin_person)
     end
 
     assert_redirected_to people_path
