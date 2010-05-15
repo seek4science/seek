@@ -1,40 +1,41 @@
 <ul class="sectionIcons">
-  <% if @investigation.can_edit?(current_user) -%>
+    <% if @investigation.can_edit?(current_user) -%>
     <li>
-      <%= image_tag_for_key('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%>
+        <%= image_tag_for_key('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%>
     </li>
-  <% end -%>
-
-  <%= delete_ISA_icon @investigation,current_user -%>
-</ul>
-
-<%= render :partial => "layouts/item_title",:locals=>{:item=>@investigation} %>
-
-<div class="show_basic">
-  <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
-    <b>Created at:</b> <%= @investigation.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-    <% unless @investigation.created_at == @investigation.updated_at -%>
-      <br/>
-      <b>Last updated: </b><%= @investigation.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
     <% end -%>
-  </div>
-  
-  <p class="id">
-    <label>ID: </label>
-    <%= @investigation.id -%>
-  </p>
-
-  <p>
-    <b>Project:</b> <%= link_to h(@investigation.project.name),@investigation.project %>
-  </p>
-
-  <p>
-    <b>Description:</b>
-    <div id="description" class="box_standout">
-      <%= text_or_not_specified(@investigation.description, :description=>true,:auto_link=>true) %>
+    <%= delete_ISA_icon @investigation,current_user -%>
+</ul>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@investigation} %>
+<div class="show_basic">
+    <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
+        <b>Created at:</b>
+        <%= @investigation.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+        <% unless @investigation.created_at == @investigation.updated_at -%>
+        <br/>
+        <b>Last updated: </b>
+        <%= @investigation.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+        <% end -%>
     </div>
-  </p>
-
-  <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @investigation %>
-  
+    <p class="id">
+        <label>
+            ID: 
+        </label>
+        <%= @investigation.id -%>
+    </p>
+    <p>
+        <b>Project:</b>
+        <%= link_to h(@investigation.project.name),@investigation.project %>
+    </p>
+    <p>
+        <b>Description:</b>
+        <div id="description" class="box_standout">
+            <%= text_or_not_specified(@investigation.description, :description=>true,:auto_link=>true) %>
+        </div>
+    </p>
+	
+    
+    <embed src='<%= investigation_path(@investigation,:format=>"svg") -%>' width='100%' height='100%' />
+    
+	<%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @investigation %>
 </div>
