@@ -33,9 +33,8 @@
             <%= text_or_not_specified(@investigation.description, :description=>true,:auto_link=>true) %>
         </div>
     </p>
-	
-    
-    <embed src='<%= investigation_path(@investigation,:format=>"svg") -%>' width='100%' height='100%' />
+	<br/>
+    <embed src='<%= investigation_path(@investigation,:format=>"svg") -%>' style="width:100%;height:100%;" />
     
 	<%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @investigation %>
 </div>
