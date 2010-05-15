@@ -5,3 +5,4 @@
 # Mime::Type.register_alias "text/html", :iphone
 
 Mime::Type.register_alias "image/svg+xml", :svg
+Mime::Type.register_alias "text/plain", :dot

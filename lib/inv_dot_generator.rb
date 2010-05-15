@@ -1,15 +1,20 @@
 module InvDotGenerator
   def to_dot
     dot = "digraph Investigation {"
-    
-    dot << "compound=true;" 
-    dot << "node [fontsize=8];"    
+    dot << "rankdir = LR;"    
+    dot << "node [fontsize=10];"    
     dot << "bgcolor=white;" 
-    dot << "edge [arrowsize=1, color=black];"
+    dot << "edge [arrowsize=0.6];\n"   
+    dot << "Inv_#{id} [label=\"#{multiline(title)}\",shape=box];\n"
+    studies.each do |s|
+      dot << "Study_#{s.id} [label=\"#{multiline(s.title)}\",shape=box];\n"
+      dot << "Inv_#{id} -> Study_#{s.id}\n"
+      s.assays.each do |a|
+        dot << "Assay_#{a.id} [label=\"#{multiline(a.title)}\",shape=box];\n"
+      dot << "Study_#{s.id} -> Assay_#{a.id}\n"
+      end
+    end
     
-    dot << "AAA [label=\"blah blah\\n blah blah blah\",shape=box];"
-    dot << "BBB [label=\"blah blah\\n blah blah blah\",shape=box];"
-    dot << "AAA -> BBB;\n"
     dot << "}"
     return dot
   end
@@ -21,6 +26,17 @@ module InvDotGenerator
     file.close    
     puts "saved to tmp file: "+tmpfile.path
     `dot -Tsvg #{tmpfile.path}`
+  end
+  
+  def multiline str,line_len=3
+    word_arr=str.split
+    x=line_len
+    while x<str.split.length do
+      word_arr.insert(x,"\\n")
+      x+=line_len
+    end
+    
+    word_arr.join(" ")
   end
     
 end
