@@ -22,8 +22,8 @@ module ISAHelper
 #    dot=["compound = true;","node[fontsize=12];","bgcolor=white;","edge [arrowsize=1, color=black];"]
 #    
 #    svg=`date`
-    
-    return "svg"
+    dot = "digraph Investigation {}"
+    return `echo #{dot} | dot -Tsvg`
   end
     
   
