@@ -67,6 +67,8 @@ class StudiesController < ApplicationController
     respond_to do |format|
       format.html
       format.xml {render :xml=>@study.to_xml }
+      format.svg { render :text=>@study.to_svg}
+      format.dot { render :text=>@study.to_dot}
     end
 
   end  

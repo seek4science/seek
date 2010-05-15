@@ -6,6 +6,7 @@ class InvestigationsController < ApplicationController
   before_filter :investigation_auth_project,:only=>[:edit,:update]
   before_filter :delete_allowed,:only=>[:destroy]
 
+
   def index
     @investigations=Investigation.find(:all, :include=>:studies, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
     @investigations=Investigation.paginate :page=>params[:page]
@@ -32,6 +33,8 @@ class InvestigationsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml { render :xml=> @investigation, :include=>@investigation.studies }
+      format.svg { render :text=>@investigation.to_svg}
+      format.dot { render :text=>@investigation.to_dot}
     end
   end
 
