@@ -1,6 +1,6 @@
 module InvDotGenerator
   def to_dot
-    dot = "digraph Investigation {"
+    dot = "graph Investigation {"
     dot << "rankdir = LR;"    
     dot << "node [fontsize=10];"    
     dot << "bgcolor=white;" 
@@ -8,10 +8,10 @@ module InvDotGenerator
     dot << "Inv_#{id} [label=\"#{multiline(title)}\",shape=box,style=filled,fillcolor=skyblue3];\n"
     studies.each do |s|
       dot << "Study_#{s.id} [label=\"#{multiline(s.title)}\",shape=box,style=filled,fillcolor=skyblue2];\n"
-      dot << "Inv_#{id} -> Study_#{s.id}\n"
+      dot << "Inv_#{id} -- Study_#{s.id}\n"
       s.assays.each do |a|
         dot << "Assay_#{a.id} [label=\"#{multiline(a.title)}\",shape=box,style=filled,fillcolor=skyblue1];\n"
-      dot << "Study_#{s.id} -> Assay_#{a.id}\n"
+      dot << "Study_#{s.id} -- Assay_#{a.id}\n"
       end
     end
     
