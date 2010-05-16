@@ -1,5 +1,7 @@
 class StudiesController < ApplicationController
 
+  include StudyDotGenerator
+  
   before_filter :login_required
     
   before_filter :is_project_member,:only=>[:create,:new]
@@ -67,8 +69,8 @@ class StudiesController < ApplicationController
     respond_to do |format|
       format.html
       format.xml {render :xml=>@study.to_xml }
-      format.svg { render :text=>@study.to_svg}
-      format.dot { render :text=>@study.to_dot}
+      format.svg { render :text=>to_svg(@study)}
+      format.dot { render :text=>to_dot(@study)}
     end
 
   end  
