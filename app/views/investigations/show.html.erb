@@ -34,7 +34,8 @@
         </div>
     </p>
 	<br/>
-    <embed src='<%= investigation_path(@investigation,:format=>"svg") -%>' style="width:100%;height:100%;" />
+	
+    <embed src='<%= investigation_path(@investigation,:format=>"svg") -%>' style="width:100%;height:100%;" ></embed>
     
 	<%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @investigation %>
 </div>

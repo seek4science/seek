@@ -1,4 +1,5 @@
 module StudyDotGenerator
+  include DotGenerator
   def to_dot study
     dot = "graph Study {"
     dot << "rankdir = LR;"    
@@ -20,26 +21,6 @@ module StudyDotGenerator
     return dot
   end
   
-  def to_svg study
-    tmpfile = Tempfile.new('study_dot')
-    file = File.new(tmpfile.path,'w')
-    file.puts to_dot(study)
-    file.close    
-    puts "saved to tmp file: "+tmpfile.path
-    `dot -Tsvg #{tmpfile.path}`
-  end
   
-  def multiline str,line_len=3    
-    str=str[0..500]
-    str+=" ..."
-    word_arr=str.split
-    x=line_len
-    while x<str.split.length do
-      word_arr.insert(x,"\\n")
-      x+=line_len
-    end
-    
-    word_arr.join(" ")
-  end
   
 end

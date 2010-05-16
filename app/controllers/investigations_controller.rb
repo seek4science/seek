@@ -37,6 +37,7 @@ class InvestigationsController < ApplicationController
       format.xml { render :xml=> @investigation, :include=>@investigation.studies }
       format.svg { render :text=>to_svg(@investigation)}
       format.dot { render :text=>to_dot(@investigation)}
+      format.png { render :text=>to_png(@investigation)}
     end
   end
 
