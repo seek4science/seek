@@ -18,7 +18,7 @@ module DotGenerator
     `dot -Tpng #{tmpfile.path}`
   end
   
-  def multiline str,line_len=2    
+  def multiline str,line_len=3    
     new_str=str[0..500]
     str+=" ..." if str.length>500
     word_arr=new_str.split
