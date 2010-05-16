@@ -2,17 +2,19 @@ module StudyDotGenerator
   def to_dot
     dot = "graph Study {"
     dot << "rankdir = LR;"    
-    dot << "node [fontsize=8];"    
+    dot << "node [fontsize=10];"    
     dot << "bgcolor=white;" 
     dot << "edge [arrowsize=0.6];\n"   
     dot << "Study_#{id} [label=\"#{multiline(title)}\",shape=box,style=filled,fillcolor=skyblue3];\n"
     assays.each do |a|
       dot << "Assay_#{a.id} [label=\"#{multiline(a.title)}\",shape=box,style=filled,fillcolor=skyblue1];\n"
       dot << "Study_#{id} -- Assay_#{a.id}\n"
-      a.assets.each do |asset|
-        dot << "Asset_#{asset.id} [label=\"#{multiline(asset.title)}\",shape=ellipse,style=filled,fillcolor=cyan];\n"
-        dot << "Assay_#{a.id} -- Asset_#{asset.id}\n"
-      end    
+#      a.assets.each do |asset|
+#        if Authorization.is_authorized?("view",nil,asset,current_user)
+#          dot << "Asset_#{asset.id} [label=\"#{multiline(asset.title)}\",shape=ellipse,style=filled,fillcolor=cyan];\n"
+#          dot << "Assay_#{a.id} -- Asset_#{asset.id}\n"
+#        end
+#      end    
     end    
     dot << "}"
     return dot
@@ -28,7 +30,7 @@ module StudyDotGenerator
   end
   
   def multiline str,line_len=3    
-    str=str[0..70]
+    str=str[0..100]
     str+=" ..."
     word_arr=str.split
     x=line_len

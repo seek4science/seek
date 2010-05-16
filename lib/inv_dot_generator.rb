@@ -2,7 +2,7 @@ module InvDotGenerator
   def to_dot
     dot = "graph Investigation {"
     dot << "rankdir = LR;"    
-    dot << "node [fontsize=10];"    
+    dot << "node [fontsize=8];"    
     dot << "bgcolor=white;" 
     dot << "edge [arrowsize=0.6];\n"   
     dot << "Inv_#{id} [label=\"#{multiline(title)}\",shape=box,style=filled,fillcolor=skyblue3];\n"
@@ -28,8 +28,8 @@ module InvDotGenerator
     `dot -Tsvg #{tmpfile.path}`
   end
   
-  def multiline str,line_len=3    
-    str=str[0..70]
+  def multiline str,line_len=4    
+    str=str[0..250]
     str+=" ..."
     word_arr=str.split
     x=line_len
