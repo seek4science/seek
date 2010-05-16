@@ -22,11 +22,11 @@ SysMO-SEEK uses Lucene as its search engine, and this requires that java is inst
 
 If using Ubuntu or Debian, the following commands should install all the packages you need:
 
-  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk
+  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
 
 For Ubuntu 10.04 (Lucid Lynx) you should use:
 
-  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev
+  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev graphviz
 
 You now need to install rubygems (1.3.6). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
 The following commands should install rubygems for you on a Ubuntu/Debian system.
