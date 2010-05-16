@@ -3,7 +3,7 @@ module InvDotGenerator
   def to_dot investigation
     dot = "graph Investigation {"
     dot << "rankdir = LR;"    
-    dot << "node [fontsize=10];"    
+    dot << "node [fontsize=10,fontname=\"Helvetica\"];"    
     dot << "bgcolor=white;" 
     dot << "edge [arrowsize=0.6];\n"   
     dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",shape=box,style=filled,fillcolor=skyblue3,URL=\"#{investigation_path(investigation)}\"];\n"
