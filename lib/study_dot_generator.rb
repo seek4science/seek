@@ -3,7 +3,7 @@ module StudyDotGenerator
   def to_dot study
     dot = "graph Study {"
     dot << "rankdir = LR;"    
-    dot << "node [fontsize=10];"    
+    dot << "node [fontsize=10,fontname=\"Helvetica\"];"
     dot << "bgcolor=white;" 
     dot << "edge [arrowsize=0.6];\n"   
     dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",shape=box,style=filled,fillcolor=skyblue3,URL=\"#{study_path(study)}\"];\n"
