@@ -1,3 +1,5 @@
+
+
 ActionView::Base.send(:include, SiteAnnouncementsHelper)
 
 # FIX for engines model reloading issue in development mode
@@ -7,3 +9,4 @@ if ENV['RAILS_ENV'] != 'production'
 	end
 end
 
+ActiveRecord::Base.send(:include,SiteAnnouncements::Acts)

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100511123315) do
+ActiveRecord::Schema.define(:version => 20100517150441) do
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
@@ -148,7 +148,7 @@ ActiveRecord::Schema.define(:version => 20100511123315) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
   end
@@ -244,7 +244,6 @@ ActiveRecord::Schema.define(:version => 20100511123315) do
 
   create_table "help_images", :force => true do |t|
     t.integer  "help_document_id"
-    t.string   "title"
     t.string   "content_type"
     t.string   "filename"
     t.integer  "size"
@@ -334,7 +333,7 @@ ActiveRecord::Schema.define(:version => 20100511123315) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
   end
@@ -350,6 +349,15 @@ ActiveRecord::Schema.define(:version => 20100511123315) do
     t.integer "topic_id"
     t.integer "user_id"
     t.boolean "active",   :default => true
+  end
+
+  create_table "notifiee_infos", :force => true do |t|
+    t.integer  "notifiee_id"
+    t.string   "notifiee_type"
+    t.string   "unique_key"
+    t.boolean  "receive_notifications", :default => true
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "organisms", :force => true do |t|
@@ -542,7 +550,7 @@ ActiveRecord::Schema.define(:version => 20100511123315) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
   end

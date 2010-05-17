@@ -5,6 +5,8 @@ class Person < ActiveRecord::Base
   
   acts_as_editable
   
+  acts_as_notifiee
+  
   has_many :favourites, 
            :as => :resource, 
            :dependent => :destroy

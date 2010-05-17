@@ -208,6 +208,23 @@ class PersonTest < ActiveSupport::TestCase
     p.save
     assert_equal "Z",p.first_letter    
   end
+  
+  def test_notifiee_info_inserted
+    p=Person.new(:first_name=>"Zebedee",:last_name=>"",:email=>"zz@email.com")
+    assert_nil p.notifiee_info
+    p.save!
+    p=Person.find(p.id)
+    assert_not_nil p.notifiee_info
+    assert true,p.receive_notifications?    
+  end
+  
+  def test_updated_not_changed_when_adding_notifiee_info
+    p=people(:modeller_person)
+    up_at=p.updated_at
+    sleep(2)
+    p.check_for_notifiee_info
+    assert_equal up_at,p.updated_at
+  end
 
 
 end

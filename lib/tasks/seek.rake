@@ -17,6 +17,14 @@ namespace :seek do
     end
   end
 
+  task(:associate_people_with_notification_info=>:environment) do
+    Person.find(:all).each do |p|
+      p.check_for_notifiee_info      
+      puts "Saved NotifieeInfo for #{p.name} - UUID = "+p.notifiee_info.unique_key
+    end
+  end
+  
+
   desc 'upgrades between 0.6 and 0.7'
   task(:upgrade_live=>:environment) do
     other_tasks=["assay_classes","update_assay_classes","strains","graft_new_assay_types","relationship_types"]

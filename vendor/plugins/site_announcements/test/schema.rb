@@ -21,10 +21,10 @@ ActiveRecord::Schema.define(:version => 0) do
   end
   
   create_table "notifiee_infos", :force=>true do |t|
-    t.column :notified_id,:integer
-    t.column :notified_type,:string
+    t.column :notifiee_id,:integer
+    t.column :notifiee_type,:string
     t.column :unique_key,:string
-    t.column :recieve_notification,:boolean,:default=>true
+    t.column :receive_notifications,:boolean,:default=>true
         
     t.timestamps
   end
