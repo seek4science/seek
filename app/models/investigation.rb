@@ -1,8 +1,6 @@
 require 'grouped_pagination'
 
-class Investigation < ActiveRecord::Base
-  
-  include InvDotGenerator
+class Investigation < ActiveRecord::Base    
   
   belongs_to :project
   has_many :studies  

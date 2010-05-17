@@ -8,6 +8,8 @@ class Asset < ActiveRecord::Base
   has_many :assay_assets, :dependent => :destroy
   has_many :assays, :through => :assay_assets
   
+  
+  
   has_and_belongs_to_many :creators,:join_table => 'assets_creators', :class_name => 'Person', :association_foreign_key => 'creator_id'  
   
   # TODO
@@ -27,6 +29,11 @@ class Asset < ActiveRecord::Base
 
   def contributor
     self.resource.contributor
+  end
+  
+  def title
+    #FIXME: quick hack to get graphviz working
+    resource.title
   end
 
   def self.classify_and_authorize(asset_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)

@@ -1,8 +1,6 @@
 require 'grouped_pagination'
 
-class Study < ActiveRecord::Base
-
-  include StudyDotGenerator
+class Study < ActiveRecord::Base  
  
   belongs_to :investigation
   

@@ -73,7 +73,10 @@
 
   </div>
   
-   <embed src='<%= study_path(@study,:format=>"svg") -%>' width='100%' height='100%' />
+  <object data="<%= study_path(@study,:format=>"svg") -%>" type="image/svg+xml" width="100%" height="100%"></object>
+	
+
+    
 
   <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @study %>
 
