@@ -1,5 +1,7 @@
 class InvestigationsController < ApplicationController
 
+  include InvDotGenerator
+
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :make_investigation_and_auth,:only=>[:create]
@@ -33,8 +35,9 @@ class InvestigationsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml { render :xml=> @investigation, :include=>@investigation.studies }
-      format.svg { render :text=>@investigation.to_svg}
-      format.dot { render :text=>@investigation.to_dot}
+      format.svg { render :text=>to_svg(@investigation)}
+      format.dot { render :text=>to_dot(@investigation)}
+      format.png { render :text=>to_png(@investigation)}
     end
   end
 
