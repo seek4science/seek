@@ -71,6 +71,7 @@ class StudiesController < ApplicationController
       format.xml {render :xml=>@study.to_xml }
       format.svg { render :text=>to_svg(@study)}
       format.dot { render :text=>to_dot(@study)}
+      format.png { render :text=>to_png(@study)}
     end
 
   end  
