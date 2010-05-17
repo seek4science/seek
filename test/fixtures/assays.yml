@@ -94,7 +94,7 @@ assay_with_public_and_private_sops_and_datafiles:
   title: Assay with 2 sops, and 2 datafiles - one of each public & private
   assay_type: metabolomics
   technology_type: gas_chromatography
-  owner: owner_of_my_first_sop
+  owner: person_for_owner_of_my_first_sop
   description: Visit my site http://www.sysmo-db.org
   study: study_with_assay_with_public_private_sops_and_datafile
   assay_class: experimental_assay_class
