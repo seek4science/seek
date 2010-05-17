@@ -20,10 +20,21 @@ class SiteAnnouncementsMigration < ActiveRecord::Migration
 
       t.timestamps
     end
+    
+    create_table :notifiee_infos do |t|
+      t.column :notified_id,:integer
+      t.column :notified_type,:string
+      t.column :unique_key,:string
+      t.column :recieve_notification,:boolean,:default=>true
+            
+      t.timestamps
+    end
+    
   end
   
   def self.down
     drop_table :site_announcements
     drop_table :site_announcement_categories
+    drop_table :notifiee_infos
   end
 end

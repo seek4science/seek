@@ -5,7 +5,7 @@ ActiveRecord::Schema.define(:version => 0) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
+  
   create_table "site_announcements", :force => true do |t|
     t.integer  "announcer_id"
     t.string   "announcer_type"
@@ -18,5 +18,14 @@ ActiveRecord::Schema.define(:version => 0) do
     t.boolean  "email_notification",            :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+  
+  create_table "notifiee_infos", :force=>true do |t|
+    t.column :notified_id,:integer
+    t.column :notified_type,:string
+    t.column :unique_key,:string
+    t.column :recieve_notification,:boolean,:default=>true
+        
+    t.timestamps
   end
 end
