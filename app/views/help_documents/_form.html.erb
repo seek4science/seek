@@ -9,8 +9,9 @@
     
     <p>      
       <%= f.label :identifier %><br/>
-      The identifier can only be specified on creation.<br/>
-      It will be present in URLs, eg. example.com/help/1234-example-identifier<br/>
+      The identifier is a unique reference to this page, which will be present in links and URLs, e.g. http://example.com/help/example-identifier<br/>
+      It cannot be editted once the page has been created.<br/>
+      Identifiers must start with a letter or a number, and may only contain alphanumeric characters and hyphens.
       <%= f.text_field :identifier, :disabled => (action == :update ? 'disabled' : nil) %><br/>
     </p>
       
@@ -20,7 +21,8 @@
     </p>  
     
     <%= f.label :body %><br/>
-    <%= render :partial => 'legend' %><br/>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:div_options => {:style => "width: 50%"}, :header_options => {:style => "padding: 0.2em"}, :title => "Legend", :partial => 'legend'} %>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:div_options => {:style => "width: 50%"}, :header_options => {:style => "padding: 0.2em"}, :title => "List of pages", :partial => 'page_list'} %>
     <%= f.text_area :body, :size => "80x20" %><br/>     
     
     <%= submit_tag "Preview" %>
@@ -28,3 +30,5 @@
     
   <% end %>
 </div>
+
+

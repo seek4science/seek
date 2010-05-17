@@ -10,10 +10,10 @@
 
 <div style="margin: 2em">
   <div style="float:left; width: 48%">
-    <%= render :partial => "attachments" -%>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Attachments", :partial => 'attachments'} %>
   </div>
   <div style="float:right; width: 51%">
-    <%= render :partial => "images" -%>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Images", :partial => 'images'} %>
   </div>
   <br style="clear:both"/>
 </div>

@@ -14,7 +14,7 @@
 <% if attachments.empty? %>
   <span class="none_text">No attachments</span>
 <% else %>
-  <ul>
+  <ul class="attachments_list">
     <% attachments.each do |a| %>
       <li>
         <%= link_to "#{a.filename} - #{a.title} (#{number_to_human_size(a.size)})", download_help_document_help_attachment_path(@help_document,a) -%>

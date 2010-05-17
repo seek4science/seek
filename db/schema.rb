@@ -244,6 +244,7 @@ ActiveRecord::Schema.define(:version => 20100511123315) do
 
   create_table "help_images", :force => true do |t|
     t.integer  "help_document_id"
+    t.string   "title"
     t.string   "content_type"
     t.string   "filename"
     t.integer  "size"

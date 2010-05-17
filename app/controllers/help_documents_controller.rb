@@ -1,5 +1,6 @@
 class HelpDocumentsController < ApplicationController
   
+  before_filter :find_document, :except => [:new, :index, :create]
   before_filter :login_required
   before_filter :is_user_admin_auth, :except => [:show, :index]
   
@@ -19,7 +20,6 @@ class HelpDocumentsController < ApplicationController
   end
 
   def show
-    @help_document = HelpDocument.find(params[:id])
     respond_to do |format|
       format.html # show.html.erb
       format.xml { render :xml=>@help_document}
@@ -36,16 +36,18 @@ class HelpDocumentsController < ApplicationController
   end
   
   def edit
-    @help_document = HelpDocument.find(params[:id])
   end
   
   def update
-    @help_document = HelpDocument.find(params[:id])
+    #Stop identifier being changed
+    params[:help_document].delete(:identifier)
+    
+    #Update changes when previewing, but don't save
     if params[:commit] == "Preview"
       @preview = true
       @help_document.body = params[:help_document][:body]
       @help_document.title = params[:help_document][:title]
-    end    
+    end   
     respond_to do |format|
       if !@preview && @help_document.update_attributes(params[:help_document])
         format.html { redirect_to(@help_document) }
@@ -78,12 +80,17 @@ class HelpDocumentsController < ApplicationController
   end
   
   def destroy
-    help_document = HelpDocument.find(params[:id])
-    help_document.destroy
+    @help_document.destroy
     
     respond_to do |format|
       format.html { redirect_to(help_documents_url) }
       format.xml  { head :ok }
     end
+  end
+  
+  private
+  
+  def find_document
+    @help_document = HelpDocument.find_by_identifier(params[:id])
   end
 end

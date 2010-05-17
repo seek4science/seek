@@ -5,3 +5,18 @@
 #
 # two:
 #   column: value
+
+one:
+  identifier: one
+  title: one
+  body: b
+  
+two:
+  identifier: two
+  title: two
+  body: b
+
+example: 
+  identifier: example
+  title: Example Doc
+  body: _this_ is an example document
