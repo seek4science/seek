@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Sun May 16 01:00:40 +0100 2010</td>
+      <td>Mon May 17 15:02:35 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -148,7 +148,15 @@ If using Ubuntu or Debian, the following commands should install all the
 gems you need:
 </p>
 <pre>
-  sudo gem install rails mysql libxml-ruby rmagick spreadsheet hpricot uuidtools fastercsv RedCloth mongrel
+  sudo gem install rails mysql rmagick spreadsheet hpricot uuidtools RedCloth mongrel
+</pre>
+<p>
+Also specific versions of <em>fastercsv</em> and <em>libxml-ruby</em> are
+required:
+</p>
+<pre>
+  sudo gem install fastercsv -v 1.5.1
+  sudo gem install libxml-ruby -v 1.1.3
 </pre>
 <h2>Getting the source code</h2>
 <p>
@@ -156,11 +164,11 @@ Our source code is stored within the <a
 href="http://code.google.com/p/sysmo-db/">Sysmo-DB Google Code
 Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
 as the version control system. For a stable version, you should check out
-according to a stable tag. Our current tag is v0.7.2, so to retrieve this
+according to a stable tag. Our current tag is v0.7.3, so to retrieve this
 version you should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.7.2 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.7.3 sysmo-seek
 </pre>
 <h2>The RAILS_ENV environment variable</h2>
 <p>
@@ -192,7 +200,7 @@ recommended to use something different).
 
     Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-    mysql&gt; GRANT ALL on *.* TO 'mysqluser'@'localhost' IDENTIFIED BY 'mysqluser'
+    mysql&gt; GRANT ALL on *.* TO 'mysqluser'@'localhost' IDENTIFIED BY 'mysqlpassword'
 </pre>
 <p>
 Run the rake tasks (the final task installs some default controlled
