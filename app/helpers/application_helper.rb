@@ -184,7 +184,7 @@ module ApplicationHelper
       :onMouseUp => "setTimeout('#{can_click_var} = true;', 200);")
     html << draggable_element(link_options[:id],
       :revert => drag_options[:revert] || true,
-      :ghosting => drag_options[:ghosting] || true,
+      :ghosting => drag_options[:ghosting] || false,
       :change => "function(element){#{can_click_var} = false;}")
     return html
   end
