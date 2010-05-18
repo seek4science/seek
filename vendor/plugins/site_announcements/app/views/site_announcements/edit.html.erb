@@ -1,6 +1,8 @@
+<div id="announcement_form">
 <% form_for @site_announcement do |f| -%>
-  
-  <%= render :partial=>"form",:locals=>{:f=>f} %>
+  <h1>Editing the announcement '<%= h(@site_announcement.title) -%>'</h1>
+  <%= render :partial=>"form",:locals=>{:f=>f,:edit=>true} %>
   <br/>
   <%= f.submit "Update" -%>
 <% end -%>
+</div>
