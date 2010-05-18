@@ -65,8 +65,7 @@ class StudiesController < ApplicationController
   end
 
   def show
-    @study=Study.find(params[:id])
-    @study_svg=to_svg(@study)
+    @study=Study.find(params[:id])    
     respond_to do |format|
       format.html
       format.xml {render :xml=>@study.to_xml }
