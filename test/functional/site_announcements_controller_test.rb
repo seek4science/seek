@@ -42,6 +42,21 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert_equal users(:quentin).person,assigns(:site_announcement).announcer
   end
   
+  test "should destroy" do
+    assert_difference("SiteAnnouncement.count",-1) do
+      delete :destroy,:id=>site_announcements(:feed)
+    end    
+  end
+  
+  test "should not destroy" do
+    login_as(:aaron)
+    assert_no_difference("SiteAnnouncement.count") do
+      delete :destroy,:id=>site_announcements(:feed)
+    end   
+    
+    assert_not_nil flash[:error]
+  end
+  
   test "should update" do
     ann=site_announcements(:feed)
     put :update,:id=>ann,:site_announcement=>{:title=>"bob"}
