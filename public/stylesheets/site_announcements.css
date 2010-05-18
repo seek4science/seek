@@ -118,6 +118,10 @@ div#announcement_form {
 	padding-left: 2em;	
 }
 
+div#announcement_form .comment {
+	color: #666;
+}
+
 div#announcement_form p {
 	padding-top: 0.5em;
 }

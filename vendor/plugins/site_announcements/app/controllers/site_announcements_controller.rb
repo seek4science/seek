@@ -1,7 +1,7 @@
 class SiteAnnouncementsController < ApplicationController
   before_filter :login_required, :except=>[:feed,:notification_settings,:update_notification_settings]
   
-  before_filter :check_manage_announcements,:only=>[:new,:create,:edit,:update]
+  before_filter :check_manage_announcements,:only=>[:new,:create,:edit,:update,:destroy]
   
   def feed
     limit=params[:limit]
@@ -25,6 +25,20 @@ class SiteAnnouncementsController < ApplicationController
         flash[:error]="Unable to update your settings"
         flash[:error]+=", the key presented wasn't recognised."
         format.html { render :action => :notification_settings}
+      end
+    end
+  end
+  
+  def destroy 
+    @site_announcement=SiteAnnouncement.find(params[:id])
+    
+    respond_to do |format|
+      if @site_announcement.destroy
+        flash[:notice]="Announcement destroyed"
+        format.html {redirect_to site_announcements_path}
+      else        
+        flash[:error]="There was a problem destroying the announcement"        
+        format.html { render :action=>:edit }
       end
     end
   end
