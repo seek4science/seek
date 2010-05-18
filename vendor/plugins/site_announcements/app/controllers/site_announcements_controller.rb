@@ -1,5 +1,5 @@
 class SiteAnnouncementsController < ApplicationController
-  before_filter :login_required, :except=>[:feed,:email_notifications]
+  before_filter :login_required, :except=>[:feed,:notification_settings,:update_notification_settings]
   
   before_filter :check_manage_announcements,:only=>[:new,:create,:edit,:update]
   
@@ -19,7 +19,7 @@ class SiteAnnouncementsController < ApplicationController
     @info.receive_notifications = receive_notifications unless @info.nil?
     respond_to do |format|
       if @info && @info.save
-        flash[:notice]="Notification setting updated. You will now #{"not " if !@info.receive_notifications?}receive notification emails."
+        flash[:notice]="Email announcement setting updated. You will now #{"not " if !@info.receive_notifications?}receive notification emails."
         format.html { redirect_to(root_url) }
       else
         flash[:error]="Unable to update your settings"
