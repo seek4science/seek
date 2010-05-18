@@ -33,17 +33,17 @@ class NotifieeInfoTest < ActiveSupport::TestCase
 #    assert_nil NotifieeInfo.find_by_id(n.id)
 #  end
   
-  def test_notifiee_isnt_deleted_when_notifiee_info_is
-    c=SiteAnnouncementCategory.new
-    c.save!
-    
-    n=NotifieeInfo.new(:notifiee=>c)        
-    n.save!
-    
-    assert_no_difference("SiteAnnouncementCategory.count") do
-      n.destroy
-    end
-    
-    assert_not_nil SiteAnnouncementCategory.find_by_id(c.id)
-  end
-end
+#  def test_notifiee_isnt_deleted_when_notifiee_info_is
+#    c=SiteAnnouncementCategory.new
+#    c.save!
+#    
+#    n=NotifieeInfo.new(:notifiee=>c)        
+#    n.save!
+#    
+#    assert_no_difference("SiteAnnouncementCategory.count") do
+#      n.destroy
+#    end
+#    
+#    assert_not_nil SiteAnnouncementCategory.find_by_id(c.id)
+#  end
+#end

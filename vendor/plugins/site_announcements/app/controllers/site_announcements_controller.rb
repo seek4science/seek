@@ -1,8 +1,8 @@
 class SiteAnnouncementsController < ApplicationController
-  before_filter :login_required, :except=>[:feed]
-
+  before_filter :login_required, :except=>[:feed,:email_notifications]
+  
   before_filter :check_manage_announcements,:only=>[:new,:create,:edit,:update]
-
+  
   def feed
     limit=params[:limit]
     limit||=10
@@ -11,11 +11,28 @@ class SiteAnnouncementsController < ApplicationController
       format.atom
     end
   end
-
+  
+  def email_notifications
+    key=params[:key]
+    error=false
+    @info=NotifieeInfo.find_by_unique_key(key) 
+    error=true if !@info.nil?
+    
+    respond_to do |format|
+      if error 
+        format.html
+      else
+        flash[:error]="Invalid Key"
+        redirect_to root_url
+      end
+      
+    end
+  end
+  
   def new
     @site_announcement=SiteAnnouncement.new
   end
-
+  
   def create
     @site_announcement=SiteAnnouncement.new(params[:site_announcement])
     @site_announcement.announcer = currently_logged_in
@@ -30,14 +47,14 @@ class SiteAnnouncementsController < ApplicationController
       end
     end
   end
-
+  
   def edit
     @site_announcement=SiteAnnouncement.find(params[:id])
   end
-
+  
   def update
     @site_announcement=SiteAnnouncement.find(params[:id])
-
+    
     respond_to do |format|
       if @site_announcement.update_attributes(params[:site_announcement])
         flash[:notice] = 'Study was successfully updated.'
@@ -53,11 +70,11 @@ class SiteAnnouncementsController < ApplicationController
   def show
     @site_announcement=SiteAnnouncement.find(params[:id])
   end
-
+  
   def index
     @site_announcements=SiteAnnouncement.find(:all)
   end
-
+  
   def check_manage_announcements    
     if !can_manage_announcements?
       flash[:error] = "Admin rights required"

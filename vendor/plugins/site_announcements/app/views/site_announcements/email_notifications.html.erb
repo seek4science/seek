@@ -1,0 +1,11 @@
+
+<% text=@info.receive_notifications? ? " are currently receiving " : " are currently not receiving " %>
+<p>
+	You have been identified as <b><%= h(@info.notifiee.name) -%></b>, and you <%= text -%> email notifications.	
+</p>
+<p>
+	Please change the setting below to your preferred setting:
+</p>
+
+<%= check_box_tag(:receive_notifications, value = "sfgsf", checked = @info.receive_notifications?, options = {}) -%>
+
