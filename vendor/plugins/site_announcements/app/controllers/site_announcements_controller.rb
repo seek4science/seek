@@ -12,7 +12,7 @@ class SiteAnnouncementsController < ApplicationController
     end
   end
   
-  def email_notifications
+  def notification_settings
     key=params[:key]
     error=false
     @info=NotifieeInfo.find_by_unique_key(key) 
