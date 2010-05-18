@@ -82,8 +82,7 @@ class Mailer < ActionMailer::Base
   
   def announcement_notification(site_announcement, notifiee_info,base_host)
     subject "SysMO SEEK Announcement:  #{site_announcement.title}"
-    #recipients notifiee_info.notifiee.email_with_name
-    recipients "sowen@cs.man.ac.uk"
+    recipients notifiee_info.notifiee.email_with_name    
     from       NOREPLY_SENDER
     sent_on    Time.now
     

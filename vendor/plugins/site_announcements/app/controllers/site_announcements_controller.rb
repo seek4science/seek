@@ -12,6 +12,23 @@ class SiteAnnouncementsController < ApplicationController
     end
   end
   
+  def update_notification_settings
+    receive_notifications = params[:receive_notifications]
+    receive_notifications ||= false
+    @info = NotifieeInfo.find_by_unique_key(params[:key])
+    @info.receive_notifications = receive_notifications unless @info.nil?
+    respond_to do |format|
+      if @info && @info.save
+        flash[:notice]="Notification setting updated. You will now #{"not " if !@info.receive_notifications?}receive notification emails."
+        format.html { redirect_to(root_url) }
+      else
+        flash[:error]="Unable to update your settings"
+        flash[:error]+=", the key presented wasn't recognised."
+        format.html { render :action => :notification_settings}
+      end
+    end
+  end
+  
   def notification_settings
     key=params[:key]
     error=false
