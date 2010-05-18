@@ -6,7 +6,16 @@ module DotGenerator
     file.puts to_dot(thing)
     file.close    
     puts "saved to tmp file: "+tmpfile.path
-    `dot -Tsvg #{tmpfile.path}`
+    post_process_svg(`dot -Tsvg #{tmpfile.path}`)
+  end
+  
+  def dot_header title
+    dot = "graph #{title} {"
+    dot << "rankdir = LR;"    
+    dot << "node [fontsize=9,fontname=\"Helvetica\"];"    
+    dot << "bgcolor=white;" 
+    dot << "edge [arrowsize=0.6];\n" 
+    return dot
   end
   
   def to_png thing
@@ -16,6 +25,10 @@ module DotGenerator
     file.close    
     puts "saved to tmp file: "+tmpfile.path
     `dot -Tpng #{tmpfile.path}`
+  end
+  
+  def post_process_svg svg
+    return svg.gsub(".00;",".00px;")
   end
   
   def multiline str,line_len=3    

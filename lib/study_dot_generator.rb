@@ -1,11 +1,7 @@
 module StudyDotGenerator
   include DotGenerator
   def to_dot study
-    dot = "graph Study {"
-    dot << "rankdir = LR;"    
-    dot << "node [fontsize=10,fontname=\"Helvetica\"];"
-    dot << "bgcolor=white;" 
-    dot << "edge [arrowsize=0.6];\n"   
+    dot = dot_header "Study" 
     dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{study.title}\",shape=box,style=filled,fillcolor=skyblue3,URL=\"#{study_path(study)}\"];\n"
     study.assays.each do |a|
       dot << "Assay_#{a.id} [label=\"#{multiline(a.title)}\",tooltip=\"#{a.title}\",shape=box,style=filled,fillcolor=skyblue1,URL=\"#{assay_path(a)}\"];\n"
