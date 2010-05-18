@@ -1,6 +1,5 @@
 module StudiesHelper
-
-
+  
 
   def new_investigation_to_project_popup_link project_id
     return link_to_remote_redbox("Create",

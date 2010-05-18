@@ -1,5 +1,5 @@
 module InvestigationsHelper
-
+  
   def investigation_link investigation
     unless investigation.nil?
       link_to h(investigation.title),investigation
