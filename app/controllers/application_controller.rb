@@ -170,11 +170,16 @@ class ApplicationController < ActionController::Base
       data_hash = downloader.get_remote_data resource.content_blob.url,project.site_username,project.site_password, resource_type
       send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
   end
+  
 
   #required for the Savage Beast
   def admin?
     current_user.is_admin?
   end
+  
+  def email_enabled?
+    EMAIL_ENABLED    
+  end      
 
   # See ActionController::Base for details 
   # Uncomment this to filter the contents of submitted sensitive data parameters

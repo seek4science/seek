@@ -109,6 +109,8 @@ class AdminController < ApplicationController
     sorted_keys=x.keys.sort
     (sorted_keys.first..sorted_keys.last).collect{|i| x[i].nil? ? 0 : x[i]  }
   end
+  
+  
 
 
 end

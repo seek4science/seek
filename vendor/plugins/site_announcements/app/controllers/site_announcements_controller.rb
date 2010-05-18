@@ -36,6 +36,11 @@ class SiteAnnouncementsController < ApplicationController
   def create
     @site_announcement=SiteAnnouncement.new(params[:site_announcement])
     @site_announcement.announcer = currently_logged_in
+    
+    if (@site_announcement.email_notification?)
+      send_announcement_emails(@site_announcement)
+    end
+    
     respond_to do |format|
       if @site_announcement.save
         flash[:notice] = 'The Announcement was successfully announced.'
@@ -48,10 +53,18 @@ class SiteAnnouncementsController < ApplicationController
     end
   end
   
+  def send_announcement_emails site_announcement
+    if email_enabled?
+      NotifieeInfo.find(:all,:conditions=>["receive_notifications=?",true]).each do |notifiee_info|
+        Mailer.deliver_announcement_notification(site_announcement, notifiee_info,base_host)                     
+      end  
+    end
+  end
+  
   def edit
     @site_announcement=SiteAnnouncement.find(params[:id])
   end
-  
+      
   def update
     @site_announcement=SiteAnnouncement.find(params[:id])
     
@@ -81,4 +94,5 @@ class SiteAnnouncementsController < ApplicationController
       redirect_to root_url
     end
   end
+   
 end

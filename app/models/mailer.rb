@@ -79,5 +79,17 @@ class Mailer < ActionMailer::Base
     
     body       :resources => harvester_responses, :person=>user.person, :host=>base_host
   end
+  
+  def announcement_notification(site_announcement, notifiee_info,base_host)
+    subject "SysMO SEEK Announcement:#{site_announcement.title}"
+    recipients notifiee_info.notifiee.email_with_name
+    #recipients "sowen@cs.man.ac.uk"
+    from       NOREPLY_SENDER
+    sent_on    Time.now
+    
+    sent_on Time.now
+
+    body :site_announcement=>site_announcement, :notifiee_info=>notifiee_info,:host=>base_host
+  end
 
 end

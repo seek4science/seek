@@ -51,8 +51,6 @@ class HomeController < ApplicationController
     end
   end
 
-  
-
   private
 
   RECENT_SIZE=3

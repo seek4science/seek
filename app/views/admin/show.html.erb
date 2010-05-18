@@ -8,6 +8,12 @@
     <br/>
     <%= link_to "Fix JERM generated titles", url_for(:action=>"fix_titles",:controller=>"jerm") %>
   </p>
+  
+  <h2>Announcements</h2>
+  <p>
+    <%= link_to "Create an announcement", new_site_announcement_path -%>    
+  </p>
+  
   <h2>Tags ...</h2>
   <p>
     <%= link_to "Manage tags", url_for(:action=>"tags", :controller=>"admin") %>
