@@ -11,7 +11,7 @@ class NotifieeInfo < ActiveRecord::Base
   
   def check_unique_key
     if self.unique_key.nil? || self.unique_key.blank?
-      self.unique_key = UUIDTools::UUID.random_create.to_s + UUIDTools::UUID.random_create.to_s
+      self.unique_key = UUIDTools::UUID.random_create.to_s
     end
   end    
   

@@ -1,1 +1,13 @@
+Hi,  
+    
+<%= @site_announcement.body -%>
 
+
+If you do not wish to receive these emails in the future, please visit:
+
+<%= email_notifications_site_announcements_url(:key=>@notifiee_info.unique_key,:host=>@host) -%>.
+    
+thanks,
+- The Sysmo-DB Team
+
+  
