@@ -2,9 +2,9 @@ module StudyDotGenerator
   include DotGenerator
   def to_dot study
     dot = dot_header "Study" 
-    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{study.title}\",shape=box,style=filled,fillcolor=skyblue3,URL=\"#{study_path(study)}\"];\n"
+    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{study.title}\",shape=box,style=filled,fillcolor=skyblue3,URL=\"#{study_path(study)}\",target=\"_top\"];\n"
     study.assays.each do |a|
-      dot << "Assay_#{a.id} [label=\"#{multiline(a.title)}\",tooltip=\"#{a.title}\",shape=box,style=filled,fillcolor=skyblue1,URL=\"#{assay_path(a)}\"];\n"
+      dot << "Assay_#{a.id} [label=\"#{multiline(a.title)}\",tooltip=\"#{a.title}\",shape=box,style=filled,fillcolor=skyblue1,URL=\"#{assay_path(a)}\",target=\"_top\"];\n"
       dot << "Study_#{study.id} -- Assay_#{a.id}\n"
 #      a.assets.each do |asset|
 #        if Authorization.is_authorized?("view",nil,asset,current_user)

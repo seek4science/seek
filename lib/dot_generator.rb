@@ -27,6 +27,8 @@ module DotGenerator
     `dot -Tpng #{tmpfile.path}`
   end
   
+  #fixes a problem with missing units, which causes Firefox to incorrectly display.
+  #this will fail if the font-size set is not a whole integer  
   def post_process_svg svg
     return svg.gsub(".00;",".00px;")
   end
