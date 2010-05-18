@@ -116,7 +116,7 @@ class SiteAnnouncementsController < ApplicationController
   end
   
   def index
-    @site_announcements=SiteAnnouncement.find(:all)
+    @site_announcements=SiteAnnouncement.find(:all,:order=>"created_at DESC")
   end
   
   def check_manage_announcements    
