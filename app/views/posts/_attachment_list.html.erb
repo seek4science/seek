@@ -1,0 +1,31 @@
+<% error_text ||= [] %>
+<% unless error_text.empty? %>
+  <div id="errorExplanation">
+    <h2>The following errors prevented your attachment being uploaded</h2>
+    <ul>
+      <% error_text.each do |e| %>
+        <% e = "The uploaded file is too large" if e[0..8] == "Size is n" %>
+        <li><%= e %></li>
+      <% end %>
+    </ul>  
+  </div> 
+<% end %>
+
+<% if attachments.empty? %>
+  <span class="none_text">No attachments</span>
+<% else %>
+  <ul class="attachments_list">
+    <% attachments.each do |a| %>
+      <li>
+        <%= link_to "#{a.filename} (#{number_to_human_size(a.size)})", download_forum_attachment_path(a) -%>
+        <%= link_to_remote(image('destroy', :title => "Delete attachment", :alt => "Delete attachment"), 
+                           :update => "attachments_list", 
+                           :url => forum_attachment_path(a),
+                           :confirm => 'Are you sure you wish to delete this attachment?', 
+                           :method => :delete,
+                           :loading => "Element.show('attachment_spinner_#{a.id}')") %>
+        <%= image_tag "ajax-loader.gif", :id => "attachment_spinner_#{a.id}", :style => 'display:none;' -%>
+      </li>
+    <% end %>
+  </ul>   
+<% end %>

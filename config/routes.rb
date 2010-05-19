@@ -64,6 +64,9 @@ ActionController::Routing::Routes.draw do |map|
     h.resources :help_images, :as => :images, :only => [:create, :destroy]
   end
   
+  #forum attachments
+  map.resources :forum_attachments, :member => {:download => :get}, :only => [:create, :destroy]
+  
   # search and saved searches
   map.search '/search/',:controller=>'search',:action=>'index'
   map.save_search '/search/save',:controller=>'search',:action=>'save'
