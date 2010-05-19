@@ -21,6 +21,8 @@ class ForumAttachmentsController < ApplicationController
         page.replace_html 'attachment_list', :partial => "posts/attachment_list", :locals => { :attachments => @post.attachments, :error_text => @error_text}
         page.visual_effect :highlight, 'attachment_list'
         page.hide 'attachment_spinner'
+        page.replace_html "post-body-#{@post.id}", :partial => 'posts/post', :object => @post
+        page.visual_effect :highlight, "post-body-#{@post.id}", :duration => 1.5
       end
     end    
   end
@@ -32,6 +34,8 @@ class ForumAttachmentsController < ApplicationController
     render :update do |page|
       page.replace_html 'attachment_list', :partial => "posts/attachment_list", :locals => { :attachments => @post.attachments, :error_text => @error_text}
       page.visual_effect :highlight, 'attachment_list'
+      page.replace_html "post-body-#{@post.id}", :partial => 'posts/post', :object => @post
+      page.visual_effect :highlight, "post-body-#{@post.id}", :duration => 1.5
     end
   end
   
