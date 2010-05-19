@@ -352,6 +352,8 @@ namespace :seek do
     files.delete("..")    
     files.each {|file| File.delete(dir.path + file)}    
     Dir.delete(dir.path)
+    #Copy image folder
+    FileUtils.cp_r('public/help_images','config/default_data/')
   end 
   
   desc "Loads help documents and attachments/images"
@@ -365,6 +367,8 @@ namespace :seek do
     format_class = "YamlDb::Helper" 
     dir = '../config/default_data/help/'
     SerializationHelper::Base.new(format_class.constantize).load_from_dir dump_dir("/#{dir}")
+    #Copy images
+    FileUtils.cp_r('config/default_data/help_images','public/')
     #Destroy irrelevent db_files
     (DbFile.all - HelpAttachment.all.collect{|h| h.db_file}).each {|d| d.destroy} 
   end 
