@@ -34,14 +34,13 @@
         </div>
     </p>
     <br/>
-	
-    <%= javascript_include_tag 'svg.js' -%>
+	    
 	<!--[if IE]>
-<object id="invSVG" src="<%= investigation_path(@investigation,:format=>:svg) -%>"
+<object id="invSVG" src="<%= polymorphic_path(@investigation,:format=>:svg) -%>"
         classid="image/svg+xml" width="100%" height="100%">
 <![endif]-->
 <!--[if !IE]>-->
-<object id="invSVG" data="<%= investigation_path(@investigation,:format=>:svg) -%>"
+<object id="invSVG" data="<%= polymorphic_path(@investigation,:format=>:svg) -%>"
         type="image/svg+xml" width="100%" height="100%">
 <!--<![endif]-->
   <h1>Unable to display SVG in your browser</h1>
