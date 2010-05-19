@@ -332,8 +332,42 @@ namespace :seek do
       puts "\t Assays: #{project.assays.count}"
       puts "\t Studies: #{project.studies.count}"
       puts "\n --------------- \n\n"
-    end
+    end   
   end
+ 
+  desc "Dumps help documents and attachments/images"
+  task :dump_help_docs => :environment do
+    format_class = "YamlDb::Helper" 
+    dir = 'help_dump_tmp'
+    SerializationHelper::Base.new(format_class.constantize).dump_to_dir dump_dir("/#{dir}")
+    #Copy relevant yaml files
+    FileUtils.copy('db/help_dump_tmp/help_documents.yml','config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/help_attachments.yml','config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/help_images.yml','config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/db_files.yml','config/default_data/help/')
+    #Delete everything else
+    dir = Dir.new('db/help_dump_tmp/')    
+    files = dir.entries
+    files.delete(".")
+    files.delete("..")    
+    files.each {|file| File.delete(dir.path + file)}    
+    Dir.delete(dir.path)
+  end 
+  
+  desc "Loads help documents and attachments/images"
+  task :load_help_docs => :environment do
+    #Clear database
+    HelpDocument.destroy_all
+    HelpAttachment.destroy_all
+    HelpImage.destroy_all
+    DbFile.destroy_all
+    #Populate database with help docs
+    format_class = "YamlDb::Helper" 
+    dir = '../config/default_data/help/'
+    SerializationHelper::Base.new(format_class.constantize).load_from_dir dump_dir("/#{dir}")
+    #Destroy irrelevent db_files
+    (DbFile.all - HelpAttachment.all.collect{|h| h.db_file}).each {|d| d.destroy} 
+  end 
 
   private
 
