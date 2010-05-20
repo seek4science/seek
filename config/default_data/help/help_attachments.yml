@@ -1,0 +1,23 @@
+
+--- 
+help_attachments: 
+  columns: 
+  - id
+  - help_document_id
+  - title
+  - content_type
+  - filename
+  - size
+  - db_file_id
+  - created_at
+  - updated_at
+  records: 
+  - - "5"
+    - "5"
+    - test
+    - application/java-vm
+    - Convert.class
+    - "728"
+    - "5"
+    - 2010-05-20 09:31:21
+    - 2010-05-20 09:31:21
