@@ -358,19 +358,31 @@ namespace :seek do
   
   desc "Loads help documents and attachments/images"
   task :load_help_docs => :environment do
-    #Clear database
-    HelpDocument.destroy_all
-    HelpAttachment.destroy_all
-    HelpImage.destroy_all
-    DbFile.destroy_all
-    #Populate database with help docs
-    format_class = "YamlDb::Helper" 
-    dir = '../config/default_data/help/'
-    SerializationHelper::Base.new(format_class.constantize).load_from_dir dump_dir("/#{dir}")
-    #Copy images
-    FileUtils.cp_r('config/default_data/help_images','public/')
-    #Destroy irrelevent db_files
-    (DbFile.all - HelpAttachment.all.collect{|h| h.db_file}).each {|d| d.destroy} 
+    #Checks if directory exists, and that there are docs present    
+    help_dir = nil
+    continue = false
+    continue = !(help_dir = Dir.new("config/default_data/help") rescue()).nil?
+    if help_dir
+      continue = !help_dir.entries.empty?
+      continue = help_dir.entries.include?("help_documents.yml")
+    end
+    if continue
+      #Clear database
+      HelpDocument.destroy_all
+      HelpAttachment.destroy_all
+      HelpImage.destroy_all
+      DbFile.destroy_all
+      #Populate database with help docs
+      format_class = "YamlDb::Helper" 
+      dir = '../config/default_data/help/'
+      SerializationHelper::Base.new(format_class.constantize).load_from_dir dump_dir("/#{dir}")
+      #Copy images
+      FileUtils.cp_r('config/default_data/help_images','public/')
+      #Destroy irrelevent db_files
+      (DbFile.all - HelpAttachment.all.collect{|h| h.db_file}).each {|d| d.destroy}
+    else
+      puts "Aborted - Couldn't find any help documents in /config/default_data/help/"
+    end
   end 
 
   private
