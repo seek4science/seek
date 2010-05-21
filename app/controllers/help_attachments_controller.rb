@@ -19,6 +19,7 @@ class HelpAttachmentsController < ApplicationController
     responds_to_parent do
       render :update do |page|
         page.replace_html 'attachment_list', :partial => "help_documents/attachment_list", :locals => { :attachments => @help_document.attachments, :error_text => @error_text}
+        page.replace_html 'attachments_count', @help_document.images.size
         page.visual_effect :highlight, 'attachment_list'
         page.hide 'attachment_spinner'
       end
@@ -27,10 +28,11 @@ class HelpAttachmentsController < ApplicationController
   
   def destroy
     @help_attachment = HelpAttachment.find(params[:id])
-    @help_document = HelpDocument.find(params[:help_document_id])
+    @help_document = HelpDocument.find_by_identifier(params[:help_document_id])
     @help_attachment.destroy
     render :update do |page|
       page.replace_html 'attachment_list', :partial => "help_documents/attachment_list", :locals => { :attachments => @help_document.attachments, :error_text => @error_text}
+      page.replace_html 'attachments_count', @help_document.images.size
       page.visual_effect :highlight, 'attachment_list'
     end
   end

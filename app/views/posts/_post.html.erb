@@ -1,0 +1,11 @@
+<%= post.body_html %>
+<% unless post.attachments.empty? %>
+  <ul class="forum_attachments">
+    Attachments
+    <% post.attachments.each do |a| %>
+      <li>
+        <%= link_to "#{a.filename} (#{number_to_human_size(a.size)})", download_forum_attachment_path(a) -%>
+      </li>
+    <% end %>
+  </ul>   
+<% end %>  

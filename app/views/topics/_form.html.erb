@@ -25,6 +25,11 @@
   <div style="clear:both;"></div>
 <% end %>
 
+<p>      
+  <%= label_tag "Attachment" %><br/>
+  (Additional attachments may be added after submitting the post)<br/>
+  <%= file_field_tag "forum_attachment[uploaded_data]" %>
+</p>
 
 <% if admin? and not @topic.new_record? %>
   <p id="topic_forum_id">

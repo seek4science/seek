@@ -7,11 +7,13 @@
    div_options[:style] ||= "" %>
 
 <% header_options ||= {} 
-   header_options[:class] ||= ""
+   header_options[:class] ||= "collapsable_div"
    header_options[:style] ||= "" %>
 
 <div <%= tag_options div_options %>>
-  <a style="display:block" href="#" onclick="toggle_collapsable_div(<%= unique_id -%>); return false;"><h2 <%= tag_options header_options %>><img id="collapsable_div_img_<%= unique_id -%>" src="/images/folds/<%= (start_open ? "fold.png" : "unfold.png") %>" style='vertical-align: middle'/> <%= title -%></h2></a>
+  <a <%= tag_options header_options %> href="#" onclick="toggle_collapsable_div(<%= unique_id -%>); return false;">
+    <img id="collapsable_div_img_<%= unique_id -%>" src="/images/folds/<%= (start_open ? "fold.png" : "unfold.png") %>" style='vertical-align: middle'/> <%= title -%>
+  </a>
   <div id="collapsable_div_<%= unique_id -%>" <%= start_open ? "" : "style=\"display: none\""%> >
     <%= render :partial => partial, :object => object, :locals => locals %>
   </div>

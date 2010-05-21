@@ -14,6 +14,7 @@ class HelpImagesController < ApplicationController
     responds_to_parent do
       render :update do |page|
         page.replace_html 'image_list', :partial => "help_documents/image_list", :locals => { :images => @help_document.images, :error_text => @error_text}
+        page.replace_html 'images_count', @help_document.images.size.to_s
         page.visual_effect :highlight, 'image_list'
         page.hide 'image_spinner'
       end
@@ -22,10 +23,11 @@ class HelpImagesController < ApplicationController
   
   def destroy
     @help_image = HelpImage.find(params[:id])
-    @help_document = HelpDocument.find(params[:help_document_id])
+    @help_document = HelpDocument.find_by_identifier(params[:help_document_id])
     @help_image.destroy
     render :update do |page|
       page.replace_html 'image_list', :partial => "help_documents/image_list", :locals => { :images => @help_document.images, :error_text => @error_text}
+      page.replace_html 'images_count', @help_document.images.size.to_s
       page.visual_effect :highlight, 'image_list'
     end
   end

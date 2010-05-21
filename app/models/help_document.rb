@@ -2,7 +2,7 @@ class HelpDocument < ActiveRecord::Base
   
   validates_presence_of :title, :identifier
   validates_uniqueness_of :identifier  
-  validates_format_of :identifier, :with => /\A[a-zA-Z0-9][-a-zA-Z0-9]*\Z/, :message => "is invalid. Please only use alphanumeric characters and hyphens."
+  validates_format_of :identifier, :with => /\A[a-z0-9][-a-z0-9]*\Z/, :message => "is invalid. Please only use lower-case alphanumeric characters and hyphens."
   
   has_many :attachments, :class_name => "HelpAttachment", :dependent => :destroy
   has_many :images, :class_name => "HelpImage", :dependent => :destroy
@@ -21,7 +21,7 @@ class HelpDocument < ActiveRecord::Base
   end
   
   def self.friendly_redcloth_link(identifier)
-    doc = HelpDocument.find_by_identifier(identifier)
+    doc = HelpDocument.find_by_identifier(identifier.downcase)
     unless doc.nil?
       return "\"#{doc.title}\"" + ":" + "/help/" + doc.to_param
     else

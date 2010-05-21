@@ -339,8 +339,65 @@ namespace :seek do
       puts "\t Assays: #{project.assays.count}"
       puts "\t Studies: #{project.studies.count}"
       puts "\n --------------- \n\n"
-    end
+    end   
   end
+ 
+  desc "Dumps help documents and attachments/images"
+  task :dump_help_docs => :environment do
+    format_class = "YamlDb::Helper" 
+    dir = 'help_dump_tmp'
+    #Clear path
+    puts "Clearing existing backup directories"
+    FileUtils.rm_r('config/default_data/help', :force => true)
+    FileUtils.rm_r('config/default_data/help_images', :force => true)
+    FileUtils.rm_r('db/help_dump_tmp/', :force => true)
+    #Dump DB
+    puts "Dumping database"
+    SerializationHelper::Base.new(format_class.constantize).dump_to_dir dump_dir("/#{dir}")
+    #Copy relevant yaml files
+    puts "Copying files"
+    FileUtils.mkdir('config/default_data/help') rescue ()
+    FileUtils.copy('db/help_dump_tmp/help_documents.yml','config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/help_attachments.yml','config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/help_images.yml','config/default_data/help/')
+    FileUtils.copy('db/help_dump_tmp/db_files.yml','config/default_data/help/')
+    #Delete everything else
+    puts "Cleaning up"
+    FileUtils.rm_r('db/help_dump_tmp/') 
+    #Copy image folder
+    puts "Copying images"
+    FileUtils.mkdir('public/help_images') rescue ()
+    FileUtils.cp_r('public/help_images','config/default_data/') rescue()
+  end 
+  
+  desc "Loads help documents and attachments/images"
+  task :load_help_docs => :environment do
+    #Checks if directory exists, and that there are docs present    
+    help_dir = nil
+    continue = false
+    continue = !(help_dir = Dir.new("config/default_data/help") rescue()).nil?
+    if help_dir
+      continue = !help_dir.entries.empty?
+      continue = help_dir.entries.include?("help_documents.yml")
+    end
+    if continue
+      #Clear database
+      HelpDocument.destroy_all
+      HelpAttachment.destroy_all
+      HelpImage.destroy_all
+      DbFile.destroy_all
+      #Populate database with help docs
+      format_class = "YamlDb::Helper" 
+      dir = '../config/default_data/help/'
+      SerializationHelper::Base.new(format_class.constantize).load_from_dir dump_dir("/#{dir}")
+      #Copy images
+      FileUtils.cp_r('config/default_data/help_images','public/')
+      #Destroy irrelevent db_files
+      (DbFile.all - HelpAttachment.all.collect{|h| h.db_file}).each {|d| d.destroy}
+    else
+      puts "Aborted - Couldn't find any help documents in /config/default_data/help/"
+    end
+  end 
 
   private
 

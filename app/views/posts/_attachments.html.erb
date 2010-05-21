@@ -1,0 +1,15 @@
+<div class="help_upload_box">
+  <div id="attachment_list">
+    <%= render :partial => 'attachment_list', :locals => {:attachments => @post.attachments} %>
+  </div>
+  <% form_for(:forum_attachment, :url => {:controller => :forum_attachments, :action => :create}, :html => { :multipart => true, :target => "attachment_upload"}) do |f| %>
+    <p>      
+      <%= label_tag "Attachment" %><br/>
+      <%= f.file_field :uploaded_data %>
+    </p>
+    <%= hidden_field_tag "forum_attachment[post_id]", @post.id %>
+    <%= submit_tag "Upload", :onclick => "Element.show('attachment_spinner')" %>
+    <%= image_tag "ajax-loader.gif", :id => 'attachment_spinner', :style => 'display:none;' -%>
+    <iframe id="attachment_upload" name="attachment_upload" style="display: none"></iframe>
+  <% end %>
+</div>
