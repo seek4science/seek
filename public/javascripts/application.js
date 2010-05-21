@@ -160,6 +160,9 @@ function toggleAuthorAvatarList(objectId){
 //http://snipplr.com/view.php?codeview&id=1384
 function insertAtCursor(myField, myValue) {
   myField = $(myField);
+
+  textAreaScrollPosition = myField.scrollTop;
+
   //IE support
   if (document.selection) {
     myField.focus();
@@ -178,6 +181,8 @@ function insertAtCursor(myField, myValue) {
   } else {
     myField.value += myValue;
   }
+  
+  myField.scrollTop = textAreaScrollPosition;
 }
 
 
