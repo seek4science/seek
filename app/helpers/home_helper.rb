@@ -34,16 +34,19 @@ module HomeHelper
     selected_studies=[]
     Study.find(:all,:order=>'updated_at DESC').each do |s|
       selected_studies << s if projects.include?(s.project)
+      break if selected_studies.size>=RECENT_SIZE
     end
 
     selected_assays=[]
     Assay.find(:all,:order=>'updated_at DESC').each do |a|
       selected_assays << a if projects.include?(a.project)
+      break if selected_assays.size>=RECENT_SIZE
     end
 
     selected_investigations=[]
     Investigation.find(:all,:order=>'updated_at DESC').each do |i|
       selected_investigations << i if projects.include?(i.project)
+      break if selected_investigations.size>=RECENT_SIZE
     end
 
     item_hash=classify_for_tabs(selected_people)
