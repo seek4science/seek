@@ -1,5 +1,7 @@
 class AssaysController < ApplicationController
 
+  include DotGenerator
+
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :delete_allowed,:only=>[:destroy]
@@ -120,6 +122,8 @@ class AssaysController < ApplicationController
     respond_to do |format|
       format.html
       format.xml { render :xml => @assay, :include=>[:assay_type,:sops]}
+      format.svg { render :text=>to_svg(@assay)}
+      format.xml { render :text=>to_dot(@assay)}
     end
   end
 

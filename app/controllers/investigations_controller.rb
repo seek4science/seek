@@ -1,6 +1,6 @@
 class InvestigationsController < ApplicationController
 
-  include InvDotGenerator
+  include DotGenerator
 
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
