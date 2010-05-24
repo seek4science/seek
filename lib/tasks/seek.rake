@@ -75,7 +75,7 @@ namespace :seek do
 
   desc 'seeds the database with the controlled vocabularies'
   task(:seed=>:environment) do
-    tasks=["refresh_controlled_vocabs","graft_new_assay_types"]
+    tasks=["refresh_controlled_vocabs","graft_new_assay_types","load_help_docs"]
     tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute     
     end
