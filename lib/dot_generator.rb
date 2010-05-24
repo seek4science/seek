@@ -52,7 +52,6 @@ module DotGenerator
     file = File.new(tmpfile.path,'w')
     file.puts to_dot(thing)
     file.close    
-    puts "saved to tmp file: "+tmpfile.path
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
   
