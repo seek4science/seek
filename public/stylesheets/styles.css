@@ -452,7 +452,7 @@ Add style only after the tabber interface is set up (.tabberlive)
 /* END Collapsable tags */
 
 
-ul#user_details  {    
+ul.users_details li {    
     margin: 4px 4px 4px 4px;
     padding: 4px 4px 4px 4px;
     border: solid 1px black;
@@ -460,15 +460,14 @@ ul#user_details  {
     width: 14em;
     text-align: left;
     background-color:silver;
+	font-size: smaller;
+	min-width: 15em;
+	min-height: 6em;
 }
 
-ul#users_details li {
-    list-style-type: none;
-}
-
-ul#user_details li {
-    font-size: 11px;
-    list-style-type: none;
+ul.users_details li p {    
+    margin: 0.1em;
+	padding: 0.1em;
 }
 
 #sop_preview {    
@@ -1198,4 +1197,21 @@ ul.forum_attachments img {
 
 div.forums {
   margin: 1em;
+}
+
+ul.stats {
+  
+}
+
+ul.stats li {
+  border: solid 1px #666;
+  padding: 1em;
+  margin: 0.5em;
+  list-style-type: none;
+  min-width: 25em;
+  background-color: white;
+}
+
+ul.stats li p label {
+  font-weight: bolder;
 }

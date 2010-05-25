@@ -1,22 +1,23 @@
 <%
 people||=nil
-collection= !people.nil? ? people : users
-%>
+collection= !people.nil? ? people : users %>
 <div class="fold">
-  <div class="foldTitle"><%= "#{title} [#{collection.size}]" %></div>
-  <div class="foldContent" style="display:none;">
-    <ul id="users_details">
-
-      <% for el in collection -%>
-        <%  if el.instance_of?(Person) -%>
-            <%= render :partial=>"profile_details",:locals=>{:profile=>el} %>
-        <% else -%>
-          <li>
-            <%= render :partial=>"user_details",:locals=>{:user=>el} %>
-          </li>
-
-        <% end -%>
-      <% end -%>
-    </ul>
-  </div>
+    <div class="foldTitle">
+        <%= "#{title} [#{collection.size}]" %>
+    </div>
+    <div class="foldContent" style="display:none;">
+        <ul class="users_details horiz_list_items">
+            <% for el in collection -%>
+	            <% if el.instance_of?(Person) -%>
+	            <li>
+	                <%= render :partial=>"profile_details",:locals=>{:profile=>el} %>
+	            </li>
+	            <% else -%>
+	            <li>
+	                <%= render :partial=>"user_details",:locals=>{:user=>el} %>
+	            </li>
+	            <% end -%>
+            <% end -%>
+        </ul>
+    </div>
 </div>

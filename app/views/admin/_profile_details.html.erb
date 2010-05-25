@@ -2,16 +2,15 @@
 user=profile.user
 -%>
 
-<ul id="user_details">
+
   <% if user -%>
-    <li>User ID:<%= user.id %></li>
-    <li>Login: <%= h user.login  %></li>
+    <p>User ID:<%= user.id %></p>
+    <p>Login: <%= h user.login  %></p>
   <% else -%>
       <span class='none_text'>No associated user</span>
   <% end -%>
-  <li class="profile">
+  <p>
 
     <%= link_to h(profile.name),profile %>
 
-  </li>
-</ul>
+  </p>

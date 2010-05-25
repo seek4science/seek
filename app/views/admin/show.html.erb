@@ -14,6 +14,11 @@
     <%= link_to "Create an announcement", new_site_announcement_path -%>    
   </p>
   
+  <h2>Content Statitics ...</h2>
+  <p>
+    <%= link_to "Content statistics", url_for(:action=>"stats", :controller=>"admin") %>
+  </p>
+  
   <h2>Tags ...</h2>
   <p>
     <%= link_to "Manage tags", url_for(:action=>"tags", :controller=>"admin") %>
