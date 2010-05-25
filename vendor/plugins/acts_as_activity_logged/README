@@ -1,0 +1,67 @@
+= acts_as_activity_logged
+
+acts_as_activity_logged is a plugin designed to record all activity made on a model, including the user and referenced models.
+
+== Install
+
+  ./script/plugin install svn://fearoffish.co.uk/acts_as_activity_logged/trunk
+
+== Basic Usage
+
+The most basic way of getting going is to add acts_as_activity_logged to the model you want to watch activity on.  This will log the action that was performed (create/update/destroy) on the model, and the type of model.
+
+  class Post < ActiveRecord::Base
+    acts_as_activity_logged
+  end
+  
+== Customizing
+
+=== delay_after_create
+
+Don't allow any updates to be written to the log for X amount of time after a create is logged.  Useful for if you need to do an immediate update after a save, but logging it would be unnecessary.
+
+  e.g. acts_as_activity_logged :delay_after_create => 5.seconds
+
+=== models
+
+By explicitly setting the models and the methods you wish to call on them (in your view for example), you can log the complete process of activity that occurred.  The three types of model you can log are:
+
+  e.g. A user adds a comment to a post
+  
+* culprit:            This is the user
+* referenced:         This would be the post
+* activity_loggable:  This would be our comment
+
+You tell acts_as_activity_logged these details like so:
+
+  e.g. 
+  class Comment < ActiveRecord::Base
+    acts_as_activity_logged :models => {  :culprit =>           { :model => :sender,  :method => :name },
+                                          :referenced =>        { :model => :post,    :method => :title },
+                                          :activity_loggable => { :model => :comment }
+  end
+  
+I'd like to use the sentence "Jamie added a comment to 'My First Post'" in my view, so:
+
+  <% log = ActivityLog.find(:first) %>
+  <%= "%s added a %s to %s" % log.culprit(:value), 
+                              log.activity_loggable.class.to_s.downcase,
+                              log.referenced(:value) %>
+
+The example is a little convoluted and demonstrates the need for a view helper (see improvements below), but it demonstrates the 2 different ways you can ask for information from the activity log. The :value option calls the :method you provided in the options on the model and displays the string response. Calling the method without the (:value) parameter will return the instance method instead.
+  
+== Improvements
+
+I intend to work on an option that allows you to set the text per model so that views become less ugly.
+
+== Notes
+
+acts_as_activity_logged is incompatible with inherited models with Rails 1.2 edge and previous (the current release as of writing) due to explicit calling of base_class in the polymorphic join association code.  There is a ticket available with patch that you can apply to get it to work though (http://dev.rubyonrails.org/ticket/6485) that solves this issue.  So the type of model that was updated in this case would be saved as Message, not Comment as expected:
+
+  class Comment < Message 
+    acts_as_activity_logged
+  end
+
+== Appreciation
+
+I've like to thank Brandon Keepers for making his acts_as_audited plugin that helped me immensely in creating this plugin, and also Jeremy Kemper (bitsweat) for helping debug the rails polymorphic issues that stumped me for far too long, and Rick Bradley for giving his time on the same problem.  I'd also like to thank caffeine for being there when I needed her the most, and I especially want to thank New Bamboo for extending the time allocated for the piece of a project I needed to do this for that allowed me to write it as a plugin instead. Thank you, thank you, thank you. You've all been wonderful.

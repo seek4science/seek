@@ -1,0 +1,7 @@
+Description:
+	This migration creates the table needed to store the polymorphic activity logs
+
+Example:
+    ./script/generate activity_log_migration add_activity_logs_table
+
+    This will create a migration in db/migrate/.  Run "rake db:migrate" to update your database.

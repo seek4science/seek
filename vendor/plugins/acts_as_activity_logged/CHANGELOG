@@ -1,0 +1,23 @@
+CHANGELOG
+============================================================================================
+
+0.1 - 22-12-2006
+* First release
+
+0.2 - 02-01-2007
+* Adjusted test schema and models
+
+0.3 - 01-02-2007
+* Added find_for and latest methods to ActivityLog
+
+0.3.1 - 01-02-2007
+* Renamed find_for to find_with, the conditions are now stackable
+
+0.3.2 - 01-02-2007
+* Refactored the find_with method, and added IN [2,1,6] capability
+
+0.3.3 - 02-02-2007
+* Added operators AND and OR for find conditionals
+
+0.3.3 - 02-02-2007
+* Added :additional option to find_with, allowing more sql terms to be tagged on
