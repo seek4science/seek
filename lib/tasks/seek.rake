@@ -41,8 +41,7 @@ namespace :seek do
       end
     end    
     
-  end
-  
+  end  
   
   task(:associate_people_with_notification_info=>:environment) do
     Person.find(:all).each do |p|
