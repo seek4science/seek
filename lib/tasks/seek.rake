@@ -163,13 +163,6 @@ namespace :seek do
     
   end
   
-  task(:list_dubious_tags=>:environment) do
-    revert_fixtures_identify
-    tags=Tag.find(:all)
-    dubious=tags.select{|tag| dubious_tag?(tag.name)}
-    dubious.each{|tag| puts "#{tag.id}\t#{tag.name}" }
-  end
-  
   task(:strains=>:environment) do
     revert_fixtures_identify
     Strain.delete_all
@@ -331,41 +324,24 @@ namespace :seek do
   end
   
   task :content_stats => :environment do
-    me=User.first
-    projects = Project.all
-    projects.each do |project|
-      sops=project.assets.select{|a| a.resource.kind_of?(Sop)}
-      models=project.assets.select{|a| a.resource.kind_of?(Model)}
-      datafiles=project.assets.select{|a| a.resource.kind_of?(DataFile)}
-      publications=project.publications
-      people=project.people
-      registered_people=people.select{|p| !p.user.nil?}
-      
-      sops_size=0
-      sops.each do |sop|
-        sops_size += sop.resource.content_blob.data.size unless sop.resource.content_blob.data.nil?
-      end
-      
-      models_size=0
-      models.each do |model|
-        models_size += model.resource.content_blob.data.size unless model.resource.content_blob.data.nil?
-      end
-      
-      dfs_size=0
-      datafiles.each do |df|
-        dfs_size += df.resource.content_blob.data.size unless df.resource.content_blob.data.nil?
-      end
-      
-      puts "Project: #{project.title}"
-      puts "\t SOPs: #{sops.count} (#{sops_size/1048576} Mb - #{sops_size/1024} Kb), that I can see #{sops.select{|s| Authorization.is_authorized?('show',nil,s.resource,me)}.count}"
-      puts "\t Models: #{models.count} (#{models_size/1048576} Mb - #{models_size/1024} Kb), that I can see #{models.select{|m| Authorization.is_authorized?('show',nil,m.resource,me)}.count}"
-      puts "\t Data: #{datafiles.count} (#{dfs_size/1048576} Mb - #{dfs_size/1024} Kb), that I can see #{datafiles.select{|df| Authorization.is_authorized?('show',nil,df.resource,me)}.count}"
-      puts "\t Publications: #{publications.count}"
-      puts "\t People: #{people.count}, of which have registered: #{registered_people.count}"
-      puts "\t Assays: #{project.assays.count}"
-      puts "\t Studies: #{project.studies.count}"
+    
+    stats=ContentStats.generate
+    
+    stats.each do |project_stat|
+      puts "Project: #{project_stat.project.title}"
+      puts "\t SOPs: #{project_stat.sops.count} (#{project_stat.sops_size/1048576} Mb / #{project_stat.sops_size/1024} Kb), of which I can see #{project_stat.visible_sops.count}"
+      puts "\t Models: #{project_stat.models.count} (#{project_stat.models_size/1048576} Mb / #{project_stat.models_size/1024} Kb), of which I can see #{project_stat.visible_models.count}"
+      puts "\t Data: #{project_stat.data_files.count} (#{project_stat.data_files_size/1048576} Mb / #{project_stat.data_files_size/1024} Kb), of which I can see #{project_stat.visible_data_files.count}"
+      puts "\t Publications: #{project_stat.publications.count}"
+      puts "\t People: #{project_stat.people.count}, of which have registered: #{project_stat.registered_people.count}"
+      puts "\t Assays: #{project_stat.assays.count}"
+      puts "\t Studies: #{project_stat.studies.count}"
       puts "\n --------------- \n\n"
-    end   
+    end
+    
+    
+    
+    
   end
   
   desc "Dumps help documents and attachments/images"
