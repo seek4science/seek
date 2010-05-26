@@ -31,12 +31,13 @@ class InvestigationsController < ApplicationController
 
   def show
     @investigation=Investigation.find(params[:id])    
+    deep=params[:deep]
     respond_to do |format|
       format.html
       format.xml { render :xml=> @investigation, :include=>@investigation.studies }
-      format.svg { render :text=>to_svg(@investigation)}
-      format.dot { render :text=>to_dot(@investigation)}
-      format.png { render :text=>to_png(@investigation)}
+      format.svg { render :text=>to_svg(@investigation,deep)}
+      format.dot { render :text=>to_dot(@investigation,deep)}
+      format.png { render :text=>to_png(@investigation,deep)}
     end
   end
 

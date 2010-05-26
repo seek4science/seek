@@ -1,10 +1,10 @@
 module DotGenerator
   
-  def to_dot thing
+  def to_dot thing, deep=false
     dot = dot_header "Investigation"
     
     if thing.instance_of?(Investigation)
-      dot += to_dot_inv thing
+      dot += to_dot_inv thing,deep
     end
     
     if thing.instance_of?(Study)
@@ -19,11 +19,11 @@ module DotGenerator
     return dot
   end
   
-  def to_dot_inv investigation    
+  def to_dot_inv investigation, show_assets=false
     dot = ""
     dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{investigation.title}\",shape=box,style=filled,fillcolor=skyblue3,URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
     investigation.studies.each do |s|
-      dot << to_dot_study (s,show_assets=false)
+      dot << to_dot_study (s,show_assets)
       dot << "Inv_#{investigation.id} -- Study_#{s.id}\n"
     end
     return dot
@@ -58,10 +58,10 @@ module DotGenerator
   end
   
   
-  def to_svg thing
+  def to_svg thing,deep=false
     tmpfile = Tempfile.new("#{thing.class.name}_dot")
     file = File.new(tmpfile.path,'w')
-    file.puts to_dot(thing)
+    file.puts to_dot(thing,deep)
     file.close    
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
@@ -76,10 +76,10 @@ module DotGenerator
     return dot
   end
   
-  def to_png thing
+  def to_png thing,deep=false
     tmpfile = Tempfile.new("#{thing.class.name}_dot")
     file = File.new(tmpfile.path,'w')
-    file.puts to_dot(thing)
+    file.puts to_dot(thing,deep)
     file.close    
     puts "saved to tmp file: "+tmpfile.path
     `dot -Tpng #{tmpfile.path}`
