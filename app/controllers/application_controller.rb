@@ -3,6 +3,9 @@
 
 class ApplicationController < ActionController::Base
 
+  if ACTIVITY_LOG_ENABLED
+    after_filter :log_event
+  end
 
   if ENV['RAILS_ENV'] == "production"
     rescue_from ActiveRecord::RecordNotFound, ActionController::RoutingError, ActionController::UnknownController, ActionController::UnknownAction, :with => :render_404
@@ -189,4 +192,38 @@ class ApplicationController < ActionController::Base
   #data fields are generally very large, and contains unpleasant characters.
   filter_parameter_logging "data"
 
+  def log_event
+    c = self.controller_name.downcase
+    a = self.action_name.downcase
+    
+    case c
+      when "investigations","studies","assays"
+        if ["show","create","update","destroy"].include?(a)
+          object = eval("@"+c.singularize)
+          raise Exception if object.nil?
+          ActivityLog.create(:action => a,
+                   :culprit => current_user,
+                   :referenced => object.project,
+                   :activity_loggable => object)
+        end 
+      when "data_files","models","sops","publications"
+        if ["show","create","update","destroy","download"].include?(a)
+          object = eval("@"+c.singularize)
+          raise Exception if object.nil?
+          ActivityLog.create(:action => a,
+                   :culprit => current_user,
+                   :referenced => object.asset.project,
+                   :activity_loggable => object)
+        end 
+      when "people"
+        if ["create","update","destroy"].include?(a)
+          object = eval("@"+c.singularize)
+          raise Exception if object.nil?
+          ActivityLog.create(:action => a,
+                   :culprit => current_user,
+                   :activity_loggable => object)
+        end 
+    end
+  end
+  
 end

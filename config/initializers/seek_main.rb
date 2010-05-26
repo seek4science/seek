@@ -3,6 +3,7 @@ require 'authorization'
 
 JERM_ENABLED=true unless defined? JERM_ENABLED
 SOLR_ENABLED=false unless defined? SOLR_ENABLED
+ACTIVITY_LOG_ENABLED=true unless defined? ACTIVITY_LOG_ENABLED
 EMAIL_ENABLED=false unless defined? EMAIL_ENABLED
 ACTIVATION_REQUIRED=false unless defined? ACTIVATION_REQUIRED
 ENABLE_GOOGLE_ANALYTICS=false unless defined? ENABLE_GOOGLE_ANALYTICS
