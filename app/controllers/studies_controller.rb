@@ -1,6 +1,6 @@
 class StudiesController < ApplicationController
 
-  include StudyDotGenerator
+  include DotGenerator
   
   before_filter :login_required
     

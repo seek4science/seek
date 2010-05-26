@@ -25,6 +25,14 @@ class AdminController < ApplicationController
     redirect_to :action=>:show
   end
   
+  def stats    
+    @stats=ContentStats.generate
+    respond_to do |format|
+      format.html
+      format.xml { render :xml=>@stats.to_xml}
+    end
+  end
+  
   def tags
     @tags=Tag.find(:all,:order=>:name)
   end  
