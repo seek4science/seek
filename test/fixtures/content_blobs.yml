@@ -18,9 +18,12 @@ one:
 
 content_blob_with_little_file:
   data: <%= load_blob_data('little_file.txt') %>
+  uuid: xxx
 
 teusink_blob:
   data: <%= load_blob_data('Teusink.xml') %>
+  uuid: yyy
 
 picture_blob:
   data: <%= load_blob_data('file_picture.png') %>
+  uuid: zzz

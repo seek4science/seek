@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100524094114) do
+ActiveRecord::Schema.define(:version => 20100527134941) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -85,11 +85,6 @@ ActiveRecord::Schema.define(:version => 20100524094114) do
     t.integer  "assay_class_id"
   end
 
-  create_table "asset_authors", :id => false, :force => true do |t|
-    t.integer "asset_id"
-    t.integer "author_id"
-  end
-
   create_table "assets", :force => true do |t|
     t.integer  "project_id"
     t.string   "resource_type"
@@ -126,6 +121,7 @@ ActiveRecord::Schema.define(:version => 20100524094114) do
     t.binary "data",   :limit => 2147483647
     t.string "md5sum"
     t.string "url"
+    t.string "uuid"
   end
 
   create_table "culture_growth_types", :force => true do |t|
