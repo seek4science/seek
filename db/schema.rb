@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100524094114) do
+ActiveRecord::Schema.define(:version => 20100527183537) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -118,9 +118,10 @@ ActiveRecord::Schema.define(:version => 20100524094114) do
   end
 
   create_table "content_blobs", :force => true do |t|
-    t.binary "data",   :limit => 2147483647
+    t.binary "data_old", :limit => 2147483647
     t.string "md5sum"
     t.string "url"
+    t.string "uuid"
   end
 
   create_table "culture_growth_types", :force => true do |t|
