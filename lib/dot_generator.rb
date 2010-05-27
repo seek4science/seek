@@ -23,7 +23,7 @@ module DotGenerator
     dot = ""
     dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{investigation.title}\",shape=box,style=filled,fillcolor=skyblue3,URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
     investigation.studies.each do |s|
-      dot << to_dot_study (s,show_assets)
+      dot << to_dot_study(s,show_assets)
       dot << "Inv_#{investigation.id} -- Study_#{s.id}\n"
     end
     return dot
