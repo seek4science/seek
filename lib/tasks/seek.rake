@@ -17,6 +17,8 @@ namespace :seek do
     end
   end
   
+  
+  
   desc "adds the default tags" 
   task(:default_tags=>:environment) do      
     File.open('config/default_data/expertise.list').each do |item|
@@ -97,6 +99,17 @@ namespace :seek do
         puts "Tagging with id #{tagging.id} is not for Project"
       end
     end
+  end
+    
+  task(:update_blobs=>:environment) do
+    ContentBlob.all.each do |blob|
+      class << blob
+        def record_timestamps
+          false
+        end
+      end
+      blob.save!
+    end    
   end
   
   desc 'seeds the database with the controlled vocabularies'
