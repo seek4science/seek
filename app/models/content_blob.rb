@@ -1,10 +1,13 @@
 require 'digest/md5'
 require 'net/http'
 require 'open-uri'
+require 'acts_as_uniquely_identifiable'
 
 
 class ContentBlob < ActiveRecord::Base
   validates_presence_of :data, :if => Proc.new { |blob| blob.url.blank? }  
+  
+  acts_as_uniquely_identifiable
   
   before_save :calculate_md5
   
