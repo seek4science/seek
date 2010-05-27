@@ -9,7 +9,29 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100517150441) do
+ActiveRecord::Schema.define(:version => 20100524094114) do
+
+  create_table "activity_logs", :force => true do |t|
+    t.string   "action"
+    t.string   "format"
+    t.string   "activity_loggable_type"
+    t.integer  "activity_loggable_id"
+    t.string   "culprit_type"
+    t.integer  "culprit_id"
+    t.string   "referenced_type"
+    t.integer  "referenced_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "http_referer"
+    t.string   "user_agent"
+    t.text     "data",                   :limit => 16777215
+  end
+
+  add_index "activity_logs", ["action"], :name => "act_logs_action_index"
+  add_index "activity_logs", ["activity_loggable_type", "activity_loggable_id"], :name => "act_logs_act_loggable_index"
+  add_index "activity_logs", ["culprit_type", "culprit_id"], :name => "act_logs_culprit_index"
+  add_index "activity_logs", ["format"], :name => "act_logs_format_index"
+  add_index "activity_logs", ["referenced_type", "referenced_id"], :name => "act_logs_referenced_index"
 
   create_table "assay_assets", :force => true do |t|
     t.integer  "assay_id"
