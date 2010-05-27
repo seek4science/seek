@@ -195,12 +195,15 @@ class ApplicationController < ActionController::Base
   def log_event
     c = self.controller_name.downcase
     a = self.action_name.downcase
+      
+    object = eval("@"+c.singularize)
+    
+    #don't log if the object is not valid, as this will a validation error on update or create
+    return if object.nil? || !object.valid?
     
     case c
       when "investigations","studies","assays"
         if ["show","create","update","destroy"].include?(a)
-          object = eval("@"+c.singularize)
-          raise Exception if object.nil?
           ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :referenced => object.project,
@@ -208,8 +211,6 @@ class ApplicationController < ActionController::Base
         end 
       when "data_files","models","sops","publications"
         if ["show","create","update","destroy","download"].include?(a)
-          object = eval("@"+c.singularize)
-          raise Exception if object.nil?
           ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :referenced => object.asset.project,
@@ -217,8 +218,6 @@ class ApplicationController < ActionController::Base
         end 
       when "people"
         if ["create","update","destroy"].include?(a)
-          object = eval("@"+c.singularize)
-          raise Exception if object.nil?
           ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :activity_loggable => object)
