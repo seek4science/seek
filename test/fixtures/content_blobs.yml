@@ -11,19 +11,19 @@
 
 one:
   id: 1
-  data: <%= load_blob_data('file_picture.png') %>
+  data_old: <%= load_blob_data('file_picture.png') %>
   
   
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
 content_blob_with_little_file:
-  data: <%= load_blob_data('little_file.txt') %>
-  uuid: xxx
+  data_old: <%= load_blob_data('little_file.txt') %>
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>
 
 teusink_blob:
-  data: <%= load_blob_data('Teusink.xml') %>
-  uuid: yyy
+  data_old: <%= load_blob_data('Teusink.xml') %>
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>
 
 picture_blob:
-  data: <%= load_blob_data('file_picture.png') %>
-  uuid: zzz
+  data_old: <%= load_blob_data('file_picture.png') %>
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>

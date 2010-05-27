@@ -7,6 +7,7 @@ module Seek
     
     module ClassMethods
       def acts_as_uniquely_identifiable
+        
         before_validation :check_uuid        
         validates_presence_of :uuid
         
@@ -18,9 +19,23 @@ module Seek
     end
     
     module InstanceMethods
+      
+      def regenerate_uuid
+        #maybe a little paranoid :)
+        self.uuid = "#{UUIDTools::UUID.random_create.to_s}-#{UUIDTools::UUID.random_create.to_s}"
+        puts "regenerating_uuid"
+      end
+      
+      def uuid
+        unless changed.include?("uuid")
+          regenerate_uuid if super.nil?
+        end
+        super
+      end
+      
       def check_uuid
-        if self.uuid.nil?
-          self.uuid = UUIDTools::UUID.random_create.to_s
+        if uuid.nil?
+          regenerate_uuid
         end
       end
     end

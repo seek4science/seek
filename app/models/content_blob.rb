@@ -8,6 +8,7 @@ class ContentBlob < ActiveRecord::Base
   
   DATA_STORAGE_PATH = "filestore/content_blobs/"
   
+  attr_writer :data
   
   #validates_presence_of :data, :if => Proc.new { |blob| blob.url.blank? }  
   
@@ -25,7 +26,19 @@ class ContentBlob < ActiveRecord::Base
     end
     super
   end
-      
+  
+  def data
+    
+    return @data if @data
+    return File.open(filepath,"rb").read if file_exists?   
+    unless self.data_old.blank?
+      dump_data_to_file
+      return self.data_old
+    end
+     
+    return nil
+  end
+  
   def calculate_md5
     #FIXME: only recalculate if the data has changed (should be able to do this with changes.keys.include?("data") or along those lines).
     unless self.data.nil?
@@ -35,14 +48,9 @@ class ContentBlob < ActiveRecord::Base
     end
   end        
   
-#  def data
-#    if File.exist?(filepath)
-#      File.open(filepath,"rb").read
-#    else
-#      dump_data_to_file
-#      File.open(filepath,"rb").read
-#    end
-#  end
+  def file_exists?
+    File.exist?(filepath)
+  end
   
   def filepath
     if RAILS_ENV == "test"
@@ -54,11 +62,15 @@ class ContentBlob < ActiveRecord::Base
     return "#{path}/#{uuid}.dat"
   end
   
-  def dump_data_to_file    
-    File.open(filepath,"w+") do |f|      
-      f.write(data)    
+  def dump_data_to_file        
+    data_to_save = @data
+    data_to_save ||= self.data_old
+    
+    if !data_to_save.nil?
+      File.open(filepath,"w+") do |f|      
+        f.write(data_to_save)    
+      end
     end
-    #self.data=nil
   end
   
 end
