@@ -22,8 +22,7 @@ module Seek
       
       def regenerate_uuid
         #maybe a little paranoid :)
-        self.uuid = "#{UUIDTools::UUID.random_create.to_s}-#{UUIDTools::UUID.random_create.to_s}"
-        puts "regenerating_uuid"
+        self.uuid = "#{UUIDTools::UUID.random_create.to_s}-#{UUIDTools::UUID.random_create.to_s}"       
       end
       
       def uuid
