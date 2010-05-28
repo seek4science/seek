@@ -72,7 +72,7 @@ module Jerm
 
     def read_data_from_tmp uuid
       data=nil
-      File.open(cached_path(uuid), 'r') do |f|
+      File.open(cached_path(uuid), 'rb') do |f|
         data=f.read
       end
       return data
@@ -96,7 +96,7 @@ module Jerm
     end
 
     def store_data_to_tmp data,uuid
-      File.open(cached_path(uuid), 'w') do |f|
+      File.open(cached_path(uuid), 'wb') do |f|
         f.write data
       end
     end
