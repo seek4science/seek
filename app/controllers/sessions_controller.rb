@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
   def create   
     self.current_user = User.authenticate(params[:login], params[:password])
     if logged_in?
-      if current_user.person && current_user.person.projects.empty?
+      if current_user.person && !current_user.is_admin? && current_user.person.projects.empty?
           logout_user
           flash[:error]="You have not yet been assigned to a project by an administrator."
           redirect_to :action=>"new"

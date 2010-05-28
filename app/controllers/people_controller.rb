@@ -170,7 +170,7 @@ class PeopleController < ApplicationController
           logout_user
           format.html {redirect_to :controller=>"users",:action=>"activation_required"}
         else
-          if registration
+          if registration && !current_user.is_admin?
             logout_user
             flash[:notice]="Profile successfully created. You can log in when an administrator has assigned you to a project."
             format.html { redirect_to :controller => "sessions", :action=>"new"}
