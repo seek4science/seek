@@ -5,7 +5,7 @@ avatar=resource_title_draggable_avatar item
   <div class="hit_counter">
     <ul>
     <%= "<li>#{image "show",:style=>"vertical-align: middle"} Views: #{count_actions(item,"show")}</li>" -%>
-    <%= "<li>#{image "download",:style=>"vertical-align: middle"} Downloads: #{count_actions(item,"show")}</li>" if ["DataFile","Model","Sop"].include?(item.class.name) -%>
+    <%= "<li>#{image "download",:style=>"vertical-align: middle"} Downloads: #{count_actions(item,"download")}</li>" if ["DataFile","Model","Sop"].include?(item.class.name) -%>
     </ul>
   </div>
   <% unless avatar.blank? -%>
