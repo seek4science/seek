@@ -85,11 +85,6 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.integer  "assay_class_id"
   end
 
-  create_table "asset_authors", :id => false, :force => true do |t|
-    t.integer "asset_id"
-    t.integer "author_id"
-  end
-
   create_table "assets", :force => true do |t|
     t.integer  "project_id"
     t.string   "resource_type"
