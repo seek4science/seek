@@ -2,20 +2,20 @@ require 'model_execution'
 
 class ModelsController < ApplicationController
   #FIXME: re-add REST for each of the core methods
-
+  
   include ModelExecution
   include WhiteListHelper
-
+  
   before_filter :login_required
-
+  
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
-
+  
   before_filter :find_models, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   before_filter :find_display_model, :only=>[:show,:download]
-
+  
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
-
+  
   # GET /models
   # GET /models.xml
   def index
@@ -26,7 +26,7 @@ class ModelsController < ApplicationController
       format.xml { render :xml=>@models}
     end
   end
-
+  
   def new_version
     data = params[:data].read
     comments = params[:revision_comment]
@@ -42,7 +42,7 @@ class ModelsController < ApplicationController
       format.html {redirect_to @model }
     end
   end
-
+  
   def delete_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"
@@ -51,8 +51,8 @@ class ModelsController < ApplicationController
       delete_model_format params
     end
   end
-
-
+  
+  
   def update_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"
@@ -61,7 +61,7 @@ class ModelsController < ApplicationController
       update_model_format params
     end
   end
-
+  
   def delete_model_type params
     id=params[:selected_model_type_id]
     model_type=ModelType.find(id)
@@ -76,7 +76,7 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Cannot delete #{model_type.title} because it is in use."
     end
-
+    
     render :update do |page|
       page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
@@ -86,7 +86,7 @@ class ModelsController < ApplicationController
     end
     
   end
-
+  
   def delete_model_format params
     id=params[:selected_model_format_id]
     model_format=ModelFormat.find(id)
@@ -101,7 +101,7 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Cannot delete #{model_format.title} because it is in use."
     end
-
+    
     render :update do |page|
       page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
@@ -109,18 +109,18 @@ class ModelsController < ApplicationController
       page << "$('model_format_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_format_info"      
     end
-
+    
   end
-
+  
   def create_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"
-        create_model_type params
+      create_model_type params
     elsif attribute=="model_format"
       create_model_format params
     end
   end
-
+  
   def update_model_type params
     title=white_list(params[:updated_model_type])
     id=params[:updated_model_type_id]
@@ -138,18 +138,18 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Another model type with #{title} already exists"
     end
-
-     render :update do |page|
+    
+    render :update do |page|
       page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
       info_colour= success ? "green" : "red"
       page << "$('model_type_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_type_info"
     end
-
+    
   end
-
-
+  
+  
   def create_model_type params
     title=white_list(params[:model_type])
     success=false
@@ -164,8 +164,8 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Model type #{title} already exists"
     end
-
-
+    
+    
     render :update do |page|
       page.replace_html "model_type_selection",collection_select(:model, :model_type_id, ModelType.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_type_selection_changed();" })
       page.replace_html "model_type_info","#{msg}<br/>"
@@ -173,10 +173,10 @@ class ModelsController < ApplicationController
       page << "$('model_type_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_type_info"
       page << "model_types_for_deletion.push(#{new_model_type.id});" if success
-
+      
     end
   end
-
+  
   def create_model_format params
     title=white_list(params[:model_format])
     success=false
@@ -191,8 +191,8 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Another model format #{title} already exists"
     end
-
-
+    
+    
     render :update do |page|
       page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
@@ -200,10 +200,10 @@ class ModelsController < ApplicationController
       page << "$('model_format_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_format_info"
       page << "model_formats_for_deletion.push(#{new_model_format.id});" if success
-
+      
     end
   end
-
+  
   def update_model_format params
     title=white_list(params[:updated_model_format])
     id=params[:updated_model_format_id]
@@ -221,7 +221,7 @@ class ModelsController < ApplicationController
     else
       msg="ERROR - Another model format with #{title} already exists"
     end
-
+    
     render :update do |page|
       page.replace_html "model_format_selection",collection_select(:model, :model_format_id, ModelFormat.find(:all), :id, :title, {:include_blank=>"Not specified"},{:onchange=>"model_format_selection_changed();" })
       page.replace_html "model_format_info","#{msg}<br/>"
@@ -229,39 +229,39 @@ class ModelsController < ApplicationController
       page << "$('model_format_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_format_info"
     end
-
+    
   end
-
+  
   def execute
     version=params[:version]
-    @applet= jws_execution_applet @model.find_version(version)
-    
-    if @applet.instance_of?(Net::HTTPInternalServerError)      
-      @error_details=@applet.body.gsub(/<head\>.*<\/head>/,"")
+    begin
+      @applet= jws_execution_applet @model.find_version(version)
+    rescue Exception => e      
+        @error_details=e.message       
     end
-
+    
     render :update do |page|
       page.replace_html "execute_model",:partial=>"execute_applet"
     end
-
+    
   end
-
+  
   # GET /models/1
   # GET /models/1.xml
   def show
     # store timestamp of the previous last usage
     @last_used_before_now = @model.last_used_at
-
+    
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
     @model.save_without_timestamping
-
+    
     respond_to do |format|
       format.html # show.html.erb
     end
   end
-
+  
   # GET /models/new
   # GET /models/new.xml
   def new
@@ -274,12 +274,12 @@ class ModelsController < ApplicationController
       end
     end
   end
-
+  
   # GET /models/1/edit
   def edit
     
   end
-
+  
   # POST /models
   # POST /models.xml
   def create
@@ -301,32 +301,32 @@ class ModelsController < ApplicationController
       end
     else
       # create new Model and content blob - non-empty file was selected
-
+      
       # prepare some extra metadata to store in Model instance
       params[:model][:contributor_type] = "User"
       params[:model][:contributor_id] = current_user.id
-
+      
       # store properties and contents of the file temporarily and remove the latter from params[],
       # so that when saving main object params[] wouldn't contain the binary data anymore
       params[:model][:content_type] = (params[:model][:data]).content_type
       params[:model][:original_filename] = (params[:model][:data]).original_filename
       data = params[:model][:data].read
       params[:model].delete('data')     
-
+      
       @model = Model.new(params[:model])
       @model.content_blob = ContentBlob.new(:data => data)
-
+      
       respond_to do |format|
         if @model.save
           # the Model was saved successfully, now need to apply policy / permissions settings to it
           policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
-
+          
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
-
+          
           if policy_err_msg.blank?
             flash[:notice] = 'Model was successfully uploaded and saved.'
             format.html { redirect_to model_path(@model) }
@@ -343,25 +343,25 @@ class ModelsController < ApplicationController
       end
     end
   end
-
+  
   # GET /models/1;download
   def download
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
     @model.save_without_timestamping
-
+    
     #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
     #@display_model.last_used_at = Time.now
     #@display_model.save_without_timestamping
-
+    
     if @display_model.content_blob.url.blank?
       send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
     else
       download_jerm_resource @display_model
     end
   end
-
+  
   # PUT /models/1
   # PUT /models/1.xml
   def update
@@ -370,29 +370,29 @@ class ModelsController < ApplicationController
       [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
         params[:model].delete(column_name)
       end
-
+      
       # update 'last_used_at' timestamp on the Model
       params[:model][:last_used_at] = Time.now
     end
-
+    
     respond_to do |format|
       if @model.update_attributes(params[:model])
         # the Model was updated successfully, now need to apply updated policy / permissions settings to it
         policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
-
+        
         # update attributions
         Relationship.create_or_update_attributions(@model, params[:attributions])
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@model, params[:creators])
-
+        
         if policy_err_msg.blank?
-            flash[:notice] = 'Model metadata was successfully updated.'
-            format.html { redirect_to model_path(@model) }
-          else
-            flash[:notice] = "Model metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
-          end
+          flash[:notice] = 'Model metadata was successfully updated.'
+          format.html { redirect_to model_path(@model) }
+        else
+          flash[:notice] = "Model metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+        end
       else
         format.html {
           set_parameters_for_sharing_form()
@@ -401,52 +401,52 @@ class ModelsController < ApplicationController
       end
     end
   end
-
+  
   # DELETE /models/1
   # DELETE /models/1.xml
   def destroy
     @model = Model.find(params[:id])
     @model.destroy
-
+    
     respond_to do |format|
       format.html { redirect_to(models_url) }
       format.xml  { head :ok }
     end
   end
-
+  
   protected
-
+  
   def default_items_per_page
     return 2
   end
-
+  
   def find_models
     found = Model.find(:all,
                      :order => "title")
-
+    
     # this is only to make sure that actual binary data isn't sent if download is not
     # allowed - this is to increase security & speed of page rendering;
     # further authorization will be done for each item when collection is rendered
     found.each do |model|
       model.content_blob.data = nil unless Authorization.is_authorized?("download", nil, model, current_user)
     end
-
+    
     @models = found    
   end
-
+  
   def find_display_model
     if @model
       @display_model = params[:version] ? @model.find_version(params[:version]) : @model.latest_version
     end
   end
-
+  
   def find_model_auth
     begin
       action=action_name
       action="download" if action=="execute"
       
       model = Model.find(params[:id])
-
+      
       if Authorization.is_authorized?(action, nil, model, current_user)
         @model = model
       else
@@ -464,12 +464,12 @@ class ModelsController < ApplicationController
       return false
     end
   end
-
-
+  
+  
   def set_parameters_for_sharing_form
     policy = nil
     policy_type = ""
-
+    
     # obtain a policy to use
     if defined?(@model) && @model.asset
       if (policy = @model.asset.policy)
@@ -480,12 +480,12 @@ class ModelsController < ApplicationController
         policy_type = "project"
       end
     end
-
+    
     unless policy
-        policy = Policy.default()
-        policy_type = "system"
+      policy = Policy.default()
+      policy_type = "system"
     end
-
+    
     # set the parameters
     # ..from policy
     @policy = policy
@@ -495,16 +495,16 @@ class ModelsController < ApplicationController
     @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
     @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
     @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
-
+    
     # ..other
     @resource_type = "Model"
     @favourite_groups = current_user.favourite_groups
     @resource=@model
-
+    
     @all_people_as_json = Person.get_all_as_json
     
     @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
     
   end
-
+  
 end
