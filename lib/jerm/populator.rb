@@ -66,7 +66,14 @@ module Jerm
         end
         project.decrypt_credentials
         downloader = DownloaderFactory.create resource.project
-        data_hash = downloader.get_remote_data(resource.uri,project.site_username,project.site_password)
+        begin
+          data_hash = downloader.get_remote_data(resource.uri,project.site_username,project.site_password)
+          
+        rescue Exception=>e
+          puts "Error fetching from :#{resource.uri} - #{e.message}"
+          return true
+        end
+      
         unless data_hash.nil?
           digest = Digest::MD5.new
           digest << data_hash[:data]
