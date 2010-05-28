@@ -229,6 +229,24 @@ class PersonTest < ActiveSupport::TestCase
     end    
   end
   
+  def test_user_is_destroyed_with_person
+    p=people(:quentin_person)
+    u=users(:quentin)
+    assert_difference("Person.count",-1) do
+      assert_difference("User.count",-1) do
+        p.destroy
+      end
+    end
+    assert_nil User.find_by_id(u.id)
+    
+    p=people(:random_userless_person)
+    assert_difference("Person.count",-1) do
+      assert_no_difference("User.count") do
+        p.destroy
+      end
+    end
+  end
+  
   def test_updated_not_changed_when_adding_notifiee_info
     p=people(:modeller_person)
     up_at=p.updated_at
