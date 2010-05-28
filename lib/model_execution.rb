@@ -17,8 +17,6 @@ module ModelExecution
     
     filepath=store_data_to_tmp model
     
-    puts "PATH = #{filepath}"
-
     part=Multipart.new({:upfile=>filepath})
 
     response = part.post(root_url+jsp)
@@ -33,8 +31,7 @@ module ModelExecution
     result=result[start_block...end_block]
     
     result = result.gsub(%{src="/webMathematica/},%{src="}+root_url)
-    
-    puts result
+        
     return result
   end
 

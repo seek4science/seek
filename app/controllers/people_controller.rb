@@ -135,7 +135,6 @@ class PeopleController < ApplicationController
     render :action=>"select",:layout=>"logged_out"
   end
 
-
   # POST /people
   # POST /people.xml
   def create
