@@ -2,6 +2,14 @@
 avatar=resource_title_draggable_avatar item
 %>
 <div class="contribution_title">
+  <% if ["Investigation","Study","Assay","DataFile","Model","Sop","Publication"].include?(item.class.name) %>
+  <div class="hit_counter">
+    <ul>
+    <%= "<li>#{image "show",:style=>"vertical-align: middle"} Views: #{count_actions(item,"show")}</li>" -%>
+    <%= "<li>#{image "download",:style=>"vertical-align: middle"} Downloads: #{count_actions(item,"download")}</li>" if ["DataFile","Model","Sop"].include?(item.class.name) -%>
+    </ul>
+  </div>
+  <% end %>
   <% unless avatar.blank? -%>
     <span class="contribution_title_image">
       <%=  avatar -%>

@@ -10,14 +10,7 @@ class JermController < ApplicationController
 
   def index
     
-  end
-
-  def fix_titles
-    @assets=Asset.find(:all).select{|a| a.contributor.nil? && a.resource.title.include?("'")}
-    respond_to do |format|
-      format.html
-    end
-  end
+  end 
 
   def update_titles
     included_keys = params.keys.select{|k| k.start_with?("include_")}

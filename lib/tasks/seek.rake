@@ -54,7 +54,7 @@ namespace :seek do
   
   desc 'upgrades between 0.7 and 0.8'
   task(:upgrade_live2=>:environment) do
-    other_tasks=["associate_people_with_notification_info","load_help_docs"]
+    other_tasks=["associate_people_with_notification_info","load_help_docs","update_blobs"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute
     end

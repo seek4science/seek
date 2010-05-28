@@ -38,7 +38,7 @@ class Person < ActiveRecord::Base
 
   acts_as_taggable_on :tools, :expertise
     
-  has_one :user   
+  has_one :user, :dependent=>:destroy
   
   has_and_belongs_to_many :created_assets, :join_table => 'assets_creators', :class_name => 'Asset', :foreign_key => 'creator_id'
   

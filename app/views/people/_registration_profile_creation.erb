@@ -1,14 +1,13 @@
 <h1>New profile</h1>
 <p class="box_infotext" style="text-align:center">
-  You should only create a new profile either if you are NOT a member of a Sysmo project, or you could not find yourself listed.<br/>
+  You should only create a new profile if you could not find yourself listed under your project.<br/>
   If you are a member of a Sysmo project and have not yet checked if your profile exists, then you should
   <b><%= link_to_function "select an existing profile" do |page|
       page.visual_effect :toggle_blind, "profile_selection"
       page.visual_effect :toggle_blind, "profile_creation"
     end -%>.</b>
   <br/><br/>
-  If you could not find your existing profile then you should check the box "I am a member of a Sysmo project", and also provide details
-  of your project(s) and institution(s). We will then double check your details and update the relevant information.
+  
 </p>
 <% form_for @person do |f| %>
   <h2>Personal Information & Contact Details</h2>
@@ -58,15 +57,10 @@
     </tr>
   </table>
   <br/>
-  <%= check_box_tag :sysmo_member,
-    "sysmo_member",
-    false,
-    :onchange=>visual_effect(:toggle_appear, "sysmo_member_details_div", :duration=>0.2)
-  -%>
-
-  &nbsp;I am a member of a Sysmo project
+  <%= hidden_field_tag :sysmo_member, true -%>  
+  
   <br/>
-  <div id="sysmo_member_details_div" style="display:none;" >
+  <div id="sysmo_member_details_div" >
     <p class="box_infotext" style="text-align:center">
       Please provide some additional details about the projects your are a member of,<br/> and the institution at which you are based.<br/>
     </p>

@@ -1215,3 +1215,20 @@ ul.stats li {
 ul.stats li p label {
   font-weight: bolder;
 }
+
+div.hit_counter {
+  float: right;
+  border: 1px solid #999;
+  background-color: #fff;
+  text-align: left;
+  padding: 5px;
+  margin-right:5px;
+}
+
+div.hit_counter  ul{
+  margin:0;
+}
+
+div.hit_counter  ul li {
+  list-style: none;
+}

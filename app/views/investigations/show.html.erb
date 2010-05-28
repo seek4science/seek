@@ -34,17 +34,6 @@
         </div>
     </p>
     <br/>
-	    
-	<!--[if IE]>
-<object id="invSVG" src="<%= polymorphic_path(@investigation,:format=>:svg) -%>"
-        classid="image/svg+xml" width="100%" height="100%">
-<![endif]-->
-<!--[if !IE]>-->
-<object id="invSVG" data="<%= polymorphic_path(@investigation,:format=>:svg) -%>"
-        type="image/svg+xml" width="100%" height="100%">
-<!--<![endif]-->
-  <h1>Unable to display SVG in your browser</h1>
-</object>
     
 	
     <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @investigation %>
