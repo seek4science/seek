@@ -10,36 +10,42 @@ class SessionsController < ApplicationController
     
   end
 
-  def create    
+  def create   
     self.current_user = User.authenticate(params[:login], params[:password])
     if logged_in?
-      if params[:remember_me] == "1"
-        current_user.remember_me unless current_user.remember_token?
-        cookies[:auth_token] = { :value => self.current_user.remember_token , :expires => self.current_user.remember_token_expires_at }
-      end
-      #if the person has registered but has not yet selected a profile then go to the select person page
-      #otherwise login normally
-      if current_user.person.nil?
-        redirect_to(select_people_path)
-      else
-        respond_to do |format|
-          if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
-            unless params[:called_from][:id].blank?
-              return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
-            else
-              return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action])
-            end
-          else
-            unless session[:return_to] and !session[:return_to].empty?
-              return_to_url = request.env['HTTP_REFERER']
-            else
-              return_to_url = session[:return_to]
-            end
-          end
-          
-          format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == '/') ? redirect_to(root_url) : redirect_to(return_to_url) }
+      if current_user.person && current_user.person.projects.empty?
+          logout_user
+          flash[:error]="You have not yet been assigned to a project by an administrator."
+          redirect_to :action=>"new"
+      else      
+        if params[:remember_me] == "1"
+          current_user.remember_me unless current_user.remember_token?
+          cookies[:auth_token] = { :value => self.current_user.remember_token , :expires => self.current_user.remember_token_expires_at }
         end
-      end            
+        #if the person has registered but has not yet selected a profile then go to the select person page
+        #otherwise login normally
+        if current_user.person.nil?
+          redirect_to(select_people_path)
+        else
+          respond_to do |format|
+            if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
+              unless params[:called_from][:id].blank?
+                return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
+              else
+                return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action])
+              end
+            else
+              unless session[:return_to] and !session[:return_to].empty?
+                return_to_url = request.env['HTTP_REFERER']
+              else
+                return_to_url = session[:return_to]
+              end
+            end
+            
+            format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == '/') ? redirect_to(root_url) : redirect_to(return_to_url) }
+          end
+        end
+      end
     else
       #check if user is part way through registration processes      
       user=User.find_by_login(params[:login])      

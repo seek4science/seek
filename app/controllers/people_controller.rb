@@ -144,8 +144,10 @@ class PeopleController < ApplicationController
 
     set_tools_and_expertise(@person, params)
    
+    registration = false
+    registration = true if (current_user.person.nil?) #indicates a profile is being created during the registration process  
     
-    if (current_user.person.nil?) #indicates a profile is being created during the registration process      
+    if registration    
       current_user.person=@person      
       @userless_projects=Project.with_userless_people
       @userless_projects.sort!{|a,b|a.name<=>b.name}
@@ -168,9 +170,15 @@ class PeopleController < ApplicationController
           logout_user
           format.html {redirect_to :controller=>"users",:action=>"activation_required"}
         else
-          flash[:notice] = 'Person was successfully created.'
-          format.html { redirect_to(@person) }
-          format.xml  { render :xml => @person, :status => :created, :location => @person }
+          if registration
+            logout_user
+            flash[:notice]="Profile successfully created. You can log in when an administrator has assigned you to a project."
+            format.html { redirect_to :controller => "sessions", :action=>"new"}
+          else
+            flash[:notice] = 'Person was successfully created.'
+            format.html { redirect_to(@person) }
+            format.xml  { render :xml => @person, :status => :created, :location => @person }
+          end
         end
         
       else        
