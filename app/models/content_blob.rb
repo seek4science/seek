@@ -6,7 +6,7 @@ require 'tmpdir'
 
 class ContentBlob < ActiveRecord::Base
   
-  DATA_STORAGE_PATH = "filestore/content_blobs/"
+  DATA_STORAGE_PATH = "filestore/content_blobs"
   
   attr_writer :data
   
