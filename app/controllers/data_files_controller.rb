@@ -196,7 +196,12 @@ class DataFilesController < ApplicationController
 
     #Send data stored in database if no url specified
     if @display_data_file.content_blob.url.blank?
-      send_data @display_data_file.content_blob.data, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
+      if @display_data_file.content_blob.file_exists?
+        send_file @display_data_file.content_blob.filepath, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
+      else
+        send_data @display_data_file.content_blob.data, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'  
+      end
+      
     else #otherwise redirect to the provided download url. this will need to be changed to support authorization
       download_jerm_resource @display_data_file
     end

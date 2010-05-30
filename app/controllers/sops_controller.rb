@@ -73,7 +73,12 @@ class SopsController < ApplicationController
     #@display_sop.save_without_timestamping
 
     if @display_sop.content_blob.url.blank?
-      send_data @display_sop.content_blob.data, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'
+      if (@sop.content_blob.file_exists?)
+        send_file @display_sop.content_blob.filepath, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'
+      else
+        send_data @display_sop.content_blob.data, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'  
+      end
+      
     else
       download_jerm_resource @display_sop
     end
