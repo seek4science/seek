@@ -38,15 +38,23 @@ help_documents:
     - index
     - List of Topics
     - |-
+      h2. Guidelines for Data and Model Annotation in SEEK
+      
       [metadata-guidelines]
       [transcriptomics-guidelines]
       [proteomics-guidelines]
       
+      h2. Guidelines for using Community Resources and Controlled Vocabularies
+      
       [controlled-vocabularies]
+      
+      h2. JERM Templates for use in SEEK 
+      
+      [Templates]
       
       [faq]
     - 2010-05-12 09:28:37
-    - 2010-05-27 14:07:18
+    - 2010-05-28 13:42:45
   - - "8"
     - metadata-guidelines
     - Metadata Guidelines
@@ -306,11 +314,22 @@ help_documents:
       | Chemical | KEGG Compund | "C0003":http://www.genome.jp/dbget-bin/www_bget?cpd:C00031 | "http://www.genome.jp/kegg/ligand.html":http://www.genome.jp/kegg/ligand.html | urn:miriam:kegg.compound |
       | Chemical | PubChem | CID:24749 | 
       "http://pubchem.ncbi.nlm.nih.gov/":http://pubchem.ncbi.nlm.nih.gov/ | urn:miriam:pubchem.compound |
-      | Reaction Kinetics | SABIO-RK | id | "http://sabio.villa-bosch.de/":http://sabio.villa-bosch.de/ | urn:miriam:sabiork.reaction |
+      | Reaction Kinetics | SABIO-RK | 20936 | "http://sabio.villa-bosch.de/":http://sabio.villa-bosch.de/ | urn:miriam:sabiork.reaction |
       | Enzymes | Enzyme Nomenclature (EC) IntEnz | "EC 1.14.13.39":http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec=1.14.13.39 | "http://www.ebi.ac.uk/intenz/":http://www.ebi.ac.uk/intenz/ | urn:miriam:ec-code |
       | Pathways | KEGG Pathways | "map00480":http://www.genome.jp/kegg/pathway/map/map00480.html | "http://www.genome.jp/kegg/pathway.html":http://www.genome.jp/kegg/pathway.html | urn:miriam:kegg.pathway |
-      | Pathways | SABIO-RK Reactions | id | "http://sabio.villa-bosch.de/":http://sabio.villa-bosch.de/ | urn:miriam:sabiork.reaction |
-      | Cellular Location | Gene Ontology | "GO:0016020":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0016020&session_id=6047amigo1272228648| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
+      | Pathways | SABIO-RK Reactions | 544 | "http://sabio.villa-bosch.de/":http://sabio.villa-bosch.de/ | urn:miriam:sabiork.reaction |
+      | Cellular Location | Gene Ontology | "GO:0016020":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0016020| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
+      | Molecular Function | Gene Ontology | "GO:0004857":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0004857| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
+      | Biological Process | Gene Ontology | "GO:0071581":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0071581| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
+      | Literature | PubMed | PMID:19112082|"http://www.ncbi.nlm.nih.gov/pubmed/":http://www.ncbi.nlm.nih.gov/pubmed/ | urn:miriam:pubmed |
 
     - 2010-05-27 10:44:44
-    - 2010-05-27 12:26:33
+    - 2010-05-28 09:06:09
+  - - "13"
+    - templates
+    - JERM Templates
+    - |
+      SysMO-DB, the SysMO-PALs and other members of the SysMO consortium have been developing a collection of JERM templates to facilitate standard formats for sharing the same kinds of data through the consortium. This page lists the current templates available. 
+
+    - 2010-05-28 09:14:54
+    - 2010-05-28 13:40:08

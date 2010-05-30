@@ -356,7 +356,12 @@ class ModelsController < ApplicationController
     #@display_model.save_without_timestamping
     
     if @display_model.content_blob.url.blank?
-      send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
+      if @display_model.content_blob.file_exists?
+        send_file @display_model.content_blob.filepath, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
+      else
+        send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
+      end
+      
     else
       download_jerm_resource @display_model
     end

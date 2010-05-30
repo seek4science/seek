@@ -1,0 +1,32 @@
+
+--- 
+help_attachments: 
+  columns: 
+  - id
+  - help_document_id
+  - title
+  - content_type
+  - filename
+  - size
+  - db_file_id
+  - created_at
+  - updated_at
+  records: 
+  - - "1"
+    - "13"
+    - MIAME_metadata
+    - application/vnd.ms-excel
+    - microarray1.xls
+    - "112640"
+    - "1"
+    - 2010-05-28 09:17:12
+    - 2010-05-28 09:17:12
+  - - "2"
+    - "13"
+    - Intracellular_metabolite_measurements
+    - application/vnd.ms-excel
+    - metabolites_intracellular.xls
+    - "76288"
+    - "2"
+    - 2010-05-28 13:38:34
+    - 2010-05-28 13:38:34
