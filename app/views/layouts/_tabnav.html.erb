@@ -53,12 +53,12 @@
     </li>
 
     <!-- Forums tab -->
-    <li <%= (["forums"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
+    <li <%= (["forums","topics"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
       <%= link_to "Forums", forums_path -%>
     </li>
 
     <!-- Help tab -->
-    <li <%= (["help"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
+    <li <%= (["help_documents"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
       <%= link_to "Help", help_documents_path -%>
     </li>
   </ul>
