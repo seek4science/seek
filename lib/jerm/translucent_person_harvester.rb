@@ -65,10 +65,10 @@ module Jerm
             person_record.disciplines << discipline unless person_record.disciplines.include?(discipline)
           end
         end
-          
         
-#        person_record.firstname=firstname
-#        person_record.lastname=lastname
+        
+        #        person_record.firstname=firstname
+        #        person_record.lastname=lastname
         person_record.email=email unless email.blank?
         person_record.phone=telephone
         unless avatar_uri.blank?
@@ -82,7 +82,14 @@ module Jerm
           avatar.save!
           person_record.avatar_id=avatar.id
         end
+        
+        class << person_record
+          def record_timestamps
+            false
+          end
+        end
         person_record.save!
+        
       end
       
       private
@@ -92,14 +99,10 @@ module Jerm
         return nil
       end
       
-      
-      
     end
     
     def self.start(root_uri,key)
-      xml = fetch_xml(root_uri,key)
-      puts "Received #{xml}"
-      puts xml
+      xml = fetch_xml(root_uri,key)           
       people=[]
       begin
         parser = LibXML::XML::Parser.string(xml,:encoding => LibXML::XML::Encoding::UTF_8)
@@ -122,8 +125,7 @@ module Jerm
       if uri.scheme=="https"
         http.use_ssl=true 
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-      puts "Fetching XML from "+uri.path+"?key=#{key}&get=#{TABLENAME}"
+      end      
       req=Net::HTTP::Get.new(uri.path+"?key=#{key}&get=#{TABLENAME}")
       
       http.request(req).body
