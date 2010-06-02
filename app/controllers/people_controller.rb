@@ -269,6 +269,25 @@ class PeopleController < ApplicationController
     end
     
   end
+  
+  def get_work_group
+    people = nil
+    project_id=params[:project_id]
+    institution_id=params[:institution_id]    
+    if institution_id == "0"
+      project = Project.find(project_id)
+      people = project.people
+    else
+      workgroup = WorkGroup.find_by_project_id_and_institution_id(project_id,institution_id)
+      people = workgroup.people
+    end
+    people_list = people.collect{|p| [p.name, p.email, p.id]}
+    respond_to do |format|
+      format.json {
+        render :json => {:status => 200, :people_list => people_list }
+      }
+    end
+  end
 
   private
 
