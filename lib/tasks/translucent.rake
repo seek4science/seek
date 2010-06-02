@@ -5,6 +5,7 @@ require 'rake'
 #Tasks specific to the Translucent project
 namespace :transclucent do
     
+  desc "Updates peoples meta data with that from the Translucent internal system"
   task(:sync_people=>:environment) do
     p=Project.find_by_name("TRANSLUCENT")
     raise Exception.new("Unable to find translucent project") if p.nil?

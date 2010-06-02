@@ -6,6 +6,9 @@ module Jerm
   class TranslucentPersonHarvester
     TABLENAME="people"
     class TranslucentPerson
+      
+      DISCIPLINE_MAP={"Laboratory"=>"Experimentalist","Modeler"=>"Modeller","Admin"=>"Admin"}
+      
       attr_accessor :seek_id,:firstname,:lastname,:tags,:avatar_uri,:institution_id,:email,:telephone 
       def initialize(node)
         @node=node
@@ -43,30 +46,50 @@ module Jerm
       
       def update
         raise Exception.new("No ID") if seek_id.blank?
-        p=Person.find_by_id(seek_id)
-        raise Exception.new("Unable to find person with ID: #{seek_id}") if p.nil?
-        raise Exception.new("Person is not a member of Translucent") unless p.projects.include?(@project)  
-        raise Exception.new("Name does not match that in database:  DB: #{p.name}, other: #{name}") if p.name!=name
+        person_record=Person.find_by_id(seek_id)
+        raise Exception.new("Unable to find person with ID: #{seek_id}") if person_record.nil?
+        raise Exception.new("Person is not a member of Translucent") unless person_record.projects.include?(@project)  
+        raise Exception.new("Name does not match that in database:  DB: #{person_record.name}, other: #{name}") if person_record.name != name
         i=Institution.find_by_id(institution_id)
         raise Exception.new("Institute not found for id: #{institution_id}") if i.nil?
         raise Exception.new("Institute #{i.name} is not a Translucent Institute") if !@project.institutions.include?(i)
         
-#        p.firstname=firstname
-#        p.lastname=lastname
-        p.email=email unless email.blank?
-        p.phone=telephone
+        if DISCIPLINE_MAP[tags].nil?
+          puts "Unable to match discipline to #{tags}"
+        else
+          title=DISCIPLINE_MAP[tags]
+          discipline=Discipline.find_by_title(title)
+          if discipline.nil?
+            puts "Unable to find the discipline #{title} in the database"
+          else
+            person_record.disciplines << discipline unless person_record.disciplines.include?(discipline)
+          end
+        end
+        
+        
+        #        person_record.firstname=firstname
+        #        person_record.lastname=lastname
+        person_record.email=email unless email.blank?
+        person_record.phone=telephone
         unless avatar_uri.blank?
-          if p.avatar_id.nil?
+          if person_record.avatar_id.nil?
             avatar=Avatar.new
-            avatar.owner=p
+            avatar.owner=person_record
           else            
-            avatar=Avatar.find(p.avatar_id)
+            avatar=Avatar.find(person_record.avatar_id)
           end  
           avatar.image_file_url=avatar_uri
           avatar.save!
-          p.avatar_id=avatar.id
+          person_record.avatar_id=avatar.id
         end
-        p.save!
+        
+        class << person_record
+          def record_timestamps
+            false
+          end
+        end
+        person_record.save!
+        
       end
       
       private
@@ -76,14 +99,10 @@ module Jerm
         return nil
       end
       
-      
-      
     end
     
     def self.start(root_uri,key)
-      xml = fetch_xml(root_uri,key)
-      puts "Received #{xml}"
-      puts xml
+      xml = fetch_xml(root_uri,key)           
       people=[]
       begin
         parser = LibXML::XML::Parser.string(xml,:encoding => LibXML::XML::Encoding::UTF_8)
@@ -106,8 +125,7 @@ module Jerm
       if uri.scheme=="https"
         http.use_ssl=true 
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      end
-      puts "Fetching XML from "+uri.path+"?key=#{key}&get=#{TABLENAME}"
+      end      
       req=Net::HTTP::Get.new(uri.path+"?key=#{key}&get=#{TABLENAME}")
       
       http.request(req).body

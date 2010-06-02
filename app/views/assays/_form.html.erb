@@ -1,5 +1,6 @@
 <%
 @assay_text=@assay.is_modelling? ? "analysis" : "assay"
+@assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
 %>
 <%= javascript_include_tag "assays.js"  %>
 
@@ -41,7 +42,7 @@
 
 <table class="padded_table">
   <tr>
-    <td><%= f.label "#{@assay_text.capitalize} type: " %></td>
+    <td><%= f.label "#{@assay_type_text.capitalize} type: " %></td>
     <% unless @assay.is_modelling? -%>
       <td><%= f.label "Technology type: " %></td>
     <% end -%>
