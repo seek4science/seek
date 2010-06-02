@@ -22,6 +22,7 @@ module Jerm
       
       @timestamp = DateTime.parse(@node.find_first("submission_date").inner_xml) unless @node.find_first("submission_date").nil?
       @title = @node.find_first("name").inner_xml unless @node.find_first("name").nil?
+      @title = @node.find_first("title").inner_xml unless @node.find_first("title").nil?
       
       @description += "Purpose: #{@node.find_first("purpose").inner_xml}\n" unless (@node.find_first("purpose").nil? || @node.find_first("purpose").blank?)
       @description += @node.find_first("descriptions").inner_xml unless @node.find_first("descriptions").nil?
