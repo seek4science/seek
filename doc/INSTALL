@@ -66,7 +66,7 @@ If you are setting up SysMO-SEEK as a production environment, rather than for de
 
 Copy config/database.default.yml to config/database.yml and edit accordingly - either MySQL or SQLite3 should work (you will need to install the <em>sqlite3-dev</em> package and the <em>sqlite3-ruby</em> gem)
 
-To add users to the MySQL database, first login to the database as an administrator (root by default) and issue a GRANT command along the lines of the example below (for clarity, this uses a username of <em>mysqluser</em> and password <em>mysqlpassword</em>. You are obviously recommended to use something different).
+To add users to the MySQL database, first login to the database as an administrator (root by default) and issue a GRANT command along the lines of the example below (for clarity, this uses a username of <em>mysqluser</em> and password <em>mysqlpassword</em>. <b>You are obviously recommended to use a different username and password</b> on a server exposed to the internet).
 
     > mysql -uroot -p
     Enter password:
@@ -76,7 +76,8 @@ To add users to the MySQL database, first login to the database as an administra
 
     Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-    mysql> GRANT ALL on *.* TO 'mysqluser'@'localhost' IDENTIFIED BY 'mysqlpassword'
+    mysql> CREATE USER 'mysqluser'@'localhost' IDENTIFIED BY 'mysqlpassword';
+    mysql> GRANT ALL PRIVILEGES ON *.* TO 'mysqluser'@'localhost' WITH GRANT OPTION;
 
 
 Run the rake tasks (the final task installs some default controlled vocubulary data)
@@ -117,22 +118,6 @@ Once logged in as an administrator, you will notice a link on the right-hand sid
 admin facilities for creating new projects, institutions and profiles.
 
 Here you can also define additional adminstrator users.
-
-== Enabling search
-
-By default search is disabled. To override this (and other settings) copy the file <em>config/initializers/seek_local.rb.pre</em> to <em>config/initializers/seek_local.rb</em>
-
-  cp config/initializers/seek_local.rb.pre config/initializers/seek_local.rb
-
-You should then edit that file, and change the setting SOLR_ENABLED to true. You will need to restart your server for this to take effect.
-
-You also need to start up the background search service. This is started with the command
-
-  rake solr:start
-
-You should reindex the search database, and can do this at anytime, using the commmand
-
-  rake solr:reindex
 
 == Contacting us and other users
 
