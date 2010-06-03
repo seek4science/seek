@@ -5,11 +5,15 @@ require 'jerm/resource'
 
 module Jerm
   class TranslucentResource < Resource
+    
+    
+    
     def initialize item      
       @type=item[:type]
       @node=item[:node]
       @project=project_name
       @description=""
+      @filename=nil
     end
     
     def populate      
@@ -27,7 +31,7 @@ module Jerm
         @timestamp = DateTime.parse(@node.find_first("submission_date").content) unless @node.find_first("submission_date").nil?
         #@title = @node.find_first("name").inner_xml unless @node.find_first("name").nil?
         @title = @node.find_first("title").content unless @node.find_first("title").nil?
-        
+        @authorization_tag = @node.find_first("authorization").content unless @node.find_first("authorization").nil?
         desc_node=@node.find_first("description")
         if !desc_node.nil?
           @description=desc_node.content          
@@ -42,6 +46,15 @@ module Jerm
     
     def project_name
       "Translucent"
+    end
+    
+    def filename
+      if (!@uri.nil?)
+        return @filename unless @filename.nil?
+        "fred.txt"
+      else
+        ""
+      end
     end
     
   end
