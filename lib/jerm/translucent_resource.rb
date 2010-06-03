@@ -53,7 +53,7 @@ module Jerm
       if (!@uri.nil?)
         return @filename unless @filename.nil?
         open(@uri) do |f|
-          return HttpDownloader.determine_filename(f)
+          return HttpDownloader.new.determine_filename(f)
         end
       else
         ""

@@ -1,10 +1,10 @@
 tables_and_types:
   phpr_mat_sop:
     type: Sop
-  phpr_mod_models:
-    type: Model
-  phpr_exp_2d:
-    type: DataFile
+#  phpr_mod_models:
+#    type: Model
+#  phpr_exp_2d:
+#    type: DataFile
 #  phpr_exp_cc:
 #    type: DataFile
 #  phpr_exp_gfp:

@@ -77,6 +77,7 @@ module Jerm
           
         rescue Exception=>e
           puts "Error fetching from :#{resource.uri} - #{e.message}"
+          puts e.backtrace.join("\n")
           return true
         end
       

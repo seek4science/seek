@@ -27,9 +27,12 @@ uuid=UUIDTools::UUID.random_create %>
     <td>
         <%= text_field_tag("seek_id_#{uuid}",fetch_result_line.author_seek_id,:size=>5) -%>
     </td>
+	<td>
+        <%= h(fetch_result_line.authorization_tag) -%>
+    </td>
     <% if fetch_result_line.error -%>
     <td>
-        <%= fetch_result_line.error.message -%>
+        <%= h(fetch_result_line.error.message) -%>
     </td>
     <% end -%>
 </tr>

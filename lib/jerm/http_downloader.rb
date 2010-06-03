@@ -8,11 +8,30 @@ module Jerm
   # The downloader is created for a given project using the Jerm::DownloaderFactory, though in most current cases the HttpDownloader is sufficient
   class HttpDownloader
     @@file_cache={}
+    @@filename_cache={}
     
     def get_remote_data url, username=nil, password=nil, type=nil
       cached=check_from_cache(url,username,password)
       return cached unless cached.nil?
       return basic_auth url, username, password
+    end
+    
+    #tries to determine the filename from f
+    #if it can it will read the content-disposition and parse the filename, otherwise falls back to what follows the last / in the uri 
+    def determine_filename f
+      return @@filename_cache[f.base_uri] unless @@filename_cache[f.base_uri].nil?
+      disp=f.meta["content-disposition"]
+      result=nil
+      unless disp.nil?        
+        m=/filename=\".*\"/.match(disp)
+        if (m)
+          m=/\".*\"/.match(m[0])           
+          result=m[0].gsub("\"","").split("/").last if (m)
+        end
+      end
+      result=f.base_uri.path.split('/').last if result.nil?
+      @@filename_cache[f.base_uri.nil?]=result
+      return result
     end
 
     private
@@ -39,7 +58,7 @@ module Jerm
           #FIXME: need to handle full range of 2xx sucess responses, in particular where the response is only partial
           if f.status[0] == "200"                    
             result = {:data=>f.read,:content_type=>f.content_type,:filename=>determine_filename(f)}
-            cache result,url,username,password
+            cache result,url,username,password                                    
             return result
           else
             raise Exception.new("Problem fetching data from remote site - response code #{thing.status[0]}, url: #{url}")
@@ -49,22 +68,6 @@ module Jerm
         raise Exception.new("Problem fetching data from remote site - response code #{error.io.status[0]}, url:#{url}")
       end
       
-    end
-
-    #tries to determine the filename from the open Http::Response
-    #if it can it will read the content-disposition and parse the filename, otherwise falls back to what follows the last / in the uri 
-    def self.determine_filename f
-      disp=f.meta["content-disposition"]
-      result=nil
-      unless disp.nil?        
-        m=/filename=\".*\"/.match(disp)
-        if (m)
-          m=/\".*\"/.match(m[0])           
-          result=m[0].gsub("\"","").split("/").last if (m)
-        end
-      end
-      result=f.base_uri.path.split('/').last if result.nil?
-      return result
     end
 
     #returns a hash that contains

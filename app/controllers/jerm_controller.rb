@@ -38,7 +38,7 @@ class JermController < ApplicationController
       project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.name
       data_hash = downloader.get_remote_data uri,project.site_username,project.site_password, type
-      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
+      send_data data_hash[:data], :filename => data_hash[:filename], :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
     end
   end
   
