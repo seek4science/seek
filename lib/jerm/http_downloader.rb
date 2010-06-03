@@ -53,7 +53,7 @@ module Jerm
 
     #tries to determine the filename from the open Http::Response
     #if it can it will read the content-disposition and parse the filename, otherwise falls back to what follows the last / in the uri 
-    def determine_filename f
+    def self.determine_filename f
       disp=f.meta["content-disposition"]
       result=nil
       unless disp.nil?        

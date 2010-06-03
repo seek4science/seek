@@ -2,6 +2,7 @@
 # and open the template in the editor.
 
 require 'jerm/resource'
+require 'jerm/http_downloader'
 
 module Jerm
   class TranslucentResource < Resource
@@ -51,7 +52,9 @@ module Jerm
     def filename
       if (!@uri.nil?)
         return @filename unless @filename.nil?
-        "fred.txt"
+        open(@uri) do |f|
+          return HttpDownloader.determine_filename(f)
+        end
       else
         ""
       end
