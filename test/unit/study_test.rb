@@ -6,7 +6,8 @@ class StudyTest < ActiveSupport::TestCase
 
   test "associations" do
     study=studies(:metabolomics_study)
-    assert_equal "A Metabolomics Study",study.title
+    #assert_equal "A Metabolomics Study",study.title
+    assert_equal "A  Study",study.title
 
     assert_not_nil study.assays
     assert_equal 1,study.assays.size
