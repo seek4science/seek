@@ -38,7 +38,7 @@ module Jerm
         open(url,:http_basic_authentication=>[username, password]) do |f|
           #FIXME: need to handle full range of 2xx sucess responses, in particular where the response is only partial
           if f.status[0] == "200"                    
-            result = {:data=>f.read,:content_type=>f.content_type,:filename=>f.base_uri.path.split('/').last}
+            result = {:data=>f.read,:content_type=>f.content_type,:filename=>"fred.zip"}
             cache result,url,username,password
             return result
           else

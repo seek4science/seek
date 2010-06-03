@@ -34,7 +34,7 @@ module Jerm
     #adds a resource to the central SEEK archive, referenced by the remote URI, or creates new version if already exists.
     #returns a report:
     # {:response=>:success|:fail|:skipped,:message=>"",:exception=>Exception|nil,:resource=>resource}
-    def populate resource      
+    def populate resource            
       begin
         if resource.uri.blank?
           response={:response=>:fail,:message=>"No URL to data file described"}
@@ -42,10 +42,12 @@ module Jerm
           response=add_as_new(resource)
         else
           response={:response=>:skipped,:message=>MESSAGES[:exists],:response_code=>RESPONSE_CODES[:exists]}
+          resource.duplicate=true
         end
       rescue Exception => exception
         response={:response=>:fail,:message=>"Something went wrong",:exception=>exception}
       end
+      
       response[:resource]=resource
       response[:uuid]=UUIDTools::UUID.random_create.to_s
       return response
@@ -55,6 +57,10 @@ module Jerm
     def exists? resource
 
       exists = false
+      
+      if (resource.uri.nil?)
+        raise Exception.new("URI is nil for resource: #{resource.to_s}")
+      end
       
       #Check the URI doesn't exist
       if find_by_uri(resource.uri).nil?
