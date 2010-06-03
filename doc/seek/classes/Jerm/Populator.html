@@ -160,21 +160,28 @@ checks whether the resource already exists in the registry
 66:         <span class="ruby-keyword kw">end</span>
 67:         <span class="ruby-identifier">project</span>.<span class="ruby-identifier">decrypt_credentials</span>
 68:         <span class="ruby-identifier">downloader</span> = <span class="ruby-constant">DownloaderFactory</span>.<span class="ruby-identifier">create</span> <span class="ruby-identifier">resource</span>.<span class="ruby-identifier">project</span>
-69:         <span class="ruby-identifier">data_hash</span> = <span class="ruby-identifier">downloader</span>.<span class="ruby-identifier">get_remote_data</span>(<span class="ruby-identifier">resource</span>.<span class="ruby-identifier">uri</span>,<span class="ruby-identifier">project</span>.<span class="ruby-identifier">site_username</span>,<span class="ruby-identifier">project</span>.<span class="ruby-identifier">site_password</span>)
-70:         <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">data_hash</span>.<span class="ruby-identifier">nil?</span>
-71:           <span class="ruby-identifier">digest</span> = <span class="ruby-constant">Digest</span><span class="ruby-operator">::</span><span class="ruby-constant">MD5</span>.<span class="ruby-identifier">new</span>
-72:           <span class="ruby-identifier">digest</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">data_hash</span>[<span class="ruby-identifier">:data</span>]
-73:           <span class="ruby-identifier">md5sum</span> = <span class="ruby-identifier">digest</span>.<span class="ruby-identifier">hexdigest</span>
-74:           <span class="ruby-identifier">exists</span> = <span class="ruby-operator">!</span><span class="ruby-constant">ContentBlob</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">:first</span>,<span class="ruby-identifier">:conditions=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-identifier">:md5sum=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">md5sum</span>}).<span class="ruby-identifier">nil?</span>
-75:         <span class="ruby-keyword kw">else</span>
-76:           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span>
-77:         <span class="ruby-keyword kw">end</span>
-78:       <span class="ruby-keyword kw">else</span>
-79:         <span class="ruby-identifier">exists</span> = <span class="ruby-keyword kw">true</span>
-80:       <span class="ruby-keyword kw">end</span>
-81:       
-82:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">exists</span>
-83:     <span class="ruby-keyword kw">end</span>
+69:         <span class="ruby-keyword kw">begin</span>
+70:           <span class="ruby-identifier">data_hash</span> = <span class="ruby-identifier">downloader</span>.<span class="ruby-identifier">get_remote_data</span>(<span class="ruby-identifier">resource</span>.<span class="ruby-identifier">uri</span>,<span class="ruby-identifier">project</span>.<span class="ruby-identifier">site_username</span>,<span class="ruby-identifier">project</span>.<span class="ruby-identifier">site_password</span>)
+71:           
+72:         <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">e</span>
+73:           <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Error fetching from :#{resource.uri} - #{e.message}&quot;</span>
+74:           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span>
+75:         <span class="ruby-keyword kw">end</span>
+76:       
+77:         <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">data_hash</span>.<span class="ruby-identifier">nil?</span>
+78:           <span class="ruby-identifier">digest</span> = <span class="ruby-constant">Digest</span><span class="ruby-operator">::</span><span class="ruby-constant">MD5</span>.<span class="ruby-identifier">new</span>
+79:           <span class="ruby-identifier">digest</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">data_hash</span>[<span class="ruby-identifier">:data</span>]
+80:           <span class="ruby-identifier">md5sum</span> = <span class="ruby-identifier">digest</span>.<span class="ruby-identifier">hexdigest</span>
+81:           <span class="ruby-identifier">exists</span> = <span class="ruby-operator">!</span><span class="ruby-constant">ContentBlob</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">:first</span>,<span class="ruby-identifier">:conditions=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-identifier">:md5sum=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">md5sum</span>}).<span class="ruby-identifier">nil?</span>
+82:         <span class="ruby-keyword kw">else</span>
+83:           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">false</span>
+84:         <span class="ruby-keyword kw">end</span>
+85:       <span class="ruby-keyword kw">else</span>
+86:         <span class="ruby-identifier">exists</span> = <span class="ruby-keyword kw">true</span>
+87:       <span class="ruby-keyword kw">end</span>
+88:       
+89:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">exists</span>
+90:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>

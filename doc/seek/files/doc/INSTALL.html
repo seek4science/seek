@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Mon May 17 15:04:16 +0100 2010</td>
+      <td>Wed Jun 02 17:37:14 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -164,11 +164,11 @@ Our source code is stored within the <a
 href="http://code.google.com/p/sysmo-db/">Sysmo-DB Google Code
 Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
 as the version control system. For a stable version, you should check out
-according to a stable tag. Our current tag is v0.7.3, so to retrieve this
+according to a stable tag. Our current tag is v0.8.0, so to retrieve this
 version you should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.7.3 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.8.0 sysmo-seek
 </pre>
 <h2>The RAILS_ENV environment variable</h2>
 <p>
@@ -188,8 +188,9 @@ the <em>sqlite3-dev</em> package and the <em>sqlite3-ruby</em> gem)
 To add users to the MySQL database, first login to the database as an
 administrator (root by default) and issue a GRANT command along the lines
 of the example below (for clarity, this uses a username of
-<em>mysqluser</em> and password <em>mysqlpassword</em>. You are obviously
-recommended to use something different).
+<em>mysqluser</em> and password <em>mysqlpassword</em>. <b>You are
+obviously recommended to use a different username and password</b> on a
+server exposed to the internet).
 </p>
 <pre>
     &gt; mysql -uroot -p
@@ -200,7 +201,8 @@ recommended to use something different).
 
     Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-    mysql&gt; GRANT ALL on *.* TO 'mysqluser'@'localhost' IDENTIFIED BY 'mysqlpassword'
+    mysql&gt; CREATE USER 'mysqluser'@'localhost' IDENTIFIED BY 'mysqlpassword';
+    mysql&gt; GRANT ALL PRIVILEGES ON *.* TO 'mysqluser'@'localhost' WITH GRANT OPTION;
 </pre>
 <p>
 Run the rake tasks (the final task installs some default controlled
@@ -257,33 +259,6 @@ institutions and profiles.
 <p>
 Here you can also define additional adminstrator users.
 </p>
-<h2>Enabling search</h2>
-<p>
-By default search is disabled. To override this (and other settings) copy
-the file <em>config/initializers/seek_local.rb.pre</em> to
-<em>config/initializers/seek_local.rb</em>
-</p>
-<pre>
-  cp config/initializers/seek_local.rb.pre config/initializers/seek_local.rb
-</pre>
-<p>
-You should then edit that file, and change the setting SOLR_ENABLED to
-true. You will need to restart your server for this to take effect.
-</p>
-<p>
-You also need to start up the background search service. This is started
-with the command
-</p>
-<pre>
-  rake solr:start
-</pre>
-<p>
-You should reindex the search database, and can do this at anytime, using
-the commmand
-</p>
-<pre>
-  rake solr:reindex
-</pre>
 <h2>Contacting us and other users</h2>
 <p>
 There is a public Google Group available for Sysmo-SEEK at <a
