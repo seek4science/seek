@@ -7,8 +7,6 @@ require 'jerm/http_downloader'
 module Jerm
   class TranslucentResource < Resource
     
-    
-    
     def initialize item      
       @type=item[:type]
       @node=item[:node]

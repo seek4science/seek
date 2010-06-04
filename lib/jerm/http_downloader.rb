@@ -1,6 +1,6 @@
 require 'openssl'
 require 'uuidtools'
-
+  
 module Jerm
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE  
 
@@ -9,7 +9,7 @@ module Jerm
   class HttpDownloader
     @@file_cache={}
     @@filename_cache={}
-    
+     
     def get_remote_data url, username=nil, password=nil, type=nil
       cached=check_from_cache(url,username,password)
       return cached unless cached.nil?
@@ -18,8 +18,11 @@ module Jerm
     
     #tries to determine the filename from f
     #if it can it will read the content-disposition and parse the filename, otherwise falls back to what follows the last / in the uri 
-    def determine_filename f
+    def determine_filename f            
       return @@filename_cache[f.base_uri] unless @@filename_cache[f.base_uri].nil?
+      puts "Cache size is: #{@@filename_cache.size}"
+      puts "Looking up filename for #{f.base_uri}"
+      puts caller[0..2].join("\n")
       disp=f.meta["content-disposition"]
       result=nil
       unless disp.nil?        
@@ -30,7 +33,8 @@ module Jerm
         end
       end
       result=f.base_uri.path.split('/').last if result.nil?
-      @@filename_cache[f.base_uri.nil?]=result
+      @@filename_cache[f.base_uri]=result
+      puts "Filename found as: #{result}"
       return result
     end
 

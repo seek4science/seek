@@ -70,25 +70,26 @@ module Jerm
         if project.nil?
           return false
         end
-        project.decrypt_credentials
-        downloader = DownloaderFactory.create resource.project
-        begin
-          data_hash = downloader.get_remote_data(resource.uri,project.site_username,project.site_password)
-          
-        rescue Exception=>e
-          puts "Error fetching from :#{resource.uri} - #{e.message}"
-          puts e.backtrace.join("\n")
-          return true
-        end
+#        project.decrypt_credentials
+#        downloader = DownloaderFactory.create resource.project
+#        begin
+#          data_hash = downloader.get_remote_data(resource.uri,project.site_username,project.site_password)
+#          
+#        rescue Exception=>e
+#          puts "Error fetching from :#{resource.uri} - #{e.message}"
+#          puts e.backtrace.join("\n")
+#          return true
+#        end
       
-        unless data_hash.nil?
-          digest = Digest::MD5.new
-          digest << data_hash[:data]
-          md5sum = digest.hexdigest
-          exists = !ContentBlob.find(:first,:conditions=>{:md5sum=>md5sum}).nil?
-        else
-          return false
-        end
+#        unless data_hash.nil?
+#          digest = Digest::MD5.new
+#          digest << data_hash[:data]
+#          md5sum = digest.hexdigest
+#          exists = !ContentBlob.find(:first,:conditions=>{:md5sum=>md5sum}).nil?
+#        else
+#          return false
+#        end
+         exists=false
       else
         exists = true
       end
