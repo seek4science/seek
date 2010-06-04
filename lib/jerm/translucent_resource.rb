@@ -31,11 +31,20 @@ module Jerm
         @timestamp = DateTime.parse(@node.find_first("submission_date").content) unless @node.find_first("submission_date").nil?
         #@title = @node.find_first("name").inner_xml unless @node.find_first("name").nil?
         @title = @node.find_first("title").content unless @node.find_first("title").nil?
-        @authorization_tag = @node.find_first("authorization").content unless @node.find_first("authorization").nil?
+        authorization_tag = @node.find_first("authorization").content unless @node.find_first("authorization").nil?
+        if authorization_tag.nil? || authorization_tag=="Translucent"
+          @authorization=AUTH_TYPES[:project]
+        elsif authorization_tag == "SysMO"
+          @authorization=AUTH_TYPES[:sysmo]
+        else
+          @authorization=AUTH_TYPES[:default]
+        end
         desc_node=@node.find_first("description")
         if !desc_node.nil?
           @description=desc_node.content          
         end
+        
+        @filename="translucent_#{@table_name}_#{@translucent_id}"
         
       rescue Exception=>e
         puts "Error processing the XML for this item"
@@ -43,19 +52,11 @@ module Jerm
         puts e.message
       end
     end
-    
-    def authorization
-      return AUTH_TYPES[:project] if @authorization_tag=="Translucent"
-      return AUTH_TYPES[:sysmo] if @authorization_tag=="SysMO"
-    end
+        
     
     def project_name
       "Translucent"
-    end
-    
-    def filename
-      "translucent_#{@table_name}_#{@translucent_id}"
-    end
+    end    
     
   end
 end

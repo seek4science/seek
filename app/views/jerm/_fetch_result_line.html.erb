@@ -2,7 +2,7 @@
 uuid=UUIDTools::UUID.random_create %>
 <tr>
     <td>
-        <%= check_box_tag "exclude_#{uuid}","",fetch_result_line.duplicate || !fetch_result_line.error.nil? -%>
+        <% check_box_tag "exclude_#{uuid}","",fetch_result_line.duplicate || !fetch_result_line.error.nil? -%>		
     </td>
     <td>
         <%= fetch_result_line.type -%>
@@ -12,7 +12,7 @@ uuid=UUIDTools::UUID.random_create %>
     </td>
     <td>
         <%= (link_to_function(image("arrow_left"),"use_title('#{uuid}','#{generate_resource_title_from_filename(fetch_result_line.filename)}');") + "<br/>") unless fetch_result_line.filename.blank? -%>
-        <%= fetch_result_line.filename -%>
+        <%= text_field_tag("filename_#{uuid}",fetch_result_line.filename) -%>
         <br/>
         <%= link_to(image("download"),url_for(:action=>"download",:uri=>fetch_result_line.uri,:project=>@project.id,:type=>fetch_result_line.type,:controller=>"jerm")) unless fetch_result_line.uri.blank? -%>
     </td>
@@ -36,6 +36,7 @@ uuid=UUIDTools::UUID.random_create %>
     </td>
     <% end -%>
 </tr>
+<%= hidden_field_tag "authorization_#{uuid}",fetch_result_line.authorization -%>
 <%= hidden_field_tag "timestamp_#{uuid}",fetch_result_line.timestamp -%>
 <%= hidden_field_tag "uri_#{uuid}",fetch_result_line.uri -%>
 <%= hidden_field_tag "project_#{uuid}",fetch_result_line.project -%>

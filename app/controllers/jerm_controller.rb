@@ -60,6 +60,8 @@ class JermController < ApplicationController
           resource.uri=params["uri_#{uuid}"]
           resource.timestamp=params["timestamp_#{uuid}"]
           resource.duplicate=params["duplicate_#{uuid}"]
+          resource.authorization=params["authorization_#{uuid}"]
+          resource.filename=params["filename_#{uuid}"]
           resources << resource
         end
       end

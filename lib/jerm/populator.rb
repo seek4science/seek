@@ -10,6 +10,7 @@ module Jerm
       :no_author=>"Unable to determine the SEEK person for the author.",
       :no_default_policy=>"Unable to determine the default policy for this project.",
       :no_title=>"Unable to correctly determine the title",
+      :unknown_auth=>"The authorization policy was not recognised",
       :success=>"Successfully added."
     }
 
@@ -19,6 +20,7 @@ module Jerm
       :no_author=>4,
       :no_default_policy=>5,
       :no_title=>6,
+      :unknown_auth=>7,
       :success=>0
     }
 

@@ -7,21 +7,21 @@ module Jerm
   #A JERM populator that is intended to be used embedded with directly within the SYSMO-DB Rails application - therefore having direct access to the
   #API and Active Record resources.
   class EmbeddedPopulator < Populator    
-
+    
     def find_by_uri uri
       ContentBlob.find(:first,:conditions=>{:url=>uri})
     end
-
+    
     #adds the resource as a new asset within the registry
     #returns a report:
     # {:response=>:success|:fail|:skipped,:message=>"",:exception=>Exception|nil}
     def add_as_new resource
-	#FIXME: this method is too long 
+      #FIXME: this method is too long 
       begin
         warning=nil
         warning_code=0
         project = Project.find(:first,:conditions=>['name = ?',resource.project])
-      
+        
         if resource.author_seek_id && resource.author_seek_id.to_i>0 #final check it that the string is a number. to_i on String returns 0 if not
           author = Person.find(resource.author_seek_id)
         else
@@ -40,8 +40,8 @@ module Jerm
           #resource_model.contributor=author.user
           #associate with ContentBlob
           resource_model.content_blob = ContentBlob.new(:url=>resource.uri)
-          resource_model.original_filename = determine_filename(resource)
-
+          resource_model.original_filename = resource.filename
+          
           if resource.title.blank?
             warning = MESSAGES[:no_title]
             warning_code=RESPONSE_CODES[:no_title]
@@ -60,16 +60,25 @@ module Jerm
             resource_model.asset.project=project
             
             #assign default policy, and save the associated asset
-
-            resource_model.asset.policy=project.default_policy.deep_copy
+            if (resource.authorization==Resource::AUTH_TYPES[:default])
+              resource_model.asset.policy=project.default_policy.deep_copy              
+            elsif (resource.authorization==Resource::AUTH_TYPES[:sysmo])
+              resource_model.asset.policy=sysmo_policy              
+            elsif (resource.authorization==Resource::AUTH_TYPES[:project])
+              resource_model.asset.policy=project_policy(project)              
+            else
+              return {:response=>:fail,:message=>MESSAGES[:unknown_auth],:author=>author,:response_code=>RESPONSE_CODES[:unknown_auth]}                                        
+            end
+            
             resource_model.asset.policy.use_custom_sharing = true
+            resource_model.asset.policy.save!
             resource_model.asset.creators << author
             resource_model.asset.save!
             resource_model.project=project
             resource_model.save!
             resource_model.reload
             resource_model.cache_remote_content_blob
-
+            
             p=Permission.new(:contributor=>author,:access_type=>Policy::MANAGING,:policy_id=>resource_model.asset.policy.id)
             p.save!
             if warning
@@ -85,17 +94,39 @@ module Jerm
       end
       return response
     end
-
+    
+    def sysmo_policy
+      Policy.new(:name=>'auto',
+                :sharing_scope=>Policy::ALL_SYSMO_USERS,
+                :access_type=>Policy::DOWNLOADING,
+                :use_custom_sharing=>true,
+                :use_whitelist=>false,
+                :use_blacklist=>false)      
+    end
+    
+    def project_policy project
+      policy=Policy.new(:name=>'auto',
+                :sharing_scope=>Policy::ALL_SYSMO_USERS,
+                :access_type=>Policy::VIEWING,
+                :use_custom_sharing=>true,
+                :use_whitelist=>false,
+                :use_blacklist=>false) 
+      policy.save!
+      p=Permission.new(:contributor=>project,:access_type=>Policy::DOWNLOADING,:policy_id=>policy.id)
+      p.save!
+      return policy
+    end
+    
     def determine_filename resource
       URI.unescape(resource.uri).split("/").last
     end
-
+    
     def generated_title resource,author
       type=resource.type.capitalize
       type="SOP" if type.downcase=="sop"
       "#{author.name}'s #{type} #{Time.now.strftime('(%d %b %Y)')}"
     end
-
+    
     def default_policy author,project
       nil
       #      Policy.new(:name => 'auto',
