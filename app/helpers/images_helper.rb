@@ -216,6 +216,8 @@ module ImagesHelper
       "famfamfam_silk/page_white_text.png"
     when "atom_feed"
       "misc_icons/feed_icon.png"
+    when "impersonate"
+      "famfamfam_silk/group_go.png"
     else
       return nil
     end
