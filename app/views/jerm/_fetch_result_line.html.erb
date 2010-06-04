@@ -2,7 +2,7 @@
 uuid=UUIDTools::UUID.random_create %>
 <tr>
     <td>
-        <% check_box_tag "exclude_#{uuid}","",fetch_result_line.duplicate || !fetch_result_line.error.nil? -%>		
+        <%= check_box_tag "exclude_#{uuid}","",fetch_result_line.duplicate || !fetch_result_line.error.nil? -%>		
     </td>
     <td>
         <%= fetch_result_line.type -%>
