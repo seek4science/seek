@@ -2,16 +2,16 @@ class JermController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth
   before_filter :jerm_enabled
-
+  
   @@harvesters=nil
   @@populator = Jerm::EmbeddedPopulator.new
-
+  
   layout "no_sidebar"
-
+  
   def index
     
   end 
-
+  
   def update_titles
     included_keys = params.keys.select{|k| k.start_with?("include_")}
     @assets=[]
@@ -26,7 +26,7 @@ class JermController < ApplicationController
       format.html
     end
   end
-
+  
   def download
     if params[:id]
       asset = Asset.find(params[:id])
@@ -38,10 +38,10 @@ class JermController < ApplicationController
       project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.name
       data_hash = downloader.get_remote_data uri,project.site_username,project.site_password, type
-      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
+      send_data data_hash[:data], :filename => data_hash[:filename], :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
     end
   end
-
+  
   def insert_results
     resources=[]
     @project=Project.find(params[:project])
@@ -60,19 +60,21 @@ class JermController < ApplicationController
           resource.uri=params["uri_#{uuid}"]
           resource.timestamp=params["timestamp_#{uuid}"]
           resource.duplicate=params["duplicate_#{uuid}"]
+          resource.authorization=params["authorization_#{uuid}"]
+          resource.filename=params["filename_#{uuid}"]
           resources << resource
         end
       end
     end
-
+    
     begin
       
       @responses = @@populator.populate_collection(resources)
       response_order=[:success,:warning,:fail,:skipped]
-
+      
       @responses=@responses.sort_by{|a| response_order.index(a[:response])}      
       @project.update_attribute(:last_jerm_run,Time.now)
-
+      
       inform_authors
     rescue Exception => @exception
       puts @exception
@@ -86,7 +88,7 @@ class JermController < ApplicationController
       end
     end
   end
-
+  
   
   def fetch    
     @project=Project.find(params[:project])
@@ -99,12 +101,18 @@ class JermController < ApplicationController
       begin
         harvester = construct_project_harvester(@project.title,@project.site_root_uri,@project.site_username,@project.site_password)        
         @resources = harvester.update
-        @resources.each {|r| r.duplicate=@@populator.exists?(r)}
+        @resources.each do |r| 
+          begin
+            r.duplicate=@@populator.exists?(r)
+          rescue Exception=>e
+            r.error=e
+          end
+        end
       rescue Exception => @exception
         puts @exception
       end
     end
-
+    
     render :update do |page|
       if @exception
         page.replace_html :results,:partial=>"exception",:object=>@exception
@@ -112,11 +120,11 @@ class JermController < ApplicationController
         page.replace_html :results,:partial=>"fetch_results",:object=>@resources
       end
     end
-
+    
   end
-
+  
   private
-
+  
   def construct_project_harvester project_name,root_uri,uname,pwd
     #removes hyphens from project name
     clean_project_name=project_name.gsub("-","")
@@ -128,11 +136,11 @@ class JermController < ApplicationController
     raise Exception.new("Unable to find Harvester for project #{project_name}") if harvester_class.nil?
     return harvester_class.new(root_uri,uname,pwd)
   end
-
+  
   def discover_harvesters
     Dir.chdir(File.join(RAILS_ROOT, "lib/jerm")) do
       Dir.glob("*harvester.rb").each do |f|
-        ("jerm/" + f.gsub(/.rb/, '')).camelize.constantize
+       ("jerm/" + f.gsub(/.rb/, '')).camelize.constantize
       end
     end
     harvesters=[]
@@ -142,14 +150,14 @@ class JermController < ApplicationController
     
     @@harvesters=harvesters
   end
-
+  
   def jerm_enabled
     if (!JERM_ENABLED)
       error("JERM is not enabled","invalid action")
       return false
     end
   end
- 
+  
   def inform_authors
     resources = {}
     @responses.each do |r|
@@ -169,5 +177,5 @@ class JermController < ApplicationController
       end
     end
   end
-
+  
 end

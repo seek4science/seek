@@ -5,7 +5,9 @@ require 'jerm/harvester'
 require 'jerm/translucent_resource'
 
 module Jerm
+  
   class TranslucentHarvester < Harvester
+    
     def initialize root_uri,username,key
       super root_uri,username,key
       configpath=File.join(File.dirname(__FILE__),"config/#{project_name.downcase}.yml")
@@ -18,16 +20,16 @@ module Jerm
       table_names.each do |table_name|
         xml=do_get(table_name)        
         type=@tables_and_types[table_name]['type']
-        begin
+        begin                    
           parser = LibXML::XML::Parser.string(xml,:encoding => LibXML::XML::Encoding::UTF_8)
           document = parser.parse
           document.find("item").each do |node|
             result << {:node=>node,:type=>type,:table_name=>table_name}
             puts "Item found in table_name: #{table_name}"
           end
-        rescue LibXML::XML::Error
+        rescue LibXML::XML::Error=>e
           puts "Error with XML from #{table_name}"
-          puts xml
+          puts e.message          
         end
 
       end
@@ -46,7 +48,7 @@ module Jerm
       http.use_ssl=true if uri.scheme=="https"
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-      req=Net::HTTP::Get.new(uri.path+"?key=#{key}&get=#{table_name}")
+      req=Net::HTTP::Get.new(uri.path+"?key=#{key}&xget=#{table_name}")
 
       http.request(req).body
     end    

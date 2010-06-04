@@ -1,11 +1,9 @@
 tables_and_types:
-  phpr_mat_sop:
-    type: Sop
+#  phpr_mat_sop:
+#    type: Sop
   phpr_mod_models:
     type: Model
   phpr_exp_2d:
-    type: DataFile
-  phpr_exp_cc:
     type: DataFile
   phpr_exp_gfp:
     type: DataFile
@@ -15,7 +13,7 @@ tables_and_types:
     type: DataFile
   phpr_exp_kinetic:
     type: DataFile
-  phpr_exp_ma_sample:
+  phpr_exp_ma_sample:    
     type: DataFile
   phpr_exp_ma_compare:
     type: DataFile
@@ -27,16 +25,6 @@ tables_and_types:
     type: DataFile
   phpr_exp_ppchip:
     type: DataFile
-  phpr_mat_deletions:
-    type: DataFile
-  phpr_mat_oligonucleotide:
-    type: DataFile
-  phpr_mat_othermat:
-    type: DataFile
-  phpr_mat_plasmid:
-    type: DataFile
-  phpr_mat_strain:
-    type: DataFile
   phpr_mod_pathway:
     type: DataFile
   phpr_exp_mife:
@@ -46,7 +34,21 @@ tables_and_types:
   phpr_exp_cytosolicph:
     type: DataFile
   phpr_exp_cellvolume:
-    type: DataFile 
+    type: DataFile
+
+
+#  phpr_mat_othermat:
+#    type: DataFile
+#  phpr_mat_plasmid:
+#    type: DataFile
+#  phpr_mat_strain:
+#    type: DataFile     
+#  phpr_exp_cc:
+#    type: DataFile
+#  phpr_mat_deletions:
+#    type: DataFile
+#  phpr_mat_oligonucleotide:
+#    type: DataFile
 
 #  phpr_isa_investigation:
 #    type: Investigation
