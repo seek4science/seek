@@ -10,6 +10,7 @@ module Jerm
     def initialize item      
       @type=item[:type]
       @node=item[:node]
+      @table_name=item[:table_name]
       @project=project_name
       @description=""
       @filename=nil
@@ -17,7 +18,7 @@ module Jerm
     
     def populate      
       begin
-        
+        @translucent_id = @node.find_first("id").content unless @node.find_first("id").nil?
         @author_seek_id = @node.find_first("submitter").content unless @node.find_first("submitter").nil?
         if @type=="Model"
           @uri = @node.find_first("model").content unless @node.find_first("model").nil?
@@ -48,14 +49,7 @@ module Jerm
     end
     
     def filename
-      if (!@uri.nil?)
-        return @filename unless @filename.nil?
-        open(@uri) do |f|
-          return HttpDownloader.new.determine_filename(f)
-        end
-      else
-        ""
-      end
+      "translucent_#{@table_name}_#{@translucent_id}"
     end
     
   end
