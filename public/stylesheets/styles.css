@@ -785,12 +785,15 @@ div.list_item_desc {
     font-size: 80%;
 }
 
-p.list_item_title {
+div.list_item_title{
     border-bottom:1px dotted black;
-    font-size:131%;
-    font-weight:bold;
     margin-bottom:0.25em;
     padding-bottom:0.25em;
+}
+
+div.list_item_title p {
+    font-size:131%;
+    font-weight:bold;
 }
 
 p.list_item_attribute {
@@ -1231,4 +1234,9 @@ div.hit_counter  ul{
 
 div.hit_counter  ul li {
   list-style: none;
+}
+
+img.visibility_icon {
+  float: right;
+  margin: 0.3em 0;  
 }

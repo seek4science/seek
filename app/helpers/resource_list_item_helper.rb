@@ -34,20 +34,26 @@ module ResourceListItemHelper
       title = get_object_title(resource)
     end    
     name = resource.class.name.split("::")[0]
+    
+    html = "<div class=\"list_item_title\">"
     case name
-    when "DataFile","Model","Sop"
-      image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))), :style => "width: 24px; height: 24px; vertical-align: middle")
-      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-      return "<p class=\"list_item_title\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
-    when "Assay"
-      image = image_tag((resource.is_modelling? ? icon_filename_for_key("assay_modelling_avatar") : icon_filename_for_key("assay_experimental_avatar")), :style => "height: 24px; vertical-align: middle")
-      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-      return "<p class=\"list_item_title\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
-    when "Person"
-      return "<p class=\"list_item_title\">#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
-    else
-      return "<p class=\"list_item_title\">#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
+      when "DataFile","Model","Sop"
+        image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))), :style => "width: 24px; height: 24px; vertical-align: middle")
+        icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+        html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
+        html << list_item_visibility(resource.asset.policy)
+        html << "<br style=\"clear:both\"/>"
+      when "Assay"
+        image = image_tag((resource.is_modelling? ? icon_filename_for_key("assay_modelling_avatar") : icon_filename_for_key("assay_experimental_avatar")), :style => "height: 24px; vertical-align: middle")
+        icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+        html << "#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
+      when "Person"
+        html << "#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}"
+      else
+        html << "#{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
     end
+    html << "</div>"
+    return html
   end
   
   def list_item_simple_list items, attribute
@@ -152,6 +158,30 @@ module ResourceListItemHelper
       html << "</div>"
       html << "</div>"
     end
+  end
+  
+  def list_item_visibility policy
+    title = ""
+    html = ""
+    case policy.sharing_scope
+      when 0
+        title = "Private"
+        html << image('lock',:title=>title, :class => "visibility_icon") 
+      when 1
+        title = "Custom Policy"
+        html << image('manage',:title=>title, :class => "visibility_icon") 
+      when 2
+        title = "Visible to all SysMO projects"
+        html << image('open',:title=>title, :class => "visibility_icon") 
+      when 3
+        title = "Visible to all registered users"
+        html << image('open',:title=>title, :class => "visibility_icon") 
+      when 4
+        title = "Visible to everyone"
+        html << image('world',:title=>title, :class => "visibility_icon") 
+      end
+    html << ""    
+    html
   end
   
 end

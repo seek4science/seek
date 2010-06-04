@@ -128,6 +128,8 @@ module ImagesHelper
       "crystal_project/22x22/apps/clean.png"
     when "lock"
       "famfamfam_silk/lock.png"
+    when "open"
+      "famfamfam_silk/lock_open.png"
     when "no_user"
       "famfamfam_silk/link_break.png"
     when "sop"
@@ -218,6 +220,8 @@ module ImagesHelper
       "misc_icons/feed_icon.png"
     when "impersonate"
       "famfamfam_silk/group_go.png"
+    when "world"
+      "famfamfam_silk/world.png"
     else
       return nil
     end

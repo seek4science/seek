@@ -316,14 +316,14 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_select "div.list_item" do
-      assert_select "p.list_item_title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:text=>"SOP with fully public policy",:count=>1
+      assert_select "div.list_item_title a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:text=>"SOP with fully public policy",:count=>1
       assert_select "div.list_item_actions a[href=?]",sop_path(sops(:sop_with_fully_public_policy),:version=>1),:count=>1
-      assert_select "p.list_item_title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
+      assert_select "div.list_item_title a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
       assert_select "div.list_item_actions a[href=?]",sop_path(sops(:sop_with_private_policy_and_custom_sharing),:version=>1),:count=>0
 
-      assert_select "p.list_item_title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:text=>"Download Only",:count=>1
+      assert_select "div.list_item_title a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:text=>"Download Only",:count=>1
       assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:downloadable_data_file),:version=>1),:count=>1
-      assert_select "p.list_item_title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
+      assert_select "div.list_item_title a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
       assert_select "div.list_item_actions a[href=?]",data_file_path(data_files(:private_data_file),:version=>1),:count=>0
     end
 
