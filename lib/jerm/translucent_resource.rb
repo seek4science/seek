@@ -44,6 +44,11 @@ module Jerm
       end
     end
     
+    def authorization
+      return AUTH_TYPES[:project] if @authorization_tag=="Translucent"
+      return AUTH_TYPES[:sysmo] if @authorization_tag=="SysMO"
+    end
+    
     def project_name
       "Translucent"
     end

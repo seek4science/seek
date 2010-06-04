@@ -3,7 +3,8 @@
 
 module Jerm
   class Resource
-
+    AUTH_TYPES={:default=>"DEFAULT",:project=>"PROJECT",:sysmo=>"SYSMO",:public=>"PUBLIC"}
+    
     attr_accessor :project, :uri, :author_first_name, :author_last_name,:author_seek_id,:timestamp,:type, :title, :description, :duplicate, :error, :authorization_tag
 
     def to_s
@@ -12,6 +13,10 @@ module Jerm
 
     def author_name
       "#{author_first_name} #{author_last_name}"
+    end
+    
+    def authorization
+      return AUTH_TYPES[:default]
     end
 
     def filename

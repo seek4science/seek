@@ -19,10 +19,7 @@ module Jerm
     #tries to determine the filename from f
     #if it can it will read the content-disposition and parse the filename, otherwise falls back to what follows the last / in the uri 
     def determine_filename f            
-      return @@filename_cache[f.base_uri] unless @@filename_cache[f.base_uri].nil?
-      puts "Cache size is: #{@@filename_cache.size}"
-      puts "Looking up filename for #{f.base_uri}"
-      puts caller[0..2].join("\n")
+      return @@filename_cache[f.base_uri] unless @@filename_cache[f.base_uri].nil?      
       disp=f.meta["content-disposition"]
       result=nil
       unless disp.nil?        
@@ -33,8 +30,7 @@ module Jerm
         end
       end
       result=f.base_uri.path.split('/').last if result.nil?
-      @@filename_cache[f.base_uri]=result
-      puts "Filename found as: #{result}"
+      @@filename_cache[f.base_uri]=result      
       return result
     end
 
