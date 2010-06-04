@@ -54,4 +54,5 @@
 
   <%= render :partial=>"users_details", :locals=>{:users=>User.admins, :title=>"Admin Users" } -%>
 
+  <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Impersonate User", :partial => 'admin/impersonate'} %>
 </div>

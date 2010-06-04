@@ -9,7 +9,7 @@ class UsersControllerTest < ActionController::TestCase
   # Then, you can remove it from this and the units test.
   include AuthenticatedTestHelper
 
-  fixtures :users,:people
+  fixtures :all
 
   def setup
     @controller = UsersController.new
@@ -160,7 +160,22 @@ class UsersControllerTest < ActionController::TestCase
     assert_nil flash[:error]
     assert User.authenticate("quentin","mmmmm")
   end
-
+  
+  def admin_can_impersonate
+    login_as :quentin
+    assert self.current_user, users(:quentin)
+    get :impersonate, :id=>users(:aaron)
+    assert self.current_user, users(:aaron)
+  end
+  
+  def non_admin_cannot_impersonate
+    login_as :aaron
+    assert self.current_user, users(:aaron)  
+    get :impersonate, :id=>users(:quentin)
+    assert flash[:error]
+    assert self.current_user, users(:aaron)    
+  end
+  
   protected
   def create_user(options = {})
     post :create, :user => { :login => 'quire', :email => 'quire@example.com',

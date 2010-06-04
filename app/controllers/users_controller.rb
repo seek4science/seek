@@ -3,6 +3,7 @@ class UsersController < ApplicationController
   layout "logged_out", :except=>[:edit]
     
   before_filter :is_current_user_auth, :only=>[:edit, :update]  
+  before_filter :is_user_admin_auth, :only => [:impersonate]
   
   # render new.rhtml
   def new
@@ -138,6 +139,15 @@ class UsersController < ApplicationController
 
   def activation_required
     
+  end
+  
+  def impersonate
+    user = User.find(params[:id])
+    if user
+      self.current_user = user
+    end
+    
+    redirect_to :controller => 'home', :action => 'index'
   end
 
 end
