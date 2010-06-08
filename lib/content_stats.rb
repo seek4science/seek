@@ -38,7 +38,7 @@ class ContentStats
     private 
     
     def visible_assets assets
-      assets.select{|asset| Authorization.is_authorized?('show',nil,asset.resource,user)}
+      assets.select{|asset| Authorization.is_authorized?('show',nil,asset.resource,@user)}
     end
     
     def assets_size assets
