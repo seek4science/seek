@@ -20,15 +20,15 @@ class ContentStats
     end
     
     def visible_data_files
-      visible_assets data_files
+      authorised_assets data_files,"show"
     end
     
     def visible_sops
-      visible_assets sops
+      authorised_assets sops,"show"
     end
     
     def visible_models
-      visible_assets models
+      authorised_assets models,"show"
     end
     
     def registered_people
@@ -37,8 +37,8 @@ class ContentStats
     
     private 
     
-    def visible_assets assets
-      assets.select{|asset| Authorization.is_authorized?('show',nil,asset.resource,user)}
+    def authorised_assets assets,action
+      assets.select{|asset| Authorization.is_authorized?(action,nil,asset.resource,@user)}
     end
     
     def assets_size assets
