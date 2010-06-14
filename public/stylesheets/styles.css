@@ -1224,4 +1224,8 @@ ul.stats li p label {
 	font-weight: bold;
 }
 
+#organism_search_results {
+	margin-left: 2em;
+}
+
 
