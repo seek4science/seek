@@ -26,10 +26,16 @@
   <p>
   <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
   <%= f.label :study-%><span class="required">*</span><br/>
-  <% studies=Study.find(:all,:joins=>:investigation,:conditions=>["project_id IN (?)",current_user.person.projects])-%>
+  <% investigations = current_user.person.projects.collect{|p| p.investigations}.flatten -%>
   <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
-  <% studies.each do |s| %>
-    <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
+  <% investigations.each do |i| %>
+    <% unless i.studies.empty?%>
+      <% options << "<optgroup label=\"#{truncate(i.title, :length => 64)}\">\n" %>
+      <% i.studies.each do |s| %>
+        <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
+      <% end %>
+      <% options << "</optgroup>" %>
+    <% end %>
   <% end %>
   <select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()" style="width:100%">
     <%= options %>
