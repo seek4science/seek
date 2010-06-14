@@ -1,7 +1,7 @@
 class OrganismsController < ApplicationController
   
   before_filter :login_required
-  before_filter :is_user_admin_auth,:only=>[:edit,:update]
+  before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create]
   before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise]
   layout "main",:except=>:visualise
 
@@ -31,7 +31,7 @@ class OrganismsController < ApplicationController
     pagenum=params[:pagenum]
     pagenum||=1
     search_term=params[:search_term]
-    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>25,:pagenum=>pagenum,:ontologyids=>"1132"}
+    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>50,:pagenum=>pagenum,:ontologyids=>"1132"}
     render :update do |page|
       if results
         page.replace_html 'search_results',:partial=>"search_results",:object=>results,:locals=>{:pages=>pages,:pagenum=>pagenum,:search_term=>search_term}
@@ -52,6 +52,20 @@ class OrganismsController < ApplicationController
     end
   end
 
+  def create
+    @organism = Organism.new(params[:organism])
+    respond_to do |format|
+      if @organism.save
+        flash[:notice] = 'Organism was successfully created.'
+        format.html { redirect_to organism_path(@organism) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
   def update
     @organism = Organism.find(params[:id])
 

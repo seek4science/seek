@@ -1,44 +1,5 @@
 <h1>Editing <%= link_to h(@organism.title),@organism -%></h1>
 
-<div id="edit_ontology">
-  <%  form_for(@organism) do |f| %>
-    <ul>
-      <li>
-        <label>Display name</label>
-        <%= f.text_field :title %>
-      </li>
-      <li>
-        <label>Ontology ID</label>
-        <%= f.text_field :ontology_id %>
-      </li>
-      <li>
-        <label>Ontology version ID</label>
-        <%= f.text_field :ontology_version_id %>
-      </li>
-      <li>
-        <label>Concept URI</label>
-        <%= f.text_field :concept_uri %>
-      </li>
-    </ul>
-    <%= f.submit "Update" -%>
-  <% end %>
-
-</div>
-
-<br/>
-<h3>Search</h3>
-<div id="search_results">
-  <%= render :partial=>"search_results",:object=>[],:locals=>{:search_term=>@organism.title,:pagenum=>1} %>
-</div>
-
-<script type="text/javascript">
-  function add_concept(label,ont_id,ont_version_id,conc_id) {
-    $('organism_title').value=label;
-    $('organism_ontology_id').value=ont_id;
-    $('organism_ontology_version_id').value=ont_version_id;
-    $('organism_concept_uri').value=conc_id;
-<%=  visual_effect :appear,"edit_ontology" -%>
-  }
-</script>
+<%= render :partial=>"form" -%>
 
 

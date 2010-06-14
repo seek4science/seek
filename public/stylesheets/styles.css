@@ -1240,3 +1240,15 @@ img.visibility_icon {
   float: right;
   margin: 0.3em 0;  
 }
+
+#edit_organism li {
+	list-style: none;	
+}
+
+#edit_organism li span {
+	font-weight: bold;
+}
+
+#organism_search_results {
+	margin-left: 2em;
+}

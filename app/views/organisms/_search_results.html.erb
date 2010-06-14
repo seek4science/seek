@@ -1,30 +1,56 @@
-<% form_remote_tag :url=>url_for(:action=>:search_ajax,:controller=>:organisms),
-  :before=>"show_ajax_loader('search_results');" do -%>
-<%= hidden_field_tag :pagenum,pagenum  -%>
-<label>Search for:</label>&nbsp;<%= text_field_tag :search_term,search_term,:style=>"padding-left: 0.5em;padding-right:0.5em;min-width:15em;"%>
-<%= submit_tag "Go."  %>
-<% end -%>
-
-<% if !search_results.empty? -%>
-<h3><%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%></h3>
-<table>
-  <tr><th>Ontology label</th><th>Ontology ID</th><th>Version ID</th><th>Concept id</th><th>Preferred name</th></tr>
-  <% search_results.each do |result| %>
-  <tr>
-    <td><%= h(result[:ontology_display_label]) -%></td>
-    <td><%= link_to_ontology(result[:ontology_id],result[:ontology_id]) -%></td>
-    <td><%= link_to_ontology_version(result[:ontology_version_id],result[:ontology_version_id]) -%>
-        <%= link_to_ontology_version_visualize("Explore",result[:ontology_version_id]) -%>
-      <%= link_to_download_ontology("Download",result[:ontology_version_id]) -%>
-    </td>
-    <td>
-      <%= result[:concept_id] -%>
-    </td>
-    <td>
-      <%= link_to_function(h(result[:preferred_name]),"add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id]}');") -%>
-    </td
-  </tr>
-  <% end %>
-
-</table>
-<% end -%>
+<div id="organism_search_results">
+    <% form_remote_tag :url=>url_for(:action=>:search_ajax,:controller=>:organisms),
+    :before=>"show_ajax_loader('search_results');" do -%>
+    <%= hidden_field_tag :pagenum,1 -%>
+    <span style="font-weight:bold;">Search for:</span>
+    <br/>
+    <%= text_field_tag :search_term,search_term,:style=>"padding-left: 0.5em;padding-right:0.5em;min-width:15em;" %>
+    <%= submit_tag "Search" %>
+    <% end -%>
+    <% if !search_results.empty? -%>
+    <h3><%= link_to_remote image("arrow_left"),:url=>url_for(:action=>:search_ajax,:controller=>:organisms,:pagenum=>pagenum.to_i-1,:search_term=>search_term),:before=>"show_ajax_loader('search_results');" unless pagenum.to_i <= 1 -%>
+        <%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%>
+        <%= link_to_remote image("arrow_right"),:url=>url_for(:action=>:search_ajax,:controller=>:organisms,:pagenum=>pagenum.to_i+1,:search_term=>search_term),:before=>"show_ajax_loader('search_results');" unless pagenum.to_i >= pages.to_i -%>
+    </h3>
+    <table>
+        <tr>
+            <th>
+                Ontology label
+            </th>
+            <th>
+                Ontology ID
+            </th>
+            <th>
+                Version ID
+            </th>
+            <th>
+                Concept id
+            </th>
+            <th>
+                Preferred name
+            </th>
+        </tr>
+        <% search_results.each do |result| %>
+        <tr>
+            <td>
+                <%= h(result[:ontology_display_label]) -%>
+            </td>
+            <td>
+                <%= link_to_ontology(result[:ontology_id],result[:ontology_id]) -%>
+            </td>
+            <td>
+                <%= link_to_ontology_version(result[:ontology_version_id],result[:ontology_version_id]) -%>
+                <%= link_to_ontology_version_visualize("Explore",result[:ontology_version_id]) -%>
+                <%= link_to_download_ontology("Download",result[:ontology_version_id]) -%>
+            </td>
+            <td>
+                <%= result[:concept_id] -%>
+            </td>
+            <td>
+                <%= link_to_function(h(result[:preferred_name]),"add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id]}');") -%>
+            </td
+        </tr>
+        <% end %>
+    </table>
+    <% end -%>
+</div>
