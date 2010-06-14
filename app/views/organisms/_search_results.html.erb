@@ -1,8 +1,9 @@
 <% form_remote_tag :url=>url_for(:action=>:search_ajax,:controller=>:organisms),
   :before=>"show_ajax_loader('search_results');" do -%>
 <%= hidden_field_tag :pagenum,pagenum  -%>
-<label>Search for:</label>&nbsp;<%= text_field_tag :search_term,search_term,:style=>"padding-left: 0.5em;padding-right:0.5em;min-width:15em;"%>
-<%= submit_tag "Go."  %>
+<span style="font-weight:bold;">Search for:</span><br/>
+<%= text_field_tag :search_term,search_term,:style=>"padding-left: 0.5em;padding-right:0.5em;min-width:15em;"%>
+<%= submit_tag "Search"  %>
 <% end -%>
 
 <% if !search_results.empty? -%>

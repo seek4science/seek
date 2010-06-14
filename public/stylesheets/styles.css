@@ -1215,3 +1215,13 @@ ul.stats li {
 ul.stats li p label {
   font-weight: bolder;
 }
+
+#edit_organism li {
+	list-style: none;	
+}
+
+#edit_organism li span {
+	font-weight: bold;
+}
+
+

@@ -3,27 +3,27 @@
     <% form_for(@organism) do |f| %>
     <ul>
         <li>
-            <label>
+            <span>
                 Display name
-            </label>
+            </span><br/>
             <%= f.text_field :title %>
         </li>
         <li>
-            <label>
+            <span>
                 Ontology ID
-            </label>
+            </span><br/>
             <%= f.text_field :ontology_id %>
         </li>
         <li>
-            <label>
+            <span>
                 Ontology version ID
-            </label>
+            </span><br/>
             <%= f.text_field :ontology_version_id %>
         </li>
         <li>
-            <label>
+            <span>
                 Concept URI
-            </label>
+            </span><br/>
             <%= f.text_field :concept_uri %>
         </li>
     </ul>
