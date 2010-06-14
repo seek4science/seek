@@ -80,7 +80,7 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Edit Organism/,:count=>1
     
     assert_select "a[href=?]",new_organism_path,:count=>1
-    assert_select "a",:text=>/Create Organism/,:count=>1
+    assert_select "a",:text=>/Add Organism/,:count=>1
   end
   
   test "non admin does not see edit and create buttons" do
@@ -92,6 +92,6 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Edit Organism/,:count=>0
     
     assert_select "a[href=?]",new_organism_path,:count=>0
-    assert_select "a",:text=>/Create Organism/,:count=>0
+    assert_select "a",:text=>/Add Organism/,:count=>0
   end
 end
