@@ -20,9 +20,8 @@ module Seek
     
     module InstanceMethods
       
-      def regenerate_uuid
-        #maybe a little paranoid :)
-        self.uuid = "#{UUIDTools::UUID.random_create.to_s}-#{UUIDTools::UUID.random_create.to_s}"       
+      def regenerate_uuid        
+        self.uuid = "#{UUIDTools::UUID.random_create.to_s}"       
       end
       
       def uuid
