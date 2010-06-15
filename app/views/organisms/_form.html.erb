@@ -35,12 +35,13 @@
 <div id="search_results">
     <%= render :partial=>"search_results",:object=>[],:locals=>{:search_term=>@organism.title,:pagenum=>1} %>
 </div>
+
 <script type="text/javascript">
       function add_concept(label,ont_id,ont_version_id,conc_id) {
         $('organism_title').value=label;
         $('organism_ontology_id').value=ont_id;
         $('organism_ontology_version_id').value=ont_version_id;
         $('organism_concept_uri').value=conc_id;
-    <%=  visual_effect :appear,"edit_ontology" -%>
+		Effect.Appear("edit_ontology");    	
       }
 </script>
