@@ -115,7 +115,7 @@
           <ul>
               <% @assay.data_files.each do |d| %>
               <li>
-                  <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %><%= d.relationship_type ? " <span>(" + d.relationship_type.title + ")</span>" : "" %>
+                  <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %><%= d.relationship_type(@assay) ? " <span>(" + d.relationship_type(@assay).title + ")</span>" : "" %>
               </li>
               <% end %>
           </ul>

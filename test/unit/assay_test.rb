@@ -56,7 +56,7 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid?
 
     assay.title=assays(:metabolomics_assay).title
-    assert !assay.valid?
+    assert assay.valid? #can have duplicate titles
 
     assay.title="test"
     assay.assay_type=nil
@@ -125,7 +125,7 @@ class AssayTest < ActiveSupport::TestCase
     
     df = assay.data_files.last
     assert_equal data_files(:picture).latest_version, df
-    assert_equal df.relationship_type, relationship_types(:test_data) 
+    assert_equal relationship_types(:test_data), df.relationship_type(assay)
   end
 
   test "organisms association" do

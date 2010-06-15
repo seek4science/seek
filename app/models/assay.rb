@@ -11,15 +11,13 @@ class Assay < ActiveRecord::Base
   has_many :organisms, :through=>:assay_organisms
   has_many :strains, :through=>:assay_organisms
 
-  has_many :assay_assets, :dependent => :destroy
+  has_many :assay_assets, :dependent => :destroy, :include => :asset
 
   has_one :investigation,:through=>:study    
 
   has_many :assets,:through=>:assay_assets
 
   validates_presence_of :title
-  validates_uniqueness_of :title
-
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
@@ -73,14 +71,16 @@ class Assay < ActiveRecord::Base
   end
 
   def data_files
-    list = []
-    assay_assets.data_files.each do |df|
-      v = df.versioned_resource
-      v.class_eval("attr_accessor :relationship_type")
-      v.relationship_type = df.relationship_type
-      list << v
-    end
-    list
+    assay_assets.data_files.collect {|d| d.versioned_resource}
+    ##This is all very slow:
+    #list = []
+    #assay_assets.data_files.each do |df|
+    #  v = df.versioned_resource
+    #  v.class_eval("attr_accessor :relationship_type")
+    #  v.relationship_type = df.relationship_type
+    #  list << v
+    #end
+    #list
   end
   
   def update_first_letter
@@ -89,7 +89,7 @@ class Assay < ActiveRecord::Base
   
   #Relate an asset to this assay with a specific relationship type
   def relate(asset, relationship_type)
-    assay_asset = AssayAsset.new()
+    assay_asset = AssayAsset.find_by_asset_id_and_assay_id(asset, self) || AssayAsset.new()
     assay_asset.assay = self
     assay_asset.asset = asset
     assay_asset.relationship_type = relationship_type      
