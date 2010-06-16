@@ -44,6 +44,10 @@ class DataFile < ActiveRecord::Base
     def project
       asset.project
     end
+    
+    def relationship_type(assay)
+      AssayAsset.find_by_assay_id_and_asset_id(assay,self.asset).relationship_type  
+    end
   end
 
   def assays
@@ -79,4 +83,7 @@ class DataFile < ActiveRecord::Base
     self.first_letter = strip_first_letter(title)
   end
 
+  def relationship_type(assay)
+    AssayAsset.find_by_assay_id_and_asset_id(assay,self.asset).relationship_type  
+  end
 end

@@ -143,6 +143,30 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show,:id=>df
     assert :success
   end
+  
+  test "filtering by assay" do
+    assay=assays(:metabolomics_assay)
+    get :index, :filter => {:assay => assay.id}
+    assert_response :success
+  end
+  
+  test "filtering by study" do
+    study=studies(:metabolomics_study)
+    get :index, :filter => {:study => study.id}
+    assert_response :success
+  end
+  
+  test "filtering by investigation" do
+    inv=investigations(:metabolomics_investigation)
+    get :index, :filter => {:investigation => inv.id}
+    assert_response :success
+  end
+
+  test "filtering by project" do
+    project=projects(:sysmo_project)
+    get :index, :filter => {:project => project.id}
+    assert_response :success
+  end
 
   private
 

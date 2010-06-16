@@ -56,7 +56,7 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.valid?
 
     assay.title=assays(:metabolomics_assay).title
-    assert !assay.valid?
+    assert assay.valid? #can have duplicate titles
 
     assay.title="test"
     assay.assay_type=nil
@@ -88,14 +88,7 @@ class AssayTest < ActiveSupport::TestCase
     
   end
 
-  test "assay with no study has nil study and project" do
-    a=assays(:assay_with_no_study_or_files)
-    assert_nil a.study
-    assert_nil a.project
-  end
-
   test "can delete?" do
-    assert assays(:assay_with_no_study_or_files).can_delete?(users(:model_owner))
     assert assays(:assay_with_just_a_study).can_delete?(users(:model_owner))
     assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:model_owner))
     assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:model_owner))
@@ -125,7 +118,7 @@ class AssayTest < ActiveSupport::TestCase
     
     df = assay.data_files.last
     assert_equal data_files(:picture).latest_version, df
-    assert_equal df.relationship_type, relationship_types(:test_data) 
+    assert_equal relationship_types(:test_data), df.relationship_type(assay)
   end
 
   test "organisms association" do

@@ -90,7 +90,7 @@ module AssetsHelper
   end
 
   #Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
-  def get_related_resources(resource)
+  def get_related_resources(resource, limit=nil)
     name = resource.class.name.split("::")[0]
 
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
@@ -99,6 +99,7 @@ module AssetsHelper
     related.each_key do |key|
       related[key][:items] = []
       related[key][:hidden_count] = 0
+      related[key][:extra_count] = 0
     end
 
     case name
@@ -184,6 +185,10 @@ module AssetsHelper
     
     related.each_key do |key|
       related[key][:items] = related[key][:items].compact
+      if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay"].include?(resource.class.name)
+        related[key][:extra_count] = related[key][:items].size - limit
+        related[key][:items] = related[key][:items][0...limit]        
+      end
     end
 
     return related
@@ -204,6 +209,21 @@ module AssetsHelper
       end
     end
     return hash
+  end
+  
+  def filter_url(resource_type, context_resource)
+    filter_text = ""
+    case context_resource.class.name
+      when "Project"
+        filter_text = "(:filter => {:project => #{context_resource.id}})"
+      when "Investigation"
+        filter_text = "(:filter => {:investigation => #{context_resource.id}})"#
+      when "Study"
+        filter_text = "(:filter => {:study => #{context_resource.id}})"
+      when "Assay"
+        filter_text = "(:filter => {:assay => #{context_resource.id}})"
+    end
+    return eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
 end

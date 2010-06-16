@@ -88,7 +88,7 @@ select_truncate_length=120;
   <% if Authorization.is_authorized?("show",nil,data_file.asset,current_user) -%>
       asset_id = '<%= data_file.asset.id -%>';
       data_title = '<%= escape_javascript(data_file.title) -%>';
-      relationship_type = '<%= escape_javascript(data_file.relationship_type.try(:title) || "None") -%>';
+      relationship_type = '<%= escape_javascript(data_file.relationship_type(@assay).try(:title) || "None") -%>';
       addDataFile(data_title,asset_id,relationship_type);
   <% end -%>
 <% end -%>

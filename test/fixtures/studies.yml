@@ -25,3 +25,8 @@ study_with_assay_with_public_private_sops_and_datafile:
   title: Study with one assay and public private sops
   investigation: investigation_with_links_in_description
   description: Visit my site http://www.sysmo-db.org
+  
+junk_study:
+  title: ansdgfdgjdfojhdfh
+  investigation: junk_investigation
+  description: Visit my site http://www.sysmo-db.org

@@ -35,3 +35,6 @@ sysmo_project:
 
 empty_project:
   name: "empty project with no members..."
+  
+other_project:
+  name: "junk goes here"

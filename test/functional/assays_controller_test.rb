@@ -123,14 +123,6 @@ class AssaysControllerTest < ActionController::TestCase
     #assert_equal organisms(:yeast),a.organism
   end
 
-  test "should delete unlinked assay" do
-    assert_difference('Assay.count', -1) do
-      delete :destroy, :id => assays(:assay_with_no_study_or_files).id
-    end
-    assert !flash[:error]
-    assert_redirected_to assays_path
-  end
-
   test "should delete assay with study" do
     login_as(:model_owner)
     assert_difference('Assay.count',-1) do
@@ -420,6 +412,24 @@ class AssaysControllerTest < ActionController::TestCase
     assert !Authorization.is_authorized?("show",nil,sops(:sop_with_private_policy_and_custom_sharing),user)
     assert Authorization.is_authorized?("show",nil,data_files(:downloadable_data_file),user)
     assert !Authorization.is_authorized?("show",nil,data_files(:private_data_file),user)
+  end
+  
+  test "filtering by study" do
+    study=studies(:metabolomics_study)
+    get :index, :filter => {:study => study.id}
+    assert_response :success
+  end
+  
+  test "filtering by investigation" do
+    inv=investigations(:metabolomics_investigation)
+    get :index, :filter => {:investigation => inv.id}
+    assert_response :success
+  end
+
+  test "filtering by project" do
+    project=projects(:sysmo_project)
+    get :index, :filter => {:project => project.id}
+    assert_response :success
   end
   
 end

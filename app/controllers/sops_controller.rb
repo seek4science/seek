@@ -220,7 +220,7 @@ class SopsController < ApplicationController
   def find_sops
     found = Sop.find(:all, 
       :order => "title")
-    
+    found = apply_filters(found)    
     # this is only to make sure that actual binary data isn't sent if download is not
     # allowed - this is to increase security & speed of page rendering;
     # further authorization will be done for each item when collection is rendered

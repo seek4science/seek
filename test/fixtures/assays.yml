@@ -38,6 +38,7 @@ assay_with_no_study_or_files:
   technology_type: gas_chromatography
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  study: junk_study
 
 assay_with_no_study_but_has_some_files:
   title: Assay with no Study but has some files
@@ -45,6 +46,7 @@ assay_with_no_study_but_has_some_files:
   technology_type: gas_chromatography
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  study: junk_study
 
 assay_with_no_study_but_has_some_sops:
   title: Assay with no Study but has some sops
@@ -52,6 +54,7 @@ assay_with_no_study_but_has_some_sops:
   technology_type: gas_chromatography  
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  study: junk_study
   
 assay_type_test_assay1:
   title: assay_type_test_assay1
@@ -59,6 +62,7 @@ assay_type_test_assay1:
   technology_type: gas_chromatography
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  study: junk_study
 
 assay_type_test_assay2:
   title: assay_type_test_assay2
@@ -66,6 +70,7 @@ assay_type_test_assay2:
   technology_type: gas_chromatography
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  study: junk_study
 
 technology_type_test_assay1:
   title: technology_type_test_assay1
@@ -73,6 +78,7 @@ technology_type_test_assay1:
   assay_type: metabolomics
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  study: junk_study
 
 technology_type_test_assay2:
   title: technology_type_test_assay2
@@ -80,6 +86,7 @@ technology_type_test_assay2:
   assay_type: metabolomics
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  study: junk_study
   
 assay_with_links_in_description:
   title: Assay with links in description

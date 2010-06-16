@@ -127,5 +127,11 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_select "a[rel=nofollow]"
     end
   end
+
+  test "filtering by project" do
+    project=projects(:sysmo_project)
+    get :index, :filter => {:project => project.id}
+    assert_response :success
+  end
   
 end
