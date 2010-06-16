@@ -7,7 +7,7 @@ class AssaysController < ApplicationController
   before_filter :delete_allowed,:only=>[:destroy]
   
   def index
-    @assays=Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
+    @assays=apply_filters(Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
     @assays=Assay.paginate :page=>params[:page]
 
     respond_to do |format|

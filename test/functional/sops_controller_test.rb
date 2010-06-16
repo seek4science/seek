@@ -209,6 +209,30 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal "blah blah blah",updated_sop.title,"Title should have been updated"
     assert_nil updated_sop.contributor,"contributor should still be nil"
   end
+  
+  test "filtering by assay" do
+    assay=assays(:metabolomics_assay)
+    get :index, :filter => {:assay => assay.id}
+    assert_response :success
+  end
+  
+  test "filtering by study" do
+    study=studies(:metabolomics_study)
+    get :index, :filter => {:study => study.id}
+    assert_response :success
+  end
+  
+  test "filtering by investigation" do
+    inv=investigations(:metabolomics_investigation)
+    get :index, :filter => {:investigation => inv.id}
+    assert_response :success
+  end
+
+  test "filtering by project" do
+    project=projects(:sysmo_project)
+    get :index, :filter => {:project => project.id}
+    assert_response :success
+  end
 
   private
 

@@ -4,7 +4,7 @@ class Asset < ActiveRecord::Base
   belongs_to :resource, :polymorphic => true
   belongs_to :project
   belongs_to :policy
-  
+
   has_many :assay_assets, :dependent => :destroy
   has_many :assays, :through => :assay_assets
   

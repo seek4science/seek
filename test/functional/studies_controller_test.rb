@@ -185,8 +185,17 @@ class StudiesControllerTest < ActionController::TestCase
     assert_select "div.tabbertab" do
       assert_select "h3",:text=>"Investigations (1)",:count=>1
     end
-
+  end
+  
+  test "filtering by investigation" do
+    inv=investigations(:metabolomics_investigation)
+    get :index, :filter => {:investigation => inv.id}
+    assert_response :success
   end
 
-  
+  test "filtering by project" do
+    project=projects(:sysmo_project)
+    get :index, :filter => {:project => project.id}
+    assert_response :success
+  end  
 end

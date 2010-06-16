@@ -31,10 +31,12 @@
       <% visible_resource_type = resource_type.titleize.pluralize -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
       <% hidden_count = 0 %>
+      <% extra_count = 0 %>
       <% unless asset_hash[resource_type].nil? %>
         <% if asset_hash.class == Hash %>
           <% hidden_count = asset_hash[resource_type][:hidden_count] %>
           <% resources = asset_hash[resource_type][:items] %>
+          <% extra_count = asset_hash[resource_type][:extra_count] || 0 %>
         <% else %>
           <% resources = asset_hash %>
         <% end %>
@@ -43,11 +45,19 @@
       <% end%>
       <% unless (resources.empty? && hidden_count < 1) %>
         <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab"> 
-          <% unless resources.empty? %>         
-            <h3><%= "#{visible_resource_type} (#{resources.length}#{"+"+hidden_count.to_s if hidden_count > 0})" -%></h3>
+          <% unless resources.empty? && extra_count < 1 %>
+            <h3><%= "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%></h3>
             <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => authorization_already_done } -%>
           <% else %>
             <h3><%= "#{visible_resource_type} (0+#{hidden_count})" -%></h3>
+          <% end %>
+          <% unless extra_count < 1 %>
+            <div class="list_items_container">
+              <div class="hidden_list_item" style="color:#000">
+                <%= link_to "View all "+(extra_count + resources.size).to_s+" items", filter_url(resource_type, item) %>
+              </div>
+              <br style="clear:both"/>
+            </div>
           <% end %>
           <% unless hidden_count < 1 %>
             <div class="list_items_container">

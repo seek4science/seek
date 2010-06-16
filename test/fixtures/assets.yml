@@ -12,7 +12,7 @@ asset_of_my_first_sop:
 
 
 asset_of_a_sop_with_custom_permissions_policy:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_with_custom_permissions_policy (Sop)
   policy: custom_permissions_only_policy
   created_at: <%= 2.days.ago.to_s :db %>
@@ -21,7 +21,7 @@ asset_of_a_sop_with_custom_permissions_policy:
 
 
 asset_of_a_sop_with_complex_permissions:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_with_complex_permissions (Sop)
   policy: policy_with_complex_permissions
   created_at: <%= 2.days.ago.to_s :db %>
@@ -30,7 +30,7 @@ asset_of_a_sop_with_complex_permissions:
 
 
 asset_of_a_sop_with_all_sysmo_users_policy:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_with_all_sysmo_users_policy (Sop)
   policy: editing_for_all_sysmo_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
@@ -39,7 +39,7 @@ asset_of_a_sop_with_all_sysmo_users_policy:
 
 
 asset_of_a_sop_with_all_registered_users_policy:  
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_with_all_registered_users_policy (Sop)
   policy: download_for_all_registered_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
@@ -48,7 +48,7 @@ asset_of_a_sop_with_all_registered_users_policy:
 
 
 asset_of_a_sop_with_fully_public_policy:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_with_fully_public_policy (Sop)
   policy: fully_public_policy
   created_at: <%= 2.days.ago.to_s :db %>
@@ -57,7 +57,7 @@ asset_of_a_sop_with_fully_public_policy:
 
 
 asset_of_a_sop_with_private_policy_and_custom_sharing:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_with_private_policy_and_custom_sharing (Sop)
   policy: private_policy_with_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
@@ -66,7 +66,7 @@ asset_of_a_sop_with_private_policy_and_custom_sharing:
 
 
 asset_of_a_sop_with_public_download_and_no_custom_sharing:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_with_public_download_and_no_custom_sharing (Sop)
   policy: public_download_with_no_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
@@ -75,7 +75,7 @@ asset_of_a_sop_with_public_download_and_no_custom_sharing:
 
 
 asset_of_a_sop_that_uses_whitelist_blacklist_and_custom_sharing:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_that_uses_whitelist_blacklist_and_custom_sharing (Sop)
   policy: whitelist_blacklist_and_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
@@ -84,7 +84,7 @@ asset_of_a_sop_that_uses_whitelist_blacklist_and_custom_sharing:
 
 
 asset_of_a_sop_for_test_with_workgroups:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_for_test_with_workgroups (Sop)
   policy: policy_for_worgroup_sharing_tests
   created_at: <%= 2.days.ago.to_s :db %>
@@ -93,7 +93,7 @@ asset_of_a_sop_for_test_with_workgroups:
 
 
 asset_of_a_sop_for_test_with_workgroups_no_custom_sharing:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_for_test_with_workgroups_no_custom_sharing (Sop)
   policy: policy_for_worgroup_sharing_tests_no_custom_sharing
   created_at: <%= 2.days.ago.to_s :db %>
@@ -102,7 +102,7 @@ asset_of_a_sop_for_test_with_workgroups_no_custom_sharing:
 
 
 asset_of_a_sop_for_test_with_projects_institutions:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: sop_for_test_with_projects_institutions (Sop)
   policy: policy_for_test_with_projects_institutions
   created_at: <%= 2.days.ago.to_s :db %>
@@ -121,7 +121,7 @@ asset_for_datafile:
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_downloadable_data_file:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: downloadable_data_file (DataFile)
   policy: download_for_all_registered_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
@@ -129,7 +129,7 @@ asset_for_downloadable_data_file:
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_editable_data_file:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: editable_data_file (DataFile)
   policy: editing_for_all_sysmo_users_policy
   created_at: <%= 2.days.ago.to_s :db %>
@@ -209,7 +209,7 @@ asset_for_model:
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_model_with_format_and_type:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: model_with_format_and_type (Model)
   policy: fully_public_policy
   created_at: <%= 2.days.ago.to_s :db %>
@@ -217,7 +217,7 @@ asset_for_model_with_format_and_type:
   last_used_at: <%= 1.days.ago.to_s :db %>
 
 asset_for_model_with_different_owner:
-  project: nil # not linked to any project for now
+  project: other_project # not linked to any project for now
   resource: model_with_different_owner (Model)
   policy: fully_public_policy
   created_at: <%= 2.days.ago.to_s :db %>

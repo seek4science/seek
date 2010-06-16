@@ -88,14 +88,7 @@ class AssayTest < ActiveSupport::TestCase
     
   end
 
-  test "assay with no study has nil study and project" do
-    a=assays(:assay_with_no_study_or_files)
-    assert_nil a.study
-    assert_nil a.project
-  end
-
   test "can delete?" do
-    assert assays(:assay_with_no_study_or_files).can_delete?(users(:model_owner))
     assert assays(:assay_with_just_a_study).can_delete?(users(:model_owner))
     assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:model_owner))
     assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:model_owner))

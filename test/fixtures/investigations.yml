@@ -18,3 +18,8 @@ investigation_with_links_in_description:
   title: Investigation with links in description
   project: sysmo_project
   description: Visit my site http://www.sysmo-db.org
+
+junk_investigation:
+  title: I collect junk
+  project: other_project
+  description: Visit my site http://www.sysmo-db.org
