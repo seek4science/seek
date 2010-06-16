@@ -8,5 +8,9 @@ module CommonSweepers
   def expire_all_favourite_fragments
     expire_fragment(/\/favourites\/user\/.*/)
   end
+  
+  def expire_organism_gadget
+    expire_fragment "organisms_gadget"
+  end
     
 end
