@@ -82,7 +82,7 @@ module ApiHelper
         if item_type_name.blank?
           item_type_name = case item
             when User
-              "Member"
+              "User"
             else
               item.class.name.titleize
           end
@@ -90,6 +90,13 @@ module ApiHelper
         
         return "#{item_type_name} - #{display_name(item, false)}"
     end
+  end
+  
+  def display_name item,escape_html=false
+    result = item.title if item.respond_to?("title")
+    result = item.name if item.respond_to?("name") && result.nil?
+    result = h(result) if escape_html
+    return result
   end
   
   def dc_xml_tag(builder, term, value, *attributes)
@@ -113,8 +120,8 @@ module ApiHelper
   def dc_core_xml builder,object
     dc_xml_tag builder,:title,object.title if object.respond_to?("title")
     dc_xml_tag builder,:description,object.description if object.respond_to?("description")
-    dcterm_xml_tag builder,:created,object.created_at if object.respond_to?("created_at")
-    dcterm_xml_tag builder,:modified,object.updated_at if object.respond_to?("modified_at")
+    dcterms_xml_tag builder,:created,object.created_at if object.respond_to?("created_at")
+    dcterms_xml_tag builder,:modified,object.updated_at if object.respond_to?("updated_at")
   end
   
 end

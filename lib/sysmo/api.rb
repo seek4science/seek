@@ -10,6 +10,8 @@
 
 module Sysmo
   module Api
+    
+    SITE_BASE_HOST="http://localhost"
   
     def self.uri_for_path(path, *args)
       options = args.extract_options!
@@ -85,7 +87,7 @@ module Sysmo
       
     def self.append_params(uri, params)
       # Remove the special params
-      new_params = BioCatalogue::Util.remove_rails_special_params_from(params)
+      new_params = Sysmo::Util.remove_rails_special_params_from(params)
       return (new_params.blank? ? uri : "#{uri}?#{new_params.to_query}")
     end
       

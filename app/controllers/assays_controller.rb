@@ -14,7 +14,7 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@assays}
+      format.xml
     end
     
   end
@@ -26,7 +26,7 @@ class AssaysController < ApplicationController
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
     respond_to do |format|
       format.html
-      format.xml  { render :xml => @assay }
+      format.xml
     end
   end
 
@@ -35,7 +35,7 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml  { render :xml => @assay }
+      format.xml
     end
   end
 
@@ -123,7 +123,7 @@ class AssaysController < ApplicationController
     @assay=Assay.find(params[:id])
     respond_to do |format|
       format.html
-      format.xml { render :xml => @assay, :include=>[:assay_type,:sops]}
+      format.xml
       format.svg { render :text=>to_svg(@assay)}
       format.xml { render :text=>to_dot(@assay)}
     end
