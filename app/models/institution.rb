@@ -1,5 +1,6 @@
 require 'acts_as_editable'
 require 'grouped_pagination'
+require 'acts_as_uniquely_identifiable'
 
 class Institution < ActiveRecord::Base
   
@@ -29,6 +30,8 @@ class Institution < ActiveRecord::Base
   alias_attribute :title, :name
 
   acts_as_solr(:fields => [ :name,:country ]) if SOLR_ENABLED
+  
+  acts_as_uniquely_identifiable
   
   def people
     res=[]

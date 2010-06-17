@@ -156,6 +156,21 @@ class UserTest < ActiveSupport::TestCase
 
   end
 
+  test "test uuid generated" do
+    user = users(:aaron)
+    assert_nil user.attributes["uuid"]
+    user.save
+    assert_not_nil user.attributes["uuid"]
+  end
+  
+  test "uuid doesn't change" do
+    x = users(:aaron)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
+
 protected
   def create_user(options = {})
     record = User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire', :password_confirmation => 'quire' }.merge(options))

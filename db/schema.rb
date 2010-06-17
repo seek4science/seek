@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100527183537) do
+ActiveRecord::Schema.define(:version => 20100616142034) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
   end
 
   add_index "activity_logs", ["action"], :name => "act_logs_action_index"
@@ -83,6 +83,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.integer  "owner_id"
     t.string   "first_letter",       :limit => 1
     t.integer  "assay_class_id"
+    t.string   "uuid"
   end
 
   create_table "assets", :force => true do |t|
@@ -157,6 +158,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "updated_at"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
+    t.string   "uuid"
   end
 
   create_table "data_files", :force => true do |t|
@@ -174,6 +176,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
+    t.string   "uuid"
   end
 
   create_table "db_files", :force => true do |t|
@@ -299,6 +302,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "updated_at"
     t.integer  "avatar_id"
     t.string   "first_letter", :limit => 1
+    t.string   "uuid"
   end
 
   create_table "investigations", :force => true do |t|
@@ -308,6 +312,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "first_letter", :limit => 1
+    t.string   "uuid"
   end
 
   create_table "measured_items", :force => true do |t|
@@ -349,6 +354,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.integer  "model_format_id"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
+    t.string   "uuid"
   end
 
   create_table "models", :force => true do |t|
@@ -370,6 +376,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
+    t.string   "uuid"
   end
 
   create_table "moderatorships", :force => true do |t|
@@ -423,6 +430,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.integer  "status_id",                  :default => 0
     t.boolean  "is_pal",                     :default => false
     t.string   "first_letter", :limit => 10
+    t.string   "uuid"
   end
 
   create_table "permissions", :force => true do |t|
@@ -472,6 +480,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.string   "site_credentials"
     t.string   "site_root_uri"
     t.datetime "last_jerm_run"
+    t.string   "uuid"
   end
 
   create_table "publication_authors", :force => true do |t|
@@ -495,6 +504,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.string   "doi"
+    t.string   "uuid"
   end
 
   create_table "recommended_model_environments", :force => true do |t|
@@ -571,6 +581,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "last_used_at"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
+    t.string   "uuid"
   end
 
   create_table "sops", :force => true do |t|
@@ -587,6 +598,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
+    t.string   "uuid"
   end
 
   create_table "strains", :force => true do |t|
@@ -620,6 +632,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "first_letter",          :limit => 1
+    t.string   "uuid"
   end
 
   create_table "taggings", :force => true do |t|
@@ -706,6 +719,7 @@ ActiveRecord::Schema.define(:version => 20100527183537) do
     t.datetime "reset_password_code_until"
     t.integer  "posts_count",                             :default => 0
     t.datetime "last_seen_at"
+    t.string   "uuid"
   end
 
   create_table "work_groups", :force => true do |t|

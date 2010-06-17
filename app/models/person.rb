@@ -1,5 +1,6 @@
 require 'acts_as_editable'
 require 'grouped_pagination'
+require 'acts_as_uniquely_identifiable'
 
 class Person < ActiveRecord::Base
   
@@ -52,6 +53,8 @@ class Person < ActiveRecord::Base
   
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
+  
+  acts_as_uniquely_identifiable
   
   def self.userless_people
     p=Person.find(:all)

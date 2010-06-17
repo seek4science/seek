@@ -1,4 +1,5 @@
 require 'grouped_pagination'
+require 'acts_as_uniquely_identifiable'
 
 class Investigation < ActiveRecord::Base    
   
@@ -20,6 +21,8 @@ class Investigation < ActiveRecord::Base
   before_save :update_first_letter
   
   grouped_pagination  
+  
+  acts_as_uniquely_identifiable
 
   def can_edit? user
     user.person.projects.include?(project)

@@ -86,6 +86,20 @@ class StudyTest < ActiveSupport::TestCase
     study=studies(:study_with_assay_with_public_private_sops_and_datafile)
     assert_equal 1,study.assays.size,"This study must have only one assay - do not modify its fixture"
   end
-
+  
+  test "test uuid generated" do
+    s = studies(:metabolomics_study)
+    assert_nil s.attributes["uuid"]
+    s.save
+    assert_not_nil s.attributes["uuid"]
+  end 
+  
+  test "uuid doesn't change" do
+    x = studies(:metabolomics_study)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
   
 end

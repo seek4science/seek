@@ -1,6 +1,7 @@
 require 'acts_as_editable'
 require 'grouped_pagination'
 require 'simple_crypt'
+require 'acts_as_uniquely_identifiable'
 
 class Project < ActiveRecord::Base
 
@@ -57,6 +58,8 @@ class Project < ActiveRecord::Base
   attr_accessor :site_username,:site_password
 
   before_save :set_credentials
+  
+  acts_as_uniquely_identifiable
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|

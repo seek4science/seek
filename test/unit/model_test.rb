@@ -63,5 +63,19 @@ class ModelTest < ActiveSupport::TestCase
     end
     assert_not_nil Model.find_by_id(model.id)
   end
+  
+  test "test uuid generated" do
+    x = models(:teusink)
+    assert_nil x.attributes["uuid"]
+    x.save
+    assert_not_nil x.attributes["uuid"]
+  end
 
+  test "uuid doesn't change" do
+    x = models(:teusink)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
 end

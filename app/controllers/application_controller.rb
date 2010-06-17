@@ -199,7 +199,7 @@ class ApplicationController < ActionController::Base
     object = eval("@"+c.singularize)
     
     #don't log if the object is not valid, as this will a validation error on update or create
-    return if object.nil? || !object.valid?
+    return if object.nil? || !object.errors.empty?
     
     case c
       when "investigations","studies","assays"

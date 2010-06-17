@@ -196,4 +196,18 @@ class AssayTest < ActiveSupport::TestCase
 
   end
 
+  test "test uuid generated" do
+    a = assays(:metabolomics_assay)
+    assert_nil a.attributes["uuid"]
+    a.save
+    assert_not_nil a.attributes["uuid"]
+  end 
+
+  test "uuid doesn't change" do
+    x = assays(:metabolomics_assay)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
 end

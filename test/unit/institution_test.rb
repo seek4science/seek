@@ -78,5 +78,19 @@ class InstitutionTest < ActiveSupport::TestCase
 
 
   end
+
+  test "test uuid generated" do
+    i = institutions(:one)
+    assert_nil i.attributes["uuid"]
+    i.save
+    assert_not_nil i.attributes["uuid"]
+  end 
   
+  test "uuid doesn't change" do
+    x = institutions(:one)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
 end

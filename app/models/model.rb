@@ -1,6 +1,7 @@
 require 'acts_as_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
+require 'acts_as_uniquely_identifiable'
 
 class Model < ActiveRecord::Base
 
@@ -30,6 +31,8 @@ class Model < ActiveRecord::Base
   before_save :update_first_letter
   
   grouped_pagination  
+  
+  acts_as_uniquely_identifiable  
   
   explicit_versioning(:version_column => "version") do
     
