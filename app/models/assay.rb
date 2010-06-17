@@ -48,7 +48,7 @@ class Assay < ActiveRecord::Base
   end
 
   def can_edit? user
-    project.nil? || user.person.projects.include?(project)
+    project.pals.include?(user.person) || user.person == owner
   end
 
   def can_delete? user
