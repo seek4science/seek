@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
   end
 
   add_index "activity_logs", ["action"], :name => "act_logs_action_index"
