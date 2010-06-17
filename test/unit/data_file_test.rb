@@ -70,5 +70,19 @@ class DataFileTest < ActiveSupport::TestCase
     end
     assert_not_nil DataFile.find_by_id(df.id)
   end
+  
+  test "test uuid generated" do
+    x = data_files(:picture)
+    assert_nil x.attributes["uuid"]
+    x.save
+    assert_not_nil x.attributes["uuid"]
+  end
 
+  test "uuid doesn't change" do
+    x = data_files(:picture)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
 end

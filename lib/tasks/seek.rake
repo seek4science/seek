@@ -414,6 +414,26 @@ namespace :seek do
     end
   end 
   
+  desc "Generates UUIDs for all items that don't have them"
+  task :generate_uuids => :environment do
+    [User,Person,Project,Institution,Investigation,Study,Assay,
+    DataFile,Model,Sop,Publication,ContentBlob].each do |c|
+      count = 0
+      c.all.each do |res|
+        if res.attributes["uuid"].nil?
+          class << res
+            def record_timestamps
+              false
+            end
+          end
+          res.save!
+          count += 1
+        end
+      end
+      puts "#{count} UUIDs generated for #{c.name}" unless count < 1
+    end
+  end
+  
   private
   
   #returns true if the tag is over 30 chars long, or contains colons, semicolons, comma's or forward slash

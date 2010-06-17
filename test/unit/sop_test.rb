@@ -118,5 +118,18 @@ class SopTest < ActiveSupport::TestCase
     assert_not_nil Sop.find_by_id(sop.id)
   end
 
+  test "test uuid generated" do
+    x = sops(:my_first_sop)
+    assert_nil x.attributes["uuid"]
+    x.save
+    assert_not_nil x.attributes["uuid"]
+  end
   
+  test "uuid doesn't change" do
+    x = sops(:my_first_sop)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
 end

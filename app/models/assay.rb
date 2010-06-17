@@ -1,4 +1,5 @@
 require 'grouped_pagination'
+require 'acts_as_uniquely_identifiable'
 
 class Assay < ActiveRecord::Base    
   
@@ -33,6 +34,8 @@ class Assay < ActiveRecord::Base
   before_save :update_first_letter
   
   grouped_pagination
+  
+  acts_as_uniquely_identifiable
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title

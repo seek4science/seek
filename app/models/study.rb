@@ -1,4 +1,5 @@
 require 'grouped_pagination'
+require 'acts_as_uniquely_identifiable'
 
 class Study < ActiveRecord::Base  
  
@@ -27,6 +28,7 @@ class Study < ActiveRecord::Base
   
   grouped_pagination
   
+  acts_as_uniquely_identifiable
 
   def sops    
     assays.collect{|assay| assay.sops.collect{|sop| sop}}.flatten.uniq    

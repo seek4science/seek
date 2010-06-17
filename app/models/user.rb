@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'acts_as_uniquely_identifiable'
 
 class User < ActiveRecord::Base
 
@@ -38,6 +39,8 @@ class User < ActiveRecord::Base
   named_scope :not_activated,:conditions=>['activation_code IS NOT NULL']
   named_scope :without_profile,:conditions=>['person_id IS NULL']
   named_scope :admins,:conditions=>['is_admin = ?',true],:include=>:person
+  
+  acts_as_uniquely_identifiable
 
   # Activates the user in the database.
   def activate

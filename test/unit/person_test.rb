@@ -255,5 +255,18 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal up_at,p.updated_at
   end
   
+  test "test uuid generated" do
+    p = people(:modeller_person)
+    assert_nil p.attributes["uuid"]
+    p.save
+    assert_not_nil p.attributes["uuid"]
+  end  
   
+  test "uuid doesn't change" do
+    x = people(:modeller_person)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
 end

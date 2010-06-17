@@ -1,6 +1,7 @@
 require 'acts_as_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
+require 'acts_as_uniquely_identifiable'
 
 class DataFile < ActiveRecord::Base
 
@@ -26,6 +27,7 @@ class DataFile < ActiveRecord::Base
   
   grouped_pagination
   
+  acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do
     

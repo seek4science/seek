@@ -58,4 +58,18 @@ class InvestigationTest < ActiveSupport::TestCase
     assert !investigation.can_delete?(users(:aaron))
   end
   
+  test "test uuid generated" do
+    i = investigations(:metabolomics_investigation)
+    assert_nil i.attributes["uuid"]
+    i.save
+    assert_not_nil i.attributes["uuid"]
+  end 
+  
+  test "uuid doesn't change" do
+    x = investigations(:metabolomics_investigation)
+    x.save
+    uuid = x.attributes["uuid"]
+    x.save
+    assert_equal x.uuid, uuid
+  end
 end
