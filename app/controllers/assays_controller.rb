@@ -4,7 +4,9 @@ class AssaysController < ApplicationController
 
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
+  before_filter :check_is_project_pal, :only=>[:edit, :update, :destroy]
   before_filter :delete_allowed,:only=>[:destroy]
+
   
   def index
     @assays=apply_filters(Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
@@ -146,19 +148,32 @@ class AssaysController < ApplicationController
       page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
     end
   end
-
+  
   private  
 
   def delete_allowed
     @assay=Assay.find(params[:id])
-    unless @assay.can_delete?(current_user)
+    if @assay.can_delete?(current_user) || current_user.is_admin?
+      return true
+    else
       respond_to do |format|
         flash[:error] = "You cannot delete an assay that is linked to a Study, Data files or Sops"
-        format.html { redirect_to assays_path }
+        format.html { redirect_to @assay }
       end
       return false
     end
   end
 
-
+  def check_is_project_pal
+    @assay=Assay.find(params[:id])
+    if @assay.can_edit?(current_user) || current_user.is_admin?
+      return true
+    else
+      respond_to do |format|
+        flash[:error] = "You are not permitted to edit this assay."
+        format.html { redirect_to @assay }
+      end
+      return false
+    end
+  end
 end

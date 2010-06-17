@@ -33,6 +33,14 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:study)
   end  
+  
+  test "shouldn't show edit for non-project member" do
+    login_as(:owner_of_fully_public_policy)
+    s = studies(:metabolomics_study)
+    get :edit, :id=>s
+    assert_redirected_to study_path(s)
+    assert flash[:error]
+  end
 
   test "should update" do
     s=studies(:metabolomics_study)

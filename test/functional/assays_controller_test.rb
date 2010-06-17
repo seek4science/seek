@@ -16,6 +16,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should update timestamp when associating sop" do
+    login_as(:model_owner)
     assay=assays(:metabolomics_assay)
     timestamp=assay.updated_at
     
@@ -32,6 +33,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should update timestamp when associating datafile" do
+    login_as(:model_owner)
     assay=assays(:metabolomics_assay)
     timestamp=assay.updated_at
 
@@ -47,6 +49,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should update timestamp when associating model" do
+    login_as(:model_owner)
     assay=assays(:metabolomics_assay)
     timestamp=assay.updated_at
 
@@ -101,6 +104,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should update with study" do
+    login_as(:model_owner)
     a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
     put :update,:id=>a,:assay=>{:study=>s}
@@ -133,28 +137,49 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should not delete assay when not project member" do
+    a = assays(:assay_with_just_a_study)
     login_as(:aaron)
     assert_no_difference('Assay.count') do
-      delete :destroy, :id => assays(:assay_with_just_a_study).id
+      delete :destroy, :id => a
     end
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to assay_path(a)
+  end
+  
+  test "should not delete assay when not project pal" do
+    a = assays(:assay_with_just_a_study)
+    login_as(:datafile_owner)
+    assert_no_difference('Assay.count') do
+      delete :destroy, :id => a
+    end
+    assert flash[:error]
+    assert_redirected_to assay_path(a)
+  end
+  
+  test "should not edit assay when not project pal" do
+    a = assays(:assay_with_just_a_study)
+    login_as(:datafile_owner)
+    get :edit, :id => a
+    assert flash[:error]
+    assert_redirected_to assay_path(a)
   end
 
   test "should not delete assay with files" do
+    a = assays(:assay_with_no_study_but_has_some_files)
     assert_no_difference('Assay.count') do
-      delete :destroy, :id => assays(:assay_with_no_study_but_has_some_files).id
+      delete :destroy, :id => a
     end
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to assay_path(a)
   end
 
   test "should not delete assay with sops" do
+    a = assays(:assay_with_no_study_but_has_some_sops)
     assert_no_difference('Assay.count') do
-      delete :destroy, :id => assays(:assay_with_no_study_but_has_some_sops).id
+      delete :destroy, :id => a
     end
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to assay_path(a)
   end
 
   test "get new presents options for class" do
@@ -358,6 +383,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "associated assets aren't lost on failed validation on update" do
+    login_as(:model_owner)
     assay=assays(:assay_with_links_in_description)
 
     #remove any existing associated assets

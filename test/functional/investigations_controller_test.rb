@@ -39,6 +39,14 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_response :success
     assert assigns(:investigation)
   end
+  
+  test "shouldn't show edit for non-project member" do
+    login_as(:owner_of_fully_public_policy)
+    i = investigations(:metabolomics_investigation)
+    get :edit, :id=>i
+    assert_redirected_to investigation_path(i)
+    assert flash[:error]
+  end
 
   test "should update" do
     i=investigations(:metabolomics_investigation)
