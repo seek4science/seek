@@ -18,6 +18,9 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assays)
   end
 
+  
+  
+
   test "should update timestamp when associating sop" do
     login_as(:model_owner)
     assay=assays(:metabolomics_assay)
@@ -72,18 +75,17 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assay)
 
-#    assert_select "p#culture_growth_type",:text=>/Chemostat/,:count=>1
     assert_select "p#assay_type",:text=>/Metabalomics/,:count=>1
     assert_select "p#technology_type",:text=>/Gas chromatography/,:count=>1
   end
-
-#  test "show culture growth type not specified" do
-#    get :show, :id=>assays(:metabolomics_assay2)
-#    assert_response :success
-#    assert_not_nil assigns(:assay)
-#
-#    assert_select "p#culture_growth_type",:text=>/Not specified/,:count=>1
-#  end
+  
+  test "should show modelling assay" do
+    get :show,:id=>assays(:modelling_assay_with_data_and_relationship)
+    
+    assert_response :success
+    assert_not_nil assigns(:assay)
+    assert_equal assigns(:assay),assays(:modelling_assay_with_data_and_relationship)
+  end
 
   test "should show new" do
     get :new

@@ -3,3 +3,7 @@
 test_data:
   title: Test data
   description: The data is used for testing
+  
+validation_data:
+  title: Validation Data
+  description: The data is used for validation  
