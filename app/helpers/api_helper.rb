@@ -115,13 +115,23 @@ module ApiHelper
   def core_xml builder,object
     dc_core_xml builder,object
     builder.tag! "uuid",object.uuid if object.respond_to?("uuid")
+    submitter = determine_submitter object
+    builder.tag! "submitter",submitter.name,xlink_attributes(uri_for_object(submitter),:resourceType => submitter.class.name) if submitter
   end
   
   def dc_core_xml builder,object
+    submitter = determine_submitter object
     dc_xml_tag builder,:title,object.title if object.respond_to?("title")
     dc_xml_tag builder,:description,object.description if object.respond_to?("description")
+    dc_xml_tag builder,:creator,submitter.name if submitter
     dcterms_xml_tag builder,:created,object.created_at if object.respond_to?("created_at")
-    dcterms_xml_tag builder,:modified,object.updated_at if object.respond_to?("updated_at")
+    dcterms_xml_tag builder,:modified,object.updated_at if object.respond_to?("updated_at")    
+  end
+  
+  def determine_submitter object
+    return object.owner if object.respond_to?("owner")
+    return object.contributor if object.respond_to?("contributor")
+    return nil
   end
   
 end
