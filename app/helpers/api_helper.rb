@@ -64,6 +64,10 @@ module ApiHelper
     xlink_attributes(resource_uri, :title => xlink_title("Next page of results"))
   end
   
+  def core_xlink object
+    xlink_attributes(uri_for_object(object),:resourceType => object.class.name)
+  end
+  
   def xlink_attributes(resource_uri, *args)
     attribs = { }
     
@@ -121,7 +125,49 @@ module ApiHelper
     dc_core_xml builder,object
     builder.tag! "uuid",object.uuid if object.respond_to?("uuid")
     submitter = determine_submitter object
-    builder.tag! "submitter",submitter.name,xlink_attributes(uri_for_object(submitter),:resourceType => submitter.class.name) if submitter
+    builder.tag! "submitter",submitter.name,xlink_attributes(uri_for_object(submitter),:resourceType => submitter.class.name) if submitter    
+  end
+    
+  def extended_xml builder,object
+    
+    unless HIDE_DETAILS
+      builder.tag! "email",object.email if object.respond_to?("email")
+      builder.tag! "webpage",object.webpage if object.respond_to?("webpage")
+      builder.tag! "internal_webpage",object.internal_webpage if object.respond_to?("internal_webpage")
+      builder.tag! "phone",object.phone if object.respond_to?("phone")
+    end
+    
+    builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
+    builder.tag! "latest_version",object.latest_version.version,xlink_attributes(uri_for_object(object.latest_version),:resourceType => object.latest_version.class.name) if object.respond_to?("latest_version")
+    builder.tag! "project",xlink_attributes(uri_for_object(object.project),:resourceType => "Project") if object.respond_to?("project")
+    
+    asset_xml builder,object.asset if object.respond_to?("asset")
+    blob_xml builder,object.content_blob if object.respond_to?("content_blob")
+    
+    if (object.respond_to?("versions"))
+      builder.tag! "versions" do
+        object.versions.each do |v|
+          builder.tag! "version",v.version,xlink_attributes(uri_for_object(v),:resourceType => v.class.name)
+        end
+      end
+    end
+    
+  end
+  
+  def asset_xml builder,asset
+    builder.tag! "asset",
+    xlink_attributes(uri_for_object(asset),:resourceType => "Asset") do
+      core_xml builder,asset
+      builder.tag! "project",xlink_attributes(uri_for_object(asset.project),:resourceType => "Project") if !asset.project.nil?      
+    end    
+  end
+  
+  def blob_xml builder,blob
+    builder.tag! "blob",xlink_attributes(uri_for_object(blob),:resourceType => "ContentBlob") do      
+      builder.tag! "uuid",blob.uuid if blob.respond_to?("uuid")
+      builder.tag! "md5sum",blob.md5sum if blob.respond_to?("md5sum")
+      builder.tag! "is_remote",!blob.url.nil?
+    end
   end
   
   def dc_core_xml builder,object

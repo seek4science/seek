@@ -10,6 +10,7 @@ ENABLE_GOOGLE_ANALYTICS=false unless defined? ENABLE_GOOGLE_ANALYTICS
 MERGED_TAG_THRESHOLD=5 unless defined? MERGED_TAG_THRESHOLD
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 TYPE_MANAGERS="admins" unless defined? TYPE_MANAGERS
+HIDE_DETAILS=false unless defined? HIDE_DETAILS
 
 # Set Google Analytics code
 if ENABLE_GOOGLE_ANALYTICS

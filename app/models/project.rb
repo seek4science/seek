@@ -50,6 +50,9 @@ class Project < ActiveRecord::Base
   
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
+  
+  alias_attribute :webpage, :web_page
+  alias_attribute :internal_webpage, :wiki_page
 
   has_and_belongs_to_many :organisms  
   

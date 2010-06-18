@@ -52,6 +52,8 @@ class Person < ActiveRecord::Base
 
   alias_attribute :title, :name
   
+  alias_attribute :webpage,:web_page   
+  
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
   
