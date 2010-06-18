@@ -15,7 +15,7 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@investigations}
+      format.xml
     end
     
   end
@@ -34,7 +34,7 @@ class InvestigationsController < ApplicationController
     deep=params[:deep]
     respond_to do |format|
       format.html
-      format.xml { render :xml=> @investigation, :include=>@investigation.studies }
+      format.xml
       format.svg { render :text=>to_svg(@investigation,deep)}
       format.dot { render :text=>to_dot(@investigation,deep)}
       format.png { render :text=>to_png(@investigation,deep)}
