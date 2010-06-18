@@ -113,6 +113,7 @@ module ApiHelper
   end
   
   def core_xml builder,object
+    builder.tag! "id",object.id
     dc_core_xml builder,object
     builder.tag! "uuid",object.uuid if object.respond_to?("uuid")
     submitter = determine_submitter object
