@@ -15,8 +15,8 @@ class SopsController < ApplicationController
     @sops=Authorization.authorize_collection("show",@sops,current_user)
     @sops=Sop.paginate_after_fetch(@sops, :page=>params[:page])
     respond_to do |format|
-      format.html # index.html.erb
-      format.xml { render :xml=>@sops}
+      format.html
+      format.xml
     end
   end
 
@@ -57,7 +57,8 @@ class SopsController < ApplicationController
     end  
     
     respond_to do |format|
-      format.html # show.html.erb
+      format.html
+      format.xml
     end
   end
   

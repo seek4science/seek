@@ -13,7 +13,7 @@ class DataFilesController < ApplicationController
     @data_files=DataFile.paginate_after_fetch(@data_files, :page=>params[:page])
     respond_to do |format|
       format.html # index.html.erb
-      format.xml { render :xml=>@data_files}
+      format.xml
     end
   end
   
@@ -137,7 +137,7 @@ class DataFilesController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml {render :xml=>@data_file}
+      format.xml
     end
   end
 

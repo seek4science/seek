@@ -1,13 +1,16 @@
 require 'test_helper'
+require 'rest_test_cases'
 
 class DataFilesControllerTest < ActionController::TestCase
   
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
 
   def setup
     login_as(:datafile_owner)
+    @object=data_files(:picture)
   end
 
   test "should show index" do

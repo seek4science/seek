@@ -1,13 +1,16 @@
 require 'test_helper'
+require 'rest_test_cases'
 
 class SopsControllerTest < ActionController::TestCase
 
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
 
   def setup
     login_as(:quentin)
+    @object=sops(:my_first_sop)
   end
 
   test "should get index" do

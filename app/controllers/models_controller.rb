@@ -23,7 +23,7 @@ class ModelsController < ApplicationController
     @models=Model.paginate_after_fetch(@models, :page=>params[:page])
     respond_to do |format|
       format.html # index.html.erb
-      format.xml { render :xml=>@models}
+      format.xml
     end
   end
   
@@ -259,6 +259,7 @@ class ModelsController < ApplicationController
     
     respond_to do |format|
       format.html # show.html.erb
+      format.xml
     end
   end
   

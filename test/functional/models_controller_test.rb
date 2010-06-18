@@ -1,13 +1,16 @@
 require 'test_helper'
+require 'rest_test_cases'
 
 class ModelsControllerTest < ActionController::TestCase
 
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
   
   def setup
     login_as(:model_owner)
+    @object=models(:teusink)
   end
   
   test "should get index" do
