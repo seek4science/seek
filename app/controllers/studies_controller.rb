@@ -15,7 +15,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @studys.to_xml}
+      format.xml
     end
   end
 
@@ -32,7 +32,7 @@ class StudiesController < ApplicationController
     @study=Study.find(params[:id])
     respond_to do |format|
       format.html
-      format.xml { render :xml=>@study.to_xml }
+      format.xml
     end
   end
 
@@ -68,7 +68,7 @@ class StudiesController < ApplicationController
     @study=Study.find(params[:id])    
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@study.to_xml }
+      format.xml
       format.svg { render :text=>to_svg(@study)}
       format.dot { render :text=>to_dot(@study)}
       format.png { render :text=>to_png(@study)}
