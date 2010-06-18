@@ -46,6 +46,8 @@ module ApiHelper
     return xlink
   end
   
+  
+  
   def xlink_attributes(resource_uri, *args)
     attribs = { }
     
@@ -132,12 +134,16 @@ module ApiHelper
     end    
   end
   
-  def asset_xml builder,asset
+  def asset_xml builder,asset,include_core=true,include_resource=true
     builder.tag! "asset",
     xlink_attributes(uri_for_object(asset),:resourceType => "Asset") do
-      core_xml builder,asset
-      builder.tag! "project",core_xlink(asset.project) if !asset.project.nil?      
+      core_xml builder,asset if include_core
+      resource_xml builder,asset.resource if (include_resource)                   
     end    
+  end
+  
+  def resource_xml builder,resource 
+    builder.tag! "resource",resource.title,core_xlink(resource)
   end
   
   def blob_xml builder,blob
@@ -145,6 +151,35 @@ module ApiHelper
       builder.tag! "uuid",blob.uuid if blob.respond_to?("uuid")
       builder.tag! "md5sum",blob.md5sum if blob.respond_to?("md5sum")
       builder.tag! "is_remote",!blob.url.nil?
+    end
+  end
+  
+  def assets_list_xml builder,assets,tag="assets",include_core=true,include_resource=true
+    builder.tag! tag do
+      assets.each do |asset|
+        asset_xml builder,asset,include_core,include_resource
+      end
+    end
+  end
+  
+  def projects_list_xml builder,projects,tag="projects"
+    generic_list_xml builder,projects,tag
+  end
+  
+  def people_list_xml builder,people,tag="people"    
+    generic_list_xml builder,people,tag    
+  end
+  
+  def institutions_list_xml builder,institutions,tag="institutions"    
+    generic_list_xml builder,institutions,tag    
+  end
+    
+  
+  def generic_list_xml builder,list,tag
+    builder.tag! tag do 
+      list.each do |item|
+        builder.tag! item.class.name.underscore,item.title,core_xlink(item)
+      end
     end
   end
   
