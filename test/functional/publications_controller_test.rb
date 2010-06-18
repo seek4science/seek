@@ -1,13 +1,16 @@
 require 'test_helper'
+require 'rest_test_cases'
 
 class PublicationsControllerTest < ActionController::TestCase
   
   fixtures :all
 
   include AuthenticatedTestHelper
-
+  include RestTestCases
+  
   def setup
     login_as(:quentin)
+    @object=publications(:taverna_paper_pubmed)
   end
   
   test "should get index" do
