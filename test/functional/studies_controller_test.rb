@@ -5,9 +5,11 @@ class StudiesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
 
   def setup
     login_as(:model_owner)
+    @object=studies(:metabolomics_study)
   end
   
   test "should get index" do
