@@ -17,10 +17,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assays)
   end
-
   
-  
-
   test "should update timestamp when associating sop" do
     login_as(:model_owner)
     assay=assays(:metabolomics_assay)

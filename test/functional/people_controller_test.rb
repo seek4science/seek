@@ -1,13 +1,16 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
+require 'rest_test_cases'
 
 class PeopleControllerTest < ActionController::TestCase
   
   fixtures :all
   
   include AuthenticatedTestHelper
+  include RestTestCases
   
   def setup
     login_as(:quentin)
+    @object=people(:quentin_person)
   end
   
   def test_title

@@ -1,9 +1,11 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 require 'libxml'
+require 'rest_test_cases'
 
 class ProjectsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include RestTestCases
   
   fixtures :all
   
@@ -14,6 +16,7 @@ class ProjectsControllerTest < ActionController::TestCase
   
   def setup
     login_as(:quentin)
+    @object=projects(:sysmo_project)
   end
   
   def test_should_get_index

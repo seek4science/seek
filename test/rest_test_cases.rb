@@ -26,7 +26,9 @@ module RestTestCases
     return false,"XML is nil" if xml.nil?
     begin
       parser = LibXML::XML::Parser.string(xml,:encoding => LibXML::XML::Encoding::UTF_8)
-      parser.parse
+      doc = parser.parse
+      
+      return false,"Could not find dcterms:created, which should be in all xml. Check its not using the old XML format" if doc.find("//dcterms:created","dcterms:http://purl.org/dc/terms/").empty?
     rescue LibXML::XML::Error=>e
       return false,"XML parse error: #{e.message}"
     end

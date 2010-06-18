@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
+require 'rest_test_cases'
 
 class InstitutionsControllerTest < ActionController::TestCase
  
@@ -6,9 +7,11 @@ class InstitutionsControllerTest < ActionController::TestCase
   fixtures :institutions, :users, :people, :work_groups, :group_memberships
   
   include AuthenticatedTestHelper
+  include RestTestCases
   
   def setup
     login_as(:quentin)
+    @object=institutions(:ebi_inst)
   end
 
   def test_title

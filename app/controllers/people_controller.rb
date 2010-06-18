@@ -48,7 +48,7 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @people.to_xml}
+      format.xml
     end
   end
 
@@ -59,7 +59,7 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @person.to_xml}
+      format.xml
     end
   end
 
