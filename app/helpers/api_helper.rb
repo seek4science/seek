@@ -20,6 +20,10 @@ module ApiHelper
     Sysmo::Api.uri_for_path(path, *args)
   end
   
+  def api_partial_path_for_item object
+    Sysmo::Api.api_partial_path_for_item(object)
+  end
+  
   def uri_for_collection(resource_name, *args)
     Sysmo::Api.uri_for_collection(resource_name, *args)
   end

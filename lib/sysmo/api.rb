@@ -28,6 +28,11 @@ module Sysmo
       return uri
     end
     
+    def self.api_partial_path_for_item object
+      item_name=object.class.name.downcase
+      "#{item_name.pluralize}/api/#{item_name}"      
+    end
+    
     def self.uri_for_collection(resource_name, *args)
       options = args.extract_options!
       # defaults:
