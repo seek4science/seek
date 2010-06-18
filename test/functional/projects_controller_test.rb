@@ -191,51 +191,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>1
       end
     end
-  end  
-
-  test "site_credentials hidden from show xml" do
-    @request.env['HTTP_ACCEPT'] = 'application/xml'
-    get :show, :id=>projects(:sysmo_project)
-    assert_response :success    
-    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
-    document = parser.parse
-    assert !document.find("//name").empty?,"There should be a field 'name'"
-    assert document.find("//site-credentials").empty?,"There should not be a field 'site-credentials'"
-    assert document.find("//site-password").empty?,"There should not be a field 'site-username'"
-    assert document.find("//site-username").empty?,"There should not be a field 'site-password'"
-  end
-
-  test "site_credentials hidden from index xml" do
-    @request.env['HTTP_ACCEPT'] = 'application/xml'
-    get :index,:page=>"all"
-    assert_response :success
-    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
-    document = parser.parse    
-    assert !document.find("//name").empty?,"There should be a field 'name'"
-    assert document.find("//site-credentials").empty?,"There should not be a field 'site-credentials'"
-    assert document.find("//site-password").empty?,"There should not be a field 'site-username'"
-    assert document.find("//site-username").empty?,"There should not be a field 'site-password'"
-  end
-
-  test "site_root_uri hidden from index xml" do
-    @request.env['HTTP_ACCEPT'] = 'application/xml'
-    get :index,:page=>"all"
-    assert_response :success
-    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
-    document = parser.parse
-    assert !document.find("//name").empty?,"There should be a field 'name'"
-    assert document.find("//site-root-uri").empty?,"There should not be a field 'site-root-uri'"
-  end
-
-  test "site_root_uri hidden from show xml" do
-    @request.env['HTTP_ACCEPT'] = 'application/xml'
-    get :show, :id=>projects(:sysmo_project)
-    assert_response :success
-    parser = LibXML::XML::Parser.string(@response.body,:encoding => LibXML::XML::Encoding::UTF_8)
-    document = parser.parse
-    assert !document.find("//name").empty?,"There should be a field 'name'"
-    assert document.find("//site-root-uri").empty?,"There should not be a field 'site-root-uri'"
-  end
+  end   
     
   
   test "changing default policy" do

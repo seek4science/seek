@@ -31,6 +31,7 @@ class Person < ActiveRecord::Base
   has_many :avatars,
     :as => :owner,
     :dependent => :destroy
+  belongs_to :avatar
     
   has_many :group_memberships
     
