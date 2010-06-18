@@ -32,30 +32,6 @@ module ApiHelper
     Sysmo::Api.uri_for_object(resource_obj, *args)
   end
   
-#  def xml_for_filters(builder, filters, filter_key, results_resource_type)
-#    return nil if builder.nil? or filters.blank?
-#    
-#    filter_key_humanised = Sysmo::Filtering.filter_type_to_display_name(filter_key).singularize.downcase
-#    
-#    filters.each do |f|
-#      
-#      attribs = xlink_attributes(generate_include_filter_url(filter_key, f["id"], results_resource_type.underscore), :title => xlink_title("Filter by #{filter_key_humanised}: '#{f['name']}'"))
-#      attribs.update({
-#        :urlValue => f["id"],
-#        :name => f["name"],
-#        :count => f['count'],
-#        :resourceType => results_resource_type
-#      })
-#      
-#      builder.filter attribs  do
-#                 
-#        xml_for_filters(builder, f["children"], filter_key, results_resource_type)
-#
-#      end
-#        
-#    end
-#  end
-  
   def previous_link_xml_attributes(resource_uri)
     xlink_attributes(resource_uri, :title => xlink_title("Previous page of results"))
   end
@@ -64,8 +40,10 @@ module ApiHelper
     xlink_attributes(resource_uri, :title => xlink_title("Next page of results"))
   end
   
-  def core_xlink object
-    xlink_attributes(uri_for_object(object),:resourceType => object.class.name)
+  def core_xlink object,include_title=true
+    xlink=xlink_attributes(uri_for_object(object),:resourceType => object.class.name)
+    xlink["xlink:title"]=xlink_title(object) unless !include_title || display_name(object,false).nil?
+    return xlink
   end
   
   def xlink_attributes(resource_uri, *args)
@@ -101,9 +79,10 @@ module ApiHelper
   end
   
   def display_name item,escape_html=false
+    result = nil
     result = item.title if item.respond_to?("title")
     result = item.name if item.respond_to?("name") && result.nil?
-    result = h(result) if escape_html
+    result = h(result) if escape_html && !result.nil?
     return result
   end
   
@@ -138,8 +117,8 @@ module ApiHelper
     end
     
     builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
-    builder.tag! "latest_version",object.latest_version.version,xlink_attributes(uri_for_object(object.latest_version),:resourceType => object.latest_version.class.name) if object.respond_to?("latest_version")
-    builder.tag! "project",xlink_attributes(uri_for_object(object.project),:resourceType => "Project") if object.respond_to?("project")
+    builder.tag! "latest_version",object.latest_version.version,core_xlink(object.latest_version) if object.respond_to?("latest_version")
+    builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")
     
     asset_xml builder,object.asset if object.respond_to?("asset")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
@@ -147,23 +126,22 @@ module ApiHelper
     if (object.respond_to?("versions"))
       builder.tag! "versions" do
         object.versions.each do |v|
-          builder.tag! "version",v.version,xlink_attributes(uri_for_object(v),:resourceType => v.class.name)
+          builder.tag! "version",v.version,core_xlink(v)
         end
       end
-    end
-    
+    end    
   end
   
   def asset_xml builder,asset
     builder.tag! "asset",
     xlink_attributes(uri_for_object(asset),:resourceType => "Asset") do
       core_xml builder,asset
-      builder.tag! "project",xlink_attributes(uri_for_object(asset.project),:resourceType => "Project") if !asset.project.nil?      
+      builder.tag! "project",core_xlink(asset.project) if !asset.project.nil?      
     end    
   end
   
   def blob_xml builder,blob
-    builder.tag! "blob",xlink_attributes(uri_for_object(blob),:resourceType => "ContentBlob") do      
+    builder.tag! "blob",core_xlink(blob) do      
       builder.tag! "uuid",blob.uuid if blob.respond_to?("uuid")
       builder.tag! "md5sum",blob.md5sum if blob.respond_to?("md5sum")
       builder.tag! "is_remote",!blob.url.nil?

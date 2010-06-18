@@ -1,7 +1,7 @@
-s_root = false unless local_assigns.has_key?(:is_root)
+is_root = false unless local_assigns.has_key?(:is_root)
 
 parent_xml.tag! "person",
-xlink_attributes(uri_for_object(person), :title => xlink_title(person)).merge(is_root ? xml_root_attributes : {}),
+core_xlink(person).merge(is_root ? xml_root_attributes : {}),
                 :resourceType => "Person" do
   
   parent_xml.tag! "first_name",person.first_name
