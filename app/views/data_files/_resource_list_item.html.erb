@@ -1,6 +1,6 @@
 <%= list_item_title resource %>
 
-<%= @assay ? (list_item_optional_attribute "Relationship type", resource.relationship_type(@assay).try(:title), resource.relationship_type(@assay)) : "" -%>
+<%= @assay ? (list_item_optional_attribute "Relationship type", resource.relationship_type(@assay).try(:title)) : "" -%>
 
 <%= list_item_simple_list resource.asset.creators, "Creator" -%>
 
