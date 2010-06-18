@@ -65,3 +65,10 @@ assay_with_public_and_private_sops_and_datafiles_private_df:
   asset: asset_for_private_data_file
   assay: assay_with_public_and_private_sops_and_datafiles
   version: 1
+  
+validation_data_for_modelling_assay:
+  asset: asset_for_datafile
+  assay: modelling_assay_with_data_and_relationship
+  relationship_type: validation_data
+  version: 1
+    
