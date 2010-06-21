@@ -29,6 +29,8 @@ core_xlink(person).merge(is_root ? xml_root_attributes : {}),
         parent_xml.tag! "tag",tool.name,{:context=>:expertise}
       end
     end
+    
+    associated_resources_xml parent_xml,person
   end
   
 end

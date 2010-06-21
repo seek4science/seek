@@ -10,5 +10,8 @@ core_xlink(assay).merge(is_root ? xml_root_attributes : {}),
   unless assay.is_modelling? 
     parent_xml.tag! "technology_type",assay.technology_type.title,core_xlink(assay.technology_type)
   end
+  if (is_root)
+    associated_resources_xml parent_xml,assay
+  end
   
 end

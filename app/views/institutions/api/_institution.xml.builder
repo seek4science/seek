@@ -8,7 +8,6 @@ core_xlink(institution).merge(is_root ? xml_root_attributes : {}),
   if (is_root)
     parent_xml.tag! "city",institution.city
     parent_xml.tag! "country",institution.country,core_xlink(institution.country)
-    people_list_xml parent_xml, institution.people
-    projects_list_xml parent_xml,institution.projects
+    associated_resources_xml parent_xml,institution
   end
 end

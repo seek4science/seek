@@ -2,9 +2,8 @@ require 'test_helper'
 require 'rest_test_cases'
 
 class InstitutionsControllerTest < ActionController::TestCase
- 
-  
-  fixtures :institutions, :users, :people, :work_groups, :group_memberships
+   
+  fixtures :all
   
   include AuthenticatedTestHelper
   include RestTestCases
