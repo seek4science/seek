@@ -10,7 +10,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-    @object=sops(:my_first_sop)
+    @object=sops(:downloadable_sop)
   end
 
   test "should get index" do

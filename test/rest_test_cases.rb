@@ -13,8 +13,7 @@ module RestTestCases
   end
   
   def test_get_xml
-    get :show,:id=>@object.id, :format=>"xml"
-    puts @response.body
+    get :show,:id=>@object.id, :format=>"xml"    
     assert_response :success    
     valid,message = check_xml
     assert valid,message
