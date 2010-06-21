@@ -12,7 +12,7 @@ module ModelExecution
   #
   # Curl equivalent may be: curl -F upfile=@/home/sowen/Desktop/Teusink.xml  http://jjj.biochem.sun.ac.za/webMathematica/upload/upload_stuart.jsp
   def jws_execution_applet model
-    root_url="http://jjj.biochem.sun.ac.za/webMathematica/"
+    root_url="http://jjj.bio.vu.nl/webMathematica/"
     jsp="upload/upload.jsp"
     
     filepath=store_data_to_tmp model
