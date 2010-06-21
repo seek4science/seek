@@ -162,21 +162,23 @@ module ApiHelper
     end
   end
   
-  def projects_list_xml builder,projects,tag="projects"
-    generic_list_xml builder,projects,tag
-  end
+  def associated_resources_xml builder, object
+    associated = get_related_resources object
+    builder.tag! "associated" do
+      associated.keys.each do |key|        
+        attr={}
+        attr[:total]=associated[key][:items].count
+        if (associated[key][:hidden_count])
+          attr[:total]=attr[:total]+associated[key][:hidden_count]
+          attr[:hidden_count]=associated[key][:hidden_count]
+        end
+        generic_list_xml(builder, associated[key][:items],key.downcase.pluralize,attr)        
+      end
+    end    
+  end        
   
-  def people_list_xml builder,people,tag="people"    
-    generic_list_xml builder,people,tag    
-  end
-  
-  def institutions_list_xml builder,institutions,tag="institutions"    
-    generic_list_xml builder,institutions,tag    
-  end
-    
-  
-  def generic_list_xml builder,list,tag
-    builder.tag! tag do 
+  def generic_list_xml builder,list,tag,attr={}
+    builder.tag! tag,attr do 
       list.each do |item|
         builder.tag! item.class.name.underscore,item.title,core_xlink(item)
       end
