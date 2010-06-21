@@ -127,12 +127,8 @@ module ApiHelper
     
     builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
     builder.tag! "version",object.version if object.respond_to?("version")
-    builder.tag! "latest_version",object.latest_version.version,core_xlink(object.latest_version) if object.respond_to?("latest_version")
-    builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")
-    
-    asset_xml builder,object.asset if object.respond_to?("asset")
-    blob_xml builder,object.content_blob if object.respond_to?("content_blob")
-    
+    builder.tag! "latest_version",object.latest_version.version,core_xlink(object.latest_version) if object.respond_to?("latest_version")           
+    builder.tag! "revision_comments",object.revision_comments if object.respond_to?("revision_comments")
     if (object.respond_to?("versions"))
       builder.tag! "versions" do
         object.versions.each do |v|
@@ -140,6 +136,10 @@ module ApiHelper
         end
       end
     end    
+    
+    asset_xml builder,object.asset if object.respond_to?("asset")
+    blob_xml builder,object.content_blob if object.respond_to?("content_blob")
+    builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")
   end
   
   def asset_xml builder,asset,include_core=true,include_resource=true
