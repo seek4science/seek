@@ -41,12 +41,15 @@ module ApiHelper
   end
   
   def core_xlink object,include_title=true
-    xlink=xlink_attributes(uri_for_object(object),:resourceType => object.class.name)
+    if (object.class.name.include?("::Version"))
+      xlink=xlink_attributes(uri_for_object(object.parent,{:params=>{:version=>object.version}}),:resourceType => object.parent.class.name)
+    else
+      xlink=xlink_attributes(uri_for_object(object),:resourceType => object.class.name)  
+    end
+    
     xlink["xlink:title"]=xlink_title(object) unless !include_title || display_name(object,false).nil?
     return xlink
   end
-  
-  
   
   def xlink_attributes(resource_uri, *args)
     attribs = { }
@@ -72,7 +75,11 @@ module ApiHelper
             when User
               "User"
             else
-              item.class.name.titleize
+              if (item.class.name.include?("::Version"))
+                item.parent.class.name
+              else
+                item.class.name  
+              end              
           end
         end
         
@@ -80,7 +87,7 @@ module ApiHelper
     end
   end
   
-  def display_name item,escape_html=false
+  def display_name item,escape_html=false          
     result = nil
     result = item.title if item.respond_to?("title")
     result = item.name if item.respond_to?("name") && result.nil?
@@ -119,6 +126,7 @@ module ApiHelper
     end
     
     builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
+    builder.tag! "version",object.version if object.respond_to?("version")
     builder.tag! "latest_version",object.latest_version.version,core_xlink(object.latest_version) if object.respond_to?("latest_version")
     builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")
     
@@ -180,7 +188,13 @@ module ApiHelper
   def generic_list_xml builder,list,tag,attr={}
     builder.tag! tag,attr do 
       list.each do |item|
-        builder.tag! item.class.name.underscore,item.title,core_xlink(item)
+        if (item.class.name.include?("::Version")) #versioned items need to be handled slightly differently.
+          parent=item.parent
+          builder.tag! parent.class.name.underscore,item.title,core_xlink(item)
+        else
+          builder.tag! item.class.name.underscore,item.title,core_xlink(item)  
+        end
+        
       end
     end
   end
