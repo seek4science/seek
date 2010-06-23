@@ -103,12 +103,10 @@ module AssetsHelper
     end
 
     case name
-    when "DataFile","Sop"
+    when "DataFile","Sop","Model"
       related["Project"][:items] << resource.project
       related["Assay"][:items] = resource.assays || []
-      related["Study"][:items] = resource.studies || []
-    when "Model"
-      related["Project"][:items] << resource.project      
+      related["Study"][:items] = resource.studies || []         
     when "Assay"
       related["Sop"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.sops, true, current_user)
       related["Sop"][:hidden_count] = resource.sops.size - (related["Sop"][:items] || []).size

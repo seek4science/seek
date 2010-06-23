@@ -57,6 +57,14 @@ class Model < ActiveRecord::Base
     
   end
   
+  def assays
+    AssayAsset.find(:all,:conditions=>["asset_id = ?",self.asset.id]).collect{|a| a.assay}
+  end
+
+  def studies
+    assays.collect{|a| a.study}.uniq
+  end
+  
 
   # get a list of Models with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
