@@ -130,8 +130,9 @@ module ApiHelper
     end
     
     builder.tag! "organisms" do
+      organisms=[]
       organisms=object.organisms if object.respond_to?("organisms")
-      organisms||=[object.organism] if object.respond_to?("organism")
+      organisms << object.organism if object.respond_to?("organism") && object.organism
       api_partial_collection builder,organisms
     end if object.respond_to?("organism") || object.respond_to?("organisms")
     
