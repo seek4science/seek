@@ -1,9 +1,16 @@
 require 'test_helper'
+require 'rest_test_cases'
 
 class OrganismsControllerTest < ActionController::TestCase
   fixtures :all
   
   include AuthenticatedTestHelper
+  include RestTestCases
+  
+  def setup
+    login_as(:aaron)
+    @object=organisms(:yeast)
+  end
   
   test "admin can get edit" do
     login_as(:quentin)

@@ -15,5 +15,19 @@ class StrainsController < ApplicationController
       @strains=@organism.strains
     end
   end
+  
+  def show
+    @strain=Strain.find(params[:id])
+    respond_to do |format|
+      format.xml
+    end
+  end
+  
+  def index
+    @strains=Strain.all
+    respond_to do |format|
+      format.xml
+    end
+  end
 
 end

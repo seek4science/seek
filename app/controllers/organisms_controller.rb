@@ -12,7 +12,14 @@ class OrganismsController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@organism}
+      format.xml
+    end
+  end
+
+  def index
+    @organisms=Organism.all
+    respond_to do |format|
+      format.xml
     end
   end
 

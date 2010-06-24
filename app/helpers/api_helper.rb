@@ -48,6 +48,8 @@ module ApiHelper
     end
     
     xlink["xlink:title"]=xlink_title(object) unless !include_title || display_name(object,false).nil?
+    xlink["id"]=object.id
+    xlink["uuid"]=object.uuid if object.respond_to?("uuid")
     return xlink
   end
   
@@ -139,7 +141,7 @@ module ApiHelper
     
     asset_xml builder,object.asset if object.respond_to?("asset")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
-    builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")
+    builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")    
   end
   
   def asset_xml builder,asset,include_core=true,include_resource=true
@@ -192,9 +194,9 @@ module ApiHelper
       list.each do |item|
         if (item.class.name.include?("::Version")) #versioned items need to be handled slightly differently.
           parent=item.parent
-          builder.tag! parent.class.name.underscore,item.title,core_xlink(item)
+          builder.tag! parent.class.name.underscore,core_xlink(item)
         else
-          builder.tag! item.class.name.underscore,item.title,core_xlink(item)  
+          builder.tag! item.class.name.underscore,core_xlink(item)  
         end
         
       end
