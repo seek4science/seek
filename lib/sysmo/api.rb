@@ -9,7 +9,7 @@
 # Taken from our friends Biocatalogue http://www.biocatalogue.org
 
 module Sysmo
-  module Api
+  module Api        
     
     #FIXME: needs setting correctly
     SITE_BASE_HOST="http://localhost:3000"
@@ -48,6 +48,7 @@ module Sysmo
       
       return uri
     end
+    
     
     def self.uri_for_object(resource_obj, *args)
       options = args.extract_options!

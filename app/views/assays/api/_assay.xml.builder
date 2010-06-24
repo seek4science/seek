@@ -15,10 +15,9 @@ core_xlink(assay).merge(is_root ? xml_root_attributes : {}),
     parent_xml.tag! "assay_organisms" do      
       assay.assay_organisms.each do |ao| 
         parent_xml.tag! "assay_organism" do
-          render :partial=>"organisms/api/organism",:locals=>{:parent_xml => parent_xml,:is_root=>false,:organism=>ao.organism}  
-                      
-          parent_xml.tag! "culture_growth",ao.culture_growth_type.title,core_xlink(ao.culture_growth_type) if ao.culture_growth_type
-          render :partial=>"strains/api/strain",:locals=>{:parent_xml => parent_xml,:is_root=>false,:strain=>ao.strain} if ao.strain
+          api_partial parent_xml,ao.organism
+          api_partial parent_xml,ao.strain if ao.strain
+          parent_xml.tag! "culture_growth",ao.culture_growth_type.title,core_xlink(ao.culture_growth_type) if ao.culture_growth_type          
         end      
       end
       

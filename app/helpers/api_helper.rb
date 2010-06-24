@@ -203,6 +203,13 @@ module ApiHelper
     end
   end
   
+  def api_partial builder,object, is_root=false
+    classname=object.class.name.underscore
+      classesname=classname.pluralize
+      path="#{classesname}/api/#{classname}"      
+      render :partial=>path,:locals=>{:parent_xml => builder,:is_root=>is_root,classname.to_sym=>object}
+  end
+  
   def dc_core_xml builder,object
     submitter = determine_submitter object
     dc_xml_tag builder,:title,object.title if object.respond_to?("title")
