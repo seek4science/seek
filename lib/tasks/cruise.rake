@@ -8,10 +8,8 @@ desc "task for cruise control"
 task :cruise do
   ENV['RAILS_ENV'] = 'test'
   
-  if !File.exists?(Dir.pwd+"/config/database.yml")
-    FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")
-  end
-
+  FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")      
+  
   begin
 	Rake::Task["db:drop:all"].invoke
   rescue Exception => e
