@@ -22,7 +22,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should get new" do
     get :new    
     assert_response :success
-  end
+  end    
 
   test "should create model" do
     assert_difference('Model.count') do

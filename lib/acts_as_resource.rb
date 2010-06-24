@@ -30,6 +30,7 @@ module Mib
             :dependent => :destroy
 
           has_one :project, :through=>:asset
+          
 
           # a virtual attribute to keep the associated project_id temporary
           # (until it's saved into the corresponding asset in the after_save callback)
@@ -56,6 +57,10 @@ module Mib
         # to which the current resource is attributed
         def attributions_objects
           self.attributions.collect { |a| a.object }
+        end
+        
+        def creators
+          asset.creators
         end
 
         

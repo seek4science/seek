@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ModelTest < ActiveSupport::TestCase
-  fixtures :models,:recommended_model_environments,:content_blobs,:assets,:projects,:model_versions
+  fixtures :all
 
   test "assocations" do
     model=models(:teusink)
@@ -22,6 +22,15 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal p,model.project
     assert_equal p,model.latest_version.asset.project
     assert_equal p,model.latest_version.project
+  end
+
+  test "creators through asset" do
+    model=models(:teusink)
+    assert_not_nil model.creators
+    assert_equal 2,model.creators.size
+    assert model.creators.include?(people(:pal))
+    assert model.creators.include?(people(:person_for_model_owner))
+    
   end
 
   test "model with no contributor" do

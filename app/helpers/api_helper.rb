@@ -5,7 +5,7 @@
 # See license.txt for details.
 
 module ApiHelper
-    
+  
   
   def xml_root_attributes
     { "xmlns" => "http://www.sysmo-db.org/2009/xml/rest",
@@ -63,29 +63,29 @@ module ApiHelper
     attribs_in.each do |k,v|
       attribs["xlink:#{k.to_s}"] = v
     end
-
+    
     return attribs
   end
   
   def xlink_title(item, item_type_name=nil)
     case item
       when String
-        return item
-      else
-        if item_type_name.blank?
-          item_type_name = case item
-            when User
+      return item
+    else
+      if item_type_name.blank?
+        item_type_name = case item
+          when User
               "User"
-            else
-              if (item.class.name.include?("::Version"))
-                item.parent.class.name
-              else
-                item.class.name  
-              end              
-          end
+        else
+          if (item.class.name.include?("::Version"))
+            item.parent.class.name
+          else
+            item.class.name  
+          end              
         end
-        
-        return "#{item_type_name} - #{display_name(item, false)}"
+      end
+      
+      return "#{item_type_name} - #{display_name(item, false)}"
     end
   end
   
@@ -113,12 +113,37 @@ module ApiHelper
   def core_xml builder,object
     builder.tag! "id",object.id
     dc_core_xml builder,object
-    builder.tag! "uuid",object.uuid if object.respond_to?("uuid")
-    submitter = determine_submitter object
-    builder.tag! "submitter",submitter.name,xlink_attributes(uri_for_object(submitter),:resourceType => submitter.class.name) if submitter    
+    builder.tag! "uuid",object.uuid if object.respond_to?("uuid")    
   end
-    
+  
   def extended_xml builder,object
+    
+    submitter = determine_submitter object
+    builder.tag! "submitter" do 
+      api_partial(builder,submitter)
+    end if submitter
+    
+    if (object.class.name.include?("::Version"))
+      builder.tag! "creators" do      
+        api_partial_collection builder,object.parent.creators
+      end if object.parent.respond_to?("creators") 
+    end
+    
+    builder.tag! "organisms" do
+      organisms=object.organisms if object.respond_to?("organisms")
+      organisms||=[object.organism] if object.respond_to?("organism")
+      api_partial_collection builder,organisms
+    end if object.respond_to?("organism") || object.respond_to?("organisms")
+    
+    if (object.class.name.include?("::Version"))
+      builder.tag! "attributions" do      
+        api_partial_collection builder,object.parent.attributions
+      end if object.parent.respond_to?("attributions") 
+    end
+    
+    builder.tag! "creators" do      
+      api_partial_collection builder,object.creators
+    end if object.respond_to?("creators")  
     
     unless HIDE_DETAILS
       builder.tag! "email",object.email if object.respond_to?("email")
@@ -142,6 +167,7 @@ module ApiHelper
     asset_xml builder,object.asset if object.respond_to?("asset")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
     builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")    
+    
   end
   
   def asset_xml builder,asset,include_core=true,include_resource=true
@@ -205,9 +231,13 @@ module ApiHelper
   
   def api_partial builder,object, is_root=false
     classname=object.class.name.underscore
-      classesname=classname.pluralize
-      path="#{classesname}/api/#{classname}"      
-      render :partial=>path,:locals=>{:parent_xml => builder,:is_root=>is_root,classname.to_sym=>object}
+    classesname=classname.pluralize
+    path="#{classesname}/api/#{classname}"      
+    render :partial=>path,:locals=>{:parent_xml => builder,:is_root=>is_root,classname.to_sym=>object}
+  end
+  
+  def api_partial_collection builder,objects,is_root=false
+    objects.each{|o| api_partial builder,o,is_root}
   end
   
   def dc_core_xml builder,object
