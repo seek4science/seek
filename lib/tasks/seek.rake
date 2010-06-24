@@ -426,7 +426,12 @@ namespace :seek do
               false
             end
           end
-          res.save!
+          if !res.valid?
+            puts "Validation error with #{res.class.name}:#{res.id}"
+            puts res.errors.full_messages.join(", ")
+          else
+            res.save!  
+          end          
           count += 1
         end
       end
