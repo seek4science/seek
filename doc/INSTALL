@@ -42,7 +42,7 @@ The following commands should install rubygems for you on a Ubuntu/Debian system
 
 If using Ubuntu or Debian, the following commands should install all the gems you need:
 
-  sudo gem install rails mysql rmagick spreadsheet hpricot uuidtools RedCloth mongrel
+  sudo gem install rails mysql rmagick spreadsheet hpricot uuidtools RedCloth mongrel sqlite3-ruby
   
 Also specific versions of <em>fastercsv</em> and <em>libxml-ruby</em> are required:
 
