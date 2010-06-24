@@ -109,12 +109,12 @@ module ApiHelper
     
     builder.tag! "dcterms:#{term}", value, attributes
   end
-  
+    
   def core_xml builder,object
     builder.tag! "id",object.id
     dc_core_xml builder,object
     builder.tag! "uuid",object.uuid if object.respond_to?("uuid")    
-  end
+  end  
   
   def extended_xml builder,object
     
