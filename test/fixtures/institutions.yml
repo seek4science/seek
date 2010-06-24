@@ -33,11 +33,14 @@ four:
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
 manchester_uni_inst:
-  name: "Manchester University"
+  name: "Manchester University"  
 
 
 ebi_inst:
   name: "European Bioinformatics Institute"
+  country: "uk"
+  address: "address"
+  city: "city"
 
 
 amsterdam_uni_inst:
