@@ -1,21 +1,26 @@
 class TechnologyTypesController < ApplicationController
-
+  
   before_filter :login_required
-  before_filter :check_allowed_to_manage_types, :except=>[:show] 
-
+  before_filter :check_allowed_to_manage_types, :except=>[:show,:index] 
+  
   def show
     @technology_type = TechnologyType.find(params[:id])
-
+    
     respond_to do |format|
       format.html
-      format.xml { render :xml=>@technology_type}
-    end
-
+      format.xml
+    end    
   end
-
+  
+  def index 
+    @technology_types = TechnologyType.all
+    respond_to do |format|
+      format.xml
+    end
+  end
+  
   def new
     @technology_type=TechnologyType.new
-
     respond_to do |format|
       format.html
       format.xml  { render :xml => @technology_type }
@@ -24,8 +29,7 @@ class TechnologyTypesController < ApplicationController
   
   def manage
     @technology_types = TechnologyType.all
-    #@technology_type = TechnologyType.last
-
+   
     respond_to do |format|
       format.html
       format.xml {render :xml=>@technology_types}
@@ -34,7 +38,7 @@ class TechnologyTypesController < ApplicationController
   
   def edit
     @technology_type=TechnologyType.find(params[:id])
-
+    
     respond_to do |format|
       format.html
       format.xml  { render :xml => @technology_type }
@@ -60,7 +64,7 @@ class TechnologyTypesController < ApplicationController
   
   def update
     @technology_type=TechnologyType.find(params[:id])
-
+    
     respond_to do |format|
       if @technology_type.update_attributes(:title => params[:technology_type][:title])
         unless params[:technology_type][:parent_id] == @technology_type.parents.collect {|par| par.id}

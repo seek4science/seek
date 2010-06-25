@@ -6,7 +6,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   
-  setup do
+  def setup
     login_as(:quentin)
     @object=technology_types(:gas_chromatography)
   end
