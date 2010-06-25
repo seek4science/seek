@@ -85,7 +85,8 @@ module ApiHelper
         end
       end
       
-      return "#{item_type_name} - #{display_name(item, false)}"
+      #return "#{item_type_name} - #{display_name(item, false)}"
+      return "#{display_name(item, false)}"
     end
   end
   
