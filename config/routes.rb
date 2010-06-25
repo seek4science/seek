@@ -26,6 +26,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :data_files, :member => {:download => :get}  do |data_file|
     data_file.resources :studied_factors
   end
+  
+  map.resources :uuids
 
   map.resources :expertise
 

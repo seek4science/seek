@@ -7,6 +7,7 @@ metabolomics_assay:
   study: metabolomics_study  
   owner: person_for_model_owner
   assay_class: experimental_assay_class  
+  uuid: pppp-kkkk-eeee-wwww
 
 metabolomics_assay2:
   title: Metabolomics Assay2
