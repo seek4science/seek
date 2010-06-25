@@ -1,2 +1,2 @@
 xml.instruct! :xml
-render :partial=>"institutions/api/institution",:locals=>{:institution=>@institution,:parent_xml => xml,:is_root=>true}
+api_partial xml,@institution,true

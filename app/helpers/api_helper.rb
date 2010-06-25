@@ -231,9 +231,9 @@ module ApiHelper
   end
   
   def api_partial builder,object, is_root=false
+    object=object.parent if object.class.name.include?("::Version")
+    path=api_partial_path_for_item(object)    
     classname=object.class.name.underscore
-    classesname=classname.pluralize
-    path="#{classesname}/api/#{classname}"      
     render :partial=>path,:locals=>{:parent_xml => builder,:is_root=>is_root,classname.to_sym=>object}
   end
   

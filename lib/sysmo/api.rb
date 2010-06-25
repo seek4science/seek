@@ -29,7 +29,7 @@ module Sysmo
       return uri
     end
     
-    def self.api_partial_path_for_item object
+    def self.api_partial_path_for_item object      
       item_name=object.class.name.underscore
       "#{item_name.pluralize}/api/#{item_name}"      
     end
