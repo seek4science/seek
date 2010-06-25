@@ -22,7 +22,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     get :manage
     assert_response :success
     assert_not_nil assigns(:assay_types)
-  end  
+  end
   
   test "should not show manage page for non-admin" do
     login_as(:cant_edit)
