@@ -10,8 +10,7 @@ teusink:
   recommended_environment: jws
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
-  version: 2
-  uuid: gggg-hhhh-jjjj-kkkk
+  version: 2  
 
 model_with_format_and_type:
   contributor: model_owner (User)
@@ -26,6 +25,7 @@ model_with_format_and_type:
   model_type: SBML
   model_format: BioPAX
   version: 1
+  uuid: gggg-hhhh-jjjj-kkkk
 
 model_with_links_in_description:
   contributor: model_owner (User)

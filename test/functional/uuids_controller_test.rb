@@ -9,13 +9,13 @@ class UuidsControllerTest < ActionController::TestCase
   end
   
   test "show" do
-    teusink=models(:teusink)
-    get :show, :id=>teusink.uuid
-    assert_redirected_to teusink
+    m=models(:model_with_format_and_type)
+    get :show, :id=>m.uuid
+    assert_redirected_to m
   end
   
   test "show2" do
-    assay=assays(:metabolomics_assay)
+    assay=assays(:metabolomics_assay2)
     get :show, :id=>assay.uuid
     assert_redirected_to assay
   end
