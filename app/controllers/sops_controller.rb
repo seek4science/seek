@@ -1,6 +1,8 @@
 class SopsController < ApplicationController
   #FIXME: re-add REST for each of the core methods
 
+  include IndexPager
+
   before_filter :login_required
 
   before_filter :find_sops, :only => [ :index ]
@@ -8,18 +10,7 @@ class SopsController < ApplicationController
   before_filter :find_display_sop, :only=>[:show,:download]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
-  
-  
-  # GET /sops
-  def index
-    @sops=Authorization.authorize_collection("show",@sops,current_user)
-    @sops=Sop.paginate_after_fetch(@sops, :page=>params[:page])
-    respond_to do |format|
-      format.html
-      format.xml
-    end
-  end
-
+    
   def new_version
     data = params[:data].read
     comments=params[:revision_comment]
@@ -42,7 +33,6 @@ class SopsController < ApplicationController
       format.html {redirect_to @sop }
     end
   end
-
   
   # GET /sops/1
   def show

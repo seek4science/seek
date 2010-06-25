@@ -3,23 +3,15 @@ require 'white_list_helper'
 class InstitutionsController < ApplicationController
   include WhiteListHelper
   
+  include IndexPager
+  
   before_filter :login_required
+  before_filter :find_instututions, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_all]
   before_filter :editable_by_user, :only=>[:edit,:update]
 
   cache_sweeper :institutions_sweeper,:only=>[:update,:create,:destroy]
-
-
-  # GET /institutions
-  # GET /institutions.xml
-  def index
-    @institutions = Institution.paginate :page=>params[:page]
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml
-    end
-  end
+  
 
   # GET /institutions/1
   # GET /institutions/1.xml
@@ -130,6 +122,10 @@ class InstitutionsController < ApplicationController
   end
 
   private
+  
+  def find_institutions
+    @institutions = Institution.paginate :page=>params[:page]
+  end
 
   def editable_by_user
     @institution = Institution.find(params[:id])

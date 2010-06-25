@@ -1,23 +1,16 @@
 class StudiesController < ApplicationController
 
   include DotGenerator
+  include IndexPager
   
   before_filter :login_required
     
+  before_filter :find_studies,:only=>[:index]
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
   before_filter :study_auth_project,:only=>[:edit,:update]
   before_filter :delete_allowed,:only=>[:destroy]
-
-  def index    
-    @studies=apply_filters(Study.find(:all,:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
-    @studies=Study.paginate :page=>params[:page]
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml
-    end
-  end
+  
 
   def new
     @study = Study.new
@@ -152,6 +145,11 @@ class StudiesController < ApplicationController
       end
       return false
     end
+  end
+  
+  def find_studies
+    @studies=apply_filters(Study.find(:all,:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
+    @studies=Study.paginate :page=>params[:page]
   end
   
 end

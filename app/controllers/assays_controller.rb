@@ -1,23 +1,15 @@
 class AssaysController < ApplicationController
 
   include DotGenerator
+  include IndexPager
 
+  before_filter :find_assays,:only=>[:index]
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :check_is_project_pal, :only=>[:edit, :update, :destroy]
-  before_filter :delete_allowed,:only=>[:destroy]
+  before_filter :delete_allowed,:only=>[:destroy]  
 
   
-  def index
-    @assays=apply_filters(Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
-    @assays=Assay.paginate :page=>params[:page]
-
-    respond_to do |format|
-      format.html
-      format.xml
-    end
-    
-  end
 
   def new
     @assay=Assay.new
@@ -150,6 +142,11 @@ class AssaysController < ApplicationController
   end
   
   private  
+  
+  def find_assays
+    @assays=apply_filters(Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
+    @assays=Assay.paginate :page=>params[:page]
+  end
 
   def delete_allowed
     @assay=Assay.find(params[:id])

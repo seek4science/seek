@@ -1,5 +1,5 @@
 parent_xml.parameters do
-  
+  api_index_parameters parent_xml,params
 end
 
 parent_xml.statistics do

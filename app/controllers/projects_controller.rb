@@ -2,7 +2,9 @@ require 'white_list_helper'
 
 class ProjectsController < ApplicationController
   include WhiteListHelper
+  include IndexPager
   
+  before_filter :find_projects, :only=>[:index]
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update,:admin]
@@ -13,17 +15,7 @@ class ProjectsController < ApplicationController
 
   def auto_complete_for_organism_name
     render :json => Project.organism_counts.map(&:name).to_json
-  end
-
-  # GET /projects
-  # GET /projects.xml
-  def index   
-    @projects = Project.paginate :page=>params[:page], :default_page => "all"
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml
-    end    
-  end
+  end  
 
   def admin
     @project = Project.find(params[:id])
@@ -203,6 +195,10 @@ class ProjectsController < ApplicationController
   end
   
   protected
+  
+  def find_projects
+    @projects = Project.paginate :page=>params[:page], :default_page => "all"
+  end
   
   def set_parameters_for_sharing_form
     policy = nil

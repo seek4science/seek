@@ -8,6 +8,7 @@ module GroupedPagination
   end
 
   module ClassMethods
+    
     def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a
       @field = options[:field] || "first_letter"

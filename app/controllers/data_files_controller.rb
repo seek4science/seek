@@ -1,21 +1,14 @@
 class DataFilesController < ApplicationController
 
+  include IndexPager
+
   before_filter :login_required
 
   before_filter :find_data_files, :only => [ :index ]
   before_filter :find_data_file_auth, :except => [ :index, :new, :create ]
   before_filter :find_display_data_file, :only=>[:show,:download]
 
-  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
-
-  def index
-    @data_files=Authorization.authorize_collection("show",@data_files,current_user)
-    @data_files=DataFile.paginate_after_fetch(@data_files, :page=>params[:page])
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml
-    end
-  end
+  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]  
   
   def new_version
     data = params[:data].read

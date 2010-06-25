@@ -1,10 +1,10 @@
 require 'model_execution'
 
 class ModelsController < ApplicationController
-  #FIXME: re-add REST for each of the core methods
   
   include ModelExecution
   include WhiteListHelper
+  include IndexPager
   
   before_filter :login_required
   
@@ -18,14 +18,7 @@ class ModelsController < ApplicationController
   
   # GET /models
   # GET /models.xml
-  def index
-    @models=Authorization.authorize_collection("show",@models,current_user)
-    @models=Model.paginate_after_fetch(@models, :page=>params[:page])
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml
-    end
-  end
+  
   
   def new_version
     data = params[:data].read
