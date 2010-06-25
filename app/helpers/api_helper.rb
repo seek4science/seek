@@ -167,7 +167,7 @@ module ApiHelper
     
     asset_xml builder,object.asset if object.respond_to?("asset")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
-    builder.tag! "project",core_xlink(object.project) if object.respond_to?("project")    
+    api_partial builder,object.project if object.respond_to?("project")    
     
   end
   
