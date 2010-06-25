@@ -3,7 +3,16 @@ parent_xml.parameters do
 end
 
 parent_xml.statistics do
-  
+  parent_xml.pages items.pages.join(", ")
+  parent_xml.page items.page
+  parent_xml.total items.size + @hidden
+  parent_xml.total_displayed items.size
+  parent_xml.hidden @hidden
+  parent_xml.page_counts do
+    items.page_totals.keys.sort.each do |key|
+      parent_xml.page_count items.page_totals[key],{:page=>key}
+    end
+  end    
 end
 
 parent_xml.items do

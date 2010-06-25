@@ -114,8 +114,6 @@ module GroupedPagination
 
   end
 
-
-
   module InstanceMethods
     #Helper to strip the first letter from the text, converting non standard A-Z characters to their equivalent, e.g Ø -> O
     #uses some code based upon: http://github.com/grosser/sort_alphabetical/blob/9a8665d17394506c29cce51d8e22af69e2931523/lib/sort_alphabetical.rb with special handling for Ø
