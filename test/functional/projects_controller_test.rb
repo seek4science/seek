@@ -1,6 +1,5 @@
 require 'test_helper'
 require 'libxml'
-require 'rest_test_cases'
 
 class ProjectsControllerTest < ActionController::TestCase
 

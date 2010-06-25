@@ -4,6 +4,12 @@ class AssayTypesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
+  
+  def setup
+    login_as(:aaron)
+    @object=assay_types(:metabolomics)
+  end
 
   test "show" do
     login_as(:quentin)

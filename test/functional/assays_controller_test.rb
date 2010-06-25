@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'rest_test_cases'
+
 
 class AssaysControllerTest < ActionController::TestCase
   fixtures :all

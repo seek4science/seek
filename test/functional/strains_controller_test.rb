@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'rest_test_cases'
 
 class StrainsControllerTest < ActionController::TestCase
   fixtures :all

@@ -4,6 +4,12 @@ class TechnologyTypesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
+  
+  setup do
+    login_as(:quentin)
+    @object=technology_types(:gas_chromatography)
+  end
 
   test "show" do
     login_as(:quentin)
