@@ -15,10 +15,12 @@ module IndexPager
     end
     objects=Sop.paginate_after_fetch(objects, :page=>params[:page]) unless objects.respond_to?("page_totals")
     eval("@"+controller+"= objects")
+    
     respond_to do |format|
       format.html
       format.xml
-    end    
+    end
+    
   end
   
 end
