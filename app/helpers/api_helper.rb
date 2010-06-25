@@ -241,6 +241,16 @@ module ApiHelper
     objects.each{|o| api_partial builder,o,is_root}
   end
   
+  def parent_child_elements builder,object
+    builder.tag! "parents" do
+      api_partial_collection(builder, object.parents, is_root = false)  
+    end
+    
+    builder.tag! "children" do
+      api_partial_collection(builder, object.children, is_root = false)
+    end
+  end
+  
   def dc_core_xml builder,object
     submitter = determine_submitter object
     dc_xml_tag builder,:title,object.title if object.respond_to?("title")

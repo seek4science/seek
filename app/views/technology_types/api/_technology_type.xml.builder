@@ -6,4 +6,8 @@ core_xlink(technology_type).merge(is_root ? xml_root_attributes : {}),
   
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>technology_type}
   
+  if (is_root)
+    parent_child_elements parent_xml,technology_type
+  end
+  
 end
