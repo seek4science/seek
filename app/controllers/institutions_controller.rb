@@ -6,7 +6,7 @@ class InstitutionsController < ApplicationController
   include IndexPager
   
   before_filter :login_required
-  before_filter :find_instututions, :only=>[:index]
+  before_filter :find_institutions, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_all]
   before_filter :editable_by_user, :only=>[:edit,:update]
 
