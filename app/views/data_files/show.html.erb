@@ -30,7 +30,7 @@
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file} %>
 
-<%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @data_file } -%>
+<%= render :partial => "layouts/usage_info", :locals => { :resource => @data_file } -%>
 
 
 <div class="show_basic">

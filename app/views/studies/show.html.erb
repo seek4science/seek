@@ -20,7 +20,7 @@
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@study} %>
 
 <div class="show_basic">
-  <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @study } -%>
+  <%= render :partial => "layouts/usage_info", :locals => { :resource => @study } -%>
   
   <p class="id">
     <label>ID: </label>

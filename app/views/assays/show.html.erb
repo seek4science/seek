@@ -11,7 +11,7 @@
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@assay} %>
 <div class="show_basic">
    <div class="main_content_left_box">
-      <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @assay } -%>
+      <%= render :partial => "layouts/usage_info", :locals => { :resource => @assay } -%>
       <% if @assay.study.nil? -%>
       <div class="warning">
           <%= image("warning") %><b style="color:red">WARNING</b>
