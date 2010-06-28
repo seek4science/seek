@@ -5,6 +5,7 @@ module IndexPager
     model_name=controller.classify
     model_class=eval(model_name)
     objects = eval("@"+controller)
+    objects.size
     @hidden=0
     params[:page] ||= "latest"
     
@@ -13,7 +14,7 @@ module IndexPager
       @hidden=objects.size - authorized.size
       objects=authorized
     end
-    objects=Sop.paginate_after_fetch(objects, :page=>params[:page]) unless objects.respond_to?("page_totals")
+    objects=model_class.paginate_after_fetch(objects, :page=>params[:page]) unless objects.respond_to?("page_totals")
     eval("@"+controller+"= objects")
     
     respond_to do |format|

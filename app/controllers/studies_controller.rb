@@ -148,8 +148,7 @@ class StudiesController < ApplicationController
   end
   
   def find_studies
-    @studies=apply_filters(Study.find(:all,:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
-    @studies=Study.paginate_after_fetch(@studies, :page=>params[:page])
+    @studies=apply_filters(Study.find(:all, :order=>'updated_at DESC'))    
   end
   
 end

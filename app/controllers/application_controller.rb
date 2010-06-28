@@ -238,7 +238,7 @@ class ApplicationController < ActionController::Base
           if res.class.name == "Person"
             pass = pass && (res.projects.include?(Project.find_by_id(params[:filter][:project].to_i)))
           else
-            pass = pass && (res.project.id == params[:filter][:project].to_i)
+            pass = pass && (res.project.id == params[:filter][:project].to_i)            
           end
         end
         unless params[:filter][:study].blank?

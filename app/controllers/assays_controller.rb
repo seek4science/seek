@@ -144,8 +144,8 @@ class AssaysController < ApplicationController
   private  
   
   def find_assays
-    @assays=apply_filters(Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
-    @assays=Assay.paginate_after_fetch(@assays, :page=>params[:page])
+    @assays = Assay.find(:all, :order=>'updated_at DESC')    
+    @assays=apply_filters(@assays)        
   end
 
   def delete_allowed
