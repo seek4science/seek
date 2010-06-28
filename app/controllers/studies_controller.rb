@@ -10,7 +10,7 @@ class StudiesController < ApplicationController
   before_filter :delete_allowed,:only=>[:destroy]
 
   def index    
-    @studies=apply_filters(Study.find(:all,:page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
+    @studies=apply_filters(Study.find(:all, :order=>'updated_at DESC'))
     @studies=Study.paginate_after_fetch(@studies, :page=>params[:page])
 
     respond_to do |format|

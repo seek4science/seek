@@ -6,10 +6,9 @@ class AssaysController < ApplicationController
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :check_is_project_pal, :only=>[:edit, :update, :destroy]
   before_filter :delete_allowed,:only=>[:destroy]
-
   
   def index
-    @assays=apply_filters(Assay.find(:all, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC'))
+    @assays=apply_filters(Assay.find(:all, :order=>'updated_at DESC'))
     @assays=Assay.paginate_after_fetch(@assays, :page=>params[:page])
 
     respond_to do |format|
