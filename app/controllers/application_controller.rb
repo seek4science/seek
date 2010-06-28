@@ -227,8 +227,8 @@ class ApplicationController < ActionController::Base
   
   def apply_filters(resources)
     set = resources
-    unless params[:filter].blank? || params[:filter][:project].blank? && params[:filter][:assay].blank? &&
-           params[:filter][:study].blank? && params[:filter][:investigation]
+    unless params[:filter].blank? || (params[:filter][:project].blank? && params[:filter][:assay].blank? &&
+           params[:filter][:study].blank? && params[:filter][:investigation].blank?)
       set = resources.select do |res|
         if ["Sop","Model","DataFile","Publication"].include?(res.class.name)
           res = res.asset
@@ -249,8 +249,8 @@ class ApplicationController < ActionController::Base
           end
         end
         unless params[:filter][:investigation].blank?
-          if res.class.name == "Study"
-            pass = pass && (res.investigation_id == params[:filter][:investigation].to_i)
+          if res.class.name == "Study" || res.class.name == "Assay"
+            pass = pass && (res.investigation.id == params[:filter][:investigation].to_i)
           else
             pass = pass && (res.assays.collect{|a| a.study.investigation_id}.include?(params[:filter][:investigation].to_i))
           end
