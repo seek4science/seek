@@ -8,15 +8,7 @@
 </ul>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@investigation} %>
 <div class="show_basic">
-    <div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
-        <b>Created at:</b>
-        <%= @investigation.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% unless @investigation.created_at == @investigation.updated_at -%>
-        <br/>
-        <b>Last updated: </b>
-        <%= @investigation.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-        <% end -%>
-    </div>
+    <%= render :partial => "assets/resource_datetime_info", :locals => { :resource => @investigation } -%>
     <p class="id">
         <label>
             ID: 

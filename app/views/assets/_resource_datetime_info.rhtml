@@ -1,9 +1,17 @@
-<div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">
-	<b>Created at:</b> <%= resource.asset.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-  &nbsp;&nbsp;&nbsp;&nbsp;
-	<b>Last used: </b><%= @last_used_before_now.blank? ? "never" : @last_used_before_now.strftime('%d/%m/%Y @ %H:%M:%S') -%>
-	<% unless resource.asset.created_at == resource.asset.updated_at -%>
-		<br/>
-		<b>Last updated: </b><%= resource.asset.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
+<div class="contribution_aftertitle" style="line-height: 1.5; margin-bottom: 0.8em;">    
+	<b>Created at:</b> <%= resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+  &nbsp;&nbsp;&nbsp;
+    <% unless @last_used_before_now.blank? -%>
+		<b>Last used: </b><%= @last_used_before_now.strftime('%d/%m/%Y @ %H:%M:%S') -%>
+		&nbsp;&nbsp;&nbsp;	
+	<% end -%>
+	<% unless resource.created_at == resource.updated_at -%>				
+		<b>Last updated: </b><%= resource.updated_at.strftime('%d/%m/%Y @ %H:%M:%S') -%> 
+	<% end -%>
+	<br/>
+	<b>Views:</b> <%= count_actions(resource,"show") -%>		
+	<% if ["DataFile","Model","Sop"].include?(resource.class.name) -%>
+	&nbsp;&nbsp;&nbsp;
+		<b>Downloads:</b> <%= count_actions(resource,"download") -%>
 	<% end -%>
 </div>

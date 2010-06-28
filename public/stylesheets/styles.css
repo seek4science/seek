@@ -1219,20 +1219,18 @@ ul.stats li p label {
 }
 
 div.hit_counter {
-  float: right;
-  border: 1px solid #999;
-  background-color: #fff;
-  text-align: left;
-  padding: 5px;
-  margin-right:5px;
+  text-align: center;
+  width: 100%;
 }
 
-div.hit_counter  ul{
+div.hit_counter  ul {  
+  text-align: center;
+  width: 100%;
   margin:0;
 }
 
-div.hit_counter  ul li {
-  list-style: none;
+div.hit_counter  ul li {	
+  	list-style: none;  
 }
 
 img.visibility_icon {
