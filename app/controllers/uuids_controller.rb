@@ -12,6 +12,7 @@ class UuidsController < ApplicationController
     end
     respond_to do |format|
       format.html {redirect_to obj}
+      format.xml {redirect_to obj,:format=>"xml"}
     end
   end
   

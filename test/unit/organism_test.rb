@@ -42,16 +42,16 @@ class OrganismTest < ActiveSupport::TestCase
     assert_nil BioportalConcept.find_by_id(concept.id)
   end
 
-  test "get concept" do
-    o=organisms(:yeast_with_bioportal_concept)
-    concept=o.concept({:maxchildren=>5,:light=>0,:refresh=>true})
-    assert_not_nil concept
-    assert_equal "NCBITaxon:4932",concept[:id]
-    assert !concept[:synonyms].empty?
-    assert !concept[:children].empty?
-    assert !concept[:parents].empty?
-    assert_equal 38802,concept[:ontology_version_id]
-  end
+#  test "get concept" do
+#    o=organisms(:yeast_with_bioportal_concept)
+#    concept=o.concept({:maxchildren=>5,:light=>0,:refresh=>true})
+#    assert_not_nil concept
+#    assert_equal "NCBITaxon:4932",concept[:id]
+#    assert !concept[:synonyms].empty?
+#    assert !concept[:children].empty?
+#    assert !concept[:parents].empty?
+#    assert_equal 38802,concept[:ontology_version_id]
+#  end
 
   test "get ontology" do
     o=organisms(:yeast_with_bioportal_concept)
