@@ -106,3 +106,11 @@ assay_with_public_and_private_sops_and_datafiles:
   study: study_with_assay_with_public_private_sops_and_datafile
   assay_class: experimental_assay_class
   
+modelling_assay_with_data_and_relationship:
+  title: Modelling Assay with Data
+  assay_type: metabolomics  
+  owner: person_for_owner_of_my_first_sop
+  description: modelling assay
+  study: study_with_modelling_assay
+  assay_class: modelling_assay_class
+  

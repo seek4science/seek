@@ -97,6 +97,7 @@ sufficient
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
+      <a href="#M000002">determine_filename</a>&nbsp;&nbsp;
       <a href="#M000001">get_remote_data</a>&nbsp;&nbsp;
       </div>
     </div>
@@ -119,6 +120,46 @@ sufficient
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
+      <div id="method-M000002" class="method-detail">
+        <a name="M000002"></a>
+
+        <div class="method-heading">
+          <a href="#M000002" class="method-signature">
+          <span class="method-name">determine_filename</span><span class="method-args">(f)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+tries to determine the filename from f if it can it will read the
+content-disposition and parse the filename, otherwise falls back to what
+follows the last / in the uri
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000002-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/jerm/http_downloader.rb, line 21</span>
+21:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">determine_filename</span> <span class="ruby-identifier">f</span>            
+22:       <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@@filename_cache</span>[<span class="ruby-identifier">f</span>.<span class="ruby-identifier">base_uri</span>] <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@filename_cache</span>[<span class="ruby-identifier">f</span>.<span class="ruby-identifier">base_uri</span>].<span class="ruby-identifier">nil?</span>      
+23:       <span class="ruby-identifier">disp</span>=<span class="ruby-identifier">f</span>.<span class="ruby-identifier">meta</span>[<span class="ruby-value str">&quot;content-disposition&quot;</span>]
+24:       <span class="ruby-identifier">result</span>=<span class="ruby-keyword kw">nil</span>
+25:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">disp</span>.<span class="ruby-identifier">nil?</span>        
+26:         <span class="ruby-identifier">m</span>=<span class="ruby-regexp re">/filename=\&quot;.*\&quot;/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">disp</span>)
+27:         <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">m</span>)
+28:           <span class="ruby-identifier">m</span>=<span class="ruby-regexp re">/\&quot;.*\&quot;/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">m</span>[<span class="ruby-value">0</span>])           
+29:           <span class="ruby-identifier">result</span>=<span class="ruby-identifier">m</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;\&quot;&quot;</span>,<span class="ruby-value str">&quot;&quot;</span>).<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;/&quot;</span>).<span class="ruby-identifier">last</span> <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">m</span>)
+30:         <span class="ruby-keyword kw">end</span>
+31:       <span class="ruby-keyword kw">end</span>
+32:       <span class="ruby-identifier">result</span>=<span class="ruby-identifier">f</span>.<span class="ruby-identifier">base_uri</span>.<span class="ruby-identifier">path</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">'/'</span>).<span class="ruby-identifier">last</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">result</span>.<span class="ruby-identifier">nil?</span>
+33:       <span class="ruby-ivar">@@filename_cache</span>[<span class="ruby-identifier">f</span>.<span class="ruby-identifier">base_uri</span>]=<span class="ruby-identifier">result</span>      
+34:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">result</span>
+35:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
       <div id="method-M000001" class="method-detail">
         <a name="M000001"></a>
 
@@ -133,12 +174,12 @@ sufficient
             onclick="toggleCode('M000001-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000001-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/jerm/http_downloader.rb, line 12</span>
-12:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_remote_data</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">password</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword kw">nil</span>
-13:       <span class="ruby-identifier">cached</span>=<span class="ruby-identifier">check_from_cache</span>(<span class="ruby-identifier">url</span>,<span class="ruby-identifier">username</span>,<span class="ruby-identifier">password</span>)
-14:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">cached</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">cached</span>.<span class="ruby-identifier">nil?</span>
-15:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">basic_auth</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>, <span class="ruby-identifier">password</span>
-16:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/jerm/http_downloader.rb, line 13</span>
+13:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_remote_data</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">password</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword kw">nil</span>
+14:       <span class="ruby-identifier">cached</span>=<span class="ruby-identifier">check_from_cache</span>(<span class="ruby-identifier">url</span>,<span class="ruby-identifier">username</span>,<span class="ruby-identifier">password</span>)
+15:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">cached</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">cached</span>.<span class="ruby-identifier">nil?</span>
+16:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">basic_auth</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>, <span class="ruby-identifier">password</span>
+17:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
