@@ -9,13 +9,9 @@ namespace :solr do
   task :start do
     require "#{File.dirname(__FILE__)}/../../config/solr_environment.rb"
     begin
-      n = Net::HTTP.new('127.0.0.1', SOLR_PORT)
-      n.request_head('/').value 
-
-    rescue Net::HTTPServerException #responding
-      puts "Port #{SOLR_PORT} in use" and return
-
-    rescue Errno::ECONNREFUSED #not responding
+      #FIXME: this was temporarily hacked to get solr working. Needs updating properly.
+      #n = Net::HTTP.new('127.0.0.1', SOLR_PORT)
+      #n.request_head('/').value 
       Dir.chdir(SOLR_PATH) do
         pid = fork do
           #STDERR.close
@@ -25,6 +21,11 @@ namespace :solr do
         File.open("#{SOLR_PIDS_PATH}/#{ENV['RAILS_ENV']}_pid", "w"){ |f| f << pid}
         puts "#{ENV['RAILS_ENV']} Solr started successfully on #{SOLR_PORT}, pid: #{pid}."
       end
+
+    rescue Net::HTTPServerException #responding
+      puts "Port #{SOLR_PORT} in use" and return
+
+    rescue Errno::ECONNREFUSED #not responding
     end
   end
   
