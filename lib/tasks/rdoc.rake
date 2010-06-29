@@ -12,7 +12,7 @@ namespace :doc do
     rdoc.options << '--charset' << 'utf-8'
     rdoc.rdoc_files.include('doc/README_FOR_APP')
     rdoc.rdoc_files.include('doc/JERM')
-    rdoc.rdoc_files.include('doc/ARCHITECTURE')
+    #rdoc.rdoc_files.include('doc/ARCHITECTURE')
     rdoc.rdoc_files.include('doc/CREDITS')
     rdoc.rdoc_files.include('doc/INSTALL')
     #rdoc.rdoc_files.include('app/**/*.rb')
