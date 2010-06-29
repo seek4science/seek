@@ -110,7 +110,7 @@ module ApiHelper
     
     builder.tag! "dcterms:#{term}", value, attributes
   end
-    
+  
   def core_xml builder,object
     builder.tag! "id",object.id
     dc_core_xml builder,object
@@ -277,6 +277,22 @@ module ApiHelper
     end
     
     return nil
+  end
+  
+  def assay_data_relationships_xml builder,assay
+    relationships={}
+    assay.assay_assets.each do |aa|
+      if aa.relationship_type
+        relationships[aa.relationship_type.title] ||= []
+        relationships[aa.relationship_type.title] << aa.asset.resource
+      end
+    end
+    
+    builder.tag! "data_relationships" do
+      relationships.keys.each do |k|        
+        generic_list_xml(builder, relationships[k],"data_relationship",{:type=>k})                 
+      end
+    end
   end
   
 end
