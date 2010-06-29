@@ -51,9 +51,9 @@ Also specific versions of <em>fastercsv</em> and <em>libxml-ruby</em> are requir
 
 == Getting the source code
 
-Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. For a stable version, you should check out according to a stable tag. Our current tag is v0.8.1, so to retrieve this version you should use:
+Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. For a stable version, you should check out according to a stable tag. Our current tag is v0.8.2, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.8.1 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.8.2 sysmo-seek
 
 
 == The RAILS_ENV environment variable
