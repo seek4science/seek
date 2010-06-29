@@ -53,6 +53,16 @@ module ApiHelper
     return xlink
   end
   
+  #requires a slightly different handling to core_xlink because the route is nested
+  def avatar_xlink avatar
+    return {"xsi:nil"=>"true"} if avatar.nil?    
+    uri=uri_for_object(avatar.owner)
+    uri="#{uri}/avatars/#{avatar.id}"
+    xlink=xlink_attributes(uri,:resourceType => avatar.class.name)
+    xlink["id"]=avatar.id
+    return xlink
+  end
+  
   def xlink_attributes(resource_uri, *args)
     attribs = { }
     
@@ -168,7 +178,9 @@ module ApiHelper
     
     asset_xml builder,object.asset if object.respond_to?("asset")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
-    api_partial builder,object.project if object.respond_to?("project")    
+    api_partial builder,object.project if object.respond_to?("project")  
+    
+    builder.tag! "avatar",avatar_xlink(object.avatar) if object.respond_to?("avatar")
     
   end
   

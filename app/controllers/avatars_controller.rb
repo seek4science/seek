@@ -84,8 +84,7 @@ class AvatarsController < ApplicationController
       end
       
       # cache data
-      cache_data!(@avatar, @image_binary, size)
-      
+      cache_data!(@avatar, @image_binary, size)      
       send_data(@image_binary, :type => 'image/jpeg', :disposition => 'inline')
     end
   end

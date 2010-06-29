@@ -155,14 +155,18 @@ class ApplicationController < ActionController::Base
   end
 
   #Custom error pages
-  def render_500
-    @title="We're sorry, but something went wrong (500)"
-    render :template=>"errors/500", :layout=>"errors"
+  def render_500    
+    respond_to do |format|
+      format.html {render :template=>"errors/500", :layout=>"errors"}
+      format.xml { render :template=>"api/errors",:locals=>{:status=>"505",:message=>"Internal server error"}}
+    end    
   end
 
-  def render_404
-    @title="The page you were looking for doesn't exist (404)"
-    render :template=>"errors/404", :layout=>"errors"
+  def render_404        
+    respond_to do |format|
+      format.html {render :template=>"errors/404", :layout=>"errors"}
+      format.xml {render :template=>"api/errors",:locals=>{:status=>"404",:message=>"Resource not found"}}
+    end
   end
 
   def download_jerm_resource resource

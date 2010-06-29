@@ -9,7 +9,7 @@ core_xlink(person).merge(is_root ? xml_root_attributes : {}),
   
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>person}
   
-  if (is_root)        
+  if (is_root)                
     
     parent_xml.tag! "groups" do
       person.work_groups.each do |wg|        
@@ -30,7 +30,9 @@ core_xlink(person).merge(is_root ? xml_root_attributes : {}),
       end
     end
     
+    
     associated_resources_xml parent_xml,person
+    
   end
   
 end

@@ -24,6 +24,8 @@ class Project < ActiveRecord::Base
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   
   validates_associated :avatars
+  
+  belongs_to :avatar
 
   #TODO: refactor to remove :name entirely
   alias_attribute :title,:name
