@@ -2,7 +2,8 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-
+    
+  
   if ACTIVITY_LOG_ENABLED
     after_filter :log_event
   end
@@ -29,8 +30,9 @@ class ApplicationController < ActionController::Base
 
   def base_host
     request.host_with_port
-  end
-
+  end 
+  
+  
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
       render :json => object.to_s.camelize.constantize.find(:all).map(&method).to_json

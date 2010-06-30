@@ -11,9 +11,6 @@
 module Sysmo
   module Api        
     
-    #FIXME: needs setting correctly
-    SITE_BASE_HOST="http://localhost:3000"
-  
     def self.uri_for_path(path, *args)
       options = args.extract_options!
       # defaults:

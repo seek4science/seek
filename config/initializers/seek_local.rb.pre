@@ -21,3 +21,6 @@ MERGED_TAG_THRESHOLD=5
 
 #Enable managing of assay and technology types by "admins", "pals", "users" or "none"
 TYPE_MANAGERS = "admins"
+
+#this is needed for the xlinks in the REST API.
+#SITE_BASE_HOST="http://localhost:3000"

@@ -12,6 +12,9 @@ GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 TYPE_MANAGERS="admins" unless defined? TYPE_MANAGERS
 HIDE_DETAILS=false unless defined? HIDE_DETAILS
 
+#this is needed for the xlinks in the REST API.
+SITE_BASE_HOST="http://localhost:3000" unless defined? SITE_BASE_HOST
+
 # Set Google Analytics code
 if ENABLE_GOOGLE_ANALYTICS
   Rubaidh::GoogleAnalytics.tracker_id = GOOGLE_ANALYTICS_TRACKER_ID
