@@ -3,21 +3,20 @@ parent_xml.parameters do
 end
 @hidden ||= 0
 
-
 parent_xml.statistics do
   parent_xml.total items.size + @hidden
   parent_xml.total_displayed items.size
   parent_xml.hidden @hidden
   if items.respond_to?("pages")
-  parent_xml.pages items.pages.join(", ")
-  parent_xml.page items.page  
-  parent_xml.page_counts do
-    items.page_totals.keys.sort.each do |key|
-      parent_xml.page_count items.page_totals[key],{:page=>key}
-    end
-  end 
-end
-     
+    pages = items.pages + ["latest","all"]
+    parent_xml.pages pages.join(", ")
+    parent_xml.page items.page  
+    parent_xml.page_counts do
+      items.page_totals.keys.sort.each do |key|
+        parent_xml.page_count items.page_totals[key],{:page=>key}
+      end
+    end 
+  end
 end
 
 parent_xml.items do
@@ -27,5 +26,11 @@ parent_xml.items do
 end
 
 parent_xml.related do
+  if items.respond_to?("pages")
+    pages = items.pages + ["latest","all"]
+    pages.each do |page|
+      parent_xml.tag! "page", {"xlink:href"=>assays_url(:page=>page)}
+    end
+  end
   
 end

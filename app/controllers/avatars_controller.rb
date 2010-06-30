@@ -80,8 +80,7 @@ class AvatarsController < ApplicationController
       @avatar.operate do |image|
         image.resize size
         @image_binary = image.image.to_blob
-      end
-      
+      end      
       # cache data
       cache_data!(@avatar, @image_binary, size)            
     end
