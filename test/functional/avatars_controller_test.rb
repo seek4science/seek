@@ -4,14 +4,15 @@ class AvatarsControllerTest < ActionController::TestCase
   
   fixtures :people,:users,:avatars
 
-  include AuthenticatedTestHelper
+  include AuthenticatedTestHelper  
   
   def setup
-    login_as(:quentin)
+    login_as(:quentin)    
   end
 
   test "show new" do
     get :new, :person_id=>people(:quentin_person).id
     assert_response :success
-  end
+  end  
+  
 end

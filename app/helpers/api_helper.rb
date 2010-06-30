@@ -231,8 +231,7 @@ module ApiHelper
   
   def api_index_parameters builder,params
     builder.page params[:page]
-    builder.page_size params[:page_size]
-    
+    builder.page_size params[:page_size]    
   end
   
   def generic_list_xml builder,list,tag,attr={}

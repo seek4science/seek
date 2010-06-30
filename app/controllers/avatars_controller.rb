@@ -4,7 +4,7 @@ class AvatarsController < ApplicationController
   before_filter :check_owner_specified
   before_filter :find_avatars, :only => [ :index ]
   before_filter :find_avatar_auth, :only => [ :show, :select, :edit, :update, :destroy ]
-
+  
   cache_sweeper :avatars_sweeper,:only=>[:destroy,:select,:create]
   
   protect_from_forgery :except => [ :new ]
@@ -31,10 +31,10 @@ class AvatarsController < ApplicationController
     else
       file_specified = false
     end
-
+    
     respond_to do |format|
       if file_specified && @avatar.save        
-
+        
         # the last thing to check - if no avatar was selected for owner before (i.e. owner.avatar_id was NULL),
         # make the new avatar selected
         if @avatar.owner.avatar_id.nil?
@@ -46,7 +46,7 @@ class AvatarsController < ApplicationController
         # updated to take account of possibly various locations from where this method can be called,
         # so multiple redirect options are possible -> now return link is passed as a parameter
         format.html { redirect_to(params[:return_to] + "?use_unsaved_session_data=true") }
-
+        
       else
         # "create" action was already called once; render it again
         @avatar = Avatar.new
@@ -65,18 +65,17 @@ class AvatarsController < ApplicationController
   # GET /users/1/avatars/1
   # GET /avatars/1 -> denied by before_filter
   def show
+    params[:size] ||= "200x200"
     if params[:size] == "large"
       size = LARGE_SIZE
     else  
-      size = params[:size] || "200x200"
+      size = params[:size]
     end
     size = size[0..-($1.length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
     
     id = params[:id].to_i
     
-    if cache_exists?(id, size) # look in file system cache before attempting db access
-      send_file(full_cache_path(id, size), :type => 'image/jpeg', :disposition => 'inline')
-    else
+    if !cache_exists?(id, size) # look in file system cache before attempting db access      
       # resize (keeping image side ratio), encode and cache the picture
       @avatar.operate do |image|
         image.resize size
@@ -84,12 +83,22 @@ class AvatarsController < ApplicationController
       end
       
       # cache data
-      cache_data!(@avatar, @image_binary, size)      
-      send_data(@image_binary, :type => 'image/jpeg', :disposition => 'inline')
+      cache_data!(@avatar, @image_binary, size)            
     end
+    
+    respond_to do |format|
+      format.html do
+        send_file(full_cache_path(id, size), :type => 'image/jpeg', :disposition => 'inline')
+      end
+      format.xml do        
+        @cache_file=full_cache_path(id, size)
+        @type='image/jpeg'
+      end
+    end
+    
   end
   
-    
+  
   # GET /users/1/avatars
   # GET /avatars -> denied by before_filter
   def index
@@ -105,7 +114,7 @@ class AvatarsController < ApplicationController
     owner = @avatar.owner
     
     @avatar.destroy
-
+    
     respond_to do |format|
       format.html { redirect_to eval("#{owner.class.name.downcase}_avatars_url(#{owner.id})") }
     end
@@ -139,7 +148,7 @@ class AvatarsController < ApplicationController
   def determine_avatar_owner
     avatar_for = nil
     id = nil
-
+    
     if params[:person_id]
       avatar_for = "Person"
       id = params[:person_id]
@@ -218,7 +227,7 @@ class AvatarsController < ApplicationController
     # all avatars for current object are only shown to the owner of the object OR to any admin (if the object is not an admin themself);
     # also, show avatars to all members of a project/institution
     if current_user.is_admin? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) ||
-                             (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.people.include?(current_user))
+     (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.people.include?(current_user))
       @avatars = Avatar.find(:all, :conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id })
     else
       flash[:error] = "You can only view avatars that belong to you or any projects/institutions where you are a member of."
@@ -240,7 +249,7 @@ class AvatarsController < ApplicationController
   end
   
   def cache_path(avatar, size=nil, include_local_name=false)
-
+    
     id = avatar.kind_of?(Integer) ? avatar : avatar.id
     rtn = "#{RAILS_ROOT}/tmp/avatars"
     rtn = "#{rtn}/#{size}" if size
@@ -259,7 +268,7 @@ class AvatarsController < ApplicationController
   # that wasn't yet saved
   def store_unsaved_person_proj_inst_data_to_session
     data_hash = {}
-
+    
     return if params["#{@avatar_for.downcase}".to_sym].nil?
     
     # all types will have main part of information in the generic form
@@ -269,18 +278,18 @@ class AvatarsController < ApplicationController
     # collect any additional type-specific data from params
     case @avatar_for
       when "Person"
-        data_hash[:description] = params[:description]
-        data_hash[:tool] = params[:tool]
-        data_hash[:expertise] = params[:expertise]
-        data_hash[:can_edit_projects] = params[:can_edit_projects]
-        data_hash[:can_edit_institutions] = params[:can_edit_institutions]
-        
+      data_hash[:description] = params[:description]
+      data_hash[:tool] = params[:tool]
+      data_hash[:expertise] = params[:expertise]
+      data_hash[:can_edit_projects] = params[:can_edit_projects]
+      data_hash[:can_edit_institutions] = params[:can_edit_institutions]
+      
       when "Project"
-        data_hash[:organism] = params[:organism]
-        
+      data_hash[:organism] = params[:organism]
+      
       when "Institution"
-        # no specific data to store for institutions so far
-        
+      # no specific data to store for institutions so far
+      
     end
     
     # store all collected data to session
