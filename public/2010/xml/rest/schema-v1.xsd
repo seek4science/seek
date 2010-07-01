@@ -1,17 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema targetNamespace="http://www.sysmo-db.org/2010/xml/rest"
-	xml:lang="en" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://www.sysmo-db.org/2010/xml/rest"
-	elementFormDefault="qualified"
-	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
-	xmlns:dcterms="http://purl.org/dc/terms/">
+	xml:lang="en" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.sysmo-db.org/2010/xml/rest"
+	elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/">
 
-	<xsd:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="dc.xsd" />
-	<xsd:import namespace="http://purl.org/dc/terms/" schemaLocation="dcterms.xsd" />
-	<xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink.xsd" />
-	
-	
-    
+	<xsd:import namespace="http://purl.org/dc/elements/1.1/"
+		schemaLocation="dc.xsd" />
+	<xsd:import namespace="http://purl.org/dc/terms/"
+		schemaLocation="dcterms.xsd" />
+	<xsd:import namespace="http://www.w3.org/1999/xlink"
+		schemaLocation="xlink.xsd" />
+
+	<xsd:complexType name="ResourceLink">
+		<xsd:attribute ref="xlink:href" use="required"></xsd:attribute>
+		<xsd:attribute ref="xlink:title" use="optional"></xsd:attribute>
+		<xsd:attribute name="resourceType" type="ResourceType"
+			use="optional">
+		</xsd:attribute>
+		<xsd:attribute name="id" type="xsd:positiveInteger"></xsd:attribute>
+		<xsd:attribute name="uuid" type="xsd:string" use="optional"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="MinimalType">
+		<xsd:complexContent>
+			<xsd:extension base="ResourceLink">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:positiveInteger"
+						minOccurs="1" maxOccurs="1">
+					</xsd:element>
+					<xsd:element ref="dc:title" maxOccurs="1" minOccurs="1">
+					</xsd:element>
+					<xsd:element ref="dcterms:created" maxOccurs="1"
+						minOccurs="1">
+					</xsd:element>
+					<xsd:element ref="dcterms:modified" maxOccurs="1"
+						minOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="strain" type="Strain"></xsd:element>
+
+	<xsd:complexType name="Strain">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+				<xsd:element name="organisms"
+						type="Organisms" maxOccurs="1" minOccurs="0">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="organism" type="Organism"></xsd:element>
+	<xsd:element name="organisms" type="Organism"></xsd:element>
+
+	<xsd:complexType name="Organism">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Organisms">
+		<xsd:sequence>
+			<xsd:element name="organism" type="Organism" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:simpleType name="ResourceType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Strain"></xsd:enumeration>
+			<xsd:enumeration value="Strains"></xsd:enumeration>
+			<xsd:enumeration value="Organism"></xsd:enumeration>
+			<xsd:enumeration value="Organisms"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
 
 </xsd:schema>

@@ -41,14 +41,15 @@ module ApiHelper
   
   def core_xlink object,include_title=true
     if (object.class.name.include?("::Version"))
-      xlink=xlink_attributes(uri_for_object(object.parent,{:params=>{:version=>object.version}}),:resourceType => object.parent.class.name)
+      xlink=xlink_attributes(uri_for_object(object.parent,{:params=>{:version=>object.version}}))
     else
-      xlink=xlink_attributes(uri_for_object(object),:resourceType => object.class.name)  
+      xlink=xlink_attributes(uri_for_object(object))  
     end
     
     xlink["xlink:title"]=xlink_title(object) unless !include_title || display_name(object,false).nil?
     xlink["id"]=object.id
     xlink["uuid"]=object.uuid if object.respond_to?("uuid")
+    xlink["resourceType"] = object.class.name
     return xlink
   end
   
@@ -57,8 +58,9 @@ module ApiHelper
     return {"xsi:nil"=>"true"} if avatar.nil?    
     uri=uri_for_object(avatar.owner)
     uri="#{uri}/avatars/#{avatar.id}"
-    xlink=xlink_attributes(uri,:resourceType => avatar.class.name)
+    xlink=xlink_attributes(uri)
     xlink["id"]=avatar.id
+    xlink["resourceType"]=avatar.class.name
     return xlink
   end
   

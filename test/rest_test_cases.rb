@@ -5,7 +5,7 @@ require 'libxml'
 module RestTestCases
     
   
-  SCHEMA_FILE_PATH = File.join(File.dirname(__FILE__), '..', '..', '..', '..', 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
+  SCHEMA_FILE_PATH = File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
   
   def test_index_xml
     get :index, :format=>"xml"
@@ -47,14 +47,13 @@ module RestTestCases
     result = document.validate_schema(schema) do |message,flag|
       puts ""
       puts "#{(flag ? 'ERROR' : 'WARNING')}: #{message}"
-      puts ""
+      puts ""      
     end
     return result
   end
   
   def classes_to_validate
-    #["AssaysControllerTest"]
-    []
+    ["StrainsControllerTest"]    
   end
   
 end
