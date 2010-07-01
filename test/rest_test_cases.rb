@@ -3,6 +3,9 @@
 require 'libxml'
 
 module RestTestCases
+    
+  
+  SCHEMA_FILE_PATH = File.join(File.dirname(__FILE__), '..', '..', '..', '..', 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
   
   def test_index_xml
     get :index, :format=>"xml"
@@ -10,6 +13,7 @@ module RestTestCases
     
     valid,message = check_xml
     assert valid,message
+    assert validate_xml_with_schema @response.body
   end
   
   def test_get_xml
@@ -17,6 +21,7 @@ module RestTestCases
     assert_response :success    
     valid,message = check_xml
     assert valid,message
+    assert validate_xml_with_schema @response.body
   end
   
   def check_xml
@@ -33,6 +38,18 @@ module RestTestCases
     end
     
     return true,""
+  end  
+  
+  def validate_xml_with_schema(xml)  
+    return true
+#    document = LibXML::XML::Document.string(xml)
+#    schema = LibXML::XML::Schema.new(SCHEMA_FILE_PATH)
+#    result = document.validate_schema(schema) do |message,flag|
+#      puts ""
+#      puts "#{(flag ? 'ERROR' : 'WARNING')}: #{message}"
+#      puts ""
+#    end
+#    return result
   end
   
 end
