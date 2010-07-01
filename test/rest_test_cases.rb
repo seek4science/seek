@@ -40,16 +40,21 @@ module RestTestCases
     return true,""
   end  
   
-  def validate_xml_with_schema(xml)  
-    return true
-#    document = LibXML::XML::Document.string(xml)
-#    schema = LibXML::XML::Schema.new(SCHEMA_FILE_PATH)
-#    result = document.validate_schema(schema) do |message,flag|
-#      puts ""
-#      puts "#{(flag ? 'ERROR' : 'WARNING')}: #{message}"
-#      puts ""
-#    end
-#    return result
+  def validate_xml_with_schema(xml)       
+    return true unless classes_to_validate().include?(self.class.name)
+    document = LibXML::XML::Document.string(xml)
+    schema = LibXML::XML::Schema.new(SCHEMA_FILE_PATH)
+    result = document.validate_schema(schema) do |message,flag|
+      puts ""
+      puts "#{(flag ? 'ERROR' : 'WARNING')}: #{message}"
+      puts ""
+    end
+    return result
+  end
+  
+  def classes_to_validate
+    #["AssaysControllerTest"]
+    []
   end
   
 end
