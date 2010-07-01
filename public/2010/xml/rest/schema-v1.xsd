@@ -15,10 +15,34 @@
 		<xsd:attribute ref="xlink:href" use="required"></xsd:attribute>
 		<xsd:attribute ref="xlink:title" use="optional"></xsd:attribute>
 		<xsd:attribute name="resourceType" type="ResourceType"
-			use="optional">
-		</xsd:attribute>
+			use="required"></xsd:attribute>
 		<xsd:attribute name="id" type="xsd:positiveInteger"></xsd:attribute>
 		<xsd:attribute name="uuid" type="xsd:string" use="optional"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="IndexLinks">
+		<xsd:attribute ref="xlink:href" use="required"></xsd:attribute>
+		<xsd:attribute ref="xlink:title" use="optional"></xsd:attribute>
+		<xsd:attribute name="resourceType" type="ResourceType"
+			use="required"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="MinimalIndex">
+		<xsd:complexContent>
+			<xsd:extension base="IndexLinks">
+				<xsd:all>
+					<xsd:element name="parameters" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1"></xsd:element>
+					<xsd:element name="statistics" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1"></xsd:element>
+					<xsd:element name="items" type="xsd:anyType" minOccurs="0"
+						maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1"></xsd:element>
+				</xsd:all>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<xsd:complexType name="MinimalType">
@@ -42,15 +66,23 @@
 	</xsd:complexType>
 
 	<xsd:element name="strain" type="Strain"></xsd:element>
+	<xsd:element name="strains" type="Strains"></xsd:element>
 
 	<xsd:complexType name="Strain">
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
-				<xsd:element name="organisms"
-						type="Organisms" maxOccurs="1" minOccurs="0">
+					<xsd:element name="organisms" type="Organisms"
+						maxOccurs="1" minOccurs="0">
 					</xsd:element>
 				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Strains">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -67,7 +99,8 @@
 
 	<xsd:complexType name="Organisms">
 		<xsd:sequence>
-			<xsd:element name="organism" type="Organism" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+			<xsd:element name="organism" type="Organism" maxOccurs="unbounded"
+				minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
