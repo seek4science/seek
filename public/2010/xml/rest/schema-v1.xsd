@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.sysmo-db.org/2010/xml/rest"
+	xml:lang="en" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://www.sysmo-db.org/2010/xml/rest"
+	elementFormDefault="qualified"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcterms="http://purl.org/dc/terms/">
+
+	<xsd:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="dc.xsd" />
+	<xsd:import namespace="http://purl.org/dc/terms/" schemaLocation="dcterms.xsd" />
+	<xsd:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink.xsd" />
+	
+	
+    
+
+</xsd:schema>
