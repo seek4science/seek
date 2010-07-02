@@ -63,7 +63,7 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
-					<xsd:element name="organisms" type="Organisms"
+					<xsd:element name="organisms" type="OrganismItems"
 						maxOccurs="1" minOccurs="0">
 					</xsd:element>
 				</xsd:sequence>
@@ -97,7 +97,6 @@
 	</xsd:complexType>
 
 	<xsd:element name="organism" type="Organism"></xsd:element>
-	<xsd:element name="organisms" type="Organism"></xsd:element>
 
 	<xsd:complexType name="Organism">
 		<xsd:complexContent>
@@ -106,7 +105,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="Organisms">
+	<xsd:complexType name="OrganismItems">
 		<xsd:sequence>
 			<xsd:element name="organism" type="Organism" maxOccurs="unbounded"
 				minOccurs="0"></xsd:element>
