@@ -81,15 +81,32 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	
+	<xsd:complexType name="Parameters">
+		<xsd:sequence>
+			<xsd:element name="page" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>			
+		</xsd:sequence>
+	</xsd:complexType>
+
+    <xsd:complexType name="Statistics">
+    	<xsd:sequence>
+    		<xsd:element name="total" type="xsd:nonNegativeInteger" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element name="total_displayed" type="xsd:nonNegativeInteger" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element name="hidden" type="xsd:nonNegativeInteger" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element name="pages" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element name="page" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element name="page_counts" type="xsd:anyType" minOccurs="1" maxOccurs="1"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
 
 	<xsd:complexType name="Institutions">
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
 				<xsd:sequence>
-					<xsd:element name="parameters" type="xsd:anyType"
+					<xsd:element name="parameters" type="Parameters"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
-					<xsd:element name="statistics" type="xsd:anyType"
+					<xsd:element name="statistics" type="Statistics"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
 					<xsd:element name="items" type="InstitutionItems"
@@ -101,6 +118,7 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	
 
 	<xsd:complexType name="InstitutionItems">
 		<xsd:sequence>
@@ -148,10 +166,10 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
 				<xsd:sequence>
-					<xsd:element name="parameters" type="xsd:anyType"
+					<xsd:element name="parameters" type="Parameters"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
-					<xsd:element name="statistics" type="xsd:anyType"
+					<xsd:element name="statistics" type="Statistics"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
 					<xsd:element name="items" type="ProjectItems"
@@ -217,10 +235,10 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
 				<xsd:sequence>
-					<xsd:element name="parameters" type="xsd:anyType"
+					<xsd:element name="parameters" type="Parameters"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
-					<xsd:element name="statistics" type="xsd:anyType"
+					<xsd:element name="statistics" type="Statistics"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
 					<xsd:element name="items" type="PersonItems" maxOccurs="1"
@@ -318,10 +336,10 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
 				<xsd:sequence>
-					<xsd:element name="parameters" type="xsd:anyType"
+					<xsd:element name="parameters" type="Parameters"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
-					<xsd:element name="statistics" type="xsd:anyType"
+					<xsd:element name="statistics" type="Statistics"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
 					<xsd:element name="items" type="StrainItems" maxOccurs="1"
@@ -338,10 +356,10 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
 				<xsd:sequence>
-					<xsd:element name="parameters" type="xsd:anyType"
+					<xsd:element name="parameters" type="Parameters"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
-					<xsd:element name="statistics" type="xsd:anyType"
+					<xsd:element name="statistics" type="Statistics"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
 					<xsd:element name="items" type="OrganismItems"
