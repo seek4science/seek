@@ -58,6 +58,67 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
+	<xsd:element name="project" type="Project"></xsd:element>
+	<xsd:element name="projects" type="Projects"></xsd:element>
+
+	<xsd:complexType name="Project">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+					<xsd:element name="uuid" type="xsd:string" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+				    <xsd:element name="organisms" type="OrganismItems"
+						maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="webpage" type="xsd:string"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="internal_webpage" type="xsd:string"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="avatars" type="Avatars" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="associated" type="AssociatedItems" minOccurs="1" maxOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Projects">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="ProjectItems"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="ProjectItems">
+		<xsd:sequence>
+			<xsd:element name="project" type="ProjectItem" maxOccurs="unbounded"
+				minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ProjectItem">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
+						maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
 	<xsd:element name="person" type="Person"></xsd:element>
 	<xsd:element name="people" type="People"></xsd:element>
 
@@ -282,8 +343,8 @@
     	<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
-					<xsd:element name="strains" type="StrainItems"></xsd:element>
-					<xsd:element name="associated" type="AssociatedItems"></xsd:element>
+					<xsd:element name="strains" type="StrainItems" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="associated" type="AssociatedItems" minOccurs="1" maxOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
