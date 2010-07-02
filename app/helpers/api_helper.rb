@@ -167,12 +167,12 @@ module ApiHelper
     
     builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
     builder.tag! "version",object.version if object.respond_to?("version")
-    builder.tag! "latest_version",object.latest_version.version,core_xlink(object.latest_version) if object.respond_to?("latest_version")           
+    builder.tag! "latest_version",core_xlink(object.latest_version) if object.respond_to?("latest_version")           
     builder.tag! "revision_comments",object.revision_comments if object.respond_to?("revision_comments")
     if (object.respond_to?("versions"))
       builder.tag! "versions" do
         object.versions.each do |v|
-          builder.tag! "version",v.version,core_xlink(v)
+          builder.tag! "version",core_xlink(v)
         end
       end
     end    
@@ -192,14 +192,14 @@ module ApiHelper
   
   def asset_xml builder,asset,include_core=true,include_resource=true
     builder.tag! "asset",
-    xlink_attributes(uri_for_object(asset),:resourceType => "Asset") do
+    core_xlink(asset) do
       core_xml builder,asset if include_core
       resource_xml builder,asset.resource if (include_resource)                   
     end    
   end
   
   def resource_xml builder,resource 
-    builder.tag! "resource",resource.title,core_xlink(resource)
+    builder.tag! "resource",core_xlink(resource)
   end
   
   def blob_xml builder,blob
@@ -273,10 +273,10 @@ module ApiHelper
   def dc_core_xml builder,object
     submitter = determine_submitter object
     dc_xml_tag builder,:title,object.title if object.respond_to?("title")
-    dc_xml_tag builder,:description,object.description if object.respond_to?("description")
-    dc_xml_tag builder,:creator,submitter.name if submitter
+    dc_xml_tag builder,:description,object.description if object.respond_to?("description")    
     dcterms_xml_tag builder,:created,object.created_at if object.respond_to?("created_at")
-    dcterms_xml_tag builder,:modified,object.updated_at if object.respond_to?("updated_at")    
+    dcterms_xml_tag builder,:modified,object.updated_at if object.respond_to?("updated_at")
+    dc_xml_tag builder,:creator,submitter.name if submitter
   end
   
   def determine_submitter object
