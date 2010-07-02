@@ -225,7 +225,7 @@ module ApiHelper
           attr[:total]=attr[:total]+associated[key][:hidden_count]
           attr[:hidden_count]=associated[key][:hidden_count]
         end
-        generic_list_xml(builder, associated[key][:items],key.downcase.pluralize,attr)        
+        generic_list_xml(builder, associated[key][:items],key.underscore.pluralize,attr)        
       end
     end    
   end    
@@ -243,8 +243,7 @@ module ApiHelper
           builder.tag! parent.class.name.underscore,core_xlink(item)
         else
           builder.tag! item.class.name.underscore,core_xlink(item)  
-        end
-        
+        end        
       end
     end
   end
