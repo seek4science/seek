@@ -677,7 +677,7 @@
    <xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
 			<xsd:sequence>
-				<xsd:element name="models" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				<xsd:element name="model" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
 			</xsd:sequence>
 			</xsd:extension>
 			</xsd:complexContent>
