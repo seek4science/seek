@@ -90,6 +90,26 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	
+	<xsd:complexType name="Organisms">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="OrganismItems" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 
 	<xsd:complexType name="StrainItems">
 		<xsd:sequence>
@@ -99,6 +119,7 @@
 	</xsd:complexType>
 
 	<xsd:element name="organism" type="Organism"></xsd:element>
+	<xsd:element name="organisms" type="Organisms"></xsd:element>
 
 
 	<xsd:complexType name="OrganismItems">
