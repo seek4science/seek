@@ -41,8 +41,7 @@ module RestTestCases
   end  
   
   def validate_xml_with_schema(xml)       
-    return true unless classes_to_validate().include?(self.class.name)
-    puts xml
+    return true unless classes_to_validate().include?(self.class.name)    
     document = LibXML::XML::Document.string(xml)
     schema = LibXML::XML::Schema.new(SCHEMA_FILE_PATH)
     result = document.validate_schema(schema) do |message,flag|
@@ -54,7 +53,7 @@ module RestTestCases
   end
   
   def classes_to_validate
-    ["StrainsControllerTest","OrganismsControllerTest","PeopleControllerTest","ProjectsControllerTest"]    
+    ["StrainsControllerTest","OrganismsControllerTest","PeopleControllerTest"]    
   end
   
 end

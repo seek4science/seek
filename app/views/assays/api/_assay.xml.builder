@@ -1,8 +1,7 @@
 is_root = false unless local_assigns.has_key?(:is_root)
 
 parent_xml.tag! "assay",
-core_xlink(assay).merge(is_root ? xml_root_attributes : {}),
-                :resourceType => "Assay" do
+core_xlink(assay).merge(is_root ? xml_root_attributes : {}) do
   
   render :partial=>"api/standard_elements",:locals=>{:parent_xml => parent_xml,:is_root=>is_root,:object=>assay}
   parent_xml.tag! "assay_class",core_xlink(assay.assay_class)

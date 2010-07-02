@@ -351,12 +351,7 @@
 		</xsd:complexContent>
     </xsd:complexType>
     
-    <xsd:complexType name="AssociatedItems">
-    <xsd:complexContent>
-			<xsd:extension base="xsd:anyType">
-			</xsd:extension>
-			</xsd:complexContent>
-    <!-- 
+    <xsd:complexType name="AssociatedItems">    
     	<xsd:all>
     		<xsd:element name="studies" type="xsd:anyType"></xsd:element>
     		<xsd:element name="publications" type="xsd:anyType"></xsd:element>
@@ -369,7 +364,7 @@
     		<xsd:element name="investigations" type="xsd:anyType"></xsd:element>
     		<xsd:element name="institutions" type="xsd:anyType"></xsd:element>
     	</xsd:all>
-     -->
+    
     </xsd:complexType>
     
 </xsd:schema>
