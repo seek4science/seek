@@ -35,7 +35,6 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-
 	<xsd:complexType name="MinimalType">
 		<xsd:complexContent>
 			<xsd:extension base="ResourceLink">
@@ -45,12 +44,89 @@
 					</xsd:element>
 					<xsd:element ref="dc:title" maxOccurs="1" minOccurs="1">
 					</xsd:element>
+					<xsd:element ref="dc:description" maxOccurs="1"
+						minOccurs="0">
+					</xsd:element>
 					<xsd:element ref="dcterms:created" maxOccurs="1"
 						minOccurs="1">
 					</xsd:element>
 					<xsd:element ref="dcterms:modified" maxOccurs="1"
 						minOccurs="1">
 					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="person" type="Person"></xsd:element>
+	
+	<xsd:complexType name="Person">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+					<xsd:element name="uuid" type="xsd:string" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="email" type="xsd:string" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="webpage" type="xsd:string"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="phone" type="xsd:string" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="avatars" type="Avatars" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="first_name" type="xsd:string"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="last_name" type="xsd:string"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="groups" type="Groups" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="tags" type="Tags" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="associated" type="AssociatedItems"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Tags">
+		<xsd:sequence>
+			<xsd:element name="tag" type="Tag" minOccurs="0"
+				maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+  <xsd:complexType name="Tag">
+  <xsd:simpleContent>
+    <xsd:extension base="xsd:string">
+      <xsd:attribute name="context" type="xsd:string" use="required"></xsd:attribute>
+    </xsd:extension>
+  </xsd:simpleContent>
+</xsd:complexType>
+
+	
+
+	<xsd:complexType name="Avatars">
+		<xsd:sequence>
+			<xsd:element name="avatar" type="ResourceLink" minOccurs="0"
+				maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Groups">
+		<xsd:sequence>
+			<xsd:element name="group" type="Group" minOccurs="0"
+				maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Group">
+		<xsd:complexContent>
+			<xsd:extension base="ResourceLink">
+				<xsd:sequence>
+					<xsd:element name="project" type="ResourceLink"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="institution" type="ResourceLink"
+						maxOccurs="1" minOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -90,7 +166,7 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	
+
 	<xsd:complexType name="Organisms">
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
@@ -101,8 +177,8 @@
 					<xsd:element name="statistics" type="xsd:anyType"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
-					<xsd:element name="items" type="OrganismItems" maxOccurs="1"
-						minOccurs="1"></xsd:element>
+					<xsd:element name="items" type="OrganismItems"
+						maxOccurs="1" minOccurs="1"></xsd:element>
 					<xsd:element name="related" type="xsd:anyType"
 						minOccurs="0" maxOccurs="1">
 					</xsd:element>
@@ -131,10 +207,30 @@
 
 	<xsd:simpleType name="ResourceType">
 		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Avatar"></xsd:enumeration>
 			<xsd:enumeration value="Strain"></xsd:enumeration>
 			<xsd:enumeration value="Strains"></xsd:enumeration>
 			<xsd:enumeration value="Organism"></xsd:enumeration>
 			<xsd:enumeration value="Organisms"></xsd:enumeration>
+			<xsd:enumeration value="Person"></xsd:enumeration>
+			<xsd:enumeration value="People"></xsd:enumeration>
+			<xsd:enumeration value="Project"></xsd:enumeration>
+			<xsd:enumeration value="Projects"></xsd:enumeration>
+			<xsd:enumeration value="Institution"></xsd:enumeration>
+			<xsd:enumeration value="Institutions"></xsd:enumeration>
+			<xsd:enumeration value="Model"></xsd:enumeration>
+			<xsd:enumeration value="Models"></xsd:enumeration>
+			<xsd:enumeration value="Sop"></xsd:enumeration>
+			<xsd:enumeration value="Sops"></xsd:enumeration>
+			<xsd:enumeration value="DataFile"></xsd:enumeration>
+			<xsd:enumeration value="DataFiles"></xsd:enumeration>
+			<xsd:enumeration value="Assay"></xsd:enumeration>
+			<xsd:enumeration value="Assays"></xsd:enumeration>
+			<xsd:enumeration value="Study"></xsd:enumeration>
+			<xsd:enumeration value="Studies"></xsd:enumeration>
+			<xsd:enumeration value="Investigation"></xsd:enumeration>
+			<xsd:enumeration value="Investigations"></xsd:enumeration>
+			<xsd:enumeration value="WorkGroup"></xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
 

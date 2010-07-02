@@ -181,7 +181,12 @@ module ApiHelper
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
     api_partial builder,object.project if object.respond_to?("project")  
     
-    builder.tag! "avatar",avatar_xlink(object.avatar) if object.respond_to?("avatar")
+    if object.respond_to?("avatar")
+      builder.tag! "avatars" do
+        builder.tag! "avatar",avatar_xlink(object.avatar) unless object.avatar.nil?
+      end      
+    end
+     
     
   end
   

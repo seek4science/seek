@@ -53,7 +53,7 @@ module RestTestCases
   end
   
   def classes_to_validate
-    ["StrainsControllerTest","OrganismsControllerTest"]    
+    ["StrainsControllerTest","OrganismsControllerTest","PeopleControllerTest"]    
   end
   
 end
