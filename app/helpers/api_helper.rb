@@ -41,14 +41,15 @@ module ApiHelper
   
   def core_xlink object,include_title=true
     if (object.class.name.include?("::Version"))
-      xlink=xlink_attributes(uri_for_object(object.parent,{:params=>{:version=>object.version}}),:resourceType => object.parent.class.name)
+      xlink=xlink_attributes(uri_for_object(object.parent,{:params=>{:version=>object.version}}))
     else
-      xlink=xlink_attributes(uri_for_object(object),:resourceType => object.class.name)  
+      xlink=xlink_attributes(uri_for_object(object))  
     end
     
     xlink["xlink:title"]=xlink_title(object) unless !include_title || display_name(object,false).nil?
     xlink["id"]=object.id
     xlink["uuid"]=object.uuid if object.respond_to?("uuid")
+    xlink["resourceType"] = object.class.name
     return xlink
   end
   
@@ -57,8 +58,9 @@ module ApiHelper
     return {"xsi:nil"=>"true"} if avatar.nil?    
     uri=uri_for_object(avatar.owner)
     uri="#{uri}/avatars/#{avatar.id}"
-    xlink=xlink_attributes(uri,:resourceType => avatar.class.name)
+    xlink=xlink_attributes(uri)
     xlink["id"]=avatar.id
+    xlink["resourceType"]=avatar.class.name
     return xlink
   end
   
@@ -165,12 +167,12 @@ module ApiHelper
     
     builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
     builder.tag! "version",object.version if object.respond_to?("version")
-    builder.tag! "latest_version",object.latest_version.version,core_xlink(object.latest_version) if object.respond_to?("latest_version")           
+    builder.tag! "latest_version",core_xlink(object.latest_version) if object.respond_to?("latest_version")           
     builder.tag! "revision_comments",object.revision_comments if object.respond_to?("revision_comments")
     if (object.respond_to?("versions"))
       builder.tag! "versions" do
         object.versions.each do |v|
-          builder.tag! "version",v.version,core_xlink(v)
+          builder.tag! "version",core_xlink(v)
         end
       end
     end    
@@ -179,20 +181,25 @@ module ApiHelper
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
     api_partial builder,object.project if object.respond_to?("project")  
     
-    builder.tag! "avatar",avatar_xlink(object.avatar) if object.respond_to?("avatar")
+    if object.respond_to?("avatar")
+      builder.tag! "avatars" do
+        builder.tag! "avatar",avatar_xlink(object.avatar) unless object.avatar.nil?
+      end      
+    end
+     
     
   end
   
   def asset_xml builder,asset,include_core=true,include_resource=true
     builder.tag! "asset",
-    xlink_attributes(uri_for_object(asset),:resourceType => "Asset") do
+    core_xlink(asset) do
       core_xml builder,asset if include_core
       resource_xml builder,asset.resource if (include_resource)                   
     end    
   end
   
   def resource_xml builder,resource 
-    builder.tag! "resource",resource.title,core_xlink(resource)
+    builder.tag! "resource",core_xlink(resource)
   end
   
   def blob_xml builder,blob
@@ -223,15 +230,11 @@ module ApiHelper
           attr[:total]=attr[:total]+associated[key][:hidden_count]
           attr[:hidden_count]=associated[key][:hidden_count]
         end
-        generic_list_xml(builder, associated[key][:items],key.downcase.pluralize,attr)        
+        generic_list_xml(builder, associated[key][:items],key.underscore.pluralize,attr)        
       end
     end    
   end    
-  
-  def api_index_parameters builder,params
-    builder.page params[:page]
-    builder.page_size params[:page_size]    
-  end
+    
   
   def generic_list_xml builder,list,tag,attr={}
     builder.tag! tag,attr do 
@@ -241,8 +244,7 @@ module ApiHelper
           builder.tag! parent.class.name.underscore,core_xlink(item)
         else
           builder.tag! item.class.name.underscore,core_xlink(item)  
-        end
-        
+        end        
       end
     end
   end
@@ -271,10 +273,10 @@ module ApiHelper
   def dc_core_xml builder,object
     submitter = determine_submitter object
     dc_xml_tag builder,:title,object.title if object.respond_to?("title")
-    dc_xml_tag builder,:description,object.description if object.respond_to?("description")
-    dc_xml_tag builder,:creator,submitter.name if submitter
+    dc_xml_tag builder,:description,object.description if object.respond_to?("description")    
     dcterms_xml_tag builder,:created,object.created_at if object.respond_to?("created_at")
-    dcterms_xml_tag builder,:modified,object.updated_at if object.respond_to?("updated_at")    
+    dcterms_xml_tag builder,:modified,object.updated_at if object.respond_to?("updated_at")
+    dc_xml_tag builder,:creator,submitter.name if submitter
   end
   
   def determine_submitter object

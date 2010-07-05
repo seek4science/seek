@@ -1,5 +1,5 @@
 parent_xml.parameters do
-  api_index_parameters parent_xml,params
+  parent_xml.page params[:page]
 end
 @hidden ||= 0
 
