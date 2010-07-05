@@ -114,7 +114,12 @@
           <% end %>
       </div>
       <% end %>
+	  
+	  <%= embedded_isa_svg(@assay) -%>
+	  
     </div>
+		
+	
     <div class="main_content_right_box">
       <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @assay, :creators => [@assay.owner]} -%>
     </div>

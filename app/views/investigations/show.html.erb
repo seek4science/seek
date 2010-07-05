@@ -27,6 +27,7 @@
     </p>
     <br/>
     
+	<%= embedded_isa_svg(@investigation) -%>
 	
     <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @investigation %>
 </div>

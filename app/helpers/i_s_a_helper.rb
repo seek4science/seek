@@ -4,6 +4,8 @@ module ISAHelper
   
   NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete an assay that has Data or SOPs associated with it.",Study=>"You cannot delete a Study that has Assays associated with it.",Investigation=>"You cannot delete an Investigation that has Studies associated with it."}
   
+  include DotGenerator
+  
   def delete_ISA_icon model_item, user
     item_name = model_item.class.name
     item_name = "Analysis" if (model_item.kind_of?(Assay) && model_item.is_modelling?)
@@ -19,4 +21,9 @@ module ISAHelper
     text=NO_DELETE_EXPLANTIONS[model_item.class] || "You are unable to delete this #{model_item.class.name}"
     return text
   end
+  
+  def embedded_isa_svg item,deep=false
+    "<center><script type=\'image/svg+xml'>#{to_svg(item,deep)}</script></center>"
+  end
+  
 end
