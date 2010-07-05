@@ -54,10 +54,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]    
   end
   
-  test "should expose spreadsheet contents" do
-    get :data, :id => data_files(:viewable_data_file)
-    assert_response :success
-  end
+#  test "should expose spreadsheet contents" do
+#    get :data, :id => data_files(:viewable_data_file)
+#    assert_response :success
+#  end
   
   test "shouldn't expose spreadsheet contents for non-spreadsheet file" do
     get :data, :id => data_files(:picture)
