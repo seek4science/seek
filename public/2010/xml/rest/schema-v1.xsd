@@ -58,8 +58,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:element name="sops" type="Sops"></xsd:element>
-	<xsd:element name="sop" type="Sop"></xsd:element>
+	
 
 	<xsd:complexType name="AssetType">
 		<xsd:complexContent>
@@ -141,6 +140,60 @@
 		</xsd:sequence>
 	</xsd:complexType>
 
+	
+
+	<xsd:complexType name="AssetItem">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+					<xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
+						maxOccurs="1" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:element name="data_files" type="DataFiles"></xsd:element>
+	<xsd:element name="data_file" type="DataFile"></xsd:element>
+
+	<xsd:complexType name="DataFile">
+		<xsd:complexContent>
+			<xsd:extension base="AssetType">
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="DataFiles">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="Parameters"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="PagedStatistics"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="DataFileItems" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	
+	<xsd:complexType name="DataFileItems">
+		<xsd:sequence>
+			<xsd:element name="data_file" type="AssetItem" maxOccurs="unbounded"
+				minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:element name="sops" type="Sops"></xsd:element>
+	<xsd:element name="sop" type="Sop"></xsd:element>
+	
 	<xsd:complexType name="Sop">
 		<xsd:complexContent>
 			<xsd:extension base="AssetType">
@@ -174,18 +227,7 @@
 				minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-
-	<xsd:complexType name="AssetItem">
-		<xsd:complexContent>
-			<xsd:extension base="MinimalType">
-				<xsd:sequence>
-					<xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
-						maxOccurs="1" />
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
+	
 
 	<xsd:element name="institution" type="Institution"></xsd:element>
 	<xsd:element name="institutions" type="Institutions"></xsd:element>
