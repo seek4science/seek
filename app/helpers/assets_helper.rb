@@ -29,7 +29,7 @@ module AssetsHelper
     when "DataFile","Model","Sop"
       image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))))
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-    when "Investigation","Study"
+    when "Investigation","Study","Publication"
       image = image "#{resource.class.name.downcase}_avatar",{}
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
     when "Assay"

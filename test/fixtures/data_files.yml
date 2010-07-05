@@ -76,4 +76,14 @@ data_file_with_no_contributor:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  
+viewable_data_file:
+  contributor: datafile_owner (User)
+  title: Can Only Be Viewed
+  description: Viewing only!
+  original_filename: file_pictuer.png
+  content_blob: spreadsheet_blob
+  content_type: application/vnd.ms-excel
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
 

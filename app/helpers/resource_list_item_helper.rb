@@ -48,9 +48,9 @@ module ResourceListItemHelper
         icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
         html << "#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
       when "Person"
-        html << "#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}"
+        html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
       else
-        html << "#{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
+        html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
     end
     html << "</div>"
     return html

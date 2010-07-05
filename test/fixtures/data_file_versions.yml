@@ -74,3 +74,14 @@ data_file_with_links_in_description_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: data_file_with_links_in_description
   version: 1
+
+viewable_data_file_v1:
+  contributor: datafile_owner (User)
+  title: Can Only Be Viewed
+  description: Viewing only!
+  original_filename: file_pictuer.png
+  content_blob: spreadsheet_blob
+  content_type: application/vnd.ms-excel
+  last_used_at: 2009-04-03 11:09:18
+  data_file: viewable_data_file
+  version: 1

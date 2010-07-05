@@ -858,6 +858,7 @@ ul.related_asset_list li{
 .contribution_title_image {
     float: left;
     margin-left: 1em;
+    margin-right: 0.5em;
     margin-top: 0.5em;
     padding :5px 5px 3px 3px;
     border:1px solid #CCCCCC;
