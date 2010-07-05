@@ -11,6 +11,7 @@ MERGED_TAG_THRESHOLD=5 unless defined? MERGED_TAG_THRESHOLD
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 TYPE_MANAGERS="admins" unless defined? TYPE_MANAGERS
 HIDE_DETAILS=false unless defined? HIDE_DETAILS
+SPREADSHEET_PARSING_ENABLED=false unless defined? SPREADSHEET_PARSING_ENABLED
 
 #this is needed for the xlinks in the REST API.
 SITE_BASE_HOST="http://localhost:3000" unless defined? SITE_BASE_HOST

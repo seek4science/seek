@@ -42,6 +42,36 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should download" do
+    get :download, :id => data_files(:viewable_data_file)
+    assert_response :success
+  end
+  
+  test "shouldn't download" do
+    login_as(:aaron)
+    get :download, :id => data_files(:viewable_data_file)
+    assert_redirected_to data_files_path
+    assert flash[:error]    
+  end
+  
+  test "should expose spreadsheet contents" do
+    get :data, :id => data_files(:viewable_data_file)
+    assert_response :success
+  end
+  
+  test "shouldn't expose spreadsheet contents for non-spreadsheet file" do
+    get :data, :id => data_files(:picture)
+    assert_redirected_to data_file_path(data_files(:picture))
+    assert flash[:error]    
+  end
+  
+  test "shouldn't expose spreadsheet contents if not authorized" do
+    login_as(:aaron)
+    get :data, :id => data_files(:viewable_data_file)
+    assert_redirected_to data_files_path
+    assert flash[:error]    
+  end
+
   test "show should now allow factors studied edited for downloadable file" do
     login_as(:aaron)
     d = data_files(:downloadable_data_file)

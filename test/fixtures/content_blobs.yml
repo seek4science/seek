@@ -27,3 +27,7 @@ teusink_blob:
 picture_blob:
   data_old: <%= load_blob_data('file_picture.png') %>
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
+  
+spreadsheet_blob:
+  data_old: <%= load_blob_data('spreadsheet.xls') %>
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>

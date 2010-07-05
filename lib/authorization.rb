@@ -340,7 +340,7 @@ module Authorization
       action = 'view'
     when 'edit', 'new', 'create', 'update', 'new_version', 'create_version', 'destroy_version', 'edit_version', 'update_version', 'new_item', 'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link'
       action = 'edit'
-    when 'download', 'named_download', 'launch', 'submit_job'
+    when 'download', 'named_download', 'launch', 'submit_job', 'data'
       action = 'download'
     when 'destroy', 'destroy_item', 'manage'
       action = 'destroy'

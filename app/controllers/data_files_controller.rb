@@ -1,3 +1,5 @@
+require 'spreadsheet_parser'
+
 class DataFilesController < ApplicationController
 
   include IndexPager
@@ -5,7 +7,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
 
   before_filter :find_data_files, :only => [ :index ]
-  before_filter :find_data_file_auth, :except => [ :index, :new, :create ]
+  before_filter :find_data_file_auth, :except => [ :index, :new, :create]
   before_filter :find_display_data_file, :only=>[:show,:download]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]  
@@ -200,6 +202,28 @@ class DataFilesController < ApplicationController
     end
   end 
 
+  def data
+    @data_file =  DataFile.find(params[:id])
+    type = nil
+    if @data_file.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      type = "xlsx"
+    elsif @data_file.content_type == "application/vnd.ms-excel"
+      type = "xls"
+    end
+    unless type.nil?
+      filename = "/tmp/temp_ss_#{@data_file.object_id}.#{type}"
+      File.open(filename, 'w') {|f| f.write(@data_file.content_blob.data)}
+      @workbook = Workbook.new("file://" + filename, type)   
+      respond_to do |format|
+        format.xml
+      end
+    else
+     respond_to do |format|
+        flash[:error] = "Unable to view contents of this data file"
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
   protected
   
   def find_data_files

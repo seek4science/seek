@@ -149,3 +149,13 @@ policy_for_test_with_projects_institutions:
   use_blacklist: false
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
+  
+policy_for_viewable_data_file:  
+  name: "auto"
+  sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
+  access_type: <%= Policy::VIEWING %>
+  use_custom_sharing: false
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
