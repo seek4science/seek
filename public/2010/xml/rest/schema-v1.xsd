@@ -206,8 +206,26 @@
 
 	<xsd:complexType name="Publication">
 		<xsd:complexContent>
-			<xsd:extension base="AssetType">
+			<xsd:extension base="MinimalType">
 				<xsd:sequence>
+					<xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+					<xsd:element name="submitter" type="Submitter"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="organisms" type="OrganismItems"
+						minOccurs="0" maxOccurs="1"></xsd:element>
+					<xsd:element name="creators" type="Creators" minOccurs="1"
+						maxOccurs="1"></xsd:element>					
+					<xsd:element name="asset" type="Asset" minOccurs="1"
+						maxOccurs="1"></xsd:element>					
+					<xsd:element name="project" type="ProjectItem"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="doi" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"></xsd:element>
+					<xsd:element name="pubmed_id" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"></xsd:element>
+					<xsd:element name="abstract" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="journal" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="published_date" type="xsd:date" minOccurs="1" maxOccurs="1"></xsd:element>
 					<xsd:element name="associated" type="AssociatedItems"
 						minOccurs="1" maxOccurs="1"></xsd:element>
 				</xsd:sequence>
