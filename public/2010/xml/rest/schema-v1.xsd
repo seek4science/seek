@@ -558,6 +558,88 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	
+	<xsd:element name="assay_types" type="AssayTypes"></xsd:element>
+	<xsd:element name="assay_type" type="AssayType"></xsd:element>
+	
+	<xsd:complexType name="AssayType">
+    	<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+					<xsd:element name="parents" type="AssayTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="children" type="AssayTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+    </xsd:complexType>	
+	
+	<xsd:complexType name="AssayTypes">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="Parameters"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="Statistics"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="AssayTypeItems"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssayTypeItems">
+		<xsd:sequence>
+			<xsd:element name="assay_type" type="MinimalType"
+				maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:element name="technology_types" type="TechnologyTypes"></xsd:element>
+	<xsd:element name="technology_type" type="TechnologyType"></xsd:element>
+	
+	<xsd:complexType name="TechnologyType">
+    	<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+					<xsd:element name="parents" type="TechnologyTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="children" type="TechnologyTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+    </xsd:complexType>	
+	
+	<xsd:complexType name="TechnologyTypes">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="Parameters"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="Statistics"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="TechnologyTypeItems"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="TechnologyTypeItems">
+		<xsd:sequence>
+			<xsd:element name="technology_type" type="MinimalType"
+				maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<xsd:element name="strain" type="Strain"></xsd:element>
 	<xsd:element name="strains" type="Strains"></xsd:element>
@@ -594,6 +676,16 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
+	<xsd:complexType name="StrainItems">
+		<xsd:sequence>
+			<xsd:element name="strain" type="MinimalType" maxOccurs="unbounded"
+				minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:element name="organism" type="Organism"></xsd:element>
+	<xsd:element name="organisms" type="Organisms"></xsd:element>
+
 	<xsd:complexType name="Organisms">
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
@@ -614,23 +706,23 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="StrainItems">
-		<xsd:sequence>
-			<xsd:element name="strain" type="MinimalType" maxOccurs="unbounded"
-				minOccurs="0"></xsd:element>
-		</xsd:sequence>
-	</xsd:complexType>
-
-	<xsd:element name="organism" type="Organism"></xsd:element>
-	<xsd:element name="organisms" type="Organisms"></xsd:element>
-
-
 	<xsd:complexType name="OrganismItems">
 		<xsd:sequence>
 			<xsd:element name="organism" type="MinimalType"
 				maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+	
+	<xsd:complexType name="Organism">
+    	<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+					<xsd:element name="strains" type="StrainItems" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="associated" type="AssociatedItems" minOccurs="1" maxOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+    </xsd:complexType>
 
 	<xsd:simpleType name="ResourceType">
 		<xsd:restriction base="xsd:string">
@@ -664,21 +756,14 @@
 			<xsd:enumeration value="WorkGroup"></xsd:enumeration>
 			<xsd:enumeration value="Publication"></xsd:enumeration>
 			<xsd:enumeration value="Publications"></xsd:enumeration>
-			<xsd:enumeration value="ContentBlob"></xsd:enumeration>
+			<xsd:enumeration value="ContentBlob"></xsd:enumeration>			
+			<xsd:enumeration value="AssayType"></xsd:enumeration>
+			<xsd:enumeration value="AssayTypes"></xsd:enumeration>
+			<xsd:enumeration value="TechnologyType"></xsd:enumeration>
+			<xsd:enumeration value="TechnologyTypes"></xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
-
-
-    <xsd:complexType name="Organism">
-    	<xsd:complexContent>
-			<xsd:extension base="MinimalType">
-				<xsd:sequence>
-					<xsd:element name="strains" type="StrainItems" minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="associated" type="AssociatedItems" minOccurs="1" maxOccurs="1"></xsd:element>
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
-    </xsd:complexType>
+    
     
     <xsd:complexType name="AssociatedItems">    
     	<xsd:sequence>
