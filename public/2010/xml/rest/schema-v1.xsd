@@ -200,6 +200,47 @@
 				minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
+	
+	<xsd:element name="publications" type="Publications"></xsd:element>
+	<xsd:element name="publication" type="Publication"></xsd:element>
+
+	<xsd:complexType name="Publication">
+		<xsd:complexContent>
+			<xsd:extension base="AssetType">
+				<xsd:sequence>
+					<xsd:element name="associated" type="AssociatedItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Publications">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="Parameters"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="PagedStatistics"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="PublicationItems"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="PublicationItems">
+		<xsd:sequence>
+			<xsd:element name="publication" type="AssetItem" maxOccurs="unbounded"
+				minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 
 	<xsd:element name="data_files" type="DataFiles"></xsd:element>
 	<xsd:element name="data_file" type="DataFile"></xsd:element>
