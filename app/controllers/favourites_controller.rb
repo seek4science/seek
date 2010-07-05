@@ -26,6 +26,8 @@ class FavouritesController < ApplicationController
       end
     else
       render :update, :status=>:unprocessable_entity do |page|
+              puts "======================================" + resource.id.to_s
+      puts f.errors.size
         page.visual_effect :highlight, "drop_favourites", :startcolor=>"#FF0000"
       end
     end

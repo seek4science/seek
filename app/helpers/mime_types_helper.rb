@@ -6,6 +6,7 @@ module MimeTypesHelper
     "application/pdf" => {:name => "PDF file", :icon_key => "pdf_file"},
     "application/vnd.ms-excel" => {:name => "Spreadsheet", :icon_key => "xls_file"},
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => {:name => "DocX document", :icon_key => "doc_file"},
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => {:name => "XLSX Spreadsheet", :icon_key => "xls_file"},
     "application/vnd.ms-powerpoint" => {:name => "PowerPoint presentation", :icon_key => "ppt_file"},
     "application/zip" => {:name => "Zip file", :icon_key => "zip_file"},
     "image/gif" => {:name => "GIF image", :icon_key => "gif_file"},
