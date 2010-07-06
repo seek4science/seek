@@ -178,7 +178,7 @@
 						maxOccurs="1" minOccurs="1" nillable="true"></xsd:element>
 					<xsd:element name="assay_organisms" type="AssayOrganisms"
 						minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="data_relationships" type="xsd:anyType"
+					<xsd:element name="data_relationships" type="DataRelationships"
 						minOccurs="0" maxOccurs="1"></xsd:element>
 					<xsd:element name="associated" type="AssociatedItems"
 						minOccurs="1" maxOccurs="1"></xsd:element>
@@ -186,22 +186,38 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	
-	<xsd:complexType name="AssayOrganisms">
+
+	<xsd:complexType name="DataRelationships">
 		<xsd:sequence>
-			<xsd:element name="assay_organism" type="AssayOrganism" maxOccurs="unbounded"
-				minOccurs="0"></xsd:element>
+			<xsd:element name="data_relationship" type="DataRelationship"
+				maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-	
+
+	<xsd:complexType name="DataRelationship">
+		<xsd:sequence>
+			<xsd:element name="data_file" type="ResourceLink"
+				maxOccurs="1" minOccurs="1">
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="type" type="xsd:string" use="required"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssayOrganisms">
+		<xsd:sequence>
+			<xsd:element name="assay_organism" type="AssayOrganism"
+				maxOccurs="unbounded" minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
 	<xsd:complexType name="AssayOrganism">
 		<xsd:sequence>
-			<xsd:element name="organism" type="MinimalType" maxOccurs="1"
-				minOccurs="1"></xsd:element>		
+			<xsd:element name="organism" type="MinimalType"
+				maxOccurs="1" minOccurs="1"></xsd:element>
 			<xsd:element name="strain" type="MinimalType" maxOccurs="1"
-				minOccurs="0"></xsd:element>		
-			<xsd:element name="culture_growth" type="ResourceLink" maxOccurs="1"
 				minOccurs="0"></xsd:element>
+			<xsd:element name="culture_growth" type="ResourceLink"
+				maxOccurs="1" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -688,8 +704,6 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 
-
-
 	<xsd:complexType name="Avatars">
 		<xsd:sequence>
 			<xsd:element name="avatar" type="ResourceLink" minOccurs="0"
@@ -928,7 +942,7 @@
 			<xsd:enumeration value="AssayClass"></xsd:enumeration>
 			<xsd:enumeration value="AssayType"></xsd:enumeration>
 			<xsd:enumeration value="TechnologyType"></xsd:enumeration>
-			<xsd:enumeration value="CultureGrowthType"></xsd:enumeration>			
+			<xsd:enumeration value="CultureGrowthType"></xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
 

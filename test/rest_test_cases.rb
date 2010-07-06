@@ -22,9 +22,9 @@ module RestTestCases
     assert_response :success    
     valid,message = check_xml
     assert valid,message
-    
-    display_xml @response.body
-    assert validate_xml_with_schema @response.body
+    schema_happy = validate_xml_with_schema @response.body
+    display_xml @response.body unless schema_happy
+    assert schema_happy, "Failed to validate against schema"
   end
   
   def check_xml
