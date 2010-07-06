@@ -83,7 +83,7 @@ module DotGenerator
     dot << "rankdir = LR;"    
     dot << "splines = line;"
     dot << "node [fontsize=9,fontname=\"Helvetica\"];"    
-    dot << "bgcolor=white;" 
+    dot << "bgcolor=transparent;" 
     dot << "edge [arrowsize=0.6];\n" 
     return dot
   end
