@@ -1,6 +1,7 @@
 #mixin to automate testing of Rest services per controller test
 
 require 'libxml'
+require 'pp'
 
 module RestTestCases
     
@@ -21,6 +22,8 @@ module RestTestCases
     assert_response :success    
     valid,message = check_xml
     assert valid,message
+    
+    display_xml @response.body
     assert validate_xml_with_schema @response.body
   end
   
@@ -55,6 +58,14 @@ module RestTestCases
   
   def classes_to_validate
     ["StrainsControllerTest","OrganismsControllerTest","PeopleControllerTest","InstitutionsControllerTest","ProjectsControllerTest","SopsControllerTest","DataFilesControllerTest","ModelsControllerTest","AssayTypesControllerTest","TechnologyTypesControllerTest","PublicationsControllerTest","AssaysControllerTest"]    
+  end
+  
+  def display_xml xml
+    x=1
+    xml.split("\n").each do |line|
+      puts "#{x} #{line}"
+      x=x+1
+    end
   end
   
 end

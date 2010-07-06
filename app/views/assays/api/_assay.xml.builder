@@ -19,7 +19,7 @@ core_xlink(assay).merge(is_root ? xml_root_attributes : {}) do
         parent_xml.tag! "assay_organism" do
           api_partial parent_xml,ao.organism
           api_partial parent_xml,ao.strain if ao.strain
-          parent_xml.tag! "culture_growth",ao.culture_growth_type.title,core_xlink(ao.culture_growth_type) if ao.culture_growth_type          
+          parent_xml.tag! "culture_growth",core_xlink(ao.culture_growth_type) if ao.culture_growth_type          
         end      
       end      
     end
