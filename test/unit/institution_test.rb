@@ -9,9 +9,7 @@ class InstitutionTest < ActiveSupport::TestCase
     
     i=Institution.find(1)
     
-    
     assert_equal 1,i.work_groups.size
-    assert_equal 2,i.work_groups.size
 
     i.work_groups.first.people=[]
     i.destroy
