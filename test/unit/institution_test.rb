@@ -11,6 +11,8 @@ class InstitutionTest < ActiveSupport::TestCase
     
     
     assert_equal 1,i.work_groups.size
+    assert_equal 2,i.work_groups.size
+
     i.work_groups.first.people=[]
     i.destroy
     assert_equal (n_inst-1),Institution.find(:all).size
