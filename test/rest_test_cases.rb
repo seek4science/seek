@@ -14,44 +14,37 @@ module RestTestCases
     
     valid,message = check_xml
     assert valid,message
-    assert validate_xml_with_schema @response.body
+    validate_xml_against_schema(@response.body)
   end
   
   def test_get_xml
-    get :show,:id=>@object.id, :format=>"xml"    
+    get :show,:id=>@object, :format=>"xml"    
     assert_response :success    
     valid,message = check_xml
-    assert valid,message
-    schema_happy = validate_xml_with_schema @response.body
-    display_xml @response.body unless schema_happy
-    assert schema_happy, "Failed to validate against schema"
+    assert valid,message        
+    validate_xml_against_schema(@response.body)
   end
   
   def check_xml
     assert_equal 'application/xml', @response.content_type
     xml=@response.body
     return false,"XML is nil" if xml.nil?
-    begin
-      parser = LibXML::XML::Parser.string(xml,:encoding => LibXML::XML::Encoding::UTF_8)
-      doc = parser.parse
-      
-      return false,"Could not find dcterms:created, which should be in all xml. Check its not using the old XML format" if doc.find("//dcterms:created","dcterms:http://purl.org/dc/terms/").empty?
-    rescue LibXML::XML::Error=>e
-      return false,"XML parse error: #{e.message}"
-    end
     
-    return true,""
-    
+    return true,""    
   end  
   
-  def validate_xml_with_schema(xml)       
+  def validate_xml_against_schema(xml)       
     document = LibXML::XML::Document.string(xml)
-    schema = LibXML::XML::Schema.new(SCHEMA_FILE_PATH)    
-    result = document.validate_schema(schema) do |message,flag|
-      puts ""
-      puts "#{(flag ? 'ERROR' : 'WARNING')}: #{message}"
-      puts ""      
+    schema = LibXML::XML::Schema.new(SCHEMA_FILE_PATH)
+    result = true
+    begin
+      document.validate_schema(schema)
+    rescue LibXML::XML::Error => e
+      result = false      
+      display_xml xml
+      assert false,"Error validating against schema: #{e.message}"
     end
+  
     return result
   end
   

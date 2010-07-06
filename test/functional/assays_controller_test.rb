@@ -18,6 +18,13 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assays)
   end
   
+  test "modelling assay schema" do
+    a=assays(:modelling_assay_with_data_and_relationship)
+    get :show, :id=>a, :format=>"xml"
+    assert_response :success    
+    validate_xml_against_schema(@response.body)
+  end
+  
   test "should update timestamp when associating sop" do
     login_as(:model_owner)
     assay=assays(:metabolomics_assay)
