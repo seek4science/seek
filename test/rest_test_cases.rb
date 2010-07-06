@@ -54,7 +54,7 @@ module RestTestCases
   end
   
   def classes_to_validate
-    ["StrainsControllerTest","OrganismsControllerTest","PeopleControllerTest","InstitutionsControllerTest","ProjectsControllerTest","SopsControllerTest","DataFilesControllerTest","ModelsControllerTest","AssayTypesControllerTest","TechnologyTypesControllerTest","PublicationsControllerTest"]    
+    ["StrainsControllerTest","OrganismsControllerTest","PeopleControllerTest","InstitutionsControllerTest","ProjectsControllerTest","SopsControllerTest","DataFilesControllerTest","ModelsControllerTest","AssayTypesControllerTest","TechnologyTypesControllerTest","PublicationsControllerTest","AssaysControllerTest"]    
   end
   
 end

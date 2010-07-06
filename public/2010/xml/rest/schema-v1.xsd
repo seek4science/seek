@@ -154,6 +154,61 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
+	<xsd:element name="assays" type="Assays"></xsd:element>
+	<xsd:element name="assay" type="Assay"></xsd:element>
+
+	<xsd:complexType name="Assay">
+		<xsd:complexContent>
+			<xsd:extension base="AssetType">
+				<xsd:sequence>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Assays">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="Parameters"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="PagedStatistics"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="AssayItems" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssayItems">
+		<xsd:sequence>
+			<xsd:element name="assay" type="AssayItem" maxOccurs="unbounded"
+				minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssayItem">
+		<xsd:complexContent>
+			<xsd:extension base="AssetItem">
+				<xsd:sequence>
+					<xsd:element name="assay_class" type="ResourceLink"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="assay_type" type="ResourceLink"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="technology_type" type="ResourceLink"
+						maxOccurs="1" minOccurs="1" nillable="true"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
 	<xsd:element name="models" type="Models"></xsd:element>
 	<xsd:element name="model" type="Model"></xsd:element>
 
@@ -200,7 +255,7 @@
 				minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-	
+
 	<xsd:element name="publications" type="Publications"></xsd:element>
 	<xsd:element name="publication" type="Publication"></xsd:element>
 
@@ -216,16 +271,21 @@
 					<xsd:element name="organisms" type="OrganismItems"
 						minOccurs="0" maxOccurs="1"></xsd:element>
 					<xsd:element name="creators" type="Creators" minOccurs="1"
-						maxOccurs="1"></xsd:element>					
+						maxOccurs="1"></xsd:element>
 					<xsd:element name="asset" type="Asset" minOccurs="1"
-						maxOccurs="1"></xsd:element>					
+						maxOccurs="1"></xsd:element>
 					<xsd:element name="project" type="ProjectItem"
 						minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="doi" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"></xsd:element>
-					<xsd:element name="pubmed_id" type="xsd:string" minOccurs="1" maxOccurs="1" nillable="true"></xsd:element>
-					<xsd:element name="abstract" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="journal" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="published_date" type="xsd:date" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="doi" type="xsd:string" minOccurs="1"
+						maxOccurs="1" nillable="true"></xsd:element>
+					<xsd:element name="pubmed_id" type="xsd:string"
+						minOccurs="1" maxOccurs="1" nillable="true"></xsd:element>
+					<xsd:element name="abstract" type="xsd:string"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="journal" type="xsd:string"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="published_date" type="xsd:date"
+						minOccurs="1" maxOccurs="1"></xsd:element>
 					<xsd:element name="associated" type="AssociatedItems"
 						minOccurs="1" maxOccurs="1"></xsd:element>
 				</xsd:sequence>
@@ -255,8 +315,8 @@
 
 	<xsd:complexType name="PublicationItems">
 		<xsd:sequence>
-			<xsd:element name="publication" type="AssetItem" maxOccurs="unbounded"
-				minOccurs="0"></xsd:element>
+			<xsd:element name="publication" type="AssetItem"
+				maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -617,21 +677,23 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	
+
 	<xsd:element name="assay_types" type="AssayTypes"></xsd:element>
 	<xsd:element name="assay_type" type="AssayType"></xsd:element>
-	
+
 	<xsd:complexType name="AssayType">
-    	<xsd:complexContent>
+		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
-					<xsd:element name="parents" type="AssayTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="children" type="AssayTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="parents" type="AssayTypeItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="children" type="AssayTypeItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
-    </xsd:complexType>	
-	
+	</xsd:complexType>
+
 	<xsd:complexType name="AssayTypes">
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
@@ -658,21 +720,23 @@
 				maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-	
+
 	<xsd:element name="technology_types" type="TechnologyTypes"></xsd:element>
 	<xsd:element name="technology_type" type="TechnologyType"></xsd:element>
-	
+
 	<xsd:complexType name="TechnologyType">
-    	<xsd:complexContent>
+		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
-					<xsd:element name="parents" type="TechnologyTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="children" type="TechnologyTypeItems" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="parents" type="TechnologyTypeItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="children" type="TechnologyTypeItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
-    </xsd:complexType>	
-	
+	</xsd:complexType>
+
 	<xsd:complexType name="TechnologyTypes">
 		<xsd:complexContent>
 			<xsd:extension base="MinimalIndex">
@@ -741,7 +805,7 @@
 				minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-	
+
 	<xsd:element name="organism" type="Organism"></xsd:element>
 	<xsd:element name="organisms" type="Organisms"></xsd:element>
 
@@ -771,17 +835,19 @@
 				maxOccurs="unbounded" minOccurs="0"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-	
+
 	<xsd:complexType name="Organism">
-    	<xsd:complexContent>
+		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
-					<xsd:element name="strains" type="StrainItems" minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="associated" type="AssociatedItems" minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="strains" type="StrainItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+					<xsd:element name="associated" type="AssociatedItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
-    </xsd:complexType>
+	</xsd:complexType>
 
 	<xsd:simpleType name="ResourceType">
 		<xsd:restriction base="xsd:string">
@@ -815,134 +881,150 @@
 			<xsd:enumeration value="WorkGroup"></xsd:enumeration>
 			<xsd:enumeration value="Publication"></xsd:enumeration>
 			<xsd:enumeration value="Publications"></xsd:enumeration>
-			<xsd:enumeration value="ContentBlob"></xsd:enumeration>			
+			<xsd:enumeration value="ContentBlob"></xsd:enumeration>
 			<xsd:enumeration value="AssayType"></xsd:enumeration>
 			<xsd:enumeration value="AssayTypes"></xsd:enumeration>
 			<xsd:enumeration value="TechnologyType"></xsd:enumeration>
 			<xsd:enumeration value="TechnologyTypes"></xsd:enumeration>
+			<xsd:enumeration value="AssayClass"></xsd:enumeration>
+			<xsd:enumeration value="AssayType"></xsd:enumeration>
+			<xsd:enumeration value="TechnologyType"></xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
-    
-    
-    <xsd:complexType name="AssociatedItems">    
-    	<xsd:sequence>
-    		<xsd:element name="studies" type="AssociatedStudies" minOccurs="0" maxOccurs="1"></xsd:element>
-    		<xsd:element name="publications" type="AssociatedPublications"></xsd:element>
-    		<xsd:element name="people" type="AssociatedPeople"></xsd:element>
-    		<xsd:element name="models" type="AssociatedModels"></xsd:element>
-    		<xsd:element name="investigations" type="AssociatedInvestigations"></xsd:element>
-    		<xsd:element name="institutions" type="AssociatedInstitutions"></xsd:element>
-    		<xsd:element name="assays" type="AssociatedAssays"></xsd:element>
-    		<xsd:element name="projects" type="AssociatedProjects"></xsd:element>
-    		<xsd:element name="data_files" type="AssociatedDataFiles"></xsd:element>
-    		<xsd:element name="sops" type="AssociatedSops"></xsd:element>
-    	</xsd:sequence>    
-    </xsd:complexType>
-    
-    <xsd:complexType name="AssociatedLinks">
-   <xsd:attribute name="total" type="xsd:nonNegativeInteger" use="required"></xsd:attribute>
-   <xsd:attribute name="hidden_count" type="xsd:nonNegativeInteger" use="required"></xsd:attribute>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedStudies">
-   <xsd:complexContent>
+
+
+	<xsd:complexType name="AssociatedItems">
+		<xsd:sequence>
+			<xsd:element name="studies" type="AssociatedStudies"
+				minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="publications" type="AssociatedPublications"></xsd:element>
+			<xsd:element name="people" type="AssociatedPeople"></xsd:element>
+			<xsd:element name="models" type="AssociatedModels"></xsd:element>
+			<xsd:element name="investigations" type="AssociatedInvestigations"></xsd:element>
+			<xsd:element name="institutions" type="AssociatedInstitutions"></xsd:element>
+			<xsd:element name="assays" type="AssociatedAssays"></xsd:element>
+			<xsd:element name="projects" type="AssociatedProjects"></xsd:element>
+			<xsd:element name="data_files" type="AssociatedDataFiles"></xsd:element>
+			<xsd:element name="sops" type="AssociatedSops"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedLinks">
+		<xsd:attribute name="total" type="xsd:nonNegativeInteger"
+			use="required"></xsd:attribute>
+		<xsd:attribute name="hidden_count" type="xsd:nonNegativeInteger"
+			use="required"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedStudies">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="study" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="study" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedPublications">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedPublications">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="publication" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="publication" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedProjects">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedProjects">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="project" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="project" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedPeople">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedPeople">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="person" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="person" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedInstitutions">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedInstitutions">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="institution" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="institution" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedSops">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedSops">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="sop" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="sop" type="ResourceLink" minOccurs="0"
+						maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedDataFiles">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedDataFiles">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="data_file" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="data_file" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedModels">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedModels">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="model" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="model" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedInvestigations">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedInvestigations">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="investigation" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="investigation" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   <xsd:complexType name="AssociatedAssays">
-   <xsd:complexContent>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="AssociatedAssays">
+		<xsd:complexContent>
 			<xsd:extension base="AssociatedLinks">
-			<xsd:sequence>
-				<xsd:element name="assay" type="ResourceLink" minOccurs="0" maxOccurs="unbounded"></xsd:element>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="assay" type="ResourceLink"
+						minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
 			</xsd:extension>
-			</xsd:complexContent>
-   </xsd:complexType>
-   
-   
+		</xsd:complexContent>
+	</xsd:complexType>
+
+
 </xsd:schema>
