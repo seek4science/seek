@@ -155,6 +155,7 @@ module AssetsHelper
       related["Project"][:items] = resource.projects || []
       related["Institution"][:items] = resource.institutions || []
       related["Study"][:items] = resource.studies || []
+      related["Assay"][:items] = resource.assays || []
       related["Publication"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:publications], true, current_user)
       related["Publication"][:hidden_count] = assets_hash[:publications].size - (related["Publication"][:items] || []).size
 
