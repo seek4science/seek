@@ -439,6 +439,62 @@ namespace :seek do
     end
   end
   
+  desc "Record asset state of old db style"
+  task :record_old_asset_state => :environment do
+    File.open("assay_asset_old.txt", "w") do |file|
+      Assay.all.each do |assay|
+        file.write("Assay ##{assay.id} - #{assay.title}\n")
+        assay.assay_assets.each do |aa|
+          res = aa.asset.resource.find_version(aa.version)
+          file.write("  AssayAsset #{aa.id} - #{res.class.name} #{res.id} (#{res.version})\n")
+        end
+      end
+    end
+  end 
+  
+  desc "Record asset state of new db style"
+  task :record_new_asset_state => :environment do
+    File.open("assay_asset_new.txt", "w") do |file|
+      Assay.all.each do |assay|
+        file.write("Assay ##{assay.id} - #{assay.title}\n")
+        assay.assay_assets.each do |aa|
+          res = aa.asset
+          file.write("  AssayAsset #{aa.id} - #{res.class.name} #{res.id} (#{res.version})\n")
+        end
+      end
+    end
+  end
+  
+  desc "Record asset creator state of old db style"
+  task :record_old_asset_state => :environment do
+    File.open("asset_creator_old.txt", "w") do |file|
+      classes = [DataFile, Model, Sop, Publication]
+      classes.each do |c|
+        c.all.each do |resource|        
+          file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
+          resource.asset.creators.each do |p|
+            file.write("  Person #{p.id} - #{p.name})\n")
+          end
+        end
+      end
+    end
+  end 
+  
+  desc "Record asset creator state of new db style"
+  task :record_new_asset_state => :environment do
+    File.open("asset_creator_new.txt", "w") do |file|
+      classes = [DataFile, Model, Sop, Publication]
+      classes.each do |c|
+        c.all.each do |resource|        
+          file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
+          resource.creators.each do |p|
+            file.write("  Person #{p.id} - #{p.name})\n")
+          end
+        end
+      end
+    end
+  end 
+  
   private
   
   #returns true if the tag is over 30 chars long, or contains colons, semicolons, comma's or forward slash
