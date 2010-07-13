@@ -13,7 +13,7 @@ select_truncate_length=120;
     selection_box.options.length=0;
 
     if (checked) {
-<% ([["Select Data file ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
+<% ([["Select Data file ...",0]]|all_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
         option = document.createElement("OPTION");
         option.text = '<%= escape_javascript(df_details[0]) -%>';
         option.value = '<%= df_details[1] -%>';
@@ -26,7 +26,7 @@ select_truncate_length=120;
 <% end -%>
     }
     else {
-<% ([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}).each do |df_details| -%>
+<% ([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
         option = document.createElement("OPTION");
         option.text = '<%= escape_javascript(df_details[0]) -%>';
         option.value = '<%= df_details[1] -%>';
@@ -58,9 +58,9 @@ select_truncate_length=120;
     <%= label_tag :data_files %><br/>
 
     <%= select_tag :possible_data_files,
-      options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.asset.id]}),
+      options_for_select([["Select Data file ...",0]]|project_data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
       {:style=>"width:90%",:onchange=>remote_function(
-        :url=>{:action=>"asset_preview_ajax",:controller=>"assets",:element=>"data_file_preview"},
+        :url=>{:action=>"preview",:controller=>"data_files",:element=>"data_file_preview"},
         :with=>"'id='+this.value",
         :before=>"show_ajax_loader('data_file_preview')"
       )+";check_show_add_data_file();return(false);"
@@ -85,23 +85,23 @@ select_truncate_length=120;
 <script type="text/javascript">
 
 <% @assay.data_files.each do |data_file| -%>    
-  <% if Authorization.is_authorized?("show",nil,data_file.asset,current_user) -%>
-      asset_id = '<%= data_file.asset.id -%>';
+  <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
+      data_file_id = '<%= data_file.id -%>';
       data_title = '<%= escape_javascript(data_file.title) -%>';
       relationship_type = '<%= escape_javascript(data_file.relationship_type(@assay).try(:title) || "None") -%>';
-      addDataFile(data_title,asset_id,relationship_type);
+      addDataFile(data_title,data_file_id,relationship_type);
   <% end -%>
 <% end -%>
 
 <% if params[:assay_data_file_asset_ids] %>
   <% params[:assay_data_file_asset_ids].each do |id_and_rel_id| -%>
     <% a_id, r_type = id_and_rel_id.split(",") %>
-    <% asset = Asset.find(a_id) %>
-    <% if Authorization.is_authorized?("show",nil,asset,current_user) -%>
-        asset_id = '<%= a_id -%>';
-        data_title = '<%= escape_javascript(asset.resource.title) -%>';
+    <% data_file = DataFile.find(a_id) %>
+    <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
+        data_file_id = '<%= a_id -%>';
+        data_title = '<%= escape_javascript(data_file.title) -%>';
         relationship_type = '<%= r_type -%>';
-        addDataFile(data_title, asset_id, relationship_type);
+        addDataFile(data_title, data_file_id, relationship_type);
     <% end -%>
   <% end -%>
 <% end -%>

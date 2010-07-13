@@ -25,7 +25,7 @@ module ModelsHelper
   end
   
   def authorised_models
-    models=Model.find(:all,:include=>:asset)
+    models=Model.find(:all)
     Authorization.authorize_collection("show",models,current_user)
   end    
 

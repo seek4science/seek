@@ -19,33 +19,27 @@ module Mib
         def acts_as_resource
           belongs_to :contributor, :polymorphic => true
           
-          has_one :asset, 
-            :as => :resource,
-            :dependent => :destroy
-          
           has_many :attributions, 
             :class_name => 'Relationship',
             :as => :subject,
             :conditions => { :predicate => Relationship::ATTRIBUTED_TO },
             :dependent => :destroy
 
-          has_one :project, :through=>:asset
+          belongs_to :project
           
+          belongs_to :policy 
 
-          # a virtual attribute to keep the associated project_id temporary
-          # (until it's saved into the corresponding asset in the after_save callback)
-          attr_accessor :project_id                    
-                  
-          after_save :save_asset_record          
-          
+          has_many :assay_assets, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
+          has_many :assays, :through => :assay_assets
+  
+          has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
+          has_many :creators, :class_name => "Person" , :through => :assets_creators
+
           class_eval do
             extend Mib::Acts::Resource::SingletonMethods
           end
           include Mib::Acts::Resource::InstanceMethods
           
-          before_create do |res|
-            res.asset = Asset.new(:resource => res)
-          end
         end
       end
       
@@ -57,43 +51,6 @@ module Mib
         # to which the current resource is attributed
         def attributions_objects
           self.attributions.collect { |a| a.object }
-        end
-        
-        def creators
-          asset.creators
-        end
-
-        
-        
-        # this method will save the resource, but will not cause 'updated_at' field to receive new value of Time.now
-        def save_without_timestamping
-          class << self
-            def record_timestamps; false; end
-          end
-    
-          save
-    
-          class << self
-            remove_method :record_timestamps
-          end
-        end
-
-
-
-        # the owner of the asset record for this resource
-        def owner?(c_utor)
-          contribution.owner?(c_utor)
-        end
-        
-        # check if c_utor is the last contributor to edit metadata for this resource
-        def last_editor?(c_utor)
-          case self.contributor_type
-          when "User"
-            return (self.contributor_id == c_utor.id && self.contributor_type == c_utor.class.name)
-          else
-            # unknown type of contributor - definitely not the owner 
-            return false
-          end
         end
 
         def can_edit? user
@@ -134,28 +91,16 @@ module Mib
         #which will be the contributor, and those that have manage permissions
         def managers
           people=[]
-          people << self.asset.contributor.person unless self.asset.contributor.nil?
-          self.asset.policy.permissions.each do |perm|
+          people << self.contributor.person unless self.contributor.nil?
+          self.policy.permissions.each do |perm|
             people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
           end
           return people.uniq
         end
-
-        private
-
-        # This is so that the updated_at time on the parent Asset record is in sync with the
-        # one in the resource record (this will also update the "last_used_at" date for the same reason)
-        def save_asset_record
-          if(parent_asset = self.asset)
-            parent_asset.project_id = self.project_id unless self.project_id.nil?
-            parent_asset.updated_at = self.updated_at
-            parent_asset.last_used_at = self.last_used_at
-            parent_asset.save_without_timestamping
-          else
-            logger.error("CRITICAL ERROR: 'asset' object is missing for a resource: (#{self.class.name}, #{self.id}")
-          end
-        end
-
+        
+        def asset; return self; end        
+        def resource; return self; end
+          
       end
     end
   end

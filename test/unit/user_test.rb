@@ -137,22 +137,19 @@ class UserTest < ActiveSupport::TestCase
 
   def test_get_assets
     user=users(:owner_of_my_first_sop)
-    assert_not_nil user.assets
-    assert user.assets.size>0
-    assert user.assets.include?(assets(:asset_of_my_first_sop))
-    assert !user.assets.include?(assets(:asset_of_a_sop_with_fully_public_policy))
+    assert user.sops.size>0
+    assert user.sops.include?(sops(:my_first_sop))
+    assert !user.sops.include?(sops(:sop_with_fully_public_policy))
 
     user=users(:model_owner)
-    assert_not_nil user.assets
-    assert user.assets.size>0
-    assert user.assets.include?(assets(:asset_for_model))
-    assert !user.assets.include?(assets(:asset_for_model_with_different_owner))
+    assert user.models.size>0
+    assert user.models.include?(models(:teusink))
+    assert !user.models.include?(models(:model_with_different_owner))
 
     user=users(:datafile_owner)
-    assert_not_nil user.assets
-    assert user.assets.size>0
-    assert user.assets.include?(assets(:asset_for_datafile))
-    assert !user.assets.include?(assets(:asset_for_sysmo_data_file))
+    assert user.data_files.size>0
+    assert user.data_files.include?(data_files(:picture))
+    assert !user.data_files.include?(data_files(:sysmo_data_file))
 
   end
 

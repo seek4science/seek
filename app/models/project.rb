@@ -37,8 +37,10 @@ class Project < ActiveRecord::Base
   has_many :investigations
   has_many :studies, :through=>:investigations  
 
-  # can't destroy the assets, because these might be valuable even in the absence of the parent project
-  has_many :assets, :dependent => :nullify
+  has_many :data_files
+  has_many :models
+  has_many :sops
+  has_many :publications
   
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
@@ -156,10 +158,6 @@ class Project < ActiveRecord::Base
     rescue
       
     end
-  end
-  
-  def publications
-    assets.collect{|a| a.resource if a.resource_type == "Publication"}.compact
   end
   
   def person_roles(person)

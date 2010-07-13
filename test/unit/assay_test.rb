@@ -112,13 +112,11 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.data_files.include?(data_files(:picture).find_version(1))
   end
   
-  test "relationship_type attached to assay's datafiles" do
-    assay=assays(:metabolomics_assay)
-    assay.relate(assets(:asset_for_datafile), relationship_types(:test_data))
-    
-    df = assay.data_files.last
-    assert_equal data_files(:picture).latest_version, df
-    assert_equal relationship_types(:test_data), df.relationship_type(assay)
+  test "can relate data files" do
+    assay = assays(:metabolomics_assay)
+    assert_difference("Assay.find_by_id(assay.id).data_files.count") do
+      assay.relate(data_file_versions(:viewable_data_file_v1), relationship_types(:test_data))
+    end
   end
 
   test "organisms association" do

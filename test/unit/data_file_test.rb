@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class DataFileTest < ActiveSupport::TestCase
 
-  fixtures :data_files,:users,:people,:content_blobs,:assets,:projects
+  fixtures :all
 
   # Replace this with your real tests.
   test "associations" do
@@ -84,5 +84,11 @@ class DataFileTest < ActiveSupport::TestCase
     uuid = x.attributes["uuid"]
     x.save
     assert_equal x.uuid, uuid
+  end
+  
+  test "can get relationship type" do
+    df = data_file_versions(:picture_v1)
+    assay = assays(:modelling_assay_with_data_and_relationship)
+    assert_equal relationship_types(:validation_data), df.relationship_type(assay)
   end
 end

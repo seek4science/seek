@@ -33,25 +33,12 @@ class Sop < ActiveRecord::Base
 
   explicit_versioning(:version_column => "version") do
     
-    belongs_to :content_blob
+    acts_as_resource
     
-    belongs_to :contributor, :polymorphic => true
+    belongs_to :content_blob
     
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  'experimental_conditions.sop_version = #{self.version}'
     
-    has_one :asset,
-      :primary_key => "sop_id",
-      :foreign_key => "resource_id",
-      :conditions => {:resource_type => "Sop"}
-            
-    #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
-    def project
-      asset.project
-    end
-  end
-
-  def assays
-    AssayAsset.find(:all,:conditions=>["asset_id = ?",self.asset.id]).collect{|a| a.assay}
   end
 
   def studies

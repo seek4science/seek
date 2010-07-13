@@ -12,7 +12,18 @@ class Assay < ActiveRecord::Base
   has_many :organisms, :through=>:assay_organisms
   has_many :strains, :through=>:assay_organisms
 
-  has_many :assay_assets, :dependent => :destroy, :include => :asset
+  has_many :assay_assets, :dependent => :destroy
+  
+  has_many :data_file_versions, :through => :assay_assets, :source => :asset, :source_type => "DataFile::Version"
+  has_many :sop_versions, :through => :assay_assets, :source => :asset, :source_type => "Sop::Version"
+  has_many :model_versions, :through => :assay_assets, :source => :asset, :source_type => "Model::Version"
+  has_many :data_file_masters, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
+  has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
+  has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
+  
+  def data_files; data_file_masters + data_file_versions; end
+  def models; model_masters + model_versions; end
+  def sops; sop_masters + sop_versions; end
 
   has_one :investigation,:through=>:study    
 
@@ -55,14 +66,6 @@ class Assay < ActiveRecord::Base
     can_edit?(user) && data_files.empty? && sops.empty?
   end
 
-  def sops
-    assay_assets.sops.collect{|s| s.versioned_resource}
-  end
-  
-  def models
-    assay_assets.models.collect{|m| m.versioned_resource}
-  end
-
   #returns true if this is a modelling class of assay
   def is_modelling?
     return !assay_class.nil? && assay_class.key=="MODEL"
@@ -72,30 +75,17 @@ class Assay < ActiveRecord::Base
   def is_experimental?
     return !assay_class.nil? && assay_class.key=="EXP"
   end
-
-  def data_files
-    assay_assets.data_files.collect {|d| d.versioned_resource}
-    ##This is all very slow:
-    #list = []
-    #assay_assets.data_files.each do |df|
-    #  v = df.versioned_resource
-    #  v.class_eval("attr_accessor :relationship_type")
-    #  v.relationship_type = df.relationship_type
-    #  list << v
-    #end
-    #list
-  end
   
   def update_first_letter
     self.first_letter = strip_first_letter(title)
   end
   
   #Relate an asset to this assay with a specific relationship type
-  def relate(asset, relationship_type)
+  def relate(asset, r_type=nil)
     assay_asset = AssayAsset.find_by_asset_id_and_assay_id(asset, self) || AssayAsset.new()
     assay_asset.assay = self
     assay_asset.asset = asset
-    assay_asset.relationship_type = relationship_type      
+    assay_asset.relationship_type = r_type unless r_type.nil?     
     assay_asset.save
   end
 
@@ -119,6 +109,10 @@ class Assay < ActiveRecord::Base
     assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
     assay_organism.strain=strain
     assay_organism.save!
+  end
+  
+  def assets
+    (data_files + models + sops).collect {|a| a.latest_version} |  (data_file_versions + model_versions + sop_versions)
   end
   
 end

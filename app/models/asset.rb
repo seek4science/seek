@@ -7,9 +7,7 @@ class Asset < ActiveRecord::Base
 
   has_many :assay_assets, :dependent => :destroy
   has_many :assays, :through => :assay_assets
-  
-  
-  
+    
   has_and_belongs_to_many :creators,:join_table => 'assets_creators', :class_name => 'Person', :association_foreign_key => 'creator_id'  
   
   # TODO
@@ -46,9 +44,8 @@ class Asset < ActiveRecord::Base
         next unless Authorization.is_authorized?("show", nil, asset, user_to_authorize)
       end
       
-      res = asset.resource
-      results[res.class.name] = [] unless results[res.class.name]
-      results[res.class.name] << res
+      results[asset.class.name] = [] unless results[asset.class.name]
+      results[asset.class.name] << asset
     end
     
     return results
@@ -62,7 +59,7 @@ class Asset < ActiveRecord::Base
       if should_perform_filtering_if_not_authorized
         # if asset is not authorized for viewing by this user, just skip it
         # (it's much faster to supply 'asset' instance instead of related resource)
-        next unless Authorization.is_authorized?("show", nil, r.asset, user_to_authorize)
+        next unless Authorization.is_authorized?("show", nil, r, user_to_authorize)
       end
       
       # Fix version class names to be the class name of the versioned object
@@ -84,9 +81,7 @@ class Asset < ActiveRecord::Base
     
     resource_array.each do |r|
       if should_perform_filtering_if_not_authorized
-        # if asset is not authorized for viewing by this user, just skip it
-        # (it's much faster to supply 'asset' instance instead of related resource)
-        next unless Authorization.is_authorized?("show", nil, r.asset, user_to_authorize)
+        next unless Authorization.is_authorized?("show", nil, r, user_to_authorize)
       end
       
       results << r

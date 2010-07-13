@@ -9,8 +9,6 @@ class Study < ActiveRecord::Base
   
   has_one :project, :through=>:investigation
 
-  #has_many :data_files,:through=>:assays
-  
   belongs_to :person_responsible, :class_name => "Person"
   
   has_many :favourites, 
@@ -30,9 +28,13 @@ class Study < ActiveRecord::Base
   
   acts_as_uniquely_identifiable
 
-  def sops    
-    assays.collect{|assay| assay.sops.collect{|sop| sop}}.flatten.uniq    
+  def data_files
+    assays.collect{|a| a.data_files}.flatten.uniq
   end
+  
+  def sops
+    assays.collect{|a| a.sops}.flatten.uniq
+  end 
 
   def can_edit? user
     user.person && user.person.projects.include?(project)
@@ -40,10 +42,6 @@ class Study < ActiveRecord::Base
 
   def can_delete? user
     assays.empty? && can_edit?(user)
-  end
-  
-  def data_files
-    assays.collect{|assay| assay.data_files.collect{|df| df  }}.flatten.uniq
   end
   
   def update_first_letter

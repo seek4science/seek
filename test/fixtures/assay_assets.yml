@@ -1,74 +1,60 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 metabolomics_assay_asset1:
-  asset: asset_of_my_first_sop
+  asset: my_first_sop_v1 (Sop::Version)
   assay: metabolomics_assay
-  version: 1
 
 metabolomics_assay_asset2:
-  asset: asset_of_a_sop_with_fully_public_policy
+  asset: sop_with_fully_public_policy_v1 (Sop::Version)
   assay: metabolomics_assay
-  version: 1
 
 metabolomics_assay_data_file_asset:
-  asset: asset_for_datafile
+  asset: picture_v1 (DataFile::Version)
   assay: metabolomics_assay
-  version: 1
 
 metabolomics_assay2_assets1:
-  asset: asset_of_my_first_sop
+  asset: my_first_sop_v1 (Sop::Version)
   assay: metabolomics_assay2
-  version: 1
 
 metabolomics_assay2_assets2:
-  asset: asset_of_a_sop_for_test_with_workgroups
+  asset: sop_for_test_with_workgroups_v1 (Sop::Version)
   assay: metabolomics_assay2
-  version: 1
 
 metabolomics_assay3_asset1:
-  asset: asset_of_my_first_sop
+  asset: my_first_sop_v1 (Sop::Version)
   assay: metabolomics_assay3
-  version: 1
 
 metabolomics_assay3_asset2:
-  asset: asset_of_a_sop_with_fully_public_policy
+  asset: sop_with_fully_public_policy_v1 (Sop::Version)
   assay: metabolomics_assay3
-  version: 1
 
 assay_with_no_study_but_has_some_sops_asset:
-  asset: asset_of_my_first_sop
+  asset: my_first_sop_v1 (Sop::Version)
   assay: assay_with_no_study_but_has_some_sops
-  version: 1
 
 assay_with_no_study_but_has_some_files_asset:
-  asset: asset_for_datafile
+  asset: picture_v1 (DataFile::Version)
   assay: assay_with_no_study_but_has_some_files
-  version: 1
 
 #these are assets that are either public or private from the viewpoint of the user :model_owner
 assay_with_public_and_private_sops_and_datafiles_public_sop:
-  asset: asset_of_a_sop_with_fully_public_policy
+  asset: sop_with_fully_public_policy_v1 (Sop::Version)
   assay: assay_with_public_and_private_sops_and_datafiles
-  version: 1
 
 assay_with_public_and_private_sops_and_datafiles_private_sop:
-  asset: asset_of_a_sop_with_private_policy_and_custom_sharing
+  asset: sop_with_private_policy_and_custom_sharing_v1 (Sop::Version)
   assay: assay_with_public_and_private_sops_and_datafiles
-  version: 1
 
 assay_with_public_and_private_sops_and_datafiles_public_df:
-  asset: asset_for_downloadable_data_file
+  asset: downloadable_data_file_v1 (DataFile::Version)
   assay: assay_with_public_and_private_sops_and_datafiles
-  version: 1
 
 assay_with_public_and_private_sops_and_datafiles_private_df:
-  asset: asset_for_private_data_file
+  asset: private_data_file_v1 (DataFile::Version)
   assay: assay_with_public_and_private_sops_and_datafiles
-  version: 1
   
 validation_data_for_modelling_assay:
-  asset: asset_for_datafile
+  asset: picture_v1 (DataFile::Version)
   assay: modelling_assay_with_data_and_relationship
   relationship_type: validation_data
-  version: 1
     

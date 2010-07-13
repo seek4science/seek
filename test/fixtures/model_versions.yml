@@ -10,6 +10,8 @@ teusink_v1:
   last_used_at: 2009-04-03 11:09:18
   model: teusink
   version: 1
+  project: sysmo_project
+  policy: policy_for_test_with_projects_institutions
 
 teusink_v2:
   contributor: model_owner (User)
@@ -23,6 +25,8 @@ teusink_v2:
   last_used_at: 2009-04-03 11:09:18
   model: teusink
   version: 2
+  project: sysmo_project
+  policy: policy_for_test_with_projects_institutions
 
 model_with_format_and_type_v1:
   contributor: model_owner (User)
@@ -38,6 +42,8 @@ model_with_format_and_type_v1:
   model_format: BioPAX
   model: model_with_format_and_type
   version: 1
+  project: other_project # not linked to any project for now
+  policy: fully_public_policy
 
 model_with_links_in_description_v1:
   contributor: model_owner (User)
@@ -51,3 +57,34 @@ model_with_links_in_description_v1:
   last_used_at: 2009-04-03 11:09:18
   model: model_with_links_in_description
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit
+  
+model_with_different_owner_v1:
+  contributor: pal_user (User)
+  title: Model with different Owner
+  description: Visit my site http://www.google.com
+  original_filename: Teusink.xml
+  content_blob: teusink_blob
+  content_type: text/xml
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  model: model_with_different_owner
+  version: 1  
+  project: other_project # not linked to any project for now
+  policy: fully_public_policy
+
+model_with_no_contributor_v1:
+  title: Model with no contributor
+  description: Visit my site http://www.google.com
+  original_filename: Teusink.xml
+  content_blob: teusink_blob
+  content_type: text/xml
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  model: model_with_no_contributor
+  version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100616142034) do
+ActiveRecord::Schema.define(:version => 20100708114759) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
   end
 
   add_index "activity_logs", ["action"], :name => "act_logs_action_index"
@@ -40,6 +40,7 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "relationship_type_id"
+    t.string   "asset_type"
   end
 
   create_table "assay_classes", :force => true do |t|
@@ -96,9 +97,10 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.datetime "last_used_at"
   end
 
-  create_table "assets_creators", :id => false, :force => true do |t|
+  create_table "assets_creators", :force => true do |t|
     t.integer "asset_id"
     t.integer "creator_id"
+    t.string  "asset_type"
   end
 
   create_table "avatars", :force => true do |t|
@@ -159,6 +161,8 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
+    t.integer  "project_id"
+    t.integer  "policy_id"
   end
 
   create_table "data_files", :force => true do |t|
@@ -177,6 +181,8 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
+    t.integer  "project_id"
+    t.integer  "policy_id"
   end
 
   create_table "db_files", :force => true do |t|
@@ -271,6 +277,17 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.datetime "updated_at"
   end
 
+  create_table "help_document_versions", :force => true do |t|
+    t.integer  "help_document_id"
+    t.integer  "version"
+    t.text     "revision_comments"
+    t.string   "identifier"
+    t.string   "title"
+    t.text     "body"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "help_documents", :force => true do |t|
     t.string   "identifier"
     t.string   "title"
@@ -355,6 +372,8 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
+    t.integer  "project_id"
+    t.integer  "policy_id"
   end
 
   create_table "models", :force => true do |t|
@@ -377,6 +396,8 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
+    t.integer  "project_id"
+    t.integer  "policy_id"
   end
 
   create_table "moderatorships", :force => true do |t|
@@ -505,6 +526,8 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.datetime "last_used_at"
     t.string   "doi"
     t.string   "uuid"
+    t.integer  "project_id"
+    t.integer  "policy_id"
   end
 
   create_table "recommended_model_environments", :force => true do |t|
@@ -582,6 +605,8 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
+    t.integer  "project_id"
+    t.integer  "policy_id"
   end
 
   create_table "sops", :force => true do |t|
@@ -599,6 +624,8 @@ ActiveRecord::Schema.define(:version => 20100616142034) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
+    t.integer  "project_id"
+    t.integer  "policy_id"
   end
 
   create_table "strains", :force => true do |t|

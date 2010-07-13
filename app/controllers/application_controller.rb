@@ -236,9 +236,6 @@ class ApplicationController < ActionController::Base
     unless params[:filter].blank? || (params[:filter][:project].blank? && params[:filter][:assay].blank? &&
            params[:filter][:study].blank? && params[:filter][:investigation].blank?)
       set = resources.select do |res|
-        if ["Sop","Model","DataFile","Publication"].include?(res.class.name)
-          res = res.asset
-        end
         pass = true
         unless params[:filter][:project].blank?
           if res.class.name == "Person"

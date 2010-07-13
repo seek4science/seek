@@ -35,36 +35,18 @@ class Model < ActiveRecord::Base
   acts_as_uniquely_identifiable  
   
   explicit_versioning(:version_column => "version") do
+    acts_as_resource
     
-    belongs_to :content_blob      
-             
+    belongs_to :content_blob             
     belongs_to :organism
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
     belongs_to :model_type
     belongs_to :model_format
-    
-    belongs_to :contributor, :polymorphic => true
-    
-    has_one :asset,
-      :primary_key => "model_id",
-      :foreign_key => "resource_id",
-      :conditions => {:resource_type => "Model"}
-
-    #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
-    def project
-      asset.project
-    end
-    
-  end
-  
-  def assays
-    AssayAsset.find(:all,:conditions=>["asset_id = ?",self.asset.id]).collect{|a| a.assay}
   end
 
   def studies
     assays.collect{|a| a.study}.uniq
-  end
-  
+  end  
 
   # get a list of Models with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)

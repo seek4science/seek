@@ -14,6 +14,7 @@ one:
   contributor_type: User
   published_date: <%= 5.days.ago.to_s :db %>  
   pubmed_id: 5
+  policy: sysmo_member_edit
   
 two:
   title: Another paper on blabla
@@ -23,6 +24,8 @@ two:
   contributor_type: User
   published_date: <%= 5.days.ago.to_s :db %>
   pubmed_id: 2
+  project: sysmo_project
+  policy: sysmo_member_edit
   
 taverna_paper_pubmed:
   title: "Taverna: a tool for building and running workflows of services"
@@ -32,3 +35,5 @@ taverna_paper_pubmed:
   contributor_type: User
   published_date: <%= 5.days.ago.to_s :db %>
   pubmed_id: 16845108
+  project: sysmo_project
+  policy: sysmo_member_edit

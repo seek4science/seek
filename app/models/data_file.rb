@@ -30,30 +30,15 @@ class DataFile < ActiveRecord::Base
   acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do
+    acts_as_resource
     
     belongs_to :content_blob
     
-    belongs_to :contributor, :polymorphic => true
-    
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
     
-    has_one :asset,
-            :primary_key => "data_file_id",
-            :foreign_key => "resource_id",
-            :conditions => {:resource_type => "DataFile"}
-            
-    #FIXME: do this through a :has_one, :through=>:asset - though this currently working as primary key for :asset is ignored
-    def project
-      asset.project
-    end
-    
     def relationship_type(assay)
-      AssayAsset.find_by_assay_id_and_asset_id(assay,self.asset).relationship_type  
+      assay_assets.find_by_assay_id(assay.id).relationship_type  
     end
-  end
-
-  def assays
-    AssayAsset.find(:all,:conditions=>["asset_id = ?",self.asset.id]).collect{|a| a.assay}
   end
 
   def studies
@@ -86,6 +71,6 @@ class DataFile < ActiveRecord::Base
   end
 
   def relationship_type(assay)
-    AssayAsset.find_by_assay_id_and_asset_id(assay,self.asset).relationship_type  
+    assay_assets.find_by_assay_id(assay.id).relationship_type  
   end
 end

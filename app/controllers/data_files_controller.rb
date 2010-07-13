@@ -224,6 +224,20 @@ class DataFilesController < ApplicationController
       end
     end
   end
+  
+  def preview
+    element=params[:element]
+    data_file=@data_file
+    
+    render :update do |page|
+      if data_file && Authorization.is_authorized?("show", nil, data_file, current_user)
+        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>data_file}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
+      end
+    end
+  end  
+  
   protected
   
   def find_data_files

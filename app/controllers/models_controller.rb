@@ -413,6 +413,20 @@ class ModelsController < ApplicationController
     end
   end
   
+  def preview
+
+    element = params[:element]
+    model = Model.find_by_id(params[:id])
+    
+    render :update do |page|
+      if model && Authorization.is_authorized?("show", nil, model, current_user)
+        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>model}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
+      end
+    end
+  end
+  
   protected
   
   def default_items_per_page

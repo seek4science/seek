@@ -7,6 +7,8 @@ picture:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: sysmo_project
+  policy: policy_for_test_with_projects_institutions
 
 private_data_file:
   contributor: datafile_owner (User)
@@ -17,6 +19,8 @@ private_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: myexperiment_project
+  policy: private_policy_with_custom_sharing
 
 downloadable_data_file:
   contributor: datafile_owner (User)
@@ -27,6 +31,8 @@ downloadable_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: other_project # not linked to any project for now
+  policy: download_for_all_registered_users_policy
 
 editable_data_file:
   contributor: datafile_owner (User)
@@ -37,6 +43,8 @@ editable_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: other_project # not linked to any project for now
+  policy: editing_for_all_sysmo_users_policy
 
 sysmo_data_file:
   contributor: model_owner (User)
@@ -47,6 +55,8 @@ sysmo_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit  
 
 myexperiment_data_file:
   contributor: datafile_owner (User)
@@ -57,6 +67,8 @@ myexperiment_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: myexperiment_project
+  policy: public_download_with_no_custom_sharing
 
 data_file_with_links_in_description:
   contributor: datafile_owner (User)
@@ -67,6 +79,8 @@ data_file_with_links_in_description:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit
 
 data_file_with_no_contributor:
   title: Picture
@@ -76,6 +90,8 @@ data_file_with_no_contributor:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit
   
 viewable_data_file:
   contributor: datafile_owner (User)
@@ -86,4 +102,5 @@ viewable_data_file:
   content_type: application/vnd.ms-excel
   last_used_at: 2009-04-03 11:09:18
   version: 1
-
+  project: sysmo_project
+  policy: policy_for_viewable_data_file

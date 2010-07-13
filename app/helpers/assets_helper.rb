@@ -103,84 +103,75 @@ module AssetsHelper
     end
 
     case name
-    when "DataFile","Sop","Model"
-      related["Project"][:items] << resource.project
-      related["Assay"][:items] = resource.assays || []
-      related["Study"][:items] = resource.studies || []         
-    when "Assay"
-      related["Sop"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.sops, true, current_user)
-      related["Sop"][:hidden_count] = resource.sops.size - (related["Sop"][:items] || []).size
-      related["DataFile"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.data_files, true, current_user)
-      related["DataFile"][:hidden_count] = resource.data_files.size - (related["DataFile"][:items] || []).size
-      if resource.assay_class_id == 2 #MODELLING ASSAY
-        related["Model"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.models, true, current_user)
-        related["Model"][:hidden_count] = resource.models.size - (related["Model"][:items] || []).size
-      end
-      related["Project"][:items] << resource.project
-      related["Investigation"][:items] << resource.investigation
-      related["Study"][:items] << resource.study
-    when "Investigation"
-      related["Sop"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.sops, true, current_user)
-      related["Sop"][:hidden_count] = resource.sops.size - (related["Sop"][:items] || []).size
-      related["DataFile"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.data_files, true, current_user)
-      related["DataFile"][:hidden_count] = resource.data_files.size - (related["DataFile"][:items] || []).size
-      related["Project"][:items] << resource.project
-      related["Assay"][:items] = resource.assays || []
-      related["Study"][:items] = resource.studies || []
-    when "Study"
-      related["Sop"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.sops, true, current_user)
-      related["Sop"][:hidden_count] = resource.sops.size - (related["Sop"][:items] || []).size
-      related["DataFile"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.data_files, true, current_user)
-      related["DataFile"][:hidden_count] = resource.data_files.size - (related["DataFile"][:items] || []).size
-      related["Project"][:items] << resource.project
-      related["Assay"][:items] = resource.assays || []
-      related["Investigation"][:items] << resource.investigation
-    when "Organism"
-      related["Model"][:items] = Asset.classify_and_authorize_homogeneous_resources(resource.models, true, current_user)
-      related["Model"][:hidden_count] = resource.models.size - (related["Model"][:items] || []).size
-      related["Assay"][:items] = resource.assays || []
-      related["Project"][:items] = resource.projects || []
-    when "Person"
-      if resource.user
-        assets_hash = split_assets_by_type(resource.user.assets | resource.created_assets)
+      when "DataFile","Sop","Model"
+        related["Project"][:items] = [resource.project]
+        related["Study"][:items] = resource.studies   
+        related["Assay"][:items] = resource.assays     
+      when "Assay"
+        related["Project"][:items] = [resource.project]
+        related["Investigation"][:items] = [resource.investigation]
+        related["Study"][:items] = [resource.study]
+        related["DataFile"][:items] = resource.data_files
+        related["Model"][:items] = resource.models if resource.is_modelling? #MODELLING ASSAY
+        related["Sop"][:items] = resource.sops
+      when "Investigation"
+        related["Project"][:items] = [resource.project]
+        related["Study"][:items] = resource.studies
+        related["Assay"][:items] = resource.assays
+        related["DataFile"][:items] = resource.data_files
+        related["Sop"][:items] = resource.sops
+      when "Study"
+        related["Project"][:items] = [resource.project]
+        related["Investigation"][:items] = [resource.investigation]
+        related["Assay"][:items] = resource.assays
+        related["DataFile"][:items] = resource.data_files
+        related["Sop"][:items] = resource.sops
+      when "Organism"
+        related["Project"][:items] = resource.projects
+        related["Assay"][:items] = resource.assays
+        related["Model"][:items] = resource.models        
+      when "Person"
+        related["Project"][:items] = resource.projects
+        related["Institution"][:items] = resource.institutions
+        related["Study"][:items] = resource.studies
+        if resource.user
+          related["DataFile"][:items] = resource.user.data_files
+          related["Model"][:items] = resource.user.models
+          related["Sop"][:items] = resource.user.sops
+        end
+        related["DataFile"][:items] = related["DataFile"][:items] | resource.created_data_files
+        related["Model"][:items] = related["Model"][:items] | resource.created_models
+        related["Sop"][:items] = related["Sop"][:items] | resource.created_sops
+        related["Publication"][:items] = related["Model"][:items] | resource.created_publications 
+      when "Institution"
+        related["Project"][:items] = resource.projects
+        related["Person"][:items] = resource.people
+      when "Project"
+        related["Person"][:items] = resource.people
+        related["Institution"][:items] = resource.institutions
+        related["Investigation"][:items] = resource.investigations
+        related["Study"][:items] = resource.studies
+        related["Assay"][:items] = resource.assays
+        related["DataFile"][:items] = resource.data_files
+        related["Model"][:items] = resource.models
+        related["Sop"][:items] = resource.sops
+        related["Publication"][:items] = resource.publications
+      when "Publication"
+        related["Person"][:items] = resource.asset.creators
+        related["Project"][:items] = [resource.project]
       else
-        assets_hash = split_assets_by_type(resource.created_assets)
-      end
-      related["Sop"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:sops], true, current_user)
-      related["Sop"][:hidden_count] = assets_hash[:sops].size - (related["Sop"][:items] || []).size
-      related["Model"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:models], true, current_user)
-      related["Model"][:hidden_count] = assets_hash[:models].size - (related["Model"][:items] || []).size
-      related["DataFile"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:data_files], true, current_user)
-      related["DataFile"][:hidden_count] = assets_hash[:data_files].size - (related["DataFile"][:items] || []).size
-      related["Project"][:items] = resource.projects || []
-      related["Institution"][:items] = resource.institutions || []
-      related["Study"][:items] = resource.studies || []
-      related["Publication"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:publications], true, current_user)
-      related["Publication"][:hidden_count] = assets_hash[:publications].size - (related["Publication"][:items] || []).size
-
-    when "Institution"
-      related["Project"][:items] = resource.projects || []
-      related["Person"][:items] = resource.people || []
-    when "Project"
-      assets_hash = split_assets_by_type(resource.assets)
-      related["Sop"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:sops], true, current_user)
-      related["Sop"][:hidden_count] = assets_hash[:sops].size - (related["Sop"][:items] || []).size
-      related["Model"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:models], true, current_user)
-      related["Model"][:hidden_count] = assets_hash[:models].size - (related["Model"][:items] || []).size
-      related["DataFile"][:items] = Asset.classify_and_authorize_homogeneous_resources(assets_hash[:data_files], true, current_user)
-      related["DataFile"][:hidden_count] = assets_hash[:data_files].size - (related["DataFile"][:items] || []).size
-      related["Institution"][:items] = resource.institutions || []
-      related["Person"][:items] = resource.people || []
-      related["Assay"][:items] = resource.assays || []
-      related["Study"][:items] = resource.studies || []
-      related["Investigation"][:items] = resource.investigations || []
-      related["Publication"][:items] = resource.publications || []
-    when "Publication"
-      related["Person"][:items] = resource.asset.creators || []
-      related["Project"][:items] << resource.project
-    else
     end
     
+    #Authorize
+    ["Sop","Model","DataFile"].each do |asset_type|
+      unless related[asset_type][:items].empty?
+        total_count = related[asset_type][:items].size
+        related[asset_type][:items] = Asset.classify_and_authorize_homogeneous_resources(related[asset_type][:items], true, current_user)
+        related[asset_type][:hidden_count] = total_count - related[asset_type][:items].size
+      end
+    end    
+    
+    #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
       related[key][:items] = related[key][:items].compact
       if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay"].include?(resource.class.name)
@@ -190,23 +181,6 @@ module AssetsHelper
     end
 
     return related
-  end
-  
-  def split_assets_by_type(asset_list)
-    hash = {:data_files => [], :models => [], :sops => [], :publications => []}
-    asset_list.each do |a|
-      case a.resource_type
-      when "Sop"
-        hash[:sops] << a.resource
-      when "Model"
-        hash[:models] << a.resource
-      when "DataFile"
-        hash[:data_files] << a.resource
-      when "Publication"
-        hash[:publications] << a.resource
-      end
-    end
-    return hash
   end
   
   def filter_url(resource_type, context_resource)

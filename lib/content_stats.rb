@@ -38,13 +38,13 @@ class ContentStats
     private 
     
     def authorised_assets assets,action
-      assets.select{|asset| Authorization.is_authorized?(action,nil,asset.resource,@user)}
+      assets.select{|asset| Authorization.is_authorized?(action,nil,asset,@user)}
     end
     
     def assets_size assets
       size=0
       assets.each do |asset|
-        size += asset.resource.content_blob.data.size unless asset.resource.content_blob.data.nil?
+        size += asset.content_blob.data.size unless asset.content_blob.data.nil?
       end
       return size
     end
@@ -56,9 +56,9 @@ class ContentStats
     Project.all.each do |project|
       project_stats=ProjectStats.new
       project_stats.project=project
-      project_stats.sops=project.assets.select{|a| a.resource.kind_of?(Sop)}
-      project_stats.models=project.assets.select{|a| a.resource.kind_of?(Model)}
-      project_stats.data_files=project.assets.select{|a| a.resource.kind_of?(DataFile)}
+      project_stats.sops=project.sops
+      project_stats.models=project.models
+      project_stats.data_files=project.data_files
       project_stats.publications=project.publications
       project_stats.people=project.people
       project_stats.assays=project.assays

@@ -7,77 +7,35 @@ class AuthorizationTest < ActiveSupport::TestCase
   # this section tests individual helper methods within Authorization module
   # ************************************************************************
   
-  # testing: find_thing(thing_type, thing_id)
-  
-  def test_find_thing_helper_try_to_find_resource
-    found = Authorization.find_thing(sops(:my_first_sop).class.name, sops(:my_first_sop))
-    
-    assert found.class.name == "Asset", "returned instance is not of class 'Asset'"
-    assert found.id == sops(:my_first_sop).asset.id, "id of found Asset is not correct"
-  end
-  
-  def test_find_thing_helper_try_to_find_not_existing_resource
-    found = Authorization.find_thing(sops(:my_first_sop).class.name, '0')
-    
-    assert_nil found, "return value should have been 'nil'"
-  end
-  
-  def test_find_thing_helper_try_to_find_asset
-    found = Authorization.find_thing(assets(:asset_of_my_first_sop).class.name, assets(:asset_of_my_first_sop))
-    
-    assert found.class.name == "Asset", "returned instance is not of class 'Asset'"
-    assert found.id == assets(:asset_of_my_first_sop).id, "id of found Asset is not correct"
-  end
-  
-  def test_find_thing_helper_try_to_find_not_existing_asset
-    found = Authorization.find_thing(assets(:asset_of_my_first_sop).class.name, '0')
-    
-    assert_nil found, "return value should have been 'nil'"
-  end
-  
-  def test_find_thing_helper_try_to_find_thing_with_illegal_type
-    found = Authorization.find_thing("illegal_thing_type_that_will_never_be_used", 123)
-    
-    assert_nil found, "return value should have been 'nil'"
-  end
-  
-  def test_find_thing_helper_for_model
-    found = Authorization.find_thing(assets(:asset_for_model).class.name, assets(:asset_for_model))
-    
-    assert found.class.name == "Asset", "returned instance is not of class 'Asset'"
-    assert found.id == assets(:asset_for_model).id, "id of found Asset is not correct"
-  end
-
-  
   # testing: can_manage?(user_id, thing_asset)
   
   # checks real owner ('contributor' of both SOP and corresponding asset)
   def test_is_owner_real_owner
-    res = Authorization.can_manage?(users(:owner_of_my_first_sop).id, assets(:asset_of_my_first_sop))
+    res = Authorization.can_manage?(users(:owner_of_my_first_sop).id, sops(:my_first_sop))
     
     assert res, "real owner of the asset wasn't considered as such"
   end
 
   def test_is_owner_of_model
-    res = Authorization.can_manage?(users(:model_owner).id, assets(:asset_for_model))
+    res = Authorization.can_manage?(users(:model_owner).id, models(:teusink))
 
     assert res, "real owner of the asset wasn't considered as such"
   end
 
   def test_is_owner_of_datafile
-    res = Authorization.can_manage?(users(:datafile_owner).id, assets(:asset_for_datafile))
+    res = Authorization.can_manage?(users(:datafile_owner).id, data_files(:picture))
   end
   
   # checks not an owner
   def test_is_owner_random_user
-    res = Authorization.can_manage?(users(:owner_of_fully_public_policy).id, assets(:asset_of_my_first_sop))
+    res = Authorization.can_manage?(users(:owner_of_fully_public_policy).id, sops(:my_first_sop))
     
     assert !res, "random user was thought to be an owner of the asset"
   end    
   
   # checks that owner of asset's policy (but not the asset!) wouldn't be treated as asset owner
   def test_is_owner_user_is_policy_owner_not_asset_owner
-    res = Authorization.can_manage?(users(:owner_of_complex_permissions_policy).id, assets(:asset_of_a_sop_with_complex_permissions))
+    res = Authorization.can_manage?(users(:owner_of_complex_permissions_policy).id, sops(:sop_with_complex_permissions))
   
     assert !res, "asset's policy owner was considered to be owner of the asset itself"
   end  
@@ -295,91 +253,91 @@ class AuthorizationTest < ActiveSupport::TestCase
   
   # 'everyone' policy
   def test_authorized_by_policy_fully_public_policy_anonymous_user
-    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), assets(:asset_of_a_sop_with_fully_public_policy), "download", nil, nil)
+    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), sops(:sop_with_fully_public_policy), "download", nil, nil)
     assert res, "policy with sharing_scope = 'Policy::EVERYONE' wouldn't allow not logged in users to perform 'download' where it should allow even 'edit'"
   end
   
   def test_authorized_by_policy_fully_public_policy_registered_user
-    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), assets(:asset_of_a_sop_with_fully_public_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), sops(:sop_with_fully_public_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
     assert res, "policy with sharing_scope = 'Policy::EVERYONE' wouldn't allow registered user to perform 'download' where it should allow even 'edit'"
   end
   
   def test_authorized_by_policy_fully_public_policy_sysmo_user
-    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), assets(:asset_of_a_sop_with_fully_public_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
+    res = Authorization.authorized_by_policy?(policies(:fully_public_policy), sops(:sop_with_fully_public_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
     assert res, "policy with sharing_scope = 'Policy::EVERYONE' wouldn't allow SysMO user to perform 'download' where it should allow even 'edit'"
   end
 
   def test_authorized_for_model
-    res = Authorization.authorized_by_policy?(policies(:policy_for_test_with_projects_institutions),assets(:asset_for_model),"view",users(:model_owner).id,people(:person_for_model_owner).id)
+    res = Authorization.authorized_by_policy?(policies(:policy_for_test_with_projects_institutions),models(:teusink),"view",users(:model_owner).id,people(:person_for_model_owner).id)
     assert res, "model_owner should be able to view his own model"
   end
 
   def test_not_authorized_for_model
-    res = Authorization.authorized_by_policy?(policies(:policy_for_test_with_projects_institutions),assets(:asset_for_model),"download",users(:quentin).id,users(:quentin).person.id)
+    res = Authorization.authorized_by_policy?(policies(:policy_for_test_with_projects_institutions),models(:teusink),"download",users(:quentin).id,users(:quentin).person.id)
     assert !res, "Quentin should not be able to download that model"
   end
   
   # 'all registered users' policy
   def test_authorized_by_policy_all_registered_users_policy_anonymous_user
-    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), assets(:asset_of_a_sop_with_all_registered_users_policy), "download", nil, nil)
+    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), sops(:sop_with_all_registered_users_policy), "download", nil, nil)
     assert !res, "policy with sharing_scope = 'Policy::ALL_REGISTERED_USERS' would allow not logged in users to perform allowed action"
   end
   
   def test_authorized_by_policy_all_registered_users_policy_registered_user
-    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), assets(:asset_of_a_sop_with_all_registered_users_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), sops(:sop_with_all_registered_users_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
     assert res, "policy with sharing_scope = 'Policy::ALL_REGISTERED_USERS' wouldn't allow registered user to perform allowed action"
   end
   
   def test_authorized_by_policy_all_registered_users_policy_sysmo_user
-    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), assets(:asset_of_a_sop_with_all_registered_users_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
+    res = Authorization.authorized_by_policy?(policies(:download_for_all_registered_users_policy), sops(:sop_with_all_registered_users_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
     assert res, "policy with sharing_scope = 'Policy::ALL_REGISTERED_USERS' wouldn't allow SysMO user to perform allowed action"
   end
   
   # 'all SysMO users' policy
   def test_authorized_by_policy_all_sysmo_users_policy_anonymous_user
-    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), assets(:asset_of_a_sop_with_all_sysmo_users_policy), "download", nil, nil)
+    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", nil, nil)
     assert !res, "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' would allow not logged in users to perform allowed action"
   end
   
   def test_authorized_by_policy_all_sysmo_users_policy_registered_user
-    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), assets(:asset_of_a_sop_with_all_sysmo_users_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
     assert !res, "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' would allow registered user to perform allowed action"
   end
   
   def test_authorized_by_policy_all_sysmo_users_policy_sysmo_user
-    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), assets(:asset_of_a_sop_with_all_sysmo_users_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
+    res = Authorization.authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", users(:owner_of_my_first_sop).id, users(:owner_of_my_first_sop).person.id)
     assert res, "policy with sharing_scope = 'Policy::ALL_SYSMO_USERS' wouldn't allow SysMO user to perform allowed action"
   end
   
   # 'custom permissions only' policy
   def test_authorized_by_policy_custom_permissions_only_policy_anonymous_user
-    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), assets(:asset_of_a_sop_with_custom_permissions_policy), "download", nil, nil)
+    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), sops(:sop_with_custom_permissions_policy), "download", nil, nil)
     assert !res, "policy with sharing_scope = 'Policy::CUSTOM_PERMISSIONS_ONLY' would allow not logged in users to perform allowed action"
   end
   
   def test_authorized_by_policy_custom_permissions_only_policy_registered_user
-    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), assets(:asset_of_a_sop_with_custom_permissions_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), sops(:sop_with_custom_permissions_policy), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
     assert !res, "policy with sharing_scope = 'Policy::CUSTOM_PERMISSIONS_ONLY' would allow registered user to perform allowed action"
   end
   
   def test_authorized_by_policy_custom_permissions_only_policy_sysmo_user
-    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), assets(:asset_of_a_sop_with_custom_permissions_policy), "download", users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
+    res = Authorization.authorized_by_policy?(policies(:custom_permissions_only_policy), sops(:sop_with_custom_permissions_policy), "download", users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
     assert !res, "policy with sharing_scope = 'Policy::CUSTOM_PERMISSIONS_ONLY' would allow SysMO user to perform allowed action"
   end
   
   # 'private' policy
   def test_authorized_by_policy_private_policy_anonymous_user
-    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), assets(:asset_of_my_first_sop), "download", nil, nil)
+    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), sops(:my_first_sop), "download", nil, nil)
     assert !res, "policy with sharing_scope = 'Policy::PRIVATE' would allow not logged in users to perform allowed action"
   end
   
   def test_authorized_by_policy_private_policy_registered_user
-    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), assets(:asset_of_my_first_sop), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
+    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), sops(:my_first_sop), "download", users(:registered_user_with_no_projects).id, users(:registered_user_with_no_projects).person.id)
     assert !res, "policy with sharing_scope = 'Policy::PRIVATE' would allow registered user to perform allowed action"
   end
   
   def test_authorized_by_policy_private_policy_sysmo_user
-    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), assets(:asset_of_my_first_sop), "download", users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
+    res = Authorization.authorized_by_policy?(policies(:private_policy_for_asset_of_my_first_sop), sops(:my_first_sop), "download", users(:owner_of_fully_public_policy).id, users(:owner_of_fully_public_policy).person.id)
     assert !res, "policy with sharing_scope = 'Policy::PRIVATE' would allow SysMO user to perform allowed action"
   end
   
@@ -394,12 +352,12 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   # various incorrect input parameters
   def test_is_authorized_invalid_action
-    res = Authorization.is_authorized?("bad_action_name_that_will_never_be_used", nil, assets(:asset_of_my_first_sop), nil)
+    res = Authorization.is_authorized?("bad_action_name_that_will_never_be_used", nil, sops(:my_first_sop), nil)
     assert !res, "invalid action name was processed and permission to execute action granted"
   end
   
   def test_is_authorized_blank_thing_type_only_id_supplied
-    res = Authorization.is_authorized?("view", nil, assets(:asset_of_my_first_sop).id, nil)
+    res = Authorization.is_authorized?("view", nil, sops(:my_first_sop).id, nil)
     assert !res, "permission to execute action granted for a 'thing' with no type (only ID) provided"
   end
 

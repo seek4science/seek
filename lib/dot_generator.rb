@@ -47,19 +47,23 @@ module DotGenerator
     if (show_assets) 
       assay.assay_assets.each do |assay_asset|
         asset=assay_asset.asset
-        asset_type=asset.resource.class.name
+        asset_type=asset.class.name
+        if asset_type.end_with?("::Version")
+          asset = asset.parent
+          asset_type = asset.class.name
+        end
         if Authorization.is_authorized?("view",nil,asset,current_user)
           title = multiline(asset.resource.title)
-          title = "#{asset.resource.class.name.upcase}: #{title}" unless title.downcase.starts_with?(asset.resource.class.name.downcase)
-          dot << "Asset_#{asset.resource.id} [label=\"#{title}\",tooltip=\"#{tooltip(asset.resource)}\",shape=box,fontsize=7,style=filled,fillcolor=#{FILL_COLOURS[asset.resource.class]},URL=\"#{polymorphic_path(asset.resource)}\",target=\"_top\"];\n"
+          title = "#{asset_type.upcase}: #{title}" unless title.downcase.starts_with?(asset_type.downcase)
+          dot << "Asset_#{asset.id} [label=\"#{title}\",tooltip=\"#{tooltip(asset)}\",shape=box,fontsize=7,style=filled,fillcolor=#{FILL_COLOURS[asset.class]},URL=\"#{polymorphic_path(asset)}\",target=\"_top\"];\n"
           label=""
           if assay_asset.relationship_type
             label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
           end
-          dot << "Assay_#{assay.id} -- Asset_#{asset.resource.id} #{label} \n"
+          dot << "Assay_#{assay.id} -- Asset_#{asset.id} #{label} \n"
         else
-          dot << "Asset_#{asset.resource.id} [label=\"Hidden Item\",tooltip=\"Hidden Item\",shape=box,fontsize=6,style=filled,fillcolor=lightgray];\n"
-          dot << "Assay_#{assay.id} -- Asset_#{asset.resource.id}\n"
+          dot << "Asset_#{asset.id} [label=\"Hidden Item\",tooltip=\"Hidden Item\",shape=box,fontsize=6,style=filled,fillcolor=lightgray];\n"
+          dot << "Assay_#{assay.id} -- Asset_#{asset.id}\n"
         end
       end
     end  

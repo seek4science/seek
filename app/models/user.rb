@@ -51,7 +51,7 @@ class User < ActiveRecord::Base
   end
 
   def assets
-    (sops | models | data_files).collect{|r| r.asset}
+    sops | models | data_files
   end
 
   def active?

@@ -42,7 +42,11 @@ class Person < ActiveRecord::Base
     
   has_one :user, :dependent=>:destroy
   
-  has_and_belongs_to_many :created_assets, :join_table => 'assets_creators', :class_name => 'Asset', :foreign_key => 'creator_id'
+  has_many :assets_creators, :dependent => :destroy, :foreign_key => "creator_id"
+  has_many :created_data_files, :through => :assets_creators, :source => :asset, :source_type => "DataFile"
+  has_many :created_models, :through => :assets_creators, :source => :asset, :source_type => "Model"
+  has_many :created_sops, :through => :assets_creators, :source => :asset, :source_type => "Sop"
+  has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :description ]) if SOLR_ENABLED
 
@@ -186,5 +190,9 @@ class Person < ActiveRecord::Base
     #Get intersection of all project memberships + person's memberships to find project membership
     memberships = group_memberships.select{|g| g.work_group.project == project}
     return memberships.collect{|m| m.roles}.flatten
-  end 
+  end
+  
+  def assets
+    created_data_files | created_models | created_sops | created_publications
+  end
 end

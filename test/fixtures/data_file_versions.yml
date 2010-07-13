@@ -8,6 +8,8 @@ picture_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: picture
   version: 1
+  project: sysmo_project
+  policy: policy_for_test_with_projects_institutions
 
 private_data_file_v1:
   contributor: datafile_owner (User)
@@ -19,6 +21,8 @@ private_data_file_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: private_data_file
   version: 1
+  project: myexperiment_project
+  policy: private_policy_with_custom_sharing  
 
 downloadable_data_file_v1:
   contributor: datafile_owner (User)
@@ -30,6 +34,8 @@ downloadable_data_file_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: downloadable_data_file
   version: 1
+  project: other_project # not linked to any project for now
+  policy: download_for_all_registered_users_policy
 
 editable_data_file_v1:
   contributor: datafile_owner (User)
@@ -41,7 +47,9 @@ editable_data_file_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: editable_data_file
   version: 1
-
+  project: other_project # not linked to any project for now
+  policy: editing_for_all_sysmo_users_policy
+  
 sysmo_data_file_v1:
   contributor: model_owner (User)
   title: Sysmo Data File
@@ -52,6 +60,8 @@ sysmo_data_file_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: sysmo_data_file
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit  
 
 myexperiment_data_file_v1:
   contributor: datafile_owner (User)
@@ -63,7 +73,9 @@ myexperiment_data_file_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: myexperiment_data_file
   version: 1
-  
+  project: myexperiment_project
+  policy: public_download_with_no_custom_sharing
+
 data_file_with_links_in_description_v1:
   contributor: datafile_owner (User)
   title: I Have Links
@@ -74,6 +86,20 @@ data_file_with_links_in_description_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: data_file_with_links_in_description
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit
+
+data_file_with_no_contributor_v1:
+  title: Picture
+  description: A picture
+  original_filename: file_pictuer.png
+  content_blob: picture_blob
+  content_type: text/png
+  last_used_at: 2009-04-03 11:09:18
+  data_file: data_file_with_no_contributor  
+  version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit
 
 viewable_data_file_v1:
   contributor: datafile_owner (User)
@@ -85,3 +111,5 @@ viewable_data_file_v1:
   last_used_at: 2009-04-03 11:09:18
   data_file: viewable_data_file
   version: 1
+  project: sysmo_project
+  policy: policy_for_viewable_data_file

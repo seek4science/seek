@@ -11,6 +11,8 @@ teusink:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 2  
+  project: sysmo_project
+  policy: policy_for_test_with_projects_institutions
 
 model_with_format_and_type:
   contributor: model_owner (User)
@@ -26,6 +28,8 @@ model_with_format_and_type:
   model_format: BioPAX
   version: 1
   uuid: gggg-hhhh-jjjj-kkkk
+  project: other_project # not linked to any project for now
+  policy: fully_public_policy
 
 model_with_links_in_description:
   contributor: model_owner (User)
@@ -38,6 +42,8 @@ model_with_links_in_description:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit
 
 model_with_different_owner:
   contributor: pal_user (User)
@@ -50,6 +56,8 @@ model_with_different_owner:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: other_project # not linked to any project for now
+  policy: fully_public_policy
 
 model_with_no_contributor:
   title: Model with no contributor
@@ -61,3 +69,5 @@ model_with_no_contributor:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit

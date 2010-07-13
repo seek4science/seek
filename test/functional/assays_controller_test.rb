@@ -30,14 +30,14 @@ class AssaysControllerTest < ActionController::TestCase
     assay=assays(:metabolomics_assay)
     timestamp=assay.updated_at
     
-    sop_asset=assets(:asset_of_a_sop_with_all_sysmo_users_policy)
-    assert !assay.assets.include?(sop_asset)
+    sop = sops(:sop_with_all_sysmo_users_policy)
+    assert !assay.sops.include?(sop.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_sop_asset_ids=>[sop_asset],:assay=>{}
+    put :update, :id=>assay,:assay_sop_asset_ids=>[sop.id],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.assets.include?(sop_asset)
+    assert updated_assay.sops.include?(sop.latest_version)
     assert_not_equal timestamp,updated_assay.updated_at
 
   end
@@ -47,14 +47,14 @@ class AssaysControllerTest < ActionController::TestCase
     assay=assays(:metabolomics_assay)
     timestamp=assay.updated_at
 
-    df_asset=assets(:asset_for_downloadable_data_file)
-    assert !assay.assets.include?(df_asset)
+    df = data_files(:downloadable_data_file)
+    assert !assay.data_files.include?(df.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_data_file_asset_ids=>["#{df_asset.id},Test data"],:assay=>{}
+    put :update, :id=>assay,:assay_data_file_asset_ids=>["#{df.id},Test data"],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.assets.include?(df_asset)
+    assert updated_assay.data_files.include?(df.latest_version)
     assert_not_equal timestamp,updated_assay.updated_at
   end
 
@@ -63,14 +63,14 @@ class AssaysControllerTest < ActionController::TestCase
     assay=assays(:metabolomics_assay)
     timestamp=assay.updated_at
 
-    model_asset=assets(:asset_for_model)
-    assert !assay.assets.include?(model_asset)
+    model = models(:teusink)
+    assert !assay.models.include?(model.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_model_asset_ids=>[model_asset],:assay=>{}
+    put :update, :id=>assay,:assay_model_asset_ids=>[model.id],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.assets.include?(model_asset)
+    assert updated_assay.models.include?(model.latest_version)
     assert_not_equal timestamp,updated_assay.updated_at
   end
 
@@ -371,20 +371,20 @@ class AssaysControllerTest < ActionController::TestCase
           :study_id=>studies(:metabolomics_study).id,
           :assay_class=>assay_classes(:modelling_assay_class)
         },
-          :assay_sop_asset_ids=>["#{sop.asset.id}"],
-          :assay_model_asset_ids=>["#{model.asset.id}"],
-          :assay_data_file_asset_ids=>["#{datafile.asset.id},#{rel.title}"]        
+          :assay_sop_asset_ids=>["#{sop.id}"],
+          :assay_model_asset_ids=>["#{model.id}"],
+          :assay_data_file_asset_ids=>["#{datafile.id},#{rel.title}"]        
       end
     end
 
     #since the items are added to the UI by manipulating the DOM with javascript, we can't do assert_select on the HTML elements to check they are there.
     #so instead check for the relevant generated lines of javascript
     assert_select "script",:text=>/sop_title = '#{sop.title}'/,:count=>1
-    assert_select "script",:text=>/asset_id = '#{sop.asset.id}'/,:count=>1
+    assert_select "script",:text=>/sop_id = '#{sop.id}'/,:count=>1
     assert_select "script",:text=>/model_title = '#{model.title}'/,:count=>1
-    assert_select "script",:text=>/asset_id = '#{model.asset.id}'/,:count=>1
+    assert_select "script",:text=>/model_id = '#{model.id}'/,:count=>1
     assert_select "script",:text=>/data_title = '#{datafile.title}'/,:count=>1
-    assert_select "script",:text=>/asset_id = '#{datafile.asset.id}'/,:count=>1
+    assert_select "script",:text=>/data_file_id = '#{datafile.id}'/,:count=>1
     assert_select "script",:text=>/relationship_type = '#{rel.title}'/,:count=>1
     assert_select "script",:text=>/addDataFile/,:count=>1
     assert_select "script",:text=>/addSop/,:count=>1
@@ -412,20 +412,20 @@ class AssaysControllerTest < ActionController::TestCase
       assert_no_difference("AssayAsset.count","Should not have added assay assets because the assay validation failed") do
         #title is blank, so should fail validation
         put :update,:id=>assay,:assay=>{:title=>"",:assay_class=>assay_classes(:modelling_assay_class)},
-          :assay_sop_asset_ids=>["#{sop.asset.id}"],
-          :assay_model_asset_ids=>["#{model.asset.id}"],
-          :assay_data_file_asset_ids=>["#{datafile.asset.id},#{rel.title}"]
+          :assay_sop_asset_ids=>["#{sop.id}"],
+          :assay_model_asset_ids=>["#{model.id}"],
+          :assay_data_file_asset_ids=>["#{datafile.id},#{rel.title}"]
       end
     end
 
     #since the items are added to the UI by manipulating the DOM with javascript, we can't do assert_select on the HTML elements to check they are there.
     #so instead check for the relevant generated lines of javascript
     assert_select "script",:text=>/sop_title = '#{sop.title}'/,:count=>1
-    assert_select "script",:text=>/asset_id = '#{sop.asset.id}'/,:count=>1
+    assert_select "script",:text=>/sop_id = '#{sop.id}'/,:count=>1
     assert_select "script",:text=>/model_title = '#{model.title}'/,:count=>1
-    assert_select "script",:text=>/asset_id = '#{model.asset.id}'/,:count=>1
+    assert_select "script",:text=>/model_id = '#{model.id}'/,:count=>1
     assert_select "script",:text=>/data_title = '#{datafile.title}'/,:count=>1
-    assert_select "script",:text=>/asset_id = '#{datafile.asset.id}'/,:count=>1
+    assert_select "script",:text=>/data_file_id = '#{datafile.id}'/,:count=>1
     assert_select "script",:text=>/relationship_type = '#{rel.title}'/,:count=>1
     assert_select "script",:text=>/addDataFile/,:count=>1
     assert_select "script",:text=>/addSop/,:count=>1

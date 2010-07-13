@@ -296,7 +296,7 @@ module ApiHelper
     assay.assay_assets.each do |aa|
       if aa.relationship_type
         relationships[aa.relationship_type.title] ||= []
-        relationships[aa.relationship_type.title] << aa.versioned_resource
+        relationships[aa.relationship_type.title] << aa.asset
       end
     end
     
