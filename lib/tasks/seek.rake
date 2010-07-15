@@ -444,19 +444,24 @@ namespace :seek do
     File.open("asset_old.txt", "w") do |file|
       classes = [DataFile, Model, Sop, Publication]
       
-      file.write("Asset + AssetsCreator changes ====================")
+      file.write("Asset + AssetsCreator changes ====================\n")
+      file.write("AssetsCreator count: #{AssetsCreator.count}\n")
       classes.each do |c|
+        file.write("#{c.name} count: #{c.count}\n")
         c.all.each do |resource|        
           file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
-          file.write("  Policy ID: #{resource.asset.policy_id} Project ID: #{resource.asset.project_id}\n")
+          file.write("  Policy #{resource.asset.policy_id}")
+          file.write("  Project ID: #{resource.asset.project_id}\n")
           resource.asset.creators.each do |p|
-            file.write("  Person #{p.id} - #{p.name})\n")
+            file.write("  Person #{p.id} - #{p.name}\n")
           end
         end
       end
       
       
-      file.write("AssayAsset changes ====================")
+      file.write("AssayAsset changes ====================\n")
+      file.write("Assay count: #{Assay.count}\n")
+      file.write("AssayAsset count: #{AssayAsset.count}\n")
       Assay.all.each do |assay|
         file.write("Assay ##{assay.id} - #{assay.title}\n")
         assay.assay_assets.each do |aa|
@@ -472,19 +477,24 @@ namespace :seek do
     File.open("asset_new.txt", "w") do |file|
       classes = [DataFile, Model, Sop, Publication]
       
-      file.write("Asset + AssetsCreator changes ====================")
+      file.write("Asset + AssetsCreator changes ====================\n")
+      file.write("AssetsCreator count: #{AssetsCreator.count}\n")
       classes.each do |c|
+        file.write("#{c.name} count: #{c.count}\n")
         c.all.each do |resource|        
           file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
-          file.write("  Policy ID: #{resource.policy_id} Project ID: #{resource.project_id}\n")
+          file.write("  Policy #{resource.policy_id}")
+          file.write("  Project ID: #{resource.project_id}\n")
           resource.creators.each do |p|
-            file.write("  Person #{p.id} - #{p.name})\n")
+            file.write("  Person #{p.id} - #{p.name}\n")
           end
         end
       end
       
       
-      file.write("AssayAsset changes ====================")
+      file.write("AssayAsset changes ====================\n")
+      file.write("Assay count: #{Assay.count}\n")
+      file.write("AssayAsset count: #{AssayAsset.count}\n")
       Assay.all.each do |assay|
         file.write("Assay ##{assay.id} - #{assay.title}\n")
         assay.assay_assets.each do |aa|
