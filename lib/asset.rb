@@ -1,4 +1,4 @@
-class Asset
+class Asset < ActiveRecord::Base
   
   #The order in which asset tabs appear
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch','Organism']

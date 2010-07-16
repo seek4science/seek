@@ -1,4 +1,5 @@
 require 'acts_as_resource'
+require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
@@ -30,7 +31,7 @@ class DataFile < ActiveRecord::Base
   acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do
-    acts_as_resource
+    acts_as_versioned_resource(:data_file_id)
     
     belongs_to :content_blob
     
