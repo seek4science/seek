@@ -24,7 +24,7 @@ class Mailer < ActionMailer::Base
 
   def request_resource(user,resource,details,base_host)
 
-    subject "A Sysmo Member requested a protected file: #{resource.title}"
+    subject "A SysMO member requested a protected file: #{resource.title}"
     recipients resource.managers.collect{|m| m.email_with_name}
     from NOREPLY_SENDER
     reply_to user.person.email_with_name
@@ -34,7 +34,7 @@ class Mailer < ActionMailer::Base
   end
 
   def signup(user,base_host)
-    subject     'Sysmo SEEK account activation'
+    subject     'SysMO SEEK account activation'
     recipients  user.person.email_with_name
     from        NOREPLY_SENDER
     sent_on     Time.now
@@ -43,7 +43,7 @@ class Mailer < ActionMailer::Base
   end
 
   def forgot_password(user,base_host)
-    subject    'Sysmo SEEK - Password reset'
+    subject    'SysMO SEEK - Password reset'
     recipients user.person.email_with_name
     from       NOREPLY_SENDER
     sent_on    Time.now
@@ -52,7 +52,7 @@ class Mailer < ActionMailer::Base
   end
 
   def welcome(user,base_host)
-    subject    'Welcome to Sysmo SEEK'
+    subject    'Welcome to SysMO SEEK'
     recipients user.person.email_with_name
     from       NOREPLY_SENDER
     sent_on    Time.now
@@ -62,7 +62,7 @@ class Mailer < ActionMailer::Base
 
   def contact_admin_new_user_no_profile(details,user,base_host)
     
-    subject    'Sysmo Member signed up'
+    subject    'SysMO member signed up'
     recipients admin_emails
     from       NOREPLY_SENDER
     sent_on    Time.now

@@ -219,7 +219,7 @@ class ApplicationController < ActionController::Base
         if ["show","create","update","destroy","download"].include?(a)
           ActivityLog.create(:action => a,
                    :culprit => current_user,
-                   :referenced => object.asset.project,
+                   :referenced => object.project,
                    :activity_loggable => object)
         end 
       when "people"

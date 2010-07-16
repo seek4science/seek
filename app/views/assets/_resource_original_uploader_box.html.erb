@@ -6,7 +6,7 @@
   </p>
   <% if resource.contributor -%>
     <p>
-      <% resource_contributor = resource.asset.contributor.person -%>
+      <% resource_contributor = resource.contributor.person -%>
       <%= favouritable_icon(resource_contributor, 80) -%><br/>
       <%= link_to(h(resource_contributor.name), resource_contributor) -%>
     </p>

@@ -45,13 +45,13 @@ class AssaysController < ApplicationController
       if @assay.save
         data_assets.each do |text|
           a_id, r_type = text.split(",")
-          @assay.relate(DataFile.find(a_id).latest_version, RelationshipType.find_by_title(r_type))
+          @assay.relate(DataFile.find(a_id), RelationshipType.find_by_title(r_type))
         end
         model_assets.each do |a_id|
-          @assay.relate(Model.find(a_id).latest_version)
+          @assay.relate(Model.find(a_id))
         end
         sop_assets.each do |a_id|
-          @assay.relate(Sop.find(a_id).latest_version)
+          @assay.relate(Sop.find(a_id))
         end
         organisms.each do |text|
           o_id,strain,culture_growth_type_text=text.split(",")
@@ -86,13 +86,13 @@ class AssaysController < ApplicationController
       if @assay.update_attributes(params[:assay])
         data_assets.each do |text|
           a_id, r_type = text.split(",")
-          @assay.relate(DataFile.find(a_id).latest_version, RelationshipType.find_by_title(r_type))
+          @assay.relate(DataFile.find(a_id), RelationshipType.find_by_title(r_type))
         end
         model_assets.each do |a_id|
-          @assay.relate(Model.find(a_id).latest_version)
+          @assay.relate(Model.find(a_id))
         end
         sop_assets.each do |a_id|
-          @assay.relate(Sop.find(a_id).latest_version)
+          @assay.relate(Sop.find(a_id))
         end
         organisms.each do |text|
           o_id,strain,culture_growth_type_text=text.split(",")

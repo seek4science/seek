@@ -15,7 +15,7 @@ class LinkAssayAssetsToResources < ActiveRecord::Migration
     count = 0
     total = AssayAsset.count
     AssayAsset.all.each do |assay_asset|
-      resource = assay_asset.asset.resource.find_version(assay_asset.version)
+      resource = assay_asset.asset.resource
       assay_asset.asset_id = resource.id
       assay_asset.asset_type = resource.class.name
       if assay_asset.save_without_timestamping

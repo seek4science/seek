@@ -89,7 +89,7 @@ module Authorization
     # this is required to get "policy_id" for policy-based authorized objects (like SOPs / spreadsheets / datafiles / assets)
     if (thing_asset.nil? && ASSET_TYPES.include?(thing_type))
       
-      found_thing = find_thing(thing_type, thing)
+      found_thing = thing
       
       unless found_thing
         # search didn't yield any results - the "thing" wasn't found; can't authorize unknown objects
@@ -354,22 +354,6 @@ module Authorization
     end
     
     return action
-  end
-
-  # check if the DB holds entry for the "thing" to be authorized 
-  def Authorization.find_thing(thing_type, thing)
-    found_instance = nil
-        
-    if thing.respond_to?(:asset) #, "Datafile", "Spreadsheet", etc
-      # "find_by_sql" works faster itself PLUS only a subset of all fields is selected;
-      # this is the most frequent query to be executed, hence needs to be optimised
-      found_instance=thing.asset
-    elsif thing_type=="Asset" && thing.instance_of?(Asset)
-      # fairly possible that it's going to be an asset itself, not a resource
-      found_instance = thing
-    end
-
-    return found_instance
   end
 
   # checks if "user" is authorized to manage this asset

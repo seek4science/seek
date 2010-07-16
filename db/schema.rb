@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20100708114759) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
   end
 
   add_index "activity_logs", ["action"], :name => "act_logs_action_index"
@@ -85,6 +85,11 @@ ActiveRecord::Schema.define(:version => 20100708114759) do
     t.string   "first_letter",       :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
+  end
+
+  create_table "asset_authors", :id => false, :force => true do |t|
+    t.integer "asset_id"
+    t.integer "author_id"
   end
 
   create_table "assets", :force => true do |t|
@@ -177,7 +182,7 @@ ActiveRecord::Schema.define(:version => 20100708114759) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -392,7 +397,7 @@ ActiveRecord::Schema.define(:version => 20100708114759) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -620,7 +625,7 @@ ActiveRecord::Schema.define(:version => 20100708114759) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"

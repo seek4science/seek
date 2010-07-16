@@ -54,7 +54,7 @@
       
       <p style="margin: 0;">
         <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
-          :existing_creators => @sop.asset.creators,
+          :existing_creators => @sop.creators,
           :other_creators => @sop.other_creators} -%>
       </p>
     <% end -%>

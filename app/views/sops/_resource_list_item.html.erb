@@ -1,6 +1,6 @@
 <%= list_item_title resource %>
 
-<%= list_item_simple_list resource.asset.creators, "Creator" %>
+<%= list_item_simple_list resource.creators, "Creator" %>
 
 <%= list_item_contributor resource -%>
 
@@ -8,6 +8,6 @@
 
 <%= list_item_optional_attribute "Associated project", resource.project.try(:title), resource.project %>
 
-<%= list_item_timestamp resource.asset %>
+<%= list_item_timestamp resource %>
 
 <%= list_item_description resource.description %>

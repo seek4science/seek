@@ -498,7 +498,7 @@ namespace :seek do
       Assay.all.each do |assay|
         file.write("Assay ##{assay.id} - #{assay.title}\n")
         assay.assay_assets.each do |aa|
-          res = aa.asset
+          res = aa.asset.find_version(aa.version)
           file.write("  AssayAsset #{aa.id} - #{res.class.name} #{res.id} (#{res.version})\n")
         end
       end      

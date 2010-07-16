@@ -157,7 +157,7 @@ module AssetsHelper
         related["Sop"][:items] = resource.sops
         related["Publication"][:items] = resource.publications
       when "Publication"
-        related["Person"][:items] = resource.asset.creators
+        related["Person"][:items] = resource.creators
         related["Project"][:items] = [resource.project]
       else
     end

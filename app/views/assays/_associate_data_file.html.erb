@@ -98,7 +98,7 @@ select_truncate_length=120;
     <% a_id, r_type = id_and_rel_id.split(",") %>
     <% data_file = DataFile.find(a_id) %>
     <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
-        data_file_id = '<%= a_id -%>';
+        data_file_id = '<%= data_file.id -%>';
         data_title = '<%= escape_javascript(data_file.title) -%>';
         relationship_type = '<%= r_type -%>';
         addDataFile(data_title, data_file_id, relationship_type);

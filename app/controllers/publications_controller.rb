@@ -32,8 +32,6 @@ class PublicationsController < ApplicationController
 
   # GET /publications/1/edit
   def edit
-    #This is necessary due to weirdness with acts_as_resource
-    @publication.project_id = @publication.asset.project_id
   end
 
   # POST /publications
@@ -58,14 +56,14 @@ class PublicationsController < ApplicationController
         
         #Make a policy
         policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
-        @publication.asset.policy = policy
-        @publication.asset.save
+        @publication.policy = policy
+        @publication.save
         #add managers (authors + contributor)
-        @publication.asset.creators.each do |author|
+        @publication.creators.each do |author|
           policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => 4)
         end
         #Add contributor
-        @publication.asset.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => 4)
+        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => 4)
         
         flash[:notice] = 'Publication was successfully created.'
         format.html { redirect_to(edit_publication_url(@publication)) }
@@ -88,7 +86,7 @@ class PublicationsController < ApplicationController
       unless author_assoc.blank?
         to_remove << PublicationAuthor.find_by_id(author_id)
         p = Person.find(author_assoc)
-        if @publication.asset.creators.include?(p)
+        if @publication.creators.include?(p)
           @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
           valid = false
         else
@@ -105,22 +103,22 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       if valid && @publication.update_attributes(params[:publication]) 
-        to_add.each {|a| @publication.asset.creators << a}
+        to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}
         
         #Create policy if not present (should be)
-        if @publication.asset.policy.nil?
-          @publication.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
-          @publication.asset.save
+        if @publication.policy.nil?
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+          @publication.save
         end
         
         #Update policy so current authors have manage permissions
-        @publication.asset.creators.each do |author|
-          @publication.asset.policy.permissions.clear
-          @publication.asset.policy.permissions << Permission.create(:contributor => author, :policy => @publication.asset.policy, :access_type => 4)
+        @publication.creators.each do |author|
+          @publication.policy.permissions.clear
+          @publication.policy.permissions << Permission.create(:contributor => author, :policy => @publication.policy, :access_type => 4)
         end      
         #Add contributor
-        @publication.asset.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.asset.policy, :access_type => 4)
+        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => 4)
         
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
@@ -233,7 +231,7 @@ class PublicationsController < ApplicationController
   
   def disassociate_authors
     @publication = Publication.find(params[:id])
-    @publication.asset.creators.clear #get rid of author links
+    @publication.creators.clear #get rid of author links
     @publication.non_seek_authors.clear
     
     #Query pubmed article to fetch authors

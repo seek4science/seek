@@ -52,7 +52,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should associate authors" do
     p = publications(:two)
     assert_equal 2, p.non_seek_authors.size
-    assert_equal 0, p.asset.creators.size
+    assert_equal 0, p.creators.size
     
     seek_author = people(:quentin_person)
     
@@ -71,11 +71,11 @@ class PublicationsControllerTest < ActionController::TestCase
   
   test "should disassociate authors" do
     p = publications(:one)
-    p.asset.creators << people(:quentin_person)
-    p.asset.creators << people(:two)
+    p.creators << people(:quentin_person)
+    p.creators << people(:two)
     
     assert_equal 0, p.non_seek_authors.size
-    assert_equal 2, p.asset.creators.size
+    assert_equal 2, p.creators.size
     
     #Check the non_seek_authors (PublicationAuthors) increase by 2, and the
     # seek_authors (AssetsCreators) decrease by 2.
@@ -89,11 +89,11 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test "should update project" do
     p = publications(:one)
-    assert p.asset.project.nil?
+    assert p.project.nil?
     
     put :update, :id => p.id, :author => {}, :publication => {:project_id => projects(:one).id}
     
-    assert_equal projects(:one), assigns(:publication).asset.project
+    assert_equal projects(:one), assigns(:publication).project
   end
 
   test "should destroy publication" do

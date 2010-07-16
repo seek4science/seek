@@ -28,7 +28,7 @@
 
   <%= list_item_authorized_list resource.data_files, "Data", true, 50, true %>
 
-  <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if (resource.assay_class_id == 2) %><%#MODELLING ASSAY%>
+  <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if resource.is_modelling? %>
 
   <%= list_item_timestamp resource %>
 </div>

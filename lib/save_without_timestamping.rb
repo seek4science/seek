@@ -4,10 +4,11 @@ class ActiveRecord::Base
       def record_timestamps; false; end
     end
   
-    save
+    truth = save
   
     class << self
       remove_method :record_timestamps
     end
+    truth
   end
 end

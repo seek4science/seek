@@ -85,6 +85,7 @@ class Assay < ActiveRecord::Base
     assay_asset = AssayAsset.find_by_asset_id_and_assay_id(asset, self) || AssayAsset.new()
     assay_asset.assay = self
     assay_asset.asset = asset
+    assay_asset.version = asset.version
     assay_asset.relationship_type = r_type unless r_type.nil?     
     assay_asset.save
   end

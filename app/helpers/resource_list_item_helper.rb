@@ -18,7 +18,7 @@ module ResourceListItemHelper
     if ["DataFile","Model","Sop"].include?(resource.class.name.split("::").first)
       avatar_partial = "layouts/asset_resource_avatars"
     elsif resource.class.name == "Publication"
-      unless resource.asset.creators.empty?
+      unless resource.creators.empty?
         avatar_partial = "layouts/asset_resource_avatars"        
       end
     elsif resource.class.name == "Assay"
@@ -41,7 +41,7 @@ module ResourceListItemHelper
         image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))), :style => "width: 24px; height: 24px; vertical-align: middle")
         icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
         html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
-        html << list_item_visibility(resource.asset.policy)
+        html << list_item_visibility(resource.policy)
         html << "<br style=\"clear:both\"/>"
       when "Assay"
         image = image_tag((resource.is_modelling? ? icon_filename_for_key("assay_modelling_avatar") : icon_filename_for_key("assay_experimental_avatar")), :style => "height: 24px; vertical-align: middle")

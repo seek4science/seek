@@ -7,7 +7,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
 
   before_filter :find_data_files, :only => [ :index ]
-  before_filter :find_data_file_auth, :except => [ :index, :new, :create]
+  before_filter :find_data_file_auth, :except => [ :index, :new, :create, :request_resource]
   before_filter :find_display_data_file, :only=>[:show,:download]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]  
@@ -238,6 +238,17 @@ class DataFilesController < ApplicationController
     end
   end  
   
+  def request_resource
+    resource = DataFile.find(params[:id])
+    details = params[:details]
+    
+    Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    
+    render :update do |page|
+      page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
+    end
+  end  
+  
   protected
   
   def find_data_files
@@ -289,8 +300,8 @@ class DataFilesController < ApplicationController
     policy_type = ""
 
     # obtain a policy to use
-    if defined?(@data_file) && @data_file.asset
-      if (policy = @data_file.asset.policy)
+    if @data_file
+      if (policy = @data_file.policy)
         # Datafile exists and has a policy associated with it - normal case
         policy_type = "asset"
       elsif @data_file.project && (policy = @data_file.project.default_policy)

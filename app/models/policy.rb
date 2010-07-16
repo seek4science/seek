@@ -76,7 +76,7 @@ class Policy < ActiveRecord::Base
     use_blacklist = params[:sharing][:use_blacklist]
     
     # PROCESS THE POLICY FIRST
-    unless resource.asset.policy
+    unless resource.policy
       #last_saved_policy = Policy._default(current_user, nil) # second parameter ensures that this policy is not applied anywhere
       
       
@@ -86,10 +86,10 @@ class Policy < ActiveRecord::Base
                           :use_custom_sharing => use_custom_sharing,
                           :use_whitelist => use_whitelist,
                           :use_blacklist => use_blacklist)
-      resource.asset.policy = policy  # by doing this the new policy object is saved implicitly too
-      resource.asset.save
+      resource.policy = policy  # by doing this the new policy object is saved implicitly too
+      resource.save
     else
-       policy = resource.asset.policy
+       policy = resource.policy
        #last_saved_policy = policy.clone # clone required, not 'dup' (which still works through reference, so the values in both get changed anyway - which is not what's needed here)
        
        policy.sharing_scope = sharing_scope
@@ -103,7 +103,7 @@ class Policy < ActiveRecord::Base
     
     # NOW PROCESS THE PERMISSIONS
     # policy of an asset; pemissions will be applied to it
-    policy = resource.asset.policy
+    policy = resource.policy
     
     # read the permission data from params[]
     unless params[:sharing][:permissions].blank?

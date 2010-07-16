@@ -8,7 +8,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     resource = sops(:my_first_sop)
     creator = people(:fred)
     params =  ActiveSupport::JSON.encode([[creator.name, creator.id]])
-    assert_difference('resource.asset.creators.count') do
+    assert_difference('resource.creators.count') do
       AssetsCreator.add_or_update_creator_list(resource, params)
     end
   end
@@ -23,8 +23,8 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     new_creator = people(:quentin_person)
     params =  ActiveSupport::JSON.encode([[new_creator.name, new_creator.id]])
     AssetsCreator.add_or_update_creator_list(resource, params)
-    assert_not_equal resource.asset.creators.first, creator
-    assert_equal resource.asset.creators.first, new_creator
+    assert_not_equal resource.creators.first, creator
+    assert_equal resource.creators.first, new_creator
   end
   
   test "removing_an_creator" do
@@ -34,7 +34,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     params =  ActiveSupport::JSON.encode([[creator.name, creator.id]])
     AssetsCreator.add_or_update_creator_list(resource, params)
     #Remove creator
-    assert_difference('resource.asset.creators.count', -1) do
+    assert_difference('resource.creators.count', -1) do
       params =  ActiveSupport::JSON.encode([])
       AssetsCreator.add_or_update_creator_list(resource, params)
     end
@@ -53,7 +53,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     params =  ActiveSupport::JSON.encode([[creator_to_stay.name, creator_to_stay.id],
                                           [new_creator.name, new_creator.id]])
     AssetsCreator.add_or_update_creator_list(resource, params)
-    creators = resource.asset.creators
+    creators = resource.creators
     assert_equal creators.count, 2
     assert creators.include?(creator_to_stay)
     assert creators.include?(new_creator)

@@ -5,7 +5,7 @@ class MailerTest < ActionMailer::TestCase
   fixtures :all
 
   test "signup" do
-    @expected.subject = 'Sysmo SEEK account activation'
+    @expected.subject = 'SysMO SEEK account activation'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date    = Time.now
@@ -31,7 +31,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request resource" do
-    @expected.subject = "A Sysmo Member requested a protected file: Picture"
+    @expected.subject = "A SysMO member requested a protected file: Picture"
     @expected.to = ["Datafile Owner <data_file_owner@email.com>","OwnerOf MyFirstSop <owner@sop.com>"]
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -48,7 +48,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request resource no details" do
-    @expected.subject = "A Sysmo Member requested a protected file: Picture"
+    @expected.subject = "A SysMO member requested a protected file: Picture"
     @expected.to = ["Datafile Owner <data_file_owner@email.com>","OwnerOf MyFirstSop <owner@sop.com>"]
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -65,7 +65,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "forgot_password" do
-    @expected.subject = 'Sysmo SEEK - Password reset'
+    @expected.subject = 'SysMO SEEK - Password reset'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date    = Time.now
@@ -82,7 +82,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "contact_admin_new_user_no_profile" do
-    @expected.subject = 'Sysmo Member signed up'
+    @expected.subject = 'SysMO member signed up'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date    = Time.now
@@ -97,7 +97,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "welcome" do
-    @expected.subject = 'Welcome to Sysmo SEEK'
+    @expected.subject = 'Welcome to SysMO SEEK'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date = Time.now

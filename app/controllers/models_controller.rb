@@ -11,7 +11,7 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_models, :only => [ :index ]
-  before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
+  before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource ]
   before_filter :find_display_model, :only=>[:show,:download]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
@@ -427,6 +427,17 @@ class ModelsController < ApplicationController
     end
   end
   
+  def request_resource
+    resource = Model.find(params[:id])
+    details = params[:details]
+    
+    Mailer.deliver_request_resource(current_user,resource,details,base_host)
+    
+    render :update do |page|
+      page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
+    end
+  end  
+  
   protected
   
   def default_items_per_page
@@ -484,8 +495,8 @@ class ModelsController < ApplicationController
     policy_type = ""
     
     # obtain a policy to use
-    if defined?(@model) && @model.asset
-      if (policy = @model.asset.policy)
+    if @model
+      if (policy = @model.policy)
         # Model exists and has a policy associated with it - normal case
         policy_type = "asset"
       elsif @model.project && (policy = @model.project.default_policy)

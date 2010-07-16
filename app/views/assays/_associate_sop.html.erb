@@ -92,7 +92,7 @@
       <% params[:assay_sop_asset_ids].each do |id| -%>
         <% sop = Sop.find(id) %>
           <% if Authorization.is_authorized?("show",nil,sop,current_user) -%>
-        sop_id = '<%= id -%>';
+        sop_id = '<%= sop.id -%>';
         sop_title = '<%= escape_javascript(sop.title) -%>';
         addSop(sop_title, sop_id);
           <% end -%>

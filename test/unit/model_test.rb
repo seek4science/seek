@@ -18,9 +18,7 @@ class ModelTest < ActiveSupport::TestCase
   test "project" do
     model=models(:teusink)
     p=projects(:sysmo_project)
-    assert_equal p,model.asset.project
     assert_equal p,model.project
-    assert_equal p,model.latest_version.asset.project
     assert_equal p,model.latest_version.project
   end
 
@@ -36,7 +34,6 @@ class ModelTest < ActiveSupport::TestCase
   test "model with no contributor" do
     model=models(:model_with_no_contributor)
     assert_nil model.contributor
-    assert_nil model.asset.contributor
   end
 
   test "versions destroyed as dependent" do

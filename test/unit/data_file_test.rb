@@ -17,16 +17,13 @@ class DataFileTest < ActiveSupport::TestCase
   test "project" do
     df=data_files(:sysmo_data_file)
     p=projects(:sysmo_project)
-    assert_equal p,df.asset.project
     assert_equal p,df.project
-    assert_equal p,df.latest_version.asset.project
     assert_equal p,df.latest_version.project
   end
 
   test "data_file with no contributor" do
     df=data_files(:data_file_with_no_contributor)
     assert_nil df.contributor
-    assert_nil df.asset.contributor
   end
 
   test "versions destroyed as dependent" do

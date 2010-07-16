@@ -6,7 +6,6 @@ class SopTest < ActiveSupport::TestCase
   test "project" do
     s=sops(:editable_sop)
     p=projects(:sysmo_project)
-    assert_equal p,s.asset.project
     assert_equal p,s.project
   end
 
@@ -75,15 +74,12 @@ class SopTest < ActiveSupport::TestCase
     sop=sops(:my_first_sop)
     project=projects(:sysmo_project)
     assert_equal project,sop.project
-    assert_equal project,sop.asset.project
-    assert_equal project,sop.latest_version.asset.project
     assert_equal project,sop.latest_version.project
   end
 
   test "sop with no contributor" do
     sop=sops(:sop_with_no_contributor)
     assert_nil sop.contributor
-    assert_nil sop.asset.contributor
   end
 
   test "versions destroyed as dependent" do

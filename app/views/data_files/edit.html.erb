@@ -42,7 +42,7 @@
       
     <p style="margin: 0;">
       <%= render :partial => "assets/author_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
-        :existing_creators => @data_file.asset.creators,
+        :existing_creators => @data_file.creators,
         :other_creators => @data_file.other_creators} -%>
     </p>
     <% end -%>

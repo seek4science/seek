@@ -5,12 +5,12 @@
 <%= list_item_attribute "DOI", resource.doi, "http://dx.doi.org/#{resource.doi}", {:popup => true} unless resource.doi.nil? %>
 
 <p class="list_item_attribute">
-  <b>Author<%= resource.asset.creators.size + resource.non_seek_authors.size > 1 ? "s" : "" -%>:</b>
-  <% if resource.asset.creators.empty? && resource.non_seek_authors.empty? %>
+  <b>Author<%= resource.creators.size + resource.non_seek_authors.size > 1 ? "s" : "" -%>:</b>
+  <% if resource.creators.empty? && resource.non_seek_authors.empty? %>
     <span class='none_text'>Not specified</span>
   <% else %>
-    <% resource.asset.creators.each do |author| %>
-      <%= (link_to get_object_title(author), show_resource_path(author)) + ((author == resource.asset.creators.last) && (resource.non_seek_authors.empty?) ? "" : ", ") %>
+    <% resource.creators.each do |author| %>
+      <%= (link_to get_object_title(author), show_resource_path(author)) + ((author == resource.creators.last) && (resource.non_seek_authors.empty?) ? "" : ", ") %>
     <% end %>
     <% resource.non_seek_authors.each do |author| %>
       <%= author.last_name + " " + author.first_name + ((author == resource.non_seek_authors.last) ? "" : ", ") %>

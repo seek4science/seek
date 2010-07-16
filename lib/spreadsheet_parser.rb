@@ -138,11 +138,7 @@ class Cell
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)
     num = @column
     col = ""
-    while num > 0
-      col = alphabet[num % 26] + col
-      num = (num / 26) - 1
-    end
-    if num == 0
+    while (num+1) > 0
       col = alphabet[num % 26] + col
       num = (num / 26) - 1
     end
