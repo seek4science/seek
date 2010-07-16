@@ -98,8 +98,8 @@ module Mib
           return people.uniq
         end
         
-        def asset; return self; end        
-        def resource; return self; end
+       # def asset; return self; end        
+       # def resource; return self; end
           
       end
     end

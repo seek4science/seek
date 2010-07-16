@@ -536,7 +536,7 @@ module Authorization
     # NB! currently SysMO won't support objects owned by entities other than users (or nil contributor to indicate automated upload - JERM)
     # (especially, policy checks are not agreed for these cases - however, owner tests and
     #  permission tests are possible and will be carried out)
-    unless thing_asset.contributor.nil? || thing_asset.resource.contributor.class.name == "User"
+    unless thing_asset.contributor.nil? || thing_asset.contributor.class.name == "User"
       return false
     end
     
