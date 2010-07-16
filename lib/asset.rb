@@ -1,38 +1,7 @@
 class Asset < ActiveRecord::Base
-  #belongs_to :contributor, :polymorphic => true
-  
-  belongs_to :resource, :polymorphic => true
-  belongs_to :project
-  belongs_to :policy
-
-  has_many :assay_assets, :dependent => :destroy
-  has_many :assays, :through => :assay_assets
-    
-  has_and_belongs_to_many :creators,:join_table => 'assets_creators', :class_name => 'Person', :association_foreign_key => 'creator_id'  
-  
-  # TODO
-  # add all required validations here
-  
-  # classifies array of assets into a hash, where keys are the class names of the resources and
-  # values - arrays of assets of that type; also, performs authorization when required
-  #
-  # Parameters:
-  # - asset_array: array of assets to process
-  # - should_perform_filtering_if_not_authorized: boolean value which indicates if the method
-  #       needs to filter out assets that are not authorized for viewing by "user_to_authorize"
-  # - user_to_authorize: user for which this asset hash will be rendered in the view
   
   #The order in which asset tabs appear
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch','Organism']
-
-  def contributor
-    self.resource.contributor
-  end
-  
-  def title
-    #FIXME: quick hack to get graphviz working
-    resource.title
-  end
 
   def self.classify_and_authorize(asset_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)
     results = {}
@@ -88,24 +57,5 @@ class Asset < ActiveRecord::Base
     end
     
     return results
-  end
-  
-  # this method will save the Asset, but will not cause 'updated_at' field to receive new value of Time.now
-  def save_without_timestamping
-    class << self
-      def record_timestamps; false; end
-    end
-  
-    save
-  
-    class << self
-      remove_method :record_timestamps
-    end
-  end
-  
-  
-  # checks if contributor is the owner of this asset
-  def owner?(contributor)
-    return self.contributor==contributor
   end
 end
