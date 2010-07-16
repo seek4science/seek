@@ -57,7 +57,7 @@ module ResourceListItemHelper
   end
   
   def list_item_simple_list items, attribute
-    html = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
+    html = "<p class=\"list_item_attribute\"><b>#{attribute}:</b> "
     if items.empty?
       html << "<span class='none_text'>Not specified</span>"
     else
