@@ -1,6 +1,7 @@
 # this will make the Authorization module available throughout the codebase
 require 'authorization'
 require 'save_without_timestamping'
+require 'asset'
 
 JERM_ENABLED=true unless defined? JERM_ENABLED
 SOLR_ENABLED=false unless defined? SOLR_ENABLED

@@ -31,13 +31,13 @@ class AssaysControllerTest < ActionController::TestCase
     timestamp=assay.updated_at
     
     sop = sops(:sop_with_all_sysmo_users_policy)
-    assert !assay.sops.include?(sop.latest_version)
+    assert !assay.sops.include?(sop)
     sleep(1)
     put :update, :id=>assay,:assay_sop_asset_ids=>[sop.id],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.sops.include?(sop.latest_version)
+    assert updated_assay.sops.include?(sop)
     assert_not_equal timestamp,updated_assay.updated_at
 
   end
@@ -48,13 +48,13 @@ class AssaysControllerTest < ActionController::TestCase
     timestamp=assay.updated_at
 
     df = data_files(:downloadable_data_file)
-    assert !assay.data_files.include?(df.latest_version)
+    assert !assay.data_files.include?(df)
     sleep(1)
     put :update, :id=>assay,:assay_data_file_asset_ids=>["#{df.id},Test data"],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.data_files.include?(df.latest_version)
+    assert updated_assay.data_files.include?(df)
     assert_not_equal timestamp,updated_assay.updated_at
   end
 
@@ -64,13 +64,13 @@ class AssaysControllerTest < ActionController::TestCase
     timestamp=assay.updated_at
 
     model = models(:teusink)
-    assert !assay.models.include?(model.latest_version)
+    assert !assay.models.include?(model)
     sleep(1)
     put :update, :id=>assay,:assay_model_asset_ids=>[model.id],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.models.include?(model.latest_version)
+    assert updated_assay.models.include?(model)
     assert_not_equal timestamp,updated_assay.updated_at
   end
 
