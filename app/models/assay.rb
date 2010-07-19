@@ -14,16 +14,23 @@ class Assay < ActiveRecord::Base
 
   has_many :assay_assets, :dependent => :destroy
   
-  has_many :data_file_versions, :through => :assay_assets, :source => :asset, :source_type => "DataFile::Version"
-  has_many :sop_versions, :through => :assay_assets, :source => :asset, :source_type => "Sop::Version"
-  has_many :model_versions, :through => :assay_assets, :source => :asset, :source_type => "Model::Version"
+  def self.asset_sql(asset_class)
+    asset_class_underscored = asset_class.underscore
+    'SELECT '+ asset_class_underscored +'_versions.* FROM ' + asset_class_underscored + '_versions ' +
+    'INNER JOIN assay_assets ' + 
+    'ON assay_assets.asset_id = ' + asset_class_underscored + '_id ' + 
+    'AND assay_assets.asset_type = \'' + asset_class + '\' ' + 
+    'WHERE (assay_assets.version = ' + asset_class_underscored + '_versions.version ' +
+    'AND assay_assets.assay_id = #{self.id})' 
+  end
+  
+  has_many :data_files, :class_name => "DataFile::Version", :finder_sql => self.asset_sql("DataFile")
+  has_many :sops, :class_name => "Sop::Version", :finder_sql => self.asset_sql("Sop")
+  has_many :models, :class_name => "Model::Version", :finder_sql => self.asset_sql("Model")
+  
   has_many :data_file_masters, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
   has_many :sop_masters, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :model_masters, :through => :assay_assets, :source => :asset, :source_type => "Model"
-  
-  def data_files; data_file_masters + data_file_versions; end
-  def models; model_masters + model_versions; end
-  def sops; sop_masters + sop_versions; end
 
   has_one :investigation,:through=>:study    
 
@@ -80,14 +87,23 @@ class Assay < ActiveRecord::Base
     self.first_letter = strip_first_letter(title)
   end
   
-  #Relate an asset to this assay with a specific relationship type
+  #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
-    assay_asset = AssayAsset.find_by_asset_id_and_assay_id(asset, self) || AssayAsset.new()
-    assay_asset.assay = self
-    assay_asset.asset = asset
-    assay_asset.version = asset.version
-    assay_asset.relationship_type = r_type unless r_type.nil?     
-    assay_asset.save
+    assay_asset = AssayAsset.find_by_asset_id_and_assay_id(asset, self)
+    if assay_asset.nil?
+      assay_asset = AssayAsset.new
+      assay_asset.assay = self
+      assay_asset.asset = asset
+      assay_asset.version = asset.version
+      assay_asset.relationship_type = r_type unless r_type.nil?     
+      assay_asset.save
+      return assay_asset
+    elsif assay_asset.version == asset.version && (r_type.nil? || assay_asset.relationship_type == r_type)
+      assay_asset.version = asset.version
+      assay_asset.relationship_type = r_type unless r_type.nil?     
+      assay_asset.save
+    end
+    return assay_asset
   end
 
   #Associates and organism with the assay
@@ -113,7 +129,6 @@ class Assay < ActiveRecord::Base
   end
   
   def assets
-    (data_files + models + sops).collect {|a| a.latest_version} |  (data_file_versions + model_versions + sop_versions)
+    (data_file_masters + model_masters + sop_masters).collect {|a| a.latest_version} |  (data_files + models + sops)
   end
-  
 end

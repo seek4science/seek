@@ -1,4 +1,5 @@
 require 'acts_as_resource'
+require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
@@ -30,14 +31,14 @@ class DataFile < ActiveRecord::Base
   acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do
-    acts_as_resource
+    acts_as_versioned_resource
     
     belongs_to :content_blob
     
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions =>  'studied_factors.data_file_version = #{self.version}'
     
     def relationship_type(assay)
-      assay_assets.find_by_assay_id(assay.id).relationship_type  
+      parent.relationship_type(assay)
     end
   end
 
