@@ -1,6 +1,6 @@
 module DotGenerator
   
-  FILL_COLOURS = {Sop=>"gold",Model=>"red",DataFile=>"cyan",Investigation=>"skyblue3",Study=>"chocolate",Assay=>"burlywood"}
+  FILL_COLOURS = {Sop=>"darksalmon",Model=>"deepskyblue4",DataFile=>"darkkhaki",Investigation=>"skyblue3",Study=>"chocolate",Assay=>"burlywood"}
   
   def to_dot thing, deep=false
     dot = dot_header "Investigation"

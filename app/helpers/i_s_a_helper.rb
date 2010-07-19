@@ -23,7 +23,7 @@ module ISAHelper
   end
   
   def embedded_isa_svg item,deep=false
-    "<center><script type=\'image/svg+xml'>#{to_svg(item,deep)}</script></center>"
+    "<div id='isa_svg'><script type=\'image/svg+xml'>#{to_svg(item,deep)}</script></div>"
   end
   
 end

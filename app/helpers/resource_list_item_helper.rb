@@ -46,7 +46,7 @@ module ResourceListItemHelper
       when "Assay"
         image = image_tag((resource.is_modelling? ? icon_filename_for_key("assay_modelling_avatar") : icon_filename_for_key("assay_experimental_avatar")), :style => "height: 24px; vertical-align: middle")
         icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-        html << "#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
+        html << "<p>#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
       when "Person"
         html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
       else

@@ -1250,3 +1250,8 @@ img.visibility_icon {
 #organism_search_results {
 	margin-left: 2em;
 }
+
+div#isa_svg {	
+	text-align: center;
+	padding-top: 1em;
+}
