@@ -80,7 +80,7 @@
 </div>
 
 <script type="text/javascript">
-    <% @assay.sops.each do |s| -%>    
+    <% @assay.sop_masters.each do |s| -%>    
       <% if Authorization.is_authorized?("show",nil,s,current_user) -%>
         sop_id = '<%= s.id -%>';
         sop_title = '<%= escape_javascript(s.title) -%>';

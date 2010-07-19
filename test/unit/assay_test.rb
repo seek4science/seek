@@ -115,7 +115,7 @@ class AssayTest < ActiveSupport::TestCase
   test "can relate data files" do
     assay = assays(:metabolomics_assay)
     assert_difference("Assay.find_by_id(assay.id).data_files.count") do
-      assay.relate(data_file_versions(:viewable_data_file_v1), relationship_types(:test_data))
+      assay.relate(data_files(:viewable_data_file), relationship_types(:test_data))
     end
   end
 

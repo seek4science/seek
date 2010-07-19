@@ -71,29 +71,34 @@ class AssaysController < ApplicationController
   def update
     @assay=Assay.find(params[:id])
     
-    @assay.sops.clear unless params[:assay][:sop_ids]
-
     #FIXME: would be better to resolve the differences, rather than keep clearing and reading the assets and organisms
-    @assay.assets = []
+    #DOES resolve differences for assets now
     @assay.assay_organisms=[]
     
     organisms = params[:assay_organism_ids] || []
     sop_assets = params[:assay_sop_asset_ids] || []
     data_assets = params[:assay_data_file_asset_ids] || []
-    model_assets = params[:assay_model_asset_ids] || []    
+    model_assets = params[:assay_model_asset_ids] || []
+    
+    assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
 
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
         data_assets.each do |text|
           a_id, r_type = text.split(",")
-          @assay.relate(DataFile.find(a_id), RelationshipType.find_by_title(r_type))
+          assay_assets_to_keep << @assay.relate(DataFile.find(a_id), RelationshipType.find_by_title(r_type))
         end
         model_assets.each do |a_id|
-          @assay.relate(Model.find(a_id))
+          assay_assets_to_keep << @assay.relate(Model.find(a_id))
         end
         sop_assets.each do |a_id|
-          @assay.relate(Sop.find(a_id))
+          assay_assets_to_keep << @assay.relate(Sop.find(a_id))
         end
+        #Destroy AssayAssets that aren't needed
+        (@assay.assay_assets - assay_assets_to_keep.compact).each do |a|
+          a.destroy            
+        end
+        
         organisms.each do |text|
           o_id,strain,culture_growth_type_text=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)

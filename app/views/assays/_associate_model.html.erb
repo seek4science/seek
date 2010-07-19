@@ -81,7 +81,7 @@ select_truncate_length=120;
 </div>
 
 <script type="text/javascript">
-<% @assay.models.each do |s| -%>    
+<% @assay.model_masters.each do |s| -%>    
   <% if Authorization.is_authorized?("show",nil,s,current_user) -%>
       model_id = '<%= s.id -%>';
       model_title = '<%= escape_javascript(s.title) -%>';
