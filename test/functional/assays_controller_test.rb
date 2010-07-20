@@ -12,6 +12,11 @@ class AssaysControllerTest < ActionController::TestCase
     @object=assays(:metabolomics_assay)
   end
 
+  def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK Assays.*/, :count=>1
+  end
+
   test "should show index" do
     get :index
     assert_response :success

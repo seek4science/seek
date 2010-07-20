@@ -11,6 +11,11 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:datafile_owner)
     @object=data_files(:picture)
   end
+  
+   def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK Data.*/, :count=>1
+  end
 
   test "should show index" do
     get :index

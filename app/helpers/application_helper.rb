@@ -193,7 +193,7 @@ module ApplicationHelper
     name=PAGE_TITLES[controller_name]
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
-    return "Sysmo SEEK&nbsp;"+name
+    return "Sysmo SEEK "+name
   end
 
   def admin_email_links
@@ -361,6 +361,6 @@ module ApplicationHelper
   end 
 
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","experiments"=>"Experiments","sops"=>"Sops","models"=>"Models","data_files"=>"Data","publications"=>"Publications"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
   
 end
