@@ -17,6 +17,11 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:studies)
   end
+  
+  def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK Studies.*/, :count=>1
+  end
 
   test "should get show" do
     get :show, :id=>studies(:metabolomics_study)

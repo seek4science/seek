@@ -11,6 +11,11 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:quentin)
     @object=sops(:downloadable_sop)
   end
+  
+  def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK SOPs.*/, :count=>1
+  end
 
   test "should get index" do
     get :index
