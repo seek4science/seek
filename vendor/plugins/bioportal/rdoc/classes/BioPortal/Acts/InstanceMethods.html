@@ -80,14 +80,14 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000013">concept</a>&nbsp;&nbsp;
-      <a href="#M000017">concept_uri</a>&nbsp;&nbsp;
-      <a href="#M000020">concept_uri=</a>&nbsp;&nbsp;
-      <a href="#M000014">ontology</a>&nbsp;&nbsp;
-      <a href="#M000015">ontology_id</a>&nbsp;&nbsp;
-      <a href="#M000018">ontology_id=</a>&nbsp;&nbsp;
-      <a href="#M000016">ontology_version_id</a>&nbsp;&nbsp;
-      <a href="#M000019">ontology_version_id=</a>&nbsp;&nbsp;
+      <a href="#M000014">concept</a>&nbsp;&nbsp;
+      <a href="#M000018">concept_uri</a>&nbsp;&nbsp;
+      <a href="#M000021">concept_uri=</a>&nbsp;&nbsp;
+      <a href="#M000015">ontology</a>&nbsp;&nbsp;
+      <a href="#M000016">ontology_id</a>&nbsp;&nbsp;
+      <a href="#M000019">ontology_id=</a>&nbsp;&nbsp;
+      <a href="#M000017">ontology_version_id</a>&nbsp;&nbsp;
+      <a href="#M000020">ontology_version_id=</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -109,87 +109,12 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000013" class="method-detail">
-        <a name="M000013"></a>
-
-        <div class="method-heading">
-          <a href="#M000013" class="method-signature">
-          <span class="method-name">concept</span><span class="method-args">(options={})</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000013-source">
-<pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 32</span>
-32:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">concept</span> <span class="ruby-identifier">options</span>={}
-33: 
-34:         <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:email</span>] <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span>.<span class="ruby-identifier">nil?</span>
-35: 
-36:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
-37:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">get_concept</span> <span class="ruby-identifier">options</span>
-38:       <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
-      <div id="method-M000017" class="method-detail">
-        <a name="M000017"></a>
-
-        <div class="method-heading">
-          <a href="#M000017" class="method-signature">
-          <span class="method-name">concept_uri</span><span class="method-args">()</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000017-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000017-source">
-<pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 57</span>
-57:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">concept_uri</span>
-58:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
-59:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">concept_uri</span>
-60:       <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
-      <div id="method-M000020" class="method-detail">
-        <a name="M000020"></a>
-
-        <div class="method-heading">
-          <a href="#M000020" class="method-signature">
-          <span class="method-name">concept_uri=</span><span class="method-args">(value)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000020-source">
-<pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 72</span>
-72:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">concept_uri=</span> <span class="ruby-identifier">value</span>
-73:         <span class="ruby-identifier">check_concept</span>
-74:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">concept_uri</span>=<span class="ruby-identifier">value</span>
-75:       <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
       <div id="method-M000014" class="method-detail">
         <a name="M000014"></a>
 
         <div class="method-heading">
           <a href="#M000014" class="method-signature">
-          <span class="method-name">ontology</span><span class="method-args">(options={})</span>
+          <span class="method-name">concept</span><span class="method-args">(options={})</span>
           </a>
         </div>
       
@@ -198,37 +123,18 @@
             onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000014-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 40</span>
-40:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology</span> <span class="ruby-identifier">options</span>={}
-41:         <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:email</span>] <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span>.<span class="ruby-identifier">nil?</span>
-42: 
-43:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
-44:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">get_ontology</span> <span class="ruby-identifier">options</span>
-45:       <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
-      <div id="method-M000015" class="method-detail">
-        <a name="M000015"></a>
-
-        <div class="method-heading">
-          <a href="#M000015" class="method-signature">
-          <span class="method-name">ontology_id</span><span class="method-args">()</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000015-source">
-<pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 47</span>
-47:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_id</span>
-48:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
-49:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_id</span>
-50:       <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 32</span>
+32:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">concept</span> <span class="ruby-identifier">options</span>={}
+33: 
+34:         <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:email</span>] <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span>.<span class="ruby-identifier">nil?</span>
+35: 
+36:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
+37:         <span class="ruby-keyword kw">begin</span>
+38:           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">get_concept</span> <span class="ruby-identifier">options</span>
+39:         <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">e</span>
+40:           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
+41:         <span class="ruby-keyword kw">end</span>
+42:       <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -239,7 +145,7 @@
 
         <div class="method-heading">
           <a href="#M000018" class="method-signature">
-          <span class="method-name">ontology_id=</span><span class="method-args">(value)</span>
+          <span class="method-name">concept_uri</span><span class="method-args">()</span>
           </a>
         </div>
       
@@ -248,11 +154,61 @@
             onclick="toggleCode('M000018-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000018-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 62</span>
-62:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_id=</span> <span class="ruby-identifier">value</span>
-63:         <span class="ruby-identifier">check_concept</span>
-64:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_id</span>=<span class="ruby-identifier">value</span>
-65:       <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 61</span>
+61:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">concept_uri</span>
+62:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
+63:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">concept_uri</span>
+64:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
+
+        <div class="method-heading">
+          <a href="#M000021" class="method-signature">
+          <span class="method-name">concept_uri=</span><span class="method-args">(value)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000021-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 76</span>
+76:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">concept_uri=</span> <span class="ruby-identifier">value</span>
+77:         <span class="ruby-identifier">check_concept</span>
+78:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">concept_uri</span>=<span class="ruby-identifier">value</span>
+79:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
+
+        <div class="method-heading">
+          <a href="#M000015" class="method-signature">
+          <span class="method-name">ontology</span><span class="method-args">(options={})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000015-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 44</span>
+44:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology</span> <span class="ruby-identifier">options</span>={}
+45:         <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:email</span>] <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_email</span>.<span class="ruby-identifier">nil?</span>
+46: 
+47:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
+48:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">get_ontology</span> <span class="ruby-identifier">options</span>
+49:       <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -263,7 +219,7 @@
 
         <div class="method-heading">
           <a href="#M000016" class="method-signature">
-          <span class="method-name">ontology_version_id</span><span class="method-args">()</span>
+          <span class="method-name">ontology_id</span><span class="method-args">()</span>
           </a>
         </div>
       
@@ -272,11 +228,11 @@
             onclick="toggleCode('M000016-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000016-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 52</span>
-52:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_version_id</span>
-53:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
-54:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_version_id</span>
-55:       <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 51</span>
+51:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_id</span>
+52:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
+53:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_id</span>
+54:       <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -287,7 +243,7 @@
 
         <div class="method-heading">
           <a href="#M000019" class="method-signature">
-          <span class="method-name">ontology_version_id=</span><span class="method-args">(value)</span>
+          <span class="method-name">ontology_id=</span><span class="method-args">(value)</span>
           </a>
         </div>
       
@@ -296,11 +252,59 @@
             onclick="toggleCode('M000019-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000019-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 67</span>
-67:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_version_id=</span> <span class="ruby-identifier">value</span>
-68:         <span class="ruby-identifier">check_concept</span>
-69:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_version_id</span>=<span class="ruby-identifier">value</span>
-70:       <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 66</span>
+66:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_id=</span> <span class="ruby-identifier">value</span>
+67:         <span class="ruby-identifier">check_concept</span>
+68:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_id</span>=<span class="ruby-identifier">value</span>
+69:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000017" class="method-detail">
+        <a name="M000017"></a>
+
+        <div class="method-heading">
+          <a href="#M000017" class="method-signature">
+          <span class="method-name">ontology_version_id</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000017-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000017-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 56</span>
+56:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_version_id</span>
+57:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">nil?</span>
+58:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_version_id</span>
+59:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
+
+        <div class="method-heading">
+          <a href="#M000020" class="method-signature">
+          <span class="method-name">ontology_version_id=</span><span class="method-args">(value)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000020-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/bioportal.rb, line 71</span>
+71:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">ontology_version_id=</span> <span class="ruby-identifier">value</span>
+72:         <span class="ruby-identifier">check_concept</span>
+73:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">bioportal_concept</span>.<span class="ruby-identifier">ontology_version_id</span>=<span class="ruby-identifier">value</span>
+74:       <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
