@@ -44,10 +44,10 @@
                 <%= link_to_download_ontology("Download",result[:ontology_version_id]) -%>
             </td>
             <td>
-                <%= result[:concept_id] -%>
+                <%= result[:concept_id_short] -%>
             </td>
             <td>
-                <%= link_to_function(h(result[:preferred_name]),"add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id]}');") -%>
+                <%= link_to_function(h(result[:preferred_name]),"add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id_short]}');") -%>
             </td
         </tr>
         <% end %>
