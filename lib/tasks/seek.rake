@@ -17,8 +17,6 @@ namespace :seek do
     end
   end
   
-  
-  
   desc "adds the default tags" 
   task(:default_tags=>:environment) do      
     File.open('config/default_data/expertise.list').each do |item|
@@ -41,8 +39,7 @@ namespace :seek do
           taggable.save!
         end
       end
-    end    
-    
+    end        
   end  
   
   task(:associate_people_with_notification_info=>:environment) do
@@ -351,10 +348,6 @@ namespace :seek do
       puts "\t Studies: #{project_stat.studies.count}"
       puts "\n --------------- \n\n"
     end
-    
-    
-    
-    
   end
   
   desc "Dumps help documents and attachments/images"
