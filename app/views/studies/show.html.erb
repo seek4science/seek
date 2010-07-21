@@ -1,6 +1,3 @@
-
-
-
 <ul class="sectionIcons">
   <% if @study.can_edit?(current_user) -%>
     <li>
@@ -67,11 +64,7 @@
 
   </div>    
     
-  
   <%= embedded_isa_svg(@study) -%>
-  
-    
 
-  <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @study %>
-
+  <%= render :partial=>"layouts/items_related_to", :object => @study %>
 </div>

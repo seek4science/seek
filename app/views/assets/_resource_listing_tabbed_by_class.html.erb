@@ -1,23 +1,22 @@
 <%# this partial will display a dynamically generated view of all assets from a collection; -%>
 <%# different types of assets will be placed in different tabs based on their class; -%>
 <%# the partial requires 3 parameters to be defined: -%>
-<%# - asset_hash: a hash of all asset instances, where keys are asset class names and values are arrays of asset instances of that class -%>
+<%# - resource_hash: a hash of all resource instances, where keys are resource class names and values are arrays of resource instances of that class -%>
 <%# - narrow_view: type of the partial to use for asset listings: 'false' to use the same partial with much info as on SOPs listing page -%>
 <%#                                                               'true' to use a partial with fewer information; suitable for 'show' pages for people/projects -%>
 <%# - authorization_already_done: boolean value indicating whether all items in the collection have already been authorized for the current user to view or not -%>
 <% tabs_id ||= "resource_list_by_class" -%>
 <% narrow_view ||= false -%>
 <% authorization_already_done ||= false -%>
-<% hidden_asset_count_hash ||= {} %>
 
 <script type="text/javascript">
   tabber_ids.push("<%= tabs_id -%>");  
 </script>
 
 <% total_count = 0 %>
-<% asset_hash.each_key do |k| %>
-  <% count = asset_hash[k][:items].size + asset_hash[k][:hidden_count] %>
-  <% asset_hash.delete(k) if count == 0 %>
+<% resource_hash.each_key do |k| %>
+  <% count = resource_hash[k][:items].size + resource_hash[k][:hidden_count] %>
+  <% resource_hash.delete(k) if count == 0 %>
   <% total_count += count %>
 <% end %>
 <% unless total_count == 0-%>
@@ -27,18 +26,18 @@
     </center>
   </div>
   <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
-    <% Asset::ASSET_ORDER.each do |resource_type| -%>  
+    <% ASSET_ORDER.each do |resource_type| -%>  
       <% visible_resource_type = resource_type.titleize.pluralize -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
       <% hidden_count = 0 %>
       <% extra_count = 0 %>
-      <% unless asset_hash[resource_type].nil? %>
-        <% if asset_hash.class == Hash %>
-          <% hidden_count = asset_hash[resource_type][:hidden_count] %>
-          <% resources = asset_hash[resource_type][:items] %>
-          <% extra_count = asset_hash[resource_type][:extra_count] || 0 %>
+      <% unless resource_hash[resource_type].nil? %>
+        <% if resource_hash.class == Hash %>
+          <% hidden_count = resource_hash[resource_type][:hidden_count] %>
+          <% resources = resource_hash[resource_type][:items] %>
+          <% extra_count = resource_hash[resource_type][:extra_count] || 0 %>
         <% else %>
-          <% resources = asset_hash %>
+          <% resources = resource_hash %>
         <% end %>
       <% else %>
         <% resources = {} %>

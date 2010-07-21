@@ -93,9 +93,9 @@ function updateSops() {
         $('sop_to_list').innerHTML = sop_text;
     }
 
-    clearList('assay_sop_asset_ids');
+    clearList('assay_sop_ids');
 
-    select=$('assay_sop_asset_ids')
+    select=$('assay_sop_ids')
     for (i=0;i<sop_ids.length;i++) {
         id=sop_ids[i];
         o=document.createElement('option');
@@ -170,9 +170,9 @@ function updateDataFiles() {
         $('data_file_to_list').innerHTML = data_file_text;
     }
 
-    clearList('assay_data_file_asset_ids');
+    clearList('assay_data_file_ids');
 
-    select=$('assay_data_file_asset_ids');
+    select=$('assay_data_file_ids');
     for (i=0;i<data_files_assets.length;i++) {
         id=data_files_assets[i][1];
         relationshipType=data_files_assets[i][2];
@@ -244,9 +244,9 @@ function updateModels() {
         $('model_to_list').innerHTML = model_text;
     }
 
-    clearList('assay_model_asset_ids');
+    clearList('assay_model_ids');
 
-    select=$('assay_model_asset_ids');
+    select=$('assay_model_ids');
     for (i=0;i<model_ids.length;i++) {
         id=model_ids[i];
         o=document.createElement('option');

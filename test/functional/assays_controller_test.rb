@@ -33,7 +33,7 @@ class AssaysControllerTest < ActionController::TestCase
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_sop_asset_ids=>[sop.id],:assay=>{}
+    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
@@ -50,7 +50,7 @@ class AssaysControllerTest < ActionController::TestCase
     df = data_files(:downloadable_data_file)
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_data_file_asset_ids=>["#{df.id},Test data"],:assay=>{}
+    put :update, :id=>assay,:assay_data_file_ids=>["#{df.id},Test data"],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
@@ -66,7 +66,7 @@ class AssaysControllerTest < ActionController::TestCase
     model = models(:teusink)
     assert !assay.models.include?(model.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_model_asset_ids=>[model.id],:assay=>{}
+    put :update, :id=>assay,:assay_model_ids=>[model.id],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
@@ -371,9 +371,9 @@ class AssaysControllerTest < ActionController::TestCase
           :study_id=>studies(:metabolomics_study).id,
           :assay_class=>assay_classes(:modelling_assay_class)
         },
-          :assay_sop_asset_ids=>["#{sop.id}"],
-          :assay_model_asset_ids=>["#{model.id}"],
-          :assay_data_file_asset_ids=>["#{datafile.id},#{rel.title}"]        
+          :assay_sop_ids=>["#{sop.id}"],
+          :assay_model_ids=>["#{model.id}"],
+          :assay_data_file_ids=>["#{datafile.id},#{rel.title}"]        
       end
     end
 
@@ -412,9 +412,9 @@ class AssaysControllerTest < ActionController::TestCase
       assert_no_difference("AssayAsset.count","Should not have added assay assets because the assay validation failed") do
         #title is blank, so should fail validation
         put :update,:id=>assay,:assay=>{:title=>"",:assay_class=>assay_classes(:modelling_assay_class)},
-          :assay_sop_asset_ids=>["#{sop.id}"],
-          :assay_model_asset_ids=>["#{model.id}"],
-          :assay_data_file_asset_ids=>["#{datafile.id},#{rel.title}"]
+          :assay_sop_ids=>["#{sop.id}"],
+          :assay_model_ids=>["#{model.id}"],
+          :assay_data_file_ids=>["#{datafile.id},#{rel.title}"]
       end
     end
 

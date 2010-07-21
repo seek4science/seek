@@ -124,5 +124,5 @@
       <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @assay, :creators => [@assay.owner]} -%>
     </div>
     <br style="clear:both"/>
-    <%= render :partial=>"layouts/items_related_to",:locals=>{:include_hidden_asset_count=>true},:object => @assay %>
+    <%= render :partial=>"layouts/items_related_to",:object => @assay %>
 </div>

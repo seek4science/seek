@@ -1,10 +1,9 @@
 <% item = items_related_to %>
-<% include_hidden_asset_count ||= false %>
-<% item_hash = get_related_resources(item, 5) %>
+<% resource_hash = get_related_resources(item, 5) %>
 <h2 style="margin-top: 3em;">  
   Items related to <span style="font-weight:bolder;"><%= h(get_object_title(item)) -%></span>.
 </h2>
 
-<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :asset_hash => item_hash,
+<%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => { :resource_hash => resource_hash,
   :narrow_view => true,
-  :authorization_already_done => true, :include_hidden_asset_count => include_hidden_asset_count, :item => item} -%>
+  :authorization_already_done => true, :item => item} -%>

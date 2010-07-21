@@ -1,8 +1,5 @@
 class Asset < ActiveRecord::Base
   
-  #The order in which asset tabs appear
-  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch','Organism']
-
   def self.classify_and_authorize(asset_array, should_perform_filtering_if_not_authorized=false, user_to_authorize=nil)
     results = {}
     

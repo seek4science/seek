@@ -65,7 +65,7 @@ select_truncate_length=120;
         :before=>"show_ajax_loader('data_file_preview')"
       )+";check_show_add_data_file();return(false);"
     } -%>
-    <%= select_tag :assay_data_file_asset_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+    <%= select_tag :assay_data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
     <% if show_relationships -%>
       <br/>
       <%= label_tag "Relationship between the data and the model" %><br/>
@@ -93,8 +93,8 @@ select_truncate_length=120;
   <% end -%>
 <% end -%>
 
-<% if params[:assay_data_file_asset_ids] %>
-  <% params[:assay_data_file_asset_ids].each do |id_and_rel_id| -%>
+<% if params[:assay_data_file_ids] %>
+  <% params[:assay_data_file_ids].each do |id_and_rel_id| -%>
     <% a_id, r_type = id_and_rel_id.split(",") %>
     <% data_file = DataFile.find(a_id) %>
     <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
