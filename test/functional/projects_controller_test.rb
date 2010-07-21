@@ -10,7 +10,7 @@ class ProjectsControllerTest < ActionController::TestCase
   
   def test_title
     get :index
-    assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
+    assert_select "title",:text=>/Sysmo SEEK Projects.*/, :count=>1
   end
   
   def setup

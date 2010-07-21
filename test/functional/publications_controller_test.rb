@@ -12,6 +12,11 @@ class PublicationsControllerTest < ActionController::TestCase
     @object=publications(:taverna_paper_pubmed)
   end
   
+  def test_title
+    get :index
+    assert_select "title",:text=>/Sysmo SEEK Publications.*/, :count=>1
+  end
+  
   test "should get index" do
     get :index
     assert_response :success

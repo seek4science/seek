@@ -146,6 +146,29 @@ module BioPortal
       
     end
 
+    # Searches the BioPortal ontologies for terms that match the query either in the term label, synonyms or definitions.
+    # Details about the REST API can be found at: http://www.bioontology.org/wiki/index.php/BioPortal_REST_services#Search_BioPortal
+    #
+    # parameters:
+    # * query=<string> - the query string
+    # * options - a hash containing any of the following (all are optional)
+    #   * :ontologyids=<ontologyid>,<ontologyid>... - limits the search to specific ontologies (default: all ontologies)
+    #   * :isexactmatch=[1/0] - match the entire concept name (default: 0)
+    #   * :includeproperties=[1/0] - include attributes in the search (default: 0)
+    #   * :pagesize=<pagesize> - the number of results to display in a single request (default: all)
+    #   * :pagenum=<pagenum> - the page number to display (pages are calculated using <total results>/<pagesize>) (default: 1)
+    #   * :maxnumhits=<maxnumhits> - the maximum number of top matching results to return (default: 1000)
+    # returns:
+    # * a collection of search results, each of which is a hash containing:
+    #   * :ontology_display_label
+    #   * :ontology_version_id
+    #   * :ontology_id
+    #   * :record_type
+    #   * :concept_id
+    #   * :concept_id_short
+    #   * :preferred_name
+    #   * :contents
+    # * the total number of pages    
     def search query,options={}
       options[:pagesize] ||= 10
       options[:pagenum] ||= 0
