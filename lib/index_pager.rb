@@ -9,7 +9,7 @@ module IndexPager
     @hidden=0
     params[:page] ||= "latest"
     
-    if (model_class.respond_to?("acts_as_resource")) 
+    if (model_class.respond_to?("policy")) 
       authorized=Authorization.authorize_collection("show",objects,current_user)
       @hidden=objects.size - authorized.size
       objects=authorized

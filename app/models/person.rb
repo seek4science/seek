@@ -34,6 +34,9 @@ class Person < ActiveRecord::Base
   belongs_to :avatar
     
   has_many :group_memberships
+  
+  has_many :favourite_group_memberships, :dependent => :destroy
+  has_many :favourite_groups, :through => :favourite_group_memberships
     
   has_many :work_groups, :through=>:group_memberships
   has_many :studies, :foreign_key => :person_responsible_id
