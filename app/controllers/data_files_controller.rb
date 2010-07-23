@@ -1,8 +1,10 @@
-require 'spreadsheet_parser'
+
+require 'simple-spreadsheet-extractor'
 
 class DataFilesController < ApplicationController
 
   include IndexPager
+  include SysMODB::SpreadsheetExtractor
 
   before_filter :login_required
 
@@ -205,17 +207,16 @@ class DataFilesController < ApplicationController
   def data
     @data_file =  DataFile.find(params[:id])
     type = nil
-    if @data_file.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    if ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].include?(@data_file.content_type) 
       type = "xlsx"
-    elsif @data_file.content_type == "application/vnd.ms-excel"
+    elsif ["application/vnd.ms-excel","application/excel"].include?(@data_file.content_type)
       type = "xls"
     end
     unless type.nil?
-      filename = "/tmp/temp_ss_#{@data_file.object_id}.#{type}"
-      File.open(filename, 'w') {|f| f.write(@data_file.content_blob.data)}
-      @workbook = Workbook.new("file://" + filename, type)   
+      xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath))
       respond_to do |format|
-        format.xml
+        format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
+        format.xml {render :xml=>xml }
       end
     else
      respond_to do |format|

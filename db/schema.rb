@@ -87,11 +87,6 @@ ActiveRecord::Schema.define(:version => 20100708114759) do
     t.string   "uuid"
   end
 
-  create_table "asset_authors", :id => false, :force => true do |t|
-    t.integer "asset_id"
-    t.integer "author_id"
-  end
-
   create_table "assets", :force => true do |t|
     t.integer  "project_id"
     t.string   "resource_type"
@@ -278,17 +273,6 @@ ActiveRecord::Schema.define(:version => 20100708114759) do
     t.string   "filename"
     t.integer  "size"
     t.integer  "db_file_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "help_document_versions", :force => true do |t|
-    t.integer  "help_document_id"
-    t.integer  "version"
-    t.text     "revision_comments"
-    t.string   "identifier"
-    t.string   "title"
-    t.text     "body"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
