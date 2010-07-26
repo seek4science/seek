@@ -23,6 +23,12 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:sops)
   end
 
+  test "shouldn't show hidden items in index" do
+    login_as(:aaron)
+    get :index, :page => "all"
+    assert_response :success
+    assert_equal assigns(:sops).sort_by(&:id), Authorization.authorize_collection("view", assigns(:sops), users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
+  end
 
   test "should get new" do
     get :new
