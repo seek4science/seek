@@ -6,6 +6,8 @@ class FavouriteGroup < ActiveRecord::Base
   
   belongs_to :user
   has_many :favourite_group_memberships, :dependent => :destroy
+  has_many :people, :through => :favourite_group_memberships
+  
   has_many :permissions, :as => :contributor, :dependent => :destroy
   
   
