@@ -22,6 +22,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:data_files)
   end
+  
+  test "shouldn't show hidden items in index" do
+    login_as(:aaron)
+    get :index, :page => "all"
+    assert_response :success
+    assert_equal assigns(:data_files).sort_by(&:id), Authorization.authorize_collection("view", assigns(:data_files), users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
+  end
 
   test "should get new" do
     get :new
