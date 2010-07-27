@@ -1,9 +1,11 @@
 
 #custom-doc {
-    margin:auto;text-align:left; /* leave unchanged */
-    width:78.77em;/* non-IE */
-    *width:76.87em;/* IE */
-    min-width:600px;/* optional but recommended */
+    margin: auto;
+    text-align: left; /* leave unchanged */
+    width: 78.77em; /* non-IE */ *width:
+    76.87em; /* IE */
+min-width:
+    600px; /* optional but recommended */
 }
 
 #errorExplanation {
@@ -12,7 +14,7 @@
     padding: 0.5em;
     margin: 1em;
     background-color: #F5F5F5;
-    text-align:left;
+    text-align: left;
 }
 
 #errorExplanation h2 {
@@ -27,7 +29,7 @@
     color: #fff;
 }
 
-#errorExplanation p {	
+#errorExplanation p {
     color: #333;
     margin-bottom: 0;
     margin-top: 0.5em;
@@ -968,26 +970,29 @@ ul.horiz_list_items li {
 }
 
 #ft .middle {
-    width: auto;
-    text-align: left;
+    width: auto;    
     border-left: 1px solid #999999;
     text-align: center;
 }
-
+	
 #ft .middle p {
     width: 100%;
     text-align: center;     
 }
 
-#ft .middle ul {
-    text-align: center;
-    width: 100%;
+#ft .middle ul {    
+    width: 100%;	
 }
 
 #ft .middle li {
     list-style: none;
     float: left;
-    padding: 3px 3px 3px 3px;
+    padding: 3px 3px 3px 3px;			
+}
+
+#ft .middle li img {
+	margin-top:auto;
+	margin-bottom:auto;	
 }
 
 #ft .right {

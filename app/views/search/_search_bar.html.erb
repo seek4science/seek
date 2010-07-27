@@ -6,7 +6,7 @@
 <% end -%>
 
 <% if logged_in? && current_user.is_admin? && current_user.person -%>
-  <%= image_tag_for_key "admin", admin_path, "Admin enabled", {:id=>"adminmode"}, "Admin enabled" -%>
+  <%= image_tag_for_key "admin", admin_path, "Admin", {:id=>"adminmode"}, "Admin" -%>
 <% end -%>
 
 <% if SOLR_ENABLED && logged_in? && current_user.person -%>
