@@ -52,7 +52,9 @@ module Authorization
     if user.nil?
       scope = Policy::EVERYONE
     else
-      if thing.contributor == user
+      if thing.contributor == user #Warning to future refactorers, this would pass in the case that
+                                   #  the user was nil (not logged in) and the contributor was also nil (jerm resource)
+                                   #  IF we didn't already check for a nil user above.
         scope = Policy::PRIVATE
         return true #contributor is always authorized 
         # have to do this because of inconsistancies with access_type that mess up later on
@@ -71,7 +73,7 @@ module Authorization
                                       access_type_allows_action?(action, policy.access_type))
     # == END BASIC POLICY
     
-    if policy.use_custom_sharing
+    if policy.use_custom_sharing && user
       # == CUSTOM PERMISSIONS
       # 1. Check if there is a specific permission relating to the user
       # 2. Check if there is a permission for a FavouriteGroup they're in
