@@ -80,9 +80,7 @@
 					<xsd:element name="latest_version" type="ResourceLink"
 						minOccurs="1" maxOccurs="1"></xsd:element>
 					<xsd:element name="versions" type="VersionLinks"
-						minOccurs="1" maxOccurs="1"></xsd:element>
-					<xsd:element name="asset" type="Asset" minOccurs="1"
-						maxOccurs="1"></xsd:element>
+						minOccurs="1" maxOccurs="1"></xsd:element>					
 					<xsd:element name="blob" type="Blob" minOccurs="1"
 						maxOccurs="1"></xsd:element>
 					<xsd:element name="project" type="ProjectItem"
