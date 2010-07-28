@@ -59,20 +59,6 @@ class AdminControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
 
   end
- 
-  test "content stats visible to admin" do
-    login_as(:quentin)
-    get :stats
-    assert_response :success
-    assert_nil flash[:error]
-  end
-  
-  test "content stats not visible to non-admin" do
-    login_as(:aaron)
-    get :stats
-    assert_redirected_to :root
-    assert_not_nil flash[:error]
-  end
 
   test "edit tag to multiple" do
     login_as(:quentin)

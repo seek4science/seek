@@ -63,6 +63,7 @@ class ContentStats
       project_stats.people=project.people
       project_stats.assays=project.assays
       project_stats.studies=project.studies
+      project_stats.investigations=project.investigations
       result << project_stats           
     end
     return result

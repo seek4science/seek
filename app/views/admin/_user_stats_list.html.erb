@@ -1,0 +1,38 @@
+<h3><%= h(title) -%></h3>
+<% if collection.empty? %>
+  <span class="none_text">No users or profiles found matching the criteria.</span>
+<% else %>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Profile</th>
+    </tr>
+    <% collection.each do |el| -%>
+    <%
+      user = nil
+      person = nil
+      if el.instance_of?(Person)
+        user = el.user
+        person = el
+      else
+        user = el
+        person = el.person
+      end      
+    %>
+    <tr>
+      <% if user.nil? %>
+        <td colspan="2"><span class="none_text">No associated user</span></td>
+      <% else %>
+        <td><%= user.id -%></td>
+        <td><%= user.login -%></td>
+      <% end %>
+      <% if person.nil? %>
+        <td><span class="none_text">No associated person</span></td>
+      <% else %>
+        <td><%= link_to person.name, person -%></td>
+      <% end %>
+    </tr>
+    <% end %>  
+  </table>
+  <% end %>  

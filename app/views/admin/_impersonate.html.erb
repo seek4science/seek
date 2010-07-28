@@ -1,4 +1,4 @@
 <% form_tag impersonate_users_url do %>
   <%= select_tag "id", options_for_select(User.all.collect{|u| [u.person.name, u.id] unless u.person.nil?}.compact) %>
-  <%= submit_tag "Go" %>
+  <%= submit_tag "Go", :confirm => "This action will log you out. Are you sure you wish to continue?" %>
 <% end %>

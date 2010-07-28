@@ -25,14 +25,6 @@ class AdminController < ApplicationController
     redirect_to :action=>:show
   end
   
-  def stats    
-    @stats=ContentStats.generate
-    respond_to do |format|
-      format.html
-      format.xml { render :xml=>@stats.to_xml}
-    end
-  end
-  
   def tags
     @tags=Tag.find(:all,:order=>:name)
   end  
@@ -97,6 +89,50 @@ class AdminController < ApplicationController
     expire_fragment("tag_clouds")
 
     redirect_to :action=>:tags
+  end
+  
+  def get_stats
+    collection = []
+    type = nil
+    title = nil
+    case params[:id]
+      when "pals"
+        title = "PALs"
+        collection = Person.pals
+        type = "users"
+      when "admins"
+        title = "Administrators"
+        collection = User.admins
+        type = "users"
+      when "invalid"
+        collection = {}
+        type = "invalid_users"
+        pal_role=Role.find(:first,:conditions=>{:name=>"Sysmo-DB Pal"})
+        collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.roles.include?(pal_role)}
+        collection[:duplicates] = Person.duplicates
+        collection[:no_person] = User.without_profile
+      when "not_activated"
+        title = "Users requiring activation"
+        collection = User.not_activated
+        type = "users"
+      when "projectless"
+        title = "Users not in a SysMO project"
+        collection = Person.without_group.registered
+        type = "users"
+      when "contents"
+        type = "content_stats"
+      else
+    end
+    respond_to do |format|
+      case type
+        when "invalid_users"
+          format.html { render :partial => "admin/invalid_user_stats_list", :locals => { :collection => collection} }          
+        when "users"
+          format.html { render :partial => "admin/user_stats_list", :locals => { :title => title, :collection => collection} }
+        when "content_stats"
+          format.html { render :partial => "admin/content_stats", :locals => {:stats => ContentStats.generate} }
+      end
+    end
   end
 
   private
