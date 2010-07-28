@@ -9,7 +9,7 @@ class PublicationsController < ApplicationController
   before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
-  ADMIN_EMAIL = "bacallf7@cs.man.ac.uk"
+  ADMIN_EMAIL = "sowen@cs.man.ac.uk"
     
   # GET /publications/1
   # GET /publications/1.xml

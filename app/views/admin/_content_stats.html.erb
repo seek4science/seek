@@ -1,0 +1,55 @@
+<%
+  #So we don't have to run lengthy authorization a second time when calculating total stats
+  total_visible_data_files = 0
+  total_visible_models = 0
+  total_visible_sops = 0
+  total_registered_people = 0
+%>
+
+<h3>Content statistics</h3>
+For data, models and SOPs, the number in brackets represents the number of items you are authorized to view.
+<table>
+  <tr>
+    <th>Project</th>
+    <th>People (Registered)</th>
+    <th>Investigations</th>
+    <th>Studies</th>
+    <th>Assays</th>
+    <th>Data Files</th>
+    <th>Models</th>
+    <th>Sops</th>
+    <th>Publications</th>
+  </tr>
+  <% stats.each do |stat| %>
+  <tr>
+    <td><%= link_to stat.project.name, stat.project -%></td>
+    <% registered_people = stat.registered_people.count
+       total_registered_people += registered_people %>
+    <td><%= stat.people.count -%> (<%= registered_people -%>)</td>
+    <td><%= stat.investigations.count -%></td>
+    <td><%= stat.studies.count -%></td>
+    <td><%= stat.assays.count -%></td>
+    <% visible_data_files = stat.visible_data_files.count
+       total_visible_data_files += visible_data_files %>
+    <td><%= stat.data_files.count -%> (<%= visible_data_files -%>)</td>
+    <% visible_models = stat.visible_models.count
+       total_visible_models += visible_models %>
+    <td><%= stat.models.count -%> (<%= visible_models -%>)</td>
+    <% visible_sops = stat.visible_sops.count
+       total_visible_sops += visible_sops %>
+    <td><%= stat.sops.count -%> (<%=  visible_sops -%>)</td>
+    <td><%= stat.publications.count -%> </td>
+  </tr>
+  <% end %>
+  <tr style="background-color: #DEF">
+    <td><b>Total</b></td>
+    <td><%= Person.count -%> (<%= total_registered_people -%>)</td>
+    <td><%= Investigation.count -%></td>
+    <td><%= Study.count -%></td>
+    <td><%= Assay.count -%></td>
+    <td><%= DataFile.count -%> (<%= total_visible_data_files -%>)</td>
+    <td><%= Model.count -%> (<%= total_visible_models -%>)</td>
+    <td><%= Sop.count -%> (<%= total_visible_sops -%>)</td>
+    <td><%= Publication.count -%> </td>
+  </tr>
+</table>

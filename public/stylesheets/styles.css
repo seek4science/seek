@@ -924,8 +924,7 @@ div.avatar_list_popup {
 }
 
 ul.horiz_list_items li {
-    float:left;
-    padding-right: 1em;
+    display: inline;
 }
 
 /* Begin Footer styles */
@@ -1153,14 +1152,7 @@ div.collapsable_div {
   margin: 3px 0;
 }
 
-div.collapsable_div div {
-  padding: 0.5em;
-}
-
-a.collapsable_div {
-  border-color: #CCCCCC;
-  border-style: solid;
-  border-width: 0 0 1px 0;
+div.collapsable_div_header {
   margin: 0; 
   background-image: url('/images/header-bg.png');
   background-position: top;
@@ -1169,6 +1161,19 @@ a.collapsable_div {
   padding: 0.5em 0.6em;  
   font-size: 100%;
   display: block;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+}
+
+div.collapsable_div_header img {
+  vertical-align: middle;
+  margin-right: 0.3em;
+}
+
+div.collapsable_div_contents {
+  padding: 0.5em;
+  border-top: 1px solid #999;
 }
 
 ul.attachments_list {
@@ -1259,4 +1264,16 @@ img.visibility_icon {
 div#isa_svg {	
 	text-align: center;
 	padding-top: 1em;
+}
+
+div.stat_item {
+  border: 1px solid #999;  
+}
+
+div.admin_tasks ul{
+  margin-bottom: 1em;
+}
+
+div.admin_tasks ul li{
+  margin-left: 1em;
 }
