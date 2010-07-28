@@ -47,7 +47,7 @@ module ImagesHelper
     when "arrow_left", "back"
       "famfamfam_silk/arrow_left.png"
     when "bioportal_logo"
-      "bioportal/bioportal_logo.png"
+      "logos/bioportal_logo.png"
     when "new"
       "famfamfam_silk/add.png"
     when "download"

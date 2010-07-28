@@ -12,21 +12,19 @@
         <tr>
           <td class="left">            
             <p><%= link_to "Front Page", "/" %></p>
-            <p><%= link_to "About Sysmo-DB", "http://www.sysmo-db.org", :target => '_blank' %></p>
-            <p><%= link_to "The Sysmo Project", "http://www.sysmo.net" %> </p>
+            <p><%= link_to "About SysMO-DB", "http://www.sysmo-db.org", :target => '_blank' %></p>
+            <p><%= link_to "The SysMO Project", "http://www.sysmo.net" %> </p>
           </td>
           <td class="middle">
-            <p>Related projects and friends</p>
-            <ul>
-              <li><%= link_to image_tag("taverna_logo.png",:title=>"Taverna workflow workbench",:alt=>"Taverna workflow workbench",:width=>"80px"), "http://www.mygrid.org.uk/tools/taverna/", :target => '_blank' %></li>
-              <li><%= link_to image_tag("myexperiment_logo.png",:title=>"myExperiment",:alt=>"myExperiment",:width=>"90px"), "http://www.myExperiment.org", :target => '_blank' %></li>
-              <li><%= link_to image_tag("jwsonline_webpic.jpg",:title=>"JWS Online",:alt=>"JWS Online",:width=>"80px"), "http://jjj.biochem.sun.ac.za/", :target => '_blank' %></li>
-              <li><%= link_to image_tag("isatab_logo.png",:title=>"ISATAB",:alt=>"ISATAB",:width=>"80px"),"http://isatab.sourceforge.net/specifications.html",:target=>'_blank' %></li>
-              <li><%= link_to image_tag("mygrid_logo.png",:title=>"myGrid",:alt=>"myGrid",:style=>"width:80px;background-color:#7589A1;"), "http://www.mygrid.org.uk", :target => '_blank' %></li>
-              <li><%= link_to image_tag("sabiork_logo.jpg",:title=>"Sabio-RK",:alt=>"Sabio-RK",:width=>"80px"),"http://sabio.villa-bosch.de/webservice.jsp",:target=>'_blank' %></li>              
-              <li><%= link_to image_tag("bioportal/bioportal_logo.png",:title=>"BioPortal",:alt=>"BioPortal",:width=>"80px"), "http://bioportal.bioontology.org/", :target => '_blank' %></li>
-			  <li><%= link_to image_tag("semanticSBML-logo.png",:title=>"Semantic SBML",:alt=>"Semantic SBML",:width=>"80px"), "http://www.semanticsbml.org/", :target => '_blank' %></li>			                
-            </ul>
+            <p>Related projects and friends</p>            
+              <%= link_to image_tag("logos/taverna_logo.png",:title=>"Taverna workflow workbench",:alt=>"Taverna workflow workbench",:width=>"70px"), "http://www.mygrid.org.uk/tools/taverna/", :target => '_blank' %>
+              <%= link_to image_tag("logos/myexperiment_logo.png",:title=>"myExperiment",:alt=>"myExperiment",:width=>"90px"), "http://www.myExperiment.org", :target => '_blank' %>
+              <%= link_to image_tag("logos/jwsonline_webpic.jpg",:title=>"JWS Online",:alt=>"JWS Online",:width=>"80px"), "http://jjj.biochem.sun.ac.za/", :target => '_blank' %>
+              <%= link_to image_tag("logos/isatab_logo.png",:title=>"ISATAB",:alt=>"ISATAB",:width=>"80px"),"http://isatab.sourceforge.net/specifications.html",:target=>'_blank' %>            
+			  <%= link_to image_tag("logos/mygrid_logo-120-transparent.png",:title=>"myGrid",:alt=>"myGrid",:width=>"80px",:style=>"background-color:#AAA;"), "http://www.mygrid.org.uk", :target => '_blank' %>
+              <%= link_to image_tag("logos/sabiork_logo.jpg",:title=>"Sabio-RK",:alt=>"Sabio-RK",:width=>"80px"),"http://sabio.villa-bosch.de/webservice.jsp",:target=>'_blank' %>          
+              <%= link_to image_tag("logos/bioportal_logo.png",:title=>"BioPortal",:alt=>"BioPortal",:width=>"80px"), "http://bioportal.bioontology.org/", :target => '_blank' %>
+			  <%= link_to image_tag("logos/semanticSBML-logo.png",:title=>"Semantic SBML",:alt=>"Semantic SBML",:width=>"60px"), "http://www.semanticsbml.org/", :target => '_blank' %>			                            
           </td>
           <td class="right">
             <p>Powered by:</p>

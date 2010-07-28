@@ -1,3 +1,8 @@
+body {
+	background: #8e8e8e url('/images/body-bg.png') repeat-y center;
+	font-family: arial;
+	line-height: 1.0;	
+}
 
 #custom-doc {
     margin: auto;
@@ -62,7 +67,8 @@ min-width:
 }
 
 #bd {
-    background-color: #FAFAFA;
+    background-color: #FAFAFA;	
+	min-height: 45em;
 }
 
 #who_am_i #avatar img {
@@ -929,15 +935,15 @@ ul.horiz_list_items li {
 
 /* Begin Footer styles */
 
-#ft {
-    margin: 2em 0;
+#ft {	
     border: 2px solid #999999;
     border-width: 1px 0 1px 0;
     color: #333333;
     background-image: url('/images/footer-bg.png');
     background-position: top;
     background-repeat: repeat-x;
-    background-color: #EEEEEE;
+    background-color: #EEEEEE;		
+	bottom:0px;
 }
 
 #ft .copyright {
@@ -950,12 +956,11 @@ ul.horiz_list_items li {
     width: 100%;
     border-top: 1px solid #999999;
     border-spacing: 0;
-    margin: 0;
+    margin: 0;		
 }
 
 #ft td {
-    padding: 0.8em 0.5em;
-    vertical-align: top;
+    padding: 0.8em 0.5em;	 
 }
 
 #ft table p {
@@ -963,44 +968,34 @@ ul.horiz_list_items li {
     line-height: 1;	
 }
 
-#ft .left p {
+#ft td.left p {
     width: 110px;
     text-align: center;
 }
 
-#ft .middle {
+#ft td.middle {
     width: auto;    
     border-left: 1px solid #999999;
-    text-align: center;
+    text-align: center;		
 }
 	
-#ft .middle p {
+#ft td.middle p {
     width: 100%;
     text-align: center;     
 }
 
-#ft .middle ul {    
-    width: 100%;	
+#ft td.middle img {	
+	vertical-align: middle;
+	padding-left: 3px;
 }
 
-#ft .middle li {
-    list-style: none;
-    float: left;
-    padding: 3px 3px 3px 3px;			
-}
-
-#ft .middle li img {
-	margin-top:auto;
-	margin-bottom:auto;	
-}
-
-#ft .right {
+#ft td.right {
     width: 110px;
     text-align: center;
     border-left: 1px solid #999999;
 }
 
-#ft .right p {
+#ft td.right p {
     text-align: center;
 }
 
