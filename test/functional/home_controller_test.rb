@@ -27,14 +27,14 @@ class HomeControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index
     assert_response :success
-    assert_select "a#adminmode",:text=>"Admin enabled",:count=>0
+    assert_select "a#adminmode[href=?]",admin_path,:count=>0
   end
 
   test "admin tab visible to admin" do
     login_as(:quentin)
     get :index
     assert_response :success
-    assert_select "a#adminmode",:text=>"Admin enabled",:count=>1
+    assert_select "a#adminmode[href=?]",admin_path,:count=>1
   end
 
 
