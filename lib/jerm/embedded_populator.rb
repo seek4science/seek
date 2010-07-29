@@ -54,32 +54,27 @@ module Jerm
           if project.default_policy.nil?
             response={:response=>:fail,:message=>MESSAGES[:no_default_policy],:author=>author,:response_code=>RESPONSE_CODES[:no_default_policy]}
           else
-            #save it
-            #FIXME: try and avoid this double save - its currently done here to create the Asset before connecting to the policy. If unavoidable, do as a transaction with rollback on failure
-            resource_model.save!
-            resource_model.asset.project=project
-            
+          
             #assign default policy, and save the associated asset
             if (resource.authorization==Resource::AUTH_TYPES[:default])
-              resource_model.asset.policy=project.default_policy.deep_copy              
+              resource_model.policy=project.default_policy.deep_copy              
             elsif (resource.authorization==Resource::AUTH_TYPES[:sysmo])
-              resource_model.asset.policy=sysmo_policy              
+              resource_model.policy=sysmo_policy              
             elsif (resource.authorization==Resource::AUTH_TYPES[:project])
-              resource_model.asset.policy=project_policy(project)              
+              resource_model.policy=project_policy(project)              
             else
               return {:response=>:fail,:message=>MESSAGES[:unknown_auth],:author=>author,:response_code=>RESPONSE_CODES[:unknown_auth]}                                        
             end
             
-            resource_model.asset.policy.use_custom_sharing = true
-            resource_model.asset.policy.save!
-            resource_model.asset.creators << author
-            resource_model.asset.save!
+            resource_model.policy.use_custom_sharing = true
+            resource_model.policy.save!
+            resource_model.creators << author
             resource_model.project=project
             resource_model.save!
             resource_model.reload
             resource_model.cache_remote_content_blob
             
-            p=Permission.new(:contributor=>author,:access_type=>Policy::MANAGING,:policy_id=>resource_model.asset.policy.id)
+            p=Permission.new(:contributor=>author,:access_type=>Policy::MANAGING,:policy_id=>resource_model.policy.id)
             p.save!
             if warning
               response={:response=>:warning,:message=>warning,:author=>author,:seek_model=>resource_model,:response_code=>warning_code}
