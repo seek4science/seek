@@ -6,16 +6,7 @@
    Note that for font-size, only use %ages according to: 
    http://developer.yahoo.com/yui/fonts/#fontsize
 */
-body {
-	background: #8e8e8e url('/images/body-bg.png') repeat-y center;
-	/* Only need to define one font here because the 
-	   YUI Fonts CSS provides a degradation path
-	   (see: http://developer.yahoo.com/yui/fonts/) */
-	font-family: arial;
-	/*background-color: #FFFFFF;*/
-	
-	line-height: 1.0;
-}
+
 
 p {
 	font-family: arial;

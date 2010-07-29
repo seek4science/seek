@@ -4,14 +4,18 @@ require 'net/http'
 require 'active_record'
 
 namespace :solr do
-
+  
   desc 'Starts Solr. Options accepted: RAILS_ENV=your_env, PORT=XX. Defaults to development if none.'
   task :start do
     require "#{File.dirname(__FILE__)}/../../config/solr_environment.rb"
     begin
-      #FIXME: this was temporarily hacked to get solr working. Needs updating properly.
-      #n = Net::HTTP.new('127.0.0.1', SOLR_PORT)
-      #n.request_head('/').value 
+      http = Net::HTTP.new('127.0.0.1', SOLR_PORT)
+      http.request_head('/').value 
+      
+    rescue Net::HTTPServerException #responding
+      puts "Port #{SOLR_PORT} in use" and return    
+                
+    rescue Errno::ECONNREFUSED,NoMethodError #not responding
       Dir.chdir(SOLR_PATH) do
         pid = fork do
           #STDERR.close
@@ -21,13 +25,10 @@ namespace :solr do
         File.open("#{SOLR_PIDS_PATH}/#{ENV['RAILS_ENV']}_pid", "w"){ |f| f << pid}
         puts "#{ENV['RAILS_ENV']} Solr started successfully on #{SOLR_PORT}, pid: #{pid}."
       end
-
-    rescue Net::HTTPServerException #responding
-      puts "Port #{SOLR_PORT} in use" and return
-
-    rescue Errno::ECONNREFUSED #not responding
-    end
-  end
+      
+    end    
+    
+  end  
   
   desc 'Stops Solr. Specify the environment by using: RAILS_ENV=your_env. Defaults to development if none.'
   task :stop do
@@ -64,7 +65,7 @@ namespace :solr do
   desc %{Reindexes data for all acts_as_solr models. Clears index first to get rid of orphaned records and optimizes index afterwards. RAILS_ENV=your_env to set environment. ONLY=book,person,magazine to only reindex those models; EXCEPT=book,magazine to exclude those models. START_SERVER=true to solr:start before and solr:stop after. BATCH=123 to post/commit in batches of that size: default is 300. CLEAR=false to not clear the index first; OPTIMIZE=false to not optimize the index afterwards.}
   task :reindex => :environment do
     require "#{File.dirname(__FILE__)}/../../config/solr_environment.rb"
-
+    
     includes = env_array_to_constants('ONLY')
     if includes.empty?
       includes = Dir.glob("#{RAILS_ROOT}/app/models/*.rb").map { |path| File.basename(path, ".rb").camelize.constantize }
@@ -77,9 +78,9 @@ namespace :solr do
     clear_first         = env_to_bool('CLEAR',       true)
     batch_size          = ENV['BATCH'].to_i.nonzero? || 300
     debug_output        = env_to_bool("DEBUG", false)
-
+    
     RAILS_DEFAULT_LOGGER.level = ActiveSupport::BufferedLogger::INFO unless debug_output
-
+    
     if start_server
       puts "Starting Solr server..."
       Rake::Task["solr:start"].invoke 
@@ -94,7 +95,7 @@ namespace :solr do
     
     models = includes.select { |m| m.respond_to?(:rebuild_solr_index) }    
     models.each do |model|
-  
+      
       if clear_first
         puts "Clearing index for #{model}..."
         ActsAsSolr::Post.execute(Solr::Request::Delete.new(:query => "#{model.solr_configuration[:type_field]}:#{model}")) 
@@ -103,16 +104,16 @@ namespace :solr do
       
       puts "Rebuilding index for #{model}..."
       model.rebuild_solr_index(batch_size)
-
+      
     end 
-
+    
     if models.empty?
       puts "There were no models to reindex."
     elsif optimize
       puts "Optimizing..."
       models.last.deferred_solr_optimize
     end
-
+    
     if start_server
       puts "Shutting down Solr server..."
       Rake::Task["solr:stop"].invoke 
@@ -130,9 +131,8 @@ namespace :solr do
     case env
       when /^true$/i then true
       when /^false$/i then false
-      else default
+    else default
     end
   end
-
+  
 end
-
