@@ -237,12 +237,6 @@ class SopsController < ApplicationController
     found = Sop.find(:all, 
       :order => "title")
     found = apply_filters(found)    
-    # this is only to make sure that actual binary data isn't sent if download is not
-    # allowed - this is to increase security & speed of page rendering;
-    # further authorization will be done for each item when collection is rendered
-    found.each do |sop|
-      sop.content_blob.data = nil unless Authorization.is_authorized?("download", nil, sop, current_user)
-    end
     
     @sops = found
   end
