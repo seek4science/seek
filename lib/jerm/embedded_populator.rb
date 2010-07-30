@@ -110,11 +110,7 @@ module Jerm
       p=Permission.new(:contributor=>project,:access_type=>Policy::DOWNLOADING,:policy_id=>policy.id)
       p.save!
       return policy
-    end
-    
-    def determine_filename resource
-      URI.unescape(resource.uri).split("/").last
-    end
+    end        
     
     def generated_title resource,author
       type=resource.type.capitalize
