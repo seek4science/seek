@@ -1,8 +1,8 @@
 <% strain_links=[] %>
 <% if existing_strains.empty? -%>
-  <p class="none_text">No strains have been defined for <%= h(organism.title) -%>, you can define a new one below.</p>
+  <p class="none_text">No strains have yet been defined for <%= h(organism.title) -%>, you can type the name in the box below to create a new one if required.</p>
 <% else -%>
-  <p class="none_text">Select an existing strain below, or submit a new one.</p>
+  <p class="none_text">Optionally, select an existing strain below, or type the name in the box below to create a new one.</p>
   <% existing_strains.each do |strain| -%>
     <% strain_links <<  link_to_function(h(strain.title),"setStrainTextField('#{strain.title}');") %>
   <% end -%>
