@@ -5,6 +5,7 @@ class DataFilesController < ApplicationController
 
   include IndexPager
   include SysMODB::SpreadsheetExtractor
+  include MimeTypesHelper  
 
   before_filter :login_required
 
@@ -206,13 +207,7 @@ class DataFilesController < ApplicationController
 
   def data
     @data_file =  DataFile.find(params[:id])
-    type = nil
-    if ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"].include?(@data_file.content_type) 
-      type = "xlsx"
-    elsif ["application/vnd.ms-excel","application/excel"].include?(@data_file.content_type)
-      type = "xls"
-    end
-    unless type.nil?
+    if ["xls","xlsx"].include?(mime_find(@data_file.content_type)[:extension])
       xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath))
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
@@ -221,7 +216,7 @@ class DataFilesController < ApplicationController
     else
      respond_to do |format|
         flash[:error] = "Unable to view contents of this data file"
-        format.html { redirect_to @data_file }
+        format.html { redirect_to @data_file,:format=>"html" }
       end
     end
   end

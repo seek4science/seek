@@ -37,7 +37,8 @@ module Jerm
           when "ownerLastName","ownerLast"
           @author_last_name=row[1]
           when "ownerSeekId","ownerSeekID"
-          @author_seek_id=row[1]          
+          #@author_seek_id=row[1]
+          @author_seek_id=1          
           when "cosmicProtocol"
           @protocol=row[1]
         end
