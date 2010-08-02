@@ -26,7 +26,7 @@ class DataFile < ActiveRecord::Base
   
   before_save :update_first_letter
   
-  grouped_pagination
+  grouped_pagination 
   
   acts_as_uniquely_identifiable  
 

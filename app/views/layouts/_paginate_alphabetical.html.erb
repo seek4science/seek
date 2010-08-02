@@ -5,7 +5,7 @@
     <% for page in pages -%>
         <% current_page_class = page==current_page ? "current_page" : "" -%>
         <% if page_totals[page]>0 -%>
-            <li class="<%= current_page_class %>"><%= link_to h(page), {:id => params[:id], :page => page}.merge(filter_hash) %></li>
+            <li class="<%= current_page_class %>"><%= link_to h("#{page}(#{page_totals[page]})"), {:id => params[:id], :page => page}.merge(filter_hash) %></li>
         <% else -%>
             <li class="disabled_page <%= current_page_class %>"><%= h(page) %></li>
         <% end -%>

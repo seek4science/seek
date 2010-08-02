@@ -15,6 +15,15 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal "A", p.first_letter
   end
   
+  def test_pages_accessor
+    pages = Person.pages
+    assert pages.length>1
+    ("A".."Z").to_a.each{|letter| assert pages.include?(letter)}
+  end
+  
+  def test_latest_limit
+    assert_equal 7,Person.latest_limit  
+  end
 
   def test_paginate_no_options
     @people=Person.paginate :default_page=>"first"

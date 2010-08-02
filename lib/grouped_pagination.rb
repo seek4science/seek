@@ -9,9 +9,16 @@ module GroupedPagination
 
   module ClassMethods
     
+    #this is the array of possible pages, defaults to A-Z. Can be set with the options[:pages] in grouped_pagination definition in model
+    attr_reader :pages
+    
+    #this is limit to the list when showing 'latest', 7. Can be set with the options[:latest_limit] in grouped_pagination definition in model
+    attr_reader :latest_limit
+    
     def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a
       @field = options[:field] || "first_letter"
+      @latest_limit = options[:latest_limit] || 7
 
       include GroupedPagination::InstanceMethods
       extend GroupedPagination::SingletonMethods
@@ -24,15 +31,13 @@ module GroupedPagination
       default_page = options[:default_page] || "latest"
       default_page = @pages.first if default_page == "first"      
         
-      page = options[:page] || default_page
-      
-      limit = options[:limit] || 7
+      page = options[:page] || default_page            
       
       records=[]
       if page == "all"
         records=collection
       elsif page == "latest"
-        records=collection.sort{|x,y| y.created_at <=> x.created_at}[0...limit]
+        records=collection.sort{|x,y| y.created_at <=> x.created_at}[0...@latest_limit]
       elsif @pages.include?(page)           
         records=collection.select {|i| i.first_letter == page}        
       end

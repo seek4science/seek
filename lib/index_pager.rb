@@ -7,13 +7,33 @@ module IndexPager
     objects = eval("@"+controller)
     objects.size
     @hidden=0
-    params[:page] ||= "latest"
+    params[:page] ||= "latest"    
     
-    if Authorization::ASSET_TYPES.include?(model_class.name) 
-      authorized=Authorization.authorize_collection("show",objects,current_user)
-      @hidden=objects.size - authorized.size
+    if Authorization::ASSET_TYPES.include?(model_class.name)
+      authorized=[]
+      auth_pages={}
+      objects=objects.sort{|x,y| y.created_at <=> x.created_at} if (params[:page]=="latest")
+      objects.each do |object|
+        if params[:page]=="all"
+          authorized << object if Authorization.is_authorized?("show",nil,object,current_user)        
+        #In the next 2 cases we need to authorize at most one item for the non displayed pages,so we keep a hash and skip over any once we've collected
+        #one for that page. Then paginate_after_fetch will then contain a page_total of 1 for the other pages, so that it is enabled in the view. 
+        #I don't want to put this logic in the GroupedPagination library, as I wish to keep it authorization agostic and record correct page_totals in normal use.
+        elsif params[:page]=="latest" && (authorized.size<model_class.latest_limit || auth_pages[object.first_letter].nil?)          
+          if Authorization.is_authorized?("show",nil,object,current_user)
+            authorized << object
+            auth_pages[object.first_letter]=true
+          end          
+        elsif model_class.pages.include?(object.first_letter) && (object.first_letter == params[:page] || auth_pages[object.first_letter].nil?)                    
+          if Authorization.is_authorized?("show",nil,object,current_user)
+            authorized << object
+            auth_pages[object.first_letter]=true
+          end                             
+        end
+      end      
       objects=authorized
     end
+    
     objects=model_class.paginate_after_fetch(objects, :page=>params[:page]) unless objects.respond_to?("page_totals")
     eval("@"+controller+"= objects")
     
@@ -25,13 +45,13 @@ module IndexPager
   end
   
   def find_assets
+    params[:page]||="latest"
     controller = self.controller_name.downcase
     model_name=controller.classify
-    model_class=eval(model_name)
-    found = model_class.find(:all, 
-      :order => "title")
-    found = apply_filters(found)    
-      
+    model_class=eval(model_name)    
+    found = model_class.find(:all, :order => "title")
+    found = apply_filters(found)        
+    
     eval("@" + controller + " = found")
   end
   
