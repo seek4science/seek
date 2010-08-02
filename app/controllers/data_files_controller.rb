@@ -9,7 +9,7 @@ class DataFilesController < ApplicationController
 
   before_filter :login_required
 
-  before_filter :find_data_files, :only => [ :index ]
+  before_filter :find_assets, :only => [ :index ]
   before_filter :find_data_file_auth, :except => [ :index, :new, :create, :request_resource]
   before_filter :find_display_data_file, :only=>[:show,:download]
 
@@ -245,15 +245,7 @@ class DataFilesController < ApplicationController
     end
   end  
   
-  protected
-  
-  def find_data_files
-    found = DataFile.find(:all,
-                     :order => "title")
-    found = apply_filters(found)
-
-    @data_files = found
-  end
+  protected    
 
   def find_display_data_file
     if @data_file

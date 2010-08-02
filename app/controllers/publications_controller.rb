@@ -5,7 +5,7 @@ class PublicationsController < ApplicationController
   require 'pubmed_query_tool'
   
   before_filter :login_required
-  before_filter :find_publications, :only => [:index]
+  before_filter :find_assets, :only => [ :index ]
   before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
@@ -260,11 +260,7 @@ class PublicationsController < ApplicationController
     end
   end
   
-  private
-  
-  def find_publications
-    @publications = Publication.paginate :page=>params[:page]
-  end
+  private    
   
   def fetch_publication
     begin

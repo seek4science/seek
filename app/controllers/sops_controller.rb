@@ -4,8 +4,7 @@ class SopsController < ApplicationController
   include IndexPager
 
   before_filter :login_required
-
-  before_filter :find_sops, :only => [ :index ]
+  before_filter :find_assets, :only => [ :index ]  
   before_filter :find_sop_auth, :except => [ :index, :new, :create, :request_resource ]
   before_filter :find_display_sop, :only=>[:show,:download]
   
@@ -233,13 +232,7 @@ class SopsController < ApplicationController
   
   protected
   
-  def find_sops
-    found = Sop.find(:all, 
-      :order => "title")
-    found = apply_filters(found)    
-    
-    @sops = found
-  end
+  
 
   def find_display_sop
     if @sop

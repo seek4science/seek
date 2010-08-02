@@ -10,7 +10,7 @@ class ModelsController < ApplicationController
   
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
-  before_filter :find_models, :only => [ :index ]
+  before_filter :find_assets, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource ]
   before_filter :find_display_model, :only=>[:show,:download]
   
@@ -442,14 +442,6 @@ class ModelsController < ApplicationController
   
   def default_items_per_page
     return 2
-  end
-  
-  def find_models
-    found = Model.find(:all,
-                     :order => "title")
-    found = apply_filters(found)    
-    
-    @models = found    
   end
   
   def find_display_model

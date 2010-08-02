@@ -1,4 +1,4 @@
-module IndexPager
+module IndexPager    
   
   def index
     controller = self.controller_name.downcase    
@@ -22,6 +22,17 @@ module IndexPager
       format.xml
     end
     
+  end
+  
+  def find_assets
+    controller = self.controller_name.downcase
+    model_name=controller.classify
+    model_class=eval(model_name)
+    found = model_class.find(:all, 
+      :order => "title")
+    found = apply_filters(found)    
+      
+    eval("@" + controller + " = found")
   end
   
 end
