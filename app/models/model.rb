@@ -73,9 +73,6 @@ class Model < ActiveRecord::Base
   def organism_name
     organism.title unless organism.nil?
   end
-  
-  def update_first_letter
-    self.first_letter = strip_first_letter(title)
-  end
+    
   
 end

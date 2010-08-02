@@ -81,11 +81,7 @@ class Assay < ActiveRecord::Base
   #returns true if this is an experimental class of assay
   def is_experimental?
     return !assay_class.nil? && assay_class.key=="EXP"
-  end
-  
-  def update_first_letter
-    self.first_letter = strip_first_letter(title)
-  end
+  end    
   
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)

@@ -67,9 +67,6 @@ class DataFile < ActiveRecord::Base
     return datafiles_with_contributors.to_json
   end
   
-  def update_first_letter
-    self.first_letter = strip_first_letter(title)
-  end
 
   def relationship_type(assay)
     assay_assets.find_by_assay_id(assay.id).relationship_type  

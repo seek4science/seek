@@ -18,7 +18,7 @@ class Project < ActiveRecord::Base
 
   before_save :update_first_letter
 
-  grouped_pagination
+  grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for project
   
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -133,10 +133,6 @@ class Project < ActiveRecord::Base
   def get_institutions_listing
     workgroups_for_project = WorkGroup.find(:all, :conditions => {:project_id => self.id})
     return workgroups_for_project.collect { |w| [w.institution.name, w.institution.id, w.id] }
-  end
-
-  def update_first_letter
-    self.first_letter=strip_first_letter(name)
   end
 
   def assays

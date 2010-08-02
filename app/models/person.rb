@@ -14,7 +14,7 @@ class Person < ActiveRecord::Base
 
   before_save :update_first_letter
   
-  grouped_pagination
+  grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
     
   validates_presence_of :name,:email
 

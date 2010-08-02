@@ -43,9 +43,5 @@ class Study < ActiveRecord::Base
   def can_delete? user
     assays.empty? && can_edit?(user)
   end
-  
-  def update_first_letter
-    self.first_letter = strip_first_letter(title)
-  end
 
 end

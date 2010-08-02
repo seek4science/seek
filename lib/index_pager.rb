@@ -11,8 +11,7 @@ module IndexPager
     
     if Authorization::ASSET_TYPES.include?(model_class.name)
       authorized=[]
-      auth_pages={}
-      objects=objects.sort{|x,y| y.created_at <=> x.created_at} if (params[:page]=="latest")
+      auth_pages={}      
       objects.each do |object|
         if params[:page]=="all"
           authorized << object if Authorization.is_authorized?("show",nil,object,current_user)        
@@ -49,7 +48,8 @@ module IndexPager
     controller = self.controller_name.downcase
     model_name=controller.classify
     model_class=eval(model_name)    
-    found = model_class.find(:all, :order => "title")
+    order_field = params[:page]=="latest" ? "created_at DESC" : "title"
+    found = model_class.find(:all, :order => order_field)
     found = apply_filters(found)        
     
     eval("@" + controller + " = found")

@@ -39,9 +39,6 @@ class Investigation < ActiveRecord::Base
   def sops
     assays.collect{|assay| assay.sops}.flatten.uniq
   end
-  
-  def update_first_letter
-    self.first_letter = strip_first_letter(title)
-  end
+
   
 end

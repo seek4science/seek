@@ -43,7 +43,7 @@ class PeopleController < ApplicationController
       @people=@people.select{|p| !(p.group_memberships & @role.group_memberships).empty?}
     else
       @people = apply_filters(Person.all(:order => "last_name"))
-      @people=DataFile.paginate_after_fetch(@people, :page=>params[:page])
+      @people=Person.paginate_after_fetch(@people, :page=>params[:page])
     end
 
     respond_to do |format|

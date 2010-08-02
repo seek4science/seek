@@ -55,10 +55,6 @@ class Institution < ActiveRecord::Base
   def self.get_all_institutions_listing
     institutions = Institution.find(:all)
     return institutions.collect { |i| [i.name, i.id] }
-  end
-
-  def update_first_letter
-    self.first_letter=strip_first_letter(name)
-  end
+  end  
   
 end
