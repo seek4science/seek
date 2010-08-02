@@ -25,8 +25,6 @@ class Sop < ActiveRecord::Base
              
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
   
-  before_save :update_first_letter
-  
   grouped_pagination
   
   acts_as_uniquely_identifiable  
@@ -69,8 +67,5 @@ class Sop < ActiveRecord::Base
   def organism_title
     organism.nil? ? "" : organism.title
   end 
-  
-  def update_first_letter
-    self.first_letter = strip_first_letter(title)
-  end
+    
 end

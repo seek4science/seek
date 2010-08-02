@@ -47,9 +47,7 @@ class Assay < ActiveRecord::Base
            :as => :resource, 
            :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if SOLR_ENABLED
-  
-  before_save :update_first_letter
+  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if SOLR_ENABLED  
   
   grouped_pagination
   

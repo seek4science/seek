@@ -9,9 +9,7 @@ class Institution < ActiveRecord::Base
   has_many :favourites, 
            :as => :resource, 
            :dependent => :destroy
-
-  before_save :update_first_letter
-
+  
   grouped_pagination
   
   validates_presence_of :name

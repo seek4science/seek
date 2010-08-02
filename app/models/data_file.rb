@@ -24,8 +24,6 @@ class DataFile < ActiveRecord::Base
   
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
   
-  before_save :update_first_letter
-  
   grouped_pagination 
   
   acts_as_uniquely_identifiable  

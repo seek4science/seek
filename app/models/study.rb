@@ -21,9 +21,7 @@ class Study < ActiveRecord::Base
   validates_uniqueness_of :title
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
-  
-  before_save :update_first_letter
-  
+ 
   grouped_pagination
   
   acts_as_uniquely_identifiable

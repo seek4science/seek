@@ -28,8 +28,6 @@ class Model < ActiveRecord::Base
 
   has_many :created_datas
   
-  before_save :update_first_letter
-  
   grouped_pagination  
   
   acts_as_uniquely_identifiable  

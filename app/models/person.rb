@@ -10,9 +10,7 @@ class Person < ActiveRecord::Base
   
   has_many :favourites, 
            :as => :resource, 
-           :dependent => :destroy
-
-  before_save :update_first_letter
+           :dependent => :destroy  
   
   grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
     

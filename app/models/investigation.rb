@@ -18,8 +18,6 @@ class Investigation < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
   
-  before_save :update_first_letter
-  
   grouped_pagination  
   
   acts_as_uniquely_identifiable

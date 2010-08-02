@@ -20,6 +20,8 @@ module GroupedPagination
       @field = options[:field] || "first_letter"
       @latest_limit = options[:latest_limit] || 7
       
+      before_save :update_first_letter
+      
       include GroupedPagination::InstanceMethods
       extend GroupedPagination::SingletonMethods
     end

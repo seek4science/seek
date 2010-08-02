@@ -8,8 +8,6 @@ class Publication < ActiveRecord::Base
   
   grouped_pagination
   
-  before_save :update_first_letter
-  
   validates_presence_of :title
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
@@ -21,13 +19,7 @@ class Publication < ActiveRecord::Base
   acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
   
   acts_as_uniquely_identifiable  
-  
-  #belongs_to :contributor, :polymorphic => true
-  
-  def update_first_letter
-    self.first_letter=strip_first_letter(title.gsub(/[\[\]]/,""))
-  end
-  
+
   def extract_pubmed_metadata(pubmed_record)
     self.title = pubmed_record.title.chop #remove full stop
     self.abstract = pubmed_record.abstract
