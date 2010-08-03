@@ -207,7 +207,7 @@ class DataFilesController < ApplicationController
 
   def data
     @data_file =  DataFile.find(params[:id])
-    if ["xls","xlsx"].include?(mime_find(@data_file.content_type)[:extension])
+    if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
       xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath))
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
