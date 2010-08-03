@@ -1,8 +1,10 @@
+require 'mime/types'
+
 module MimeTypesHelper
   MIME_MAP = {
     "application/excel" => {:name => "Spreadsheet", :icon_key => "xls_file",:extension=>"xls"},
     "application/msword" => {:name => "Word document", :icon_key => "doc_file",:extension=>"doc"},
-    "application/octet-stream" => {:name => "Unknown file type", :icon_key => "misc_file",:extension=>""},
+    "application/octet-stream" => {:name => "Binary file type", :icon_key => "misc_file",:extension=>""},
     "application/pdf" => {:name => "PDF file", :icon_key => "pdf_file",:extension=>"pdf"},
     "application/vnd.excel" => {:name=>"Spreadsheet",:icon_key=>"xls_file",:extension=>"xls"},
     "application/vnd.ms-excel" => {:name => "Spreadsheet", :icon_key => "xls_file",:extension=>"xls"},
@@ -33,4 +35,9 @@ module MimeTypesHelper
   def mime_icon_url(mime)
     return icon_filename_for_key(mime_find(mime)[:icon_key])
   end
+  
+  def mime_extension(mime)
+    return mime_find(mime)[:extension]
+  end
+  
 end
