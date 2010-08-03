@@ -11,6 +11,13 @@ class PublicationTest < ActiveSupport::TestCase
     assert_not_nil x.attributes["uuid"]
   end
   
+  test "title trimmed" do
+    x = publications(:one)
+    x.title=" a pub"
+    x.save!
+    assert_equal("a pub",x.title)
+  end
+  
   test "uuid doesn't change" do
     x = publications(:one)
     x.save

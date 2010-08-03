@@ -21,6 +21,14 @@ class InvestigationTest < ActiveSupport::TestCase
     assert assays.include?(assays(:metabolomics_assay3))
   end  
   
+  #the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
+  test "title trimmed" do
+    inv=Investigation.new(:title=>" Test",:project=>projects(:sysmo_project))
+    inv.save!
+    inv.reload
+    assert_equal "Test",inv.title
+  end
+  
   test "validations" do
     
     inv=Investigation.new(:title=>"Test",:project=>projects(:sysmo_project))

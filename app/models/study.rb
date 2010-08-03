@@ -1,7 +1,10 @@
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
+require 'title_trimmer'
 
 class Study < ActiveRecord::Base  
+  
+  title_trimmer
  
   belongs_to :investigation
   

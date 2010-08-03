@@ -17,6 +17,12 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal (n_wg-1), WorkGroup.find(:all).size, "the workgroup should also have been destroyed"
   end
 
+  def test_title_trimmed
+    i=Institution.new(:title=>" an institution")
+    i.save!
+    assert_equal("an institution",i.title) 
+  end
+  
   def test_update_first_letter
     i=Institution.new(:name=>"an institution")
     i.save

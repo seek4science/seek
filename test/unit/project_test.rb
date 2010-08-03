@@ -33,6 +33,12 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal p.name,p.title
   end
 
+  def test_title_trimmed 
+   p=Project.new(:title=>" test project")
+   p.save!
+   assert_equal("test project",p.title)
+  end
+
   def test_set_credentials
     p=Project.new(:title=>"test project")
     p.site_password="12345"

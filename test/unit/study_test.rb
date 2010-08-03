@@ -63,6 +63,13 @@ class StudyTest < ActiveSupport::TestCase
     assert_not_nil study.project.name
   end
 
+  test "title trimmed" do
+    s=Study.new(:title=>" title",:investigation=>investigations(:metabolomics_investigation))
+    s.save!
+    assert_equal("title",s.title)
+  end
+  
+
   test "validation" do
     s=Study.new(:title=>"title",:investigation=>investigations(:metabolomics_investigation))
     assert s.valid?

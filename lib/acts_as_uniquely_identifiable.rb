@@ -15,9 +15,6 @@ module Seek
       end     
     end
     
-    module SingletonMethods
-    end
-    
     module InstanceMethods
       
       def regenerate_uuid        

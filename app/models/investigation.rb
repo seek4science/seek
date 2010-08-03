@@ -1,10 +1,13 @@
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
+require 'title_trimmer'
 
 class Investigation < ActiveRecord::Base    
   
   belongs_to :project
   has_many :studies  
+  
+  title_trimmer
 
   validates_presence_of :title
   validates_presence_of :project

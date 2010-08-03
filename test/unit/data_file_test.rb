@@ -74,6 +74,13 @@ class DataFileTest < ActiveSupport::TestCase
     x.save
     assert_not_nil x.attributes["uuid"]
   end
+  
+  test "title_trimmed" do
+    df=data_files(:picture)
+    df.title=" should be trimmed"
+    df.save!
+    assert_equal "should be trimmed",df.title
+  end
 
   test "uuid doesn't change" do
     x = data_files(:picture)

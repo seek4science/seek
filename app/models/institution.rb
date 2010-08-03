@@ -1,10 +1,13 @@
 require 'acts_as_editable'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
+require 'title_trimmer'
 
 class Institution < ActiveRecord::Base
   
   acts_as_editable
+  
+  title_trimmer
   
   has_many :favourites, 
            :as => :resource, 

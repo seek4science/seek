@@ -30,6 +30,13 @@ class ModelTest < ActiveSupport::TestCase
     assert model.creators.include?(people(:person_for_model_owner))
     
   end
+  
+  test "titled trimmed" do
+    model=models(:teusink)
+    model.title=" space"
+    model.save!
+    assert_equal "space",model.title
+  end
 
   test "model with no contributor" do
     model=models(:model_with_no_contributor)

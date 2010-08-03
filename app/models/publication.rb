@@ -1,8 +1,11 @@
 require 'acts_as_resource'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
+require 'title_trimmer'
 
 class Publication < ActiveRecord::Base
+  
+  title_trimmer
 
   acts_as_resource
   

@@ -9,6 +9,12 @@ class SopTest < ActiveSupport::TestCase
     assert_equal p,s.project
   end
 
+  def test_title_trimmed 
+    sop=Sop.new(:title=>" test sop")
+    sop.save!
+    assert_equal("test sop",sop.title)
+  end
+
   def test_version_created_for_new_sop
 
     sop=Sop.new(:title=>"test sop")

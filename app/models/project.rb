@@ -2,10 +2,13 @@ require 'acts_as_editable'
 require 'grouped_pagination'
 require 'simple_crypt'
 require 'acts_as_uniquely_identifiable'
+require 'title_trimmer'
 
 class Project < ActiveRecord::Base
 
   include SimpleCrypt
+  
+  title_trimmer
   
   acts_as_editable
   
