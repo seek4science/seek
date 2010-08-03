@@ -21,6 +21,12 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     ("A".."Z").to_a.each{|letter| assert pages.include?(letter)}
   end
   
+  def test_first_letter_ignore_space
+    inv=Investigation.new(:title=>" Inv",:project=>projects(:sysmo_project))
+    inv.save!    
+    assert_equal "I",inv.first_letter
+  end
+  
   def test_latest_limit
     assert_equal 7,Person.latest_limit  
   end

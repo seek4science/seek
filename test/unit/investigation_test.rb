@@ -19,8 +19,8 @@ class InvestigationTest < ActiveSupport::TestCase
     assert assays.include?(assays(:metabolomics_assay))
     assert assays.include?(assays(:metabolomics_assay2))
     assert assays.include?(assays(:metabolomics_assay3))
-  end
-
+  end  
+  
   test "validations" do
     
     inv=Investigation.new(:title=>"Test",:project=>projects(:sysmo_project))

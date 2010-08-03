@@ -139,7 +139,7 @@ module GroupedPagination
     end
     
     def update_first_letter
-      self.first_letter = strip_first_letter(title.gsub(/[\[\]]/,""))
+      self.first_letter = strip_first_letter(title.strip.gsub(/[\[\]]/,""))
       self.first_letter = "?" unless self.class.pages.include?(self.first_letter)
     end
         
