@@ -254,17 +254,20 @@ class DataFilesController < ApplicationController
   end
 
   def find_data_file_auth
-    begin
-      action=action_name      
-
+    begin      
+      
+      action=action_name
+      action="download" if action=="data"
       data_file = DataFile.find(params[:id])
 
-      if Authorization.is_authorized?(action_name, nil, data_file, current_user)
+      if Authorization.is_authorized?(action, nil, data_file, current_user)
         @data_file = data_file
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"
           format.html { redirect_to data_files_path }
+          #FIXME: this isn't the right response - should return with an unauthorized status code
+          format.xml { redirect_to data_files_path(:format=>"xml") }
         end
         return false
       end

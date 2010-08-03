@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'libxml'
 
 class DataFilesControllerTest < ActionController::TestCase
   
@@ -66,10 +67,21 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]    
   end
   
-#  test "should expose spreadsheet contents" do
-#    get :data, :id => data_files(:viewable_data_file)
-#    assert_response :success
-#  end
+  test "should expose spreadsheet contents" do
+    login_as(:model_owner)
+    get :data, :id => data_files(:downloadable_data_file),:format=>"xml"
+    assert_response :success
+    xml=@response.body
+    schema_path=File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
+    validate_xml_against_schema(xml,schema_path)     
+  end
+  
+  test "should not expose non downloadable spreadsheet" do
+    login_as(:model_owner)
+    get :data, :id => data_files(:viewable_data_file),:format=>"xml"    
+    assert_redirected_to data_files_path(:format=>"xml")
+    assert_not_nil flash[:error]         
+  end
   
   test "shouldn't expose spreadsheet contents for non-spreadsheet file" do
     get :data, :id => data_files(:picture)

@@ -25,10 +25,10 @@ private_data_file:
 downloadable_data_file:
   contributor: datafile_owner (User)
   title: Download Only
-  description: A picture
-  original_filename: file_pictuer.png
-  content_blob: picture_blob
-  content_type: text/png
+  description: A spreadsheet
+  original_filename: spreadsheet.xls
+  content_blob: spreadsheet_blob
+  content_type: application/vnd.excel
   last_used_at: 2009-04-03 11:09:18
   version: 1
   project: other_project # not linked to any project for now

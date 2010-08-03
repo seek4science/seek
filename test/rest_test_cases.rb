@@ -33,9 +33,9 @@ module RestTestCases
     return true,""    
   end  
   
-  def validate_xml_against_schema(xml)       
+  def validate_xml_against_schema(xml,schema=SCHEMA_FILE_PATH)       
     document = LibXML::XML::Document.string(xml)
-    schema = LibXML::XML::Schema.new(SCHEMA_FILE_PATH)
+    schema = LibXML::XML::Schema.new(schema)
     result = true
     begin
       document.validate_schema(schema)
