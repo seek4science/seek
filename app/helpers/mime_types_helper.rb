@@ -1,5 +1,3 @@
-require 'mime/types'
-
 module MimeTypesHelper
   #IF YOU ADD NEW MIME-TYPES, PLEASE ALSO UPDATE THE TEST AT test/units/helpers/mime_types_helper.rb FOR THAT TYPE.
   MIME_MAP = {
