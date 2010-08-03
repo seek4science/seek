@@ -9,8 +9,13 @@ class SearchController < ApplicationController
     @search_type = params[:search_type]
     type=@search_type.downcase unless @search_type.nil?
 
-    downcase_query = @search_query.downcase
+    if @search_query.start_with?("*")
+      flash[:error]="You cannot start a query with a wildcard, so this was removed. You CAN however include wildcards at the end or within the query."
+      @search_query=@search_query[1..-1] while @search_query.start_with?("*")      
+    end
     
+    downcase_query = @search_query.downcase
+      
     @results=[]
     case(type)
     when("people")
@@ -37,8 +42,7 @@ class SearchController < ApplicationController
       @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Study,DataFile,Assay,Investigation, Publication]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     end
 
-    @results = select_authorised @results
-    
+    @results = select_authorised @results    
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."
     else
@@ -46,10 +50,6 @@ class SearchController < ApplicationController
     end
     
   end
-  
-  
-  
-  
 
   private  
 

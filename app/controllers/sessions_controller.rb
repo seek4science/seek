@@ -74,7 +74,6 @@ class SessionsController < ApplicationController
     redirect_back_or_default('/')
   end
 
-
   private
 
   #will initiate creating an initial admin user if no users are present
