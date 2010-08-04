@@ -100,4 +100,31 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_select "a[href=?]",new_organism_path,:count=>0
     assert_select "a",:text=>/Add Organism/,:count=>0
   end
+  
+  test "delete as admin" do
+    login_as(:quentin)
+    o=organisms(:human)
+    assert_difference('Organism.count', -1) do
+      delete :destroy, :id => o
+    end    
+    #TODO: this should be changed to organisms#index when/if it exists
+    assert_redirected_to root_path
+  end
+  
+  test "cannot delete as non-admin" do
+    login_as(:aaron)
+    o=organisms(:human)
+    assert_no_difference('Organism.count') do
+      delete :destroy, :id => o
+    end    
+  end
+  
+  test "cannot delete associated organism" do
+    login_as(:aaron)
+    o=organisms(:yeast)
+    assert_no_difference('Organism.count') do
+      delete :destroy, :id => o
+    end    
+  end
+  
 end

@@ -11,3 +11,7 @@ yeast:
 
 yeast_with_bioportal_concept:
   title: "Yeast with concept"  
+  
+#this origanism mustn't be associated with anything
+human:
+  title: Homo Sapian  

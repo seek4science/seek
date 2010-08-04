@@ -41,6 +41,13 @@ class OrganismTest < ActiveSupport::TestCase
     o.destroy
     assert_nil BioportalConcept.find_by_id(concept.id)
   end
+  
+  test "can_delete?" do
+    o=organisms(:yeast)
+    assert !o.can_delete?
+    o=organisms(:human)
+    assert o.can_delete?
+  end
 
 #  test "get concept" do
 #    o=organisms(:yeast_with_bioportal_concept)

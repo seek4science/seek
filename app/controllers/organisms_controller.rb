@@ -1,8 +1,8 @@
 class OrganismsController < ApplicationController
   
   before_filter :login_required
-  before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create]
-  before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise]
+  before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]
+  before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise,:destroy]
   layout "main",:except=>:visualise
   
   cache_sweeper :organisms_sweeper,:only=>[:update,:create,:destroy]
@@ -13,6 +13,18 @@ class OrganismsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+    end
+  end
+  
+  def destroy
+    respond_to do |format|
+      if @organism.can_delete? && @organism.destroy
+        flash[:notice] = 'Organism was successfully removed.'
+        format.html { redirect_to root_path }        
+      else
+        flash[:error] = "Unable to delete organism"
+        format.html { render :action => "show" }       
+      end
     end
   end
 
