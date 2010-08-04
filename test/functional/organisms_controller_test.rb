@@ -77,9 +77,18 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
   
-  test "admin sees edit and create buttons" do
+  test "delete button disabled for associated organisms" do
     login_as(:quentin)
     y=organisms(:yeast)
+    get :show,:id=>y
+    assert_response :success
+    assert_select "span.disabled_icon img",:count=>1
+    assert_select "span.disabled_icon a",:count=>0
+  end
+  
+  test "admin sees edit and create buttons" do
+    login_as(:quentin)
+    y=organisms(:human)
     get :show,:id=>y
     assert_response :success
     assert_select "a[href=?]",edit_organism_path(y),:count=>1
@@ -87,11 +96,13 @@ class OrganismsControllerTest < ActionController::TestCase
     
     assert_select "a[href=?]",new_organism_path,:count=>1
     assert_select "a",:text=>/Add Organism/,:count=>1
+        
+    assert_select "a",:text=>/Delete Organism/,:count=>1
   end
   
-  test "non admin does not see edit and create buttons" do
+  test "non admin does not see edit, create and delete buttons" do
     login_as(:aaron)
-    y=organisms(:yeast)
+    y=organisms(:human)
     get :show,:id=>y
     assert_response :success
     assert_select "a[href=?]",edit_organism_path(y),:count=>0
@@ -99,6 +110,8 @@ class OrganismsControllerTest < ActionController::TestCase
     
     assert_select "a[href=?]",new_organism_path,:count=>0
     assert_select "a",:text=>/Add Organism/,:count=>0
+    
+    assert_select "a",:text=>/Delete Organism/,:count=>0
   end
   
   test "delete as admin" do

@@ -12,7 +12,7 @@ class Organism < ActiveRecord::Base
   validates_presence_of :title
   
   def can_delete?
-    models.empty? && assays.empty?
+    models.empty? && assays.empty? && projects.empty?
   end
 
 end

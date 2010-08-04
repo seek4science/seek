@@ -32,6 +32,7 @@ moses_project:
 
 sysmo_project:
   name: "SysMO"
+  organisms: organism_linked_project_only
 
 empty_project:
   name: "empty project with no members..."

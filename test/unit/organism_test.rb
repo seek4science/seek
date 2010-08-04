@@ -47,6 +47,8 @@ class OrganismTest < ActiveSupport::TestCase
     assert !o.can_delete?
     o=organisms(:human)
     assert o.can_delete?
+    o=organisms(:organism_linked_project_only)
+    assert !o.can_delete?
   end
 
 #  test "get concept" do

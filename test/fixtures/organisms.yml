@@ -14,4 +14,8 @@ yeast_with_bioportal_concept:
   
 #this origanism mustn't be associated with anything
 human:
-  title: Homo Sapian  
+  title: Homo Sapian
+  
+#this organism must only be linked to a project
+organism_linked_project_only:
+  title: Project link    
