@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'rake'
+require 'time'
 require 'model_execution'
 require 'active_record/fixtures'
 
@@ -117,6 +118,132 @@ namespace :seek do
     end
   end
   
+  desc 'creates an initial institution set '
+  task(:create_institutions=>:environment) do
+    revert_fixtures_identify
+    Institution.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "institutions")  				  
+  end
+
+  desc 'creates an initial projects set '
+  task(:create_projects=>:environment) do
+    revert_fixtures_identify
+    Institution.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "projects")  				  
+  end
+
+  desc 'creates an initial users and people set '
+  task(:create_users_and_people=>:environment) do
+    #Users.delete_all
+    #People.delete_all
+
+    count = 0;
+    File.open(File.join(RAILS_ROOT, "config/default_data/users_and_people.csv"
+    )).each do |line|
+
+    	 count = count + 1;
+	 
+	 next if(count == 1);
+
+         email,first_name,last_name,phone,skype_name,web_page,institution,projects = line.chomp.split(/,/);
+
+	 
+	 #print "#{first_name} #{last_name}\n"
+
+	 #print "#{first_name.downcase[0..0]}#{first_name.downcase[-1..-1]}#{last_name.tr('äöüß','aous').downcase}"
+
+	 login = "#{first_name.downcase[0..0]}#{first_name.downcase[-1..-1]}#{last_name.downcase}"
+
+	p = Person.find_or_create_by_email( :email => email,
+	    				    :first_name => first_name,
+					    :last_name => last_name,
+					    :phone => phone,
+					    :skype_name => skype_name,
+					    :web_page => web_page);  
+
+	saved = p.save(true);
+	
+	print "Saving #{p}: #{saved}\n";
+
+	person_id = p.id;
+
+	print "Person ID for #{first_name} #{last_name}: #{person_id} / Login #{login}\n";
+
+	u = p.user;
+
+
+	fullInstitution = Institution.find_by_name(institution);
+	print "found institution #{fullInstitution}\n";
+	 projectsList = projects.split(/;/);
+	 projectsList.each do |currentProject|
+		 print "Current project: #{currentProject}\n";
+		 # looking for the stuff before the colon in the project name
+		 # NOTE THAT THIS ACTUALLY RELIES ON THE PROJECT NAME FORMAT
+	 	 fullProject = Project.find (:all, :conditions=> ["name like ?", "#{currentProject.upcase}:%"]);
+		 print "found full project #{fullProject[-1].name}\n";
+		 print "querying for institution_id=#{fullInstitution.id} AND project_id=#{fullProject[-1].id}"
+		workgroups = WorkGroup.find(:all,:conditions=>["institution_id=? AND project_id=?",fullInstitution.id,fullProject[-1].id]);
+
+		w = workgroups[-1]
+		if(w.nil?)
+			w=WorkGroup.new(:institution => fullInstitution,
+					:project=>fullProject[-1]);
+			w.save(true);
+		end;
+		print "Found workgroup #{w}\n";
+		if(!w.nil?)
+			## need to specify the work group
+
+			memberships= GroupMembership.find(:all,:conditions=>["person_id=? and work_group_id=?",p.id,w.id]);
+
+			if(memberships.empty?)#save only if there is not already a membership record
+				g = GroupMembership.new(:person=>p,
+							:work_group=>w);	
+				if(g.save(true))
+					print "saved successfully #{g}\n";
+				else
+					print "failed to save #{g}\n";
+				end
+			end
+		end
+	 end
+	
+	if(u.nil?)
+			u = User.new(:email=>email,
+				     :login=>login ,
+				     :password=>"dummypass",
+				     :password_confirmation=>"dummypass"
+				     );
+			
+			saved = u.save(true)			   
+			u.activate()
+			print "Saving #{u}: #{saved}\n";
+			p.user = u;
+			p.save(true);
+			u.save(true);
+			print "creating new user #{u}\n"
+
+	end
+
+        if(u.save(true))
+
+		print u.login
+
+		u = User.find_by_login(login);
+
+		if(!u.nil?)
+			user_id = u.id;
+			print "User ID for #{first_name} #{last_name}: #{user_id}\n";
+		else
+			print "Could not find user with ID #{login}\n"
+		end
+	else
+		print "Could not save #{u}\n";
+		person.errors.each_full { |msg| puts "ERROR: #{msg}" };
+	end
+    end
+  end
+
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
     other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains"]
