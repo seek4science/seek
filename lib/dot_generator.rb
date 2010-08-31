@@ -1,6 +1,6 @@
 module DotGenerator
   
-  FILL_COLOURS = {Sop=>"darksalmon",Model=>"deepskyblue3",DataFile=>"darkkhaki",Investigation=>"skyblue3",Study=>"chocolate",Assay=>"burlywood"}
+  FILL_COLOURS = {Sop=>"cadetblue2",Model=>"yellow3",DataFile=>"darkgoldenrod2",Investigation=>"#C7E9C0",Study=>"#91c98b",Assay=>"#64b466"}
   HIGHLIGHT_ATTRIBUTE="color=orangered,penwidth=4"
   
   def to_dot root_item, deep=false, current_item=nil
@@ -27,7 +27,7 @@ module DotGenerator
     current_item||=investigation
     dot = ""
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if investigation==current_item
-    dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=#{FILL_COLOURS[Investigation]},#{highlight_attribute},URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
+    dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Investigation]}\",#{highlight_attribute},URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
     investigation.studies.each do |s|
       dot << to_dot_study(s,show_assets,current_item)
       dot << "Inv_#{investigation.id} -- Study_#{s.id}\n"
@@ -41,7 +41,7 @@ module DotGenerator
     
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if study==current_item
     
-    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=#{FILL_COLOURS[Study]},#{highlight_attribute},URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
+    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Study]}\",#{highlight_attribute},URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
     study.assays.each do |assay|
       dot << to_dot_assay(assay, show_assets,current_item)
       dot << "Study_#{study.id} -- Assay_#{assay.id}\n"
@@ -53,7 +53,7 @@ module DotGenerator
     current_item||=assay
     dot = ""    
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if assay==current_item
-    dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=#{FILL_COLOURS[Assay]},#{highlight_attribute},URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
+    dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute},URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
     if (show_assets) 
       assay.assay_assets.each do |assay_asset|
         asset=assay_asset.asset
@@ -65,7 +65,7 @@ module DotGenerator
         if Authorization.is_authorized?("view",nil,asset,current_user)
           title = multiline(asset.title)
           title = "#{asset_type.upcase}: #{title}" unless title.downcase.starts_with?(asset_type.downcase)
-          dot << "Asset_#{asset.id} [label=\"#{title}\",tooltip=\"#{tooltip(asset)}\",shape=box,fontsize=7,style=filled,fillcolor=#{FILL_COLOURS[asset.class]},URL=\"#{polymorphic_path(asset)}\",target=\"_top\"];\n"
+          dot << "Asset_#{asset.id} [label=\"#{title}\",tooltip=\"#{tooltip(asset)}\",shape=box,fontsize=7,style=filled,fillcolor=\"#{FILL_COLOURS[asset.class]}\",URL=\"#{polymorphic_path(asset)}\",target=\"_top\"];\n"
           label=""
           if assay_asset.relationship_type
             label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
@@ -81,7 +81,7 @@ module DotGenerator
   end
   
   def tooltip resource
-    resource.title.strip
+    resource.class.name.upcase + ": " + resource.title.strip
   end
   
   def to_svg root_item,deep=false,current_item=nil
