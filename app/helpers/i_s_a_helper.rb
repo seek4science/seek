@@ -22,8 +22,9 @@ module ISAHelper
     return text
   end
   
-  def embedded_isa_svg item,deep=false
-    "<div id='isa_svg'><script type=\'image/svg+xml'>#{to_svg(item,deep)}</script></div>"
+  def embedded_isa_svg root_item,deep=true,current_item=nil    
+    current_item||=root_item
+    "<div id='isa_svg'><script type=\'image/svg+xml'>#{to_svg(root_item,deep,current_item)}</script></div>"
   end
   
 end

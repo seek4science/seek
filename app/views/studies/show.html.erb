@@ -64,7 +64,7 @@
 
   </div>    
     
-  <%= embedded_isa_svg(@study.investigation) -%>
+  <%= embedded_isa_svg(@study.investigation,false,@study) -%>
 
   <%= render :partial=>"layouts/items_related_to", :object => @study %>
 </div>

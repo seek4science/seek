@@ -1,49 +1,59 @@
 module DotGenerator
   
-  FILL_COLOURS = {Sop=>"darksalmon",Model=>"deepskyblue4",DataFile=>"darkkhaki",Investigation=>"skyblue3",Study=>"chocolate",Assay=>"burlywood"}
+  FILL_COLOURS = {Sop=>"darksalmon",Model=>"deepskyblue3",DataFile=>"darkkhaki",Investigation=>"skyblue3",Study=>"chocolate",Assay=>"burlywood"}
+  HIGHLIGHT_ATTRIBUTE="color=orangered,penwidth=4"
   
-  def to_dot thing, deep=false
+  def to_dot root_item, deep=false, current_item=nil
+    current_item||=root_item
     dot = dot_header "Investigation"
     
-    if thing.instance_of?(Investigation)
-      dot += to_dot_inv thing,deep
+    if root_item.instance_of?(Investigation)
+      dot += to_dot_inv root_item,deep,current_item
     end
     
-    if thing.instance_of?(Study)
-      dot += to_dot_study thing
+    if root_item.instance_of?(Study)
+      dot += to_dot_study root_item,deep,current_item
     end
     
-    if thing.instance_of?(Assay)
-      dot += to_dot_assay thing
+    if root_item.instance_of?(Assay)
+      dot += to_dot_assay root_item,deep,current_item
     end
     
     dot << "}"
     return dot
   end
   
-  def to_dot_inv investigation, show_assets=false
+  def to_dot_inv investigation, show_assets=false,current_item=nil
+    current_item||=investigation
     dot = ""
-    dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=#{FILL_COLOURS[Investigation]},URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
+    highlight_attribute=HIGHLIGHT_ATTRIBUTE if investigation==current_item
+    dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=#{FILL_COLOURS[Investigation]},#{highlight_attribute},URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
     investigation.studies.each do |s|
-      dot << to_dot_study(s,show_assets)
+      dot << to_dot_study(s,show_assets,current_item)
       dot << "Inv_#{investigation.id} -- Study_#{s.id}\n"
     end
     return dot
   end
   
-  def to_dot_study study, show_assets=true
+  def to_dot_study study, show_assets=true,current_item=nil
+    current_item||=study
     dot = ""
-    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=#{FILL_COLOURS[Study]},URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
+    
+    highlight_attribute=HIGHLIGHT_ATTRIBUTE if study==current_item
+    
+    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=#{FILL_COLOURS[Study]},#{highlight_attribute},URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
     study.assays.each do |assay|
-      dot << to_dot_assay(assay, show_assets)
+      dot << to_dot_assay(assay, show_assets,current_item)
       dot << "Study_#{study.id} -- Assay_#{assay.id}\n"
     end
     return dot  
   end
   
-  def to_dot_assay assay, show_assets=true
-    dot = ""
-    dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=#{FILL_COLOURS[Assay]},URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
+  def to_dot_assay assay, show_assets=true,current_item=nil
+    current_item||=assay
+    dot = ""    
+    highlight_attribute=HIGHLIGHT_ATTRIBUTE if assay==current_item
+    dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=#{FILL_COLOURS[Assay]},#{highlight_attribute},URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
     if (show_assets) 
       assay.assay_assets.each do |assay_asset|
         asset=assay_asset.asset
@@ -74,10 +84,11 @@ module DotGenerator
     resource.title.strip
   end
   
-  def to_svg thing,deep=false
-    tmpfile = Tempfile.new("#{thing.class.name}_dot")
+  def to_svg root_item,deep=false,current_item=nil
+    current_item||=root_item
+    tmpfile = Tempfile.new("#{root_item.class.name}_dot")
     file = File.new(tmpfile.path,'w')
-    file.puts to_dot(thing,deep)
+    file.puts to_dot(root_item,deep,current_item)
     file.close    
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
@@ -92,10 +103,10 @@ module DotGenerator
     return dot
   end
   
-  def to_png thing,deep=false
-    tmpfile = Tempfile.new("#{thing.class.name}_dot")
+  def to_png root_item,deep=false
+    tmpfile = Tempfile.new("#{root_item.class.name}_dot")
     file = File.new(tmpfile.path,'w')
-    file.puts to_dot(thing,deep)
+    file.puts to_dot(root_item,deep)
     file.close    
     puts "saved to tmp file: "+tmpfile.path
     `dot -Tpng #{tmpfile.path}`
