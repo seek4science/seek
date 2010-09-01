@@ -1,7 +1,7 @@
 module DotGenerator
   
   FILL_COLOURS = {Sop=>"cadetblue2",Model=>"yellow3",DataFile=>"darkgoldenrod2",Investigation=>"#C7E9C0",Study=>"#91c98b",Assay=>"#64b466"}
-  HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=4"
+  HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=4," #trailing comma is required
   
   def to_dot root_item, deep=false, current_item=nil
     current_item||=root_item
@@ -27,7 +27,7 @@ module DotGenerator
     current_item||=investigation
     dot = ""
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if investigation==current_item
-    dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Investigation]}\",#{highlight_attribute},URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
+    dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Investigation]}\",#{highlight_attribute}URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
     investigation.studies.each do |s|
       dot << to_dot_study(s,show_assets,current_item)
       dot << "Inv_#{investigation.id} -- Study_#{s.id}\n"
@@ -41,7 +41,7 @@ module DotGenerator
     
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if study==current_item
     
-    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Study]}\",#{highlight_attribute},URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
+    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Study]}\",#{highlight_attribute}URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
     study.assays.each do |assay|
       dot << to_dot_assay(assay, show_assets,current_item)
       dot << "Study_#{study.id} -- Assay_#{assay.id}\n"
@@ -53,7 +53,7 @@ module DotGenerator
     current_item||=assay
     dot = ""    
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if assay==current_item
-    dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute},URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
+    dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute}URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
     if (show_assets) 
       assay.assay_assets.each do |assay_asset|
         asset=assay_asset.asset
