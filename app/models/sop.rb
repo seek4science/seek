@@ -34,7 +34,7 @@ class Sop < ActiveRecord::Base
 
   explicit_versioning(:version_column => "version") do
     
-    acts_as_resource
+    acts_as_versioned_resource
     
     belongs_to :content_blob
     
