@@ -258,13 +258,11 @@ class ApplicationController < ActionController::Base
         unless params[:filter][:assay].blank?
           pass = pass && (res.assay_ids.include?(params[:filter][:assay].to_i))
         end
-        unless params[:filter][:person].blank?          
-          if (res.respond_to?("creators")) #jerm added, or uploaded assets, where the creator is defined as on of the creators
-            pass = pass && res.creators.include?(Person.find_by_id(params[:filter][:person].to_i)) 
-          end
-          if (res.respond_to?("contributor")) #uploaded assets where creator may not include the uploader
-            pass = pass || (!res.contributor.nil? && res.contributor.person.id == params[:filter][:person].to_i)
-          end
+        unless params[:filter][:person].blank?
+          if (res.respond_to?("creators") && res.respond_to?("contributor")) #an asset that acts_as_resource
+            #succeeds if and/or the creators contains the person, or the contributor is the person
+            pass = pass && (res.creators.include?(Person.find_by_id(params[:filter][:person].to_i)) || (!res.contributor.nil? && res.contributor.person.id == params[:filter][:person].to_i))
+          end          
           if (res.respond_to?("owner")) #assays
             pass = pass && (!res.owner.nil? && res.owner.id == params[:filter][:person].to_i)
           end
