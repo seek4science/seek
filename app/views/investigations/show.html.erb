@@ -19,8 +19,6 @@
         <b>Project:</b>
         <%= link_to h(@investigation.project.name),@investigation.project %>
     </p>
-	<%= render :partial=>"investigations/simple_study_list",:locals=>{:studies=>@investigation.studies} %>
-	<%= render :partial=>"studies/simple_assay_list",:locals=>{:assays=>@investigation.assays} %>
     <p>
         <b>Description:</b>
         <div id="description" class="box_standout">

@@ -51,11 +51,7 @@
       </p>
     </div>
 
-    
-    <%= render :partial=>"studies/simple_assay_list",:locals=>{:assays=>@study.assays} %>
-    
-
-    <p style="margin-top: 1em;">
+    <p>
       <b>Description:</b>
       <div id="description" class="box_standout">
         <%= text_or_not_specified(@study.description, :description=>true,:auto_link=>true) %>
