@@ -3,6 +3,7 @@ require 'explicit_versioning'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
+require 'acts_as_versioned_resource'
 
 class Sop < ActiveRecord::Base
 

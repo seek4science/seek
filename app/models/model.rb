@@ -1,4 +1,5 @@
 require 'acts_as_resource'
+require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
