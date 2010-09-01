@@ -1,0 +1,21 @@
+<div id="studies">
+  <p>
+      <label>Studies:</label>
+
+      <%  if studies.blank? -%>
+        <span class='none_text'>None defined</span>
+      <% else %>
+
+        <% for study in studies  -%>
+          <%
+            title=h study.title           
+          %>
+          <%= link_to "#{title.capitalize}",study_path(study) %>
+          
+          <% unless study==studies.last %>
+            |
+          <% end %>
+        <% end %>
+      <% end %>
+    </p>
+</div>
