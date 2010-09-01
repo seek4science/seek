@@ -223,6 +223,18 @@ class DataFilesControllerTest < ActionController::TestCase
     get :index, :filter => {:project => project.id}
     assert_response :success
   end
+  
+  test "filtering by person" do
+    person = people(:person_for_datafile_owner)
+    get :index,:filter=>{:person=>person.id},:page=>"all"
+    assert_response :success    
+    df = data_files(:downloadable_data_file)
+    df2 = data_files(:sysmo_data_file)
+    assert_select "div.list_items_container" do      
+      assert_select "a",:text=>df.title,:count=>1
+      assert_select "a",:text=>df2.title,:count=>0
+    end
+  end
 
   private
 

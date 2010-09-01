@@ -263,7 +263,7 @@ class ApplicationController < ActionController::Base
             pass = pass && res.creators.include?(Person.find_by_id(params[:filter][:person].to_i)) 
           end
           if (res.respond_to?("contributor")) #uploaded assets where creator may not include the uploader
-            pass = pass || (!res.contributor.nil? && res.contributor.person == params[:filter][:person].to_i)
+            pass = pass || (!res.contributor.nil? && res.contributor.person.id == params[:filter][:person].to_i)
           end
           if (res.respond_to?("owner")) #assays
             pass = pass && (!res.owner.nil? && res.owner.id == params[:filter][:person].to_i)
