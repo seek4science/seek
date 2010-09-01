@@ -36,7 +36,7 @@
           <label>
               Owner: 
           </label>
-          <%= @assay.owner.name -%>
+          <%= link_to h(@assay.owner.name),@assay.owner -%>
       </p>
       <p>
           <b>Description:</b>
