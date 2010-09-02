@@ -11,7 +11,7 @@
   <XMI.metamodel xmi.name = "UML" xmi.version = "1.3"/>
  </XMI.header>
 <XMI.content>
-<UML:Model xmi.id="UMLProject.1" name="seek_development">
+<UML:Model xmi.id="UMLProject.1" name="seekhub2_development">
   <UML:Namespace.ownedElement>
     <UML:Model xmi.id="UMLModel.6" name="Design Model">
       <UML:Namespace.ownedElement>
