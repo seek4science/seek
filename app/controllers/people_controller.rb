@@ -211,7 +211,12 @@ class PeopleController < ApplicationController
         @person.user.save
       end
     end
-
+    
+    if !@person.notifiee_info.nil?
+      @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
+      @person.notifiee_info.save if @person.notifiee_info.changed?
+    end
+    
     new_tags=@person.tool_list + @person.expertise_list
 
     #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
@@ -220,6 +225,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
+         
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }

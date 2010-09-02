@@ -1,0 +1,4 @@
+fred_info:
+    notifiee: fred (Person)
+    receive_notifications: true    
+    

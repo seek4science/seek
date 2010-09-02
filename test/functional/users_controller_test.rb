@@ -94,7 +94,7 @@ class UsersControllerTest < ActionController::TestCase
   def test_should_activate_user
     assert_nil User.authenticate('aaron', 'test')
     get :activate, :activation_code => users(:aaron).activation_code
-    assert_redirected_to person_path(people(:two))
+    assert_redirected_to person_path(people(:aaron_person))
     assert_not_nil flash[:notice]
     assert_equal users(:aaron), User.authenticate('aaron', 'test')
   end

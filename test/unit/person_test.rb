@@ -38,7 +38,7 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:quentin_person)
     assert_equal 2, p.expertise.size
     
-    p=people(:two)
+    p=people(:aaron_person)
     assert_equal 1, p.expertise.size
     assert_equal "golf",p.expertise[0].name
   end
@@ -47,7 +47,7 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:quentin_person)
     assert_equal 2,p.institutions.size
     
-    p=people(:two)
+    p=people(:aaron_person)
     assert_equal 2,p.work_groups.size
     assert_equal 2,p.projects.size
     assert_equal 1,p.institutions.size
@@ -269,4 +269,5 @@ class PersonTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+  
 end
