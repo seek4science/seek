@@ -96,7 +96,7 @@ module DotGenerator
   def dot_header title
     dot = "graph #{title} {"
     dot << "rankdir = LR;"    
-    dot << "splines = line;"
+    dot << "splines = spline;"
     dot << "node [fontsize=9,fontname=\"Helvetica\"];"    
     dot << "bgcolor=transparent;" 
     dot << "edge [arrowsize=0.6];\n" 
