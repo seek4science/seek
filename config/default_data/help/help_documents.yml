@@ -41,6 +41,7 @@ help_documents:
       h2. Guidelines for Data and Model Annotation in SEEK
       
       [metadata-guidelines]
+      [isa-best-practice]
       [transcriptomics-guidelines]
       [proteomics-guidelines]
       
@@ -52,9 +53,11 @@ help_documents:
       
       [Templates]
       
+      h2. FAQ
+      
       [faq]
     - 2010-05-12 09:28:37
-    - 2010-05-28 13:42:45
+    - 2010-09-01 09:00:13
   - - "8"
     - metadata-guidelines
     - Metadata Guidelines
@@ -308,8 +311,8 @@ help_documents:
       SysMO-DB recommends using the following controlled vocabularies and data resources for data annotation
       
       
-      |_. Entity |_. Resource |_. Example ID |_. Database URL |_. MIRIAM URL |
-      | Protein | UNIPROT | "P23470":http:www.uniprot.org/uniprot/p23470 | "http://www.ebi.uniprot.org":http://www.ebi.uniprot.org | urn:miriam:uniprot |
+      |_. Entity |_. Resource |_. Example ID |_. Database URL |_. MIRIAM URN |
+      | Protein | UNIPROT | "P23470":http://www.uniprot.org/uniprot/p23470 | "http://www.ebi.uniprot.org":http://www.ebi.uniprot.org | urn:miriam:uniprot |
       |Chemical | ChEBI | "CHEBI:17234":http://www.ebi.ac.uk/chebi/searchId.do;25A6E76925354DCD82F282F5BA968FFE?chebiId=CHEBI:17234| "http://www.ebi.ac.uk/chebi/":http://www.ebi.ac.uk/chebi/ | urn:miriam:obo.chebi |
       | Chemical | KEGG Compund | "C0003":http://www.genome.jp/dbget-bin/www_bget?cpd:C00031 | "http://www.genome.jp/kegg/ligand.html":http://www.genome.jp/kegg/ligand.html | urn:miriam:kegg.compound |
       | Chemical | PubChem | CID:24749 | 
@@ -317,14 +320,13 @@ help_documents:
       | Reaction Kinetics | SABIO-RK | 20936 | "http://sabio.villa-bosch.de/":http://sabio.villa-bosch.de/ | urn:miriam:sabiork.reaction |
       | Enzymes | Enzyme Nomenclature (EC) IntEnz | "EC 1.14.13.39":http://www.ebi.ac.uk/intenz/query?cmd=SearchEC&ec=1.14.13.39 | "http://www.ebi.ac.uk/intenz/":http://www.ebi.ac.uk/intenz/ | urn:miriam:ec-code |
       | Pathways | KEGG Pathways | "map00480":http://www.genome.jp/kegg/pathway/map/map00480.html | "http://www.genome.jp/kegg/pathway.html":http://www.genome.jp/kegg/pathway.html | urn:miriam:kegg.pathway |
-      | Pathways | SABIO-RK Reactions | 544 | "http://sabio.villa-bosch.de/":http://sabio.villa-bosch.de/ | urn:miriam:sabiork.reaction |
       | Cellular Location | Gene Ontology | "GO:0016020":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0016020| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
       | Molecular Function | Gene Ontology | "GO:0004857":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0004857| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
       | Biological Process | Gene Ontology | "GO:0071581":http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0071581| "http://www.geneontology.org/":http://www.geneontology.org/ | urn:miriam:obo.go |
       | Literature | PubMed | PMID:19112082|"http://www.ncbi.nlm.nih.gov/pubmed/":http://www.ncbi.nlm.nih.gov/pubmed/ | urn:miriam:pubmed |
 
     - 2010-05-27 10:44:44
-    - 2010-05-28 09:06:09
+    - 2010-06-14 15:40:32
   - - "13"
     - templates
     - JERM Templates
@@ -333,3 +335,68 @@ help_documents:
 
     - 2010-05-28 09:14:54
     - 2010-05-28 13:40:08
+  - - "14"
+    - isa-best-practice
+    - ISA Best Practice
+    - "h1. ISA Best Practice Guide\r\n\
+      \r\n\
+      The ISA Infrastructure (Investigation, Study, Assay) is a general purpose framework for describing how experiments relate to one another. It describes both metadata (samples, characteristics, technologies, etc) and data (transcriptomics, proteomics etc), but the data itself is stored separately, and can therefore be as public or private as required. The ISA descriptions are visible to the rest of the SysMO consortium.\r\n\
+      The original purpose of the ISA infrastructure was to provide a common framework for relating multiple omics data and to provide a single mechanism for submission to omics data silos (such as ArrayExpress for Microarray data, or PRIDE, for proteomics data). SysMO data often involves omics data and generally relies on the integration of multiple data types, so the ISA infrastructure will provide a mechanism for SysMO data export as well as providing a common framework for navigation. \r\n\
+      For more information on the ISA community work, please see: \r\n\
+      \"http://isatab.sourceforge.net/index.html\":http://isatab.sourceforge.net/index.html\r\n\
+      \r\n\
+      h2. Examples\r\n\
+      \r\n\
+      There are many ways to describe your projects and the relationships between the different work-packages and research topics. The following guidelines provide a general description of the ISA Infrastructure and examples of how this may fit with your SysMO project. We use examples from the Bioinvestigation Index (BII \"http://www.ebi.ac.uk/bioinvindex/\":http://www.ebi.ac.uk/bioinvindex/), which is a public database of ISA compliant data. We also use examples already available in SysMO\r\n\
+      \r\n\
+      * *Investigation:* a high level description of the area and the main aims of a project\r\n    ** In SysMO, this may be the overall aims as stated on the sysmo.net website. \r\n\
+      If your project has several subprojects that do not share any data, you should define an investigation for each.\r\n    ** *BII Example:* Growth control of the eukaryote cell: a systems biology study in yeast\r\n    ** *SysMO Example* Analysis of Central Carbon Metabolism of Sulfolobus solfataricus under varying temperatures\r\n\
+      \r\n\
+      * *Study:* a particular biological hypothesis or analysis\r\n   ** In SysMO, these studies may contain only experimental assays, only modelling analyses, only informatics analyses, \r\n\
+      or a mixture of all \r\n   ** *BII Example:* Study of the impact of changes in flux on the transcriptome, proteome, endometabolome and exometabolome \r\n\
+      of the yeast Saccharomyces cerevisiae under different nutrient limitations\r\n   ** *SysMO Example:* Comparison of S. solfataricus grown at 70 and 80 degrees\r\n\
+      \r\n\
+      * *Assay:* specific, individual experiments required to be undertaken together in order to address the study hypotheses.\r\n   ** In SysMO, this may be one single microarray experiment, or one flux balance analysis, for example\r\n   ** *BII Example:* \r\n      *** Transcriptional profiling\r\n      *** DNA Microarray\r\n   ** *SysMO Example:*\r\n      *** Comparison of transcriptome 70 and 80c (Cdna microarray)\r\n      *** Comparison of proteome at 70 and 80c (Protein expression profiling)\r\n      *** Intracellular metabolomics of s. solfataricus at 70 and 80c (Metabolomics)\r\n\
+      \r\n\
+      \r\n\
+      \r\n\
+      h1. Required Fields in the SysMO ISA\r\n\
+      \r\n\
+      A short guide to creating a new ISA file\r\n\
+      \r\n\
+      \r\n\
+      h3. Investigation\r\n\
+      \r\n\
+      *Title* - The name of the investigation. All assets should have a title\r\n\
+      *Description* - free text describing the purpose of the investigation\r\n\
+      *Project* - The project that the investigation belongs to. All assets should be associated with a project\r\n\
+      \r\n\
+      \r\n\
+      h3. Study\r\n\
+      \r\n\
+      *Title* \xE2\x80\x93 The name of the Study. All assets should have a title\r\n\
+      *Description* \xE2\x80\x93 free text describing the purpose of the study\r\n\
+      *Person Responsible* \xE2\x80\x93 the creator of the study description\r\n\
+      *Experimentalists* \xE2\x80\x93 other scientists involved in any of the work in the study. If they are in SysMO, please give their SEEK ID, so we can link to their profiles in SEEK. If they are not in SEEK, their names will still be displayed, but not linked. People\xE2\x80\x99s involvement can also be inferred from anyone named in included assays.\r\n\
+      *Project* \xE2\x80\x93 The project that the study belongs to. All assets should be associated with a project\r\n\
+      *Investigation title* \xE2\x80\x93 The name of the investigation the study belongs to. \r\n\
+      \r\n\
+      \r\n\
+      h3. Assay\r\n\
+      \r\n\
+      *Assay Title* \xE2\x80\x93 The name of the assay that the asset links to. \r\n\
+      *Assay type* \xE2\x80\x93 The controlled vocabulary term describing the assay classification\r\n\
+      If you cannot find a suitable Assay Type term, please contact us or your PAL to update the vocabulary \r\n\
+      *Technology type* \xE2\x80\x93 The controlled vocabulary term describing the technology used in the assay\r\n\
+      If you cannot find a suitable Technology Type term, please contact us or your PAL to update the vocabulary \r\n\
+      *Study title* \xE2\x80\x93 The name of the study the assay belongs to. An assay can belong to more than one study\r\n\
+      *Organism* The name of the organism being studied with this asset. If uploading through SEEK, organism names are provided as a drop-down list\r\n\
+      *Strain* The name of the particular strain being studied\r\n\
+      *WT/Mutant* - Specifies whether this strain is wild-type or mutant\r\n\
+      *Genotype* \xE2\x80\x93 a brief text description of the genotype\r\n\
+      *Phenotype* \xE2\x80\x93 a brief text description of the phenotype\r\n\
+      *Culture Growth* - This describes how the culture was grown for this assay. You can choose values from a drop-down list when adding new assays directly to SEEK\r\n\
+      *Data File Titles* \xE2\x80\x93 the title of one or many data files produced during this assay\r\n\
+      *SOP Titles* \xE2\x80\x93 the title of one or many SOPs used to execute this assay\r\n"
+    - 2010-09-01 08:59:29
+    - 2010-09-01 09:04:59
