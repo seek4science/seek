@@ -246,6 +246,20 @@ class SopsControllerTest < ActionController::TestCase
     get :index, :filter => {:project => project.id}
     assert_response :success
   end
+  
+  test "filtering by person" do
+    login_as(:owner_of_my_first_sop)
+    person = people(:person_for_owner_of_my_first_sop)    
+    p=projects(:sysmo_project)
+    get :index,:filter=>{:person=>person.id},:page=>"all"
+    assert_response :success    
+    sop = sops(:downloadable_sop)
+    sop2 = sops(:sop_with_fully_public_policy)
+    assert_select "div.list_items_container" do      
+      assert_select "a",:text=>sop.title,:count=>1
+      assert_select "a",:text=>sop2.title,:count=>0
+    end
+  end
 
   private
 

@@ -472,4 +472,16 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  test "filtering by person" do
+    person = people(:person_for_model_owner)
+    get :index,:filter=>{:person=>person.id},:page=>"all"
+    assert_response :success    
+    a = assays(:metabolomics_assay)
+    a2 = assays(:modelling_assay_with_data_and_relationship)
+    assert_select "div.list_items_container" do      
+      assert_select "a",:text=>a.title,:count=>1
+      assert_select "a",:text=>a2.title,:count=>0
+    end
+  end
+  
 end

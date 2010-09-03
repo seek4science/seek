@@ -175,7 +175,7 @@ module AssetsHelper
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
       related[key][:items] = related[key][:items].compact
-      if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay"].include?(resource.class.name)
+      if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay","Person"].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]        
       end
@@ -195,6 +195,8 @@ module AssetsHelper
         filter_text = "(:filter => {:study => #{context_resource.id}},:page=>'all')"
       when "Assay"
         filter_text = "(:filter => {:assay => #{context_resource.id}},:page=>'all')"
+      when "Person"
+        filter_text = "(:filter => {:person => #{context_resource.id}},:page=>'all')"
     end
     return eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end

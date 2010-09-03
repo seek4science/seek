@@ -86,9 +86,9 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000022">exists?</a>&nbsp;&nbsp;
-      <a href="#M000021">populate</a>&nbsp;&nbsp;
-      <a href="#M000020">populate_collection</a>&nbsp;&nbsp;
+      <a href="#M000021">exists?</a>&nbsp;&nbsp;
+      <a href="#M000020">populate</a>&nbsp;&nbsp;
+      <a href="#M000019">populate_collection</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -128,11 +128,11 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000022" class="method-detail">
-        <a name="M000022"></a>
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
 
         <div class="method-heading">
-          <a href="#M000022" class="method-signature">
+          <a href="#M000021" class="method-signature">
           <span class="method-name">exists?</span><span class="method-args">(resource)</span>
           </a>
         </div>
@@ -142,8 +142,8 @@
 checks whether the resource already exists in the registry
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000022-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000022-source">
+            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000021-source">
 <pre>
      <span class="ruby-comment cmt"># File lib/jerm/populator.rb, line 59</span>
  59:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">exists?</span> <span class="ruby-identifier">resource</span>
@@ -193,11 +193,11 @@ checks whether the resource already exists in the registry
         </div>
       </div>
 
-      <div id="method-M000021" class="method-detail">
-        <a name="M000021"></a>
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
 
         <div class="method-heading">
-          <a href="#M000021" class="method-signature">
+          <a href="#M000020" class="method-signature">
           <span class="method-name">populate</span><span class="method-args">(resource)</span>
           </a>
         </div>
@@ -211,8 +211,8 @@ or creates new version if already exists. returns a report:
  {:response=&gt;:success|:fail|:skipped,:message=&gt;&quot;&quot;,:exception=&gt;Exception|nil,:resource=&gt;resource}
 </pre>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000021-source">
+            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000020-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/populator.rb, line 39</span>
 39:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">populate</span> <span class="ruby-identifier">resource</span>            
@@ -238,23 +238,23 @@ or creates new version if already exists. returns a report:
         </div>
       </div>
 
-      <div id="method-M000020" class="method-detail">
-        <a name="M000020"></a>
+      <div id="method-M000019" class="method-detail">
+        <a name="M000019"></a>
 
         <div class="method-heading">
-          <a href="#M000020" class="method-signature">
+          <a href="#M000019" class="method-signature">
           <span class="method-name">populate_collection</span><span class="method-args">(resources)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-calls <a href="Populator.html#M000021">populate</a> on an enumeration of
+calls <a href="Populator.html#M000020">populate</a> on an enumeration of
 resources, and returns an enumeration of responses
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000020-source">
+            onclick="toggleCode('M000019-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000019-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/populator.rb, line 28</span>
 28:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">populate_collection</span> <span class="ruby-identifier">resources</span>
