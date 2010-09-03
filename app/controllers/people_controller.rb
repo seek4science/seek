@@ -131,7 +131,7 @@ class PeopleController < ApplicationController
     end
 
     @userless_projects.sort!{|a,b|a.name<=>b.name}
-    @person = Person.new
+    @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
     render :action=>"select",:layout=>"logged_out"
   end

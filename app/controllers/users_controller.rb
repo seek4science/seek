@@ -7,8 +7,6 @@ class UsersController < ApplicationController
   
   # render new.rhtml
   def new
-    @user=User.new
-    
   end
 
   def create
@@ -17,21 +15,16 @@ class UsersController < ApplicationController
     # request forgery protection.
     # uncomment at your own risk
     # reset_session
-    @user = User.new(params[:user])
-
-    #first user is automatically set as an admin user
-    @user.is_admin=true if User.count == 0
-    
-    @user.save
-    
-    if @user.errors.empty?
-      @user.activate unless ACTIVATION_REQUIRED
-      self.current_user = @user
-      redirect_to(select_people_path)
+    if using_open_id?
+      open_id_authentication(params[:openid_identifier])
     else
-      render :action => 'new'
+      @user = User.new(:login => params[:login], :password => params[:password], :password_confirmation => params[:password_confirmation])
+      check_registration
     end
+
   end
+
+
 
   def activate
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
@@ -148,6 +141,76 @@ class UsersController < ApplicationController
     end
     
     redirect_to :controller => 'home', :action => 'index'
+  end
+  
+  protected
+  
+  def open_id_authentication(identity_url)
+    # Pass optional :required and :optional keys to specify what sreg fields you want.
+    # Be sure to yield registration, a third argument in the #authenticate_with_open_id block.
+    authenticate_with_open_id(identity_url,        
+        :required => [:email, :fullname,
+                      'http://schema.openid.net/contact/email',
+                      'http://openid.net/schema/contact/email',
+                      'http://axschema.org/contact/email',
+                      'http://schema.openid.net/namePerson',
+                      'http://openid.net/schema/namePerson',
+                      'http://axschema.org/namePerson']) do |result, identity_url, registration|
+      case result.status
+      when :missing
+        failed_registration "Sorry, the OpenID server couldn't be found"
+      when :invalid
+        failed_registration "Sorry, but this does not appear to be a valid OpenID"
+      when :canceled
+        failed_registration "OpenID verification was canceled"
+      when :failed
+        failed_registration "Sorry, the OpenID verification failed"
+      when :successful
+        if !User.find_by_openid(identity_url)
+          @openid_details = {}
+          @openid_details[:email] = registration['email']
+          name = registration['fullname']
+          ax_response = OpenID::AX::FetchResponse.from_success_response(request.env[Rack::OpenID::RESPONSE])
+          @openid_details[:email] ||= ax_response['http://schema.openid.net/contact/email'].first
+          @openid_details[:email] ||= ax_response['http://openid.net/schema/contact/email'].first
+          @openid_details[:email] ||= ax_response['http://axschema.org/contact/email'].first
+          name ||= ax_response['http://schema.openid.net/namePerson'].first
+          name ||= ax_response['http://openid.net/schema/namePerson'].first
+          name ||= ax_response['http://axschema.org/namePerson'].first
+          if name
+            @openid_details[:first_name], @openid_details[:last_name] = name.split(" ", 2)
+          end
+          @user = User.new(:openid => identity_url)
+          check_registration
+        else
+          failed_registration "There is already a user registered with the given OpenID URL"
+        end
+      end
+    end
+  end
+  
+  private 
+  
+  def check_registration
+    #first user is automatically set as an admin user
+    @user.is_admin=true if User.count == 0    
+    if @user.save
+      successful_registration
+    else
+      failed_registration @user.errors.full_messages.to_sentence
+    end
+  end
+  
+  def failed_registration(message)
+    flash[:error] = message
+    redirect_to(new_user_url)
+  end
+  
+  def successful_registration
+    @user.activate unless ACTIVATION_REQUIRED
+    self.current_user = @user
+    @openid_details ||= nil
+    redirect_to(select_people_path(:openid_details => @openid_details))
   end
 
 end

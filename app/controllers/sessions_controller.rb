@@ -11,74 +11,95 @@ class SessionsController < ApplicationController
   end
 
   def create   
-    self.current_user = User.authenticate(params[:login], params[:password])
-    if logged_in?
-      if current_user.person && !current_user.is_admin? && current_user.person.projects.empty?
-          logout_user
-          flash[:error]="You have not yet been assigned to a project by an administrator."
-          redirect_to :action=>"new"
-      else      
-        if params[:remember_me] == "1"
-          current_user.remember_me unless current_user.remember_token?
-          cookies[:auth_token] = { :value => self.current_user.remember_token , :expires => self.current_user.remember_token_expires_at }
-        end
-        #if the person has registered but has not yet selected a profile then go to the select person page
-        #otherwise login normally
-        if current_user.person.nil?
-          redirect_to(select_people_path)
-        else
-          respond_to do |format|
-            if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
-              unless params[:called_from][:id].blank?
-                return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
-              else
-                return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action])
-              end
-            else
-              unless session[:return_to] and !session[:return_to].empty?
-                return_to_url = request.env['HTTP_REFERER']
-              else
-                return_to_url = session[:return_to]
-              end
-            end
-            
-            format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == '/') ? redirect_to(root_url) : redirect_to(return_to_url) }
-          end
-        end
-      end
-    else
-      #check if user is part way through registration processes      
-      user=User.find_by_login(params[:login])      
-      if !user.nil? && !user.active? && user.authenticated?(params[:password])
-        if (user.person.nil?)
-          flash[:notice]="You need to continue selecting a profile"
-          session[:user_id]=user.id
-          redirect_to select_people_path
-        else
-          flash[:error]="You still need to activate your account. You should have been sent a validation email."
-          redirect_to :action=>"new"
-        end
-      else
-        flash[:error] = "Invalid login"
-        redirect_to :action => 'new'
-      end
-      
-    end
+    if using_open_id?
+      open_id_authentication
+    else      
+      password_authentication
+    end   
   end
 
   def destroy    
-    self.current_user.forget_me if logged_in?
+    current_user.forget_me if logged_in?
     cookies.delete :auth_token
     reset_session
     flash[:notice] = "You have been logged out."
     redirect_back_or_default('/')
   end
 
+  protected
+  
+  def open_id_authentication
+    authenticate_with_open_id do |result, identity_url|
+      if result.successful?
+        if @user = User.find_by_openid(identity_url)          
+          check_login
+        else
+          failed_login "Sorry, no user by that identity URL exists (#{identity_url})"
+        end
+      else
+        failed_login result.message
+      end
+    end
+  end
+  
+  def password_authentication
+    if @user = User.authenticate(params[:login], params[:password])
+      check_login
+    else
+      failed_login "Invalid username/password."
+    end  
+  end
+
   private
+  
+  def check_login
+    session[:user_id] = @user.id
+    if @user.person && !@user.is_admin? && @user.person.projects.empty?
+      failed_login "You have not yet been assigned to a project by an administrator."
+    else      
+      #if the person has registered but has not yet selected a profile then go to the select person page
+      #otherwise login normally
+      if @user.person.nil?
+        redirect_to(select_people_path)
+      else
+        successful_login
+      end
+    end   
+  end
+  
+  def successful_login
+    if params[:remember_me] == "1"
+      @user.remember_me unless @user.remember_token?
+      cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
+    end
+    
+    respond_to do |format|
+      if !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
+        unless params[:called_from][:id].blank?
+          return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
+        else
+          return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action])
+        end
+      else
+        unless session[:return_to] and !session[:return_to].empty?
+          return_to_url = request.env['HTTP_REFERER']
+        else
+          return_to_url = session[:return_to]
+        end
+      end
+      
+      format.html { return_to_url.nil? || (return_to_url && URI.parse(return_to_url).path == '/') ? redirect_to(root_url) : redirect_to(return_to_url) }
+    end
+  end
+
+  def failed_login(message)
+    logout_user
+    flash[:error] = message
+    redirect_to(new_session_url)
+  end
 
   #will initiate creating an initial admin user if no users are present
   def signup_admin_if_not_users    
     redirect_to :signup if User.count==0
-  end
-  
+  end  
 end

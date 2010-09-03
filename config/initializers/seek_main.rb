@@ -26,3 +26,5 @@ end
 
 #The order in which asset tabs appear
 ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch','Organism']
+
+OpenIdAuthentication.store = :memory

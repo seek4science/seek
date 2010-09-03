@@ -19,19 +19,19 @@ class User < ActiveRecord::Base
   #validates_presence_of     :login, :email - removed requirement on email
   #validates_length_of       :email,    :within => 3..100
   
-  validates_presence_of     :login
-  validates_presence_of     :password,                   :if => :password_required?
-  validates_presence_of     :password_confirmation,      :if => :password_required?
-  validates_length_of       :password, :within => 4..40, :if => :password_required?
-  validates_confirmation_of :password,                   :if => :password_required?
-  validates_length_of       :login,    :within => 3..40
+  validates_presence_of     :login,                      :unless => :using_openid?
+  validates_presence_of     :password,                   :if => :password_required?, :unless => :using_openid?
+  validates_presence_of     :password_confirmation,      :if => :password_required?, :unless => :using_openid?
+  validates_length_of       :password, :within => 4..40, :if => :password_required?, :unless => :using_openid?
+  validates_confirmation_of :password,                   :if => :password_required?, :unless => :using_openid?
+  validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
   
   validates_uniqueness_of   :login, :case_sensitive => false
   before_save :encrypt_password
   before_create :make_activation_code 
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :password, :password_confirmation
+  attr_accessible :login, :email, :password, :password_confirmation, :openid
   
   has_many :favourites, :dependent => :destroy
   has_many :favourite_groups, :dependent => :destroy
@@ -136,6 +136,10 @@ class User < ActiveRecord::Base
 
   def display_name
     person.name
+  end
+  
+  def using_openid?
+    !openid.nil?
   end
 
   protected

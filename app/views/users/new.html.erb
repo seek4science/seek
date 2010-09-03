@@ -32,40 +32,44 @@
 
     <h2>Please provide your details <%= help_icon("Please note that fields marked with an asterisk are compulsory.") %></h2>
 
-    <% form_for :user, :url=>users_url do |f| -%>
-      <table style="width: 100%;">
-        <tr>
-          <td style="width: 50%;">
-            <div class="box_simple">
-              <center>
-                <div style="width: 90%;">
-                  <p>
-                    <label for="user_login">
-                      <b><font style="color: #FF0000;">*</font> Login name</b>
-                      <%= help_icon("Login should contain a minimum of 3 characters") -%>
-                    </label><br/>
-                    <%= f.text_field :login, :style => "width: 100%" %>
-                  </p>
+    <% form_tag users_path do |f| -%>
+      <div style="width: 90%;">
+        <p>
+          <label for="user_login">
+            <b><font style="color: #FF0000;">*</font> Login name</b>
+            <%= help_icon("Login should contain a minimum of 3 characters") -%>
+          </label><br/>
+          <%= text_field_tag :login, nil, :style => "width: 80%" %>
+        </p>
 
-                  <p>
-                    <label for="user_password">
-                      <b><font style="color: #FF0000;">*</font> Password</b>
-                      <%= help_icon("Password should contain a minimum of 4 characters") -%>
-                    </label><br/>
-                    <%= f.password_field :password, :style => "width: 100%;" %>
-                  </p>
+        <p>
+          <label for="user_password">
+            <b><font style="color: #FF0000;">*</font> Password</b>
+            <%= help_icon("Password should contain a minimum of 4 characters") -%>
+          </label><br/>
+          <%= password_field_tag :password, nil, :style => "width: 80%;" %>
+        </p>
 
-                  <p>
-                    <label for="user_password_confirmation"><b><font style="color: #FF0000;">*</font> Confirm Password</b></label><br/>
-                    <%= f.password_field :password_confirmation, :style => "width: 100%;" %>
-                  </p>
-                </div>
-              </center>
-            </div>
-          </td>
+        <p>
+          <label for="user_password_confirmation"><b><font style="color: #FF0000;">*</font> Confirm Password</b></label><br/>
+          <%= password_field_tag :password_confirmation, nil, :style => "width: 80%;" %>
+        </p>
+      </div>
 
-        </tr>
-      </table>
+      <p style="text-align: center;">
+        <%= submit_tag 'Register' %>
+      </p>
+      
+      <h2>Alternatively, register with an <a href="http://openid.net/" target="_blank">OpenID</a> <%= help_icon("If you aren't sure what an OpenID is or whether or not you have one, you can safely ignore this an register using a username and password using the form above.") %></h2>     
+      
+      <div style="width: 90%; border: 1px dashed #CCC; padding: 5px;">
+        <p>
+          <label for="user_login">
+            <%= image_tag "openid-16x16.gif" %><b> OpenID</b>
+          </label><br/>
+          <%= text_field_tag :openid_identifier, nil, :style => "width: 95%" %>
+        </p>
+      </div>
 
       <p style="text-align: center;">
         <%= submit_tag 'Register' %>
