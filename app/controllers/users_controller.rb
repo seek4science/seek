@@ -24,7 +24,25 @@ class UsersController < ApplicationController
 
   end
 
-
+  def set_openid
+    @user = User.find(params[:id])
+    authenticate_with_open_id do |result, identity_url|
+      if result.successful?
+        @user.openid = identity_url
+        if @user.save
+          flash[:notice] = "OpenID successfully set"
+          redirect_to(@user.person)
+        else
+          puts @user.errors.full_messages.to_sentence
+          puts @user.openid
+          redirect_to(edit_user_path(@user))
+        end
+      else
+        flash[:error] = result.message
+        redirect_to(edit_user_path(@user))
+      end
+    end
+  end
 
   def activate
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])

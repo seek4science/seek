@@ -54,7 +54,8 @@ ActionController::Routing::Routes.draw do |map|
     sop.resources :experimental_conditions
   end
 
-  map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get}
+  map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
+                        :member => {:set_openid => :put}
 
   map.resource :session  
   

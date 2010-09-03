@@ -6,7 +6,7 @@
 
     <% if mine?(@person) -%>
       <li>
-        <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Change password", nil, "Change password" -%>
+        <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
       </li>
     <% end -%>
 

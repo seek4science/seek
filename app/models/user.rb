@@ -27,6 +27,8 @@ class User < ActiveRecord::Base
   validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
   
   validates_uniqueness_of   :login, :case_sensitive => false
+  validates_uniqueness_of   :openid, :case_sensitive => false
+  
   before_save :encrypt_password
   before_create :make_activation_code 
   # prevents a user from submitting a crafted form that bypasses activation
