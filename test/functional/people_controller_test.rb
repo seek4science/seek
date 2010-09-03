@@ -39,6 +39,13 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal "T", assigns(:person).first_letter
     assert_not_nil Person.find(assigns(:person).id).notifiee_info
   end
+  
+  def test_created_person_should_receive_notifications
+    post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com" }
+    p=assigns(:person)
+    assert_not_nil p.notifiee_info
+    assert p.notifiee_info.receive_notifications?
+  end
       
   test "non_admin_should_not_create_pal" do
     login_as(:pal_user)
@@ -69,12 +76,12 @@ class PeopleControllerTest < ActionController::TestCase
   
   def test_non_admin_cant_edit_someone_else
     login_as(:fred)
-    get :edit, :id=> people(:two)
+    get :edit, :id=> people(:aaron_person)
     assert_redirected_to root_path
   end
   
   def test_admin_can_edit_others
-    get :edit, :id=>people(:two)
+    get :edit, :id=>people(:aaron_person)
     assert_response :success
   end
   
@@ -84,6 +91,19 @@ class PeopleControllerTest < ActionController::TestCase
     assert !p.is_pal?
     put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
     assert Person.find(p.id).is_pal?
+  end
+  
+  def test_change_notification_settings
+    login_as(:quentin)
+    p=people(:fred)
+    assert p.notifiee_info.receive_notifications?,"should receive noticiations by default in fixtures"
+    
+    put :update, :id=>p.id, :person=>{:id=>p.id}
+    assert !Person.find(p.id).notifiee_info.receive_notifications?
+    
+    put :update, :id=>p.id, :person=>{:id=>p.id},:receive_notifications=>true
+    assert Person.find(p.id).notifiee_info.receive_notifications?
+    
   end
   
   def test_non_admin_cant_set_pal_flag
@@ -102,7 +122,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
   
   def test_not_current_user_doesnt_show_link_to_change_password
-    get :edit, :id => people(:two)
+    get :edit, :id => people(:aaron_person)
     assert_select "a", :text=>"Change password", :count=>0
   end
   
@@ -113,7 +133,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
   
   def test_not_current_user_doesnt_show_seek_id
-    get :show, :id=> people(:two)
+    get :show, :id=> people(:aaron_person)
     assert_select ".box_about_actor p", :text=>/Seek ID :/, :count=>0
   end
   
@@ -123,7 +143,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
   
   def test_tags_updated_correctly
-    p=people(:two)
+    p=people(:aaron_person)
     p.expertise_list="one,two,three"
     p.tool_list="four"
     assert p.save

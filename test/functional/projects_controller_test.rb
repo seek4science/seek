@@ -196,7 +196,7 @@ class ProjectsControllerTest < ActionController::TestCase
   test "changing default policy" do
     login_as(:quentin)
     
-    person = people(:two) #aaron
+    person = people(:aaron_person)
     project = projects(:four)
     assert_nil project.default_policy_id #check theres no policy to begin with
     

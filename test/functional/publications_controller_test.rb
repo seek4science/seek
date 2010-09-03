@@ -77,7 +77,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should disassociate authors" do
     p = publications(:one)
     p.creators << people(:quentin_person)
-    p.creators << people(:two)
+    p.creators << people(:aaron_person)
     
     assert_equal 0, p.non_seek_authors.size
     assert_equal 2, p.creators.size

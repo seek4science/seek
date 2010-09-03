@@ -44,7 +44,7 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     resource = sops(:my_first_sop)
     #Set creators
     creator_to_stay = people(:quentin_person)
-    creator_to_remove = people(:two)
+    creator_to_remove = people(:aaron_person)
     params =  ActiveSupport::JSON.encode([[creator_to_stay.name, creator_to_stay.id],
                                           [creator_to_remove.name, creator_to_remove.id]])
     AssetsCreator.add_or_update_creator_list(resource, params)
