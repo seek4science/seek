@@ -21,7 +21,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :data_files, :member => {:download => :get, :data => :get}  do |data_file|
+  map.resources :data_files, :member => {:download => :get, :data => :get, :request_resource=>:post}  do |data_file|
     data_file.resources :studied_factors
   end
   
@@ -37,7 +37,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :groups
 
-  map.resources :models, :member => { :download => :get, :execute=>:post }
+  map.resources :models, :member => { :download => :get, :execute=>:post, :request_resource=>:post }
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
     # avatars / pictures 'owned by' person
@@ -50,7 +50,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :sops, :member => { :download => :get, :new_version=>:post } do |sop|
+  map.resources :sops, :member => { :download => :get, :new_version=>:post, :request_resource=>:post } do |sop|
     sop.resources :experimental_conditions
   end
 

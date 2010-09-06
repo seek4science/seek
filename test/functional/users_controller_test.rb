@@ -181,4 +181,5 @@ class UsersControllerTest < ActionController::TestCase
     post :create, :user => { :login => 'quire', :email => 'quire@example.com',
       :password => 'quire', :password_confirmation => 'quire' }.merge(options),:person=>{:first_name=>"fred"}
   end
+  
 end

@@ -15,7 +15,7 @@ resource_type=resource.class.name.humanize
     <p>
         Please provide some extra information
     </p>
-    <% form_remote_tag :url=>polymorhpic_url(resource, :action => :request_resource),
+    <% form_remote_tag :url=>polymorphic_url(resource, :action => :request_resource),
                        :before=>"Effect.Appear('requesting_resource_status');$('request_resource_form').hide();" do -%>
         <%=  text_area_tag :details,'',:cols=>50,:rows=>5 -%>        
         <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{resource.managers.collect{|p| p.name}.join(", ")}. Are you sure?" -%>
