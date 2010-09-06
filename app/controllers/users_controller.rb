@@ -113,8 +113,8 @@ class UsersController < ApplicationController
     @user.attributes=params[:user]
 
     if (!person.nil? && person.is_pal?)
-      @user.can_edit_projects=true
-      @user.can_edit_institutions=true
+      @user.person.can_edit_projects=true
+      @user.person.can_edit_institutions=true
     end
 
     respond_to do |format|

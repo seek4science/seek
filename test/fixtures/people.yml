@@ -21,6 +21,9 @@ fred:
   first_name: "fred"
   last_name: "blogs"
   email: "fred@email.com"
+  is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
 no_first_name:
   id: 6

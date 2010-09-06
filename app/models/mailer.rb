@@ -1,16 +1,7 @@
 class Mailer < ActionMailer::Base
   helper UsersHelper
 
-  NOREPLY_SENDER="no-reply@sysmo-db.org"
-
-  def admin_emails
-    begin      
-      User.admins.map { |a| a.person.email_with_name }
-    rescue
-      @@logger.error("Error determining admin email addresses")
-      ["sowen@cs.man.ac.uk"]
-    end
-  end
+  NOREPLY_SENDER="no-reply@sysmo-db.org"  
 
   def feedback user,topic,details,send_anonymously,base_host
     subject "SysMO SEEK Feedback provided - #{topic}"
@@ -20,7 +11,7 @@ class Mailer < ActionMailer::Base
     sent_on Time.now
 
     body :topic=>topic,:details=>details,:anon=>send_anonymously,:host=>base_host,:person=>user.person
-  end
+  end    
 
   def request_resource(user,resource,details,base_host)
 
@@ -39,7 +30,7 @@ class Mailer < ActionMailer::Base
     from        NOREPLY_SENDER
     sent_on     Time.now
 
-    body        :username=>user.login, :name=>user.person.name, :admins=>User.admins.collect{|u| u.person}, :activation_code=>user.activation_code, :host=>base_host
+    body        :username=>user.login, :name=>user.person.name, :admins=>admins, :activation_code=>user.activation_code, :host=>base_host
   end
 
   def forgot_password(user,base_host)
@@ -89,6 +80,21 @@ class Mailer < ActionMailer::Base
     sent_on Time.now
 
     body :site_announcement=>site_announcement, :notifiee_info=>notifiee_info,:host=>base_host
+  end
+
+  private
+  
+  def admin_emails
+    begin      
+      admins.map { |p| p.email_with_name }
+    rescue
+      @@logger.error("Error determining admin email addresses")
+      ["sowen@cs.man.ac.uk"]
+    end
+  end
+  
+  def admins
+    Person.admins
   end
 
 end

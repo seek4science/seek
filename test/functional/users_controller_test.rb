@@ -140,17 +140,11 @@ class UsersControllerTest < ActionController::TestCase
     login_as :part_registered
     u=users(:part_registered)
 
-    #check fixture
-    assert !u.can_edit_projects?
-    assert !u.can_edit_institutions?
-
     p=people(:pal)
     post :update, :id=>u.id,:user=>{:id=>u.id,:person_id=>p.id}
     assert_nil flash[:error]
     u=User.find(u.id)
-
-    assert u.can_edit_projects?
-    assert u.can_edit_institutions?
+    assert_equal p.id,u.person.id
   end
 
   def test_update_password

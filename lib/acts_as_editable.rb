@@ -25,7 +25,7 @@ module Sergey
           case self.class.name
             when "Person"
               # authorised to admins if the "person" doesn't have a user or the associated user is not an admin 
-              return(subject.is_admin? && (self.user.nil? || !self.user.is_admin?))
+              return(subject.is_admin? && (self.user.nil? || !self.is_admin?))
             when "Project"
               # authorised to admins and selected people within the project
               return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_projects))
