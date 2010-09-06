@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100906134526) do
+ActiveRecord::Schema.define(:version => 20100906134539) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -731,13 +731,11 @@ ActiveRecord::Schema.define(:version => 20100906134526) do
     t.string   "activation_code",           :limit => 40
     t.datetime "activated_at"
     t.integer  "person_id"
-    t.boolean  "can_edit_institutions",                   :default => false
     t.string   "reset_password_code"
     t.datetime "reset_password_code_until"
     t.integer  "posts_count",                             :default => 0
     t.datetime "last_seen_at"
     t.string   "uuid"
-    t.boolean  "is_admin",                                :default => false
   end
 
   create_table "work_groups", :force => true do |t|
