@@ -37,8 +37,7 @@ class User < ActiveRecord::Base
   has_many :favourite_groups, :dependent => :destroy
   
   named_scope :not_activated,:conditions=>['activation_code IS NOT NULL']
-  named_scope :without_profile,:conditions=>['person_id IS NULL']
-  named_scope :admins,:conditions=>['is_admin = ?',true],:include=>:person
+  named_scope :without_profile,:conditions=>['person_id IS NULL']  
   
   acts_as_uniquely_identifiable
 
@@ -136,6 +135,19 @@ class User < ActiveRecord::Base
 
   def display_name
     person.name
+  end
+  
+  #TODO: may no longer be required after refactoring    
+  def is_admin?
+    !person.nil? && person.is_admin?
+  end
+  
+  def can_edit_projects?
+    !person.nil? && person.can_edit_projects?
+  end
+  
+  def can_edit_institutions?
+    !person.nil? && person.can_edit_institutions?
   end
 
   protected

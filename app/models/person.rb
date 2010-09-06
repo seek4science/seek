@@ -55,6 +55,7 @@ class Person < ActiveRecord::Base
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
   named_scope :pals,:conditions=>{:is_pal=>true}
+  named_scope :admins,:conditions=>{:is_admin=>true}
 
   alias_attribute :title, :name
   
@@ -89,10 +90,6 @@ class Person < ActiveRecord::Base
                   (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : p.last_name),
         "email" => (p.email.blank? ? "unknown" : p.email) } }
     return names_emails.to_json
-  end
-
-  def is_admin?
-    !user.nil? && user.is_admin?
   end
   
   def validates_associated(*associations)
