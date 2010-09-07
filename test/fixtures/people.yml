@@ -5,12 +5,14 @@ quentin_person:
   first_name: "quentin"
   last_name: "jones"
   email: "quentin@email.com"
+  is_admin: true  
 
 aaron_person:
   id: 2
   first_name: "aaron"
   last_name: "spiggle"
   email: "aaron@email.com"
+  is_admin: false
 
 three:
   id: 3
@@ -53,11 +55,17 @@ cant_edit:
   id: 11        
   first_name: "Cant"
   last_name: "Edit"
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
 
 can_edit:
   id: 12
   first_name: "Can"
   last_name: "Edit"
+  is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
 not_registered:
   id: 13

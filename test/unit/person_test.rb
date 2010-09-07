@@ -9,6 +9,12 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2,p.work_groups.size
   end
   
+  def test_admins_named_scope
+    admins=Person.admins
+    assert_equal 1,admins.size
+    assert admins.include?(people(:quentin_person))
+  end
+  
   def test_registered
     registered=Person.registered
     registered.each do |p|

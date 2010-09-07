@@ -28,10 +28,10 @@ module Sergey
               return(subject.is_admin? && (self.user.nil? || !self.is_admin?))
             when "Project"
               # authorised to admins and selected people within the project
-              return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_projects))
+              return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_projects?))
             when "Institution"
               # authorised to admins and selected people within the project
-              return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_institutions))
+              return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_institutions?))
             else
               # don't know what kind of object that is, not authorised
               return false
