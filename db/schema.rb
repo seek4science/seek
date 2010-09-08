@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100902081442) do
+ActiveRecord::Schema.define(:version => 20100906134539) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20100902081442) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
   end
 
   add_index "activity_logs", ["action"], :name => "act_logs_action_index"
@@ -437,10 +437,13 @@ ActiveRecord::Schema.define(:version => 20100902081442) do
     t.string   "web_page"
     t.text     "description"
     t.integer  "avatar_id"
-    t.integer  "status_id",                  :default => 0
-    t.boolean  "is_pal",                     :default => false
-    t.string   "first_letter", :limit => 10
+    t.integer  "status_id",                           :default => 0
+    t.boolean  "is_pal",                              :default => false
+    t.string   "first_letter",          :limit => 10
     t.string   "uuid"
+    t.boolean  "can_edit_projects",                   :default => false
+    t.boolean  "can_edit_institutions",               :default => false
+    t.boolean  "is_admin",                            :default => false
   end
 
   create_table "permissions", :force => true do |t|
@@ -728,9 +731,6 @@ ActiveRecord::Schema.define(:version => 20100902081442) do
     t.string   "activation_code",           :limit => 40
     t.datetime "activated_at"
     t.integer  "person_id"
-    t.boolean  "is_admin",                                :default => false
-    t.boolean  "can_edit_projects",                       :default => false
-    t.boolean  "can_edit_institutions",                   :default => false
     t.string   "reset_password_code"
     t.datetime "reset_password_code_until"
     t.integer  "posts_count",                             :default => 0

@@ -95,12 +95,12 @@
 <p style="line-height: 1.8;">
     <% if person && person.user && (mine?(person) || !person.user.is_admin?) -%>
     <label for="can_edit_projects" style="font-weight: normal;">
-        <%= check_box_tag "can_edit_projects", true, (person.user.can_edit_projects || person.user.is_admin?) -%>Allow this person to edit <b>projects</b>
+        <%= check_box_tag "can_edit_projects", true, (person.can_edit_projects? || person.is_admin?) -%>Allow this person to edit <b>projects</b>
         they work in.
     </label>
     <br/>
     <label for="can_edit_institutions" style="font-weight: normal;">
-        <%= check_box_tag "can_edit_institutions", true, (person.user.can_edit_institutions || person.user.is_admin?) -%>Allow this person to edit <b>institutions</b>
+        <%= check_box_tag "can_edit_institutions", true, (person.can_edit_institutions? || person.user.is_admin?) -%>Allow this person to edit <b>institutions</b>
         they work in.
     </label>
     <br/>

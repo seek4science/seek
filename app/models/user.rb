@@ -143,6 +143,18 @@ class User < ActiveRecord::Base
   def using_openid?
     !openid.nil?
   end
+  #TODO: may no longer be required after refactoring    
+  def is_admin?
+    !person.nil? && person.is_admin?
+  end
+  
+  def can_edit_projects?
+    !person.nil? && person.can_edit_projects?
+  end
+  
+  def can_edit_institutions?
+    !person.nil? && person.can_edit_institutions?
+  end
 
   protected
   # before filter

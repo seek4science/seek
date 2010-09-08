@@ -121,12 +121,7 @@ class UsersController < ApplicationController
     
     @user.person=person if !person.nil?
     
-    @user.attributes=params[:user]
-
-    if (!person.nil? && person.is_pal?)
-      @user.can_edit_projects=true
-      @user.can_edit_institutions=true
-    end
+    @user.attributes=params[:user]    
 
     respond_to do |format|
       

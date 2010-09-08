@@ -5,12 +5,14 @@ quentin_person:
   first_name: "quentin"
   last_name: "jones"
   email: "quentin@email.com"
+  is_admin: true  
 
 aaron_person:
   id: 2
   first_name: "aaron"
   last_name: "spiggle"
   email: "aaron@email.com"
+  is_admin: false
 
 three:
   id: 3
@@ -20,6 +22,10 @@ three:
 fred:  
   first_name: "fred"
   last_name: "blogs"
+  email: "fred@email.com"
+  is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
 no_first_name:
   id: 6
@@ -49,11 +55,17 @@ cant_edit:
   id: 11        
   first_name: "Cant"
   last_name: "Edit"
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
 
 can_edit:
   id: 12
   first_name: "Can"
   last_name: "Edit"
+  is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
 not_registered:
   id: 13
@@ -69,6 +81,9 @@ pal:
   first_name: "A Pal"
   email: "test@test.com"
   is_pal: true
+  is_admin: false
+  can_edit_projects: true
+  can_edit_institutions: true
 
 person_for_owner_of_my_first_sop:
   first_name: "OwnerOf"
