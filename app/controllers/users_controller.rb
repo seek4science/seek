@@ -17,10 +17,7 @@ class UsersController < ApplicationController
     # request forgery protection.
     # uncomment at your own risk
     # reset_session
-    @user = User.new(params[:user])
-
-    #first user is automatically set as an admin user
-    @user.is_admin=true if User.count == 0
+    @user = User.new(params[:user])    
     
     @user.save
     
