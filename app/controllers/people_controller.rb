@@ -206,8 +206,8 @@ class PeopleController < ApplicationController
     # some "Person" instances might not have a "User" associated with them - because the user didn't register yet
     if current_user.is_admin?
       unless @person.user.nil?
-        @person.user.can_edit_projects = (params[:can_edit_projects] ? true : false)
-        @person.user.can_edit_institutions = (params[:can_edit_institutions] ? true : false)
+        @person.can_edit_projects = (params[:can_edit_projects] ? true : false)
+        @person.can_edit_institutions = (params[:can_edit_institutions] ? true : false)
         @person.user.save
       end
     end

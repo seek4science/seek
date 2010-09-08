@@ -105,8 +105,8 @@
       <ul>
         <%= "<li>This person is a SysMo-DB PAL<li>" if @person.is_pal?  %>
         <% if @person.user -%>
-          <li>Editing <b>projects</b>, where this person is involved: <%= @person.user.can_edit_projects ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
-          <li>Editing <b>institutions</b>, where this person works with: <%= @person.user.can_edit_institutions ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
+          <li>Editing <b>projects</b>, where this person is involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
+          <li>Editing <b>institutions</b>, where this person works with: <%= @person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
         <% else -%>
           <li class="none_text">No "user" instance detected for this person. User has not registered yet.</li>
         <% end -%>
