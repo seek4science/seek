@@ -15,6 +15,20 @@ class PersonTest < ActiveSupport::TestCase
     assert admins.include?(people(:quentin_person))
   end
   
+  def test_first_person_is_admin
+    assert Person.count>0 #should already be people from fixtures
+    p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
+    p.save!
+    assert !p.is_admin?, "Should not automatically be admin, since people already exist"
+    
+    Person.destroy_all
+    
+    assert_equal 0,Person.count #no people should exist
+    p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")
+    p.save!
+    assert p.is_admin?, "Should automatically be admin, since it is the first created person"    
+  end
+  
   def test_registered
     registered=Person.registered
     registered.each do |p|
