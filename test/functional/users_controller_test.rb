@@ -52,7 +52,7 @@ class UsersControllerTest < ActionController::TestCase
     assert_no_difference 'User.count' do
       create_user(:password => nil)
       assert assigns(:user).errors.on(:password)
-      assert_response ::redirect
+      assert_response :redirect
     end
   end
 
