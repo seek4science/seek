@@ -27,7 +27,7 @@ class User < ActiveRecord::Base
   validates_length_of       :login,    :within => 3..40, :unless => :using_openid?
   
   validates_uniqueness_of   :login, :case_sensitive => false
-  validates_uniqueness_of   :openid, :case_sensitive => false
+  validates_uniqueness_of   :openid, :case_sensitive => false, :allow_nil => true
   
   before_save :encrypt_password
   before_create :make_activation_code 
