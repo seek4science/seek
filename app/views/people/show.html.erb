@@ -30,7 +30,7 @@
         <b>Name:</b> <%= h @person.name %>
       </p>
 
-      <% if mine?(@person) -%>
+      <% if current_user.person == @person %>
         <p>
           <b>Seek ID:</b> <%= @person.id %>
         </p>

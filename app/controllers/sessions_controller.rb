@@ -54,16 +54,15 @@ class SessionsController < ApplicationController
   
   def check_login
     session[:user_id] = @user.id
-    if @user.person && !@user.is_admin? && @user.person.projects.empty?
+    if @user.person.nil?
+      flash[:notice] = "You have successfully registered your account, but now must select a profile, or create your own."
+      redirect_to(select_people_path)
+	elsif !@user.active?
+      failed_login "You still need to activate your account. You should have been sent a validation email."
+    elsif @user.person && !@user.is_admin? && @user.person.projects.empty?
       failed_login "You have not yet been assigned to a project by an administrator."
     else      
-      #if the person has registered but has not yet selected a profile then go to the select person page
-      #otherwise login normally
-      if @user.person.nil?
-        redirect_to(select_people_path)
-      else
-        successful_login
-      end
+      successful_login
     end   
   end
   
