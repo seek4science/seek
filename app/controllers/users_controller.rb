@@ -204,9 +204,7 @@ class UsersController < ApplicationController
   
   private 
   
-  def check_registration
-    #first user is automatically set as an admin user
-    @user.is_admin=true if User.count == 0    
+  def check_registration       
     if @user.save
       successful_registration
     else
