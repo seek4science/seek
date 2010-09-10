@@ -4,6 +4,8 @@ require 'acts_as_uniquely_identifiable'
 
 class Person < ActiveRecord::Base
   
+  before_save :first_person_admin
+  
   acts_as_editable
   
   acts_as_notifiee
@@ -193,5 +195,12 @@ class Person < ActiveRecord::Base
   
   def assets
     created_data_files | created_models | created_sops | created_publications
+  end
+  
+  private
+  
+  #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
+  def first_person_admin
+    self.is_admin=true if Person.count==0
   end
 end
