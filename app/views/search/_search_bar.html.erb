@@ -5,7 +5,7 @@
   <% if EMAIL_ENABLED %>
     <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
   <% else %>
-    <span class="icon"><%= mail_to User.admins.first.email, (image("feedback") + "Provide Feedback"), :id => "feedback" %></span>    
+    <span class="icon"><%= mail_to User.admins.first.email, (image("feedback") + "Provide Feedback"), :cc => User.admins[1..-1].collect{|a| a.email}.join(",") , :subject => "SysMO-SEEK feedback", :id => "feedback" %></span>    
   <% end %>
 <% end -%>
 
