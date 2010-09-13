@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100902081442) do
+ActiveRecord::Schema.define(:version => 20100913080833) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -186,7 +186,7 @@ ActiveRecord::Schema.define(:version => 20100902081442) do
   end
 
   create_table "db_files", :force => true do |t|
-    t.binary "data"
+    t.binary "data", :limit => 2147483647
   end
 
   create_table "disciplines", :force => true do |t|
