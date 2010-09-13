@@ -21,14 +21,13 @@ class InvestigationsController < ApplicationController
   end
 
   def show
-    @investigation=Investigation.find(params[:id])    
-    deep=params[:deep]
+    @investigation=Investigation.find(params[:id])        
     respond_to do |format|
       format.html
       format.xml
-      format.svg { render :text=>to_svg(@investigation,deep)}
-      format.dot { render :text=>to_dot(@investigation,deep)}
-      format.png { render :text=>to_png(@investigation,deep)}
+      format.svg { render :text=>to_svg(@investigation,params[:deep]=='true')}
+      format.dot { render :text=>to_dot(@investigation,params[:deep]=='true')}
+      format.png { render :text=>to_png(@investigation,params[:deep]=='true')}
     end
   end
 

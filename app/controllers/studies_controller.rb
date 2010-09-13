@@ -62,9 +62,9 @@ class StudiesController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
-      format.svg { render :text=>to_svg(@study)}
-      format.dot { render :text=>to_dot(@study)}
-      format.png { render :text=>to_png(@study)}
+      format.svg { render :text=>to_svg(@study.investigation,params[:deep]=='true',@study)}
+      format.dot { render :text=>to_dot(@study.investigation,params[:deep]=='true',@study)}
+      format.png { render :text=>to_png(@study.investigation,params[:deep]=='true',@study)}
     end
 
   end  

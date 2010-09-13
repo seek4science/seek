@@ -119,9 +119,10 @@ class AssaysController < ApplicationController
     @assay=Assay.find(params[:id])
     respond_to do |format|
       format.html
-      format.xml
-      format.svg { render :text=>to_svg(@assay)}
-      format.xml { render :text=>to_dot(@assay)}
+      format.xml      
+      format.svg { render :text=>to_svg(@assay.study,params[:deep]=='true',@assay)}
+      format.xml { render :text=>to_dot(@assay.study,params[:deep]=='true',@assay)}
+      format.png { render :text=>to_png(@assay.study,params[:deep]=='true',@assay)}
     end
   end
 
