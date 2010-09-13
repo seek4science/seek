@@ -5,10 +5,9 @@
 
   <div class="contents">
     <ul>
-      <% organisms = Organism.all.sort_by{|o| -o.assays.count - o.models.count - o.projects.count} %>
-      <% organisms[0...5].each do |organism| %>
+      <% Organism.all.each do |organism| %>
         <li>
-          <%= link_to organism.title, organism%>
+          <%= link_to organism.title, organism %>
         </li>
       <% end %>
     </ul>
