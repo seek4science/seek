@@ -7,9 +7,7 @@ quentin:
   created_at: <%= 5.days.ago.to_s :db %>  
   activated_at: <%= 5.days.ago.to_s :db %> 
   person_id: 1
-  is_admin: true
-  can_edit_projects: true
-  can_edit_institutions: true
+  
 
 aaron:
   id: 2
@@ -20,9 +18,7 @@ aaron:
   created_at: <%= 1.days.ago.to_s :db %>  
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
   person_id: 2
-  is_admin: false
-  can_edit_projects: true
-  can_edit_institutions: true
+  
 
 fred:  
   login: fred
@@ -32,9 +28,7 @@ fred:
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a 
   person: fred
-  is_admin: false
-  can_edit_projects: true
-  can_edit_institutions: true
+  
 
 cant_edit:
   id: 4
@@ -44,10 +38,7 @@ cant_edit:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  person_id: 11
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+  person_id: 11  
 
 can_edit:
   id: 5
@@ -58,9 +49,7 @@ can_edit:
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
   person_id: 12
-  is_admin: false
-  can_edit_projects: true
-  can_edit_institutions: true
+  
 
 #a user that is not activated and has no profile associated
 part_registered:
@@ -71,9 +60,7 @@ part_registered:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
@@ -86,9 +73,7 @@ owner_of_my_first_sop:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 owner_of_fully_public_policy:
@@ -99,9 +84,7 @@ owner_of_fully_public_policy:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 owner_of_download_for_all_registered_users_policy:
@@ -112,9 +95,7 @@ owner_of_download_for_all_registered_users_policy:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 owner_of_editing_for_all_sysmo_users_policy:
@@ -125,9 +106,7 @@ owner_of_editing_for_all_sysmo_users_policy:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 owner_of_custom_permissions_only_policy:
@@ -138,9 +117,7 @@ owner_of_custom_permissions_only_policy:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 owner_of_complex_permissions_policy:
@@ -151,9 +128,7 @@ owner_of_complex_permissions_policy:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 owner_of_a_sop_with_complex_permissions:
@@ -164,9 +139,7 @@ owner_of_a_sop_with_complex_permissions:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 registered_user_with_no_projects:
@@ -177,9 +150,7 @@ registered_user_with_no_projects:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 test_user_only_in_whitelist:
@@ -190,9 +161,7 @@ test_user_only_in_whitelist:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 test_user_only_in_blacklist:
@@ -203,9 +172,7 @@ test_user_only_in_blacklist:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 sysmo_user_in_blacklist:
@@ -216,9 +183,7 @@ sysmo_user_in_blacklist:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 sysmo_user_both_in_blacklist_and_whitelist:
@@ -229,9 +194,7 @@ sysmo_user_both_in_blacklist_and_whitelist:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 
 random_registered_user_who_wants_to_access_different_things:
@@ -242,9 +205,7 @@ random_registered_user_who_wants_to_access_different_things:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: 8f24789ae988411ccf33ab0c30fe9106fab32e9a
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 model_owner:
   person: person_for_model_owner
@@ -254,9 +215,7 @@ model_owner:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: nil
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 datafile_owner:
   person: person_for_datafile_owner
@@ -266,9 +225,7 @@ datafile_owner:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activation_code: nil
-  is_admin: false
-  can_edit_projects: false
-  can_edit_institutions: false
+
 
 pal_user:
   person: pal
@@ -278,9 +235,7 @@ pal_user:
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
   activated_at: <%= 1.days.ago.to_s :db %> 
-  is_admin: false
-  can_edit_projects: true
-  can_edit_institutions: true
+
 
 
 

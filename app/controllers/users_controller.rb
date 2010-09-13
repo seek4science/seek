@@ -121,12 +121,7 @@ class UsersController < ApplicationController
     
     @user.person=person if !person.nil?
     
-    @user.attributes=params[:user]
-
-    if (!person.nil? && person.is_pal?)
-      @user.can_edit_projects=true
-      @user.can_edit_institutions=true
-    end
+    @user.attributes=params[:user]    
 
     respond_to do |format|
       
@@ -209,9 +204,7 @@ class UsersController < ApplicationController
   
   private 
   
-  def check_registration
-    #first user is automatically set as an admin user
-    @user.is_admin=true if User.count == 0    
+  def check_registration       
     if @user.save
       successful_registration
     else

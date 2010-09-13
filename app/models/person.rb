@@ -4,6 +4,8 @@ require 'acts_as_uniquely_identifiable'
 
 class Person < ActiveRecord::Base
   
+  before_save :first_person_admin
+  
   acts_as_editable
   
   acts_as_notifiee
@@ -55,6 +57,7 @@ class Person < ActiveRecord::Base
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
   named_scope :pals,:conditions=>{:is_pal=>true}
+  named_scope :admins,:conditions=>{:is_admin=>true}
 
   alias_attribute :title, :name
   
@@ -89,10 +92,6 @@ class Person < ActiveRecord::Base
                   (p.last_name.blank? ? (logger.error("\n----\nUNEXPECTED DATA: person id = #{p.id} doesn't have a last name\n----\n"); "(NO LAST NAME)") : p.last_name),
         "email" => (p.email.blank? ? "unknown" : p.email) } }
     return names_emails.to_json
-  end
-
-  def is_admin?
-    !user.nil? && user.is_admin?
   end
   
   def validates_associated(*associations)
@@ -196,5 +195,12 @@ class Person < ActiveRecord::Base
   
   def assets
     created_data_files | created_models | created_sops | created_publications
+  end
+  
+  private
+  
+  #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
+  def first_person_admin
+    self.is_admin=true if Person.count==0
   end
 end

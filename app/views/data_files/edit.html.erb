@@ -37,7 +37,7 @@
       <p style="margin: 0;">
         <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
           :existing_attributions => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user),
-          :attribution_suggestions => DataFile.get_all_as_json(current_user) } -%>
+          :attribution_suggestions => DataFile.get_all_as_json(current_user)[0..-2] + "," + Model.get_all_as_json(current_user)[1..-1]  } -%>
       </p>
       
     <p style="margin: 0;">

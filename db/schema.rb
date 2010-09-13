@@ -437,10 +437,13 @@ ActiveRecord::Schema.define(:version => 20100913080833) do
     t.string   "web_page"
     t.text     "description"
     t.integer  "avatar_id"
-    t.integer  "status_id",                  :default => 0
-    t.boolean  "is_pal",                     :default => false
-    t.string   "first_letter", :limit => 10
+    t.integer  "status_id",                           :default => 0
+    t.boolean  "is_pal",                              :default => false
+    t.string   "first_letter",          :limit => 10
     t.string   "uuid"
+    t.boolean  "can_edit_projects",                   :default => false
+    t.boolean  "can_edit_institutions",               :default => false
+    t.boolean  "is_admin",                            :default => false
   end
 
   create_table "permissions", :force => true do |t|
@@ -728,9 +731,6 @@ ActiveRecord::Schema.define(:version => 20100913080833) do
     t.string   "activation_code",           :limit => 40
     t.datetime "activated_at"
     t.integer  "person_id"
-    t.boolean  "is_admin",                                :default => false
-    t.boolean  "can_edit_projects",                       :default => false
-    t.boolean  "can_edit_institutions",                   :default => false
     t.string   "reset_password_code"
     t.datetime "reset_password_code_until"
     t.integer  "posts_count",                             :default => 0

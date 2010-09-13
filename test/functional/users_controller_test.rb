@@ -64,39 +64,19 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
-  def test_create_first_user_as_admin
-    assert_difference 'User.count' do
-      create_user
-      assert !assigns(:user).is_admin?
-    end
-
-    User.destroy_all
-    assert_difference 'User.count' do
-      create_user
-      assert assigns(:user).is_admin?
-    end
-    
-  end
-
   def test_should_not_require_email_on_signup
     assert_difference 'User.count' do
       create_user(:email => nil)
       assert_response :redirect
     end
-  end
-  
-  #  def test_should_sign_up_user_with_activation_code
-  #    create_user
-  #    assigns(:user).reload
-  #    assert_not_nil assigns(:user).activation_code
-  #  end
+  end  
 
   def test_should_activate_user
-    assert !users(:aaron).active?
+    assert_nil User.authenticate('aaron', 'test')
     get :activate, :activation_code => users(:aaron).activation_code
     assert_redirected_to person_path(people(:aaron_person))
     assert_not_nil flash[:notice]
-	assert User.find(users(:aaron).id).active?
+    assert_equal users(:aaron), User.authenticate('aaron', 'test')
   end
   
   def test_should_not_activate_user_without_key
@@ -140,17 +120,11 @@ class UsersControllerTest < ActionController::TestCase
     login_as :part_registered
     u=users(:part_registered)
 
-    #check fixture
-    assert !u.can_edit_projects?
-    assert !u.can_edit_institutions?
-
     p=people(:pal)
     post :update, :id=>u.id,:user=>{:id=>u.id,:person_id=>p.id}
     assert_nil flash[:error]
     u=User.find(u.id)
-
-    assert u.can_edit_projects?
-    assert u.can_edit_institutions?
+    assert_equal p.id,u.person.id
   end
 
   def test_update_password

@@ -28,6 +28,36 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  def test_first_regsitered_person_is_admin
+    Person.destroy_all
+    assert_equal 0,Person.count,"There should be no people in the database"
+    login_as(:part_registered)
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com" }
+      end
+    end
+    assert assigns(:person)
+    person = Person.find(assigns(:person).id)
+    assert person.is_admin?
+  end
+  
+  def test_second_regsitered_person_is_not_admin
+    Person.destroy_all
+    person = Person.new(:first_name=>"fred",:email=>"fred@dddd.com")
+    person.save!
+    assert_equal 1,Person.count,"There should be 1 person in the database"
+    login_as(:part_registered)
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com" }
+      end
+    end
+    assert assigns(:person)
+    person = Person.find(assigns(:person).id)
+    assert !person.is_admin?
+  end
+  
   def test_should_create_person
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
