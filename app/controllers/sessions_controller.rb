@@ -10,6 +10,10 @@ class SessionsController < ApplicationController
     
   end
 
+  def auto_openid
+    create
+  end
+
   def create   
     if using_open_id?
       open_id_authentication
@@ -21,6 +25,7 @@ class SessionsController < ApplicationController
   def destroy    
     current_user.forget_me if logged_in?
     cookies.delete :auth_token
+    cookies.delete :open_id
     reset_session
     flash[:notice] = "You have been logged out."
     redirect_back_or_default('/')
@@ -33,6 +38,7 @@ class SessionsController < ApplicationController
       if result.successful?
         if @user = User.find_by_openid(identity_url)          
           check_login
+          cookies[:open_id]={ :value => identity_url , :expires => 2.weeks.from_now }
         else
           failed_login "Sorry, no user by that identity URL exists (#{identity_url})"
         end
@@ -67,6 +73,7 @@ class SessionsController < ApplicationController
   end
   
   def successful_login
+    self.current_user = @user
     if params[:remember_me] == "1"
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
