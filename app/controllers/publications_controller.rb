@@ -37,7 +37,7 @@ class PublicationsController < ApplicationController
   # POST /publications
   # POST /publications.xml
   def create
-    @publication = Publication.new()
+    @publication = Publication.new(params[:publication])
     pubmed_id = params[:publication][:pubmed_id]
     pubmed_id = nil if pubmed_id.blank?
     doi = params[:publication][:doi]
@@ -143,7 +143,8 @@ class PublicationsController < ApplicationController
   
   def fetch_preview
     begin
-      @publication = Publication.new
+      @publication = Publication.new(params[:publication])
+      @publication.project_id = params[:project_id]
       key = params[:key]
       protocol = params[:protocol]
       pubmed_id = nil

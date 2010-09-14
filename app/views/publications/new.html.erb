@@ -14,6 +14,10 @@
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.
     </p>
     <div id="publication_error" class="error_div" style="display:none"></div>  
+	<p>
+      <label>Project:</label><br/>
+      <%= select_tag :project_id, options_from_collection_for_select(current_user.person.projects, :id, :name) -%>
+    </p>
     <p>
       <%= select_tag("protocol", options_for_select([["PubMed ID","pubmed"],["DOI","doi"]])) %>
       <%= text_field_tag("key") %>
