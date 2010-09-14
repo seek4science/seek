@@ -30,6 +30,15 @@ module DotGenerator
       end
     end
     
+    if root_item.instance_of?(Publication)
+      root_item.related_assays.each do |assay|
+        dot += to_dot_assay assay,deep,current_item, true
+      end
+      (root_item.related_data_files + root_item.related_models).each do |asset|
+        dot += to_dot_asset asset,current_item, true
+      end
+    end
+    
     dot << "}"
     return dot
   end
@@ -74,13 +83,13 @@ module DotGenerator
         end   
         dot << "Assay_#{assay.id} -- #{assay_asset.asset_type}_#{assay_asset.asset_id} #{label} \n"
       end
-      if show_publications
-        assay.related_publications.each do |publication|
-          dot << to_dot_publication(publication, current_item)
-          dot << "Assay_#{assay.id} -- Publication_#{publication.id} \n"
-        end
-      end
     end  
+    if show_publications
+      assay.related_publications.each do |publication|
+        dot << to_dot_publication(publication, current_item)
+        dot << "Assay_#{assay.id} -- Publication_#{publication.id} \n"
+      end
+    end
     return dot
   end
   
