@@ -96,17 +96,17 @@ module DotGenerator
   def dot_header title
     dot = "graph #{title} {"
     dot << "rankdir = LR;"    
-    dot << "splines = spline;"
+    dot << "splines = line;"
     dot << "node [fontsize=9,fontname=\"Helvetica\"];"    
     dot << "bgcolor=transparent;" 
     dot << "edge [arrowsize=0.6];\n" 
     return dot
   end
   
-  def to_png root_item,deep=false
+  def to_png root_item,deep=false,current_item=nil
     tmpfile = Tempfile.new("#{root_item.class.name}_dot")
     file = File.new(tmpfile.path,'w')
-    file.puts to_dot(root_item,deep)
+    file.puts to_dot(root_item,deep,current_item)
     file.close    
     puts "saved to tmp file: "+tmpfile.path
     `dot -Tpng #{tmpfile.path}`

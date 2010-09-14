@@ -95,7 +95,7 @@ class SessionsControllerTest < ActionController::TestCase
     post :create, :login => 'aaron', :password => 'test'
     assert !session[:user_id]
     assert_redirected_to :action=>"new"
-    assert_not_nil flash[:error]
+    assert_not_nil flash[:error]    
     assert flash[:error].include?("You still need to activate your account.")
   end
 
