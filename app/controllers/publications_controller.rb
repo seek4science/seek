@@ -54,11 +54,10 @@ class PublicationsController < ApplicationController
   # POST /publications.xml
   def create
     @publication = Publication.new(params[:publication])
-    pubmed_id = params[:publication][:pubmed_id]
-    pubmed_id = nil if pubmed_id.blank?
-    doi = params[:publication][:doi]
-    doi = nil if doi.blank?
-    result = get_data(@publication, pubmed_id, doi)
+    @publication.pubmed_id=nil if @publication.pubmed_id.blank?
+    @publication.doi=nil if @publication.doi.blank?
+    
+    result = get_data(@publication, @publication.pubmed_id, @publication.doi)
     @publication.contributor = current_user    
     respond_to do |format|
       if @publication.save
