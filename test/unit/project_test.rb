@@ -18,7 +18,7 @@ class ProjectTest < ActiveSupport::TestCase
     wg=WorkGroup.find(:all).first
     assert_same 1,wg.project_id
   end
-
+  
   def test_publications
     project=projects(:sysmo_project)
 
