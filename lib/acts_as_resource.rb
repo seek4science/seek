@@ -19,6 +19,11 @@ module Mib
         def acts_as_resource
           belongs_to :contributor, :polymorphic => true
           
+          has_many :relationships, 
+            :class_name => 'Relationship',
+            :as => :subject,
+            :dependent => :destroy
+          
           has_many :attributions, 
             :class_name => 'Relationship',
             :as => :subject,
@@ -49,8 +54,16 @@ module Mib
       module InstanceMethods
         # this method will take attributions' association and return a collection of resources,
         # to which the current resource is attributed
+        def attributions
+          self.relationships.select {|a| a.predicate == Relationship::ATTRIBUTED_TO}
+        end
+        
         def attributions_objects
           self.attributions.collect { |a| a.object }
+        end
+        
+        def related_publications
+          self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
         end
 
         def can_edit? user

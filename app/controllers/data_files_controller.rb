@@ -103,6 +103,9 @@ class DataFilesController < ApplicationController
 
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
+          
+          # update related publications
+          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION)
 
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
@@ -161,6 +164,10 @@ class DataFilesController < ApplicationController
 
         # update attributions
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
+        
+        # update related publications
+        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION)
+
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])

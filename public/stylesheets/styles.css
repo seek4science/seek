@@ -535,6 +535,14 @@ ul.users_details li p {
     border: 1px solid #999999;
 }
 
+#publication_preview {
+    width: 17em;
+    max-height: 25em;
+    background-color: #EEEEEE;
+    display: inline-block;
+    padding: 1em 1em 1em 1em;
+    border: 1px solid #999999;
+}
 
 .foldContent {
     padding-top:0.5em;

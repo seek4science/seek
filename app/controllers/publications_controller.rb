@@ -6,10 +6,22 @@ class PublicationsController < ApplicationController
   
   before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
-  before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
+  before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy, :preview]
   before_filter :associate_authors, :only => [:edit, :update]
 
   ADMIN_EMAIL = "sowen@cs.man.ac.uk"
+  
+  def preview
+    element=params[:element]
+    
+    render :update do |page|
+      if @publication
+        page.replace_html element,:partial=>"publications/resource_preview",:locals=>{:resource=>@publication}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
+      end
+    end
+  end    
     
   # GET /publications/1
   # GET /publications/1.xml
