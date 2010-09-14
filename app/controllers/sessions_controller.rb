@@ -33,12 +33,11 @@ class SessionsController < ApplicationController
 
   protected
   
-  def open_id_authentication
+  def open_id_authentication    
     authenticate_with_open_id do |result, identity_url|
       if result.successful?
         if @user = User.find_by_openid(identity_url)          
           check_login
-          cookies[:open_id]={ :value => identity_url , :expires => 2.weeks.from_now }
         else
           failed_login "Sorry, no user by that identity URL exists (#{identity_url})"
         end
