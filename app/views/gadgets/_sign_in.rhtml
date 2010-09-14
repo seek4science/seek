@@ -17,16 +17,16 @@
                     Login:
                 </p>
                 <p>
-                    <%= text_field_tag 'login', nil, :class => 'field', :style => "width: 140px;" %>
+                    <%= text_field_tag 'login', nil, :class => 'field' -%>
                 </p>
                 <p class="label">
                     Password:
                 </p>
                 <p>
-                    <%= password_field_tag 'password', nil, :class => 'field', :style => "width: 140px;" %>
+                    <%= password_field_tag 'password', nil, :class => 'field' -%>
                 </p>
                 <p class="label">
-                    Remember me: <%= check_box_tag 'remember_me' %>
+                    Remember me: <%= check_box_tag 'remember_me',nil,false, {:style=>"width:2em;"} %>
                 </p>
             </div>
             <div id="openid_login" style="display: none">
@@ -34,13 +34,13 @@
                     <a href="http://openid.net/" target="_blank"><%= image_tag "openid-16x16.gif" %>OpenID:</a>
                 </p>
                 <p>
-                    <%= text_field_tag 'openid_identifier', nil, :class => 'field', :style => "width: 140px;" %>
+                    <%= text_field_tag 'openid_identifier', nil, :class => 'field' -%>
                 </p>
             </div>
             <p>
                 Alternatively...
                 <br/>
-                <a href="#" id="login_toggle_link" onclick="toggleLogin();return false">Log in using OpenID</a>
+                <a href="#" id="login_toggle_link" onclick="toggleLogin();return false">Log in using <%= image_tag "openid-16x16.gif" %>OpenID</a>
                 <br/>
             </p>
         </div>
@@ -67,7 +67,7 @@
         var elem2 = $('openid_login');
         var link = $('login_toggle_link');
         if (elem1.style.display == 'none') {
-            link.innerHTML = "Log in using OpenID";
+            link.innerHTML = '<%= "Log in using "+image_tag("openid-16x16.gif")+"OpenID" %>';
             Effect.BlindUp('openid_login', {
                 duration: 0.2
             });
