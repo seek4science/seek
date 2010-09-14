@@ -1,6 +1,7 @@
 class PublicationsController < ApplicationController
   
   include IndexPager
+  include DotGenerator
   
   require 'pubmed_query_tool'
   
@@ -30,6 +31,9 @@ class PublicationsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
+      format.svg { render :text=>to_svg(@publication,params[:deep]=='false',@publication)}
+      format.dot { render :text=>to_dot(@publication,params[:deep]=='false',@publication)}
+      format.png { render :text=>to_png(@publication,params[:deep]=='false',@publication)}
     end
   end
 

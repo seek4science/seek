@@ -2,6 +2,7 @@ class SopsController < ApplicationController
   #FIXME: re-add REST for each of the core methods
 
   include IndexPager
+  include DotGenerator
 
   before_filter :login_required
   before_filter :find_assets, :only => [ :index ]  
@@ -48,6 +49,9 @@ class SopsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.svg { render :text=>to_svg(@sop,params[:deep]=='true',@sop)}
+      format.dot { render :text=>to_dot(@sop,params[:deep]=='true',@sop)}
+      format.png { render :text=>to_png(@sop,params[:deep]=='true',@sop)}
     end
   end
   
