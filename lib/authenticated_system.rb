@@ -49,7 +49,7 @@ module AuthenticatedSystem
   #   skip_before_filter :login_required
   #
   def login_required      
-    authorized? || login_from_open_id_cookie || access_denied      
+    authorized? || access_denied      
   end
   
   # Redirect as appropriate when an access request fails.
