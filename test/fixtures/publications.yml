@@ -14,6 +14,7 @@ one:
   contributor_type: User
   published_date: <%= 5.days.ago.to_s :db %>  
   pubmed_id: 5
+  project: sysmo_project
   policy: sysmo_member_edit
   
 two:

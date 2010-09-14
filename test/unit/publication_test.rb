@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PublicationTest < ActiveSupport::TestCase
   
-  fixtures :publications
+  fixtures :all
   
   test "test uuid generated" do
     x = publications(:one)
@@ -25,4 +25,12 @@ class PublicationTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+  
+  def test_project_required
+    p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
+    assert !p.valid?
+    p.project=projects(:sysmo_project)
+    assert p.valid?
+  end
+  
 end
