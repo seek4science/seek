@@ -1,8 +1,52 @@
-<%
-   all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}   
-   project_sops=all_sops.select{|s| current_user.person.projects.include?(s.project )}
-   select_truncate_length=120;
--%>
+<div class="fold">
+
+  <div class="foldTitle">
+    <%= help_icon("Here you associate SOPs in SEEK to this assay.") -%>
+    Associate SOPs
+  </div>
+
+  <div id="associate_model_fold_content" class="foldContent" style="display: block;">
+    <div class="yui-u first" style="width:66%; float:left">
+      <%
+        all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}   
+        project_sops=all_sops.select{|s| current_user.person.projects.include?(s.project )}
+        select_truncate_length=120
+      -%>
+
+      <p style="color: #666666;">
+        The following SOPs are involved in this <%= @assay_text -%>:
+      </p>
+  
+      <div id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text" id="sops">Loading...</span>
+      </div>
+      <br/>
+      <%= label_tag :sops -%>
+      <br/>
+  
+      <%= select_tag :possible_sops,
+                     options_for_select([["Select SOP ...", 0]]|project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
+                     {:style=>"width:90%",:onchange=>remote_function(
+                             :url=>{:action=>"preview", :controller=>"sops",:element=>"sop_preview"},
+                             :with=>"'id='+this.value",
+                             :before=>"show_ajax_loader('sop_preview')"
+                     )+";check_show_add_sop();return(false);"
+                     } -%>
+      
+      <%= select_tag :assay_sop_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+      
+      <b><%= link_to_function "Add", "addSelectedSop(); return(false);", :id=>"add_sop_link" %></b>
+      <br/>
+      <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Include SOPs from other projects?
+    </div>
+    <div id="sop_preview" class="yui-u"  style="float:right">
+      <div style="text-align: center;">SOP preview</div>
+    </div>
+ 
+    <br style="clear:both"/>
+  
+  </div>
+</div>
 
 <script type="text/javascript">
     function toggle_sop_list() {
@@ -40,46 +84,8 @@
         }
 
         selection_box.onchange();
-    }
-</script>
-
-<div class="yui-gc">
-  <h2>SOPs</h2>
-  <div class="yui-u first">
-    <p style="color: #666666;">
-      The following SOPs are involved in this <%= @assay_text -%>:
-    </p>
-
-    <div id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
-      <span class="none_text" id="sops">Loading...</span>
-    </div>
-    <br/>
-    <%= label_tag :sops -%>
-    <br/>
-
-    <%= select_tag :possible_sops,
-                   options_for_select([["Select SOP ...", 0]]|project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
-                   {:style=>"width:90%",:onchange=>remote_function(
-                           :url=>{:action=>"preview", :controller=>"sops",:element=>"sop_preview"},
-                           :with=>"'id='+this.value",
-                           :before=>"show_ajax_loader('sop_preview')"
-                   )+";check_show_add_sop();return(false);"
-                   } -%>
-    
-    <%= select_tag :assay_sop_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
-    
-    <b><%= link_to_function "Add", "addSelectedSop(); return(false);", :id=>"add_sop_link" %></b>
-    <br/>
-    <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Include SOPs from other projects?
-  </div>
-
-  <div id="sop_preview" class="yui-u">
-    <div style="text-align: center;">SOP preview</div>
-  </div>
-
-</div>
-
-<script type="text/javascript">
+    }  
+  
     <% @assay.sop_masters.each do |s| -%>    
       <% if Authorization.is_authorized?("show",nil,s,current_user) -%>
         sop_id = '<%= s.id -%>';

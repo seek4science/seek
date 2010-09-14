@@ -52,6 +52,11 @@
     </p>
     
     <p style="margin: 0;">
+      <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Model",
+                                                                              :related_publications => []} -%>
+    </p>      
+    
+    <p style="margin: 0;">
       <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
         :existing_creators => [current_user.person],
         :other_creators => nil} -%>

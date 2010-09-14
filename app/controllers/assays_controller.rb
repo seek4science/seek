@@ -58,6 +58,10 @@ class AssaysController < ApplicationController
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id,strain,culture_growth)
         end
+        
+        # update related publications
+        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        
         flash[:notice] = 'Assay was successfully created.'
         format.html { redirect_to(@assay) }
         format.xml  { render :xml => @assay, :status => :created, :location => @assay }
@@ -101,7 +105,11 @@ class AssaysController < ApplicationController
           o_id,strain,culture_growth_type_text=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id,strain,culture_growth)
-        end        
+        end   
+        
+        # update related publications
+        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        
         #FIXME: required to update timestamp. :touch=>true on AssayAsset association breaks acts_as_trashable
         @assay.updated_at=Time.now
         @assay.save!

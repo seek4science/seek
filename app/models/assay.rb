@@ -49,6 +49,11 @@ class Assay < ActiveRecord::Base
   has_many :favourites, 
            :as => :resource, 
            :dependent => :destroy
+           
+  has_many :relationships, 
+    :class_name => 'Relationship',
+    :as => :subject,
+    :dependent => :destroy
           
   acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if SOLR_ENABLED  
   
@@ -127,5 +132,9 @@ class Assay < ActiveRecord::Base
   
   def assets
     (data_file_masters + model_masters + sop_masters).collect {|a| a.latest_version} |  (data_files + models + sops)
+  end
+  
+  def related_publications
+    self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
   end
 end

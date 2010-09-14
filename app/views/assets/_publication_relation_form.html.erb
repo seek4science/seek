@@ -15,7 +15,7 @@
         show_relationships=false
       -%>
       <p style="color: #666666;">
-        The following publications are related to this x:
+        The following publications are related to this resource:
       </p>
       <div id="publication_to_list" class="box_editing_inner" style="line-height: 1.5">
         <span class="none_text" id="publications">Loading...</span>
@@ -41,12 +41,12 @@
       <br/>
       <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Include publications from other projects?
     </div>
-    <div id="publication_preview" class="yui-u" style="float:right">
-      <div style="text-align: center;">Publication preview</div>
-    </div>  
-    <br style="clear:both"/>
+      <div id="publication_preview" class="yui-u" style="float:right">
+        <div style="text-align: center;">Publication preview</div>
+      </div>  
+      <br style="clear:both"/>  
+    </div>
   
-  </div>
 </div>
 
 <script type="text/javascript">

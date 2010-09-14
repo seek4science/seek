@@ -47,7 +47,7 @@ class Relationship < ActiveRecord::Base
     
     # first delete any old attributions that are no longer valid
     changes_made = false
-    resource.attributions.each do |a|
+    resource.relationships.each do |a|
       unless (new_attributions["#{a.object_type}"] && new_attributions["#{a.object_type}"].include?(a.object_id))
         a.destroy
         changes_made = true

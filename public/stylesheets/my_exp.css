@@ -526,8 +526,7 @@ ul.breadcrumb_list a:hover {
 	background-repeat: repeat-x;
 	background-color: #EEEEEE;
 	color: #333333;
-	border: 1px solid #999999;
-	border-bottom: 2px solid #aaa;
+	border: 1px solid #AAA;
 	pointer: pointer;
 	cursor: pointer;
 	width: 100%;
@@ -584,7 +583,7 @@ ul.breadcrumb_list a:hover {
 
 .foldContent {
 	border: 1px solid #aaa;
-	border-top: 1px solid transparent;
+	border-width: 0px 1px 1px 1px;
 	padding: 1em;
 }
 

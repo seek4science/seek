@@ -106,7 +106,8 @@ module AssetsHelper
       when "DataFile","Sop","Model"
         related["Project"][:items] = [resource.project]
         related["Study"][:items] = resource.studies   
-        related["Assay"][:items] = resource.assays     
+        related["Assay"][:items] = resource.assays
+        related["Publication"][:items] = resource.related_publications   
       when "Assay"
         related["Project"][:items] = [resource.project]
         related["Investigation"][:items] = [resource.investigation]
@@ -114,6 +115,7 @@ module AssetsHelper
         related["DataFile"][:items] = resource.data_files
         related["Model"][:items] = resource.models if resource.is_modelling? #MODELLING ASSAY
         related["Sop"][:items] = resource.sops
+        related["Publication"][:items] = resource.related_publications
       when "Investigation"
         related["Project"][:items] = [resource.project]
         related["Study"][:items] = resource.studies
@@ -160,6 +162,9 @@ module AssetsHelper
       when "Publication"
         related["Person"][:items] = resource.creators
         related["Project"][:items] = [resource.project]
+        related["DataFile"][:items] = resource.related_data_files
+        related["Model"][:items] = resource.related_models
+        related["Assay"][:items] = resource.related_assays
       else
     end
     
