@@ -117,7 +117,7 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      if valid && @publication.update_attributes(params[:publication]) 
+      if valid && @publication.update_attributes(params[:publication])
         to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}
         

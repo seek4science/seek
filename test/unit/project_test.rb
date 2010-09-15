@@ -18,15 +18,7 @@ class ProjectTest < ActiveSupport::TestCase
     wg=WorkGroup.find(:all).first
     assert_same 1,wg.project_id
   end
-  
-  def test_publications
-    project=projects(:sysmo_project)
-
-    assert_equal 2,project.publications.count
-    
-    assert project.publications.include?(publications(:two))
-    assert project.publications.include?(publications(:taverna_paper_pubmed))
-  end
+      
 
   def test_title_alias_for_name
     p=projects(:sysmo_project)
@@ -76,6 +68,16 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal cred,p.site_credentials
     p=Project.find(p.id)
     assert_equal cred,p.site_credentials
+  end
+  
+  def test_publications_association
+    project=projects(:sysmo_project)
+
+    assert_equal 3,project.publications.count
+    
+    assert project.publications.include?(publications(:one))
+    assert project.publications.include?(publications(:two))
+    assert project.publications.include?(publications(:taverna_paper_pubmed))
   end
 
   def test_projects_with_userless_people
