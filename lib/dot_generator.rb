@@ -12,11 +12,11 @@ module DotGenerator
     end
     
     if root_item.instance_of?(Study)
-      dot += to_dot_study root_item,deep,current_item
+      dot += to_dot_study root_item,deep,current_item, true
     end
     
     if root_item.instance_of?(Assay)
-      dot += to_dot_assay root_item,deep,current_item
+      dot += to_dot_assay root_item,deep,current_item, true
     end
     
     if root_item.instance_of?(DataFile) ||
@@ -55,7 +55,7 @@ module DotGenerator
     return dot
   end
   
-  def to_dot_study study, show_assets=true,current_item=nil
+  def to_dot_study study, show_assets=true,current_item=nil, show_publications=false
     current_item||=study
     dot = ""
     
@@ -63,7 +63,7 @@ module DotGenerator
     
     dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Study]}\",#{highlight_attribute}URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
     study.assays.each do |assay|
-      dot << to_dot_assay(assay, show_assets,current_item)
+      dot << to_dot_assay(assay, show_assets,current_item, show_publications)
       dot << "Study_#{study.id} -- Assay_#{assay.id}\n"
     end
     return dot  
@@ -76,7 +76,7 @@ module DotGenerator
     dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute}URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
     if (show_assets) 
       assay.assay_assets.each do |assay_asset|
-        dot << to_dot_asset(assay_asset.asset, current_item, show_publications)
+        dot << to_dot_asset(assay_asset.asset, current_item)
         label=""
         if assay_asset.relationship_type
           label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
