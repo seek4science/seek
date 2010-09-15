@@ -22,25 +22,26 @@
       </div>
       <br/>
       <div id="add_model_elements">
-        <%= label_tag :models %>
-        <br/>
-        <%= select_tag :possible_models,
-          options_for_select([["Select Model ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
-          {:style=>"width:90%",:onchange=>remote_function(
-            :url=>{:action=>"preview", :controller=>"models",:element=>"model_preview"},
-            :with=>"'id='+this.value",
-            :before=>"show_ajax_loader('model_preview')"
-          )+";check_show_add_model();return(false);"
-        } -%>
+        <div class="association_step">
+          <%= select_tag :possible_models,
+            options_for_select([["Select Model ...", 0]]|project_models.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}),
+            {:style=>"width:90%",:onchange=>remote_function(
+              :url=>{:action=>"preview", :controller=>"models",:element=>"model_preview"},
+              :with=>"'id='+this.value",
+              :before=>"show_ajax_loader('model_preview')"
+            )+";check_show_add_model();return(false);"
+          } -%>
+    
+          <%= select_tag :assay_model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
   
-        <%= select_tag :assay_model_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
-  
-        <b><%= link_to_function "Add", "addSelectedModel(); return(false);", :id=>"add_model_link" %></b>
-        <br/>
-        <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Include Models from other projects?
+          <br/>
+          
+          <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Include Models from other projects?
+        </div>
+        <%= link_to_function (image("new") + " Include in assay"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link", :style => "width: 9em" %>
       </div>
     </div>
-      <div id="model_preview" class="yui-u" style="float:right">
+      <div id="model_preview" class="yui-u preview_box" style="float:right">
         <div style="text-align: center;">Model preview</div>
       </div>
       <br style="clear:both"/>

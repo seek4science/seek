@@ -18,7 +18,7 @@
       <div id="organism_to_list" class="box_editing_inner" style="line-height: 1.5;">
         <span class="none_text" id="organisms">Loading...</span>
       </div>
-      <div class="organism_step box_editing_inner">
+      <div class="association_step">
         <b>Step 1</b> - Choose an organism<br/><br/>
         <%= select_tag :possible_organisms,
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
@@ -30,18 +30,18 @@
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
       <div id="extra_organism_details" style="display:none;">
-        <div class="organism_step box_editing_inner">
+        <div class="association_step">
           <b>Step 2</b> - Select method of culture growth (optional)<br/><br/>
           <%= select_tag :culture_growth,culture_growth_options -%>
           <br/>
         </div>
-        <div class="organism_step box_editing_inner">
+        <div class="association_step">
           <b>Step 3</b> - Specify a strain (optional)<br/>
           <div id="existing_strains"></div>
           <%= text_field_tag :strain %>
           <br/>
         </div>
-        <%= link_to_function (image("new") + " Add To Assay"), "addSelectedOrganism(); return(false);", :id=>"add_organism_link", :class=>"block_link", :style => "width: 8em" %>
+        <%= link_to_function (image("new") + " Include in assay"), "addSelectedOrganism(); return(false);", :id=>"add_organism_link", :class=>"block_link", :style => "width: 9em" %>
       </div>
     </div>
   </div>
