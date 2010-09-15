@@ -1288,3 +1288,22 @@ div.admin_tasks ul{
 div.admin_tasks ul li{
   margin-left: 1em;
 }
+
+div.organism_step {
+  background-color: #EEE;
+  border: 1px solid #DDD;
+  margin-top: 0.5em;
+}
+
+a.block_link {
+  display: block;
+  border: 1px solid #CCC;
+  background-color: #EEE;
+  padding: 0.5em;-moz-binding;
+  margin-top: 0.5em;
+}
+
+a.block_link img{
+  vertical-align: middle; 
+}
+  

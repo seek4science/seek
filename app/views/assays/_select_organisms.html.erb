@@ -18,36 +18,31 @@
       <div id="organism_to_list" class="box_editing_inner" style="line-height: 1.5;">
         <span class="none_text" id="organisms">Loading...</span>
       </div>
-      <br/>
-      <%= label_tag :organisms -%>
-      <br/>
-      <%= select_tag :possible_organisms,
-      options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
-       {:style=>"width:90%",
-        :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains",:element=>"existing_strains"},
-        :with=>"'organism_id='+this.value",
-        :before=>"show_ajax_loader('existing_strains')")+
-        ";check_show_add_organism();$('strain').clear();return(false);"} -%>
-      <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+      <div class="organism_step box_editing_inner">
+        <b>Step 1</b> - Choose an organism<br/><br/>
+        <%= select_tag :possible_organisms,
+        options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
+         {:style=>"width:90%",
+          :onchange=>remote_function(:url=>{:action=>"show_existing_strains", :controller=>"strains",:element=>"existing_strains"},
+          :with=>"'organism_id='+this.value",
+          :before=>"show_ajax_loader('existing_strains')")+
+          ";check_show_add_organism();$('strain').clear();return(false);"} -%>
+        <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+      </div>
       <div id="extra_organism_details" style="display:none;">
-        <br/>
-        <div style="min-width:12em;float:left;min-height: 8em;">
-          <%= label_tag :culture_growth %>
-          <br/>
+        <div class="organism_step box_editing_inner">
+          <b>Step 2</b> - Select method of culture growth (optional)<br/><br/>
           <%= select_tag :culture_growth,culture_growth_options -%>
           <br/>
         </div>
-        <div style="min-height: 8em;">
-          <%= label_tag :strain %>
-          <br/>
-          <div id="existing_strains">
-          </div>
+        <div class="organism_step box_editing_inner">
+          <b>Step 3</b> - Specify a strain (optional)<br/>
+          <div id="existing_strains"></div>
           <%= text_field_tag :strain %>
           <br/>
         </div>
-        <%= link_to_function "Add", "addSelectedOrganism(); return(false);", :id=>"add_organism_link" %>
+        <%= link_to_function (image("new") + " Add To Assay"), "addSelectedOrganism(); return(false);", :id=>"add_organism_link", :class=>"block_link", :style => "width: 7em" %>
       </div>
-      <br/>
     </div>
   </div>
 </div>
