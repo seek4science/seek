@@ -543,8 +543,13 @@ ul.users_details li p {
     border: 1px solid #999999;
 }
 
+#publication_preview_container {
+	width: 22em;
+    max-height: 26em;	
+}
+
 #publication_preview {
-    width: 17em;
+    width: 20em;
     max-height: 25em;
     background-color: #EEEEEE;
     display: inline-block;

@@ -53,12 +53,11 @@ class PublicationsController < ApplicationController
   # POST /publications
   # POST /publications.xml
   def create
-    @publication = Publication.new()
-    pubmed_id = params[:publication][:pubmed_id]
-    pubmed_id = nil if pubmed_id.blank?
-    doi = params[:publication][:doi]
-    doi = nil if doi.blank?
-    result = get_data(@publication, pubmed_id, doi)
+    @publication = Publication.new(params[:publication])
+    @publication.pubmed_id=nil if @publication.pubmed_id.blank?
+    @publication.doi=nil if @publication.doi.blank?
+    
+    result = get_data(@publication, @publication.pubmed_id, @publication.doi)
     @publication.contributor = current_user    
     respond_to do |format|
       if @publication.save
@@ -118,7 +117,7 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      if valid && @publication.update_attributes(params[:publication]) 
+      if valid && @publication.update_attributes(params[:publication])
         to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}
         
@@ -159,7 +158,8 @@ class PublicationsController < ApplicationController
   
   def fetch_preview
     begin
-      @publication = Publication.new
+      @publication = Publication.new(params[:publication])
+      @publication.project_id = params[:project_id]
       key = params[:key]
       protocol = params[:protocol]
       pubmed_id = nil

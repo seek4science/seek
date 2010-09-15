@@ -8,7 +8,7 @@
   <% form_tag publication_path(@publication), :method => :put do %>
     <p>
       <label>Project:</label><br/>
-      <%= collection_select :publication, :project_id, Project.all,:id,:name,{ :include_blank => "None" }%>
+      <%= collection_select :publication, :project_id, current_user.person.projects,:id,:name -%>
     </p>
     
     <% if @publication.pubmed_id.nil? && @publication.doi %>
