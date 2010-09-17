@@ -288,7 +288,7 @@ module ImagesHelper
       img = image_tag file_type_icon_url(object),
         :alt => alt,
         :class=> "avatar framed"
-    when "model","investigation","study"
+    when "model","investigation","study","publication"
       img = image "#{object.class.name.downcase}_avatar",
         {:alt => alt,
         :class=>"avatar framed"}
