@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Sep 07 09:57:41 +0100 2010</td>
+      <td>Mon Sep 27 17:02:04 +0100 2010</td>
     </tr>
     </table>
   </div>
@@ -113,17 +113,22 @@ SysMO-SEEK uses Lucene as its search engine, and this requires that java is
 installed. We use the Sun Java 1.6 package <em>sun-java6-jdk</em>
 </p>
 <p>
+<b>Note:You will need to enable Partner sources to install
+sun-java6-jdk</b> (if you are unsure of how to do this, see <a
+href="https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories">help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories</a>).
+</p>
+<p>
 If using Ubuntu or Debian, the following commands should install all the
 packages you need:
 </p>
 <pre>
-  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
+  sudo apt-get install wget mercurial ruby rdoc libsqlite3-dev sqlite3 ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
 </pre>
 <p>
 For Ubuntu 10.04 (Lucid Lynx) you should use:
 </p>
 <pre>
-  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev graphviz
+  sudo apt-get install wget mercurial ruby rdoc libsqlite3-dev sqlite3 ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
 </pre>
 <p>
 You now need to install rubygems (1.3.6). Rather than install through
@@ -148,13 +153,15 @@ If using Ubuntu or Debian, the following commands should install all the
 gems you need:
 </p>
 <pre>
-  sudo gem install rails mysql rmagick hpricot uuidtools RedCloth mongrel sqlite3-ruby simple-spreadsheet-extractor
+  sudo gem install mysql rmagick hpricot uuidtools RedCloth mongrel sqlite3-ruby simple-spreadsheet-extractor ruby-openid
 </pre>
 <p>
-Also specific versions of <em>fastercsv</em> and <em>libxml-ruby</em> are
-required:
+Also specific versions of <em>rails</em>, <em>rack-openid</em>,
+<em>fastercsv</em>, <em>libxml-ruby</em> and <em>rails</em> are required:
 </p>
 <pre>
+  sudo gem install rails -v 2.3.5
+  sudo gem install rack-openid -v 1.0.1
   sudo gem install fastercsv -v 1.5.1
   sudo gem install libxml-ruby -v 1.1.3
 </pre>
