@@ -158,9 +158,9 @@ class PeopleControllerTest < ActionController::TestCase
   
   def test_current_user_shows_seek_id
     login_as(:quentin)
-    get :show, :id=> people(:quentin_person)
-    assert_select ".box_about_actor p", :text=>/Seek ID: /
-    assert_select ".box_about_actor p", :text=>/Seek ID: .*#{people(:quentin_person).id}/
+    get :show, :id=> people(:quentin_person)    
+    assert_select ".box_about_actor p", :text=>/Seek ID: /m
+    assert_select ".box_about_actor p", :text=>/Seek ID: .*#{people(:quentin_person).id}/m, :count=>1
   end
   
   def test_not_current_user_doesnt_show_seek_id

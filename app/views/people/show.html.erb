@@ -21,13 +21,13 @@
     <div class="main_content_left_box">
         <div class="box_about_actor">
             <p>
-                <b>Name:</b>
-                <%= h @person.name %>
+                <b>Name:</b> 
+				<%= h @person.name %>                
             </p>
             <% if current_user.person == @person %>
             <p>
-                <b>Seek ID:</b>
-                <%= @person.id %>
+                <b>Seek ID:</b> 
+				<%= @person.id %>                
             </p>
             <% if @person.user.login %>
             <p>
