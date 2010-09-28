@@ -3,7 +3,7 @@ require 'libxml'
 module DotGenerator
   
   FILL_COLOURS = {Sop=>"cadetblue2",Model=>"yellow3",DataFile=>"darkgoldenrod2",Investigation=>"#C7E9C0",Study=>"#91c98b",Assay=>"#64b466",Publication=>"#FFEEEE"}
-  HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=4," #trailing comma is required
+  HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=2," #trailing comma is required
   
   def to_dot root_item, deep=false, current_item=nil
     current_item||=root_item
@@ -49,10 +49,10 @@ module DotGenerator
     current_item||=investigation
     dot = ""
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if investigation==current_item
-    dot << "Inv_#{investigation.id} [label=\"#{multiline(investigation.title)}\",width=2,tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Investigation]}\",#{highlight_attribute}URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
+    dot << "Investigation_#{investigation.id} [label=\"#{multiline(investigation.title)}\",width=2,tooltip=\"#{tooltip(investigation)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Investigation]}\",#{highlight_attribute}URL=\"#{polymorphic_path(investigation)}\",target=\"_top\"];\n"
     investigation.studies.each do |s|
       dot << to_dot_study(s,show_assets,current_item)
-      dot << "Inv_#{investigation.id} -- Study_#{s.id}\n"
+      dot << "Investigation_#{investigation.id} -- Study_#{s.id}\n"
     end
     return dot
   end
@@ -173,7 +173,7 @@ module DotGenerator
     document.find("g//g").each do |node|
       title = node.find_first("title").content
       unless title.include?("--")
-        object_class,object_id = title.split("_")
+        object_class,object_id = title.split("_")        
         if ["Sop","Model","DataFile","Publication","Study","Assay","Investigation"].include?(object_class)
           a = node.find_first(".//a")
           polygon = a.find_first(".//polygon")
