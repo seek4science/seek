@@ -100,9 +100,7 @@ class PeopleController < ApplicationController
         # uploaded and redirected back to edit profile page; at this poing *new* records
         # in the DB for person's work group memberships would already be created, which is an
         # error (if the following 3 lines are ever to be removed, the bug needs investigation)
-        session[possible_unsaved_data][:person].delete(:work_group_ids)
-        session[possible_unsaved_data].delete(:can_edit_projects)
-        session[possible_unsaved_data].delete(:can_edit_institutions)
+        session[possible_unsaved_data][:person].delete(:work_group_ids)        
         
         # update those attributes of a person that we want to be updated from the session
         @person.attributes = session[possible_unsaved_data][:person]
@@ -202,16 +200,7 @@ class PeopleController < ApplicationController
     @person.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     set_tools_and_expertise(@person,params)    
-    
-    # some "Person" instances might not have a "User" associated with them - because the user didn't register yet
-    if current_user.is_admin?
-      unless @person.user.nil?
-        @person.can_edit_projects = (params[:can_edit_projects] ? true : false)
-        @person.can_edit_institutions = (params[:can_edit_institutions] ? true : false)
-        @person.user.save
-      end
-    end
-    
+        
     if !@person.notifiee_info.nil?
       @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
       @person.notifiee_info.save if @person.notifiee_info.changed?

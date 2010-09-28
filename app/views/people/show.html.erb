@@ -1,126 +1,110 @@
 <% drag_id=model_to_drag_id @person %>
-
 <% if mine?(@person) || @person.can_be_edited_by?(current_user) -%>
-  <ul class="sectionIcons">
-    <li><%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%></li>
-
+<ul class="sectionIcons">
+    <li>
+        <%= image_tag_for_key('edit', edit_person_path(@person), "Edit Person Profile", nil, 'Edit Profile') -%>
+    </li>
     <% if mine?(@person) -%>
-      <li>
+    <li>
         <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
-      </li>
+    </li>
     <% end -%>
-
     <% if current_user.is_admin? -%>
-      <li>
+    <li>
         <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", { :confirm => 'Are you sure?', :method => :delete }, "Delete Person" -%>
-      </li>
+    </li>
     <% end -%>
-  </ul>
+</ul>
 <% end %>
-
-
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@person} %>
-
 <div class="show_basic">
-
-  <div class="main_content_left_box">
-    <div class="box_about_actor">
-
-      <p>
-        <b>Name:</b> <%= h @person.name %>
-      </p>
-
-      <% if current_user.person == @person %>
-        <p>
-          <b>Seek ID:</b> <%= @person.id %>
-        </p>
-        <% if @person.user.login %>
-          <p>
-            <b>Login name:</b> <%= h @person.user.login %> <span class='none_text'>(Only visible to you)</span>
-          </p>
-        <% end %>
-        <% if @person.user.openid %>       
-        <p>
-          <b>OpenID URL:</b> <%= h @person.user.openid %> <span class='none_text'>(Only visible to you)</span>
-        </p>
-        <% end %>                
-      <% end %>
-
-
-
-      <p>
-        <% locations = @person.locations -%>
-        <% unless locations.empty? -%>
-          <table>
-            <tr>
-              <td style="padding: 0; vertical-align: top;"><b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b></td>
-              <td style="padding: 0; text-align: left;"><ul>
-                  <% locations.each do |l| -%>
-                    <li><%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%></li>
-                  <% end -%>
-              </ul></td>
-            </tr>
-          </table>
-        <% else -%>
-          <b>Location:</b> <span class="none_text">Not known</span>
-        <% end -%>
-      </p>
-
-      <p>
-        <b>Disciplines:</b> <%= discipline_list(@person) %>
-      </p>
-
-      <p>
-        <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person}  %>
-      </p>
-
-
+    <div class="main_content_left_box">
+        <div class="box_about_actor">
+            <p>
+                <b>Name:</b>
+                <%= h @person.name %>
+            </p>
+            <% if current_user.person == @person %>
+            <p>
+                <b>Seek ID:</b>
+                <%= @person.id %>
+            </p>
+            <% if @person.user.login %>
+            <p>
+                <b>Login name:</b>
+                <%= h @person.user.login %><span class='none_text'>(Only visible to you)</span>
+            </p>
+            <% end %>
+            <% if @person.user.openid %>
+            <p>
+                <b>OpenID URL:</b>
+                <%= h @person.user.openid %><span class='none_text'>(Only visible to you)</span>
+            </p>
+            <% end %>
+            <% end %>
+            <p>
+                <% locations = @person.locations -%>
+                <% unless locations.empty? -%>
+                <table>
+                    <tr>
+                        <td style="padding: 0; vertical-align: top;">
+                            <b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b>
+                        </td>
+                        <td style="padding: 0; text-align: left;">
+                            <ul>
+                                <% locations.each do |l| -%>
+                                <li>
+                                    <%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%>
+                                </li>
+                                <% end -%>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <% else -%>
+                <b>Location:</b>
+                <span class="none_text">Not known</span>
+                <% end -%>
+            </p>
+            <p>
+                <b>Disciplines:</b>
+                <%= discipline_list(@person) %>
+            </p>
+            <p>
+                <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
+            </p>
+        </div>
     </div>
-  </div>
-
-
-
-
-  <div class="main_content_right_box">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @person, :drag_id => drag_id } -%>    
-  </div>
-
-  <div style="clear:both;">
-    <br/>
-    <hr/>
-
-    <p>
-      <b>About me:</b>
-      <div id="description" class="box_standout">
-        <%= text_or_not_specified(@person.description, :description=>true,:auto_link=>true) %>
-      </div>
-    </p>
-
-    <br/>
-
-    <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
-
-    <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
-
-    <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
-    <%= render :partial=>"layouts/items_related_to",:object => @person %>
-
-    <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
-    <%# this is because it's not needed then: admins can see everything anyway -%>
-    <% if current_user.is_admin?  -%>
-      <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
-      <ul>
-        <%= "<li>This person is a SysMo-DB PAL<li>" if @person.is_pal?  %>
-        <% if @person.user -%>
-          <li>Editing <b>projects</b>, where this person is involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
-          <li>Editing <b>institutions</b>, where this person works with: <%= @person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
-        <% else -%>
-          <li class="none_text">No "user" instance detected for this person. User has not registered yet.</li>
+    <div class="main_content_right_box">
+        <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @person, :drag_id => drag_id } -%>
+    </div>
+    <div style="clear:both;">
+        <br/>
+        <hr/>
+        <p>
+            <b>About me:</b>
+            <div id="description" class="box_standout">
+                <%= text_or_not_specified(@person.description, :description=>true,:auto_link=>true) %>
+            </div>
+        </p>
+        <br/>
+        <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
+        <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
+        <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
+        <%= render :partial=>"layouts/items_related_to",:object => @person %>
+        <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
+        <%# this is because it's not needed then: admins can see everything anyway -%>
+        <% if current_user.is_admin? -%>
+        <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
+        <ul>
+            <%= "<li><b>This person is a SysMo-DB PAL</b><li><li>&nbsp;</li>" if @person.is_pal? %>
+            <li>
+                Editing <b>projects</b>, where this person is involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+            </li>
+            <li>
+                Editing <b>institutions</b>, where this person works with: <%= @person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+            </li>
+        </ul>
         <% end -%>
-      </ul>
-    <% end -%>
-
-
-  </div>
-
+    </div>
 </div>

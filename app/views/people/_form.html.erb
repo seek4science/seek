@@ -52,7 +52,6 @@
     <%= f.text_area :description, :class=>"description", :rows => 8, :style => "width: 100%;" -%>
 </p>
 <br/>
-
 <% if person -%>
 <div class="fold">
     <div class="foldTitle">
@@ -67,15 +66,13 @@
 </div>
 <%= render :partial=>"roles",:locals=>{:editable=>true} -%>
 <% end %>
-
 <% if person && person.notifiee_info -%>
-	<h2>Email announcements</h2>
-	<p>
-	    <%= check_box_tag "receive_notifications",true,person.notifiee_info.receive_notifications -%>&nbsp;I wish to receive occasional email announcements?&nbsp;
-	</p>
-	<br/>
+<h2>Email announcements</h2>
+<p>
+    <%= check_box_tag "receive_notifications",true,person.notifiee_info.receive_notifications -%>&nbsp;I wish to receive occasional email announcements?&nbsp;
+</p>
+<br/>
 <% end -%>
-
 <%# show avatar selection only when the project exists AND when current user is allowed to edit it -%>
 <% if person && (mine?(person) || person.can_be_edited_by?(current_user)) -%>
 <div class="fold">
@@ -93,24 +90,22 @@
 <%# only makes sense to display these settings when the person has "user" associated with it; -%>
 <%# also, can only do this if the person is not an admin, too - because admins cannot edit accounts of each other -%>
 <p style="line-height: 1.8;">
-    <% if person && person.user && (mine?(person) || !person.user.is_admin?) -%>
-    <label for="can_edit_projects" style="font-weight: normal;">
-        <%= check_box_tag "can_edit_projects", true, (person.can_edit_projects? || person.is_admin?) -%>Allow this person to edit <b>projects</b>
-        they work in.
-    </label>
-    <br/>
-    <label for="can_edit_institutions" style="font-weight: normal;">
-        <%= check_box_tag "can_edit_institutions", true, (person.can_edit_institutions? || person.user.is_admin?) -%>Allow this person to edit <b>institutions</b>
-        they work in.
-    </label>
-    <br/>
-    <% end -%>
-    <% if current_user.is_admin? -%>
+    <% if !person || (mine?(person) || !person.is_admin?) -%>
+	    <label for="can_edit_projects" style="font-weight: normal;">
+	        <%= f.check_box :can_edit_projects -%>Allow this person to edit <b>projects</b>
+	        they work in.
+	    </label>
+	    <br/>
+	    <label for="can_edit_institutions" style="font-weight: normal;">
+	        <%= f.check_box :can_edit_institutions -%>Allow this person to edit <b>institutions</b>
+	        they work in.
+	    </label>
+	    <br/>
+    <% end -%>    
     <label for="is_pal" style="font-weight: normal;">
         <%= f.check_box :is_pal -%>
         This person is a certified <b>SysMo-DB PAL</b>
-    </label>
-    <% end -%>
+    </label>    
 </p>
 <% end -%>
 <p style="text-align: center; margin-top: 1.5em;">
