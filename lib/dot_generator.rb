@@ -2,7 +2,7 @@ require 'libxml'
 
 module DotGenerator
   
-  FILL_COLOURS = {Sop=>"cadetblue2",Model=>"yellow3",DataFile=>"darkgoldenrod2",Investigation=>"#C7E9C0",Study=>"#91c98b",Assay=>"#64b466",Publication=>"#FFEEEE"}
+  FILL_COLOURS = {Sop=>"cadetblue3",Model=>"yellow3",DataFile=>"burlywood2",Investigation=>"#C7E9C0",Study=>"#91c98b",Assay=>"#64b466",Publication=>"#FFEEEE"}
   HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=2," #trailing comma is required
   
   def to_dot root_item, deep=false, current_item=nil
@@ -189,9 +189,9 @@ module DotGenerator
           #ADD THE CORRECT AVATAR, HERE
           if self.respond_to?("avatar")
             object = eval("#{object_class}.find(#{object_id})")
-            av_url = avatar(object, 16, true).match(/src=\"[^\"]*\"/).to_s.gsub("src=","").gsub("\"","") 
-            rect_node = LibXML::XML::Node.new("rect width=\"20\" height=\"20\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: rgb(255,255,255);\"")
-            image_node = LibXML::XML::Node.new("image width=\"16\" height=\"16\" x=\"#{x2.to_f + 5}\" y=\"#{y2.to_f + 5}\" xlink:href=\"#{av_url}\"")
+            av_url = avatar(object, 14, true).match(/src=\"[^\"]*\"/).to_s.gsub("src=","").gsub("\"","") 
+            rect_node = LibXML::XML::Node.new("rect width=\"16\" height=\"16\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: rgb(255,255,255);stroke:rgb(120,120,120);\"")
+            image_node = LibXML::XML::Node.new("image width=\"14\" height=\"14\" x=\"#{x2.to_f + 4}\" y=\"#{y2.to_f + 4}\" xlink:href=\"#{av_url}\"")
             a.add_element(rect_node)  
             a.add_element(image_node)
           end
