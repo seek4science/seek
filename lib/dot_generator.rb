@@ -8,7 +8,7 @@ module DotGenerator
   def to_dot root_item, deep=false, current_item=nil
     current_item||=root_item
     dot = dot_header "Investigation"
-   
+    
     if root_item.instance_of?(Investigation)
       dot += to_dot_inv root_item,deep,current_item
     end
@@ -22,8 +22,8 @@ module DotGenerator
     end
     
     if root_item.instance_of?(DataFile) ||
-       root_item.instance_of?(Model) ||
-       root_item.instance_of?(Sop)
+      root_item.instance_of?(Model) ||
+      root_item.instance_of?(Sop)
       root_item.assays.each do |assay|
         dot += to_dot_assay assay,deep,current_item, true
       end
@@ -36,7 +36,7 @@ module DotGenerator
       root_item.related_assays.each do |assay|
         dot += to_dot_assay assay,deep,current_item, true
       end
-      (root_item.related_data_files + root_item.related_models).each do |asset|
+       (root_item.related_data_files + root_item.related_models).each do |asset|
         dot += to_dot_asset asset,current_item, true
       end
     end
@@ -187,12 +187,15 @@ module DotGenerator
             x2,y2 = points[4].split(",")
           end
           #ADD THE CORRECT AVATAR, HERE
-          object = eval("#{object_class}.find(#{object_id})")
-          av_url = avatar(object, 16, true).match(/src=\"[^\"]*\"/).to_s.gsub("src=","").gsub("\"","")
-          rect_node = LibXML::XML::Node.new("rect width=\"20\" height=\"20\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: rgb(255,255,255);\"")
-          image_node = LibXML::XML::Node.new("image width=\"16\" height=\"16\" x=\"#{x2.to_f + 5}\" y=\"#{y2.to_f + 5}\" xlink:href=\"#{av_url}\"")
-          a.add_element(rect_node)  
-          a.add_element(image_node)        
+          if self.respond_to?("avatar")
+            object = eval("#{object_class}.find(#{object_id})")
+            av_url = avatar(object, 16, true).match(/src=\"[^\"]*\"/).to_s.gsub("src=","").gsub("\"","") 
+            rect_node = LibXML::XML::Node.new("rect width=\"20\" height=\"20\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: rgb(255,255,255);\"")
+            image_node = LibXML::XML::Node.new("image width=\"16\" height=\"16\" x=\"#{x2.to_f + 5}\" y=\"#{y2.to_f + 5}\" xlink:href=\"#{av_url}\"")
+            a.add_element(rect_node)  
+            a.add_element(image_node)
+          end
+          
         end
       end
     end
@@ -204,7 +207,7 @@ module DotGenerator
   
   def multiline str,line_len=3    
     new_str=str[0..80]
-        
+    
     word_arr=new_str.split
     x=line_len
     while x<new_str.split.length do
@@ -213,7 +216,7 @@ module DotGenerator
     end
     
     end_str = (new_str.length!=str.length) ? " ..." : ""
-    (word_arr.join(" ") + end_str).strip   
+     (word_arr.join(" ") + end_str).strip   
   end
   
 end
