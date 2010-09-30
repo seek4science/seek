@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource ]
-  before_filter :find_display_model, :only=>[:show,:download]
+  before_filter :find_display_model, :only=>[:show,:download,:execute]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   

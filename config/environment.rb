@@ -33,6 +33,7 @@ Rails::Initializer.run do |config|
   config.gem 'uuidtools',:lib=>"uuidtools",:version=>"2.1.1"
   config.gem 'RedCloth'
   config.gem 'simple-spreadsheet-extractor',:version=>"0.3.3"    
+  #config.gem 'rack-openid',:version=>"1.1.0"
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

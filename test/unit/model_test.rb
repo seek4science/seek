@@ -2,6 +2,8 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ModelTest < ActiveSupport::TestCase
   fixtures :all
+  
+  include ModelExecution
 
   test "assocations" do
     model=models(:teusink)
@@ -14,6 +16,13 @@ class ModelTest < ActiveSupport::TestCase
     blob=content_blobs(:teusink_blob)
     assert_equal blob,model.content_blob
   end
+  
+  test "jws execution applet" do
+    model=models(:teusink)
+    resp=jws_execution_applet model
+    assert response.include?("applet")
+  end
+  
 
   test "project" do
     model=models(:teusink)
