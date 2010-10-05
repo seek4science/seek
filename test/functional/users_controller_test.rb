@@ -22,6 +22,11 @@ class UsersControllerTest < ActionController::TestCase
     assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
   end
   
+  def test_activation_required_link
+    get :activation_required
+    assert_response :success
+  end
+  
   def test_system_messge_on_signup_no_users
     get :new
     assert_response :success
