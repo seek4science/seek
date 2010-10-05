@@ -50,6 +50,15 @@ class Mailer < ActionMailer::Base
     
     body       :name=>user.person.name,:person=>user.person, :host=>base_host
   end
+  
+  def welcome_no_projects(user,base_host)
+    subject    'Welcome to SysMO SEEK'
+    recipients user.person.email_with_name
+    from       NOREPLY_SENDER
+    sent_on    Time.now
+    
+    body       :name=>user.person.name,:person=>user.person, :host=>base_host
+  end
 
   def contact_admin_new_user_no_profile(details,user,base_host)
     

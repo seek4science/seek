@@ -85,9 +85,10 @@ class ApplicationController < ActionController::Base
   end
   
   def logout_user
-    self.current_user.forget_me if logged_in?
+    current_user.forget_me if logged_in?
     cookies.delete :auth_token
-    session[:user_id]=nil
+    cookies.delete :open_id
+    reset_session    
   end
   
   private
