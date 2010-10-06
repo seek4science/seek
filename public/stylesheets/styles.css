@@ -4,6 +4,19 @@ body {
 	line-height: 1.0;	
 }
 
+
+div#login_details input {
+	width: 60%;
+}
+
+div#login_details p {
+	text-align: center;
+}
+
+div#login_details b {
+	text-align: left;
+}
+
 #custom-doc {
     margin: auto;
     text-align: left; /* leave unchanged */

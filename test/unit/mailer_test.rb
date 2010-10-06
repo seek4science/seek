@@ -18,6 +18,20 @@ class MailerTest < ActionMailer::TestCase
     
   end
   
+  test "signup_open_id" do
+    @expected.subject = 'SysMO SEEK account activation'
+    @expected.to = "Aaron Openid Spiggle <aaron_openid@email.com>"
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.date    = Time.now
+
+    @expected.body    = read_fixture('signup_openid')
+    
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded, Mailer.create_signup(users(:aaron_openid),"localhost").encoded
+    end
+    
+  end
+  
   test "announcement notification" do
     announcement = site_announcements(:mail)
     @expected.subject = "SysMO SEEK Announcement: #{announcement.title}"

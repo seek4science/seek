@@ -77,6 +77,12 @@ not_registered:
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
 
+aaron_openid_person:  
+  first_name: "aaron openid"
+  last_name: "spiggle"
+  email: "aaron_openid@email.com"
+  is_admin: false
+
 pal:
   first_name: "A Pal"
   email: "test@test.com"

@@ -2,7 +2,11 @@ Hi <%= @name %>,
 
 Thank you for registering with Sysmo SEEK.
 
-Your username is: <%= @username %> and you are <%= @name %>.
+<% if @openid -%>
+You registered using OpenID, with: <%= @openid %>, and your name is <%= @name %>.
+<% else -%>
+Your username is: <%= @username %> and your name is <%= @name %>.
+<% end -%>
 
 If you did not create this account, or the above details are incorrect, then DO NOT activate the account and instead contact one of the Sysmo-DB administrators named below:
 <% for admin in @admins -%>

@@ -30,7 +30,7 @@ class Mailer < ActionMailer::Base
     from        NOREPLY_SENDER
     sent_on     Time.now
 
-    body        :username=>user.login, :name=>user.person.name, :admins=>admins, :activation_code=>user.activation_code, :host=>base_host
+    body        :username=>user.login,:openid=>user.openid, :name=>user.person.name, :admins=>admins, :activation_code=>user.activation_code, :host=>base_host
   end
 
   def forgot_password(user,base_host)

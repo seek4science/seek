@@ -33,26 +33,24 @@
     <h2>Please provide your details <%= help_icon("Please note that fields marked with an asterisk are compulsory.") %></h2>
 
     <% form_tag users_path do |f| -%>
-      <div style="width: 90%;">
-        <p>
-          <label for="user_login">
+      <div id="login_details">
+        <p>          
             <b><font style="color: #FF0000;">*</font> Login name</b>
             <%= help_icon("Login should contain a minimum of 3 characters") -%>
-          </label><br/>
-          <%= text_field_tag :login, nil, :style => "width: 80%" %>
+          <br/>
+          <%= text_field_tag :login, nil %>
         </p>
 
         <p>
-          <label for="user_password">
-            <b><font style="color: #FF0000;">*</font> Password</b>
+          <b><font style="color: #FF0000;">*</font> Password</b>
             <%= help_icon("Password should contain a minimum of 4 characters") -%>
-          </label><br/>
-          <%= password_field_tag :password, nil, :style => "width: 80%;" %>
+          <br/>
+          <%= password_field_tag :password, nil %>
         </p>
 
         <p>
-          <label for="user_password_confirmation"><b><font style="color: #FF0000;">*</font> Confirm Password</b></label><br/>
-          <%= password_field_tag :password_confirmation, nil, :style => "width: 80%;" %>
+          <b><font style="color: #FF0000;">*</font> Confirm Password</b><br/>
+          <%= password_field_tag :password_confirmation, nil %>
         </p>
       </div>
 
