@@ -3,9 +3,9 @@
 
 class ApplicationController < ActionController::Base
   
-  include ExceptionNotifiable if EXCEPTION_NOTIFICATION_ENABLED
-  self.error_layout="errors"
   
+  include ExceptionNotifiable 
+  self.error_layout="errors"  
   self.rails_error_classes = { 
     ActiveRecord::RecordNotFound => "404",
     ::ActionController::UnknownController => "406",
@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
     ::ActionView::MissingTemplate => "406",
     ::ActionView::TemplateError => "500"
   }
+  
+  
   
   if ACTIVITY_LOG_ENABLED
     after_filter :log_event

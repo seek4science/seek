@@ -54,7 +54,7 @@ class PeopleController < ApplicationController
 
   # GET /people/1
   # GET /people/1.xml
-  def show            
+  def show                
     @person = Person.find(params[:id])
     
     respond_to do |format|
