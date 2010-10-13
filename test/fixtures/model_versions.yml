@@ -11,7 +11,7 @@ teusink_v1:
   model: teusink
   version: 1
   project: sysmo_project
-  policy: policy_for_test_with_projects_institutions
+  policy: policy_for_test_with_projects_institutions  
 
 teusink_v2:
   contributor: model_owner (User)
@@ -27,6 +27,21 @@ teusink_v2:
   version: 2
   project: sysmo_project
   policy: policy_for_test_with_projects_institutions
+  
+francos_model_v1:
+  contributor: model_owner (User)
+  title: Francos model
+  description: Problematic BioModels model that Franco gave as a test
+  original_filename: BIOMD0000000064.xml
+  content_blob: francos_model_blob
+  content_type: text/xml  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  model: francos_model
+  version: 1  
+  project: sysmo_project
+  policy: policy_for_test_with_projects_institutions    
 
 model_with_format_and_type_v1:
   contributor: model_owner (User)

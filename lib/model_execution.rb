@@ -29,6 +29,8 @@ module ModelExecution
     
     raise Exception.new("There currently appears to be a problem with JWS Online (empty response)") if result.blank?
     raise Exception.new("There currently appears to be a problem with JWS Online (response is shorter than expected)\n#{result}") if result.length < 10
+    raise Exception.new("There is no applet defined in the response from JWS Online") if !result.include?(%{div id="applet_box"})
+    
     
     start_block=result.index(%{<div id="applet_box"})
     end_block=result.index("</div>",start_block)+6

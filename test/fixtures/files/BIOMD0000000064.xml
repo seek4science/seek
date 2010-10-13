@@ -1,0 +1,3762 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level2" metaid="metaid_0000001" level="2" version="1">
+  <model metaid="metaid_0000002" id="Teusink2000_Glycolysis" name="Teusink2000_Glycolysis">
+    <notes>
+      <p xmlns="http://www.w3.org/1999/xhtml">The model reproduces the steady-state fluxes and metabolite concentrations of the branched model as given in Table 4 of the paper. For Vmax values, please note that there is a conversion factor of 270 to convert from U/mg-protein to mmol/min-Lcytosol as shown in Table 1 of the paper. For ADH the Keq given in the paper is for the reverse reaction and hence in the forward direction is 1/Keq. The model was successfully tested on MathSBML</p><p xmlns="http://www.w3.org/1999/xhtml">This model originates from BioModels Database: A Database of Annotated Published Models. It is copyright (c) 2005-2006 The BioModels Team.<br/> For more information see the <a href="http://www.ebi.ac.uk/biomodels/legal.html">terms of use</a>.</p>
+    </notes>
+    <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000002">
+<dc:creator rdf:parseType="Resource">
+<rdf:Bag>
+<rdf:li rdf:parseType="Resource">
+<vCard:N rdf:parseType="Resource">
+<vCard:Family>Snoep</vCard:Family>
+<vCard:Given>Jacky L</vCard:Given>
+</vCard:N>
+<vCard:EMAIL>jls@sun.ac.za</vCard:EMAIL>
+<vCard:ORG>
+<vCard:Orgname>Stellenbosh University</vCard:Orgname>
+</vCard:ORG>
+</rdf:li>
+<rdf:li rdf:parseType="Resource">
+<vCard:N rdf:parseType="Resource">
+<vCard:Family>Dharuri</vCard:Family>
+<vCard:Given>Harish</vCard:Given>
+</vCard:N>
+<vCard:EMAIL>hdharuri@cds.caltech.edu</vCard:EMAIL>
+<vCard:ORG>
+<vCard:Orgname>California Institute of Technology</vCard:Orgname>
+</vCard:ORG>
+</rdf:li>
+</rdf:Bag>
+</dc:creator>
+<dcterms:created rdf:parseType="Resource">
+<dcterms:W3CDTF>2006-07-26T10:48:38</dcterms:W3CDTF>
+</dcterms:created>
+<dcterms:modified rdf:parseType="Resource">
+<dcterms:W3CDTF>2006-08-14T10:05:30</dcterms:W3CDTF>
+</dcterms:modified>
+<bqmodel:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/biomodels/#BIOMD0000000064"/>
+</rdf:Bag>
+</bqmodel:is>
+<bqmodel:isDescribedBy>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.pubmed.gov/#10951190"/>
+</rdf:Bag>
+</bqmodel:isDescribedBy>
+<bqbiol:hasPart>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0006114"/>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0019642"/>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0005978"/>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0005992"/>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0006105"/>
+</rdf:Bag>
+</bqbiol:hasPart>
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/pathway/#sce00010"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243766"/>
+<rdf:li rdf:resource="http://www.taxonomy.org/#4932"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+    <listOfUnitDefinitions>
+      <unitDefinition metaid="metaid_0000070" id="substance" name="millimole">
+        <listOfUnits>
+          <unit kind="mole" scale="-3" multiplier="1" offset="0"/>
+        </listOfUnits>
+      </unitDefinition>
+      <unitDefinition metaid="metaid_0000071" id="time" name="minute">
+        <listOfUnits>
+          <unit kind="second" multiplier="60" offset="0"/>
+        </listOfUnits>
+      </unitDefinition>
+      <unitDefinition metaid="metaid_0000072" id="mM_per_minute" name="mM_per_minute">
+        <listOfUnits>
+          <unit kind="mole" scale="-3" multiplier="1" offset="0"/>
+          <unit kind="litre" exponent="-1" multiplier="1" offset="0"/>
+          <unit kind="second" exponent="-1" multiplier="60" offset="0"/>
+        </listOfUnits>
+      </unitDefinition>
+      <unitDefinition metaid="metaid_0000073" id="mM" name="mM">
+        <listOfUnits>
+          <unit kind="mole" scale="-3" multiplier="1" offset="0"/>
+          <unit kind="litre" exponent="-1" multiplier="1" offset="0"/>
+        </listOfUnits>
+      </unitDefinition>
+      <unitDefinition metaid="metaid_0000074" id="per_minute" name="per minute">
+        <listOfUnits>
+          <unit kind="second" exponent="-1" multiplier="60" offset="0"/>
+        </listOfUnits>
+      </unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment metaid="metaid_0000003" id="extracellular" size="1">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000003">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0005576"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </compartment>
+      <compartment metaid="metaid_0000075" id="cytosol" size="1">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000075">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0005829"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </compartment>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species metaid="metaid_0000004" id="GLCi" name="Glucose in Cytosol" compartment="cytosol" initialConcentration="0.087">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000004">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:17234"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00293"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000005" id="G6P" name="Glucose 6 Phosphate" compartment="cytosol" initialConcentration="2.45">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000005">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:17665"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00668"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000006" id="F6P" name="Fructose 6 Phosphate" compartment="cytosol" initialConcentration="0.62">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000006">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:15946"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C05345"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000007" id="F16P" name="Fructose-1,6 bisphosphate" compartment="cytosol" initialConcentration="5.51">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000007">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:16905"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00354"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000008" id="TRIO" name="Triose-phosphate" compartment="cytosol" initialConcentration="0.96">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000008">
+<bqbiol:hasPart>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:29052"/>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:16108"/>
+</rdf:Bag>
+</bqbiol:hasPart>
+<bqbiol:hasPart>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00118"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00111"/>
+</rdf:Bag>
+</bqbiol:hasPart>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000009" id="BPG" name="1,3-bisphosphoglycerate" compartment="cytosol" initialConcentration="0">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000009">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:16001"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00236"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000010" id="P3G" name="3-phosphoglycerate" compartment="cytosol" initialConcentration="0.9">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000010">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:17794"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00197"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000011" id="P2G" name="2-phosphoglycerate" compartment="cytosol" initialConcentration="0.12">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000011">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:17835"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00631"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000012" id="PEP" name="Phosphoenolpyruvate" compartment="cytosol" initialConcentration="0.07">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000012">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:26055"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00074"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000013" id="PYR" name="Pyruvate" compartment="cytosol" initialConcentration="1.85">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000013">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:32816"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00022"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000014" id="ACE" name="Acetaldehyde" compartment="cytosol" initialConcentration="0.17">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000014">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:15343"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00084"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000042" id="P" name="High energy phosphates" compartment="cytosol" initialConcentration="6.31">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000042">
+<bqbiol:hasPart>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:15422"/>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:16761"/>
+</rdf:Bag>
+</bqbiol:hasPart>
+<bqbiol:hasPart>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00002"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00008"/>
+</rdf:Bag>
+</bqbiol:hasPart>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000016" id="NAD" name="NAD" compartment="cytosol" initialConcentration="1.2">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000016">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:15846"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00003"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000017" id="NADH" name="NADH" compartment="cytosol" initialConcentration="0.39">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000017">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:16908"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00004"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000018" id="Glyc" name="Glycogen" compartment="cytosol" initialConcentration="0" boundaryCondition="true">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000018">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:28087"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00182"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000019" id="Trh" name="Trehalose" compartment="cytosol" initialConcentration="0" boundaryCondition="true">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000019">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:27082"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C01083"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000020" id="CO2" name="CO2" compartment="cytosol" initialConcentration="1" boundaryCondition="true">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000020">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:16526"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00011"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000021" id="SUCC" name="Succinate" compartment="cytosol" initialConcentration="0" boundaryCondition="true">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000021">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:30031"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000022" id="GLCo" name="Extracellular Glucose" compartment="extracellular" initialConcentration="50" boundaryCondition="true">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000022">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:17234"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00293"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000023" id="ETOH" name="Ethanol" compartment="cytosol" initialConcentration="50" boundaryCondition="true">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000023">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:16236"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00469"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+      <species metaid="metaid_0000024" id="GLY" name="Glycerol" compartment="cytosol" initialConcentration="0.15" boundaryCondition="true">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000024">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ebi.ac.uk/chebi/#CHEBI:17754"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/compound/#C00116"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+      </species>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter metaid="metaid_0000043" id="Lambda1" units="dimensionless" constant="false"/>
+      <parameter metaid="metaid_0000044" id="Lambda2" units="dimensionless" constant="false"/>
+      <parameter metaid="metaid_0000045" id="R_PFK" units="dimensionless" constant="false"/>
+      <parameter metaid="metaid_0000046" id="T_PFK" units="dimensionless" constant="false"/>
+      <parameter metaid="metaid_0000047" id="L_PFK" units="dimensionless" constant="false"/>
+      <parameter metaid="metaid_0000050" id="gR_5" value="5.12" units="dimensionless"/>
+      <parameter metaid="metaid_0000051" id="KmPFKF6P_5" value="0.1" units="mM"/>
+      <parameter metaid="metaid_0000052" id="KeqAK_5" value="0.45" units="dimensionless"/>
+      <parameter metaid="metaid_0000053" id="SUMAXP_5" value="4.1" units="mM"/>
+      <parameter metaid="metaid_0000054" id="KmPFKATP_5" value="0.71" units="mM"/>
+      <parameter metaid="metaid_0000055" id="Lzero_5" value="0.66" units="dimensionless"/>
+      <parameter metaid="metaid_0000056" id="CiPFKATP_5" value="100" units="dimensionless"/>
+      <parameter metaid="metaid_0000057" id="KiPFKATP_5" value="0.65" units="mM"/>
+      <parameter metaid="metaid_0000058" id="CPFKAMP_5" value="0.0845" units="dimensionless"/>
+      <parameter metaid="metaid_0000059" id="KPFKAMP_5" value="0.0995" units="mM"/>
+      <parameter metaid="metaid_0000060" id="CPFKF26BP_5" value="0.0174" units="dimensionless"/>
+      <parameter metaid="metaid_0000061" id="F26BP_5" value="0.02" units="mM"/>
+      <parameter metaid="metaid_0000062" id="KPFKF26BP_5" value="0.000682" units="mM"/>
+      <parameter metaid="metaid_0000063" id="CPFKF16BP_5" value="0.397" units="dimensionless"/>
+      <parameter metaid="metaid_0000064" id="KPFKF16BP_5" value="0.111" units="mM"/>
+      <parameter metaid="metaid_0000065" id="CPFKATP_5" value="3" units="dimensionless"/>
+    </listOfParameters>
+    <listOfRules>
+      <assignmentRule metaid="metaid_0000048" variable="L_PFK">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <times/>
+            <ci> Lzero_5 </ci>
+            <apply>
+              <power/>
+              <apply>
+                <divide/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <times/>
+                    <ci> CiPFKATP_5 </ci>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <divide/>
+                        <apply>
+                          <plus/>
+                          <apply>
+                            <minus/>
+                            <apply>
+                              <minus/>
+                              <ci> P </ci>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 4 </cn>
+                                <ci> KeqAK_5 </ci>
+                                <ci> P </ci>
+                              </apply>
+                            </apply>
+                            <ci> SUMAXP_5 </ci>
+                          </apply>
+                          <apply>
+                            <power/>
+                            <apply>
+                              <plus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <minus/>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                  <apply>
+                                    <times/>
+                                    <cn type="integer"> 4 </cn>
+                                    <ci> KeqAK_5 </ci>
+                                    <apply>
+                                      <power/>
+                                      <ci> P </ci>
+                                      <cn type="integer"> 2 </cn>
+                                    </apply>
+                                  </apply>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 2 </cn>
+                                  <ci> P </ci>
+                                  <ci> SUMAXP_5 </ci>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 8 </cn>
+                                <ci> KeqAK_5 </ci>
+                                <ci> P </ci>
+                                <ci> SUMAXP_5 </ci>
+                              </apply>
+                              <apply>
+                                <power/>
+                                <ci> SUMAXP_5 </ci>
+                                <cn type="integer"> 2 </cn>
+                              </apply>
+                            </apply>
+                            <cn> 0.5 </cn>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <minus/>
+                          <cn type="integer"> 2 </cn>
+                          <apply>
+                            <times/>
+                            <cn type="integer"> 8 </cn>
+                            <ci> KeqAK_5 </ci>
+                          </apply>
+                        </apply>
+                      </apply>
+                      <ci> KiPFKATP_5 </ci>
+                    </apply>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <ci> P </ci>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_5 </ci>
+                              <ci> P </ci>
+                            </apply>
+                          </apply>
+                          <ci> SUMAXP_5 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_5 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_5 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_5 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_5 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_5 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 2 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_5 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KiPFKATP_5 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <cn type="integer"> 2 </cn>
+            </apply>
+            <apply>
+              <power/>
+              <apply>
+                <divide/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> CPFKAMP_5 </ci>
+                      <apply>
+                        <divide/>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 2 </cn>
+                          <ci> KeqAK_5 </ci>
+                          <apply>
+                            <power/>
+                            <apply>
+                              <minus/>
+                              <ci> SUMAXP_5 </ci>
+                              <apply>
+                                <power/>
+                                <apply>
+                                  <plus/>
+                                  <apply>
+                                    <minus/>
+                                    <apply>
+                                      <minus/>
+                                      <apply>
+                                        <power/>
+                                        <ci> P </ci>
+                                        <cn type="integer"> 2 </cn>
+                                      </apply>
+                                      <apply>
+                                        <times/>
+                                        <cn type="integer"> 4 </cn>
+                                        <ci> KeqAK_5 </ci>
+                                        <apply>
+                                          <power/>
+                                          <ci> P </ci>
+                                          <cn type="integer"> 2 </cn>
+                                        </apply>
+                                      </apply>
+                                    </apply>
+                                    <apply>
+                                      <times/>
+                                      <cn type="integer"> 2 </cn>
+                                      <ci> P </ci>
+                                      <ci> SUMAXP_5 </ci>
+                                    </apply>
+                                  </apply>
+                                  <apply>
+                                    <times/>
+                                    <cn type="integer"> 8 </cn>
+                                    <ci> KeqAK_5 </ci>
+                                    <ci> P </ci>
+                                    <ci> SUMAXP_5 </ci>
+                                  </apply>
+                                  <apply>
+                                    <power/>
+                                    <ci> SUMAXP_5 </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                                <cn> 0.5 </cn>
+                              </apply>
+                            </apply>
+                            <cn type="integer"> 2 </cn>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <times/>
+                          <apply>
+                            <plus/>
+                            <cn type="integer"> -1 </cn>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_5 </ci>
+                            </apply>
+                          </apply>
+                          <apply>
+                            <minus/>
+                            <apply>
+                              <plus/>
+                              <apply>
+                                <minus/>
+                                <ci> P </ci>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 4 </cn>
+                                <ci> KeqAK_5 </ci>
+                                <ci> P </ci>
+                              </apply>
+                              <ci> SUMAXP_5 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <apply>
+                                <plus/>
+                                <apply>
+                                  <minus/>
+                                  <apply>
+                                    <minus/>
+                                    <apply>
+                                      <power/>
+                                      <ci> P </ci>
+                                      <cn type="integer"> 2 </cn>
+                                    </apply>
+                                    <apply>
+                                      <times/>
+                                      <cn type="integer"> 4 </cn>
+                                      <ci> KeqAK_5 </ci>
+                                      <apply>
+                                        <power/>
+                                        <ci> P </ci>
+                                        <cn type="integer"> 2 </cn>
+                                      </apply>
+                                    </apply>
+                                  </apply>
+                                  <apply>
+                                    <times/>
+                                    <cn type="integer"> 2 </cn>
+                                    <ci> P </ci>
+                                    <ci> SUMAXP_5 </ci>
+                                  </apply>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 8 </cn>
+                                  <ci> KeqAK_5 </ci>
+                                  <ci> P </ci>
+                                  <ci> SUMAXP_5 </ci>
+                                </apply>
+                                <apply>
+                                  <power/>
+                                  <ci> SUMAXP_5 </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                              </apply>
+                              <cn> 0.5 </cn>
+                            </apply>
+                          </apply>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KPFKAMP_5 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 2 </cn>
+                        <ci> KeqAK_5 </ci>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <minus/>
+                            <ci> SUMAXP_5 </ci>
+                            <apply>
+                              <power/>
+                              <apply>
+                                <plus/>
+                                <apply>
+                                  <minus/>
+                                  <apply>
+                                    <minus/>
+                                    <apply>
+                                      <power/>
+                                      <ci> P </ci>
+                                      <cn type="integer"> 2 </cn>
+                                    </apply>
+                                    <apply>
+                                      <times/>
+                                      <cn type="integer"> 4 </cn>
+                                      <ci> KeqAK_5 </ci>
+                                      <apply>
+                                        <power/>
+                                        <ci> P </ci>
+                                        <cn type="integer"> 2 </cn>
+                                      </apply>
+                                    </apply>
+                                  </apply>
+                                  <apply>
+                                    <times/>
+                                    <cn type="integer"> 2 </cn>
+                                    <ci> P </ci>
+                                    <ci> SUMAXP_5 </ci>
+                                  </apply>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 8 </cn>
+                                  <ci> KeqAK_5 </ci>
+                                  <ci> P </ci>
+                                  <ci> SUMAXP_5 </ci>
+                                </apply>
+                                <apply>
+                                  <power/>
+                                  <ci> SUMAXP_5 </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                              </apply>
+                              <cn> 0.5 </cn>
+                            </apply>
+                          </apply>
+                          <cn type="integer"> 2 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <times/>
+                        <apply>
+                          <plus/>
+                          <cn type="integer"> -1 </cn>
+                          <apply>
+                            <times/>
+                            <cn type="integer"> 4 </cn>
+                            <ci> KeqAK_5 </ci>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <ci> P </ci>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_5 </ci>
+                              <ci> P </ci>
+                            </apply>
+                            <ci> SUMAXP_5 </ci>
+                          </apply>
+                          <apply>
+                            <power/>
+                            <apply>
+                              <plus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <minus/>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                  <apply>
+                                    <times/>
+                                    <cn type="integer"> 4 </cn>
+                                    <ci> KeqAK_5 </ci>
+                                    <apply>
+                                      <power/>
+                                      <ci> P </ci>
+                                      <cn type="integer"> 2 </cn>
+                                    </apply>
+                                  </apply>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 2 </cn>
+                                  <ci> P </ci>
+                                  <ci> SUMAXP_5 </ci>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 8 </cn>
+                                <ci> KeqAK_5 </ci>
+                                <ci> P </ci>
+                                <ci> SUMAXP_5 </ci>
+                              </apply>
+                              <apply>
+                                <power/>
+                                <ci> SUMAXP_5 </ci>
+                                <cn type="integer"> 2 </cn>
+                              </apply>
+                            </apply>
+                            <cn> 0.5 </cn>
+                          </apply>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KPFKAMP_5 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <cn type="integer"> 2 </cn>
+            </apply>
+            <apply>
+              <power/>
+              <apply>
+                <divide/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> CPFKF26BP_5 </ci>
+                      <ci> F26BP_5 </ci>
+                    </apply>
+                    <ci> KPFKF26BP_5 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> CPFKF16BP_5 </ci>
+                      <ci> F16P </ci>
+                    </apply>
+                    <ci> KPFKF16BP_5 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> F26BP_5 </ci>
+                    <ci> KPFKF26BP_5 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> F16P </ci>
+                    <ci> KPFKF16BP_5 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <cn type="integer"> 2 </cn>
+            </apply>
+          </apply>
+        </math>
+      </assignmentRule>
+      <assignmentRule metaid="metaid_0000066" variable="Lambda1">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <ci> F6P </ci>
+            <ci> KmPFKF6P_5 </ci>
+          </apply>
+        </math>
+      </assignmentRule>
+      <assignmentRule metaid="metaid_0000067" variable="Lambda2">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <divide/>
+              <apply>
+                <plus/>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <minus/>
+                    <ci> P </ci>
+                    <apply>
+                      <times/>
+                      <cn type="integer"> 4 </cn>
+                      <ci> KeqAK_5 </ci>
+                      <ci> P </ci>
+                    </apply>
+                  </apply>
+                  <ci> SUMAXP_5 </ci>
+                </apply>
+                <apply>
+                  <power/>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <apply>
+                        <minus/>
+                        <apply>
+                          <power/>
+                          <ci> P </ci>
+                          <cn type="integer"> 2 </cn>
+                        </apply>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 4 </cn>
+                          <ci> KeqAK_5 </ci>
+                          <apply>
+                            <power/>
+                            <ci> P </ci>
+                            <cn type="integer"> 2 </cn>
+                          </apply>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 2 </cn>
+                        <ci> P </ci>
+                        <ci> SUMAXP_5 </ci>
+                      </apply>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <cn type="integer"> 8 </cn>
+                      <ci> KeqAK_5 </ci>
+                      <ci> P </ci>
+                      <ci> SUMAXP_5 </ci>
+                    </apply>
+                    <apply>
+                      <power/>
+                      <ci> SUMAXP_5 </ci>
+                      <cn type="integer"> 2 </cn>
+                    </apply>
+                  </apply>
+                  <cn> 0.5 </cn>
+                </apply>
+              </apply>
+              <apply>
+                <minus/>
+                <cn type="integer"> 2 </cn>
+                <apply>
+                  <times/>
+                  <cn type="integer"> 8 </cn>
+                  <ci> KeqAK_5 </ci>
+                </apply>
+              </apply>
+            </apply>
+            <ci> KmPFKATP_5 </ci>
+          </apply>
+        </math>
+      </assignmentRule>
+      <assignmentRule metaid="metaid_0000068" variable="R_PFK">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <plus/>
+            <cn type="integer"> 1 </cn>
+            <apply>
+              <divide/>
+              <ci> F6P </ci>
+              <ci> KmPFKF6P_5 </ci>
+            </apply>
+            <apply>
+              <divide/>
+              <apply>
+                <divide/>
+                <apply>
+                  <plus/>
+                  <apply>
+                    <minus/>
+                    <apply>
+                      <minus/>
+                      <ci> P </ci>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 4 </cn>
+                        <ci> KeqAK_5 </ci>
+                        <ci> P </ci>
+                      </apply>
+                    </apply>
+                    <ci> SUMAXP_5 </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <plus/>
+                      <apply>
+                        <minus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <power/>
+                            <ci> P </ci>
+                            <cn type="integer"> 2 </cn>
+                          </apply>
+                          <apply>
+                            <times/>
+                            <cn type="integer"> 4 </cn>
+                            <ci> KeqAK_5 </ci>
+                            <apply>
+                              <power/>
+                              <ci> P </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 2 </cn>
+                          <ci> P </ci>
+                          <ci> SUMAXP_5 </ci>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 8 </cn>
+                        <ci> KeqAK_5 </ci>
+                        <ci> P </ci>
+                        <ci> SUMAXP_5 </ci>
+                      </apply>
+                      <apply>
+                        <power/>
+                        <ci> SUMAXP_5 </ci>
+                        <cn type="integer"> 2 </cn>
+                      </apply>
+                    </apply>
+                    <cn> 0.5 </cn>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <cn type="integer"> 2 </cn>
+                  <apply>
+                    <times/>
+                    <cn type="integer"> 8 </cn>
+                    <ci> KeqAK_5 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <ci> KmPFKATP_5 </ci>
+            </apply>
+            <apply>
+              <times/>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <ci> gR_5 </ci>
+                  <ci> F6P </ci>
+                </apply>
+                <ci> KmPFKF6P_5 </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <apply>
+                        <minus/>
+                        <ci> P </ci>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 4 </cn>
+                          <ci> KeqAK_5 </ci>
+                          <ci> P </ci>
+                        </apply>
+                      </apply>
+                      <ci> SUMAXP_5 </ci>
+                    </apply>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <apply>
+                              <power/>
+                              <ci> P </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_5 </ci>
+                              <apply>
+                                <power/>
+                                <ci> P </ci>
+                                <cn type="integer"> 2 </cn>
+                              </apply>
+                            </apply>
+                          </apply>
+                          <apply>
+                            <times/>
+                            <cn type="integer"> 2 </cn>
+                            <ci> P </ci>
+                            <ci> SUMAXP_5 </ci>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_5 </ci>
+                          <ci> P </ci>
+                          <ci> SUMAXP_5 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <ci> SUMAXP_5 </ci>
+                          <cn type="integer"> 2 </cn>
+                        </apply>
+                      </apply>
+                      <cn> 0.5 </cn>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <minus/>
+                    <cn type="integer"> 2 </cn>
+                    <apply>
+                      <times/>
+                      <cn type="integer"> 8 </cn>
+                      <ci> KeqAK_5 </ci>
+                    </apply>
+                  </apply>
+                </apply>
+                <ci> KmPFKATP_5 </ci>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </assignmentRule>
+      <assignmentRule metaid="metaid_0000069" variable="T_PFK">
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <plus/>
+            <cn type="integer"> 1 </cn>
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <ci> CPFKATP_5 </ci>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <minus/>
+                      <apply>
+                        <minus/>
+                        <ci> P </ci>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 4 </cn>
+                          <ci> KeqAK_5 </ci>
+                          <ci> P </ci>
+                        </apply>
+                      </apply>
+                      <ci> SUMAXP_5 </ci>
+                    </apply>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <apply>
+                              <power/>
+                              <ci> P </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_5 </ci>
+                              <apply>
+                                <power/>
+                                <ci> P </ci>
+                                <cn type="integer"> 2 </cn>
+                              </apply>
+                            </apply>
+                          </apply>
+                          <apply>
+                            <times/>
+                            <cn type="integer"> 2 </cn>
+                            <ci> P </ci>
+                            <ci> SUMAXP_5 </ci>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_5 </ci>
+                          <ci> P </ci>
+                          <ci> SUMAXP_5 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <ci> SUMAXP_5 </ci>
+                          <cn type="integer"> 2 </cn>
+                        </apply>
+                      </apply>
+                      <cn> 0.5 </cn>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <minus/>
+                    <cn type="integer"> 2 </cn>
+                    <apply>
+                      <times/>
+                      <cn type="integer"> 8 </cn>
+                      <ci> KeqAK_5 </ci>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+              <ci> KmPFKATP_5 </ci>
+            </apply>
+          </apply>
+        </math>
+      </assignmentRule>
+    </listOfRules>
+    <listOfReactions>
+      <reaction metaid="metaid_0000025" id="vGLK" name="Hexokinase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000025">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#2.7.1.2"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R00299"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243618"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="GLCi"/>
+          <speciesReference species="P"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="G6P"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmGLK_1 </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KmGLKGLCi_1 </ci>
+                    <ci> KmGLKATP_1 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <times/>
+                    <ci> GLCi </ci>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <ci> P </ci>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_1 </ci>
+                              <ci> P </ci>
+                            </apply>
+                          </apply>
+                          <ci> SUMAXP_1 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_1 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_1 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_1 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_1 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_1 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 2 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_1 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <times/>
+                        <ci> G6P </ci>
+                        <apply>
+                          <minus/>
+                          <ci> SUMAXP_1 </ci>
+                          <apply>
+                            <power/>
+                            <apply>
+                              <plus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <minus/>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                  <apply>
+                                    <times/>
+                                    <cn type="integer"> 4 </cn>
+                                    <ci> KeqAK_1 </ci>
+                                    <apply>
+                                      <power/>
+                                      <ci> P </ci>
+                                      <cn type="integer"> 2 </cn>
+                                    </apply>
+                                  </apply>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 2 </cn>
+                                  <ci> P </ci>
+                                  <ci> SUMAXP_1 </ci>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 8 </cn>
+                                <ci> KeqAK_1 </ci>
+                                <ci> P </ci>
+                                <ci> SUMAXP_1 </ci>
+                              </apply>
+                              <apply>
+                                <power/>
+                                <ci> SUMAXP_1 </ci>
+                                <cn type="integer"> 2 </cn>
+                              </apply>
+                            </apply>
+                            <cn> 0.5 </cn>
+                          </apply>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 1 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 4 </cn>
+                          <ci> KeqAK_1 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KeqGLK_1 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> GLCi </ci>
+                    <ci> KmGLKGLCi_1 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> G6P </ci>
+                    <ci> KmGLKG6P_1 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <ci> P </ci>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_1 </ci>
+                              <ci> P </ci>
+                            </apply>
+                          </apply>
+                          <ci> SUMAXP_1 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_1 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_1 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_1 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_1 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_1 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 2 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_1 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KmGLKATP_1 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <minus/>
+                        <ci> SUMAXP_1 </ci>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_1 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_1 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_1 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_1 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_1 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 1 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 4 </cn>
+                          <ci> KeqAK_1 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KmGLKADP_1 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmGLK_1" value="226.8" units="mM_per_minute"/>
+            <parameter id="KmGLKGLCi_1" value="0.08" units="mM"/>
+            <parameter id="KmGLKATP_1" value="0.15" units="mM"/>
+            <parameter id="KeqAK_1" value="0.45"/>
+            <parameter id="SUMAXP_1" value="4.1" units="mM"/>
+            <parameter id="KeqGLK_1" value="3800" units="dimensionless"/>
+            <parameter id="KmGLKG6P_1" value="30" units="mM"/>
+            <parameter id="KmGLKADP_1" value="0.23" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000026" id="vPGI" name="Glucose-6-phosphate isomerase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000026">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#5.3.1.9"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R00771"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243603"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="G6P"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="F6P"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmPGI_2 </ci>
+                  </apply>
+                  <ci> KmPGIG6P_2 </ci>
+                </apply>
+                <apply>
+                  <minus/>
+                  <ci> G6P </ci>
+                  <apply>
+                    <divide/>
+                    <ci> F6P </ci>
+                    <ci> KeqPGI_2 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> G6P </ci>
+                  <ci> KmPGIG6P_2 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> F6P </ci>
+                  <ci> KmPGIF6P_2 </ci>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmPGI_2" value="340.2" units="mM_per_minute"/>
+            <parameter id="KmPGIG6P_2" value="1.4" units="mM"/>
+            <parameter id="KeqPGI_2" value="0.314" units="dimensionless"/>
+            <parameter id="KmPGIF6P_2" value="0.3" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000027" id="vGLYCO" name="Glycogen synthesis">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000027">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0005978"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="G6P"/>
+          <speciesReference species="P"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="Glyc"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> cytosol </ci>
+              <ci> KGLYCOGEN_3 </ci>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="KGLYCOGEN_3" value="6" units="mM_per_minute"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000028" id="vTreha" name="Trehalose 6-phosphate synthase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000028">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0005992"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="G6P" stoichiometry="2"/>
+          <speciesReference species="P"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="Trh"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> cytosol </ci>
+              <ci> KTREHALOSE_4 </ci>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="KTREHALOSE_4" value="2.4" units="mM_per_minute"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000029" id="vPFK" name="Phosphofructokinase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000029">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#2.7.1.11"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R00756"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243619"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="F6P"/>
+          <speciesReference species="P"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="F16P"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <ci> cytosol </ci>
+                <ci> VmPFK_5 </ci>
+                <ci> gR_5 </ci>
+                <ci> Lambda1 </ci>
+                <ci> Lambda2 </ci>
+                <ci> R_PFK </ci>
+              </apply>
+              <apply>
+                <plus/>
+                <apply>
+                  <power/>
+                  <ci> R_PFK </ci>
+                  <cn type="integer"> 2 </cn>
+                </apply>
+                <apply>
+                  <times/>
+                  <ci> L_PFK </ci>
+                  <apply>
+                    <power/>
+                    <ci> T_PFK </ci>
+                    <cn type="integer"> 2 </cn>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmPFK_5" value="183.6" units="mM_per_minute"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000030" id="vALD" name="Aldolase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000030">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#4.1.2.13"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R01070"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="F16P"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="TRIO" stoichiometry="2"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmALD_6 </ci>
+                  </apply>
+                  <ci> KmALDF16P_6 </ci>
+                </apply>
+                <apply>
+                  <minus/>
+                  <ci> F16P </ci>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <apply>
+                        <divide/>
+                        <ci> KeqTPI_6 </ci>
+                        <apply>
+                          <plus/>
+                          <cn type="integer"> 1 </cn>
+                          <ci> KeqTPI_6 </ci>
+                        </apply>
+                      </apply>
+                      <ci> TRIO </ci>
+                      <apply>
+                        <divide/>
+                        <cn type="integer"> 1 </cn>
+                        <apply>
+                          <plus/>
+                          <cn type="integer"> 1 </cn>
+                          <ci> KeqTPI_6 </ci>
+                        </apply>
+                      </apply>
+                      <ci> TRIO </ci>
+                    </apply>
+                    <ci> KeqALD_6 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> F16P </ci>
+                  <ci> KmALDF16P_6 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <divide/>
+                      <ci> KeqTPI_6 </ci>
+                      <apply>
+                        <plus/>
+                        <cn type="integer"> 1 </cn>
+                        <ci> KeqTPI_6 </ci>
+                      </apply>
+                    </apply>
+                    <ci> TRIO </ci>
+                  </apply>
+                  <ci> KmALDGAP_6 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <divide/>
+                      <cn type="integer"> 1 </cn>
+                      <apply>
+                        <plus/>
+                        <cn type="integer"> 1 </cn>
+                        <ci> KeqTPI_6 </ci>
+                      </apply>
+                    </apply>
+                    <ci> TRIO </ci>
+                  </apply>
+                  <ci> KmALDDHAP_6 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <divide/>
+                      <ci> KeqTPI_6 </ci>
+                      <apply>
+                        <plus/>
+                        <cn type="integer"> 1 </cn>
+                        <ci> KeqTPI_6 </ci>
+                      </apply>
+                    </apply>
+                    <ci> TRIO </ci>
+                    <apply>
+                      <divide/>
+                      <cn type="integer"> 1 </cn>
+                      <apply>
+                        <plus/>
+                        <cn type="integer"> 1 </cn>
+                        <ci> KeqTPI_6 </ci>
+                      </apply>
+                    </apply>
+                    <ci> TRIO </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KmALDGAP_6 </ci>
+                    <ci> KmALDDHAP_6 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> F16P </ci>
+                    <apply>
+                      <divide/>
+                      <ci> KeqTPI_6 </ci>
+                      <apply>
+                        <plus/>
+                        <cn type="integer"> 1 </cn>
+                        <ci> KeqTPI_6 </ci>
+                      </apply>
+                    </apply>
+                    <ci> TRIO </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KmALDGAPi_6 </ci>
+                    <ci> KmALDF16P_6 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmALD_6" value="321.3" units="mM_per_minute"/>
+            <parameter id="KmALDF16P_6" value="0.3" units="mM"/>
+            <parameter id="KeqTPI_6" value="0.045" units="dimensionless"/>
+            <parameter id="KeqALD_6" value="0.069" units="dimensionless"/>
+            <parameter id="KmALDGAP_6" value="2" units="mM"/>
+            <parameter id="KmALDDHAP_6" value="2.4" units="mM"/>
+            <parameter id="KmALDGAPi_6" value="10" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000031" id="vGAPDH" name="Glyceraldehyde 3-phosphate dehydrogenase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000031">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#1.2.1.12"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R01061"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243646"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="TRIO"/>
+          <speciesReference species="NAD"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="BPG"/>
+          <speciesReference species="NADH"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <ci> cytosol </ci>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> VmGAPDHf_7 </ci>
+                      <apply>
+                        <divide/>
+                        <ci> KeqTPI_7 </ci>
+                        <apply>
+                          <plus/>
+                          <cn type="integer"> 1 </cn>
+                          <ci> KeqTPI_7 </ci>
+                        </apply>
+                      </apply>
+                      <ci> TRIO </ci>
+                      <ci> NAD </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KmGAPDHGAP_7 </ci>
+                      <ci> KmGAPDHNAD_7 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> VmGAPDHr_7 </ci>
+                      <ci> BPG </ci>
+                      <ci> NADH </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KmGAPDHBPG_7 </ci>
+                      <ci> KmGAPDHNADH_7 </ci>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <apply>
+                        <divide/>
+                        <ci> KeqTPI_7 </ci>
+                        <apply>
+                          <plus/>
+                          <cn type="integer"> 1 </cn>
+                          <ci> KeqTPI_7 </ci>
+                        </apply>
+                      </apply>
+                      <ci> TRIO </ci>
+                    </apply>
+                    <ci> KmGAPDHGAP_7 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> BPG </ci>
+                    <ci> KmGAPDHBPG_7 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> NAD </ci>
+                    <ci> KmGAPDHNAD_7 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> NADH </ci>
+                    <ci> KmGAPDHNADH_7 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmGAPDHf_7" value="1188" units="mM_per_minute"/>
+            <parameter id="KeqTPI_7" value="0.045" units="dimensionless"/>
+            <parameter id="KmGAPDHGAP_7" value="0.21" units="mM"/>
+            <parameter id="KmGAPDHNAD_7" value="0.09" units="mM"/>
+            <parameter id="VmGAPDHr_7" value="6561" units="mM_per_minute"/>
+            <parameter id="KmGAPDHBPG_7" value="0.0098" units="mM"/>
+            <parameter id="KmGAPDHNADH_7" value="0.06" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000032" id="vPGK" name="Phosphoglycerate kinase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000032">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#2.7.2.3"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R01512"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243598"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="BPG"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="P3G"/>
+          <speciesReference species="P"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmPGK_8 </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KmPGKP3G_8 </ci>
+                    <ci> KmPGKATP_8 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> KeqPGK_8 </ci>
+                      <ci> BPG </ci>
+                      <apply>
+                        <minus/>
+                        <ci> SUMAXP_8 </ci>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_8 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_8 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_8 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_8 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_8 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <apply>
+                      <minus/>
+                      <cn type="integer"> 1 </cn>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 4 </cn>
+                        <ci> KeqAK_8 </ci>
+                      </apply>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> P3G </ci>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <ci> P </ci>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_8 </ci>
+                              <ci> P </ci>
+                            </apply>
+                          </apply>
+                          <ci> SUMAXP_8 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_8 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_8 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_8 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_8 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_8 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 2 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_8 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> BPG </ci>
+                    <ci> KmPGKBPG_8 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> P3G </ci>
+                    <ci> KmPGKP3G_8 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <ci> P </ci>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_8 </ci>
+                              <ci> P </ci>
+                            </apply>
+                          </apply>
+                          <ci> SUMAXP_8 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_8 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_8 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_8 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_8 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_8 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 2 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_8 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KmPGKATP_8 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <minus/>
+                        <ci> SUMAXP_8 </ci>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_8 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_8 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_8 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_8 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_8 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 1 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 4 </cn>
+                          <ci> KeqAK_8 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KmPGKADP_8 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmPGK_8" value="1296" units="mM_per_minute"/>
+            <parameter id="KmPGKP3G_8" value="0.53" units="mM"/>
+            <parameter id="KmPGKATP_8" value="0.3" units="mM"/>
+            <parameter id="KeqPGK_8" value="3200" units="dimensionless"/>
+            <parameter id="SUMAXP_8" value="4.1" units="mM"/>
+            <parameter id="KeqAK_8" value="0.45" units="mM"/>
+            <parameter id="KmPGKBPG_8" value="0.003" units="mM"/>
+            <parameter id="KmPGKADP_8" value="0.2" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000033" id="vPGM" name="Phosphoglycerate mutase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000033">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#5.4.2.1"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R01518"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="P3G"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="P2G"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmPGM_9 </ci>
+                  </apply>
+                  <ci> KmPGMP3G_9 </ci>
+                </apply>
+                <apply>
+                  <minus/>
+                  <ci> P3G </ci>
+                  <apply>
+                    <divide/>
+                    <ci> P2G </ci>
+                    <ci> KeqPGM_9 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> P3G </ci>
+                  <ci> KmPGMP3G_9 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> P2G </ci>
+                  <ci> KmPGMP2G_9 </ci>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmPGM_9" value="2538" units="mM_per_minute"/>
+            <parameter id="KmPGMP3G_9" value="1.2" units="mM"/>
+            <parameter id="KeqPGM_9" value="0.19" units="dimensionless"/>
+            <parameter id="KmPGMP2G_9" value="0.1" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000034" id="vENO" name="Enolase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000034">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#4.2.1.11"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R00658"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="P2G"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="PEP"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmENO_10 </ci>
+                  </apply>
+                  <ci> KmENOP2G_10 </ci>
+                </apply>
+                <apply>
+                  <minus/>
+                  <ci> P2G </ci>
+                  <apply>
+                    <divide/>
+                    <ci> PEP </ci>
+                    <ci> KeqENO_10 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> P2G </ci>
+                  <ci> KmENOP2G_10 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> PEP </ci>
+                  <ci> KmENOPEP_10 </ci>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmENO_10" value="364.5" units="mM_per_minute"/>
+            <parameter id="KmENOP2G_10" value="0.04" units="mM"/>
+            <parameter id="KeqENO_10" value="6.7" units="dimensionless"/>
+            <parameter id="KmENOPEP_10" value="0.5" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000035" id="vPYK" name="Pyruvate kinase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000035">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#2.7.1.40"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R00200"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243599"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="PEP"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="PYR"/>
+          <speciesReference species="P"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmPYK_11 </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KmPYKPEP_11 </ci>
+                    <ci> KmPYKADP_11 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> PEP </ci>
+                      <apply>
+                        <minus/>
+                        <ci> SUMAXP_11 </ci>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_11 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_11 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_11 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_11 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_11 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <apply>
+                      <minus/>
+                      <cn type="integer"> 1 </cn>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 4 </cn>
+                        <ci> KeqAK_11 </ci>
+                      </apply>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> PYR </ci>
+                      <apply>
+                        <divide/>
+                        <apply>
+                          <plus/>
+                          <apply>
+                            <minus/>
+                            <apply>
+                              <minus/>
+                              <ci> P </ci>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 4 </cn>
+                                <ci> KeqAK_11 </ci>
+                                <ci> P </ci>
+                              </apply>
+                            </apply>
+                            <ci> SUMAXP_11 </ci>
+                          </apply>
+                          <apply>
+                            <power/>
+                            <apply>
+                              <plus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <minus/>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                  <apply>
+                                    <times/>
+                                    <cn type="integer"> 4 </cn>
+                                    <ci> KeqAK_11 </ci>
+                                    <apply>
+                                      <power/>
+                                      <ci> P </ci>
+                                      <cn type="integer"> 2 </cn>
+                                    </apply>
+                                  </apply>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 2 </cn>
+                                  <ci> P </ci>
+                                  <ci> SUMAXP_11 </ci>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 8 </cn>
+                                <ci> KeqAK_11 </ci>
+                                <ci> P </ci>
+                                <ci> SUMAXP_11 </ci>
+                              </apply>
+                              <apply>
+                                <power/>
+                                <ci> SUMAXP_11 </ci>
+                                <cn type="integer"> 2 </cn>
+                              </apply>
+                            </apply>
+                            <cn> 0.5 </cn>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <minus/>
+                          <cn type="integer"> 2 </cn>
+                          <apply>
+                            <times/>
+                            <cn type="integer"> 8 </cn>
+                            <ci> KeqAK_11 </ci>
+                          </apply>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KeqPYK_11 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> PEP </ci>
+                    <ci> KmPYKPEP_11 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> PYR </ci>
+                    <ci> KmPYKPYR_11 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <plus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <minus/>
+                            <ci> P </ci>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 4 </cn>
+                              <ci> KeqAK_11 </ci>
+                              <ci> P </ci>
+                            </apply>
+                          </apply>
+                          <ci> SUMAXP_11 </ci>
+                        </apply>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_11 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_11 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_11 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_11 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_11 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 2 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 8 </cn>
+                          <ci> KeqAK_11 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KmPYKATP_11 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <minus/>
+                        <ci> SUMAXP_11 </ci>
+                        <apply>
+                          <power/>
+                          <apply>
+                            <plus/>
+                            <apply>
+                              <minus/>
+                              <apply>
+                                <minus/>
+                                <apply>
+                                  <power/>
+                                  <ci> P </ci>
+                                  <cn type="integer"> 2 </cn>
+                                </apply>
+                                <apply>
+                                  <times/>
+                                  <cn type="integer"> 4 </cn>
+                                  <ci> KeqAK_11 </ci>
+                                  <apply>
+                                    <power/>
+                                    <ci> P </ci>
+                                    <cn type="integer"> 2 </cn>
+                                  </apply>
+                                </apply>
+                              </apply>
+                              <apply>
+                                <times/>
+                                <cn type="integer"> 2 </cn>
+                                <ci> P </ci>
+                                <ci> SUMAXP_11 </ci>
+                              </apply>
+                            </apply>
+                            <apply>
+                              <times/>
+                              <cn type="integer"> 8 </cn>
+                              <ci> KeqAK_11 </ci>
+                              <ci> P </ci>
+                              <ci> SUMAXP_11 </ci>
+                            </apply>
+                            <apply>
+                              <power/>
+                              <ci> SUMAXP_11 </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                          <cn> 0.5 </cn>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <minus/>
+                        <cn type="integer"> 1 </cn>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 4 </cn>
+                          <ci> KeqAK_11 </ci>
+                        </apply>
+                      </apply>
+                    </apply>
+                    <ci> KmPYKADP_11 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmPYK_11" value="1093.5" units="mM_per_minute"/>
+            <parameter id="KmPYKPEP_11" value="0.14" units="mM"/>
+            <parameter id="KmPYKADP_11" value="0.53" units="mM"/>
+            <parameter id="SUMAXP_11" value="4.1" units="mM"/>
+            <parameter id="KeqAK_11" value="0.45" units="dimensionless"/>
+            <parameter id="KeqPYK_11" value="6500" units="dimensionless"/>
+            <parameter id="KmPYKPYR_11" value="21" units="mM"/>
+            <parameter id="KmPYKATP_11" value="1.5" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000036" id="vPDC" name="Pyruvate decarboxylase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000036">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#4.1.1.1"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R00224"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="PYR"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="ACE"/>
+          <speciesReference species="CO2"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <ci> cytosol </ci>
+                <ci> VmPDC_12 </ci>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <power/>
+                    <ci> PYR </ci>
+                    <ci> nPDC_12 </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <ci> KmPDCPYR_12 </ci>
+                    <ci> nPDC_12 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <power/>
+                    <ci> PYR </ci>
+                    <ci> nPDC_12 </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <ci> KmPDCPYR_12 </ci>
+                    <ci> nPDC_12 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmPDC_12" value="175.5" units="mM_per_minute"/>
+            <parameter id="nPDC_12" value="1.9" units="dimensionless"/>
+            <parameter id="KmPDCPYR_12" value="4.33" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000037" id="vSUC" name="Succinate synthesis">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000037">
+<bqbiol:isVersionOf>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0006105"/>
+</rdf:Bag>
+</bqbiol:isVersionOf>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="ACE" stoichiometry="2"/>
+          <speciesReference species="NAD" stoichiometry="3"/>
+          <speciesReference species="P" stoichiometry="4"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="NADH" stoichiometry="3"/>
+          <speciesReference species="SUCC"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> cytosol </ci>
+              <ci> KSUCC_13 </ci>
+              <ci> ACE </ci>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="KSUCC_13" value="21.4" units="per_minute"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000038" id="vGLT" name="Glucose transport">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000038">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0046323"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="GLCo"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="GLCi"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <ci> VmGLT_14 </ci>
+                  <ci> KmGLTGLCo_14 </ci>
+                </apply>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <times/>
+                    <ci> extracellular </ci>
+                    <ci> GLCo </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> cytosol </ci>
+                      <ci> GLCi </ci>
+                    </apply>
+                    <ci> KeqGLT_14 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> GLCo </ci>
+                  <ci> KmGLTGLCo_14 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> GLCi </ci>
+                  <ci> KmGLTGLCi_14 </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <cn> 0.91 </cn>
+                    <ci> GLCo </ci>
+                    <ci> GLCi </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KmGLTGLCo_14 </ci>
+                    <ci> KmGLTGLCi_14 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmGLT_14" value="97.2" units="mM_per_minute"/>
+            <parameter id="KmGLTGLCo_14" value="1.1918" units="mM"/>
+            <parameter id="KeqGLT_14" value="1" units="dimensionless"/>
+            <parameter id="KmGLTGLCi_14" value="1.1918" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000039" id="vADH" name="Alcohol dehydrogenase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000039">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#1.1.1.2"/>
+<rdf:li rdf:resource="http://www.genome.jp/kegg/reaction/#R00746"/>
+<rdf:li rdf:resource="http://www.reactome.org/#243665"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="ACE"/>
+          <speciesReference species="NADH"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="NAD"/>
+          <speciesReference species="ETOH"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <apply>
+                <minus/>
+                <ci> cytosol </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <apply>
+                    <divide/>
+                    <ci> VmADH_15 </ci>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNAD_15 </ci>
+                      <ci> KmADHETOH_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <minus/>
+                    <apply>
+                      <times/>
+                      <ci> NAD </ci>
+                      <ci> ETOH </ci>
+                    </apply>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <times/>
+                        <ci> NADH </ci>
+                        <ci> ACE </ci>
+                      </apply>
+                      <ci> KeqADH_15 </ci>
+                    </apply>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> NAD </ci>
+                    <ci> KiADHNAD_15 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> KmADHNAD_15 </ci>
+                      <ci> ETOH </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNAD_15 </ci>
+                      <ci> KmADHETOH_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> KmADHNADH_15 </ci>
+                      <ci> ACE </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNADH_15 </ci>
+                      <ci> KmADHACE_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> NADH </ci>
+                    <ci> KiADHNADH_15 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> NAD </ci>
+                      <ci> ETOH </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNAD_15 </ci>
+                      <ci> KmADHETOH_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> KmADHNADH_15 </ci>
+                      <ci> NAD </ci>
+                      <ci> ACE </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNAD_15 </ci>
+                      <ci> KiADHNADH_15 </ci>
+                      <ci> KmADHACE_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> KmADHNAD_15 </ci>
+                      <ci> ETOH </ci>
+                      <ci> NADH </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNAD_15 </ci>
+                      <ci> KmADHETOH_15 </ci>
+                      <ci> KiADHNADH_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> NADH </ci>
+                      <ci> ACE </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNADH_15 </ci>
+                      <ci> KmADHACE_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> NAD </ci>
+                      <ci> ETOH </ci>
+                      <ci> ACE </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHNAD_15 </ci>
+                      <ci> KmADHETOH_15 </ci>
+                      <ci> KiADHACE_15 </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> ETOH </ci>
+                      <ci> NADH </ci>
+                      <ci> ACE </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KiADHETOH_15 </ci>
+                      <ci> KiADHNADH_15 </ci>
+                      <ci> KmADHACE_15 </ci>
+                    </apply>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmADH_15" value="810" units="mM_per_minute"/>
+            <parameter id="KiADHNAD_15" value="0.92" units="mM"/>
+            <parameter id="KmADHETOH_15" value="17" units="mM"/>
+            <parameter id="KeqADH_15" value="6.9e-05" units="dimensionless"/>
+            <parameter id="KmADHNAD_15" value="0.17" units="mM"/>
+            <parameter id="KmADHNADH_15" value="0.11" units="mM"/>
+            <parameter id="KiADHNADH_15" value="0.031" units="mM"/>
+            <parameter id="KmADHACE_15" value="1.11" units="mM"/>
+            <parameter id="KiADHACE_15" value="1.1" units="mM"/>
+            <parameter id="KiADHETOH_15" value="90" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000040" id="vG3PDH" name="Glycerol 3-phosphate dehydrogenase">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000040">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#1.1.1.8"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="TRIO"/>
+          <speciesReference species="NADH"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="NAD"/>
+          <speciesReference species="GLY"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <divide/>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> cytosol </ci>
+                    <ci> VmG3PDH_16 </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KmG3PDHDHAP_16 </ci>
+                    <ci> KmG3PDHNADH_16 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <divide/>
+                      <cn type="integer"> 1 </cn>
+                      <apply>
+                        <plus/>
+                        <cn type="integer"> 1 </cn>
+                        <ci> KeqTPI_16 </ci>
+                      </apply>
+                    </apply>
+                    <ci> TRIO </ci>
+                    <ci> NADH </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> GLY </ci>
+                      <ci> NAD </ci>
+                    </apply>
+                    <ci> KeqG3PDH_16 </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <apply>
+                        <divide/>
+                        <cn type="integer"> 1 </cn>
+                        <apply>
+                          <plus/>
+                          <cn type="integer"> 1 </cn>
+                          <ci> KeqTPI_16 </ci>
+                        </apply>
+                      </apply>
+                      <ci> TRIO </ci>
+                    </apply>
+                    <ci> KmG3PDHDHAP_16 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> GLY </ci>
+                    <ci> KmG3PDHGLY_16 </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> NADH </ci>
+                    <ci> KmG3PDHNADH_16 </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> NAD </ci>
+                    <ci> KmG3PDHNAD_16 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="VmG3PDH_16" value="70.2" units="mM_per_minute"/>
+            <parameter id="KmG3PDHDHAP_16" value="0.4" units="mM"/>
+            <parameter id="KmG3PDHNADH_16" value="0.023" units="mM"/>
+            <parameter id="KeqTPI_16" value="0.045" units="dimensionless"/>
+            <parameter id="KeqG3PDH_16" value="4300" units="dimensionless"/>
+            <parameter id="KmG3PDHGLY_16" value="1" units="mM"/>
+            <parameter id="KmG3PDHNAD_16" value="0.93" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction metaid="metaid_0000041" id="vATP" name="ATPase activity">
+        <annotation>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/" >
+<rdf:Description rdf:about="#metaid_0000041">
+<bqbiol:is>
+<rdf:Bag>
+<rdf:li rdf:resource="http://www.ec-code.org/#3.6.1.3"/>
+<rdf:li rdf:resource="http://www.geneontology.org/#GO:0016887"/>
+</rdf:Bag>
+</bqbiol:is>
+</rdf:Description>
+</rdf:RDF>
+</annotation>
+
+        <listOfReactants>
+          <speciesReference species="P"/>
+        </listOfReactants>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> cytosol </ci>
+              <ci> KATPASE_17 </ci>
+              <apply>
+                <divide/>
+                <apply>
+                  <plus/>
+                  <apply>
+                    <minus/>
+                    <apply>
+                      <minus/>
+                      <ci> P </ci>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 4 </cn>
+                        <ci> KeqAK_17 </ci>
+                        <ci> P </ci>
+                      </apply>
+                    </apply>
+                    <ci> SUMAXP_17 </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <plus/>
+                      <apply>
+                        <minus/>
+                        <apply>
+                          <minus/>
+                          <apply>
+                            <power/>
+                            <ci> P </ci>
+                            <cn type="integer"> 2 </cn>
+                          </apply>
+                          <apply>
+                            <times/>
+                            <cn type="integer"> 4 </cn>
+                            <ci> KeqAK_17 </ci>
+                            <apply>
+                              <power/>
+                              <ci> P </ci>
+                              <cn type="integer"> 2 </cn>
+                            </apply>
+                          </apply>
+                        </apply>
+                        <apply>
+                          <times/>
+                          <cn type="integer"> 2 </cn>
+                          <ci> P </ci>
+                          <ci> SUMAXP_17 </ci>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <times/>
+                        <cn type="integer"> 8 </cn>
+                        <ci> KeqAK_17 </ci>
+                        <ci> P </ci>
+                        <ci> SUMAXP_17 </ci>
+                      </apply>
+                      <apply>
+                        <power/>
+                        <ci> SUMAXP_17 </ci>
+                        <cn type="integer"> 2 </cn>
+                      </apply>
+                    </apply>
+                    <cn> 0.5 </cn>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <cn type="integer"> 2 </cn>
+                  <apply>
+                    <times/>
+                    <cn type="integer"> 8 </cn>
+                    <ci> KeqAK_17 </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </math>
+          <listOfParameters>
+            <parameter id="KATPASE_17" value="33.7" units="per_minute"/>
+            <parameter id="KeqAK_17" value="0.45" units="dimensionless"/>
+            <parameter id="SUMAXP_17" value="4.1" units="mM"/>
+          </listOfParameters>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>

@@ -23,6 +23,12 @@ class ModelTest < ActiveSupport::TestCase
     assert resp.include?("applet")
   end
   
+  test "jws execution applet biomodel model" do
+    model=models(:francos_model)
+    resp=jws_execution_applet model
+    assert resp.include?("applet")
+  end
+  
 
   test "project" do
     model=models(:teusink)
