@@ -10,17 +10,16 @@ resource_type=resource.class.name.humanize
     <%= link_to_function request_request_label(resource),"Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');" -%>
   </div>  
 
-  <div id="request_resource_form" style="display:none;">
-
+  <div id="request_resource_form" style="display:none;">	
     <p>
-        Please provide some extra information
+    	An email will be sent to <%= join_with_and(resource.managers.collect{|m| m.name}) -%> to let them know of your interest.<br/>
+        Please provide some extra information you feel may be useful to your request.
     </p>
     <% form_remote_tag :url=>polymorphic_url(resource, :action => :request_resource),
                        :before=>"Effect.Appear('requesting_resource_status');$('request_resource_form').hide();" do -%>
         <%=  text_area_tag :details,'',:cols=>50,:rows=>5 -%>        
-        <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{resource.managers.collect{|p| p.name}.join(", ")}. Are you sure?" -%>
-    <% end -%>
-
+        <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{join_with_and(resource.managers.collect{|m| m.name})}. Are you sure?" -%>
+    <% end -%>	
   </div>
 
   <div id="requesting_resource_status" style="display:none;">About to request access to the <%= resource_type -%> <%= resource.title %> from <%= h(resource.managers.collect{|p| p.name}.join(", ")) %> ...</div>

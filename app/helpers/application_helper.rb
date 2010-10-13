@@ -9,6 +9,23 @@ module ApplicationHelper
     #FIXME: very bad method name
     [Model,DataFile,Sop,Study,Assay,Investigation,Publication]
 
+end
+
+  #joins the list with seperator and the last item with an 'and'
+  def join_with_and list, seperator=", "
+    return list.first if list.count==1
+    result = ""
+    list.each do |item|
+      result << item
+      unless item==list.last
+        if item==list[-2]
+          result << " and "
+        else
+          result << seperator
+        end
+      end
+    end
+    return result
   end
 
   def tag_cloud(tags, classes)
