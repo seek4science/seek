@@ -5,8 +5,8 @@
   <div class="foldContent">
     <ul class="groups">
       <% for group_membership in @person.group_memberships -%>
-        <li>
-          <label>Roles within <b><%= h group_membership.work_group.description -%></b></label>
+        <li class="group">
+          <p>Roles within <b><%= h(group_membership.work_group.description) -%></b></p>
           <% if editable -%>
             <%=  link_to_function "[edit]","startRolesEdit(#{group_membership.id});return(false);",:id=>"edit_link_#{group_membership.id}" %>
           <% end -%>
@@ -14,8 +14,6 @@
             <div id="roles_<%= group_membership.id -%>">
               <% unless group_membership.roles.empty? -%>
                 <% for role in group_membership.roles -%>
-
-
                   <% if editable -%>
                     <script type="text/javascript">
                       addRole(<%= group_membership.id %>,'<%= role.name %>',<%= role.id %>);
