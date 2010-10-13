@@ -3,16 +3,21 @@
 
 class ApplicationController < ActionController::Base
   
+  include ExceptionNotifiable if EXCEPTION_NOTIFICATION_ENABLED
+  self.error_layout="errors"
+  
+  self.rails_error_classes = { 
+    ActiveRecord::RecordNotFound => "404",
+    ::ActionController::UnknownController => "406",
+    ::ActionController::UnknownAction => "406",
+    ::ActionController::RoutingError => "406",
+    ::ActionView::MissingTemplate => "406",
+    ::ActionView::TemplateError => "500"
+  }
   
   if ACTIVITY_LOG_ENABLED
     after_filter :log_event
-  end
-  
-  if ENV['RAILS_ENV'] == "production"
-    rescue_from ActiveRecord::RecordNotFound, ActionController::RoutingError, ActionController::UnknownController, ActionController::UnknownAction, :with => :render_404
-    rescue_from NameError, RuntimeError, :with => :render_500
-  end
-  
+  end  
   
   include AuthenticatedSystem  
   
