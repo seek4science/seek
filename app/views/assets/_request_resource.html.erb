@@ -6,7 +6,7 @@ resource_type=resource.class.name.humanize
 <% if EMAIL_ENABLED && !resource.managers.empty? -%>
 
   <div id="request_resource_button">
-    <%=  help_icon("You do not have permission to download this #{resource_type}, but if you are interested you can request permission from the owner.") %>
+    <%#	=  help_icon("You do not have permission to download this #{resource_type}, but if you are interested you can request permission from the owner.") %>
     <%= link_to_function request_request_label(resource),"Effect.Appear('request_resource_form');Effect.Fade('request_resource_button');" -%>
   </div>  
 
