@@ -54,8 +54,7 @@ class SessionsController < ApplicationController
 
   private
   
-  def check_login
-    session[:user_id] = @user.id
+  def check_login    
     if @user.person.nil?
       flash[:notice] = "You have successfully registered your account, but now must select a profile, or create your own."
       redirect_to(select_people_path)
@@ -70,6 +69,7 @@ class SessionsController < ApplicationController
   
   def successful_login
     self.current_user = @user
+    session[:user_id] = @user.id
     if params[:remember_me] == "1"
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
@@ -97,7 +97,7 @@ class SessionsController < ApplicationController
   def failed_login(message)
     logout_user
     flash[:error] = message
-    redirect_to(new_session_url)
+    redirect_to("/")
   end
 
   #will initiate creating an initial admin user if no users are present
