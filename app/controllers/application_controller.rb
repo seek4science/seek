@@ -5,7 +5,8 @@ class ApplicationController < ActionController::Base
   
   
   include ExceptionNotifiable 
-  self.error_layout="errors"  
+  self.error_layout="errors" 
+  self.silent_exceptions = []
   self.rails_error_classes = { 
     ActiveRecord::RecordNotFound => "404",
     ::ActionController::UnknownController => "406",

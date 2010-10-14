@@ -97,6 +97,7 @@ module ExceptionNotifiable
 
       file = file_path ? ExceptionNotifier.get_view_path(file_path) : ExceptionNotifier.get_view_path(status_cd)
       send_email = ExceptionNotifier.should_send_email?(status_cd, exception)
+      puts "SEND EMAIL=#{send_email}"
       if self.class.exception_notifier_verbose
         puts "[EXCEPTION] #{exception}"
         puts "[EXCEPTION CLASS] #{exception.class}"
@@ -108,7 +109,7 @@ module ExceptionNotifiable
         logger.error("render_error(#{status_cd}, #{self.class.http_error_codes[status_cd]}) invoked for request_uri=#{request.request_uri} and env=#{request.env.inspect}")
       end
       
-      #send the email before rendering to avert possible errors on render preventing the email from being sent.
+      #send the email before rendering to avert possible errors on render preventing the email from being sent.      
       send_exception_email(exception) if send_email
       
       respond_to do |type|
@@ -120,7 +121,7 @@ module ExceptionNotifiable
       end
     end
 
-    def send_exception_email(exception)
+    def send_exception_email(exception)      
       unless self.class.silent_exceptions.any? {|klass| klass === exception}
         deliverer = self.class.exception_data
         data = case deliverer
@@ -128,8 +129,7 @@ module ExceptionNotifiable
           when Symbol then send(deliverer)
           when Proc then deliverer.call(self)
         end
-        the_blamed = lay_blame(exception)
-
+        the_blamed = lay_blame(exception)        
         ExceptionNotifier.deliver_exception_notification(exception, self,
           request, data, the_blamed)
       end
