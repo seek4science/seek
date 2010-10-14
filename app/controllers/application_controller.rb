@@ -14,7 +14,7 @@ class ApplicationController < ActionController::Base
     ::ActionView::MissingTemplate => "406",
     ::ActionView::TemplateError => "500"
   }
-  
+  local_addresses.clear
   
   
   if ACTIVITY_LOG_ENABLED
@@ -162,22 +162,7 @@ class ApplicationController < ActionController::Base
   #The default for the number items in a page when paginating
   def default_items_per_page
     7
-  end
-  
-  #Custom error pages
-  def render_500    
-    respond_to do |format|
-      format.html {render :template=>"errors/500", :layout=>"errors"}
-      format.xml { render :template=>"api/errors",:locals=>{:status=>"505",:message=>"Internal server error"}}
-    end    
-  end
-  
-  def render_404        
-    respond_to do |format|
-      format.html {render :template=>"errors/404", :layout=>"errors"}
-      format.xml {render :template=>"api/errors",:locals=>{:status=>"404",:message=>"Resource not found"}}
-    end
-  end
+  end    
   
   def download_jerm_resource resource
     project=resource.project
