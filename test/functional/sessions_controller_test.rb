@@ -96,7 +96,7 @@ class SessionsControllerTest < ActionController::TestCase
   def test_non_validated_user_should_redirect_to_new_with_message
     post :create, :login => 'aaron', :password => 'test'
     assert !session[:user_id]
-    assert_redirected_to :action=>"new"
+    assert_redirected_to "/"
     assert_not_nil flash[:error]    
     assert flash[:error].include?("You still need to activate your account.")
   end
@@ -112,7 +112,7 @@ class SessionsControllerTest < ActionController::TestCase
   def test_invalid_user_should_not_login
     post :create, :login => 'fred', :password => 'blogs'
     assert !session[:user_id]
-    assert_redirected_to :action => "new"
+    assert_redirected_to "/"
   end
 
   protected

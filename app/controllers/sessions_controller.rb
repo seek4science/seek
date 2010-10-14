@@ -55,6 +55,7 @@ class SessionsController < ApplicationController
   private
   
   def check_login    
+    session[:user_id] = @user.id
     if @user.person.nil?
       flash[:notice] = "You have successfully registered your account, but now must select a profile, or create your own."
       redirect_to(select_people_path)
@@ -68,8 +69,7 @@ class SessionsController < ApplicationController
   end
   
   def successful_login
-    self.current_user = @user
-    session[:user_id] = @user.id
+    self.current_user = @user    
     if params[:remember_me] == "1"
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
