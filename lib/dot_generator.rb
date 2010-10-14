@@ -2,7 +2,14 @@ require 'libxml'
 
 module DotGenerator
   
-  FILL_COLOURS = {Sop=>"cadetblue3",Model=>"yellow3",DataFile=>"burlywood2",Investigation=>"#C7E9C0",Study=>"#91c98b",Assay=>"#64b466",Publication=>"#FFEEEE"}
+  FILL_COLOURS = {Sop=>"cadetblue3",
+                  Model=>"yellow3",
+                  DataFile=>"burlywood2",
+                  Investigation=>"#C7E9C0",
+                  Study=>"#91c98b",
+                  Assay=>"#64b466",
+                  Publication=>"cornflowerblue"
+                  }
   HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=2," #trailing comma is required
   
   def to_dot root_item, deep=false, current_item=nil
