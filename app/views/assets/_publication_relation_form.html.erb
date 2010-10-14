@@ -33,6 +33,7 @@
                 <br/>
                 <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Include publications from other projects?
             </div>
+			<br/>
             <%= link_to_function (image("new") + " Relate publication"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link", :style => "width: 10em" %>
         </div>
         <div id="publication_preview" class="yui-u preview_box" style="float:right">

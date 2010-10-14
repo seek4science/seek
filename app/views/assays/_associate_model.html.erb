@@ -38,7 +38,8 @@
           
           <%= check_box_tag :include_other_project_models, nil, false, {:onchange=>"toggle_model_list();",:style=>"margin-top:0.5em;"} -%> Include Models from other projects?
         </div>
-        <%= link_to_function (image("new") + " Include in assay"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link", :style => "width: 9em" %>
+		<br/>
+        <%= link_to_function (image("new") + " Include in the assay"), "addSelectedModel(); return(false);", :id=>"add_model_link", :class=>"block_link", :style => "width: 11em" %>
       </div>
     </div>
       <div id="model_preview" class="yui-u preview_box" style="float:right">

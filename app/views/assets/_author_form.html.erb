@@ -21,18 +21,18 @@
 
   <div id="creator_fold_content" class="foldContent" style="display: block;">
 
-    <p style="font-weight: bold; margin-top: 0.5em;">
+    <p>
       If this <%= resource_type %> was created by, or together with, other SysMO members, please list their names below
     </p>
 
-    <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
+    <div class="box_editing">
       <p style="color: #666666;">
         So far you have specified the following creators:
       </p>
-      <p id="creators_list" class="box_editing_inner" style="line-height: 1.5;">
+      <p id="creators_list" class="box_editing_inner">
         <span class="none_text" id="creators_text">Loading...</span>
       </p>      
-      <p style="margin-top: 1em;">
+      <p>
         Please type creators into the box below - suggestions will be displayed as you type.
         Select creators that you want to include and click "Add" to add them to the list.
       </p>
@@ -51,11 +51,10 @@
               <div class="typeahead_message">Type the name of a friend, friend list, or email address</div>
             </div>
           </td>
-
-          <td style="padding-left: 0.7em; vertical-align: middle;">
-            <span style="font-weight: bold;"><%= link_to "Add", "", :onclick => "javascript: addCreators(); return(false);" -%></span>
-          </td>
         </tr>
+		<tr>
+			<td><%= link_to_function (image("new") + " Add creator"), "addCreators(); return(false);", :id=>"add_creator", :class=>"block_link", :style => "width: 10em" %></td>
+		</tr>
       </table>
 
       <script type="text/javascript">
@@ -75,11 +74,13 @@
 
         autocompleters[creator_autocompleter_id] = creator_autocompleter;
       </script>
-      <%= render :partial => 'assets/advanced_creator_select' %>
+	  
+	  <%= render :partial => 'assets/advanced_creator_select' %></td>	  
+	  
     </div>
     <br/>
     <div>
-      <p style="font-weight: bold; margin-top: 0.5em;">
+      <p>
         If anyone not registered with SEEK assisted with the creation of this <%= resource_type %>, you can specify them below.</b>
       </p>
       <%= text_field_tag resource_type.underscore+"[other_creators]", other_creators, :size=>90 %>

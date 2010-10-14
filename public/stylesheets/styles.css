@@ -1279,13 +1279,15 @@ div.association_step {
 
 a.block_link {
   display: block;
-  border: 1px solid #CCC;
-  background-color: #EEE;
-  padding: 0.5em;-moz-binding;
-  margin-top: 0.5em;
+  border: 1px solid #aaa;
+  background-color: #eee;  
+  padding: 0.4em;-moz-binding;
+  margin-top: 0.3em;
+  text-align: left;
+  vertical-align: middle;
 }
 
-a.block_link img{
+a.block_link img {
   vertical-align: middle; 
 }
 

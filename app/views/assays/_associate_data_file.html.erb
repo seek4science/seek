@@ -42,7 +42,8 @@
         
         <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?        
       </div>
-      <%= link_to_function (image("new") + " Include in assay"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link", :style => "width: 9em" %>      
+	  <br/>
+      <%= link_to_function (image("new") + " Include in the assay"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link", :style => "width: 11em" %>      
     </div>
   
     <div id="data_file_preview" class="yui-u preview_box"  style="float:right">

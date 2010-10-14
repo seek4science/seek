@@ -41,7 +41,8 @@
           <%= text_field_tag :strain %>
           <br/>
         </div>
-        <%= link_to_function (image("new") + " Include in assay"), "addSelectedOrganism(); return(false);", :id=>"add_organism_link", :class=>"block_link", :style => "width: 9em" %>
+		<br/>
+        <%= link_to_function (image("new") + " Include in the #{@assay_text}"), "addSelectedOrganism(); return(false);", :id=>"add_organism_link", :class=>"block_link", :style => "width: 12em" %>
       </div>
     </div>
   </div>
