@@ -107,6 +107,24 @@ min-width:
     margin-left: 1em;
 }
 
+
+.box_editing {
+	
+}
+
+.box_editing_inner {
+	padding: 0.5em;
+	border: 1px solid #9BCDFF;
+	background-color: #DDEEFF;
+}
+
+.box_editing_inner2 {
+	background-color: #EEEEEE;
+	padding: 0.5em 0.8em;
+	border: 1px dotted #999999;
+}
+
+
 .list_items_container{
     padding-left: 7px;
 }
@@ -1278,5 +1296,9 @@ div.preview_box {
   display: inline-block;
   padding: 1em 1em 1em 1em;
   border: 1px solid #999999;
+}
+
+.pale_text {
+	color: #666666;
 }
   

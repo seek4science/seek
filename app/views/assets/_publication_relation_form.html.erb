@@ -1,129 +1,121 @@
 <div class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you attribute this #{resource_type} to any publications registered in SEEK, or vice versa.") -%>
-    Related Publications
-  </div>
-
-  <div id="publications_fold_content" class="foldContent" style="display: block;">
-    <div class="yui-u first" style="width:66%; float:left">
-  
-      <%
-        all_publications=Publication.all.sort{|a, b| a.title<=>b.title}
-        project_publications=all_publications.select{|p| current_user.person.projects.include?(p.project )}
-        select_truncate_length=120
-        show_relationships=false
-      -%>
-      <p style="color: #666666;">
-        The following publications are related to this resource:
-      </p>
-      <div id="publication_to_list" class="box_editing_inner" style="line-height: 1.5">
-        <span class="none_text" id="publications">Loading...</span>
-      </div>
-  
-      <div class="association_step">    
-        <%= select_tag :possible_publications,
-          options_for_select([["Select publication ...",0]]|project_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-          {:style=>"width:90%",:onchange=>remote_function(
-            :url=>{:action=>"preview",:controller=>"publications",:element=>"publication_preview"},
-            :with=>"'id='+this.value",
-            :before=>"show_ajax_loader('publication_preview')"
-          )+";check_show_add_publication();return(false);"
-        } -%>
-        <%= select_tag :related_publication_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-        <% if show_relationships -%>
-          <br/>
-          <%= select_tag :publication_relationship_type, options_for_select([["None",0]]) %>
-        <% end -%>
-        
-        <br/>
-        
-        <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Include publications from other projects?
-      </div>
-      <%= link_to_function (image("new") + " Relate publication"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link", :style => "width: 10em" %>
+    <div class="foldTitle">
+        <%= help_icon("Here you attribute this #{resource_type} to any publications registered in SEEK, or vice versa.") -%>
+        Related Publications
     </div>
-      <div id="publication_preview" class="yui-u preview_box" style="float:right">
-        <div style="text-align: center;">Publication preview</div>
-      </div>  
-      <br style="clear:both"/>  
+    <div id="publications_fold_content" class="foldContent" style="display: block;">
+        <div class="yui-u first" style="width:66%; float:left">
+            <%
+            all_publications=Publication.all.sort{|a, b| a.title<=>b.title}
+            project_publications=all_publications.select{|p| current_user.person.projects.include?(p.project )}
+            select_truncate_length=120
+            show_relationships=false -%>
+            <p class="pale_text">
+                The following publications are related to this resource:
+            </p>
+            <div id="publication_to_list" class="box_editing_inner" style="line-height: 1.5">
+                <span class="none_text" id="publications">Loading...</span>
+            </div>
+            <div class="association_step">
+                <%= select_tag :possible_publications,
+                options_for_select([["Select publication ...",0]]|project_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+                {:style=>"width:90%",:onchange=>remote_function(
+                :url=>{:action=>"preview",:controller=>"publications",:element=>"publication_preview"},
+                :with=>"'id='+this.value",
+                :before=>"show_ajax_loader('publication_preview')"
+                )+";check_show_add_publication();return(false);"
+                } -%>
+                <%= select_tag :related_publication_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+                <% if show_relationships -%>
+                <br/>
+                <%= select_tag :publication_relationship_type, options_for_select([["None",0]]) %>
+                <% end -%>
+                <br/>
+                <%= check_box_tag :include_other_project_publications, nil, false, {:onchange=>"toggle_publication_list();",:style=>"margin-top:0.5em;"} -%> Include publications from other projects?
+            </div>
+            <%= link_to_function (image("new") + " Relate publication"), "addSelectedPublication(); return(false);", :id=>"add_publication_link", :class=>"block_link", :style => "width: 10em" %>
+        </div>
+        <div id="publication_preview" class="yui-u preview_box" style="float:right">
+            <div style="text-align: center;">
+                Publication preview
+            </div>
+        </div>
+        <br style="clear:both"/>
     </div>
-  
 </div>
-
 <script type="text/javascript">
-  function toggle_publication_list() {
-    var checked = $('include_other_project_publications').checked;
-    var selection_box = $('possible_publications');
-    var option;
-            
-    selection_box.options.length=0;
-
-    if (checked) {
-<% ([["Select publication...",0]]|all_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |details| -%>
-        option = document.createElement("OPTION");
-        option.text = '<%= escape_javascript(details[0]) -%>';
-        option.value = '<%= details[1] -%>';
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-<% end -%>
-    }
-    else {
-<% ([["Select publication ...",0]]|project_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |details| -%>
-        option = document.createElement("OPTION");
-        option.text = '<%= escape_javascript(details[0]) -%>';
-        option.value = '<%= details[1] -%>';
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-<% end -%>
-    }
-    selection_box.selectedIndex=0;
-    selection_box.onchange();
-  }
-
-
-<% related_publications.each do |publication| -%>    
-  <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
-      publication_id = '<%= publication.id -%>';
-      publication_title = '<%= escape_javascript(publication.title) -%>';
-      relationship_type = '<%= escape_javascript("None") -%>';
-      addPublication(publication_title,publication_id,relationship_type);
-  <% end -%>
-<% end -%>
-
-<% if params[:related_publication_ids] %>
-  <% params[:related_publication_ids].each do |id_and_rel_id| -%>
-    <% a_id, r_type = id_and_rel_id.split(",") %>
-    <% publication = Publication.find(a_id) %>
-    <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
-        publication_id = '<%= publication.id -%>';
-        publication_title = '<%= escape_javascript(publication.title) -%>';
-        relationship_type = '<%= r_type -%>';
-        addPublication(publication_title, publication_id, relationship_type);
+      function toggle_publication_list() {
+        var checked = $('include_other_project_publications').checked;
+        var selection_box = $('possible_publications');
+        var option;
+                
+        selection_box.options.length=0;
+    
+        if (checked) {
+    <% ([["Select publication...",0]]|all_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(details[0]) -%>';
+            option.value = '<%= details[1] -%>';
+            try {
+              selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+              selection_box.add(option, null);
+            }
     <% end -%>
-  <% end -%>
-<% end -%>
-
-  updatePublications();
-
-  function check_show_add_publication() {
-    i=$('possible_publications').selectedIndex;
-    selected_id=$('possible_publications').options[i].value;
-    if (selected_id=='0') {
-      $('add_publication_link').hide();
-    }
-    else {
-      $('add_publication_link').show();
-    }
-  }
-
-  check_show_add_publication();
+        }
+        else {
+    <% ([["Select publication ...",0]]|project_publications.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(details[0]) -%>';
+            option.value = '<%= details[1] -%>';
+            try {
+              selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+              selection_box.add(option, null);
+            }
+    <% end -%>
+        }
+        selection_box.selectedIndex=0;
+        selection_box.onchange();
+      }
+    
+    
+    <% related_publications.each do |publication| -%>    
+      <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
+          publication_id = '<%= publication.id -%>';
+          publication_title = '<%= escape_javascript(publication.title) -%>';
+          relationship_type = '<%= escape_javascript("None") -%>';
+          addPublication(publication_title,publication_id,relationship_type);
+      <% end -%>
+    <% end -%>
+    
+    <% if params[:related_publication_ids] %>
+      <% params[:related_publication_ids].each do |id_and_rel_id| -%>
+        <% a_id, r_type = id_and_rel_id.split(",") %>
+        <% publication = Publication.find(a_id) %>
+        <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
+            publication_id = '<%= publication.id -%>';
+            publication_title = '<%= escape_javascript(publication.title) -%>';
+            relationship_type = '<%= r_type -%>';
+            addPublication(publication_title, publication_id, relationship_type);
+        <% end -%>
+      <% end -%>
+    <% end -%>
+    
+      updatePublications();
+    
+      function check_show_add_publication() {
+        i=$('possible_publications').selectedIndex;
+        selected_id=$('possible_publications').options[i].value;
+        if (selected_id=='0') {
+          $('add_publication_link').hide();
+        }
+        else {
+          $('add_publication_link').show();
+        }
+      }
+    
+      check_show_add_publication();
 </script>
-

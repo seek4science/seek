@@ -1383,24 +1383,7 @@ div.auto_complete ul strong.highlight {
 	border-bottom: 1px dotted #999999;
 }
 
-.box_editing {
-	padding: 0.5em; 
-	border-left: 5px solid #0066CC;
-	padding-left: 0.8em;
-	margin-left: 0.8em;
-}
 
-.box_editing_inner {
-	padding: 0.5em;
-	border: 1px solid #9BCDFF;
-	background-color: #DDEEFF;
-}
-
-.box_editing_inner2 {
-	background-color: #EEEEEE;
-	padding: 0.5em 0.8em;
-	border: 1px dotted #999999;
-}
 
 .box_infotext {
 	font-size: 93%;
