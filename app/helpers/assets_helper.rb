@@ -206,4 +206,10 @@ module AssetsHelper
     return eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
+  #provides a list of assets, according to the class, that are authorized to 'show'
+  def authorised_assets asset_class
+    assets=asset_class.find(:all)
+    Authorization.authorize_collection("show",assets,current_user)
+  end
+
 end

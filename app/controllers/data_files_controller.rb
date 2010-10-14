@@ -11,7 +11,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
 
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_data_file_auth, :except => [ :index, :new, :create, :request_resource]
+  before_filter :find_data_file_auth, :except => [ :index, :new, :create, :request_resource, :preview]
   before_filter :find_display_data_file, :only=>[:show,:download]
 
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]  
@@ -234,7 +234,7 @@ class DataFilesController < ApplicationController
   
   def preview
     element=params[:element]
-    data_file=@data_file
+    data_file=DataFile.find_by_id(params[:id])
     
     render :update do |page|
       if data_file && Authorization.is_authorized?("show", nil, data_file, current_user)

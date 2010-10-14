@@ -7,14 +7,14 @@ class PublicationsController < ApplicationController
   
   before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
-  before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy, :preview]
+  before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
   ADMIN_EMAIL = "sowen@cs.man.ac.uk"
   
   def preview
     element=params[:element]
-    
+    @publication = Publication.find_by_id(params[:id])
     render :update do |page|
       if @publication
         page.replace_html element,:partial=>"publications/resource_preview",:locals=>{:resource=>@publication}
