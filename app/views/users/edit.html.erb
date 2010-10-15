@@ -1,37 +1,60 @@
 <ul class="sectionIcons">
-  <li><%= image_tag_for_key('arrow_left', person_path(@user.person), 'Return to profile', nil, 'Return to profile') -%></li>
+    <li>
+        <%= image_tag_for_key('arrow_left', person_path(@user.person), 'Return to profile', nil, 'Return to profile') -%>
+    </li>
 </ul>
-
 <h1>Manage Account</h1>
-
 <div class="show_basic">
-  <% unless @user.login.nil? && @user.openid %>
+    <% unless @user.login.nil? && @user.openid %>
     <h2>Login Details</h2>
-    <p><label>Login:</label><br/>
-    <b><%= @user.login %></b></p>
-  
-  
-    <h2>Change password</h2>    
+    <p>
+        <label>
+            Login:
+        </label>
+        <br/>
+        <b><%= @user.login %></b>
+    </p>
+    <h2>Change password</h2>
     <% form_for @user do |f| -%>
-        <%= f.error_messages %>            
-  
-        <p><label>New password:</label><br/>
-        <%= f.password_field :password %></p>
-    
-        <p><label>Confirm new password:</label><br/>
-        <%= f.password_field :password_confirmation %></p>
-    
-        <p><%= submit_tag 'Update' %></p>
+    <%= f.error_messages %>
+    <p>
+        <label>
+            New password:
+        </label>
+        <br/>
+        <%= f.password_field :password %>
+    </p>
+    <p>
+        <label>
+            Confirm new password:
+        </label>
+        <br/>
+        <%= f.password_field :password_confirmation %>
+    </p>
+    <p>
+        <%= submit_tag 'Update' %>
+    </p>
     <% end -%>
-  <% end -%> 
-  
-  <h2>OpenID</h2>
-  <% if error_messages_for :user -%>
-    <p><%= error_messages_for :user %></p>
-  <% end -%>
-  <% form_tag set_openid_user_path(@user), :method => :put do -%>
-      <p><label><%= image_tag "openid-16x16.gif" %> OpenID:</label><br/>
-      <%= text_field_tag :openid_identifier, @user.openid, :size => 40 %><%= submit_tag 'Update' %>  
-  <% end -%>     
-  <p>To find out more about OpenID, <a href="http://openid.net" target="_blank">click here</a>.</p>
+    <% end -%>
+    <h2>OpenID</h2>
+    <% if error_messages_for :user -%>
+    <p>
+        <%= error_messages_for :user %>
+    </p>
+    <% end -%>
+    <% form_tag set_openid_user_path(@user), :method => :put do -%>
+    <p>
+        <label>
+            <%= image_tag "openid-16x16.gif" %>OpenID: 
+        </label>
+        <br/>
+        <%= text_field_tag :openid_identifier, @user.openid, :size => 40 %>
+    </p>
+    <p>
+        <%= submit_tag 'Update' %>
+    </p>
+    <% end -%>
+    <p>
+        To find out more about OpenID, <a href="http://openid.net" target="_blank">click here</a>.
+    </p>
 </div>

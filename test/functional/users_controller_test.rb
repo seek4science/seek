@@ -27,7 +27,7 @@ class UsersControllerTest < ActionController::TestCase
     assert_response :success
   end
   
-  def test_system_messge_on_signup_no_users
+  def test_system_message_on_signup_no_users
     get :new
     assert_response :success
     assert_select "p.system_message",:count=>0
