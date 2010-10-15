@@ -13,7 +13,7 @@ module RestTestCases
     assert_response :success
     
     valid,message = check_xml
-    assert valid,message
+    assert !valid,message
     validate_xml_against_schema(@response.body)
   end
   
