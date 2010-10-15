@@ -191,7 +191,7 @@ class AssaysControllerTest < ActionController::TestCase
       delete :destroy, :id => a
     end
     assert flash[:error]    
-    assert flash[:error].include?("You cannot delete an assay that is linked")
+    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assay_path(a)
   end
   
@@ -202,7 +202,7 @@ class AssaysControllerTest < ActionController::TestCase
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that is linked")
+    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assay_path(a)
   end
   
@@ -213,7 +213,7 @@ class AssaysControllerTest < ActionController::TestCase
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that is linked")
+    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assay_path(a)
   end
 
@@ -224,7 +224,7 @@ class AssaysControllerTest < ActionController::TestCase
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that is linked")
+    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assay_path(a)
   end
 
