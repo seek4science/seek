@@ -5,3 +5,7 @@
 #
 # two:
 #   column: value
+
+assay_and_publication:
+    subject: assay_with_a_publication (Assay)
+    object: taverna_paper_pubmed (Publication)    

@@ -184,21 +184,47 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(a)
   end
 
-  test "should not delete assay with files" do
+  test "should not delete assay with data files" do
+    login_as(:model_owner)
     a = assays(:assay_with_no_study_but_has_some_files)
     assert_no_difference('Assay.count') do
       delete :destroy, :id => a
     end
+    assert flash[:error]    
+    assert flash[:error].include?("You cannot delete an assay that is linked")
+    assert_redirected_to assay_path(a)
+  end
+  
+  test "should not delete assay with model" do
+    login_as(:model_owner)
+    a = assays(:assay_with_a_model)
+    assert_no_difference('Assay.count') do
+      delete :destroy, :id => a
+    end
     assert flash[:error]
+    assert flash[:error].include?("You cannot delete an assay that is linked")
+    assert_redirected_to assay_path(a)
+  end
+  
+  test "should not delete assay with publication" do
+    login_as(:model_owner)
+    a = assays(:assay_with_a_publication)
+    assert_no_difference('Assay.count') do
+      delete :destroy, :id => a
+    end
+    assert flash[:error]
+    assert flash[:error].include?("You cannot delete an assay that is linked")
     assert_redirected_to assay_path(a)
   end
 
   test "should not delete assay with sops" do
+    login_as(:model_owner)
     a = assays(:assay_with_no_study_but_has_some_sops)
     assert_no_difference('Assay.count') do
       delete :destroy, :id => a
     end
     assert flash[:error]
+    assert flash[:error].include?("You cannot delete an assay that is linked")
     assert_redirected_to assay_path(a)
   end
 

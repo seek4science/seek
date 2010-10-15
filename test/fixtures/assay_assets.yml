@@ -71,4 +71,10 @@ validation_data_for_modelling_assay:
   assay: modelling_assay_with_data_and_relationship
   version: 1
   relationship_type: validation_data
+  
+assay_with_a_model:
+  asset: teusink (Model)
+  assay: assay_with_a_model
+  version: 1
+    
     
