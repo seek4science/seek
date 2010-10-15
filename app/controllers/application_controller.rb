@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
     ActiveRecord::RecordNotFound => "404",
     ::ActionController::UnknownController => "406",
     ::ActionController::UnknownAction => "406",
-    ::ActionController::RoutingError => "406",
+    ::ActionController::RoutingError => "404",
     ::ActionView::MissingTemplate => "406",
     ::ActionView::TemplateError => "500"
   }
