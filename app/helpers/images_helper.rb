@@ -127,7 +127,7 @@ module ImagesHelper
     when "project"
       "famfamfam_silk/report.png"
     when "tick"
-      "crystal_project/22x22/apps/clean.png"
+      "crystal_project/22x22/apps/clean.png"    
     when "lock"
       "famfamfam_silk/lock.png"
     when "open"
