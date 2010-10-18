@@ -21,7 +21,7 @@ class DataFilesController < ApplicationController
   def test_asset_url
     icon_filename=icon_filename_for_key("tick")
     begin
-      asset_url=params[:asset_url]
+      asset_url=params[:data_file][:data_url]
       url = URI.parse(asset_url)
       Net::HTTP.start(url.host, url.port) do |http|
         code = http.head(url.request_uri).code
