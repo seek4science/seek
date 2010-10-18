@@ -167,7 +167,7 @@ class AssaysController < ApplicationController
       return true
     else
       respond_to do |format|
-        flash[:error] = "You cannot delete an assay that is linked to a Study, Data files or Sops"
+        flash[:error] = "You cannot delete an assay that has items associated with it"
         format.html { redirect_to @assay }
       end
       return false

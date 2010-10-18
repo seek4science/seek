@@ -76,7 +76,7 @@ class Assay < ActiveRecord::Base
   end
 
   def can_delete? user
-    can_edit?(user) && data_files.empty? && sops.empty?
+    can_edit?(user) && assets.empty? && related_publications.empty?
   end
 
   #returns true if this is a modelling class of assay

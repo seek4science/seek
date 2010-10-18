@@ -1,0 +1,27 @@
+<%
+upload_field = type.name.underscore
+-%>
+<p id="upload_as_file">
+    <b>File to upload</b>
+    <span class="required">*</span><br/>
+    <%= file_field upload_field, :data -%><br/>
+	or <%= link_to_function "Register using a URL","$('#{upload_field}_data').value='';"+visual_effect(:toggle_blind,"upload_as_file")+";"+visual_effect(:toggle_blind,"upload_as_url") -%>
+</p>
+
+<p id="upload_as_url" style="display:none;">
+	<b>Add via URL</b>
+	<span class="required">*</span><br/>
+	<%= text_field upload_field,:data_url,:size=>50 -%>
+	<span id="test_url_result"></span>
+	<%= link_to_remote "Test", 
+		  :url=>{:action=>:test_asset_url,:controller=>:data_files},
+          :method=>:post,
+		  :with=>"$('#{upload_field}_data_url').serialize()",
+		  :update=>'test_url_result',
+          :before=>"show_ajax_loader('test_url_result');"          
+	-%>
+	<br/>
+	<b>Store local copy?</b>
+	<%= check_box upload_field, :local_copy -%><br/>
+	or <%= link_to_function "Upload as a File","$('#{upload_field}_data_url').value='';"+visual_effect(:toggle_blind,"upload_as_url")+";"+visual_effect(:toggle_blind,"upload_as_file") -%>
+</p>

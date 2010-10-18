@@ -36,6 +36,19 @@ downloadable_data_file_v1:
   version: 1
   project: other_project # not linked to any project for now
   policy: download_for_all_registered_users_policy
+  
+url_based_data_file_v1:
+  contributor: datafile_owner (User)
+  data_file: url_based_data_file
+  title: Data file from URL
+  description: Uses a URL to the sysmo logo
+  original_filename: sysmologo.png
+  content_blob: url_content_blob
+  content_type: images/png
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
+  project: other_project # not linked to any project for now
+  policy: download_for_all_registered_users_policy    
 
 editable_data_file_v1:
   contributor: datafile_owner (User)

@@ -5,6 +5,11 @@ require 'active_record/fixtures'
 
 namespace :seek do
   
+  desc 'an alternative to the doc:seek task'
+  task(:docs=>["doc:seek"]) do
+    
+  end
+  
   desc 'updates the md5sum, and makes a local cache, for existing remote assets'
   task(:cache_remote_content_blobs=>:environment) do
     resources = Sop.find(:all)

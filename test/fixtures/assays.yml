@@ -116,3 +116,19 @@ modelling_assay_with_data_and_relationship:
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
   
+assay_with_a_model:
+  title: Assay with model
+  assay_type: metabolomics
+  technology_type: gas_chromatography
+  study: metabolomics_study2
+  owner: person_for_model_owner
+  assay_class: experimental_assay_class 
+  
+assay_with_a_publication:
+  title: Assay with publication 
+  assay_type: metabolomics
+  technology_type: gas_chromatography
+  study: metabolomics_study2
+  owner: person_for_model_owner
+  assay_class: experimental_assay_class    
+  

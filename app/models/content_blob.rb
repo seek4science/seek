@@ -27,15 +27,13 @@ class ContentBlob < ActiveRecord::Base
     super
   end
   
-  def data
-    
+  def data    
     return @data if @data
     return File.open(filepath,"rb").read if file_exists?   
     unless self.data_old.blank?
       dump_data_to_file
       return self.data_old
-    end
-     
+    end     
     return nil
   end
   

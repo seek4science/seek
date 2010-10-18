@@ -15,8 +15,7 @@ class ApplicationController < ActionController::Base
     ::ActionView::MissingTemplate => "406",
     ::ActionView::TemplateError => "500"
   }
-  local_addresses.clear
-  
+  local_addresses.clear  
   
   if ACTIVITY_LOG_ENABLED
     after_filter :log_event
@@ -164,16 +163,6 @@ class ApplicationController < ActionController::Base
   def default_items_per_page
     7
   end    
-  
-  def download_jerm_resource resource
-    project=resource.project
-    project.decrypt_credentials
-    downloader=Jerm::DownloaderFactory.create project.name
-    resource_type = resource.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
-    data_hash = downloader.get_remote_data resource.content_blob.url,project.site_username,project.site_password, resource_type
-    send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
-  end
-  
   
   #required for the Savage Beast
   def admin?
