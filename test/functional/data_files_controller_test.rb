@@ -49,6 +49,23 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:data_file).content_type
   end
   
+  test "should create data file and store with url and store flag" do
+    datafile_details = valid_data_file_with_url
+    datafile_details[:local_copy]="1"
+    
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => datafile_details, :sharing=>valid_sharing
+      end
+    end
+    
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert !assigns(:data_file).content_blob.data.nil?
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
+    assert_equal "image/png", assigns(:data_file).content_type
+  end
+  
   test "should create data file" do
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do

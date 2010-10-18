@@ -15,8 +15,7 @@ class ApplicationController < ActionController::Base
     ::ActionView::MissingTemplate => "406",
     ::ActionView::TemplateError => "500"
   }
-  local_addresses.clear
-  
+  local_addresses.clear  
   
   if ACTIVITY_LOG_ENABLED
     after_filter :log_event

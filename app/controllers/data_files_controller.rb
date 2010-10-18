@@ -1,13 +1,14 @@
 
 require 'simple-spreadsheet-extractor'
 
-class DataFilesController < AbstractAssetController
+class DataFilesController < ApplicationController
   
   include IndexPager
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper  
   include DotGenerator
   include ImagesHelper
+  include Seek::AssetsCommon
   
   before_filter :login_required
   
