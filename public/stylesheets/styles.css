@@ -1287,6 +1287,11 @@ a.block_link {
   vertical-align: middle;
 }
 
+a:hover.block_link {
+  border: 1px solid #888;
+  background-color: #ddd;
+}
+
 a.block_link img {
   vertical-align: middle; 
 }
