@@ -31,6 +31,7 @@ SUMO_harvester.rb
 script/finns_tests/*
 config/environment_local.rb
 public/help_images/*
+.rvmrc
 
 
 syntax: regexp
