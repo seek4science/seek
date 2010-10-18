@@ -88,69 +88,82 @@ class DataFilesController < ApplicationController
   end
   
   def create
-    if (params[:data_file][:data]).blank?
-      respond_to do |format|
-        flash.now[:error] = "Please select a file to upload."
-        format.html {
-          set_parameters_for_sharing_form()
-          render :action => "new"
-        }
-      end
-    elsif (params[:data_file][:data]).size == 0
-      respond_to do |format|
-        flash.now[:error] = "The file that you have selected is empty. Please check your selection and try again!"
-        format.html {
-          set_parameters_for_sharing_form()
-          render :action => "new"
-        }
-      end
-    else
-      # create new Data file and content blob - non-empty file was selected
-      
-      # prepare some extra metadata to store in Data files instance
-      params[:data_file][:contributor_type] = "User"
-      params[:data_file][:contributor_id] = current_user.id
-      
-      # store properties and contents of the file temporarily and remove the latter from params[],
-      # so that when saving main object params[] wouldn't contain the binary data anymore
-      params[:data_file][:content_type] = (params[:data_file][:data]).content_type
-      params[:data_file][:original_filename] = (params[:data_file][:data]).original_filename
-      data = params[:data_file][:data].read
-      params[:data_file].delete('data')
-      
-      @data_file = DataFile.new(params[:data_file])
-      @data_file.content_blob = ContentBlob.new(:data => data)
-      
-      respond_to do |format|
-        if @data_file.save
-          # the Data file was saved successfully, now need to apply policy / permissions settings to it
-          policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-          
-          # update attributions
-          Relationship.create_or_update_attributions(@data_file, params[:attributions])
-          
-          # update related publications
-          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-          
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-          
-          if policy_err_msg.blank?
-            flash[:notice] = 'Data file was successfully uploaded and saved.'
-            format.html { redirect_to data_file_path(@data_file) }
-          else
-            flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
-          end
+    handle_data
+    
+    @data_file = DataFile.new params[:data_file]
+    @data_file.contributor=current_user
+    @data_file.content_blob = ContentBlob.new :data => @data, :url=>@data_url
+    
+    respond_to do |format|
+      if @data_file.save
+        # the Data file was saved successfully, now need to apply policy / permissions settings to it
+        policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
+        
+        # update attributions
+        Relationship.create_or_update_attributions(@data_file, params[:attributions])
+        
+        # update related publications
+        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        
+        #Add creators
+        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+        
+        if policy_err_msg.blank?
+          flash[:notice] = 'Data file was successfully uploaded and saved.'
+          format.html { redirect_to data_file_path(@data_file) }
         else
-          format.html {
-            set_parameters_for_sharing_form()
-            render :action => "new"
-          }
+          flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
         end
+      else
+        format.html {
+          set_parameters_for_sharing_form()
+          render :action => "new"
+        }
       end
     end
+    
   end
+  
+  def handle_data    
+    c = self.controller_name.downcase    
+    symb=c.singularize.to_sym
+    
+    if (params[symb][:data]).blank? && (params[symb][:data_url]).blank?
+      respond_to do |format|
+        flash.now[:error] = "Please select a file to upload or provide a URL to the data."
+        format.html do 
+          set_parameters_for_sharing_form
+          render :action => "new"
+        end
+      end
+    elsif !(params[symb][:data]).blank? && (params[symb][:data]).size == 0 && (params[symb][:data_url]).blank?
+      respond_to do |format|
+        flash.now[:error] = "The file that you are uploading is empty. Please check your selection and try again!"
+        format.html do 
+          set_parameters_for_sharing_form
+          render :action => "new"
+        end
+      end
+    else
+      #upload takes precendence if both params are present
+      if !(params[symb][:data]).blank?
+        # store properties and contents of the file temporarily and remove the latter from params[],
+        # so that when saving main object params[] wouldn't contain the binary data anymore
+        params[symb][:content_type] = (params[symb][:data]).content_type
+        params[symb][:original_filename] = (params[symb][:data]).original_filename
+        @data = params[symb][:data].read
+      elsif !(params[symb][:data_url]).blank?
+        @data_url=params[symb][:data_url]
+      else
+        raise Exception.new("Neither a data file or url was provided.")        
+      end
+      
+      params[symb].delete 'data_url'
+      params[symb].delete 'data'      
+      
+    end
+  end  
   
   def show
     # store timestamp of the previous last usage
