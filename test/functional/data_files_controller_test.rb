@@ -75,6 +75,11 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  test "should download from url" do
+    get :download, :id => data_files(:url_based_data_file)
+    assert_response :success
+  end
+  
   test "shouldn't download" do
     login_as(:aaron)
     get :download, :id => data_files(:viewable_data_file)

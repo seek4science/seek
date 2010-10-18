@@ -35,3 +35,7 @@ picture_blob:
 spreadsheet_blob:
   data_old: <%= load_blob_data('spreadsheet.xls') %>
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
+  
+url_content_blob:
+  url: http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png  
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>
