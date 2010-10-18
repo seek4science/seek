@@ -211,7 +211,11 @@ class DataFilesController < ApplicationController
       if @display_data_file.contributor.nil? #A jerm generated resource
         download_jerm_resource @display_data_file
       else
-        download_via_url @display_data_file
+        if @display_data_file.content_blob.file_exists?
+          send_file @display_data_file.content_blob.filepath, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
+        else
+          download_via_url @display_data_file
+        end
       end
     end
   end 
