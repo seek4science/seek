@@ -43,8 +43,10 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
   end
@@ -60,8 +62,10 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     
     assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
     assert !assigns(:data_file).content_blob.data.nil?
+    assert assigns(:data_file).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
   end
@@ -73,6 +77,8 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    
     assert !assigns(:data_file).content_blob.data.nil?
     assert assigns(:data_file).content_blob.url.blank?
   end
