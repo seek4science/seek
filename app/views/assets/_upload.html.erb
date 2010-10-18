@@ -22,6 +22,6 @@ upload_field = type.name.underscore
 	-%>
 	<br/>
 	<b>Store local copy?</b>
-	<%= check_box_tag :local_copy -%><br/>
+	<%= check_box upload_field, :local_copy -%><br/>
 	or <%= link_to_function "Upload as a File","$('#{upload_field}_data_url').value='';"+visual_effect(:toggle_blind,"upload_as_url")+";"+visual_effect(:toggle_blind,"upload_as_file") -%>
 </p>
