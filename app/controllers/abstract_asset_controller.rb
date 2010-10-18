@@ -43,8 +43,12 @@ class AbstractAssetController < ApplicationController
         params[symb][:content_type] = (params[symb][:data]).content_type
         params[symb][:original_filename] = (params[symb][:data]).original_filename
         @data = params[symb][:data].read
-      elsif !(params[symb][:data_url]).blank?
+      elsif !(params[symb][:data_url]).blank?        
         @data_url=params[symb][:data_url]
+        downloader=Jerm::HttpDownloader.new
+        data_hash = downloader.get_remote_data @data_url
+        params[symb][:content_type] = data_hash[:content_type]
+        params[symb][:original_filename] = data_hash[:filename]
       else
         raise Exception.new("Neither a data file or url was provided.")        
       end

@@ -45,6 +45,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data.nil?
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
+    assert_equal "image/png", assigns(:data_file).content_type
   end
   
   test "should create data file" do
