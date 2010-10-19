@@ -30,19 +30,19 @@ module Seek
       
     end
     
-    def download_jerm_resource resource
-      project=resource.project
+    def download_jerm_asset asset
+      project=asset.project
       project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.name
       resource_type = resource.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
-      data_hash = downloader.get_remote_data resource.content_blob.url,project.site_username,project.site_password, resource_type
-      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
+      data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
+      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
     end
     
-    def download_via_url resource    
+    def download_via_url asset    
       downloader=Jerm::HttpDownloader.new
-      data_hash = downloader.get_remote_data resource.content_blob.url
-      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
+      data_hash = downloader.get_remote_data asset.content_blob.url
+      send_data data_hash[:data], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
     end
     
     def handle_data    
@@ -93,6 +93,26 @@ module Seek
         return true
       end
     end  
+    
+    def handle_download asset
+      if asset.content_blob.url.blank?
+      if asset.content_blob.file_exists?
+        send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+      else
+        send_data asset.content_blob.data, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'  
+      end      
+    else
+      if asset.contributor.nil? #A jerm generated resource
+        download_jerm_resource asset
+      else
+        if asset.content_blob.file_exists?
+          send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+        else
+          download_via_url asset
+        end
+      end
+    end
+    end
     
   end
 end

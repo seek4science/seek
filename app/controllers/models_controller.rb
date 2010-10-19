@@ -324,22 +324,9 @@ class ModelsController < ApplicationController
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
-    @model.save_without_timestamping
+    @model.save_without_timestamping    
     
-    #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
-    #@display_model.last_used_at = Time.now
-    #@display_model.save_without_timestamping
-    
-    if @display_model.content_blob.url.blank?
-      if @display_model.content_blob.file_exists?
-        send_file @display_model.content_blob.filepath, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
-      else
-        send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
-      end
-      
-    else
-      download_jerm_resource @display_model
-    end
+    handle_download @display_model
   end
   
   # PUT /models/1

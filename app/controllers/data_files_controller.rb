@@ -171,30 +171,9 @@ class DataFilesController < ApplicationController
     # update timestamp in the current data file record
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
-    @data_file.save_without_timestamping
+    @data_file.save_without_timestamping    
     
-    #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
-    #@display_data_file.last_used_at = Time.now
-    #@display_data_file.save_without_timestamping
-    
-    #Send data stored in database if no url specified
-    if @display_data_file.content_blob.url.blank?
-      if @display_data_file.content_blob.file_exists?
-        send_file @display_data_file.content_blob.filepath, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
-      else
-        send_data @display_data_file.content_blob.data, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'  
-      end      
-    else
-      if @display_data_file.contributor.nil? #A jerm generated resource
-        download_jerm_resource @display_data_file
-      else
-        if @display_data_file.content_blob.file_exists?
-          send_file @display_data_file.content_blob.filepath, :filename => @display_data_file.original_filename, :content_type => @display_data_file.content_type, :disposition => 'attachment'
-        else
-          download_via_url @display_data_file
-        end
-      end
-    end
+    handle_download @display_data_file
   end 
   
   def data
