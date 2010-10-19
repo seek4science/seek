@@ -55,7 +55,7 @@ class SopsController < ApplicationController
     end
   end
   
-  # GET /sops/1;download
+  # GET /sops/1/download
   def download
     # update timestamp in the current SOP record 
     # (this will also trigger timestamp update in the corresponding Asset)

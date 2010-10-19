@@ -319,7 +319,7 @@ class ModelsController < ApplicationController
     
   end
   
-  # GET /models/1;download
+  # GET /models/1/download
   def download
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)

@@ -166,7 +166,7 @@ class DataFilesController < ApplicationController
     end
   end
   
-  # GET /data_files/1;download
+  # GET /data_files/1/download
   def download
     # update timestamp in the current data file record
     # (this will also trigger timestamp update in the corresponding Asset)
