@@ -8,10 +8,8 @@
 
     <center>
       <div style="width:90%">
-        <p>
-          <b>File to upload</b><span class="required">*</span>
-          <%= file_field :sop, :data -%>
-        </p>
+      	
+        <%= render :partial=>"assets/upload", :locals=>{:type=>Sop} -%>
 
         <p style="margin-top: 1.5em;">
           <b>Title</b><span class="required">*</span><br/>

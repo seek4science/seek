@@ -1148,8 +1148,8 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
 function validateSopFields(is_new_file) {
     // only make this test if that's a new SOP
     if(is_new_file) {
-        if($('sop_data').value.length == 0) {
-            alert("Please specify the name of the file to upload!");
+        if($('sop_data').value.length == 0 && $('model_data_url').value.length == 0) {
+            alert("Please specify the file to upload, or provide a URL.");
             $('sop_data').focus();
             return(false);
         }
@@ -1182,8 +1182,8 @@ function validateSopFields(is_new_file) {
 function validateModelFields(is_new_file) {
     // only make this test if that's a new Model
     if(is_new_file) {
-        if($('model_data').value.length == 0) {
-            alert("Please specify the name of the file to upload!");
+        if($('model_data').value.length == 0 && $('model_data_url').value.length == 0) {
+            alert("Please specify the file to upload, or provide a URL.");
             $('model_data').focus();
             return(false);
         }

@@ -6,8 +6,7 @@ class DataFilesController < ApplicationController
   include IndexPager
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper  
-  include DotGenerator
-  include ImagesHelper
+  include DotGenerator  
   include Seek::AssetsCommon
   
   before_filter :login_required
@@ -16,30 +15,7 @@ class DataFilesController < ApplicationController
   before_filter :find_data_file_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
   before_filter :find_display_data_file, :only=>[:show,:download]
   
-  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]  
-  
-  #FIXME: this is not unique to DataFiles, so doesn't really belong here
-  def test_asset_url
-    icon_filename=icon_filename_for_key("tick")
-    begin
-      asset_url=params[:data_file][:data_url]
-      url = URI.parse(asset_url)
-      Net::HTTP.start(url.host, url.port) do |http|
-        code = http.head(url.request_uri).code
-        puts code
-        icon_filename=icon_filename_for_key("error") unless code == "200"
-      end
-      
-    rescue 
-      icon_filename=icon_filename_for_key("error")
-    end
-    
-    respond_to do |format|
-      #FIXME: path won't be safe it running under a subdirectory
-      format.html { render :text=>"<img src='/images/#{icon_filename}'/>" }
-    end
-    
-  end
+  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]        
   
   def new_version
     data = params[:data].read

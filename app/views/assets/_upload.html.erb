@@ -14,7 +14,7 @@ upload_field = type.name.underscore
 	<%= text_field upload_field,:data_url,:size=>50 -%>
 	<span id="test_url_result"></span>
 	<%= link_to_remote "Test", 
-		  :url=>{:action=>:test_asset_url,:controller=>:data_files},
+		  :url=>{:action=>:test_asset_url},
           :method=>:post,
 		  :with=>"$('#{upload_field}_data_url').serialize()",
 		  :update=>'test_url_result',

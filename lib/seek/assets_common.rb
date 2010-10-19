@@ -1,6 +1,35 @@
 module Seek
   module AssetsCommon
     
+    #required to get the icon_filename_for_key
+    include ImagesHelper
+    
+    def test_asset_url
+      c = self.controller_name.downcase    
+      symb=c.singularize.to_sym
+      
+      icon_filename=icon_filename_for_key("tick")
+      begin
+        asset_url=params[symb][:data_url]
+        url = URI.parse(asset_url)
+        Net::HTTP.start(url.host, url.port) do |http|
+          code = http.head(url.request_uri).code
+          puts code
+          icon_filename=icon_filename_for_key("error") unless code == "200"
+        end
+        
+      rescue Exception=>e
+        puts e
+        icon_filename=icon_filename_for_key("error")
+      end
+      
+      respond_to do |format|
+        #FIXME: path won't be safe it running under a subdirectory
+        format.html { render :text=>"<img src='/images/#{icon_filename}'/>" }
+      end
+      
+    end
+    
     def download_jerm_resource resource
       project=resource.project
       project.decrypt_credentials
