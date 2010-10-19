@@ -6,6 +6,7 @@ class ModelsController < ApplicationController
   include WhiteListHelper
   include IndexPager
   include DotGenerator
+  include Seek::AssetsCommon
   
   before_filter :login_required
   
@@ -231,7 +232,7 @@ class ModelsController < ApplicationController
     begin
       @applet= jws_execution_applet @model.find_version(version)
     rescue Exception => e      
-        @error_details=e.message       
+      @error_details=e.message       
     end
     
     render :update do |page|
@@ -280,39 +281,11 @@ class ModelsController < ApplicationController
   
   # POST /models
   # POST /models.xml
-  def create
-    if (params[:model][:data]).blank?
-      respond_to do |format|
-        flash.now[:error] = "Please select a file to upload."
-        format.html {
-          set_parameters_for_sharing_form()
-          render :action => "new"
-        }
-      end
-    elsif (params[:model][:data]).size == 0
-      respond_to do |format|
-        flash.now[:error] = "The file that you have selected is empty. Please check your selection and try again!"
-        format.html {
-          set_parameters_for_sharing_form()
-          render :action => "new"
-        }
-      end
-    else
-      # create new Model and content blob - non-empty file was selected
-      
-      # prepare some extra metadata to store in Model instance
-      params[:model][:contributor_type] = "User"
-      params[:model][:contributor_id] = current_user.id
-      
-      # store properties and contents of the file temporarily and remove the latter from params[],
-      # so that when saving main object params[] wouldn't contain the binary data anymore
-      params[:model][:content_type] = (params[:model][:data]).content_type
-      params[:model][:original_filename] = (params[:model][:data]).original_filename
-      data = params[:model][:data].read
-      params[:model].delete('data')     
-      
+  def create    
+    if handle_data
       @model = Model.new(params[:model])
-      @model.content_blob = ContentBlob.new(:data => data)
+      @model.contributor = current_user
+      @model.content_blob = ContentBlob.new(:data => @data,:url=>@data_url)
       
       respond_to do |format|
         if @model.save
@@ -343,6 +316,7 @@ class ModelsController < ApplicationController
         end
       end
     end
+    
   end
   
   # GET /models/1;download
@@ -424,7 +398,7 @@ class ModelsController < ApplicationController
   end
   
   def preview
-
+    
     element = params[:element]
     model = Model.find_by_id(params[:id])
     

@@ -28,6 +28,7 @@ module Seek
             render :action => "new"
           end
         end
+        return false
       elsif !(params[symb][:data]).blank? && (params[symb][:data]).size == 0 && (params[symb][:data_url]).blank?
         respond_to do |format|
           flash.now[:error] = "The file that you are uploading is empty. Please check your selection and try again!"
@@ -36,6 +37,7 @@ module Seek
             render :action => "new"
           end
         end
+        return false
       else
         #upload takes precendence if both params are present
         if !(params[symb][:data]).blank?
@@ -59,7 +61,7 @@ module Seek
         params[symb].delete 'data_url'
         params[symb].delete 'data'
         params[symb].delete 'local_copy' 
-        
+        return true
       end
     end  
     

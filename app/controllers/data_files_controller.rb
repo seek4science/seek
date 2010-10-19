@@ -89,40 +89,41 @@ class DataFilesController < ApplicationController
   end
   
   def create
-    handle_data
-    
-    @data_file = DataFile.new params[:data_file]
-    @data_file.contributor=current_user
-    @data_file.content_blob = ContentBlob.new :data => @data, :url=>@data_url
-    
-    respond_to do |format|
-      if @data_file.save
-        # the Data file was saved successfully, now need to apply policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-        
-        # update attributions
-        Relationship.create_or_update_attributions(@data_file, params[:attributions])
-        
-        # update related publications
-        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-        
-        #Add creators
-        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-        
-        if policy_err_msg.blank?
-          flash[:notice] = 'Data file was successfully uploaded and saved.'
-          format.html { redirect_to data_file_path(@data_file) }
+    if handle_data
+      
+      @data_file = DataFile.new params[:data_file]
+      @data_file.contributor=current_user
+      @data_file.content_blob = ContentBlob.new :data => @data, :url=>@data_url
+      
+      respond_to do |format|
+        if @data_file.save
+          # the Data file was saved successfully, now need to apply policy / permissions settings to it
+          policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
+          
+          # update attributions
+          Relationship.create_or_update_attributions(@data_file, params[:attributions])
+          
+          # update related publications
+          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+          
+          #Add creators
+          AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+          
+          if policy_err_msg.blank?
+            flash[:notice] = 'Data file was successfully uploaded and saved.'
+            format.html { redirect_to data_file_path(@data_file) }
+          else
+            flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+            format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
+          end
         else
-          flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
+          format.html {
+            set_parameters_for_sharing_form()
+            render :action => "new"
+          }
         end
-      else
-        format.html {
-          set_parameters_for_sharing_form()
-          render :action => "new"
-        }
-      end
-    end   
+      end   
+    end
   end
   
   def show

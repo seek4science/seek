@@ -30,11 +30,19 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal assigns(:sops).sort_by(&:id), Authorization.authorize_collection("view", assigns(:sops), users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
   end
   
-  
-  
   test "should get new" do
     get :new
     assert_response :success
+  end
+  
+  test "should not create invalid sop" do
+    sop={:title=>"Test"}
+    assert_no_difference('Sop.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :sop => sop, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
   end
   
   test "should create sop" do
@@ -107,19 +115,20 @@ class SopsControllerTest < ActionController::TestCase
   test "should destroy sop" do
     login_as(:owner_of_my_first_sop)
     assert_difference('Sop.count', -1) do
-      assert_no_difference("ContentBlob.count","The ContentBlob for this SOP should be preserved") do
-      delete :destroy, :id => sops(:my_first_sop)
+      assert_no_difference("ContentBlob.count") do
+        delete :destroy, :id => sops(:my_first_sop)
+      end
+      
     end
+    assert_redirected_to sops_path
   end
   
-  assert_redirected_to sops_path
-end
-
-test "should not be able to edit exp conditions for downloadable only sop" do
-s=sops(:downloadable_sop)
-
-get :show, :id=>s
-assert_select "a", :text=>/Edit experimental conditions/, :count=>0
+  
+  test "should not be able to edit exp conditions for downloadable only sop" do
+  s=sops(:downloadable_sop)
+  
+  get :show, :id=>s
+  assert_select "a", :text=>/Edit experimental conditions/, :count=>0
 end
 
 test "should be able to edit exp conditions for owners downloadable only sop" do

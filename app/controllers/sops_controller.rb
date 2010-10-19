@@ -97,35 +97,36 @@ class SopsController < ApplicationController
   
   # POST /sops
   def create
-    handle_data            
-    
-    @sop = Sop.new(params[:sop])
-    @sop.contributor=current_user
-    @sop.content_blob = ContentBlob.new(:data => @data,:url=>@data_url)
-    
-    respond_to do |format|
-      if @sop.save
-        # the SOP was saved successfully, now need to apply policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
-        
-        # update attributions
-        Relationship.create_or_update_attributions(@sop, params[:attributions])
-        
-        #Add creators
-        AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
-        
-        if policy_err_msg.blank?
-          flash[:notice] = 'SOP was successfully uploaded and saved.'
-          format.html { redirect_to sop_path(@sop) }
+    if handle_data            
+      
+      @sop = Sop.new(params[:sop])
+      @sop.contributor=current_user
+      @sop.content_blob = ContentBlob.new(:data => @data,:url=>@data_url)
+      
+      respond_to do |format|
+        if @sop.save
+          # the SOP was saved successfully, now need to apply policy / permissions settings to it
+          policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
+          
+          # update attributions
+          Relationship.create_or_update_attributions(@sop, params[:attributions])
+          
+          #Add creators
+          AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
+          
+          if policy_err_msg.blank?
+            flash[:notice] = 'SOP was successfully uploaded and saved.'
+            format.html { redirect_to sop_path(@sop) }
+          else
+            flash[:notice] = "SOP was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+            format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
+          end
         else
-          flash[:notice] = "SOP was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
+          format.html { 
+            set_parameters_for_sharing_form()
+            render :action => "new" 
+          }
         end
-      else
-        format.html { 
-          set_parameters_for_sharing_form()
-          render :action => "new" 
-        }
       end
     end
   end

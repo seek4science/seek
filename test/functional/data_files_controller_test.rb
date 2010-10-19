@@ -36,6 +36,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  test "should not create invalid datafile" do
+    df={:title=>"Test"}
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
+  end
+  
   test "should create data file with url" do
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
