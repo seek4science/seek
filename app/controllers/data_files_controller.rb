@@ -52,7 +52,6 @@ class DataFilesController < ApplicationController
     end
   end
   
-  
   def new
     respond_to do |format|
       if Authorization.is_member?(current_user.person_id, nil, nil)

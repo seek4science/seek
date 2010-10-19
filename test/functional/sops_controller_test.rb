@@ -35,6 +35,25 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  test "should correctly handle bad data url" do
+    sop={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png"}
+    assert_no_difference('Sop.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :sop => sop, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
+    
+    #not even a valid url
+    sop={:title=>"Test",:data_url=>"s  df::sd:dfds.com/sdf.png"}
+    assert_no_difference('Sop.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :sop => sop, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
+  end
+  
   test "should not create invalid sop" do
     sop={:title=>"Test"}
     assert_no_difference('Sop.count') do

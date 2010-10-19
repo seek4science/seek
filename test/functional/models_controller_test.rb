@@ -30,6 +30,16 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
   end    
   
+  test "should correctly handle bad data url" do
+    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png"}
+    assert_no_difference('Model.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :model => model, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
+  end
+  
   test "should not create invalid model" do
     model={:title=>"Test"}
     assert_no_difference('Model.count') do
