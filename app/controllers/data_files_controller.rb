@@ -85,7 +85,7 @@ class DataFilesController < ApplicationController
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
           
           if policy_err_msg.blank?
-            flash[:notice] = 'Data file was successfully uploaded and saved.'
+            flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
             format.html { redirect_to data_file_path(@data_file) }
           else
             flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"

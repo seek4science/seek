@@ -30,7 +30,7 @@ module Seek
           msg="The url responded with a redirect. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy."
         elsif code == "401"
           icon_filename=icon_filename_for_key("warn")
-          "The url responded with a request for authorization. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy."
+          msg="The url responded with a request for authorization. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy."
         end        
       rescue Exception=>e
         puts e
@@ -62,9 +62,14 @@ module Seek
     end
     
     def download_via_url asset    
-      downloader=Jerm::HttpDownloader.new
-      data_hash = downloader.get_remote_data asset.content_blob.url
-      send_data data_hash[:data], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+      code = url_response_code(asset.content_blob.url)
+      if (["302","401"].include?(code))
+        redirect_to(asset.content_blob.url,:target=>"_blank")
+      else
+        downloader=Jerm::HttpDownloader.new
+        data_hash = downloader.get_remote_data asset.content_blob.url
+        send_data data_hash[:data], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+      end      
     end
     
     def handle_data    
@@ -101,15 +106,30 @@ module Seek
           elsif !(params[symb][:data_url]).blank?
             make_local_copy = params[symb][:local_copy]=="1"
             @data_url=params[symb][:data_url]
-            downloader=Jerm::HttpDownloader.new
-            data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
-            @data=data_hash[:data] if make_local_copy
-            params[symb][:content_type] = data_hash[:content_type]
-            params[symb][:original_filename] = data_hash[:filename]          
+            code = url_response_code @data_url
+            if (code == "200")
+              downloader=Jerm::HttpDownloader.new
+              data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
+              @data=data_hash[:data] if make_local_copy
+              params[symb][:content_type] = data_hash[:content_type]
+              params[symb][:original_filename] = data_hash[:filename]
+            elsif (["302","401"].include?(code))
+              params[symb][:content_type] = ""
+              params[symb][:original_filename] = ""
+            else
+              respond_to do |format|
+                flash.now[:error] = "Unable to process the URL."
+                format.html do 
+                  set_parameters_for_sharing_form
+                  render :action => "new"
+                end
+              end
+              return false
+            end            
           end        
         rescue Exception=>e
           respond_to do |format|
-            flash.now[:error] = "Unable to process the URL"
+            flash.now[:error] = "Unable to read from the URL."
             format.html do 
               set_parameters_for_sharing_form
               render :action => "new"

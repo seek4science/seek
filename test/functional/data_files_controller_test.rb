@@ -149,14 +149,14 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def test_should_not_expose_contents_for_picture
-    get :data, :id => data_files(:picture),:format=>"xml"
+    get :data, :id => data_files(:picture)
     assert_redirected_to data_file_path(data_files(:picture))
     assert flash[:error]    
   end
   
   test "should not expose spreadsheet contents if not authorized" do
     login_as(:aaron)
-    get :data, :id => data_files(:viewable_data_file),:format=>"xml"
+    get :data, :id => data_files(:viewable_data_file)
     assert_redirected_to data_files_path
     assert flash[:error]    
   end
@@ -209,8 +209,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_no_difference("ContentBlob.count") do
         delete :destroy, :id => data_files(:editable_data_file).id
       end
-    end
-    f
+    end    
     assert_redirected_to data_files_path
   end
   
