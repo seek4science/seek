@@ -69,24 +69,32 @@ module Seek
         return false
       else
         #upload takes precendence if both params are present
-        if !(params[symb][:data]).blank?
-          # store properties and contents of the file temporarily and remove the latter from params[],
-          # so that when saving main object params[] wouldn't contain the binary data anymore
-          params[symb][:content_type] = (params[symb][:data]).content_type
-          params[symb][:original_filename] = (params[symb][:data]).original_filename
-          @data = params[symb][:data].read
-        elsif !(params[symb][:data_url]).blank?
-          make_local_copy = params[symb][:local_copy]=="1"
-          @data_url=params[symb][:data_url]
-          downloader=Jerm::HttpDownloader.new
-          data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
-          @data=data_hash[:data] if make_local_copy
-          params[symb][:content_type] = data_hash[:content_type]
-          params[symb][:original_filename] = data_hash[:filename]
-        else
-          raise Exception.new("Neither a data file or url was provided.")        
+        begin
+          if !(params[symb][:data]).blank?
+            # store properties and contents of the file temporarily and remove the latter from params[],
+            # so that when saving main object params[] wouldn't contain the binary data anymore
+            params[symb][:content_type] = (params[symb][:data]).content_type
+            params[symb][:original_filename] = (params[symb][:data]).original_filename
+            @data = params[symb][:data].read
+          elsif !(params[symb][:data_url]).blank?
+            make_local_copy = params[symb][:local_copy]=="1"
+            @data_url=params[symb][:data_url]
+            downloader=Jerm::HttpDownloader.new
+            data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
+            @data=data_hash[:data] if make_local_copy
+            params[symb][:content_type] = data_hash[:content_type]
+            params[symb][:original_filename] = data_hash[:filename]          
+          end        
+        rescue Exception=>e
+          respond_to do |format|
+            flash.now[:error] = "Unable to process the URL"
+            format.html do 
+              set_parameters_for_sharing_form
+              render :action => "new"
+            end
+          end
+          return false
         end
-        
         params[symb].delete 'data_url'
         params[symb].delete 'data'
         params[symb].delete 'local_copy' 
@@ -96,22 +104,22 @@ module Seek
     
     def handle_download asset
       if asset.content_blob.url.blank?
-      if asset.content_blob.file_exists?
-        send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
-      else
-        send_data asset.content_blob.data, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'  
-      end      
-    else
-      if asset.contributor.nil? #A jerm generated resource
-        download_jerm_resource asset
-      else
         if asset.content_blob.file_exists?
           send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
         else
-          download_via_url asset
+          send_data asset.content_blob.data, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'  
+        end      
+      else
+        if asset.contributor.nil? #A jerm generated resource
+          download_jerm_resource asset
+        else
+          if asset.content_blob.file_exists?
+            send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+          else
+            download_via_url asset
+          end
         end
       end
-    end
     end
     
   end
