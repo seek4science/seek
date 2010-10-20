@@ -246,7 +246,8 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert_not_equal 0, d.find_version(1).studied_factors.count
     assert_not_equal 0, d.find_version(2).studied_factors.count
-    assert_not_equal d.find_version(1).studied_factors, d.find_version(2).studied_factors    
+    assert_not_equal d.find_version(1).studied_factors, d.find_version(2).studied_factors
+    assert_equal d.find_version(1).studied_factors.count, d.find_version(2).studied_factors.count
   end
   
   test "should destroy DataFile" do
