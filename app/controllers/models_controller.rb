@@ -23,18 +23,21 @@ class ModelsController < ApplicationController
   
   
   def new_version
-    data = params[:data].read
-    comments = params[:revision_comment]
-    @model.content_blob = ContentBlob.new(:data => data)
-    @model.content_type = params[:data].content_type
-    @model.original_filename = params[:data].original_filename
-    respond_to do |format|
-      if @model.save_as_new_version(comments)
-        flash[:notice]="New version uploaded - now on version #{@model.version}"
-      else
-        flash[:error]="Unable to save new version"          
+    if (handle_data)
+     
+      comments = params[:revision_comment]
+      @model.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
+      @model.content_type = params[:model][:content_type]
+      @model.original_filename = params[:model][:original_filename]
+      
+      respond_to do |format|
+        if @model.save_as_new_version(comments)
+          flash[:notice]="New version uploaded - now on version #{@model.version}"
+        else
+          flash[:error]="Unable to save new version"          
+        end
+        format.html {redirect_to @model }
       end
-      format.html {redirect_to @model }
     end
   end
   
@@ -263,7 +266,7 @@ class ModelsController < ApplicationController
   
   # GET /models/new
   # GET /models/new.xml
-  def new
+  def new    
     respond_to do |format|
       if Authorization.is_member?(current_user.person_id, nil, nil)
         format.html # new.html.erb

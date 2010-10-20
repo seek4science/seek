@@ -1,6 +1,16 @@
 <%
-upload_field = type.name.underscore
+
+# determine the asset type from the controller
+upload_field = controller_name.downcase.singularize.underscore
+
+# inject the methods data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+obj=eval("@"+upload_field)
+class << obj
+	attr_reader :data_url,:local_copy
+end unless obj.nil?
+
 -%>
+
 <p id="upload_as_file">
     <b>File to upload</b>
     <span class="required">*</span><br/>

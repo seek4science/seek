@@ -12,26 +12,30 @@ class SopsController < ApplicationController
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
   def new_version
-    data = params[:data].read
-    comments=params[:revision_comment]
-    @sop.content_blob = ContentBlob.new(:data => data)
-    @sop.content_type = params[:data].content_type
-    @sop.original_filename=params[:data].original_filename
-    conditions = @sop.experimental_conditions
-    respond_to do |format|
-      if @sop.save_as_new_version(comments)
-        #Duplicate experimental conditions
-        conditions.each do |con|
-          new_con = con.clone
-          new_con.sop_version = @sop.version
-          new_con.save
+    if (handle_data)      
+      comments=params[:revision_comment]
+      
+      @sop.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
+      @sop.content_type = params[:model][:content_type]
+      @sop.original_filename = params[:model][:original_filename]
+      
+      conditions = @sop.experimental_conditions
+      respond_to do |format|
+        if @sop.save_as_new_version(comments)
+          #Duplicate experimental conditions
+          conditions.each do |con|
+            new_con = con.clone
+            new_con.sop_version = @sop.version
+            new_con.save
+          end
+          flash[:notice]="New version uploaded - now on version #{@sop.version}"
+        else
+          flash[:error]="Unable to save new version"          
         end
-        flash[:notice]="New version uploaded - now on version #{@sop.version}"
-      else
-        flash[:error]="Unable to save new version"          
+        format.html {redirect_to @sop }
       end
-      format.html {redirect_to @sop }
     end
+    
   end
   
   # GET /sops/1

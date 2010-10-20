@@ -18,25 +18,26 @@ class DataFilesController < ApplicationController
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]        
   
   def new_version
-    data = params[:data].read
-    comments=params[:revision_comment]
-    @data_file.content_blob = ContentBlob.new(:data => data)
-    @data_file.content_type = params[:data].content_type
-    @data_file.original_filename=params[:data].original_filename
-    factors = @data_file.studied_factors
-    respond_to do |format|
-      if @data_file.save_as_new_version(comments)
-        #Duplicate studied factors
-        factors.each do |f|
-          new_f = f.clone
-          new_f.data_file_version = @data_file.version
-          new_f.save
+    if (handle_data)          
+      comments=params[:revision_comment]
+      @data_file.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)      
+      @data_file.content_type = params[:data_file][:content_type]
+      @data_file.original_filename=params[:data_file][:original_filename]
+      factors = @data_file.studied_factors
+      respond_to do |format|
+        if @data_file.save_as_new_version(comments)
+          #Duplicate studied factors
+          factors.each do |f|
+            new_f = f.clone
+            new_f.data_file_version = @data_file.version
+            new_f.save
+          end
+          flash[:notice]="New version uploaded - now on version #{@data_file.version}"
+        else
+          flash[:error]="Unable to save new version"          
         end
-        flash[:notice]="New version uploaded - now on version #{@data_file.version}"
-      else
-        flash[:error]="Unable to save new version"          
+        format.html {redirect_to @data_file }
       end
-      format.html {redirect_to @data_file }
     end
   end
   

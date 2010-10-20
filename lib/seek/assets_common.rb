@@ -27,10 +27,10 @@ module Seek
           icon_filename=icon_filename_for_key("tick")
         elsif code == "302"
           icon_filename=icon_filename_for_key("warn")
-          msg="The url responded with a redirect. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy."
+          msg="The url responded with a redirect. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy. When downloading this file, the downloader will be redirected to the URL."
         elsif code == "401"
           icon_filename=icon_filename_for_key("warn")
-          msg="The url responded with a request for authorization. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy."
+          msg="The url responded with a request for authorization. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy. When downloading this file, the downloader will be redirected to the URL."
         end        
       rescue Exception=>e
         puts e
@@ -162,7 +162,6 @@ module Seek
           end
         end
       end
-    end
-    
+    end    
   end
 end
