@@ -12,16 +12,17 @@ upload_field = type.name.underscore
 	<b>Add via URL</b>
 	<span class="required">*</span><br/>
 	<%= text_field upload_field,:data_url,:size=>50 -%>
-	<span id="test_url_result"></span>
+	<span id="test_url_result_icon"></span>
 	<%= link_to_remote "Test", 
 		  :url=>{:action=>:test_asset_url},
           :method=>:post,
-		  :with=>"$('#{upload_field}_data_url').serialize()",
-		  :update=>'test_url_result',
-          :before=>"show_ajax_loader('test_url_result');"          
+		  :with=>"$('#{upload_field}_data_url').serialize()",		  
+          :before=>"show_ajax_loader('test_url_result_icon');"          
 	-%>
 	<br/>
+	<p id="test_url_msg" class="box_infotext" style="display:none"></p>
+	<br/>
 	<b>Store local copy?</b>
-	<%= check_box upload_field, :local_copy -%><br/>
+	<%= check_box upload_field, :local_copy,:id=>"local_copy" -%><br/>
 	or <%= link_to_function "Upload as a File","$('#{upload_field}_data_url').value='';"+visual_effect(:toggle_blind,"upload_as_url")+";"+visual_effect(:toggle_blind,"upload_as_file") -%>
 </p>

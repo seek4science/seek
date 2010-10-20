@@ -4,30 +4,52 @@ module Seek
     #required to get the icon_filename_for_key
     include ImagesHelper
     
+    def url_response_code asset_url
+      url = URI.parse(asset_url)
+      code=""
+      Net::HTTP.start(url.host, url.port) do |http|
+        code = http.head(url.request_uri).code        
+      end
+      return code
+    end
+    
     def test_asset_url
-      c = self.controller_name.downcase    
+      c = self.controller_name.downcase
       symb=c.singularize.to_sym
       
-      icon_filename=icon_filename_for_key("tick")
+      icon_filename=icon_filename_for_key("error")
+      code=""
+      msg=""
       begin
         asset_url=params[symb][:data_url]
-        url = URI.parse(asset_url)
-        Net::HTTP.start(url.host, url.port) do |http|
-          code = http.head(url.request_uri).code
-          puts code
-          icon_filename=icon_filename_for_key("error") unless code == "200"
-        end
-        
+        code = url_response_code(asset_url)        
+        if code == "200"
+          icon_filename=icon_filename_for_key("tick")
+        elsif code == "302"
+          icon_filename=icon_filename_for_key("warn")
+          msg="The url responded with a redirect. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy."
+        elsif code == "401"
+          icon_filename=icon_filename_for_key("warn")
+          "The url responded with a request for authorization. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy."
+        end        
       rescue Exception=>e
         puts e
-        icon_filename=icon_filename_for_key("error")
       end
       
-      respond_to do |format|
-        #FIXME: path won't be safe it running under a subdirectory
-        format.html { render :text=>"<img src='/images/#{icon_filename}'/>" }
+      image = "<img src='/images/#{icon_filename}'/>"
+      render :update do |page|
+        page.replace_html "test_url_result_icon",image
+        if msg.length>0
+          page.replace_html "test_url_msg",msg
+          page.show 'test_url_msg'
+          page.visual_effect :highlight,"test_url_msg"
+          page['local_copy'].checked=false
+          page['local_copy'].disable
+        else
+          page.hide 'test_url_msg'
+          page['local_copy'].enable
+        end
       end
-      
     end
     
     def download_jerm_asset asset

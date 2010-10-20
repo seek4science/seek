@@ -148,7 +148,7 @@ module ImagesHelper
       "famfamfam_silk/page.png"
     when "execute"
       "famfamfam_silk/lightning.png"
-    when "warning"
+    when "warning","warn"
       "crystal_project/22x22/apps/alert.png"
     when "skipped"
       "crystal_project/22x22/actions/undo.png"
