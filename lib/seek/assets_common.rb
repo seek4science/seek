@@ -20,11 +20,12 @@ module Seek
       icon_filename=icon_filename_for_key("error")
       code=""
       msg=""
-      begin
-        asset_url=params[symb][:data_url]
+      asset_url=params[symb][:data_url]
+      begin        
         code = url_response_code(asset_url)        
         if code == "200"
           icon_filename=icon_filename_for_key("tick")
+          msg="The URL was accessed successfully"
         elsif code == "302"
           icon_filename=icon_filename_for_key("warn")
           msg="The url responded with a redirect. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy. When downloading this file, the downloader will be redirected to the URL."
@@ -33,7 +34,7 @@ module Seek
           msg="The url responded with a request for authorization. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy. When downloading this file, the downloader will be redirected to the URL."
         end        
       rescue Exception=>e
-        puts e
+        msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+h(asset_url)
       end
       
       image = "<img src='/images/#{icon_filename}'/>"

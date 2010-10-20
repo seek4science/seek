@@ -3,36 +3,60 @@
 # determine the asset type from the controller
 upload_field = controller_name.downcase.singularize.underscore
 
-# inject the methods data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+# inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
 obj=eval("@"+upload_field)
 class << obj
 	attr_reader :data_url,:local_copy
 end unless obj.nil?
 
+asset_name = upload_field.humanize.capitalize
+assert_name = "SOP" if asset_name=="Sop"
+
 -%>
 
-<p id="upload_as_file">
+<script type="text/javascript">
+	
+</script>
+
+<p class="box_infotext">
+	You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting.
+	<span id="more_link"><%= link_to_function "more details ...",visual_effect('toggle_appear','more_link')+";"+visual_effect('toggle_appear','more_info') -%></span>
+	<br/>
+	<span id="more_info" style="display:none;">
+	When registering a URL you can specify that the data should be stored
+	within SEEK. This is recommended and is equivalent to uploading a file directly. It also means that should the data behind the URL the data is still available from SEEK. 
+	<br/>
+	If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
+	then they will simply directed to the URL (for example, so that they can login to access the file).	
+	</span>
+</p>
+<div id="upload_as_file">
+<p>
     <b>File to upload</b>
     <span class="required">*</span><br/>
     <%= file_field upload_field, :data -%><br/>
 	or <%= link_to_function "Register using a URL","$('#{upload_field}_data').value='';"+visual_effect(:toggle_blind,"upload_as_file")+";"+visual_effect(:toggle_blind,"upload_as_url") -%>
 </p>
+</div>
 
-<p id="upload_as_url" style="display:none;">
+<div id="upload_as_url" style="display:none;">
+	<p>
 	<b>Add via URL</b>
 	<span class="required">*</span><br/>
 	<%= text_field upload_field,:data_url,:size=>50 -%>
-	<span id="test_url_result_icon"></span>
+	
 	<%= link_to_remote "Test", 
 		  :url=>{:action=>:test_asset_url},
           :method=>:post,
 		  :with=>"$('#{upload_field}_data_url').serialize()",		  
-          :before=>"show_ajax_loader('test_url_result_icon');"          
+          :before=>"show_ajax_loader('test_url_result_icon');" 
 	-%>
 	<br/>
-	<p id="test_url_msg" class="box_infotext" style="display:none"></p>
-	<br/>
+	<span id="test_url_result_icon"></span><p id="test_url_msg" class="box_infotext" style="display:none"></p>
+	</p>
+	<p>
 	<b>Store local copy?</b>
 	<%= check_box upload_field, :local_copy,:id=>"local_copy" -%><br/>
 	or <%= link_to_function "Upload as a File","$('#{upload_field}_data_url').value='';"+visual_effect(:toggle_blind,"upload_as_url")+";"+visual_effect(:toggle_blind,"upload_as_file") -%>
-</p>
+	</p>
+</div>
