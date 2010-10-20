@@ -82,7 +82,7 @@ module Seek
           respond_to do |format|
             format.html do 
               set_parameters_for_sharing_form
-              render :action => render_action_on_error,:id=>id
+              render :action => render_action_on_error
             end
           end
         end
@@ -93,7 +93,7 @@ module Seek
           respond_to do |format|          
             format.html do 
               set_parameters_for_sharing_form
-              render :action => render_action_on_error,:id=>id
+              render :action => render_action_on_error
             end
           end
         end
@@ -126,7 +126,7 @@ module Seek
                 respond_to do |format|                  
                   format.html do 
                     set_parameters_for_sharing_form
-                    render :action => render_action_on_error,:id=>id
+                    render :action => render_action_on_error
                   end
                 end
               end
@@ -139,7 +139,7 @@ module Seek
             respond_to do |format|            
               format.html do 
                 set_parameters_for_sharing_form
-                render :action => render_action_on_error,:id=>id
+                render :action => render_action_on_error
               end
             end
           end

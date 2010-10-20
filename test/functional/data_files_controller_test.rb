@@ -235,13 +235,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
   end
   
-  test "should_duplicate_factors_studied_for_new_version" do
+  def test_should_duplicate_factors_studied_for_new_version
     d=data_files(:editable_data_file)
     d.save! #v1
     sf = StudiedFactor.create(:unit => units(:gram),:measured_item => measured_items(:weight),
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
-      post :new_version, :id=>d, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision" #v2
+      post :new_version, :id=>d, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
     
     assert_not_equal 0, d.find_version(1).studied_factors.count
@@ -263,7 +263,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sf = StudiedFactor.create(:unit => units(:gram),:measured_item => measured_items(:weight),
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
-      post :new_version, :id=>d, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision" #v2
+      post :new_version, :id=>d, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
     
     d.find_version(2).studied_factors.each {|e| e.destroy}

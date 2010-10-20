@@ -16,8 +16,8 @@ class SopsController < ApplicationController
       comments=params[:revision_comment]
       
       @sop.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
-      @sop.content_type = params[:model][:content_type]
-      @sop.original_filename = params[:model][:original_filename]
+      @sop.content_type = params[:sop][:content_type]
+      @sop.original_filename = params[:sop][:original_filename]
       
       conditions = @sop.experimental_conditions
       respond_to do |format|

@@ -338,7 +338,7 @@ class ModelsControllerTest < ActionController::TestCase
     m=models(:model_with_format_and_type)    
     
     assert_difference("Model::Version.count", 1) do
-      post :new_version, :id=>m, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
+      post :new_version, :id=>m, :model=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision"
     end
     
     assert_redirected_to model_path(m)
