@@ -90,6 +90,51 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:data_file).content_type
   end
   
+  
+  #This test is quite fragile, because it relies on an external resource
+  test "should create and redirect on download for 401 url" do
+    df = {:title=>"401",:data_url=>"http://www.myexperiment.org/workflow.xml?id=82"}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).original_filename
+    assert_equal "",assigns(:data_file).content_type
+    
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://www.myexperiment.org/workflow.xml?id=82"
+  end
+  
+  
+  #This test is quite fragile, because it relies on an external resource
+  test "should create and redirect on download for 302 url" do
+    
+    df = {:title=>"302",:data_url=>"http://demo.sysmo-db.org/models/1/download"}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).original_filename
+    assert_equal "",assigns(:data_file).content_type
+    
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://demo.sysmo-db.org/models/1/download"
+  end
+  
   test "should create data file" do
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
