@@ -23,7 +23,7 @@ class ModelsController < ApplicationController
   
   
   def new_version
-    if (handle_data)
+    if (handle_data nil)
      
       comments = params[:revision_comment]
       @model.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
@@ -38,6 +38,9 @@ class ModelsController < ApplicationController
         end
         format.html {redirect_to @model }
       end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @model
     end
   end
   

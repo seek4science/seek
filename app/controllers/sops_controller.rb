@@ -12,7 +12,7 @@ class SopsController < ApplicationController
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
   def new_version
-    if (handle_data)      
+    if (handle_data nil)      
       comments=params[:revision_comment]
       
       @sop.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
@@ -34,6 +34,9 @@ class SopsController < ApplicationController
         end
         format.html {redirect_to @sop }
       end
+    else
+      flash[:error]=flash.now[:error] 
+      redirect_to @sop
     end
     
   end

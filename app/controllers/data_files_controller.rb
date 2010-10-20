@@ -18,7 +18,7 @@ class DataFilesController < ApplicationController
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]        
   
   def new_version
-    if (handle_data)          
+    if (handle_data nil)          
       comments=params[:revision_comment]
       @data_file.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)      
       @data_file.content_type = params[:data_file][:content_type]
@@ -38,6 +38,9 @@ class DataFilesController < ApplicationController
         end
         format.html {redirect_to @data_file }
       end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @data_file
     end
   end
   

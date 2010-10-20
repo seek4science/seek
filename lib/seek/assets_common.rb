@@ -72,25 +72,29 @@ module Seek
       end      
     end
     
-    def handle_data    
+    def handle_data render_action_on_error=:new
       c = self.controller_name.downcase    
       symb=c.singularize.to_sym
       
       if (params[symb][:data]).blank? && (params[symb][:data_url]).blank?
-        respond_to do |format|
-          flash.now[:error] = "Please select a file to upload or provide a URL to the data."
-          format.html do 
-            set_parameters_for_sharing_form
-            render :action => "new"
+        flash.now[:error] = "Please select a file to upload or provide a URL to the data."
+        if render_action_on_error
+          respond_to do |format|
+            format.html do 
+              set_parameters_for_sharing_form
+              render :action => render_action_on_error,:id=>id
+            end
           end
         end
         return false
       elsif !(params[symb][:data]).blank? && (params[symb][:data]).size == 0 && (params[symb][:data_url]).blank?
-        respond_to do |format|
-          flash.now[:error] = "The file that you are uploading is empty. Please check your selection and try again!"
-          format.html do 
-            set_parameters_for_sharing_form
-            render :action => "new"
+        flash.now[:error] = "The file that you are uploading is empty. Please check your selection and try again!"
+        if render_action_on_error
+          respond_to do |format|          
+            format.html do 
+              set_parameters_for_sharing_form
+              render :action => render_action_on_error,:id=>id
+            end
           end
         end
         return false
@@ -117,22 +121,26 @@ module Seek
               params[symb][:content_type] = ""
               params[symb][:original_filename] = ""
             else
-              respond_to do |format|
-                flash.now[:error] = "Unable to process the URL."
-                format.html do 
-                  set_parameters_for_sharing_form
-                  render :action => "new"
+              flash.now[:error] = "Unable to process the URL."
+              if render_action_on_error
+                respond_to do |format|                  
+                  format.html do 
+                    set_parameters_for_sharing_form
+                    render :action => render_action_on_error,:id=>id
+                  end
                 end
               end
               return false
             end            
           end        
         rescue Exception=>e
-          respond_to do |format|
-            flash.now[:error] = "Unable to read from the URL."
-            format.html do 
-              set_parameters_for_sharing_form
-              render :action => "new"
+          flash.now[:error] = "Unable to read from the URL."
+          if render_action_on_error
+            respond_to do |format|            
+              format.html do 
+                set_parameters_for_sharing_form
+                render :action => render_action_on_error,:id=>id
+              end
             end
           end
           return false

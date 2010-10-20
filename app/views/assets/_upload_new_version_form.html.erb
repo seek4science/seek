@@ -1,7 +1,10 @@
+<%
+upload_field = controller_name.downcase.singularize.underscore
+%>
 <script>
     function validateUploadFormFields(form){
-        if ($('data').value.length == 0) {
-            alert("Please specify the name of the file to upload!");
+        if ($('<%= "#{upload_field}_data" -%>').value.length == 0 && $('<%= "#{upload_field}_data_url" -%>').value.length == 0) {
+            alert("Please specify the name of the file to upload or provide a URL	");
             $('data').focus();
             return (false);
         }
