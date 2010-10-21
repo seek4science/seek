@@ -26,15 +26,15 @@
     Sharing
   </div>
 
-  <div class="foldContent" style="display: block;">
+  <div class="foldContent" style="display: none;">
 
     <div class="box_infotext">
       <p>
         Here you can specify who can <b>view</b>, <b>download</b> and <b>edit</b> this <%= @resource_type -%>.
-        <%= link_to_function "Click here" + expand_image, visual_effect(:toggle_blind, "more_info", :duration => 0.3) -%> for more information.
+        <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3) -%>
       </p>
 
-      <div id="more_info" class="box_simple" style="display: none;">
+      <div id="more_sharing_info" class="box_simple" style="display: none;">
         <p>
           Here you may specify the People, Projects or Groups that may View and Edit the details about your <%= @resource_type -%>.<br>
         <p>

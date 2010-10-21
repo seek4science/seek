@@ -3,7 +3,7 @@
         <%= help_icon("Here you attribute this #{resource_type} to any publications registered in SEEK, or vice versa.") -%>
         Related Publications
     </div>
-    <div id="publications_fold_content" class="foldContent" style="display: block;">
+    <div id="publications_fold_content" class="foldContent" style="display: none;">
         <div class="yui-u first" style="width:66%; float:left">
             <%
             all_publications=Publication.all.sort{|a, b| a.title<=>b.title}
