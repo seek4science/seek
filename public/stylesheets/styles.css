@@ -335,12 +335,12 @@ span.disabled_icon {
 
 .main_content_left_box {
     float: left;
-    width: 73.5%;
+    width: 84%;
 }
 
 .main_content_right_box {
     float: right;
-    width: 24%;
+    width: 15%;
 }
 
 
@@ -873,7 +873,7 @@ ul.related_asset_list li{
 }
 
 .contribution_title h1 {    
-    width: 100%;
+    width: 90%;
 }
 
 table.jerm_results {
