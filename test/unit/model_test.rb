@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 class ModelTest < ActiveSupport::TestCase
   fixtures :all
   
-  include ModelExecution
+  include Seek::ModelExecution
 
   test "assocations" do
     model=models(:teusink)

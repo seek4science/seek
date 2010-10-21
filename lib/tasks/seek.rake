@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'rake'
-require 'model_execution'
 require 'active_record/fixtures'
 
 namespace :seek do

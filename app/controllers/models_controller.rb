@@ -1,8 +1,6 @@
-require 'model_execution'
-
 class ModelsController < ApplicationController
   
-  include ModelExecution
+  include Seek::ModelExecution
   include WhiteListHelper
   include IndexPager
   include DotGenerator
