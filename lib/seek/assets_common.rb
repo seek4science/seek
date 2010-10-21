@@ -28,10 +28,10 @@ module Seek
           msg="The URL was accessed successfully"
         elsif code == "302"
           icon_filename=icon_filename_for_key("warn")
-          msg="The url responded with a redirect. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy. When downloading this file, the downloader will be redirected to the URL."
+          msg="The url responded with a <b>redirect</b>. It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         elsif code == "401"
           icon_filename=icon_filename_for_key("warn")
-          msg="The url responded with a request for authorization. It can still be used, but content type and filename will not be recorded.You will also not be able to store a copy. When downloading this file, the downloader will be redirected to the URL."
+          msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         end        
       rescue Exception=>e
         msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+h(asset_url)
@@ -44,11 +44,18 @@ module Seek
           page.replace_html "test_url_msg",msg
           page.show 'test_url_msg'
           page.visual_effect :highlight,"test_url_msg"
-          page['local_copy'].checked=false
-          page['local_copy'].disable
-        else
-          page.hide 'test_url_msg'
-          page['local_copy'].enable
+          if code=="302" || code=="401"            
+            page['local_copy'].checked=false
+            page['local_copy'].disable
+            
+          else
+            page['local_copy'].enable
+#            if (code=="200")
+#              
+#            else
+#              
+#            end
+          end
         end
       end
     end
