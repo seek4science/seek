@@ -1,46 +1,41 @@
 <%= javascript_include_tag "sharing.js" -%>
-
 <h1>New SOP</h1>
-
 <div class="show_basic">
-  <% form_tag({:action => :create}, :multipart => true) do -%>
-    <%= error_messages_for :sop -%>    
-      	
+    <% form_tag({:action => :create}, :multipart => true) do -%>
+    <div class="asset_form">
+        <%= error_messages_for :sop -%>
         <%= render :partial=>"assets/upload_box" -%>
-
         <p style="margin-top: 1.5em;">
-          <b>Title</b><span class="required">*</span><br/>
-          <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
-          <%= text_area_tag 'sop[title]', sop_title_value, :style => "width: 100%;", :rows=>2 -%>
+            <b>Title</b>
+            <span class="required">*</span>
+            <br/>
+            <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
+            <%= text_area_tag 'sop[title]', sop_title_value, :style => "width: 100%;", :rows=>2 -%>
         </p>
-
         <p style="margin-top: 0.5em;">
-          <b>Description</b><br/>
-          <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
-          <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
+            <b>Description</b>
+            <br/>
+            <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
+            <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
-
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
-          :project_hash => current_user.generate_own_project_id_name_hash } -%>      
-
-    <p>
-      <%= render :partial => "assets/sharing_form" -%>
-    </p>
-  
-    <p>
-      <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
-        :existing_attributions => [],
-        :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
-    </p>
-    
-    <p>
-      <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
-        :existing_creators => [current_user.person],
-        :other_creators => nil} -%>
-    </p>
-
-    <p>
-      <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
-    </p>
-  <% end -%>
+        :project_hash => current_user.generate_own_project_id_name_hash } -%>
+        <p>
+            <%= render :partial => "assets/sharing_form" -%>
+        </p>
+        <p>
+            <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
+            :existing_attributions => [],
+            :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
+        </p>
+        <p>
+            <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
+            :existing_creators => [current_user.person],
+            :other_creators => nil} -%>
+        </p>
+        <p>
+            <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(true); return(false);" -%>or <%= link_to 'Cancel', sops_path -%>
+        </p>
+        <% end -%>
+    </div>
 </div>

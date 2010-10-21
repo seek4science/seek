@@ -1303,4 +1303,8 @@ div.preview_box {
 .pale_text {
 	color: #666666;
 }
+
+div.asset_form {
+	padding-right: 1em;
+}
   

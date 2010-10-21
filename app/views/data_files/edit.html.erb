@@ -8,6 +8,7 @@
 <h1>Editing Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
 <div class="show_basic">
     <% form_for(@data_file) do |f| %>
+	<div class="asset_form">
     <%= f.error_messages %>
     <p>
         <b>Title:</b>
@@ -43,4 +44,5 @@
         <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(false); return(false);" -%>or <%= link_to "Cancel", data_file_path(@data_file) -%>
     </p>
     <% end %>
+    </div>
 </div>
