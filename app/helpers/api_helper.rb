@@ -185,9 +185,7 @@ module ApiHelper
       builder.tag! "avatars" do
         builder.tag! "avatar",avatar_xlink(object.avatar) unless object.avatar.nil?
       end      
-    end
-     
-    
+    end    
   end
   
   def asset_xml builder,asset,include_core=true,include_resource=true
@@ -204,9 +202,10 @@ module ApiHelper
   
   def blob_xml builder,blob
     builder.tag! "blob",core_xlink(blob) do      
-      builder.tag! "uuid",blob.uuid if blob.respond_to?("uuid")
-      builder.tag! "md5sum",blob.md5sum if blob.respond_to?("md5sum")
-      builder.tag! "is_remote",!blob.url.nil?
+      builder.tag! "uuid",blob.uuid
+      builder.tag! "md5sum",blob.md5sum
+      builder.tag! "url",blob.url
+      builder.tag! "is_remote",!blob.file_exists?
     end
   end
   
@@ -235,7 +234,6 @@ module ApiHelper
     end    
   end    
     
-  
   def generic_list_xml builder,list,tag,attr={}
     builder.tag! tag,attr do 
       list.each do |item|
