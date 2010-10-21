@@ -533,11 +533,6 @@ ul.users_details li p {
 
 }
 
-.foldContent {
-    padding-top:0.5em;
-    background-color: #FCFCFF;    	
-}
-
 table.conditions_or_factors {
     border: dotted #999999 1px;
     margin-top: 1em;

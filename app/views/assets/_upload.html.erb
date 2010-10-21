@@ -18,18 +18,22 @@ assert_name = "SOP" if asset_name=="Sop"
 	
 </script>
 
-<p class="box_infotext">
+<div class="box_infotext">
+	<p>
 	You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting.
 	<%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
-	<br/>
+	</p>
 	<span id="more_upload_info" style="display:none;">
+	<p>
 	When registering a URL you can specify that the data should be stored
 	within SEEK. This is recommended and is equivalent to uploading a file directly. It also means that should the data behind the URL the data is still available from SEEK. 
-	<br/>
+	</p>
+	<p>
 	If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
-	then they will simply directed to the URL (for example, so that they can login to access the file).	
+	then they will simply directed to the URL (for example, so that they can login to access the file).
+	</p>	
 	</span>
-</p>
+</div>
 <div id="upload_as_file">
 <p>
     <b>File to upload</b>

@@ -6,10 +6,9 @@
   <% form_tag({:action => :create}, :multipart => true) do -%>
     <%= error_messages_for :data_file -%>
 
-    <center>
-      <div style="width: 95%;">
+    
         
-		<%= render :partial=>"assets/upload" -%>
+		<%= render :partial=>"assets/upload_box" -%>
 		
         <p style="margin-top: 1.5em;">
           <b>Title</b><span class="required">*</span><br/>
@@ -25,36 +24,29 @@
 
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "DataFile",   # this is only for presentation, not for any processing
           :project_hash => current_user.generate_own_project_id_name_hash } -%>
-        
-      </div>
-      
-    </center>
-
     
-
-
-    <p style="margin: 2.5em 0 0 0;">
+    <p>
       <%= render :partial => "assets/sharing_form" -%>
     </p>
 
-    <p style="margin: 0;">
+    <p>
       <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
         :existing_attributions => [],
         :attribution_suggestions => DataFile.get_all_as_json(current_user) } -%>
     </p>
     
-    <p style="margin: 0;">
+    <p>
       <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "DataFile",
                                                                               :related_publications => []} -%>
     </p>
 
-    <p style="margin: 0;">
+    <p>
       <%= render :partial => "assets/author_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
         :existing_creators => [current_user.person],
         :other_creators => nil} -%>
     </p>
 
-    <p style="text-align: center; margin-top: 1.5em;">
+    <p>
       <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
     </p>
   <% end -%>

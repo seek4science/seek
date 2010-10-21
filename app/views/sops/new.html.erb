@@ -4,12 +4,9 @@
 
 <div class="show_basic">
   <% form_tag({:action => :create}, :multipart => true) do -%>
-    <%= error_messages_for :sop -%>
-
-    <center>
-      <div style="width:95%">
+    <%= error_messages_for :sop -%>    
       	
-        <%= render :partial=>"assets/upload" -%>
+        <%= render :partial=>"assets/upload_box" -%>
 
         <p style="margin-top: 1.5em;">
           <b>Title</b><span class="required">*</span><br/>
@@ -24,31 +21,25 @@
         </p>
 
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
-          :project_hash => current_user.generate_own_project_id_name_hash } -%>
-      </div>
-    </center>
+          :project_hash => current_user.generate_own_project_id_name_hash } -%>      
 
-    <%#*<p>%>
-    <%#= render :partial => "organisms/select_organism",:locals=>{:model=>Sop} -%>
-    <%#*</p>%>
-
-    <p style="margin: 2.5em 0 0 0;">
+    <p>
       <%= render :partial => "assets/sharing_form" -%>
     </p>
   
-    <p style="margin: 0;">
+    <p>
       <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
         :existing_attributions => [],
         :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
     </p>
     
-    <p style="margin: 0;">
+    <p>
       <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
         :existing_creators => [current_user.person],
         :other_creators => nil} -%>
     </p>
 
-    <p style="text-align: center; margin-top: 1.5em;">
+    <p>
       <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
     </p>
   <% end -%>
