@@ -1307,4 +1307,31 @@ div.preview_box {
 div.asset_form {
 	padding-right: 1em;
 }
+
+div#upload_type_selection {
+    padding-left: 0.5em;
+    height: 120px;
+}
+
+ul#switch_upload_buttons {
+    list-style: none;
+    clear: both;
+    display: block;
+}
+
+ul#switch_upload_buttons li {
+	list-style: none;
+    float: left;
+    padding-right: 0.75em;
+    padding-top: 10px;
+}
+
+ul#switch_upload_buttons a {
+    width: 34px;
+}
+
+li#upload_options {
+    padding-left: 1em;
+    display: inline-block;
+}
   

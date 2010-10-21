@@ -8,28 +8,25 @@ attr_reader :data_url,:local_copy
 end unless obj.nil?
 asset_name = upload_field.humanize.capitalize
 assert_name = "SOP" if asset_name=="Sop" -%>
+
 <script type="text/javascript">
     function from_url_selected(){
         Effect.Fade("upload_from_file", {
             duration: 0.0
         });
-        Effect.Appear("upload_from_url");
-        $('upload_from_file_button').enable
-        $('upload_from_url_button').disable
+        Effect.Appear("upload_from_url");       
     }
     
     function from_file_selected(){
         Effect.Fade("upload_from_url", {
             duration: 0.0
         });
-        Effect.Appear("upload_from_file");
-        $('upload_from_url_button').enable
-        $('upload_from_file_button').disable
+        Effect.Appear("upload_from_file");        
     }
 </script>
 <div class="box_infotext">
     <p>
-        You can register a <%= asset_name -%>by either directly uploading a file, or registering a URL. Please test the URL before submitting.<%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
+        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting.<%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
     </p>
     <span id="more_upload_info" style="display:none;">
         <p>
@@ -42,34 +39,7 @@ assert_name = "SOP" if asset_name=="Sop" -%>
         </p>
     </span>
 </div>
-<style>
-    div#upload_type_selection {
-        padding-left: 0.5em;
-        height: 120px;
-    }
-    
-    ul#switch_upload_buttons {
-        list-style: none;
-        clear: both;
-        display: block;
-    }
-    
-    ul#switch_upload_buttons li {
-        float: left;
-        padding-right: 0.75em;
-        padding-top: 10px;
-    }
-    
-    ul#switch_upload_buttons a {
-        width: 34px;
-    }
-    
-    li#upload_options {
-        padding-left: 1em;
-        display: inline-block;
-    }
-       
-</style>
+
 <div>
     <div id="upload_type_selection">
         <ul id="switch_upload_buttons">

@@ -18,13 +18,13 @@ upload_field = controller_name.downcase.singularize.underscore
     <% form_tag({:action=>"new_version", :id=>resource}, :multipart => true) do -%>
     <center>
         <div style="width:95%;margin-top:0.75em;">
-			<%= render :partial=>"assets/upload" -%>
+			<%= render :partial=>"assets/upload_box" -%>
             <p>
                 <b>Revision comments (optional)</b>
                 <br/>
                 <%= text_area_tag :revision_comment, nil, :size=>"55x4" -%>
                 <br/>
-                <%= submit_tag "Upload", :id => "new_version_submit_btn", :onclick => "javascript: validateUploadFormFields(this.form); return(false);", :style=>"float:right;margin-right:2em;" -%>
+                <%= submit_tag "Upload", :id => "new_version_submit_btn", :onclick => "javascript: validateUploadFormFields(this.form); return(false);" -%>
             </p>
         </div>
     </center>
