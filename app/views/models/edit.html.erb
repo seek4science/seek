@@ -1,95 +1,62 @@
-<%= javascript_include_tag "sharing.js" %>
-
+<%= javascript_include_tag "sharing.js","models.js" -%>
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @model, current_user) -%>
-
-
 <ul class="sectionIcons">
-  <li><%= image_tag_for_key('arrow_left', model_path(@model), 'Return to Model', nil, 'Return to Model') -%></li>
+    <li>
+        <%= image_tag_for_key('arrow_left', model_path(@model), 'Return to Model', nil, 'Return to Model') -%>
+    </li>
 </ul>
-
 <h1>Editing Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
-
 <div class="show_basic">
-  <% form_for(@model) do |f| %>
+    <% form_for(@model) do |f| %>
     <%= f.error_messages %>
-
-    <center>
-      <div style="width: 90%;">
-        <p style="margin-top: 1.5em;">
-          <b>Title:</b><br/>
-          <%= f.text_area :title, :style => "width: 100%;",:rows=>2 -%>
-        </p>
-
-        <p style="margin-top: 0.5em;">
-          <b>Description:</b><br/>
-          <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
-        </p>
-
-        <p>
-          <b>Model type:</b><br/>
-          <%= f.collection_select :model_type_id,ModelType.find(:all),:id,:title,:include_blank=>"Not specified" %>
-        </p>
-
-        <p>
-          <b>Model format:</b><br/>
-          <%= f.collection_select :model_format_id,ModelFormat.find(:all),:id,:title,:include_blank=>"Not specified" %>
-        </p>
-
-        <%
-        environment_options=[['Unknown',0]]|RecommendedModelEnvironment.find(:all).collect{|e| [h(e.title),e.id]}
-        environment_value= @model.recommended_environment ? @model.recommended_environment.id : 0
-      %>
-        <p>
-          <b>Preferred execution or visualisation environment:</b>
-          <%= select_tag 'model[recommended_environment_id]',
-            options_for_select(environment_options,environment_value),
-            {
-            :style=>"width:82%",
-            :name=>"model[recommended_environment_id]"
-          }
-        %>
-        </p>
-
-        <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
-        <% if current_user_authorized_to_manage -%>
-          <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+    <p>
+        <b>Title:</b>
+        <br/>
+        <%= f.text_area :title, :style => "width: 100%;",:rows=>2 -%>
+    </p>
+    <p>
+        <b>Description:</b>
+        <br/>
+        <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
+    </p>
+    <div class="fold">
+        <div class="foldTitle">
+            Other information 
+        </div>
+        <div class="foldContent">
+            <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+            <% if current_user_authorized_to_manage -%>
+            <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
             :selected_project_id => @model.project_id,
             :project_hash => current_user.generate_own_project_id_name_hash,
             :disable_project_select => true } -%>
-        <% end -%>
-      </div>
-    </center>
-
-    <p>
-      <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
-    </p>
-
+            <% end -%>
+            <%= render :partial=>"model_metadata" -%>
+        </div>
+    </div>
+    <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>
-      <p style="margin: 2.5em 0 0 0;">
+    <p>
         <%= render :partial => "assets/sharing_form" -%>
-      </p>
-
-      <p style="margin: 0;">
-        <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-          :existing_attributions => Authorization.authorize_collection("show", @model.attributions_objects, current_user),
-          :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
-      </p>
-      
-      <p style="margin: 0;">
-        <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Model",
-                                                                                :related_publications => @model.related_publications} -%>
-      </p>
-      
-      <p style="margin: 0;">
-        <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-          :existing_creators => @model.creators,
-          :other_creators => @model.other_creators} -%>
-      </p>
-    <% end -%>
-
-    <p style="text-align: center;">
-      <%= f.submit "Update", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(false); return(false);"  -%> or <%= link_to "Cancel", model_path(@model) -%>
     </p>
-  <% end %>
+    <p>
+        <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+        :existing_attributions => Authorization.authorize_collection("show", @model.attributions_objects, current_user),
+        :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
+    </p>
+    <p>
+        <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Model",
+        :related_publications => @model.related_publications} -%>
+    </p>
+    <p>
+        <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+        :existing_creators => @model.creators,
+        :other_creators => @model.other_creators} -%>
+    </p>
+    <% end -%>
+    <p>
+        <%= f.submit "Update", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(false); return(false);" -%>or <%= link_to "Cancel", model_path(@model) -%>
+    </p>
+    <% end %>
 </div>

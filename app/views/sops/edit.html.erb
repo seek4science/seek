@@ -14,14 +14,13 @@
   <% form_for(@sop) do |f| %>
     <%= f.error_messages %>
 
-    <center>
-      <div style="width:90%">
-        <p style="margin-top: 1.5em;">
+    
+        <p>
           <b>Title:</b><br/>
           <%= f.text_area :title, :style=>"width: 100%", :rows=>2 -%>
         </p>
 
-        <p style="margin-top: 0.5em;">
+        <p>
           <b>Description:</b><br/>
           <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
         </p>
@@ -33,33 +32,27 @@
             :project_hash => current_user.generate_own_project_id_name_hash,
             :disable_project_select => true } -%>
         <% end -%>
-      </div>
-    </center>
-
-    <%#*<p>%>
-      <%#= render :partial => "organisms/select_organism",:locals=>{:model=>Sop} -%>
-    <%#*</p>%>
-
+  
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>
-      <p style="margin: 2.5em 0 0 0;">
+      <p>
         <%= render :partial => "assets/sharing_form" -%>
       </p>
 
-      <p style="margin: 0;">
+      <p>
         <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
           :existing_attributions => Authorization.authorize_collection("show", @sop.attributions_objects, current_user),
           :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
       </p>
       
-      <p style="margin: 0;">
+      <p>
         <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
           :existing_creators => @sop.creators,
           :other_creators => @sop.other_creators} -%>
       </p>
     <% end -%>
 
-    <p style="text-align: center;">
+    <p>
       <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);"  -%> or <%= link_to "Cancel", sop_path(@sop) -%>
     </p>
   <% end %>

@@ -1,60 +1,46 @@
 <%= javascript_include_tag "sharing.js" %>
-
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @data_file, current_user) -%>
-
-
 <ul class="sectionIcons">
-  <li><%= image_tag_for_key('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%></li>
+    <li>
+        <%= image_tag_for_key('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%>
+    </li>
 </ul>
-
 <h1>Editing Data file: <%= link_to(h(@data_file.title), data_file_path(@data_file)) -%></h1>
-
 <div class="show_basic">
-  <% form_for(@data_file) do |f| %>
+    <% form_for(@data_file) do |f| %>
     <%= f.error_messages %>
-
-    <center>
-      <div style="width: 90%;">
-        <p style="margin-top: 1.5em;">
-          <b>Title:</b><br/>
-          <%= f.text_area :title, :style => "width: 100%;",:rows=>2 -%>
-        </p>
-
-        <p style="margin-top: 0.5em;">
-          <b>Description:</b><br/>
-          <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
-        </p>
-
-      </div>
-    </center>
-
+    <p>
+        <b>Title:</b>
+        <br/>
+        <%= f.text_area :title, :style => "width: 100%;",:rows=>2 -%>
+    </p>
+    <p>
+        <b>Description:</b>
+        <br/>
+        <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
+    </p>
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>
-      <p style="margin: 2.5em 0 0 0;">
+    <p>
         <%= render :partial => "assets/sharing_form" -%>
-      </p>
-
-      <p style="margin: 0;">
-        <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
-          :existing_attributions => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user),
-          :attribution_suggestions => DataFile.get_all_as_json(current_user)} -%>
-      </p>
-      
-      <p style="margin: 0;">
-        <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "DataFile",
-                                                                                :related_publications => @data_file.related_publications} -%>
-      </p>
-      
-      <p style="margin: 0;">
-        <%= render :partial => "assets/author_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
-          :existing_creators => @data_file.creators,
-          :other_creators => @data_file.other_creators} -%>
-      </p>
-    <% end -%>
-    
-
-    <p style="text-align: center;">
-      <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(false); return(false);"  -%> or <%= link_to "Cancel", data_file_path(@data_file) -%>
     </p>
-  <% end %>
+    <p>
+        <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
+        :existing_attributions => Authorization.authorize_collection("show", @data_file.attributions_objects, current_user),
+        :attribution_suggestions => DataFile.get_all_as_json(current_user)} -%>
+    </p>
+    <p>
+        <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "DataFile",
+        :related_publications => @data_file.related_publications} -%>
+    </p>
+    <p>
+        <%= render :partial => "assets/author_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
+        :existing_creators => @data_file.creators,
+        :other_creators => @data_file.other_creators} -%>
+    </p>
+    <% end -%>
+    <p>
+        <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(false); return(false);" -%>or <%= link_to "Cancel", data_file_path(@data_file) -%>
+    </p>
+    <% end %>
 </div>
