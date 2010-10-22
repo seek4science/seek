@@ -45,10 +45,11 @@ module Seek
       
       doc = Hpricot(body)
       
+      scripts_and_stylesheets = process_scripts_and_styles(doc).join("\n")
       div_block = find_the_boxes_div(doc).join("\n")
       div_block = div_block.gsub("window.open('/webMathematica","window.open('http://jjj.mib.ac.uk/webMathematica/")
       
-      return process_scripts_and_styles(doc).join("\n"),div_block
+      return scripts_and_stylesheets,div_block
     end
     
     def self.process_scripts_and_styles doc
@@ -63,8 +64,8 @@ module Seek
         ss << script.to_s
         break if ss.size == 6
       end
-      
-      doc.search("//link[@rel='stylesheet'").each do |link|
+      doc.search("//link[@rel='stylesheet']")
+      doc.search("//link[@rel='stylesheet']").each do |link|
         href=link.attributes['href']
         
         if href
@@ -72,7 +73,7 @@ module Seek
           link.attributes['href'] = href  
         end        
         ss << link.to_html
-      end
+      end            
       
       return ss
     end
