@@ -42,6 +42,7 @@ module Seek
     end
     
     def self.process_response_body body            
+      body=body.gsub("\";","\"")
       
       doc = Hpricot(body)
       
@@ -84,12 +85,7 @@ module Seek
         if img.attributes['src']
           img.attributes['src'] = BUILDER_URL_BASE+"/"+img.attributes['src']
         end
-      end
-      puts "-------------------------------------------------"
-      form_elements.search("//input").each do |button|
-        puts button.to_html
-      end
-      puts "-------------------------------------------------"
+      end      
       
       [form_elements.first.to_html]      
     end
