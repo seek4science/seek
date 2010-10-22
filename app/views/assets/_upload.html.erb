@@ -26,7 +26,7 @@ assert_name = "SOP" if asset_name=="Sop" -%>
 </script>
 <div class="box_infotext">
     <p>
-        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting.<%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
+        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
     </p>
     <span id="more_upload_info" style="display:none;">
         <p>
