@@ -56,7 +56,10 @@ class ModelsController < ApplicationController
     @javascript_and_styles,@page_content = Seek::ModelBuilder.get_content
   end
   
-  
+  def validate
+    @javascript_and_styles,@page_content = Seek::ModelBuilder.get_validate_content @model
+  end
+    
   def update_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"

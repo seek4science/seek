@@ -31,6 +31,8 @@
 
 <div class="show_basic">
   <div class="main_content_left_box">
+  	
+	<%= link_to "VALIDATE",validate_model_path(@model)%>
     
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
     

@@ -9,6 +9,26 @@ module Seek
       "#{BUILDER_URL_BASE}/DatFileReader.jsp"
     end
     
+    def self.upload_dat_url
+      self.builder_url+"?datFilePosted=true"
+    end
+    
+    def self.get_validate_content model
+      filepath=model.content_blob.filepath
+      
+      part=Multipart.new({:uploadedDatFile=>filepath})
+      
+      response = part.post(upload_dat_url)
+      
+      if response.instance_of?(Net::HTTPInternalServerError)       
+        puts response.to_s
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      end
+      
+      process_response_body(response.body)
+      
+    end
+    
     def self.get_content       
       uri=URI.parse(builder_url)      
       http=Net::HTTP.new(uri.host,uri.port)
@@ -18,13 +38,19 @@ module Seek
 
       req=Net::HTTP::Get.new(uri.path)      
             
-      doc = Hpricot(http.request(req).body)
+      process_response_body http.request(req).body      
+    end
+    
+    def self.process_response_body body
+      
+      puts "Body = #{body}"
+      
+      doc = Hpricot(body)
       
       div_block = find_the_boxes_div(doc).join("\n")
       div_block = div_block.gsub("window.open('/webMathematica","window.open('http://jjj.mib.ac.uk/webMathematica/")
       
       return process_scripts_and_styles(doc).join("\n"),div_block
-      
     end
     
     def self.process_scripts_and_styles doc
