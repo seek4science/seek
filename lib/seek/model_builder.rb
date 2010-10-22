@@ -41,9 +41,7 @@ module Seek
       process_response_body http.request(req).body      
     end
     
-    def self.process_response_body body
-      
-      puts "Body = #{body}"
+    def self.process_response_body body            
       
       doc = Hpricot(body)
       
@@ -54,6 +52,7 @@ module Seek
     end
     
     def self.process_scripts_and_styles doc
+      
       ss = []
       doc.search("//script").each do |script|
         src=script.attributes['src']
@@ -72,24 +71,26 @@ module Seek
           href=BUILDER_URL_BASE+"/"+href
           link.attributes['href'] = href  
         end        
-        ss << link.to_s
+        ss << link.to_html
       end
       
       return ss
     end
     
-    def self.find_the_boxes_div doc
+    def self.find_the_boxes_div doc      
       form_elements = doc.search("//form[@name='form']/div")
       form_elements.search("//img").each do |img|
         if img.attributes['src']
           img.attributes['src'] = BUILDER_URL_BASE+"/"+img.attributes['src']
         end
       end
-      els= []
-              
-      els << form_elements.first.to_s
+      puts "-------------------------------------------------"
+      form_elements.search("//input").each do |button|
+        puts button.to_html
+      end
+      puts "-------------------------------------------------"
       
-      els
+      [form_elements.first.to_html]      
     end
     
   end

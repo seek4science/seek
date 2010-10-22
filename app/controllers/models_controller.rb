@@ -58,6 +58,7 @@ class ModelsController < ApplicationController
   
   def validate
     @javascript_and_styles,@page_content = Seek::ModelBuilder.get_validate_content @model
+    render :layout=>"jws_constructor"
   end
     
   def update_model_metadata
