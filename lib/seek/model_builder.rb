@@ -16,9 +16,7 @@ module Seek
       http.use_ssl=true if uri.scheme=="https"
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-      req=Net::HTTP::Get.new(uri.path)
-
-      http.request(req).body
+      req=Net::HTTP::Get.new(uri.path)      
             
       doc = Hpricot(http.request(req).body)
       
