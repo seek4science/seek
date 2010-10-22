@@ -1,6 +1,7 @@
 class ModelsController < ApplicationController
   
   include Seek::ModelExecution
+  
   include WhiteListHelper
   include IndexPager
   include DotGenerator
@@ -11,7 +12,7 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview , :test_asset_url]
+  before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview , :test_asset_url]
   before_filter :find_display_model, :only=>[:show,:download,:execute]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
@@ -49,6 +50,10 @@ class ModelsController < ApplicationController
     elsif attribute=="model_format"
       delete_model_format params
     end
+  end
+  
+  def build
+    @javascript_and_styles,@page_content = Seek::ModelBuilder.get_content
   end
   
   
