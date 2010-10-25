@@ -57,7 +57,7 @@ class ModelsController < ApplicationController
   end
   
   def validate
-    @javascript_and_styles,@page_content = Seek::ModelBuilder.get_validate_content @model
+    @javascript_and_styles,@page_content, @saved_file = Seek::ModelBuilder.get_validate_content @model
     
     respond_to do |format|
       format.html
@@ -65,9 +65,17 @@ class ModelsController < ApplicationController
   end
   
   def construct
-    @javascript_and_styles,@page_content = Seek::ModelBuilder.construct @model,params
+    @javascript_and_styles,@page_content,@saved_file = Seek::ModelBuilder.construct @model,params
     respond_to do |format|
       format.html { render :action=>"validate" }
+    end
+  end
+  
+  def simulate
+    saved_file = params[:savedfile]
+    @applet=Seek::ModelBuilder.simulate saved_file
+    respond_to do |format|
+      format.html
     end
   end
     

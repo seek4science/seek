@@ -4,6 +4,7 @@ module Seek
   
   module ModelBuilder
     BUILDER_URL_BASE = "http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels"
+    SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"
     
     def self.builder_url
       "#{BUILDER_URL_BASE}/DatFileReader.jsp"
@@ -13,8 +14,12 @@ module Seek
       self.builder_url+"?datFilePosted=true"
     end        
     
+    def self.simulate_url
+      SIMULATE_URL
+    end
+    
     def self.construct model,params
-      puts "KEYS = \n #{params.keys.join(', ')}"
+      
       required_params=["assignmentRules","modelname","parameterset","kinetics","functions","initVal","reaction","events","steadystateanalysis"]
       url = builder_url
       form_data = {}
@@ -48,15 +53,42 @@ module Seek
       
     end
     
+    def self.simulate saved_file
+      url=simulate_url
+      #url=url+"?savedfile=#{saved_file}&inputFileConstructor=true"           
+      
+      part=Multipart.new({:upfile=>"/tmp/bob"})
+      
+      response = part.post(url)
+      
+      if response.instance_of?(Net::HTTPInternalServerError)       
+        puts response.to_s
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      end
+      
+      if response.instance_of?(Net::HTTPRedirection)
+        puts "REDIRECTION TO #{response['location']}"
+      end
+      
+      extract_applet(response.body)
+    end
+    
+    def self.extract_applet body
+      doc = Hpricot(body)
+      puts body
+      element = doc.search("//object").first
+      element.inner_html
+    end
+    
     def self.get_content       
       uri=URI.parse(builder_url)      
       http=Net::HTTP.new(uri.host,uri.port)
-
+      
       http.use_ssl=true if uri.scheme=="https"
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
+      
       req=Net::HTTP::Get.new(uri.path)      
-            
+      
       process_response_body http.request(req).body      
     end
     
@@ -68,8 +100,15 @@ module Seek
       scripts_and_stylesheets = process_scripts_and_styles(doc).join("\n")
       div_block = find_the_boxes_div(doc).join("\n")
       div_block = div_block.gsub("window.open('/webMathematica","window.open('http://jjj.mib.ac.uk/webMathematica/")
+      saved_file = determine_saved_file doc
       
-      return scripts_and_stylesheets,div_block
+      return scripts_and_stylesheets,div_block,saved_file
+    end
+    
+    def self.determine_saved_file doc
+      element = doc.search("//input[@name='savedfile']").first
+      return element.attributes['value']
+      
     end
     
     def self.process_scripts_and_styles doc

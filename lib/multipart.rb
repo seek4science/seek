@@ -28,7 +28,7 @@ class Multipart
     req = Net::HTTP::Post.new(url.request_uri)
     req.content_length = post_stream.size
     req.content_type = 'multipart/form-data; boundary=' + boundary
-    #req.set_form_data(form_data,";")
+    req.set_form_data({"savedfile"=>"model1.dat","inputFileConstructor"=>"true"},";")
     req.body_stream = post_stream
     res = Net::HTTP.new(url.host, url.port).start {|http| http.request(req) }
 
