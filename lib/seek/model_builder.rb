@@ -80,8 +80,7 @@ module Seek
       element.inner_html
     end        
     
-    def self.process_response_body body            
-      body=body.gsub("\";","\"")
+    def self.process_response_body body                  
       
       doc = Hpricot(body)
       
