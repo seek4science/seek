@@ -57,8 +57,7 @@ class ModelsController < ApplicationController
   end
   
   def builder
-    @javascript_and_styles,@page_content, @saved_file = Seek::ModelBuilder.get_builder_content @model
-    
+    @javascript_and_styles,@page_content, @saved_file = Seek::ModelBuilder.get_builder_content @model    
     respond_to do |format|
       format.html
     end
@@ -67,7 +66,7 @@ class ModelsController < ApplicationController
   def construct
     @javascript_and_styles,@page_content,@saved_file = Seek::ModelBuilder.construct @model,params
     respond_to do |format|
-      format.html { render :action=>"validate" }
+      format.html { render :action=>"builder" }
     end
   end
   
