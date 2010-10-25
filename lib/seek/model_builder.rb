@@ -55,9 +55,9 @@ module Seek
     
     def self.simulate saved_file
       url=simulate_url
-      #url=url+"?savedfile=#{saved_file}&inputFileConstructor=true"           
+      url=url+"?savedfile=#{saved_file}&inputFileConstructor=true"           
       
-      part=Multipart.new({:upfile=>"/tmp/bob"})
+      part=Multipart.new({})
       
       response = part.post(url)
       
