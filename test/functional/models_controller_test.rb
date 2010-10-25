@@ -25,6 +25,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert assigns(:model)
     assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
+    assert_select "script",:text=>/VmGLT = 97.264/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file
   end
   
   test "shouldn't show hidden items in index" do
