@@ -23,6 +23,10 @@ content_blob_with_little_file:
 teusink_blob:
   data_old: <%= load_blob_data('Teusink.xml') %>
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
+
+jws_model_blob:
+  data_old: <%= load_blob_data('Teusink2010921171725.dat') %>
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>
   
 francos_model_blob:
   data_old: <%= load_blob_data('BIOMD0000000064.xml') %>

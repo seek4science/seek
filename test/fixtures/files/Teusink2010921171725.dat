@@ -1,0 +1,184 @@
+begin name
+teusink20101021091712
+end name
+begin units
+end units
+begin reactions
+v[vGLK] {1.0}GLCi + {1.0}Prb = {1.0}G6P
+v[vPGI] {1.0}G6P = {1.0}F6P
+v[vGLYCO] {1.0}G6P + {1.0}Prb = {1.0}$Glyc
+v[vTreha] {2.0}G6P + {1.0}Prb = {1.0}$Trh
+v[vPFK] {1.0}F6P + {1.0}Prb = {1.0}F16P
+v[vALD] {1.0}F16P = {2.0}TRIO
+v[vGAPDH] {1.0}TRIO + {1.0}NAD = {1.0}BPG + {1.0}NADH
+v[vPGK] {1.0}BPG = {1.0}P3G + {1.0}Prb
+v[vPGM] {1.0}P3G = {1.0}P2G
+v[vENO] {1.0}P2G = {1.0}PEP
+v[vPYK] {1.0}PEP = {1.0}PYR + {1.0}Prb
+v[vPDC] {1.0}PYR = {1.0}$CO2 + {1.0}ACE
+v[vSUC] {2.0}ACE + {3.0}NAD = {1.0}$SUCC + {3.0}NADH
+v[vGLT] {1.0}$GLCo = {1.0}GLCi
+v[vADH] {1.0}ACE + {1.0}NADH = {1.0}NAD + {1.0}$ETOH
+v[vG3PDH] {1.0}TRIO + {1.0}NADH = {1.0}NAD + {1.0}$GLY
+v[vATP] {1.0}Prb = {1.0}$X
+end reactions
+begin rate equations
+v[vGLK] = (VmGLK*(-(G6P[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KeqGLK))+GLCi[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(2-8*KeqAK))/(KmGLKATP*KmGLKGLCi*(1+G6P[t]/KmGLKG6P+GLCi[t]/KmGLKGLCi)*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmGLKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmGLKATP))))
+v[vPGI] = VmPGI/KmPGIG6P*(G6P[t]-F6P[t]/KeqPGI)/(1+G6P[t]/KmPGIG6P+F6P[t]/KmPGIF6P)
+v[vGLYCO] = KGLYCOGEN
+v[vTreha] = KTREHALOSE
+v[vPFK] = gR*VmPFK*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])*(1+F6P[t]/KmPFKF6P+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP)+gR*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP*KmPFKF6P))/((2-8*KeqAK)*KmPFKATP*KmPFKF6P*(L0*Power[1+CPFKF26BP*F26BP/KPFKF26BP+CPFKF16BP*F16P[t]/KPFKF16BP,2]*Power[1+2*CPFKAMP*KeqAK*Power[SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5],2]/((-1+4*KeqAK)*KPFKAMP*(SUMAXP-Prb[t]+4*KeqAK*Prb[t]-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])),2]*Power[1+CiPFKATP*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KiPFKATP),2]*Power[1+CPFKATP*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP),2]/(Power[1+F26BP/KPFKF26BP+F16P[t]/KPFKF16BP,2]*Power[1+2*KeqAK*Power[SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5],2]/((-1+4*KeqAK)*KPFKAMP*(SUMAXP-Prb[t]+4*KeqAK*Prb[t]-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])),2]*Power[1+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KiPFKATP),2])+Power[1+F6P[t]/KmPFKF6P+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP)+gR*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP*KmPFKF6P),2]))
+v[vALD] = VmALD*(F16P[t]-KeqTPI*Power[TRIO[t],2]/(KeqALD*Power[1+KeqTPI,2]))/(KmALDF16P*(1+F16P[t]/KmALDF16P+TRIO[t]/((1+KeqTPI)*KmALDDHAP)+KeqTPI*TRIO[t]/((1+KeqTPI)*KmALDGAP)+KeqTPI*F16P[t]*TRIO[t]/((1+KeqTPI)*KmALDF16P*KmALDGAPi)+KeqTPI*Power[TRIO[t],2]/(Power[1+KeqTPI,2]*KmALDDHAP*KmALDGAP)))
+v[vGAPDH] = (-(VmGAPDHr*BPG[t]*NADH[t]/(KmGAPDHBPG*KmGAPDHNADH))+KeqTPI*VmGAPDHf*NAD[t]*TRIO[t]/((1+KeqTPI)*KmGAPDHGAP*KmGAPDHNAD))/((1+NAD[t]/KmGAPDHNAD+NADH[t]/KmGAPDHNADH)*(1+BPG[t]/KmGAPDHBPG+KeqTPI*TRIO[t]/((1+KeqTPI)*KmGAPDHGAP)))
+v[vPGK] = VmPGK*(KeqPGK*BPG[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(1-4*KeqAK)-(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])*P3G[t]/(2-8*KeqAK))/(KmPGKATP*KmPGKP3G*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmPGKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPGKATP))*(1+BPG[t]/KmPGKBPG+P3G[t]/KmPGKP3G))
+v[vPGM] = VmPGM/KmPGMP3G*(P3G[t]-P2G[t]/KeqPGM)/(1+P3G[t]/KmPGMP3G+P2G[t]/KmPGMP2G)
+v[vENO] = VmENO/KmENOP2G*(P2G[t]-PEP[t]/KeqENO)/(1+P2G[t]/KmENOP2G+PEP[t]/KmENOPEP)
+v[vPYK] = VmPYK/(KmPYKPEP*KmPYKADP)*(PEP[t]*(SUMAXP-Power[Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2]-2*Prb[t]*SUMAXP+8*KeqAK*Prb[t]*SUMAXP+Power[SUMAXP,2],0.5])/(1-4*KeqAK)-PYR[t]*((Prb[t]-4*KeqAK*Prb[t]-SUMAXP+Power[Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2]-2*Prb[t]*SUMAXP+8*KeqAK*Prb[t]*SUMAXP+Power[SUMAXP,2],0.5])/(2-8*KeqAK))/KeqPYK)/((1+PEP[t]/KmPYKPEP+PYR[t]/KmPYKPYR)*(1+(Prb[t]-4*KeqAK*Prb[t]-SUMAXP+Power[Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2]-2*Prb[t]*SUMAXP+8*KeqAK*Prb[t]*SUMAXP+Power[SUMAXP,2],0.5])/(2-8*KeqAK)/KmPYKATP+(SUMAXP-Power[Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2]-2*Prb[t]*SUMAXP+8*KeqAK*Prb[t]*SUMAXP+Power[SUMAXP,2],0.5])/(1-4*KeqAK)/KmPYKADP))
+v[vPDC] = VmPDC*(Power[PYR[t],nPDC]/Power[KmPDCPYR,nPDC])/(1+Power[PYR[t],nPDC]/Power[KmPDCPYR,nPDC])
+v[vSUC] = KSUCC*ACE[t]
+v[vGLT] = VmGLT*(GLCo-GLCi[t]/KeqGLT)/(KmGLTGLCo*(1+GLCo/KmGLTGLCo+GLCi[t]/KmGLTGLCi+0.91*GLCo*GLCi[t]/(KmGLTGLCi*KmGLTGLCo)))
+v[vADH] = -(VmADH/(KiADHNAD*KmADHETOH)*(NAD[t]*ETOH-NADH[t]*ACE[t]/KeqADH)/(1+NAD[t]/KiADHNAD+KmADHNAD*ETOH/(KiADHNAD*KmADHETOH)+KmADHNADH*ACE[t]/(KiADHNADH*KmADHACE)+NADH[t]/KiADHNADH+NAD[t]*ETOH/(KiADHNAD*KmADHETOH)+KmADHNADH*NAD[t]*ACE[t]/(KiADHNAD*KiADHNADH*KmADHACE)+KmADHNAD*ETOH*NADH[t]/(KiADHNAD*KmADHETOH*KiADHNADH)+NADH[t]*ACE[t]/(KiADHNADH*KmADHACE)+NAD[t]*ETOH*ACE[t]/(KiADHNAD*KmADHETOH*KiADHACE)+ETOH*NADH[t]*ACE[t]/(KiADHETOH*KiADHNADH*KmADHACE)))
+v[vG3PDH] = VmG3PDH*(-(GLY*NAD[t]/KeqG3PDH)+NADH[t]*TRIO[t]/(1+KeqTPI))/(KmG3PDHDHAP*KmG3PDHNADH*(1+NAD[t]/KmG3PDHNAD+NADH[t]/KmG3PDHNADH)*(1+GLY/KmG3PDHGLY+TRIO[t]/((1+KeqTPI)*KmG3PDHDHAP)))
+v[vATP] = KATPASE*((Prb[t]-4*KeqAK*Prb[t]-SUMAXP+Power[Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2]-2*Prb[t]*SUMAXP+8*KeqAK*Prb[t]*SUMAXP+Power[SUMAXP,2],0.5])/(2-8*KeqAK))
+end rate equations
+begin events
+end events
+begin assignment rules
+end assignment rules
+begin algebraic rules
+end algebraic rules
+begin rate rules
+end rate rules
+begin function definitions
+end function definitions
+begin parameters
+VmGLT = 97.264
+KeqGLT = 1
+KmGLTGLCo = 1.1918
+KmGLTGLCi = 1.1918
+VmGLK = 226.452
+KeqGLK = 3800
+KmGLKGLCi = 0.08
+KmGLKG6P = 30
+KmGLKATP = 0.15
+KmGLKADP = 0.23
+VmPGI = 339.677
+KeqPGI = 0.314
+KmPGIG6P = 1.4
+KmPGIF6P = 0.3
+VmPFK = 182.903
+gR = 5.12
+L0 = 0.66
+KmPFKF6P = 0.1
+CPFKF6P = 0.0
+KmPFKATP = 0.71
+CPFKATP = 3
+KPFKAMP = 0.0995
+CPFKAMP = 0.0845
+KiPFKATP = 0.65
+CiPFKATP = 100
+KPFKF26BP = 0.000682
+CPFKF26BP = 0.0174
+KPFKF16BP = 0.111
+CPFKF16BP = 0.397
+VmALD = 322.258
+KeqALD = 0.069
+KmALDF16P = 0.3
+KmALDGAP = 2
+KmALDDHAP = 2.4
+KmALDGAPi = 10
+VmGAPDHf = 1184.52
+VmGAPDHr = 6549.68
+KmGAPDHGAP = 0.21
+KmGAPDHBPG = 0.0098
+KmGAPDHNAD = 0.09
+KmGAPDHNADH = 0.06
+VmG3PDH = 70.15
+KeqG3PDH = 4300
+KmG3PDHDHAP = 0.4
+KmG3PDHNADH = 0.023
+KmG3PDHNAD = 0.93
+KmG3PDHGLY = 1
+VmPGK = 1306.45
+KeqPGK = 3200
+KmPGKBPG = 0.003
+KmPGKP3G = 0.53
+KmPGKADP = 0.2
+KmPGKATP = 0.3
+VmPGM = 2525.81
+KeqPGM = 0.19
+KmPGMP3G = 1.2
+KmPGMP2G = 0.08
+VmENO = 365.806
+KeqENO = 6.7
+KmENOP2G = 0.04
+KmENOPEP = 0.5
+VmPYK = 1088.71
+KeqPYK = 6500
+KmPYKPEP = 0.14
+KmPYKPYR = 21
+KmPYKADP = 0.53
+KmPYKATP = 1.5
+VmPDC = 174.194
+KmPDCPYR = 4.33
+nPDC = 1.9
+VmADH = 810
+KeqADH = "6.9e-5"
+KmADHACE = 1.11
+KmADHETOH = 17
+KmADHNADH = 0.11
+KmADHNAD = 0.17
+KiADHACE = 1.1
+KiADHETOH = 90
+KiADHNADH = 0.031
+KiADHNAD = 0.92
+KATPASE = 39.5
+KGLYCOGEN = 6
+KTREHALOSE = 2.4
+KSUCC = 21.4
+F26BP = 0.02
+SUMAXP = 4.1
+KeqAK = 0.45
+KeqTPI = 0.045
+compartment = 1
+Glyc = 0.0
+Trh = 0.0
+CO2 = 1
+SUCC = 0.0
+GLCo = 50
+ETOH = 50
+GLY = 0.15
+X = 0.0
+end parameters
+begin initial conditions
+GLCi[0] = GLCii
+Prb[0] = Prbi
+G6P[0] = G6Pi
+F6P[0] = F6Pi
+F16P[0] = F16Pi
+TRIO[0] = TRIOi
+NAD[0] = NADi
+BPG[0] = BPGi
+NADH[0] = NADHi
+P3G[0] = P3Gi
+P2G[0] = P2Gi
+PEP[0] = PEPi
+PYR[0] = PYRi
+ACE[0] = ACEi
+end initial conditions
+begin initial values
+GLCii = 0.087
+Prbi = 5
+G6Pi = 1.39
+F6Pi = 0.28
+F16Pi = 0.1
+TRIOi = 5.17
+NADi = 1.2
+BPGi = 0.0
+NADHi = 0.39
+P3Gi = 0.1
+P2Gi = 0.1
+PEPi = 0.1
+PYRi = 3.36
+ACEi = 0.04
+end initial values

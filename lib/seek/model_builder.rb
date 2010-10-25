@@ -37,7 +37,7 @@ module Seek
       process_response_body(response.body)
     end
     
-    def self.get_validate_content model
+    def self.get_builder_content model
       filepath=model.content_blob.filepath
       
       part=Multipart.new({:uploadedDatFile=>filepath})
@@ -78,19 +78,7 @@ module Seek
       puts body
       element = doc.search("//object").first
       element.inner_html
-    end
-    
-    def self.get_content       
-      uri=URI.parse(builder_url)      
-      http=Net::HTTP.new(uri.host,uri.port)
-      
-      http.use_ssl=true if uri.scheme=="https"
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      
-      req=Net::HTTP::Get.new(uri.path)      
-      
-      process_response_body http.request(req).body      
-    end
+    end        
     
     def self.process_response_body body            
       body=body.gsub("\";","\"")

@@ -52,7 +52,7 @@ class ContentBlob < ActiveRecord::Base
   
   def filepath
     if RAILS_ENV == "test"
-      path = "#{Dir::tmpdir}/seek_content_blobs/"
+      path = "#{Dir::tmpdir}/seek_content_blobs"
     else
       path = "#{RAILS_ROOT}/#{DATA_STORAGE_PATH}/#{RAILS_ENV}"
     end

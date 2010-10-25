@@ -56,8 +56,8 @@ class ModelsController < ApplicationController
     @javascript_and_styles,@page_content = Seek::ModelBuilder.get_content
   end
   
-  def validate
-    @javascript_and_styles,@page_content, @saved_file = Seek::ModelBuilder.get_validate_content @model
+  def builder
+    @javascript_and_styles,@page_content, @saved_file = Seek::ModelBuilder.get_builder_content @model
     
     respond_to do |format|
       format.html

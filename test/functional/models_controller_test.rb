@@ -18,6 +18,15 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:models)
   end
   
+  test "show builder with jws format" do
+    m=models(:jws_model)
+    m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
+    get :builder,:id=>m
+    assert_response :success
+    assert assigns(:model)
+    assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
+  end
+  
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"

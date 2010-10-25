@@ -14,6 +14,20 @@ teusink:
   project: sysmo_project
   policy: policy_for_test_with_projects_institutions
   
+jws_model:
+  contributor: model_owner (User)
+  title: Model in JWS Dat format
+  description: Model in JWS Dat format
+  original_filename: Teusink2010921171725.dat
+  content_blob: jws_model_blob
+  content_type: text/xml  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1  
+  project: sysmo_project
+  policy: fully_public_policy
+  
 francos_model:
   contributor: model_owner (User)
   title: Francos model
