@@ -11,6 +11,25 @@ module Seek
     
     def self.upload_dat_url
       self.builder_url+"?datFilePosted=true"
+    end        
+    
+    def self.construct model,params
+      puts "KEYS = \n #{params.keys.join(', ')}"
+      required_params=["assignmentRules","modelname","parameterset","kinetics","functions","initVal","reaction","events","steadystateanalysis"]
+      url = builder_url
+      form_data = {}
+      required_params.each do |p|
+        form_data[p]=params[p] if params.has_key?(p)
+      end
+      
+      response = Net::HTTP.post_form(URI.parse(url),form_data)
+      
+      if response.instance_of?(Net::HTTPInternalServerError)       
+        puts response.to_s
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      end
+      
+      process_response_body(response.body)
     end
     
     def self.get_validate_content model

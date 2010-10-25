@@ -37,7 +37,9 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :groups
 
-  map.resources :models, :member => { :download => :get, :execute=>:post, :request_resource=>:post, :validate=>:get },:collection=>{:build=>:get}
+  map.resources :models, 
+    :member => { :download => :get, :execute=>:post, :request_resource=>:post, :validate=>:get, :construct=>:post },
+    :collection=>{:build=>:get}
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
     # avatars / pictures 'owned by' person

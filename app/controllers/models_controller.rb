@@ -63,6 +63,13 @@ class ModelsController < ApplicationController
       format.html
     end
   end
+  
+  def construct
+    @javascript_and_styles,@page_content = Seek::ModelBuilder.construct @model,params
+    respond_to do |format|
+      format.html { render :action=>"validate" }
+    end
+  end
     
   def update_model_metadata
     attribute=params[:attribute]

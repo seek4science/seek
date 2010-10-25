@@ -23,13 +23,17 @@ div.a p { margin:0;padding:0; }
 <div style='height: 25px; width: 145px; float: left'>
     <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
         Open/Close Panels
-    </button>
-    <p>
+    </button>    
 </div>
+<% form_tag construct_model_path(@model) do |f| -%> 
 <div style="float: left">
     <div style='float: left;'>
         <%= @page_content -%>
     </div>
 </div>
+<span style="clear:both;">&nbsp;</span>
+<input type=checkbox name="steadystateanalysis"  /> Steady state analysis
+<%= submit_tag "Go!" -%>
+<% end -%>
 <!-- JWS CONSTRUCTOR END -->
 <%= link_to "Try again", validate_model_path(@model) -%>
