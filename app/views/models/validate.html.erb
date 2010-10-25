@@ -1,19 +1,35 @@
 <!-- JWS CONSTRUCTOR -->
 
-    <div style='height: 25px; width: 145px; float: left'>
-        <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
-            Open/Close Panels
-        </button>
-        <p>
+<%= @javascript_and_styles -%>
+
+<link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/sweetTitles.css" rel="stylesheet" media="screen" type="text/css" />
+<style type="text/css" media="screen,projection"> 
+            
+@import "http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/sweetTitles.css"
+#wrapper { border:1px solid #333;width:850px;margin:20px auto 0 auto;padding:20px 20px 5px 20px;text-align:left;position:relative; }
+p#tagLine { position:absolute;top:0;right:0; }
+ul li,p { font:14px/18px georgia,times,serif; }
+p#gap { margin-top:600px; }
+acronym,abbr { border-bottom:1px dotted #333;cursor:pointer; }
+	a { color:#00f; }
+		a img { border:0; }
+div.a p { margin:0;padding:0; }
+.rtTextArea {
+	font-size: 10pt;
+}
+    		
+            
+</style>
+<div style='height: 25px; width: 145px; float: left'>
+    <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
+        Open/Close Panels
+    </button>
+    <p>
+</div>
+<div style="float: left">
+    <div style='float: left;'>
+        <%= @page_content -%>
     </div>
-	
-    
-        <div style="float: left">
-            <div style='float: left;'>
-                <%= @page_content -%>
-            </div>
-        </div>
-    
+</div>
 <!-- JWS CONSTRUCTOR END -->
 <%= link_to "Try again", validate_model_path(@model) -%>
-
