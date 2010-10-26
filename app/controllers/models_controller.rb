@@ -17,9 +17,10 @@ class ModelsController < ApplicationController
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
+  @@model_builder = Seek::JWSModelBuilder.new
+  
   # GET /models
   # GET /models.xml
-  
   
   def new_version
     if (handle_data nil)
@@ -51,20 +52,16 @@ class ModelsController < ApplicationController
       delete_model_format params
     end
   end
-  
-  def build
-    @javascript_and_styles,@page_content = Seek::ModelBuilder.get_content
-  end
-  
+    
   def builder
-    @javascript_and_styles,@page_content, @saved_file = Seek::ModelBuilder.get_builder_content @model    
+    @javascript_and_styles,@page_content, @saved_file = @@model_builder.builder_content @model    
     respond_to do |format|
       format.html
     end
   end
   
   def construct
-    @javascript_and_styles,@page_content,@saved_file = Seek::ModelBuilder.construct @model,params
+    @javascript_and_styles,@page_content,@saved_file = @@model_builder.construct @model,params
     respond_to do |format|
       format.html { render :action=>"builder" }
     end
@@ -72,7 +69,7 @@ class ModelsController < ApplicationController
   
   def simulate
     saved_file = params[:savedfile]
-    @applet=Seek::ModelBuilder.simulate saved_file
+    @applet=@@model_builder.simulate saved_file
     respond_to do |format|
       format.html
     end
@@ -133,8 +130,7 @@ class ModelsController < ApplicationController
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_format_info"      
-    end
-    
+    end    
   end
   
   def create_model_metadata

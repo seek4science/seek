@@ -2,23 +2,24 @@ require 'hpricot'
 
 module Seek
   
-  module ModelBuilder
+  class JWSModelBuilder
+    
     BUILDER_URL_BASE = "http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels"
     SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"
     
-    def self.builder_url
+    def builder_url
       "#{BUILDER_URL_BASE}/DatFileReader.jsp"
     end
     
-    def self.upload_dat_url
+    def upload_dat_url
       self.builder_url+"?datFilePosted=true"
     end        
     
-    def self.simulate_url
+    def simulate_url
       SIMULATE_URL
     end
     
-    def self.construct model,params
+    def construct model,params
       
       required_params=["assignmentRules","modelname","parameterset","kinetics","functions","initVal","reaction","events","steadystateanalysis"]
       url = builder_url
@@ -37,7 +38,7 @@ module Seek
       process_response_body(response.body)
     end
     
-    def self.get_builder_content model
+    def builder_content model
       filepath=model.content_blob.filepath
       
       part=Multipart.new({:uploadedDatFile=>filepath})
@@ -53,7 +54,7 @@ module Seek
       
     end
     
-    def self.simulate saved_file
+    def simulate saved_file
       url=simulate_url
       url=url+"?savedfile=#{saved_file}&inputFileConstructor=true"           
       
@@ -73,14 +74,14 @@ module Seek
       extract_applet(response.body)
     end
     
-    def self.extract_applet body
+    def extract_applet body
       doc = Hpricot(body)
       puts body
       element = doc.search("//object").first
       element.inner_html
     end        
     
-    def self.process_response_body body                  
+    def process_response_body body                  
       
       doc = Hpricot(body)
       
@@ -92,13 +93,13 @@ module Seek
       return scripts_and_stylesheets,div_block,saved_file
     end
     
-    def self.determine_saved_file doc
+    def determine_saved_file doc
       element = doc.search("//input[@name='savedfile']").first
       return element.attributes['value']
       
     end
     
-    def self.process_scripts_and_styles doc
+    def process_scripts_and_styles doc
       
       ss = []
       doc.search("//script").each do |script|
@@ -124,7 +125,7 @@ module Seek
       return ss
     end
     
-    def self.find_the_boxes_div doc      
+    def find_the_boxes_div doc      
       form_elements = doc.search("//form[@name='form']/div")
       form_elements.search("//img").each do |img|
         if img.attributes['src']
