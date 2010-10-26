@@ -18,22 +18,132 @@
             
 </style>
 
-<div style='height: 25px; width: 145px; float: left'>
-    <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
+<div style='height: 25px; width: 145px; float: left'> 
+    <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously"> 
         Open/Close Panels
     </button>    
-</div>
-
+</div> 
+ 
 <% form_tag construct_model_path(@model) do -%> 
-<div style="float: left">
-    <div style='float: left;'>
-        <%= @page_content -%>
-    </div>
-</div>
-<div style="clear:both;">&nbsp;</div>
+<div style="margin:0;padding:0;display:inline"><input name="authenticity_token" type="hidden" value="zjde9FskV5Mc7+vTYIH6p3JEtoIViKbhSZd30ipFfG4=" /></div> 
+<div style="float: left"> 
+    <div style='float: left;'> 
+        <div style="width: 720px; border: 5px; float: left"> 
+ 
+ 
+				<div id="name_top" style="width: auto; padding: 3px; float: left"> 
+				    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Model name</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+				        </div><div class="squareboxcontent" id="name_panel" style="display: none"> 
+							<!-- model name script -->
+							<%= @data_script_hash["modelname"] -%>
+				             <p> 
+				<button title="Examples for model names are: model1, westerhoff2010" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpName.html','model name help window', 'width=300,height=300,toolbar=0'); return false;">Model name help</button> 
+				        </p></div> 
+					</div> 
+						<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+				</div>				
+			<div style="width:auto; padding: 3px; float: left"> 
+		    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Reactions</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+		        </div><div class="squareboxcontent" id="reactions_panel" style="display: none">
+		        	<!-- reactions script --> 
+		             <%= @data_script_hash["reactions"] -%>
+					 <p> 
+			<button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">Reactions help</button> 
+			<input value="Show schema" type="button" onclick="document.form.plotGraphPanel.value='on';createCookie('name_panel',1);  createCookie('reactions_panel',1); createCookie('equations_panel',1); createCookie('assignments_panel',1);createCookie('initial_panel',1); createCookie('parameters_panel',1); createCookie('functions_panel',1); createCookie('events_panel',1);
+createCookie2(rtmodelname,1,'rtmodelname');createCookie2(rtreaction,1,'rtreaction');createCookie2(rtkinetics,1,'rtkinetics');createCookie2(rtassignmentRules,1,'rtassignmentRules');createCookie2(rtinitVal,1,'rtinitVal');createCookie2(rtparameterset,1,'rtparameterset');createCookie2(rtfunctions,1,'rtfunctions');createCookie2(rtevents,1,'rtevents'); createCookie3(plotGraphPanel,1,'plotGraphPanel'); createCookie3(plotKineticsPanel,1,'plotKineticsPanel');createCookie4(getScrollPos(),1,'scrollPos');createCookie5(rc,rtreaction,1,'rc');  createCookie6(rc2,rtkinetics,1,'rc2');{ this.form.submit();}" alt="Evaluate" width="175" /> 
+			<input value="Hide schema" type="button" onclick="document.form.plotGraphPanel.value='off';createCookie('name_panel',1);  createCookie('reactions_panel',1); createCookie('equations_panel',1); createCookie('assignments_panel',1);createCookie('initial_panel',1); createCookie('parameters_panel',1); createCookie('functions_panel',1); createCookie('events_panel',1);createCookie2(rtmodelname,1,'rtmodelname');createCookie2(rtreaction,1,'rtreaction');createCookie2(rtkinetics,1,'rtkinetics');createCookie2(rtassignmentRules,1,'rtassignmentRules');createCookie2(rtinitVal,1,'rtinitVal');createCookie2(rtparameterset,1,'rtparameterset');createCookie2(rtfunctions,1,'rtfunctions');createCookie2(rtevents,1,'rtevents');createCookie3(plotGraphPanel,1,'plotGraphPanel');createCookie3(plotKineticsPanel,1,'plotKineticsPanel');createCookie4(getScrollPos(),1,'scrollPos');createCookie6(rc2,rtkinetics,1,'rc2');eraseCookie('rc');{ this.form.submit();}" alt="Evaluate" width="175" /> 
+			
+		      	<input name="plotGraphPanel" type="hidden" /> 
+				<!-- resizable? script -->
+		      <%= @data_script_hash["resizable"] -%>
+		
+					</p></div> 
+		        </div> 
+				<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+		</div> 
+		
+ 
+				
+		<div style="width:auto; padding: 3px; float: left"> 
+		    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Rate equations</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+		        </div><div class="squareboxcontent" id="equations_panel" style="display: none"> 
+				<!-- equations script -->
+		             <%= @data_script_hash["equations"] -%>
+					 <p> 
+</p><p><button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">Rate equations help</button> 
+	<input value="Show eqs graph" type="button" onclick="document.form.plotKineticsPanel.value='on';createCookie('name_panel',1);  createCookie('reactions_panel',1); createCookie('equations_panel',1); createCookie('assignments_panel',1);createCookie('initial_panel',1); createCookie('parameters_panel',1); createCookie('functions_panel',1); createCookie('events_panel',1);createCookie2(rtmodelname,1,'rtmodelname');createCookie2(rtreaction,1,'rtreaction');createCookie2(rtkinetics,1,'rtkinetics');createCookie2(rtassignmentRules,1,'rtassignmentRules');createCookie2(rtinitVal,1,'rtinitVal');createCookie2(rtparameterset,1,'rtparameterset');createCookie2(rtfunctions,1,'rtfunctions');createCookie2(rtevents,1,'rtevents'); createCookie3(plotGraphPanel,1,'plotGraphPanel'); createCookie3(plotKineticsPanel,1,'plotKineticsPanel');createCookie4(getScrollPos(),1,'scrollPos');createCookie5(rc,rtreaction,1,'rc');createCookie6(rc2,rtkinetics,1,'rc2');{ this.form.submit();}" alt="Evaluate" width="175" /> 
+	<input value="Hide eqs graph" type="button" onclick="document.form.plotKineticsPanel.value='off';createCookie('name_panel',1);  createCookie('reactions_panel',1); createCookie('equations_panel',1); createCookie('assignments_panel',1);createCookie('initial_panel',1); createCookie('parameters_panel',1); createCookie('functions_panel',1); createCookie('events_panel',1);createCookie2(rtmodelname,1,'rtmodelname');createCookie2(rtreaction,1,'rtreaction');createCookie2(rtkinetics,1,'rtkinetics');createCookie2(rtassignmentRules,1,'rtassignmentRules');createCookie2(rtinitVal,1,'rtinitVal');createCookie2(rtparameterset,1,'rtparameterset');createCookie2(rtfunctions,1,'rtfunctions');createCookie2(rtevents,1,'rtevents');createCookie3(plotGraphPanel,1,'plotGraphPanel'); createCookie3(plotKineticsPanel,1,'plotKineticsPanel');createCookie4(getScrollPos(),1,'scrollPos');createCookie5(rc,rtreaction,1,'rc');eraseCookie('rc2');{ this.form.submit();}" alt="Evaluate" width="175" /> 
+	
+      	<input name="plotKineticsPanel" type="hidden" /> 
+	<!-- resizable_2 script -->
+      <%= @data_script_hash["resizable_2"] -%>
+			</p></div> 
+		   	</div>	
+				<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+			</div> 
+ 
+				<div style="width:auto; padding: 3px; float: left"> 
+				    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Initial values</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+				        </div><div class="squareboxcontent" id="initial_panel" style="display: none"> 
+						<!-- initial values script -->
+				        <%= @data_script_hash["initial"] -%>
+							 <p> 
+							<button title="Example of variable initialisations:<br> x[0] = 1<br> g6p[0] = 1.4 " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpInitVals.html','model parameter values help window', 'width=300,height=300,toolbar=0'); return false;">Initial values help</button> 
+				        </p></div> 
+					</div> 
+						<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+				</div> 
+				
+				<div style="width:auto; padding: 3px; float: left"> 
+				    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Parameter values</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+				        </div><div class="squareboxcontent" id="parameters_panel" style="display: none">   
+						<!--parameters script -->  
+						<%= @data_script_hash["parameters"] -%>
+				            <p><button title="Example of parameter initialisations:<br> k1 = 1<br> k2 = 3 " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpParameters.html','model parameter values help window', 'width=300,height=300,toolbar=0'); return false;">Parameters help</button> 
+				        </p></div> 
+					</div> 
+						<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+				</div> 
+				
+				<div style="width:auto; padding: 3px; float: left"> 
+				    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Assignment rules</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+				        </div><div class="squareboxcontent" id="assignments_panel" style="display: none"> 
+						<!-- rules script -->
+							<%= @data_script_hash["rules"] -%> 
+				             <p><button title="Examples of assignment rules are:<br>totalP := P1[t]+P2[t]<br> a := a[t]+Sin[t]  " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpAssignmentRules.html','model assignments rules help window', 'width=300,height=300,toolbar=0'); return false;">Assignment rules help</button> 
+				        </p></div> 
+					</div> 
+						<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+				</div> 
+				
+				<div style="width:auto; padding: 3px; float: left"> 
+				    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Functions</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+				        </div><div class="squareboxcontent" id="functions_panel" style="display: none"> 
+						<!-- functions script -->
+							<%= @data_script_hash["functions"] -%>
+				             <p><button title="Examples of functions are:<br> mmKin[vm_,s_,kms_] := vm*s/(s+kms)<br>aFree[tot_]:=tot-a[t]" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpFunctions.html','model functions help window', 'width=300,height=500,toolbar=0'); return false;">Functions help</button> 
+				        </p></div> 
+					</div> 
+						<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+				</div> 
+				<div style="width:auto; padding: 3px; float: left"> 
+				    <div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Events</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div> 
+				        </div><div class="squareboxcontent" id="events_panel" style="display: none"> 
+						<!-- events script -->
+				           	<%= @data_script_hash["events"] -%>
+							<p><button title="Examples of events are:<br> ?" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpEvents.html','model events help window', 'width=300,height=500,toolbar=0'); return false;">Events help</button> 
+				        </p></div> 
+					</div> 
+						<img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" /> 
+				</div> 
+ 
+	</div>    </div> 
+</div> 
+<div style="clear:both;">&nbsp;</div> 
 <input type=checkbox name="steadystateanalysis"  /> Steady state analysis
-<%= submit_tag "Go!" -%>
-<% end -%>
+<input name="commit" type="submit" value="Go!" />
+<% end -%> 
+
 
 <% form_tag simulate_model_path(@model) do -%>
 <input type="hidden" name="savedfile" value="<%= @saved_file %>"/>

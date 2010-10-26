@@ -85,18 +85,35 @@ module Seek
       
       doc = Hpricot(body)
       
-      scripts_and_stylesheets = process_scripts_and_styles(doc).join("\n")
-      div_block = find_the_boxes_div(doc).join("\n")
-      div_block = div_block.gsub("window.open('/webMathematica","window.open('http://jjj.mib.ac.uk/webMathematica/")
+      data_scripts = data_script_hash doc
       saved_file = determine_saved_file doc
       
-      return scripts_and_stylesheets,div_block,saved_file
+      
+      return data_scripts,saved_file
+    end
+    
+    def data_script_hash doc
+      keys=["events","functions","rules","parameters","initial","resizable_2","equations","resizable","reactions","modelname"]
+      scripts = doc.search("//script[@type='text/javascript']").reverse
+      keyi=0
+      result={}
+      scripts[0,keys.size].each do |script|
+        k=keys[keyi]
+        
+        result[k]=script.to_s
+        
+        puts "-------- script for key: #{k} ----------"
+        puts result[k]
+        puts "----------------------------------------"
+        
+        keyi+=1
+      end
+      result      
     end
     
     def determine_saved_file doc
       element = doc.search("//input[@name='savedfile']").first
-      return element.attributes['value']
-      
+      return element.attributes['value']      
     end
     
     def process_scripts_and_styles doc
