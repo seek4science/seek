@@ -54,14 +54,14 @@ class ModelsController < ApplicationController
   end
     
   def builder
-    @data_script_hash,@saved_file = @@model_builder.builder_content @model    
+    @data_script_hash,@saved_file,@objects_hash = @@model_builder.builder_content @model    
     respond_to do |format|
       format.html
     end
   end
   
   def construct
-    @data_script_hash,@saved_file = @@model_builder.construct @model,params
+    @data_script_hash,@saved_file,@objects_hash = @@model_builder.construct @model,params
     respond_to do |format|
       format.html { render :action=>"builder" }
     end

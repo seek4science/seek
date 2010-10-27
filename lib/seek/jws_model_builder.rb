@@ -4,11 +4,11 @@ module Seek
   
   class JWSModelBuilder
     
-    BUILDER_URL_BASE = "http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels"
-    SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"
+    BASE_URL = "http://jjj.mib.ac.uk/webMathematica/Examples/"    
+    SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
     def builder_url
-      "#{BUILDER_URL_BASE}/DatFileReader.jsp"
+      "#{BASE_URL}JWSconstructor_panels/DatFileReader.jsp"
     end
     
     def upload_dat_url
@@ -21,12 +21,12 @@ module Seek
     
     def construct model,params
       
-      required_params=["assignmentRules","modelname","parameterset","kinetics","functions","initVal","reaction","events","steadystateanalysis"]
+      required_params=["assignmentRules","modelname","parameterset","kinetics","functions","initVal","reaction","events","steadystateanalysis","plotGraphPanel","plotKineticsPanel"]
       url = builder_url
       form_data = {}
       required_params.each do |p|
         form_data[p]=params[p] if params.has_key?(p)
-      end
+      end      
       
       response = Net::HTTP.post_form(URI.parse(url),form_data)
       
@@ -34,7 +34,7 @@ module Seek
         puts response.to_s
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end
-      
+
       process_response_body(response.body)
     end
     
@@ -85,14 +85,28 @@ module Seek
       
       doc = Hpricot(body)
       
-      data_scripts = data_script_hash doc
+      data_scripts = create_data_script_hash doc
       saved_file = determine_saved_file doc
+      objects_hash = create_objects_hash doc
       
       
-      return data_scripts,saved_file
+      return data_scripts,saved_file,objects_hash
     end
     
-    def data_script_hash doc
+    def create_objects_hash doc
+      result = {}
+      doc.search("//object").each do |obj|
+        id=obj.attributes['id']
+        obj.attributes['data']=BASE_URL+"/"+obj.attributes['data']
+        result[id]=obj.to_s
+        puts "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        puts obj.to_s
+        puts "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+      end
+      return result
+    end
+    
+    def create_data_script_hash doc
       keys=["events","functions","rules","parameters","initial","resizable_2","equations","resizable","reactions","modelname"]
       scripts = doc.search("//script[@type='text/javascript']").reverse
       keyi=0
@@ -102,9 +116,9 @@ module Seek
         
         result[k]=script.to_s
         
-        puts "-------- script for key: #{k} ----------"
-        puts result[k]
-        puts "----------------------------------------"
+#        puts "-------- script for key: #{k} ----------"
+#        puts result[k]
+#        puts "----------------------------------------"
         
         keyi+=1
       end
@@ -114,44 +128,7 @@ module Seek
     def determine_saved_file doc
       element = doc.search("//input[@name='savedfile']").first
       return element.attributes['value']      
-    end
-    
-    def process_scripts_and_styles doc
-      
-      ss = []
-      doc.search("//script").each do |script|
-        src=script.attributes['src']
-        if src
-          src=BUILDER_URL_BASE+"/"+src
-          script.attributes['src'] = src  
-        end        
-        ss << script.to_s
-        break if ss.size == 6
-      end
-      doc.search("//link[@rel='stylesheet']")
-      doc.search("//link[@rel='stylesheet']").each do |link|
-        href=link.attributes['href']
-        
-        if href
-          href=BUILDER_URL_BASE+"/"+href
-          link.attributes['href'] = href  
-        end        
-        ss << link.to_html
-      end            
-      
-      return ss
-    end
-    
-    def find_the_boxes_div doc      
-      form_elements = doc.search("//form[@name='form']/div")
-      form_elements.search("//img").each do |img|
-        if img.attributes['src']
-          img.attributes['src'] = BUILDER_URL_BASE+"/"+img.attributes['src']
-        end
-      end      
-      
-      [form_elements.first.to_html]      
-    end
+    end        
     
   end
   
