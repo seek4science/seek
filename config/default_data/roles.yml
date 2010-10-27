@@ -1,23 +1,33 @@
-member:
+WP coordinator:
   id: 1
-  name: Member
-
-vice coordinator:
-  id: 2
-  name: Vice Coordinator
+  name: Workpackage Coordinator
 
 project coordinator:
-  id: 3
+  id: 2
   name: Project Coordinator
 
-student:
+project vice coordinator:
+  id: 3
+  name: Project Vice Coordinator
+
+PI:
   id: 4
-  name: Student
+  name: Principal Investigator
+
+research associate:
+  id: 5
+  name: Research Associate
 
 postdoc:
-  id: 5
+  id: 6
   name: Postdoc
 
+PhD student:
+  id: 7
+  name: Student
+
 pal:
-  id: 6
-  name: Sysmo-DB Pal
+  id: 8
+  name: Virtual Liver Pal
+
+

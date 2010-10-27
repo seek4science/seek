@@ -122,7 +122,9 @@ namespace :seek do
   task(:create_institutions=>:environment) do
     revert_fixtures_identify
     Institution.delete_all
+    print "BEFORE\n"
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "institutions")  				  
+    print "AFTER\n"
   end
 
   desc 'creates an initial projects set '
@@ -173,7 +175,8 @@ namespace :seek do
 
 
 	fullInstitution = Institution.find_by_name(institution);
-	print "found institution #{fullInstitution}\n";
+	print "found institution _#{fullInstitution}_ for name _#{institution}_\n";
+	if(!fullInstitution.nil?)
 	 projectsList = projects.split(/;/);
 	 projectsList.each do |currentProject|
 		 print "Current project: #{currentProject}\n";
@@ -242,6 +245,7 @@ namespace :seek do
 		person.errors.each_full { |msg| puts "ERROR: #{msg}" };
 	end
     end
+  end
   end
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'

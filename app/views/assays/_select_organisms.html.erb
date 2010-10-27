@@ -30,14 +30,14 @@ culture_growth_options=options_for_select(CultureGrowthType.find(:all,:order=>:t
         <%= select_tag :assay_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
         <div id="extra_organism_details" style="display:none;">
             <br/>
-            <div style="min-width:12em;float:left;min-height: 8em;">
+            <!--<div style="min-width:12em;float:left;min-height: 8em;">
                 <%= label_tag :culture_growth %>
                 <br/>
                 <%= select_tag :culture_growth,culture_growth_options -%>
                 <br/>
-            </div>
+            </div>-->
             <div style="min-height: 8em;">
-                <%= label_tag :strain %>
+	<%= label_tag :cell_type %>
                 <br/>
                 <div id="existing_strains">
                 </div>

@@ -6,5 +6,108 @@ hits:
   city: Heidelberg
   country: Germany
   
+medma:
+  id: 2
+  name: Medical Faculty Mannheim 
+  address: Theodor Kutzer Ufer 1-3
+  web_page: 
+  city: Mannheim
+  country: Germany
 
+dhzb:
+  id: 3
+  name: Pathologie des Deutschen Herzzentrums
+  address: Augustenburger Platz 1
+  web_page: 
+  city: Berlin
+  country: Germany
+
+medma:
+  id: 4
+  name: Medical Faculty Mannheim 
+  address: Theodor Kutzer Ufer 1-3
+  web_page: 
+  city: Mannheim
+  country: Germany
   
+uleip:
+  id: 5
+  name: University of Leipzig
+  address: Johannisallee 30
+  web_page: 
+  city: Leipzig
+  country: Germany
+	
+  
+dkfz:
+  id: 7
+  name: German Cancer Research Center (DKFZ)
+  address: Im Neuenheimer Feld 280
+  web_page: 
+  city: Heidelberg
+  country: Germany
+	
+  
+ifado:
+  id: 6
+  name: IfADo - Leibniz Research Centre
+  address: Ardeystraße 67
+  web_page: 
+  city: Dortmund
+  country: Germany
+	
+  
+charite:
+  id: 8
+  name: Charité - Universitätsmedizin Berlin
+  address: Monbijoustr. 2
+  web_page: 
+  city: Berlin
+  country: Germany
+	
+unihd:
+  id: 9
+  name: University of Heidelberg
+  address: Im Neuenheimer Feld 267
+  web_page: 
+  city: Heidelberg
+  country: Germany
+
+unifr:
+  id: 10
+  name: University of Freiburg
+  address: Hermann - Herder Str. 3
+  web_page: 
+  city: Freiburg
+  country: Germany
+
+mevis:
+  id: 11
+  name: Fraunhofer MEVIS
+  address: Universitaetsallee 29
+  web_page: 
+  city: Bremen
+  country: Germany
+ 
+mpimc:
+  id: 12
+  name: Max Planck Institute of Molecular Cell Biology and Genetics
+  address: Pfotenhauerstrasse 108
+  city: Dresden
+  country: Germany
+
+inria:
+  id: 13
+  name: INRIA
+  address: Domaine de Voluceau-Rocquencourt, B.P. 105
+  web_page: 
+  city: Le Chesnay Cedex
+  country: France
+
+bayer:
+  id: 14
+  name: Bayer Technology Services GmbH
+  address: E41
+  web_page: 
+  city: Leverkusen
+  country: Germany
