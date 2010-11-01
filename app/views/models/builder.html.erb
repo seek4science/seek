@@ -21,15 +21,12 @@
         font-size: 10pt;
     }
 </style>
-
 <div style='height: 25px; width: 145px; float: left'>
     <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
         Open/Close Panels
     </button>
 </div>
-
 <% form_tag construct_model_path(@model),:name=>"form" do -%>
-
 <div style="float: left">
     <div style='float: left;'>
         <div style="width: 720px; border: 5px; float: left">
@@ -72,17 +69,29 @@
                             <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
-                            <input value="Show schema" type="button" onclick="$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /> 
-                            <input value="Hide schema" type="button" onclick="$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" />
-							<!-- resizable? script -->                            
-							<%= hidden_field_tag "plotGraphPanel" -%>
-							<%= @objects_hash["resizeableElement"] -%>
-							<%= @data_script_hash["resizable"] -%>							
+                            <input value="Show schema" type="button" onclick="$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide schema" type="button" onclick="$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
+                            <% if @objects_hash["resizeableElement"] -%>
+	                            <%= hidden_field_tag "plotGraphPanel","on" -%>
+	                            <%= @objects_hash["resizeableElement"] -%>
+	                            <%= @data_script_hash["resizable"] -%>
+                            <% else -%>
+								<%= hidden_field_tag "plotGraphPanel","off" -%>
+                            <% end -%>
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left"><div class="squarebox"><div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;"><div style="float: left">Rate equations</div><div style="float: right; vertical-align: middle"><img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" /></div></div><div class="squareboxcontent" id="equations_panel" style="display: none">
+            <div style="width:auto; padding: 3px; float: left">
+                <div class="squarebox">
+                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                        <div style="float: left">
+                            Rate equations
+                        </div>
+                        <div style="float: right; vertical-align: middle">
+                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                        </div>
+                    </div>
+                    <div class="squareboxcontent" id="equations_panel" style="display: none">
                         <!-- equations script -->
                         <%= @data_script_hash["equations"] -%>
                         <p>
@@ -91,12 +100,14 @@
                             <button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Rate equations help
                             </button>
-                            <input value="Show eqs graph" type="button" onclick="$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />
-							<input value="Hide eqs graph" type="button" onclick="$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" />
-							<!-- resizable_2 script -->
-                            <%= hidden_field_tag "plotKineticsPanel" -%>
-							<%= @objects_hash["resizeableElement2"] -%>
-							<%= @data_script_hash["resizable_2"] -%>							
+                            <input value="Show eqs graph" type="button" onclick="$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
+							<% if @objects_hash["resizeableElement2"] -%>							
+	                            <%= @objects_hash["resizeableElement2"] -%>
+	                            <%= @data_script_hash["resizable_2"] -%>
+							<% else -%>
+								<%= hidden_field_tag "plotKineticsPanel","off" -%>
+							<% end -%>
+                            
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
@@ -223,7 +234,6 @@
 <% end -%>
 <!-- JWS CONSTRUCTOR END -->
 <%= link_to "Try again", builder_model_path(@model) -%>
-
-<script type="text/javascript" >
-	setTheDivStyle();
+<script type="text/javascript">
+    setTheDivStyle();
 </script>
