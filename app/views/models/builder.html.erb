@@ -101,7 +101,8 @@
                                 Rate equations help
                             </button>
                             <input value="Show eqs graph" type="button" onclick="$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
-							<% if @objects_hash["resizeableElement2"] -%>							
+							<% if @objects_hash["resizeableElement2"] -%>					
+								<%= hidden_field_tag "plotKineticsPanel","on" -%>		
 	                            <%= @objects_hash["resizeableElement2"] -%>
 	                            <%= @data_script_hash["resizable_2"] -%>
 							<% else -%>
