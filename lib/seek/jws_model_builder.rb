@@ -49,10 +49,10 @@ module Seek
         part=Multipart.new("upfile",filepath,model.original_filename)
         response = part.post(upload_sbml_url)
         if response.code == "302" 
-          url = URI.parse(response['location'])
-          puts "PATH=#{url.path}"
-          req = Net::HTTP::Get.new(url.path)
-          response = Net::HTTP.start(url.host, url.port) {|http|
+          uri = URI.parse(response['location'])
+          puts "PATH=#{uri.request_uri}"
+          req = Net::HTTP::Get.new(uri.request_uri)
+          response = Net::HTTP.start(uri.host, uri.port) {|http|
             http.request(req)
           }
         else
