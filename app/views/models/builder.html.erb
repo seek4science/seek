@@ -21,12 +21,22 @@
         font-size: 10pt;
     }
 </style>
-<div style='height: 25px; width: 145px; float: left'>
+
+<div>
     <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
         Open/Close Panels
-    </button>
+    </button>			
 </div>
+
+<% form_tag simulate_model_path(@model) do -%>
+	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/><%= submit_tag "Simulate in JWS Online" -%>
+<% end -%>
+
 <% form_tag construct_model_path(@model),:name=>"form" do -%>
+<div>
+	<input type=checkbox name="steadystateanalysis" />Steady state analysis<button title="Update the model with the new values" name="commit" type="submit">Update</button>
+</div>
+
 <div style="float: left">
     <div style='float: left;'>
         <div style="width: 720px; border: 5px; float: left">
@@ -229,12 +239,11 @@
 <div style="clear:both;">
     &nbsp;
 </div>
-<input type=checkbox name="steadystateanalysis" /> Steady state analysis<input name="commit" type="submit" value="Go!" /><% end -%>
-<% form_tag simulate_model_path(@model) do -%>
-<input type="hidden" name="savedfile" value="<%= @saved_file %>"/><%= submit_tag "Simulate in JWS Online" -%>
+
 <% end -%>
+
 <!-- JWS CONSTRUCTOR END -->
-<%= link_to "Try again", builder_model_path(@model) -%>
+
 <script type="text/javascript">
     setTheDivStyle();
 </script>
