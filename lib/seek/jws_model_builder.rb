@@ -16,8 +16,7 @@ module Seek
     end
     
     def upload_sbml_url
-      "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp?SBMLFilePostedToIFC=true"
-      #"#{BASE_URL}/upload/uploadNEW.jsp?SBMLFilePostedToIFC=true"
+      "#{SIMULATE_URL}?SBMLFilePostedToIFC=true"      
     end
     
     def simulate_url
@@ -46,12 +45,12 @@ module Seek
     def builder_content model
       filepath=model.content_blob.filepath
       
-      if (model.is_sbml?)
-        filepath="/home/sowen/Downloads/Teusink.xml"
-        part=Multipart.new({:upfile=>filepath})
+      if (model.is_sbml?)        
+        part=Multipart.new("upfile",filepath,model.original_filename)
         response = part.post(upload_sbml_url)
         if response.code == "302" 
           url = URI.parse(response['location'])
+          puts "PATH=#{url.path}"
           req = Net::HTTP::Get.new(url.path)
           response = Net::HTTP.start(url.host, url.port) {|http|
             http.request(req)
@@ -60,7 +59,7 @@ module Seek
           raise Exception.new("Expected a redirection from JWS Online")
         end
       elsif (model.is_dat?)
-        part=Multipart.new({:uploadedDatFile=>filepath})
+        part=Multipart.new("uploadedDatFile",filepath,model.original_filename)
         response = part.post(upload_dat_url)
       end
       

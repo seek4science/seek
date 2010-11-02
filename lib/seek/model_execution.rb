@@ -18,7 +18,7 @@ module Seek
       
       filepath=store_data_to_tmp model
       
-      part=Multipart.new({:upfile=>filepath})
+      part=Multipart.new("upfile",filepath,model.original_filename)
       
       response = part.post(root_url+jsp)
       
