@@ -75,6 +75,15 @@ class Model < ActiveRecord::Base
   def organism_name
     organism.title unless organism.nil?
   end
-    
+  
+  def is_dat?
+    #FIXME: needs to actually check contents rather than the extension
+    original_filename.end_with?(".dat")
+  end
+  
+  def is_sbml?
+    #FIXME: needs to actually check contents rather than the extension
+    original_filename.end_with?(".xml")
+  end
   
 end

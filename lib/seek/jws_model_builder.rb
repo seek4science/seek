@@ -12,8 +12,13 @@ module Seek
     end
     
     def upload_dat_url
-      self.builder_url+"?datFilePosted=true"
-    end        
+      builder_url+"?datFilePosted=true"
+    end
+    
+    def upload_sbml_url
+      "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp?SBMLFilePostedToIFC=true"
+      #"#{BASE_URL}/upload/uploadNEW.jsp?SBMLFilePostedToIFC=true"
+    end
     
     def simulate_url
       SIMULATE_URL
@@ -41,15 +46,29 @@ module Seek
     def builder_content model
       filepath=model.content_blob.filepath
       
-      part=Multipart.new({:uploadedDatFile=>filepath})
-      
-      response = part.post(upload_dat_url)
+      if (model.is_sbml?)
+        filepath="/home/sowen/Downloads/Teusink.xml"
+        part=Multipart.new({:upfile=>filepath})
+        response = part.post(upload_sbml_url)
+        if response.code == "302" 
+          url = URI.parse(response['location'])
+          req = Net::HTTP::Get.new(url.path)
+          response = Net::HTTP.start(url.host, url.port) {|http|
+            http.request(req)
+          }
+        else
+          raise Exception.new("Expected a redirection from JWS Online")
+        end
+      elsif (model.is_dat?)
+        part=Multipart.new({:uploadedDatFile=>filepath})
+        response = part.post(upload_dat_url)
+      end
       
       if response.instance_of?(Net::HTTPInternalServerError)       
         puts response.to_s
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end
-      
+      puts response.body
       process_response_body(response.body)
       
     end
