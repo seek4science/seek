@@ -1,4 +1,5 @@
 require 'hpricot'
+require 'rest_client'
 
 module Seek
   
@@ -38,7 +39,7 @@ module Seek
         puts response.to_s
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end
-
+      
       process_response_body(response.body)
     end
     
@@ -74,29 +75,38 @@ module Seek
     
     def simulate saved_file
       url=simulate_url
-      url=url+"?savedfile=#{saved_file}&inputFileConstructor=true"           
+      response = RestClient.post(url,:savedfile=>saved_file,:multipart=>true) { |response, request, result, &block|
+        if [301, 302, 307].include? response.code
+          puts "CODE=#{response.code}"
+          response.follow_redirection(request, result, &block)
+        else
+          response.return!(request, result, &block)
+        end
+      }
       
-      part=Multipart.new({})
-      
-      response = part.post(url)
-      
-      if response.instance_of?(Net::HTTPInternalServerError)       
-        puts response.to_s
-        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
-      end
-      
-      if response.instance_of?(Net::HTTPRedirection)
-        puts "REDIRECTION TO #{response['location']}"
-      end
-      
-      extract_applet(response.body)
+      #      url=url+"?savedfile=#{saved_file}&inputFileConstructor=true"           
+      #      
+      #      part=Multipart.new({})
+      #      
+      #      response = part.post(url)
+      #      
+      #      if response.instance_of?(Net::HTTPInternalServerError)       
+      #        puts response.to_s
+      #        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      #      end
+      #      
+      #      if response.instance_of?(Net::HTTPRedirection)
+      #        puts "REDIRECTION TO #{response['location']}"
+      #      end
+      #            
+      extract_applet(response.body)      
     end
     
     def extract_applet body
-      doc = Hpricot(body)
-      puts body
+      doc = Hpricot(body)      
       element = doc.search("//object").first
-      element.inner_html
+      puts element.to_s
+      element.to_s
     end        
     
     def process_response_body body                  
@@ -134,9 +144,9 @@ module Seek
         
         result[k]=script.to_s
         
-#        puts "-------- script for key: #{k} ----------"
-#        puts result[k]
-#        puts "----------------------------------------"
+        #        puts "-------- script for key: #{k} ----------"
+        #        puts result[k]
+        #        puts "----------------------------------------"
         
         keyi+=1
       end

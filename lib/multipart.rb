@@ -1,9 +1,9 @@
 class Multipart
   
-  def initialize( param_name,filepath,filename )
-    @param_name=param_name
+  def initialize( file_param_name,filepath,filename )
+    @file_param_name=file_param_name
     @filepath=filepath
-    @filename=filename
+    @filename=filename    
   end
   
   def post( to_url )
@@ -13,7 +13,7 @@ class Multipart
     streams = []
            
     parts << StringPart.new( "--" + boundary + "\r\n" +
-          "Content-Disposition: form-data; name=\"" + @param_name.to_s + "\"; filename=\"" + @filename + "\"\r\n" +
+          "Content-Disposition: form-data; name=\"" + @file_param_name.to_s + "\"; filename=\"" + @filename + "\"\r\n" +
           "Content-Type: video/x-msvideo\r\n\r\n")
     stream = File.open(@filepath, "rb")
     streams << stream
