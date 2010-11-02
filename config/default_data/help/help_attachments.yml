@@ -12,21 +12,30 @@ help_attachments:
   - created_at
   - updated_at
   records: 
-  - - "1"
+  - - "3"
+    - "13"
+    - Nature Protocols Format for SOPs
+    - application/msword
+    - NatureProtocolsFormat.doc
+    - "24064"
+    - "5"
+    - 2010-09-08 13:11:19
+    - 2010-09-08 13:11:19
+  - - "4"
     - "13"
     - MIAME_metadata
     - application/vnd.ms-excel
-    - microarray1.xls
-    - "112640"
-    - "1"
-    - 2010-05-28 09:17:12
-    - 2010-05-28 09:17:12
-  - - "2"
+    - microarray_example_newformat.xls
+    - "102400"
+    - "7"
+    - 2010-11-02 13:43:31
+    - 2010-11-02 13:43:31
+  - - "5"
     - "13"
-    - Intracellular_metabolite_measurements
+    - Intracellular metabolite mesurements
     - application/vnd.ms-excel
     - metabolites_intracellular.xls
-    - "76288"
-    - "2"
-    - 2010-05-28 13:38:34
-    - 2010-05-28 13:38:34
+    - "75776"
+    - "8"
+    - 2010-11-02 13:44:55
+    - 2010-11-02 13:44:55
