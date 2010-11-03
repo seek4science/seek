@@ -6,6 +6,7 @@ module MimeTypesHelper
     "application/octet-stream" => {:name => "Binary file type", :icon_key => "misc_file",:extension=>""},
     "application/pdf" => {:name => "PDF document", :icon_key => "pdf_file",:extension=>"pdf"},
     "application/vnd.excel" => {:name=>"Spreadsheet",:icon_key=>"xls_file",:extension=>"xls"},
+    "application/msexcel" => {:name => "Spreadsheet", :icon_key => "xls_file",:extension=>"xls"},
     "application/vnd.ms-excel" => {:name => "Spreadsheet", :icon_key => "xls_file",:extension=>"xls"},
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => {:name => "Word document", :icon_key => "doc_file",:extension=>"docx"},
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" => {:name => "Spreadsheet", :icon_key => "xls_file",:extension=>"xlsx"},
@@ -17,6 +18,7 @@ module MimeTypesHelper
     "text/plain" => {:name => "Plain text file", :icon_key => "txt_file",:extension=>"txt"},
     "text/x-comma-separated-values" => {:name => "Comma-seperated-values file", :icon_key => "misc_file",:extension=>"csv"},
     "text/xml" => {:name => "XML document", :icon_key => "xml_file",:extension=>"xml"},
+    "application/xml" => {:name => "XML document", :icon_key => "xml_file",:extension=>"xml"},
     "text/x-objcsrc" => {:name => "Objective C file", :icon_key => "misc_file",:extension=>"objc"}
   }  
 
