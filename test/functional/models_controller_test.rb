@@ -18,6 +18,16 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:models)
   end    
   
+  test "show builder with sbml format" do
+    m=models(:teusink)
+    m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file
+    get :builder,:id=>m
+    assert_response :success
+    assert assigns(:model)
+    assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
+    assert_select "script",:text=>/VmGLT = 97.264/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file  
+  end
+  
   test "show builder with jws format" do
     m=models(:jws_model)
     m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file

@@ -46,12 +46,23 @@ module Seek
     def builder_content model
       filepath=model.content_blob.filepath
       
+      #this is necessary to get the correct filename and especially extension, which JWS relies on
+      tmpfile = Tempfile.new(model.original_filename)       
+      FileUtils.cp(filepath,tmpfile.path)
+      
       if (model.is_sbml?)        
+#        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
+#          if [301, 302, 307].include? response.code 
+#            puts "REDIRECT to #{response['location']}"
+#            response.follow_redirection(request, result, &block)
+#          else
+#            response.return!(request, result, &block)
+#          end
+#        } 
         part=Multipart.new("upfile",filepath,model.original_filename)
         response = part.post(upload_sbml_url)
-        if response.code == "302" 
-          uri = URI.parse(response['location'])
-          puts "PATH=#{uri.request_uri}"
+        if response.code == "302"
+          uri = URI.parse(response['location'])          
           req = Net::HTTP::Get.new(uri.request_uri)
           response = Net::HTTP.start(uri.host, uri.port) {|http|
             http.request(req)
@@ -60,15 +71,19 @@ module Seek
           raise Exception.new("Expected a redirection from JWS Online")
         end
       elsif (model.is_dat?)
-        part=Multipart.new("uploadedDatFile",filepath,model.original_filename)
-        response = part.post(upload_dat_url)
+        response = RestClient.post(upload_dat_url,:uploadedDatFile=>tmpfile,:filename=>model.original_filename,:multipart=>true) { |response, request, result, &block|
+          if [301, 302, 307].include? response.code
+            response.follow_redirection(request, result, &block)
+          else
+            response.return!(request, result, &block)
+          end
+        }        
       end
       
       if response.instance_of?(Net::HTTPInternalServerError)       
         puts response.to_s
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
-      end
-      puts response.body
+      end      
       process_response_body(response.body)
       
     end
@@ -76,29 +91,13 @@ module Seek
     def simulate saved_file
       url=simulate_url
       response = RestClient.post(url,:savedfile=>saved_file,:multipart=>true) { |response, request, result, &block|
-        if [301, 302, 307].include? response.code
-          puts "CODE=#{response.code}"
+        if [301, 302, 307].include? response.code          
           response.follow_redirection(request, result, &block)
         else
           response.return!(request, result, &block)
         end
       }
       
-      #      url=url+"?savedfile=#{saved_file}&inputFileConstructor=true"           
-      #      
-      #      part=Multipart.new({})
-      #      
-      #      response = part.post(url)
-      #      
-      #      if response.instance_of?(Net::HTTPInternalServerError)       
-      #        puts response.to_s
-      #        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
-      #      end
-      #      
-      #      if response.instance_of?(Net::HTTPRedirection)
-      #        puts "REDIRECTION TO #{response['location']}"
-      #      end
-      #            
       extract_applet(response.body)      
     end
     
