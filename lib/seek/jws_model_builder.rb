@@ -105,6 +105,7 @@ module Seek
     def extract_applet body
       doc = Hpricot(body)      
       element = doc.search("//object").first
+      element.at("param").before(%!<param name="codebase" value="#{BASE_URL}"/>!)
       puts element.to_s
       element.to_s
     end        
@@ -126,10 +127,7 @@ module Seek
       doc.search("//object").each do |obj|
         id=obj.attributes['id']
         obj.attributes['data']=BASE_URL+"/"+obj.attributes['data']
-        result[id]=obj.to_s
-        puts "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
-        puts obj.to_s
-        puts "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"
+        result[id]=obj.to_s        
       end
       return result
     end
