@@ -21,20 +21,7 @@ Rails::Initializer.run do |config|
   # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
 
   # Specify gems that this application depends on. 
-  # They can then be installed with "rake gems:install" on new installations.
-  # config.gem "bj"
-  # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  # config.gem "aws-s3", :lib => "aws/s3"
-  config.gem 'rubaidh-google_analytics', :lib => 'rubaidh/google_analytics', :source => 'http://gems.github.com'  
-#  config.gem 'spreadsheet',:version=>"0.6.4.1"
-  config.gem 'hpricot',:version=>"0.8.2"
-  #config.gem 'ruby-openid'
-  #config.gem 'rack-openid',:version=>"1.0.1"
-  config.gem 'fastercsv', :version=>"1.5.1"
-  config.gem 'libxml-ruby',:lib=>"libxml",:version=>"1.1.3"
-  config.gem 'uuidtools',:lib=>"uuidtools",:version=>"2.1.1"
-  config.gem 'RedCloth'
-  config.gem 'simple-spreadsheet-extractor',:version=>"0.3.5"
+  # NOW using Bundler. Check the Gemfile for gems, and read more at: http://gembundler.com/
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

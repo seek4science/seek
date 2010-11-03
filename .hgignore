@@ -32,6 +32,8 @@ script/finns_tests/*
 config/environment_local.rb
 public/help_images/*
 .rvmrc
+.bundle/config
+Gemfile.lock
 
 
 syntax: regexp

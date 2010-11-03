@@ -1,3 +1,5 @@
+require 'RedCloth'
+
 class HelpDocument < ActiveRecord::Base
   
   validates_presence_of :title, :identifier
