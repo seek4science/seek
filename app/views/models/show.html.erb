@@ -5,9 +5,11 @@
   <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
     <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
     <li><%= image_tag_for_key('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
+	<li><%= image_tag_for_key('jws_builder', builder_model_path(@model),nil,nil,"JWS Builder") -%></li>
   <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
     <%# this is not owner, but current user can edit -%>
     <li><%= image_tag_for_key('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%></li>
+	<li><%= image_tag_for_key('jws_builder', builder_model_path(@model),nil,nil,"JWS Builder") -%></li>
   <% end -%>
 
   <% if Authorization.is_authorized?("destroy", nil, @model, current_user) -%>
@@ -30,9 +32,7 @@
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
 
 <div class="show_basic">
-  <div class="main_content_left_box">
-  	
-	<%= link_to "Builder",builder_model_path(@model)%>
+  <div class="main_content_left_box">  		
     
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
     

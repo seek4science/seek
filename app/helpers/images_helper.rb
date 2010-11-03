@@ -231,7 +231,9 @@ module ImagesHelper
       when "file_large"
       "crystal_project/32x32/devices/3floppy_unmount.png"
       when "internet_large"
-    "crystal_project/32x32/devices/Globe2.png"
+      "crystal_project/32x32/devices/Globe2.png"
+      when "jws_builder"
+        "misc_icons/jws_builder24x24.png"
     else
       return nil
     end
