@@ -1,9 +1,7 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-require "uri"
-require "net/http"
-require 'multipart'
+require 'rest_client'
 
 module Seek
   module ModelExecution
@@ -18,9 +16,7 @@ module Seek
       
       filepath=store_data_to_tmp model
       
-      part=Multipart.new("upfile",filepath,model.original_filename)
-      
-      response = part.post(root_url+jsp)
+      response=RestClient.post(root_url+jsp,:upfile=>File.new(filepath,'rb'))
       
       if response.instance_of?(Net::HTTPInternalServerError)       
         puts response.to_s
@@ -31,7 +27,6 @@ module Seek
       raise Exception.new("There currently appears to be a problem with JWS Online (empty response)") if result.blank?
       raise Exception.new("There currently appears to be a problem with JWS Online (response is shorter than expected)\n#{result}") if result.length < 10
       raise Exception.new("There is no applet defined in the response from JWS Online") if !result.include?(%{div id="applet_box"})
-      
       
       start_block=result.index(%{<div id="applet_box"})
       end_block=result.index("</div>",start_block)+6
