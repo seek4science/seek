@@ -24,7 +24,7 @@ class ModelsController < ApplicationController
   
   def new_version
     if (handle_data nil)
-     
+      
       comments = params[:revision_comment]
       @model.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
       @model.content_type = params[:model][:content_type]
@@ -52,11 +52,17 @@ class ModelsController < ApplicationController
       delete_model_format params
     end
   end
-    
+  
   def builder
-    @data_script_hash,@saved_file,@objects_hash = @@model_builder.builder_content @model    
+    supported = Seek::JWSModelBuilder.is_supported?(@model)
+    @data_script_hash,@saved_file,@objects_hash = @@model_builder.builder_content @model if supported    
     respond_to do |format|
-      format.html
+      if supported
+        format.html
+      else
+        flash[:error]="This model is of neither SBML or JWS Dat format so cannot be used with JWS Online"
+        format.html { redirect_to(@model)}
+      end
     end
   end
   
@@ -74,7 +80,7 @@ class ModelsController < ApplicationController
       format.html
     end
   end
-    
+  
   def update_model_metadata
     attribute=params[:attribute]
     if attribute=="model_type"
