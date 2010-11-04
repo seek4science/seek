@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
   
   #required for the Savage Beast
   def admin?
-    current_user.is_admin?
+    current_user && current_user.is_admin?
   end
   
   def email_enabled?
