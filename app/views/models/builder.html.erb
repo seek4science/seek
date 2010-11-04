@@ -29,7 +29,20 @@
 </div>
 
 <% form_tag simulate_model_path(@model,:version=>@display_model.version) do -%>
-	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/><%= submit_tag "Simulate in JWS Online" -%>
+	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/>
+	<%= submit_tag "Simulate in JWS Online" -%>
+<% end -%>
+
+<% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
+	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/>
+	<input type="hidden" name="model_format" value="dat"/>
+	<%= submit_tag "Save as new JWS Dat version" -%>
+<% end -%>
+
+<% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
+	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/>
+	<input type="hidden" name="model_format" value="sbml"/>
+	<%= submit_tag "Save as new SBML version" -%>
 <% end -%>
 
 <% form_tag construct_model_path(@model,:version=>@display_model.version),:name=>"form" do -%>

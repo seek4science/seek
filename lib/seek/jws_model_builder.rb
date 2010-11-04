@@ -17,6 +17,10 @@ module Seek
       model.original_filename.end_with?(".dat")
     end
     
+    def get_saved_dat_url savedfile
+        "#{BASE_URL}JWSconstructor_panels/#{savedfile}"
+    end
+    
     def is_sbml? model
       #FIXME: needs to actually check contents rather than the extension
       model.original_filename.end_with?(".xml")
