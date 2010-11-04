@@ -25,7 +25,7 @@ SITE_BASE_HOST="http://localhost:3000" unless defined? SITE_BASE_HOST
 if ENABLE_GOOGLE_ANALYTICS
   Rubaidh::GoogleAnalytics.tracker_id = GOOGLE_ANALYTICS_TRACKER_ID
 else
-  Rubaidh::GoogleAnalytics.tracker_id = nil
+  Rubaidh::GoogleAnalytics.tracker_id = "000-000"
 end
 
 if EXCEPTION_NOTIFICATION_ENABLED
