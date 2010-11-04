@@ -99,3 +99,17 @@ model_with_no_contributor:
   version: 1
   project: sysmo_project
   policy: sysmo_member_edit
+  
+model_jws_incompatible:
+  title: A model that is neither JWS Dat or SBML
+  description: It is actually a picture
+  original_filename: file_picture.png
+  content_blob: picture_blob
+  content_type: image/png
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
+  project: sysmo_project
+  policy: sysmo_member_edit
+  

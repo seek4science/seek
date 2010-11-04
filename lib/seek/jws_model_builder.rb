@@ -8,6 +8,10 @@ module Seek
     BASE_URL = "http://jjj.mib.ac.uk/webMathematica/Examples/"    
     SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
+    def self.is_supported? model
+      model.is_sbml? || model.is_dat?  
+    end
+    
     def builder_url
       "#{BASE_URL}JWSconstructor_panels/DatFileReader.jsp"
     end

@@ -1,9 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ModelTest < ActiveSupport::TestCase
-  fixtures :all
-  
-  include Seek::ModelExecution
+  fixtures :all    
 
   test "assocations" do
     model=models(:teusink)
@@ -15,18 +13,18 @@ class ModelTest < ActiveSupport::TestCase
 
     blob=content_blobs(:teusink_blob)
     assert_equal blob,model.content_blob
-  end
+  end    
   
-  test "jws execution applet" do
+  test "is sbml" do
     model=models(:teusink)
-    resp=jws_execution_applet model    
-    assert resp.include?("applet")
+    assert model.is_sbml?
+    assert !model.is_dat?
   end
   
-  test "jws execution applet biomodel model" do
-    model=models(:francos_model)
-    resp=jws_execution_applet model
-    assert resp.include?("applet")
+  test "is jws dat" do
+    model=models(:jws_model)
+    assert !model.is_sbml?
+    assert model.is_dat?
   end
   
   test "project" do
