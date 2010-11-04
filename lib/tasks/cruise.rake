@@ -8,7 +8,7 @@ desc "task for cruise control"
 task :cruise do
   RAILS_ENV = ENV['RAILS_ENV'] = 'test'
   
-  sh "bundle install"
+  `bundle install`
   Bundler.setup(:default, :test)
   
   FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")      
