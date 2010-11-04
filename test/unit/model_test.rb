@@ -29,7 +29,6 @@ class ModelTest < ActiveSupport::TestCase
     assert resp.include?("applet")
   end
   
-
   test "project" do
     model=models(:teusink)
     p=projects(:sysmo_project)

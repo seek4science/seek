@@ -27,7 +27,7 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem 'rubaidh-google_analytics', :lib => 'rubaidh/google_analytics', :source => 'http://gems.github.com'  
 #  config.gem 'spreadsheet',:version=>"0.6.4.1"
-  config.gem 'hpricot',:version=>"0.8.2"
+  config.gem 'hpricot',:version=>">=0.8.3"
   #config.gem 'ruby-openid'
   #config.gem 'rack-openid',:version=>"1.0.1"
   config.gem 'fastercsv', :version=>"1.5.1"
