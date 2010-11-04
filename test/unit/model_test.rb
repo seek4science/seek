@@ -19,8 +19,7 @@ class ModelTest < ActiveSupport::TestCase
   
   test "jws execution applet" do
     model=models(:teusink)
-    resp=jws_execution_applet model
-    puts resp
+    resp=jws_execution_applet model    
     assert resp.include?("applet")
   end
   
