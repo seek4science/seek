@@ -127,14 +127,13 @@ module Seek
       element.to_s
     end        
     
-    def process_response_body body                  
+    def process_response_body body                              
       
       doc = Hpricot(body)
-      
+      puts doc.to_s
       data_scripts = create_data_script_hash doc
       saved_file = determine_saved_file doc
-      objects_hash = create_objects_hash doc
-      
+      objects_hash = create_objects_hash doc      
       
       return data_scripts,saved_file,objects_hash
     end
@@ -155,21 +154,17 @@ module Seek
       keyi=0
       result={}
       scripts[0,keys.size].each do |script|
-        k=keys[keyi]
-        
+        k=keys[keyi]        
         result[k]=script.to_s
-        
-        #        puts "-------- script for key: #{k} ----------"
-        #        puts result[k]
-        #        puts "----------------------------------------"
-        
         keyi+=1
       end
       result      
     end
     
-    def determine_saved_file doc
-      element = doc.search("//input[@name='savedfile']").first
+    def determine_saved_file doc                  
+      elements = doc.search("//input[@name='savedfile']")
+      puts "FOUND #{elements.size} savedfile elements"
+      element = elements.first
       return element.attributes['value']      
     end        
     
