@@ -27,6 +27,11 @@ module ModelsHelper
   def authorised_models
     models=Model.find(:all)
     Authorization.authorize_collection("show",models,current_user)
-  end    
+  end  
+  
+  def jws_supported? model
+    builder = Seek::JWSModelBuilder.new
+    builder.is_supported? model
+  end
 
 end

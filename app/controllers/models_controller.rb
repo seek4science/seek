@@ -13,7 +13,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview , :test_asset_url]
-  before_filter :find_display_model, :only=>[:show,:download,:execute]
+  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:construct]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
@@ -54,20 +54,20 @@ class ModelsController < ApplicationController
   end
   
   def builder
-    supported = Seek::JWSModelBuilder.is_supported?(@model)
-    @data_script_hash,@saved_file,@objects_hash = @@model_builder.builder_content @model if supported    
+    supported = @@model_builder.is_supported?(@display_model)
+    @data_script_hash,@saved_file,@objects_hash = @@model_builder.builder_content @display_model if supported    
     respond_to do |format|
       if supported
         format.html
       else
         flash[:error]="This model is of neither SBML or JWS Dat format so cannot be used with JWS Online"
-        format.html { redirect_to(@model)}
+        format.html { redirect_to(@display_model)}
       end
     end
   end
   
   def construct
-    @data_script_hash,@saved_file,@objects_hash = @@model_builder.construct @model,params
+    @data_script_hash,@saved_file,@objects_hash = @@model_builder.construct @display_model,params
     respond_to do |format|
       format.html { render :action=>"builder" }
     end

@@ -4,6 +4,7 @@ class JWSTests < ActiveSupport::TestCase
   fixtures :all
   
   include Seek::ModelExecution
+    
   
   test "jws execution applet" do
     model=models(:teusink)
@@ -18,13 +19,41 @@ class JWSTests < ActiveSupport::TestCase
   end
   
   test "is supported" do
+    builder = Seek::JWSModelBuilder.new
     model=models(:teusink)
-    assert Seek::JWSModelBuilder.is_supported?(model)
+    assert builder.is_supported?(model)
     
     model=models(:jws_model)
-    assert Seek::JWSModelBuilder.is_supported?(model)
+    assert builder.is_supported?(model)
     
     model=models(:model_jws_incompatible)
-    assert !Seek::JWSModelBuilder.is_supported?(model)
+    assert !builder.is_supported?(model)
   end
+  
+  test "is supported with versioned model" do
+    builder = Seek::JWSModelBuilder.new
+    model=model_versions(:teusink_v2)
+    assert builder.is_supported?(model)
+    
+    model=model_versions(:jws_model_v1)
+    assert builder.is_supported?(model)
+    
+    model=model_versions(:model_jws_incompatible_v1)
+    assert !builder.is_supported?(model)
+  end
+  
+  test "is sbml" do
+    builder = Seek::JWSModelBuilder.new
+    model=models(:teusink)
+    assert builder.is_sbml?(model)
+    assert !builder.is_dat?(model)
+  end
+  
+  test "is jws dat" do
+    builder = Seek::JWSModelBuilder.new
+    model=models(:jws_model)
+    assert !builder.is_sbml?(model)
+    assert builder.is_dat?(model)
+  end
+  
 end

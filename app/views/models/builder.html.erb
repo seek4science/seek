@@ -28,11 +28,11 @@
     </button>			
 </div>
 
-<% form_tag simulate_model_path(@model) do -%>
+<% form_tag simulate_model_path(@model,:version=>@display_model.version) do -%>
 	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/><%= submit_tag "Simulate in JWS Online" -%>
 <% end -%>
 
-<% form_tag construct_model_path(@model),:name=>"form" do -%>
+<% form_tag construct_model_path(@model,:version=>@display_model.version),:name=>"form" do -%>
 <div>
 	<input type=checkbox name="steadystateanalysis" />Steady state analysis<button title="Update the model with the new values" name="commit" type="submit">Update</button>
 </div>

@@ -13,19 +13,7 @@ class ModelTest < ActiveSupport::TestCase
 
     blob=content_blobs(:teusink_blob)
     assert_equal blob,model.content_blob
-  end    
-  
-  test "is sbml" do
-    model=models(:teusink)
-    assert model.is_sbml?
-    assert !model.is_dat?
-  end
-  
-  test "is jws dat" do
-    model=models(:jws_model)
-    assert !model.is_sbml?
-    assert model.is_dat?
-  end
+  end        
   
   test "project" do
     model=models(:teusink)

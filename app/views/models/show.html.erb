@@ -1,18 +1,19 @@
 <%= stylesheet_link_tag 'jws' %>
 <%= javascript_include_tag "resource" -%>
 
+
 <ul class="sectionIcons">
   <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
     <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
     <li><%= image_tag_for_key('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
-	<% if Seek::JWSModelBuilder.is_supported?(@model) -%>
-		<li><%= image_tag_for_key('jws_builder', builder_model_path(@model),nil,nil,"JWS Builder") -%></li>
+	<% if jws_supported?(@display_model) -%>
+		<li><%= image_tag_for_key('jws_builder', builder_model_path(@model,:version=>@display_model.version),nil,nil,"JWS Builder") -%></li>
 	<% end -%>
   <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
     <%# this is not owner, but current user can edit -%>
     <li><%= image_tag_for_key('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%></li>
-	<% if Seek::JWSModelBuilder.is_supported?(@model) -%>
-		<li><%= image_tag_for_key('jws_builder', builder_model_path(@model),nil,nil,"JWS Builder") -%></li>
+	<% if jws_supported?(@display_model) -%>
+		<li><%= image_tag_for_key('jws_builder', builder_model_path(@model,:version=>@display_model.version),nil,nil,"JWS Builder") -%></li>
 	<% end -%>
   <% end -%>
 
@@ -21,7 +22,7 @@
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
-    <li><%= image_tag_for_key('download', download_model_url(:version=>@display_model.version), "Download Model", nil, "Download Model") -%></li>
+    <li><%= image_tag_for_key('download', download_model_path(@model,:version=>@display_model.version), "Download Model", nil, "Download Model") -%></li>
   <% else -%>
     <li>
       <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@model} %>

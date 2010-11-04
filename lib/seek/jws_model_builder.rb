@@ -8,8 +8,18 @@ module Seek
     BASE_URL = "http://jjj.mib.ac.uk/webMathematica/Examples/"    
     SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
-    def self.is_supported? model
-      model.is_sbml? || model.is_dat?  
+    def is_supported? model
+      is_sbml?(model) || is_dat?(model)  
+    end
+    
+    def is_dat? model
+      #FIXME: needs to actually check contents rather than the extension
+      model.original_filename.end_with?(".dat")
+    end
+    
+    def is_sbml? model
+      #FIXME: needs to actually check contents rather than the extension
+      model.original_filename.end_with?(".xml")
     end
     
     def builder_url
@@ -54,15 +64,15 @@ module Seek
       tmpfile = Tempfile.new(model.original_filename)       
       FileUtils.cp(filepath,tmpfile.path)
       
-      if (model.is_sbml?)        
-#        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
-#          if [301, 302, 307].include? response.code 
-#            puts "REDIRECT to #{response['location']}"
-#            response.follow_redirection(request, result, &block)
-#          else
-#            response.return!(request, result, &block)
-#          end
-#        } 
+      if (is_sbml? model)        
+        #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
+        #          if [301, 302, 307].include? response.code 
+        #            puts "REDIRECT to #{response['location']}"
+        #            response.follow_redirection(request, result, &block)
+        #          else
+        #            response.return!(request, result, &block)
+        #          end
+        #        } 
         part=Multipart.new("upfile",filepath,model.original_filename)
         response = part.post(upload_sbml_url)
         if response.code == "302"
@@ -74,7 +84,7 @@ module Seek
         else
           raise Exception.new("Expected a redirection from JWS Online")
         end
-      elsif (model.is_dat?)
+      elsif (is_dat? model)
         response = RestClient.post(upload_dat_url,:uploadedDatFile=>tmpfile,:filename=>model.original_filename,:multipart=>true) { |response, request, result, &block|
           if [301, 302, 307].include? response.code
             response.follow_redirection(request, result, &block)
