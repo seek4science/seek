@@ -1,6 +1,4 @@
-class ModelsController < ApplicationController
-  
-  include Seek::ModelExecution
+class ModelsController < ApplicationController    
   
   include WhiteListHelper
   include IndexPager
@@ -292,19 +290,6 @@ class ModelsController < ApplicationController
     
   end
   
-  def execute
-    version=params[:version]
-    begin
-      @applet= jws_execution_applet @model.find_version(version)
-    rescue Exception => e      
-      @error_details=e.message       
-    end
-    
-    render :update do |page|
-      page.replace_html "execute_model",:partial=>"execute_applet"
-    end
-    
-  end
   
   # GET /models/1
   # GET /models/1.xml

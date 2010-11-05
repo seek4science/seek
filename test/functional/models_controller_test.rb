@@ -62,6 +62,14 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select "script",:text=>/VmGLT = 99.999/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file
   end    
   
+  test "simulate model" do
+    m=models(:teusink)
+    m.content_blob.dump_data_to_file
+    post :simulate,:id=>m,:version=>m.version
+    assert_response :success
+    assert_select "object[type='application/x-java-applet']",:count=>1
+  end
+  
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
