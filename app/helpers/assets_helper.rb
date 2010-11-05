@@ -144,7 +144,7 @@ module AssetsHelper
         related["DataFile"][:items] = related["DataFile"][:items] | resource.created_data_files
         related["Model"][:items] = related["Model"][:items] | resource.created_models
         related["Sop"][:items] = related["Sop"][:items] | resource.created_sops
-        related["Publication"][:items] = related["Model"][:items] | resource.created_publications 
+        related["Publication"][:items] = related["Publication"][:items] | resource.created_publications 
         related["Assay"][:items] = resource.assays
       when "Institution"
         related["Project"][:items] = resource.projects

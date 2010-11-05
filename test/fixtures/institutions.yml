@@ -45,6 +45,7 @@ ebi_inst:
 
 amsterdam_uni_inst:
   name: "University of Amsterdam"
+  country: Netherlands
 
 
 empty_inst:

@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
   
   #required for the Savage Beast
   def admin?
-    current_user.is_admin?
+    current_user && current_user.is_admin?
   end
   
   def email_enabled?
@@ -185,8 +185,8 @@ class ApplicationController < ActionController::Base
     object = eval("@"+c.singularize)
     
     #don't log if the object is not valid, as this will a validation error on update or create
-    return if object.nil? || !object.errors.empty?
-    
+    return if object.nil? || !object.respond_to?("errors") || !object.errors.empty?        
+      
     case c
       when "investigations","studies","assays"
       if ["show","create","update","destroy"].include?(a)

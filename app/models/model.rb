@@ -34,7 +34,7 @@ class Model < ActiveRecord::Base
   
   grouped_pagination  
   
-  acts_as_uniquely_identifiable  
+  acts_as_uniquely_identifiable
   
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
@@ -74,16 +74,6 @@ class Model < ActiveRecord::Base
 
   def organism_name
     organism.title unless organism.nil?
-  end
-  
-  def is_dat?
-    #FIXME: needs to actually check contents rather than the extension
-    original_filename.end_with?(".dat")
-  end
-  
-  def is_sbml?
-    #FIXME: needs to actually check contents rather than the extension
-    original_filename.end_with?(".xml")
-  end
+  end    
   
 end

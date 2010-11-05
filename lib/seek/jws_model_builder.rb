@@ -8,6 +8,24 @@ module Seek
     BASE_URL = "http://jjj.mib.ac.uk/webMathematica/Examples/"    
     SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
+    def is_supported? model
+      is_sbml?(model) || is_dat?(model)  
+    end
+    
+    def is_dat? model
+      #FIXME: needs to actually check contents rather than the extension
+      model.original_filename.end_with?(".dat")
+    end
+    
+    def get_saved_dat_url savedfile
+        "#{BASE_URL}JWSconstructor_panels/#{savedfile}"
+    end
+    
+    def is_sbml? model
+      #FIXME: needs to actually check contents rather than the extension
+      model.original_filename.end_with?(".xml")
+    end
+    
     def builder_url
       "#{BASE_URL}JWSconstructor_panels/DatFileReader.jsp"
     end
@@ -50,15 +68,15 @@ module Seek
       tmpfile = Tempfile.new(model.original_filename)       
       FileUtils.cp(filepath,tmpfile.path)
       
-      if (model.is_sbml?)        
-#        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
-#          if [301, 302, 307].include? response.code 
-#            puts "REDIRECT to #{response['location']}"
-#            response.follow_redirection(request, result, &block)
-#          else
-#            response.return!(request, result, &block)
-#          end
-#        } 
+      if (is_sbml? model)        
+        #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
+        #          if [301, 302, 307].include? response.code 
+        #            puts "REDIRECT to #{response['location']}"
+        #            response.follow_redirection(request, result, &block)
+        #          else
+        #            response.return!(request, result, &block)
+        #          end
+        #        } 
         part=Multipart.new("upfile",filepath,model.original_filename)
         response = part.post(upload_sbml_url)
         if response.code == "302"
@@ -70,7 +88,7 @@ module Seek
         else
           raise Exception.new("Expected a redirection from JWS Online")
         end
-      elsif (model.is_dat?)
+      elsif (is_dat? model)
         response = RestClient.post(upload_dat_url,:uploadedDatFile=>tmpfile,:filename=>model.original_filename,:multipart=>true) { |response, request, result, &block|
           if [301, 302, 307].include? response.code
             response.follow_redirection(request, result, &block)
@@ -109,14 +127,13 @@ module Seek
       element.to_s
     end        
     
-    def process_response_body body                  
+    def process_response_body body                              
       
       doc = Hpricot(body)
-      
+      puts doc.to_s
       data_scripts = create_data_script_hash doc
       saved_file = determine_saved_file doc
-      objects_hash = create_objects_hash doc
-      
+      objects_hash = create_objects_hash doc      
       
       return data_scripts,saved_file,objects_hash
     end
@@ -137,21 +154,17 @@ module Seek
       keyi=0
       result={}
       scripts[0,keys.size].each do |script|
-        k=keys[keyi]
-        
+        k=keys[keyi]        
         result[k]=script.to_s
-        
-        #        puts "-------- script for key: #{k} ----------"
-        #        puts result[k]
-        #        puts "----------------------------------------"
-        
         keyi+=1
       end
       result      
     end
     
-    def determine_saved_file doc
-      element = doc.search("//input[@name='savedfile']").first
+    def determine_saved_file doc                  
+      elements = doc.search("//input[@name='savedfile']")
+      puts "FOUND #{elements.size} savedfile elements"
+      element = elements.first
       return element.attributes['value']      
     end        
     
