@@ -1,6 +1,4 @@
-class ModelsController < ApplicationController
-  
-  include Seek::ModelExecution
+class ModelsController < ApplicationController    
   
   include WhiteListHelper
   include IndexPager
@@ -103,9 +101,14 @@ class ModelsController < ApplicationController
   
   def simulate
     saved_file = params[:savedfile]
+    @back_button_text = 'Back to JWS Builder'
+    unless saved_file
+      @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model
+      @back_button_text = "Back to Model"
+    end
     @applet=@@model_builder.simulate saved_file
     respond_to do |format|
-      format.html
+      format.html {render :layout=>"no_sidebar"}
     end
   end
   
@@ -287,19 +290,6 @@ class ModelsController < ApplicationController
     
   end
   
-  def execute
-    version=params[:version]
-    begin
-      @applet= jws_execution_applet @model.find_version(version)
-    rescue Exception => e      
-      @error_details=e.message       
-    end
-    
-    render :update do |page|
-      page.replace_html "execute_model",:partial=>"execute_applet"
-    end
-    
-  end
   
   # GET /models/1
   # GET /models/1.xml

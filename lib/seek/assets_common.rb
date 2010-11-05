@@ -46,15 +46,9 @@ module Seek
           page.visual_effect :highlight,"test_url_msg"
           if code=="302" || code=="401"            
             page['local_copy'].checked=false
-            page['local_copy'].disable
-            
+            page['local_copy'].disable            
           else
             page['local_copy'].enable
-#            if (code=="200")
-#              
-#            else
-#              
-#            end
           end
         end
       end

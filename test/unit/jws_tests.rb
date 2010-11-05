@@ -1,22 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class JWSTests < ActiveSupport::TestCase  
-  fixtures :all
-  
-  include Seek::ModelExecution
-    
-  
-  test "jws execution applet" do
-    model=models(:teusink)
-    resp=jws_execution_applet model    
-    assert resp.include?("applet")
-  end
-  
-  test "jws execution applet biomodel model" do
-    model=models(:francos_model)
-    resp=jws_execution_applet model
-    assert resp.include?("applet")
-  end
+  fixtures :all           
   
   test "is supported" do
     builder = Seek::JWSModelBuilder.new

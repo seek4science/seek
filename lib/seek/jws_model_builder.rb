@@ -122,15 +122,13 @@ module Seek
     def extract_applet body
       doc = Hpricot(body)      
       element = doc.search("//object").first
-      element.at("param").before(%!<param name="codebase" value="#{BASE_URL}"/>!)
-      puts element.to_s
+      element.at("param").before(%!<param name="codebase" value="#{BASE_URL}"/>!)      
       element.to_s
     end        
     
     def process_response_body body                              
       
-      doc = Hpricot(body)
-      puts doc.to_s
+      doc = Hpricot(body)      
       data_scripts = create_data_script_hash doc
       saved_file = determine_saved_file doc
       objects_hash = create_objects_hash doc      
@@ -162,8 +160,7 @@ module Seek
     end
     
     def determine_saved_file doc                  
-      elements = doc.search("//input[@name='savedfile']")
-      puts "FOUND #{elements.size} savedfile elements"
+      elements = doc.search("//input[@name='savedfile']")      
       element = elements.first
       return element.attributes['value']      
     end        

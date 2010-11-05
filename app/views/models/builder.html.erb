@@ -20,47 +20,52 @@
     .rtTextArea {
         font-size: 10pt;
     }
+    
+    .builder_box {
+        width: auto;
+        padding: 3px;
+        float: left;
+    }
 </style>
-
-<div>
-    <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
-        Open/Close Panels
-    </button>			
-</div>
-
-<% form_tag simulate_model_path(@model,:version=>@display_model.version) do -%>
-	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/>
-	<%= submit_tag "Simulate in JWS Online" -%>
-<% end -%>
-
-<% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
-	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/>
-	<input type="hidden" name="model_format" value="dat"/>
-	<%= submit_tag "Save as new JWS Dat version" -%>
-<% end -%>
-
-<% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
-	<input type="hidden" name="savedfile" value="<%= @saved_file %>"/>
-	<input type="hidden" name="model_format" value="sbml"/>
-	<%= submit_tag "Save as new SBML version" -%>
-<% end -%>
-
-<% form_tag construct_model_path(@model,:version=>@display_model.version),:name=>"form" do -%>
-<div>
-	<input type=checkbox name="steadystateanalysis" />Steady state analysis<button title="Update the model with the new values" name="commit" type="submit">Update</button>
-</div>
-
-<div style="float: left">
-    <div style='float: left;'>
-        <div style="width: 720px; border: 5px; float: left">
-            <div id="name_top" style="width: auto; padding: 3px; float: left">
+<ul class="sectionIcons">
+    <li>
+        <%= image_tag_for_key('back', model_path(@model,:version=>@display_model.version), nil, nil, "Back to model") -%>
+    </li>
+</ul>
+<%= render :partial=>"models/builder/header" -%>
+<div class="yui-gf">
+    <div class="yui-u first" style="width:17%;border-right: 1px #999 solid;text-align:center;height:100%;">
+        <div>
+            <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
+                Open/Close Panels
+            </button>
+        </div>
+        <hr/><% form_tag simulate_model_path(@model,:version=>@display_model.version) do -%>
+        <input type="hidden" name="savedfile" value="<%= @saved_file %>"/><%= submit_tag "Simulate" -%>
+        <% end -%>
+        <hr/><% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
+        <input type="hidden" name="savedfile" value="<%= @saved_file %>"/>Model format
+        <br/>
+        <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
+        <%= submit_tag "Add as new version" -%>
+        <% end -%>
+        <hr/>
+        <div>
+            <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis<input value="Update" type="button" alt="Update" title="Update the model with the modified values" onclick="update_clicked();"/>
+        </div>
+    </div>
+    <div class="yui-u" style="width: 83%; height: 100%;">
+        <% form_tag construct_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
+        <input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
+        <div>
+            <div id="name_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('name');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Model name
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="name_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="name_panel" style="display: none">
@@ -75,14 +80,14 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left">
+            <div class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('reactions');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Reactions
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="reactions_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="reactions_panel" style="display: none">
@@ -94,24 +99,24 @@
                             </button>
                             <input value="Show schema" type="button" onclick="$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide schema" type="button" onclick="$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
                             <% if @objects_hash["resizeableElement"] -%>
-	                            <%= hidden_field_tag "plotGraphPanel","on" -%>
-	                            <%= @objects_hash["resizeableElement"] -%>
-	                            <%= @data_script_hash["resizable"] -%>
+                            <%= hidden_field_tag "plotGraphPanel","on" -%>
+                            <%= @objects_hash["resizeableElement"] -%>
+                            <%= @data_script_hash["resizable"] -%>
                             <% else -%>
-								<%= hidden_field_tag "plotGraphPanel","off" -%>
+                            <%= hidden_field_tag "plotGraphPanel","off" -%>
                             <% end -%>
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left">
+            <div class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('equations');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Rate equations
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="equations_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="equations_panel" style="display: none">
@@ -124,26 +129,25 @@
                                 Rate equations help
                             </button>
                             <input value="Show eqs graph" type="button" onclick="$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
-							<% if @objects_hash["resizeableElement2"] -%>					
-								<%= hidden_field_tag "plotKineticsPanel","on" -%>		
-	                            <%= @objects_hash["resizeableElement2"] -%>
-	                            <%= @data_script_hash["resizable_2"] -%>
-							<% else -%>
-								<%= hidden_field_tag "plotKineticsPanel","off" -%>
-							<% end -%>
-                            
+                            <% if @objects_hash["resizeableElement2"] -%>
+                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
+                            <%= @objects_hash["resizeableElement2"] -%>
+                            <%= @data_script_hash["resizable_2"] -%>
+                            <% else -%>
+                            <%= hidden_field_tag "plotKineticsPanel","off" -%>
+                            <% end -%>
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left">
+            <div class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('initial');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Initial values
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="initial_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="initial_panel" style="display: none">
@@ -158,14 +162,14 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left">
+            <div class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('parameters');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Parameter values
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="parameters_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="parameters_panel" style="display: none">
@@ -180,14 +184,14 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left">
+            <div class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('assignments');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Assignment rules
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="assignments_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="assignments_panel" style="display: none">
@@ -202,14 +206,14 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left">
+            <div class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('functions');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Functions
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="functions_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="functions_panel" style="display: none">
@@ -224,14 +228,14 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div style="width:auto; padding: 3px; float: left">
+            <div class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePannelAnimatedStatus(this.nextSibling,50,50)" style="height:20px; cursor: pointer;">
+                    <div class="squareboxgradientcaption" onclick="togglePanel('events');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Events
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="events_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="events_panel" style="display: none">
@@ -246,17 +250,25 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-        </div>
+        </div><% end -%>
     </div>
-</div>
-<div style="clear:both;">
-    &nbsp;
-</div>
-
-<% end -%>
-
-<!-- JWS CONSTRUCTOR END -->
-
+</div><!-- JWS CONSTRUCTOR END -->
 <script type="text/javascript">
+    
     setTheDivStyle();
+    
+    function update_clicked(){
+        $('steadystateanalysis').value = $('steadystate').value;
+        alert($('steadystateanalysis').value);
+        $('form').submit();
+    }
+    
+    function togglePanel(panel_name){
+        Effect.toggle(panel_name + "_panel", "blind", {
+            duration: 0.25
+        });
+        chevron = $(panel_name + "_chevron")
+        var expand = (chevron.src.indexOf("expand.gif") > 0);
+        chevron.src = chevron.src.split(expand ? "expand.gif" : "collapse.gif").join(expand ? "collapse.gif" : "expand.gif");
+    }
 </script>
