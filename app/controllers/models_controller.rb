@@ -103,6 +103,11 @@ class ModelsController < ApplicationController
   
   def simulate
     saved_file = params[:savedfile]
+    @back_button_text = 'Back to JWS Builder'
+    unless saved_file
+      @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model
+      @back_button_text = "Back to Model"
+    end
     @applet=@@model_builder.simulate saved_file
     respond_to do |format|
       format.html {render :layout=>"no_sidebar"}
