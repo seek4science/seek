@@ -22,6 +22,9 @@
   <% end -%>
 
   <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
+  	<% if jws_supported?(@display_model) -%>
+	<li><%= image_tag_for_key('execute', simulate_model_path(@model,:version=>@display_model.version),nil,{:method=>:post},"Simulate Model") -%></li>
+	<% end -%>
     <li><%= image_tag_for_key('download', download_model_path(@model,:version=>@display_model.version), "Download Model", nil, "Download Model") -%></li>
   <% else -%>
     <li>
@@ -104,8 +107,7 @@
 
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
 
-  <div style="clear:both;padding-top:1em;">      
-    <%= render :partial=>"execute" -%>
+  <div style="clear:both;padding-top:1em;">    
     <%= render :partial=>"layouts/items_related_to",:object => @model %>
   </div>
 
