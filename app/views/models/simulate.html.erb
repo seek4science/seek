@@ -1,1 +1,11 @@
-<%= @applet -%>
+<ul class="sectionIcons">
+	<li><%= image_tag_for_key('back', builder_model_path(@model,:version=>@display_model.version), nil, nil, 'Back to JWS Builder') -%></li>
+</ul>
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@display_model} %>
+
+<br/>
+<center>
+	<div style="border: #999 1px solid;">	
+    	<%= @applet -%>
+	</div>
+</center>

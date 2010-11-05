@@ -105,7 +105,7 @@ class ModelsController < ApplicationController
     saved_file = params[:savedfile]
     @applet=@@model_builder.simulate saved_file
     respond_to do |format|
-      format.html
+      format.html {render :layout=>"no_sidebar"}
     end
   end
   
