@@ -165,7 +165,7 @@ follows the last / in the uri
 
         <div class="method-heading">
           <a href="#M000001" class="method-signature">
-          <span class="method-name">get_remote_data</span><span class="method-args">(url, username=nil, password=nil, type=nil)</span>
+          <span class="method-name">get_remote_data</span><span class="method-args">(url, username=nil, password=nil, type=nil, include_data=true)</span>
           </a>
         </div>
       
@@ -175,10 +175,10 @@ follows the last / in the uri
           <div class="method-source-code" id="M000001-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/http_downloader.rb, line 13</span>
-13:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_remote_data</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">password</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword kw">nil</span>
+13:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_remote_data</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">password</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">include_data</span>=<span class="ruby-keyword kw">true</span>
 14:       <span class="ruby-identifier">cached</span>=<span class="ruby-identifier">check_from_cache</span>(<span class="ruby-identifier">url</span>,<span class="ruby-identifier">username</span>,<span class="ruby-identifier">password</span>)
 15:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">cached</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">cached</span>.<span class="ruby-identifier">nil?</span>
-16:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">basic_auth</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>, <span class="ruby-identifier">password</span>
+16:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">basic_auth</span> <span class="ruby-identifier">url</span>, <span class="ruby-identifier">username</span>, <span class="ruby-identifier">password</span>,<span class="ruby-identifier">include_data</span>
 17:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
