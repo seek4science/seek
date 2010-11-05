@@ -1,114 +1,109 @@
 <%= stylesheet_link_tag 'jws' %>
 <%= javascript_include_tag "resource" -%>
-
-
 <ul class="sectionIcons">
-  <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
-    <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
-    <li><%= image_tag_for_key('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%></li>
-	<% if jws_supported?(@display_model) -%>
-		<li><%= image_tag_for_key('jws_builder', builder_model_path(@model,:version=>@display_model.version),nil,nil,"JWS Builder") -%></li>
-	<% end -%>
-  <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
-    <%# this is not owner, but current user can edit -%>
-    <li><%= image_tag_for_key('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%></li>
-	<% if jws_supported?(@display_model) -%>
-		<li><%= image_tag_for_key('jws_builder', builder_model_path(@model,:version=>@display_model.version),nil,nil,"JWS Builder") -%></li>
-	<% end -%>
-  <% end -%>
-
-  <% if Authorization.is_authorized?("destroy", nil, @model, current_user) -%>
-    <li><%= image_tag_for_key('destroy', model_path(@model), nil, { :confirm => 'This deletes the Model and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%></li>
-  <% end -%>
-
-  <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
-  	<% if jws_supported?(@display_model) -%>
-	<li><%= image_tag_for_key('execute', simulate_model_path(@model,:version=>@display_model.version),nil,{:method=>:post},"Simulate Model") -%></li>
-	<% end -%>
-    <li><%= image_tag_for_key('download', download_model_path(@model,:version=>@display_model.version), "Download Model", nil, "Download Model") -%></li>
-  <% else -%>
+    <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
     <li>
-      <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@model} %>
+        <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%>
     </li>
-  <% end -%>
+    <li>
+        <%= image_tag_for_key('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%>
+    </li>    
+    <% elsif Authorization.is_authorized?("edit", nil, @model, current_user) -%>
+    <%# this is not owner, but current user can edit -%>
+    <li>
+        <%= image_tag_for_key('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%>
+    </li>
+    <% end -%>
+    <% if Authorization.is_authorized?("destroy", nil, @model, current_user) -%>
+    <li>
+        <%= image_tag_for_key('destroy', model_path(@model), nil, { :confirm => 'This deletes the Model and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%>
+    </li>
+    <% end -%>
+    <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
+    <li>
+        <%= image_tag_for_key('download', download_model_path(@model,:version=>@display_model.version), "Download Model", nil, "Download Model") -%>
+    </li>
+    <% else -%>
+    <li>
+        <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@model} %>
+    </li>
+    <% end -%>
 </ul>
 
+<% if jws_supported?(@display_model) -%>
+	<ul class="sectionIcons">
+		<% if Authorization.is_authorized?("edit", nil, @model, current_user) -%>
+		    <li>
+		        <%= image_tag_for_key('jws_builder', builder_model_path(@model,:version=>@display_model.version),nil,nil,"JWS Builder") -%>
+		    </li>
+	    <% end -%>
+	    <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
+		    <li>
+		        <%= image_tag_for_key('execute', simulate_model_path(@model,:version=>@display_model.version),nil,{:method=>:post},"Simulate Model") -%>
+		    </li>
+	    <% end -%>	    
+	</ul>
+<% end -%>
+
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
-
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
-
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
-
 <div class="show_basic">
-  <div class="main_content_left_box">  		
-    
-    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
-    
-    <div class="box_about_actor">
-      <p>
-        <b>Title:</b>
-        <span class="title"><%=h @display_model.title -%></span>
-      </p>
-
-      <p>
-        <b>File name:</b>
-        <%=h @display_model.original_filename -%>
-      </p>
-
-      <p>
-        <b>Format:</b>
-        <%=h mime_nice_name(@display_model.content_type) -%>
-      </p>
-
-      <p>
-        <b>Organism:</b>
-        <% if @display_model.organism -%>
-          <%= organism_link_to @display_model.organism -%>
-        <% else -%>
-          <span class="none_text">Not specified</span>
-        <% end -%>
-      </p>
-
-      <p>
-        <b>Model type:</b>
-        <%= model_type_text @display_model.model_type %>
-      </p>
-
-      <p>
-        <b>Model format:</b>
-        <%= model_format_text @display_model.model_format %>
-      </p>
-
-      <p>
-        <b>Execution or visualisation environment:</b>
-        <%= model_environment_text @display_model %>
-      </p>
-
-      <br/>
-
-      <p>
-        <b>Description:</b>
-        <% unless @display_model.description.blank? -%>
-          <div class="box_standout" id="description">
-            <%= simple_format(auto_link(white_list(@display_model.description),:all,:rel=>'nofollow')) -%>
-          </div>
-        <% else -%>
-          <p class="none_text">
-            No description.
-          </p>
-        <% end -%>
-      </p>    
-      
-      <p>
-        <%= embedded_isa_svg(@model, true, @model) -%>
-      </p>  
+    <div class="main_content_left_box">
+        <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
+        <div class="box_about_actor">
+            <p>
+                <b>Title:</b>
+                <span class="title"><%=h @display_model.title -%></span>
+            </p>
+            <p>
+                <b>File name:</b>
+                <%=h @display_model.original_filename -%>
+            </p>
+            <p>
+                <b>Format:</b>
+                <%=h mime_nice_name(@display_model.content_type) -%>
+            </p>
+            <p>
+                <b>Organism:</b>
+                <% if @display_model.organism -%>
+                <%= organism_link_to @display_model.organism -%>
+                <% else -%>
+                <span class="none_text">Not specified</span>
+                <% end -%>
+            </p>
+            <p>
+                <b>Model type:</b>
+                <%= model_type_text @display_model.model_type %>
+            </p>
+            <p>
+                <b>Model format:</b>
+                <%= model_format_text @display_model.model_format %>
+            </p>
+            <p>
+                <b>Execution or visualisation environment:</b>
+                <%= model_environment_text @display_model %>
+            </p>
+            <br/>
+            <p>
+                <b>Description:</b>
+                <% unless @display_model.description.blank? -%>
+                <div class="box_standout" id="description">
+                    <%= simple_format(auto_link(white_list(@display_model.description),:all,:rel=>'nofollow')) -%>
+                </div>
+                <% else -%>
+                <p class="none_text">
+                    No description.
+                </p>
+                <% end -%>
+            </p>
+            <p>
+                <%= embedded_isa_svg(@model, true, @model) -%>
+            </p>
+        </div>
     </div>
-  </div>
-
-  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
-
-  <div style="clear:both;padding-top:1em;">    
-    <%= render :partial=>"layouts/items_related_to",:object => @model %>
-  </div>
-
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model } %>
+    <div style="clear:both;padding-top:1em;">
+        <%= render :partial=>"layouts/items_related_to",:object => @model %>
+    </div>
 </div>
