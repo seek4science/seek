@@ -1,5 +1,10 @@
+
 <%
-avatar=resource_title_draggable_avatar item %>
+
+avatar=resource_title_draggable_avatar item
+title_prefix||="" 
+title_postfix||=""
+%>
 <div class="contribution_title">
     <% if ["Investigation","Study","Assay","DataFile","Model","Sop","Publication"].include?(item.class.name) %>
     <% end %>
@@ -7,6 +12,6 @@ avatar=resource_title_draggable_avatar item %>
     <span class="contribution_title_image"><%= avatar -%>
     </span>
     <% end -%>
-    <h1><%= h(item.title) -%></h1>
+    <h1><%= title_prefix + h(item.title) + title_postfix -%></h1>
 </div>
 
