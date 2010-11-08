@@ -16,7 +16,7 @@ class ModelsController < ApplicationController
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
   @@model_builder = Seek::JWSModelBuilder.new
-  
+    
   # GET /models
   # GET /models.xml
   
@@ -46,8 +46,7 @@ class ModelsController < ApplicationController
       delete_model_format params
     end
   end
-  
-  
+    
   def builder
     supported = @@model_builder.is_supported?(@display_model)
     @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported    

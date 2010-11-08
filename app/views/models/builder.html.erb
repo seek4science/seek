@@ -18,13 +18,38 @@
 <style type="text/css" media="screen,projection">
     
     .rtTextArea {
-        font-size: 10pt;
+        font-size: 10pt;		
     }
     
     .builder_box {
         width: auto;
         padding: 3px;
         float: left;
+    }
+    
+    div.builder_actions {
+        border-right: 1px #999 solid;
+        border-bottom: 1px #999 solid;
+        text-align: center;
+        height: 100%;
+    }
+    
+    div.builder_actions h6 {
+        background-color: #EEE;
+        width: 100%;
+        margin-bottom: 0.5em;
+        padding-top: 0.4em;
+        border-top: solid 1px #999;
+        border-bottom: solid 1px #BBB;
+        height: 1.5em;
+        vertical-align: middle;
+    }
+    
+    div.jws_errors {
+        color: red;
+        text-align: center;
+        font-weight: bolder;
+        margin-bottom: 1em;
     }
 </style>
 <ul class="sectionIcons">
@@ -33,29 +58,43 @@
     </li>
 </ul>
 <%= render :partial=>"models/builder/header" -%>
-<% unless @error_keys.empty? -%>
-<div style="color:red;padding-left:1em;">    
-	A problem was reported with: <%= join_with_and(@error_keys.collect{|k| jws_key_to_text(k)}) -%>
-</div>
-<% end -%>
+
 <div class="yui-gf">
-    <div class="yui-u first" style="width:17%;border-right: 1px #999 solid;text-align:center;height:100%;">
-        <div>
-            <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
-                Open/Close Panels
-            </button>
-        </div>
-        <hr/><!-- Simulate action --><input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="simulate_clicked();"/><hr/><!-- Save new version action -->Model format
+    <div class="yui-u first builder_actions" style="width:19%;">
+        <!-- Simulate action --><h6>Simulate</h6>
+        <input type=checkbox name="steadystate" id="steadystate" />Steady State Analysis?
         <br/>
-        <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
-        <input value="Save as new version" type="button" alt="Save as new version" title="" id="new_version_button" onclick="save_new_version_clicked();"/><hr/>
+        <input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="simulate_clicked();"/>
+        <br/>
+        <br/>
+        <!-- Save new version action --><h6>Save as new version</h6>
+        Model format: <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
+        <br/>
+        <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="save_new_version_clicked();"/>
+        <br/>
+        <br/>
+        <!-- Check --><h6>Check</h6>
         <div>
-            <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis<input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
+            <input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
         </div>
+        <br/>
     </div>
-    <div class="yui-u" style="width: 83%; height: 100%">
+    <div class="yui-u" style="width: 80%; height: 100%; margin-left: 0.1em;">
+        <% unless @error_keys.empty? -%>
+			<div class="jws_errors">
+	            There were problems reported with: <%= join_with_and(@error_keys.collect{|k| jws_key_to_text(k)}) -%>
+	        </div>
+			<script type="text/javascript">
+				$('simulate_button').disabled=true;
+				$('new_version_button').disabled=true;
+			</script>
+		<% end -%>
+		
+        <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
+            Open/Close all panels
+        </button>
         <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
-        <input type="hidden" name="following_action" id="following_action" value=""/><input type="hidden" name="saved_model_format" id="saved_model_format" value=""/><input type="checkbox" name="steadystateanalysis" id="steadystateanalysis"/>Steady state analysis
+        <input type="hidden" name="following_action" id="following_action" value=""/><input type="hidden" name="saved_model_format" id="saved_model_format" value=""/><input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
         <br/>
         <br/>
         <div>
@@ -261,13 +300,13 @@
     function check_clicked(){
         $('check_button').value = "Submitting ...";
         $('check_button').disabled = true;
-        $('steadystateanalysis').value = $('steadystate').value;
         $('form').submit();
     }
     
     function simulate_clicked(){
         $('simulate_button').value = "Submitting ...";
         $('simulate_button').disabled = true;
+        $('steadystateanalysis').value = $('steadystate').value;
         $('form').following_action.value = "simulate";
         $('form').submit();
     }
@@ -288,4 +327,5 @@
         var expand = (chevron.src.indexOf("expand.gif") > 0);
         chevron.src = chevron.src.split(expand ? "expand.gif" : "collapse.gif").join(expand ? "collapse.gif" : "expand.gif");
     }
+			
 </script>
