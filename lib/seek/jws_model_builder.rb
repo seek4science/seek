@@ -133,6 +133,9 @@ module Seek
       saved_file = determine_saved_file doc
       objects_hash = create_objects_hash doc      
       fields_with_errors = find_reported_errors doc
+        
+      #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
+      fields_with_errors.delete("functions")
       
       return data_scripts,saved_file,objects_hash,fields_with_errors
     end
