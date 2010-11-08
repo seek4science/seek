@@ -29,18 +29,13 @@ class ModelsController < ApplicationController
       @model.original_filename = params[:model][:original_filename]
       
       respond_to do |format|
-        if @model.save_as_new_version(comments)
-          flash[:notice]="New version uploaded - now on version #{@model.version}"
-        else
-          flash[:error]="Unable to save new version"          
-        end
-        format.html {redirect_to @model }
+        create_new_version comments
       end
     else
       flash[:error]=flash.now[:error]
       redirect_to @model
     end
-  end
+  end    
   
   def delete_model_metadata
     attribute=params[:attribute]
@@ -64,67 +59,33 @@ class ModelsController < ApplicationController
       end
     end
   end
-  
-  #adds a new version of the model using the changes from the constructor
-  def store_from_builder 
-    format=params[:model_format]
-    savedfile=params[:savedfile]
-    comments = ""
     
-    case format
-      when "dat"
-      url=@@model_builder.get_saved_dat_url savedfile
-      downloader=Jerm::HttpDownloader.new
-      data_hash = downloader.get_remote_data url
-      @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
-      @model.content_type=data_hash[:content_type]               
-      when "smbl"
-    end
-    
-    @model.original_filename = savedfile
-    respond_to do |format|
-      if @model.save_as_new_version(comments)
-        flash[:notice]="New version created - now on version #{@model.version}"
-      else
-        flash[:error]="Unable to save new version"          
-      end
-      format.html { redirect_to @model }
-    end
-    
-  end
   
   def submit_to_jws
     following_action=params.delete("following_action")
     
     @data_script_hash,@saved_file,@objects_hash = @@model_builder.construct @display_model,params
-    case(following_action)
-      when "simulate"
+    if following_action == "simulate"
       @applet=@@model_builder.simulate @saved_file
-      when "save_new_version"
+    elsif following_action == "save_new_version"
       model_format=params.delete("saved_model_format") #only used for saving as a new version
       comments=""
-      case(model_format)
-        when "dat"
+      if model_format == "dat"
         url=@@model_builder.get_saved_dat_url @saved_file
         downloader=Jerm::HttpDownloader.new
         data_hash = downloader.get_remote_data url
         @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
         @model.content_type=data_hash[:content_type]   
-        when "sbml"
+      elsif model_format == "sbml"
+        
       end
     end
     respond_to do |format|      
-      case(following_action)
-        when "simulate"
+      if following_action == "simulate"
         @back_button_text = 'Back to JWS Builder'
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
-        when "save_new_version"
-        if @model.save_as_new_version(comments)
-          flash[:notice]="New version created - now on version #{@model.version}"
-        else
-          flash[:error]="Unable to save new version"          
-        end
-        format.html { redirect_to @model }
+      elsif following_action == "save_new_version"
+        create_new_version comments
       else
         format.html { render :action=>"builder" }
       end      
@@ -132,12 +93,8 @@ class ModelsController < ApplicationController
   end
   
   def simulate
-    saved_file = params[:savedfile]
-    @back_button_text = 'Back to JWS Builder'
-    unless saved_file
-      @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model
-      @back_button_text = "Back to Model"
-    end
+    @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model
+    @back_button_text = "Back to Model"    
     @applet=@@model_builder.simulate saved_file
     respond_to do |format|
       format.html {render :layout=>"no_sidebar"}
@@ -492,6 +449,15 @@ class ModelsController < ApplicationController
   end  
   
   protected
+  
+  def create_new_version comments
+    if @model.save_as_new_version(comments)
+      flash[:notice]="New version uploaded - now on version #{@model.version}"
+    else
+      flash[:error]="Unable to save new version"          
+    end
+    format.html {redirect_to @model }
+  end
   
   def default_items_per_page
     return 2
