@@ -42,17 +42,17 @@
         </div>
         <hr/>
 		<!-- Simulate action -->
-		<input value="Simulate" type="button" alt="Simulate" title="" onclick="simulate_clicked();"/>        
+		<input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="simulate_clicked();"/>        
 		<hr/>
 		<!-- Save new version action -->
         Model format
         <br/>
         <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
-        <input value="Save as new version" type="button" alt="Save as new version" title="" onclick="save_new_version_clicked();"/>        
+        <input value="Save as new version" type="button" alt="Save as new version" title="" id="new_version_button"  onclick="save_new_version_clicked();"/>        
         <hr/>
         <div>
             <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis
-			<input value="Check" type="button" alt="Check" title="Check the modified values are valid" onclick="update_clicked();"/>
+			<input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
         </div>
     </div>
     <div class="yui-u" style="width: 83%; height: 100%;">
@@ -260,19 +260,25 @@
     
     setTheDivStyle();
     
-    function update_clicked(){
+    function check_clicked(){
+		$('check_button').value="Submitting ...";
+		$('check_button').disabled=true;
         $('steadystateanalysis').value = $('steadystate').value;        
         $('form').submit();
     }
 	
 	function simulate_clicked() {
-		$('form').following_action.value="simulate"
+		$('simulate_button').value="Submitting ...";
+		$('simulate_button').disabled=true;
+		$('form').following_action.value="simulate";
 		$('form').submit();
 	}
 	
 	function save_new_version_clicked() {
-		$('form').following_action.value="save_new_version"
-		$('form').saved_model_format.value = $('model_format').value
+		$('new_version_button').value="Submitting ...";
+		$('new_version_button').disabled=true;
+		$('form').following_action.value="save_new_version";
+		$('form').saved_model_format.value = $('model_format').value;
 		$('form').submit();
 	}
     
