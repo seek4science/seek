@@ -13,6 +13,10 @@ function simulate_clicked(){
 }
 
 function save_new_version_clicked(){
+	$('new_version_comments').value=$('new_version_comments_rb').value;
+	$('new_version_filename').value=$('new_version_filename_rb').value;
+	$('new_version_options').hide();
+	$('new_version_waiting').show();
     $('new_version_button').value = "Submitting ...";
     $('new_version_button').disabled = true;
     $('form').following_action.value = "save_new_version";

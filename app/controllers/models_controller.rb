@@ -61,7 +61,7 @@ class ModelsController < ApplicationController
   end    
   
   def submit_to_jws
-    following_action=params.delete("following_action")
+    following_action=params.delete("following_action")    
     
     @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct @display_model,params
     if (@error_keys.empty?)
@@ -69,13 +69,15 @@ class ModelsController < ApplicationController
         @applet=@@model_builder.simulate @saved_file
       elsif following_action == "save_new_version"
         model_format=params.delete("saved_model_format") #only used for saving as a new version
-        comments=""
+        new_version_filename=params.delete("new_version_filename")
+        new_version_comments=params.delete("new_version_comments")
         if model_format == "dat"
           url=@@model_builder.get_saved_dat_url @saved_file
           downloader=Jerm::HttpDownloader.new
           data_hash = downloader.get_remote_data url
           @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
-          @model.content_type=data_hash[:content_type]   
+          @model.content_type=data_hash[:content_type] 
+          @model.original_filename=new_version_filename
         elsif model_format == "sbml"
           
         end
@@ -86,7 +88,7 @@ class ModelsController < ApplicationController
         @back_button_text = 'Back to JWS Builder'
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
       elsif @error_keys.empty? && following_action == "save_new_version"
-        create_new_version comments
+        create_new_version new_version_comments
         format.html {redirect_to @model }
       else
         format.html { render :action=>"builder" }

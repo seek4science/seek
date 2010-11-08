@@ -30,6 +30,7 @@
     </li>
 </ul>
 <%= render :partial=>"models/builder/header" -%>
+
 <div class="yui-gf">
     <div class="yui-u first builder_actions" style="width:19%;">
         <!-- Simulate action --><h6>Simulate</h6>
@@ -41,7 +42,7 @@
         <!-- Save new version action --><h6>Save as new version</h6>
         Model format: <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
         <br/>
-        <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="save_new_version_clicked();"/>
+        <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="RedBox.showInline('new_version_details'); return false;"/>
         <br/>
         <br/>
         <!-- Check --><h6>Check</h6>
@@ -64,7 +65,11 @@
             Open/Close all panels
         </button>
         <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
-        <input type="hidden" name="following_action" id="following_action" value=""/><input type="hidden" name="saved_model_format" id="saved_model_format" value=""/><input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
+		<input type="hidden" name="new_version_comments" id="new_version_comments" value=""/>
+		<input type="hidden" name="new_version_filename" id="new_version_filename" value=""/>
+        <input type="hidden" name="following_action" id="following_action" value=""/>
+		<input type="hidden" name="saved_model_format" id="saved_model_format" value=""/>
+		<input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
         <br/>
         <br/>
         <div>
@@ -262,9 +267,13 @@
             </div>
         </div><% end -%>
     </div>
-</div><!-- JWS CONSTRUCTOR END -->
+</div>
+<!-- JWS CONSTRUCTOR END -->
+
 <script type="text/javascript">
     
     setTheDivStyle();
     
 </script>
+
+<%= render :partial=>"models/builder/new_version_details" -%>

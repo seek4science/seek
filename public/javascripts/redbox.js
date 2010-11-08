@@ -7,7 +7,8 @@ var RedBox = {
   showInline: function(id)
   {
     this.showOverlay();
-    new Effect.Appear('RB_window', {duration: 0.4, queue: 'end'});        
+    new Effect.Appear('RB_window', {duration: 0.4, queue: 'end'}); 
+	Element.hide('RB_loading');       
     this.cloneWindowContents(id);
   },
 
