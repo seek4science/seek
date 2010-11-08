@@ -41,13 +41,14 @@
             </button>
         </div>
         <hr/>
-		<input value="Simulate" type="button" alt="Simulate" title="" onclick="simulate_clicked();"/>
-        <hr/><% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
-        <input type="hidden" name="savedfile" value="<%= @saved_file %>"/>Model format
+		<!-- Simulate action -->
+		<input value="Simulate" type="button" alt="Simulate" title="" onclick="simulate_clicked();"/>        
+		<hr/>
+		<!-- Save new version action -->
+        Model format
         <br/>
         <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
-        <%= submit_tag "Add as new version" -%>
-        <% end -%>
+        <input value="Save as new version" type="button" alt="Save as new version" title="" onclick="save_new_version_clicked();"/>        
         <hr/>
         <div>
             <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis
@@ -58,6 +59,7 @@
         <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
 		<input type="hidden" name="following_action" id="following_action" value=""/>
+		<input type="hidden" name="saved_model_format" id="saved_model_format" value=""/>
         <div>
             <div id="name_top" class="builder_box">
                 <div class="squarebox">
@@ -265,6 +267,12 @@
 	
 	function simulate_clicked() {
 		$('form').following_action.value="simulate"
+		$('form').submit();
+	}
+	
+	function save_new_version_clicked() {
+		$('form').following_action.value="save_new_version"
+		$('form').saved_model_format.value = $('model_format').value
 		$('form').submit();
 	}
     
