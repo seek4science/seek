@@ -55,11 +55,13 @@
 			<input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
         </div>
     </div>
-    <div class="yui-u" style="width: 83%; height: 100%;">
+    <div class="yui-u" style="width: 83%; height: 100%">
         <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
-        <input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
 		<input type="hidden" name="following_action" id="following_action" value=""/>
 		<input type="hidden" name="saved_model_format" id="saved_model_format" value=""/>
+		
+        <input type="checkbox" name="steadystateanalysis" id="steadystateanalysis"/>Steady state analysis
+		<br/><br/>
         <div>
             <div id="name_top" class="builder_box">
                 <div class="squarebox">

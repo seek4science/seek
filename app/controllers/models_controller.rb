@@ -30,6 +30,7 @@ class ModelsController < ApplicationController
       
       respond_to do |format|
         create_new_version comments
+        format.html {redirect_to @model }
       end
     else
       flash[:error]=flash.now[:error]
@@ -86,6 +87,7 @@ class ModelsController < ApplicationController
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
       elsif following_action == "save_new_version"
         create_new_version comments
+        format.html {redirect_to @model }
       else
         format.html { render :action=>"builder" }
       end      
@@ -455,8 +457,7 @@ class ModelsController < ApplicationController
       flash[:notice]="New version uploaded - now on version #{@model.version}"
     else
       flash[:error]="Unable to save new version"          
-    end
-    format.html {redirect_to @model }
+    end    
   end
   
   def default_items_per_page

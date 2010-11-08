@@ -78,7 +78,7 @@ module Seek
         #          end
         #        } 
         part=Multipart.new("upfile",filepath,model.original_filename)
-        response = part.post(upload_sbml_url)
+        response = part.post(upload_sbml_url)        
         if response.code == "302"
           uri = URI.parse(response['location'])          
           req = Net::HTTP::Get.new(uri.request_uri)
