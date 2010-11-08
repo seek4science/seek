@@ -33,6 +33,11 @@
     </li>
 </ul>
 <%= render :partial=>"models/builder/header" -%>
+<% unless @error_keys.empty? -%>
+<div style="color:red;padding-left:1em;">    
+	A problem was reported with: <%= join_with_and(@error_keys.collect{|k| jws_key_to_text(k)}) -%>
+</div>
+<% end -%>
 <div class="yui-gf">
     <div class="yui-u first" style="width:17%;border-right: 1px #999 solid;text-align:center;height:100%;">
         <div>
@@ -40,28 +45,19 @@
                 Open/Close Panels
             </button>
         </div>
-        <hr/>
-		<!-- Simulate action -->
-		<input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="simulate_clicked();"/>        
-		<hr/>
-		<!-- Save new version action -->
-        Model format
+        <hr/><!-- Simulate action --><input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="simulate_clicked();"/><hr/><!-- Save new version action -->Model format
         <br/>
         <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
-        <input value="Save as new version" type="button" alt="Save as new version" title="" id="new_version_button"  onclick="save_new_version_clicked();"/>        
-        <hr/>
+        <input value="Save as new version" type="button" alt="Save as new version" title="" id="new_version_button" onclick="save_new_version_clicked();"/><hr/>
         <div>
-            <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis
-			<input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
+            <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis<input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
         </div>
     </div>
     <div class="yui-u" style="width: 83%; height: 100%">
         <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
-		<input type="hidden" name="following_action" id="following_action" value=""/>
-		<input type="hidden" name="saved_model_format" id="saved_model_format" value=""/>
-		
-        <input type="checkbox" name="steadystateanalysis" id="steadystateanalysis"/>Steady state analysis
-		<br/><br/>
+        <input type="hidden" name="following_action" id="following_action" value=""/><input type="hidden" name="saved_model_format" id="saved_model_format" value=""/><input type="checkbox" name="steadystateanalysis" id="steadystateanalysis"/>Steady state analysis
+        <br/>
+        <br/>
         <div>
             <div id="name_top" class="builder_box">
                 <div class="squarebox">
@@ -263,26 +259,26 @@
     setTheDivStyle();
     
     function check_clicked(){
-		$('check_button').value="Submitting ...";
-		$('check_button').disabled=true;
-        $('steadystateanalysis').value = $('steadystate').value;        
+        $('check_button').value = "Submitting ...";
+        $('check_button').disabled = true;
+        $('steadystateanalysis').value = $('steadystate').value;
         $('form').submit();
     }
-	
-	function simulate_clicked() {
-		$('simulate_button').value="Submitting ...";
-		$('simulate_button').disabled=true;
-		$('form').following_action.value="simulate";
-		$('form').submit();
-	}
-	
-	function save_new_version_clicked() {
-		$('new_version_button').value="Submitting ...";
-		$('new_version_button').disabled=true;
-		$('form').following_action.value="save_new_version";
-		$('form').saved_model_format.value = $('model_format').value;
-		$('form').submit();
-	}
+    
+    function simulate_clicked(){
+        $('simulate_button').value = "Submitting ...";
+        $('simulate_button').disabled = true;
+        $('form').following_action.value = "simulate";
+        $('form').submit();
+    }
+    
+    function save_new_version_clicked(){
+        $('new_version_button').value = "Submitting ...";
+        $('new_version_button').disabled = true;
+        $('form').following_action.value = "save_new_version";
+        $('form').saved_model_format.value = $('model_format').value;
+        $('form').submit();
+    }
     
     function togglePanel(panel_name){
         Effect.toggle(panel_name + "_panel", "blind", {

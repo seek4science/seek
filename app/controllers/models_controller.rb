@@ -50,7 +50,7 @@ class ModelsController < ApplicationController
   
   def builder
     supported = @@model_builder.is_supported?(@display_model)
-    @data_script_hash,@saved_file,@objects_hash = @@model_builder.builder_content @display_model if supported    
+    @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported    
     respond_to do |format|
       if supported
         format.html
@@ -59,33 +59,34 @@ class ModelsController < ApplicationController
         format.html { redirect_to(@model,:version=>@display_model.version)}
       end
     end
-  end
-    
+  end    
   
   def submit_to_jws
     following_action=params.delete("following_action")
     
-    @data_script_hash,@saved_file,@objects_hash = @@model_builder.construct @display_model,params
-    if following_action == "simulate"
-      @applet=@@model_builder.simulate @saved_file
-    elsif following_action == "save_new_version"
-      model_format=params.delete("saved_model_format") #only used for saving as a new version
-      comments=""
-      if model_format == "dat"
-        url=@@model_builder.get_saved_dat_url @saved_file
-        downloader=Jerm::HttpDownloader.new
-        data_hash = downloader.get_remote_data url
-        @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
-        @model.content_type=data_hash[:content_type]   
-      elsif model_format == "sbml"
-        
+    @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct @display_model,params
+    if (@error_keys.empty?)
+      if following_action == "simulate"
+        @applet=@@model_builder.simulate @saved_file
+      elsif following_action == "save_new_version"
+        model_format=params.delete("saved_model_format") #only used for saving as a new version
+        comments=""
+        if model_format == "dat"
+          url=@@model_builder.get_saved_dat_url @saved_file
+          downloader=Jerm::HttpDownloader.new
+          data_hash = downloader.get_remote_data url
+          @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
+          @model.content_type=data_hash[:content_type]   
+        elsif model_format == "sbml"
+          
+        end
       end
     end
     respond_to do |format|      
-      if following_action == "simulate"
+      if @error_keys.empty? && following_action == "simulate"
         @back_button_text = 'Back to JWS Builder'
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
-      elsif following_action == "save_new_version"
+      elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version comments
         format.html {redirect_to @model }
       else

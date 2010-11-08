@@ -1,5 +1,15 @@
 module ModelsHelper
 
+  JWS_PANEL_NAMES={
+    "reacs" => "Reactions",
+    "kinetics" => "Rate equations",
+    "initVal"=>"Initial values",
+    "parameters"=>"Parameter values",
+    "functions"=>"Functions",
+    "assRules"=>"Assignment rules",
+    "events"=>"Events"
+  }
+
   def model_environment_text model
     model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Unknown</span>" 
   end
@@ -32,6 +42,10 @@ module ModelsHelper
   def jws_supported? model
     builder = Seek::JWSModelBuilder.new
     builder.is_supported? model
+  end
+  
+  def jws_key_to_text key
+    return JWS_PANEL_NAMES[key]
   end
 
 end

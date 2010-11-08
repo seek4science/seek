@@ -85,7 +85,7 @@ module Seek
           response = Net::HTTP.start(uri.host, uri.port) {|http|
             http.request(req)
           }
-        else
+        else          
           raise Exception.new("Expected a redirection from JWS Online")
         end
       elsif (is_dat? model)
@@ -132,8 +132,20 @@ module Seek
       data_scripts = create_data_script_hash doc
       saved_file = determine_saved_file doc
       objects_hash = create_objects_hash doc      
+      fields_with_errors = find_reported_errors doc
       
-      return data_scripts,saved_file,objects_hash
+      return data_scripts,saved_file,objects_hash,fields_with_errors
+    end
+    
+    def find_reported_errors doc
+      errors=[]
+      doc.search("//form[@name='errorinfo']/input").each do |error_report|
+        value=error_report.attributes['value']
+        name=error_report.attributes['name']
+        name=name.gsub("Errors","")
+        errors << name unless value=="0"
+      end      
+      return errors
     end
     
     def create_objects_hash doc
