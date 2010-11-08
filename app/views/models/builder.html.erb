@@ -40,9 +40,8 @@
                 Open/Close Panels
             </button>
         </div>
-        <hr/><% form_tag simulate_model_path(@model,:version=>@display_model.version) do -%>
-        <input type="hidden" name="savedfile" value="<%= @saved_file %>"/><%= submit_tag "Simulate" -%>
-        <% end -%>
+        <hr/>
+		<input value="Simulate" type="button" alt="Simulate" title="" onclick="simulate_clicked();"/>
         <hr/><% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
         <input type="hidden" name="savedfile" value="<%= @saved_file %>"/>Model format
         <br/>
@@ -51,12 +50,14 @@
         <% end -%>
         <hr/>
         <div>
-            <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis<input value="Update" type="button" alt="Update" title="Update the model with the modified values" onclick="update_clicked();"/>
+            <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis
+			<input value="Check" type="button" alt="Check" title="Check the modified values are valid" onclick="update_clicked();"/>
         </div>
     </div>
     <div class="yui-u" style="width: 83%; height: 100%;">
-        <% form_tag construct_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
+        <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
+		<input type="hidden" name="following_action" id="following_action" value=""/>
         <div>
             <div id="name_top" class="builder_box">
                 <div class="squarebox">
@@ -261,6 +262,11 @@
         $('steadystateanalysis').value = $('steadystate').value;        
         $('form').submit();
     }
+	
+	function simulate_clicked() {
+		$('form').following_action.value="simulate"
+		$('form').submit();
+	}
     
     function togglePanel(panel_name){
         Effect.toggle(panel_name + "_panel", "blind", {

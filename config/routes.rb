@@ -38,7 +38,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :groups
 
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post, :builder=>:get, :construct=>:post, :simulate=>:post, :store_from_builder=>:post },
+    :member => { :download => :get, :execute=>:post, :request_resource=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :store_from_builder=>:post },
     :collection=>{:build=>:get}
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|

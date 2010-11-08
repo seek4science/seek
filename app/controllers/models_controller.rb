@@ -11,7 +11,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview , :test_asset_url]
-  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:construct,:save_from_builder]
+  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws,:save_from_builder]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
@@ -92,10 +92,22 @@ class ModelsController < ApplicationController
     end
   end
   
-  def construct
+  def submit_to_jws
+    following_action=params.delete("following_action")
     @data_script_hash,@saved_file,@objects_hash = @@model_builder.construct @display_model,params
-    respond_to do |format|
-      format.html { render :action=>"builder" }
+    case(following_action)
+      when "simulate"
+      @applet=@@model_builder.simulate @saved_file
+      when "save_new_version"
+    end
+    respond_to do |format|      
+      case(following_action)
+    when "simulate"
+      @back_button_text = 'Back to JWS Builder'
+      format.html {render :action=>"simulate",:layout=>"no_sidebar"}
+      else
+        format.html { render :action=>"builder" }
+      end      
     end
   end
   
