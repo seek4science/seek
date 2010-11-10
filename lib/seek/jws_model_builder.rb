@@ -15,20 +15,19 @@ module Seek
     def is_dat? model
       #FIXME: needs to actually check contents rather than the extension
       model.original_filename.end_with?(".dat")
-    end
-    
-    def get_saved_sbml_url savedfile
-      saved_xml=savedfile.gsub("\.dat",".xml.txt")
-      "#{BASE_URL}JWSconstructor_panels/#{saved_xml}"
-    end
-      
-    def get_saved_dat_url savedfile
-        "#{BASE_URL}JWSconstructor_panels/#{savedfile}"
-    end
+    end                      
     
     def is_sbml? model
       #FIXME: needs to actually check contents rather than the extension
       model.original_filename.end_with?(".xml")
+    end
+    
+    def dat_to_sbml_url
+      "#{BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"
+    end
+    
+    def saved_dat_download_url savedfile
+        "#{BASE_URL}JWSconstructor_panels/#{savedfile}"
     end
     
     def builder_url
@@ -45,6 +44,19 @@ module Seek
     
     def simulate_url
       SIMULATE_URL
+    end
+    
+    def sbml_download_url savedfile
+      modelname=savedfile.gsub("\.dat","")
+      url=""
+      response = RestClient.post(dat_to_sbml_url,:modelName=>modelname) do |response, request, result, &block|
+        if [301, 302, 307].include? response.code
+          url=response.headers[:location]
+        else
+          raise Exception.new("Redirection expected to converted dat file")
+        end
+      end      
+      url
     end
     
     def construct model,params

@@ -16,7 +16,7 @@ class ModelsController < ApplicationController
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
   @@model_builder = Seek::JWSModelBuilder.new
-    
+  
   # GET /models
   # GET /models.xml
   
@@ -46,7 +46,7 @@ class ModelsController < ApplicationController
       delete_model_format params
     end
   end
-    
+  
   def builder
     saved_file=params[:saved_file]
     if saved_file
@@ -79,14 +79,16 @@ class ModelsController < ApplicationController
         new_version_filename=params.delete("new_version_filename")
         new_version_comments=params.delete("new_version_comments")
         if model_format == "dat"
-          url=@@model_builder.get_saved_dat_url @saved_file
+          url=@@model_builder.saved_dat_download_url @saved_file                    
+        elsif model_format == "sbml"
+          url=@@model_builder.sbml_download_url @saved_file          
+        end
+        if url
           downloader=Jerm::HttpDownloader.new
           data_hash = downloader.get_remote_data url
           @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
           @model.content_type=data_hash[:content_type] 
           @model.original_filename=new_version_filename
-        elsif model_format == "sbml"
-          
         end
       end
     end
