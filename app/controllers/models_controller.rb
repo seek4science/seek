@@ -91,8 +91,7 @@ class ModelsController < ApplicationController
       end
     end
     respond_to do |format|      
-      if @error_keys.empty? && following_action == "simulate"
-        @back_button_text = 'Back to JWS Builder'
+      if @error_keys.empty? && following_action == "simulate"        
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
       elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version new_version_comments
@@ -104,8 +103,7 @@ class ModelsController < ApplicationController
   end
   
   def simulate
-    @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model
-    @back_button_text = "Back to Model"    
+    @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
     @applet=@@model_builder.simulate saved_file
     respond_to do |format|
       format.html {render :layout=>"no_sidebar"}
