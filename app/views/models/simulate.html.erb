@@ -1,5 +1,5 @@
 <ul class="sectionIcons">
-	<li><%= image_tag_for_key('back', "javascript:history.go(-1)", nil, nil, @back_button_text) -%></li>
+	<li><%= image_tag_for_key('back', builder_model_path(@model,:version=>@display_model.version,:saved_file=>@saved_file), nil, nil, @back_button_text) -%></li>
 </ul>
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@display_model,:title_postfix=>" - JWS Model Simulation"} %>

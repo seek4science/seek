@@ -33,19 +33,22 @@
 
 <div class="yui-gf">
     <div class="yui-u first builder_actions" style="width:19%;">
-        <!-- Simulate action --><h6>Simulate</h6>
+        <!-- Simulate action -->
+		<h6>Simulate</h6>
         <input type=checkbox name="steadystate" id="steadystate" />Steady State Analysis?
         <br/>
         <input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="simulate_clicked();"/>
         <br/>
         <br/>
-        <!-- Save new version action --><h6>Save as new version</h6>
+        <!-- Save new version action -->
+		<h6>Save as new version</h6>
         Model format: <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
         <br/>
         <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="RedBox.showInline('new_version_details'); return false;"/>
         <br/>
         <br/>
-        <!-- Check --><h6>Check</h6>
+        <!-- Check -->
+		<h6>Check</h6>
         <div>
             <input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
         </div>

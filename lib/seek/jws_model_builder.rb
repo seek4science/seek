@@ -17,6 +17,11 @@ module Seek
       model.original_filename.end_with?(".dat")
     end
     
+    def get_saved_sbml_url savedfile
+      saved_xml=savedfile.gsub("\.dat",".xml.txt")
+      "#{BASE_URL}JWSconstructor_panels/#{saved_xml}"
+    end
+      
     def get_saved_dat_url savedfile
         "#{BASE_URL}JWSconstructor_panels/#{savedfile}"
     end
@@ -61,7 +66,21 @@ module Seek
       process_response_body(response.body)
     end
     
+    def saved_file_builder_content saved_file
+      model_name=saved_file.gsub("\.dat","")      
+      response = RestClient.get(builder_url,:params=>{:loadModel=>model_name,:userModel=>true})
+      
+      puts response.body
+      
+      if response.instance_of?(Net::HTTPInternalServerError)       
+        puts response.to_s
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      end      
+      process_response_body(response.body)
+    end
+    
     def builder_content model
+            
       filepath=model.content_blob.filepath
       
       #this is necessary to get the correct filename and especially extension, which JWS relies on
@@ -136,7 +155,7 @@ module Seek
         
       #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
       fields_with_errors.delete("functions")
-      
+      puts "SAVED FILE=#{saved_file}"
       return data_scripts,saved_file,objects_hash,fields_with_errors
     end
     

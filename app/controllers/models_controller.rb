@@ -48,8 +48,15 @@ class ModelsController < ApplicationController
   end
     
   def builder
-    supported = @@model_builder.is_supported?(@display_model)
-    @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported    
+    saved_file=params[:saved_file]
+    if saved_file
+      supported=true
+      @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
+    else
+      supported = @@model_builder.is_supported?(@display_model)
+      @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+    end
+        
     respond_to do |format|
       if supported
         format.html
