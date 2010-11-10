@@ -1,6 +1,6 @@
 module ModelsHelper
 
-  JWS_PANEL_NAMES={
+  JWS_ERROR_TO_PANEL_NAMES={
     "reacs" => "Reactions",
     "kinetics" => "Rate equations",
     "initVal"=>"Initial values",
@@ -8,6 +8,16 @@ module ModelsHelper
     "functions"=>"Functions",
     "assRules"=>"Assignment rules",
     "events"=>"Events"
+  }
+  
+  JWS_ERROR_TO_PREFIX={
+    "reacs" => "reactions",
+    "kinetics" => "equations",
+    "initVal"=>"initial",
+    "parameters"=>"parameters",
+    "functions"=>"functions",
+    "assRules"=>"assignments",
+    "events"=>"events"
   }
 
   def model_environment_text model
@@ -45,7 +55,11 @@ module ModelsHelper
   end
   
   def jws_key_to_text key
-    return JWS_PANEL_NAMES[key]
+    JWS_ERROR_TO_PANEL_NAMES[key]
+  end
+  
+  def jws_key_to_prefix key
+    JWS_ERROR_TO_PREFIX[key]  
   end
 
 end

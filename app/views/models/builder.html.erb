@@ -78,7 +78,7 @@
         <div>
             <div id="name_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('name');" style="height:20px; cursor: pointer;">
+                    <div id="name_caption" class="squareboxgradientcaption" onclick="togglePanel('name');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Model name
                         </div>
@@ -98,9 +98,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="reactions_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('reactions');" style="height:20px; cursor: pointer;">
+                    <div id="reactions_caption" class="squareboxgradientcaption" onclick="togglePanel('reactions');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Reactions
                         </div>
@@ -127,9 +127,9 @@
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="equations_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('equations');" style="height:20px; cursor: pointer;">
+                    <div id="equations_caption" class="squareboxgradientcaption" onclick="togglePanel('equations');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Rate equations
                         </div>
@@ -158,9 +158,9 @@
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="initial_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('initial');" style="height:20px; cursor: pointer;">
+                    <div id="initial_caption" class="squareboxgradientcaption" onclick="togglePanel('initial');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Initial values
                         </div>
@@ -168,7 +168,7 @@
                             <img id="initial_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
-                    <div class="squareboxcontent" id="initial_panel" style="display: none">
+                    <div id="initial_panel" class="squareboxcontent" style="display: none">
                         <!-- initial values script -->
                         <%= @data_script_hash["initial"] -%>
                         <p>
@@ -180,9 +180,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="parameters_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('parameters');" style="height:20px; cursor: pointer;">
+                    <div id="parameters_caption" class="squareboxgradientcaption" onclick="togglePanel('parameters');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Parameter values
                         </div>
@@ -190,7 +190,7 @@
                             <img id="parameters_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
-                    <div class="squareboxcontent" id="parameters_panel" style="display: none">
+                    <div id="parameters_panel" class="squareboxcontent" style="display: none">
                         <!--parameters script -->
                         <%= @data_script_hash["parameters"] -%>
                         <p>
@@ -202,9 +202,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="assignments_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('assignments');" style="height:20px; cursor: pointer;">
+                    <div id="assignments_caption" class="squareboxgradientcaption" onclick="togglePanel('assignments');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Assignment rules
                         </div>
@@ -224,9 +224,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="functions_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('functions');" style="height:20px; cursor: pointer;">
+                    <div id="functions_caption" class="squareboxgradientcaption" onclick="togglePanel('functions');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Functions
                         </div>
@@ -246,9 +246,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="events_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('events');" style="height:20px; cursor: pointer;">
+                    <div id="events_caption" class="squareboxgradientcaption" onclick="togglePanel('events');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Events
                         </div>
@@ -276,7 +276,13 @@
 <script type="text/javascript">
     
     setTheDivStyle();
-    
+	
 </script>
 
 <%= render :partial=>"models/builder/new_version_details" -%>
+
+<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.each do |prefix| -%>		
+		<script type="text/javascript">
+			highlight_error("<%= prefix -%>");					
+		</script>
+<% end -%>

@@ -24,11 +24,31 @@ function save_new_version_clicked(){
     $('form').submit();
 }
 
-function togglePanel(panel_name){
-    Effect.toggle(panel_name + "_panel", "blind", {
+function highlight_error(prefix) {
+	var panel=prefix+"_panel";
+	var caption=prefix+"_caption";
+	Effect.BlindDown(panel,{duration:0.3});
+	chevronExpand(prefix)				
+	Element.removeClassName(caption,"squareboxgradientcaption");	
+	$(caption).addClassName("squareboxgradientcaption2");
+	new Effect.Highlight(panel,{startcolor:"#ff1111"});
+}
+
+function togglePanel(prefix){
+    Effect.toggle(prefix + "_panel", "blind", {
         duration: 0.25
-    });
-    chevron = $(panel_name + "_chevron")
+    });    
+	toggleChevron(prefix);
+}
+
+function toggleChevron(prefix) {
+	chevron = $(prefix + "_chevron");
     var expand = (chevron.src.indexOf("expand.gif") > 0);
     chevron.src = chevron.src.split(expand ? "expand.gif" : "collapse.gif").join(expand ? "collapse.gif" : "expand.gif");
+}
+
+function chevronExpand(prefix) {
+	chevron = $(prefix + "_chevron");
+	expand=true;
+	chevron.src = chevron.src.split(expand ? "expand.gif" : "collapse.gif").join(expand ? "collapse.gif" : "expand.gif");
 }
