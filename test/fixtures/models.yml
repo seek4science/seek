@@ -51,9 +51,9 @@ non_sbml_xml:
   content_type: text/xml  
   recommended_environment: jws
   result_graph: Grapsh
-  last_used_at: 2009-04-03 11:09:18
+  last_used_at: 2009-04-02 11:09:18
   version: 1  
-  project: sysmo_project
+  project: other_project
   policy: policy_for_test_with_projects_institutions   
   
 non_jws_dat:
@@ -65,9 +65,9 @@ non_jws_dat:
   content_type: text/xml  
   recommended_environment: jws
   result_graph: Grapsh
-  last_used_at: 2009-04-03 11:09:18
+  last_used_at: 2009-04-02 11:09:18
   version: 1  
-  project: sysmo_project
+  project: other_project
   policy: policy_for_test_with_projects_institutions   
 
 model_with_format_and_type:

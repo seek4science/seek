@@ -144,7 +144,7 @@ non_sbml_xml_v1:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1  
-  project: sysmo_project
+  project: other_project
   policy: policy_for_test_with_projects_institutions  
   
 non_jws_dat_v1:  
@@ -158,5 +158,5 @@ non_jws_dat_v1:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1  
-  project: sysmo_project
+  project: other_project
   policy: policy_for_test_with_projects_institutions  
