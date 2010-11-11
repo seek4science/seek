@@ -9,21 +9,25 @@ module Seek
     SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
     def is_supported? model
-      is_sbml?(model) || is_dat?(model)  
+      model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
     end
     
     def is_dat? model
       #FIXME: needs to actually check contents rather than the extension
       model.original_filename.end_with?(".dat")
-    end
-    
-    def get_saved_dat_url savedfile
-        "#{BASE_URL}JWSconstructor_panels/#{savedfile}"
-    end
+    end                      
     
     def is_sbml? model
       #FIXME: needs to actually check contents rather than the extension
       model.original_filename.end_with?(".xml")
+    end
+    
+    def dat_to_sbml_url
+      "#{BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"
+    end
+    
+    def saved_dat_download_url savedfile
+        "#{BASE_URL}JWSconstructor_panels/#{savedfile}"
     end
     
     def builder_url
@@ -40,6 +44,19 @@ module Seek
     
     def simulate_url
       SIMULATE_URL
+    end
+    
+    def sbml_download_url savedfile
+      modelname=savedfile.gsub("\.dat","")
+      url=""
+      response = RestClient.post(dat_to_sbml_url,:modelName=>modelname) do |response, request, result, &block|
+        if [301, 302, 307].include? response.code
+          url=response.headers[:location]
+        else
+          raise Exception.new("Redirection expected to converted dat file")
+        end
+      end      
+      url
     end
     
     def construct model,params
@@ -61,7 +78,21 @@ module Seek
       process_response_body(response.body)
     end
     
+    def saved_file_builder_content saved_file
+      model_name=saved_file.gsub("\.dat","")      
+      response = RestClient.get(builder_url,:params=>{:loadModel=>model_name,:userModel=>true})
+      
+      puts response.body
+      
+      if response.instance_of?(Net::HTTPInternalServerError)       
+        puts response.to_s
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      end      
+      process_response_body(response.body)
+    end
+    
     def builder_content model
+            
       filepath=model.content_blob.filepath
       
       #this is necessary to get the correct filename and especially extension, which JWS relies on
@@ -78,14 +109,14 @@ module Seek
         #          end
         #        } 
         part=Multipart.new("upfile",filepath,model.original_filename)
-        response = part.post(upload_sbml_url)
+        response = part.post(upload_sbml_url)        
         if response.code == "302"
           uri = URI.parse(response['location'])          
           req = Net::HTTP::Get.new(uri.request_uri)
           response = Net::HTTP.start(uri.host, uri.port) {|http|
             http.request(req)
           }
-        else
+        else          
           raise Exception.new("Expected a redirection from JWS Online")
         end
       elsif (is_dat? model)
@@ -132,8 +163,23 @@ module Seek
       data_scripts = create_data_script_hash doc
       saved_file = determine_saved_file doc
       objects_hash = create_objects_hash doc      
-      
-      return data_scripts,saved_file,objects_hash
+      fields_with_errors = find_reported_errors doc
+        
+      #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
+      fields_with_errors.delete("functions")
+      puts "SAVED FILE=#{saved_file}"
+      return data_scripts,saved_file,objects_hash,fields_with_errors
+    end
+    
+    def find_reported_errors doc
+      errors=[]
+      doc.search("//form[@name='errorinfo']/input").each do |error_report|
+        value=error_report.attributes['value']
+        name=error_report.attributes['name']
+        name=name.gsub("Errors","")
+        errors << name unless value=="0"
+      end      
+      return errors
     end
     
     def create_objects_hash doc

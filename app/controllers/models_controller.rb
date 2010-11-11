@@ -11,7 +11,7 @@ class ModelsController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview , :test_asset_url]
-  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:construct,:save_from_builder]
+  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
@@ -29,18 +29,14 @@ class ModelsController < ApplicationController
       @model.original_filename = params[:model][:original_filename]
       
       respond_to do |format|
-        if @model.save_as_new_version(comments)
-          flash[:notice]="New version uploaded - now on version #{@model.version}"
-        else
-          flash[:error]="Unable to save new version"          
-        end
+        create_new_version comments
         format.html {redirect_to @model }
       end
     else
       flash[:error]=flash.now[:error]
       redirect_to @model
     end
-  end
+  end    
   
   def delete_model_metadata
     attribute=params[:attribute]
@@ -51,65 +47,95 @@ class ModelsController < ApplicationController
     end
   end
   
-  #adds a new version of the model using the changes from the constructor
-  def store_from_builder 
-    format=params[:model_format]
-    savedfile=params[:savedfile]
-    comments = ""
-    
-    case format
-      when "dat"
-      url=@@model_builder.get_saved_dat_url savedfile
-      downloader=Jerm::HttpDownloader.new
-      data_hash = downloader.get_remote_data url
-      @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
-      @model.content_type=data_hash[:content_type]               
-      when "smbl"
-    end
-    
-    @model.original_filename = savedfile
-    respond_to do |format|
-      if @model.save_as_new_version(comments)
-        flash[:notice]="New version created - now on version #{@model.version}"
-      else
-        flash[:error]="Unable to save new version"          
-      end
-      format.html { redirect_to @model }
-    end
-    
-  end
-  
   def builder
-    supported = @@model_builder.is_supported?(@display_model)
-    @data_script_hash,@saved_file,@objects_hash = @@model_builder.builder_content @display_model if supported    
-    respond_to do |format|
-      if supported
-        format.html
+    saved_file=params[:saved_file]
+    error=nil
+    begin
+      if saved_file
+        supported=true
+        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
-        flash[:error]="This model is of neither SBML or JWS Dat format so cannot be used with JWS Online"
-        format.html { redirect_to(@model,:version=>@display_model.version)}
+        supported = @@model_builder.is_supported?(@display_model)
+        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+      end
+    rescue Exception=>e
+      error=e
+    end
+    
+    respond_to do |format|
+      if error
+        flash[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+      elsif !supported
+        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        format.html { redirect_to(@model,:version=>@display_model.version)}        
+      else
+        format.html
       end
     end
-  end
+  end    
   
-  def construct
-    @data_script_hash,@saved_file,@objects_hash = @@model_builder.construct @display_model,params
-    respond_to do |format|
-      format.html { render :action=>"builder" }
+  def submit_to_jws
+    following_action=params.delete("following_action")    
+    
+    @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct @display_model,params
+    if (@error_keys.empty?)
+      if following_action == "simulate"
+        @applet=@@model_builder.simulate @saved_file
+      elsif following_action == "save_new_version"
+        model_format=params.delete("saved_model_format") #only used for saving as a new version
+        new_version_filename=params.delete("new_version_filename")
+        new_version_comments=params.delete("new_version_comments")
+        if model_format == "dat"
+          url=@@model_builder.saved_dat_download_url @saved_file                    
+        elsif model_format == "sbml"
+          url=@@model_builder.sbml_download_url @saved_file          
+        end
+        if url
+          downloader=Jerm::HttpDownloader.new
+          data_hash = downloader.get_remote_data url
+          @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
+          @model.content_type=data_hash[:content_type] 
+          @model.original_filename=new_version_filename
+        end
+      end
+    end
+    respond_to do |format|      
+      if @error_keys.empty? && following_action == "simulate"        
+        format.html {render :action=>"simulate",:layout=>"no_sidebar"}
+      elsif @error_keys.empty? && following_action == "save_new_version"
+        create_new_version new_version_comments
+        format.html {redirect_to @model }
+      else
+        format.html { render :action=>"builder" }
+      end      
     end
   end
   
   def simulate
-    saved_file = params[:savedfile]
-    @back_button_text = 'Back to JWS Builder'
-    unless saved_file
-      @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model
-      @back_button_text = "Back to Model"
+    error=nil
+    begin
+      supported = @@model_builder.is_supported?(@display_model)
+      if supported
+        @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
+        @applet=@@model_builder.simulate saved_file
+      end
+    rescue Exception=>e
+      error=e
     end
-    @applet=@@model_builder.simulate saved_file
+    
     respond_to do |format|
-      format.html {render :layout=>"no_sidebar"}
+      if error
+        flash[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+      elsif !supported
+        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        format.html { redirect_to(@model,:version=>@display_model.version)}        
+      else
+        format.html {render :layout=>"no_sidebar"}
+      end
     end
+    
   end
   
   def update_model_metadata
@@ -460,6 +486,14 @@ class ModelsController < ApplicationController
   end  
   
   protected
+  
+  def create_new_version comments
+    if @model.save_as_new_version(comments)
+      flash[:notice]="New version uploaded - now on version #{@model.version}"
+    else
+      flash[:error]="Unable to save new version"          
+    end    
+  end
   
   def default_items_per_page
     return 2
