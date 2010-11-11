@@ -37,20 +37,20 @@
 		<h6>Simulate</h6>
         <input type=checkbox name="steadystate" id="steadystate" />Steady State Analysis?
         <br/>
-        <input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="simulate_clicked();"/>
+        <input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="create_panel_cookies();simulate_clicked();"/>
         <br/>
         <br/>
         <!-- Save new version action -->
 		<h6>Save as new version</h6>
         Model format: <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml'>SBML</option>" -%>
         <br/>
-        <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="save_new_version_extra_options();"/>
+        <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="create_panel_cookies();save_new_version_extra_options();"/>
         <br/>
         <br/>
         <!-- Check -->
 		<h6>Check</h6>
         <div>
-            <input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="check_clicked();"/>
+            <input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="create_panel_cookies();check_clicked();"/>
         </div>
         <br/>
     </div>
@@ -115,14 +115,16 @@
                             <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
-                            <input value="Show schema" type="button" onclick="$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide schema" type="button" onclick="$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
+                            <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />
+							<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
                             <% if @objects_hash["resizeableElement"] -%>
-                            <%= hidden_field_tag "plotGraphPanel","on" -%>
-                            <%= @objects_hash["resizeableElement"] -%>
-                            <%= @data_script_hash["resizable"] -%>
+	                            <%= hidden_field_tag "plotGraphPanel","on" -%>
+	                            <%= @objects_hash["resizeableElement"] -%>    
+								<%= @data_script_hash["resizable"] -%>                        
                             <% else -%>
-                            <%= hidden_field_tag "plotGraphPanel","off" -%>
+                            	<%= hidden_field_tag "plotGraphPanel","off" -%>
                             <% end -%>
+							
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
@@ -146,14 +148,16 @@
                             <button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Rate equations help
                             </button>
-                            <input value="Show eqs graph" type="button" onclick="$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
+                            <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />
+							<input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
                             <% if @objects_hash["resizeableElement2"] -%>
-                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
-                            <%= @objects_hash["resizeableElement2"] -%>
-                            <%= @data_script_hash["resizable_2"] -%>
+	                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
+	                            <%= @objects_hash["resizeableElement2"] -%>          
+								<%= @data_script_hash["resizable_2"] -%>                  
                             <% else -%>
-                            <%= hidden_field_tag "plotKineticsPanel","off" -%>
+                            	<%= hidden_field_tag "plotKineticsPanel","off" -%>
                             <% end -%>
+							
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
@@ -274,8 +278,8 @@
 <!-- JWS CONSTRUCTOR END -->
 
 <script type="text/javascript">
-    
-    setTheDivStyle();
+    map_rt_elements();
+    read_panel_cookies();
 	
 </script>
 
