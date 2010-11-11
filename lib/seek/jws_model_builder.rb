@@ -5,6 +5,8 @@ module Seek
   
   class JWSModelBuilder
     
+    include ModelTypeDetection
+    
     BASE_URL = "http://jjj.mib.ac.uk/webMathematica/Examples/"    
     SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
@@ -12,15 +14,6 @@ module Seek
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
     end
     
-    def is_dat? model
-      #FIXME: needs to actually check contents rather than the extension
-      model.original_filename.end_with?(".dat")
-    end                      
-    
-    def is_sbml? model
-      #FIXME: needs to actually check contents rather than the extension
-      model.original_filename.end_with?(".xml")
-    end
     
     def dat_to_sbml_url
       "#{BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"
