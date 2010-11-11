@@ -13,8 +13,7 @@ module Seek
     def is_supported? model
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
     end
-    
-    
+        
     def dat_to_sbml_url
       "#{BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"
     end
@@ -159,8 +158,7 @@ module Seek
       fields_with_errors = find_reported_errors doc
         
       #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
-      fields_with_errors.delete("functions")
-      puts "SAVED FILE=#{saved_file}"
+      fields_with_errors.delete("functions")      
       return data_scripts,saved_file,objects_hash,fields_with_errors
     end
     
