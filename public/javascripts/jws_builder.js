@@ -41,6 +41,23 @@ function togglePanel(prefix){
 	toggleChevron(prefix);
 }
 
+function save_new_version_extra_options() {
+	var filename=$('new_version_filename_rb').value;
+	var type=$('model_format').value;
+	if (filename.endsWith(".dat") && type == 'sbml') {
+		filename=filename.gsub("\.dat$",".xml");		
+		$('new_version_filename_rb').value=filename;					
+	}
+	
+	if (filename.endsWith(".xml") && type == 'dat') {		
+		filename=filename.gsub("\.xml$",".dat");		
+		$('new_version_filename_rb').value=filename;				
+	}	
+    			
+	RedBox.showInline('new_version_details'); 
+	return false;
+}
+
 function toggleChevron(prefix) {
 	chevron = $(prefix + "_chevron");
     var expand = (chevron.src.indexOf("expand.gif") > 0);
