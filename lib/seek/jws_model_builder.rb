@@ -9,7 +9,7 @@ module Seek
     SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
     def is_supported? model
-      is_sbml?(model) || is_dat?(model)  
+      model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
     end
     
     def is_dat? model
