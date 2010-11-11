@@ -49,20 +49,28 @@ class ModelsController < ApplicationController
   
   def builder
     saved_file=params[:saved_file]
-    if saved_file
-      supported=true
-      @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
-    else
-      supported = @@model_builder.is_supported?(@display_model)
-      @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+    error=nil
+    begin
+      if saved_file
+        supported=true
+        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
+      else
+        supported = @@model_builder.is_supported?(@display_model)
+        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+      end
+    rescue Exception=>e
+      error=e
     end
     
     respond_to do |format|
-      if supported
-        format.html
+      if error
+        flash[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+      elsif !supported
+        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        format.html { redirect_to(@model,:version=>@display_model.version)}        
       else
-        flash[:error]="This model is of neither SBML or JWS Dat format so cannot be used with JWS Online"
-        format.html { redirect_to(@model,:version=>@display_model.version)}
+        format.html
       end
     end
   end    
@@ -105,11 +113,29 @@ class ModelsController < ApplicationController
   end
   
   def simulate
-    @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
-    @applet=@@model_builder.simulate saved_file
-    respond_to do |format|
-      format.html {render :layout=>"no_sidebar"}
+    error=nil
+    begin
+      supported = @@model_builder.is_supported?(@display_model)
+      if supported
+        @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
+        @applet=@@model_builder.simulate saved_file
+      end
+    rescue Exception=>e
+      error=e
     end
+    
+    respond_to do |format|
+      if error
+        flash[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+      elsif !supported
+        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        format.html { redirect_to(@model,:version=>@display_model.version)}        
+      else
+        format.html {render :layout=>"no_sidebar"}
+      end
+    end
+    
   end
   
   def update_model_metadata
