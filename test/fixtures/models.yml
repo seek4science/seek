@@ -41,6 +41,34 @@ francos_model:
   version: 1  
   project: sysmo_project
   policy: policy_for_test_with_projects_institutions  
+  
+non_sbml_xml:
+  contributor: model_owner (User)
+  title: Non SBML XML
+  description: An XML file that is not SBML
+  original_filename: non_sbml_xml.xml
+  content_blob: non_sbml_xml_blob
+  content_type: text/xml  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-02 11:09:18
+  version: 1  
+  project: other_project
+  policy: policy_for_test_with_projects_institutions   
+  
+non_jws_dat:
+  contributor: model_owner (User)
+  title: Non JWS Online Dat file
+  description: An Dat file that is not JWS Online format
+  original_filename: non_jws_dat.xml
+  content_blob: non_jws_dat_blob
+  content_type: text/xml  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-02 11:09:18
+  version: 1  
+  project: other_project
+  policy: policy_for_test_with_projects_institutions   
 
 model_with_format_and_type:
   contributor: model_owner (User)

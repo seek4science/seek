@@ -11,20 +11,17 @@
 </script>
 <script src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Container/javascript.js" type="text/javascript">
 </script>
+<%= javascript_include_tag "jws_builder.js" -%>
 <link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/JWSconstructor_panels.css" rel="stylesheet" type="text/css" />
 <link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Textbox/style.css" rel="stylesheet" media="screen" type="text/css" />
 <link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Container/style.css" rel="stylesheet" media="screen" type="text/css" />
 <link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/sweetTitles.css" rel="stylesheet" media="screen" type="text/css" />
-<style type="text/css" media="screen,projection">
-    
-    .rtTextArea {
-        font-size: 10pt;
-    }
-    
+<%= stylesheet_link_tag 'jws_builder' -%>
+<style>
     .builder_box {
         width: auto;
         padding: 3px;
-        float: left;
+        float: left;		
     }
 </style>
 <ul class="sectionIcons">
@@ -33,34 +30,55 @@
     </li>
 </ul>
 <%= render :partial=>"models/builder/header" -%>
+
 <div class="yui-gf">
-    <div class="yui-u first" style="width:17%;border-right: 1px #999 solid;text-align:center;height:100%;">
-        <div>
-            <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
-                Open/Close Panels
-            </button>
-        </div>
-        <hr/><% form_tag simulate_model_path(@model,:version=>@display_model.version) do -%>
-        <input type="hidden" name="savedfile" value="<%= @saved_file %>"/><%= submit_tag "Simulate" -%>
-        <% end -%>
-        <hr/><% form_tag store_from_builder_model_path(@model,:version=>@display_model.version) do -%>
-        <input type="hidden" name="savedfile" value="<%= @saved_file %>"/>Model format
+    <div class="yui-u first builder_actions" style="width:19%;">
+        <!-- Simulate action -->
+		<h6>Simulate</h6>
+        <input type=checkbox name="steadystate" id="steadystate" />Steady State Analysis?
         <br/>
-        <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml' disabled='true'>SBML</option>" -%>
-        <%= submit_tag "Add as new version" -%>
-        <% end -%>
-        <hr/>
+        <input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="create_panel_cookies();simulate_clicked();"/>
+        <br/>
+        <br/>
+        <!-- Save new version action -->
+		<h6>Save as new version</h6>
+        Model format: <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml'>SBML</option>" -%>
+        <br/>
+        <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="create_panel_cookies();save_new_version_extra_options();"/>
+        <br/>
+        <br/>
+        <!-- Check -->
+		<h6>Check</h6>
         <div>
-            <input type=checkbox name="steadystate" id="steadystate" />Steady state analysis<input value="Update" type="button" alt="Update" title="Update the model with the modified values" onclick="update_clicked();"/>
+            <input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="create_panel_cookies();check_clicked();"/>
         </div>
+        <br/>
     </div>
-    <div class="yui-u" style="width: 83%; height: 100%;">
-        <% form_tag construct_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
-        <input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
+    <div class="yui-u" style="width: 80%; height: 100%; margin-left: 0.1em;">
+        <% unless @error_keys.empty? -%>
+        <div class="jws_errors">
+            There were problems reported with: <%= join_with_and(@error_keys.collect{|k| jws_key_to_text(k)}) -%>
+        </div>
+        <script type="text/javascript">
+            $('simulate_button').disabled = true;
+            $('new_version_button').disabled = true;
+        </script>
+        <% end -%>
+        <button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
+            Open/Close all panels
+        </button>
+        <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
+		<input type="hidden" name="new_version_comments" id="new_version_comments" value=""/>
+		<input type="hidden" name="new_version_filename" id="new_version_filename" value=""/>
+        <input type="hidden" name="following_action" id="following_action" value=""/>
+		<input type="hidden" name="saved_model_format" id="saved_model_format" value=""/>
+		<input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
+        <br/>
+        <br/>
         <div>
             <div id="name_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('name');" style="height:20px; cursor: pointer;">
+                    <div id="name_caption" class="squareboxgradientcaption" onclick="togglePanel('name');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Model name
                         </div>
@@ -80,9 +98,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="reactions_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('reactions');" style="height:20px; cursor: pointer;">
+                    <div id="reactions_caption" class="squareboxgradientcaption" onclick="togglePanel('reactions');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Reactions
                         </div>
@@ -97,21 +115,23 @@
                             <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
-                            <input value="Show schema" type="button" onclick="$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide schema" type="button" onclick="$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
+                            <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />
+							<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
                             <% if @objects_hash["resizeableElement"] -%>
-                            <%= hidden_field_tag "plotGraphPanel","on" -%>
-                            <%= @objects_hash["resizeableElement"] -%>
-                            <%= @data_script_hash["resizable"] -%>
+	                            <%= hidden_field_tag "plotGraphPanel","on" -%>
+	                            <%= @objects_hash["resizeableElement"] -%>    
+								<%= @data_script_hash["resizable"] -%>                        
                             <% else -%>
-                            <%= hidden_field_tag "plotGraphPanel","off" -%>
+                            	<%= hidden_field_tag "plotGraphPanel","off" -%>
                             <% end -%>
+							
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="equations_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('equations');" style="height:20px; cursor: pointer;">
+                    <div id="equations_caption" class="squareboxgradientcaption" onclick="togglePanel('equations');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Rate equations
                         </div>
@@ -128,21 +148,23 @@
                             <button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Rate equations help
                             </button>
-                            <input value="Show eqs graph" type="button" onclick="$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
+                            <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />
+							<input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
                             <% if @objects_hash["resizeableElement2"] -%>
-                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
-                            <%= @objects_hash["resizeableElement2"] -%>
-                            <%= @data_script_hash["resizable_2"] -%>
+	                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
+	                            <%= @objects_hash["resizeableElement2"] -%>          
+								<%= @data_script_hash["resizable_2"] -%>                  
                             <% else -%>
-                            <%= hidden_field_tag "plotKineticsPanel","off" -%>
+                            	<%= hidden_field_tag "plotKineticsPanel","off" -%>
                             <% end -%>
+							
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="initial_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('initial');" style="height:20px; cursor: pointer;">
+                    <div id="initial_caption" class="squareboxgradientcaption" onclick="togglePanel('initial');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Initial values
                         </div>
@@ -150,7 +172,7 @@
                             <img id="initial_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
-                    <div class="squareboxcontent" id="initial_panel" style="display: none">
+                    <div id="initial_panel" class="squareboxcontent" style="display: none">
                         <!-- initial values script -->
                         <%= @data_script_hash["initial"] -%>
                         <p>
@@ -162,9 +184,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="parameters_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('parameters');" style="height:20px; cursor: pointer;">
+                    <div id="parameters_caption" class="squareboxgradientcaption" onclick="togglePanel('parameters');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Parameter values
                         </div>
@@ -172,7 +194,7 @@
                             <img id="parameters_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
-                    <div class="squareboxcontent" id="parameters_panel" style="display: none">
+                    <div id="parameters_panel" class="squareboxcontent" style="display: none">
                         <!--parameters script -->
                         <%= @data_script_hash["parameters"] -%>
                         <p>
@@ -184,9 +206,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="assignments_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('assignments');" style="height:20px; cursor: pointer;">
+                    <div id="assignments_caption" class="squareboxgradientcaption" onclick="togglePanel('assignments');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Assignment rules
                         </div>
@@ -206,9 +228,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="functions_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('functions');" style="height:20px; cursor: pointer;">
+                    <div id="functions_caption" class="squareboxgradientcaption" onclick="togglePanel('functions');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Functions
                         </div>
@@ -228,9 +250,9 @@
                 </div>
                 <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
-            <div class="builder_box">
+            <div id="events_top" class="builder_box">
                 <div class="squarebox">
-                    <div class="squareboxgradientcaption" onclick="togglePanel('events');" style="height:20px; cursor: pointer;">
+                    <div id="events_caption" class="squareboxgradientcaption" onclick="togglePanel('events');" style="height:20px; cursor: pointer;">
                         <div style="float: left">
                             Events
                         </div>
@@ -252,22 +274,19 @@
             </div>
         </div><% end -%>
     </div>
-</div><!-- JWS CONSTRUCTOR END -->
+</div>
+<!-- JWS CONSTRUCTOR END -->
+
 <script type="text/javascript">
-    
-    setTheDivStyle();
-    
-    function update_clicked(){
-        $('steadystateanalysis').value = $('steadystate').value;        
-        $('form').submit();
-    }
-    
-    function togglePanel(panel_name){
-        Effect.toggle(panel_name + "_panel", "blind", {
-            duration: 0.25
-        });
-        chevron = $(panel_name + "_chevron")
-        var expand = (chevron.src.indexOf("expand.gif") > 0);
-        chevron.src = chevron.src.split(expand ? "expand.gif" : "collapse.gif").join(expand ? "collapse.gif" : "expand.gif");
-    }
+    map_rt_elements();
+    read_panel_cookies();
+	
 </script>
+
+<%= render :partial=>"models/builder/new_version_details" -%>
+
+<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.each do |prefix| -%>		
+		<script type="text/javascript">
+			highlight_error("<%= prefix -%>");					
+		</script>
+<% end -%>
