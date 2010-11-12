@@ -132,3 +132,31 @@ model_jws_incompatible_v1:
   version: 1
   project: sysmo_project
   policy: sysmo_member_edit  
+  
+non_sbml_xml_v1:  
+  title: Non SBML XML
+  description: An XML file that is not SBML
+  original_filename: non_sbml_xml.xml
+  content_blob: non_sbml_xml_blob
+  model: non_sbml_xml
+  content_type: text/xml  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1  
+  project: other_project
+  policy: policy_for_test_with_projects_institutions  
+  
+non_jws_dat_v1:  
+  title: Non JWS Online Dat file
+  description: An Dat file that is not JWS Online format
+  original_filename: non_jws_dat.xml
+  content_blob: non_jws_dat_blob
+  content_type: text/xml
+  model: non_jws_dat  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1  
+  project: other_project
+  policy: policy_for_test_with_projects_institutions  

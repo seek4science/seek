@@ -43,3 +43,11 @@ spreadsheet_blob:
 url_content_blob:
   url: http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png  
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
+  
+non_sbml_xml_blob:
+  data_old: <%= load_blob_data('non_sbml_xml.xml') %> 
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>  
+  
+non_jws_dat_blob:
+  data_old: <%= load_blob_data('non_jws_dat.dat') %> 
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>    
