@@ -5,7 +5,7 @@
 	<% else -%>
 		<%= image_tag_for_key('back', model_path(@model,:version=>@display_model.version), nil, nil, "Back to Model") -%>
 	<% end -%>
-	<li>
+	</li>
 </ul>
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@display_model,:title_postfix=>" - JWS Model Simulation"} %>
