@@ -1282,6 +1282,16 @@ a.block_link {
   vertical-align: middle;
 }
 
+a.block_link_active {
+  display: block;
+  border: 1px solid #0000ff;
+  background-color: #eee;  
+  padding: 0.4em;-moz-binding;
+  margin-top: 0.3em;
+  text-align: left;
+  vertical-align: middle;
+}
+
 a:hover.block_link {
   border: 1px solid #888;
   background-color: #ddd;

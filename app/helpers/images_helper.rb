@@ -229,7 +229,7 @@ module ImagesHelper
       when "world"
       "famfamfam_silk/world.png"
       when "file_large"
-      "crystal_project/32x32/devices/3floppy_unmount.png"
+      "crystal_project/32x32/devices/hdd_unmount.png"
       when "internet_large"
       "crystal_project/32x32/devices/Globe2.png"
       when "jws_builder"
