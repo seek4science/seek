@@ -17,3 +17,7 @@ gem "rmagick"
 gem "sqlite3-ruby",:require=>"sqlite3"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
+
+group :development do
+  
+end

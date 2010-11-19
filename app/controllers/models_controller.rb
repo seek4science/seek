@@ -10,7 +10,7 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview , :test_asset_url]
+  before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url]
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
@@ -507,8 +507,9 @@ class ModelsController < ApplicationController
   
   def find_model_auth
     begin
-      action=action_name
-      action="download" if action=="execute"
+      action=action_name      
+      action="download" if action == "simulate"
+      action="edit" if ["submit_to_jws","builder"].include?(action)
       
       model = Model.find(params[:id])
       
