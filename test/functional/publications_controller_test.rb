@@ -59,19 +59,25 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 2, p.non_seek_authors.size
     assert_equal 0, p.creators.size
     
-    seek_author = people(:quentin_person)
+    seek_author1 = people(:modeller_person)
+    seek_author2 = people(:quentin_person)    
     
     #Associate a non-seek author to a seek person
 
     #Check the non_seek_authors (PublicationAuthors) decrease by 1, and the
     # seek_authors (AssetsCreators) increase by 1.
-    assert_difference('PublicationAuthor.count', -1) do
-      assert_difference('AssetsCreator.count', 1) do
-        put :update, :id => p.id, :author => {p.non_seek_authors.first.id => seek_author.id}
+    assert_difference('PublicationAuthor.count', -2) do
+      assert_difference('AssetsCreator.count', 2) do
+        put :update, :id => p.id, :author => {p.non_seek_authors[1].id => seek_author2.id,p.non_seek_authors[0].id => seek_author1.id}
       end
     end
     
-    assert_redirected_to publication_path(p)
+    assert_redirected_to publication_path(p)    
+    p.reload
+    
+    #make sure that the authors are stored according to key, and that creators keeps the order
+    assert_equal [seek_author1,seek_author2],p.assets_creators.sort_by(&:id).collect{|ac| ac.creator}
+    assert_equal [seek_author1,seek_author2],p.creators
   end
   
   test "should disassociate authors" do

@@ -39,11 +39,11 @@
         <% end -%>
       </p>
       <p>
-        <label>Author<%= @publication.creators.size + @publication.non_seek_authors.size > 1 ? "s" : "" -%>:</label>
-        <% if @publication.creators.empty? && @publication.non_seek_authors.empty? %>
+        <label>Author<%= @publication.seek_authors.size + @publication.non_seek_authors.size > 1 ? "s" : "" -%>:</label>
+        <% if @publication.seek_authors.empty? && @publication.non_seek_authors.empty? %>
           <span class='none_text'>Not specified</span>
         <% else %>
-          <% @publication.creators.each do |author| %>
+          <% @publication.seek_authors.each do |author| %>
             <%= (link_to get_object_title(author), show_resource_path(author)) + ((author == @publication.creators.last) && (@publication.non_seek_authors.empty?) ? "" : ", ") %>
           <% end %>
           <% @publication.non_seek_authors.each do |author| %>

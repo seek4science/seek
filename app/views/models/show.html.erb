@@ -1,5 +1,6 @@
 <%= stylesheet_link_tag 'jws' %>
 <%= javascript_include_tag "resource" -%>
+
 <ul class="sectionIcons">
     <% if Authorization.is_authorized?("manage", nil, @model, current_user) -%>
     <li>

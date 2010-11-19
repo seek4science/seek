@@ -24,10 +24,13 @@ class Publication < ActiveRecord::Base
     :class_name => 'Relationship',
     :as => :object,
     :dependent => :destroy
+   
+  alias :seek_authors :creators
   
   acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
   
   acts_as_uniquely_identifiable  
+    
 
   def extract_pubmed_metadata(pubmed_record)
     self.title = pubmed_record.title.chop #remove full stop

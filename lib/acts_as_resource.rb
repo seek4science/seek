@@ -38,7 +38,7 @@ module Mib
           has_many :assays, :through => :assay_assets
   
           has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-          has_many :creators, :class_name => "Person" , :through => :assets_creators
+          has_many :creators, :class_name => "Person" , :through => :assets_creators,:order=>'assets_creators.id'
 
           class_eval do
             extend Mib::Acts::Resource::SingletonMethods

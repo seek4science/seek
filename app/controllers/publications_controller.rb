@@ -96,7 +96,7 @@ class PublicationsController < ApplicationController
     valid = true
     to_add = []
     to_remove = []
-    params[:author].each_key do |author_id|
+    params[:author].keys.sort.each do |author_id|
       author_assoc = params[:author][author_id]
       unless author_assoc.blank?
         to_remove << PublicationAuthor.find_by_id(author_id)
