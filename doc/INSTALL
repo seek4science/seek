@@ -42,16 +42,7 @@ The following commands should install rubygems for you on a Ubuntu/Debian system
   sudo ln -s gem1.8 gem
   cd -
 
-If using Ubuntu or Debian, the following commands should install all the gems you need:
 
-  sudo gem install -d mysql rmagick hpricot uuidtools RedCloth mongrel sqlite3-ruby simple-spreadsheet-extractor ruby-openid 
-  
-Also specific versions of <em>rails</em>, <em>rack-openid</em>, <em>fastercsv</em>, <em>libxml-ruby</em> and <em>rails</em> are required:
-
-  sudo gem install -d rails -v 2.3.5
-  sudo gem install -d rack-openid -v 1.0.1
-  sudo gem install -d fastercsv -v 1.5.1
-  sudo gem install -d libxml-ruby -v 1.1.3
 
 == Getting the source code
 
@@ -60,6 +51,14 @@ Our source code is stored within the {Sysmo-DB Google Code Repository}[http://co
 For a stable version, you should check out according to a stable tag. Our current tag is v0.9.1, so to retrieve this version you should use:
 
   hg clone https://sysmo-db.googlecode.com/hg/ -r v0.9.1 sysmo-seek
+  
+To install the required gems you first need to install Bundler[http://gembundler.com/]:
+
+  sudo gem install bundler
+  
+Then from within the sysmo-seek directory run
+
+  bundle install  
 
 
 == The RAILS_ENV environment variable
