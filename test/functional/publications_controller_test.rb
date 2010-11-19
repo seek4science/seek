@@ -76,7 +76,7 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
     
     #make sure that the authors are stored according to key, and that creators keeps the order
-    assert_equal [seek_author1,seek_author2],p.assets_creators.sort_by(&:id).collect{|ac| ac.creator}
+    assert_equal [seek_author1,seek_author2],p.assets_creators.sort_by(&:id).collect(&:creator)
     assert_equal [seek_author1,seek_author2],p.creators
   end
   
