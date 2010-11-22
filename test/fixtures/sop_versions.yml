@@ -1,5 +1,3 @@
-
-
 my_first_sop_v1:
   title: "My First Favourite SOP"
   contributor: owner_of_my_first_sop (User)
@@ -12,21 +10,6 @@ my_first_sop_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: my_first_sop
   version: 1
-  project: sysmo_project
-  policy: private_policy_for_asset_of_my_first_sop
-  
-my_first_sop_v2:
-  title: "My First Favourite SOP"
-  contributor: owner_of_my_first_sop (User)
-  description: "This is the very first proper sop in the test fixtures."
-  original_filename: "little_file.txt"
-  content_type: "text/plain"
-  content_blob: content_blob_with_little_file2
-  created_at: <%= 2.days.ago.to_s :db %>
-  updated_at: <%= 2.days.ago.to_s :db %>
-  last_used_at: <%= 1.days.ago.to_s :db %>
-  sop: my_first_sop
-  version: 2
   project: sysmo_project
   policy: private_policy_for_asset_of_my_first_sop  
 
@@ -210,6 +193,21 @@ downloadable_sop_v1:
   version: 1
   project: sysmo_project
   policy: sysmo_member_download
+  
+downloadable_sop_v2:
+  contributor: owner_of_my_first_sop (User)
+  title: "SOP that is downloadable."
+  description: "This is a SOP that has a policy with use_whitelist/use_blacklist set to 'false' and 'use_custom_sharing' set to 'true'."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file2
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+  sop: downloadable_sop
+  version: 2
+  project: sysmo_project
+  policy: sysmo_member_download  
 
 editable_sop_v1:
   contributor: owner_of_my_first_sop (User)

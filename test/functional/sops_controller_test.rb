@@ -14,7 +14,7 @@ class SopsControllerTest < ActionController::TestCase
   
   def test_get_xml_specific_version
     login_as(:owner_of_my_first_sop)
-    get :show,:id=>sops(:my_first_sop), :format=>"xml"
+    get :show,:id=>sops(:downloadable_sop), :format=>"xml"
     perform_api_checks
     xml=@response.body
     document = LibXML::XML::Document.string(xml)
@@ -26,7 +26,7 @@ class SopsControllerTest < ActionController::TestCase
     md5sum=content_blob_node.find_first("//ns:md5sum","ns:http://www.sysmo-db.org/2010/xml/rest").content
     
     #now check version 1
-    get :show,:id=>sops(:my_first_sop),:version=>1, :format=>"xml"
+    get :show,:id=>sops(:downloadable_sop),:version=>1, :format=>"xml"
     perform_api_checks
     xml=@response.body
     document = LibXML::XML::Document.string(xml)
