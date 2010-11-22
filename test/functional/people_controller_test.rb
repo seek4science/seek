@@ -212,6 +212,15 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to person_path(assigns(:person))
   end
   
+  def test_should_not_update_somebody_else_if_not_admin
+    login_as(:aaron)
+    quentin=people(:quentin_person)
+    put :update, :id => people(:quentin_person), :person => {:email=>"kkkkk@kkkkk.com" }    
+    assert_not_nil flash[:error]
+    quentin.reload
+    assert_equal "quentin@email.com",quentin.email
+  end
+  
   def test_tags_updated_correctly
     p=people(:aaron_person)
     p.expertise_list="one,two,three"
