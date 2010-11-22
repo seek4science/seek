@@ -183,6 +183,24 @@ class PeopleControllerTest < ActionController::TestCase
     assert !p.is_admin?
   end
   
+  def test_non_admin_cant_set_can_edit_institutions
+    login_as(:aaron)
+    p=people(:aaron_person)
+    assert !p.can_edit_institutions?
+    put :update, :id=>p.id, :person=>{:id=>p.id, :can_edit_institutions=>true, :email=>"ssfdsd@sdfsdf.com"}        
+    p.reload
+    assert !p.can_edit_institutions?
+  end
+  
+  def test_non_admin_cant_set_can_edit_projects
+    login_as(:aaron)
+    p=people(:aaron_person)
+    assert !p.can_edit_projects?
+    put :update, :id=>p.id, :person=>{:id=>p.id, :can_edit_projects=>true, :email=>"ssfdsd@sdfsdf.com"}        
+    p.reload
+    assert !p.can_edit_projects?
+  end
+  
   def test_can_edit_person_and_user_id_different
     #where a user_id for a person are not the same
     login_as(:fred)

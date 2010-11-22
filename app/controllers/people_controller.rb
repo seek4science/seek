@@ -344,9 +344,11 @@ class PeopleController < ApplicationController
 
   #checks the params attributes and strips those that cannot be set by non-admins, or other policy
   def auth_params
+    admin_only_params=[:is_pal,:is_admin,:can_edit_projects,:can_edit_institutions]
     if !current_user.is_admin?
-      params[:person].delete(:is_pal) if params[:person]
-      params[:person].delete(:is_admin) if params[:person]
+      admin_only_params.each do |p|
+          params[:person].delete(p) if params[:person]
+      end      
     end
   end
 
