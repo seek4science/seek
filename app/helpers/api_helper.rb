@@ -49,7 +49,7 @@ module ApiHelper
     xlink["xlink:title"]=xlink_title(object) unless !include_title || display_name(object,false).nil?
     xlink["id"]=object.id
     xlink["uuid"]=object.uuid if object.respond_to?("uuid")
-    xlink["resourceType"] = object.class.name
+    xlink["resourceType"] = object.class.name.include?("::Version") ? object.parent.class.name : object.class.name
     return xlink
   end
   

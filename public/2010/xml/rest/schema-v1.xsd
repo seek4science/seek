@@ -1030,14 +1030,11 @@
 			<xsd:enumeration value="Projects"></xsd:enumeration>
 			<xsd:enumeration value="Institution"></xsd:enumeration>
 			<xsd:enumeration value="Institutions"></xsd:enumeration>
-			<xsd:enumeration value="Model"></xsd:enumeration>
-			<xsd:enumeration value="Model::Version"></xsd:enumeration>
+			<xsd:enumeration value="Model"></xsd:enumeration>			
 			<xsd:enumeration value="Models"></xsd:enumeration>
-			<xsd:enumeration value="Sop"></xsd:enumeration>
-			<xsd:enumeration value="Sop::Version"></xsd:enumeration>
+			<xsd:enumeration value="Sop"></xsd:enumeration>			
 			<xsd:enumeration value="Sops"></xsd:enumeration>
-			<xsd:enumeration value="DataFile"></xsd:enumeration>
-			<xsd:enumeration value="DataFile::Version"></xsd:enumeration>
+			<xsd:enumeration value="DataFile"></xsd:enumeration>			
 			<xsd:enumeration value="DataFiles"></xsd:enumeration>
 			<xsd:enumeration value="Assay"></xsd:enumeration>
 			<xsd:enumeration value="Assays"></xsd:enumeration>
