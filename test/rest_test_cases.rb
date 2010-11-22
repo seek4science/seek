@@ -19,6 +19,10 @@ module RestTestCases
   
   def test_get_xml
     get :show,:id=>@object, :format=>"xml"    
+    perform_api_checks
+  end
+  
+  def perform_api_checks
     assert_response :success    
     valid,message = check_xml
     assert valid,message        
