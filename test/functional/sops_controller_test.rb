@@ -244,7 +244,9 @@ def test_should_create_new_version
 end
 
 def test_should_not_create_new_version_for_downloadable_only_sop
-  s=sops(:downloadable_sop)    
+  s=sops(:downloadable_sop)   
+  current_version=s.version
+  current_version_count=s.versions.size
   
   assert_no_difference("Sop::Version.count") do
     post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
@@ -254,9 +256,8 @@ def test_should_not_create_new_version_for_downloadable_only_sop
   assert_not_nil flash[:error]
   
   s=Sop.find(s.id)
-  assert_equal 1,s.versions.size
-  assert_equal 1,s.version
-  assert_equal "little_file.txt",s.original_filename   
+  assert_equal current_version_count,s.versions.size
+  assert_equal current_version,s.version  
   
 end
 
