@@ -9,25 +9,6 @@ end unless obj.nil?
 asset_name = upload_field.humanize.capitalize
 assert_name = "SOP" if asset_name=="Sop" -%>
 
-<script type="text/javascript">
-    function from_url_selected(){
-        Effect.Fade("upload_from_file", {
-            duration: 0.0
-        });
-        Effect.Appear("upload_from_url");  		    
-		$('upload_from_file_button').className="block_link";
-		$('upload_from_url_button').className="block_link_active";
-    }
-    
-    function from_file_selected(){
-        Effect.Fade("upload_from_url", {
-            duration: 0.0
-        });
-        Effect.Appear("upload_from_file");   
-		$('upload_from_file_button').className="block_link_active";
-		$('upload_from_url_button').className="block_link";  
-    }
-</script>
 <div class="box_infotext">
     <p>
         You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
@@ -89,6 +70,6 @@ assert_name = "SOP" if asset_name=="Sop" -%>
     </div>
 </div>
 
-<script type=text/javascript>
+<script type="text/javascript">
 	from_file_selected();
 </script>

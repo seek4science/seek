@@ -1,6 +1,25 @@
+<script type="text/javascript">
+    function from_url_selected(){
+        Effect.Fade("upload_from_file", {
+            duration: 0.0
+        });
+        Effect.Appear("upload_from_url");  		    
+		$('upload_from_file_button').className="block_link";
+		$('upload_from_url_button').className="block_link_active";
+    }
+    
+    function from_file_selected(){
+        Effect.Fade("upload_from_url", {
+            duration: 0.0
+        });
+        Effect.Appear("upload_from_file");   
+		$('upload_from_file_button').className="block_link_active";
+		$('upload_from_url_button').className="block_link";  
+    }
+</script>
+
 <div class="fold">
     <div class="foldTitle">
-        
         Upload
     </div>
     <div class="foldContent" style="display: block;">
