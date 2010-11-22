@@ -346,6 +346,7 @@ class PeopleController < ApplicationController
   def auth_params
     if !current_user.is_admin?
       params[:person].delete(:is_pal) if params[:person]
+      params[:person].delete(:is_admin) if params[:person]
     end
   end
 

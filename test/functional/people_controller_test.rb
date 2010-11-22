@@ -93,11 +93,6 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id => people(:quentin_person)
     assert_response :success
   end
-  #FIXME: This test needs looking at
-  # def test_show_no_email
-  #   get :show, :id => people(:quentin_person)
-  #   assert_select "div#email", false
-  # end
   
   def test_should_get_edit
     get :edit, :id => people(:quentin_person)
@@ -113,15 +108,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_admin_can_edit_others
     get :edit, :id=>people(:aaron_person)
     assert_response :success
-  end
-  
-  def test_admin_can_set_pal_flag
-    login_as(:quentin)
-    p=people(:fred)
-    assert !p.is_pal?
-    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
-    assert Person.find(p.id).is_pal?
-  end
+  end    
   
   def test_change_notification_settings
     login_as(:quentin)
@@ -136,12 +123,64 @@ class PeopleControllerTest < ActionController::TestCase
     
   end
   
+  def test_admin_can_is_admin_flag
+    login_as(:quentin)
+    p=people(:fred)
+    assert !p.is_admin?
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_admin=>true, :email=>"ssfdsd@sdfsdf.com"}
+    assert_redirected_to person_path(p)
+    assert_nil flash[:error]
+    p.reload
+    assert p.is_admin?
+  end
+  
+  def test_non_admin_cant_is_admin_flag
+    login_as(:aaron)
+    p=people(:fred)
+    assert !p.is_admin?
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_admin=>true, :email=>"ssfdsd@sdfsdf.com"}    
+    assert_not_nil flash[:error]
+    p.reload
+    assert !p.is_admin?
+  end
+  
+  def test_admin_can_set_pal_flag
+    login_as(:quentin)
+    p=people(:fred)
+    assert !p.is_pal?
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
+    assert_redirected_to person_path(p)
+    assert_nil flash[:error]
+    p.reload
+    assert p.is_pal?
+  end
+  
   def test_non_admin_cant_set_pal_flag
     login_as(:aaron)
     p=people(:fred)
     assert !p.is_pal?
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}    
+    assert_not_nil flash[:error]
+    p.reload
+    assert !p.is_pal?
+  end
+  
+  def test_cant_set_yourself_to_pal
+    login_as(:aaron)
+    p=people(:aaron_person)
+    assert !p.is_pal?
     put :update, :id=>p.id, :person=>{:id=>p.id, :is_pal=>true, :email=>"ssfdsd@sdfsdf.com"}
-    assert !Person.find(p.id).is_pal?
+    p.reload
+    assert !p.is_pal?
+  end
+  
+  def test_cant_set_yourself_to_admin
+    login_as(:aaron)
+    p=people(:aaron_person)
+    assert !p.is_admin?
+    put :update, :id=>p.id, :person=>{:id=>p.id, :is_admin=>true, :email=>"ssfdsd@sdfsdf.com"}        
+    p.reload
+    assert !p.is_admin?
   end
   
   def test_can_edit_person_and_user_id_different
