@@ -14,7 +14,7 @@ class SopsControllerTest < ActionController::TestCase
   
   def test_get_xml_specific_version
     login_as(:owner_of_my_first_sop)
-    get :show,:id=>sops(:downloadable_sop), :format=>"xml"
+    get :show,:id=>sops(:downloadable_sop),:version=>2, :format=>"xml"
     perform_api_checks
     xml=@response.body
     document = LibXML::XML::Document.string(xml)

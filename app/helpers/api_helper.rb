@@ -5,7 +5,7 @@
 # See license.txt for details.
 
 module ApiHelper
-    
+  
   def xml_root_attributes
     { "xmlns" => "http://www.sysmo-db.org/2010/xml/rest",
       "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
@@ -128,36 +128,28 @@ module ApiHelper
     builder.tag! "uuid",object.uuid if object.respond_to?("uuid")    
   end  
   
-  def extended_xml builder,object
+  def extended_xml builder,object        
     
     submitter = determine_submitter object
     builder.tag! "submitter" do 
       api_partial(builder,submitter)
     end if submitter
     
-    if (object.class.name.include?("::Version"))
-      builder.tag! "creators" do      
-        api_partial_collection builder,object.parent.creators
-      end if object.parent.respond_to?("creators") 
-    end
-    
     builder.tag! "organisms" do
       organisms=[]
       organisms=object.organisms if object.respond_to?("organisms")
       organisms << object.organism if object.respond_to?("organism") && object.organism
       api_partial_collection builder,organisms
-    end if object.respond_to?("organism") || object.respond_to?("organisms")
-    
-    if (object.class.name.include?("::Version"))
-      builder.tag! "attributions" do      
-        api_partial_collection builder,object.parent.attributions
-      end if object.parent.respond_to?("attributions") 
-    end
-    
+    end if object.respond_to?("organism") || object.respond_to?("organisms")              
+        
     builder.tag! "creators" do      
       api_partial_collection builder,object.creators
-    end if object.respond_to?("creators")  
+    end if object.respond_to?("creators") 
     
+#    builder.tag! "attributions" do      
+#      api_partial_collection builder,object.parent.attributions
+#    end if object.parent.respond_to?("attributions")  
+        
     unless HIDE_DETAILS
       builder.tag! "email",object.email if object.respond_to?("email")
       builder.tag! "webpage",object.webpage if object.respond_to?("webpage")
@@ -167,8 +159,9 @@ module ApiHelper
     
     builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
     builder.tag! "version",object.version if object.respond_to?("version")
-    builder.tag! "latest_version",core_xlink(object.latest_version) if object.respond_to?("latest_version")           
     builder.tag! "revision_comments",object.revision_comments if object.respond_to?("revision_comments")
+    builder.tag! "latest_version",core_xlink(object.latest_version) if object.respond_to?("latest_version")           
+    
     if (object.respond_to?("versions"))
       builder.tag! "versions" do
         object.versions.each do |v|
@@ -233,7 +226,7 @@ module ApiHelper
       end
     end    
   end    
-    
+  
   def generic_list_xml builder,list,tag,attr={}
     builder.tag! tag,attr do 
       list.each do |item|
@@ -248,9 +241,9 @@ module ApiHelper
   end
   
   def api_partial builder,object, is_root=false
-    object=object.parent if object.class.name.include?("::Version")
-    path=api_partial_path_for_item(object)    
-    classname=object.class.name.underscore
+    parent_object =  object.class.name.include?("::Version") ? object.parent : object
+    path=api_partial_path_for_item(parent_object)    
+    classname=parent_object.class.name.underscore
     render :partial=>path,:locals=>{:parent_xml => builder,:is_root=>is_root,classname.to_sym=>object}
   end
   
