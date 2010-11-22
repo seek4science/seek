@@ -19,6 +19,10 @@ one:
 content_blob_with_little_file:
   data_old: <%= load_blob_data('little_file.txt') %>
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
+  
+content_blob_with_little_file2:
+  data_old: <%= load_blob_data('little_file_v2.txt') %>
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>  
 
 teusink_blob:
   data_old: <%= load_blob_data('Teusink.xml') %>
