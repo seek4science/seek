@@ -52,7 +52,7 @@ For a stable version, you should check out according to a stable tag. Our curren
 
   hg clone https://sysmo-db.googlecode.com/hg/ -r v0.9.1 sysmo-seek
   
-To install the required gems you first need to install Bundler[http://gembundler.com/]:
+Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
   sudo gem install bundler
   
