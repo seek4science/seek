@@ -49,7 +49,7 @@ module ApiHelper
     xlink["xlink:title"]=xlink_title(object) unless !include_title || display_name(object,false).nil?
     xlink["id"]=object.id
     xlink["uuid"]=object.uuid if object.respond_to?("uuid")
-    xlink["resourceType"] = object.class.name
+    #xlink["resourceType"] = object.class.name
     return xlink
   end
   
@@ -60,7 +60,7 @@ module ApiHelper
     uri="#{uri}/avatars/#{avatar.id}"
     xlink=xlink_attributes(uri)
     xlink["id"]=avatar.id
-    xlink["resourceType"]=avatar.class.name
+    #xlink["resourceType"]=avatar.class.name
     return xlink
   end
   
