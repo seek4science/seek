@@ -13,14 +13,18 @@
 
 	<xsd:complexType name="ResourceLink">
 		<xsd:attribute ref="xlink:href" use="required"></xsd:attribute>
-		<xsd:attribute ref="xlink:title" use="optional"></xsd:attribute>		
+		<xsd:attribute ref="xlink:title" use="optional"></xsd:attribute>
+		<xsd:attribute name="resourceType" type="ResourceType"
+			use="required"></xsd:attribute>
 		<xsd:attribute name="id" type="xsd:positiveInteger"></xsd:attribute>
 		<xsd:attribute name="uuid" type="xsd:string" use="optional"></xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="IndexLinks">
 		<xsd:attribute ref="xlink:href" use="required"></xsd:attribute>
-		<xsd:attribute ref="xlink:title" use="optional"></xsd:attribute>		
+		<xsd:attribute ref="xlink:title" use="optional"></xsd:attribute>
+		<xsd:attribute name="resourceType" type="ResourceType"
+			use="required"></xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="MinimalIndex">
@@ -1011,6 +1015,51 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+
+	<xsd:simpleType name="ResourceType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Asset"></xsd:enumeration>
+			<xsd:enumeration value="Avatar"></xsd:enumeration>
+			<xsd:enumeration value="Strain"></xsd:enumeration>
+			<xsd:enumeration value="Strains"></xsd:enumeration>
+			<xsd:enumeration value="Organism"></xsd:enumeration>
+			<xsd:enumeration value="Organisms"></xsd:enumeration>
+			<xsd:enumeration value="Person"></xsd:enumeration>
+			<xsd:enumeration value="People"></xsd:enumeration>
+			<xsd:enumeration value="Project"></xsd:enumeration>
+			<xsd:enumeration value="Projects"></xsd:enumeration>
+			<xsd:enumeration value="Institution"></xsd:enumeration>
+			<xsd:enumeration value="Institutions"></xsd:enumeration>
+			<xsd:enumeration value="Model"></xsd:enumeration>
+			<xsd:enumeration value="Model::Version"></xsd:enumeration>
+			<xsd:enumeration value="Models"></xsd:enumeration>
+			<xsd:enumeration value="Sop"></xsd:enumeration>
+			<xsd:enumeration value="Sop::Version"></xsd:enumeration>
+			<xsd:enumeration value="Sops"></xsd:enumeration>
+			<xsd:enumeration value="DataFile"></xsd:enumeration>
+			<xsd:enumeration value="DataFile::Version"></xsd:enumeration>
+			<xsd:enumeration value="DataFiles"></xsd:enumeration>
+			<xsd:enumeration value="Assay"></xsd:enumeration>
+			<xsd:enumeration value="Assays"></xsd:enumeration>
+			<xsd:enumeration value="Study"></xsd:enumeration>
+			<xsd:enumeration value="Studies"></xsd:enumeration>
+			<xsd:enumeration value="Investigation"></xsd:enumeration>
+			<xsd:enumeration value="Investigations"></xsd:enumeration>
+			<xsd:enumeration value="WorkGroup"></xsd:enumeration>
+			<xsd:enumeration value="Publication"></xsd:enumeration>
+			<xsd:enumeration value="Publications"></xsd:enumeration>
+			<xsd:enumeration value="ContentBlob"></xsd:enumeration>
+			<xsd:enumeration value="AssayType"></xsd:enumeration>
+			<xsd:enumeration value="AssayTypes"></xsd:enumeration>
+			<xsd:enumeration value="TechnologyType"></xsd:enumeration>
+			<xsd:enumeration value="TechnologyTypes"></xsd:enumeration>
+			<xsd:enumeration value="AssayClass"></xsd:enumeration>
+			<xsd:enumeration value="AssayType"></xsd:enumeration>
+			<xsd:enumeration value="TechnologyType"></xsd:enumeration>
+			<xsd:enumeration value="CultureGrowthType"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+
 
 	<xsd:complexType name="AssociatedItems">
 		<xsd:sequence>
