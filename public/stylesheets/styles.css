@@ -859,17 +859,18 @@ ul.related_asset_list li{
     float: left;
     margin-left: 1em;
     margin-right: 0.5em;
-    margin-top: 0.5em;
-    padding :5px 5px 3px 3px;
+    margin-top: -0.2em;
+    padding:3px 5px 0px 3px;
     border:1px solid #CCCCCC;
     background-color: #FFFFFF;
-    min-width :3em;
-    min-height: 3em;
+    
+	min-width :2.3em;
+    min-height: 2.3em;
 }
 
 .contribution_title_image img {        
-    width: 35px;
-    vertical-align: middle;
+    width: 27px;
+    vertical-align: middle;	
 }
 
 .contribution_title h1 {    

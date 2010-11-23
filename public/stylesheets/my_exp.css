@@ -30,7 +30,7 @@ h1 {
 	text-align: center;
 	font-size: 167%;
 	color: #000033;
-	margin: 0.8em 0 1em 0;
+	margin: 0.1em 0 0.3em 0;
 	line-height: 1.4;
 }
 
@@ -867,19 +867,17 @@ a.button_slim * {
 	vertical-align: middle;
 }
 
+
 .icon IMG {
 	padding: 2px;
 	vertical-align: middle;
-}
-
-.contribution_title {
-	margin-bottom: 0.6em;
 }
 
 .contribution_aftertitle {
 	color: #666666; 
 	font-size: 85%; 
 	text-align: center; 
+	margin-top: 0.5em;
 	margin-bottom: 0.6em;
 }
 
