@@ -108,6 +108,30 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal "file_picture.png", assigns(:sop).original_filename    
   end
   
+  def test_missing_sharing_should_default_to_private
+    assert_difference('Sop.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :sop => valid_sop
+      end
+    end
+    assert_redirected_to sop_path(assigns(:sop))
+    assert_equal users(:quentin),assigns(:sop).contributor
+    assert assigns(:sop)
+    
+    sop=assigns(:sop)
+    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
+    assert_equal private_policy.sharing_scope,sop.policy.sharing_scope
+    assert_equal private_policy.access_type,sop.policy.access_type
+    assert_equal private_policy.use_whitelist,sop.policy.use_whitelist
+    assert_equal private_policy.use_blacklist,sop.policy.use_blacklist
+    assert_equal false,sop.policy.use_custom_sharing
+    assert sop.policy.permissions.empty?
+    
+    #check it doesn't create an error when retreiving the index
+    get :index
+    assert_response :success    
+  end
+  
   test "should create sop with url" do
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do

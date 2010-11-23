@@ -19,6 +19,9 @@ module Mib
         def acts_as_resource
           belongs_to :contributor, :polymorphic => true
           
+          #checks a policy exists, and if missing resorts to using a private policy
+          before_save :policy_or_default
+          
           has_many :relationships, 
             :class_name => 'Relationship',
             :as => :subject,
@@ -56,6 +59,12 @@ module Mib
         # to which the current resource is attributed
         def attributions
           self.relationships.select {|a| a.predicate == Relationship::ATTRIBUTED_TO}
+        end
+        
+        def policy_or_default
+          if self.policy.nil?
+            self.policy = Policy.private_policy
+          end
         end
         
         def attributions_objects

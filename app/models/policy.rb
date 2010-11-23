@@ -310,13 +310,24 @@ class Policy < ActiveRecord::Base
     return project.default_policy
   end
   
+  def self.private_policy
+    policy = Policy.new(:name => "default private",                        
+                        :sharing_scope => PRIVATE,
+                        :access_type => NO_ACCESS,
+                        :use_custom_sharing => false,
+                        :use_whitelist => false,
+                        :use_blacklist => false)
+                        
+    return policy
+  end
+  
   
   # returns a default system policy with "contributor" assigned as an admin;
   # as of now, default system policy is that assets are private to the uploader
   def self.system_default()
     policy = Policy.new(:name => "system default",                        
-                        :sharing_scope => 0,
-                        :access_type => 0,
+                        :sharing_scope => PRIVATE,
+                        :access_type => NO_ACCESS,
                         :use_custom_sharing => false,
                         :use_whitelist => false,
                         :use_blacklist => false)

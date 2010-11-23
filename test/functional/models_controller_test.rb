@@ -148,6 +148,30 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to model_path(assigns(:model))
   end
   
+  def test_missing_sharing_should_default_to_private
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :model => valid_model
+      end
+    end
+    assert_redirected_to model_path(assigns(:model))
+    assert_equal users(:model_owner),assigns(:model).contributor
+    assert assigns(:model)
+    
+    model=assigns(:model)
+    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
+    assert_equal private_policy.sharing_scope,model.policy.sharing_scope
+    assert_equal private_policy.access_type,model.policy.access_type
+    assert_equal private_policy.use_whitelist,model.policy.use_whitelist
+    assert_equal private_policy.use_blacklist,model.policy.use_blacklist
+    assert_equal false,model.policy.use_custom_sharing
+    assert model.policy.permissions.empty?
+    
+    #check it doesn't create an error when retreiving the index
+    get :index
+    assert_response :success    
+  end
+  
   test "should create model with url" do
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do

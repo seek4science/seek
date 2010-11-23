@@ -20,6 +20,19 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal p,df.project
     assert_equal p,df.latest_version.project
   end
+  
+  def test_defaults_to_private_policy
+    df=DataFile.new(:title=>"A df with no policy")
+    df.save!
+    df.reload
+    assert_not_nil df.policy
+    assert_equal Policy::PRIVATE, df.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, df.policy.access_type
+    assert_equal false,df.policy.use_whitelist
+    assert_equal false,df.policy.use_blacklist
+    assert_equal false,df.policy.use_custom_sharing
+    assert df.policy.permissions.empty?
+  end
 
   test "data_file with no contributor" do
     df=data_files(:data_file_with_no_contributor)

@@ -15,6 +15,7 @@ class DataFilesControllerTest < ActionController::TestCase
   
   def test_title
     get :index
+    assert_response :success
     assert_select "title",:text=>/Sysmo SEEK Data.*/, :count=>1
   end
   
@@ -70,6 +71,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
   end
+  
+  
   
   test "should create data file and store with url and store flag" do
     datafile_details = valid_data_file_with_url
@@ -146,6 +149,30 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert !assigns(:data_file).content_blob.data.nil?
     assert assigns(:data_file).content_blob.url.blank?
+  end
+  
+  def test_missing_sharing_should_default_to_private
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file
+      end
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert assigns(:data_file)
+    
+    df=assigns(:data_file)
+    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
+    assert_equal private_policy.sharing_scope,df.policy.sharing_scope
+    assert_equal private_policy.access_type,df.policy.access_type
+    assert_equal private_policy.use_whitelist,df.policy.use_whitelist
+    assert_equal private_policy.use_blacklist,df.policy.use_blacklist
+    assert_equal false,df.policy.use_custom_sharing
+    assert df.policy.permissions.empty?
+    
+    #check it doesn't create an error when retreiving the index
+    get :index
+    assert_response :success    
   end
   
   test "should show data file" do
@@ -287,7 +314,9 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
   
-  def test_update_should_not_overright_contributor
+  
+  
+  def test_update_should_not_overwrite_contributor
     login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
     df=data_files(:data_file_with_no_contributor)
     put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
