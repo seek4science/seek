@@ -1007,6 +1007,8 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
+					<xsd:element name="bioportal_concepts" type="BioportalConcepts"
+						minOccurs="1" maxOccurs="1"></xsd:element>
 					<xsd:element name="strains" type="StrainItems"
 						minOccurs="1" maxOccurs="1"></xsd:element>
 					<xsd:element name="associated" type="AssociatedItems"
@@ -1016,6 +1018,23 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
+	<xsd:complexType name="BioportalConcepts">
+		<xsd:sequence>
+			<xsd:element name="bioportal_concept" type="BioportalConcept" minOccurs="0"
+				maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="BioportalConcept">
+		<xsd:sequence>
+			<xsd:element name="ontology_id" type="xsd:positiveInteger"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+			<xsd:element name="ontology_version_id" type="xsd:positiveInteger"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+			<xsd:element name="concept_id" type="xsd:string"
+						maxOccurs="1" minOccurs="1"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
 	<xsd:simpleType name="ResourceType">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="Asset"></xsd:enumeration>

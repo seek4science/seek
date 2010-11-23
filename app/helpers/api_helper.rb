@@ -158,12 +158,17 @@ module ApiHelper
     end
     
     builder.tag! "bioportal_concepts" do
-      builder.tag! "bioportal_concept" do
-        builder.tag! "ontology_id",object.ontology_id
-        builder.tag! "ontology_version_id",object.ontology_version_id
-        builder.tag! "concept_id",object.concept_uri
-      end      
-    end if object.respond_to?("bioportal_concept") 
+      concepts=[]
+      concepts=object.bioportal_concepts if object.respond_to?("bioportal_concepts")
+      concepts << object.bioportal_concept if object.respond_to?("bioportal_concept")
+      concepts.compact.each do |concept|
+        builder.tag! "bioportal_concept" do
+          builder.tag! "ontology_id",concept.ontology_id
+          builder.tag! "ontology_version_id",concept.ontology_version_id
+          builder.tag! "concept_id",concept.concept_uri
+        end      
+      end
+    end if object.respond_to?("bioportal_concept") || object.respond_to?("bioportal_concepts")
     
     builder.tag! "content_type",object.content_type if object.respond_to?("content_type")
     builder.tag! "version",object.version if object.respond_to?("version")
