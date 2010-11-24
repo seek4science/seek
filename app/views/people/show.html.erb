@@ -103,7 +103,7 @@
     <% if current_user.is_admin?  -%>
       <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
       <ul>
-        <%= "<li>This person is a SysMo-DB PAL<li>" if @person.is_pal?  %>
+        <%= "<li>This person is a Virtual Liver PAL<li>" if @person.is_pal?  %>
         <% if @person.user -%>
           <li>Editing <b>projects</b>, where this person is involved: <%= @person.user.can_edit_projects ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
           <li>Editing <b>institutions</b>, where this person works with: <%= @person.user.can_edit_institutions ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%></li>
