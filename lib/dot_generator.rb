@@ -105,7 +105,7 @@ module DotGenerator
   def to_dot_asset asset, current_item=nil, show_publications=false
     current_item||=asset
     dot = ""    
-    highlight_attribute=HIGHLIGHT_ATTRIBUTE if asset==current_item
+    highlight_attribute=HIGHLIGHT_ATTRIBUTE if asset==current_item || (asset.class.name.end_with?("::Version") && asset.parent==current_item)
     asset_type=asset.class.name
     version = asset.version
     if asset_type.end_with?("::Version")

@@ -46,8 +46,7 @@ class AssayAssetTest < ActiveSupport::TestCase
     a.save!
     
     assert_equal sop.version,a.versioned_asset.version
-    assert_equal sop.latest_version,a.versioned_asset
-    
+    assert_equal sop.latest_version,a.versioned_asset    
   end
   
 end
