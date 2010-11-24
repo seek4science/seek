@@ -1,64 +1,56 @@
 <%= javascript_include_tag "sharing.js","models.js" -%>
-
 <h1>New Model</h1>
-
 <div class="show_basic">
-  <% form_tag({:action => :create}, :multipart => true) do -%>
-    <%= error_messages_for :model -%>
-
-    <center>
-      <div style="width: 90%;">
-        <p>
-          <b>File to upload&nbsp;</b><span class="required">*</span>
-          <%= file_field :model, :data -%>
-        </p>
-
+    <% form_tag({:action => :create}, :multipart => true) do -%>
+    <div class="asset_form">
+        <%= error_messages_for :model -%>
+        <%= render :partial=>"assets/upload_box" -%>
         <p style="margin-top: 1.5em;">
-          <b>Title</b><span class="required">*</span><br/>
-          <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
-          <%= text_area_tag 'model[title]', model_title_value, :style => "width: 100%;", :rows=>2 -%>
+            <b>Title</b>
+            <span class="required">*</span>
+            <br/>
+            <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
+            <%= text_area_tag 'model[title]', model_title_value, :style => "width: 100%;", :rows=>2 -%>
         </p>
-
         <p style="margin-top: 0.5em;">
-          <b>Description</b><br/>
-          <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
-          <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 10 -%>
+            <b>Description</b>
+            <br/>
+            <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
+            <%= text_area_tag 'model[description]', model_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
-
-        <%= render :partial=>"model_metadata" -%>
-
-        
-        
-        <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",   # this is only for presentation, not for any processing
-          :project_hash => current_user.generate_own_project_id_name_hash } -%>
-
-        
-        
-      </div>
-    </center>
-
-    <p>
-      <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
-    </p>
-
-    <p style="margin: 2.5em 0 0 0;">
-      <%= render :partial => "assets/sharing_form" -%>
-    </p>
-
-    <p style="margin: 0;">
-      <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-        :existing_attributions => [],
-        :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
-    </p>
-    
-    <p style="margin: 0;">
-      <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-        :existing_creators => [current_user.person],
-        :other_creators => nil} -%>
-    </p>
-
-    <p style="text-align: center; margin-top: 1.5em;">
-      <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%> or <%= link_to 'Cancel', models_path -%>
-    </p>
-  <% end -%>
+        <p>
+            <div class="fold">
+                <div class="foldTitle">
+                    Other information 
+                </div>
+                <div class="foldContent">
+                    <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",   # this is only for presentation, not for any processing
+                    :project_hash => current_user.generate_own_project_id_name_hash } -%>
+                    <%= render :partial=>"model_metadata" -%>
+                </div>
+            </div>
+        </p>
+        <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
+        <p>
+            <%= render :partial => "assets/sharing_form" -%>
+        </p>
+        <p>
+            <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+            :existing_attributions => [],
+            :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
+        </p>
+        <p>
+            <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Model",
+            :related_publications => []} -%>
+        </p>
+        <p>
+            <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
+            :existing_creators => [current_user.person],
+            :other_creators => nil} -%>
+        </p>
+        <p>
+            <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
+        </p>
+        <% end -%>
+    </div>
 </div>

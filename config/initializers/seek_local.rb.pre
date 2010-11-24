@@ -7,6 +7,16 @@ SOLR_ENABLED = false
 #Enable email
 EMAIL_ENABLED = false
 
+
+#this enables the sending of emails when things go wrong. If you set this to true, you should also comment out the following lines and edit accordingly.
+EXCEPTION_NOTIFICATION_ENABLED = false
+#ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
+#ExceptionNotifier.sender_address = %w(no-reply@sysmo-db.org)
+#ExceptionNotifier.email_prefix = "[SEEK-#{RAILS_ENV.capitalize} ERROR] "
+#ExceptionNotifier.exception_recipients = %w(joe@example.com bill@example.com)
+
+  
+
 #Activation, at registration time, required
 ACTIVATION_REQUIRED=false
 

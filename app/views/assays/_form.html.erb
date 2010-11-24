@@ -43,7 +43,6 @@
 </p>
 </div>
 
-<h2><%= "#{@assay_text.capitalize} types" -%></h2>
 <%= f.hidden_field :assay_class_id -%>
 
 <table class="padded_table">
@@ -61,6 +60,7 @@
     <% end -%>
   </tr>
 </table>
+<br style="clear:both"/>
 
 <%= render :partial=>"assays/select_organisms" -%>
 
@@ -70,8 +70,11 @@
   <%= render :partial=>"assays/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
 <% end -%>
 
-<%= render :partial=>"assays/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
+<%= render :partial => "assays/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
 
+<%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Assay",
+                                                                        :related_publications => @assay.related_publications} -%>
+                                                                        
 <p style="margin-top: 2em; text-align: center;" >
   <%= f.submit(action==:edit ? "Update" : "Create") -%>
   or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>

@@ -26,5 +26,16 @@ class PolicyTest < ActiveSupport::TestCase
       assert_not_equal perm.id,copy_perm.id      
     end
   end
+  
+  test "private policy" do
+    pol=Policy.private_policy
+    assert_equal Policy::PRIVATE, pol.sharing_scope
+    assert_equal Policy::NO_ACCESS, pol.access_type
+    assert_equal false,pol.use_whitelist
+    assert_equal false,pol.use_blacklist
+    assert_equal false,pol.use_custom_sharing
+    assert pol.permissions.empty?
+    
+  end
 
 end

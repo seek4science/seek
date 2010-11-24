@@ -68,8 +68,9 @@
           </p>
         <% end -%>
       </p>
-
-
+      <p>
+        <%= embedded_isa_svg(@data_file, true, @data_file) -%>
+      </p>
     </div>
   </div>
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } %>

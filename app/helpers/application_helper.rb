@@ -9,6 +9,23 @@ module ApplicationHelper
     #FIXME: very bad method name
     [Model,DataFile,Sop,Study,Assay,Investigation,Publication]
 
+end
+
+  #joins the list with seperator and the last item with an 'and'
+  def join_with_and list, seperator=", "
+    return list.first if list.count==1
+    result = ""
+    list.each do |item|
+      result << item
+      unless item==list.last
+        if item==list[-2]
+          result << " and "
+        else
+          result << seperator
+        end
+      end
+    end
+    return result
   end
 
   def tag_cloud(tags, classes)
@@ -194,16 +211,6 @@ module ApplicationHelper
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
     return "Sysmo SEEK "+name
-  end
-
-  def admin_email_links
-    admins=User.admins
-    result=""
-    admins.each do |u|
-      result << mail_to(u.person.email,u.person.name)
-      result << ", " unless admins.last==u
-    end
-    return result    
   end
 
   # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/

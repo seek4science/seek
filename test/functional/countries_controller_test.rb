@@ -1,8 +1,18 @@
 require 'test_helper'
 
 class CountriesControllerTest < ActionController::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  
+  fixtures :all
+  
+  include AuthenticatedTestHelper
+   
+  def setup
+    login_as :quentin
   end
+  
+  test "get Netherlands" do
+    get :show,:country_name=>"Netherlands"
+    assert_response :success
+  end
+  
 end

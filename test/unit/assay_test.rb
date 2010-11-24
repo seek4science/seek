@@ -99,10 +99,16 @@ class AssayTest < ActiveSupport::TestCase
     
   end
 
+  test "associated publication" do
+    assert_equal 1, assays(:assay_with_a_publication).related_publications.size
+  end
+
   test "can delete?" do
     assert assays(:assay_with_just_a_study).can_delete?(users(:model_owner))
     assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:model_owner))
     assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:model_owner))
+    assert !assays(:assay_with_a_model).can_delete?(users(:model_owner))
+    assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
   end
 
   test "assets" do

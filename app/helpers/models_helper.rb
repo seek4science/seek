@@ -1,5 +1,25 @@
 module ModelsHelper
 
+  JWS_ERROR_TO_PANEL_NAMES={
+    "reacs" => "Reactions",
+    "kinetics" => "Rate equations",
+    "initVal"=>"Initial values",
+    "parameters"=>"Parameter values",
+    "functions"=>"Functions",
+    "assRules"=>"Assignment rules",
+    "events"=>"Events"
+  }
+  
+  JWS_ERROR_TO_PREFIX={
+    "reacs" => "reactions",
+    "kinetics" => "equations",
+    "initVal"=>"initial",
+    "parameters"=>"parameters",
+    "functions"=>"functions",
+    "assRules"=>"assignments",
+    "events"=>"events"
+  }
+
   def model_environment_text model
     model.recommended_environment ? h(model.recommended_environment.title) : "<span class='none_text'>Unknown</span>" 
   end
@@ -27,6 +47,19 @@ module ModelsHelper
   def authorised_models
     models=Model.find(:all)
     Authorization.authorize_collection("show",models,current_user)
-  end    
+  end  
+  
+  def jws_supported? model
+    builder = Seek::JWSModelBuilder.new
+    builder.is_supported? model
+  end
+  
+  def jws_key_to_text key
+    JWS_ERROR_TO_PANEL_NAMES[key]
+  end
+  
+  def jws_key_to_prefix key
+    JWS_ERROR_TO_PREFIX[key]  
+  end
 
 end

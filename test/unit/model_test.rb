@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class ModelTest < ActiveSupport::TestCase
-  fixtures :all
+  fixtures :all    
 
   test "assocations" do
     model=models(:teusink)
@@ -13,13 +13,26 @@ class ModelTest < ActiveSupport::TestCase
 
     blob=content_blobs(:teusink_blob)
     assert_equal blob,model.content_blob
-  end
-
+  end        
+  
   test "project" do
     model=models(:teusink)
     p=projects(:sysmo_project)
     assert_equal p,model.project
     assert_equal p,model.latest_version.project
+  end
+  
+  def test_defaults_to_private_policy
+    model=Model.new(:title=>"A sop with no policy")
+    model.save!
+    model.reload
+    assert_not_nil model.policy
+    assert_equal Policy::PRIVATE, model.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, model.policy.access_type
+    assert_equal false,model.policy.use_whitelist
+    assert_equal false,model.policy.use_blacklist
+    assert_equal false,model.policy.use_custom_sharing
+    assert model.policy.permissions.empty?
   end
 
   test "creators through asset" do

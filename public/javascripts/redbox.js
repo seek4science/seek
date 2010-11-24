@@ -7,8 +7,9 @@ var RedBox = {
   showInline: function(id)
   {
     this.showOverlay();
-    new Effect.Appear('RB_window', {duration: 0.4, queue: 'end'});        
+    new Effect.Appear('RB_window', {duration: 0.4, queue: 'end'}); 	      
     this.cloneWindowContents(id);
+	Element.hide('RB_loading');
   },
 
   loading: function()
@@ -33,9 +34,15 @@ var RedBox = {
 
   close: function()
   {
-    new Effect.Fade('RB_window', {duration: 0.4});
-    new Effect.Fade('RB_overlay', {duration: 0.4});
-    this.showSelectBoxes();
+    new Effect.Fade('RB_window', {duration: 0.3});
+     new Effect.Fade('RB_overlay', {duration: 0.3});
+     $('RB_window').lastChild.style.display='none';
+     if (this.content_parentNode)
+     {
+        this.content_parentNode.appendChild($('RB_window').lastChild);
+         $(this.div_id).style.display='none';
+     }
+ this.showSelectBoxes();
   },
 
   showOverlay: function()
@@ -194,11 +201,12 @@ var RedBox = {
 
   cloneWindowContents: function(id)
   {
-    var content = $(id).cloneNode(true);
-    content.style['display'] = 'block';
-    $('RB_window').appendChild(content);  
-
-    this.setWindowPositions();
+    var content = $(id); //.cloneNode(true);
+     this.content_parentNode = content.parentNode;
+     this.div_id=id;
+     content.style['display'] = 'block';
+     $('RB_window').appendChild(content);
+     this.setWindowPositions();
   },
   
   hideSelectBoxes: function()

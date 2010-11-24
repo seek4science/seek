@@ -1,12 +1,15 @@
 require 'rubygems'
 require 'rake'
 require 'fileutils'
-
+require 'bundler'
 
 
 desc "task for cruise control"
 task :cruise do
-  ENV['RAILS_ENV'] = 'test'
+  RAILS_ENV = ENV['RAILS_ENV'] = 'test'
+  
+  `bundle install`
+  Bundler.setup(:default, :test)
   
   FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")      
   

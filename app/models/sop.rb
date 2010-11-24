@@ -3,6 +3,7 @@ require 'explicit_versioning'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
+require 'acts_as_versioned_resource'
 
 class Sop < ActiveRecord::Base
 
@@ -34,7 +35,7 @@ class Sop < ActiveRecord::Base
 
   explicit_versioning(:version_column => "version") do
     
-    acts_as_resource
+    acts_as_versioned_resource
     
     belongs_to :content_blob
     

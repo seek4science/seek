@@ -22,7 +22,7 @@
   <ul class="horiz_list_items">
     <% @organism.strains.each do |strain| -%>
       <li>
-        <%= h(strain.title) -%>
+        <%= h(strain.title) + (strain!=@organism.strains.last ? "," : "") -%>
       </li>
     <% end -%>    
   </ul>

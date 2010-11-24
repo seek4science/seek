@@ -1,57 +1,88 @@
 <% unless logged_in? -%>
-
 <div class="sysmo_gadget">
-  <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
-    
-  <div class="header">
-    <p>Log in / Register</p>
-  </div>
-  
-  <div class="contents">
-    <% form_tag session_path do %>
-      <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
-      <%= hidden_field_tag "called_from[action]", controller.action_name -%>
-      <%= hidden_field_tag "called_from[id]", params[:id] -%>
-			
-			<div class="box1">
-	  	<p class="label">
-          Login:
-	  	</p>
-	    <p>
-       	  <%= text_field_tag 'login', nil, :class => 'field', :style => "width: 140px;" %>
-	    </p>
-        <p class="label">
-	      Password:
-	    </p>
-	  	<p>
-      	  <%= password_field_tag 'password', nil, :class => 'field', :style => "width: 140px;" %>
-	  	</p>
-	  	
-		<p class="label">
-      	  Remember me: <%= check_box_tag 'remember_me' %>
+    <b class="xtop"><b class="xb1"></b><b class="xb2"></b><b class="xb3"></b><b class="xb4"></b></b>
+    <div class="header">
+        <p>
+            Log in / Register
         </p>
-
-		
-	  </div>
-	    
-      <p>
-        <%= submit_tag "Log in", :disable_with => "Logging in..." %>
-      </p>
-	  
-    <% end %>
-    
-    <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 93%;">
-      <b>Need an account?</b><br />
-      <b><%= link_to "Sign up", signup_url %></b>
-    </p>
-    <br/>
-    <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 83%;">
-      <b><%= link_to "Forgotten password?", forgot_password_url %></b>
-    </p>
-
-  </div>
-  
-  <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
+    </div>
+    <div class="contents">
+        <% form_tag session_path do %>
+        <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
+        <%= hidden_field_tag "called_from[action]", controller.action_name -%>
+        <%= hidden_field_tag "called_from[id]", params[:id] -%>
+        <div class="box1">
+            <div id="password_login">
+                <p class="label">
+                    Login:
+                </p>
+                <p>
+                    <%= text_field_tag 'login', nil, :class => 'field' -%>
+                </p>
+                <p class="label">
+                    Password:
+                </p>
+                <p>
+                    <%= password_field_tag 'password', nil, :class => 'field' -%>
+                </p>
+                <p class="label">
+                    Remember me: <%= check_box_tag 'remember_me',nil,false, {:style=>"width:2em;"} %>
+                </p>
+            </div>
+            <div id="openid_login" style="display: none">
+                <p class="label">
+                    <a href="http://openid.net/" target="_blank"><%= image_tag "openid-16x16.gif" %>OpenID:</a>
+                </p>
+                <p>
+                    <%= text_field_tag 'openid_identifier', nil, :class => 'field' -%>
+                </p>
+            </div>
+            <p>
+                Alternatively...
+                <br/>
+                <a href="#" id="login_toggle_link" onclick="toggleLogin();return false">Log in using <%= image_tag "openid-16x16.gif" %>OpenID</a>
+                <br/>
+            </p>
+        </div>
+        <p>
+            <%= submit_tag "Log in" %>
+        </p>
+        <% end %>
+        <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 93%;">
+            <b>Need an account?</b>
+            <br/>
+            <b><%= link_to "Sign up", signup_url %></b>
+        </p>
+        <br/>
+        <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 83%;">
+            <b><%= link_to "Forgotten password?", forgot_password_url %></b>
+        </p>
+    </div>
+    <b class="xbottom"><b class="xb5"></b><b class="xb6"></b><b class="xb7"></b><b class="xb1"></b></b>
 </div>
-
 <% end -%>
+<script type="text/javascript">
+    function toggleLogin(){
+        var elem1 = $('password_login');
+        var elem2 = $('openid_login');
+        var link = $('login_toggle_link');
+        if (elem1.style.display == 'none') {
+            link.innerHTML = '<%= "Log in using "+image_tag("openid-16x16.gif")+"OpenID" %>';
+            Effect.BlindUp('openid_login', {
+                duration: 0.2
+            });
+            Effect.BlindDown('password_login', {
+                duration: 0.2
+            });
+        }
+        else {
+            link.innerHTML = "Log in using username/password";
+            Effect.BlindUp('password_login', {
+                duration: 0.2
+            });
+            Effect.BlindDown('openid_login', {
+                duration: 0.2
+            });
+        }
+    }
+</script>

@@ -24,10 +24,10 @@
         <div id="description" class="box_standout">
             <%= text_or_not_specified(@investigation.description, :description=>true,:auto_link=>true) %>
         </div>
-    </p>
+    </p>	
     <br/>
     
-	<%= embedded_isa_svg(@investigation) -%>
+	<%= embedded_isa_svg(@investigation,false) -%>
 	
     <%= render :partial=>"layouts/items_related_to",:object => @investigation %>
 </div>

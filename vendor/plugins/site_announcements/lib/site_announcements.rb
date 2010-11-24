@@ -7,8 +7,8 @@ module SiteAnnouncements
     module ClassMethods
       def acts_as_notifiee(options = {}, &extension)
         
-        has_one :notifiee_info,:dependent=>:destroy,:as=>:notifiee
-                       
+        has_one :notifiee_info,:dependent=>:destroy,:as=>:notifiee    
+        
         before_save :check_for_notifiee_info
         
         extend SiteAnnouncements::Acts::SingletonMethods

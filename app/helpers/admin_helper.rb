@@ -4,5 +4,15 @@ module AdminHelper
   def dubious_tag?(tag)
     tag.name.length>50 || [";",",",":","/","|"].detect{|c| tag.name.include?(c)}
   end
+  
+  def admin_mail_to_links   
+    result=""
+    admins=Person.admins
+    admins.each do |person|
+      result << mail_to(person.email,person.name)
+      result << ", " unless admins.last==person
+    end
+    return result    
+  end
 
 end

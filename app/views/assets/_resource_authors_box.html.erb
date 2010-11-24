@@ -6,7 +6,7 @@
 <div class="contribution_section_box" style="padding: 0.5em 0 1em 0;">
   <p class="heading">
     <%= help_icon("The authors are the people who originally created this file.") -%>
-    Creators <span class="count_text">(<%= creators.length -%>)</span>
+    Creators
     <a name="authors"></a>
     <% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
       <p style="text-align:center; margin: 0; padding: 0;"><small>[ <%= link_to "edit", edit_polymorphic_path(resource) %> ]</small></p>
@@ -15,7 +15,7 @@
   <p>
   <% creators.each do |creator| %>
     <% if creators.count < 3 #display full avatar if not too many authors %>
-      <%= favouritable_icon(creator, 80) -%><br/>
+      <%= favouritable_icon(creator, 60) -%><br/>
     <% end %>
     <%= link_to(h(creator.name), url_for(creator)) -%><br/>
   <% end %>

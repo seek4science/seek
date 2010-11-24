@@ -1,40 +1,42 @@
-require 'model_execution'
-
-class ModelsController < ApplicationController
+class ModelsController < ApplicationController    
   
-  include ModelExecution
   include WhiteListHelper
   include IndexPager
+  include DotGenerator
+  include Seek::AssetsCommon
   
   before_filter :login_required
   
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_model_auth, :except => [ :index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource ]
-  before_filter :find_display_model, :only=>[:show,:download]
+  before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url]
+  before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
+  
+  @@model_builder = Seek::JWSModelBuilder.new
   
   # GET /models
   # GET /models.xml
   
-  
   def new_version
-    data = params[:data].read
-    comments = params[:revision_comment]
-    @model.content_blob = ContentBlob.new(:data => data)
-    @model.content_type = params[:data].content_type
-    @model.original_filename = params[:data].original_filename
-    respond_to do |format|
-      if @model.save_as_new_version(comments)
-        flash[:notice]="New version uploaded - now on version #{@model.version}"
-      else
-        flash[:error]="Unable to save new version"          
+    if (handle_data nil)
+      
+      comments = params[:revision_comment]
+      @model.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
+      @model.content_type = params[:model][:content_type]
+      @model.original_filename = params[:model][:original_filename]
+      
+      respond_to do |format|
+        create_new_version comments
+        format.html {redirect_to @model }
       end
-      format.html {redirect_to @model }
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @model
     end
-  end
+  end    
   
   def delete_model_metadata
     attribute=params[:attribute]
@@ -45,6 +47,96 @@ class ModelsController < ApplicationController
     end
   end
   
+  def builder
+    saved_file=params[:saved_file]
+    error=nil
+    begin
+      if saved_file
+        supported=true
+        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
+      else
+        supported = @@model_builder.is_supported?(@display_model)
+        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+      end
+    rescue Exception=>e
+      error=e
+    end
+    
+    respond_to do |format|
+      if error
+        flash[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+      elsif !supported
+        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        format.html { redirect_to(@model,:version=>@display_model.version)}        
+      else
+        format.html
+      end
+    end
+  end    
+  
+  def submit_to_jws
+    following_action=params.delete("following_action")    
+    
+    @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct @display_model,params
+    if (@error_keys.empty?)
+      if following_action == "simulate"
+        @applet=@@model_builder.simulate @saved_file
+      elsif following_action == "save_new_version"
+        model_format=params.delete("saved_model_format") #only used for saving as a new version
+        new_version_filename=params.delete("new_version_filename")
+        new_version_comments=params.delete("new_version_comments")
+        if model_format == "dat"
+          url=@@model_builder.saved_dat_download_url @saved_file                    
+        elsif model_format == "sbml"
+          url=@@model_builder.sbml_download_url @saved_file          
+        end
+        if url
+          downloader=Jerm::HttpDownloader.new
+          data_hash = downloader.get_remote_data url
+          @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
+          @model.content_type=data_hash[:content_type] 
+          @model.original_filename=new_version_filename
+        end
+      end
+    end
+    respond_to do |format|      
+      if @error_keys.empty? && following_action == "simulate"        
+        format.html {render :action=>"simulate",:layout=>"no_sidebar"}
+      elsif @error_keys.empty? && following_action == "save_new_version"
+        create_new_version new_version_comments
+        format.html {redirect_to @model }
+      else
+        format.html { render :action=>"builder" }
+      end      
+    end
+  end
+  
+  def simulate
+    error=nil
+    begin
+      supported = @@model_builder.is_supported?(@display_model)
+      if supported
+        @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
+        @applet=@@model_builder.simulate saved_file
+      end
+    rescue Exception=>e
+      error=e
+    end
+    
+    respond_to do |format|
+      if error
+        flash[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+      elsif !supported
+        flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
+        format.html { redirect_to(@model,:version=>@display_model.version)}        
+      else
+        format.html {render :layout=>"no_sidebar"}
+      end
+    end
+    
+  end
   
   def update_model_metadata
     attribute=params[:attribute]
@@ -101,8 +193,7 @@ class ModelsController < ApplicationController
       info_colour= success ? "green" : "red"
       page << "$('model_format_info').style.color='#{info_colour}';"
       page.visual_effect :appear, "model_format_info"      
-    end
-    
+    end    
   end
   
   def create_model_metadata
@@ -225,19 +316,6 @@ class ModelsController < ApplicationController
     
   end
   
-  def execute
-    version=params[:version]
-    begin
-      @applet= jws_execution_applet @model.find_version(version)
-    rescue Exception => e      
-        @error_details=e.message       
-    end
-    
-    render :update do |page|
-      page.replace_html "execute_model",:partial=>"execute_applet"
-    end
-    
-  end
   
   # GET /models/1
   # GET /models/1.xml
@@ -253,12 +331,15 @@ class ModelsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
+      format.svg { render :text=>to_svg(@model,params[:deep]=='true',@model)}
+      format.dot { render :text=>to_dot(@model,params[:deep]=='true',@model)}
+      format.png { render :text=>to_png(@model,params[:deep]=='true',@model)}
     end
   end
   
   # GET /models/new
   # GET /models/new.xml
-  def new
+  def new    
     respond_to do |format|
       if Authorization.is_member?(current_user.person_id, nil, nil)
         format.html # new.html.erb
@@ -276,39 +357,11 @@ class ModelsController < ApplicationController
   
   # POST /models
   # POST /models.xml
-  def create
-    if (params[:model][:data]).blank?
-      respond_to do |format|
-        flash.now[:error] = "Please select a file to upload."
-        format.html {
-          set_parameters_for_sharing_form()
-          render :action => "new"
-        }
-      end
-    elsif (params[:model][:data]).size == 0
-      respond_to do |format|
-        flash.now[:error] = "The file that you have selected is empty. Please check your selection and try again!"
-        format.html {
-          set_parameters_for_sharing_form()
-          render :action => "new"
-        }
-      end
-    else
-      # create new Model and content blob - non-empty file was selected
-      
-      # prepare some extra metadata to store in Model instance
-      params[:model][:contributor_type] = "User"
-      params[:model][:contributor_id] = current_user.id
-      
-      # store properties and contents of the file temporarily and remove the latter from params[],
-      # so that when saving main object params[] wouldn't contain the binary data anymore
-      params[:model][:content_type] = (params[:model][:data]).content_type
-      params[:model][:original_filename] = (params[:model][:data]).original_filename
-      data = params[:model][:data].read
-      params[:model].delete('data')     
-      
+  def create    
+    if handle_data
       @model = Model.new(params[:model])
-      @model.content_blob = ContentBlob.new(:data => data)
+      @model.contributor = current_user
+      @model.content_blob = ContentBlob.new(:data => @data,:url=>@data_url)
       
       respond_to do |format|
         if @model.save
@@ -317,6 +370,9 @@ class ModelsController < ApplicationController
           
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
+          
+          # update related publications
+          Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
@@ -336,29 +392,17 @@ class ModelsController < ApplicationController
         end
       end
     end
+    
   end
   
-  # GET /models/1;download
+  # GET /models/1/download
   def download
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
-    @model.save_without_timestamping
+    @model.save_without_timestamping    
     
-    #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
-    #@display_model.last_used_at = Time.now
-    #@display_model.save_without_timestamping
-    
-    if @display_model.content_blob.url.blank?
-      if @display_model.content_blob.file_exists?
-        send_file @display_model.content_blob.filepath, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
-      else
-        send_data @display_model.content_blob.data, :filename => @display_model.original_filename, :content_type => @display_model.content_type, :disposition => 'attachment'
-      end
-      
-    else
-      download_jerm_resource @display_model
-    end
+    handle_download @display_model
   end
   
   # PUT /models/1
@@ -381,6 +425,9 @@ class ModelsController < ApplicationController
         
         # update attributions
         Relationship.create_or_update_attributions(@model, params[:attributions])
+        
+        # update related publications
+        Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@model, params[:creators])
@@ -414,7 +461,7 @@ class ModelsController < ApplicationController
   end
   
   def preview
-
+    
     element = params[:element]
     model = Model.find_by_id(params[:id])
     
@@ -440,6 +487,14 @@ class ModelsController < ApplicationController
   
   protected
   
+  def create_new_version comments
+    if @model.save_as_new_version(comments)
+      flash[:notice]="New version uploaded - now on version #{@model.version}"
+    else
+      flash[:error]="Unable to save new version"          
+    end    
+  end
+  
   def default_items_per_page
     return 2
   end
@@ -452,8 +507,9 @@ class ModelsController < ApplicationController
   
   def find_model_auth
     begin
-      action=action_name
-      action="download" if action=="execute"
+      action=action_name      
+      action="download" if action == "simulate"
+      action="edit" if ["submit_to_jws","builder"].include?(action)
       
       model = Model.find(params[:id])
       

@@ -7,8 +7,6 @@ class UsersController < ApplicationController
   
   # render new.rhtml
   def new
-    @user=User.new
-    
   end
 
   def create
@@ -17,29 +15,49 @@ class UsersController < ApplicationController
     # request forgery protection.
     # uncomment at your own risk
     # reset_session
-    @user = User.new(params[:user])
-
-    #first user is automatically set as an admin user
-    @user.is_admin=true if User.count == 0
-    
-    @user.save
-    
-    if @user.errors.empty?
-      @user.activate unless ACTIVATION_REQUIRED
-      self.current_user = @user
-      redirect_to(select_people_path)
+    if using_open_id?
+      open_id_authentication(params[:openid_identifier])
     else
-      render :action => 'new'
+      @user = User.new(:login => params[:login], :password => params[:password], :password_confirmation => params[:password_confirmation])
+      check_registration
+    end
+
+  end
+
+  def set_openid
+    @user = User.find(params[:id])
+    authenticate_with_open_id do |result, identity_url|
+      if result.successful?
+        @user.openid = identity_url
+        if @user.save
+          flash[:notice] = "OpenID successfully set"
+          redirect_to(@user.person)
+        else
+          puts @user.errors.full_messages.to_sentence
+          puts @user.openid
+          redirect_to(edit_user_path(@user))
+        end
+      else
+        flash[:error] = result.message
+        redirect_to(edit_user_path(@user))
+      end
     end
   end
 
   def activate
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
     if logged_in? && !current_user.active?
-      current_user.activate
-      Mailer.deliver_welcome current_user, base_host
-      flash[:notice] = "Signup complete!"
-      redirect_to current_user.person
+      current_user.activate      
+      if (current_user.person.projects.empty? && User.count>1)
+        Mailer.deliver_welcome_no_projects current_user, base_host      
+        logout_user
+        flash[:notice] = "Signup complete! However, you will need to wait for an administrator to associate you with your project(s) before you can login."        
+        redirect_to new_session_path
+      else
+        Mailer.deliver_welcome current_user, base_host      
+        flash[:notice] = "Signup complete!"
+        redirect_to current_user.person
+      end
     else
       redirect_back_or_default('/')
     end
@@ -110,12 +128,7 @@ class UsersController < ApplicationController
     
     @user.person=person if !person.nil?
     
-    @user.attributes=params[:user]
-
-    if (!person.nil? && person.is_pal?)
-      @user.can_edit_projects=true
-      @user.can_edit_institutions=true
-    end
+    @user.attributes=params[:user]    
 
     respond_to do |format|
       
@@ -148,6 +161,78 @@ class UsersController < ApplicationController
     end
     
     redirect_to :controller => 'home', :action => 'index'
+  end
+  
+  protected
+  
+  def open_id_authentication(identity_url)
+    # Pass optional :required and :optional keys to specify what sreg fields you want.
+    # Be sure to yield registration, a third argument in the #authenticate_with_open_id block.
+    authenticate_with_open_id(identity_url,        
+        :required => [:email, :fullname,
+                      'http://schema.openid.net/contact/email',
+                      'http://openid.net/schema/contact/email',
+                      'http://axschema.org/contact/email',
+                      'http://schema.openid.net/namePerson',
+                      'http://openid.net/schema/namePerson',
+                      'http://axschema.org/namePerson']) do |result, identity_url, registration|
+      case result.status
+      when :missing
+        failed_registration "Sorry, the OpenID server couldn't be found"
+      when :invalid
+        failed_registration "Sorry, but this does not appear to be a valid OpenID"
+      when :canceled
+        failed_registration "OpenID verification was canceled"
+      when :failed
+        failed_registration "Sorry, the OpenID verification failed"
+      when :successful
+        if !User.find_by_openid(identity_url)
+          @openid_details = {}
+          @openid_details[:email] = registration['email']
+          name = registration['fullname']
+          ax_response = OpenID::AX::FetchResponse.from_success_response(request.env[Rack::OpenID::RESPONSE])
+          @openid_details[:email] ||= ax_response['http://schema.openid.net/contact/email'].first
+          @openid_details[:email] ||= ax_response['http://openid.net/schema/contact/email'].first
+          @openid_details[:email] ||= ax_response['http://axschema.org/contact/email'].first
+          name ||= ax_response['http://schema.openid.net/namePerson'].first
+          name ||= ax_response['http://openid.net/schema/namePerson'].first
+          name ||= ax_response['http://axschema.org/namePerson'].first
+          if name
+            @openid_details[:first_name], @openid_details[:last_name] = name.split(" ", 2)
+          end
+          @user = User.new(:openid => identity_url)
+          check_registration
+        else
+          failed_registration "There is already a user registered with the given OpenID URL"
+        end
+      end
+    end
+  end
+  
+  private 
+  
+  def check_registration       
+    if @user.save
+      successful_registration
+    else
+      failed_registration @user.errors.full_messages.to_sentence
+    end
+  end
+  
+  def failed_registration(message)
+    flash[:error] = message
+    redirect_to(new_user_url)
+  end
+  
+  def successful_registration
+    @user.activate unless activation_required?
+    self.current_user = @user
+    @openid_details ||= nil
+    redirect_to(select_people_path(:openid_details => @openid_details))
+  end
+  
+  def activation_required?
+    ACTIVATION_REQUIRED && User.count>1
   end
 
 end

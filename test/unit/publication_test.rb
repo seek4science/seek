@@ -2,7 +2,7 @@ require 'test_helper'
 
 class PublicationTest < ActiveSupport::TestCase
   
-  fixtures :publications
+  fixtures :all
   
   test "test uuid generated" do
     x = publications(:one)
@@ -18,6 +18,27 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal("a pub",x.title)
   end
   
+  test "creators order is returned in the order they were added" do
+    p=Publication.new(:title=>"The meaining of life",:abstract=>"Chocolate",:pubmed_id=>"777",:project=>projects(:sysmo_project))
+    p.save!
+    assert_equal 0,p.creators.size
+    
+    p1=people(:modeller_person)
+    p2=people(:fred)    
+    p3=people(:aaron_person)
+    p4=people(:pal)
+    
+    p.creators << p1
+    p.creators << p2    
+    p.creators << p3
+    p.creators << p4
+    
+    p.save!
+    
+    assert_equal 4,p.creators.size
+    assert_equal [p1,p2,p3,p4],p.creators
+  end
+  
   test "uuid doesn't change" do
     x = publications(:one)
     x.save
@@ -25,4 +46,12 @@ class PublicationTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+  
+  def test_project_required
+    p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
+    assert !p.valid?
+    p.project=projects(:sysmo_project)
+    assert p.valid?
+  end
+  
 end

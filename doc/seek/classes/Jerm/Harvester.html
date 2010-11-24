@@ -82,8 +82,8 @@
       <p>
 This can be concidered an Abstract class and should be extended for you own
 <a href="Harvester.html">Harvester</a>. In your specialised class you need
-to implement the methods <a href="Harvester.html#M000016">changed_since</a>
-and <a href="Harvester.html#M000015">construct_resource</a>.
+to implement the methods <a href="Harvester.html#M000015">changed_since</a>
+and <a href="Harvester.html#M000014">construct_resource</a>.
 </p>
 
     </div>
@@ -95,11 +95,11 @@ and <a href="Harvester.html#M000015">construct_resource</a>.
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000016">changed_since</a>&nbsp;&nbsp;
-      <a href="#M000015">construct_resource</a>&nbsp;&nbsp;
-      <a href="#M000014">last_run</a>&nbsp;&nbsp;
-      <a href="#M000012">new</a>&nbsp;&nbsp;
-      <a href="#M000013">update</a>&nbsp;&nbsp;
+      <a href="#M000015">changed_since</a>&nbsp;&nbsp;
+      <a href="#M000014">construct_resource</a>&nbsp;&nbsp;
+      <a href="#M000013">last_run</a>&nbsp;&nbsp;
+      <a href="#M000011">new</a>&nbsp;&nbsp;
+      <a href="#M000012">update</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -137,11 +137,11 @@ The base URI for the Data Storage system to be Harvested.
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000012" class="method-detail">
-        <a name="M000012"></a>
+      <div id="method-M000011" class="method-detail">
+        <a name="M000011"></a>
 
         <div class="method-heading">
-          <a href="#M000012" class="method-signature">
+          <a href="#M000011" class="method-signature">
           <span class="method-name">new</span><span class="method-args">(base_uri,user, pass)</span>
           </a>
         </div>
@@ -152,8 +152,8 @@ Initialized the <a href="Harvester.html">Harvester</a> with the base_uri,
 username and password.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000012-source">
+            onclick="toggleCode('M000011-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000011-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 10</span>
 10:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">base_uri</span>,<span class="ruby-identifier">user</span>, <span class="ruby-identifier">pass</span>)
@@ -169,11 +169,11 @@ username and password.
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000014" class="method-detail">
-        <a name="M000014"></a>
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
 
         <div class="method-heading">
-          <a href="#M000014" class="method-signature">
+          <a href="#M000013" class="method-signature">
           <span class="method-name">last_run</span><span class="method-args">()</span>
           </a>
         </div>
@@ -181,14 +181,14 @@ username and password.
         <div class="method-description">
           <p>
 returns the time that this <a href="Harvester.html">Harvester</a> was last
-run, and causes only <a href="Harvester.html#M000012">new</a> resources
+run, and causes only <a href="Harvester.html#M000011">new</a> resources
 since this time to be returned by <a
-href="Harvester.html#M000013">update</a>. This date is passed to <a
-href="Harvester.html#M000016">changed_since</a>.
+href="Harvester.html#M000012">update</a>. This date is passed to <a
+href="Harvester.html#M000015">changed_since</a>.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000014-source">
+            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000013-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 32</span>
 32:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">last_run</span>
@@ -199,11 +199,11 @@ href="Harvester.html#M000016">changed_since</a>.
         </div>
       </div>
 
-      <div id="method-M000013" class="method-detail">
-        <a name="M000013"></a>
+      <div id="method-M000012" class="method-detail">
+        <a name="M000012"></a>
 
         <div class="method-heading">
-          <a href="#M000013" class="method-signature">
+          <a href="#M000012" class="method-signature">
           <span class="method-name">update</span><span class="method-args">()</span>
           </a>
         </div>
@@ -211,15 +211,15 @@ href="Harvester.html#M000016">changed_since</a>.
         <div class="method-description">
           <p>
 Generates an Enumeration of Jerm::Resources that have changed since the
-value returned by <a href="Harvester.html#M000014">last_run</a>. This
+value returned by <a href="Harvester.html#M000013">last_run</a>. This
 method ties together the methods <a
-href="Harvester.html#M000016">changed_since</a> and <a
-href="Harvester.html#M000015">construct_resource</a> and is unlikely to be
+href="Harvester.html#M000015">changed_since</a> and <a
+href="Harvester.html#M000014">construct_resource</a> and is unlikely to be
 changed in your subclass.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000013-source">
+            onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000012-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 19</span>
 19:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update</span>      
@@ -239,11 +239,11 @@ changed in your subclass.
 
       <h3 class="section-bar">Protected Instance methods</h3>
 
-      <div id="method-M000016" class="method-detail">
-        <a name="M000016"></a>
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
 
         <div class="method-heading">
-          <a href="#M000016" class="method-signature">
+          <a href="#M000015" class="method-signature">
           <span class="method-name">changed_since</span><span class="method-args">(since_date)</span>
           </a>
         </div>
@@ -252,11 +252,11 @@ changed in your subclass.
           <p>
 Returns an Enumeration of items changed since the <em>since_date</em>.
 These items are subsequently passed to <a
-href="Harvester.html#M000015">construct_resource</a>.
+href="Harvester.html#M000014">construct_resource</a>.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000016-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000016-source">
+            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000015-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 45</span>
 45:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">changed_since</span> <span class="ruby-identifier">since_date</span>
@@ -267,11 +267,11 @@ href="Harvester.html#M000015">construct_resource</a>.
         </div>
       </div>
 
-      <div id="method-M000015" class="method-detail">
-        <a name="M000015"></a>
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
 
         <div class="method-heading">
-          <a href="#M000015" class="method-signature">
+          <a href="#M000014" class="method-signature">
           <span class="method-name">construct_resource</span><span class="method-args">(item)</span>
           </a>
         </div>
@@ -279,15 +279,15 @@ href="Harvester.html#M000015">construct_resource</a>.
         <div class="method-description">
           <p>
 This method it responsible for constructing a <a
-href="Harvester.html#M000012">new</a> <a
+href="Harvester.html#M000011">new</a> <a
 href="Resource.html">Jerm::Resource</a>, based upon the information
 provided by <em>item</em>. It is entirely up to you what type is used for
 <em>item</em>, but within SysMO-DB we tend to use a Hash containg property
 value pairs.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000015-source">
+            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000014-source">
 <pre>
     <span class="ruby-comment cmt"># File lib/jerm/harvester.rb, line 40</span>
 40:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">construct_resource</span> <span class="ruby-identifier">item</span>

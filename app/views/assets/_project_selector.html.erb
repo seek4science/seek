@@ -12,10 +12,10 @@
 	  <%= image_tag icon_filename_for_key("spinner"), :id => "policy_loading_spinner", :alt=>"loading...", :title=>"loading...", :style => "display: none; vertical-align: middle; float: right;" -%>
 		
 		<% front_part_of_msg = (disable_project_select ? "Previously you have chosen to associate this #{resource_type} with the<br/>project below. You are not allowed to change this. Please<br/>contact administrator to amend the association." : "Please choose a project to associate this #{resource_type} with. You will<br/>not be able to amend this association afterwards.") -%>
-		<%= help_icon("#{front_part_of_msg}<br/><br/><b>\"Load sharing defaults\"</b> button will reset any sharing<br/>options to default options set by a PAL for selected project.<br/>This will discard any changes you might have made.") -%>
+		<%= help_icon("#{front_part_of_msg}") -%>
 		
 		<% unless disable_project_select -%>
-          <b>Associate this <%= resource_type -%> with the following project</b><span class="required">*</span>
+          <b>Project:</b><span class="required">*</span>
 	  <% else -%>
           <b>This <%= resource_type -%> is associated with the following project</b>
 		<% end -%>

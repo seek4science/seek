@@ -30,7 +30,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test "should create publication" do
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 3 }
+      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id }
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -38,7 +38,7 @@ class PublicationsControllerTest < ActionController::TestCase
   
   test "should create doi publication" do
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1371/journal.pone.0004803" } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "10.1371/journal.pone.0004803",:project_id=>projects(:sysmo_project).id } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -59,25 +59,31 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 2, p.non_seek_authors.size
     assert_equal 0, p.creators.size
     
-    seek_author = people(:quentin_person)
+    seek_author1 = people(:modeller_person)
+    seek_author2 = people(:quentin_person)    
     
     #Associate a non-seek author to a seek person
 
     #Check the non_seek_authors (PublicationAuthors) decrease by 1, and the
     # seek_authors (AssetsCreators) increase by 1.
-    assert_difference('PublicationAuthor.count', -1) do
-      assert_difference('AssetsCreator.count', 1) do
-        put :update, :id => p.id, :author => {p.non_seek_authors.first.id => seek_author.id}
+    assert_difference('PublicationAuthor.count', -2) do
+      assert_difference('AssetsCreator.count', 2) do
+        put :update, :id => p.id, :author => {p.non_seek_authors[1].id => seek_author2.id,p.non_seek_authors[0].id => seek_author1.id}
       end
     end
     
-    assert_redirected_to publication_path(p)
+    assert_redirected_to publication_path(p)    
+    p.reload
+    
+    #make sure that the authors are stored according to key, and that creators keeps the order
+    assert_equal [seek_author1,seek_author2],p.assets_creators.sort_by(&:id).collect(&:creator)
+    assert_equal [seek_author1,seek_author2],p.creators
   end
   
   test "should disassociate authors" do
     p = publications(:one)
     p.creators << people(:quentin_person)
-    p.creators << people(:two)
+    p.creators << people(:aaron_person)
     
     assert_equal 0, p.non_seek_authors.size
     assert_equal 2, p.creators.size
@@ -94,11 +100,10 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test "should update project" do
     p = publications(:one)
-    assert p.project.nil?
-    
-    put :update, :id => p.id, :author => {}, :publication => {:project_id => projects(:one).id}
-    
-    assert_equal projects(:one), assigns(:publication).project
+    assert_equal projects(:sysmo_project), p.project   
+    put :update, :id => p.id, :author => {}, :publication => {:project_id => projects(:one).id}  
+    assert_redirected_to publication_path(p)
+    assert_equal projects(:one), Publication.find(p.id).project
   end
 
   test "should destroy publication" do

@@ -21,6 +21,7 @@ class Relationship < ActiveRecord::Base
   
   ATTRIBUTED_TO = "attributed_to"
   CREDITED_FOR = "credited_for"
+  RELATED_TO_PUBLICATION = "related_to_publication"
   
   # **********************************************************************
   
@@ -30,7 +31,7 @@ class Relationship < ActiveRecord::Base
   # it will make sure that if some attributions are to have the same data as
   # before, then these will not get deleted (and re-created afterwards, but
   # will be kept intact in first place)
-  def self.create_or_update_attributions(resource, attributions_from_params)
+  def self.create_or_update_attributions(resource, attributions_from_params, predicate = Relationship::ATTRIBUTED_TO)
     received_attributions = (attributions_from_params.blank? ? [] : ActiveSupport::JSON.decode(attributions_from_params)) 
     
     # build a more convenient hash structure with attribution parameters
@@ -46,7 +47,7 @@ class Relationship < ActiveRecord::Base
     
     # first delete any old attributions that are no longer valid
     changes_made = false
-    resource.attributions.each do |a|
+    resource.relationships.each do |a|
       unless (new_attributions["#{a.object_type}"] && new_attributions["#{a.object_type}"].include?(a.object_id))
         a.destroy
         changes_made = true
@@ -60,7 +61,7 @@ class Relationship < ActiveRecord::Base
     new_attributions.each_key do |attributable_type|
       new_attributions["#{attributable_type}"].each do |attributable_id|
         unless (found = Relationship.find(:first, :conditions => { :subject_type => resource.class.name, :subject_id => resource.id, :predicate => Relationship::ATTRIBUTED_TO, :object_type => attributable_type, :object_id => attributable_id }))
-          Relationship.create(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => Relationship::ATTRIBUTED_TO, :object_type => attributable_type, :object_id => attributable_id)
+          Relationship.create(:subject_type => resource.class.name, :subject_id => resource.id, :predicate => predicate, :object_type => attributable_type, :object_id => attributable_id)
         end
       end
     end

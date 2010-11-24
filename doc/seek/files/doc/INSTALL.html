@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Tue Jun 29 21:55:04 +0100 2010</td>
+      <td>Mon Nov 22 17:02:28 +0000 2010</td>
     </tr>
     </table>
   </div>
@@ -71,19 +71,19 @@
     <div id="description">
       <h1>Installation</h1>
 <p>
-SysMO-SEEK is based upon the Ruby on Rails platform. Although the
-information on this page should provide you with everything you need to get
-a basic installation of SysMO-SEEK up and running, some background reading
-on Ruby on Rails would be beneficial if it is new to you. Documentation and
-resources describing Ruby on Rails can be found at <a
+SEEK is based upon the Ruby on Rails platform. Although the information on
+this page should provide you with everything you need to get a basic
+installation of SEEK up and running, some background reading on Ruby on
+Rails would be beneficial if it is new to you. Documentation and resources
+describing Ruby on Rails can be found at <a
 href="http://rubyonrails.org/documentation">rubyonrails.org/documentation</a>
 and there are some good guides at <a
 href="http://guides.rubyonrails.org">guides.rubyonrails.org</a>/.
 </p>
 <p>
-We recommend that you run SysMO-SEEK on a Linux system. All of the examples
-here describe installing on an Ubuntu or Debian system, but should be
-easily transferrable to other Linux systems such as Fedora.
+We recommend that you run SEEK on a Linux system. All of the examples here
+describe installing on an Ubuntu or Debian system, but should be easily
+transferrable to other Linux systems such as Fedora.
 </p>
 <p>
 Although possible, installing and running Ruby on Rails on a Windows system
@@ -109,24 +109,29 @@ compilation. The Ubuntu/Debian package <em>build-essentials</em> should be
 sufficient
 </p>
 <p>
-SysMO-SEEK uses Lucene as its search engine, and this requires that java is
+SEEK uses Lucene as its search engine, and this requires that java is
 installed. We use the Sun Java 1.6 package <em>sun-java6-jdk</em>
 </p>
 <p>
-If using Ubuntu or Debian, the following commands should install all the
+<b>Note:You will need to enable Partner sources to install
+sun-java6-jdk</b> (if you are unsure of how to do this, see <a
+href="https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories">help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories</a>).
+</p>
+<p>
+If using Ubuntu or Debian, the following commands should install most the
 packages you need:
 </p>
 <pre>
-  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
+  sudo apt-get install wget mercurial ruby rdoc libsqlite3-dev sqlite3 ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
 </pre>
 <p>
 For Ubuntu 10.04 (Lucid Lynx) you should use:
 </p>
 <pre>
-  sudo apt-get install mercurial ruby rdoc ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev graphviz
+  sudo apt-get install wget mercurial ruby rdoc libsqlite3-dev sqlite3 ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
 </pre>
 <p>
-You now need to install rubygems (1.3.6). Rather than install through
+You now need to install rubygems (1.3.7). Rather than install through
 apt-get, we recommend downloading and installing from the rubygems website:
 <a
 href="http://rubygems.org/pages/download">rubygems.org/pages/download</a>.
@@ -135,45 +140,45 @@ system.
 </p>
 <pre>
   cd /tmp
-  wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.6.tgz
-  tar zfxv rubygems-1.3.6.tgz
-  cd rubygems-1.3.6/
+  wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.7.tgz
+  tar zfxv rubygems-1.3.7.tgz
+  cd rubygems-1.3.7/
   sudo ruby ./setup.rb
   cd /usr/bin/
   sudo ln -s gem1.8 gem
   cd -
-</pre>
-<p>
-If using Ubuntu or Debian, the following commands should install all the
-gems you need:
-</p>
-<pre>
-  sudo gem install rails mysql rmagick hpricot uuidtools RedCloth mongrel sqlite3-ruby
-</pre>
-<p>
-Also specific versions of <em>fastercsv</em> and <em>libxml-ruby</em> are
-required:
-</p>
-<pre>
-  sudo gem install fastercsv -v 1.5.1
-  sudo gem install libxml-ruby -v 1.1.3
 </pre>
 <h2>Getting the source code</h2>
 <p>
 Our source code is stored within the <a
 href="http://code.google.com/p/sysmo-db/">Sysmo-DB Google Code
 Repository</a>, using <a href="http://mercurial.selenic.com/">Mercurial</a>
-as the version control system. For a stable version, you should check out
-according to a stable tag. Our current tag is v0.8.2, so to retrieve this
-version you should use:
+as the version control system.
+</p>
+<p>
+For a stable version, you should check out according to a stable tag. Our
+current tag is v0.9.1, so to retrieve this version you should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.8.2 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.9.1 sysmo-seek
+</pre>
+<p>
+<a href="http://gembundler.com/">Bundler</a> is used to manage gems, so to
+install the required gems you first need to install the bundler gem:
+</p>
+<pre>
+  sudo gem install bundler
+</pre>
+<p>
+Then from within the sysmo-seek directory run
+</p>
+<pre>
+  bundle install
 </pre>
 <h2>The RAILS_ENV environment variable</h2>
 <p>
-If you are setting up SysMO-SEEK as a production environment, rather than
-for development, you should set the RAILS_ENV variable before proceeding
+If you are setting up SEEK as a production environment, rather than for
+development, you should set the RAILS_ENV variable before proceeding
 </p>
 <pre>
   export RAILS_ENV=production
@@ -257,11 +262,11 @@ this will provide you with some admin facilities for creating new projects,
 institutions and profiles.
 </p>
 <p>
-Here you can also define additional adminstrator users.
+Here you can also define additional administrator users.
 </p>
 <h2>Contacting us and other users</h2>
 <p>
-There is a public Google Group available for Sysmo-SEEK at <a
+There is a public Google Group available for SEEK at <a
 href="http://groups.google.com/group/sysmo-seek">groups.google.com/group/sysmo-seek</a>
 </p>
 

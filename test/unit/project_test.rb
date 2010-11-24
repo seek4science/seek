@@ -18,15 +18,7 @@ class ProjectTest < ActiveSupport::TestCase
     wg=WorkGroup.find(:all).first
     assert_same 1,wg.project_id
   end
-
-  def test_publications
-    project=projects(:sysmo_project)
-
-    assert_equal 2,project.publications.count
-    
-    assert project.publications.include?(publications(:two))
-    assert project.publications.include?(publications(:taverna_paper_pubmed))
-  end
+      
 
   def test_title_alias_for_name
     p=projects(:sysmo_project)
@@ -77,6 +69,16 @@ class ProjectTest < ActiveSupport::TestCase
     p=Project.find(p.id)
     assert_equal cred,p.site_credentials
   end
+  
+  def test_publications_association
+    project=projects(:sysmo_project)
+
+    assert_equal 3,project.publications.count
+    
+    assert project.publications.include?(publications(:one))
+    assert project.publications.include?(publications(:two))
+    assert project.publications.include?(publications(:taverna_paper_pubmed))
+  end
 
   def test_projects_with_userless_people
     projects=Project.with_userless_people
@@ -118,7 +120,7 @@ class ProjectTest < ActiveSupport::TestCase
     u=users(:cant_edit)
     p=projects(:three)
     assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
-  end
+  end    
 
   def test_update_first_letter
     p=Project.new(:name=>"test project")

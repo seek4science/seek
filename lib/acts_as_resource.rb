@@ -19,6 +19,14 @@ module Mib
         def acts_as_resource
           belongs_to :contributor, :polymorphic => true
           
+          #checks a policy exists, and if missing resorts to using a private policy
+          before_save :policy_or_default
+          
+          has_many :relationships, 
+            :class_name => 'Relationship',
+            :as => :subject,
+            :dependent => :destroy
+          
           has_many :attributions, 
             :class_name => 'Relationship',
             :as => :subject,
@@ -33,7 +41,7 @@ module Mib
           has_many :assays, :through => :assay_assets
   
           has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
-          has_many :creators, :class_name => "Person" , :through => :assets_creators
+          has_many :creators, :class_name => "Person" , :through => :assets_creators,:order=>'assets_creators.id'
 
           class_eval do
             extend Mib::Acts::Resource::SingletonMethods
@@ -49,8 +57,22 @@ module Mib
       module InstanceMethods
         # this method will take attributions' association and return a collection of resources,
         # to which the current resource is attributed
+        def attributions
+          self.relationships.select {|a| a.predicate == Relationship::ATTRIBUTED_TO}
+        end
+        
+        def policy_or_default
+          if self.policy.nil?
+            self.policy = Policy.private_policy
+          end
+        end
+        
         def attributions_objects
           self.attributions.collect { |a| a.object }
+        end
+        
+        def related_publications
+          self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
         end
 
         def can_edit? user

@@ -1,6 +1,7 @@
 class PublicationsController < ApplicationController
   
   include IndexPager
+  include DotGenerator
   
   require 'pubmed_query_tool'
   
@@ -10,6 +11,18 @@ class PublicationsController < ApplicationController
   before_filter :associate_authors, :only => [:edit, :update]
 
   ADMIN_EMAIL = "sowen@cs.man.ac.uk"
+  
+  def preview
+    element=params[:element]
+    @publication = Publication.find_by_id(params[:id])
+    render :update do |page|
+      if @publication
+        page.replace_html element,:partial=>"publications/resource_preview",:locals=>{:resource=>@publication}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
+      end
+    end
+  end    
     
   # GET /publications/1
   # GET /publications/1.xml
@@ -18,6 +31,9 @@ class PublicationsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml
+      format.svg { render :text=>to_svg(@publication,params[:deep]=='false',@publication)}
+      format.dot { render :text=>to_dot(@publication,params[:deep]=='false',@publication)}
+      format.png { render :text=>to_png(@publication,params[:deep]=='false',@publication)}
     end
   end
 
@@ -37,12 +53,11 @@ class PublicationsController < ApplicationController
   # POST /publications
   # POST /publications.xml
   def create
-    @publication = Publication.new()
-    pubmed_id = params[:publication][:pubmed_id]
-    pubmed_id = nil if pubmed_id.blank?
-    doi = params[:publication][:doi]
-    doi = nil if doi.blank?
-    result = get_data(@publication, pubmed_id, doi)
+    @publication = Publication.new(params[:publication])
+    @publication.pubmed_id=nil if @publication.pubmed_id.blank?
+    @publication.doi=nil if @publication.doi.blank?
+    
+    result = get_data(@publication, @publication.pubmed_id, @publication.doi)
     @publication.contributor = current_user    
     respond_to do |format|
       if @publication.save
@@ -81,7 +96,7 @@ class PublicationsController < ApplicationController
     valid = true
     to_add = []
     to_remove = []
-    params[:author].each_key do |author_id|
+    params[:author].keys.sort.each do |author_id|
       author_assoc = params[:author][author_id]
       unless author_assoc.blank?
         to_remove << PublicationAuthor.find_by_id(author_id)
@@ -102,7 +117,7 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      if valid && @publication.update_attributes(params[:publication]) 
+      if valid && @publication.update_attributes(params[:publication])
         to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}
         
@@ -143,7 +158,8 @@ class PublicationsController < ApplicationController
   
   def fetch_preview
     begin
-      @publication = Publication.new
+      @publication = Publication.new(params[:publication])
+      @publication.project_id = params[:project_id]
       key = params[:key]
       protocol = params[:protocol]
       pubmed_id = nil

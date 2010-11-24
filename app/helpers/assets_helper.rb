@@ -1,7 +1,7 @@
 module AssetsHelper
 
   def request_request_label resource
-    icon_filename=icon_filename_for_key(resource.class.name.underscore)
+    icon_filename=icon_filename_for_key("message")
     resource_type=resource.class.name.humanize
     return '<span class="icon">' + image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}</span>";
   end
@@ -106,7 +106,8 @@ module AssetsHelper
       when "DataFile","Sop","Model"
         related["Project"][:items] = [resource.project]
         related["Study"][:items] = resource.studies   
-        related["Assay"][:items] = resource.assays     
+        related["Assay"][:items] = resource.assays
+        related["Publication"][:items] = resource.related_publications   
       when "Assay"
         related["Project"][:items] = [resource.project]
         related["Investigation"][:items] = [resource.investigation]
@@ -114,6 +115,7 @@ module AssetsHelper
         related["DataFile"][:items] = resource.data_files
         related["Model"][:items] = resource.models if resource.is_modelling? #MODELLING ASSAY
         related["Sop"][:items] = resource.sops
+        related["Publication"][:items] = resource.related_publications
       when "Investigation"
         related["Project"][:items] = [resource.project]
         related["Study"][:items] = resource.studies
@@ -142,7 +144,7 @@ module AssetsHelper
         related["DataFile"][:items] = related["DataFile"][:items] | resource.created_data_files
         related["Model"][:items] = related["Model"][:items] | resource.created_models
         related["Sop"][:items] = related["Sop"][:items] | resource.created_sops
-        related["Publication"][:items] = related["Model"][:items] | resource.created_publications 
+        related["Publication"][:items] = related["Publication"][:items] | resource.created_publications 
         related["Assay"][:items] = resource.assays
       when "Institution"
         related["Project"][:items] = resource.projects
@@ -160,6 +162,9 @@ module AssetsHelper
       when "Publication"
         related["Person"][:items] = resource.creators
         related["Project"][:items] = [resource.project]
+        related["DataFile"][:items] = resource.related_data_files
+        related["Model"][:items] = resource.related_models
+        related["Assay"][:items] = resource.related_assays
       else
     end
     
@@ -175,7 +180,7 @@ module AssetsHelper
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
       related[key][:items] = related[key][:items].compact
-      if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay"].include?(resource.class.name)
+      if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay","Person"].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]        
       end
@@ -195,8 +200,16 @@ module AssetsHelper
         filter_text = "(:filter => {:study => #{context_resource.id}},:page=>'all')"
       when "Assay"
         filter_text = "(:filter => {:assay => #{context_resource.id}},:page=>'all')"
+      when "Person"
+        filter_text = "(:filter => {:person => #{context_resource.id}},:page=>'all')"
     end
     return eval("#{resource_type.underscore.pluralize}_path" + filter_text)
+  end
+
+  #provides a list of assets, according to the class, that are authorized to 'show'
+  def authorised_assets asset_class
+    assets=asset_class.find(:all)
+    Authorization.authorize_collection("show",assets,current_user)
   end
 
 end

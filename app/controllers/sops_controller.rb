@@ -1,36 +1,44 @@
-class SopsController < ApplicationController
-  #FIXME: re-add REST for each of the core methods
-
+class SopsController < ApplicationController  
+  
   include IndexPager
-
+  include DotGenerator
+  include Seek::AssetsCommon
+  
   before_filter :login_required
   before_filter :find_assets, :only => [ :index ]  
-  before_filter :find_sop_auth, :except => [ :index, :new, :create, :request_resource ]
+  before_filter :find_sop_auth, :except => [ :index, :new, :create, :request_resource,:preview , :test_asset_url]
   before_filter :find_display_sop, :only=>[:show,:download]
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
-    
+  
   def new_version
-    data = params[:data].read
-    comments=params[:revision_comment]
-    @sop.content_blob = ContentBlob.new(:data => data)
-    @sop.content_type = params[:data].content_type
-    @sop.original_filename=params[:data].original_filename
-    conditions = @sop.experimental_conditions
-    respond_to do |format|
-      if @sop.save_as_new_version(comments)
-        #Duplicate experimental conditions
-        conditions.each do |con|
-          new_con = con.clone
-          new_con.sop_version = @sop.version
-          new_con.save
+    if (handle_data nil)      
+      comments=params[:revision_comment]
+      
+      @sop.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
+      @sop.content_type = params[:sop][:content_type]
+      @sop.original_filename = params[:sop][:original_filename]
+      
+      conditions = @sop.experimental_conditions
+      respond_to do |format|
+        if @sop.save_as_new_version(comments)
+          #Duplicate experimental conditions
+          conditions.each do |con|
+            new_con = con.clone
+            new_con.sop_version = @sop.version
+            new_con.save
+          end
+          flash[:notice]="New version uploaded - now on version #{@sop.version}"
+        else
+          flash[:error]="Unable to save new version"          
         end
-        flash[:notice]="New version uploaded - now on version #{@sop.version}"
-      else
-        flash[:error]="Unable to save new version"          
+        format.html {redirect_to @sop }
       end
-      format.html {redirect_to @sop }
+    else
+      flash[:error]=flash.now[:error] 
+      redirect_to @sop
     end
+    
   end
   
   # GET /sops/1
@@ -48,32 +56,22 @@ class SopsController < ApplicationController
     respond_to do |format|
       format.html
       format.xml
+      format.svg { render :text=>to_svg(@sop,params[:deep]=='true',@sop)}
+      format.dot { render :text=>to_dot(@sop,params[:deep]=='true',@sop)}
+      format.png { render :text=>to_png(@sop,params[:deep]=='true',@sop)}
     end
   end
   
-  # GET /sops/1;download
+  # GET /sops/1/download
   def download
     # update timestamp in the current SOP record 
     # (this will also trigger timestamp update in the corresponding Asset)
     @sop.last_used_at = Time.now
     @sop.save_without_timestamping
-
-    #This should be fixed to work in the future, as the downloaded version doesnt get its last_used_at updated
-    #@display_sop.last_used_at = Time.now
-    #@display_sop.save_without_timestamping
-
-    if @display_sop.content_blob.url.blank?
-      if (@sop.content_blob.file_exists?)
-        send_file @display_sop.content_blob.filepath, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'
-      else
-        send_data @display_sop.content_blob.data, :filename => @display_sop.original_filename, :content_type => @display_sop.content_type, :disposition => 'attachment'  
-      end
-      
-    else
-      download_jerm_resource @display_sop
-    end
+    
+    handle_download @display_sop
   end
-
+  
   # GET /sops/new
   def new
     respond_to do |format|
@@ -85,47 +83,20 @@ class SopsController < ApplicationController
       end
     end
   end
-
+  
   # GET /sops/1/edit
   def edit
-  
+    
   end
-
+  
   # POST /sops
   def create
-    if (params[:sop][:data]).blank?
-      respond_to do |format|
-        flash.now[:error] = "Please select a file to upload."
-        format.html { 
-          set_parameters_for_sharing_form()
-          render :action => "new" 
-        }
-      end
-    elsif (params[:sop][:data]).size == 0
-      respond_to do |format|
-        flash.now[:error] = "The file that you have selected is empty. Please check your selection and try again!"
-        format.html { 
-          set_parameters_for_sharing_form()
-          render :action => "new" 
-        }
-      end
-    else
-      # create new SOP and content blob - non-empty file was selected
-
-      # prepare some extra metadata to store in SOP instance
-      params[:sop][:contributor_type] = "User"
-      params[:sop][:contributor_id] = current_user.id
+    if handle_data            
       
-      # store properties and contents of the file temporarily and remove the latter from params[],
-      # so that when saving main object params[] wouldn't contain the binary data anymore
-      params[:sop][:content_type] = (params[:sop][:data]).content_type
-      params[:sop][:original_filename] = (params[:sop][:data]).original_filename
-      data = params[:sop][:data].read
-      params[:sop].delete('data')            
-            
       @sop = Sop.new(params[:sop])
-      @sop.content_blob = ContentBlob.new(:data => data)
-
+      @sop.contributor=current_user
+      @sop.content_blob = ContentBlob.new(:data => @data,:url=>@data_url)
+      
       respond_to do |format|
         if @sop.save
           # the SOP was saved successfully, now need to apply policy / permissions settings to it
@@ -152,10 +123,9 @@ class SopsController < ApplicationController
         end
       end
     end
-    
   end
-
-
+  
+  
   # PUT /sops/1
   def update
     # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
@@ -163,7 +133,7 @@ class SopsController < ApplicationController
       [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
         params[:sop].delete(column_name)
       end
-    
+      
       # update 'last_used_at' timestamp on the SOP
       params[:sop][:last_used_at] = Time.now
     end
@@ -194,11 +164,11 @@ class SopsController < ApplicationController
       end
     end
   end
-
+  
   # DELETE /sops/1
   def destroy
     @sop.destroy
-
+    
     respond_to do |format|
       format.html { redirect_to(sops_url) }
     end
@@ -206,7 +176,7 @@ class SopsController < ApplicationController
   
   
   def preview
-
+    
     element=params[:element]
     sop=Sop.find_by_id(params[:id])
     
@@ -233,7 +203,7 @@ class SopsController < ApplicationController
   protected
   
   
-
+  
   def find_display_sop
     if @sop
       @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
@@ -279,8 +249,8 @@ class SopsController < ApplicationController
     end
     
     unless policy
-        policy = Policy.default()
-        policy_type = "system"
+      policy = Policy.default()
+      policy_type = "system"
     end
     
     # set the parameters
@@ -299,7 +269,7 @@ class SopsController < ApplicationController
     @resource = @sop
     
     @all_people_as_json = Person.get_all_as_json
-
+    
     @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
     
   end

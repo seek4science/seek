@@ -17,6 +17,35 @@ class MailerTest < ActionMailer::TestCase
     end
     
   end
+  
+  test "signup_open_id" do
+    @expected.subject = 'SysMO SEEK account activation'
+    @expected.to = "Aaron Openid Spiggle <aaron_openid@email.com>"
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.date    = Time.now
+
+    @expected.body    = read_fixture('signup_openid')
+    
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded, Mailer.create_signup(users(:aaron_openid),"localhost").encoded
+    end
+    
+  end
+  
+  test "announcement notification" do
+    announcement = site_announcements(:mail)
+    @expected.subject = "SysMO SEEK Announcement: #{announcement.title}"
+    @expected.to = "Fred Blogs <fred@email.com>"
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.date    = Time.now
+
+    @expected.body    = read_fixture('announcement_notification')
+    
+    person=people(:fred)
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded, Mailer.create_announcement_notification(announcement,person.notifiee_info,"localhost").encoded
+    end    
+  end
 
   test "feedback anonymously" do
     message=Mailer.create_feedback(users(:aaron),"Topic","Details",true,"localhost")

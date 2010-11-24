@@ -4,6 +4,19 @@ body {
 	line-height: 1.0;	
 }
 
+
+div#login_details input {
+	width: 60%;
+}
+
+div#login_details p {
+	text-align: center;
+}
+
+div#login_details b {
+	text-align: left;
+}
+
 #custom-doc {
     margin: auto;
     text-align: left; /* leave unchanged */
@@ -94,8 +107,34 @@ min-width:
     margin-left: 1em;
 }
 
+
+.box_editing {
+	
+}
+
+.box_editing_inner {
+	padding: 0.5em;
+	border: 1px solid #9BCDFF;
+	background-color: #DDEEFF;
+}
+
+.box_editing_inner2 {
+	background-color: #EEEEEE;
+	padding: 0.5em 0.8em;
+	border: 1px dotted #999999;
+}
+
+
 .list_items_container{
     padding-left: 7px;
+}
+
+#password_login input {
+	width: 18em;
+}
+
+#openid_login input {
+	width: 18em;
 }
 
 table.list_item {
@@ -296,12 +335,12 @@ span.disabled_icon {
 
 .main_content_left_box {
     float: left;
-    width: 73.5%;
+    width: 84%;
 }
 
 .main_content_right_box {
     float: right;
-    width: 24%;
+    width: 15%;
 }
 
 
@@ -473,72 +512,25 @@ ul.users_details li {
 	min-height: 6em;
 }
 
+li.group p{	
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+
 ul.users_details li p {    
     margin: 0.1em;
 	padding: 0.1em;
 }
 
-#sop_preview {    
-    width: 17em;
-    max-height: 25em;
-    background-color: #EEEEEE;
-    display: inline-block;
-    padding: 1em 1em 1em 1em;
-    border: 1px solid #999999;
+#publication_preview_container {
+    max-height: 26em;	
 }
 
-#sop_preview p.title {
-    font-weight: bolder;
-    text-align:center;
-}
+#publication_preview {
 
-#sop_preview p.description {
-    border: 1px dotted #999999;
-    margin: 0.2em 0;
-    padding: 0.4em 0.6em;
-    background-color: #FFFFCC;
-    text-align: left;
-    line-height: 1.3;
-    overflow: hidden;
-}
-
-#data_file_preview {
-    max-width: 17em;
-    max-height: 25em;
-    background-color: #EEEEEE;
-    display: inline-block;
-    padding: 1em 1em 1em 1em;
-    border: 1px solid #999999;
-}
-
-#data_file_preview p.title {
-    font-weight: bolder;
-    text-align:center;
-}
-
-#data_file_preview p.description {
-    border: 1px dotted #999999;
-    margin: 0.2em 0;
-    padding: 0.4em 0.6em;
-    background-color: #FFFFCC;
-    text-align: left;
-    line-height: 1.3;
-    overflow: hidden;
-}
-
-#model_preview {
-    width: 17em;
-    max-height: 25em;
-    background-color: #EEEEEE;
-    display: inline-block;
-    padding: 1em 1em 1em 1em;
-    border: 1px solid #999999;
-}
-
-
-.foldContent {
-    padding-top:0.5em;
-    background-color: #FCFCFF;    
 }
 
 table.conditions_or_factors {
@@ -867,21 +859,22 @@ ul.related_asset_list li{
     float: left;
     margin-left: 1em;
     margin-right: 0.5em;
-    margin-top: 0.5em;
-    padding :5px 5px 3px 3px;
+    margin-top: -0.2em;
+    padding:3px 5px 0px 3px;
     border:1px solid #CCCCCC;
     background-color: #FFFFFF;
-    min-width :3em;
-    min-height: 3em;
+    
+	min-width :2.3em;
+    min-height: 2.3em;
 }
 
 .contribution_title_image img {        
-    width: 35px;
-    vertical-align: middle;
+    width: 27px;
+    vertical-align: middle;	
 }
 
 .contribution_title h1 {    
-    width: 100%;
+    width: 90%;
 }
 
 table.jerm_results {
@@ -1259,6 +1252,7 @@ img.visibility_icon {
 div#isa_svg {	
 	text-align: center;
 	padding-top: 1em;
+	
 }
 
 div.stat_item {
@@ -1272,3 +1266,84 @@ div.admin_tasks ul{
 div.admin_tasks ul li{
   margin-left: 1em;
 }
+
+div.association_step {
+  background-color: #EEE;
+  border: 1px solid #DDD;
+  margin-top: 0.5em;
+  padding: 0.5em;
+}
+
+a.block_link {
+  display: block;
+  border: 1px solid #aaa;
+  background-color: #eee;  
+  padding: 0.4em;-moz-binding;
+  margin-top: 0.3em;
+  text-align: left;
+  vertical-align: middle;
+}
+
+a.block_link_active {
+  display: block;
+  border: 1px solid #0000ff;
+  background-color: #eee;  
+  padding: 0.4em;-moz-binding;
+  margin-top: 0.3em;
+  text-align: left;
+  vertical-align: middle;
+}
+
+a:hover.block_link {
+  border: 1px solid #888;
+  background-color: #ddd;
+}
+
+a.block_link img {
+  vertical-align: middle; 
+}
+
+div.preview_box {
+  width: 17em;
+  max-height: 25em;
+  background-color: #EEEEEE;
+  display: inline-block;
+  padding: 1em 1em 1em 1em;
+  border: 1px solid #999999;
+}
+
+.pale_text {
+	color: #666666;
+}
+
+div.asset_form {
+	padding-right: 1em;
+}
+
+div#upload_type_selection {
+    padding-left: 0.5em;
+    height: 120px;
+}
+
+ul#switch_upload_buttons {
+    list-style: none;
+    clear: both;
+    display: block;
+}
+
+ul#switch_upload_buttons li {
+	list-style: none;
+    float: left;
+    padding-right: 0.75em;
+    padding-top: 10px;
+}
+
+ul#switch_upload_buttons a {
+    width: 34px;
+}
+
+li#upload_options {
+    padding-left: 1em;
+    display: inline-block;
+}
+  

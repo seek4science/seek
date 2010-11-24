@@ -48,8 +48,10 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_should_logout
     login_as :quentin
+    @request.cookies[:open_id] = 'http://fred.openid.org'
     get :destroy
     assert_nil session[:user_id]
+    assert_nil cookies[:open_id]
     assert_response :redirect
   end
 
@@ -94,9 +96,9 @@ class SessionsControllerTest < ActionController::TestCase
   def test_non_validated_user_should_redirect_to_new_with_message
     post :create, :login => 'aaron', :password => 'test'
     assert !session[:user_id]
-    assert_redirected_to :action=>"new"
-    assert_not_nil flash.now[:error]
-    assert flash.now[:error].include?("need to activate")
+    assert_redirected_to "/"
+    assert_not_nil flash[:error]    
+    assert flash[:error].include?("You still need to activate your account.")
   end
 
   def test_partly_registed_user_should_redirect_to_select
@@ -110,7 +112,7 @@ class SessionsControllerTest < ActionController::TestCase
   def test_invalid_user_should_not_login
     post :create, :login => 'fred', :password => 'blogs'
     assert !session[:user_id]
-    assert_redirected_to :action => "new"
+    assert_redirected_to "/"
   end
 
   protected

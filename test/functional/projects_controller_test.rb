@@ -175,7 +175,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test "non admin has no option to administer project" do
     login_as(:pal_user)
-    get :show,:id=>projects(:sysmo_project)
+    get :show,:id=>projects(:sysmo_project)    
     assert_select "ul.sectionIcons" do
       assert_select "span.icon" do
         assert_select "a[href=?]",admin_project_path(projects(:sysmo_project)),:text=>/Project administration/,:count=>0
@@ -196,7 +196,7 @@ class ProjectsControllerTest < ActionController::TestCase
   test "changing default policy" do
     login_as(:quentin)
     
-    person = people(:two) #aaron
+    person = people(:aaron_person)
     project = projects(:four)
     assert_nil project.default_policy_id #check theres no policy to begin with
     

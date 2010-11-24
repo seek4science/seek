@@ -10,11 +10,11 @@ module Jerm
     @@file_cache={}
     @@filename_cache={}
      
-    def get_remote_data url, username=nil, password=nil, type=nil
+    def get_remote_data url, username=nil, password=nil, type=nil, include_data=true
       cached=check_from_cache(url,username,password)
       return cached unless cached.nil?
-      return basic_auth url, username, password
-    end
+      return basic_auth url, username, password,include_data
+    end        
     
     #tries to determine the filename from f
     #if it can it will read the content-disposition and parse the filename, otherwise falls back to what follows the last / in the uri 
@@ -43,7 +43,7 @@ module Jerm
     # :filename => the filename
     #
     # throws an Exception if anything goes wrong.
-    def basic_auth url, username,password
+    def basic_auth url, username,password, include_data=true
 
       #This block is to ensure that only urls are encoded if they need it.
       #This is to prevent already encoded urls being re-encoded, which can lead to % being replaced with %25.
@@ -56,8 +56,10 @@ module Jerm
       begin
         open(url,:http_basic_authentication=>[username, password]) do |f|
           #FIXME: need to handle full range of 2xx sucess responses, in particular where the response is only partial
-          if f.status[0] == "200"                    
-            result = {:data=>f.read,:content_type=>f.content_type,:filename=>determine_filename(f)}            
+          if f.status[0] == "200"               
+            data=nil
+            data=f.read if include_data
+            result = {:data=>data,:content_type=>f.content_type,:filename=>determine_filename(f)}            
             cache result,url,username,password                                    
             return result
           else

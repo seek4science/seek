@@ -21,7 +21,6 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal 2, model.version
     assert_equal 1, data_file.version
     
-    #assert Authorization.is_authorized?("show", nil, sop_version1.asset, user)
         
     result = Asset.classify_and_authorize_resources(resource_array, true, user)    
     

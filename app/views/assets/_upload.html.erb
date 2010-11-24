@@ -1,0 +1,75 @@
+<%
+# determine the asset type from the controller
+upload_field = controller_name.downcase.singularize.underscore
+# inject the attributes data_url and local_copy in the asset type, e.g. @model. This keeps the form clean.
+obj=eval("@"+upload_field)
+class << obj
+attr_reader :data_url,:local_copy
+end unless obj.nil?
+asset_name = upload_field.humanize.capitalize
+assert_name = "SOP" if asset_name=="Sop" -%>
+
+<div class="box_infotext">
+    <p>
+        You can register a <%= asset_name -%> by either directly uploading a file, or registering a URL. Please test the URL before submitting. <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_upload_info", :duration => 0.3) -%>
+    </p>
+    <span id="more_upload_info" style="display:none;">
+        <p>
+            When registering a URL you can specify that a copy of the data should be stored 
+            within SEEK. This is recommended and is equivalent to uploading a file. It also means that should the data behind the URL the data is still available from SEEK. 
+        </p>
+        <p>
+            If the URL results in a redirection or unauthorized response, then SEEK has no option but to store only the URL. In this case, when another user selects to download the <%= asset_name -%>
+            then they will simply directed to the URL (for example, so that they can login to access the file).
+        </p>
+    </span>
+</div>
+
+<div>
+    <div id="upload_type_selection">
+        <ul id="switch_upload_buttons">
+            <li>
+                <%= link_to_function image("file_large"),"from_file_selected(); return (false);",:class=>"block_link_active",:id=>"upload_from_file_button",:title=>tooltip_title_attrib('Add from a local file') -%> 
+            </li>
+            <li>
+                <%= link_to_function image("internet_large"),"from_url_selected(); return (false);",:class=>"block_link",:id=>"upload_from_url_button",:title=>tooltip_title_attrib('Add from a remote URL') -%>
+            </li>
+            <li id="upload_options">
+                <div id="upload_from_file">
+                    <p>
+                        <b>File to upload:</b>
+                        <span class="required">*</span>
+                        <br/>
+                        <%= file_field upload_field, :data -%>
+                    </p>
+                </div>
+                <div id="upload_from_url" style="display:none;">
+                <p>
+                    <b>URL:</b>
+                    <span class="required">*</span>                    
+                    <%= text_field upload_field,:data_url,:size=>55 -%>
+                    <%= link_to_remote image("test",:title=>"Test",:alt=>"Test")+" Test",
+                    :url=>{:action=>:test_asset_url},
+                    :method=>:post,
+                    :with=>"$('#{upload_field}_data_url').serialize()",
+                    :before=>"$('test_url_msg').innerHTML='';show_ajax_loader('test_url_result_icon');" -%>
+                    <br/>
+                    <p style="clear:both;">
+                        <b>Make a copy?</b>
+                        <%= check_box upload_field, :local_copy,:id=>"local_copy" -%>
+                    </p>
+                </p>
+                <p>
+                    <span id="test_url_result_icon"></span>
+                    <span id="test_url_msg" style="display:none;"></span>
+                </p>
+                
+            </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+	from_file_selected();
+</script>

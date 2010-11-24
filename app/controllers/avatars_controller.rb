@@ -279,9 +279,7 @@ class AvatarsController < ApplicationController
       when "Person"
       data_hash[:description] = params[:description]
       data_hash[:tool] = params[:tool]
-      data_hash[:expertise] = params[:expertise]
-      data_hash[:can_edit_projects] = params[:can_edit_projects]
-      data_hash[:can_edit_institutions] = params[:can_edit_institutions]
+      data_hash[:expertise] = params[:expertise]      
       
       when "Project"
       data_hash[:organism] = params[:organism]

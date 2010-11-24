@@ -10,7 +10,8 @@ vendor/plugins/acts_as_solr/solr/tmp/*_pid
 vendor/plugins/acts_as_solr/solr/solr/data/*
 vendor/plugins/acts_as_solr/solr/logs/*
 nbproject/*
-filestore/*
+filestore
+filestore-local/
 tmp/avatars/*
 tmp/models/*
 debug.log
@@ -30,6 +31,9 @@ SUMO_harvester.rb
 script/finns_tests/*
 config/environment_local.rb
 public/help_images/*
+.rvmrc
+.bundle/config
+Gemfile.lock
 
 
 syntax: regexp

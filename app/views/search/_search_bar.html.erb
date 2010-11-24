@@ -2,7 +2,11 @@
 <% @search_type="All" unless @search_type %>
 
 <% if logged_in? && current_user.person -%>
-  <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
+  <% if EMAIL_ENABLED %>
+    <%= image_tag_for_key("feedback",feedback_path,"Feedback",{:id=>"feedback"},"Provide Feedback") %>
+  <% else %>
+    <span class="icon"><%= mail_to Person.admins.first.email, (image("feedback") + "Provide Feedback"), :cc => Person.admins[1..-1].collect{|a| a.email}.join(",") , :subject => "SysMO-SEEK feedback", :id => "feedback" %></span>    
+  <% end %>
 <% end -%>
 
 <% if logged_in? && current_user.is_admin? && current_user.person -%>

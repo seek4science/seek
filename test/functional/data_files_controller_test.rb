@@ -4,20 +4,21 @@ require 'libxml'
 class DataFilesControllerTest < ActionController::TestCase
   
   fixtures :all
-
+  
   include AuthenticatedTestHelper
   include RestTestCases
-
+  
   def setup
     login_as(:datafile_owner)
     @object=data_files(:picture)
   end
   
-   def test_title
+  def test_title
     get :index
+    assert_response :success
     assert_select "title",:text=>/Sysmo SEEK Data.*/, :count=>1
   end
-
+  
   test "should show index" do
     get :index
     assert_response :success
@@ -30,33 +31,169 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal assigns(:data_files).sort_by(&:id), Authorization.authorize_collection("view", assigns(:data_files), users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
   end
-
+  
   test "should get new" do
     get :new
     assert_response :success
   end
   
-  test "should create data file" do
+  test "should correctly handle bad data url" do
+    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png"}    
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
+  end
+  
+  test "should not create invalid datafile" do
+    df={:title=>"Test"}
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
+  end
+  
+  test "should create data file with url" do
     assert_difference('DataFile.count') do
-      post :create, :data_file => valid_data_file, :sharing=>valid_sharing
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file_with_url, :sharing=>valid_sharing
+      end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
+    assert_equal "image/png", assigns(:data_file).content_type
   end
-
+  
+  
+  
+  test "should create data file and store with url and store flag" do
+    datafile_details = valid_data_file_with_url
+    datafile_details[:local_copy]="1"
+    
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => datafile_details, :sharing=>valid_sharing
+      end
+    end
+    
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert !assigns(:data_file).content_blob.data.nil?
+    assert assigns(:data_file).content_blob.file_exists?
+    assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
+    assert_equal "image/png", assigns(:data_file).content_type
+  end
+  
+  
+  #This test is quite fragile, because it relies on an external resource
+  test "should create and redirect on download for 401 url" do
+    df = {:title=>"401",:data_url=>"http://www.myexperiment.org/workflow.xml?id=82"}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).original_filename
+    assert_equal "",assigns(:data_file).content_type
+    
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://www.myexperiment.org/workflow.xml?id=82"
+  end
+  
+  
+  #This test is quite fragile, because it relies on an external resource
+  test "should create and redirect on download for 302 url" do
+    
+    df = {:title=>"302",:data_url=>"http://demo.sysmo-db.org/models/1/download"}
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "",assigns(:data_file).original_filename
+    assert_equal "",assigns(:data_file).content_type
+    
+    get :download, :id => assigns(:data_file)
+    assert_redirected_to "http://demo.sysmo-db.org/models/1/download"
+  end
+  
+  test "should create data file" do
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file, :sharing=>valid_sharing
+      end
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    
+    assert !assigns(:data_file).content_blob.data.nil?
+    assert assigns(:data_file).content_blob.url.blank?
+  end
+  
+  def test_missing_sharing_should_default_to_private
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file
+      end
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert assigns(:data_file)
+    
+    df=assigns(:data_file)
+    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
+    assert_equal private_policy.sharing_scope,df.policy.sharing_scope
+    assert_equal private_policy.access_type,df.policy.access_type
+    assert_equal private_policy.use_whitelist,df.policy.use_whitelist
+    assert_equal private_policy.use_blacklist,df.policy.use_blacklist
+    assert_equal false,df.policy.use_custom_sharing
+    assert df.policy.permissions.empty?
+    
+    #check it doesn't create an error when retreiving the index
+    get :index
+    assert_response :success    
+  end
+  
   test "should show data file" do
     d = data_files(:picture)
     d.save
     get :show, :id => d
     assert_response :success
   end
-
+  
   test "should get edit" do
     get :edit, :id => data_files(:picture).id
     assert_response :success
   end
-
+  
   test "should download" do
     get :download, :id => data_files(:viewable_data_file)
+    assert_response :success
+  end
+  
+  test "should download from url" do
+    get :download, :id => data_files(:url_based_data_file)
     assert_response :success
   end
   
@@ -83,28 +220,28 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]         
   end
   
-  test "shouldn't expose spreadsheet contents for non-spreadsheet file" do
+  def test_should_not_expose_contents_for_picture
     get :data, :id => data_files(:picture)
     assert_redirected_to data_file_path(data_files(:picture))
     assert flash[:error]    
   end
   
-  test "shouldn't expose spreadsheet contents if not authorized" do
+  test "should not expose spreadsheet contents if not authorized" do
     login_as(:aaron)
     get :data, :id => data_files(:viewable_data_file)
     assert_redirected_to data_files_path
     assert flash[:error]    
   end
-
-  test "show should now allow factors studied edited for downloadable file" do
+  
+  def test_should_allow_factors_studies_edited_for_downloadable_file
     login_as(:aaron)
     d = data_files(:downloadable_data_file)
     d.save
     get :show, :id=>d
     assert_select "a",:text=>/Edit factors studied/,:count=>0
   end
-
-  test "show should allow factors studied edited for editable file" do
+  
+  def test_should_allow_factors_studies_edited_for_editable_file
     login_as(:aaron)
     d=data_files(:editable_data_file)
     d.save
@@ -119,34 +256,33 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, :id=>d
     assert_select "a",:text=>/Edit factors studied/,:count=>1
   end
-
-
+  
   test "should update data file" do
     put :update, :id => data_files(:picture).id, :data_file => { }
     assert_redirected_to data_file_path(assigns(:data_file))
   end
   
-  test "should_duplicate_factors_studied_for_new_version" do
+  def test_should_duplicate_factors_studied_for_new_version
     d=data_files(:editable_data_file)
     d.save! #v1
     sf = StudiedFactor.create(:unit => units(:gram),:measured_item => measured_items(:weight),
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
-      post :new_version, :id=>d, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision" #v2
+      post :new_version, :id=>d, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
     
     assert_not_equal 0, d.find_version(1).studied_factors.count
     assert_not_equal 0, d.find_version(2).studied_factors.count
-    assert_not_equal d.find_version(1).studied_factors, d.find_version(2).studied_factors    
+    assert_not_equal d.find_version(1).studied_factors, d.find_version(2).studied_factors
+    assert_equal d.find_version(1).studied_factors.count, d.find_version(2).studied_factors.count
   end
-
+  
   test "should destroy DataFile" do
     assert_difference('DataFile.count', -1) do
-      assert_no_difference("ContentBlob.count","The ContentBlob for this DataFile should be preserved") do
+      assert_no_difference("ContentBlob.count") do
         delete :destroy, :id => data_files(:editable_data_file).id
       end
-    end
-
+    end    
     assert_redirected_to data_files_path
   end
   
@@ -155,16 +291,16 @@ class DataFilesControllerTest < ActionController::TestCase
     sf = StudiedFactor.create(:unit => units(:gram),:measured_item => measured_items(:weight),
                               :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
     assert_difference("DataFile::Version.count", 1) do
-      post :new_version, :id=>d, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision" #v2
+      post :new_version, :id=>d, :data_file=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
     
     d.find_version(2).studied_factors.each {|e| e.destroy}
     assert_equal sf, d.find_version(1).studied_factors.first
     assert_equal 0, d.find_version(2).studied_factors.count
-
+    
     sf2 = StudiedFactor.create(:unit => units(:gram),:measured_item => measured_items(:weight),
                               :start_value => 2, :end_value => 3, :data_file_id => d.id, :data_file_version => 2)
-
+    
     assert_not_equal 0, d.find_version(2).studied_factors.count
     assert_equal sf2, d.find_version(2).studied_factors.first
     assert_not_equal sf2, d.find_version(1).studied_factors.first
@@ -177,8 +313,10 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a[rel=nofollow]"
     end
   end
-
-  def test_update_should_not_overright_contributor
+  
+  
+  
+  def test_update_should_not_overwrite_contributor
     login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
     df=data_files(:data_file_with_no_contributor)
     put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
@@ -187,7 +325,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "blah blah blah blah",updated_df.title,"Title should have been updated"
     assert_nil updated_df.contributor,"contributor should still be nil"
   end
-
+  
   def test_show_item_attributed_to_jerm_file
     login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
     df=data_files(:editable_data_file)
@@ -217,19 +355,35 @@ class DataFilesControllerTest < ActionController::TestCase
     get :index, :filter => {:investigation => inv.id}
     assert_response :success
   end
-
+  
   test "filtering by project" do
     project=projects(:sysmo_project)
     get :index, :filter => {:project => project.id}
     assert_response :success
   end
-
+  
+  test "filtering by person" do
+    person = people(:person_for_datafile_owner)
+    get :index,:filter=>{:person=>person.id},:page=>"all"
+    assert_response :success    
+    df = data_files(:downloadable_data_file)
+    df2 = data_files(:sysmo_data_file)
+    assert_select "div.list_items_container" do      
+      assert_select "a",:text=>df.title,:count=>1
+      assert_select "a",:text=>df2.title,:count=>0
+    end
+  end
+  
   private
-
+  
   def valid_data_file
     { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png')}
   end
-
+  
+  def valid_data_file_with_url
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}
+  end
+  
   def valid_sharing
     {
       :use_whitelist=>"0",
@@ -238,5 +392,5 @@ class DataFilesControllerTest < ActionController::TestCase
       :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
     }
   end
-
+  
 end

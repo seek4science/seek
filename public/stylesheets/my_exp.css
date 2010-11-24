@@ -30,7 +30,7 @@ h1 {
 	text-align: center;
 	font-size: 167%;
 	color: #000033;
-	margin: 0.8em 0 1em 0;
+	margin: 0.1em 0 0.3em 0;
 	line-height: 1.4;
 }
 
@@ -514,79 +514,7 @@ ul.breadcrumb_list a:hover {
 
 /* end home styles */
 
-/* begin css folds */
 
-.fold {
-	margin-bottom: 0.5em;
-}
-
-.foldTitle {
-	background-image: url('/images/header-bg.png');
-	background-position: top;
-	background-repeat: repeat-x;
-	background-color: #EEEEEE;
-	color: #333333;
-	border: 1px solid #999999;
-	border-bottom: 2px solid #aaa;
-	pointer: pointer;
-	cursor: pointer;
-	width: 100%;
-}
-
-.foldTitle p {
-	padding: 0.1em 0;
-	line-height: 1.0;
-	vertical-align: middle;
-}
-
-.foldTitle p * {
-	vertical-align: top;
-}
-
-.foldTitle hr {
-	margin: 0.4em 0;
-	*margin: 0;
-	line-height: 1.0;
-}
-
-.foldTitle small {
-	font-size: 85%;
-	font-weight: normal;
-	line-height: 1.2;
-}
-
-.foldText {
-	font-weight: bold;
-	text-align: left;
-	padding: 0.5em;
-	*padding: 0.3em;
-	vertical-align: middle;
-	
-}
-
-.foldText * {
-	vertical-align: middle;
-}
-
-.foldPlaintext {
-	font-weight: normal;
-	font-size: 85%;
-	line-height: 1.2;
-	padding: 0.1em 0;
-}
-
-.foldImage {
-	text-align: center;
-	padding: 0 0.5em;
-	vertical-align: middle;
-	width: 20px;
-}
-
-.foldContent {
-	border: 1px solid #aaa;
-	border-top: 1px solid transparent;
-	padding: 1em;
-}
 
 /* end css folds */ /* begin css tabs */
 .tabsContainer {
@@ -939,19 +867,17 @@ a.button_slim * {
 	vertical-align: middle;
 }
 
+
 .icon IMG {
 	padding: 2px;
 	vertical-align: middle;
-}
-
-.contribution_title {
-	margin-bottom: 0.6em;
 }
 
 .contribution_aftertitle {
 	color: #666666; 
 	font-size: 85%; 
 	text-align: center; 
+	margin-top: 0.5em;
 	margin-bottom: 0.6em;
 }
 
@@ -1384,24 +1310,7 @@ div.auto_complete ul strong.highlight {
 	border-bottom: 1px dotted #999999;
 }
 
-.box_editing {
-	padding: 0.5em; 
-	border-left: 5px solid #0066CC;
-	padding-left: 0.8em;
-	margin-left: 0.8em;
-}
 
-.box_editing_inner {
-	padding: 0.5em;
-	border: 1px solid #9BCDFF;
-	background-color: #DDEEFF;
-}
-
-.box_editing_inner2 {
-	background-color: #EEEEEE;
-	padding: 0.5em 0.8em;
-	border: 1px dotted #999999;
-}
 
 .box_infotext {
 	font-size: 93%;

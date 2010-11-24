@@ -2,7 +2,7 @@ require 'tempfile'
 
 module ISAHelper
   
-  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete an assay that has Data or SOPs associated with it.",Study=>"You cannot delete a Study that has Assays associated with it.",Investigation=>"You cannot delete an Investigation that has Studies associated with it."}
+  NO_DELETE_EXPLANTIONS={Assay=>"You cannot delete an assay that has items associated with it.",Study=>"You cannot delete a Study that has Assays associated with it.",Investigation=>"You cannot delete an Investigation that has Studies associated with it."}
   
   include DotGenerator
   
@@ -22,8 +22,9 @@ module ISAHelper
     return text
   end
   
-  def embedded_isa_svg item,deep=false
-    "<div id='isa_svg'><script type=\'image/svg+xml'>#{to_svg(item,deep)}</script></div>"
+  def embedded_isa_svg root_item,deep=true,current_item=nil    
+    current_item||=root_item
+    "<div id='isa_svg'><script type=\'image/svg+xml'>#{to_svg(root_item,deep,current_item)}</script></div>"
   end
   
 end

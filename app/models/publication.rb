@@ -12,6 +12,7 @@ class Publication < ActiveRecord::Base
   grouped_pagination
   
   validates_presence_of :title
+  validates_presence_of :project
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
@@ -19,9 +20,17 @@ class Publication < ActiveRecord::Base
   
   has_many :non_seek_authors, :class_name => 'PublicationAuthor', :dependent => :destroy
   
+  has_many :backwards_relationships, 
+    :class_name => 'Relationship',
+    :as => :object,
+    :dependent => :destroy
+   
+  alias :seek_authors :creators
+  
   acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
   
   acts_as_uniquely_identifiable  
+    
 
   def extract_pubmed_metadata(pubmed_record)
     self.title = pubmed_record.title.chop #remove full stop
@@ -36,6 +45,18 @@ class Publication < ActiveRecord::Base
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
     self.doi = doi_record.doi    
+  end
+  
+  def related_data_files
+    self.backwards_relationships.select {|a| a.subject_type == "DataFile"}.collect { |a| a.subject }
+  end
+  
+  def related_models
+    self.backwards_relationships.select {|a| a.subject_type == "Model"}.collect { |a| a.subject }
+  end
+  
+  def related_assays
+    self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
   
   private

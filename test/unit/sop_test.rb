@@ -14,6 +14,19 @@ class SopTest < ActiveSupport::TestCase
     sop.save!
     assert_equal("test sop",sop.title)
   end
+  
+  def test_defaults_to_private_policy
+    sop=Sop.new(:title=>"A sop with no policy")
+    sop.save!
+    sop.reload
+    assert_not_nil sop.policy
+    assert_equal Policy::PRIVATE, sop.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    assert_equal false,sop.policy.use_whitelist
+    assert_equal false,sop.policy.use_blacklist
+    assert_equal false,sop.policy.use_custom_sharing
+    assert sop.policy.permissions.empty?
+  end
 
   def test_version_created_for_new_sop
 

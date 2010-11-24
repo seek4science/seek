@@ -27,15 +27,13 @@ class ContentBlob < ActiveRecord::Base
     super
   end
   
-  def data
-    
+  def data    
     return @data if @data
     return File.open(filepath,"rb").read if file_exists?   
     unless self.data_old.blank?
       dump_data_to_file
       return self.data_old
-    end
-     
+    end     
     return nil
   end
   
@@ -54,7 +52,7 @@ class ContentBlob < ActiveRecord::Base
   
   def filepath
     if RAILS_ENV == "test"
-      path = "#{Dir::tmpdir}/seek_content_blobs/"
+      path = "#{Dir::tmpdir}/seek_content_blobs"
     else
       path = "#{RAILS_ROOT}/#{DATA_STORAGE_PATH}/#{RAILS_ENV}"
     end

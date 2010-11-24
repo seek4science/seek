@@ -54,9 +54,9 @@ class PeopleController < ApplicationController
 
   # GET /people/1
   # GET /people/1.xml
-  def show    
+  def show                
     @person = Person.find(params[:id])
-
+    
     respond_to do |format|
       format.html # show.html.erb
       format.xml
@@ -100,9 +100,7 @@ class PeopleController < ApplicationController
         # uploaded and redirected back to edit profile page; at this poing *new* records
         # in the DB for person's work group memberships would already be created, which is an
         # error (if the following 3 lines are ever to be removed, the bug needs investigation)
-        session[possible_unsaved_data][:person].delete(:work_group_ids)
-        session[possible_unsaved_data].delete(:can_edit_projects)
-        session[possible_unsaved_data].delete(:can_edit_institutions)
+        session[possible_unsaved_data][:person].delete(:work_group_ids)        
         
         # update those attributes of a person that we want to be updated from the session
         @person.attributes = session[possible_unsaved_data][:person]
@@ -131,7 +129,7 @@ class PeopleController < ApplicationController
     end
 
     @userless_projects.sort!{|a,b|a.name<=>b.name}
-    @person = Person.new
+    @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
     render :action=>"select",:layout=>"logged_out"
   end
@@ -202,16 +200,12 @@ class PeopleController < ApplicationController
     @person.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
     
     set_tools_and_expertise(@person,params)    
-    
-    # some "Person" instances might not have a "User" associated with them - because the user didn't register yet
-    if current_user.is_admin?
-      unless @person.user.nil?
-        @person.user.can_edit_projects = (params[:can_edit_projects] ? true : false)
-        @person.user.can_edit_institutions = (params[:can_edit_institutions] ? true : false)
-        @person.user.save
-      end
+        
+    if !@person.notifiee_info.nil?
+      @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
+      @person.notifiee_info.save if @person.notifiee_info.changed?
     end
-
+    
     new_tags=@person.tool_list + @person.expertise_list
 
     #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
@@ -220,6 +214,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
+         
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -349,8 +344,11 @@ class PeopleController < ApplicationController
 
   #checks the params attributes and strips those that cannot be set by non-admins, or other policy
   def auth_params
+    admin_only_params=[:is_pal,:is_admin,:can_edit_projects,:can_edit_institutions]
     if !current_user.is_admin?
-      params[:person].delete(:is_pal) if params[:person]
+      admin_only_params.each do |p|
+          params[:person].delete(p) if params[:person]
+      end      
     end
   end
 
