@@ -92,19 +92,17 @@ class Assay < ActiveRecord::Base
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
     assay_asset = assay_assets.select {|aa| aa.asset_id == asset.id}.first
+    
     if assay_asset.nil?
       assay_asset = AssayAsset.new
-      assay_asset.assay = self
-      assay_asset.asset = asset
-      assay_asset.version = asset.version
-      assay_asset.relationship_type = r_type unless r_type.nil?     
-      assay_asset.save
-      return assay_asset
-    elsif assay_asset.version == asset.version && (r_type.nil? || assay_asset.relationship_type == r_type)
-      assay_asset.version = asset.version
-      assay_asset.relationship_type = r_type unless r_type.nil?     
-      assay_asset.save
+      assay_asset.assay = self             
     end
+    
+    assay_asset.asset = asset
+    assay_asset.version = asset.version
+    assay_asset.relationship_type = r_type unless r_type.nil?
+    assay_asset.save if assay_asset.changed?
+    
     return assay_asset
   end
 

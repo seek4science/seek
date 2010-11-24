@@ -51,12 +51,7 @@ class AssayTest < ActiveSupport::TestCase
   
 
   test "validation" do
-    assay=Assay.new(:title=>"test",
-      :assay_type=>assay_types(:metabolomics),
-      :technology_type=>technology_types(:gas_chromatography),
-      :study => studies(:metabolomics_study),
-      :owner => people(:person_for_model_owner),
-      :assay_class => assay_classes(:experimental_assay_class))
+    assay=new_valid_assay
     
     assert assay.valid?
 
@@ -134,6 +129,33 @@ class AssayTest < ActiveSupport::TestCase
     assert_difference("Assay.find_by_id(assay.id).data_files.count") do
       assay.relate(data_files(:viewable_data_file), relationship_types(:test_data))
     end
+  end
+  
+  test "relate new version of sop" do
+    assay=new_valid_assay
+    assay.save!
+    sop=sops(:sop_with_all_sysmo_users_policy)
+    assert_difference("Assay.find_by_id(assay.id).sops.count",1) do
+      assert_difference("AssayAsset.count",1) do
+        assay.relate(sop)
+      end
+    end
+    assay.reload
+    assert_equal 1,assay.assay_assets.size
+    assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
+    
+    sop.save_as_new_version
+    
+    assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
+      assert_no_difference("AssayAsset.count") do
+        assay.relate(sop)
+      end
+    end
+    
+    assay.reload
+    assert_equal 1,assay.assay_assets.size
+    assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
+    
   end
 
   test "organisms association" do
@@ -224,5 +246,14 @@ class AssayTest < ActiveSupport::TestCase
     uuid = x.attributes["uuid"]
     x.save
     assert_equal x.uuid, uuid
+  end
+  
+  def new_valid_assay
+    Assay.new(:title=>"test",
+      :assay_type=>assay_types(:metabolomics),
+      :technology_type=>technology_types(:gas_chromatography),
+      :study => studies(:metabolomics_study),
+      :owner => people(:person_for_model_owner),
+      :assay_class => assay_classes(:experimental_assay_class))
   end
 end

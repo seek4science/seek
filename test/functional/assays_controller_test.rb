@@ -30,6 +30,32 @@ class AssaysControllerTest < ActionController::TestCase
     validate_xml_against_schema(@response.body)
   end
   
+  test "should update assay with new version of same sop" do
+    login_as(:model_owner)
+    assay=assays(:metabolomics_assay)
+    timestamp=assay.updated_at
+    
+    sop = sops(:sop_with_all_sysmo_users_policy)
+    assert !assay.sops.include?(sop.latest_version)   
+    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
+    assert_redirected_to assay_path(assay)
+    assert assigns(:assay)
+    
+    assay.reload
+    stored_sop = assay.assay_assets.detect{|aa| aa.asset_id=sop.id}.versioned_asset
+    assert_equal sop.version, stored_sop.version
+    
+    sop.save_as_new_version
+    
+    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
+    
+    assay.reload
+    stored_sop = assay.assay_assets.detect{|aa| aa.asset_id=sop.id}.versioned_asset
+    assert_equal sop.version, stored_sop.version
+    
+    
+  end
+  
   test "should update timestamp when associating sop" do
     login_as(:model_owner)
     assay=assays(:metabolomics_assay)
@@ -45,7 +71,9 @@ class AssaysControllerTest < ActionController::TestCase
     assert updated_assay.sops.include?(sop.latest_version)
     assert_not_equal timestamp,updated_assay.updated_at
 
-  end
+end
+
+  
 
   test "should update timestamp when associating datafile" do
     login_as(:model_owner)
