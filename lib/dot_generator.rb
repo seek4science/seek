@@ -85,7 +85,7 @@ module DotGenerator
     dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",width=2,tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute}URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
     if (show_assets) 
       assay.assay_assets.each do |assay_asset|
-        dot << to_dot_asset(assay_asset.asset, current_item)
+        dot << to_dot_asset(assay_asset.versioned_asset, current_item)
         label=""
         if assay_asset.relationship_type
           label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
@@ -107,6 +107,7 @@ module DotGenerator
     dot = ""    
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if asset==current_item
     asset_type=asset.class.name
+    version = asset.version
     if asset_type.end_with?("::Version")
       asset = asset.parent
       asset_type = asset.class.name
@@ -114,7 +115,7 @@ module DotGenerator
     if Authorization.is_authorized?("view",nil,asset,current_user)
       title = multiline(asset.title)
       title = "#{asset_type.upcase}\\n #{title}" unless title.downcase.starts_with?(asset_type.downcase)
-      dot << "#{asset.class.name}_#{asset.id} [label=\"#{title}\",width=2,tooltip=\"#{tooltip(asset)}\",shape=box,fontsize=7,style=filled,fillcolor=\"#{FILL_COLOURS[asset.class]}\",#{highlight_attribute}URL=\"#{polymorphic_path(asset)}\",target=\"_top\"];\n"
+      dot << "#{asset.class.name}_#{asset.id} [label=\"#{title}\",width=2,tooltip=\"#{tooltip(asset)}\",shape=box,fontsize=7,style=filled,fillcolor=\"#{FILL_COLOURS[asset.class]}\",#{highlight_attribute}URL=\"#{polymorphic_path(asset,:version=>version)}\",target=\"_top\"];\n"
       if show_publications
         asset.related_publications.each do |publication|
           dot << to_dot_publication(publication, current_item)
