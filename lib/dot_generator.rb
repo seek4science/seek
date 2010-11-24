@@ -174,17 +174,17 @@ module DotGenerator
   def post_process_svg svg
     svg = svg.gsub(".00;",".00px;")
     orig_header = svg.match(/<svg([^>]*)>/).to_s #remember header with namespace
-    svg = svg.gsub(/xmlns=\"([^\"]*)\"/,"") #Strip NS
     
     parser = LibXML::XML::Parser.string(svg)
     document = parser.parse
-    document.find("g//g").each do |node|
-      title = node.find_first("title").content
+    document.root.namespaces.default_prefix = 'svg'
+    document.find("svg:g//svg:g").each do |node|
+      title = node.find_first("svg:title").content
       unless title.include?("--")
         object_class,object_id = title.split("_")        
         if ["Sop","Model","DataFile","Publication","Study","Assay","Investigation"].include?(object_class)
-          a = node.find_first(".//a")
-          polygon = a.find_first(".//polygon")
+          a = node.find_first(".//svg:a")
+          polygon = a.find_first(".//svg:polygon")
           points = polygon.attributes["points"]
           points = points.split(" ")
           x2 = nil
@@ -209,8 +209,7 @@ module DotGenerator
     end
     
     svg = document.to_s
-    
-    svg = svg.gsub(/<svg([^>]*)>/,orig_header) #revert header now we're done parsing
+        
   end
   
   def multiline str,line_len=3    
