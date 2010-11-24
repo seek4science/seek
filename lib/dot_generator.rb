@@ -85,7 +85,7 @@ module DotGenerator
     dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",width=2,tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute}URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
     if (show_assets) 
       assay.assay_assets.each do |assay_asset|
-        dot << to_dot_asset(assay_asset.versioned_asset, current_item)
+        dot << to_dot_asset(assay_asset.versioned_asset, current_item,true)
         label=""
         if assay_asset.relationship_type
           label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
@@ -155,7 +155,7 @@ module DotGenerator
     dot << "rankdir = LR;"    
     dot << "splines = line;"
     dot << "node [fontsize=9,fontname=\"Helvetica\"];"    
-    dot << "bgcolor=transparent;" 
+    dot << "bgcolor=transparent;"     
     dot << "edge [arrowsize=0.6];\n" 
     return dot
   end
@@ -208,6 +208,8 @@ module DotGenerator
       end
     end
     
+    svg_el = document.find_first("//svg:svg")
+    svg_el.attributes["width"]="500pt"    
     svg = document.to_s
         
   end
