@@ -3,6 +3,8 @@ require 'rake'
 require 'time'
 require 'active_record/fixtures'
 
+require 'csv'
+
 namespace :seek do
   
   desc 'an alternative to the doc:seek task'
@@ -125,7 +127,7 @@ namespace :seek do
   desc 'creates an initial institution set '
   task(:create_institutions=>:environment) do
     revert_fixtures_identify
-    Institution.delete_all
+    #Institution.delete_all
     print "BEFORE\n"
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "institutions")  				  
     print "AFTER\n"
@@ -134,7 +136,8 @@ namespace :seek do
   desc 'creates an initial projects set '
   task(:create_projects=>:environment) do
     revert_fixtures_identify
-    Institution.delete_all
+	# was Institutions.delete_all is this wanted??
+    Projects.delete_all  
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "projects")  				  
   end
 
@@ -144,14 +147,18 @@ namespace :seek do
     #People.delete_all
 
     count = 0;
-    File.open(File.join(RAILS_ROOT, "config/default_data/users_and_people.csv"
-    )).each do |line|
+
+    CSV.open(File.join(RAILS_ROOT,
+    "config/default_data/users_and_people.csv"), 'r', ',').each do |row|
+
 
     	 count = count + 1;
 	 
 	 next if(count == 1);
 
-         email,first_name,last_name,phone,skype_name,web_page,institution,projects = line.chomp.split(/,/);
+         email,first_name,last_name,phone,skype_name,web_page,institution,projects = row
+
+	 
 
 	 
 	 #print "#{first_name} #{last_name}\n"
@@ -167,13 +174,21 @@ namespace :seek do
 					    :skype_name => skype_name,
 					    :web_page => web_page);  
 
+	p.email=email;
+
 	saved = p.save(true);
 	
-	print "Saving #{p}: #{saved}\n";
+	print "Saving #{email} #{web_page} -> #{p}: #{saved}\n";
 
 	person_id = p.id;
 
+	puts p.to_yaml
+
 	print "Person ID for #{first_name} #{last_name}: #{person_id} / Login #{login}\n";
+
+	unless(saved)
+		p.errors.each_full { |msg| puts "ERROR: #{msg}" }
+	end;
 
 	u = p.user;
 
@@ -228,7 +243,7 @@ namespace :seek do
 			p.user = u;
 			p.save(true);
 			u.save(true);
-			print "creating new user #{u}\n"
+			print "creating new user #{u.login} #{u}\n"
 
 	end
 
@@ -246,7 +261,8 @@ namespace :seek do
 		end
 	else
 		print "Could not save #{u}\n";
-		person.errors.each_full { |msg| puts "ERROR: #{msg}" };
+		u.errors.each_full { |msg| puts "ERROR: #{msg}" };
+		exit;
 	end
     end
   end
