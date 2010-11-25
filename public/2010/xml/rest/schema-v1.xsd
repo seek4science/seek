@@ -82,7 +82,8 @@
 					<xsd:element name="latest_version" type="ResourceLink"
 						minOccurs="1" maxOccurs="1"></xsd:element>					
 					<xsd:element name="versions" type="VersionLinks"
-						minOccurs="1" maxOccurs="1"></xsd:element>					
+						minOccurs="1" maxOccurs="1"></xsd:element>	
+					<xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>				
 					<xsd:element name="blob" type="Blob" minOccurs="1"
 						maxOccurs="1"></xsd:element>
 					<xsd:element name="project" type="ProjectItem"
@@ -442,7 +443,8 @@
 					<xsd:element name="organisms" type="OrganismItems"
 						minOccurs="0" maxOccurs="1"></xsd:element>
 					<xsd:element name="creators" type="Creators" minOccurs="1"
-						maxOccurs="1"></xsd:element>					
+						maxOccurs="1"></xsd:element>
+					<xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>					
 					<xsd:element name="project" type="ProjectItem"
 						minOccurs="1" maxOccurs="1"></xsd:element>
 					<xsd:element name="doi" type="xsd:string" minOccurs="1"
