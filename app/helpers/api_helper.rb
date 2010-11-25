@@ -140,7 +140,7 @@ module ApiHelper
       organisms=object.organisms if object.respond_to?("organisms")
       organisms << object.organism if object.respond_to?("organism") && object.organism
       api_partial_collection builder,organisms
-    end if object.respond_to?("organism") || object.respond_to?("organisms")              
+    end if object.respond_to?("organism") || object.respond_to?("organisms")                
         
     builder.tag! "creators" do      
       api_partial_collection builder,object.creators
@@ -183,7 +183,7 @@ module ApiHelper
       end
     end    
     
-    asset_xml builder,object.asset if object.respond_to?("asset")
+    policy_xml builder,object if current_user.person.is_admin? && object.respond_to?("policy")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
     api_partial builder,object.project if object.respond_to?("project")  
     
