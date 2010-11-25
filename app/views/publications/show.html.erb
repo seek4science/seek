@@ -77,7 +77,12 @@
 
     </div>
   </div>
-
+  
+  <div class="main_content_right_box">
+  	<%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @publication, :title=>"Registered by" } -%>  
+	<%= render :partial => "assets/resource_authors_box", :locals => { :resource => @publication, :creators => @publication.creators, :truncate_to => 20, :title=>"Authors" } -%>
+  </div>
+  
   <div style="clear:both;padding-top:1em;">    
     <%= render :partial=>"layouts/items_related_to",:object => @publication %>
   </div>

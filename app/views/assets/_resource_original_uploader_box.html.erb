@@ -1,8 +1,12 @@
+<%
+title||="Uploader"
+%>
+
 <div class="contribution_section_box" style="padding: 0.5em 0 1em 0;">
 
   <p class="heading">
-    <%= help_icon("The original uploader is the person who uploaded, or registered automatically via the JERM") -%>
-    Uploader
+    <%= help_icon("The original uploader is the person who uploaded or registered the item, or JERM if registred automatically") -%>
+    <%= h(title) -%>
   </p>
   <% if resource.contributor -%>
     <p>
