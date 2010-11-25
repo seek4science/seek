@@ -8,7 +8,7 @@ module DotGenerator
                   Investigation=>"#C7E9C0",
                   Study=>"#91c98b",
                   Assay=>"#64b466",
-                  Publication=>"cornflowerblue"
+                  Publication=>"#84B5FD"
                   }
   HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=2," #trailing comma is required
   
