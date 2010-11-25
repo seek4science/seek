@@ -12,6 +12,8 @@ class Policy < ActiveRecord::Base
 
   validates_numericality_of :sharing_scope, :access_type
   
+  alias_attribute :title, :name
+  
   
   # *****************************************************************************
   #  This section defines constants for "sharing_scope" and "access_type" values

@@ -194,13 +194,30 @@ module ApiHelper
     end    
   end
   
-  def asset_xml builder,asset,include_core=true,include_resource=true
-    builder.tag! "asset",
-    core_xlink(asset) do
-      core_xml builder,asset if include_core
-      resource_xml builder,asset.resource if (include_resource)                   
-    end    
-  end
+  def policy_xml builder,asset
+    policy = asset.policy
+    unless policy.nil?
+      builder.tag! "policy" do
+        dc_core_xml builder,policy
+        builder.tag! "sharing_scope",policy.sharing_scope
+        builder.tag! "access_type",policy.access_type
+        builder.tag! "use_custom_sharing",policy.use_custom_sharing ? policy.use_custom_sharing : false
+        builder.tag! "use_blacklist",policy.use_blacklist ? policy.use_blacklist : false
+        builder.tag! "use_whitelist",policy.use_whitelist ? policy.use_whitelist : false
+        builder.tag! "permissions" do
+          policy.permissions.select{|p| p.contributor_type!="FavouriteGroup"}.each do |permission|
+            builder.tag! "permission" do
+              dc_core_xml builder,permission
+              builder.tag! "contributor",core_xlink(permission.contributor)              
+              builder.tag! "access_type",permission.access_type
+            end
+          end
+        end
+      end
+    else
+      builder.tag! "policy",{"xsi:nil"=>"true"}
+    end
+  end    
   
   def resource_xml builder,resource 
     builder.tag! "resource",core_xlink(resource)
