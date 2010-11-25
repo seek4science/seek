@@ -12,6 +12,17 @@ module DotGenerator
                   }
   HIGHLIGHT_ATTRIBUTE="color=blue,penwidth=2," #trailing comma is required
   
+  def dot_header title
+    dot = "graph #{title} {"
+    dot << "rankdir = LR;\n"    
+    dot << "splines = line;\n"
+    dot << "node [fontsize=9,fontname=\"Helvetica\"];\n"    
+    dot << "bgcolor=transparent;\n"
+    dot << "ranksep=0.2;\n"
+    dot << "edge [arrowsize=0.6];\n" 
+    return dot
+  end
+  
   def to_dot root_item, deep=false, current_item=nil
     current_item||=root_item
     dot = dot_header "Investigation"
@@ -21,33 +32,34 @@ module DotGenerator
     end
     
     if root_item.instance_of?(Study)
-      dot += to_dot_study root_item,deep,current_item, true
+      dot += to_dot_study root_item,deep,current_item
     end
     
     if root_item.instance_of?(Assay)
-      dot += to_dot_assay root_item,deep,current_item, true
+      dot += to_dot_assay root_item,deep,current_item
     end
     
     if root_item.instance_of?(DataFile) ||
       root_item.instance_of?(Model) ||
       root_item.instance_of?(Sop)
       root_item.assays.each do |assay|
-        dot += to_dot_assay assay,deep,current_item, true
+        dot += to_dot_assay assay,deep,current_item
       end
       if root_item.assays.empty?
-        dot += to_dot_asset root_item,current_item, true
+        dot += to_dot_asset root_item,current_item
       end
     end
     
     if root_item.instance_of?(Publication)
+      dot << to_dot_publication(root_item,current_item)
       root_item.related_assays.each do |assay|
-        dot += to_dot_assay assay,deep,current_item, true
+        dot += to_dot_assay assay,deep,current_item
+        dot << "Assay_#{assay.id} -- Publication_#{root_item.id}; \n"
       end
        (root_item.related_data_files + root_item.related_models).each do |asset|
-        dot += to_dot_asset asset,current_item, true
+        dot += to_dot_asset asset,current_item
       end
-    end
-    
+    end    
     dot << "}"
     return dot
   end
@@ -64,7 +76,7 @@ module DotGenerator
     return dot
   end
   
-  def to_dot_study study, show_assets=true,current_item=nil, show_publications=false
+  def to_dot_study study, show_assets=true,current_item=nil
     current_item||=study
     dot = ""
     
@@ -72,38 +84,39 @@ module DotGenerator
     
     dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",width=2,tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Study]}\",#{highlight_attribute}URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
     study.assays.each do |assay|
-      dot << to_dot_assay(assay, show_assets,current_item, show_publications)
-      dot << "Study_#{study.id} -- Assay_#{assay.id}\n"
+      dot << to_dot_assay(assay, show_assets,current_item)
+      dot << "Study_#{study.id} -- Assay_#{assay.id}; \n"
     end
     return dot  
   end
   
-  def to_dot_assay assay, show_assets=true,current_item=nil, show_publications=false
+  def to_dot_assay assay, show_assets=true,current_item=nil
     current_item||=assay
-    dot = ""    
+    dot = ""
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if assay==current_item
     dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",width=2,tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute}URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
-    if (show_assets) 
+    if (show_assets)            
       assay.assay_assets.each do |assay_asset|
-        dot << to_dot_asset(assay_asset.versioned_asset, current_item,true)
+        dot << to_dot_asset(assay_asset.versioned_asset, current_item)
         label=""
         if assay_asset.relationship_type
           label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
         end   
-        dot << "Assay_#{assay.id} -- #{assay_asset.asset_type}_#{assay_asset.asset_id} #{label} \n"
+        dot << "Assay_#{assay.id} -- #{assay_asset.asset_type}_#{assay_asset.asset_id} #{label} ;\n"        
       end
-    end  
-    if show_publications
       assay.related_publications.each do |publication|
         dot << to_dot_publication(publication, current_item)
-        dot << "Assay_#{assay.id} -- Publication_#{publication.id} \n"
-      end
-    end
+        dot << "Assay_#{assay.id} -- Publication_#{publication.id}; \n"        
+      end            
+    end  
+    
     return dot
   end
   
-  def to_dot_asset asset, current_item=nil, show_publications=false
+  def to_dot_asset asset, current_item=nil
     current_item||=asset
+    
+    show_publications = current_item.respond_to?("contributor")
     dot = ""    
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if asset==current_item || (asset.class.name.end_with?("::Version") && asset.parent==current_item)
     asset_type=asset.class.name
@@ -119,12 +132,13 @@ module DotGenerator
       if show_publications
         asset.related_publications.each do |publication|
           dot << to_dot_publication(publication, current_item)
-          dot << "#{asset.class.name}_#{asset.id} -- Publication_#{publication.id} \n"
+          dot << "#{asset.class.name}_#{asset.id} -- Publication_#{publication.id}; \n"          
         end
       end
     else
       dot << "#{asset.class.name}_#{asset.id} [label=\"Hidden Item\",width=2,tooltip=\"Hidden Item\",shape=box,fontsize=6,style=filled,fillcolor=lightgray];\n"
     end
+    
     return dot    
   end
   
@@ -150,15 +164,7 @@ module DotGenerator
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
   
-  def dot_header title
-    dot = "graph #{title} {"
-    dot << "rankdir = LR;"    
-    dot << "splines = line;"
-    dot << "node [fontsize=9,fontname=\"Helvetica\"];"    
-    dot << "bgcolor=transparent;"     
-    dot << "edge [arrowsize=0.6];\n" 
-    return dot
-  end
+  
   
   def to_png root_item,deep=false,current_item=nil
     tmpfile = Tempfile.new("#{root_item.class.name}_dot")
