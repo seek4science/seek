@@ -32,13 +32,13 @@
             <% if @person.user.login %>
             <p>
                 <b>Login name:</b>
-                <%= h @person.user.login %><span class='none_text'>(Only visible to you)</span>
+                <%= h @person.user.login %><span class='none_text'> (Only visible to you)</span>
             </p>
             <% end %>
             <% if @person.user.openid %>
             <p>
                 <b>OpenID URL:</b>
-                <%= h @person.user.openid %><span class='none_text'>(Only visible to you)</span>
+                <%= h @person.user.openid %><span class='none_text'> (Only visible to you)</span>
             </p>
             <% end %>
             <% end %>
