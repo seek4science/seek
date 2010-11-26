@@ -75,8 +75,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not create data file with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
-    uri=URI.parse(file_url)
-    #check the url can be opened
+    uri=URI.parse(file_url)    
    
     assert_no_difference('DataFile.count') do
       assert_no_difference('ContentBlob.count') do
