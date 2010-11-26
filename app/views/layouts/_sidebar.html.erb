@@ -7,9 +7,9 @@
   <%= render :partial => "gadgets/sign_in" -%>
 <% end -%>
 
-<% if ENV['RAILS_ENV'] != "development" -%>
-	<% cache "tag_clouds" do -%>
-	  <%= render :partial=>"gadgets/merged_tag_cloud_gadget" %>
-	<% end -%>	
-<% end -%>
+
+<% cache "tag_clouds" do -%>
+  <%= render :partial=>"gadgets/merged_tag_cloud_gadget" %>
+<% end -%>	
+
 <%= render :partial=>"gadgets/organism_gadget" %>
