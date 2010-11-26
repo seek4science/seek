@@ -40,6 +40,19 @@ class SopsControllerTest < ActionController::TestCase
     
   end
   
+  test "should not create sop with file url" do
+    file_path=File.expand_path(__FILE__) #use the current file
+    file_url="file://"+file_path
+    uri=URI.parse(file_url)    
+   
+    assert_no_difference('Sop.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :sop => { :title=>"Test",:data_url=>uri.to_s}, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash[:error]    
+  end
+  
   def test_title
     get :index
     assert_select "title",:text=>/Sysmo SEEK SOPs.*/, :count=>1

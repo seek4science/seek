@@ -18,6 +18,19 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:models)
   end    
   
+  test "should not create model with file url" do
+    file_path=File.expand_path(__FILE__) #use the current file
+    file_url="file://"+file_path
+    uri=URI.parse(file_url)    
+   
+    assert_no_difference('Model.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :model => { :title=>"Test",:data_url=>uri.to_s}, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash[:error]    
+  end
+  
   test "show builder with versioned sbml format" do
     m=models(:teusink)
     m.content_blob.dump_data_to_file #required for the form post to work, as it uses the stored file

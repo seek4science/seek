@@ -72,6 +72,20 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:data_file).content_type
   end
   
+  test "should not create data file with file url" do
+    file_path=File.expand_path(__FILE__) #use the current file
+    file_url="file://"+file_path
+    uri=URI.parse(file_url)
+    #check the url can be opened
+   
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :data_file => { :title=>"Test",:data_url=>uri.to_s}, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash[:error]    
+  end
+  
   
   
   test "should create data file and store with url and store flag" do
