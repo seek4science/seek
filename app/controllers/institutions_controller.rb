@@ -125,6 +125,7 @@ class InstitutionsController < ApplicationController
   
   def find_institutions
     @institutions = Institution.paginate :page=>params[:page]
+    @institutions = apply_filters(@institutions)
   end
 
   def editable_by_user

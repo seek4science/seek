@@ -218,7 +218,7 @@ class ApplicationController < ActionController::Base
       set = resources.select do |res|
         pass = true
         unless params[:filter][:project].blank?
-          if res.class.name == "Person"
+          if res.class.name == "Person" || res.class.name == "Institution"
             pass = pass && (res.projects.include?(Project.find_by_id(params[:filter][:project].to_i)))
           else
             pass = pass && (res.project.id == params[:filter][:project].to_i)            
