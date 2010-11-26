@@ -34,6 +34,7 @@ public/help_images/*
 .rvmrc
 .bundle/config
 Gemfile.lock
+vendor/bundle/
 
 
 syntax: regexp
