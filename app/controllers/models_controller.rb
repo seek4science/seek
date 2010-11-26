@@ -15,6 +15,8 @@ class ModelsController < ApplicationController
   
   before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
+  before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
+  
   @@model_builder = Seek::JWSModelBuilder.new
   
   # GET /models
@@ -65,10 +67,10 @@ class ModelsController < ApplicationController
     respond_to do |format|
       if error
         flash[:error]="JWS Online encountered a problem processing this model."
-        format.html { redirect_to(@model,:version=>@display_model.version)}                      
+        format.html { redirect_to model_path(@model,:version=>@display_model.version)}                      
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
-        format.html { redirect_to(@model,:version=>@display_model.version)}        
+        format.html { redirect_to model_path(@model,:version=>@display_model.version)}        
       else
         format.html
       end
@@ -105,7 +107,7 @@ class ModelsController < ApplicationController
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
       elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version new_version_comments
-        format.html {redirect_to @model }
+        format.html {redirect_to model_path(@model,:version=>@model.version) }
       else
         format.html { render :action=>"builder" }
       end      
@@ -531,6 +533,15 @@ class ModelsController < ApplicationController
     end
   end
   
+  def jws_enabled
+    unless JWS_ENABLED      
+      respond_to do |format|
+        flash[:error] = "Interaction with JWS Online is currently disabled"
+        format.html { redirect_to model_path(@model,:version=>@display_model.version) }
+      end
+      return false
+    end
+  end
   
   def set_parameters_for_sharing_form
     policy = nil

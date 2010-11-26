@@ -7,6 +7,9 @@ SOLR_ENABLED = false
 #Enable email
 EMAIL_ENABLED = false
 
+#enable JWS Online for building and simulating SBML models
+JWS_ENABLED = false
+
 
 #this enables the sending of emails when things go wrong. If you set this to true, you should also comment out the following lines and edit accordingly.
 EXCEPTION_NOTIFICATION_ENABLED = false

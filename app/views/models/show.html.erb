@@ -31,7 +31,7 @@
     <% end -%>
 </ul>
 
-<% if jws_supported?(@display_model) -%>
+<% if JWS_ENABLED && jws_supported?(@display_model) -%>
 	<ul class="sectionIcons">
 		<% if Authorization.is_authorized?("edit", nil, @model, current_user) -%>
 		    <li>
