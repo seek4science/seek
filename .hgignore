@@ -35,6 +35,7 @@ public/help_images/*
 .bundle/config
 Gemfile.lock
 vendor/bundle/
+tmp/restart.txt
 
 
 syntax: regexp
