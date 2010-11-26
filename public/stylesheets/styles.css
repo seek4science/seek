@@ -853,6 +853,7 @@ ul.related_asset_list li{
     margin-left: 1em;
     margin-top: 1em;
     text-align: center;
+	margin-bottom: 0.5em;
 }
 
 .contribution_title_image {
@@ -875,6 +876,14 @@ ul.related_asset_list li{
 
 .contribution_title h1 {    
     width: 90%;
+}
+
+.contribution_aftertitle {
+	color: #666666; 
+	font-size: 85%; 
+	text-align: center; 	
+	margin-bottom: 0.6em;
+	line-height: 1.5;
 }
 
 table.jerm_results {
