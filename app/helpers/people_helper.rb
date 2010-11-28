@@ -12,11 +12,11 @@ module PeopleHelper
   end
 
   def pal_icon person
-    person.is_pal? ? image("pal",:alt=>"Pal",:title=>tooltip_title_attrib("Official SysMO-DB Pal"), :style=>"vertical-align: middle")  : ""
+    person.is_pal? ? image("pal",:alt=>"Pal",:title=>tooltip_title_attrib("Official Virtual Liver Pal"), :style=>"vertical-align: middle")  : ""
   end
 
   def admin_icon person
-    person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("Sysmo-DB Administrator"), :style=>"vertical-align: middle") : ""
+    person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("VLN Administrator"), :style=>"vertical-align: middle") : ""
   end
 
   def discipline_list person

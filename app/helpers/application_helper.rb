@@ -193,7 +193,7 @@ module ApplicationHelper
     name=PAGE_TITLES[controller_name]
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
-    return "Sysmo SEEK "+name
+    return "Virtual Liver SEEK "+name
   end
 
   def admin_email_links
