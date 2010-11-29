@@ -2,14 +2,20 @@
 JERM_ENABLED = true
 
 #Enable search
-SOLR_ENABLED = false
+SOLR_ENABLED = true
 
 #Enable email
 EMAIL_ENABLED = false
 
+#Activation, at registration time, required
+ACTIVATION_REQUIRED=false
+
 #enable JWS Online for building and simulating SBML models
 JWS_ENABLED = false
 
+#a threshold of the total number of times a tag must occur before it appears in the tag cloud. Increasing this setting can prevent
+#a very large tag cloud as the number of tags grow.
+MERGED_TAG_THRESHOLD=1
 
 #this enables the sending of emails when things go wrong. If you set this to true, you should also comment out the following lines and edit accordingly.
 EXCEPTION_NOTIFICATION_ENABLED = false
@@ -18,11 +24,6 @@ EXCEPTION_NOTIFICATION_ENABLED = false
 #ExceptionNotifier.email_prefix = "[SEEK-#{RAILS_ENV.capitalize} ERROR] "
 #ExceptionNotifier.exception_recipients = %w(joe@example.com bill@example.com)
 
-  
-
-#Activation, at registration time, required
-ACTIVATION_REQUIRED=false
-
 #Hide contact details
 HIDE_DETAILS = false
 
@@ -30,10 +31,18 @@ HIDE_DETAILS = false
 ENABLE_GOOGLE_ANALYTICS = false
 GOOGLE_ANALYTICS_TRACKER_ID = 'XX-XXXXXXX-X'
 
-MERGED_TAG_THRESHOLD=5
-
 #Enable managing of assay and technology types by "admins", "pals", "users" or "none"
 TYPE_MANAGERS = "admins"
 
 #this is needed for the xlinks in the REST API.
 #SITE_BASE_HOST="http://localhost:3000"
+
+#Mailer settings
+ActionMailer::Base.smtp_settings= {
+  :address => "",
+  :port => "25",
+  :domain => "",
+  :authentication => :plain,
+  :user_name => "",
+  :password  => ""
+}

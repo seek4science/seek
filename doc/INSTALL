@@ -24,11 +24,15 @@ SEEK uses Lucene as its search engine, and this requires that java is installed.
 
 If using Ubuntu or Debian, the following commands should install most the packages you need:
 
-  sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential openssh-server libxml++2.6-dev sun-java6-jdk graphviz
+  sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential openssh-server libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
 
-if you are intending to develop SEEK you will probably also want to install:
+if you are intending to develop SEEK you will probably also want to use:
 
-  sudo apt-get install libsqlite3-dev sqlite3 curl irb
+  sudo apt-get install curl irb
+  
+if setting up for production deployment using the Passenger Phusion Apache module you can save a step later by also using:
+
+  sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
 
 You now need to install rubygems (1.3.7). Rather than install through apt-get, we recommend downloading and installing from the rubygems website: http://rubygems.org/pages/download.
 The following commands should install rubygems for you on a Ubuntu/Debian system.
@@ -54,11 +58,16 @@ For a stable version, you should check out according to a stable tag. Our curren
   
 Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
-  sudo gem install bundler
+  sudo gem install -d bundler rake
   
 Then from within the sysmo-seek directory run
 
   bundle install  
+  
+If you are requested for a root or sudo password, but you do not have this level of access then you should use
+
+  bundle install --deployment
+  
 
 
 == The RAILS_ENV environment variable
