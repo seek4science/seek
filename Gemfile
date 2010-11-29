@@ -14,7 +14,7 @@ gem 'uuidtools',"2.1.1"
 gem "RedCloth","~>4.2.3"
 gem 'simple-spreadsheet-extractor',"0.3.5"
 gem "rmagick","2.12.2"
-gem "sqlite3-ruby",:require=>"sqlite3"
+#gem "sqlite3-ruby",:require=>"sqlite3"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
 
