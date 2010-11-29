@@ -1,19 +1,27 @@
 require 'openssl'
 require 'uuidtools'
-  
+
 module Jerm
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE  
-
+  
   # Handles downloading data files from a Remote site, together with authentication using the provided username and password.
   # The downloader is created for a given project using the Jerm::DownloaderFactory, though in most current cases the HttpDownloader is sufficient
   class HttpDownloader
     @@file_cache={}
     @@filename_cache={}
-     
+    
     def get_remote_data url, username=nil, password=nil, type=nil, include_data=true
       cached=check_from_cache(url,username,password)
       return cached unless cached.nil?
-      return basic_auth url, username, password,include_data
+      uri=URI.parse(url)
+      if ["http","https"].include? uri.scheme
+        return basic_auth url, username, password,include_data
+      elsif uri.scheme=="ftp"
+        return fetch_from_ftp url,username,password,include_data
+      else
+        raise URI::InvalidURIError.new("Only http, https and ftp are supported") 
+      end
+      
     end        
     
     #tries to determine the filename from f
@@ -33,9 +41,9 @@ module Jerm
       @@filename_cache[f.base_uri]=result      
       return result
     end
-
+    
     private
-
+    
     #handles fetching data using basic authentication. Handles http and https.
     #returns a hash that contains the following:
     # :data=> the data
@@ -44,7 +52,7 @@ module Jerm
     #
     # throws an Exception if anything goes wrong.
     def basic_auth url, username,password, include_data=true
-
+      
       #This block is to ensure that only urls are encoded if they need it.
       #This is to prevent already encoded urls being re-encoded, which can lead to % being replaced with %25.
       begin
@@ -71,7 +79,27 @@ module Jerm
       end
       
     end
-
+    
+    #fetches from an FTP based url. If the url contains username and password information then this is used instead of
+    #that passed in. If no username and password is provided, then anonymous is assumed
+    def fetch_from_ftp url,username=nil,password=nil,include_data=true      
+      uri=URI.parse(url)
+      unless uri.userinfo.nil? 
+        username, password = url.userinfo.split(/:/)
+      end
+      username="anonymous" if username.nil?
+      ftp = Net::FTP.new(uri.host)
+      ftp.login(username,password)      
+      data=""
+      ftp.getbinaryfile(uri.path) do |block|        
+        data << block
+      end
+      ftp.close      
+      result = {:data=>data,:filename=>File.basename(url),:content_type=>nil}
+      cache result,url,username,password
+      return result
+    end
+    
     #returns a hash that contains
     # :data
     # :content_type
@@ -83,14 +111,14 @@ module Jerm
     def check_from_cache url,username,password
       key=generate_key url,username,password
       res=@@file_cache[key]
-
+      
       return nil if res.nil?
       return nil if (res[:time_stored] + 3600) < Time.now
       
       res[:data]=read_data_from_tmp res[:uuid]
       return res
     end
-
+    
     def read_data_from_tmp uuid
       data=nil
       File.open(cached_path(uuid), 'rb') do |f|
@@ -115,22 +143,22 @@ module Jerm
         @@file_cache[key]=nil
       end      
     end
-
+    
     def store_data_to_tmp data,uuid
       File.open(cached_path(uuid), 'wb') do |f|
         f.write data
       end
     end
-
+    
     def cached_path uuid
       path = "#{RAILS_ROOT}/tmp/cache/downloader_cache/"
       FileUtils.mkdir_p(path)
       return "#{path}/#{uuid}.dat"
     end
-
+    
     def generate_key url,username,password
       "#{url}+#{username}+#{password}"
     end
-
+    
   end
 end

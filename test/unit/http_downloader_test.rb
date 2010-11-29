@@ -33,5 +33,13 @@ class HttpDownloaderTest < ActiveSupport::TestCase
     assert_equal res[:filename],res2[:filename]
     assert_equal res[:content_type],res2[:content_type]
   end
+  
+  def test_fetch_from_ftp
+    ftp_url = "ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt"
+    downloader = Jerm::HttpDownloader.new
+    res = downloader.get_remote_data(ftp_url)
+    assert_not_nil res[:data]
+    assert_equal "robots.txt",res[:filename]
+  end
 
 end

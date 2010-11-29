@@ -72,20 +72,20 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:data_file).content_type
   end
   
-#  test "should create data file with ftp_url" do
-#    assert_difference('DataFile.count') do
-#      assert_difference('ContentBlob.count') do
-#        post :create, :data_file => valid_data_file_with_ftp_url, :sharing=>valid_sharing
-#      end
-#    end
-#    assert_redirected_to data_file_path(assigns(:data_file))
-#    assert_equal users(:datafile_owner),assigns(:data_file).contributor
-#    assert !assigns(:data_file).content_blob.url.blank?
-#    assert assigns(:data_file).content_blob.data.nil?
-#    assert !assigns(:data_file).content_blob.file_exists?
-#    assert_equal "robots.txt", assigns(:data_file).original_filename
-#    assert_equal "text/plain", assigns(:data_file).content_type
-#  end
+  test "should create data file with ftp_url" do
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file_with_ftp_url, :sharing=>valid_sharing
+      end
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal "robots.txt", assigns(:data_file).original_filename
+    assert_equal "text/plain", assigns(:data_file).content_type
+  end
   
   test "should not create data file with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
