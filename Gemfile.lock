@@ -37,7 +37,7 @@ GEM
     rake (0.8.7)
     rest-client (1.6.1)
       mime-types (>= 1.16)
-    rmagick (2.13.1)
+    rmagick (2.12.2)
     rubaidh-google_analytics (1.1.4)
       actionpack
       activesupport
@@ -63,7 +63,7 @@ DEPENDENCIES
   rack-openid (= 1.0.1)
   rails (= 2.3.5)
   rest-client (>= 1.6.1)
-  rmagick
+  rmagick (= 2.12.2)
   rubaidh-google_analytics (~> 1.1.4)
   ruby-openid
   simple-spreadsheet-extractor (= 0.3.5)
