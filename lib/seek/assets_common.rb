@@ -34,7 +34,7 @@ module Seek
           msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         end        
       rescue Exception=>e
-        msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+h(asset_url)
+        msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+asset_url
       end
       
       image = "<img src='/images/#{icon_filename}'/>"
