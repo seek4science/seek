@@ -91,7 +91,8 @@ module Jerm
       ftp = Net::FTP.new(uri.host)
       ftp.login(username,password)      
       data=""
-      ftp.getbinaryfile(uri.path) do |block|        
+      
+      ftp.getbinaryfile(uri.path,"/dev/null") do |block|        
         data << block
       end
       ftp.close      
