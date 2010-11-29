@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Mon Nov 22 17:02:28 +0000 2010</td>
+      <td>Mon Nov 29 10:07:48 +0000 2010</td>
     </tr>
     </table>
   </div>
@@ -122,13 +122,14 @@ If using Ubuntu or Debian, the following commands should install most the
 packages you need:
 </p>
 <pre>
-  sudo apt-get install wget mercurial ruby rdoc libsqlite3-dev sqlite3 ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient15-dev libmagick++9-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
+  sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential openssh-server libxml++2.6-dev sun-java6-jdk graphviz
 </pre>
 <p>
-For Ubuntu 10.04 (Lucid Lynx) you should use:
+if you are intending to develop SEEK you will probably also want to
+install:
 </p>
 <pre>
-  sudo apt-get install wget mercurial ruby rdoc libsqlite3-dev sqlite3 ri irb libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential curl openssh-server libxml++2.6-dev sun-java6-jdk graphviz
+  sudo apt-get install libsqlite3-dev sqlite3 curl irb
 </pre>
 <p>
 You now need to install rubygems (1.3.7). Rather than install through
@@ -157,10 +158,10 @@ as the version control system.
 </p>
 <p>
 For a stable version, you should check out according to a stable tag. Our
-current tag is v0.9.1, so to retrieve this version you should use:
+current tag is v0.10.0, so to retrieve this version you should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.9.1 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.10.0 sysmo-seek
 </pre>
 <p>
 <a href="http://gembundler.com/">Bundler</a> is used to manage gems, so to
