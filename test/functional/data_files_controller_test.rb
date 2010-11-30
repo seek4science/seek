@@ -83,8 +83,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "robots.txt", assigns(:data_file).original_filename
-    assert_equal "text/plain", assigns(:data_file).content_type
+    assert_equal "robots.txt", assigns(:data_file).original_filename    
   end
   
   test "should not create data file with file url" do
