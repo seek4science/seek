@@ -14,10 +14,13 @@ gem 'uuidtools',"2.1.1"
 gem "RedCloth","~>4.2.3"
 gem 'simple-spreadsheet-extractor',"0.3.5"
 gem "rmagick","2.12.2"
-gem "sqlite3-ruby","1.3.2",:require=>"sqlite3"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
 
 group :development do
-  
+  gem "sqlite3-ruby","1.3.2",:require=>"sqlite3"
+end
+
+group :test do
+  gem "sqlite3-ruby","1.3.2",:require=>"sqlite3"
 end
