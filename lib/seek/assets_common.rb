@@ -17,14 +17,15 @@ module Seek
         username = 'anonymous'
         password = nil
         username, password = url.userinfo.split(/:/) if url.userinfo
-        
-        ftp = Net::FTP.new(url.host)
-        ftp.login(username,password)
-        ftp.getbinaryfile(url.path, '/dev/null', 20) {
-          break
-        }
-        ftp.close
-        code="200"
+        begin
+          ftp = Net::FTP.new(url.host)
+          ftp.login(username,password)
+          ftp.getbinaryfile(url.path, '/dev/null', 20) { break }
+          ftp.close
+          code="200"
+        rescue Net::FTPPermError
+          code="401"        
+        end                
       else
         raise URI::InvalidURIError.new("Only http, https and ftp are supported")  
       end
@@ -47,13 +48,12 @@ module Seek
           msg="The URL was accessed successfully"
         elsif code == "302"
           icon_filename=icon_filename_for_key("warn")
-          msg="The url responded with a <b>redirect</b>. It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
+          msg="The url responded with a <b>redirect</b>. It can still be used, but content type and filename may not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         elsif code == "401"
           icon_filename=icon_filename_for_key("warn")
           msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         end        
-      rescue Exception=>e
-        #raise e
+      rescue Exception=>e        
         msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+asset_url
       end
       

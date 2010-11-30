@@ -10,7 +10,7 @@ module Jerm
     @@file_cache={}
     @@filename_cache={}
     
-    def get_remote_data url, username=nil, password=nil, type=nil, include_data=true
+    def get_remote_data url, username=nil, password=nil, type=nil, include_data=true      
       cached=check_from_cache(url,username,password)
       return cached unless cached.nil?
       uri=URI.parse(url)
@@ -20,8 +20,7 @@ module Jerm
         return fetch_from_ftp url,username,password,include_data
       else
         raise URI::InvalidURIError.new("Only http, https and ftp are supported") 
-      end
-      
+      end          
     end        
     
     #tries to determine the filename from f
@@ -82,12 +81,14 @@ module Jerm
     
     #fetches from an FTP based url. If the url contains username and password information then this is used instead of
     #that passed in. If no username and password is provided, then anonymous is assumed
-    def fetch_from_ftp url,username=nil,password=nil,include_data=true      
+    def fetch_from_ftp url,username=nil,password=nil,include_data=true
       uri=URI.parse(url)
       unless uri.userinfo.nil? 
-        username, password = url.userinfo.split(/:/)
+        username, password = uri.userinfo.split(/:/)
       end
+      
       username="anonymous" if username.nil?
+      
       ftp = Net::FTP.new(uri.host)
       ftp.login(username,password)      
       data=""
