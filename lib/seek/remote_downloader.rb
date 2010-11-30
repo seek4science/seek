@@ -109,6 +109,7 @@ module Seek
     # returns nil if either it is not available in the cache, or the time_stored is older than 1hr ago
     def check_from_cache url,username,password
       key=generate_key url,username,password
+      
       res=@@file_cache[key]
       
       return nil if res.nil? || !File.exists?(res[:data_tmp_path])
@@ -125,20 +126,25 @@ module Seek
     def cache file_obj,data_result,url,username,password
       data_result[:uuid]=UUIDTools::UUID.random_create.to_s
       key=generate_key url,username,password      
-            
+      
       begin
         data_result[:data_tmp_path] = store_data_to_tmp file_obj,data_result[:uuid]
         data_result[:time_stored]=Time.now
         @@file_cache[key]=data_result
-      rescue Exception=>e
-        raise e
+      rescue Exception=>e        
         @@file_cache[key]=nil
       end      
     end
     
     def store_data_to_tmp file_obj,uuid
       path = cached_path(uuid)
-      FileUtils.cp(file_obj.path,path)
+      file_obj.rewind
+      File.open(path, 'wb') do |f|
+        file_obj.each_byte do |byte|
+          f.write byte.chr
+        end        
+      end
+      
       return path
     end
     

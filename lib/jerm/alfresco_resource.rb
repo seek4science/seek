@@ -28,8 +28,8 @@ module Jerm
     
     def read_metadata metadata_uri      
       downloader = Seek::RemoteDownloader.new
-      data=downloader.get_remote_data(metadata_uri,@username,@password)[:data]
-      FasterCSV.parse(data) do |row|
+      data_file_path = downloader.get_remote_data(metadata_uri,@username,@password)[:data_tmp_path]      
+      FasterCSV.foreach(data_file_path) do |row|
         case row[0]
           when "ownerFirstName","ownerFirst"
           @author_first_name=row[1]

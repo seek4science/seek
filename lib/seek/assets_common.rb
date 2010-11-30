@@ -79,7 +79,7 @@ module Seek
       downloader=Jerm::DownloaderFactory.create project.name
       resource_type = resource.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
       data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
-      send_data data_hash[:data], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+      send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
     end
     
     def download_via_url asset    
@@ -89,7 +89,7 @@ module Seek
       else
         downloader=RemoteDownloader.new
         data_hash = downloader.get_remote_data asset.content_blob.url
-        send_data data_hash[:data], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
       end      
     end
     
@@ -146,7 +146,7 @@ module Seek
               params[symb][:content_type] = ""
               params[symb][:original_filename] = ""
             else
-              flash.now[:error] = "Unable to process the URL."
+              flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
               if render_action_on_error
                 respond_to do |format|                  
                   format.html do 
@@ -158,7 +158,8 @@ module Seek
               return false
             end            
           end        
-        rescue Exception=>e          
+        rescue Exception=>e    
+          raise e
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
             respond_to do |format|            
