@@ -1,5 +1,6 @@
 require 'openssl'
 require 'uuidtools'
+require 'fileutils'
 
 module Seek
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
@@ -46,7 +47,7 @@ module Seek
     
     #handles fetching data using basic authentication. Handles http and https.
     #returns a hash that contains the following:
-    # :data=> the data
+    # :data_tmp_path=> a path to a temporary copy of the data
     # :content_type=> the content_type
     # :filename => the filename
     #
@@ -64,11 +65,9 @@ module Seek
       begin
         open(url,:http_basic_authentication=>[username, password]) do |f|
           #FIXME: need to handle full range of 2xx sucess responses, in particular where the response is only partial
-          if f.status[0] == "200"               
-            data=nil
-            data=f.read if include_data
-            result = {:data=>data,:content_type=>f.content_type,:filename=>determine_filename(f)}            
-            cache result,url,username,password                                    
+          if f.status[0] == "200"                           
+            result = {:content_type=>f.content_type,:filename=>determine_filename(f)}
+            result = cache f,result,url,username,password
             return result
           else
             raise Exception.new("Problem fetching data from remote site - response code #{thing.status[0]}, url: #{url}")
@@ -91,15 +90,12 @@ module Seek
       username="anonymous" if username.nil?
       
       ftp = Net::FTP.new(uri.host)
-      ftp.login(username,password)      
-      data=""
-      
-      ftp.getbinaryfile(uri.path,"/dev/null") do |block|        
-        data << block
-      end
+      ftp.login(username,password)            
+      tmp=Tempfile.new("_seek")
+      ftp.getbinaryfile(uri.path,tmp.path)
       ftp.close      
-      result = {:data=>data,:filename=>File.basename(url),:content_type=>nil}
-      cache result,url,username,password
+      result = {:filename=>File.basename(url),:content_type=>nil}
+      result = cache tmp,result,url,username,password
       return result
     end
     
@@ -115,42 +111,35 @@ module Seek
       key=generate_key url,username,password
       res=@@file_cache[key]
       
-      return nil if res.nil?
-      return nil if (res[:time_stored] + 3600) < Time.now
+      return nil if res.nil? || !File.exists?(res[:data_tmp_path])
       
-      res[:data]=read_data_from_tmp res[:uuid]
-      return res
-    end
-    
-    def read_data_from_tmp uuid
-      data=nil
-      File.open(cached_path(uuid), 'rb') do |f|
-        data=f.read
+      if (res[:time_stored] + 3600) < Time.now
+        FileUtils.delete res[:data_tmp_path]
+        return nil
       end
-      return data
-    end
+            
+      return res
+    end        
     
     #caches the result into a temporary file
-    def cache data_result,url,username,password
+    def cache file_obj,data_result,url,username,password
       data_result[:uuid]=UUIDTools::UUID.random_create.to_s
-      key=generate_key url,username,password
-      cached={}
-      
-      #we don't want to hold the data value in memory, this gets stored to disk
-      data_result.keys.each{|k| cached[k]=data_result[k] unless k==:data}
+      key=generate_key url,username,password      
+            
       begin
-        store_data_to_tmp data_result[:data],data_result[:uuid]
-        cached[:time_stored]=Time.now
-        @@file_cache[key]=cached
-      rescue
+        data_result[:data_tmp_path] = store_data_to_tmp file_obj,data_result[:uuid]
+        data_result[:time_stored]=Time.now
+        @@file_cache[key]=data_result
+      rescue Exception=>e
+        raise e
         @@file_cache[key]=nil
       end      
     end
     
-    def store_data_to_tmp data,uuid
-      File.open(cached_path(uuid), 'wb') do |f|
-        f.write data
-      end
+    def store_data_to_tmp file_obj,uuid
+      path = cached_path(uuid)
+      FileUtils.cp(file_obj.path,path)
+      return path
     end
     
     def cached_path uuid
