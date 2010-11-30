@@ -135,7 +135,11 @@ module Seek
             if (code == "200")
               downloader=RemoteDownloader.new
               data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
-              @data=data_hash[:data] if make_local_copy
+              if make_local_copy
+                file=File.open data_hash[:data_tmp_path],"r"
+                #FIXME: this needs changing to avoid holding the data content in memory
+                @data=file.read
+              end
               params[symb][:content_type] = data_hash[:content_type]
               params[symb][:original_filename] = data_hash[:filename]
             elsif (["302","401"].include?(code))
@@ -154,7 +158,7 @@ module Seek
               return false
             end            
           end        
-        rescue Exception=>e
+        rescue Exception=>e          
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
             respond_to do |format|            
