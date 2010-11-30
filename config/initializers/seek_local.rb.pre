@@ -11,7 +11,7 @@ EMAIL_ENABLED = false
 ACTIVATION_REQUIRED=false
 
 #enable JWS Online for building and simulating SBML models
-JWS_ENABLED = false
+JWS_ENABLED = true
 
 #a threshold of the total number of times a tag must occur before it appears in the tag cloud. Increasing this setting can prevent
 #a very large tag cloud as the number of tags grow.

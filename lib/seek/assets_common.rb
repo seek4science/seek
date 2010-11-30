@@ -158,8 +158,7 @@ module Seek
               return false
             end            
           end        
-        rescue Exception=>e    
-          raise e
+        rescue Exception=>e              
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
             respond_to do |format|            

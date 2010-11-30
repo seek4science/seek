@@ -96,8 +96,10 @@ class ModelsController < ApplicationController
         if url
           downloader=Seek::RemoteDownloader.new
           data_hash = downloader.get_remote_data url
-          @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
-          @model.content_type=data_hash[:content_type] 
+          File.open(data_hash[:data_tmp_path],"r") do |f|
+            @model.content_blob=ContentBlob.new(:data=>f.read)
+          end                      
+          @model.content_type=data_hash[:content_type]
           @model.original_filename=new_version_filename
         end
       end
