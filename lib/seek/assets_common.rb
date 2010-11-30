@@ -12,8 +12,7 @@ module Seek
         Net::HTTP.start(url.host, url.port) do |http|
           code = http.head(url.request_uri).code        
         end
-      elsif (url.scheme=="ftp")
-        
+      elsif (url.scheme=="ftp")        
         username = 'anonymous'
         password = nil
         username, password = url.userinfo.split(/:/) if url.userinfo
