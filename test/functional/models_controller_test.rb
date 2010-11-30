@@ -75,13 +75,16 @@ class ModelsControllerTest < ActionController::TestCase
       "reaction"=>"v[vGLK] {1.0}GLCi + {1.0}Prb = {1.0}G6P\r\nv[vPGI] {1.0}G6P = {1.0}F6P\r\nv[vGLYCO] {1.0}G6P + {1.0}Prb = {1.0}$Glyc\r\nv[vTreha] {2.0}G6P + {1.0}Prb = {1.0}$Trh\r\nv[vPFK] {1.0}F6P + {1.0}Prb = {1.0}F16P\r\nv[vALD] {1.0}F16P = {2.0}TRIO\r\nv[vGAPDH] {1.0}TRIO + {1.0}NAD = {1.0}BPG + {1.0}NADH\r\nv[vPGK] {1.0}BPG = {1.0}P3G + {1.0}Prb\r\nv[vPGM] {1.0}P3G = {1.0}P2G\r\nv[vENO] {1.0}P2G = {1.0}PEP\r\nv[vPYK] {1.0}PEP = {1.0}PYR + {1.0}Prb\r\nv[vPDC] {1.0}PYR = {1.0}$CO2 + {1.0}ACE\r\nv[vSUC] {2.0}ACE + {3.0}NAD = {1.0}$SUCC + {3.0}NADH\r\nv[vGLT] {1.0}$GLCo = {1.0}GLCi\r\nv[vADH] {1.0}ACE + {1.0}NADH = {1.0}NAD + {1.0}$ETOH\r\nv[vG3PDH] {1.0}TRIO + {1.0}NADH = {1.0}NAD + {1.0}$GLY\r\nv[vATP] {1.0}Prb = {1.0}$X\r\n", 
       "steadystateanalysis"=>"on"
     end
-    assert_redirected_to model_path(m)
+    
+    m.reload
+    assert_equal current_version+1,m.version
+    
+    assert_redirected_to model_path(m,:version=>m.version) 
     assert assigns(:model)
     assert_not_nil flash[:notice]
     assert_nil flash[:error]    
     
-    m=Model.find(m.id)
-    assert_equal current_version+1,m.version
+    
   end if JWS_ENABLED
   
   test "changing model with jws builder" do
