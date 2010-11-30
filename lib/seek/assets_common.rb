@@ -87,7 +87,7 @@ module Seek
       if (["302","401"].include?(code))
         redirect_to(asset.content_blob.url,:target=>"_blank")
       else
-        downloader=Jerm::HttpDownloader.new
+        downloader=RemoteDownloader.new
         data_hash = downloader.get_remote_data asset.content_blob.url
         send_data data_hash[:data], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
       end      
@@ -133,7 +133,7 @@ module Seek
             @data_url=params[symb][:data_url]
             code = url_response_code @data_url
             if (code == "200")
-              downloader=Jerm::HttpDownloader.new
+              downloader=RemoteDownloader.new
               data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
               @data=data_hash[:data] if make_local_copy
               params[symb][:content_type] = data_hash[:content_type]

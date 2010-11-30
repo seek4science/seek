@@ -94,7 +94,7 @@ class ModelsController < ApplicationController
           url=@@model_builder.sbml_download_url @saved_file          
         end
         if url
-          downloader=Jerm::HttpDownloader.new
+          downloader=Seek::RemoteDownloader.new
           data_hash = downloader.get_remote_data url
           @model.content_blob=ContentBlob.new(:data=>data_hash[:data])
           @model.content_type=data_hash[:content_type] 

@@ -1,15 +1,16 @@
 require 'openssl'
 require 'uuidtools'
 
-module Jerm
-  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE  
+module Seek
+  OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
   
   # Handles downloading data files from a Remote site, together with authentication using the provided username and password.
-  # The downloader is created for a given project using the Jerm::DownloaderFactory, though in most current cases the HttpDownloader is sufficient
-  class HttpDownloader
+  # Includes some simple file caching to prevent multiple downloads of the same item    
+  class RemoteDownloader
+    
     @@file_cache={}
     @@filename_cache={}
-    
+        
     def get_remote_data url, username=nil, password=nil, type=nil, include_data=true      
       cached=check_from_cache(url,username,password)
       return cached unless cached.nil?

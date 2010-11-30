@@ -26,9 +26,8 @@ module Jerm
       read_metadata(@metadata)      
     end
     
-    def read_metadata metadata_uri
-      #FIXME: will re-open the same metadata_uri multiple times here, which is inefficient. Should cache based upon the uri
-      downloader = HttpDownloader.new
+    def read_metadata metadata_uri      
+      downloader = Seek::RemoteDownloader.new
       data=downloader.get_remote_data(metadata_uri,@username,@password)[:data]
       FasterCSV.parse(data) do |row|
         case row[0]
@@ -37,8 +36,7 @@ module Jerm
           when "ownerLastName","ownerLast"
           @author_last_name=row[1]
           when "ownerSeekId","ownerSeekID"
-          #@author_seek_id=row[1]
-          @author_seek_id=1          
+          @author_seek_id=row[1]                   
           when "cosmicProtocol"
           @protocol=row[1]
         end
