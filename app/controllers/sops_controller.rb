@@ -15,7 +15,7 @@ class SopsController < ApplicationController
     if (handle_data nil)      
       comments=params[:revision_comment]
       
-      @sop.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
+      @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
       @sop.content_type = params[:sop][:content_type]
       @sop.original_filename = params[:sop][:original_filename]
       
@@ -95,7 +95,7 @@ class SopsController < ApplicationController
       
       @sop = Sop.new(params[:sop])
       @sop.contributor=current_user
-      @sop.content_blob = ContentBlob.new(:data => @data,:url=>@data_url)
+      @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
       
       respond_to do |format|
         if @sop.save
