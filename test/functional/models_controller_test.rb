@@ -197,7 +197,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor   
     assert !assigns(:model).content_blob.url.blank?
-    assert assigns(:model).content_blob.data.nil?
+    assert assigns(:model).content_blob.data_io_object.nil?
     assert !assigns(:model).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
     assert_equal "image/png", assigns(:model).content_type
@@ -214,7 +214,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
     assert !assigns(:model).content_blob.url.blank?
-    assert !assigns(:model).content_blob.data.nil?
+    assert !assigns(:model).content_blob.data_io_object.read.nil?
     assert assigns(:model).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:model).original_filename
     assert_equal "image/png", assigns(:model).content_type

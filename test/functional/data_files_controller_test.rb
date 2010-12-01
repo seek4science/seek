@@ -66,7 +66,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data.nil?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
@@ -81,7 +81,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data.nil?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
     assert_equal "robots.txt", assigns(:data_file).original_filename    
   end
@@ -112,7 +112,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert !assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
@@ -130,7 +130,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data.nil?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
     assert_equal "",assigns(:data_file).original_filename
     assert_equal "",assigns(:data_file).content_type
@@ -153,7 +153,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).content_blob.data.nil?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
     assert_equal "",assigns(:data_file).original_filename
     assert_equal "",assigns(:data_file).content_type
@@ -171,7 +171,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     
-    assert !assigns(:data_file).content_blob.data.nil?
+    assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.url.blank?
   end
   

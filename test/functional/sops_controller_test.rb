@@ -116,7 +116,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal users(:quentin),assigns(:sop).contributor
     
     assert assigns(:sop).content_blob.url.blank?
-    assert !assigns(:sop).content_blob.data.nil?
+    assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
     assert_equal "file_picture.png", assigns(:sop).original_filename    
   end
@@ -154,7 +154,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_redirected_to sop_path(assigns(:sop))
     assert_equal users(:quentin),assigns(:sop).contributor   
     assert !assigns(:sop).content_blob.url.blank?
-    assert assigns(:sop).content_blob.data.nil?
+    assert assigns(:sop).content_blob.data_io_object.nil?
     assert !assigns(:sop).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).original_filename
     assert_equal "image/png", assigns(:sop).content_type
@@ -171,7 +171,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_redirected_to sop_path(assigns(:sop))
     assert_equal users(:quentin),assigns(:sop).contributor
     assert !assigns(:sop).content_blob.url.blank?
-    assert !assigns(:sop).content_blob.data.nil?
+    assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:sop).original_filename
     assert_equal "image/png", assigns(:sop).content_type
