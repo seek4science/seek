@@ -39,7 +39,8 @@ class ContentBlobTest < ActiveSupport::TestCase
   
   def test_file_dump
     pic=content_blobs(:picture_blob)
-    blob=ContentBlob.new(:data_old=>pic.data)
+    pic.save! #to trigger callback to save to file
+    blob=ContentBlob.new(:data_old=>pic.data_io_object.read)
     blob.save!
     assert_not_nil blob.filepath
     data=nil
@@ -51,22 +52,23 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
   
   def test_dumps_file_on_fetch
-    pic=content_blobs(:picture_blob)
-    pic.regenerate_uuid #makes sure is not there from a previous test
+    pic=content_blobs(:picture_blob)    
+    pic.regenerate_uuid #makes sure is not there from a previous test    
     assert !pic.file_exists?
-    assert_equal test_data('file_picture.png'),pic.data
+    assert_equal test_data('file_picture.png'),pic.data_io_object.read
     assert pic.file_exists?
-    assert_equal test_data('file_picture.png'),pic.data
+    assert_equal test_data('file_picture.png'),pic.data_io_object.read
   end
   
   #checks that the data is assigned through the new method, stored to a file, and not written to the old data_old field
   def test_data_assignment
     pic=content_blobs(:picture_blob)
-    blob=ContentBlob.new(:data=>pic.data)
+    pic.save! #to trigger callback to save to file
+    blob=ContentBlob.new(:data=>pic.data_io_object.read)
     blob.save!
     blob=ContentBlob.find(blob.id)
     assert_nil blob.data_old
-    assert_equal test_data('file_picture.png'),blob.data
+    assert_equal test_data('file_picture.png'),blob.data_io_object.read
     
     assert_not_nil blob.filepath
     data=nil
@@ -87,9 +89,11 @@ class ContentBlobTest < ActiveSupport::TestCase
   
   #simply checks that get and set data returns the same thing
   def test_data_assignment2
-    pic=content_blobs(:picture_blob)
+    pic=content_blobs(:picture_blob)    
+    pic.save! #to trigger callback to save to file
     pic.data=test_data("little_file.txt")
-    assert_equal test_data("little_file.txt"),pic.data
+    pic.save!
+    assert_equal test_data("little_file.txt"),pic.data_io_object.read
   end
   
   def test_will_overwrite_if_data_changes
@@ -103,7 +107,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   
   def test_uuid
     pic=content_blobs(:picture_blob)
-    blob=ContentBlob.new(:data_old=>pic.data)
+    blob=ContentBlob.new(:data_old=>pic.data_io_object.read)
     blob.save!
     assert_not_nil blob.uuid
     assert_not_nil ContentBlob.find(blob.id).uuid
@@ -153,5 +157,34 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_not_nil data
     assert_equal "frog",data.to_s
   end  
+  
+  def test_data_io
+    io_object = StringIO.new("frog")
+    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    blob.save!
+    blob.reload
+    assert_equal "frog",blob.data_io_object.read
+    
+    file_path=File.expand_path(__FILE__) #use the current file
+    io_object = File.new(file_path,"r")
+    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    blob.save!
+    blob.reload
+    io_object.rewind
+    assert_equal io_object.read,blob.data_io_object.read
+    
+    blob=ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png")
+    blob.save!
+    blob.reload
+    assert_not_nil blob.data_io_object.read
+  end
+  
+  def test_exception_when_both_data_and_io_object
+    io_object = StringIO.new("frog")
+    blob=ContentBlob.new(:tmp_io_object=>io_object,:data=>"snake")
+    assert_raise Exception do
+      blob.save
+    end
+  end
   
 end
