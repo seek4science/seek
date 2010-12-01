@@ -99,8 +99,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]    
   end
   
-  
-  
   test "should create data file and store with url and store flag" do
     datafile_details = valid_data_file_with_http_url
     datafile_details[:local_copy]="1"
@@ -118,8 +116,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assigns(:data_file).content_blob.file_exists?
     assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
-  end
-  
+  end  
   
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 401 url" do

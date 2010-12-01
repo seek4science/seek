@@ -40,12 +40,12 @@ class ContentBlob < ActiveRecord::Base
     data_io_object.read
   end
   
-  #returns an IO Object to the data content, or nil if the data file doesn't exist
+  #returns an IO Object to the data content, or nil if the data file doesn't exist. 
+  # In the case that there is a URL defined, but no local copy, the IO Object is still nil.
   def data_io_object
     return @tmp_io_object unless @tmp_io_object.nil?
     return StringIO.new(@data) unless @data.nil?    
-    return File.open(filepath,"rb") if file_exists?
-    return open(url) unless url.nil?
+    return File.open(filepath,"rb") if file_exists?    
     return StringIO.new(data_old) unless data_old.nil?
     return nil
   end
