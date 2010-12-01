@@ -81,8 +81,7 @@ class ContentBlob < ActiveRecord::Base
       dump_tmp_io_object_to_file
     else
       dump_data_object_to_file
-    end
-    
+    end    
   end
   
   private

@@ -178,7 +178,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob=ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png")
     blob.save!
     blob.reload
-    assert_not_nil blob.data_io_object.read
+    assert_nil blob.data_io_object
     
     blob=ContentBlob.new
     assert_nil blob.data_io_object
