@@ -18,7 +18,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob.save!
     assert_equal "zzz",blob.uuid
   end
-  
+    
   def test_uuid_doesnt_change2
     blob=content_blobs(:picture_blob)
     blob.uuid="zzz"
@@ -113,4 +113,45 @@ class ContentBlobTest < ActiveSupport::TestCase
     file = "#{RAILS_ROOT}/test/fixtures/files/#{filename}"
     return File.open(file,"rb").read
   end
+  
+  def test_tmp_io_object
+    file_path=File.expand_path(__FILE__) #use the current file
+    io_object = File.new(file_path,"r")
+    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    assert_difference("ContentBlob.count") do
+      blob.save!
+    end
+    
+    blob.reload
+    assert_not_nil blob.filepath
+    assert File.exists?(blob.filepath)
+    data=nil
+    File.open(blob.filepath,"rb") do |f|
+      data=f.read
+    end
+    io_object.rewind
+    io_data = io_object.read
+    assert_not_nil data
+    assert_equal io_data.to_s,data.to_s
+  end
+  
+  def test_string_io_object
+    io_object = StringIO.new("frog")
+    blob=ContentBlob.new(:tmp_io_object=>io_object)
+    assert_difference("ContentBlob.count") do
+      blob.save!
+    end
+    
+    blob.reload
+    assert_not_nil blob.filepath
+    assert File.exists?(blob.filepath)
+    data=nil
+    File.open(blob.filepath,"rb") do |f|
+      data=f.read
+    end
+    
+    assert_not_nil data
+    assert_equal "frog",data.to_s
+  end  
+  
 end

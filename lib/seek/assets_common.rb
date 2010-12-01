@@ -127,7 +127,7 @@ module Seek
             # so that when saving main object params[] wouldn't contain the binary data anymore
             params[symb][:content_type] = (params[symb][:data]).content_type
             params[symb][:original_filename] = (params[symb][:data]).original_filename
-            @data = params[symb][:data].read
+            @tmp_io_object = params[symb][:data]
           elsif !(params[symb][:data_url]).blank?
             make_local_copy = params[symb][:local_copy]=="1"
             @data_url=params[symb][:data_url]
@@ -135,11 +135,9 @@ module Seek
             if (code == "200")
               downloader=RemoteDownloader.new
               data_hash = downloader.get_remote_data @data_url,nil,nil,nil,make_local_copy
-              if make_local_copy
-                file=File.open data_hash[:data_tmp_path],"r"
-                #FIXME: this needs changing to avoid holding the data content in memory
-                @data=file.read
-              end
+              
+              @tmp_io_object=File.open data_hash[:data_tmp_path],"r" if make_local_copy
+              
               params[symb][:content_type] = data_hash[:content_type]
               params[symb][:original_filename] = data_hash[:filename]
             elsif (["302","401"].include?(code))

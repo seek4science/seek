@@ -26,7 +26,7 @@ class ModelsController < ApplicationController
     if (handle_data nil)
       
       comments = params[:revision_comment]
-      @model.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)
+      @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)
       @model.content_type = params[:model][:content_type]
       @model.original_filename = params[:model][:original_filename]
       
@@ -236,8 +236,7 @@ class ModelsController < ApplicationController
     end
     
   end
-  
-  
+    
   def create_model_type params
     title=white_list(params[:model_type])
     success=false
@@ -365,7 +364,7 @@ class ModelsController < ApplicationController
     if handle_data
       @model = Model.new(params[:model])
       @model.contributor = current_user
-      @model.content_blob = ContentBlob.new(:data => @data,:url=>@data_url)
+      @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
       
       respond_to do |format|
         if @model.save

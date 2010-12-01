@@ -20,7 +20,7 @@ class DataFilesController < ApplicationController
   def new_version
     if (handle_data nil)          
       comments=params[:revision_comment]
-      @data_file.content_blob = ContentBlob.new(:data => @data, :url=>@data_url)      
+      @data_file.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object, :url=>@data_url)      
       @data_file.content_type = params[:data_file][:content_type]
       @data_file.original_filename=params[:data_file][:original_filename]
       factors = @data_file.studied_factors
@@ -72,7 +72,7 @@ class DataFilesController < ApplicationController
       
       @data_file = DataFile.new params[:data_file]
       @data_file.contributor=current_user
-      @data_file.content_blob = ContentBlob.new :data => @data, :url=>@data_url
+      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       
       respond_to do |format|
         if @data_file.save

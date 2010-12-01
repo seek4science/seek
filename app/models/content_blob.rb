@@ -8,13 +8,22 @@ class ContentBlob < ActiveRecord::Base
   
   DATA_STORAGE_PATH = "filestore/content_blobs/"
   
+  #the actual data value stored in memeory. If this could be large, then using :tmp_io_object is preferred
   attr_writer :data
   
-  #validates_presence_of :data, :if => Proc.new { |blob| blob.url.blank? }  
-  
+  #this is used as an alternative to passing the data contents directly (in memory).
+  #it is not stored in the database, but when the content_blob is saved is save, the IO object is read and stored in the correct location.
+  #if the file doesn't exist an error occurs
+  attr_writer :tmp_io_object
+      
   acts_as_uniquely_identifiable
+  
+  #this action saves the contents of @data to the storage file
   before_save :dump_data_to_file
   
+  #stores the contents contained within the @tmp_io_object to the storage file
+  before_save :dumo_tmp_io_object_to_file
+    
   before_save :calculate_md5
   
   def md5sum
@@ -67,6 +76,15 @@ class ContentBlob < ActiveRecord::Base
     if !data_to_save.nil?
       File.open(filepath,"w+") do |f|      
         f.write(data_to_save)    
+      end
+    end
+  end
+  
+  def dumo_tmp_io_object_to_file
+    unless @tmp_io_object.nil?
+      @tmp_io_object.rewind
+      File.open(filepath,"w+") do |f|      
+        f.write @tmp_io_object.read
       end
     end
   end
