@@ -83,9 +83,11 @@ class ContentBlob < ActiveRecord::Base
   def dumo_tmp_io_object_to_file
     unless @tmp_io_object.nil?
       @tmp_io_object.rewind
-      File.open(filepath,"w+") do |f|      
-        @tmp_io_object.each_byte do |byte|
-          f << byte.chr
+      
+      File.open(filepath,"w+") do |f|
+        buffer=""
+        while @tmp_io_object.read(16384,buffer)
+          f << buffer
         end        
       end
     end

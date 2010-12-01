@@ -140,8 +140,9 @@ module Seek
       path = cached_path(uuid)
       file_obj.rewind
       File.open(path, 'wb') do |f|
-        file_obj.each_byte do |byte|
-          f.write byte.chr
+        buffer=""
+        while file_obj.read(16384,buffer)
+          f << buffer
         end        
       end
       
