@@ -84,7 +84,9 @@ class ContentBlob < ActiveRecord::Base
     unless @tmp_io_object.nil?
       @tmp_io_object.rewind
       File.open(filepath,"w+") do |f|      
-        f.write @tmp_io_object.read
+        @tmp_io_object.each_byte do |byte|
+          f << byte.chr
+        end        
       end
     end
   end
