@@ -48,9 +48,9 @@ class ContentBlob < ActiveRecord::Base
   
   def calculate_md5
     #FIXME: only recalculate if the data has changed (should be able to do this with changes.keys.include?("data") or along those lines).
-    unless self.data.nil?
+    if file_exists?
       digest = Digest::MD5.new
-      digest << self.data
+      digest.file(filepath)
       self.md5sum = digest.hexdigest
     end
   end        
