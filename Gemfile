@@ -18,9 +18,9 @@ gem "mysql"
 gem 'rest-client',">=1.6.1"
 
 group :development do
-  gem "sqlite3-ruby","1.3.2",:require=>"sqlite3"
+  gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
 end
 
 group :test do
-  gem "sqlite3-ruby","1.3.2",:require=>"sqlite3"
+  gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
 end
