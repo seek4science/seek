@@ -20,11 +20,12 @@ You will need a minimal build environment, as some of the ruby gems require comp
 
 SEEK uses Lucene as its search engine, and this requires that java is installed. We use the Sun Java 1.6 package <em>sun-java6-jdk</em>
 
-<b>Note:You will need to enable Partner sources to install sun-java6-jdk</b> (if you are unsure of how to do this, see https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories).
+<b>Note:</b>If using Ubuntu, you will need to enable Partner sources to install sun-java6-jdk (if you are unsure of how to do this, see https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories).
 
 If using Ubuntu or Debian, the following commands should install most the packages you need:
 
-  sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev libmysqlclient16-dev libmagick++-dev build-essential openssh-server libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
+  sudo libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
 
 if you are intending to develop SEEK you will probably also want to use:
 
