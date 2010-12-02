@@ -48,15 +48,28 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "feedback anonymously" do
-    message=Mailer.create_feedback(users(:aaron),"Topic","Details",true,"localhost")
-    assert !message.encoded.include?("Aaron")
-    assert !message.encoded.include?("aaron@")
+    @expected.subject = "SysMO SEEK Feedback provided - This is a test feedback"
+    @expected.to = "Quentin Jones <quentin@email.com>"
+    @expected.from    = "no-reply@sysmo-db.org"    
+    @expected.date    = Time.now
+
+    @expected.body    = read_fixture('feedback_anon')
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,Mailer.create_feedback(users(:aaron),"This is a test feedback","testing the feedback message",true,"localhost").encoded
+    end
   end
 
   test "feedback non anonymously" do
-    message=Mailer.create_feedback(users(:aaron),"Topic","Details",false,"localhost")
-    assert message.encoded.include?("Aaron")
-    assert message.encoded.include?("aaron@")
+    @expected.subject = "SysMO SEEK Feedback provided - This is a test feedback"
+    @expected.to = "Quentin Jones <quentin@email.com>"
+    @expected.from    = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+    @expected.date    = Time.now
+
+    @expected.body    = read_fixture('feedback_non_anon')
+    pretend_now_is(@expected.date) do
+      assert_equal @expected.encoded,Mailer.create_feedback(users(:aaron),"This is a test feedback","testing the feedback message",false,"localhost").encoded
+    end
   end
 
   test "request resource" do
