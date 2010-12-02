@@ -45,7 +45,7 @@
             </p>
         </div>
         <p>
-            <%= submit_tag "Log in" %>
+            <%= submit_tag "Log in", :id=>"login_button",:onclick=>"$('login_button').disabled=true;this.form.submit();return(false);" %>
         </p>
         <% end %>
         <p style="margin-top: 0.6em; line-height: 1.3em; font-size: 93%;">
