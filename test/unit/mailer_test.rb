@@ -127,13 +127,14 @@ class MailerTest < ActionMailer::TestCase
     @expected.subject = 'SysMO member signed up'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
     @expected.date    = Time.now
 
     @expected.body    = read_fixture('contact_admin_new_user_no_profile')
     
     pretend_now_is(@expected.date) do
       assert_equal @expected.encoded, 
-        Mailer.create_contact_admin_new_user_no_profile("test message",users(:quentin),"localhost").encoded
+        Mailer.create_contact_admin_new_user_no_profile("test message",users(:aaron),"localhost").encoded
     end
     
   end

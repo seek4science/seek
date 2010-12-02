@@ -65,6 +65,7 @@ class Mailer < ActionMailer::Base
     subject    'SysMO member signed up'
     recipients admin_emails
     from       NOREPLY_SENDER
+    reply_to   user.person.email_with_name
     sent_on    Time.now
     
     body       :details=>details, :person=>user.person, :user=>user, :host=>base_host
