@@ -14,7 +14,8 @@ class Mailer < ActionMailer::Base
     end
   end
 
-  def feedback user,topic,details,send_anonymously,base_host
+#feedback ()
+  def feedback(user,topic,details,send_anonymously,base_host)
     subject "#{project} SEEK Feedback provided - #{topic}"
     recipients admin_emails
     from NOREPLY_SENDER

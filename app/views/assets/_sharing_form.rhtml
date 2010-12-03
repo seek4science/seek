@@ -41,8 +41,8 @@
           You may:
         <ul>
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
-		      <li>Share with all other users, <b>including</b> those that are not a member of a Sysmo project.</li>
-          <li>Share with all other users that are a member of a Sysmo project.</li>
+		      <li>Share with all other users, <b>including</b> those that are not a member of a Virtual Liver project.</li>
+          <li>Share with all other users that are a member of a Virtual Liver project.</li>
           <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> By using custom sharing permissions you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
         </ul>
         </p>
@@ -74,7 +74,7 @@
       <label for="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_REGISTERED_USERS -%> id="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>" name="sharing[sharing_scope]"
                value="<%= Policy::ALL_REGISTERED_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_REGISTERED_USERS -%>);" />
-        - All users, including those that are not members of SysMO projects, for
+        - All users, including those that are not members of Virtual Liver projects, for
       </label>
       <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_REGISTERED_USERS,
         :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
@@ -90,7 +90,7 @@
       <label for="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]"
                value="<%= Policy::ALL_SYSMO_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_SYSMO_USERS -%>);" />
-        - All registered users that are members of a SysMO project for
+        - All registered users that are members of a Virtual Liver project for
       </label>
       <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
         :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
