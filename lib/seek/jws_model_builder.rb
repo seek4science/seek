@@ -165,21 +165,23 @@ module Seek
         
 #      saved_file = determine_saved_file doc
 #      objects_hash = create_objects_hash doc      
-#      fields_with_errors = find_reported_errors doc
+      fields_with_errors = find_reported_errors doc
         
       #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
       #fields_with_errors.delete("functions")      
-      return param_values,"",{},[]
+      return param_values,"",{},fields_with_errors
     end
     
     def find_reported_errors doc
       errors=[]
-      doc.search("//form[@name='errorinfo']/input").each do |error_report|
-        value=error_report.attributes['value']
-        name=error_report.attributes['name']
-        name=name.gsub("Errors","")
+      puts "=================== Finding errors"
+      doc.find("//errorinfo/error").each do |error_report|
+        value=error_report.content.strip
+        name=error_report.attributes['id']
+        puts "Error for #{name} = #{value}"
         errors << name unless value=="0"
       end      
+      puts "=================== End"
       return errors
     end
     

@@ -1,7 +1,7 @@
 module ModelsHelper
 
   JWS_ERROR_TO_PANEL_NAMES={
-    "reacs" => "Reactions",
+    "reaction" => "Reactions",
     "kinetics" => "Rate equations",
     "initVal"=>"Initial values",
     "parameters"=>"Parameter values",
@@ -11,7 +11,7 @@ module ModelsHelper
   }
   
   JWS_ERROR_TO_PREFIX={
-    "reacs" => "reactions",
+    "reaction" => "reactions",
     "kinetics" => "equations",
     "initVal"=>"initial",
     "parameters"=>"parameters",
