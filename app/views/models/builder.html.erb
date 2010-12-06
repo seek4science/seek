@@ -21,7 +21,7 @@
     .builder_box {
         width: auto;
         padding: 3px;
-        float: left;		
+        float: left;
     }
 </style>
 <ul class="sectionIcons">
@@ -30,25 +30,21 @@
     </li>
 </ul>
 <%= render :partial=>"models/builder/header" -%>
-
 <div class="yui-gf">
     <div class="yui-u first builder_actions" style="width:19%;">
-        <!-- Simulate action -->
-		<h6>Simulate</h6>
+        <!-- Simulate action --><h6>Simulate</h6>
         <input type=checkbox name="steadystate" id="steadystate" />Steady State Analysis?
         <br/>
         <input value="Simulate" type="button" alt="Simulate" title="" id="simulate_button" onclick="create_panel_cookies();simulate_clicked();"/>
         <br/>
         <br/>
-        <!-- Save new version action -->
-		<h6>Save as new version</h6>
+        <!-- Save new version action --><h6>Save as new version</h6>
         Model format: <%= select_tag "model_format","<option value='dat'>JWS Dat</option><option value='sbml'>SBML</option>" -%>
         <br/>
         <input value="Save" type="button" alt="Save" title="" id="new_version_button" onclick="create_panel_cookies();save_new_version_extra_options();"/>
         <br/>
         <br/>
-        <!-- Check -->
-		<h6>Check</h6>
+        <!-- Check --><h6>Check</h6>
         <div>
             <input value="Check" type="button" alt="Check" title="Check the modified values are valid" id="check_button" onclick="create_panel_cookies();check_clicked();"/>
         </div>
@@ -68,11 +64,7 @@
             Open/Close all panels
         </button>
         <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
-		<input type="hidden" name="new_version_comments" id="new_version_comments" value=""/>
-		<input type="hidden" name="new_version_filename" id="new_version_filename" value=""/>
-        <input type="hidden" name="following_action" id="following_action" value=""/>
-		<input type="hidden" name="saved_model_format" id="saved_model_format" value=""/>
-		<input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
+        <input type="hidden" name="new_version_comments" id="new_version_comments" value=""/><input type="hidden" name="new_version_filename" id="new_version_filename" value=""/><input type="hidden" name="following_action" id="following_action" value=""/><input type="hidden" name="saved_model_format" id="saved_model_format" value=""/><input type="hidden" name="steadystateanalysis" id="steadystateanalysis"/>
         <br/>
         <br/>
         <div>
@@ -88,7 +80,13 @@
                     </div>
                     <div class="squareboxcontent" id="name_panel" style="display: none">
                         <!-- model name script -->
-                        <%= @data_script_hash["modelname"] -%>
+                        <script type="text/javascript">
+                            var rtmodelname = new ResizeableTextbox('modelname');
+                            rtmodelname.SetText("<%= @params_hash['modelname'] -%>");
+                            rtmodelname.GetContainer().style.left = '10px';
+                            rtmodelname.GetContainer().style.top = '10px';
+                            rtmodelname.SetCurrentWidth(150);
+                        </script>
                         <p>
                             <button title="Examples for model names are: model1, westerhoff2010" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpName.html','model name help window', 'width=300,height=300,toolbar=0'); return false;">
                                 Model name help
@@ -110,24 +108,39 @@
                     </div>
                     <div class="squareboxcontent" id="reactions_panel" style="display: none">
                         <!-- reactions script -->
-                        <%= @data_script_hash["reactions"] -%>
+                        <script type="text/javascript">
+                            var rtreaction = new ResizeableTextbox('reaction');
+                            rtreaction.SetText("<%= @params_hash['reaction'] -%>");
+                            rtreaction.GetContainer().style.left = '10px';
+                            rtreaction.GetContainer().style.top = '10px';
+                            rtreaction.SetCurrentWidth(200);
+                            rtreaction.SetMaxWidth(700);
+                            rtreaction.SetMaxHeight(300);
+                        </script>
                         <p>
                             <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
-                            <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />
-							<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
+                            <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
                             <% if @objects_hash["resizeableElement"] -%>
-	                            <%= hidden_field_tag "plotGraphPanel","on" -%>
-	                            <%= @objects_hash["resizeableElement"] -%>    
-								<%= @data_script_hash["resizable"] -%>                        
+                            <%= hidden_field_tag "plotGraphPanel","on" -%>
+                            <%= @objects_hash["resizeableElement"] -%>
+                            <script type="text/javascript">
+                                var rc = new ResizeableContainer('resizeableElement');
+                                rc.GetContainer().style.left = '10px';
+                                rc.GetContainer().style.top = '10px';
+                                rc.SetMaxWidth(700);
+                                rc.SetMaxHeight(300);
+                                rc.SetCurrentWidth2(700);
+                                rc.SetCurrentHeight(100);
+                            </script>
                             <% else -%>
-                            	<%= hidden_field_tag "plotGraphPanel","off" -%>
+                            <%= hidden_field_tag "plotGraphPanel","off" -%>
                             <% end -%>
-							
                         </p>
                     </div>
-                </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                </div>
+                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="equations_top" class="builder_box">
                 <div class="squarebox">
@@ -141,23 +154,33 @@
                     </div>
                     <div class="squareboxcontent" id="equations_panel" style="display: none">
                         <!-- equations script -->
-                        <%= @data_script_hash["equations"] -%>
+                        <script type="text/javascript"> 
+					var rtkinetics = new ResizeableTextbox('kinetics');
+					rtkinetics.SetText("<%= @params_hash['kinetics'] -%>");
+					rtkinetics.GetContainer().style.left = '10px';
+					rtkinetics.GetContainer().style.top = '10px';
+					rtkinetics.SetCurrentWidth(200);
+					</script>
                         <p>
                         </p>
                         <p>
                             <button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Rate equations help
                             </button>
-                            <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />
-							<input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
+                            <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
                             <% if @objects_hash["resizeableElement2"] -%>
-	                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
-	                            <%= @objects_hash["resizeableElement2"] -%>          
-								<%= @data_script_hash["resizable_2"] -%>                  
+                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
+                            <%= @objects_hash["resizeableElement2"] -%>
+                            <script type="text/javascript"> 
+        var rc2 = new ResizeableContainer('resizeableElement2');
+        rc2.GetContainer().style.left = '10px';
+        rc2.GetContainer().style.top = '10px';
+        rc2.SetMaxWidth(700);
+        rc2.SetMaxHeight(300);
+      </script>
                             <% else -%>
-                            	<%= hidden_field_tag "plotKineticsPanel","off" -%>
+                            <%= hidden_field_tag "plotKineticsPanel","off" -%>
                             <% end -%>
-							
                         </p>
                     </div>
                 </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
@@ -174,7 +197,13 @@
                     </div>
                     <div id="initial_panel" class="squareboxcontent" style="display: none">
                         <!-- initial values script -->
-                        <%= @data_script_hash["initial"] -%>
+                        <script type="text/javascript"> 
+							var rtinitVal = new ResizeableTextbox('initVal');
+							rtinitVal.SetText("<%= @params_hash['initVal'] -%>");
+							rtinitVal.GetContainer().style.left = '10px';
+							rtinitVal.GetContainer().style.top = '10px';
+							rtinitVal.SetCurrentWidth(150);
+							</script>
                         <p>
                             <button title="Example of variable initialisations:<br> x[0] = 1<br> g6p[0] = 1.4 " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpInitVals.html','model parameter values help window', 'width=300,height=300,toolbar=0'); return false;">
                                 Initial values help
@@ -196,7 +225,13 @@
                     </div>
                     <div id="parameters_panel" class="squareboxcontent" style="display: none">
                         <!--parameters script -->
-                        <%= @data_script_hash["parameters"] -%>
+                        <script type="text/javascript"> 
+							var rtparameterset = new ResizeableTextbox('parameterset');
+							rtparameterset.SetText("<%= @params_hash['parameterset'] -%>");
+							rtparameterset.GetContainer().style.left = '10px';
+							rtparameterset.GetContainer().style.top = '10px';
+							rtparameterset.SetCurrentWidth(150);
+							</script>
                         <p>
                             <button title="Example of parameter initialisations:<br> k1 = 1<br> k2 = 3 " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpParameters.html','model parameter values help window', 'width=300,height=300,toolbar=0'); return false;">
                                 Parameters help
@@ -218,7 +253,13 @@
                     </div>
                     <div class="squareboxcontent" id="assignments_panel" style="display: none">
                         <!-- rules script -->
-                        <%= @data_script_hash["rules"] -%>
+                        <script type="text/javascript"> 
+										var rtassignmentRules = new ResizeableTextbox('assignmentRules');
+										rtassignmentRules.SetText("<%= @params_hash['assignmentRules'] -%>");
+										rtassignmentRules.GetContainer().style.left = '10px';
+										rtassignmentRules.GetContainer().style.top = '10px';
+										rtassignmentRules.SetCurrentWidth(150);
+										</script>
                         <p>
                             <button title="Examples of assignment rules are:<br>totalP := P1[t]+P2[t]<br> a := a[t]+Sin[t]  " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpAssignmentRules.html','model assignments rules help window', 'width=300,height=300,toolbar=0'); return false;">
                                 Assignment rules help
@@ -240,7 +281,13 @@
                     </div>
                     <div class="squareboxcontent" id="functions_panel" style="display: none">
                         <!-- functions script -->
-                        <%= @data_script_hash["functions"] -%>
+                        <script type="text/javascript"> 
+										var rtfunctions = new ResizeableTextbox('functions');
+										rtfunctions.SetText("<%= @params_hash['functions'] -%>");
+										rtfunctions.GetContainer().style.left = '10px';
+										rtfunctions.GetContainer().style.top = '10px';
+										rtfunctions.SetCurrentWidth(150);
+										</script> 
                         <p>
                             <button title="Examples of functions are:<br> mmKin[vm_,s_,kms_] := vm*s/(s+kms)<br>aFree[tot_]:=tot-a[t]" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpFunctions.html','model functions help window', 'width=300,height=500,toolbar=0'); return false;">
                                 Functions help
@@ -262,7 +309,13 @@
                     </div>
                     <div class="squareboxcontent" id="events_panel" style="display: none">
                         <!-- events script -->
-                        <%= @data_script_hash["events"] -%>
+                        <script type="text/javascript"> 
+							var rtevents = new ResizeableTextbox('events');
+							rtevents.SetText("<%= @params_hash['events'] -%>");
+							rtevents.GetContainer().style.left = '10px';
+							rtevents.GetContainer().style.top = '10px';
+							rtfunctions.SetCurrentWidth(150);
+							</script>
                         <p>
                             <button title="Examples of events are:<br> ?" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpEvents.html','model events help window', 'width=300,height=500,toolbar=0'); return false;">
                                 Events help
@@ -274,19 +327,15 @@
             </div>
         </div><% end -%>
     </div>
-</div>
-<!-- JWS CONSTRUCTOR END -->
-
+</div><!-- JWS CONSTRUCTOR END -->
 <script type="text/javascript">
     map_rt_elements();
     read_panel_cookies();
-	
+    
 </script>
-
 <%= render :partial=>"models/builder/new_version_details" -%>
-
-<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.each do |prefix| -%>		
-		<script type="text/javascript">
-			highlight_error("<%= prefix -%>");					
-		</script>
+<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.each do |prefix| -%>
+<script type="text/javascript">
+    highlight_error("<%= prefix -%>");
+</script>
 <% end -%>

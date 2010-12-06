@@ -1,5 +1,6 @@
 require 'hpricot'
 require 'rest_client'
+require 'libxml'
 
 module Seek
   
@@ -91,41 +92,45 @@ module Seek
       tmpfile = Tempfile.new(model.original_filename)       
       FileUtils.cp(filepath,tmpfile.path)
       
-      if (is_sbml? model)        
-        #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
-        #          if [301, 302, 307].include? response.code 
-        #            puts "REDIRECT to #{response['location']}"
-        #            response.follow_redirection(request, result, &block)
-        #          else
-        #            response.return!(request, result, &block)
-        #          end
-        #        } 
-        part=Multipart.new("upfile",filepath,model.original_filename)
-        response = part.post(upload_sbml_url)        
-        if response.code == "302"
-          uri = URI.parse(response['location'])          
-          req = Net::HTTP::Get.new(uri.request_uri)
-          response = Net::HTTP.start(uri.host, uri.port) {|http|
-            http.request(req)
-          }
-        else          
-          raise Exception.new("Expected a redirection from JWS Online")
-        end
-      elsif (is_dat? model)
-        response = RestClient.post(upload_dat_url,:uploadedDatFile=>tmpfile,:filename=>model.original_filename,:multipart=>true) { |response, request, result, &block|
-          if [301, 302, 307].include? response.code
-            response.follow_redirection(request, result, &block)
-          else
-            response.return!(request, result, &block)
-          end
-        }        
-      end
-      
-      if response.instance_of?(Net::HTTPInternalServerError)       
-        puts response.to_s
-        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
-      end      
-      process_response_body(response.body)
+#      if (is_sbml? model)        
+#        #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
+#        #          if [301, 302, 307].include? response.code 
+#        #            puts "REDIRECT to #{response['location']}"
+#        #            response.follow_redirection(request, result, &block)
+#        #          else
+#        #            response.return!(request, result, &block)
+#        #          end
+#        #        } 
+#        part=Multipart.new("upfile",filepath,model.original_filename)
+#        response = part.post(upload_sbml_url)        
+#        if response.code == "302"
+#          uri = URI.parse(response['location'])          
+#          req = Net::HTTP::Get.new(uri.request_uri)
+#          response = Net::HTTP.start(uri.host, uri.port) {|http|
+#            http.request(req)
+#          }
+#        else          
+#          raise Exception.new("Expected a redirection from JWS Online")
+#        end
+#      elsif (is_dat? model)
+#        response = RestClient.post(upload_dat_url,:uploadedDatFile=>tmpfile,:filename=>model.original_filename,:multipart=>true) { |response, request, result, &block|
+#          if [301, 302, 307].include? response.code
+#            response.follow_redirection(request, result, &block)
+#          else
+#            response.return!(request, result, &block)
+#          end
+#        }        
+#      end
+#      
+#      if response.instance_of?(Net::HTTPInternalServerError)       
+#        puts response.to_s
+#        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+#      end      
+      body = dummy_response_xml
+      puts "###########################################################"
+      puts "Body = \n#{body}"
+      puts "###########################################################"
+      process_response_body(body)
       
     end
     
@@ -151,15 +156,20 @@ module Seek
     
     def process_response_body body                              
       
-      doc = Hpricot(body)      
-      data_scripts = create_data_script_hash doc
-      saved_file = determine_saved_file doc
-      objects_hash = create_objects_hash doc      
-      fields_with_errors = find_reported_errors doc
+      parser = LibXML::XML::Parser.string(body,:encoding => LibXML::XML::Encoding::UTF_8)
+      doc = parser.parse
+      param_values = extract_main_parameters doc
+      form_parameters={}
+      object_urls = {}
+      errors={}
+        
+#      saved_file = determine_saved_file doc
+#      objects_hash = create_objects_hash doc      
+#      fields_with_errors = find_reported_errors doc
         
       #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
-      fields_with_errors.delete("functions")      
-      return data_scripts,saved_file,objects_hash,fields_with_errors
+      #fields_with_errors.delete("functions")      
+      return param_values,"",{},[]
     end
     
     def find_reported_errors doc
@@ -183,6 +193,18 @@ module Seek
       return result
     end
     
+    def extract_main_parameters doc
+      params={}
+      doc.find("//form[@id='main']/*/parameter").each do |node|
+        unless node.attributes['id'].nil?
+          id=node.attributes['id']
+          params[id]=node.content.strip
+        end
+      end     
+      params
+    end
+    
+    #OLD
     def create_data_script_hash doc
       keys=["events","functions","rules","parameters","initial","resizable_2","equations","resizable","reactions","modelname"]
       scripts = doc.search("//script[@type='text/javascript']").reverse
@@ -202,6 +224,11 @@ module Seek
       return element.attributes['value']      
     end        
     
+    def dummy_response_xml
+      path="#{RAILS_ROOT}/doc/franco.xml"
+      File.open(path,"rb").read
+    end
+      
   end
   
 end

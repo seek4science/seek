@@ -55,13 +55,14 @@ class ModelsController < ApplicationController
     begin
       if saved_file
         supported=true
-        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
+        @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
         supported = @@model_builder.is_supported?(@display_model)
-        @data_script_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+        @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
       end
     rescue Exception=>e
       error=e
+      raise e
     end
     
     respond_to do |format|
