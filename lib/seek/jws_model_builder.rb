@@ -163,25 +163,24 @@ module Seek
       object_urls = {}
       errors={}
         
-#      saved_file = determine_saved_file doc
+      saved_file = determine_saved_file doc
 #      objects_hash = create_objects_hash doc      
       fields_with_errors = find_reported_errors doc
         
       #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
-      #fields_with_errors.delete("functions")      
-      return param_values,"",{},fields_with_errors
+      fields_with_errors.delete("functions")      
+      return param_values,saved_file,{},fields_with_errors
     end
     
     def find_reported_errors doc
       errors=[]
-      puts "=================== Finding errors"
+      
       doc.find("//errorinfo/error").each do |error_report|
         value=error_report.content.strip
-        name=error_report.attributes['id']
-        puts "Error for #{name} = #{value}"
+        name=error_report.attributes['id']        
         errors << name unless value=="0"
       end      
-      puts "=================== End"
+      
       return errors
     end
     
@@ -220,10 +219,13 @@ module Seek
       result      
     end
     
-    def determine_saved_file doc                  
-      elements = doc.search("//input[@name='savedfile']")      
-      element = elements.first
-      return element.attributes['value']      
+    def determine_saved_file doc
+      file=nil
+      node = doc.find_first("//form[@id='simulate']/parameters/parameter[@id='savedfile']")
+      unless node.nil?
+        file=node.content.strip
+      end      
+      file
     end        
     
     def dummy_response_xml
