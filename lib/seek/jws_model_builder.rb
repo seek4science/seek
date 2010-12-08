@@ -184,8 +184,7 @@ module Seek
     def create_objects_hash doc
       objects_hash = {}
       doc.find("//form[@id='main']/objects/object").each do |node|
-        id=node.attributes['id']
-        puts " ================= Found Object for id = #{id}"
+        id=node.attributes['id']        
         if ["reactionImage","kineticsImage"].include?(id)
           url=node.content.strip
           url = BASE_URL + "/" + url
@@ -231,7 +230,7 @@ module Seek
     end        
     
     def dummy_response_xml
-      path="#{RAILS_ROOT}/doc/franco.xml"
+      path="#{RAILS_ROOT}/lib/seek/jws_example.xml"
       File.open(path,"rb").read
     end
       
