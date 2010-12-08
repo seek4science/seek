@@ -8,8 +8,8 @@ module Seek
     
     include ModelTypeDetection
     
-    BASE_URL = "http://jjj.mib.ac.uk/webMathematica/Examples/"    
-    SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
+    BASE_URL = "http://130.88.195.31/webMathematica/Examples/"    
+    SIMULATE_URL = "http://130.88.195.31/webMathematica/upload/uploadNEW_xml.jsp"    
     
     def is_supported? model      
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
@@ -24,7 +24,7 @@ module Seek
     end
     
     def builder_url
-      "#{BASE_URL}JWSconstructor_panels/DatFileReader.jsp"
+      "#{BASE_URL}JWSconstructor_panels/DatFileReader_xml.jsp"
     end
     
     def upload_dat_url
@@ -44,7 +44,7 @@ module Seek
       url=""
       response = RestClient.post(dat_to_sbml_url,:modelName=>modelname) do |response, request, result, &block|
         if [301, 302, 307].include? response.code
-          url=response.headers[:location]
+          url=response.headers[:location]        
         else
           raise Exception.new("Redirection expected to converted dat file")
         end
@@ -92,41 +92,46 @@ module Seek
       tmpfile = Tempfile.new(model.original_filename)       
       FileUtils.cp(filepath,tmpfile.path)
       
-#      if (is_sbml? model)        
-#        #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
-#        #          if [301, 302, 307].include? response.code 
-#        #            puts "REDIRECT to #{response['location']}"
-#        #            response.follow_redirection(request, result, &block)
-#        #          else
-#        #            response.return!(request, result, &block)
-#        #          end
-#        #        } 
-#        part=Multipart.new("upfile",filepath,model.original_filename)
-#        response = part.post(upload_sbml_url)        
-#        if response.code == "302"
-#          uri = URI.parse(response['location'])          
-#          req = Net::HTTP::Get.new(uri.request_uri)
-#          response = Net::HTTP.start(uri.host, uri.port) {|http|
-#            http.request(req)
-#          }
-#        else          
-#          raise Exception.new("Expected a redirection from JWS Online")
-#        end
-#      elsif (is_dat? model)
-#        response = RestClient.post(upload_dat_url,:uploadedDatFile=>tmpfile,:filename=>model.original_filename,:multipart=>true) { |response, request, result, &block|
-#          if [301, 302, 307].include? response.code
-#            response.follow_redirection(request, result, &block)
-#          else
-#            response.return!(request, result, &block)
-#          end
-#        }        
-#      end
-#      
-#      if response.instance_of?(Net::HTTPInternalServerError)       
-#        puts response.to_s
-#        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
-#      end      
-      body = dummy_response_xml
+      if (is_sbml? model)        
+        #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
+        #          if [301, 302, 307].include? response.code 
+        #            puts "REDIRECT to #{response['location']}"
+        #            response.follow_redirection(request, result, &block)
+        #          else
+        #            response.return!(request, result, &block)
+        #          end
+        #        }         
+        part=Multipart.new("upfile",filepath,model.original_filename)
+        response = part.post(upload_sbml_url)        
+        if response.code == "302"
+          uri = URI.parse(response['location'])          
+          req = Net::HTTP::Get.new(uri.request_uri)
+          response = Net::HTTP.start(uri.host, uri.port) {|http|
+            http.request(req)
+          }
+        elsif response.code == "404"
+          raise Exception.new("Page not found on JWS Online for url: #{upload_sbml_url}")
+        elsif response.code == "500"
+          raise Exception.new("Server error on JWS Online for url: #{upload_sbml_url}")
+        else          
+          raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}")
+        end
+      elsif (is_dat? model)        
+        response = RestClient.post(upload_dat_url,:uploadedDatFile=>tmpfile,:filename=>model.original_filename,:multipart=>true) { |response, request, result, &block|
+          if [301, 302, 307].include? response.code
+            response.follow_redirection(request, result, &block)
+          else
+            response.return!(request, result, &block)
+          end
+        }        
+      end
+      
+      if response.instance_of?(Net::HTTPInternalServerError)       
+        puts response.to_s
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      end      
+      #body = dummy_response_xml
+      body = response.body
       puts "###########################################################"
       puts "Body = \n#{body}"
       puts "###########################################################"
