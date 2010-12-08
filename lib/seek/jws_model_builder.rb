@@ -69,25 +69,8 @@ module Seek
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end
       
-      puts "###########################################################"
-      puts "Body = \n#{response.body}"
-      puts "###########################################################"
-      
       process_response_body(response.body)
-    end
-    
-    def saved_file_builder_content saved_file
-      model_name=saved_file.gsub("\.dat","")      
-      response = RestClient.get(builder_url,:params=>{:loadModel=>model_name,:userModel=>true})
-      
-      puts response.body
-      
-      if response.instance_of?(Net::HTTPInternalServerError)       
-        puts response.to_s
-        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
-      end      
-      process_response_body(response.body)
-    end
+    end        
     
     def builder_content model
             
@@ -135,12 +118,8 @@ module Seek
         puts response.to_s
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end      
-      #body = dummy_response_xml
-      body = response.body
-      puts "###########################################################"
-      puts "Body = \n#{body}"
-      puts "###########################################################"
-      process_response_body(body)
+      
+      process_response_body(response.body)
       
     end
     
@@ -156,6 +135,19 @@ module Seek
       
       extract_applet(response.body)      
     end
+    
+    def saved_file_builder_content saved_file
+      model_name=saved_file.gsub("\.dat","")      
+      response = RestClient.get(builder_url,:params=>{:loadModel=>model_name,:userModel=>true})
+      
+      if response.instance_of?(Net::HTTPInternalServerError)       
+        puts response.to_s
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
+      end      
+      process_response_body(response.body)
+    end
+    
+    private
     
     def extract_applet body
       doc = Hpricot(body)      
@@ -215,21 +207,7 @@ module Seek
       end     
       params
     end
-    
-    #OLD
-    def create_data_script_hash doc
-      keys=["events","functions","rules","parameters","initial","resizable_2","equations","resizable","reactions","modelname"]
-      scripts = doc.search("//script[@type='text/javascript']").reverse
-      keyi=0
-      result={}
-      scripts[0,keys.size].each do |script|
-        k=keys[keyi]        
-        result[k]=script.to_s
-        keyi+=1
-      end
-      result      
-    end
-    
+       
     def determine_saved_file doc
       file=nil
       node = doc.find_first("//form[@id='simulate']/parameters/parameter[@id='savedfile']")
@@ -239,6 +217,8 @@ module Seek
       file
     end        
     
+    
+    #only used for testing and development purposes
     def dummy_response_xml
       path="#{RAILS_ROOT}/lib/seek/jws_example.xml"
       File.open(path,"rb").read

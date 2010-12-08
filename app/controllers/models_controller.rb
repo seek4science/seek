@@ -61,8 +61,7 @@ class ModelsController < ApplicationController
         @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
       end
     rescue Exception=>e
-      error=e
-      raise e
+      error=e      
     end
     
     respond_to do |format|
