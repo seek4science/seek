@@ -1,17 +1,7 @@
 <!-- JWS CONSTRUCTOR -->
-<script src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/JWSconstructor_panels.js" language="javascript" type="text/javascript">
-</script>
-<script src="http://jjj.mib.ac.uk/webMathematica/Resources/JavaScript/webMathematica.js" type="text/javascript">
-</script>
-<script src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/addEvent.js" type="text/javascript">
-</script>
-<script src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/sweetTitles.js" type="text/javascript">
-</script>
-<script src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Textbox/javascript.js" type="text/javascript">
-</script>
-<script src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Container/javascript.js" type="text/javascript">
-</script>
-<%= javascript_include_tag "jws_builder.js" -%>
+
+<%= javascript_include_tag "jws/JWSconstructor_panels.js","jws/webMathematica.js","jws/addEvent.js","jws/sweetTitles.js","jws/Resizeable_Textbox/javascript.js","jws/Resizeable_Container/javascript.js","jws/jws_builder.js" -%>
+
 <link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/JWSconstructor_panels.css" rel="stylesheet" type="text/css" />
 <link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Textbox/style.css" rel="stylesheet" media="screen" type="text/css" />
 <link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Container/style.css" rel="stylesheet" media="screen" type="text/css" />
@@ -19,10 +9,10 @@
 <%= stylesheet_link_tag 'jws_builder' -%>
 <style>
     .builder_box {
-        width: auto;
+        width: 50em;
         padding: 3px;
         float: left;
-    }
+    }				
 </style>
 <ul class="sectionIcons">
     <li>
@@ -85,7 +75,11 @@
                             rtmodelname.SetText("<%= @params_hash['modelname'] -%>");
                             rtmodelname.GetContainer().style.left = '10px';
                             rtmodelname.GetContainer().style.top = '10px';
-                            rtmodelname.SetCurrentWidth(150);
+                            rtmodelname.SetCurrentWidth(600);
+							rtmodelname.SetMaxWidth(600);
+							rtmodelname.SetCurrentHeight(100);
+							rtmodelname.SetMaxHeight(800);
+							
                         </script>
                         <p>
                             <button title="Examples for model names are: model1, westerhoff2010" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpName.html','model name help window', 'width=300,height=300,toolbar=0'); return false;">
@@ -113,15 +107,16 @@
                             rtreaction.SetText("<%= @params_hash['reaction'] -%>");
                             rtreaction.GetContainer().style.left = '10px';
                             rtreaction.GetContainer().style.top = '10px';
-                            rtreaction.SetCurrentWidth(200);
-                            rtreaction.SetMaxWidth(700);
-                            rtreaction.SetMaxHeight(300);
+                            rtreaction.SetCurrentWidth(600);
+							rtreaction.SetCurrentHeight(300);
+                            rtreaction.SetMaxWidth(600);
+                            rtreaction.SetMaxHeight(800);
                         </script>
                         <p>
                             <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
-                            <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
+                            <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
                             <% if @objects_hash["reactionImage"] -%>
                             <%= hidden_field_tag "plotGraphPanel","on" -%>
                             <%= @objects_hash["reactionImage"] -%>
@@ -129,10 +124,10 @@
                                 var rc = new ResizeableContainer('resizeableElement');
                                 rc.GetContainer().style.left = '10px';
                                 rc.GetContainer().style.top = '10px';
-                                rc.SetMaxWidth(700);
-                                rc.SetMaxHeight(300);
-                                rc.SetCurrentWidth2(700);
-                                rc.SetCurrentHeight(100);
+                                rc.SetMaxWidth(600);
+                                rc.SetMaxHeight(800);
+                                rc.SetCurrentWidth2(600);
+                                rc.SetCurrentHeight(300);
                             </script>
                             <% else -%>
                             <%= hidden_field_tag "plotGraphPanel","off" -%>
@@ -159,7 +154,10 @@
 					rtkinetics.SetText("<%= @params_hash['kinetics'] -%>");
 					rtkinetics.GetContainer().style.left = '10px';
 					rtkinetics.GetContainer().style.top = '10px';
-					rtkinetics.SetCurrentWidth(200);
+					rtkinetics.SetCurrentWidth(600);
+					rtkinetics.SetCurrentHeight(300);
+					rtkinetics.SetMaxWidth(600);
+					rtkinetics.SetMaxHeight(800);
 					</script>
                         <p>
                         </p>
@@ -167,17 +165,19 @@
                             <button title="Examples of rate equations:<br> v[1] = k1*sink*a[t]/(a[t]+Kma)-k2*c[t]*d[t]<br> vGLK = Vm*glc[t]/(KmGLKglc+glc[t])" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpRateEquations.html','model rate equations help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Rate equations help
                             </button>
-                            <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
+                            <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
                             <% if @objects_hash["kineticsImage"] -%>
                             <%= hidden_field_tag "plotKineticsPanel","on" -%>
                             <%= @objects_hash["kineticsImage"] -%>
                             <script type="text/javascript"> 
-        var rc2 = new ResizeableContainer('resizeableElement2');
-        rc2.GetContainer().style.left = '10px';
-        rc2.GetContainer().style.top = '10px';
-        rc2.SetMaxWidth(700);
-        rc2.SetMaxHeight(300);
-      </script>
+						        var rc2 = new ResizeableContainer('resizeableElement2');
+						        rc2.GetContainer().style.left = '10px';
+						        rc2.GetContainer().style.top = '10px';
+								rc2.SetCurrentWidth2(600);
+								rc2.SetCurrentHeight(300);
+						        rc2.SetMaxWidth(600);
+						        rc2.SetMaxHeight(800);
+						      </script>
                             <% else -%>
                             <%= hidden_field_tag "plotKineticsPanel","off" -%>
                             <% end -%>
@@ -202,7 +202,10 @@
 							rtinitVal.SetText("<%= @params_hash['initVal'] -%>");
 							rtinitVal.GetContainer().style.left = '10px';
 							rtinitVal.GetContainer().style.top = '10px';
-							rtinitVal.SetCurrentWidth(150);
+							rtinitVal.SetCurrentWidth(600);
+							rtinitVal.SetCurrentHeight(400);
+							rtinitVal.SetMaxWidth(600);
+							rtinitVal.SetMaxHeight(800);
 							</script>
                         <p>
                             <button title="Example of variable initialisations:<br> x[0] = 1<br> g6p[0] = 1.4 " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpInitVals.html','model parameter values help window', 'width=300,height=300,toolbar=0'); return false;">
@@ -230,7 +233,10 @@
 							rtparameterset.SetText("<%= @params_hash['parameterset'] -%>");
 							rtparameterset.GetContainer().style.left = '10px';
 							rtparameterset.GetContainer().style.top = '10px';
-							rtparameterset.SetCurrentWidth(150);
+							rtparameterset.SetCurrentWidth(600);
+							rtparameterset.SetCurrentHeight(300);
+							rtparameterset.SetMaxWidth(600);
+							rtparameterset.SetMaxHeight(800);							
 							</script>
                         <p>
                             <button title="Example of parameter initialisations:<br> k1 = 1<br> k2 = 3 " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpParameters.html','model parameter values help window', 'width=300,height=300,toolbar=0'); return false;">
@@ -258,7 +264,10 @@
 										rtassignmentRules.SetText("<%= @params_hash['assignmentRules'] -%>");
 										rtassignmentRules.GetContainer().style.left = '10px';
 										rtassignmentRules.GetContainer().style.top = '10px';
-										rtassignmentRules.SetCurrentWidth(150);
+										rtassignmentRules.SetCurrentWidth(600);
+										rtassignmentRules.SetCurrentHeight(300);
+										rtassignmentRules.SetMaxWidth(600);
+										rtassignmentRules.SetMaxHeight(800);
 										</script>
                         <p>
                             <button title="Examples of assignment rules are:<br>totalP := P1[t]+P2[t]<br> a := a[t]+Sin[t]  " onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpAssignmentRules.html','model assignments rules help window', 'width=300,height=300,toolbar=0'); return false;">
@@ -286,7 +295,10 @@
 										rtfunctions.SetText("<%= @params_hash['functions'] -%>");
 										rtfunctions.GetContainer().style.left = '10px';
 										rtfunctions.GetContainer().style.top = '10px';
-										rtfunctions.SetCurrentWidth(150);
+										rtfunctions.SetCurrentWidth(600);
+										rtfunctions.SetCurrentHeight(300);
+										rtfunctions.SetMaxWidth(600);
+										rtfunctions.SetMaxHeight(800);
 										</script> 
                         <p>
                             <button title="Examples of functions are:<br> mmKin[vm_,s_,kms_] := vm*s/(s+kms)<br>aFree[tot_]:=tot-a[t]" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpFunctions.html','model functions help window', 'width=300,height=500,toolbar=0'); return false;">
@@ -314,7 +326,10 @@
 							rtevents.SetText("<%= @params_hash['events'] -%>");
 							rtevents.GetContainer().style.left = '10px';
 							rtevents.GetContainer().style.top = '10px';
-							rtfunctions.SetCurrentWidth(150);
+							rtevents.SetCurrentWidth(600);
+							rtevents.SetCurrentHeight(300);
+							rtevents.SetMaxWidth(600);
+							rtevents.SetMaxHeight(800);
 							</script>
                         <p>
                             <button title="Examples of events are:<br> ?" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpEvents.html','model events help window', 'width=300,height=500,toolbar=0'); return false;">

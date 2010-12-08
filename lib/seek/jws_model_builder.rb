@@ -69,6 +69,10 @@ module Seek
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end
       
+      puts "###########################################################"
+      puts "Body = \n#{response.body}"
+      puts "###########################################################"
+      
       process_response_body(response.body)
     end
     
@@ -193,7 +197,7 @@ module Seek
         id=node.attributes['id']        
         if ["reactionImage","kineticsImage"].include?(id)
           url=node.content.strip
-          url = BASE_URL + "/" + url
+          url = BASE_URL + "JWSconstructor_panels/" + url
           element_id = id =="reactionImage" ? "resizeableElement" : "resizeableElement2"
           objects_hash[id] = %!<object data="#{url}" id="#{element_id}" alt="Network structure" class="reContent"></object>!
         end
