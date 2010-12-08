@@ -2,11 +2,7 @@
 
 <%= javascript_include_tag "jws/JWSconstructor_panels.js","jws/webMathematica.js","jws/addEvent.js","jws/sweetTitles.js","jws/Resizeable_Textbox/javascript.js","jws/Resizeable_Container/javascript.js","jws/jws_builder.js" -%>
 
-<link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/JWSconstructor_panels.css" rel="stylesheet" type="text/css" />
-<link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Textbox/style.css" rel="stylesheet" media="screen" type="text/css" />
-<link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/Resizeable_Container/style.css" rel="stylesheet" media="screen" type="text/css" />
-<link href="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/sweetTitles.css" rel="stylesheet" media="screen" type="text/css" />
-<%= stylesheet_link_tag 'jws_builder' -%>
+<%= stylesheet_link_tag 'jws/JWSconstructor_panels','jws/Resizeable_Textbox/style.css','jws/Resizeable_Container/style.css','jws/sweetTitles.css','jws/jws_builder' -%>
 <style>
     .builder_box {
         width: 50em;
@@ -65,7 +61,7 @@
                             Model name
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="name_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="name_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="name_panel" style="display: none">
@@ -88,7 +84,7 @@
                         </p>
                     </div>
                 </div>
-                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                <img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="reactions_top" class="builder_box">
                 <div class="squarebox">
@@ -97,7 +93,7 @@
                             Reactions
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="reactions_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="reactions_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="reactions_panel" style="display: none">
@@ -135,7 +131,7 @@
                         </p>
                     </div>
                 </div>
-                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                <img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="equations_top" class="builder_box">
                 <div class="squarebox">
@@ -144,20 +140,20 @@
                             Rate equations
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="equations_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="equations_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="equations_panel" style="display: none">
                         <!-- equations script -->
                         <script type="text/javascript"> 
-					var rtkinetics = new ResizeableTextbox('kinetics');
-					rtkinetics.SetText("<%= @params_hash['kinetics'] -%>");
-					rtkinetics.GetContainer().style.left = '10px';
-					rtkinetics.GetContainer().style.top = '10px';
-					rtkinetics.SetCurrentWidth(600);
-					rtkinetics.SetCurrentHeight(300);
-					rtkinetics.SetMaxWidth(600);
-					rtkinetics.SetMaxHeight(800);
+						var rtkinetics = new ResizeableTextbox('kinetics');
+						rtkinetics.SetText("<%= @params_hash['kinetics'] -%>");
+						rtkinetics.GetContainer().style.left = '10px';
+						rtkinetics.GetContainer().style.top = '10px';
+						rtkinetics.SetCurrentWidth(600);
+						rtkinetics.SetCurrentHeight(300);
+						rtkinetics.SetMaxWidth(600);
+						rtkinetics.SetMaxHeight(800);
 					</script>
                         <p>
                         </p>
@@ -183,7 +179,7 @@
                             <% end -%>
                         </p>
                     </div>
-                </div><img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                </div><img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="initial_top" class="builder_box">
                 <div class="squarebox">
@@ -192,7 +188,7 @@
                             Initial values
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="initial_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="initial_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div id="initial_panel" class="squareboxcontent" style="display: none">
@@ -214,7 +210,7 @@
                         </p>
                     </div>
                 </div>
-                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                <img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="parameters_top" class="builder_box">
                 <div class="squarebox">
@@ -223,7 +219,7 @@
                             Parameter values
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="parameters_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="parameters_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div id="parameters_panel" class="squareboxcontent" style="display: none">
@@ -245,7 +241,7 @@
                         </p>
                     </div>
                 </div>
-                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                <img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="assignments_top" class="builder_box">
                 <div class="squarebox">
@@ -254,7 +250,7 @@
                             Assignment rules
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="assignments_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="assignments_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="assignments_panel" style="display: none">
@@ -276,7 +272,7 @@
                         </p>
                     </div>
                 </div>
-                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                <img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="functions_top" class="builder_box">
                 <div class="squarebox">
@@ -285,7 +281,7 @@
                             Functions
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="functions_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="functions_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="functions_panel" style="display: none">
@@ -307,7 +303,7 @@
                         </p>
                     </div>
                 </div>
-                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                <img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
             <div id="events_top" class="builder_box">
                 <div class="squarebox">
@@ -316,7 +312,7 @@
                             Events
                         </div>
                         <div style="float: right; vertical-align: middle">
-                            <img id="events_chevron" title="Show/Hide" src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                            <img id="events_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
                         </div>
                     </div>
                     <div class="squareboxcontent" id="events_panel" style="display: none">
@@ -338,7 +334,7 @@
                         </p>
                     </div>
                 </div>
-                <img src="http://jjj.mib.ac.uk/webMathematica/Examples/JWSconstructor_panels/images/shadow2.gif" height="20" alt="" width="100%" />
+                <img src="/images/jws/shadow2.gif" height="20" alt="" width="100%" />
             </div>
         </div><% end -%>
     </div>

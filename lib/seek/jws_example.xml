@@ -115,8 +115,7 @@
             Fru6P urn:miriam:obo.chebi:CHEBI%3A17234 nupnoort
             Fru6P urn:miriam:obo.chebi:CHEBI%3A37624 onltaiatu
             Fru6P urn:miriam:obo.chebi:CHEBI%3A17234 nupnoort
-        </annotations>
-        
+        </annotations>        
     </form>
     
     <!-- NOTE: ampersand escaped in URL -->
@@ -128,8 +127,7 @@
             <parameter id="savedfile">
                 bakker201012312641010948.dat
             </parameter>
-        </parameters>
-        
+        </parameters>        
     </form>
     
     <form id="BuildSBMLFile">
@@ -140,8 +138,7 @@
             <parameter id="modelName">
                 bakker201012312641010948
             </parameter>
-        </parameters>
-        
+        </parameters>        
     </form>
     
     <form id="BuildJWSFile">
