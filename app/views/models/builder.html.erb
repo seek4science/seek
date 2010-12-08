@@ -122,9 +122,9 @@
                                 Reactions help
                             </button>
                             <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
-                            <% if @objects_hash["resizeableElement"] -%>
+                            <% if @objects_hash["reactionImage"] -%>
                             <%= hidden_field_tag "plotGraphPanel","on" -%>
-                            <%= @objects_hash["resizeableElement"] -%>
+                            <%= @objects_hash["reactionImage"] -%>
                             <script type="text/javascript">
                                 var rc = new ResizeableContainer('resizeableElement');
                                 rc.GetContainer().style.left = '10px';
@@ -168,9 +168,9 @@
                                 Rate equations help
                             </button>
                             <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" /><input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
-                            <% if @objects_hash["resizeableElement2"] -%>
+                            <% if @objects_hash["kineticsImage"] -%>
                             <%= hidden_field_tag "plotKineticsPanel","on" -%>
-                            <%= @objects_hash["resizeableElement2"] -%>
+                            <%= @objects_hash["kineticsImage"] -%>
                             <script type="text/javascript"> 
         var rc2 = new ResizeableContainer('resizeableElement2');
         rc2.GetContainer().style.left = '10px';

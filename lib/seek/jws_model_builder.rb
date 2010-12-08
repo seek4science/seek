@@ -158,18 +158,15 @@ module Seek
       
       parser = LibXML::XML::Parser.string(body,:encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse
-      param_values = extract_main_parameters doc
-      form_parameters={}
-      object_urls = {}
-      errors={}
+      param_values = extract_main_parameters doc      
         
       saved_file = determine_saved_file doc
-#      objects_hash = create_objects_hash doc      
+      objects_hash = create_objects_hash doc     
       fields_with_errors = find_reported_errors doc
         
       #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
       fields_with_errors.delete("functions")      
-      return param_values,saved_file,{},fields_with_errors
+      return param_values,saved_file,objects_hash,fields_with_errors
     end
     
     def find_reported_errors doc
@@ -185,13 +182,18 @@ module Seek
     end
     
     def create_objects_hash doc
-      result = {}
-      doc.search("//object").each do |obj|
-        id=obj.attributes['id']
-        obj.attributes['data']=BASE_URL+"/"+obj.attributes['data']
-        result[id]=obj.to_s        
-      end
-      return result
+      objects_hash = {}
+      doc.find("//form[@id='main']/objects/object").each do |node|
+        id=node.attributes['id']
+        puts " ================= Found Object for id = #{id}"
+        if ["reactionImage","kineticsImage"].include?(id)
+          url=node.content.strip
+          url = BASE_URL + "/" + url
+          element_id = id =="reactionImage" ? "resizeableElement" : "resizeableElement2"
+          objects_hash[id] = %!<object data="#{url}" id="#{element_id}" alt="Network structure" class="reContent"></object>!
+        end
+      end      
+      objects_hash
     end
     
     def extract_main_parameters doc

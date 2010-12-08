@@ -2,22 +2,22 @@
     <errorinfo>
         <error id="reaction">
             0
-        </error>        
+        </error>
         <error id="kinetics">
             0
-        </error>        
+        </error>
         <error id="initVal">
             0
-        </error>        
+        </error>
         <error id="parameters">
             7
-        </error>        
+        </error>
         <error id="functions">
             0
-        </error>        
+        </error>
         <error id="assRules">
             0
-        </error>        
+        </error>
         <error id="events">
             0
         </error>
@@ -33,11 +33,11 @@
         <action>
             ../../upload/uploadNEW.jsp?SBMLFilePostedToIFC=true
         </action>
-		<parameters>
-        <parameter id="SBMLFilePostedToIFC">
-            true
-        </parameter>
-		</parameters>
+        <parameters>
+            <parameter id="SBMLFilePostedToIFC">
+                true
+            </parameter>
+        </parameters>
     </form>
     
     <form id="main">
@@ -69,13 +69,15 @@
             <parameter id="events">
                 \n
             </parameter>
-            <parameter id="reactionImageURL">
-                ../franco/test.gif
-            </parameter>
-            <parameter id="kineticsImageURL">
-                ../franco/kin.html
-            </parameter>
         </parameters>
+        <objects>
+            <object id="reactionImage">
+                ../franco/test.gif
+            </object>
+            <object id="kineticsImage">
+                ../franco/kin.html
+            </object>
+        </objects>
         
         <annotations>
             GlcI urn:miriam:kegg.compound:C00293 leoSsd
@@ -116,29 +118,29 @@
         </annotations>
         
     </form>
-	
-    <!-- ampersand -->
-    <form id="simulate">
-    <action>
-        ../../upload/uploadNEW.jsp?inputFileConstructor=true&amp;savedfile=bakker201012312641010948.dat
-    </action>
-    <parameters>
-        <parameter id="savedfile">
-            bakker201012312641010948.dat
-        </parameter>
-    </parameters>
     
+    <!-- NOTE: ampersand escaped in URL -->
+    <form id="simulate">
+        <action>
+            ../../upload/uploadNEW.jsp?inputFileConstructor=true&amp;savedfile=bakker201012312641010948.dat
+        </action>
+        <parameters>
+            <parameter id="savedfile">
+                bakker201012312641010948.dat
+            </parameter>
+        </parameters>
+        
     </form>
     
     <form id="BuildSBMLFile">
         <action>
             datToSBMLstageII.jsp
         </action>
-		<parameters>
-        <parameter id="modelName">
-            bakker201012312641010948
-        </parameter>
-    </parameters>
+        <parameters>
+            <parameter id="modelName">
+                bakker201012312641010948
+            </parameter>
+        </parameters>
         
     </form>
     
@@ -146,8 +148,8 @@
         <action>
             bakker201012312641010948.dat
         </action>
-		<parameters>
-		</parameters>
+        <parameters>
+        </parameters>
     </form>
     
 </builder>
