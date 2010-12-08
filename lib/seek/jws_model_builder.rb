@@ -9,7 +9,7 @@ module Seek
     include ModelTypeDetection
     
     BASE_URL = "http://130.88.195.31/webMathematica/Examples/"    
-    SIMULATE_URL = "http://130.88.195.31/webMathematica/upload/uploadNEW_xml.jsp"    
+    SIMULATE_URL = "http://130.88.195.31/webMathematica/upload/uploadNEW.jsp"    
     
     def is_supported? model      
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
@@ -32,7 +32,7 @@ module Seek
     end
     
     def upload_sbml_url
-      "#{SIMULATE_URL}?SBMLFilePostedToIFC=true"      
+      "#{SIMULATE_URL}?SBMLFilePostedToIFC=true&xmlOutput=true"
     end
     
     def simulate_url
@@ -61,6 +61,7 @@ module Seek
         form_data[p]=params[p] if params.has_key?(p)
       end      
       
+      puts "============ Plot graph - #{form_data['plotGraphPanel']}"
       response = Net::HTTP.post_form(URI.parse(url),form_data)
       
       if response.instance_of?(Net::HTTPInternalServerError)       
