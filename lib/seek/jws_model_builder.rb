@@ -8,8 +8,8 @@ module Seek
     
     include ModelTypeDetection
     
-    BASE_URL = "http://130.88.195.31/webMathematica/Examples/"    
-    SIMULATE_URL = "http://130.88.195.31/webMathematica/upload/uploadNEW.jsp"    
+    BASE_URL = "http://jjj.mib.ac.uk//webMathematica/Examples/"    
+    SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
     
     def is_supported? model      
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
