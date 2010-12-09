@@ -15,7 +15,7 @@ module Seek
     def get_remote_data url, username=nil, password=nil, type=nil, include_data=true      
       cached=check_from_cache(url,username,password)
       return cached unless cached.nil?
-      uri=URI.parse(url)
+      uri=parse_and_encode_url(url)
       if ["http","https"].include? uri.scheme
         return basic_auth url, username, password,include_data
       elsif uri.scheme=="ftp"
@@ -157,6 +157,15 @@ module Seek
     
     def generate_key url,username,password
       "#{url}+#{username}+#{password}"
+    end
+    
+    def parse_and_encode_url url
+      begin
+        return URI.parse(url)
+      rescue URI::InvalidURIError
+        url=URI.encode(url)
+        return URI.parse(url)
+      end
     end
     
   end

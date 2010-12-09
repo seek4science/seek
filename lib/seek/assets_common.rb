@@ -77,9 +77,9 @@ module Seek
       project=asset.project
       project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.name
-      resource_type = resource.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
+      resource_type = asset.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
       data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
-      send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || resource.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+      send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
     end
     
     def download_via_url asset    
@@ -184,7 +184,7 @@ module Seek
         end      
       else
         if asset.contributor.nil? #A jerm generated resource
-          download_jerm_resource asset
+          download_jerm_asset asset
         else
           if asset.content_blob.file_exists?
             send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
