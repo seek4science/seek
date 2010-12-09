@@ -32,7 +32,7 @@ class Institution < ActiveRecord::Base
 
   alias_attribute :title, :name
 
-  acts_as_solr(:fields => [ :name,:country ]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :name,:country,:city ]) if SOLR_ENABLED
   
   acts_as_uniquely_identifiable
   
