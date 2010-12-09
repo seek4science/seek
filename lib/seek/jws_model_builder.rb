@@ -60,12 +60,10 @@ module Seek
       required_params.each do |p|
         form_data[p]=params[p] if params.has_key?(p)
       end      
-      
-      puts "============ Plot graph - #{form_data['plotGraphPanel']}"
+            
       response = Net::HTTP.post_form(URI.parse(url),form_data)
       
-      if response.instance_of?(Net::HTTPInternalServerError)       
-        puts response.to_s
+      if response.instance_of?(Net::HTTPInternalServerError)               
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end
       
@@ -82,13 +80,12 @@ module Seek
       
       if (is_sbml? model)        
         #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
-        #          if [301, 302, 307].include? response.code 
-        #            puts "REDIRECT to #{response['location']}"
+        #          if [301, 302, 307].include? response.code         
         #            response.follow_redirection(request, result, &block)
         #          else
         #            response.return!(request, result, &block)
         #          end
-        #        }         
+        #        }                 
         part=Multipart.new("upfile",filepath,model.original_filename)
         response = part.post(upload_sbml_url)        
         if response.code == "302"
@@ -114,10 +111,9 @@ module Seek
         }        
       end
       
-      if response.instance_of?(Net::HTTPInternalServerError)       
-        puts response.to_s
+      if response.instance_of?(Net::HTTPInternalServerError)               
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
-      end      
+      end           
       
       process_response_body(response.body)
       
@@ -140,8 +136,7 @@ module Seek
       model_name=saved_file.gsub("\.dat","")      
       response = RestClient.get(builder_url,:params=>{:loadModel=>model_name,:userModel=>true})
       
-      if response.instance_of?(Net::HTTPInternalServerError)       
-        puts response.to_s
+      if response.instance_of?(Net::HTTPInternalServerError)               
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/,""))
       end      
       process_response_body(response.body)

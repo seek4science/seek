@@ -62,6 +62,7 @@ class ModelsController < ApplicationController
       end
     rescue Exception=>e
       error=e      
+      raise e
     end
     
     respond_to do |format|
