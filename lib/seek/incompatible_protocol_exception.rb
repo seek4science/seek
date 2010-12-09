@@ -1,2 +1,4 @@
-class IncompatibleProtocolException < Exception
+module Seek
+  class IncompatibleProtocolException < Exception
+  end
 end

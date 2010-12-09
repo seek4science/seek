@@ -23,10 +23,12 @@ module Seek
           ftp.close
           code="200"
         rescue Net::FTPPermError
-          code="401"        
+          code="401"       
+        rescue Errno::ECONNREFUSED,SocketError
+          code="404"
         end                
       else
-        raise IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")  
+        raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")  
       end
       
       return code
@@ -52,7 +54,7 @@ module Seek
           icon_filename=icon_filename_for_key("warn")
           msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         end        
-      rescue IncompatibleProtocolException=>e
+      rescue Seek::IncompatibleProtocolException=>e
         msg = e.message
       rescue Exception=>e        
         msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+asset_url
@@ -88,10 +90,13 @@ module Seek
       code = url_response_code(asset.content_blob.url)
       if (["302","401"].include?(code))
         redirect_to(asset.content_blob.url,:target=>"_blank")
+      elsif code=="404"
+        flash[:error]="This item is referenced at a remote location, which is currently unavailable"
+        redirect_to asset.parent,:version=>asset.version
       else
         downloader=RemoteDownloader.new
         data_hash = downloader.get_remote_data asset.content_blob.url
-        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'              
       end      
     end
     
@@ -158,7 +163,7 @@ module Seek
               return false
             end            
           end
-        rescue IncompatibleProtocolException=>e
+        rescue Seek::IncompatibleProtocolException=>e
           flash.now[:error] = e.message
           if render_action_on_error
             respond_to do |format|            
@@ -195,17 +200,17 @@ module Seek
         else
           send_data asset.content_blob.data, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'  
         end      
-      else
+      else        
         if asset.contributor.nil? #A jerm generated resource
           download_jerm_asset asset
         else
           if asset.content_blob.file_exists?
             send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
-          else
-            download_via_url asset
+          else                        
+            download_via_url asset            
           end
-        end
+        end                 
       end
-    end    
+    end
   end
 end
