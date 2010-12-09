@@ -31,6 +31,18 @@ class ContentStats
       authorised_assets models,"show"
     end
     
+    def accessible_data_files
+      authorised_assets data_files,"download"
+    end
+    
+    def accessible_sops
+      authorised_assets sops,"download"
+    end
+    
+    def accessible_models
+      authorised_assets models,"download"
+    end
+    
     def registered_people
       people.select{|p| !p.user.nil?}
     end
