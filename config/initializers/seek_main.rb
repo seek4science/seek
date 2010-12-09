@@ -6,7 +6,7 @@ require 'authorization'
 require 'save_without_timestamping'
 require 'asset'
 
-JWS_ENABLED=true unless defined? JWS_ENABLED
+JWS_ENABLED=false unless defined? JWS_ENABLED
 JERM_ENABLED=true unless defined? JERM_ENABLED
 SOLR_ENABLED=false unless defined? SOLR_ENABLED
 ACTIVITY_LOG_ENABLED=true unless defined? ACTIVITY_LOG_ENABLED
