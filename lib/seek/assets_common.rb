@@ -53,11 +53,15 @@ module Seek
         elsif code == "401"
           icon_filename=icon_filename_for_key("warn")
           msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
+        elsif code == "404"
+          msg="Nothing was found at the URL you provided. You can test the link by opening in another window or tab:<br/><a href=#{asset_url} target='_blank'>#{asset_url}</a>"
+        else
+          msg="There was a problem accessing the URL. You can test the link by opening in another window or tab:<br/><a href=#{asset_url} target='_blank'>#{asset_url}</a>"
         end        
       rescue Seek::IncompatibleProtocolException=>e
         msg = e.message
       rescue Exception=>e        
-        msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+asset_url
+        msg="There was a problem accessing the URL. You can test the link by opening in another window or tab:<br/><a href=#{asset_url}>#{asset_url}</a>"
       end
       
       image = "<img src='/images/#{icon_filename}'/>"
