@@ -1,0 +1,2 @@
+class IncompatibleProtocolException < Exception
+end

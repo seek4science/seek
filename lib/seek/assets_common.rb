@@ -26,7 +26,7 @@ module Seek
           code="401"        
         end                
       else
-        raise URI::InvalidURIError.new("Only http, https and ftp are supported")  
+        raise IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")  
       end
       
       return code
@@ -52,6 +52,8 @@ module Seek
           icon_filename=icon_filename_for_key("warn")
           msg="The url responded with <b>unauthorized</b>.<br/> It can still be used, but content type and filename will not be recorded.<br/>You will also not be able to make a copy. When a user downloads this file, they will be redirected to the URL."
         end        
+      rescue IncompatibleProtocolException=>e
+        msg = e.message
       rescue Exception=>e        
         msg="There was a problem accessing the URL. You can test the link by opening in another window:<br/>"+asset_url
       end
@@ -155,7 +157,18 @@ module Seek
               end
               return false
             end            
-          end        
+          end
+        rescue IncompatibleProtocolException=>e
+          flash.now[:error] = e.message
+          if render_action_on_error
+            respond_to do |format|            
+              format.html do 
+                set_parameters_for_sharing_form
+                render :action => render_action_on_error
+              end
+            end
+          end
+          return false
         rescue Exception=>e              
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
