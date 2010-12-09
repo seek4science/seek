@@ -24,7 +24,7 @@ module Seek
           code="200"
         rescue Net::FTPPermError
           code="401"       
-        rescue Errno::ECONNREFUSED,SocketError
+        rescue Errno::ECONNREFUSED,SocketError,Errno::EHOSTUNREACH
           code="404"
         end                
       else
