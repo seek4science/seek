@@ -16,19 +16,19 @@ module ApiHelper
   end
   
   def uri_for_path(path, *args)
-    Sysmo::Api.uri_for_path(path, *args)
+    Seek::Api.uri_for_path(path, *args)
   end
   
   def api_partial_path_for_item object
-    Sysmo::Api.api_partial_path_for_item(object)
+    Seek::Api.api_partial_path_for_item(object)
   end
   
   def uri_for_collection(resource_name, *args)
-    Sysmo::Api.uri_for_collection(resource_name, *args)
+    Seek::Api.uri_for_collection(resource_name, *args)
   end
   
   def uri_for_object(resource_obj, *args)
-    Sysmo::Api.uri_for_object(resource_obj, *args)
+    Seek::Api.uri_for_object(resource_obj, *args)
   end
   
   def previous_link_xml_attributes(resource_uri)

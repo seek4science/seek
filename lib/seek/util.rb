@@ -1,4 +1,4 @@
-module Sysmo
+module Seek
   module Util
     
     # This method removes the special Rails parameters from a params hash provided.   

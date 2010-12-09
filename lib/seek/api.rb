@@ -8,7 +8,7 @@
 
 # Taken from our friends Biocatalogue http://www.biocatalogue.org
 
-module Sysmo
+module Seek
   module Api        
     
     def self.uri_for_path(path, *args)
@@ -91,7 +91,7 @@ module Sysmo
       
     def self.append_params(uri, params)
       # Remove the special params
-      new_params = Sysmo::Util.remove_rails_special_params_from(params)
+      new_params = Seek::Util.remove_rails_special_params_from(params)
       return (new_params.blank? ? uri : "#{uri}?#{new_params.to_query}")
     end
       
