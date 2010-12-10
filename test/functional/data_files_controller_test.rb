@@ -37,6 +37,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  test "should correctly handle 404 url" do
+    df={:title=>"Test",:data_url=>"http:/www.sysmo-db.org/nothing-there.png"}    
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
+      end
+    end
+    assert_not_nil flash.now[:error]
+  end
+  
   test "should correctly handle bad data url" do
     df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png"}    
     assert_no_difference('DataFile.count') do

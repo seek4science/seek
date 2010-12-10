@@ -49,6 +49,14 @@ url_content_blob:
   url: http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png  
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
   
+url_no_host_content_blob:
+  url: http://sdkfhsdfkhskfj.com/pic.png 
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>
+  
+url_not_found_content_blob:
+  url: http://www.sysmo-db.org/notthere.png  
+  uuid: <%= UUIDTools::UUID.random_create.to_s %>  
+  
 non_sbml_xml_blob:  
   uuid: <%= init_blob('non_sbml_xml.xml') %>  
   
