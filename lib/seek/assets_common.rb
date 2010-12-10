@@ -8,27 +8,30 @@ module Seek
     def url_response_code asset_url
       url = URI.parse(asset_url)
       code=""
-      if (["http","https"].include?(url.scheme))
-        Net::HTTP.start(url.host, url.port) do |http|
-          code = http.head(url.request_uri).code        
-        end
-      elsif (url.scheme=="ftp")        
-        username = 'anonymous'
-        password = nil
-        username, password = url.userinfo.split(/:/) if url.userinfo
-        begin
+      begin
+        if (["http","https"].include?(url.scheme))
+          Net::HTTP.start(url.host, url.port) do |http|
+            code = http.head(url.request_uri).code        
+          end
+        elsif (url.scheme=="ftp")        
+          username = 'anonymous'
+          password = nil
+          username, password = url.userinfo.split(/:/) if url.userinfo
+          
           ftp = Net::FTP.new(url.host)
           ftp.login(username,password)
           ftp.getbinaryfile(url.path, '/dev/null', 20) { break }
           ftp.close
-          code="200"
-        rescue Net::FTPPermError
-          code="401"       
-        rescue Errno::ECONNREFUSED,SocketError,Errno::EHOSTUNREACH
-          code="404"
-        end                
-      else
-        raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")  
+          code="200"                       
+        else
+          raise Seek::IncompatibleProtocolException.new("Only http, https and ftp protocols are supported")  
+        end
+      rescue Net::FTPPermError
+        code="401"       
+      rescue Errno::ECONNREFUSED,SocketError,Errno::EHOSTUNREACH
+        #FIXME:also using 404 for uknown host, which wouldn't actually really be a http response code
+        #indicating that using response codes is not the best approach here.
+        code="404" 
       end
       
       return code

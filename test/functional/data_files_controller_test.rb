@@ -128,6 +128,20 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "image/png", assigns(:data_file).content_type
   end  
   
+  test "should gracefully handle when downloading a unknown host url" do
+    df=data_files(:url_no_host_data_file)
+    get :download,:id=>df
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+  
+  test "should gracefully handle when downloading a url resulting in 404" do
+    df=data_files(:url_not_found_data_file)
+    get :download,:id=>df
+    assert_redirected_to data_file_path(df,:version=>df.version)
+    assert_not_nil flash[:error]
+  end
+  
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 401 url" do
     df = {:title=>"401",:data_url=>"http://www.myexperiment.org/workflow.xml?id=82"}
