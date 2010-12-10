@@ -99,7 +99,7 @@ module Seek
         redirect_to(asset.content_blob.url,:target=>"_blank")
       elsif code=="404"
         flash[:error]="This item is referenced at a remote location, which is currently unavailable"
-        redirect_to asset.parent,:version=>asset.version
+        redirect_to polymorphic_path(asset.parent,{:version=>asset.version})
       else
         downloader=RemoteDownloader.new
         data_hash = downloader.get_remote_data asset.content_blob.url
