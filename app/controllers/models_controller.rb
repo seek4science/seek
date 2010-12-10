@@ -62,7 +62,6 @@ class ModelsController < ApplicationController
       end
     rescue Exception=>e
       error=e      
-      raise e
     end
     
     respond_to do |format|
@@ -111,7 +110,7 @@ class ModelsController < ApplicationController
       elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version new_version_comments
         format.html {redirect_to model_path(@model,:version=>@model.version) }
-      else
+      else        
         format.html { render :action=>"builder" }
       end      
     end

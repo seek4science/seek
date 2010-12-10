@@ -12,7 +12,7 @@ div.builder_actions {
 div.builder_actions h6 {
     background-color: #EEE;
     width: 100%;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.5em;	
     padding-top: 0.4em;
     border-top: solid 1px #999;
     border-bottom: solid 1px #BBB;
@@ -25,4 +25,15 @@ div.jws_errors {
     text-align: center;
     font-weight: bolder;
     margin-bottom: 1em;
+}
+
+div.jws_success {
+    color: green;
+    text-align: center;
+    font-weight: bolder;
+    margin-bottom: 1em;
+}
+
+#builder_header p {
+	margin: 0.0em 0.0em 0.5em 1em;
 }
