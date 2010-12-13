@@ -20,7 +20,8 @@
         <%= f.label :expires,"Expires at" -%>
         <br/>
         <%= datetime_select "site_announcement","expires_at" -%>
-        <br/>
+        <br/>		
+		<span class="headline_announcement_date">( Current server time is <%= Time.now.utc -%> )</span>
     </div>
 </p>
 <p>
