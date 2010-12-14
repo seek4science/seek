@@ -208,7 +208,7 @@
 
                   <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
                     <option value="<%= Policy::VIEWING -%>" >Viewing only</option>
-                    <option value="<%= Policy::DOWNLOADING -%>" >Viewing and downloading only</option>
+                    <option value="<%= Policy::ACCESSIBLE -%>" >Viewing and downloading only</option>
                     <option value="<%= Policy::EDITING -%>" >Viewing, downloading and editing</option>
                   </select>
                 </div>
@@ -272,7 +272,7 @@
                     <select name="individual_people_access_type_select" id="individual_people_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;">
                       <option value="<%= Policy::NO_ACCESS -%>" >no access</option>
                       <option value="<%= Policy::VIEWING -%>" >viewing only</option>
-                      <option value="<%= Policy::DOWNLOADING -%>" >viewing and downloading only</option>
+                      <option value="<%= Policy::ACCESSIBLE -%>" >viewing and downloading only</option>
                       <option value="<%= Policy::EDITING -%>" >viewing, downloading and editing</option>
                       <option value="<%= Policy::MANAGING -%>" >manage</option>
                     </select>

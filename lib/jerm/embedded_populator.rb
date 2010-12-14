@@ -93,7 +93,7 @@ module Jerm
     def sysmo_policy
       Policy.new(:name=>'auto',
                 :sharing_scope=>Policy::ALL_SYSMO_USERS,
-                :access_type=>Policy::DOWNLOADING,
+                :access_type=>Policy::ACCESSIBLE,
                 :use_custom_sharing=>true,
                 :use_whitelist=>false,
                 :use_blacklist=>false)      
@@ -107,7 +107,7 @@ module Jerm
                 :use_whitelist=>false,
                 :use_blacklist=>false) 
       policy.save!
-      p=Permission.new(:contributor=>project,:access_type=>Policy::DOWNLOADING,:policy_id=>policy.id)
+      p=Permission.new(:contributor=>project,:access_type=>Policy::ACCESSIBLE,:policy_id=>policy.id)
       p.save!
       return policy
     end        
@@ -119,15 +119,8 @@ module Jerm
     end
     
     def default_policy author,project
-      nil
-      #      Policy.new(:name => 'auto',
-      #        :contributor_type => 'User',
-      #        :contributor_id => author.user.id,
-      #        :sharing_scope => Policy::EVERYONE,
-      #        :access_type => Policy::DOWNLOADING,
-      #        :use_custom_sharing => false,
-      #        :use_whitelist => false,
-      #        :use_blacklist => false)
+      #FIXME: IS THIS USED?
+      nil      
     end
   end
 end

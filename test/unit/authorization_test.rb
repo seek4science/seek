@@ -73,10 +73,10 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
   
   def test_access_type_allows_action_viewing_and_downloading_only
-    assert Authorization.access_type_allows_action?("view", Policy::DOWNLOADING), "'view' action should have been allowed with access_type set to 'Policy::DOWNLOADING' (cascading permissions)"
-    assert Authorization.access_type_allows_action?("download", Policy::DOWNLOADING), "'download' action should have been allowed with access_type set to 'Policy::DOWNLOADING'"
-    assert !Authorization.access_type_allows_action?("edit", Policy::DOWNLOADING), "'edit' action should have NOT been allowed with access_type set to 'Policy::DOWNLOADING'"
-    assert !Authorization.access_type_allows_action?("destroy", Policy::DOWNLOADING), "'destroy' action should have NOT been allowed with access_type set to 'Policy::DOWNLOADING'"
+    assert Authorization.access_type_allows_action?("view", Policy::ACCESSIBLE), "'view' action should have been allowed with access_type set to 'Policy::ACCESSIBLE' (cascading permissions)"
+    assert Authorization.access_type_allows_action?("download", Policy::ACCESSIBLE), "'download' action should have been allowed with access_type set to 'Policy::ACCESSIBLE'"
+    assert !Authorization.access_type_allows_action?("edit", Policy::ACCESSIBLE), "'edit' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
+    assert !Authorization.access_type_allows_action?("destroy", Policy::ACCESSIBLE), "'destroy' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
   end
   
   def test_access_type_allows_action_editing
@@ -688,7 +688,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     permissions = temp_get_group_permissions(sops(:sop_for_test_with_workgroups).policy)
     assert permissions.length == 1, "expected to have one permission for workgroups in that policy, not #{permissions.length}"
     assert permissions[0].contributor_type == "WorkGroup", "expected to have permission for 'WorkGroup'"
-    assert permissions[0].access_type == Policy::DOWNLOADING, "expected that the permission would give the test user download access to the test SOP"
+    assert permissions[0].access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
     
     # verify that test user is a member of the group in the permission
     temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person, permissions[0].contributor_type, permissions[0].contributor_id)
@@ -719,7 +719,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     permissions = temp_get_group_permissions(sops(:sop_for_test_with_workgroups_no_custom_sharing).policy)
     assert permissions.length == 1, "expected to have one permission for workgroups in that policy, not #{permissions.length}"
     assert permissions[0].contributor_type == "WorkGroup", "expected to have permission for 'WorkGroup'"
-    assert permissions[0].access_type == Policy::DOWNLOADING, "expected that the permission would give the test user download access to the test SOP"
+    assert permissions[0].access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
     
     # verify that test user is a member of the group in the permission
     temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person, permissions[0].contributor_type, permissions[0].contributor_id)
@@ -799,7 +799,7 @@ class AuthorizationTest < ActiveSupport::TestCase
       perm = nil
     end
     assert !perm.nil?, "couldn't find correct permission for the test"
-    assert perm.access_type == Policy::DOWNLOADING, "expected that the permission would give the test user download access to the test SOP"
+    assert perm.access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
     
     # verify that test user is a member of the institution in the permission
     temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person, perm.contributor_type, perm.contributor_id)

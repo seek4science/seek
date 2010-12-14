@@ -208,7 +208,7 @@ module Authorization
       when "view"
         return access_type >= Policy::VIEWING
       when "download"
-        return access_type >= Policy::DOWNLOADING
+        return access_type >= Policy::ACCESSIBLE
       when "edit"
         return access_type >= Policy::EDITING
       when "destroy"

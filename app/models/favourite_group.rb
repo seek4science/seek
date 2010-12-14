@@ -20,7 +20,7 @@ class FavouriteGroup < ActiveRecord::Base
   
   # defaults for access types in BLACKLIST and WHITELIST groups
   BLACKLIST_ACCESS_TYPE = Policy::NO_ACCESS
-  WHITELIST_ACCESS_TYPE = Policy::DOWNLOADING
+  WHITELIST_ACCESS_TYPE = Policy::ACCESSIBLE
   
   
   # check if current favourite group is a blacklist or whitelist
