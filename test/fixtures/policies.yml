@@ -46,7 +46,7 @@ sysmo_member_edit:
 download_for_all_registered_users_policy:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
   use_custom_sharing: true
   use_whitelist: false
   use_blacklist: false
@@ -90,7 +90,7 @@ private_policy_with_custom_sharing:
 public_download_with_no_custom_sharing:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
   use_custom_sharing: false
   use_whitelist: false
   use_blacklist: false
@@ -133,7 +133,7 @@ policy_for_worgroup_sharing_tests_no_custom_sharing:
 sysmo_member_download:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
   use_custom_sharing: false
   use_whitelist: false
   use_blacklist: false

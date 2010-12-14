@@ -6,7 +6,7 @@
 download_of_sop_with_private_policy_and_custom_sharing_for_person_not_associated_with_any_projects:
   contributor: person_not_associated_with_any_projects (Person)
   policy: private_policy_with_custom_sharing
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
 
 
 no_access_to_sop_with_all_registered_users_policy_for_person_for_sysmo_user_in_blacklist:
@@ -61,25 +61,25 @@ editing_sop_that_uses_whitelist_blacklist_and_custom_sharing_for_person_for_owne
 downloading_sop_that_uses_whitelist_blacklist_and_custom_sharing_for_person_not_associated_with_any_projects:
   contributor: person_not_associated_with_any_projects (Person)
   policy: whitelist_blacklist_and_custom_sharing
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
 
 
 downloading_sop_for_test_with_workgroups_for_ebi_inst_workgroup:
   contributor: ebi_inst_workgroup (WorkGroup)
   policy: policy_for_worgroup_sharing_tests
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
 
 
 downloading_sop_for_test_with_workgroups_no_custom_sharing_for_ebi_inst_workgroup:
   contributor: ebi_inst_workgroup (WorkGroup)
   policy: policy_for_worgroup_sharing_tests_no_custom_sharing
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
 
 
 downloading_sop_for_test_with_projects_institutions_for_ebi_inst:
   contributor: ebi_inst (Institution)
   policy: policy_for_test_with_projects_institutions
-  access_type: <%= Policy::DOWNLOADING %>
+  access_type: <%= Policy::ACCESSIBLE %>
 
 
 editing_sop_for_test_with_projects_institutions_sysmo_project:
