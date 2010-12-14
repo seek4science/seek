@@ -313,13 +313,13 @@ function accessTypeTranslation(access_type) {
             txt = 'no access';
             break;
         case VIEWING:
-            txt = 'viewing only';
+            txt = 'visible only';
             break;
         case DOWNLOADING:
-            txt = 'viewing and downloading only';
+            txt = 'visible and accessible';
             break;
         case EDITING:
-            txt = 'viewing, downloading and editing';
+            txt = 'visible, accessible and editable';
             break;
         case MANAGING:
             txt = "manage"

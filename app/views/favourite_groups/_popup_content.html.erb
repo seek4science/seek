@@ -59,9 +59,9 @@
 							
 						  	<select name="group_access_type_select" id="group_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;" <%= "disabled" if @f_group.is_whitelist_or_blacklist? -%>>
 								  <% unless @f_group.is_whitelist_or_blacklist? -%>
-										<option value="<%= Policy::VISIBLE -%>" >viewing only</option>
-									  <option value="<%= Policy::ACCESSIBLE -%>" >viewing and downloading only</option>
-									  <option value="<%= Policy::EDITING -%>" >viewing, downloading and editing</option>
+										<option value="<%= Policy::VISIBLE -%>" >visible only</option>
+									  <option value="<%= Policy::ACCESSIBLE -%>" >visible and accessible</option>
+									  <option value="<%= Policy::EDITING -%>" >visible, accessible and editable</option>
 									<% else -%>
 									  <% if @f_group.name == FavouriteGroup::BLACKLIST_NAME -%>
 										  <option value="<%= FavouriteGroup::BLACKLIST_ACCESS_TYPE -%>" ><%= Policy.get_access_type_wording(FavouriteGroup::BLACKLIST_ACCESS_TYPE) -%></option>

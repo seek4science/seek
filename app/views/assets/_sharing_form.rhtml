@@ -207,9 +207,9 @@
                   <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
 
                   <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-                    <option value="<%= Policy::VISIBLE -%>" >Viewing only</option>
-                    <option value="<%= Policy::ACCESSIBLE -%>" >Viewing and downloading only</option>
-                    <option value="<%= Policy::EDITING -%>" >Viewing, downloading and editing</option>
+                    <option value="<%= Policy::VISIBLE -%>" >Visible only</option>
+                    <option value="<%= Policy::ACCESSIBLE -%>" >Visible and accessible</option>
+                    <option value="<%= Policy::EDITING -%>" >Visible, accessible and editable</option>
                   </select>
                 </div>
 
@@ -271,9 +271,9 @@
 
                     <select name="individual_people_access_type_select" id="individual_people_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;">
                       <option value="<%= Policy::NO_ACCESS -%>" >no access</option>
-                      <option value="<%= Policy::VISIBLE -%>" >viewing only</option>
-                      <option value="<%= Policy::ACCESSIBLE -%>" >viewing and downloading only</option>
-                      <option value="<%= Policy::EDITING -%>" >viewing, downloading and editing</option>
+                      <option value="<%= Policy::VISIBLE -%>" >visible only</option>
+                      <option value="<%= Policy::ACCESSIBLE -%>" >visible and accessible</option>
+                      <option value="<%= Policy::EDITING -%>" >visible, accessible and editable</option>
                       <option value="<%= Policy::MANAGING -%>" >manage</option>
                     </select>
                   </td>

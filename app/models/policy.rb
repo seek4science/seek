@@ -36,10 +36,10 @@ class Policy < ActiveRecord::Base
   # access_type
   DETERMINED_BY_GROUP = -1  # used for whitelist/blacklist (meaning that it doesn't matter what value this field has)
   NO_ACCESS = 0             # i.e. only for anyone; only owner has access
-  VISIBLE = 1               # viewing only
-  ACCESSIBLE = 2           # downloading and viewing
-  EDITING = 3               # downloading, viewing and editing
-  MANAGING = 4                 # any actions that owner of the asset can perform (including "destroy"ing)
+  VISIBLE = 1               # visible only
+  ACCESSIBLE = 2            # accessible and visible
+  EDITING = 3               # accessible, visible and editing
+  MANAGING = 4              # any actions that owner of the asset can perform (including "destroy"ing)
     
   # "true" value for flag-type fields
   TRUE_VALUE = 1
@@ -346,13 +346,13 @@ class Policy < ActiveRecord::Base
       when Policy::NO_ACCESS
         return "no access"
       when Policy::VISIBLE
-        return "viewing only"
+        return "visible only"
       when Policy::ACCESSIBLE
-        return "viewing and downloading only"
+        return "visible and accessible only"
       when Policy::EDITING
-        return "viewing, downloading and editing"
+        return "visible, accessible and editable"
       when Policy::MANAGING
-        return "manage"
+        return "manageable"
       else
         return "invalid access type"
     end
