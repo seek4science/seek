@@ -201,9 +201,7 @@
                   <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
 
                   <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-                    <option value="<%= Policy::VISIBLE -%>" >Visible only</option>
-                    <option value="<%= Policy::ACCESSIBLE -%>" >Visible and accessible</option>
-                    <option value="<%= Policy::EDITING -%>" >Visible, accessible and editable</option>
+                    <%= policy_selection_options [Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] -%>					
                   </select>
                 </div>
 
