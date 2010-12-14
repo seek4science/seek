@@ -36,7 +36,7 @@ class Policy < ActiveRecord::Base
   # access_type
   DETERMINED_BY_GROUP = -1  # used for whitelist/blacklist (meaning that it doesn't matter what value this field has)
   NO_ACCESS = 0             # i.e. only for anyone; only owner has access
-  VIEWING = 1               # viewing only
+  VISIBLE = 1               # viewing only
   ACCESSIBLE = 2           # downloading and viewing
   EDITING = 3               # downloading, viewing and editing
   MANAGING = 4                 # any actions that owner of the asset can perform (including "destroy"ing)
@@ -345,7 +345,7 @@ class Policy < ActiveRecord::Base
         return "individual access rights for each member"
       when Policy::NO_ACCESS
         return "no access"
-      when Policy::VIEWING
+      when Policy::VISIBLE
         return "viewing only"
       when Policy::ACCESSIBLE
         return "viewing and downloading only"

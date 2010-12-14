@@ -102,7 +102,7 @@ module Jerm
     def project_policy project
       policy=Policy.new(:name=>'auto',
                 :sharing_scope=>Policy::ALL_SYSMO_USERS,
-                :access_type=>Policy::VIEWING,
+                :access_type=>Policy::VISIBLE,
                 :use_custom_sharing=>true,
                 :use_whitelist=>false,
                 :use_blacklist=>false) 

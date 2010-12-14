@@ -66,10 +66,10 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
   
   def test_access_type_allows_action_viewing_only
-    assert Authorization.access_type_allows_action?("view", Policy::VIEWING), "'view' action should have been allowed with access_type set to 'Policy::VIEWING'"
-    assert !Authorization.access_type_allows_action?("download", Policy::VIEWING), "'download' action should NOT have been allowed with access_type set to 'Policy::VIEWING'"
-    assert !Authorization.access_type_allows_action?("edit", Policy::VIEWING), "'edit' action should have NOT been allowed with access_type set to 'Policy::VIEWING'"
-    assert !Authorization.access_type_allows_action?("destroy", Policy::VIEWING), "'destroy' action should have NOT been allowed with access_type set to 'Policy::VIEWING'"
+    assert Authorization.access_type_allows_action?("view", Policy::VISIBLE), "'view' action should have been allowed with access_type set to 'Policy::VISIBLE'"
+    assert !Authorization.access_type_allows_action?("download", Policy::VISIBLE), "'download' action should NOT have been allowed with access_type set to 'Policy::VISIBLE'"
+    assert !Authorization.access_type_allows_action?("edit", Policy::VISIBLE), "'edit' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
+    assert !Authorization.access_type_allows_action?("destroy", Policy::VISIBLE), "'destroy' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
   end
   
   def test_access_type_allows_action_viewing_and_downloading_only
@@ -543,7 +543,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     # verify that permissions for the user exist, but don't give enough access rights..
     permissions = temp_get_person_permissions(users(:random_registered_user_who_wants_to_access_different_things).person, sops(:sop_with_all_registered_users_policy).policy)
     assert permissions.length == 1, "expected to have one permission in that policy for the test person, not #{permissions.length}"
-    assert permissions[0].access_type == Policy::VIEWING, "expected that the permission would give the test user viewing access to the test SOP, but no access for editing"
+    assert permissions[0].access_type == Policy::VISIBLE, "expected that the permission would give the test user viewing access to the test SOP, but no access for editing"
     
     # ..check that sharing with favourite group gives more access to this person..
     permissions = temp_get_person_access_rights_from_favourite_group_permissions(users(:random_registered_user_who_wants_to_access_different_things).person, sops(:sop_with_all_registered_users_policy).policy)

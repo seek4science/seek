@@ -206,7 +206,7 @@ module Authorization
   def self.access_type_allows_action?(action, access_type)
     case action
       when "view"
-        return access_type >= Policy::VIEWING
+        return access_type >= Policy::VISIBLE
       when "download"
         return access_type >= Policy::ACCESSIBLE
       when "edit"

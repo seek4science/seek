@@ -4,7 +4,7 @@
 <%# 3) access_type - active access_type for the current policy -%>
 
 <select name="sharing[access_type_<%= access_type_selector_for_scope -%>]" id="access_type_select_<%= access_type_selector_for_scope -%>" style="width: 220px; vertical-align: middle; margin: 0.3em 0;">
-  <option value="<%= Policy::VIEWING -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::VIEWING) -%>>viewing only</option>
+  <option value="<%= Policy::VISIBLE -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::VISIBLE) -%>>viewing only</option>
   <option value="<%= Policy::ACCESSIBLE -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::ACCESSIBLE) -%>>viewing and downloading only</option>
   <option value="<%= Policy::EDITING -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::EDITING) -%>>viewing, downloading and editing</option>  
 </select>

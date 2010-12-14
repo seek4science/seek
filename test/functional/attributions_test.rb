@@ -141,7 +141,7 @@ class AttributionsTest < ActionController::TestCase
   def valid_sharing
     {
       :sharing_scope => Policy::ALL_REGISTERED_USERS,
-      :access_type => Policy::VIEWING,
+      :access_type => Policy::VISIBLE,
       :use_whitelist => false,
       :use_blacklist => false,
       :use_custom_sharing => false,

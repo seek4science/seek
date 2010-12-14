@@ -101,7 +101,7 @@ public_download_with_no_custom_sharing:
 whitelist_blacklist_and_custom_sharing:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
-  access_type: <%= Policy::VIEWING %>
+  access_type: <%= Policy::VISIBLE %>
   use_custom_sharing: true
   use_whitelist: true
   use_blacklist: true
@@ -112,7 +112,7 @@ whitelist_blacklist_and_custom_sharing:
 policy_for_worgroup_sharing_tests:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
-  access_type: <%= Policy::VIEWING %>
+  access_type: <%= Policy::VISIBLE %>
   use_custom_sharing: true
   use_whitelist: false
   use_blacklist: false
@@ -123,7 +123,7 @@ policy_for_worgroup_sharing_tests:
 policy_for_worgroup_sharing_tests_no_custom_sharing:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
-  access_type: <%= Policy::VIEWING %>
+  access_type: <%= Policy::VISIBLE %>
   use_custom_sharing: false
   use_whitelist: false
   use_blacklist: false
@@ -143,7 +143,7 @@ sysmo_member_download:
 policy_for_test_with_projects_institutions:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
-  access_type: <%= Policy::VIEWING %>
+  access_type: <%= Policy::VISIBLE %>
   use_custom_sharing: true
   use_whitelist: false
   use_blacklist: false
@@ -153,7 +153,7 @@ policy_for_test_with_projects_institutions:
 policy_for_viewable_data_file:  
   name: "auto"
   sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
-  access_type: <%= Policy::VIEWING %>
+  access_type: <%= Policy::VISIBLE %>
   use_custom_sharing: false
   use_whitelist: false
   use_blacklist: false

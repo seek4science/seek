@@ -3,7 +3,7 @@
 owner_of_fully_public_policy_in_my_collaborators_group_for_owner_of_a_sop_with_complex_permissions:
   person: person_for_owner_of_fully_public_policy
   favourite_group: my_collaborators_group_for_owner_of_a_sop_with_complex_permissions
-  access_type: <%= Policy::VIEWING %>
+  access_type: <%= Policy::VISIBLE %>
 
 
 owner_of_fully_public_policy_in_whitelist_for_owner_of_a_sop_with_complex_permissions:
