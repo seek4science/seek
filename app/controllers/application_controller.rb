@@ -184,9 +184,7 @@ class ApplicationController < ActionController::Base
     
     object = eval("@"+c.singularize)
     
-    object=current_user if c=="sessions" #logging in and out is a special case
- 
-    puts "Logging for controller: #{c}, action: #{a}. Object = #{object}"
+    object=current_user if c=="sessions" #logging in and out is a special case    
     
     #don't log if the object is not valid, as this will a validation error on update or create
     return if object.nil? || (object.respond_to?("errors") && !object.errors.empty?)        
