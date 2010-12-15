@@ -212,7 +212,7 @@ class ApplicationController < ActionController::Base
       end 
       when "search"
       if a=="index"
-        ActivityLog.create(:action => a,
+        ActivityLog.create(:action => "search",
                    :culprit => current_user,
                    :data => {:search_query=>object,:result_count=>@results.count}) 
       end
