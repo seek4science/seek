@@ -1,4 +1,5 @@
 class ForumsController < ApplicationController
+  
 	before_filter :login_required
   before_filter :find_or_initialize_forum, :except => :index
 	before_filter :admin?, :except => [:show, :index]
@@ -13,8 +14,7 @@ class ForumsController < ApplicationController
       format.html
       format.xml { render :xml => @forums }
     end
-  end
-  
+  end  
 
   def show
     respond_to do |format|
@@ -61,6 +61,6 @@ class ForumsController < ApplicationController
       @forum = params[:id] ? Forum.find(params[:id]) : Forum.new
     end
 
-  alias authorized? admin?
+  #alias authorized? admin?
   
 end

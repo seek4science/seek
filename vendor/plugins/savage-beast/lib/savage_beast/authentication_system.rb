@@ -20,28 +20,5 @@ module SavageBeast::AuthenticationSystem
       #User.update_all ['last_seen_at = ?', Time.now.utc], ['id = ?', current_user.id] 
       #current_user.last_seen_at = Time.now.utc
     end
-    
-    def login_required
-      if !current_user
-				# redirect to login page
-				return false
-			end
-    end
-    
-    def authorized?() 
-			true 
-			# in your code, redirect to an appropriate page if not an admin
-		end
-
-    def current_user
-      #@current_user ||= ((session[:user_id] && User.find_by_id(session[:user_id])) || 0)
-    end
-    
-    def logged_in?
-      current_user ? true : false #current_user != 0
-    end
-    
-    def admin?
-      #logged_in? && current_user.admin?
-    end
+                
 end
