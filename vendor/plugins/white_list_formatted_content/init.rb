@@ -1,3 +1,5 @@
+require 'RedCloth'
+
 ActiveRecord::Base.class_eval do
   include ActionView::Helpers::TagHelper, ActionView::Helpers::TextHelper, WhiteListHelper
   def self.format_attribute(attr_name)
