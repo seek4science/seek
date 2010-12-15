@@ -121,6 +121,8 @@ class AdminController < ApplicationController
         type = "users"
       when "contents"
         type = "content_stats"
+      when "activity"
+        type = "activity_stats"
       else
     end
     respond_to do |format|
@@ -131,6 +133,8 @@ class AdminController < ApplicationController
           format.html { render :partial => "admin/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
           format.html { render :partial => "admin/content_stats", :locals => {:stats => ContentStats.generate} }
+        when "activity_stats"
+          format.html { render :partial => "admin/activity_stats", :locals => {:stats => ActivityStats.new} }
       end
     end
   end
