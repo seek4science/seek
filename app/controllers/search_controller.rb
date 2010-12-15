@@ -5,6 +5,7 @@ class SearchController < ApplicationController
   def index
     
     @search_query = params[:search_query]
+    @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
     @search_type = params[:search_type]
     type=@search_type.downcase unless @search_type.nil?

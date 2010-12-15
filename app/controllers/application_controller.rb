@@ -184,9 +184,11 @@ class ApplicationController < ActionController::Base
     
     object = eval("@"+c.singularize)
     
+    puts "Logging for controller: #{c}, action: #{a}. Object = #{object}"
+    
     #don't log if the object is not valid, as this will a validation error on update or create
-    return if object.nil? || !object.respond_to?("errors") || !object.errors.empty?        
-      
+    return if object.nil? || (object.respond_to?("errors") && !object.errors.empty?)        
+    
     case c
       when "investigations","studies","assays"
       if ["show","create","update","destroy"].include?(a)
@@ -206,8 +208,14 @@ class ApplicationController < ActionController::Base
       if ["create","update","destroy"].include?(a)
         ActivityLog.create(:action => a,
                    :culprit => current_user,
-                   :activity_loggable => object)
+                   :activity_loggable => object)      
       end 
+      when "search"
+      if a=="index"
+        ActivityLog.create(:action => a,
+                   :culprit => current_user,
+                   :data => {:search_query=>object,:result_count=>@results.count}) 
+      end
     end
   end
   
