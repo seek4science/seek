@@ -195,6 +195,7 @@ class ApplicationController < ActionController::Base
         ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :referenced => object.project,
+                   :controller_name=>c,
                    :activity_loggable => object)
       end 
       when "data_files","models","sops","publications"
@@ -202,18 +203,21 @@ class ApplicationController < ActionController::Base
         ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :referenced => object.project,
+                   :controller_name=>c,
                    :activity_loggable => object)
       end 
       when "people"
-      if ["create","update","destroy"].include?(a)
+      if ["show","create","update","destroy"].include?(a)
         ActivityLog.create(:action => a,
                    :culprit => current_user,
+                   :controller_name=>c,
                    :activity_loggable => object)      
       end 
       when "search"
       if a=="index"
-        ActivityLog.create(:action => "search",
+        ActivityLog.create(:action => "index",
                    :culprit => current_user,
+                   :controller_name=>c,
                    :data => {:search_query=>object,:result_count=>@results.count}) 
       end
     end

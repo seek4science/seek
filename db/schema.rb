@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100913080833) do
+ActiveRecord::Schema.define(:version => 20101215152705) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(:version => 20100913080833) do
     t.string   "http_referer"
     t.string   "user_agent"
     t.text     "data",                   :limit => 2147483647
+    t.string   "controller_name"
   end
 
   add_index "activity_logs", ["action"], :name => "act_logs_action_index"
