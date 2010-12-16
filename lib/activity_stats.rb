@@ -1,6 +1,34 @@
-class ActivityStats
+class ActivityStats   
   
-  #FIXME: this should be changed to iterate over the activity logs and gather, rather than all these multipe queries
+  #the time periods to be tested
+  PERIODS={"daily"=>1.day.ago,"weekly"=>1.week.ago,"monthly"=>1.month.ago,"yearly"=>1.year.ago}
+  
+  #the item types to include
+  INCLUDED_TYPES=["Sop","Model","Publication","DataFile","Assay","Study","Investigation"] 
+  
+  def initialize
+    create_attributes
+    
+    logs = ActivityLog.find(:all,:conditions=>["(action = ? or action = ?)","create","download"])
+    logs.each do |log|
+      next unless INCLUDED_TYPES.include?(log.activity_loggable_type)
+      action=""      
+      case log.action
+        when "create"
+        action="created"
+        when "download"
+        action="downloaded"
+      end      
+      
+      PERIODS.keys.each do |period_key|
+        if log.created_at > PERIODS[period_key]
+          attribute="@#{period_key}_#{log.activity_loggable_type.downcase.pluralize}_#{action}"          
+          eval("#{attribute} += 1")
+        end
+      end
+      
+    end    
+  end
   
   def monthly_users
     distinct_culprits_since 1.month.ago
@@ -22,148 +50,19 @@ class ActivityStats
     distinct_culprits_since 1.year.ago
   end 
   
-  # Uploaded/Registered
+  private  
   
-  def yearly_sops_uploaded
-    assets_created_since "Sop",1.year.ago
-  end
-  
-  def monthly_sops_uploaded
-    assets_created_since "Sop",1.month.ago
-  end
-  
-  def weekly_sops_uploaded
-    assets_created_since "Sop",1.week.ago
-  end
-  
-  def daily_sops_uploaded
-    assets_created_since "Sop",1.day.ago
-  end
-  
-  def yearly_models_uploaded
-    assets_created_since "Model",1.year.ago
-  end
-  
-  def monthly_models_uploaded
-    assets_created_since "Model",1.month.ago
-  end
-  
-  def weekly_models_uploaded
-    assets_created_since "Model",1.week.ago
-  end
-  
-  def daily_models_uploaded
-    assets_created_since "Model",1.day.ago
-  end
-  
-  def yearly_datafiles_uploaded
-    assets_created_since "DataFile",1.year.ago
-  end
-  
-  def monthly_datafiles_uploaded
-    assets_created_since "DataFile",1.month.ago
-  end
-  
-  def weekly_datafiles_uploaded
-    assets_created_since "DataFile",1.week.ago
-  end
-  
-  def daily_datafiles_uploaded
-    assets_created_since "DataFile",1.day.ago
-  end
-  
-  def yearly_publications_registered
-    assets_created_since "Publication",1.year.ago
-  end
-  
-  def monthly_publications_registered
-    assets_created_since "Publication",1.month.ago
-  end
-  
-  def weekly_publications_registered
-    assets_created_since "Publication",1.week.ago
-  end
-  
-  def daily_publications_registered
-    assets_created_since "Publication",1.day.ago
-  end
-  
-  #Downloaded
-    
-  def yearly_sops_downloaded
-    assets_downloaded_since "Sop",1.year.ago
-  end
-  
-  def monthly_sops_downloaded
-    assets_created_since "Sop",1.month.ago
-  end
-  
-  def weekly_sops_downloaded
-    assets_created_since "Sop",1.week.ago
-  end
-  
-  def daily_sops_downloaded
-    assets_created_since "Sop",1.day.ago
-  end
-  
-  def yearly_models_downloaded
-    assets_created_since "Model",1.year.ago
-  end
-  
-  def monthly_models_downloaded
-    assets_created_since "Model",1.month.ago
-  end
-  
-  def weekly_models_downloaded
-    assets_created_since "Model",1.week.ago
-  end
-  
-  def daily_models_downloaded
-    assets_created_since "Model",1.day.ago
-  end
-  
-  def yearly_datafiles_downloaded
-    assets_created_since "DataFile",1.year.ago
-  end
-  
-  def monthly_datafiles_downloaded
-    assets_created_since "DataFile",1.month.ago
-  end
-  
-  def weekly_datafiles_downloaded
-    assets_created_since "DataFile",1.week.ago
-  end
-  
-  def daily_datafiles_downloaded
-    assets_downloaded_since "DataFile",1.day.ago
-  end
-  
-  def yearly_publications_downloaded
-    assets_downloaded_since "Publication",1.year.ago
-  end
-  
-  def monthly_publications_downloaded
-    assets_downloaded_since "Publication",1.month.ago
-  end
-  
-  def weekly_publications_downloaded
-    assets_downloaded_since "Publication",1.week.ago
-  end
-  
-  def daily_publications_downloaded
-    assets_downloaded_since "Publication",1.day.ago
-  end
-  
-  
-  private
-  
-  def assets_created_since type,time=500.years.ago
-    ActivityLog.count(:all,:conditions=>["action='create' and activity_loggable_type= ? and created_at > ?",type,time])
-  end
-  
-  def assets_downloaded_since type,time=500.years.ago
-    ActivityLog.count(:all,:conditions=>["action='download' and activity_loggable_type= ? and created_at > ?",type,time])
-  end
+  def create_attributes
+    ["created","downloaded"].each do |action|
+      PERIODS.keys.each do |period|
+        INCLUDED_TYPES.each do |type|
+          attrubute="#{period}_#{type.downcase.pluralize}_#{action}"
+          self.class.class_eval { attr_accessor attrubute.intern }
+          instance_variable_set "@#{attrubute}".intern, 0
+        end
+      end        
+    end
+  end  
   
   def distinct_culprits_since time=500.years.ago
     ActivityLog.count(:all,:select=>"distinct culprit_id",:conditions=>["created_at > ?",time])
