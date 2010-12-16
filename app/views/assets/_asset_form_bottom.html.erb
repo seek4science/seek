@@ -3,7 +3,9 @@ existing_attributions||=[]
 existing_creators||=[current_user.person]
 related_publications||=[]
 other_creators||=nil
+show_publications=true if show_publications.nil?
 %>
+
 <p>
     <%= render :partial => "assets/sharing_form" -%>
 </p>
@@ -14,10 +16,12 @@ other_creators||=nil
 </p>
 <p>
     <%= render :partial => "assets/author_form", :locals => { :resource_type => resource_type,  # this is only for presentation, not for any processing
-    :existing_creators => [current_user.person],
+    :existing_creators => existing_creators,
     :other_creators => other_creators} -%>
 </p>
+<% if show_publications -%>
 <p>
     <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => resource_type,
     :related_publications => related_publications} -%>
 </p>
+<% end -%>

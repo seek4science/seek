@@ -190,6 +190,17 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
   end
   
+  test "publications excluded in form for sops" do
+    login_as(:owner_of_my_first_sop)
+    get :edit, :id => sops(:my_first_sop)
+    assert_response :success
+    assert_select "div#publications_fold_content",false
+    
+    get :new
+    assert_response :success
+    assert_select "div#publications_fold_content",false
+  end
+  
   test "should update sop" do
     login_as(:owner_of_my_first_sop)
     put :update, :id => sops(:my_first_sop).id, :sop => {:title=>"Test2"}, :sharing=>valid_sharing

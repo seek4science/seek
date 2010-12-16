@@ -35,8 +35,9 @@
 					:existing_attributions=>Authorization.authorize_collection("show", @sop.attributions_objects, current_user),
 					:existing_creators=>@sop.creators,
 					:other_creators=>@sop.other_creators,
-					:related_publications=>@sop.related_publications
-				} 
+					:related_publications=>@sop.related_publications,
+					:show_publications=>false
+				}
     	-%>
 		
         <% end -%>

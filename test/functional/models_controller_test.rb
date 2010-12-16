@@ -247,8 +247,19 @@ class ModelsControllerTest < ActionController::TestCase
   end
   
   test "should get edit" do
-    get :edit, :id => models(:teusink).id
+    get :edit, :id => models(:teusink)
     assert_response :success
+  end
+  
+  test "publications included in form for model" do
+    
+    get :edit, :id => models(:teusink)
+    assert_response :success
+    assert_select "div#publications_fold_content",true
+    
+    get :new
+    assert_response :success
+    assert_select "div#publications_fold_content",true
   end
   
   test "should update model" do

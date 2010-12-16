@@ -231,8 +231,19 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should get edit" do
-    get :edit, :id => data_files(:picture).id
+    get :edit, :id => data_files(:picture)
     assert_response :success
+  end
+  
+  test "publications included in form for datafile" do
+    
+    get :edit, :id => data_files(:picture)
+    assert_response :success
+    assert_select "div#publications_fold_content",true
+    
+    get :new
+    assert_response :success
+    assert_select "div#publications_fold_content",true
   end
   
   test "should download" do

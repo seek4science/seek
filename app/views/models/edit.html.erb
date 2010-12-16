@@ -52,23 +52,6 @@
 				} 
     	-%>
 		
-        <p>
-            <%= render :partial => "assets/sharing_form" -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-            :existing_attributions => Authorization.authorize_collection("show", @model.attributions_objects, current_user),
-            :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Model",
-            :related_publications => @model.related_publications} -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-            :existing_creators => @model.creators,
-            :other_creators => @model.other_creators} -%>
-        </p>
         <% end -%>
         <p>
             <%= f.submit "Update", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(false); return(false);" -%>or <%= link_to "Cancel", model_path(@model) -%>
