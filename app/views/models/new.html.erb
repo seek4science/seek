@@ -31,23 +31,7 @@
             </div>
         </p>
         <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
-        <p>
-            <%= render :partial => "assets/sharing_form" -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-            :existing_attributions => [],
-            :attribution_suggestions => Model.get_all_as_json(current_user) } -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Model",
-            :related_publications => []} -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/author_form", :locals => { :resource_type => "Model",  # this is only for presentation, not for any processing
-            :existing_creators => [current_user.person],
-            :other_creators => nil} -%>
-        </p>
+        <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Model"} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
         </p>

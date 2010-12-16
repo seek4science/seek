@@ -20,23 +20,9 @@
         </p>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "DataFile",   # this is only for presentation, not for any processing
         :project_hash => current_user.generate_own_project_id_name_hash } -%>
-        <p>
-            <%= render :partial => "assets/sharing_form" -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
-            :existing_attributions => [],
-            :attribution_suggestions => DataFile.get_all_as_json(current_user) } -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "DataFile",
-            :related_publications => []} -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/author_form", :locals => { :resource_type => "DataFile",  # this is only for presentation, not for any processing
-            :existing_creators => [current_user.person],
-            :other_creators => nil} -%>
-        </p>
+		
+        <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
+		
         <p>
             <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%>or <%= link_to 'Cancel', data_files_path -%>
         </p>

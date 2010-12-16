@@ -42,6 +42,16 @@
         </p>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
+		
+		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
+					:resource_type => "Model",
+					:existing_attributions=>Authorization.authorize_collection("show", @model.attributions_objects, current_user),
+					:existing_creators=>@model.creators,
+					:other_creators=>@model.other_creators,
+					:related_publications=>@model.related_publications
+				} 
+    	-%>
+		
         <p>
             <%= render :partial => "assets/sharing_form" -%>
         </p>

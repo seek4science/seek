@@ -29,19 +29,16 @@
         <% end -%>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
-        <p>
-            <%= render :partial => "assets/sharing_form" -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/attribution_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
-            :existing_attributions => Authorization.authorize_collection("show", @sop.attributions_objects, current_user),
-            :attribution_suggestions => Sop.get_all_as_json(current_user) } -%>
-        </p>
-        <p>
-            <%= render :partial => "assets/author_form", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
-            :existing_creators => @sop.creators,
-            :other_creators => @sop.other_creators} -%>
-        </p>
+		
+		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
+					:resource_type => "Sop",
+					:existing_attributions=>Authorization.authorize_collection("show", @sop.attributions_objects, current_user),
+					:existing_creators=>@sop.creators,
+					:other_creators=>@sop.other_creators,
+					:related_publications=>@sop.related_publications
+				} 
+    	-%>
+		
         <% end -%>
         <p>
             <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);" -%>or <%= link_to "Cancel", sop_path(@sop) -%>

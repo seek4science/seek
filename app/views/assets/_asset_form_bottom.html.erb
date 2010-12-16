@@ -1,0 +1,23 @@
+<%
+existing_attributions||=[]
+existing_creators||=[current_user.person]
+related_publications||=[]
+other_creators||=nil
+%>
+<p>
+    <%= render :partial => "assets/sharing_form" -%>
+</p>
+<p>
+    <%= render :partial => "assets/attribution_form", :locals => { :resource_type => resource_type,  # this is only for presentation, not for any processing
+    :existing_attributions => existing_attributions,
+    :attribution_suggestions => eval("#{resource_type}.get_all_as_json(current_user)") } -%>
+</p>
+<p>
+    <%= render :partial => "assets/author_form", :locals => { :resource_type => resource_type,  # this is only for presentation, not for any processing
+    :existing_creators => [current_user.person],
+    :other_creators => other_creators} -%>
+</p>
+<p>
+    <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => resource_type,
+    :related_publications => related_publications} -%>
+</p>
