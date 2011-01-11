@@ -47,21 +47,21 @@ if Rails.env.test?
   PROJECT_NAME = 'Sysmo'
   PROJECT_TITLE = 'The Sysmo Consortium'
   DM_PROJECT_NAME = 'Sysmo-DB'
-else
+end
   
   APPLICATION_NAME="SysMO-SEEK" unless defined? APPLICATION_NAME
   APPLICATION_TITLE=APPLICATION_NAME unless defined? APPLICATION_TITLE
 
   PROJECT_NAME="SysMO" unless defined? PROJECT_NAME
-  PROJECT_TITLE=PROJECT_NAME unless defined? PROJECT_TITLE
+  PROJECT_TITLE="The SysMO Project" unless defined? PROJECT_TITLE
   PROJECT_TYPE="Consortium" unless defined? PROJECT_TYPE
   PROJECT_LONG_NAME="#{PROJECT_NAME} #{PROJECT_TYPE}" unless defined? PROJECT_LONG_NAME
-  PROJECT_LINK="http://www.sysmo.net"
+  PROJECT_LINK="http://www.sysmo.net" unless defined? PROJECT_LINK
 
   DM_PROJECT_NAME="SysMO-DB" unless defined? DM_PROJECT_NAME
   DM_PROJECT_TITLE=DM_PROJECT_NAME unless defined? DM_PROJECT_TITLE
+  DM_PROJECT_LINK="http://www.sysmo-db.org/" unless defined? DM_PROJECT_LINK
 
-  HEADER_IMAGE="sysmo-db-logo_smaller.png"
-  HEADER_IMAGE_LINK="http://www.sysmo-db.org/"
-  HEADER_IMAGE_TITLE="Sysmo-DB"
-end
+  HEADER_IMAGE="sysmo-db-logo_smaller.png" unless defined? HEADER_IMAGE
+  HEADER_IMAGE_LINK=DM_PROJECT_LINK unless defined? HEADER_IMAGE_LINK
+  HEADER_IMAGE_TITLE=DM_PROJECT_NAME unless defined? HEADER_IMAGE_TITLE

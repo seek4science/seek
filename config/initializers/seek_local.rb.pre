@@ -56,17 +56,17 @@ PROJECT_LINK="http://www.sysmo.net"
 #Uncomment this to add an addendum to the copyright statement
 #COPYRIGHT_ADDENDUM="Additions copyright ..."
 
-#These define the image used in the upper right hand corner of the SEEK website. The image named below should be placed in public/images/
-#If left commented out, no image will be displayed.
-#HEADER_IMAGE="sysmo-db-logo_smaller.png"
-#HEADER_IMAGE_LINK="http://www.sysmo-db.org/"
-#HEADER_IMAGE_TITLE="Sysmo-DB"
-
 #Defining these is optional, they take their defaults based on the constants above
-PROJECT_TITLE=PROJECT_LONG_NAME
 APPLICATION_TITLE=APPLICATION_NAME
 PROJECT_LONG_NAME="#{PROJECT_NAME} #{PROJECT_TYPE}"
+PROJECT_TITLE=PROJECT_LONG_NAME
 
 #The project/group managing SEEK. Defaults based on PROJECT_NAME and PROJECT_TITLE
 DM_PROJECT_NAME=PROJECT_NAME
 DM_PROJECT_TITLE=PROJECT_TITLE
+
+#These define the image used in the upper right hand corner of the SEEK website. The image named below should be placed in public/images/
+#If left commented out, no image will be displayed.
+#HEADER_IMAGE="sysmo-db-logo_smaller.png"
+#HEADER_IMAGE_LINK=DM_PROJECT_LINK
+#HEADER_IMAGE_TITLE=DM_PROJECT_NAME

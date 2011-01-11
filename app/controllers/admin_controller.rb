@@ -107,7 +107,7 @@ class AdminController < ApplicationController
       when "invalid"
         collection = {}
         type = "invalid_users"
-        pal_role=Role.find(:first,:conditions=>{:name=>"Sysmo-DB Pal"})
+        pal_role=Role.find(:first,:conditions=>{:name=>"#{DM_PROJECT_NAME} Pal"})
         collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.roles.include?(pal_role)}
         collection[:duplicates] = Person.duplicates
         collection[:no_person] = User.without_profile
@@ -116,7 +116,7 @@ class AdminController < ApplicationController
         collection = User.not_activated
         type = "users"
       when "projectless"
-        title = "Users not in a SysMO project"
+        title = "Users not in a #{PROJECT_NAME} project"
         collection = Person.without_group.registered
         type = "users"
       when "contents"
