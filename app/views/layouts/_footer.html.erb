@@ -12,7 +12,7 @@
         <tr>
           <td class="left">            
             <p><%= link_to "Front Page", "/" %></p>
-            <p><%= link_to "About #{DM_PROJECT_NAME}", DM_PROJECT_LINK, :target => '_blank' %></p>
+            <%if DM_PROJECT_LINK != PROJECT_LINK %><p><%= link_to "About #{DM_PROJECT_NAME}", DM_PROJECT_LINK, :target => '_blank' %></p><%end%>
             <p><%= link_to PROJECT_TITLE, PROJECT_LINK %> </p>
           </td>
           <td class="middle">
