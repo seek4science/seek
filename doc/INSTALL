@@ -77,6 +77,18 @@ If you are setting up SEEK as a production environment, rather than for developm
 
   export RAILS_ENV=production
 
+== Rebranding SysMO SEEK for other projects
+
+If you are running SEEK for a project other than SysMO, copy config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb. This file contains several constants that you should set, to reflect the name of your project/application.
+
+To insert your Application/Project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
+
+rake seek:rebrand
+
+If you only want to change the help documents, you can instead use
+
+rake seek:rebrand_help_docs
+
 == Configuring the database
 
 Copy config/database.default.yml to config/database.yml and edit accordingly - either MySQL or SQLite3 should work (you will need to install the <em>sqlite3-dev</em> package and the <em>sqlite3-ruby</em> gem)

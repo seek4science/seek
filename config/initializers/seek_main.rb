@@ -40,3 +40,28 @@ end
 ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch','Organism']
 
 OpenIdAuthentication.store = :memory
+
+if Rails.env.test?
+  APPLICATION_NAME = 'Sysmo SEEK'
+  APPLICATION_TITLE = 'The Sysmo SEEK'
+  PROJECT_NAME = 'Sysmo'
+  PROJECT_TITLE = 'The Sysmo Consortium'
+  DM_PROJECT_NAME = 'Sysmo-DB'
+else
+  
+  APPLICATION_NAME="SysMO-SEEK" unless defined? APPLICATION_NAME
+  APPLICATION_TITLE=APPLICATION_NAME unless defined? APPLICATION_TITLE
+
+  PROJECT_NAME="SysMO" unless defined? PROJECT_NAME
+  PROJECT_TITLE=PROJECT_NAME unless defined? PROJECT_TITLE
+  PROJECT_TYPE="Consortium" unless defined? PROJECT_TYPE
+  PROJECT_LONG_NAME="#{PROJECT_NAME} #{PROJECT_TYPE}" unless defined? PROJECT_LONG_NAME
+  PROJECT_LINK="http://www.sysmo.net"
+
+  DM_PROJECT_NAME="SysMO-DB" unless defined? DM_PROJECT_NAME
+  DM_PROJECT_TITLE=DM_PROJECT_NAME unless defined? DM_PROJECT_TITLE
+
+  HEADER_IMAGE="sysmo-db-logo_smaller.png"
+  HEADER_IMAGE_LINK="http://www.sysmo-db.org/"
+  HEADER_IMAGE_TITLE="Sysmo-DB"
+end

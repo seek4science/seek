@@ -16,7 +16,7 @@ class DataFilesControllerTest < ActionController::TestCase
   def test_title
     get :index
     assert_response :success
-    assert_select "title",:text=>/Sysmo SEEK Data.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
   
   test "should show index" do

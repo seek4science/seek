@@ -20,4 +20,4 @@ postdoc:
 
 pal:
   id: 6
-  name: Sysmo-DB Pal
+  name: <%= DM_PROJECT_NAME %> Pal
