@@ -64,6 +64,7 @@ PROJECT_TITLE=PROJECT_LONG_NAME
 #The project/group managing SEEK. Defaults based on PROJECT_NAME and PROJECT_TITLE
 DM_PROJECT_NAME=PROJECT_NAME
 DM_PROJECT_TITLE=PROJECT_TITLE
+DM_PROJECT_LINK=PROJECT_LINK
 
 #These define the image used in the upper right hand corner of the SEEK website. The image named below should be placed in public/images/
 #If HEADER_IMAGE is set to false, instead of an image file, no image will be displayed
