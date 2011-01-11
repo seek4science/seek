@@ -66,7 +66,7 @@ DM_PROJECT_NAME=PROJECT_NAME
 DM_PROJECT_TITLE=PROJECT_TITLE
 
 #These define the image used in the upper right hand corner of the SEEK website. The image named below should be placed in public/images/
-#If left commented out, no image will be displayed.
-#HEADER_IMAGE="sysmo-db-logo_smaller.png"
-#HEADER_IMAGE_LINK=DM_PROJECT_LINK
-#HEADER_IMAGE_TITLE=DM_PROJECT_NAME
+#If HEADER_IMAGE is set to false, instead of an image file, no image will be displayed
+HEADER_IMAGE=false
+HEADER_IMAGE_LINK=DM_PROJECT_LINK
+HEADER_IMAGE_TITLE=DM_PROJECT_NAME

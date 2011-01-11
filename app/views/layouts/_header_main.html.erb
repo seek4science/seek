@@ -9,7 +9,7 @@
         <%= render :partial=>"layouts/header_text_main" -%>
       </td>
       <td style="text-align:right;">
-        <%if defined? HEADER_IMAGE%><%= link_to image_tag(HEADER_IMAGE,:alt=>HEADER_IMAGE_LINK,:title=>HEADER_IMAGE_TITLE),
+        <%if HEADER_IMAGE%><%= link_to image_tag(HEADER_IMAGE,:alt=>HEADER_IMAGE_LINK,:title=>HEADER_IMAGE_TITLE),
           HEADER_IMAGE_LINK %><%end%>
       </td>
     </tr>
