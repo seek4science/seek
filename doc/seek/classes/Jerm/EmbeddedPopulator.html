@@ -239,16 +239,9 @@ adds the resource as a new asset within the registry returns a report:
 <pre>
      <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 121</span>
 121:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_policy</span> <span class="ruby-identifier">author</span>,<span class="ruby-identifier">project</span>
-122:       <span class="ruby-keyword kw">nil</span>
-123:       <span class="ruby-comment cmt">#      Policy.new(:name =&gt; 'auto',</span>
-124:       <span class="ruby-comment cmt">#        :contributor_type =&gt; 'User',</span>
-125:       <span class="ruby-comment cmt">#        :contributor_id =&gt; author.user.id,</span>
-126:       <span class="ruby-comment cmt">#        :sharing_scope =&gt; Policy::EVERYONE,</span>
-127:       <span class="ruby-comment cmt">#        :access_type =&gt; Policy::DOWNLOADING,</span>
-128:       <span class="ruby-comment cmt">#        :use_custom_sharing =&gt; false,</span>
-129:       <span class="ruby-comment cmt">#        :use_whitelist =&gt; false,</span>
-130:       <span class="ruby-comment cmt">#        :use_blacklist =&gt; false)</span>
-131:     <span class="ruby-keyword kw">end</span>
+122:       <span class="ruby-comment cmt">#FIXME: IS THIS USED?</span>
+123:       <span class="ruby-keyword kw">nil</span>      
+124:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -320,12 +313,12 @@ adds the resource as a new asset within the registry returns a report:
 102:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">project_policy</span> <span class="ruby-identifier">project</span>
 103:       <span class="ruby-identifier">policy</span>=<span class="ruby-constant">Policy</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'auto'</span>,
 104:                 <span class="ruby-identifier">:sharing_scope=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ALL_SYSMO_USERS</span>,
-105:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">VIEWING</span>,
+105:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">VISIBLE</span>,
 106:                 <span class="ruby-identifier">:use_custom_sharing=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>,
 107:                 <span class="ruby-identifier">:use_whitelist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>,
 108:                 <span class="ruby-identifier">:use_blacklist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>) 
 109:       <span class="ruby-identifier">policy</span>.<span class="ruby-identifier">save!</span>
-110:       <span class="ruby-identifier">p</span>=<span class="ruby-constant">Permission</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:contributor=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">project</span>,<span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">DOWNLOADING</span>,<span class="ruby-identifier">:policy_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">policy</span>.<span class="ruby-identifier">id</span>)
+110:       <span class="ruby-identifier">p</span>=<span class="ruby-constant">Permission</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:contributor=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">project</span>,<span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ACCESSIBLE</span>,<span class="ruby-identifier">:policy_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">policy</span>.<span class="ruby-identifier">id</span>)
 111:       <span class="ruby-identifier">p</span>.<span class="ruby-identifier">save!</span>
 112:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">policy</span>
 113:     <span class="ruby-keyword kw">end</span>
@@ -352,7 +345,7 @@ adds the resource as a new asset within the registry returns a report:
  93:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sysmo_policy</span>
  94:       <span class="ruby-constant">Policy</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'auto'</span>,
  95:                 <span class="ruby-identifier">:sharing_scope=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ALL_SYSMO_USERS</span>,
- 96:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">DOWNLOADING</span>,
+ 96:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ACCESSIBLE</span>,
  97:                 <span class="ruby-identifier">:use_custom_sharing=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>,
  98:                 <span class="ruby-identifier">:use_whitelist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>,
  99:                 <span class="ruby-identifier">:use_blacklist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>)      
