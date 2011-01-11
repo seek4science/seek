@@ -48,7 +48,6 @@ ActionMailer::Base.smtp_settings= {
 }
 
 #To create an instance of SEEK for use by projects other than Sysmo, it is essential to redefine the following:
-APPLICATION_NAME="SysMO-SEEK"
 PROJECT_NAME="SysMO"
 PROJECT_TYPE="Consortium"
 PROJECT_LINK="http://www.sysmo.net"
@@ -57,6 +56,7 @@ PROJECT_LINK="http://www.sysmo.net"
 #COPYRIGHT_ADDENDUM="Additions copyright ..."
 
 #Defining these is optional, they take their defaults based on the constants above
+APPLICATION_NAME="#{PROJECT_NAME}-SEEK"
 APPLICATION_TITLE=APPLICATION_NAME
 PROJECT_LONG_NAME="#{PROJECT_NAME} #{PROJECT_TYPE}"
 PROJECT_TITLE=PROJECT_LONG_NAME
