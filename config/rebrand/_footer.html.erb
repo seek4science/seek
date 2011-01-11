@@ -17,8 +17,8 @@
         <tr>
           <td class="left">            
             <p><%= link_to "Front Page", "/" %></p>
-            <%if defined? DM_PROJECT_LINK %><p><%= link_to "About #{DM_PROJECT_NAME}", DM_PROJECT_LINK, :target => '_blank' %></p> <%end%>
-            <%if defined? PROJECT_LINK %><p><%= link_to PROJECT_TITLE, PROJECT_LINK %> </p> <%end%>
+            <%if DM_PROJECT_LINK != PROJECT_LINK %><p><%= link_to "About #{DM_PROJECT_NAME}", DM_PROJECT_LINK, :target => '_blank' %></p> <%end%>
+            <p><%= link_to PROJECT_TITLE, PROJECT_LINK %> </p>
           </td>
           <td class="middle">
           </td>
