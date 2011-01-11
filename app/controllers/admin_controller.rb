@@ -102,7 +102,7 @@ class AdminController < ApplicationController
         type = "users"
       when "admins"
         title = "Administrators"
-        collection = User.admins
+        collection = Person.admins
         type = "users"
       when "invalid"
         collection = {}
