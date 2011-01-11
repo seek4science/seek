@@ -81,7 +81,7 @@ If you are setting up SEEK as a production environment, rather than for developm
 
 If you are running SEEK for a project other than SysMO, copy config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb. This file contains several constants that you should set, to reflect the name of your project/application.
 
-To insert your Application/Project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
+To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
 
 rake seek:rebrand
 
