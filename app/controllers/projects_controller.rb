@@ -250,7 +250,7 @@ class ProjectsController < ApplicationController
   def editable_by_user
     @project = Project.find(params[:id])
     unless current_user.is_admin? || @project.can_be_edited_by?(current_user)
-      error("Insufficient priviledges", "is invalid (insufficient_priviledges)")
+      error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end
   end
