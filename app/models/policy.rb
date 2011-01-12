@@ -336,8 +336,7 @@ class Policy < ActiveRecord::Base
                         
     return policy
   end
-  
-  
+   
   # translates access type codes into human-readable form
   def self.get_access_type_wording(access_type)
     case access_type
@@ -346,13 +345,13 @@ class Policy < ActiveRecord::Base
       when Policy::NO_ACCESS
         return "No access"
       when Policy::VISIBLE
-        return "Visible only"
+        return "View summary only"
       when Policy::ACCESSIBLE
-        return "Visible and accessible"
+        return "View summary and get contents"
       when Policy::EDITING
-        return "Visible, accessible and editable"
+        return "View and edit summary and contents"
       when Policy::MANAGING
-        return "Manageable"
+        return "Manage"
       else
         return "Invalid access type"
     end

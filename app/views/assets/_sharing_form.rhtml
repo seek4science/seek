@@ -22,7 +22,7 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can specify who can <b>view</b>, <b>download</b> and <b>edit</b> this #{@resource_type}.") -%>
+    <%= help_icon("Here you can specify who can <b>see</b>, <b>download</b> and <b>edit</b> this #{@resource_type}.") -%>
     Sharing
   </div>
 
@@ -30,18 +30,14 @@
 
     <div class="box_infotext">
       <p>
-        Here you can specify to whom the <%= @resource_type -%> is <b>visible</b>, <b>accessible</b> and <b>editable</b>.
+        Here you can specify who can <b>view</b> the summary of, <b>get</b> access to the content of, and <b>edit</b> the <%= @resource_type -%>.
         <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3) -%>
       </p>
-
-      <div id="more_sharing_info" class="box_simple" style="display: none;">
-        <p>
-          Here you may specify the People, Projects or Groups that may <b>see</b>, <b>access</b>, or <b>edit</b> the details about your <%= @resource_type -%>.<br>
-        <p>
+      <div id="more_sharing_info" class="box_simple" style="display: none;">        
           You may:
-        <ul>
+        <ul style="padding-left:1em;">
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
-		      <li>Share with all other users, <em>including</em> those that are not a member of a Sysmo project.</li>
+		  <li>Share with all other users, <em>including</em> those that are not a member of a Sysmo project.</li>
           <li>Share with all other users that are a member of a Sysmo project.</li>
           <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> By using custom sharing permissions you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
         </ul>
@@ -74,7 +70,7 @@
       <label for="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_REGISTERED_USERS -%> id="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>" name="sharing[sharing_scope]"
                value="<%= Policy::ALL_REGISTERED_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_REGISTERED_USERS -%>);" />
-        - All users, including those that are not members of SysMO projects, for
+        - All users, including those that are not members of SysMO projects, can
       </label>
       <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_REGISTERED_USERS,
         :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
@@ -90,7 +86,7 @@
       <label for="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]"
                value="<%= Policy::ALL_SYSMO_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_SYSMO_USERS -%>);" />
-        - All registered users that are members of a SysMO project for
+        - All registered users that are members of a SysMO project can
       </label>
       <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
         :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>

@@ -310,19 +310,19 @@ function accessTypeTranslation(access_type) {
             txt = 'individual access rights for each member';
             break;
         case NO_ACCESS:
-            txt = 'no access';
+            txt = 'No access';
             break;
         case VIEWING:
-            txt = 'visible only';
+            txt = 'View summary only';
             break;
         case DOWNLOADING:
-            txt = 'visible and accessible';
+            txt = 'View summary and get contents';
             break;
         case EDITING:
-            txt = 'visible, accessible and editable';
+            txt = 'View and edit summary and contents';
             break;
         case MANAGING:
-            txt = "manage"
+            txt = "Manage"
             break;
     }
   

@@ -3,7 +3,7 @@
 <%# 2) sharing_scope - active sharing_scope for the current policy -%>
 <%# 3) access_type - active access_type for the current policy -%>
 
-<select name="sharing[access_type_<%= access_type_selector_for_scope -%>]" id="access_type_select_<%= access_type_selector_for_scope -%>" style="width: 220px; vertical-align: middle; margin: 0.3em 0;">
+<select name="sharing[access_type_<%= access_type_selector_for_scope -%>]" id="access_type_select_<%= access_type_selector_for_scope -%>" style="width: 22em; vertical-align: middle; margin: 0.3em 0;">
   <option value="<%= Policy::VISIBLE -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::VISIBLE) -%>><%= Policy.get_access_type_wording(Policy::VISIBLE)-%></option>
   <option value="<%= Policy::ACCESSIBLE -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::ACCESSIBLE) -%>><%= Policy.get_access_type_wording(Policy::ACCESSIBLE)-%></option>
   <option value="<%= Policy::EDITING -%>" <%= "selected='selected'" if (access_type_selector_for_scope == sharing_scope && access_type == Policy::EDITING) -%>><%= Policy.get_access_type_wording(Policy::EDITING)-%></option>  
