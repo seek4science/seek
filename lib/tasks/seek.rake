@@ -417,7 +417,7 @@ namespace :seek do
     File.open("config/default_data/help/help_documents.yml", 'w') {|f| f.write template.result(binding)}
   end
 
-  desc "Overwrite header/footer layouts with generic, rebranded alternatives"
+  desc "Overwrite footer layouts with generic, rebranded alternatives"
   task :rebrand_layouts do
     dir = 'config/rebrand/'
     #TODO: Change to select everything in config/rebrand/ except for help_documents.erb
