@@ -13,7 +13,6 @@ class SopsControllerTest < ActionController::TestCase
   end
   
   def test_get_xml_specific_version
-    assert false
     login_as(:owner_of_my_first_sop)
     get :show,:id=>sops(:downloadable_sop),:version=>2, :format=>"xml"
     perform_api_checks
