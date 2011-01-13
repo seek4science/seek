@@ -82,7 +82,7 @@ class Project < ActiveRecord::Base
   end
 
   def pals
-    people.select{|p| p.is_pal?}.select{|p| p.project_roles(self).collect{|r| r.name}.include?("Sysmo-DB Pal")}
+    people.select{|p| p.is_pal?}.select{|p| p.project_roles(self).collect{|r| r.name}.include?("#{DM_PROJECT_NAME} Pal")}
   end
 
   def locations

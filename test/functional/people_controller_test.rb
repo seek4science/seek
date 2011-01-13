@@ -14,7 +14,7 @@ class PeopleControllerTest < ActionController::TestCase
   
   def test_title
     get :index
-    assert_select "title", :text=>/Sysmo SEEK People.*/, :count=>1
+    assert_select "title", :text=>/The Sysmo SEEK People.*/, :count=>1
   end
   
   def test_should_get_index

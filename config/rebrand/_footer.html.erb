@@ -1,0 +1,43 @@
+<p class="copyright">
+  Copyright (c) 2008 - 2010
+  <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %>
+  and
+  <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
+  <% if defined? COPYRIGHT_ADDENDUM  %>
+    <p class="copyright">
+      <%= COPYRIGHT_ADDENDUM %>
+    </p>
+  <%end%>
+</p>
+
+<% if logged_in? -%>
+  <% cache "footer" do -%>
+    <div>
+      <table>
+        <tr>
+          <td class="left">            
+            <p><%= link_to "Front Page", "/" %></p>
+            <%if DM_PROJECT_LINK != PROJECT_LINK %><p><%= link_to "About #{DM_PROJECT_NAME}", DM_PROJECT_LINK, :target => '_blank' %></p> <%end%>
+            <p><%= link_to PROJECT_TITLE, PROJECT_LINK %> </p>
+          </td>
+          <td class="middle">
+          </td>
+          <td class="right">
+            <p>Powered by:</p>
+            <%= link_to image_tag('ror-logo-32.png'), "http://www.rubyonrails.com", :target => '_blank',:class=>"middle" %>
+            <p style="margin-top: 0.2em;">
+              Icons:
+              <br/>
+              <%= link_to "Silk icons 1.3", "http://www.famfamfam.com/lab/icons/silk/", :target => '_blank' %>
+              <br/>
+              <%= link_to "Crystal Clear icons", "http://www.everaldo.com/crystal/", :target => '_blank' %>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </div>
+  <% end -%>  
+<% else -%>
+	
+<% end -%>
+

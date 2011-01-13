@@ -3,6 +3,11 @@
   <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %>
   and
   <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
+  <% if defined? COPYRIGHT_ADDENDUM  %>
+    <p class="copyright">
+      <%= COPYRIGHT_ADDENDUM %>
+</p>
+  <%end%>
 </p>
 
 <% if logged_in? -%>
@@ -12,8 +17,8 @@
         <tr>
           <td class="left">            
             <p><%= link_to "Front Page", "/" %></p>
-            <p><%= link_to "About SysMO-DB", "http://www.sysmo-db.org", :target => '_blank' %></p>
-            <p><%= link_to "The SysMO Project", "http://www.sysmo.net" %> </p>
+            <%if DM_PROJECT_LINK != PROJECT_LINK %><p><%= link_to "About #{DM_PROJECT_NAME}", DM_PROJECT_LINK, :target => '_blank' %></p><%end%>
+            <p><%= link_to PROJECT_TITLE, PROJECT_LINK %> </p>
           </td>
           <td class="middle">
             <p>Related projects and friends</p>            
