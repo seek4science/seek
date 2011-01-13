@@ -1,7 +1,5 @@
 class Mailer < ActionMailer::Base
-  helper UsersHelper
-
-  NOREPLY_SENDER="no-reply@sysmo-db.org"  
+  helper UsersHelper  
 
   def feedback user,topic,details,send_anonymously,base_host
     subject "#{APPLICATION_NAME} Feedback provided - #{topic}"

@@ -47,6 +47,7 @@ if Rails.env.test?
   PROJECT_NAME = 'Sysmo'
   PROJECT_TITLE = 'The Sysmo Consortium'
   DM_PROJECT_NAME = 'Sysmo-DB'
+  NOREPLY_SENDER="no-reply@sysmo-db.org"
 end
   
   APPLICATION_NAME="SysMO-SEEK" unless defined? APPLICATION_NAME
@@ -65,3 +66,5 @@ end
   HEADER_IMAGE="sysmo-db-logo_smaller.png" unless defined? HEADER_IMAGE
   HEADER_IMAGE_LINK=DM_PROJECT_LINK unless defined? HEADER_IMAGE_LINK
   HEADER_IMAGE_TITLE=DM_PROJECT_NAME unless defined? HEADER_IMAGE_TITLE
+
+  NOREPLY_SENDER="no-reply@sysmo-db.org" unless defined? NOREPLY_SENDER

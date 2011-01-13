@@ -71,3 +71,6 @@ DM_PROJECT_LINK=PROJECT_LINK
 HEADER_IMAGE=false
 HEADER_IMAGE_LINK=DM_PROJECT_LINK
 HEADER_IMAGE_TITLE=DM_PROJECT_NAME
+
+#The 'no reply' address automatic emails are sent from
+NOREPLY_SENDER="no-reply@sysmo-db.org"
