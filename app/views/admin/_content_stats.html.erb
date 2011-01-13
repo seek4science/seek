@@ -51,8 +51,8 @@ For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible
   </tr>
   <% end %>
   <tr style="background-color: #DEF">
-    <td><b>Total</b></td>
-    <td><%= Person.count -%> (<%= total_registered_people -%>)</td>
+    <td><b>Overall</b></td>
+    <td><%= Person.count -%> (<%= total_registered_people -%>)<em>*</em></td>
     <td><%= Investigation.count -%></td>
     <td><%= Study.count -%></td>
     <td><%= Assay.count -%></td>
@@ -62,3 +62,5 @@ For data, models and SOPs, the numbers are split as <em>total</em> / <em>visible
     <td><%= Publication.count -%></td>
   </tr>
 </table>
+<hr/>
+<em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple projects.</em>
