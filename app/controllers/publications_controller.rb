@@ -255,7 +255,7 @@ class PublicationsController < ApplicationController
     pubmed_id = @publication.pubmed_id
     doi = @publication.doi
     if pubmed_id
-      query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
+      query = PubmedQuery.new("seek",ADMIN_EMAIL)
       result = query.fetch(pubmed_id)      
     elsif doi
       query = DoiQuery.new(ADMIN_EMAIL)
