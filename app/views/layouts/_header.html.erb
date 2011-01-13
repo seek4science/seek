@@ -9,8 +9,8 @@
         <%= render :partial=>"layouts/header_text_main" -%>
       </td>
       <td style="text-align:right;">
-        <%= link_to image_tag("sysmo-db-logo_smaller.png",:alt=>"www.sysmo-db.org",:title=>"Sysmo-DB"),
-          "http://www.sysmo-db.org" %>
+        <%if HEADER_IMAGE%><%= link_to image_tag(HEADER_IMAGE,:alt=>HEADER_IMAGE_LINK,:title=>HEADER_IMAGE_TITLE),
+          HEADER_IMAGE_LINK %><%end%>
       </td>
     </tr>
     </table>      

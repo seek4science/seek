@@ -210,7 +210,7 @@ end
     name=PAGE_TITLES[controller_name]
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
-    return "Sysmo SEEK "+name
+    return "#{APPLICATION_TITLE} "+name
   end
 
   # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/

@@ -19,7 +19,7 @@ class UsersControllerTest < ActionController::TestCase
   
   def test_title
     get :new
-    assert_select "title",:text=>/Sysmo SEEK.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK.*/, :count=>1
   end
   
   def test_activation_required_link

@@ -14,7 +14,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select "title",:text=>/Sysmo SEEK Investigations.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK Investigations.*/, :count=>1
   end
 
   test "should show index" do

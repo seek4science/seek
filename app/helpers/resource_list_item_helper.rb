@@ -171,7 +171,7 @@ module ResourceListItemHelper
         title = "Custom Policy"
         html << image('manage',:title=>title, :class => "visibility_icon") 
       when 2
-        title = "Visible to all SysMO projects"
+        title = "Visible to all #{PROJECT_NAME} projects"
         html << image('open',:title=>title, :class => "visibility_icon") 
       when 3
         title = "Visible to all registered users"

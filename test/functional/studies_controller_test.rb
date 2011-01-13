@@ -20,7 +20,7 @@ class StudiesControllerTest < ActionController::TestCase
   
   def test_title
     get :index
-    assert_select "title",:text=>/Sysmo SEEK Studies.*/, :count=>1
+    assert_select "title",:text=>/The Sysmo SEEK Studies.*/, :count=>1
   end
 
   test "should get show" do

@@ -1,7 +1,7 @@
 #Enable JERM
 JERM_ENABLED = true
 
-#Enable search
+#Enable search. Requires Solr to be running.
 SOLR_ENABLED = true
 
 #Enable email
@@ -46,3 +46,31 @@ ActionMailer::Base.smtp_settings= {
   :user_name => "",
   :password  => ""
 }
+
+#To create an instance of SEEK for use by projects other than Sysmo, it is essential to redefine the following:
+PROJECT_NAME="SysMO"
+PROJECT_TYPE="Consortium"
+PROJECT_LINK="http://www.sysmo.net"
+
+#Uncomment this to add an addendum to the copyright statement
+#COPYRIGHT_ADDENDUM="Additions copyright ..."
+
+#Defining these is optional, they take their defaults based on the constants above
+APPLICATION_NAME="#{PROJECT_NAME}-SEEK"
+APPLICATION_TITLE=APPLICATION_NAME
+PROJECT_LONG_NAME="#{PROJECT_NAME} #{PROJECT_TYPE}"
+PROJECT_TITLE=PROJECT_LONG_NAME
+
+#The project/group managing SEEK. Defaults based on PROJECT_NAME and PROJECT_TITLE
+DM_PROJECT_NAME=PROJECT_NAME
+DM_PROJECT_TITLE=PROJECT_TITLE
+DM_PROJECT_LINK=PROJECT_LINK
+
+#These define the image used in the upper right hand corner of the SEEK website. The image named below should be placed in public/images/
+#If HEADER_IMAGE is set to false, instead of an image file, no image will be displayed
+HEADER_IMAGE=false
+HEADER_IMAGE_LINK=DM_PROJECT_LINK
+HEADER_IMAGE_TITLE=DM_PROJECT_NAME
+
+#The 'no reply' address automatic emails are sent from
+NOREPLY_SENDER="no-reply@sysmo-db.org"

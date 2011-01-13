@@ -1,10 +1,8 @@
 class Mailer < ActionMailer::Base
-  helper UsersHelper
-
-  NOREPLY_SENDER="no-reply@sysmo-db.org"  
+  helper UsersHelper  
 
   def feedback user,topic,details,send_anonymously,base_host
-    subject "SysMO SEEK Feedback provided - #{topic}"
+    subject "#{APPLICATION_NAME} Feedback provided - #{topic}"
     recipients admin_emails
     from NOREPLY_SENDER
     reply_to user.person.email_with_name unless send_anonymously
@@ -15,7 +13,7 @@ class Mailer < ActionMailer::Base
 
   def request_resource(user,resource,details,base_host)
 
-    subject "A SysMO member requested a protected file: #{resource.title}"
+    subject "A #{APPLICATION_NAME} member requested a protected file: #{resource.title}"
     recipients resource.managers.collect{|m| m.email_with_name}
     from NOREPLY_SENDER
     reply_to user.person.email_with_name
@@ -25,7 +23,7 @@ class Mailer < ActionMailer::Base
   end
 
   def signup(user,base_host)
-    subject     'SysMO SEEK account activation'
+    subject     "#{APPLICATION_NAME} account activation"
     recipients  user.person.email_with_name
     from        NOREPLY_SENDER
     sent_on     Time.now
@@ -34,7 +32,7 @@ class Mailer < ActionMailer::Base
   end
 
   def forgot_password(user,base_host)
-    subject    'SysMO SEEK - Password reset'
+    subject    "#{APPLICATION_NAME} - Password reset"
     recipients user.person.email_with_name
     from       NOREPLY_SENDER
     sent_on    Time.now
@@ -43,7 +41,7 @@ class Mailer < ActionMailer::Base
   end
 
   def welcome(user,base_host)
-    subject    'Welcome to SysMO SEEK'
+    subject    "Welcome to #{APPLICATION_NAME}"
     recipients user.person.email_with_name
     from       NOREPLY_SENDER
     sent_on    Time.now
@@ -52,7 +50,7 @@ class Mailer < ActionMailer::Base
   end
   
   def welcome_no_projects(user,base_host)
-    subject    'Welcome to SysMO SEEK'
+    subject    "Welcome to #{APPLICATION_NAME}"
     recipients user.person.email_with_name
     from       NOREPLY_SENDER
     sent_on    Time.now
@@ -62,7 +60,7 @@ class Mailer < ActionMailer::Base
 
   def contact_admin_new_user_no_profile(details,user,base_host)
     
-    subject    'SysMO member signed up'
+    subject    "#{APPLICATION_NAME} member signed up"
     recipients admin_emails
     from       NOREPLY_SENDER
     reply_to   user.person.email_with_name
@@ -82,7 +80,7 @@ class Mailer < ActionMailer::Base
   end
   
   def announcement_notification(site_announcement, notifiee_info,base_host)
-    subject "SysMO SEEK Announcement: #{site_announcement.title}"
+    subject "#{APPLICATION_NAME} Announcement: #{site_announcement.title}"
     recipients notifiee_info.notifiee.email_with_name    
     from       NOREPLY_SENDER
     sent_on    Time.now

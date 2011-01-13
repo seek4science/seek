@@ -2,7 +2,7 @@
 
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
-at http://rubyonrails.org/documentation and there are some good guides at http://guides.rubyonrails.org/.
+at http://rubyonrails.org/documentation. Since SEEK uses v2.3.5 of Rails, http://guides.rubyonrails.org/v2.3.8/ and http://api.rubyonrails.org/v2.3.8 may be useful as well.
 
 We recommend that you run SEEK on a Linux system. All of the examples here describe installing on an Ubuntu or Debian system, but should be easily transferrable to other Linux systems such as Fedora.
 
@@ -76,6 +76,18 @@ If you are requested for a root or sudo password, but you do not have this level
 If you are setting up SEEK as a production environment, rather than for development, you should set the RAILS_ENV variable before proceeding
 
   export RAILS_ENV=production
+
+== Rebranding SysMO SEEK for other projects
+
+If you are running SEEK for a project other than SysMO, copy config/initializers/seek_local.rb.pre to config/initializers/seek_local.rb. This file contains several constants that you should set, to reflect the name of your project/application.
+
+To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
+
+rake seek:rebrand
+
+If you only want to change the help documents, you can instead use
+
+rake seek:rebrand_help_docs
 
 == Configuring the database
 

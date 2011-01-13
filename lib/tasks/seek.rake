@@ -409,8 +409,24 @@ namespace :seek do
     else
       puts "Aborted - Couldn't find any help documents in /config/default_data/help/"
     end
-  end 
-  
+  end
+
+  desc "Create rebranded default help documents"
+  task :rebrand_help_docs => :environment do
+    template = ERB.new File.new("config/rebrand/help_documents.erb").read, nil, "%"
+    File.open("config/default_data/help/help_documents.yml", 'w') {|f| f.write template.result(binding)}
+  end
+
+  desc "Overwrite footer layouts with generic, rebranded alternatives"
+  task :rebrand_layouts do
+    dir = 'config/rebrand/'
+    #TODO: Change to select everything in config/rebrand/ except for help_documents.erb
+    FileUtils.cp FileList["#{dir}/*"].exclude("#{dir}/help_documents.erb"), 'app/views/layouts/'
+  end
+
+  desc "Replace Sysmo specific files with rebranded alternatives"
+  task :rebrand => [:rebrand_help_docs, :rebrand_layouts]
+
   desc "Generates UUIDs for all items that don't have them"
   task :generate_uuids => :environment do
     [User,Person,Project,Institution,Investigation,Study,Assay,
