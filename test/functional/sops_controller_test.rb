@@ -74,6 +74,7 @@ class SopsControllerTest < ActionController::TestCase
   test "should get new" do
     get :new
     assert_response :success
+    assert_select "div#dummy_element",false #used to validate the html
   end
   
   test "should correctly handle bad data url" do
@@ -188,6 +189,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     get :edit, :id => sops(:my_first_sop)
     assert_response :success
+    assert_select "div#dummy_element",false #used to validate the html
   end
   
   test "publications excluded in form for sops" do
