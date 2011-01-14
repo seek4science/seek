@@ -58,7 +58,10 @@ url_not_found_content_blob:
   uuid: <%= UUIDTools::UUID.random_create.to_s %>  
   
 non_sbml_xml_blob:  
-  uuid: <%= init_blob('non_sbml_xml.xml') %>  
+  uuid: <%= init_blob('non_sbml_xml.xml') %>
+  
+invalid_sbml_xml_blob:  
+  uuid: <%= init_blob('invalid_sbml_xml.xml') %>    
   
 non_jws_dat_blob:  
   uuid: <%= init_blob('non_jws_dat.dat') %>    

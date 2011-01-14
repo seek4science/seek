@@ -151,7 +151,9 @@ module Seek
       element.to_s
     end        
     
-    def process_response_body body                              
+    def process_response_body body                           
+      
+      #puts body
       
       parser = LibXML::XML::Parser.string(body,:encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse

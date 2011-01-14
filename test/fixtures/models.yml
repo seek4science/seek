@@ -56,6 +56,20 @@ non_sbml_xml:
   project: other_project
   policy: policy_for_test_with_projects_institutions   
   
+invalid_sbml_xml:
+  contributor: model_owner (User)
+  title: Invalid SBML XML
+  description: An XML file that is not SBML
+  original_filename: invalid_sbml_xml.xml
+  content_blob: invalid_sbml_xml_blob
+  content_type: text/xml  
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-02 11:09:18
+  version: 1  
+  project: other_project
+  policy: policy_for_test_with_projects_institutions   
+  
 non_jws_dat:
   contributor: model_owner (User)
   title: Non JWS Online Dat file

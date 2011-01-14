@@ -67,4 +67,11 @@ class JWSTests < ActiveSupport::TestCase
     assert !builder.is_supported?(model)
   end
   
+  test "jws online response handled when errors present" do
+    builder = Seek::JWSModelBuilder.new
+    model=models(:invalid_sbml_xml)
+    params_hash,saved_file,objects_hash,error_keys = builder.builder_content model.versions.first
+    assert !error_keys.empty?
+  end
+  
 end
