@@ -1,7 +1,7 @@
 <ul class="sectionIcons">
 	<li>
 	<% if @saved_file -%>
-		<%= image_tag_for_key('back', builder_model_path(@model,:version=>@display_model.version,:saved_file=>@saved_file), nil, nil, "Back to JWS Builder") -%>
+		<%= image_tag_for_key('back', builder_model_path(@model,:version=>@display_model.version,:saved_file=>@saved_file), nil, nil, "Back to JWS One Stop") -%>
 	<% else -%>
 		<%= image_tag_for_key('back', model_path(@model,:version=>@display_model.version), nil, nil, "Back to Model") -%>
 	<% end -%>

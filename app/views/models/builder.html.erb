@@ -346,9 +346,9 @@
 </div><!-- JWS CONSTRUCTOR END -->
 <script type="text/javascript">
     map_rt_elements();
-    read_panel_cookies();
-    
+    read_panel_cookies();    
 </script>
+
 <%= render :partial=>"models/builder/new_version_details" -%>
 <% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.each do |prefix| -%>
 <script type="text/javascript">
