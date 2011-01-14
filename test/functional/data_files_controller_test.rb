@@ -35,6 +35,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should get new" do
     get :new
     assert_response :success
+    assert_select "h1",:text=>"New Data file"
   end
   
   test "should correctly handle 404 url" do
@@ -233,6 +234,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should get edit" do
     get :edit, :id => data_files(:picture)
     assert_response :success
+    assert_select "h1",:text=>/Editing Data file/
   end
   
   test "publications included in form for datafile" do

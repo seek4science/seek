@@ -134,6 +134,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should get new" do
     get :new    
     assert_response :success
+    assert_select "h1",:text=>"New Model"
   end    
   
   test "should correctly handle bad data url" do
@@ -249,6 +250,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should get edit" do
     get :edit, :id => models(:teusink)
     assert_response :success
+    assert_select "h1",:text=>/Editing Model/
   end
   
   test "publications included in form for model" do
