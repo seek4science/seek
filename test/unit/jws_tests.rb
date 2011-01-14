@@ -72,6 +72,7 @@ class JWSTests < ActiveSupport::TestCase
     model=models(:invalid_sbml_xml)
     params_hash,saved_file,objects_hash,error_keys = builder.builder_content model.versions.first
     assert !error_keys.empty?
+    assert error.keys.include?("parameters")
   end
   
 end
