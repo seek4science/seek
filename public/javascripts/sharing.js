@@ -1148,7 +1148,7 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
 function validateSopFields(is_new_file) {
     // only make this test if that's a new SOP
     if(is_new_file) {
-        if($('sop_data').value.length == 0 && $('model_data_url').value.length == 0) {
+        if($('sop_data').value.length == 0 && $('sop_data_url').value.length == 0) {
             alert("Please specify the file to upload, or provide a URL.");
             $('sop_data').focus();
             return(false);
