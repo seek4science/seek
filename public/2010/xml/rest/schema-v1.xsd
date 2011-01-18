@@ -373,8 +373,10 @@
 						maxOccurs="1" minOccurs="1"></xsd:element>
 					<xsd:element name="assay_type" type="ResourceLink"
 						maxOccurs="1" minOccurs="1"></xsd:element>
-					<xsd:element name="technology_type" type="ResourceLink"
-						maxOccurs="1" minOccurs="1" nillable="true"></xsd:element>
+                                        <xsd:choice>
+						<xsd:element name="technology_type" type="ResourceLink" maxOccurs="1" minOccurs="1"></xsd:element>
+						<xsd:element name="technology_type" maxOccurs="1" minOccurs="1" nillable="true"></xsd:element>
+					</xsd:choice>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
