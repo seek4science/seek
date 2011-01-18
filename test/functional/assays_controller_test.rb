@@ -11,7 +11,25 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:aaron)
     @object=assays(:metabolomics_assay)
   end
-
+  
+  test "modelling assay validates with schema" do
+    a=assays(:modelling_assay_with_data_and_relationship)
+    get :show, :id=>a, :format=>"xml"
+    assert_response :success    
+    
+    validate_xml_against_schema(@response.body)
+    
+  end
+  
+  test "index includes modelling validates with schema" do
+    get :index, :page=>"all",:format=>"xml"
+    assert_response :success
+    assays=assigns(:assays)
+    assert assays.include?(assays(:modelling_assay_with_data_and_relationship)), "This test is invalid as the list should include the modelling assay"
+    
+    validate_xml_against_schema(@response.body)
+  end
+  
   def test_title
     get :index
     assert_select "title",:text=>/The Sysmo SEEK Assays.*/, :count=>1
@@ -21,13 +39,6 @@ class AssaysControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:assays)
-  end
-  
-  test "modelling assay schema" do
-    a=assays(:modelling_assay_with_data_and_relationship)
-    get :show, :id=>a, :format=>"xml"
-    assert_response :success    
-    validate_xml_against_schema(@response.body)
   end
   
   test "should update assay with new version of same sop" do
