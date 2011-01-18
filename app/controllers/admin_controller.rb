@@ -123,6 +123,8 @@ class AdminController < ApplicationController
         type = "content_stats"
       when "activity"
         type = "activity_stats"
+      when "search"
+        type = "search_stats"
       else
     end
     respond_to do |format|
@@ -132,9 +134,11 @@ class AdminController < ApplicationController
         when "users"
           format.html { render :partial => "admin/user_stats_list", :locals => { :title => title, :collection => collection} }
         when "content_stats"
-          format.html { render :partial => "admin/content_stats", :locals => {:stats => ContentStats.generate} }
+          format.html { render :partial => "admin/content_stats", :locals => {:stats => Seek::ContentStats.generate} }
         when "activity_stats"
-          format.html { render :partial => "admin/activity_stats", :locals => {:stats => ActivityStats.new} }
+          format.html { render :partial => "admin/activity_stats", :locals => {:stats => Seek::ActivityStats.new} }
+        when "search_stats"
+          format.html { render :partial => "admin/search_stats", :locals => {:stats => Seek::SearchStats.new} }
       end
     end
   end
