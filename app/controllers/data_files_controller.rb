@@ -57,6 +57,7 @@ class DataFilesController < ApplicationController
   end
   
   def new
+    @data_file = DataFile.new
     respond_to do |format|
       if Authorization.is_member?(current_user.person_id, nil, nil)
         format.html # new.html.erb

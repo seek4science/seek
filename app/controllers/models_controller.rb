@@ -343,6 +343,7 @@ class ModelsController < ApplicationController
   # GET /models/new
   # GET /models/new.xml
   def new    
+    @model=Model.new
     respond_to do |format|
       if Authorization.is_member?(current_user.person_id, nil, nil)
         format.html # new.html.erb
