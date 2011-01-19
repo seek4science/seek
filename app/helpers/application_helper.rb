@@ -253,7 +253,7 @@ end
 
   def list_item_tags_list tags,options={}
     tags.map do |t|
-      divider=tags.last==t ? "" : "<span class='spacer'>,</span> "
+      divider=tags.last==t ? "" : "<span class='spacer'>,</span> ".html_safe
       link_for_tag(t,options)+divider
     end
   end

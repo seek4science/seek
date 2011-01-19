@@ -54,7 +54,7 @@
                             <ul>
                                 <% locations.each do |l| -%>
                                 <li>
-                                    <%= flag_icon(l) + "&nbsp;" + link_to(h(l), country_path(h(l))) -%>
+                                    <%= flag_icon(l) + "&nbsp;".html_safe + link_to(h(l), country_path(h(l))) -%>
                                 </li>
                                 <% end -%>
                             </ul>
