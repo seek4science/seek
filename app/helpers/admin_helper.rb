@@ -17,6 +17,7 @@ module AdminHelper
   
   #takes the terms and scores received from SearchStats, and generates a string
   def search_terms_summary terms_and_scores    
+    return "<span class='none_text'>No search queries during this period</span>" if terms_and_scores.empty?
     words=terms_and_scores.collect{|ts| "#{ts[0]}(#{ts[1]})" }
     words.join(", ")
   end
