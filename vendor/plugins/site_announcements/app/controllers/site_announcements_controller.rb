@@ -116,7 +116,12 @@ class SiteAnnouncementsController < ApplicationController
   end
   
   def index
-    @site_announcements=SiteAnnouncement.find(:all,:order=>"created_at DESC")
+    if params[:feed_only]
+      @site_announcements=SiteAnnouncement.feed_announcements(:limit=>1000)
+    else
+      @site_announcements=SiteAnnouncement.find(:all,:order=>"created_at DESC")  
+    end
+    
   end
   
   def check_manage_announcements    

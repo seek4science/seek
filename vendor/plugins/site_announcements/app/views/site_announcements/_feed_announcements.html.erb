@@ -4,7 +4,7 @@
   <li class="feed_announcement">
   	<% if SiteAnnouncement.count > limit -%>
   	<center>
-  		<span class="announcement_title"><%= link_to "See all",site_announcements_path -%></span>
+  		<span class="announcement_title"><%= link_to "See all",site_announcements_path(:feed_only=>true) -%></span>
 	</center>
 	<% end -%>
   </li>
