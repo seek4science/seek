@@ -9,10 +9,25 @@
 		<th>1 day</th>
 	</tr>
 	<tr>
-		<td>Unique Users</td>		
+		<td>Searches made</td>		
 		<td><%= stats.yearly_searches -%></td>
 		<td><%= stats.monthly_searches -%></td>
 		<td><%= stats.weekly_searches -%></td>
 		<td><%= stats.daily_searches -%></td>
 	</tr>
 </table>	
+
+<ul>
+	<li>
+		<label><b>1 year:</b></label> <%= search_terms_summary stats.yearly_search_terms -%>		
+	</li>
+	<li>
+		<label><b>1 month:</b></label> <%= search_terms_summary stats.monthly_search_terms -%>
+	</li>
+	<li>
+		<label><b>1 week:</b></label> <%= search_terms_summary stats.weekly_search_terms -%>
+	</li>
+	<li>
+		<label><b>1 day:</b></label> <%= search_terms_summary stats.daily_search_terms -%>
+	</li>
+</ul>
