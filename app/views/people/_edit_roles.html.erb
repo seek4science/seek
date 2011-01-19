@@ -7,4 +7,4 @@
 
 
 
-<%= select_tag "group_membership_role_ids_#{group_membership.id}",[],:multiple=>true,:style=>"display:none;" %>
+<%= select_tag "group_membership_role_ids_#{group_membership.id}",[].join.html_safe,:multiple=>true,:style=>"display:none;" %>
