@@ -74,7 +74,8 @@ class MailerTest < ActionMailer::TestCase
 
   test "request resource" do
     @expected.subject = "A Sysmo SEEK member requested a protected file: Picture"
-    @expected.to = ["Datafile Owner <data_file_owner@email.com>","OwnerOf MyFirstSop <owner@sop.com>"]
+    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+    @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
     @expected.date = Time.now
@@ -91,7 +92,8 @@ class MailerTest < ActionMailer::TestCase
 
   test "request resource no details" do
     @expected.subject = "A Sysmo SEEK member requested a protected file: Picture"
-    @expected.to = ["Datafile Owner <data_file_owner@email.com>","OwnerOf MyFirstSop <owner@sop.com>"]
+    #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
+    @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
     @expected.date = Time.now
