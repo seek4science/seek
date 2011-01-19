@@ -32,7 +32,7 @@
         <%= f.password_field :password_confirmation %>
     </p>
     <p>
-        <%= submit_tag 'Update' %>
+        <%= submit_tag 'Update',:disable_with=>"Updating..." %>
     </p>
     <% end -%>
     <% end -%>
@@ -51,7 +51,7 @@
         <%= text_field_tag :openid_identifier, @user.openid, :size => 40 %>
     </p>
     <p>
-        <%= submit_tag 'Update' %>
+        <%= submit_tag 'Update',:disable_with=>"Updating..." %>
     </p>
     <% end -%>
     <p>

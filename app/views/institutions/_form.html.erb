@@ -37,6 +37,6 @@
 <% end -%>
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(institution ? "Update" : "Create") -%>
+  <%= f.submit(institution ? "Update" : "Create",:disable_with=>(institution ? "Updating..." : "Creating...")) -%>
 	or <%= link_to 'Cancel', (institution ? institution_path(institution.id) : institutions_path) -%>
 </p>
