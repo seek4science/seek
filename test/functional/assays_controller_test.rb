@@ -222,6 +222,14 @@ end
     assert flash[:error]
     assert_redirected_to assay_path(a)
   end
+  
+  test "admin should not edit somebody elses assay" do
+    a = assays(:assay_with_just_a_study)
+    login_as(:quentin)
+    get :edit, :id => a
+    assert flash[:error]
+    assert_redirected_to assay_path(a)
+  end
 
   test "should not delete assay with data files" do
     login_as(:model_owner)

@@ -176,7 +176,7 @@ class AssaysController < ApplicationController
 
   def check_is_project_pal
     @assay=Assay.find(params[:id])
-    if @assay.can_edit?(current_user) || current_user.is_admin?
+    if @assay.can_edit?(current_user)
       return true
     else
       respond_to do |format|
