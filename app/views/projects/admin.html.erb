@@ -22,7 +22,7 @@
     </div>
 
     <p style="margin-top: 2em; text-align: center;">
-      <%= f.submit("Update") -%>
+      <%= f.submit("Update", :disable_with=>"Updating...") -%>
       or <%= link_to 'Cancel', project_path(@project.id) -%>
     </p>
 
