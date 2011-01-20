@@ -2,7 +2,6 @@
 # and open the template in the editor.
 
 require 'jerm/resource'
-require 'jerm/http_downloader'
 
 module Jerm
   class TranslucentResource < Resource
