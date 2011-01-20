@@ -17,7 +17,7 @@ module Jerm
       return harvester_class.new(root_uri,uname,pwd)
     end
         
-    #find and constructs all the harversters found in lib/jerm
+    #find class for all the harversters found in lib/jerm
     def discover_harvesters
       Dir.chdir(File.join(RAILS_ROOT, "lib/jerm")) do
         Dir.glob("*harvester.rb").each do |f|

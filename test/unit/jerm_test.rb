@@ -12,8 +12,19 @@ class JermTest  < ActiveSupport::TestCase
     harvesters = harvester_factory.discover_harvesters
     assert !harvesters.empty?
     
+    assert harvesters.include?(Jerm::CosmicHarvester)
+    assert harvesters.include?(Jerm::BaCellSysmoHarvester)
+    assert harvesters.include?(Jerm::TranslucentHarvester)
+    
     harvesters.each do |h|
-      assert h.kind_of?(Jerm::Harvester)
+      superclasses=[]
+      c=h
+      while !c.superclass.nil? do
+        superclasses << c.superclass
+        c=c.superclass
+      end
+      assert superclasses.include?(Jerm::Harvester),"#{h} is not a subclass of Jerm::Harvester"
+      
     end
     
   end
