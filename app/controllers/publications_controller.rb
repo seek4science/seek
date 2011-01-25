@@ -151,7 +151,7 @@ class PublicationsController < ApplicationController
     @publication.destroy
 
     respond_to do |format|
-      format.html { redirect_to(publications_url) }
+      format.html { redirect_to(publications_path) }
       format.xml  { head :ok }
     end
   end
