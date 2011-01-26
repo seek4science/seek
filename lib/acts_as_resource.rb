@@ -7,7 +7,7 @@
 # * Copyright (c) 2007 University of Manchester and the University of Southampton.
 # * See license.txt for details.
 # ********************************************************************************
-require 'acts_as_authenticated'
+require 'acts_as_authorized'
 module Mib
   module Acts #:nodoc:
     module Resource #:nodoc:
@@ -17,7 +17,7 @@ module Mib
       
       module ClassMethods
         def acts_as_resource
-          acts_as_authenticated
+          acts_as_authorized
           #belongs_to :contributor, :polymorphic => true
           
           #checks a policy exists, and if missing resorts to using a private policy

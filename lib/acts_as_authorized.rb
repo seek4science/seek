@@ -2,7 +2,7 @@
 # and open the template in the editor.
 module Mib
   module Acts #:nodoc:
-    module Authenticated #:nodoc:
+    module Authorized #:nodoc:
       def self.included(mod)
         mod.extend(ClassMethods)
       end
@@ -19,9 +19,9 @@ module Mib
           belongs_to :policy
 
           class_eval do
-            extend Mib::Acts::Authenticated::SingletonMethods
+            extend Mib::Acts::Authorized::SingletonMethods
           end
-          include Mib::Acts::Authenticated::InstanceMethods
+          include Mib::Acts::Authorized::InstanceMethods
 
         end
       end
@@ -76,6 +76,6 @@ module Mib
 end
 
 ActiveRecord::Base.class_eval do
-  include Mib::Acts::Authenticated
+  include Mib::Acts::Authorized
 end
 
