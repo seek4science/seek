@@ -8,7 +8,7 @@ module Mib
       end
 
       module ClassMethods
-        def acts_as_authenticated
+        def acts_as_authorized
           belongs_to :contributor, :polymorphic => true
 
           #checks a policy exists, and if missing resorts to using a private policy
