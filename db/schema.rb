@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101215152705) do
+ActiveRecord::Schema.define(:version => 20110125131601) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20101215152705) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -186,6 +186,11 @@ ActiveRecord::Schema.define(:version => 20101215152705) do
     t.integer  "policy_id"
   end
 
+  create_table "data_files_events", :id => false, :force => true do |t|
+    t.integer "data_file_id"
+    t.integer "event_id"
+  end
+
   create_table "db_files", :force => true do |t|
     t.binary "data", :limit => 2147483647
   end
@@ -199,6 +204,22 @@ ActiveRecord::Schema.define(:version => 20101215152705) do
   create_table "disciplines_people", :id => false, :force => true do |t|
     t.integer "discipline_id"
     t.integer "person_id"
+  end
+
+  create_table "events", :force => true do |t|
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.text     "address"
+    t.string   "city"
+    t.string   "country"
+    t.string   "url"
+    t.text     "description"
+    t.string   "title"
+    t.integer  "project_id"
+    t.integer  "policy_id"
+    t.integer  "contributor_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "experimental_conditions", :force => true do |t|

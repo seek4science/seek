@@ -1,0 +1,10 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+
+<%= params.inspect%>
+<% @event.attributes.each do |a| %>
+<%= a[0].to_s + ': ' + a[1].inspect%><br/>
+<% end %>

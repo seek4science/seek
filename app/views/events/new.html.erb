@@ -1,0 +1,54 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+<h1><%= @new ? 'New Event' : ('Editing Event: ' + link_to(h(@event.title), event_path(@event))) -%></h1>
+<div class="show_basic">
+  <% form_for @event do |f| %>
+    <div class="asset_form">
+      <%= f.error_messages %>
+
+      <h2>Event Information</h2>
+      <div style="text-align: center;">
+        <div style="width: 95%;">
+          <p>
+            <%= f.label :title -%>
+            <%= f.text_field :title -%>
+          </p>
+          <p>
+            <%= f.label :description %><br/>
+            <%= f.text_area :description, :rows => 7 %>
+          </p>
+          <p>
+            <%= f.label :start_date %>
+            <%= datetime_select "event", "start_date"%>
+          </p>
+          <p>
+            <%= f.label :end_date %>
+            <%= datetime_select "event", "end_date"%>
+          </p>
+          <p>
+            <%= f.label "Event Website" -%>
+            <%= f.text_field :url -%>
+          </p>
+          <p style="margin-top: 1.5em;">
+            <%= f.label :address -%><br/>
+            <%= f.text_area :address, :style => "width: 350px;", :rows => 4 -%>
+          </p>
+          <p>
+            <%= f.label :city -%><br/>
+            <%= f.text_field :city, :style => "width: 350px;" -%>
+          </p>
+
+          <p>
+            <%= f.label :country -%><br/>
+            <%= f.country_select :country, nil, {}, :style => "width: 350px;" -%>
+          </p>
+        </div>
+      </div>
+    </div>
+    <p>
+      <%= f.submit(@new ? "Create" : "Update",:disable_with=>(@new ? "Creating...":"Updating...")) %>
+    </p>
+  <% end %>
+</div>
