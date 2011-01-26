@@ -7,7 +7,7 @@ class OrganismTest < ActiveSupport::TestCase
   test "assay association" do
     o=organisms(:Saccharomyces_cerevisiae)
     a=assays(:metabolomics_assay)
-    assert_equal 2,o.assays.size
+    assert_equal 1,o.assays.size
     assert o.assays.include?(a)
   end
  
