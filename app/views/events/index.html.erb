@@ -1,6 +1,4 @@
-<%#
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-%>
-
-<%= "index.html" %>
+<ul class="sectionIcons">
+	<li><%= image_tag_for_key "new", new_event_path, "Announce an Event", nil, "Announce an Event" %></li>
+</ul>
+<%= render :partial => "assets/resource_list", :locals => { :collection => @events, :authorization_for_showing_already_done=>true } %>

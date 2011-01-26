@@ -28,6 +28,18 @@ end
     return result
   end
 
+  def tab_definition(options={})
+    options[:gap_before] ||= false
+    options[:title] ||= options[:controllers].first.capitalize
+    options[:path] ||= eval "#{options[:controllers].first}_path"
+
+    attributes = (options[:controllers].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '')
+    attributes += " class='tab_gap_before'" if options[:gap_before]
+
+    link=link_to options[:title], options[:path]
+    "<li #{attributes}>#{link}</li>"
+  end
+
   def tag_cloud(tags, classes)
     max_count = tags.sort_by(&:total).last.total.to_f
     if max_count < 1

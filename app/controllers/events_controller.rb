@@ -2,6 +2,7 @@ class EventsController < ApplicationController
   before_filter :login_required
   before_filter :find_event_auth, :except =>  [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
 
+  #include IndexPager
   
   def show
     
@@ -63,6 +64,13 @@ class EventsController < ApplicationController
     else
       @new = false
       render "new"
+    end
+  end
+
+  def index
+    @events = Authorization.authorize_collection 'view', Event.find(:all), current_user, false
+    respond_to do |format|
+      format.html
     end
   end
 
