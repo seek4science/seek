@@ -1,7 +1,4 @@
-<%#
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
-%>
+<%= javascript_include_tag 'assays.js' %>
 <h1><%= @new ? 'New Event' : ('Editing Event: ' + link_to(h(@event.title), event_path(@event))) -%></h1>
 <div class="show_basic">
   <% form_for @event do |f| %>
@@ -44,6 +41,8 @@
             <%= f.label :country -%><br/>
             <%= f.country_select :country, nil, {}, :style => "width: 350px;" -%>
           </p>
+
+          <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @event,:show_relationships=>false} -%>
         </div>
       </div>
     </div>

@@ -36,7 +36,7 @@ class AssaysController < ApplicationController
 
     organisms = params[:assay_organism_ids] || []
     sop_ids = params[:assay_sop_ids] || []
-    data_file_ids = params[:assay_data_file_ids] || []
+    data_file_ids = params[:data_file_ids] || []
     model_ids = params[:assay_model_ids] || []
     
     @assay.owner=current_user.person       
@@ -81,7 +81,7 @@ class AssaysController < ApplicationController
     
     organisms = params[:assay_organism_ids] || []
     sop_ids = params[:assay_sop_ids] || []
-    data_file_ids = params[:assay_data_file_ids] || []
+    data_file_ids = params[:data_file_ids] || []
     model_ids = params[:assay_model_ids] || []
     
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this

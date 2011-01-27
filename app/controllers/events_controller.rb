@@ -34,8 +34,15 @@ class EventsController < ApplicationController
   end
 
   def create
+    p params.inspect
     @event = Event.new params[:event]
     @event.contributor=current_user
+    data_file_ids = params[:data_file_ids] || []
+    data_file_ids.each do |text|
+      a_id, r_type = text.split(",")
+      @event.data_files << DataFile.find(a_id)
+    end
+    params.delete :data_file_ids
 
     respond_to do | format |
       if @event.save

@@ -170,9 +170,9 @@ function updateDataFiles() {
         $('data_file_to_list').innerHTML = data_file_text;
     }
 
-    clearList('assay_data_file_ids');
+    clearList('data_file_ids');
 
-    select=$('assay_data_file_ids');
+    select=$('data_file_ids');
     for (i=0;i<data_files_assets.length;i++) {
         id=data_files_assets[i][1];
         relationshipType=data_files_assets[i][2];

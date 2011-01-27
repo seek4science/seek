@@ -31,7 +31,7 @@
           )+";check_show_add_data_file();return(false);"
         } -%>
         
-        <%= select_tag "#{controller_name.singularize}_data_file_ids".to_sym,'',{:multiple=>true,:style=>"display:none;"} -%>
+        <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
         
         <% if show_relationships -%>
           <br/>
@@ -98,17 +98,17 @@
   <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
       data_file_id = '<%= data_file.id -%>';
       data_title = '<%= escape_javascript(data_file.title) -%>';
-      <% if resource.instance_of Assay %> 
+      <% if resource.instance_of? Assay %>
         relationship_type = '<%= escape_javascript(data_file.relationship_type(resource).try(:title) || "None") -%>';
       <%  else %>
-        relationship_type = 'None';
+        relationship_type = "None";
       <%  end %>
       addDataFile(data_title,data_file_id,relationship_type);
   <% end -%>
 <% end -%>
 
-<% if params["#{controller_name.singularize}_data_file_ids".to_sym] %>
-  <% params["#{controller_name.singularize}_data_file_ids".to_sym].each do |id_and_rel_id| -%>
+<% if params[:data_file_ids] %>
+  <% params[:data_file_ids].each do |id_and_rel_id| -%>
     <% a_id, r_type = id_and_rel_id.split(",") %>
     <% data_file = DataFile.find(a_id) %>
     <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
