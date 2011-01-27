@@ -14,6 +14,7 @@ module ResourceListItemHelper
   end
   
   def get_list_item_avatar_partial resource
+    #FIXME: get rid of hard coded asset names
     avatar_partial = ""
     if ["DataFile","Model","Sop"].include?(resource.class.name.split("::").first)
       avatar_partial = "layouts/asset_resource_avatars"
@@ -29,7 +30,8 @@ module ResourceListItemHelper
     return avatar_partial
   end
   
-  def list_item_title resource, title=nil, url=nil    
+  def list_item_title resource, title=nil, url=nil
+    #FIXME: this method needs refactoring an tidying up. Don't like model_to_drag_id method name, and the class being asset for the draggable item, and is generally more complicated than it needs to be.
     if title.nil?
       title = get_object_title(resource)
     end    
