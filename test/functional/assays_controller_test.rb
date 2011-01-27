@@ -94,7 +94,7 @@ end
     df = data_files(:downloadable_data_file)
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_data_file_ids=>["#{df.id},Test data"],:assay=>{}
+    put :update, :id=>assay,:data_file_ids=>["#{df.id},Test data"],:assay=>{}
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
@@ -457,7 +457,7 @@ end
         },
           :assay_sop_ids=>["#{sop.id}"],
           :assay_model_ids=>["#{model.id}"],
-          :assay_data_file_ids=>["#{datafile.id},#{rel.title}"]        
+          :data_file_ids=>["#{datafile.id},#{rel.title}"]        
       end
     end
 
@@ -498,7 +498,7 @@ end
         put :update,:id=>assay,:assay=>{:title=>"",:assay_class=>assay_classes(:modelling_assay_class)},
           :assay_sop_ids=>["#{sop.id}"],
           :assay_model_ids=>["#{model.id}"],
-          :assay_data_file_ids=>["#{datafile.id},#{rel.title}"]
+          :data_file_ids=>["#{datafile.id},#{rel.title}"]
       end
     end
 
