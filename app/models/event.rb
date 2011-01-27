@@ -9,7 +9,9 @@ class Event < ActiveRecord::Base
   acts_as_authorized
   grouped_pagination
 
-
+  validates_each :data_files do |model,attr,value|
+    model.errors.add(attr, 'May only contain one association to each data file') if value.uniq.size != value.size
+  end
 
   validates_presence_of :title
   #validates_uniqueness_of :title
