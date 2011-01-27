@@ -64,6 +64,7 @@ class Policy < ActiveRecord::Base
     
     # if no data about sharing is contained in params[], it should be some user (not the onwer!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
+    #FIXME: this error will be an empty string if params[:sharing] is missins
     return error_msg unless params[:sharing]
     
     # this variable will hold current settings of the policy in case something
