@@ -1,5 +1,5 @@
 module IndexPager    
-  
+
   def index
     controller = self.controller_name.downcase    
     model_name=controller.classify

@@ -70,7 +70,7 @@
   <%= render :partial=>"assays/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
 <% end -%>
 
-<%= render :partial => "assays/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
+<%= render :partial => "assets/associate_data_file",:locals=>{:resource_text=>@assay_text,:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
 
 <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Assay",
                                                                         :related_publications => @assay.related_publications} -%>

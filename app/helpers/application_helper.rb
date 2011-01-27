@@ -7,7 +7,7 @@ module ApplicationHelper
   def creatable_classes
     #FIXME: make these discovered automatically.
     #FIXME: very bad method name
-    [Model,DataFile,Sop,Study,Assay,Investigation,Publication]
+    [Model,DataFile,Sop,Study,Assay,Investigation,Publication,Event]
 
 end
 

@@ -1,4 +1,9 @@
 <ul class="sectionIcons">
 	<li><%= image_tag_for_key "new", new_event_path, "Announce an Event", nil, "Announce an Event" %></li>
 </ul>
+
+<% if @events.public_methods.include?("page_totals") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @events.pages, :page_totals=>@events.page_totals,:current_page=>@events.page } -%>
+<% end %>
 <%= render :partial => "assets/resource_list", :locals => { :collection => @events, :authorization_for_showing_already_done=>true } %>

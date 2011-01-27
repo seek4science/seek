@@ -1,7 +1,8 @@
+<% resource_text ||= resource.class.name.downcase %>
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate data in SEEK to this assay.") -%>
+    <%= help_icon("Here you associate data in SEEK to this #{resource_text}.") -%>
     Associate Data
   </div>
 
@@ -15,7 +16,7 @@
       -%>
       
       <p style="color: #666666;">
-        The following Data Files are involved in this <%= @assay_text -%>:
+        The following Data Files are involved in this <%= resource_text -%>:
       </p>
       <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5">
         <span class="none_text" id="data_files">Loading...</span>
@@ -30,7 +31,7 @@
           )+";check_show_add_data_file();return(false);"
         } -%>
         
-        <%= select_tag :assay_data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+        <%= select_tag "#{controller_name.singularize}_data_file_ids".to_sym,'',{:multiple=>true,:style=>"display:none;"} -%>
         
         <% if show_relationships -%>
           <br/>
@@ -43,7 +44,7 @@
         <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Include Data files from other projects?        
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Include in the assay"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link", :style => "width: 11em" %>      
+      <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedDataFile(); return(false);", :id=>"add_data_file_link", :class=>"block_link", :style => "width: 11em" %>
     </div>
   
     <div id="data_file_preview" class="yui-u preview_box"  style="float:right">
@@ -93,17 +94,21 @@
     selection_box.onchange();
   }
 
-<% @assay.data_file_masters.each do |data_file| -%>    
+<% resource.data_file_masters.each do |data_file| -%>
   <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
       data_file_id = '<%= data_file.id -%>';
       data_title = '<%= escape_javascript(data_file.title) -%>';
-      relationship_type = '<%= escape_javascript(data_file.relationship_type(@assay).try(:title) || "None") -%>';
+      <% if resource.instance_of Assay %> 
+        relationship_type = '<%= escape_javascript(data_file.relationship_type(resource).try(:title) || "None") -%>';
+      <%  else %>
+        relationship_type = 'None';
+      <%  end %>
       addDataFile(data_title,data_file_id,relationship_type);
   <% end -%>
 <% end -%>
 
-<% if params[:assay_data_file_ids] %>
-  <% params[:assay_data_file_ids].each do |id_and_rel_id| -%>
+<% if params["#{controller_name.singularize}_data_file_ids".to_sym] %>
+  <% params["#{controller_name.singularize}_data_file_ids".to_sym].each do |id_and_rel_id| -%>
     <% a_id, r_type = id_and_rel_id.split(",") %>
     <% data_file = DataFile.find(a_id) %>
     <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
