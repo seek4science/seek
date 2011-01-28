@@ -119,20 +119,20 @@ class PeopleController < ApplicationController
   #
   #Page for after registration that allows you to select yourself from a list of
   #people yet to be assigned, or create a new one if you don't exist
-  #def select
-  #  @userless_projects=Project.with_userless_people
-#
-#    #strip out project with no people with email addresses
-#    #TODO: can be made more efficient by putting into a direct query in Project.with_userless_people - but not critical as this is only used during registration
-#    @userless_projects = @userless_projects.select do |proj|
-#      !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
-#    end
+  def select
+    @userless_projects=Project.with_userless_people
 
-#    @userless_projects.sort!{|a,b|a.name<=>b.name}
-#    @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
+    #strip out project with no people with email addresses
+    #TODO: can be made more efficient by putting into a direct query in Project.with_userless_people - but not critical as this is only used during registration
+    @userless_projects = @userless_projects.select do |proj|
+      !proj.people.find{|person| !person.email.nil? && person.user.nil?}.nil?
+    end
 
-#    render :action=>"select",:layout=>"logged_out"
-#  end
+    @userless_projects.sort!{|a,b|a.name<=>b.name}
+    @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
+
+    render :action=>"select",:layout=>"logged_out"
+  end
 
   # POST /people
   # POST /people.xml

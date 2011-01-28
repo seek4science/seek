@@ -24,7 +24,7 @@ class Tag < ActiveRecord::Base
   def total 
     # "if" added by WM
     if taggings.nil? 
-        taggings.select{|tg| !tg.taggable.nil?}.size
+        taggings.select{|tg| !tg.taggable.nil?}.count
     else
       0
     end
