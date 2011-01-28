@@ -6,8 +6,8 @@ class UsersController < ApplicationController
   before_filter :is_user_admin_auth, :only => [:impersonate]
   
   # render new.rhtml
-  def new
-  end
+  #def new
+  #end
 
   def create
     cookies.delete :auth_token
