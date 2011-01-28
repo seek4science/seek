@@ -1,11 +1,12 @@
 require 'test_helper'
 
 class EventsControllerTest < ActionController::TestCase
-  # Replace this with your real tests.
   include AuthenticatedTestHelper
+  #include RestTestCases
 
   def setup
     login_as(:datafile_owner)
+    @object=events(:event_with_no_files)
   end
 
   fixtures :all

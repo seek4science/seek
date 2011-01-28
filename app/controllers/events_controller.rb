@@ -25,7 +25,7 @@ class EventsController < ApplicationController
     @new = true
     respond_to do |format|
       if Authorization.is_member?(current_user.person_id, nil, nil)
-        format.html
+        format.html {render "events/form"}
       else
         flash[:error] = "You are not authorized to create new Events. Only members of known projects, institutions or work groups are allowed to create new content."
         format.html { redirect_to events_path}
@@ -50,7 +50,7 @@ class EventsController < ApplicationController
         format.html { redirect_to @event}
       else
         @new = true
-        format.html {render :action => "new"}
+        format.html {render "events/form"}
       end
     end
   end
@@ -61,10 +61,17 @@ class EventsController < ApplicationController
 
   def edit
     @new = false
-    render "new"
+    render "events/form"
   end
 
   def update
+    data_file_ids = params[:data_file_ids] || []
+    @event.data_files = []
+    data_file_ids.each do |text|
+      a_id, r_type = text.split(",")
+      @event.data_files << DataFile.find(a_id)
+    end
+    params.delete :data_file_ids
     if @event.update_attributes params[:event]
       respond_to do | format |
         flash[:notice] = "The Event was updated successfully."
@@ -72,7 +79,7 @@ class EventsController < ApplicationController
       end
     else
       @new = false
-      render "new"
+      render "events/form"
     end
   end
 

@@ -12,9 +12,7 @@ class ModelsController < ApplicationController
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url]
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
-  
-  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
-  
+    
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
   
   @@model_builder = Seek::JWSModelBuilder.new
@@ -390,7 +388,6 @@ class ModelsController < ApplicationController
           end
         else
           format.html {
-            set_parameters_for_sharing_form()
             render :action => "new"
           }
         end
@@ -445,7 +442,6 @@ class ModelsController < ApplicationController
         end
       else
         format.html {
-          set_parameters_for_sharing_form()
           render :action => "edit"
         }
       end
@@ -543,47 +539,6 @@ class ModelsController < ApplicationController
       end
       return false
     end
-  end
-  
-  def set_parameters_for_sharing_form
-    policy = nil
-    policy_type = ""
-    
-    # obtain a policy to use
-    if @model
-      if (policy = @model.policy)
-        # Model exists and has a policy associated with it - normal case
-        policy_type = "asset"
-      elsif @model.project && (policy = @model.project.default_policy)
-        # Model exists, but policy not attached - try to use project default policy, if exists
-        policy_type = "project"
-      end
-    end
-    
-    unless policy
-      policy = Policy.default()
-      policy_type = "system"
-    end
-    
-    # set the parameters
-    # ..from policy
-    @policy = policy
-    @policy_type = policy_type
-    @sharing_mode = policy.sharing_scope
-    @access_mode = policy.access_type
-    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
-    @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
-    @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
-    
-    # ..other
-    @resource_type = "Model"
-    @favourite_groups = current_user.favourite_groups
-    @resource=@model
-    
-    @all_people_as_json = Person.get_all_as_json
-    
-    @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
-    
   end
   
 end

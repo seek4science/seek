@@ -1,5 +1,62 @@
+<ul class="sectionIcons">
+  <% if Authorization.is_authorized?("manage", nil, @event, current_user) -%>
+    <li><%= image_tag_for_key('manage', edit_event_path(@event), nil, nil, 'Manage Event') -%></li>
+  <% elsif Authorization.is_authorized?("edit", nil, @event, current_user) -%>
+  <%# this is not owner, but current user can edit -%>
+    <li><%= image_tag_for_key('edit', edit_event_path(@event), nil, nil, 'Edit Event') -%></li>
+  <% end -%>
 
-<%= params.inspect%>
-<% (eval "@#{params[:controller].singularize}").attributes.each do |a| %>
-<%= a[0].to_s + ': ' + a[1].inspect%><br/>
-<% end %>
+  <% if Authorization.is_authorized?("destroy", nil, @event, current_user) -%>
+    <li><%= image_tag_for_key('destroy', event_path(@event), nil, { :confirm => 'This deletes the Event listing. Are you sure?', :method => :delete }, 'Delete Event') -%></li>
+  <% end -%>
+</ul>
+
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@event} %>
+
+<%= render :partial => "layouts/usage_info", :locals => { :resource => @event } -%>
+
+<div class="show_basic">
+  <div class="main_content_left_box">
+    <div class="box_about_actor">
+      <p>
+        <label>Project:</label>
+        <% if @event.project.nil? -%>
+          <%= text_or_not_specified nil %>
+        <% else -%>
+          <%= link_to h(@event.project.name),@event.project %>
+        <% end -%>
+      </p>
+      <p>
+        <label>Title:</label>
+        <%=h @event.title -%>
+      </p>
+      <p>
+        <label>Start Time:</label>
+        <%=h @event.start_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+      </p>
+      <p>
+        <label>End Time:</label>
+        <%=h @event.end_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+      </p>
+      <br/>
+
+      <p>
+        <b>Description:</b>
+        <% unless @event.description.blank? -%>
+        <div class="box_standout" id="description">
+          <%= simple_format(auto_link(white_list(@event.description),:all,:rel=>'nofollow')) -%>
+        </div>
+      <% else -%>
+        <p class="none_text">
+          No description.
+        </p>
+      <% end -%>
+      </p>
+    </div>
+  </div>
+  <div style="clear:both;">
+
+    <%= render :partial=>"layouts/items_related_to",:object => @event %>
+  </div>
+
+</div>

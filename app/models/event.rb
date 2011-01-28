@@ -1,4 +1,5 @@
 require 'acts_as_authorized'
+require 'acts_as_uniquely_identifiable'
 require 'grouped_pagination'
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
@@ -7,10 +8,18 @@ class Event < ActiveRecord::Base
   #belongs_to :contributor
   #belongs_to :policy
   acts_as_authorized
+  acts_as_uniquely_identifiable
   grouped_pagination
 
+  #FIXME: Move to Libs
+  Array.class_eval do
+    def contains_duplicates?
+      self.uniq.size != self.size
+    end
+  end
+  
   validates_each :data_files do |model,attr,value|
-    model.errors.add(attr, 'May only contain one association to each data file') if value.uniq.size != value.size
+    model.errors.add(attr, 'May only contain one association to each data file') if value.contains_duplicates?
   end
 
   validates_presence_of :title

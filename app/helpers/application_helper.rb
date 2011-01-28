@@ -9,7 +9,7 @@ module ApplicationHelper
     #FIXME: very bad method name
     [Model,DataFile,Sop,Study,Assay,Investigation,Publication,Event]
 
-end
+  end
 
   #joins the list with seperator and the last item with an 'and'
   def join_with_and list, seperator=", "
@@ -357,6 +357,7 @@ end
   
   def get_object_title(item)
     title = ""
+    
     if ["Person", "Institution", "Project"].include? item.class.name
       title = h(item.name)          
     else
@@ -377,7 +378,57 @@ end
       count = ActivityLog.count(:conditions => {:action => actions, :activity_loggable_type => object.class.name, :activity_loggable_id => object.id})
     end
     count
-  end 
+  end
+
+  def set_parameters_for_sharing_form
+    object = eval "@#{controller_name.singularize}"
+    policy = nil
+    policy_type = ""
+
+    # obtain a policy to use
+    if object
+      if object.instance_of? Project
+        if object.default_policy
+          policy = object.default_policy
+          policy_type ="project"
+        else
+          policy = Policy.system_default
+          policy.sharing_scope = Policy::ALL_REGISTERED_USERS
+          policy_type = "system"
+        end
+      elsif (policy = object.policy)
+        # object exists and has a policy associated with it - normal case
+        policy_type = "asset"
+      elsif object.project && (policy = object.project.default_policy)
+        # object exists, but policy not attached - try to use project default policy, if exists
+        policy_type = "project"
+      end
+    end
+
+    unless policy
+      policy = Policy.default()
+      policy_type = "system"
+    end
+
+    # set the parameters
+    # ..from policy
+    @policy = policy
+    @policy_type = policy_type
+    @sharing_mode = policy.sharing_scope
+    @access_mode = policy.access_type
+    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
+    @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
+    @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
+
+    # ..other
+    @resource_type = object.class.name
+    @favourite_groups = current_user.favourite_groups
+    @resource = object
+
+    @all_people_as_json = Person.get_all_as_json
+
+    @enable_black_white_listing = @resource.nil? || (@resource.respond_to?(:contributor) and !@resource.contributor.nil?)
+  end
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}

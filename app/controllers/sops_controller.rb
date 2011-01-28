@@ -9,7 +9,6 @@ class SopsController < ApplicationController
   before_filter :find_sop_auth, :except => [ :index, :new, :create, :request_resource,:preview , :test_asset_url]
   before_filter :find_display_sop, :only=>[:show,:download]
   
-  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]
   
   def new_version
     if (handle_data nil)      
@@ -118,7 +117,6 @@ class SopsController < ApplicationController
           end
         else
           format.html { 
-            set_parameters_for_sharing_form()
             render :action => "new" 
           }
         end
@@ -159,7 +157,6 @@ class SopsController < ApplicationController
         end
       else
         format.html { 
-          set_parameters_for_sharing_form()
           render :action => "edit" 
         }
       end

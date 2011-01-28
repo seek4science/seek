@@ -205,7 +205,7 @@ class ApplicationController < ActionController::Base
                    :controller_name=>c,
                    :activity_loggable => object)
       end 
-      when "data_files","models","sops","publications"
+      when "data_files","models","sops","publications","events"
       if ["show","create","update","destroy","download"].include?(a)
         ActivityLog.create(:action => a,
                    :culprit => current_user,

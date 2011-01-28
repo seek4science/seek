@@ -8,15 +8,13 @@ class DataFilesController < ApplicationController
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
-  
+
   before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_data_file_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
   before_filter :find_display_data_file, :only=>[:show,:download]
-  
-  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit ]        
-  
+    
   def new_version
     if (handle_data nil)          
       comments=params[:revision_comment]
@@ -98,7 +96,6 @@ class DataFilesController < ApplicationController
           end
         else
           format.html {
-            set_parameters_for_sharing_form()
             render :action => "new"
           }
         end
@@ -163,7 +160,6 @@ class DataFilesController < ApplicationController
         end
       else
         format.html {
-          set_parameters_for_sharing_form()
           render :action => "edit"
         }
       end
@@ -253,47 +249,6 @@ class DataFilesController < ApplicationController
       end
       return false
     end
-  end
-  
-  def set_parameters_for_sharing_form
-    policy = nil
-    policy_type = ""
-    
-    # obtain a policy to use
-    if @data_file
-      if (policy = @data_file.policy)
-        # Datafile exists and has a policy associated with it - normal case
-        policy_type = "asset"
-      elsif @data_file.project && (policy = @data_file.project.default_policy)
-        # Datafile exists, but policy not attached - try to use project default policy, if exists
-        policy_type = "project"
-      end
-    end
-    
-    unless policy
-      policy = Policy.default()
-      policy_type = "system"      
-    end
-    
-    # set the parameters
-    # ..from policy
-    @policy = policy
-    @policy_type = policy_type
-    @sharing_mode = policy.sharing_scope
-    @access_mode = policy.access_type
-    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
-    @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
-    @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
-    
-    # ..other
-    @resource_type = "DataFile"
-    @favourite_groups = current_user.favourite_groups
-    @resource = @data_file
-    
-    @all_people_as_json = Person.get_all_as_json
-    
-    @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
-    
   end
   
 end
