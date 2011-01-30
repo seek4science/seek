@@ -1,5 +1,5 @@
 ActionMailer::Base.smtp_settings= {
-  :address => "",
+  :address => "vbemail30.villa-bosch.de",
   :port => "25",
   :domain => "",
   :authentication => :plain,

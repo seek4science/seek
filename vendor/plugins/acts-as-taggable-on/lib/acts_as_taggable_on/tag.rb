@@ -21,7 +21,12 @@ class Tag < ActiveRecord::Base
     read_attribute(:count).to_i
   end
 
-  def total
-    taggings.select{|tg| !tg.taggable.nil?}.count
+  def total 
+    # "if" added by WM
+    if taggings.nil? 
+        taggings.select{|tg| !tg.taggable.nil?}.count
+    else
+      0
+    end
   end
 end
