@@ -539,9 +539,25 @@
 
 	<xsd:complexType name="Event">
 		<xsd:complexContent>
-			<xsd:extension base="AssetType">
+			<xsd:extension base="MinimalType">
 				<xsd:sequence>
-					<xsd:element name="associated" type="AssociatedItems"
+                                    <xsd:element name="uuid" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="project" type="ProjectItem" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="start_date" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="end_date" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="url" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="city" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="country" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="address" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="associated" type="AssociatedItems"
 						minOccurs="1" maxOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>

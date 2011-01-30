@@ -2,7 +2,7 @@ require 'test_helper'
 
 class EventsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
-  #include RestTestCases
+  include RestTestCases
 
   def setup
     login_as(:datafile_owner)
