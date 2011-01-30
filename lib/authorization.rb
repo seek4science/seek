@@ -14,7 +14,7 @@ module Authorization
   
   #the types of Assets supported by the Authorization module
   ASSET_TYPES = ["Sop","Model","DataFile","Publication",
-                 "Sop::Version","Model::Version","DataFile::Version","Publication"]
+                 "Sop::Version","Model::Version","DataFile::Version","Publication","Event"]
   
   # 1) action_name - name of the action that is about to happen with the "thing"
   # 2) thing_type - class name of the thing that needs to be authorized;
@@ -28,7 +28,7 @@ module Authorization
 
     #Don't try and authorize things that don't have policies!
     unless ASSET_TYPES.include?(thing.class.name)
-      return true
+      return true 
     end
     
     # check first if the action that is being executed is know

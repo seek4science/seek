@@ -9,6 +9,31 @@ class EventsControllerTest < ActionController::TestCase
     @object=events(:event_with_no_files)
   end
 
+  def test_title
+    get :index
+    assert_response :success
+    assert_select "title",:text=>/The Sysmo SEEK.*/, :count=>1
+  end
+
+  test "should show index" do
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:events)
+  end
+
+  test "shouldn't show hidden items in index" do
+    login_as(:aaron)
+    get :index, :page => "all"
+    assert_response :success
+    assert_equal assigns(:events).sort_by(&:id), Authorization.authorize_collection("view", assigns(:events), users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
+    assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
+  end
+
+  test "should show event" do
+    get :show, :id => events(:event_with_no_files).id
+    assert_response :success
+  end
+
   fixtures :all
   test "should destroy Event" do
     assert_difference('Event.count', -1) do
@@ -32,6 +57,20 @@ class EventsControllerTest < ActionController::TestCase
   test "should create valid event" do
     assert_difference('Event.count', 1) do
       post :create, :event => valid_event
+    end
+  end
+
+  test "should not create invalid event" do
+    assert_difference('Event.count', 0) do
+      post :create, :event => {}
+    end
+  end
+
+  test "should not create event with invalid url" do
+    event = valid_event
+    event[:url] = "--"
+    assert_difference('Event.count', 0) do
+      post :create, :event => event
     end
   end
 

@@ -34,7 +34,6 @@ class EventsController < ApplicationController
   end
 
   def create
-    p params.inspect
     @event = Event.new params[:event]
     @event.contributor=current_user
     data_file_ids = params[:data_file_ids] || []
@@ -56,7 +55,28 @@ class EventsController < ApplicationController
   end
 
   def find_event_auth
-    @event = Event.find(params[:id])
+    begin
+      action=action_name
+      event = Event.find(params[:id])
+
+      if Authorization.is_authorized?(action, nil, event, current_user)
+        @event = event
+      else
+        respond_to do |format|
+          flash[:error] = "You are not authorized to perform this action"
+          format.html { redirect_to events_path }
+          #FIXME: this isn't the right response - should return with an unauthorized status code
+          format.xml { redirect_to events_path(:format=>"xml") }
+        end
+        return false
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        flash[:error] = "Couldn't find the Event or you are not authorized to view it"
+        format.html { redirect_to events_path }
+      end
+      return false
+    end
   end
 
   def edit
