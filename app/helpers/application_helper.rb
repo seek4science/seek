@@ -7,8 +7,11 @@ module ApplicationHelper
   def creatable_classes
     #FIXME: make these discovered automatically.
     #FIXME: very bad method name
-    [Model,DataFile,Sop,Study,Assay,Investigation,Publication,Event]
+    creatables = [Model,DataFile,Sop,Study,Assay,Investigation,Publication,Event]
 
+    creatables.delete(Event) unless EVENTS_ENABLED
+
+    creatables
   end
 
   #joins the list with seperator and the last item with an 'and'
