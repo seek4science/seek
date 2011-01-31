@@ -1,5 +1,14 @@
 ODE:
-  title: Ordinary differential equations
+  title: Ordinary differential equations (ODE)
+
+PDE:
+  title: Partial differential equations (PDE)
+
+boolean:
+  title: Boolean network
+
+Petri:
+  title: Petri net
 
 linear equations:
   title: Linear equations
@@ -7,8 +16,14 @@ linear equations:
 algebraic equations:
   title: Algebraic equations
 
-partial differential equations:
-  title: Partial differential equations
+bayesian:
+  title: Bayesian network
+
+graphical:
+  title: Graphical model
+
+stoichiometric:
+  title: Stoichiometric model
 
 agent based modelling:
   title: Agent based modelling

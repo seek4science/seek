@@ -1,29 +1,51 @@
-SBML:
-  title: SBML
+BioPAX:
+  title: BioPAX
 
 CellML:
   title: CellML
 
-SciLab:
-  title: SciLab
+FieldML:
+  title: Field Modelling Markup Language (FieldML)
 
-XPP:
-  title: XPP
+GraphML:
+  title: GraphML
 
-BioPAX:
-  title: BioPAX
+Image:
+  title: Image
 
-VCell:
-  title: VCell
-
-Matlab:
-  title: Matlab package
-
-R:
-  title: R package
+KGML:
+  title: KEGG Markup Language (KGML)
 
 Mathematica:
   title: Mathematica
 
+Matlab:
+  title: Matlab package
+
 MFAML:
   title: MFAML
+
+PDF:
+  title: PDF (Model description)
+
+R:
+  title: R package
+
+SBML:
+  title: SBML
+
+SciLab:
+  title: SciLab
+
+SVG:
+  title: SVG
+
+SXML:
+  title: SXML
+
+VCML:
+  title: Virtual Cell Markup Language (VCML)
+
+XPP:
+  title: XPP
+

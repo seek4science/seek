@@ -7,7 +7,7 @@ genomics:
   title: genomics
   children: comparative_genomics,DNA_sequencing,genotyping,primer_design,SNP_detection  
 
-comparative_genomics:
+comparative_genomics: 
   title: comparative genomics
 
 DNA_sequencing:
@@ -25,23 +25,17 @@ SNP_detection:
 #---------------------------
 metabolomics:
   title: metabolomics
-  children: cell_growth_optimisation,metabolite_profiling,metabonomics
-
-cell_growth_optimisation:
-  title: cell growth optimisation
+  children: metabolite_profiling,metabonomics
 
 metabolite_profiling:
   title: metabolite profiling
-  children: catabolic_response,glucose_pulse, flux_balance_analysis
+  children: catabolic_response,flux_balance_analysis
 
 flux_balance_analysis:
   title: flux balanace analysis
 
 catabolic_response:
   title: catabolic response
-
-glucose_pulse:
-  title: glucose pulse
 
 metabonomics:
   title: metabonomics
