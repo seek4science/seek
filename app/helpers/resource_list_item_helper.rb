@@ -16,7 +16,7 @@ module ResourceListItemHelper
   def get_list_item_avatar_partial resource
     #FIXME: get rid of hard coded asset names
     avatar_partial = ""
-    if ["DataFile","Model","Sop"].include?(resource.class.name.split("::").first)
+    if ["DataFile","Model","Sop","Event"].include?(resource.class.name.split("::").first)
       avatar_partial = "layouts/asset_resource_avatars"
     elsif resource.class.name == "Publication"
       unless resource.creators.empty?
@@ -51,6 +51,12 @@ module ResourceListItemHelper
         html << "<p>#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
       when "Person"
         html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
+      when "Event"
+        image = image_tag icon_filename_for_key("event_avatar"), :style => "height: 24px; vertical-align: middle"
+        icon = link_to_draggable image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=>"asset", :title=>tooltip_title_attrib(get_object_title(resource))
+        html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
+        html << list_item_visibility(resource.policy) if Authorization.is_authorized?("manage",nil,resource,current_user)
+        html << "<br style=\"clear:both\"/>"
       else
         html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
     end

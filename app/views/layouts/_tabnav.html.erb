@@ -57,6 +57,8 @@
       <%= link_to "Forums", forums_path -%>
     </li>
 
+    <%= tab_definition :controllers=>["events"], :gap_before=>true  -%>
+
     <!-- Help tab -->
     <li <%= (["help_documents"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
       <%= link_to "Help", help_documents_path -%>

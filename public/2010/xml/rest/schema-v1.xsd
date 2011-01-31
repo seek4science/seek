@@ -534,7 +534,65 @@
 		</xsd:sequence>
 	</xsd:complexType>
 
-	<xsd:element name="sops" type="Sops"></xsd:element>
+        <xsd:element name="events" type="Events"></xsd:element>
+	<xsd:element name="event" type="Event"></xsd:element>
+
+	<xsd:complexType name="Event">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalType">
+				<xsd:sequence>
+                                    <xsd:element name="uuid" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="project" type="ProjectItem" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="start_date" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="end_date" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="url" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="city" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="country" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="address" type="xsd:string" minOccurs="1"
+						maxOccurs="1"></xsd:element>
+                                    <xsd:element name="associated" type="AssociatedItems"
+						minOccurs="1" maxOccurs="1"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Events">
+		<xsd:complexContent>
+			<xsd:extension base="MinimalIndex">
+				<xsd:sequence>
+					<xsd:element name="parameters" type="Parameters"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="statistics" type="PagedStatistics"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+					<xsd:element name="items" type="EventItems" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="related" type="xsd:anyType"
+						minOccurs="0" maxOccurs="1">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="EventItems">
+		<xsd:sequence>
+			<xsd:element name="event" type="AssetItem" maxOccurs="unbounded"
+				minOccurs="0"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+        <xsd:element name="sops" type="Sops"></xsd:element>
 	<xsd:element name="sop" type="Sop"></xsd:element>
 
 	<xsd:complexType name="Sop">
@@ -576,7 +634,7 @@
 	</xsd:complexType>
 
 
-	<xsd:element name="institution" type="Institution"></xsd:element>
+        <xsd:element name="institution" type="Institution"></xsd:element>
 	<xsd:element name="institutions" type="Institutions"></xsd:element>
 
 	<xsd:complexType name="Institution">
@@ -1057,6 +1115,8 @@
 			<xsd:enumeration value="Models"></xsd:enumeration>
 			<xsd:enumeration value="Sop"></xsd:enumeration>			
 			<xsd:enumeration value="Sops"></xsd:enumeration>
+			<xsd:enumeration value="Event"></xsd:enumeration>
+			<xsd:enumeration value="Events"></xsd:enumeration>
 			<xsd:enumeration value="DataFile"></xsd:enumeration>			
 			<xsd:enumeration value="DataFiles"></xsd:enumeration>
 			<xsd:enumeration value="Assay"></xsd:enumeration>
@@ -1093,6 +1153,7 @@
 			<xsd:element name="assays" type="AssociatedAssays"></xsd:element>
 			<xsd:element name="projects" type="AssociatedProjects"></xsd:element>
 			<xsd:element name="data_files" type="AssociatedDataFiles"></xsd:element>
+			<xsd:element name="events" type="AssociatedEvents"></xsd:element>
 			<xsd:element name="sops" type="AssociatedSops"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -1164,6 +1225,17 @@
 			<xsd:extension base="AssociatedLinks">
 				<xsd:sequence>
 					<xsd:element name="sop" type="ResourceLink" minOccurs="0"
+						maxOccurs="unbounded"></xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+        <xsd:complexType name="AssociatedEvents">
+		<xsd:complexContent>
+			<xsd:extension base="AssociatedLinks">
+				<xsd:sequence>
+					<xsd:element name="event" type="ResourceLink" minOccurs="0"
 						maxOccurs="unbounded"></xsd:element>
 				</xsd:sequence>
 			</xsd:extension>

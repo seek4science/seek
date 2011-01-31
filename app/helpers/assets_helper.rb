@@ -29,7 +29,7 @@ module AssetsHelper
     when "DataFile","Model","Sop"
       image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))))
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-    when "Investigation","Study","Publication"
+    when "Investigation","Study","Publication","Event"
       image = image "#{resource.class.name.downcase}_avatar",{}
       icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
     when "Assay"
@@ -94,7 +94,7 @@ module AssetsHelper
     name = resource.class.name.split("::")[0]
 
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-      "Study" => {}, "Assay" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}}
+      "Study" => {}, "Assay" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Event" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -165,11 +165,17 @@ module AssetsHelper
         related["DataFile"][:items] = resource.related_data_files
         related["Model"][:items] = resource.related_models
         related["Assay"][:items] = resource.related_assays
+      when "Event"
+        {"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
+         "Project" => [resource.project],
+         "DataFile" => resource.data_files}.each do |k,v|
+            related[k][:items] = v unless v.nil?
+         end
       else
     end
     
     #Authorize
-    ["Sop","Model","DataFile"].each do |asset_type|
+    ["Sop","Model","DataFile","Event"].each do |asset_type|
       unless related[asset_type][:items].empty?
         total_count = related[asset_type][:items].size
         related[asset_type][:items] = Asset.classify_and_authorize_homogeneous_resources(related[asset_type][:items], true, current_user)

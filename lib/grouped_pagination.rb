@@ -30,11 +30,11 @@ module GroupedPagination
       options=args.pop unless args.nil?
       options ||= {}
       
-      default_page = options[:default_page] || "latest"
+      default_page = options[:default_page] || "all"
       default_page = @pages.first if default_page == "first"      
       
       page = options[:page] || default_page            
-      
+    
       records=[]
       if page == "all"
         records=collection
@@ -79,7 +79,7 @@ module GroupedPagination
       options=args.pop unless args.nil?
       options ||= {}
       
-      default_page = options[:default_page] || "latest"
+      default_page = options[:default_page] || "all"
       default_page = @pages.first if default_page == "first"      
       
       page = options[:page] || default_page

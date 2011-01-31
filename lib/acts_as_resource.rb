@@ -7,7 +7,7 @@
 # * Copyright (c) 2007 University of Manchester and the University of Southampton.
 # * See license.txt for details.
 # ********************************************************************************
-
+require 'acts_as_authorized'
 module Mib
   module Acts #:nodoc:
     module Resource #:nodoc:
@@ -17,10 +17,11 @@ module Mib
       
       module ClassMethods
         def acts_as_resource
-          belongs_to :contributor, :polymorphic => true
+          acts_as_authorized
+          #belongs_to :contributor, :polymorphic => true
           
           #checks a policy exists, and if missing resorts to using a private policy
-          before_save :policy_or_default
+          #before_save :policy_or_default
           
           has_many :relationships, 
             :class_name => 'Relationship',
@@ -33,9 +34,9 @@ module Mib
             :conditions => { :predicate => Relationship::ATTRIBUTED_TO },
             :dependent => :destroy
 
-          belongs_to :project
+          #belongs_to :project
           
-          belongs_to :policy 
+          #belongs_to :policy
 
           has_many :assay_assets, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
           has_many :assays, :through => :assay_assets
@@ -61,11 +62,6 @@ module Mib
           self.relationships.select {|a| a.predicate == Relationship::ATTRIBUTED_TO}
         end
         
-        def policy_or_default
-          if self.policy.nil?
-            self.policy = Policy.private_policy
-          end
-        end
         
         def attributions_objects
           self.attributions.collect { |a| a.object }
@@ -75,22 +71,7 @@ module Mib
           self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
         end
 
-        def can_edit? user
-          Authorization.is_authorized? "edit",nil,self,user
-        end
-
-        def can_view? user
-          Authorization.is_authorized? "view",nil,self,user
-        end
-
-        def can_download? user
-          Authorization.is_authorized? "download",nil,self,user
-        end
-
-        def can_delete? user
-          Authorization.is_authorized? "destroy",nil,self,user
-        end
-      
+        
         def cache_remote_content_blob
           if self.content_blob && self.content_blob.data.nil? && self.content_blob.url && self.project
             begin
@@ -107,17 +88,6 @@ module Mib
               puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
             end
           end
-        end
-
-        #returns a list of the people that can manage this file
-        #which will be the contributor, and those that have manage permissions
-        def managers
-          people=[]
-          people << self.contributor.person unless self.contributor.nil?
-          self.policy.permissions.each do |perm|
-            people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
-          end
-          return people.uniq
         end
         
        # def asset; return self; end        

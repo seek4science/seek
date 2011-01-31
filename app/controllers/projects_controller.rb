@@ -9,8 +9,6 @@ class ProjectsController < ApplicationController
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update,:admin]
   
-  before_filter :set_parameters_for_sharing_form, :only => [ :new, :edit, :admin ]
-
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
 
   def auto_complete_for_organism_name
@@ -200,50 +198,6 @@ class ProjectsController < ApplicationController
     @projects = Project.paginate :page=>params[:page], :default_page => "all"
   end
   
-  def set_parameters_for_sharing_form
-    policy = nil
-    policy_type = ""
-
-    # obtain a policy to use
-    if defined?(@project)
-      if @project.default_policy
-        policy = @project.default_policy
-        policy_type = "project"
-      end
-    end
-
-    unless policy
-      # several scenarios could lead to this point:
-      # 1) this is a "new" action - no Model exists yet; use default policy:
-      #    - if current user is associated with only one project - use that project's default policy;
-      #    - if current user is associated with many projects - use system default one;
-      # 2) this is "edit" action - Model exists, but policy wasn't attached to it;
-      #    (also, Model wasn't attached to a project or that project didn't have a default policy) --
-      #    hence, try to obtain a default policy for the contributor (i.e. owner of the Model) OR system default
-      policy = Policy.system_default()
-      #Set the sharing scope to all_registered_users, instead of private, because if private only the system
-      # would be able to view the resource, which is pointless.
-      policy.sharing_scope = Policy::ALL_REGISTERED_USERS  
-      policy_type = "system"
-      
-    end
-
-    # set the parameters
-    # ..from policy
-    @policy = policy
-    @policy_type = policy_type
-    @sharing_mode = policy.sharing_scope
-    @access_mode = policy.access_type
-    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
-    @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
-    @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
-
-    # ..other
-    @resource_type = "Project"
-    @favourite_groups = current_user.favourite_groups
-
-    @all_people_as_json = Person.get_all_as_json
-  end
 
   private  
 
