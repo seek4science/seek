@@ -281,4 +281,22 @@ class AdminControllerTest < ActionController::TestCase
 
   end
 
+  test "update admins" do
+    login_as(:quentin)
+    quentin=people(:quentin_person)
+    aaron=people(:aaron_person)
+    
+    assert quentin.is_admin?
+    assert !aaron.is_admin?
+
+    post :update_admins,:admins=>[aaron.id]
+
+    quentin.reload
+    aaron.reload
+
+    assert !quentin.is_admin?
+    assert aaron.is_admin?
+    
+  end
+
 end
