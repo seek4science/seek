@@ -9,7 +9,7 @@ module IndexPager
     @hidden=0
     params[:page] ||= "latest"    
     
-    if Authorization::ASSET_TYPES.include?(model_class.name)
+    if !objects.empty? && Authorization::authorization_supported?(objects.first)
       authorized=[]
       auth_pages={}      
       objects.each do |object|
