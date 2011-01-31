@@ -12,9 +12,10 @@ module Authorization
   
   @@logger = RAILS_DEFAULT_LOGGER
   
-  #the types of Assets supported by the Authorization module
-  ASSET_TYPES = ["Sop","Model","DataFile","Publication",
-                 "Sop::Version","Model::Version","DataFile::Version","Publication"]
+  #determines when the thing passed supports authorization
+  def self.authorization_supported? thing
+    thing.respond_to?(:policy) && thing.respond_to?(:contributor)
+  end
   
   # 1) action_name - name of the action that is about to happen with the "thing"
   # 2) thing_type - class name of the thing that needs to be authorized;
@@ -27,9 +28,7 @@ module Authorization
     # ***************************************
 
     #Don't try and authorize things that don't have policies!
-    unless ASSET_TYPES.include?(thing.class.name)
-      return true
-    end
+    return true unless authorization_supported?(thing)
     
     # check first if the action that is being executed is know
     # - it should be, if not there's a bug in the code
