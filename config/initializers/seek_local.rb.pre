@@ -2,7 +2,7 @@
 JERM_ENABLED = true
 
 #Enable search. Requires Solr to be running.
-SOLR_ENABLED = true
+SOLR_ENABLED = false
 
 #Enable email
 EMAIL_ENABLED = false
