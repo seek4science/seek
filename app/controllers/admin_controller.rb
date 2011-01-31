@@ -9,18 +9,18 @@ class AdminController < ApplicationController
   end
 
   def update_admins
-    admin_ids = params[:admins]
-    current_admins = Person.registered.select{|p| p.is_admin?}
+    admin_ids = params[:admins] || []
+    current_admins = Person.all.select{|p| p.is_admin?}
     admins = admin_ids.collect{|id| Person.find(id)}
-    current_admins.each{|ca| ca.user.is_admin=false}
-    admins.each{|a| a.user.is_admin=true}
+    current_admins.each{|ca| ca.is_admin=false}
+    admins.each{|a| a.is_admin=true}
     (admins | current_admins).each do |admin|
-      class << admin.user
+      class << admin
         def record_timestamps
           false
         end
       end
-      admin.user.save
+      admin.save
     end
     redirect_to :action=>:show
   end

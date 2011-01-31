@@ -89,8 +89,18 @@ module Seek
       project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.name
       resource_type = asset.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
-      data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
-      send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+      begin
+        data_hash = downloader.get_remote_data asset.content_blob.url,project.site_username,project.site_password, resource_type
+        send_file data_hash[:data_tmp_path], :filename => data_hash[:filename] || asset.original_filename, :content_type => data_hash[:content_type] || asset.content_type, :disposition => 'attachment'
+      rescue Seek::DownloadException=>de
+        #FIXME: use proper logging
+        puts "Unable to fetch from remote: #{de.message}"
+        if asset.content_blob.file_exists?
+          send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+        else
+          raise de
+        end
+      end
     end
     
     def download_via_url asset    
@@ -207,16 +217,25 @@ module Seek
         else
           send_data asset.content_blob.data, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'  
         end      
-      else        
-        if asset.contributor.nil? #A jerm generated resource
-          download_jerm_asset asset
-        else
-          if asset.content_blob.file_exists?
-            send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
-          else                        
-            download_via_url asset            
+      else
+        begin
+          if asset.contributor.nil? #A jerm generated resource
+            download_jerm_asset asset
+          else
+            if asset.content_blob.file_exists?
+              send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
+            else
+              download_via_url asset
+            end
           end
-        end                 
+        rescue Seek::DownloadException=>de
+          flash[:error]="There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
+          if (asset.class.name.include?("::Version"))
+            redirect_to asset.parent,:version=>asset.version
+          else
+            redirect_to asset
+          end
+        end
       end
     end
   end
