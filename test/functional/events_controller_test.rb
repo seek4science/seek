@@ -29,6 +29,11 @@ class EventsControllerTest < ActionController::TestCase
     assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
   end
 
+  test "should create hidden event by default" do
+    post :create, :event => valid_event
+    assert !Authorization.is_authorized?("view", nil, assigns(:event), users(:aaron)) #must be a user other than the one you are logged in as
+  end
+
   test "should show event" do
     get :show, :id => events(:event_with_no_files).id
     assert_response :success

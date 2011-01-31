@@ -45,8 +45,15 @@ class EventsController < ApplicationController
 
     respond_to do | format |
       if @event.save
-        flash.now[:notice] = 'Event was successfully saved.'
-        format.html { redirect_to @event}
+        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
+
+        if policy_err_msg.blank?
+          flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
+          format.html { redirect_to @event }
+        else
+          flash[:notice] = "Event was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to event_edit_path(@event)}
+        end
       else
         @new = true
         format.html {render "events/form"}
@@ -92,14 +99,21 @@ class EventsController < ApplicationController
       @event.data_files << DataFile.find(a_id)
     end
     params.delete :data_file_ids
-    if @event.update_attributes params[:event]
-      respond_to do | format |
-        flash[:notice] = "The Event was updated successfully."
-        format.html {redirect_to @event}
+    respond_to do | format |
+      if @event.update_attributes params[:event]
+        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
+ 
+        if policy_err_msg.blank?
+          flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
+          format.html { redirect_to @event }
+        else
+          flash[:notice] = "Event metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to event_edit_path(@event)}
+        end
+      else
+        @new = false
+        format.html {render "events/form"}
       end
-    else
-      @new = false
-      render "events/form"
     end
   end
 
