@@ -15,6 +15,10 @@ module Acts #:nodoc:
       mod.extend(ClassMethods)
     end
 
+    def is_asset?
+      self.class.is_asset?
+    end
+
     module ClassMethods
       def acts_as_asset
         acts_as_authorized
@@ -92,6 +96,7 @@ module Acts #:nodoc:
 
     end
   end
+
 end
 
 

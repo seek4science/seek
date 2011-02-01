@@ -17,6 +17,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test "is asset?" do
     assert Model.is_asset?
+    assert models(:teusink).is_asset?
   end
   
   test "project" do

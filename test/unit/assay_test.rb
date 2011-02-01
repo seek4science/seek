@@ -12,6 +12,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_asset?" do
     assert !Assay.is_asset?
+    assert !assays(:metabolomics_assay).is_asset?
   end
 
   test "is_modelling" do
