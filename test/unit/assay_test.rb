@@ -15,6 +15,11 @@ class AssayTest < ActiveSupport::TestCase
     assert !assays(:metabolomics_assay).is_asset?
   end
 
+  test "authorization supported?" do
+    assert !Assay.authorization_supported?
+    assert !assays(:metabolomics_assay).authorization_supported?
+  end
+
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
     assert !assay.is_modelling?

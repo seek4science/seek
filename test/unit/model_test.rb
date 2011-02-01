@@ -19,6 +19,12 @@ class ModelTest < ActiveSupport::TestCase
     assert Model.is_asset?
     assert models(:teusink).is_asset?
   end
+
+  test "authorization supported?" do
+    assert Model.authorization_supported?
+    assert models(:teusink).authorization_supported?
+  end
+
   
   test "project" do
     model=models(:teusink)

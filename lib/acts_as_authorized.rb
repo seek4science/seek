@@ -4,6 +4,10 @@ module Acts #:nodoc:
       mod.extend(ClassMethods)
     end
 
+    def authorization_supported?
+      self.class.authorization_supported?
+    end
+
     module ClassMethods
       def acts_as_authorized
         belongs_to :contributor, :polymorphic => true
@@ -21,6 +25,11 @@ module Acts #:nodoc:
         include Acts::Authorized::InstanceMethods
 
       end
+
+      def authorization_supported?
+        include?(Acts::Authorized::InstanceMethods)
+      end
+
     end
 
     module SingletonMethods
