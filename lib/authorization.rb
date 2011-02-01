@@ -11,7 +11,10 @@
 module Authorization
   
   @@logger = RAILS_DEFAULT_LOGGER
-  
+
+  def self.authorization_supported? thing
+    !thing.nil? && thing.authorization_supported?
+  end
 
   
   # 1) action_name - name of the action that is about to happen with the "thing"
@@ -25,7 +28,7 @@ module Authorization
     # ***************************************
 
     #Don't try and authorize things that don't have policies!
-    return true unless thing.authorization_supported?
+    return true unless authorization_supported?(thing)
     
     # check first if the action that is being executed is know
     # - it should be, if not there's a bug in the code
