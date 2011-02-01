@@ -17,6 +17,7 @@ GEM
     activeresource (2.3.8)
       activesupport (= 2.3.8)
     activesupport (2.3.8)
+    calendar_date_select (1.16.2)
     fastercsv (1.5.1)
     hpricot (0.8.3)
     libxml-ruby (1.1.3)
@@ -56,6 +57,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth (~> 4.2.3)
+  calendar_date_select
   fastercsv (= 1.5.1)
   hpricot (~> 0.8.2)
   libxml-ruby (= 1.1.3)
