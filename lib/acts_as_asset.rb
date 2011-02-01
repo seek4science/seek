@@ -19,6 +19,10 @@ module Acts #:nodoc:
       self.class.is_asset?
     end
 
+    def is_downloadable_asset?
+      is_asset? && respond_to?(:content_blob)
+    end
+
     module ClassMethods
       def acts_as_asset
         acts_as_authorized

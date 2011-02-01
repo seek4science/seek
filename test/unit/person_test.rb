@@ -8,7 +8,13 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:quentin_person)
     assert_equal 2,p.work_groups.size
   end
-  
+
+  def test_is_asset
+    assert !Person.is_asset?
+    assert !people(:quentin_person).is_asset?
+    assert !people(:quentin_person).is_downloadable_asset?
+  end
+
   def test_admins_named_scope
     admins=Person.admins
     assert_equal 1,admins.size

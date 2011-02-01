@@ -1,16 +1,16 @@
 module ResourceListItemHelper  
   
   def get_list_item_content_partial resource
-    return get_original_model_name(resource).pluralize.underscore + "/resource_list_item"
+    get_original_model_name(resource).pluralize.underscore + "/resource_list_item"
   end
   
   def get_list_item_actions_partial resource
-    if ["DataFile","Model","Sop"].include?(resource.class.name.split("::").first)
+    if resource.authorization_supported? && resource.is_downloadable_asset?
       actions_partial = "assets/resource_actions_td"
     else
       actions_partial = nil
     end
-    return actions_partial
+    actions_partial
   end
   
   def get_list_item_avatar_partial resource
