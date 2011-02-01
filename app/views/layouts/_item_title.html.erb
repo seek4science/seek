@@ -5,9 +5,7 @@ avatar=resource_title_draggable_avatar item
 title_prefix||="" 
 title_postfix||=""
 %>
-<div class="contribution_title">
-    <% if ["Investigation","Study","Assay","DataFile","Model","Sop","Publication"].include?(item.class.name) %>
-    <% end %>
+<div class="contribution_title">    
     <% unless avatar.blank? -%>
     <span class="contribution_title_image"><%= avatar -%>
     </span>

@@ -1,4 +1,11 @@
 class SiteAnnouncement < ActiveRecord::Base
+
+  class BodyHelper
+    include ActionView::Helpers::TextHelper
+    include ActionView::Helpers::TagHelper
+    include ActionView::Helpers::UrlHelper
+  end
+
   belongs_to :site_announcement_category
   belongs_to :announcer,:polymorphic=>true
 
@@ -16,7 +23,14 @@ class SiteAnnouncement < ActiveRecord::Base
   end
 
   def body_html
-    auto_link(simple_format(h(body)))
+    helper.auto_link(simple_format(h(body)))
+  end
+
+
+  private
+
+  def helper
+    @helper ||= BodyHelper.new
   end
   
 end

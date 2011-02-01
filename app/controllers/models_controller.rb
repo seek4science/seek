@@ -451,11 +451,10 @@ class ModelsController < ApplicationController
   # DELETE /models/1
   # DELETE /models/1.xml
   def destroy
-    @model = Model.find(params[:id])
     @model.destroy
     
     respond_to do |format|
-      format.html { redirect_to(models_url) }
+      format.html { redirect_to(models_path) }
       format.xml  { head :ok }
     end
   end

@@ -26,14 +26,18 @@ module MimeTypesHelper
   def mime_nice_name(mime)
     return mime_find(mime)[:name]
   end
+
+  def mime_icon_key mime
+    mime_find(mime)[:icon_key]
+  end
   
   #Get the appropriate file icon for the MIME type
   def mime_icon_url(mime)
-    return icon_filename_for_key(mime_find(mime)[:icon_key])
+    icon_filename_for_key(mime_icon_key(mime))
   end
   
   def mime_extension(mime)
-    return mime_find(mime)[:extension]
+    mime_find(mime)[:extension]
   end
   
   protected

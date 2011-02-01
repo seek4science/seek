@@ -1,68 +1,45 @@
 <% if logged_in? && !current_user.person.nil? -%>
-  <div>
-    <ul class="tabnav">
+    <div>
+      <ul class="tabnav">
 
-      <!-- People tab -->
-      <li <%= (["people"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-        <%= link_to "People", people_path -%>
-      </li>
+        <!-- People tab -->
+        <%= tab_definition :controllers=>["people"] -%>
 
-      <!-- Projects tab -->
-      <li <%= (["projects"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-        <%= link_to "Projects", projects_path -%>
-      </li>
+        <!-- Projects tab -->
+        <%= tab_definition :controllers=>["projects"] -%>
 
-      <!-- Institutions tab -->
-      <li <%= (["institutions"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %>>
-        <%= link_to "Institutions", institutions_path -%>
-      </li>
+        <!-- Institutions tab -->
+        <%= tab_definition :controllers=>["institutions"] -%>
 
-      <!-- Investigations tab -->
-      <li <%= (["investigations"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before">
-        <%= link_to "Investigations", investigations_path -%>
-      </li>
+        <!-- Investigations tab -->
+        <%= tab_definition :controllers=>["investigations"], :gap_before=>true -%>
 
-      <!-- Studies tab -->
-      <li <%= (["studies"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-        <%= link_to "Studies", studies_path -%>
-      </li>
+        <!-- Studies tab -->
+        <%= tab_definition :controllers=>["studies"] -%>
 
-      <!-- Assays tab -->
-      <li <%= (["assays"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-        <%= link_to "Assays", assays_path -%>
-      </li>
+        <!-- Assays tab -->
+        <%= tab_definition :controllers=>["assays"] -%>
 
-      <!-- Data tab -->
-      <li <%= (["data_files"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
-        <%= link_to "Data", data_files_path -%>
-      </li>
+        <!-- Data tab -->
+        <%= tab_definition :controllers=>["data_files"],:title=>"Data", :gap_before=>true -%>
 
-      <!-- Models tab -->
-      <li <%= (["models"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-      <%= link_to "Models", models_path -%>
-    </li>
+        <!-- Models tab -->
+        <%= tab_definition :controllers=>["models"] -%>
 
-    <!-- SOPs tab -->
-    <li <%= (["sops"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-      <%= link_to "SOPs", sops_path -%>
-    </li>
-    
-    <!-- Publications tab -->
-    <li <%= (["publications"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> >
-      <%= link_to "Publications", publications_path -%>
-    </li>
+        <!-- SOPs tab -->
+        <%= tab_definition :controllers=>["sops"] -%>
 
-    <!-- Forums tab -->
-    <li <%= (["forums","topics"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
-      <%= link_to "Forums", forums_path -%>
-    </li>
+        <!-- Publications tab -->
+        <%= tab_definition :controllers=>["publications"] -%>
 
-    <%= tab_definition :controllers=>["events"], :gap_before=>true  -%>
+        <!-- Forums tab -->
+        <%= tab_definition :controllers=>["forums","topics"], :gap_before=>true -%>
 
-    <!-- Help tab -->
-    <li <%= (["help_documents"].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '') %> class="tab_gap_before" >
-      <%= link_to "Help", help_documents_path -%>
-    </li>
-  </ul>
-  </div>
-<% end  -%>
+        <!-- Events tab -->
+        <%= tab_definition :controllers=>["events"], :gap_before=>true if EVENTS_ENABLED -%>
+
+        <!-- Help tab -->
+        <%= tab_definition :controllers=>["help_documents"],:title=>"Help",:gap_before=>true -%>
+      </ul>
+    </div>
+<% end -%>

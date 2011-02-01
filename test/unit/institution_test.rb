@@ -17,6 +17,12 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal (n_wg-1), WorkGroup.find(:all).size, "the workgroup should also have been destroyed"
   end
 
+  def test_avatar_key
+    i=institutions(:one)
+    assert_nil i.avatar_key
+    assert i.defines_own_avatar?
+  end
+
   def test_title_trimmed
     i=Institution.new(:title=>" an institution")
     i.save!

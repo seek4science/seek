@@ -14,6 +14,14 @@ class SopTest < ActiveSupport::TestCase
     sop.save!
     assert_equal("test sop",sop.title)
   end
+
+  def test_avatar_key
+    assert_nil sops(:editable_sop).avatar_key
+    assert sops(:editable_sop).use_mime_type_for_avatar?
+
+    assert_nil sop_versions(:my_first_sop_v1).avatar_key
+    assert sop_versions(:my_first_sop_v1).use_mime_type_for_avatar?
+  end
   
   def test_defaults_to_private_policy
     sop=Sop.new(:title=>"A sop with no policy")

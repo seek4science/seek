@@ -13,6 +13,14 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal blob,datafile.content_blob    
   end
 
+  def test_avatar_key
+    assert_nil data_files(:picture).avatar_key
+    assert data_files(:picture).use_mime_type_for_avatar?
+
+    assert_nil data_file_versions(:picture_v1).avatar_key
+    assert data_file_versions(:picture_v1).use_mime_type_for_avatar?
+  end
+
   test "project" do
     df=data_files(:sysmo_data_file)
     p=projects(:sysmo_project)

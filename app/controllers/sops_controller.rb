@@ -168,7 +168,7 @@ class SopsController < ApplicationController
     @sop.destroy
     
     respond_to do |format|
-      format.html { redirect_to(sops_url) }
+      format.html { redirect_to(sops_path) }
     end
   end
   

@@ -1,4 +1,4 @@
-require 'acts_as_resource'
+require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
@@ -7,7 +7,7 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
-  acts_as_resource
+  acts_as_asset
   acts_as_trashable
   
   title_trimmer
@@ -70,6 +70,11 @@ class DataFile < ActiveRecord::Base
   
 
   def relationship_type(assay)
+    #FIXME: don't like this hardwiring to assay within data file, needs abstracting
     assay_assets.find_by_assay_id(assay.id).relationship_type  
+  end
+
+  def use_mime_type_for_avatar?
+    true
   end
 end

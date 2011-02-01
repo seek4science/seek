@@ -49,7 +49,7 @@ class DataFilesController < ApplicationController
     @data_file.destroy
     
     respond_to do |format|
-      format.html { redirect_to(data_files_url) }
+      format.html { redirect_to(data_files_path) }
       format.xml  { head :ok }
     end
   end

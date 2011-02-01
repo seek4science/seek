@@ -261,7 +261,7 @@ class ApplicationController < ActionController::Base
           pass = pass && (res.assay_ids.include?(params[:filter][:assay].to_i))
         end
         unless params[:filter][:person].blank?
-          if (res.respond_to?("creators") && res.respond_to?("contributor")) #an asset that acts_as_resource
+          if (res.class.is_asset?) #an asset that acts_as_asset
             #succeeds if and/or the creators contains the person, or the contributor is the person
             pass = pass && (res.creators.include?(Person.find_by_id(params[:filter][:person].to_i)) || (!res.contributor.nil? && res.contributor.person.id == params[:filter][:person].to_i))
           end          

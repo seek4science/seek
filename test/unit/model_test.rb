@@ -13,7 +13,25 @@ class ModelTest < ActiveSupport::TestCase
 
     blob=content_blobs(:teusink_blob)
     assert_equal blob,model.content_blob
-  end        
+  end
+
+  test "is asset?" do
+    assert Model.is_asset?
+    assert models(:teusink).is_asset?
+    
+    assert model_versions(:teusink_v1).is_asset?
+  end
+
+  test "avatar_key" do
+    assert_equal "model_avatar",models(:teusink).avatar_key
+    assert_equal "model_avatar",model_versions(:teusink_v1).avatar_key
+  end
+
+  test "authorization supported?" do
+    assert Model.authorization_supported?
+    assert models(:teusink).authorization_supported?
+    assert model_versions(:teusink_v1).authorization_supported?
+  end
   
   test "project" do
     model=models(:teusink)

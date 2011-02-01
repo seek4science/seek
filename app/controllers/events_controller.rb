@@ -4,6 +4,8 @@ class EventsController < ApplicationController
 
   before_filter :find_assets
 
+  before_filter :check_events_enabled
+
   include IndexPager
   
   def show
@@ -115,6 +117,20 @@ class EventsController < ApplicationController
         format.html {render "events/form"}
       end
     end
+  end
+
+  private
+
+  #filter to check if events are enabled using the EVENTS_ENABLED configuration flag
+  def check_events_enabled
+    if !EVENTS_ENABLED
+      respond_to do |format|
+        flash[:error]="Events are currently disabled"
+        format.html { redirect_to root_path }
+      end
+      return false
+    end
+    true
   end
 
 

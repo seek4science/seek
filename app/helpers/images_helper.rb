@@ -216,7 +216,7 @@ module ImagesHelper
       "misc_icons/green_virus-64x64.png"
       when "publication_avatar"
      "crystal_project/64x64/filesystems/file_doc.png"
-      when "saved_search"
+      when "saved_search_avatar"
       "crystal_project/32x32/actions/find.png"
       when "visit_pubmed"
       "famfamfam_silk/page_white_go.png"
@@ -348,9 +348,13 @@ module ImagesHelper
     url = file_type_icon_url(item)
     image_tag url, :class => "icon"
   end
-  
+
+  def file_type_icon_key(item)
+    mime_icon_key item.content_type
+  end
+
   def file_type_icon_url(item)
-    return mime_icon_url(item.content_type)
+    mime_icon_url item.content_type
   end
   
   def expand_image(margin_left="0.3em")
