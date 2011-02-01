@@ -5,6 +5,7 @@
 require 'authorization'
 require 'save_without_timestamping'
 require 'asset'
+require 'active_record_extensions'
 
 JWS_ENABLED=true unless defined? JWS_ENABLED
 JERM_ENABLED=true unless defined? JERM_ENABLED
