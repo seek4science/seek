@@ -21,31 +21,8 @@
             <%= f.label :description %><br/>
             <%= f.text_area :description, :style => "width:100%", :rows => 10 %>
           </p>
-          <p>
-            <%= f.label :start_date %>
-            <%= f.text_field :start_date, :style => "width: 100%" %>
-            <input type="button" id="event_start_date_clear" value="clear" />
-            <script type="text/javascript">
-              AnyTime.picker( "event_start_date",
-              { format: "%Y-%d-%m %T" } );
-              $("#event_start_date_clear").click( function(e) {
-              $("#event_start_date").val("").change(); } );
-            </script>
-  <%#= datetime_select "event", "start_date"%>
-          </p>
-          <p>
-            <%= f.label :end_date %>
-            <%= f.text_field :end_date, :style => "width: 100%" %>
-            <input type="button" id="event_end_date_clear" value="clear" />
-            <script type="text/javascript">
-              AnyTime.picker( "event_end_date",
-              { format: "%Y-%d-%m %T" } );
-              $("#event_end_date_clear").click( function(e) {
-              $("#event_end_date").val("").change(); } );
-            </script>
-
-  <%#= datetime_select "event", "end_date"%>
-          </p>
+          <%= render :partial => 'date_time', :locals => {:object => :event, :attribute => :start_date}%>
+          <%= render :partial => 'date_time', :locals => {:object => :event, :attribute => :end_date}%>
           <p>
             <%= f.label "Event Website" -%><br/>
             <%= f.text_field :url, :style => "width:100%" -%>

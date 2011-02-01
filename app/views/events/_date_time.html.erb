@@ -1,0 +1,13 @@
+<% attribute ||= :date %>
+<% id = "#{object.to_s}_#{attribute.to_s}" %>
+<p>
+  <%= f.label attribute %>
+  <%= f.text_field attribute, :style => "width: 100%" %>
+  <input type="button" id="<%= id %>_clear" value="clear" />
+  <script type="text/javascript">
+      AnyTime.picker( "<%= id %>",
+      { format: "%Y-%d-%m %T" } );
+      $("#<%=id%>_clear").click( function(e) {
+          $("#<%=id%>").val("").change(); } );
+  </script>
+</p>
