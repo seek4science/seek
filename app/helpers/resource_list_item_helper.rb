@@ -17,17 +17,17 @@ module ResourceListItemHelper
     #FIXME: get rid of hard coded asset names
     avatar_partial = ""
     if ["DataFile","Model","Sop","Event"].include?(resource.class.name.split("::").first)
-      avatar_partial = "layouts/asset_resource_avatars"
+      avatar_partial = "assets/asset_avatars"
     elsif resource.class.name == "Publication"
       unless resource.creators.empty?
-        avatar_partial = "layouts/asset_resource_avatars"        
+        avatar_partial = "assets/asset_avatars"
       end
     elsif resource.class.name == "Assay"
-      avatar_partial = "assays/resource_avatar"
+      avatar_partial = "assays/avatars"
     else
-      avatar_partial = "layouts/resource_avatar"
+      avatar_partial = "layouts/avatars"
     end
-    return avatar_partial
+    avatar_partial
   end
   
   def list_item_title resource, title=nil, url=nil
