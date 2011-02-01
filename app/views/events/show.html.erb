@@ -46,6 +46,22 @@
           <%=h @event.end_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
         <% end %>
       </p>
+      <p class="web_page">
+        <label>Event Website: </label><%= text_or_not_specified(@event.url, :external_link=>true) -%>
+      </p>
+
+
+      <p class="country">
+        <label>Country: </label><%= text_or_not_specified @event.country, :link_as_country => true -%>
+      </p>
+
+      <p class="city">
+        <label>City: </label><%= text_or_not_specified @event.city %>
+      </p>
+
+      <p class="address">
+        <label>Address: </label><%= text_or_not_specified @event.address, :address=>true %>
+      </p>
       <br/>
 
       <p>
