@@ -216,7 +216,7 @@ module ImagesHelper
       "misc_icons/green_virus-64x64.png"
       when "publication_avatar"
      "crystal_project/64x64/filesystems/file_doc.png"
-      when "saved_search"
+      when "saved_search_avatar"
       "crystal_project/32x32/actions/find.png"
       when "visit_pubmed"
       "famfamfam_silk/page_white_go.png"

@@ -13,7 +13,7 @@ module ActiveRecordExtensions
     thing = self
     thing = thing.parent if thing.class.name.include?("::Version")
     return nil if thing.use_mime_type_for_avatar? || thing.defines_own_avatar?
-    "#{thing.class.name.downcase}_avatar"
+    "#{thing.class.name.underscore}_avatar"
   end
   
 end
