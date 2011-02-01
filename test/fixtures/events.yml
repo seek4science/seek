@@ -2,7 +2,7 @@
 
 event_with_no_files:
   start_date: 2011-01-25 14:11:43
-  end_date: 2011-01-25 14:11:43
+  end_date: 2011-02-25 14:11:43
   address: MyText
   city: MyString
   country: MyString
@@ -14,7 +14,7 @@ event_with_no_files:
 
 private_event:
   start_date: 2011-01-25 14:11:43
-  end_date: 2011-01-25 14:11:43
+  end_date: 2011-02-25 14:11:43
   address: MyText
   city: MyString
   country: MyString

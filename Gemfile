@@ -16,6 +16,7 @@ gem 'simple-spreadsheet-extractor',"0.3.5"
 gem "rmagick","2.12.2"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
+gem 'calendar_date_select'
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
