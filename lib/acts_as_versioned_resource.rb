@@ -31,9 +31,6 @@ module Acts #:nodoc:
 
       end
 
-      def is_asset?        
-        true
-      end
     end
 
     module SingletonMethods
