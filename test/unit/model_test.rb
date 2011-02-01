@@ -18,8 +18,7 @@ class ModelTest < ActiveSupport::TestCase
   test "is asset?" do
     assert Model.is_asset?
     assert models(:teusink).is_asset?
-
-    assert Model::Version.is_asset?
+    
     assert model_versions(:teusink_v1).is_asset?
   end
 
