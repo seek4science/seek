@@ -30,4 +30,8 @@ class Event < ActiveRecord::Base
 
   alias_attribute :data_file_masters, :data_files
 
+  def show_contributor_avatars?
+    false
+  end
+
 end

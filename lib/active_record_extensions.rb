@@ -15,6 +15,10 @@ module ActiveRecordExtensions
     return nil if thing.use_mime_type_for_avatar? || thing.defines_own_avatar?
     "#{thing.class.name.underscore}_avatar"
   end
+
+  def show_contributor_avatars?
+    self.respond_to?(:contributor) || self.respond_to?(:creators)
+  end
   
 end
 

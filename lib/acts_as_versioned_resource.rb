@@ -109,6 +109,10 @@ module Acts #:nodoc:
       def avatar_key
         parent.avatar_key
       end
+
+      def show_contributor_avatars?
+        parent.show_contributor_avatars?
+      end
     end
   end
 end
