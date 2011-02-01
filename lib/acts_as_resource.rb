@@ -50,6 +50,10 @@ module Acts #:nodoc:
         include Acts::Resource::InstanceMethods
 
       end
+
+      def is_asset?
+        include?(Acts::Resource::InstanceMethods)
+      end
     end
 
     module SingletonMethods

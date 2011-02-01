@@ -13,7 +13,11 @@ class ModelTest < ActiveSupport::TestCase
 
     blob=content_blobs(:teusink_blob)
     assert_equal blob,model.content_blob
-  end        
+  end
+
+  test "is asset?" do
+    assert Model.is_asset?
+  end
   
   test "project" do
     model=models(:teusink)

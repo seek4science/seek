@@ -15,7 +15,7 @@ module ResourceListItemHelper
   
   def get_list_item_avatar_partial resource
     avatar_partial = "layouts/avatars"
-    if resource.respond_to?(:contributor) || resource.respond_to?(:creators)
+    if resource.class.is_asset?
       avatar_partial = "assets/asset_avatars"
     end
     avatar_partial

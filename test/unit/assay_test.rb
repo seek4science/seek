@@ -10,6 +10,10 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
   end
 
+  test "is_asset?" do
+    assert !Assay.is_asset?
+  end
+
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
     assert !assay.is_modelling?
