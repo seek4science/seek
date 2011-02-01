@@ -28,7 +28,6 @@ module ResourceListItemHelper
 
     html = "<div class=\"list_item_title\">"
 
-
     if resource.class.name.split("::")[0] == "Person"
       html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
     else
