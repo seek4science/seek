@@ -48,7 +48,7 @@ module IndexPager
     controller = self.controller_name.downcase
     model_name=controller.classify
     model_class=eval(model_name)    
-    order_field = params[:page]=="latest" ? "created_at DESC" : "title"
+    order_field = "created_at DESC"
     found = model_class.find(:all, :order => order_field)
     found = apply_filters(found)        
     

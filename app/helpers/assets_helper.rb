@@ -166,7 +166,7 @@ module AssetsHelper
         related["Model"][:items] = resource.related_models
         related["Assay"][:items] = resource.related_assays
       when "Event"
-        {"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
+        {#"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
          "Project" => [resource.project],
          "DataFile" => resource.data_files}.each do |k,v|
             related[k][:items] = v unless v.nil?

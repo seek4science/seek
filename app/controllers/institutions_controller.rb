@@ -124,7 +124,7 @@ class InstitutionsController < ApplicationController
   private
   
   def find_institutions
-    @institutions = Institution.paginate :page=>params[:page]
+    @institutions = Institution.paginate :page=>params[:page] || "latest"
     @institutions = apply_filters(@institutions)
   end
 
