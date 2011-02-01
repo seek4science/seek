@@ -18,8 +18,14 @@ class Event < ActiveRecord::Base
     end
   end
   
-  validates_each :data_files do |model,attr,value|
-    model.errors.add(attr, 'May only contain one association to each data file') if value.contains_duplicates?
+  validate :validate_data_files
+  def validate_data_files
+    errors.add(:data_files, 'May only contain one association to each data file') if self.data_files.contains_duplicates?
+  end
+
+  validate :validate_end_date
+  def validate_end_date
+    errors.add(:end_date, "is before start date.") unless self.end_date.nil? || self.end_date > self.start_date
   end
 
   validates_presence_of :title

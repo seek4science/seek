@@ -32,11 +32,19 @@
       </p>
       <p>
         <label>Start Time:</label>
-        <%=h @event.start_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+        <% if @event.start_date.nil? %>
+          <%= text_or_not_specified nil %>
+        <% else %>
+          <%=h @event.start_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+        <% end %>
       </p>
       <p>
         <label>End Time:</label>
-        <%=h @event.end_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+        <% if @event.end_date.nil? %>
+          <%= text_or_not_specified nil %>
+        <% else %>
+          <%=h @event.end_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+        <% end %>
       </p>
       <br/>
 

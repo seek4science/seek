@@ -6,6 +6,7 @@
 
 <% selected_project_id ||= 0 -%>
 <% disable_project_select ||= false -%>
+<% allow_nil ||= false %>
 
 <% unless project_hash.empty? -%>
 	<div style="margin: 1.5em 0 1em 0; text-align: left;">
@@ -22,6 +23,7 @@
 		<br/>
 		
 		<select name="<%=resource_type.underscore -%>[project_id]" id="project_selector" <%= "disabled" if disable_project_select -%> style="width: 250px; vertical-align: middle; margin: 0.3em 0;">
+                  <%  if allow_nil %> <option value="" <%= "selected='selected'" if nil == selected_project_id -%>>No Project</option><%  end %>
 		  <% project_hash.each do |p| -%>
 			  <option value="<%= p[0] -%>" <%= "selected='selected'" if p[0] == selected_project_id -%>><%= h(p[1]) -%></option>
 			<% end -%>

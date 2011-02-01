@@ -22,4 +22,12 @@ class EventTest < ActiveSupport::TestCase
     assert !event.valid?
     assert !event.save
   end
+
+  test "end date after start date" do
+    event = events(:event_with_no_files)
+    assert event.start_date != nil
+    event.end_date = Time.at 0
+    assert !event.valid?
+    assert !event.save
+  end
 end
