@@ -135,4 +135,9 @@ class Assay < ActiveRecord::Base
   def related_publications
     self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
   end
+
+  def avatar_key
+    type = is_modelling? ? "modelling" : "experimental"
+    "assay_#{type}_avatar"
+  end
 end

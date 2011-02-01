@@ -73,4 +73,8 @@ class DataFile < ActiveRecord::Base
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting
     assay_assets.find_by_assay_id(assay.id).relationship_type  
   end
+
+  def use_mime_type_for_avatar?
+    false
+  end
 end

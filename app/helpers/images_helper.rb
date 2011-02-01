@@ -348,9 +348,13 @@ module ImagesHelper
     url = file_type_icon_url(item)
     image_tag url, :class => "icon"
   end
-  
+
+  def file_type_icon_key(item)
+    mime_icon_key item.content_type
+  end
+
   def file_type_icon_url(item)
-    return mime_icon_url(item.content_type)
+    mime_icon_url item.content_type
   end
   
   def expand_image(margin_left="0.3em")

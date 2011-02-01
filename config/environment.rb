@@ -77,5 +77,6 @@ Rails::Initializer.run do |config|
 
 end
 
+require 'active_record_extensions'
 
 

@@ -20,6 +20,11 @@ class AssayTest < ActiveSupport::TestCase
     assert !assays(:metabolomics_assay).authorization_supported?
   end
 
+  test "avatar_key" do
+    assert_equal "assay_experimental_avatar",assays(:metabolomics_assay).avatar_key
+    assert_equal "assay_modelling_avatar",assays(:modelling_assay_with_data_and_relationship).avatar_key
+  end
+
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
     assert !assay.is_modelling?

@@ -22,25 +22,18 @@ module AssetsHelper
     )+"</form>"    
   end
   
-  def resource_title_draggable_avatar resource
-    name = resource.class.name.split("::")[0]
+  def resource_title_draggable_avatar resource    
     icon=""
-    case name
-    when "DataFile","Model","Sop"
-      image = image_tag(((name == "Model") ? icon_filename_for_key("model_avatar"): (file_type_icon_url(resource))))
-      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-    when "Investigation","Study","Publication","Event"
-      image = image "#{resource.class.name.downcase}_avatar",{}
-      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-    when "Assay"
-      type=resource.is_modelling? ? "modelling" : "experimental"
-      image = image "#{resource.class.name.downcase}_#{type}_avatar",{}
-      icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
-    when "Organism"
-      image = image "#{resource.class.name.downcase}_avatar",{}
-      icon = link_to_draggable(image, organism_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
+    image=nil
+
+    if resource.avatar_key
+      image=image resource.avatar_key,{}
+    elsif resource.use_mime_type_for_avatar?
+      image = image file_type_icon_key(resource),{}
     end
-    return icon
+
+    icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
+    icon
   end
 
   def get_original_model_name(model)

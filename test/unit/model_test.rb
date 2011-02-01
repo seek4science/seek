@@ -22,12 +22,16 @@ class ModelTest < ActiveSupport::TestCase
     assert model_versions(:teusink_v1).is_asset?
   end
 
+  test "avatar_key" do
+    assert_equal "model_avatar",models(:teusink).avatar_key
+    assert_equal "model_avatar",model_versions(:teusink_v1).avatar_key
+  end
+
   test "authorization supported?" do
     assert Model.authorization_supported?
     assert models(:teusink).authorization_supported?
     assert model_versions(:teusink_v1).authorization_supported?
   end
-
   
   test "project" do
     model=models(:teusink)

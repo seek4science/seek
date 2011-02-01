@@ -97,6 +97,18 @@ module Acts #:nodoc:
       def authorization_supported?
         self.parent.authorization_supported?
       end
+
+      def defines_own_avatar?
+        parent.defines_own_avatar?
+      end
+
+      def use_mime_type_for_avatar?
+        parent.use_mime_type_for_avatar?
+      end
+
+      def avatar_key
+        parent.avatar_key
+      end
     end
   end
 end

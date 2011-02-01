@@ -20,7 +20,13 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 1,admins.size
     assert admins.include?(people(:quentin_person))
   end
-  
+
+  def test_avatar_key
+    p=people(:quentin_person)
+    assert_nil p.avatar_key
+    assert p.defines_own_avatar?
+  end
+
   def test_first_person_is_admin
     assert Person.count>0 #should already be people from fixtures
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")

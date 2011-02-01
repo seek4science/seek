@@ -70,6 +70,11 @@ class Sop < ActiveRecord::Base
 
   def organism_title
     organism.nil? ? "" : organism.title
-  end 
+  end
+
+
+  def use_mime_type_for_avatar?
+    true
+  end
     
 end
