@@ -9,7 +9,7 @@ module IndexPager
     @hidden=0
     params[:page] ||= "all"
     
-    if !objects.empty? && Authorization::authorization_supported?(objects.first)
+    if !objects.empty? && objects.first.authorization_supported?
       authorized=[]
       auth_pages={}      
       objects.each do |object|
