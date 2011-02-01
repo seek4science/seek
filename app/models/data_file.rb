@@ -1,4 +1,4 @@
-require 'acts_as_resource'
+require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
@@ -7,7 +7,7 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
-  acts_as_resource
+  acts_as_asset
   acts_as_trashable
   
   title_trimmer

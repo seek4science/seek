@@ -1,4 +1,4 @@
-# SysMO: lib/acts_as_resource.rb
+# SysMO: lib/acts_as_asset.rb
 # Original code borrowed from myExperiment and tailored for SysMO needs.
 
 # ********************************************************************************
@@ -10,18 +10,14 @@
 require 'acts_as_authorized'
 
 module Acts #:nodoc:
-  module Resource #:nodoc:
+  module Asset #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
     end
 
     module ClassMethods
-      def acts_as_resource
+      def acts_as_asset
         acts_as_authorized
-        #belongs_to :contributor, :polymorphic => true
-
-        #checks a policy exists, and if missing resorts to using a private policy
-        #before_save :policy_or_default
 
         has_many :relationships,
                  :class_name => 'Relationship',
@@ -34,9 +30,6 @@ module Acts #:nodoc:
                  :conditions => {:predicate => Relationship::ATTRIBUTED_TO},
                  :dependent  => :destroy
 
-        #belongs_to :project
-
-        #belongs_to :policy
 
         has_many :assay_assets, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
         has_many :assays, :through => :assay_assets
@@ -45,14 +38,14 @@ module Acts #:nodoc:
         has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
         class_eval do
-          extend Acts::Resource::SingletonMethods
+          extend Acts::Asset::SingletonMethods
         end
-        include Acts::Resource::InstanceMethods
+        include Acts::Asset::InstanceMethods
 
       end
 
       def is_asset?
-        include?(Acts::Resource::InstanceMethods)
+        include?(Acts::Asset::InstanceMethods)
       end
     end
 
@@ -103,5 +96,5 @@ end
 
 
 ActiveRecord::Base.class_eval do
-  include Acts::Resource
+  include Acts::Asset
 end

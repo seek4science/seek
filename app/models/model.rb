@@ -1,4 +1,4 @@
-require 'acts_as_resource'
+require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
@@ -9,7 +9,7 @@ class Model < ActiveRecord::Base
 
   title_trimmer
   
-  acts_as_resource
+  acts_as_asset
   acts_as_trashable
   
   has_many :favourites, 

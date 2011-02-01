@@ -61,7 +61,7 @@ module Acts #:nodoc:
         self.policy.permissions.each do |perm|
           people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
         end
-        return people.uniq
+        people.uniq
       end
 
       # def asset; return self; end
