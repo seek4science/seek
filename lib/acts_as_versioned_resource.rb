@@ -30,6 +30,10 @@ module Acts #:nodoc:
         include Acts::VersionedResource::InstanceMethods
 
       end
+
+      def is_asset?        
+        true
+      end
     end
 
     module SingletonMethods
@@ -89,6 +93,13 @@ module Acts #:nodoc:
         self.parent.assets_creators
       end
 
+      def is_asset?
+        self.parent.is_asset?
+      end
+
+      def authorization_supported?
+        self.parent.authorization_supported?
+      end
     end
   end
 end
