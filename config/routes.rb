@@ -21,7 +21,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get, :data => :get, :request_resource=>:post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get, :data => :get, :request_resource=>:post, :explore => :get} do |data_file|
     data_file.resources :studied_factors
   end
   

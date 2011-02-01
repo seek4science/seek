@@ -173,7 +173,7 @@ module Authorization
            'tag',  'items', 'statistics', 'tag_suggestions','preview'
         action = 'view'
         
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute', 'explore'
         action = 'download'
         
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',

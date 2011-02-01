@@ -1,0 +1,67 @@
+table.sheet {
+  border: 1px solid #CCC;
+  background-color: #DDD;
+  table-layout: fixed;
+}
+
+table.sheet tr td {
+  width: 50px;
+  height: 20px;
+}
+
+th.col_heading, td.row_heading {
+  border: 1px outset #FFF;
+  background: #DDD;
+  text-align: center;
+}
+
+td.cell {
+  background: #FFF;
+  border: 1px solid #CCC;
+  border-width: 0px 1px 1px 0px;
+}
+
+td.selected_cell {
+  background: #9CF;
+}
+
+td.primary_selected_cell {
+  background: #69F;
+}
+
+td.annotated_cell {
+  background: #FCC;
+}
+
+div.sheet {
+  overflow: scroll;
+  height: 600px;
+  margin: 0px;
+}
+
+a.sheet_tab {
+  display: inline-block;
+  background: #AAA;
+  margin: 0 0.5em;
+  padding: 0.5em;
+  border: 1px solid black;
+  border-width: 1px 1px 0px 1px;
+  color: #000;
+}
+
+a.sheet_tab:hover
+{
+  background: #7CF;
+  color: #125;
+}
+
+a.selected_tab
+{
+  background: #EEE;
+}
+
+div.spreadsheet_container
+{
+  border: 1px solid black;
+  padding: 0px;
+}
