@@ -35,7 +35,11 @@
         <% if @event.start_date.nil? %>
           <%= text_or_not_specified nil %>
         <% else %>
-          <%=h @event.start_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+          <% if @event.start_date.hour == 0 and @event.start_date.min == 0 and @event.start_date.sec == 0 then %>
+              <%=h @event.start_date.strftime('%d/%m/%Y') %>
+          <% else %>
+              <%=h @event.start_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+          <% end %>
         <% end %>
       </p>
       <p>
@@ -43,39 +47,48 @@
         <% if @event.end_date.nil? %>
           <%= text_or_not_specified nil %>
         <% else %>
-          <%=h @event.end_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+            <% if @event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0 then %>
+              <%=h @event.end_date.strftime('%d/%m/%Y') %>
+          <% else %>
+              <%=h @event.end_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+          <% end %>
         <% end %>
       </p>
-      <p class="web_page">
-        <label>Event Website: </label><%= text_or_not_specified(@event.url, :external_link=>true) -%>
-      </p>
+
+      <% unless @event.url.nil? || @event.url.chomp == "" then %>
+          <p class="web_page">
+            <label>Event Website: </label><%= text_or_not_specified(@event.url, :external_link=>true) -%>
+          </p>
+      <% end %>
 
 
-      <p class="country">
-        <label>Country: </label><%= text_or_not_specified @event.country, :link_as_country => true -%>
-      </p>
+      <% unless @event.country.nil? then %>
+          <p class="country">
+            <label>Country: </label><%= text_or_not_specified @event.country, :link_as_country => true -%>
+          </p>
+      <% end %>
 
-      <p class="city">
-        <label>City: </label><%= text_or_not_specified @event.city %>
-      </p>
+      <% unless @event.city.nil? || @event.city.chomp == "" then %>
+          <p class="city">
+            <label>City: </label><%= text_or_not_specified @event.city %>
+          </p>
+      <% end %>
 
-      <p class="address">
-        <label>Address: </label><%= text_or_not_specified @event.address, :address=>true %>
-      </p>
+      <% unless @event.address.nil? || @event.address.chomp == "" then %>
+          <p class="address">
+            <label>Address: </label><%= text_or_not_specified @event.address, :address=>true %>
+          </p>
+      <% end %>
       <br/>
 
-      <p>
-        <b>Description:</b>
-        <% unless @event.description.blank? -%>
-        <div class="box_standout" id="description">
-          <%= simple_format(auto_link(white_list(@event.description),:all,:rel=>'nofollow')) -%>
-        </div>
-      <% else -%>
-        <p class="none_text">
-          No description.
+      <% unless @event.description.blank? -%>
+        <p>
+         <b>Description:</b>
+            <div class="box_standout" id="description">
+                <%= simple_format(auto_link(white_list(@event.description),:all,:rel=>'nofollow')) -%>
+            </div>
         </p>
       <% end -%>
-      </p>
     </div>
   </div>
   <div style="clear:both;">

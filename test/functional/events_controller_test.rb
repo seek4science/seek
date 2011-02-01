@@ -80,7 +80,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   def valid_event
-    {:title => "Barn Raising"}
+    {:title => "Barn Raising", :start_date => DateTime.now, :end_date => DateTime.now}
   end
 
   test "should get edit" do

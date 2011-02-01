@@ -25,10 +25,12 @@ class Event < ActiveRecord::Base
 
   validate :validate_end_date
   def validate_end_date
-    errors.add(:end_date, "is before start date.") unless self.end_date.nil? || self.end_date > self.start_date
+    errors.add(:end_date, "is before start date.") unless self.end_date.nil? || self.start_date.nil? || self.end_date > self.start_date
   end
 
   validates_presence_of :title
+  validates_presence_of :start_date
+  validates_presence_of :end_date
   #validates_uniqueness_of :title
 
   #validates_is_url_string :url
