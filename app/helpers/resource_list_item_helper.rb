@@ -14,18 +14,9 @@ module ResourceListItemHelper
   end
   
   def get_list_item_avatar_partial resource
-    #FIXME: get rid of hard coded asset names
-    avatar_partial = ""
-    if ["DataFile","Model","Sop","Event"].include?(resource.class.name.split("::").first)
+    avatar_partial = "layouts/avatars"
+    if resource.respond_to?(:contributor) || resource.respond_to?(:creators)
       avatar_partial = "assets/asset_avatars"
-    elsif resource.class.name == "Publication"
-      unless resource.creators.empty?
-        avatar_partial = "assets/asset_avatars"
-      end
-    elsif resource.class.name == "Assay"
-      avatar_partial = "assays/avatars"
-    else
-      avatar_partial = "layouts/avatars"
     end
     avatar_partial
   end

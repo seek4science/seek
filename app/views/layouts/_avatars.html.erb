@@ -1,1 +1,1 @@
-<%= favouritable_icon(resource, 60) -%>
+<%= resource.respond_to?(:owner) ? favouritable_icon(resource.owner, 60) : favouritable_icon(resource, 60) -%>
