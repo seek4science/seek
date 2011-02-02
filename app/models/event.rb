@@ -42,4 +42,9 @@ class Event < ActiveRecord::Base
     false
   end
 
+  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
+  end
+
 end

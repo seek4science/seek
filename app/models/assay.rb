@@ -16,6 +16,11 @@ class Assay < ActiveRecord::Base
   has_many :strains, :through=>:assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
+
+  #defines that this is a user_creatable object, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
+  end
   
   def self.asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
