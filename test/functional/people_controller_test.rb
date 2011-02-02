@@ -28,7 +28,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
   
-  def test_first_regisitered_person_is_admin
+  def test_first_registered_person_is_admin
     Person.destroy_all
     assert_equal 0,Person.count,"There should be no people in the database"
     login_as(:part_registered)
@@ -42,7 +42,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_admin?
   end
   
-  def test_second_regisitered_person_is_not_admin
+  def test_second_registered_person_is_not_admin
     Person.destroy_all
     person = Person.new(:first_name=>"fred",:email=>"fred@dddd.com")
     person.save!
