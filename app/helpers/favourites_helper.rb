@@ -24,7 +24,7 @@ module FavouritesHelper
       else
         tiny_image = default_avatar(item.class.name, 32, h(title))
       end
-    elsif item.use_mime_type_avatar?
+    elsif item.use_mime_type_for_avatar?
       tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
     end
 
