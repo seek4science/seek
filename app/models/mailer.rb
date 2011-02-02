@@ -1,7 +1,7 @@
 class Mailer < ActionMailer::Base
   helper UsersHelper
 
-  NOREPLY_SENDER="no-reply@sysmo-db.org"
+  NOREPLY_SENDER="seek@virtual-liver.de"
 
   project = "Virtual Liver"
 

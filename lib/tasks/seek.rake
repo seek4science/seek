@@ -264,6 +264,45 @@ namespace :seek do
   end
   end
 
+  desc 'Builds users matching people '
+  task(:generate_users_for_people=>:environment) do
+
+    Person.all.each do |person|
+
+	 login = "#{person.first_name.downcase[0..0]}#{person.first_name.downcase[-1..-1]}#{person.last_name.downcase}".gsub(" ","")
+
+
+		password = Digest::MD5.hexdigest("#{rand(20000000)}")
+
+    	       print "#{person.id} #{person.user} #{login} _#{password}_\n"
+
+	u = person.user;
+
+	if(u.nil?)
+
+		p "building user!"
+
+			u = User.new(:email=>person.email,
+				     :login=>login ,
+				     :password=>password,
+				     :password_confirmation=>password
+				     );
+			
+			saved = u.save(true)			   
+			u.activate()
+			print "Saving #{u}: #{saved}\n";
+			person.user = u;
+			person.save(true);
+			u.save(true);
+			print "creating new user #{u.login} #{u}\n"
+
+	end
+
+
+    end
+  end
+
+
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
     other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains"]

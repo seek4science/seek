@@ -1,0 +1,1 @@
+./vendor/plugins/site_announcements/app/controllers/site_announcements_controller.rb:        Mailer.deliver_announcement_notification(site_announcement, notifiee_info,base_host)                     
