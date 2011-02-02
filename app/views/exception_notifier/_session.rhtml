@@ -1,0 +1,10 @@
+* session id: <%= @request.session.instance_variable_get(:@session_id).inspect %>
+* data: <%= PP.pp(@request.session.instance_variable_get(:@data),"").gsub(/\n/, "\n  ").strip %>
+<% if !@current_logged_in_user.nil? -%>
+* user_id: <%= @current_logged_in_user.id  %> \n
+
+* person: <%= @current_logged_in_user.person ? @current_logged_in_user.person.name : "No person associated with user" -%>
+<% else -%>
+* user: no logged in user
+<% end -%>
+\n

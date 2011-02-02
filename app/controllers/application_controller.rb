@@ -15,7 +15,9 @@ class ApplicationController < ActionController::Base
     ::ActionView::MissingTemplate => "406",
     ::ActionView::TemplateError => "500"
   }
-  local_addresses.clear  
+  local_addresses.clear
+
+  exception_data :additional_exception_notifier_data
   
   if ACTIVITY_LOG_ENABLED
     after_filter :log_event
@@ -273,6 +275,12 @@ class ApplicationController < ActionController::Base
       end
     end
     set
+  end
+
+  def additional_exception_notifier_data
+    {
+        :current_logged_in_user=>current_user
+    }
   end
   
 end
