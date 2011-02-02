@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
   
@@ -195,6 +195,9 @@ class ProjectTest < ActiveSupport::TestCase
 
     assert_equal 1,project.pals.size
     assert project.pals.include?(pal)
+
+    project = projects(:moses_project)
+    assert !project.pals.include?(pal)
   end
 
   test "test uuid generated" do
