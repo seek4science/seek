@@ -23,7 +23,7 @@ two:
   journal: JOURNAL OF SCIENCE
   contributor_id: 1
   contributor_type: User
-  published_date: <%= 5.days.ago.to_s :db %>
+  published_date: <%= 4.days.ago.to_s :db %>
   pubmed_id: 2
   project: sysmo_project
   policy: sysmo_member_edit
@@ -34,7 +34,7 @@ taverna_paper_pubmed:
   journal: JOURNAL OF SCIENCE
   contributor_id: 1
   contributor_type: User
-  published_date: <%= 5.days.ago.to_s :db %>
+  published_date: <%= 3.days.ago.to_s :db %>
   pubmed_id: 16845108
   project: sysmo_project
   policy: sysmo_member_edit

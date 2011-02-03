@@ -9,6 +9,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2,p.work_groups.size
   end
 
+  def test_ordered_by_last_name
+    sorted = Person.find(:all).sort_by do |p|
+      lname = "" || p.last_name.try(:downcase)
+      fname = "" || p.first_name.try(:downcase)
+      lname+fname
+    end
+    assert_equal sorted, Person.find(:all)
+  end
+
   def test_is_asset
     assert !Person.is_asset?
     assert !people(:quentin_person).is_asset?

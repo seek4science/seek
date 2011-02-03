@@ -4,7 +4,7 @@ require 'acts_as_yellow_pages'
 class Person < ActiveRecord::Base
 
   acts_as_yellow_pages
-  default_scope :order => "first_name DESC"
+  default_scope :order => "last_name, first_name"
 
   before_save :first_person_admin
 

@@ -9,6 +9,10 @@ class SopTest < ActiveSupport::TestCase
     assert_equal p,s.project
   end
 
+  test "sort by updated_at" do
+    assert_equal Sop.find(:all).sort_by { |s| s.updated_at.to_i * -1 }, Sop.find(:all)
+  end
+
   def test_title_trimmed 
     sop=Sop.new(:title=>" test sop")
     sop.save!

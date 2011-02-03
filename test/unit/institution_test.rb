@@ -17,6 +17,10 @@ class InstitutionTest < ActiveSupport::TestCase
     assert_equal (n_wg-1), WorkGroup.find(:all).size, "the workgroup should also have been destroyed"
   end
 
+  def test_ordered_by_name
+    assert_equal Institution.find(:all).sort_by {|i| i.name.downcase} ,Institution.find(:all)
+  end
+
   def test_avatar_key
     i=institutions(:one)
     assert_nil i.avatar_key

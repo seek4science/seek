@@ -1,3 +1,4 @@
+
 # SysMO: lib/acts_as_asset.rb
 # Original code borrowed from myExperiment and tailored for SysMO needs.
 
