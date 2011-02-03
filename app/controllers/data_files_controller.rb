@@ -226,6 +226,7 @@ class DataFilesController < ApplicationController
     if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
       xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath))
       @spreadsheet = parse_spreadsheet_xml(xml)
+      @spreadsheet.annotations = @data_file.spreadsheet_annotations
       respond_to do |format|
         format.html
       end

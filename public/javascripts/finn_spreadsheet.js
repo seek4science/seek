@@ -133,3 +133,10 @@ function num2alpha(col)
   }
   return result;
 }
+
+function show_annotation(id,x,y)
+{
+  $("#annotation_" + id).css('left',x+30);  
+  $("#annotation_" + id).css('top',y);
+  $("#annotation_" + id).show();  
+}

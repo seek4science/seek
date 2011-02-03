@@ -75,10 +75,12 @@ module SpreadsheetViewer
   
     attr_accessor :sheets
     attr_accessor :styles
+    attr_accessor :annotations
     
     def initialize
       @sheets = []
       @styles = {}
+      @annotations = []
     end
     
     def [] x

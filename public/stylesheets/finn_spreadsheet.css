@@ -65,3 +65,12 @@ div.spreadsheet_container
   border: 1px solid black;
   padding: 0px;
 }
+
+div.annotation
+{
+  border: 1px solid #CCC;
+  background-color: #FFF;
+  padding: 0.5em;
+  position: absolute;
+  display:none;
+}

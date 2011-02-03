@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101215152705) do
+ActiveRecord::Schema.define(:version => 20110202235621) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -619,6 +619,21 @@ ActiveRecord::Schema.define(:version => 20101215152705) do
     t.string   "uuid"
     t.integer  "project_id"
     t.integer  "policy_id"
+  end
+
+  create_table "spreadsheet_annotations", :force => true do |t|
+    t.integer  "data_file_id"
+    t.integer  "sheet"
+    t.integer  "start_row"
+    t.integer  "start_column"
+    t.integer  "end_row"
+    t.integer  "end_column"
+    t.integer  "source_id"
+    t.integer  "source_type"
+    t.string   "annotation_type"
+    t.text     "content"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "strains", :force => true do |t|

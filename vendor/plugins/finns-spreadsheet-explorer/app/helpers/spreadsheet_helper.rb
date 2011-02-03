@@ -4,6 +4,7 @@ module SpreadsheetHelper
     html = ""
     
     html << generate_spreadsheet_styles(workbook.styles)
+    html << generate_spreadsheet_annotations(workbook.annotations)
     
     html << "<div class=\"spreadsheet_viewer\">"
         
@@ -65,7 +66,8 @@ module SpreadsheetHelper
     end
     html << "</div>"
     html << "</div>"
-    html
+    html << link_annotations(workbook.annotations)
+    return html
   end
   
   private
@@ -89,10 +91,40 @@ module SpreadsheetHelper
     return html
   end
   
+  def generate_spreadsheet_annotations(annotations)
+    html = ""
+    unless annotations.empty?
+      html << "<div id=\"hidden_annotations\">\n"
+      html << "<h1>ANNOTATIONS</h1>"
+      annotations.each do |a|
+        html << "\t <div class=\"annotation\" id=\"annotation_#{a.id}\">\n"
+        html << "\t\t #{a.content}"
+        html << "\t</div>\n\n"
+      end
+    end
+    html << "</div>\n"
+    return html
+  end
+  
+  def link_annotations(annotations)
+    html = ""
+    unless annotations.empty?
+      html << "<script type=\"text/javascript\">\n"
+      html << "\t$(function () {\n"
+      annotations.each do |a|
+        cell_id = "cell_#{to_alpha(a.start_column)}#{a.start_row}"
+        html << "\t\t$(\"td\##{cell_id}\").click(function (e) {show_annotation(#{a.id},e.pageX,e.pageY);});"
+      end
+      html << "\t});\n"
+      html << "</script>\n\n"
+    end
+    return html
+  end
+  
   def to_alpha(col)
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)    
     result = ""
-    
+    col = col-1
     while (col > -1) do
       letter = (col % 26)
       result = alphabet[letter] + result

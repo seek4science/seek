@@ -27,6 +27,8 @@ class DataFile < ActiveRecord::Base
   
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
   
+  has_many :spreadsheet_annotations
+  
   grouped_pagination 
   
   acts_as_uniquely_identifiable  
