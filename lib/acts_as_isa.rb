@@ -25,9 +25,9 @@ module Acts #:nodoc:
                  :dependent => :destroy
 
 
-  grouped_pagination
+        grouped_pagination
 
-  acts_as_uniquely_identifiable
+        acts_as_uniquely_identifiable
 
 
         class_eval do
@@ -37,18 +37,16 @@ module Acts #:nodoc:
 
       end
 
-
-      #defines that this is a user_creatable object type, and appears in the "New Object" gadget
-      def user_creatable?
-        true
-      end
-
       def is_isa?
-        include?(Acts::Asset::InstanceMethods)
+        include?(Acts::Isa::InstanceMethods)
       end
     end
 
     module SingletonMethods
+      #defines that this is a user_creatable object type, and appears in the "New Object" gadget
+      def user_creatable?
+        true
+      end
     end
 
     module InstanceMethods
