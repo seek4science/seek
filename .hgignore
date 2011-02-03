@@ -1,4 +1,5 @@
 syntax: glob
+.redcar/
 .idea/
 *.svn
 db/*.sqlite3

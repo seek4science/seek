@@ -173,7 +173,38 @@ class ApplicationController < ActionController::Base
   
   def email_enabled?
     EMAIL_ENABLED    
-  end      
+  end
+
+  def find_and_auth
+    begin
+      name = self.controller_name.singularize
+      action=action_name
+      action="download" if action=="data"
+      action="download" if action == "simulate"
+      action="edit" if ["submit_to_jws","builder"].include?(action)
+
+      object = name.camelize.constantize.find(params[:id])
+
+      if Authorization.is_authorized?(action, nil, object, current_user)
+        eval "@#{name} = object"
+        params.delete :sharing unless object.can_manage?(current_user)
+      else
+        respond_to do |format|
+          flash[:error] = "You are not authorized to perform this action"
+          format.html { redirect_to object }
+          #FIXME: this isn't the right response - should return with an unauthorized status code
+          format.xml { redirect_to object,:format=>"xml" }
+        end
+        return false
+      end
+    rescue ActiveRecord::RecordNotFound
+      respond_to do |format|
+        flash[:error] = "Couldn't find the #{name.humanize} or you are not authorized to view it"
+        format.html { redirect_to object }
+      end
+      return false
+    end
+  end
   
   # See ActionController::Base for details 
   # Uncomment this to filter the contents of submitted sensitive data parameters
