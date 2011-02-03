@@ -22,6 +22,6 @@
 
 <%= list_item_expandable_text "Abstract", h(resource.abstract) %>
 
-<%= list_item_optional_attribute publication_type_text(@publication.publication_type), h(resource.journal) %>
+<%= list_item_optional_attribute publication_type_text(resource.publication_type), h(resource.journal) %>
 
 <%= list_item_attribute "Date Published", resource.published_date.strftime('%d/%m/%Y') %>     
