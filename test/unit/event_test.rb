@@ -2,7 +2,7 @@ require 'test_helper'
 
 class EventTest < ActiveSupport::TestCase
   fixtures :all
-  # Replace this with your real tests.
+
   test "datafile association" do
     event = events(:event_with_no_files)
     assert event.data_files.empty?

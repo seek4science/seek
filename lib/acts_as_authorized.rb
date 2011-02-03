@@ -62,6 +62,10 @@ module Acts #:nodoc:
         Authorization.is_authorized? "destroy", nil, self, user
       end
 
+      def can_manage? user
+        Authorization.is_authorized? "manage", nil, self, user
+      end
+
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers

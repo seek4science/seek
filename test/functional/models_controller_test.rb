@@ -569,5 +569,37 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "a",:text=>m2.title,:count=>0
     end
   end
+
+  test "should not be able to update sharing without manage rights" do
+    login_as(:quentin)
+    user = users(:quentin)
+    model   = models(:model_with_links_in_description)
+
+    assert model.can_edit?(user), "sop should be editable but not manageable for this test"
+    assert !model.can_manage?(user), "sop should be editable but not manageable for this test"
+    assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
+    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
+    assert_redirected_to model_path(model)
+    model.reload
+
+    assert_equal "new title", model.title
+    assert_equal Policy::EDITING, model.policy.access_type, "policy should not have been updated"
+  end
+
+  test "owner should be able to update sharing" do
+    login_as(:model_owner)
+    user = users(:model_owner)
+    model   = models(:model_with_links_in_description)
+
+    assert model.can_edit?(user), "sop should be editable and manageable for this test"
+    assert model.can_manage?(user), "sop should be editable and manageable for this test"
+    assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
+    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
+    assert_redirected_to model_path(model)
+    model.reload
+
+    assert_equal "new title", model.title
+    assert_equal Policy::NO_ACCESS, model.policy.access_type, "policy should have been updated"
+  end
   
 end

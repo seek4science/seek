@@ -434,6 +434,38 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a",:text=>df2.title,:count=>0
     end
   end
+
+  test "should not be able to update sharing without manage rights" do
+     login_as(:quentin)
+     user = users(:quentin)
+     df = data_files(:editable_data_file)
+
+     assert df.can_edit?(user), "data file should be editable but not manageable for this test"
+     assert !df.can_manage?(user), "data file should be editable but not manageable for this test"
+     assert_equal Policy::EDITING,df.policy.access_type,"data file should have an initial policy with access type for editing"
+     put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS,:access_type_2=>Policy::NO_ACCESS }
+     assert_redirected_to data_file_path(df)
+     df.reload
+
+     assert_equal "new title",df.title
+     assert_equal Policy::EDITING,df.policy.access_type,"policy should not have been updated"
+
+  end
+
+  test "owner should be able to update sharing" do
+     user = users(:datafile_owner)
+     df = data_files(:editable_data_file)
+
+     assert df.can_edit?(user), "data file should be editable and manageable for this test"
+     assert df.can_manage?(user), "data file should be editable and manageable for this test"
+     assert_equal Policy::EDITING,df.policy.access_type,"data file should have an initial policy with access type for editing"
+     put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS,:access_type_2=>Policy::NO_ACCESS }
+     assert_redirected_to data_file_path(df)
+     df.reload
+
+     assert_equal "new title",df.title
+     assert_equal Policy::NO_ACCESS,df.policy.access_type,"policy should have been updated"
+  end
   
   private
   

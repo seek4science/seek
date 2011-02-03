@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class AttributionsTest < ActionController::TestCase
   # use SopsController, because attributions don't have their own controller

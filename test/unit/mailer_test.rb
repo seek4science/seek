@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/../test_helper'
-require File.dirname(__FILE__) + '/../time_test_helper'
+require 'test_helper'
+require 'time_test_helper'
 
 class MailerTest < ActionMailer::TestCase
   fixtures :all

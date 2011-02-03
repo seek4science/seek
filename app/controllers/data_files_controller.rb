@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_data_file_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
+  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
   before_filter :find_display_data_file, :only=>[:show,:download]
     
   def new_version
@@ -223,32 +223,10 @@ class DataFilesController < ApplicationController
       @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
     end
   end
-  
-  def find_data_file_auth
-    begin      
-      
-      action=action_name
-      action="download" if action=="data"
-      data_file = DataFile.find(params[:id])
-      
-      if Authorization.is_authorized?(action, nil, data_file, current_user)
-        @data_file = data_file
-      else
-        respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to data_files_path }
-          #FIXME: this isn't the right response - should return with an unauthorized status code
-          format.xml { redirect_to data_files_path(:format=>"xml") }
-        end
-        return false
-      end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        flash[:error] = "Couldn't find the Data file or you are not authorized to view it"
-        format.html { redirect_to data_files_path }
-      end
-      return false
-    end
+
+  def translate_action action
+    action="download" if action=="data"
+    action
   end
-  
+
 end
