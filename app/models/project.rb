@@ -1,5 +1,6 @@
 require 'grouped_pagination'
 require 'simple_crypt'
+require 'acts_as_yellow_pages'
 
 class Project < ActiveRecord::Base
 

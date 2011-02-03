@@ -1,4 +1,5 @@
 require 'grouped_pagination'
+require 'acts_as_yellow_pages'
 
 class Institution < ActiveRecord::Base
 
