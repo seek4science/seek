@@ -14,7 +14,7 @@ module Acts #:nodoc:
 
     module ClassMethods
       def acts_as_isa
-        default_scope :order => "updated_at DESC"
+        default_scope :order => "#{self.table_name}.updated_at DESC"
 
         title_trimmer
 
