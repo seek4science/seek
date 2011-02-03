@@ -20,8 +20,8 @@ class DoiQuery
       params[:noredirect] = true
       url = FETCH_URL + "?" + params.delete_if{|k,v| k.nil?}.to_param
       
-      doc = query(url)  
-      
+      doc = query(url)
+
       return parse_xml(doc)
     rescue
       raise
@@ -29,14 +29,20 @@ class DoiQuery
   end
   
   #Parses the XML returned from the DOI query, and creates an object
-  def parse_xml(doc)
+  def parse_xml(doc)    
     begin
-      article = doc.find_first("//journal")    
+
       params = {}
+
+      article = doc.find_first("//journal")
+      params[:type]=DoiRecord::PUBLICATION_TYPES[:journal] unless article.nil?
+      article ||= doc.find_first("//conference")
+      params[:type] ||= DoiRecord::PUBLICATION_TYPES[:conference] unless article.nil?
       
       params[:doc] = article
       
       title = article.find_first('//journal_article/titles/title')
+      title ||= article.find_first('//conference_paper/titles/title')
       params[:title] = title.nil? ? nil : title.content
       
       params[:authors] = []
@@ -47,7 +53,10 @@ class DoiQuery
       end
       
       journal = article.find_first('//journal_metadata/abbrev_title')
+      journal ||= article.find_first("//proceedings_metadata/proceedings_title")
+
       params[:journal] = journal.nil? ? nil : journal.content
+
       
       date = article.find_first('//publication_date')
       params[:pub_date] = date.nil? ? nil : parse_date(date)

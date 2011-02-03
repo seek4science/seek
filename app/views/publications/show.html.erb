@@ -38,6 +38,15 @@
           <%= link_to h(@publication.project.name),@publication.project %>
         <% end -%>
       </p>
+
+      <p>
+        <label><%= publication_type_text @publication.publication_type -%>:</label>
+        <%=h @publication.journal -%>
+        <br/>
+        <label>Date Published:</label>
+        <%= @publication.published_date.strftime("#{@publication.published_date.day.ordinalize} %B %Y") -%>
+      </p>
+
       <p>
         <label>Author<%= @publication.seek_authors.size + @publication.non_seek_authors.size > 1 ? "s" : "" -%>:</label>
         <% if @publication.seek_authors.empty? && @publication.non_seek_authors.empty? %>
@@ -50,13 +59,6 @@
             <%= author.last_name + " " + author.first_name + ((author == @publication.non_seek_authors.last) ? "" : ", ") %>
           <% end %>
         <% end %>
-      </p>
-      <p>
-        <label>Journal:</label>
-        <%=h @publication.journal -%>
-        <br/>
-        <label>Date Published:</label>
-        <%= @publication.published_date.strftime("#{@publication.published_date.day.ordinalize} %B %Y") -%>
       </p>
 
       <p>
