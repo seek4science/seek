@@ -10,7 +10,7 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_model_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url]
+  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url]
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
@@ -451,11 +451,10 @@ class ModelsController < ApplicationController
   # DELETE /models/1
   # DELETE /models/1.xml
   def destroy
-    @model = Model.find(params[:id])
     @model.destroy
     
     respond_to do |format|
-      format.html { redirect_to(models_url) }
+      format.html { redirect_to(models_path) }
       format.xml  { head :ok }
     end
   end
@@ -504,31 +503,11 @@ class ModelsController < ApplicationController
       @display_model = params[:version] ? @model.find_version(params[:version]) : @model.latest_version
     end
   end
-  
-  def find_model_auth
-    begin
-      action=action_name      
-      action="download" if action == "simulate"
-      action="edit" if ["submit_to_jws","builder"].include?(action)
-      
-      model = Model.find(params[:id])
-      
-      if Authorization.is_authorized?(action, nil, model, current_user)
-        @model = model
-      else
-        respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to models_path }
-        end
-        return false
-      end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        flash[:error] = "Couldn't find the Model or you are not authorized to view it"
-        format.html { redirect_to models_path }
-      end
-      return false
-    end
+
+  def translate_action action
+    action="download" if action == "simulate"
+    action="edit" if ["submit_to_jws","builder"].include?(action)
+    action
   end
   
   def jws_enabled

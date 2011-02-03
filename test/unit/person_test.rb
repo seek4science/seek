@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
   fixtures :all
@@ -8,13 +8,25 @@ class PersonTest < ActiveSupport::TestCase
     p=people(:quentin_person)
     assert_equal 2,p.work_groups.size
   end
-  
+
+  def test_is_asset
+    assert !Person.is_asset?
+    assert !people(:quentin_person).is_asset?
+    assert !people(:quentin_person).is_downloadable_asset?
+  end
+
   def test_admins_named_scope
     admins=Person.admins
     assert_equal 1,admins.size
     assert admins.include?(people(:quentin_person))
   end
-  
+
+  def test_avatar_key
+    p=people(:quentin_person)
+    assert_nil p.avatar_key
+    assert p.defines_own_avatar?
+  end
+
   def test_first_person_is_admin
     assert Person.count>0 #should already be people from fixtures
     p=Person.new(:first_name=>"XXX",:email=>"xxx@email.com")

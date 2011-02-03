@@ -1,4 +1,4 @@
-require 'acts_as_resource'
+require 'acts_as_asset'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
@@ -7,7 +7,7 @@ class Publication < ActiveRecord::Base
   
   title_trimmer
 
-  acts_as_resource
+  acts_as_asset
   
   grouped_pagination
   
@@ -64,9 +64,14 @@ class Publication < ActiveRecord::Base
   def check_identifier_present
     if self.doi.nil? && self.pubmed_id.nil?
       self.errors.add_to_base("Please specify either a PubMed ID or DOI")
-      return false
+      false
     else
-      return true
+      true
     end
+  end
+
+  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
   end
 end

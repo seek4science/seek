@@ -3,6 +3,11 @@ require 'uuidtools'
 require 'fileutils'
 
 module Seek
+
+  class DownloadException < Exception
+
+  end
+  
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
   
   # Handles downloading data files from a Remote site, together with authentication using the provided username and password.
@@ -70,11 +75,11 @@ module Seek
             result = cache f,result,url,username,password
             return result
           else
-            raise Exception.new("Problem fetching data from remote site - response code #{thing.status[0]}, url: #{url}")
+            raise DownloadException.new("Problem fetching data from remote site - response code #{thing.status[0]}, url: #{url}")
           end
         end        
       rescue OpenURI::HTTPError => error
-        raise Exception.new("Problem fetching data from remote site - response code #{error.io.status[0]}, url:#{url}")
+        raise DownloadException.new("Problem fetching data from remote site - response code #{error.io.status[0]}, url:#{url}")
       end
       
     end

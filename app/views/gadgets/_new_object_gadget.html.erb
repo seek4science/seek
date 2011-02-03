@@ -1,39 +1,8 @@
-<script type="text/javascript">
-
-  function newAsset() {
-    selected_model=$('new_resource_type').value;
-
-    if (selected_model == "model") {
-      location.href = "<%= new_model_path -%>";
-    }
-    else if (selected_model == "sop") {
-      location.href = "<%= new_sop_path -%>";
-    }
-    else if (selected_model == "assay") {
-      location.href = "<%= new_assay_path -%>";
-    }
-    else if (selected_model == "investigation") {
-      location.href = "<%= new_investigation_path -%>";
-    }
-    else if (selected_model == "study") {
-      location.href = "<%= new_study_path -%>";
-    }
-    else if (selected_model == "data_file") {
-      location.href = "<%= new_data_file_path -%>";
-    }
-    else if (selected_model == "investigation") {
-      location.href = "<%= new_investigation_path -%>";
-    }
-    else if (selected_model == "publication") {
-      location.href = "<%= new_publication_path -%>";
-    }
-
-  }
-
-</script>
-
 <% unless current_user.person.work_groups.empty? -%>
   <% cache "new_object_gadget" do -%>
+
+   <%= new_creatable_javascript -%>
+
     <div id="new_asset" class="sysmo_gadget">
       
       <div class="header">

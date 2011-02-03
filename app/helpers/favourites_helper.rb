@@ -14,31 +14,22 @@ module FavouritesHelper
   def fav_image_tag favourite
     item = favourite.resource
     title = get_object_title(item)
-    
     tiny_image = ""
-    case item.class.name.downcase
-    when "datafile", "sop"
-      tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
-    when "model","investigation","study","publication","event"
-      tiny_image = image "#{item.class.name.downcase}_avatar", :class=>"fav_icon"
-    when "assay"
-      type=item.is_modelling? ? "modelling" : "experimental"
-      tiny_image = image "#{item.class.name.downcase}_#{type}_avatar", :class=>"fav_icon"
-    when "person", "project", "institution"
+
+    if item.avatar_key
+      tiny_image = image item.avatar_key, :class=>"fav_icon"
+    elsif item.defines_own_avatar?
       if (item.avatar_selected?)
         tiny_image = image_tag avatar_url(item, item.avatar_id, 32), :alt=> h(title), :class => 'fav_icon'
       else
         tiny_image = default_avatar(item.class.name, 32, h(title))
       end
-    when "organism"
-      tiny_image = image "#{item.class.name.downcase}_avatar", :class=>"fav_icon"
-    when "savedsearch"
-      tiny_image = image "saved_search", :class=>"fav_icon"
+    elsif item.use_mime_type_for_avatar?
+      tiny_image = image_tag(file_type_icon_url(item), :class=>"fav_icon")
     end
-    
-    image_tag_code = tiny_image #avatar(item, 24, true)
 
-    return link_to_draggable(image_tag_code, show_resource_path(item), :title=>tooltip_title_attrib(title),:class=>"favourite", :id=>"fav_#{favourite.id}")
+    link_to_draggable(tiny_image, show_resource_path(item), :title=>tooltip_title_attrib(title),:class=>"favourite", :id=>"fav_#{favourite.id}")
+
   end
   
   def favourite_drag_element drag_id

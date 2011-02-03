@@ -1,14 +1,20 @@
 # Methods added to this helper will be available to all templates in the application.
+
 module ApplicationHelper
   include TagsHelper
   include SavageBeast::ApplicationHelper
 
-  #List of creatable model classes
-  def creatable_classes
-    #FIXME: make these discovered automatically.
-    #FIXME: very bad method name
-    [Model,DataFile,Sop,Study,Assay,Investigation,Publication,Event]
+  #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
+  #returns a list of all types that respond_to and return true for user_creatable?
+  def user_creatable_classes
+    return @@creatable_model_classes if @creatable_model_classes
+    Dir.glob(RAILS_ROOT + '/app/models/*.rb').each { |file| require file }
 
+    @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
+      c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
+    end
+    @@creatable_model_classes.delete(Event) unless EVENTS_ENABLED
+    @@creatable_model_classes = @@creatable_model_classes.compact.sort{|a,b| a.name <=> b.name}    
   end
 
   #joins the list with seperator and the last item with an 'and'
@@ -71,9 +77,28 @@ module ApplicationHelper
     return results
   end
 
+  def new_creatable_javascript
+    script="<script type='text/javascript'>\n"
+    script << "function newAsset() {\n"
+    script << "selected_model=$('new_resource_type').value;\n"
+    user_creatable_classes.each do |c|
+      name=c.name.underscore
+      path = eval "new_#{name}_path"
+      if c==user_creatable_classes.first
+        script << "if "
+      else
+        script << "else if "
+      end
+      script << "(selected_model == '#{name}') {\n location.href = '#{path}';\n }\n"
+
+    end
+    script << "}\n"
+    script << "</script>"
+  end
+
   #selection of assets for new asset gadget
   def new_creatable_selection
-    select_tag :new_resource_type, options_for_select(creatable_classes.collect{|c| [c.name.underscore.humanize,c.name.underscore] })
+    select_tag :new_resource_type, options_for_select(user_creatable_classes.collect{|c| [c.name.underscore.humanize,c.name.underscore] })
   end
   
   def is_nil_or_empty? thing

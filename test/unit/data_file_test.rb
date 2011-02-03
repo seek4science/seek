@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class DataFileTest < ActiveSupport::TestCase
 
@@ -11,6 +11,14 @@ class DataFileTest < ActiveSupport::TestCase
 
     blob=content_blobs(:picture_blob)
     assert_equal blob,datafile.content_blob    
+  end
+
+  def test_avatar_key
+    assert_nil data_files(:picture).avatar_key
+    assert data_files(:picture).use_mime_type_for_avatar?
+
+    assert_nil data_file_versions(:picture_v1).avatar_key
+    assert data_file_versions(:picture_v1).use_mime_type_for_avatar?
   end
 
   test "project" do

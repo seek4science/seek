@@ -1,5 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
- 
+require 'test_helper'
 
 class WorkGroupTest < ActiveSupport::TestCase
   fixtures :people, :projects,:institutions, :work_groups, :group_memberships

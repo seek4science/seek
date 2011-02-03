@@ -1,9 +1,8 @@
 <%
 creators = []
 creators = resource.creators if resource.respond_to? :creators
-(creators = creators + [resource.contributor.try(:person)]) unless (resource.class == Publication)
+(creators = creators + [resource.contributor.try(:person)])
 creators = creators.compact.uniq
-creators_sorted_by_avatar = creators.sort_by{|p| p.avatar_id.nil? ? 1 : 0}
 %>
 <div style="text-align: center">
   
@@ -13,7 +12,7 @@ creators_sorted_by_avatar = creators.sort_by{|p| p.avatar_id.nil? ? 1 : 0}
         <%=  favouritable_icon(a, 60) -%>
       <% end -%>
     <% else %>
-      <% creators_sorted_by_avatar[0...2].each do |a|  -%>
+      <% creators[0...2].each do |a|  -%>
         <%=  favouritable_icon(a, 60) -%>
       <% end -%>
       <div id="authorAvatarList<%= resource.object_id -%>" class="avatar_list_popup" style="display:none;">

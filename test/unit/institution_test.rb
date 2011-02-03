@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class InstitutionTest < ActiveSupport::TestCase
   fixtures :institutions,:projects,:work_groups,:users,:group_memberships, :people
@@ -15,6 +15,12 @@ class InstitutionTest < ActiveSupport::TestCase
     i.destroy
     assert_equal (n_inst-1),Institution.find(:all).size
     assert_equal (n_wg-1), WorkGroup.find(:all).size, "the workgroup should also have been destroyed"
+  end
+
+  def test_avatar_key
+    i=institutions(:one)
+    assert_nil i.avatar_key
+    assert i.defines_own_avatar?
   end
 
   def test_title_trimmed

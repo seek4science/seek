@@ -78,4 +78,3 @@ Rails::Initializer.run do |config|
 end
 
 
-

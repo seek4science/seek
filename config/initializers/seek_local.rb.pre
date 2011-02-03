@@ -2,7 +2,7 @@
 JERM_ENABLED = true
 
 #Enable search. Requires Solr to be running.
-SOLR_ENABLED = true
+SOLR_ENABLED = false
 
 #Enable email
 EMAIL_ENABLED = false
@@ -12,6 +12,9 @@ ACTIVATION_REQUIRED=false
 
 #enable JWS Online for building and simulating SBML models
 JWS_ENABLED = true
+
+#Enable Events - a type for describing conferences and meetings
+EVENTS_ENABLED = true
 
 #a threshold of the total number of times a tag must occur before it appears in the tag cloud. Increasing this setting can prevent
 #a very large tag cloud as the number of tags grow.

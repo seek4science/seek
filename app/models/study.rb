@@ -45,4 +45,9 @@ class Study < ActiveRecord::Base
     assays.empty? && can_edit?(user)
   end
 
+  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
+  end
+
 end

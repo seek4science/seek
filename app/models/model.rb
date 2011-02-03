@@ -1,4 +1,4 @@
-require 'acts_as_resource'
+require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
@@ -9,7 +9,7 @@ class Model < ActiveRecord::Base
 
   title_trimmer
   
-  acts_as_resource
+  acts_as_asset
   acts_as_trashable
   
   has_many :favourites, 
@@ -74,6 +74,11 @@ class Model < ActiveRecord::Base
 
   def organism_name
     organism.title unless organism.nil?
-  end    
+  end
+
+  #defines that this is a user_creatable object, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
+  end
   
 end

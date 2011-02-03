@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class FavouritesControllerTest < ActionController::TestCase
   
@@ -98,7 +98,7 @@ class FavouritesControllerTest < ActionController::TestCase
 
   def test_valid_delete
     project = projects(:two)  
-    id="fav_#{favourites(:one).id}"
+    id="fav_#{favourites(:project_fav).id}"
     xml_http_request(:delete, :delete, {:id=>id})
     assert_response :success
     fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)

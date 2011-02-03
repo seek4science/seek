@@ -1,6 +1,5 @@
 require 'test_helper'
 
-
 class ContentBlobTest < ActiveSupport::TestCase
   
   fixtures :content_blobs

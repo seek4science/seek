@@ -38,4 +38,13 @@ class Event < ActiveRecord::Base
 
   alias_attribute :data_file_masters, :data_files
 
+  def show_contributor_avatars?
+    false
+  end
+
+  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
+  def self.user_creatable?
+    true
+  end
+
 end

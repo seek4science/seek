@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class AssayTest < ActiveSupport::TestCase
   fixtures :all
@@ -8,6 +8,21 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 2,assay.sops.size
     assert assay.sops.include?(sops(:my_first_sop).versions.first)
     assert assay.sops.include?(sops(:sop_with_fully_public_policy).versions.first)
+  end
+
+  test "is_asset?" do
+    assert !Assay.is_asset?
+    assert !assays(:metabolomics_assay).is_asset?
+  end
+
+  test "authorization supported?" do
+    assert !Assay.authorization_supported?
+    assert !assays(:metabolomics_assay).authorization_supported?
+  end
+
+  test "avatar_key" do
+    assert_equal "assay_experimental_avatar",assays(:metabolomics_assay).avatar_key
+    assert_equal "assay_modelling_avatar",assays(:modelling_assay_with_data_and_relationship).avatar_key
   end
 
   test "is_modelling" do

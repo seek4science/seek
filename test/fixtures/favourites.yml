@@ -6,10 +6,14 @@
 # two:
 #   column: value
 
-one:
+project_fav:
     resource_type: Project
     resource_id: 2
     user_id: 1
+
+data_file_fav:
+    user: pal_user
+    resource: picture(DataFile)
 
 saved_search:
     user: pal_user

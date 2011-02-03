@@ -6,7 +6,7 @@ class SopsController < ApplicationController
   
   before_filter :login_required
   before_filter :find_assets, :only => [ :index ]  
-  before_filter :find_sop_auth, :except => [ :index, :new, :create, :request_resource,:preview , :test_asset_url]
+  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview , :test_asset_url]
   before_filter :find_display_sop, :only=>[:show,:download]
   
   
@@ -168,7 +168,7 @@ class SopsController < ApplicationController
     @sop.destroy
     
     respond_to do |format|
-      format.html { redirect_to(sops_url) }
+      format.html { redirect_to(sops_path) }
     end
   end
   
@@ -205,28 +205,6 @@ class SopsController < ApplicationController
   def find_display_sop
     if @sop
       @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
-    end
-  end
-  
-  def find_sop_auth
-    begin
-      sop = Sop.find(params[:id])             
-      
-      if Authorization.is_authorized?(action_name, nil, sop, current_user)
-        @sop = sop
-      else
-        respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to sops_path }
-        end
-        return false
-      end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        flash[:error] = "Couldn't find the SOP or you are not authorized to view it"
-        format.html { redirect_to sops_path }
-      end
-      return false
     end
   end
   

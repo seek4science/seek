@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
+require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
   
@@ -18,7 +18,12 @@ class ProjectTest < ActiveSupport::TestCase
     wg=WorkGroup.find(:all).first
     assert_same 1,wg.project_id
   end
-      
+
+  def test_avatar_key
+    p=projects(:sysmo_project)
+    assert_nil p.avatar_key
+    assert p.defines_own_avatar?
+  end
 
   def test_title_alias_for_name
     p=projects(:sysmo_project)
@@ -195,6 +200,9 @@ class ProjectTest < ActiveSupport::TestCase
 
     assert_equal 1,project.pals.size
     assert project.pals.include?(pal)
+
+    project = projects(:moses_project)
+    assert !project.pals.include?(pal)
   end
 
   test "test uuid generated" do

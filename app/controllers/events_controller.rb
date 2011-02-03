@@ -1,8 +1,10 @@
 class EventsController < ApplicationController
   before_filter :login_required
-  before_filter :find_event_auth, :except =>  [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
+  before_filter :find_and_auth, :except =>  [ :index, :new, :create, :preview]
 
   before_filter :find_assets
+
+  before_filter :check_events_enabled
 
   include IndexPager
   
@@ -61,31 +63,6 @@ class EventsController < ApplicationController
     end
   end
 
-  def find_event_auth
-    begin
-      action=action_name
-      event = Event.find(params[:id])
-
-      if Authorization.is_authorized?(action, nil, event, current_user)
-        @event = event
-      else
-        respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to events_path }
-          #FIXME: this isn't the right response - should return with an unauthorized status code
-          format.xml { redirect_to events_path(:format=>"xml") }
-        end
-        return false
-      end
-    rescue ActiveRecord::RecordNotFound
-      respond_to do |format|
-        flash[:error] = "Couldn't find the Event or you are not authorized to view it"
-        format.html { redirect_to events_path }
-      end
-      return false
-    end
-  end
-
   def edit
     @new = false
     render "events/form"
@@ -115,6 +92,20 @@ class EventsController < ApplicationController
         format.html {render "events/form"}
       end
     end
+  end
+
+  private
+
+  #filter to check if events are enabled using the EVENTS_ENABLED configuration flag
+  def check_events_enabled
+    if !EVENTS_ENABLED
+      respond_to do |format|
+        flash[:error]="Events are currently disabled"
+        format.html { redirect_to root_path }
+      end
+      return false
+    end
+    true
   end
 
 
