@@ -1,7 +1,10 @@
 require 'grouped_pagination'
 require 'acts_as_yellow_pages'
+require 'title_trimmer'
 
 class Institution < ActiveRecord::Base
+
+  title_trimmer
 
   acts_as_yellow_pages
 

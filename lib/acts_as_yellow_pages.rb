@@ -1,4 +1,3 @@
-require 'title_trimmer'
 require 'acts_as_editable'
 require 'acts_as_uniquely_identifiable'
 
@@ -15,8 +14,6 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_yellow_pages
         #default_scope :order => "title/name DESC"
-
-        title_trimmer
 
         validates_presence_of :name
 
@@ -63,7 +60,7 @@ module Acts #:nodoc:
       # "false" returned by this helper method won't mean that no avatars are uploaded for this yellow page model;
       # it rather means that no avatar (other than default placeholder) was selected for the yellow page model
       def avatar_selected?
-        return !avatar_id.nil?
+        return !self.avatar_id.nil?
       end
     end
   end

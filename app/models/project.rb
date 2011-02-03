@@ -1,10 +1,15 @@
 require 'grouped_pagination'
 require 'simple_crypt'
 require 'acts_as_yellow_pages'
+require 'title_trimmer'
 
 class Project < ActiveRecord::Base
 
+  acts_as_yellow_pages
+
   include SimpleCrypt
+
+  title_trimmer
   
   validates_uniqueness_of :name
 
