@@ -1,39 +1,16 @@
-require 'acts_as_editable'
 require 'grouped_pagination'
 require 'simple_crypt'
-require 'acts_as_uniquely_identifiable'
-require 'title_trimmer'
 
 class Project < ActiveRecord::Base
 
   include SimpleCrypt
   
-  title_trimmer
-  
-  acts_as_editable
-  
-  has_many :favourites, 
-    :as => :resource,
-    :dependent => :destroy
-  
-  validates_presence_of :name
   validates_uniqueness_of :name
 
   grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for project
   
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
-  
-  validates_associated :avatars
-  
-  belongs_to :avatar
-
-  #TODO: refactor to remove :name entirely
-  alias_attribute :title,:name
-  
-  has_many :avatars, 
-    :as => :owner,
-    :dependent => :destroy
 
   has_many :investigations
   has_many :studies, :through=>:investigations  
@@ -66,8 +43,6 @@ class Project < ActiveRecord::Base
   attr_accessor :site_username,:site_password
 
   before_save :set_credentials
-  
-  acts_as_uniquely_identifiable
   
   def institutions=(new_institutions)
     new_institutions.each_index do |i|
@@ -107,12 +82,6 @@ class Project < ActiveRecord::Base
     end
     #TODO: write a test to check they are ordered
     return res.sort{|a,b| (a.last_name.nil? ? a.name : a.last_name) <=> (a.last_name.nil? ? a.name : a.last_name)}
-  end
-  
-  # "false" returned by this helper method won't mean that no avatars are uploaded for this project;
-  # it rather means that no avatar (other than default placeholder) was selected for the project 
-  def avatar_selected?
-    return !avatar_id.nil?
   end
 
   # provides a list of people that are said to be members of this project, but are not associated with any user

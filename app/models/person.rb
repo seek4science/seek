@@ -1,22 +1,14 @@
-require 'acts_as_editable'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
 
 class Person < ActiveRecord::Base
   
   before_save :first_person_admin
   
-  acts_as_editable
-  
   acts_as_notifiee
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy  
   
   grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
     
-  validates_presence_of :name,:email
+  validates_presence_of :email
 
   #FIXME: consolidate these regular expressions into 1 holding class
   validates_format_of :email,:with=>RFC822::EmailAddress
@@ -24,15 +16,8 @@ class Person < ActiveRecord::Base
 
   validates_uniqueness_of :email
 
-  validates_associated :avatars
-
   has_and_belongs_to_many :disciplines
-  
-  has_many :avatars,
-    :as => :owner,
-    :dependent => :destroy
-  belongs_to :avatar
-    
+
   has_many :group_memberships
   
   has_many :favourite_group_memberships, :dependent => :destroy
@@ -58,15 +43,11 @@ class Person < ActiveRecord::Base
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
   named_scope :pals,:conditions=>{:is_pal=>true}
   named_scope :admins,:conditions=>{:is_admin=>true}
-
-  alias_attribute :title, :name
   
   alias_attribute :webpage,:web_page   
   
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
-  
-  acts_as_uniquely_identifiable
   
   def self.userless_people
     p=Person.find(:all)
@@ -163,12 +144,6 @@ class Person < ActiveRecord::Base
     #capitalize, including double barrelled names
     #TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
-  end
-    
-  # "false" returned by this helper method won't mean that no avatars are uploaded for this person;
-  # it rather means that no avatar (other than default placeholder) was selected for the person
-  def avatar_selected?
-    return !avatar_id.nil?
   end
 
   def roles
