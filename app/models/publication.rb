@@ -31,7 +31,7 @@ class Publication < ActiveRecord::Base
   
   acts_as_uniquely_identifiable
 
-#   default_scope :order => "published_date DESC"
+  default_scope :order => "#{self.table_name}.published_date DESC"
     
 
   def extract_pubmed_metadata(pubmed_record)

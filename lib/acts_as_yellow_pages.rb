@@ -13,7 +13,7 @@ module Acts #:nodoc:
 
     module ClassMethods
       def acts_as_yellow_pages
-        #default_scope :order => "title/name DESC"
+        default_scope :order => "#{self.table_name}.name DESC"
 
         validates_presence_of :name
 

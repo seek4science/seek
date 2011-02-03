@@ -26,7 +26,7 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_asset
         acts_as_authorized
-        #default_scope :order => "updated_at DESC"          
+        default_scope :order => "#{self.table_name}.updated_at DESC"
 
         has_many :relationships,
                  :class_name => 'Relationship',
