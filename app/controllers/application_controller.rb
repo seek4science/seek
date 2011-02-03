@@ -189,9 +189,9 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to object }
+          format.html { redirect_to eval "#{self.controller_name}_path" }
           #FIXME: this isn't the right response - should return with an unauthorized status code
-          format.xml { redirect_to object,:format=>"xml" }
+          format.xml { redirect_to eval "#{self.controller_name}_path(:format=>'xml')" }
         end
         return false
       end
