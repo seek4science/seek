@@ -502,7 +502,13 @@ class ModelsController < ApplicationController
     if @model
       @display_model = params[:version] ? @model.find_version(params[:version]) : @model.latest_version
     end
-  end  
+  end
+
+  def translate_action action
+    action="download" if action == "simulate"
+    action="edit" if ["submit_to_jws","builder"].include?(action)
+    action
+  end
   
   def jws_enabled
     unless JWS_ENABLED      

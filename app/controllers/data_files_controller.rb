@@ -224,5 +224,9 @@ class DataFilesController < ApplicationController
     end
   end
 
-  
+  def translate_action action
+    action="download" if action=="data"
+    action
+  end
+
 end

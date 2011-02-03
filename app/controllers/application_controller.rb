@@ -179,9 +179,7 @@ class ApplicationController < ActionController::Base
     begin
       name = self.controller_name.singularize
       action=action_name
-      action="download" if action=="data"
-      action="download" if action == "simulate"
-      action="edit" if ["submit_to_jws","builder"].include?(action)
+      action = translate_action(action) if respond_to?(:translate_action)            
 
       object = name.camelize.constantize.find(params[:id])
 
