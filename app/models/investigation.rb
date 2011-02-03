@@ -1,29 +1,18 @@
-require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
-require 'title_trimmer'
+require 'acts_as_isa'
 
 class Investigation < ActiveRecord::Base    
+  acts_as_isa
   
   belongs_to :project
   has_many :studies  
-  
-  title_trimmer
 
-  validates_presence_of :title
+
   validates_presence_of :project
   validates_uniqueness_of :title
 
   has_many :assays,:through=>:studies
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
-  
-  grouped_pagination  
-  
-  acts_as_uniquely_identifiable
 
   def can_edit? user
     user.person.projects.include?(project)
@@ -39,11 +28,6 @@ class Investigation < ActiveRecord::Base
   
   def sops
     assays.collect{|assay| assay.sops}.flatten.uniq
-  end
-
-  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
-    true
   end
 
   
