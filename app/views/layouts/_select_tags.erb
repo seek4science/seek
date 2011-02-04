@@ -1,0 +1,48 @@
+<div id="facebook" class="clearfix">
+  <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
+    <span class="tokenizer_stretcher">^_^</span>
+    <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
+    <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
+      <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
+    </div>
+  </div>
+  <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
+    <div class="typeahead_message">Type the areas you have expertise in</div>
+  </div>
+</div>
+
+
+<p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+  <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "#{name}_tag_suggestions", :duration => 0.4) %>
+</p>
+
+<div id="<%= name -%>_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
+  <div class="tags_smaller">
+	  <div id="<%= name -%>_select_tags" class="hTagcloud">
+	    <div class="popularity">
+	      <% unless existing_tag_counts.blank? -%>
+	        <% tag_cloud existing_tag_counts, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+	          <%= link_to tag.name, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class -%>
+	        <% end -%>
+	      <% end -%>
+	    </div>
+	  </div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+  var expertise_list = <%= existing_tag_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}.to_json -%>;
+  var prepopulate_with = <%= existing_tags.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+  var expertise_autocompleter_id = '<%= name -%>_autocompleter';
+  var expertise_autocompleter = new Autocompleter.LocalAdvanced(
+      expertise_autocompleter_id, '<%= name -%>_autocomplete_input', '<%= name -%>_autocomplete_display', '<%= name -%>_autocomplete_populate', expertise_list, prepopulate_with, {
+      frequency: 0.1,
+      updateElement: addAction,
+      search_field: "name",
+      id_field: "id",
+      validation_type: "any"
+  });
+  var hidden_input = new HiddenInput('<%= name -%>_hidden_input', expertise_autocompleter);
+  autocompleters[expertise_autocompleter_id] = expertise_autocompleter;
+</script>

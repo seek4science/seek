@@ -28,24 +28,6 @@ function trimSpaces(str) {
     return str;
 }
 
-function addToolListTag(tag_id) {
-    tools_autocompleter = autocompleters['tools_autocompleter']
-    var index = tools_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
-    var item = new Element('a', {
-        'value': index
-    });
-    tools_autocompleter.addContactToList(item);
-}
-
-function addExpertiseListTag(tag_id) {
-    expertise_autocompleter = autocompleters['expertise_autocompleter']
-    var index = expertise_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
-    var item = new Element('a', {
-        'value': index
-    });
-    expertise_autocompleter.addContactToList(item);
-}
-
 function addOrganismListTag(tag_id) {
 
     organism_autocompleter = autocompleters['organism_autocompleter']
@@ -77,18 +59,7 @@ function clearList(name) {
 }
 
 
-//Add the last tag entered onto the list when the element becomes unfocused.
-//Code taken from the onKeyPress method of autocompleter_advanced.js.
-function addLastTag(autocompleter_id){
-    var autocompleter = autocompleters[autocompleter_id];
-    var unrecognized_item = autocompleter.element.value.strip().sub(',', '');
-    if (unrecognized_item.length > 0 && autocompleter.validate_item(unrecognized_item)) {
-      autocompleter.addUnrecognizedItemToList(unrecognized_item);
-      autocompleter.element.value = "";        
-      autocompleter.set_input_size();
-    }
-    return false;
-  }
+
   
   
 /*==================================================
