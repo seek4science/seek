@@ -19,17 +19,23 @@
   <div class="main_content_left_box">
     <div class="box_about_actor">
       <p>
-        <label>Project:</label>
-        <% if @event.project.nil? -%>
-          <%= text_or_not_specified nil %>
-        <% else -%>
-          <%= link_to h(@event.project.name),@event.project %>
-        <% end -%>
-      </p>
-      <p>
         <label>Title:</label>
         <%=h @event.title -%>
       </p>
+      <p>
+        <label>Project:</label>
+        <% if @event.project.nil? -%>
+            <%= text_or_not_specified nil %>
+        <% else -%>
+            <%= link_to h(@event.project.name), @event.project %>
+        <% end -%>
+      </p>
+      <% unless @event.contributor.nil? then %>
+          <p>
+            <label>Uploader:</label>
+            <%= link_to h(@event.contributor.person.name), @event.contributor.person -%>
+          </p>
+      <% end %>
       <p>
         <label>Start Time:</label>
         <% if @event.start_date.nil? %>
