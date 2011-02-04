@@ -1,14 +1,5 @@
 var autocompleters = new Array();
 
-function addToolListTag(tag_id) {
-    tools_autocompleter = autocompleters['tools_autocompleter']
-    var index = tools_autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];
-    var item = new Element('a', {
-        'value': index
-    });
-    tools_autocompleter.addContactToList(item);
-}
-
 function addListTag(name,tag_id) {
     autocompleter = autocompleters[name+'_autocompleter'];
     var index = autocompleter.itemIDsToJsonArrayIDs([tag_id])[0];

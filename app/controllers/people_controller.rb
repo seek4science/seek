@@ -6,8 +6,7 @@ class PeopleController < ApplicationController
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
-  before_filter :auth_params,:only=>[:update,:create]
-  before_filter :set_tagging_parameters,:only=>[:edit,:new,:create,:update]
+  before_filter :auth_params,:only=>[:update,:create]  
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   
@@ -65,10 +64,7 @@ class PeopleController < ApplicationController
 
   # GET /people/new
   # GET /people/new.xml
-  def new
-    @tags_tools = Person.tool_counts.sort{|a,b| a.name<=>b.name}
-    @tags_expertise = Person.expertise_counts.sort{|a,b| a.name<=>b.name}
-
+  def new    
     @person = Person.new
 
     respond_to do |format|
@@ -79,10 +75,6 @@ class PeopleController < ApplicationController
 
   # GET /people/1/edit
   def edit
-    recommended_tag_limit = 30
-    @tags_tools = Person.tool_counts.sort{|a,b| b.total<=>a.total}[0...recommended_tag_limit].sort{|a,b| a.name<=>b.name}
-    @tags_expertise = Person.expertise_counts.sort{|a,b| b.total<=>a.total}[0...recommended_tag_limit].sort{|a,b| a.name<=>b.name}
-
     @person = Person.find(params[:id])
     
     possible_unsaved_data = "unsaved_#{@person.class.name}_#{@person.id}".to_sym
@@ -352,11 +344,4 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_tagging_parameters
-    tools=Person.tool_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}
-    @all_tools_as_json=tools.to_json
-
-    expertise=Person.expertise_counts.sort{|a,b| a.id<=>b.id}.collect{|t|{'id'=>t.id,'name'=>t.name}}
-    @all_expertise_as_json=expertise.to_json
-  end
 end

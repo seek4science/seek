@@ -3,4 +3,4 @@
   <%= help_icon("A comma seperated list of keywords that describe your expertise.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") -%>
 </label>
 
-<%= render :partial=>"layouts/select_tags",:locals=>{:existing_tag_counts=>@tags_expertise, :existing_tags=>@person.expertise, :name=>"expertise"} -%>
+<%= render :partial=>"layouts/select_tags",:locals=>{:existing_tag_counts=>Person.expertise_counts, :this_item_tags=>@person.expertise, :name=>"expertise", :no_tags_message=>"Type the areas you have expertise in" } -%>

@@ -1,3 +1,10 @@
+<%
+suggested_limit ||= 30
+suggested_tag_counts = existing_tag_counts.sort{|a,b| a.total <=> b.total}[0...suggested_limit]
+suggested_tag_counts.sort!{|a,b| a.name <=> b.name}
+existing_tag_counts.sort!{|a,b| a.name <=> b.name}
+%>
+
 <div id="facebook" class="clearfix">
   <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
     <span class="tokenizer_stretcher">^_^</span>
@@ -7,7 +14,7 @@
     </div>
   </div>
   <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
-    <div class="typeahead_message">Type the areas you have expertise in</div>
+    <div class="typeahead_message"><%= no_tags_message -%></div>
   </div>
 </div>
 
@@ -20,8 +27,8 @@
   <div class="tags_smaller">
 	  <div id="<%= name -%>_select_tags" class="hTagcloud">
 	    <div class="popularity">
-	      <% unless existing_tag_counts.blank? -%>
-	        <% tag_cloud existing_tag_counts, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+	      <% unless suggested_tag_counts.blank? -%>
+	        <% tag_cloud suggested_tag_counts, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
 	          <%= link_to tag.name, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class -%>
 	        <% end -%>
 	      <% end -%>
@@ -30,19 +37,22 @@
 	</div>
 </div>
 
-
 <script type="text/javascript">
-  var expertise_list = <%= existing_tag_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}.to_json -%>;
-  var prepopulate_with = <%= existing_tags.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
-  var expertise_autocompleter_id = '<%= name -%>_autocompleter';
-  var expertise_autocompleter = new Autocompleter.LocalAdvanced(
-      expertise_autocompleter_id, '<%= name -%>_autocomplete_input', '<%= name -%>_autocomplete_display', '<%= name -%>_autocomplete_populate', expertise_list, prepopulate_with, {
-      frequency: 0.1,
-      updateElement: addAction,
-      search_field: "name",
-      id_field: "id",
-      validation_type: "any"
-  });
-  var hidden_input = new HiddenInput('<%= name -%>_hidden_input', expertise_autocompleter);
-  autocompleters[expertise_autocompleter_id] = expertise_autocompleter;
+  function initialize_<%= name -%>() {
+      var list = <%= existing_tag_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}.to_json -%>;
+      var prepopulate_with = <%= this_item_tags.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+      var autocompleter_id = '<%= name -%>_autocompleter';
+      var autocompleter = new Autocompleter.LocalAdvanced(
+          autocompleter_id, '<%= name -%>_autocomplete_input', '<%= name -%>_autocomplete_display', '<%= name -%>_autocomplete_populate', list, prepopulate_with, {
+          frequency: 0.1,
+          updateElement: addAction,
+          search_field: "name",
+          id_field: "id",
+          validation_type: "any"
+      });
+      var hidden_input = new HiddenInput('<%= name -%>_hidden_input', autocompleter);
+      autocompleters[autocompleter_id] = autocompleter;
+  }
+  initialize_<%= name -%>();
+
 </script>
