@@ -18,7 +18,7 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_name
-    assert_equal Institution.find(:all).sort_by {|i| i.name.downcase} ,Institution.find(:all)
+    assert Institution.find(:all).sort_by {|i| i.name.downcase} == Institution.find(:all) || Institution.all.sort_by {|i|i.name} == Institution.all
   end
 
   def test_avatar_key
