@@ -1,8 +1,21 @@
+<%#
+
+    all_tags - are all the tags that are available that have been used for this item before. These are used for the suggested tags, and the autocomplete
+    item_tags - these are the tags already associated with the item, and will pre-populate the text box
+    name - is the name that is prefixed to element id's and javascript functions. should be unique if multiple tag boxes on a single page. The resulting tag id's
+           will be named '#{name}_ids'
+    suggested_limit - optional - is the number of tags to show in the suggested tags box. defaults to 7. If zero the suggested tag box won't be show.
+    no_tags_message - optional - the text that is displayed when the box is empty. Defaults to empty
+
+ %>
+
 <%
+
 suggested_limit ||= 30
-suggested_tag_counts = existing_tag_counts.sort{|a,b| a.total <=> b.total}[0...suggested_limit]
-suggested_tag_counts.sort!{|a,b| a.name <=> b.name}
-existing_tag_counts.sort!{|a,b| a.name <=> b.name}
+suggested_tags = all_tags.sort{|a,b| a.total <=> b.total}[0...suggested_limit]
+suggested_tags.sort!{|a,b| a.name <=> b.name}
+all_tags.sort!{|a,b| a.name <=> b.name}
+no_tags_message ||= ""
 %>
 
 <div id="facebook" class="clearfix">
@@ -18,7 +31,7 @@ existing_tag_counts.sort!{|a,b| a.name <=> b.name}
   </div>
 </div>
 
-
+<% if suggested_limit > 0 -%>
 <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
   <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "#{name}_tag_suggestions", :duration => 0.4) %>
 </p>
@@ -27,8 +40,8 @@ existing_tag_counts.sort!{|a,b| a.name <=> b.name}
   <div class="tags_smaller">
 	  <div id="<%= name -%>_select_tags" class="hTagcloud">
 	    <div class="popularity">
-	      <% unless suggested_tag_counts.blank? -%>
-	        <% tag_cloud suggested_tag_counts, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+	      <% unless suggested_tags.blank? -%>
+	        <% tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
 	          <%= link_to tag.name, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class -%>
 	        <% end -%>
 	      <% end -%>
@@ -37,10 +50,12 @@ existing_tag_counts.sort!{|a,b| a.name <=> b.name}
 	</div>
 </div>
 
+<% end -%>
+
 <script type="text/javascript">
   function initialize_<%= name -%>() {
-      var list = <%= existing_tag_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}.to_json -%>;
-      var prepopulate_with = <%= this_item_tags.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+      var list = <%= all_tags.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}.to_json -%>;
+      var prepopulate_with = <%= item_tags.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
       var autocompleter_id = '<%= name -%>_autocompleter';
       var autocompleter = new Autocompleter.LocalAdvanced(
           autocompleter_id, '<%= name -%>_autocomplete_input', '<%= name -%>_autocomplete_display', '<%= name -%>_autocomplete_populate', list, prepopulate_with, {

@@ -39,7 +39,7 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids = params[:assay_model_ids] || []
     
-    @assay.owner=current_user.person       
+    @assay.owner=current_user.person     
     
     respond_to do |format|
       if @assay.save

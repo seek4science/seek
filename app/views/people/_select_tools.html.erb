@@ -3,4 +3,4 @@
   <%= help_icon("A comma seperated list of keywords that describe your tools and techniques.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
 </label>
 
-<%= render :partial=>"layouts/select_tags",:locals=>{:existing_tag_counts=>Person.tool_counts, :this_item_tags=>@person.tools, :name=>"tools", :no_tags_message=>"Type the tools you use regularly" } -%>
+<%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>Person.tool_counts, :item_tags=>@person.tools, :name=>"tools", :no_tags_message=>"Type the tools you use regularly" } -%>
