@@ -10,6 +10,10 @@ class InvestigationTest < ActiveSupport::TestCase
     assert inv.studies.include?(studies(:metabolomics_study))    
   end
 
+  test "sort by updated_at" do
+    assert_equal Investigation.find(:all).sort_by {|i| i.updated_at.to_i * -1},Investigation.find(:all)
+  end
+
   test "assays through association" do
     inv=investigations(:metabolomics_investigation)
     assays=inv.assays

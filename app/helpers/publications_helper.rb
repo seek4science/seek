@@ -1,3 +1,5 @@
+require 'doi_record'
+
 module PublicationsHelper
   def people_by_project_options(projects, selected_person=nil, selected_project=nil)
     options = ""
@@ -17,5 +19,13 @@ module PublicationsHelper
       options += project_options unless project.people.empty?
     end   
     return options
-  end  
+  end
+
+  def publication_type_text type
+    if type==DoiRecord::PUBLICATION_TYPES[:conference]
+      "Conference"
+    else
+      "Journal"
+    end
+  end
 end

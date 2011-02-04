@@ -1,40 +1,23 @@
-require 'acts_as_editable'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
+require 'acts_as_yellow_pages'
 require 'title_trimmer'
 
 class Institution < ActiveRecord::Base
-  
-  acts_as_editable
-  
+
   title_trimmer
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
-  
+
+  acts_as_yellow_pages
+
   grouped_pagination
-  
-  validates_presence_of :name
-  validates_uniqueness_of :name  
-  validates_associated :avatars
+
+  validates_uniqueness_of :name
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
-
-  has_many :avatars, 
-           :as => :owner,
-           :dependent => :destroy
-           
-  belongs_to :avatar           
   
   has_many :work_groups, :dependent => :destroy
   has_many :projects, :through=>:work_groups
 
-  alias_attribute :title, :name
-
   acts_as_solr(:fields => [ :name,:country,:city ]) if SOLR_ENABLED
-  
-  acts_as_uniquely_identifiable
   
   def people
     res=[]
@@ -43,14 +26,7 @@ class Institution < ActiveRecord::Base
     end
     #TODO: write a test to check they are ordered
     return res.sort{|a,b| a.last_name <=> b.last_name}
-  end
-  
-  # "false" returned by this helper method won't mean that no avatars are uploaded for this institution;
-  # it rather means that no avatar (other than default placeholder) was selected for the institution 
-  def avatar_selected?
-    return !avatar_id.nil?
-  end
-  
+  end  
   
   # get a listing of all known institutions
   def self.get_all_institutions_listing

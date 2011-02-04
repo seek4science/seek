@@ -13,6 +13,10 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 1, event.data_files.count
   end
 
+  test "sort by created_at" do
+    assert_equal Event.find(:all).sort_by { |e| e.start_date.to_i * -1 }, Event.find(:all)
+  end
+
   test "datafiles are unique" do
     event = events(:event_with_no_files)
     assert event.data_files.empty?

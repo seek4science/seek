@@ -1,3 +1,4 @@
+
 # SysMO: lib/acts_as_asset.rb
 # Original code borrowed from myExperiment and tailored for SysMO needs.
 
@@ -26,6 +27,7 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_asset
         acts_as_authorized
+        default_scope :order => "#{self.table_name}.updated_at DESC"
 
         has_many :relationships,
                  :class_name => 'Relationship',
