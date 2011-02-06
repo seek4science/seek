@@ -30,8 +30,10 @@ module Sergey
               # authorised to admins and selected people within the project
               return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_projects?))
             when "Institution"
-              # authorised to admins and selected people within the project
-              return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_institutions?))
+              # authorised to admins, selected people within the project, and people with a project management role in the institution
+              return(subject.is_admin? ||
+                  (self.people.include?(subject.person) && subject.can_edit_institutions?) ||
+                  !self.class.work_groups.reduce([]){|sum,wg|sum + wg.group_memberships}.select{|gm| gm.person == subject.person and gm.roles.map{|r|r.name}.include?"Project Management"}.empty?)
             else
               # don't know what kind of object that is, not authorised
               return false
