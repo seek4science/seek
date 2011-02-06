@@ -33,6 +33,9 @@ Rails::Initializer.run do |config|
 
   config.load_paths += %W(#{RAILS_ROOT}/app/sweepers )
 
+  #Got an error 'can't dup NilClass' and the internet told me this should fix it
+  config.reload_plugins = true if RAILS_ENV == 'development'
+
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)
   # config.log_level = :info
