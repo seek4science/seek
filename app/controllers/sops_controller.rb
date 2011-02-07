@@ -90,9 +90,9 @@ class SopsController < ApplicationController
   end
   
   # POST /sops
-  def create
+  def create    
+
     if handle_data            
-      
       @sop = Sop.new(params[:sop])
       @sop.contributor=current_user
       @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
