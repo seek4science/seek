@@ -20,6 +20,9 @@
             <br/>
             <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
         </p>
+
+        <%= render :partial=>"assets/select_tags" -%>
+      
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
         <% if current_user_authorized_to_manage -%>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing

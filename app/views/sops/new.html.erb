@@ -20,6 +20,12 @@
         </p>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
         :project_hash => current_user.generate_own_project_id_name_hash } -%>
+
+        <p>
+          <label>Tags</label>
+
+          <%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>Sop.tag_counts, :item_tags=>@sop.tags, :name=>"tag", :no_tags_message=>"Type the areas you have expertise in" } -%>
+        </p>
         
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Sop",:show_publications=>false} -%>
 		

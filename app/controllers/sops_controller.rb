@@ -96,6 +96,8 @@ class SopsController < ApplicationController
       @sop = Sop.new(params[:sop])
       @sop.contributor=current_user
       @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
+
+      update_tags @sop
       
       respond_to do |format|
         if @sop.save
@@ -136,6 +138,8 @@ class SopsController < ApplicationController
       # update 'last_used_at' timestamp on the SOP
       params[:sop][:last_used_at] = Time.now
     end
+
+    update_tags @sop
     
     respond_to do |format|
       if @sop.update_attributes(params[:sop])
@@ -171,7 +175,7 @@ class SopsController < ApplicationController
       format.html { redirect_to(sops_path) }
     end
   end
-  
+
   
   def preview
     
@@ -200,7 +204,23 @@ class SopsController < ApplicationController
   
   protected
   
-  
+  def update_tags entity
+    new_tags = params[:tag_autocompleter_unrecognized_items]
+    known_tag_ids=params[:tag_autocompleter_selected_ids]
+
+    tags=""
+    known_tag_ids.each do |id|
+      tag=Tag.find(id)
+      tags << tag.name << "," unless tag.nil?
+    end unless known_tag_ids.nil?
+
+    new_tags.each do |tag|
+      tags << tag << ","
+    end
+
+    current_user.tag entity,:with=>tags,:on=>:tags
+
+  end
   
   def find_display_sop
     if @sop

@@ -4,6 +4,8 @@ require 'acts_as_uniquely_identifiable'
 class User < ActiveRecord::Base
 
   include SavageBeast::UserInit
+
+  acts_as_tagger
     
   belongs_to :person
   #validates_associated :person

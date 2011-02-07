@@ -31,7 +31,7 @@ no_tags_message ||= ""
   </div>
 </div>
 
-<% if suggested_limit > 0 -%>
+<% if suggested_limit > 0 && suggested_tags.count > 0 -%>
 <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
   <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "#{name}_tag_suggestions", :duration => 0.4) %>
 </p>

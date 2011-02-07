@@ -1,0 +1,13 @@
+<%
+   entity=controller_name.singularize
+   object=eval("@"+entity)
+   model_class=entity.camelize.constantize
+%>
+
+<p>
+  <label>Tags</label>
+    <%= "Current user = " + current_user.id.to_s -%>
+    <%= "Object = " + object.to_s %>
+    <%= "tags = " + object.tags_from(current_user).to_s %>
+  <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>model_class.tag_counts, :item_tags=>object.tags_on(:tags,current_user), :name=>"tag"} -%>
+</p>
