@@ -78,15 +78,15 @@ module Acts #:nodoc:
 
 
       def cache_remote_content_blob
-        if self.content_blob && self.content_blob.data.nil? && self.content_blob.url && self.project
+        if self.content_blob && self.content_blob.url && self.project
           begin
             p=self.project
             p.decrypt_credentials
             downloader            =Jerm::DownloaderFactory.create p.name
             resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
             data_hash             = downloader.get_remote_data self.content_blob.url, p.site_username, p.site_password, resource_type
-            self.content_blob.data=data_hash[:data]
-            self.content_type     =data_hash[:content_type]
+            self.content_blob.tmp_io_object = File.open data_hash[:data_tmp_path],"r"
+            self.content_type     = data_hash[:content_type]
             self.content_blob.save
             self.save
           rescue Exception=>e
