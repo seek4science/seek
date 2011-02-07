@@ -10,7 +10,7 @@ class PublicationsController < ApplicationController
   before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
 
-  ADMIN_EMAIL = "sowen@cs.man.ac.uk"
+  LOOKUP_ACCOUNT_EMAIL = "sowen@cs.man.ac.uk"
   
   def preview
     element=params[:element]
@@ -255,10 +255,10 @@ class PublicationsController < ApplicationController
     pubmed_id = @publication.pubmed_id
     doi = @publication.doi
     if pubmed_id
-      query = PubmedQuery.new("seek",ADMIN_EMAIL)
+      query = PubmedQuery.new("seek",LOOKUP_ACCOUNT_EMAIL)
       result = query.fetch(pubmed_id)      
     elsif doi
-      query = DoiQuery.new(ADMIN_EMAIL)
+      query = DoiQuery.new(LOOKUP_ACCOUNT_EMAIL)
       result = query.fetch(doi)
     end      
     unless result.nil?
@@ -302,7 +302,7 @@ class PublicationsController < ApplicationController
   
   def get_data(publication, pubmed_id, doi=nil)
     if !pubmed_id.nil?
-      query = PubmedQuery.new("sysmo-seek",ADMIN_EMAIL)
+      query = PubmedQuery.new("sysmo-seek",LOOKUP_ACCOUNT_EMAIL)
       result = query.fetch(pubmed_id)
       unless result.nil?
         publication.extract_pubmed_metadata(result)
@@ -311,7 +311,7 @@ class PublicationsController < ApplicationController
         raise "Error - No publication could be found with that PubMed ID"
       end    
     elsif !doi.nil?
-      query = DoiQuery.new(ADMIN_EMAIL)
+      query = DoiQuery.new(LOOKUP_ACCOUNT_EMAIL)
       result = query.fetch(doi)
       unless result.nil?
         publication.extract_doi_metadata(result)
