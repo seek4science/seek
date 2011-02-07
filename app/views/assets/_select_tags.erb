@@ -2,12 +2,18 @@
    entity=controller_name.singularize
    object=eval("@"+entity)
    model_class=entity.camelize.constantize
+   #FIXME: this is required for some cases where the page is rendererd from an error, but the @entity doesn't exist. Mainly when rendering from a caught Exception AssetsCommon.handle_data
+   #the correct fix is to fix AssetsCommon.handle_data to correctly create an instance of @entity
+   object ||= model_class.new
 %>
 
 <p>
-  <label>Tags</label>
-    <%= "Current user = " + current_user.id.to_s -%>
-    <%= "Object = " + object.to_s %>
-    <%= "tags = " + object.tags_from(current_user).to_s %>
-  <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>model_class.tag_counts, :item_tags=>object.tags_on(:tags,current_user), :name=>"tag"} -%>
+<div class="fold">
+  <div class="foldTitle">
+    Tags
+  </div>
+  <div class="foldContent">
+    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>model_class.tag_counts, :item_tags=>object.tags_on(:tags, current_user), :name=>"tag"} -%>
+  </div>
+</div>
 </p>
