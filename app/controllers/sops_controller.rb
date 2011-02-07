@@ -205,8 +205,8 @@ class SopsController < ApplicationController
   protected
   
   def update_tags entity
-    new_tags = params[:tag_autocompleter_unrecognized_items]
-    known_tag_ids=params[:tag_autocompleter_selected_ids]
+    new_tags = params[:tag_autocompleter_unrecognized_items] || []
+    known_tag_ids=params[:tag_autocompleter_selected_ids] || []
 
     tags=""
     known_tag_ids.each do |id|
