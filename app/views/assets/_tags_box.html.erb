@@ -1,0 +1,26 @@
+<%
+   entity=controller_name.singularize
+   object=eval("@"+entity)
+   model_class=entity.camelize.constantize
+   tags=object.tags
+%>
+
+<div class="tags_box">
+  <% unless tags.blank? -%>
+  <div id="tag_cloud">
+    <div class="tags_smaller">
+      <div class="hTagcloud">
+        <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+                <%
+                  type = tag.taggings.first.context.to_sym
+                  tag_class="#{css_class}"
+                %>
+                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => tag_class -%>
+            <% end -%>
+      </div>
+    </div>
+  </div>
+  <% else -%>
+    <span class="none_text">This item is yet to be tagged</span>
+  <% end -%>
+</div>
