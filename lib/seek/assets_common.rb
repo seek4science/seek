@@ -142,7 +142,7 @@ module Seek
         end
         return false
       else
-        #upload takes precendence if both params are present
+        #upload takes precedence if both params are present
         begin
           if !(params[symb][:data]).blank?
             # store properties and contents of the file temporarily and remove the latter from params[],
@@ -177,7 +177,7 @@ module Seek
               return false
             end            
           end
-        rescue Seek::IncompatibleProtocolException=>e
+        rescue Seek::IncompatibleProtocolException=>e          
           flash.now[:error] = e.message
           if render_action_on_error
             respond_to do |format|            
@@ -187,7 +187,7 @@ module Seek
             end
           end
           return false
-        rescue Exception=>e              
+        rescue Exception=>e
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
             respond_to do |format|            
