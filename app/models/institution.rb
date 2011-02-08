@@ -31,9 +31,8 @@ class Institution < ActiveRecord::Base
    def can_be_edited_by?(subject)
     return(subject.is_admin? ||
           (self.people.include?(subject.person) && subject.can_edit_institutions?) ||
-          (subject.person.is_project_manager &&
+          (subject.is_project_manager? &&
               self.work_groups.reduce([]) { |sum, wg| sum + wg.group_memberships }.find(false) { |gm| gm.person == subject.person and gm.roles.map { |r| r.name }.include? "Project Management" }))
-
   end
   
   # get a listing of all known institutions

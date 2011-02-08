@@ -142,7 +142,7 @@ class Project < ActiveRecord::Base
     return person_project_membership.roles
   end
 
-  def can_be_edited_by(subject)
+  def can_be_edited_by?(subject)
     return(subject.is_admin? || (self.people.include?(subject.person) && subject.can_edit_projects?))
   end
   
