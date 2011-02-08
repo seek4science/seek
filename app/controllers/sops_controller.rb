@@ -6,7 +6,7 @@ class SopsController < ApplicationController
   
   before_filter :login_required
   before_filter :find_assets, :only => [ :index ]  
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview , :test_asset_url]
+  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_sop, :only=>[:show,:download]
   
   
@@ -201,7 +201,12 @@ class SopsController < ApplicationController
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end
-  
+
+  def update_tags_ajax
+    @sop=Sop.find(params[:id])
+    update_tags @sop
+  end
+
   protected
   
   def update_tags entity
@@ -227,7 +232,6 @@ class SopsController < ApplicationController
       @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
     end
   end
-  
   
   def set_parameters_for_sharing_form
     policy = nil

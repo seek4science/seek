@@ -3,24 +3,69 @@
    object=eval("@"+entity)
    model_class=entity.camelize.constantize
    tags=object.tags
+   all_tags=model_class.tag_counts
+   no_tags_message||=""
+   name||="tag"
+   item_tags = object.tags_on(:tags, current_user)
 %>
 
 <div class="tags_box">
   <% unless tags.blank? -%>
-  <div id="tag_cloud">
-    <div class="tags_smaller">
-      <div class="hTagcloud">
-        <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+      <div id="tag_cloud">
+        <div class="tags_smaller">
+          <div class="hTagcloud">
+            <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
                 <%
-                  type = tag.taggings.first.context.to_sym
-                  tag_class="#{css_class}"
+                   type = tag.taggings.first.context.to_sym
+                   tag_class="#{css_class}"
                 %>
-                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => tag_class -%>
+                <%= link_for_tag tag, :type=>type, :truncate_length=>40, :class => tag_class -%>
             <% end -%>
+          </div>
+        </div>
+      </div>
+  <% else -%>
+      <span class="none_text">This item is yet to be tagged</span>
+  <% end -%>
+<% form_remote_tag :url=>{:action=>:update_tags_ajax},
+    :method=>:post,
+    :loading =>"show_ajax_loader('tag_cloud');" do
+%>
+  <div id="facebook" class="clearfix">
+    <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
+      <span class="tokenizer_stretcher">^_^</span>
+      <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
+
+      <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
+        <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
       </div>
     </div>
+    <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list">
+      <div class="typeahead_message"><%= no_tags_message -%></div>
+    </div>
   </div>
-  <% else -%>
-    <span class="none_text">This item is yet to be tagged</span>
-  <% end -%>
 </div>
+<p>
+	<%= submit_tag 'Update' -%>
+</p>
+<% end -%>
+
+<script type="text/javascript">
+    function initialize_<%= name -%>() {
+        var list = <%= all_tags.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}.to_json -%>;
+        var prepopulate_with = <%= item_tags.sort{|a,b| a.id<=>b.id}.collect{|t| t.id}.to_json -%>;
+        var autocompleter_id = '<%= name -%>_autocompleter';
+        var autocompleter = new Autocompleter.LocalAdvanced(
+                autocompleter_id, '<%= name -%>_autocomplete_input', '<%= name -%>_autocomplete_display', '<%= name -%>_autocomplete_populate', list, prepopulate_with, {
+            frequency: 0.1,
+            updateElement: addAction,
+            search_field: "name",
+            id_field: "id",
+            validation_type: "any"
+        });
+        var hidden_input = new HiddenInput('<%= name -%>_hidden_input', autocompleter);
+        autocompleters[autocompleter_id] = autocompleter;
+    }
+    initialize_<%= name -%>();
+
+</script>
