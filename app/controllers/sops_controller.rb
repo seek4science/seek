@@ -215,7 +215,7 @@ class SopsController < ApplicationController
 
     tags=""
     known_tag_ids.each do |id|
-      tag=Tag.find(id)
+      tag=ActsAsTaggableOn::Tag.find(id)
       tags << tag.name << "," unless tag.nil?
     end unless known_tag_ids.nil?
 

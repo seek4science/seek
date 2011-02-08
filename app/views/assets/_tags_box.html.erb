@@ -6,7 +6,7 @@
    all_tags=model_class.tag_counts
    no_tags_message||=""
    name||="tag"
-   item_tags = object.tags_on(:tags, current_user)
+   item_tags = object.owner_tags_on(current_user,:tags)
 %>
 
 <div class="tags_box">

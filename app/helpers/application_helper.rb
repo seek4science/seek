@@ -1,7 +1,7 @@
 # Methods added to this helper will be available to all templates in the application.
 
 module ApplicationHelper
-  include TagsHelper
+  include ActsAsTaggableOn::TagsHelper
   include SavageBeast::ApplicationHelper
 
   @@creatable_model_classes ||= nil
@@ -52,13 +52,13 @@ module ApplicationHelper
   end
 
   def tag_cloud(tags, classes)
-    max_count = tags.sort_by(&:total).last.total.to_f
+    max_count = tags.sort_by(&:count).last.count.to_f
     if max_count < 1
       max_count = 1
     end
 
     tags.each do |tag|
-      index = ((tag.total / max_count) * (classes.size - 1)).round
+      index = ((tag.count / max_count) * (classes.size - 1)).round
       yield tag, classes[index]
     end
   end

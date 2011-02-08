@@ -11,7 +11,7 @@
 <%
 
 suggested_limit ||= 30
-suggested_tags = all_tags.sort{|a,b| a.total <=> b.total}[0...suggested_limit]
+suggested_tags = all_tags.sort{|a,b| a.count <=> b.count}[0...suggested_limit]
 suggested_tags.sort!{|a,b| a.name <=> b.name}
 all_tags.sort!{|a,b| a.name <=> b.name}
 no_tags_message ||= ""

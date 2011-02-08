@@ -283,7 +283,7 @@ class PeopleController < ApplicationController
     
       tags=""
       params[:tools_autocompleter_selected_ids].each do |selected_id|        
-        tag=Tag.find(selected_id)        
+        tag=ActsAsTaggableOn::Tag.find(selected_id)        
         tags << tag.name << ","
       end unless params[:tools_autocompleter_selected_ids].nil?
       params[:tools_autocompleter_unrecognized_items].each do |item|
@@ -294,7 +294,7 @@ class PeopleController < ApplicationController
     
       tags=""
       params[:expertise_autocompleter_selected_ids].each do |selected_id|
-        tag=Tag.find(selected_id)
+        tag=ActsAsTaggableOn::Tag.find(selected_id)
         tags << tag.name << ","
       end unless params[:expertise_autocompleter_selected_ids].nil?
       params[:expertise_autocompleter_unrecognized_items].each do |item|

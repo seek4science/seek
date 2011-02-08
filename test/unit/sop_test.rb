@@ -9,6 +9,32 @@ class SopTest < ActiveSupport::TestCase
     assert_equal p,s.project
   end
 
+  test "tag ownership" do
+    s=sops(:my_first_sop)
+    assert s.tags.empty?, "This sop should have no tags for this test to work"
+
+    u1=users(:quentin)
+    u2=users(:aaron)
+
+    assert s.tags_from(u2).empty?
+    assert s.tags_from(u1).empty?
+
+    u1.tag(s,:with=>"one, two",:on=>:tags)
+    s.reload
+
+    assert_equal ["one","two"],s.tag_counts.collect{|t| t.name}.sort
+    assert_equal ["one","two"],s.tags_from(u1).sort
+    assert s.tags_from(u2).empty?
+
+    u2.tag(s,:with=>"two, three",:on=>:tags)
+
+    s.reload
+
+    assert_equal ["one","three","two"],s.tag_counts.collect{|t| t.name}.sort
+    assert_equal ["one","two"],s.tags_from(u1).sort
+    assert_equal ["three","two"],s.tags_from(u2).sort    
+  end
+
   def test_title_trimmed 
     sop=Sop.new(:title=>" test sop")
     sop.save!
