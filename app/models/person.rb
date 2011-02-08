@@ -158,6 +158,11 @@ class Person < ActiveRecord::Base
     return roles
   end
 
+  def is_project_manager?
+    #true if one of the roles returned by roles has the name "Project Management"
+    roles.map{|r|r.name}.include? "Project Management"
+  end
+
   def update_first_letter
     no_last_name=last_name.nil? || last_name.strip.blank?
     first_letter = strip_first_letter(last_name) unless no_last_name

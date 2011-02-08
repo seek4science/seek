@@ -84,7 +84,7 @@
     </div>
 </div>
 <% end -%>
-<% if current_user.is_admin? -%>
+<% if current_user.is_admin? || current_user.person.is_project_manager?-%>
 <h2 style="margin-top: 1.5em;">Choose Project / Institution&nbsp;&nbsp;&nbsp;<span class="admin_warning">(This section is visible only to admins)</span></h2>
 <%= render :partial => "work_groups", :locals=> { :person => (person ? person : Person.new) } -%>
 <%# only makes sense to display these settings when the person has "user" associated with it; -%>
