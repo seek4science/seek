@@ -251,9 +251,9 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal ["one","two","three"],p.expertise_list
     assert_equal ["four"],p.tool_list
     
-    one=Tag.find(:first,:conditions=>{:name=>"one"})
-    two=Tag.find(:first,:conditions=>{:name=>"two"})
-    four=Tag.find(:first,:conditions=>{:name=>"four"})
+    one=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"one"})
+    two=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"two"})
+    four=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"four"})
     post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:tools_autocompleter_selected_ids=>[four.id],:tools_autocompleter_unrecognized_items=>"three"
     
     p=Person.find(p.id)
