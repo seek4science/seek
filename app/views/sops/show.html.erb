@@ -79,8 +79,9 @@
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop } %>
 
   <div style="clear:both;padding-top:1em;">
-
-    <%= render :partial=>"assets/tags_box" %>
+    <div id="tags_box">
+        <%= render :partial=>"assets/tags_box" -%>
+    </div>
 
     <h2>
       Experimental Conditions

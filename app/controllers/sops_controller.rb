@@ -205,6 +205,11 @@ class SopsController < ApplicationController
   def update_tags_ajax
     @sop=Sop.find(params[:id])
     update_tags @sop
+
+    render :update do |page|
+      page.replace_html 'tags_box',:partial=>'assets/tags_box'
+      page.visual_effect :highlight,'tags_box'
+    end
   end
 
   protected
