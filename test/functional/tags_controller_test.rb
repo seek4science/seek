@@ -15,11 +15,11 @@ class TagsControllerTest< ActionController::TestCase
   end
 
   test "dont show duplicates for same tag for expertise and tools" do
-    q=people(:quentin_person)
+    q=people(:pal)
     q.tool_list="zzzzz"
     q.expertise_list="zzzzz"
     q.save!
-    q=Person.find(q.id)
+    q.reload
     assert_equal 1,q.expertise_counts.size,"should be 1 expertise tag"
     assert_equal 1,q.tool_counts.size,"should be 1 tools tag"
     tag=q.expertise_counts.first
@@ -27,7 +27,7 @@ class TagsControllerTest< ActionController::TestCase
     get :show,:id=>tag.id
     assert_response :success
     assert_select "div.list_items_container" do
-      assert_select "a",:text=>"Quentin Jones",:count=>1
+      assert_select "a",:text=>"A Pal",:count=>1
     end
   end
 

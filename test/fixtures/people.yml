@@ -85,7 +85,7 @@ aaron_openid_person:
 
 pal:
   first_name: "A Pal"
-  email: "test@test.com"
+  email: "pal@test.com"
   is_pal: true
   is_admin: false
   can_edit_projects: true
