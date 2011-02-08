@@ -84,7 +84,8 @@ aaron_openid_person:
   is_admin: false
 
 pal:
-  first_name: "A Pal"
+  first_name: "A"
+  last_name: "Pal"
   email: "pal@test.com"
   is_pal: true
   is_admin: false
