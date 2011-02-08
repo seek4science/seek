@@ -4,11 +4,16 @@ module ApplicationHelper
   include TagsHelper
   include SavageBeast::ApplicationHelper
 
+  @@creatable_model_classes ||= nil
+
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
   #returns a list of all types that respond_to and return true for user_creatable?
   def user_creatable_classes
-    return @@creatable_model_classes if @creatable_model_classes
-    Dir.glob(RAILS_ROOT + '/app/models/*.rb').each { |file| require file }
+    return @@creatable_model_classes if @@creatable_model_classes
+    Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
+      model_name = file.gsub(".rb","").split(File::SEPARATOR).last
+      model_name.camelize.constantize
+    end
 
     @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
       c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
