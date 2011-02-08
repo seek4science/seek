@@ -121,14 +121,20 @@ class ProjectTest < ActiveSupport::TestCase
     assert p.can_be_edited_by?(u),"Project :three should be editable by user :can_edit"
 
     p=projects(:four)
-    assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :can_edit as he is not a member"
+    assert !p.can_be_edited_by?(u),"Project :four should not be editable by user :can_edit as he is not a member"
 
     u=users(:quentin)
-    assert p.can_be_edited_by?(u),"Project :three should be editable by user :quentin as he's an admin"
+    assert p.can_be_edited_by?(u),"Project :four should be editable by user :quentin as he's an admin"
 
     u=users(:cant_edit)
     p=projects(:three)
     assert !p.can_be_edited_by?(u),"Project :three should not be editable by user :cant_edit"
+
+    u=users(:project_manager)
+    assert p.can_be_edited_by?(u),"Project :three should be editable by user :project_manager"
+
+    p=projects(:four)
+    assert !p.can_be_edited_by?(u),"Project :four should not be editable by user :can_edit as he is not a member"
   end    
 
   def test_update_first_letter

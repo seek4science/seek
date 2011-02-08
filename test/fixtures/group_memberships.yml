@@ -66,3 +66,7 @@ group_for_datafile_owner:
 group_for_pal:
   person: pal
   work_group: sysmo_at_manchester_uni_workgroup
+
+group_for_project_manager:
+  person: person_for_project_manager
+  work_group_id: 4
