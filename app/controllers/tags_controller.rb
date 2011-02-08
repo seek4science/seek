@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
   def show
-    @tag = Tag.find_by_id(params[:id])
+    @tag = ActsAsTaggableOn::Tag.find_by_id(params[:id])
     taggings = @tag.taggings
     @tagged_objects = select_authorised taggings.collect{|tagging| tagging.taggable}.uniq
     

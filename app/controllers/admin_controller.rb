@@ -26,12 +26,12 @@ class AdminController < ApplicationController
   end
   
   def tags
-    @tags=Tag.find(:all,:order=>:name)
+    @tags=ActsAsTaggableOn::Tag.find(:all,:order=>:name)
   end  
 
   def edit_tag
     if request.post?
-      @tag=Tag.find(params[:id])
+      @tag=ActsAsTaggableOn::Tag.find(params[:id])
       @tag.taggings.select{|t| !t.taggable.nil?}.each do |tagging|
         context_sym=tagging.context.to_sym
         taggable=tagging.taggable
@@ -40,7 +40,7 @@ class AdminController < ApplicationController
 
         replacement_tags=", "
         params[:tags_autocompleter_selected_ids].each do |selected_id|
-          tag=Tag.find(selected_id)
+          tag=ActsAsTaggableOn::Tag.find(selected_id)
           replacement_tags << tag.name << ","
         end unless params[:tags_autocompleter_selected_ids].nil?
         params[:tags_autocompleter_unrecognized_items].each do |item|
@@ -57,7 +57,7 @@ class AdminController < ApplicationController
 
       end
 
-      @tag=Tag.find(params[:id])
+      @tag=ActsAsTaggableOn::Tag.find(params[:id])
       
       @tag.destroy if @tag.taggings.select{|t| !t.taggable.nil?}.empty?
 
@@ -66,8 +66,8 @@ class AdminController < ApplicationController
 
       redirect_to :action=>:tags
     else
-      @tag=Tag.find(params[:id])
-      @all_tags_as_json=Tag.find(:all).collect{|t| {'id'=>t.id, 'name'=>t.name}}.to_json
+      @tag=ActsAsTaggableOn::Tag.find(params[:id])
+      @all_tags_as_json=ActsAsTaggableOn::Tag.find(:all).collect{|t| {'id'=>t.id, 'name'=>t.name}}.to_json
       respond_to do |format|
         format.html
       end
@@ -76,7 +76,7 @@ class AdminController < ApplicationController
   end
 
   def delete_tag
-    tag=Tag.find(params[:id])
+    tag=ActsAsTaggableOn::Tag.find(params[:id])
     if request.post?
       tag.delete
       flash.now[:notice]="Tag #{tag.name} deleted"
