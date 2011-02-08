@@ -1,6 +1,6 @@
 directories_and_types:
   models:
-    ext: [xml]
+    ext: [xml, zip, gz, sbml]
     type: Model
   protocols:
     ext: [doc, docx, pdf]

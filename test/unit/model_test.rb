@@ -43,6 +43,25 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal p,model.project
     assert_equal p,model.latest_version.project
   end
+
+  test "cache_remote_content" do
+    project = projects(:sysmo_project)
+    
+    model=Model.new(:title=>"test model for caching remote")
+    model.policy = Policy.private_policy
+    model.content_blob = ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png")
+    model.original_filename = "sysmo-logo.png"
+    model.project=project
+    model.save!
+    model.reload
+
+    assert !model.content_blob.file_exists?
+
+    model.cache_remote_content_blob
+
+    assert model.content_blob.file_exists?
+
+  end
   
   def test_defaults_to_private_policy
     model=Model.new(:title=>"A sop with no policy")
