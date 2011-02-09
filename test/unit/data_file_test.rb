@@ -13,6 +13,10 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal blob,datafile.content_blob    
   end
 
+  test "sort by updated_at" do
+    assert_equal DataFile.find(:all).sort_by { |df| df.updated_at.to_i * -1 }, DataFile.find(:all)
+  end
+
   def test_avatar_key
     assert_nil data_files(:picture).avatar_key
     assert data_files(:picture).use_mime_type_for_avatar?

@@ -148,7 +148,7 @@ class StudiesController < ApplicationController
   end
   
   def find_studies
-    @studies=apply_filters(Study.find(:all, :order=>'updated_at DESC'))    
+    @studies=apply_filters(Study.find(:all))    
   end
   
 end

@@ -1,10 +1,7 @@
-require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
-require 'title_trimmer'
+require 'acts_as_isa'
 
-class Assay < ActiveRecord::Base    
-
-  title_trimmer
+class Assay < ActiveRecord::Base
+  acts_as_isa
   
   belongs_to :assay_type
   belongs_to :technology_type  
@@ -16,11 +13,6 @@ class Assay < ActiveRecord::Base
   has_many :strains, :through=>:assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
-
-  #defines that this is a user_creatable object, and appears in the "New Object" gadget
-  def self.user_creatable?
-    true
-  end
   
   def self.asset_sql(asset_class)
     asset_class_underscored = asset_class.underscore
@@ -44,27 +36,18 @@ class Assay < ActiveRecord::Base
 
   has_many :assets,:through=>:assay_assets
 
-  validates_presence_of :title
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
            
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
     :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if SOLR_ENABLED  
-  
-  grouped_pagination
-  
-  acts_as_uniquely_identifiable
+  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if SOLR_ENABLED
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title
@@ -97,7 +80,7 @@ class Assay < ActiveRecord::Base
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
     assay_asset = assay_assets.select {|aa| aa.asset_id == asset.id}.first
-    
+
     if assay_asset.nil?
       assay_asset = AssayAsset.new
       assay_asset.assay = self             

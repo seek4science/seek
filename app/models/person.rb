@@ -1,22 +1,18 @@
-require 'acts_as_editable'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
+require 'acts_as_yellow_pages'
 
 class Person < ActiveRecord::Base
-  
+
+  acts_as_yellow_pages
+  default_scope :order => "last_name, first_name"
+
   before_save :first_person_admin
-  
-  acts_as_editable
-  
+
   acts_as_notifiee
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy  
-  
+
   grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
-    
-  validates_presence_of :name,:email
+
+  validates_presence_of :email
 
   #FIXME: consolidate these regular expressions into 1 holding class
   validates_format_of :email,:with=>RFC822::EmailAddress
@@ -24,34 +20,27 @@ class Person < ActiveRecord::Base
 
   validates_uniqueness_of :email
 
-  validates_associated :avatars
-
   has_and_belongs_to_many :disciplines
-  
-  has_many :avatars,
-    :as => :owner,
-    :dependent => :destroy
-  belongs_to :avatar
-    
+
   has_many :group_memberships
-  
+
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
-    
+
   has_many :work_groups, :through=>:group_memberships
   has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
 
   acts_as_taggable_on :tools, :expertise
-    
+
   has_one :user, :dependent=>:destroy
-  
+
   has_many :assets_creators, :dependent => :destroy, :foreign_key => "creator_id"
   has_many :created_data_files, :through => :assets_creators, :source => :asset, :source_type => "DataFile"
   has_many :created_models, :through => :assets_creators, :source => :asset, :source_type => "Model"
   has_many :created_sops, :through => :assets_creators, :source => :asset, :source_type => "Sop"
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
-  
+
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :description ]) if SOLR_ENABLED
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
@@ -59,15 +48,11 @@ class Person < ActiveRecord::Base
   named_scope :pals,:conditions=>{:is_pal=>true}
   named_scope :admins,:conditions=>{:is_admin=>true}
 
-  alias_attribute :title, :name
-  
-  alias_attribute :webpage,:web_page   
-  
+  alias_attribute :webpage,:web_page
+
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
-  
-  acts_as_uniquely_identifiable
-  
+
   def self.userless_people
     p=Person.find(:all)
     return p.select{|person| person.user.nil?}
@@ -83,7 +68,7 @@ class Person < ActiveRecord::Base
     end
     return dup
   end
-    
+
   # get a list of people with their email for autocomplete fields
   def self.get_all_as_json
     all_people = Person.find(:all, :order => "ID asc")
@@ -93,7 +78,7 @@ class Person < ActiveRecord::Base
         "email" => (p.email.blank? ? "unknown" : p.email) } }
     return names_emails.to_json
   end
-  
+
   def validates_associated(*associations)
     associations.each do |association|
       class_eval do
@@ -119,7 +104,7 @@ class Person < ActiveRecord::Base
         res << p unless p==self or res.include? p
       end
     end
-    
+
     projects.each do |proj|
       proj.people.each do |p|
         res << p unless p==self or res.include? p
@@ -127,34 +112,34 @@ class Person < ActiveRecord::Base
     end
     return  res
   end
-  
+
   def institutions
     res=[]
     work_groups.collect {|wg| res << wg.institution unless res.include?(wg.institution) }
     return res
   end
-  
+
   def projects
     res=[]
     work_groups.collect {|wg| res << wg.project unless res.include?(wg.project) }
     return res
   end
-  
+
   def locations
     # infer all person's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }
-    
+
     # make sure this list is unique and (if any institutions didn't have a country set) that 'nil' element is deleted
     locations = locations.uniq
     locations.delete(nil)
-    
+
     return locations
   end
 
   def email_with_name
     name + " <" + email + ">"
   end
-  
+
   def name
     firstname=first_name
     firstname||=""
@@ -163,12 +148,6 @@ class Person < ActiveRecord::Base
     #capitalize, including double barrelled names
     #TODO: why not just store them like this rather than processing each time? Will need to reprocess exiting entries if we do this.
     return (firstname.gsub(/\b\w/) {|s| s.upcase} + " " + lastname.gsub(/\b\w/) {|s| s.upcase}).strip
-  end
-    
-  # "false" returned by this helper method won't mean that no avatars are uploaded for this person;
-  # it rather means that no avatar (other than default placeholder) was selected for the person
-  def avatar_selected?
-    return !avatar_id.nil?
   end
 
   def roles
@@ -192,13 +171,13 @@ class Person < ActiveRecord::Base
     memberships = group_memberships.select{|g| g.work_group.project == project}
     return memberships.collect{|m| m.roles}.flatten
   end
-  
+
   def assets
     created_data_files | created_models | created_sops | created_publications
   end
-  
+
   private
-  
+
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
     self.is_admin=true if Person.count==0

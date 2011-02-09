@@ -21,6 +21,10 @@ class StudyTest < ActiveSupport::TestCase
 
   end
 
+  test "sort by updated_at" do
+    assert_equal Study.find(:all).sort_by { |s| s.updated_at.to_i * -1 }, Study.find(:all)
+  end
+
   test "can_edit" do
     study=studies(:metabolomics_study)
     assert !study.can_edit?(users(:aaron))

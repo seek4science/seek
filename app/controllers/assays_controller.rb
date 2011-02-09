@@ -157,7 +157,7 @@ class AssaysController < ApplicationController
   private  
   
   def find_assays
-    @assays = Assay.find(:all, :order=>'updated_at DESC')    
+    @assays = Assay.find(:all)    
     @assays=apply_filters(@assays)        
   end
 
