@@ -9,7 +9,9 @@
 
 
 <% cache "tag_clouds" do -%>
-  <%= render :partial=>"gadgets/merged_tag_cloud_gadget" %>
+  <div id="sidebar_tag_cloud">
+    <%= render :partial=>"gadgets/merged_tag_cloud_gadget" %>
+  </div>
 <% end -%>	
 
 <%= render :partial=>"gadgets/organism_gadget" %>

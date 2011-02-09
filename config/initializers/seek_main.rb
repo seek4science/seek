@@ -7,6 +7,7 @@ require 'save_without_timestamping'
 require 'asset'
 require 'calendar_date_select'
 require 'active_record_extensions'
+require 'acts_as_taggable_extensions'
 
 JWS_ENABLED=true unless defined? JWS_ENABLED
 JERM_ENABLED=true unless defined? JERM_ENABLED
