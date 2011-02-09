@@ -76,7 +76,9 @@
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } %>
   
   <div style="clear:both;">
-
+    <div id="tags_box">
+        <%= render :partial=>"assets/tags_box" -%>
+    </div>
     <p>
       <h2>Factors studied:</h2>
       <%= render :partial=>"data_files/studied_factors" %>

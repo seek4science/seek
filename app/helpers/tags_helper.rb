@@ -1,29 +1,21 @@
 module TagsHelper
   include ActsAsTaggableOn::TagsHelper
 
-  def tag_cloud(tags, classes)
-    tags = tags.sort{|a,b| b.count<=>a.count}
-    max_count = tags.first.count.to_f
+  def tag_cloud(tags, classes,counter_method=:count)
+    tags = tags.sort_by(&:name)
+    max_count = tags.max_by(&counter_method).send(counter_method).to_f
     if max_count < 1
       max_count = 1
     end
 
     tags.each do |tag|
-      index = ((tag.count / max_count) * (classes.size - 1)).round
+      index = ((tag.send(counter_method) / max_count) * (classes.size - 1)).round
       yield tag, classes[index]
     end
   end
 
-  def overall_tag_cloud(tags, classes)
-    tags = tags.sort{|a,b| b.overall_total<=>a.overall_total}
-    max_count = tags.first.overall_total.to_f
-    if max_count < 1
-      max_count = 1
-    end
-
-    tags.each do |tag|
-      index = ((tag.overall_total / max_count) * (classes.size - 1)).round
-      yield tag, classes[index]
-    end
+  def overall_tag_cloud(tags, classes,&block)
+    tag_cloud(tags,classes,:overall_total, &block)
   end
+
 end

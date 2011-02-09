@@ -23,7 +23,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get, :data => :get, :request_resource=>:post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get, :data => :get, :request_resource=>:post, :update_tags_ajax=>:post}  do |data_file|
     data_file.resources :studied_factors
   end
   
@@ -40,7 +40,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :groups
 
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post },
+    :member => { :download => :get, :execute=>:post, :request_resource=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_tags_ajax=>:post },
     :collection=>{:build=>:get}
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
