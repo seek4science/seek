@@ -109,7 +109,7 @@ class InvestigationsController < ApplicationController
   end
   
   def find_investigations
-    @investigations=Investigation.find(:all, :include=>:studies, :page=>{:size=>default_items_per_page,:current=>params[:page]}, :order=>'updated_at DESC')
+    @investigations=Investigation.find(:all, :include=>:studies, :page=>{:size=>default_items_per_page,:current=>params[:page]})
     @investigations=Investigation.paginate :page=>params[:page]
     @investigations=apply_filters(@investigations)
   end

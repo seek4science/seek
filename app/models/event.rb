@@ -4,9 +4,8 @@ require 'grouped_pagination'
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
 
-  #belongs_to :project
-  #belongs_to :contributor
-  #belongs_to :policy
+  default_scope :order => "#{self.table_name}.start_date DESC"
+
   acts_as_authorized
   acts_as_uniquely_identifiable
   grouped_pagination

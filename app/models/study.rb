@@ -1,10 +1,7 @@
-require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
-require 'title_trimmer'
+require 'acts_as_isa'
 
 class Study < ActiveRecord::Base  
-  
-  title_trimmer
+  acts_as_isa
  
   belongs_to :investigation
   
@@ -13,21 +10,13 @@ class Study < ActiveRecord::Base
   has_one :project, :through=>:investigation
 
   belongs_to :person_responsible, :class_name => "Person"
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
 
-  validates_presence_of :title
+
   validates_presence_of :investigation
 
   validates_uniqueness_of :title
 
   acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
- 
-  grouped_pagination
-  
-  acts_as_uniquely_identifiable
 
   def data_files
     assays.collect{|a| a.data_files}.flatten.uniq
@@ -45,9 +34,5 @@ class Study < ActiveRecord::Base
     assays.empty? && can_edit?(user)
   end
 
-  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
-    true
-  end
 
 end

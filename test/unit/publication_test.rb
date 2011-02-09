@@ -10,6 +10,10 @@ class PublicationTest < ActiveSupport::TestCase
     x.save    
     assert_not_nil x.attributes["uuid"]
   end
+
+  test "sort by published_date" do
+    assert_equal Publication.find(:all).sort_by { |p| p.published_date}.reverse, Publication.find(:all)
+  end
   
   test "title trimmed" do
     x = publications(:one)

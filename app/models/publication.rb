@@ -29,7 +29,9 @@ class Publication < ActiveRecord::Base
   
   acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
   
-  acts_as_uniquely_identifiable  
+  acts_as_uniquely_identifiable
+
+  default_scope :order => "#{self.table_name}.published_date DESC"
     
 
   def extract_pubmed_metadata(pubmed_record)
