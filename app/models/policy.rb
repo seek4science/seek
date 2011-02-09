@@ -57,6 +57,15 @@ class Policy < ActiveRecord::Base
   def permission_granted?(contributor,access_type)
     permissions.detect{|p| p.contributor==contributor && p.access_type >= access_type}
   end
+
+  def self.new_for_upload_tool(resource, recipient)
+    permissions = [Permission.new :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE]
+    return Policy.new(:name               => 'auto',
+                      :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
+                      :access_type        => Policy::NO_ACCESS,
+                      :use_custom_sharing => Policy::TRUE_VALUE,
+                      :permissions        => permissions)
+  end
   
   def self.create_or_update_policy(resource, user, params)
     # this method will return an error message is something goes wrong (empty string in case of success)

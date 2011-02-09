@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url]
   before_filter :find_display_data_file, :only=>[:show,:download]
     
   def new_version
@@ -64,6 +64,32 @@ class DataFilesController < ApplicationController
         format.html { redirect_to data_files_path }
       end
     end
+  end
+
+  def upload_for_tool
+    t1 = Time.now
+    if handle_data
+      t2 = Time.now
+
+      @data_file = DataFile.new params[:data_file]
+
+      @data_file.contributor  = current_user
+      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      @data_file.policy       = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+      @data_file.creators << current_user.person
+
+      respond_to do |format|
+        if @data_file.save
+          flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+          format.html { redirect_to data_file_path(@data_file) }
+        else
+          format.html { render :action => "new" }
+        end
+      end
+    end
+    time = Time.now
+    logger.info "TIME: total for upload tool #{t1 - time}"
+    logger.info "TIME: after handle_data #{t2 - time}"
   end
   
   def create
