@@ -18,7 +18,10 @@ EVENTS_ENABLED = true
 
 #a threshold of the total number of times a tag must occur before it appears in the tag cloud. Increasing this setting can prevent
 #a very large tag cloud as the number of tags grow.
-MERGED_TAG_THRESHOLD=1
+TAG_THRESHOLD=1
+
+#the number of tags to be shown in the main tag cloud, with extra tags hidden but viewable by expanding the box. Keeps the box small
+MAX_VISIBLE_TAG=20
 
 #this enables the sending of emails when things go wrong. If you set this to true, you should also comment out the following lines and edit accordingly.
 EXCEPTION_NOTIFICATION_ENABLED = false
