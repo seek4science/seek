@@ -62,7 +62,7 @@ class AdminController < ApplicationController
       @tag.destroy if @tag.taggings.select{|t| !t.taggable.nil?}.empty?
 
       #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-      expire_fragment("tag_clouds")
+      expire_fragment("sidebar_tag_cloud")
 
       redirect_to :action=>:tags
     else
@@ -86,7 +86,7 @@ class AdminController < ApplicationController
     end
 
     #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-    expire_fragment("tag_clouds")
+    expire_fragment("sidebar_tag_cloud")
 
     redirect_to :action=>:tags
   end

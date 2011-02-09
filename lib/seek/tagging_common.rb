@@ -35,6 +35,8 @@ module Seek
 
     current_user.tag entity,:with=>tags,:on=>:tags
 
+    expire_fragment("sidebar_tag_cloud")
+
   end
 
   end

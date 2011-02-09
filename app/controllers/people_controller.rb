@@ -182,7 +182,6 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
-    old_tags=@person.tool_list + @person.expertise_list
     
     @person.disciplines.clear if params[:discipline_ids].nil?
 
@@ -197,11 +196,9 @@ class PeopleController < ApplicationController
       @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
       @person.notifiee_info.save if @person.notifiee_info.changed?
     end
-    
-    new_tags=@person.tool_list + @person.expertise_list
 
     #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-    expire_fragment("tag_clouds") if (old_tags != new_tags)
+    expire_fragment("sidebar_tag_cloud")
     
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
