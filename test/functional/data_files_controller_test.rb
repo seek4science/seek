@@ -466,6 +466,21 @@ class DataFilesControllerTest < ActionController::TestCase
      assert_equal "new title",df.title
      assert_equal Policy::NO_ACCESS,df.policy.access_type,"policy should have been updated"
   end
+
+  test "update tags with ajax" do
+    df=data_files(:picture)
+    golf_tags=tags(:golf)
+
+    assert df.tag_counts.empty?, "This sop should have no tags for the test"
+
+    assert_difference("ActsAsTaggableOn::Tag.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id}
+    end
+
+    df.reload
+    assert_equal ["golf","soup"],df.tag_counts.collect(&:name).sort
+
+  end
   
   private
   

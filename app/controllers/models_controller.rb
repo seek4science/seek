@@ -10,7 +10,7 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url]
+  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_tags_ajax]
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]

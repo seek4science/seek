@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
+  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_data_file, :only=>[:show,:download]
     
   def new_version

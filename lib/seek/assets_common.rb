@@ -1,9 +1,11 @@
-module Seek  
+module Seek
   module AssetsCommon
     require 'net/ftp'
-    
+
+    include Seek::TaggingCommon
+
     #required to get the icon_filename_for_key
-    include ImagesHelper
+    include ImagesHelper    
     
     def url_response_code asset_url
       url = URI.parse(asset_url)

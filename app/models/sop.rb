@@ -29,9 +29,7 @@ class Sop < ActiveRecord::Base
              
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
   
-  grouped_pagination
-
-  acts_as_taggable
+  grouped_pagination  
   
   acts_as_uniquely_identifiable  
 

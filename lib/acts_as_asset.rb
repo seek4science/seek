@@ -27,6 +27,8 @@ module Acts #:nodoc:
       def acts_as_asset
         acts_as_authorized
 
+        acts_as_taggable
+
         has_many :relationships,
                  :class_name => 'Relationship',
                  :as         => :subject,
