@@ -10,16 +10,21 @@ module ApplicationHelper
   #returns a list of all types that respond_to and return true for user_creatable?
   def user_creatable_classes
     return @@creatable_model_classes if @@creatable_model_classes
-    Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
-      model_name = file.gsub(".rb","").split(File::SEPARATOR).last
-      model_name.camelize.constantize
-    end
+
+    ensure_models_loaded
 
     @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
       c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
     end
     @@creatable_model_classes.delete(Event) unless EVENTS_ENABLED
     @@creatable_model_classes = @@creatable_model_classes.compact.sort{|a,b| a.name <=> b.name}    
+  end 
+
+  def ensure_models_loaded
+    Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
+      model_name = file.gsub(".rb","").split(File::SEPARATOR).last
+      model_name.camelize.constantize
+    end
   end
 
   #joins the list with seperator and the last item with an 'and'
