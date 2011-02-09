@@ -275,6 +275,7 @@ module ApplicationHelper
   end
 
   def show_tag?(tag)
+    #FIXME: not sure this is required or works any more. was originally to work around a bug in acts-as-taggable-on
     tag.taggings.size>1 || (tag.taggings.size==1 && tag.taggings[0].taggable_id)
   end
 
