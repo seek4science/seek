@@ -75,7 +75,7 @@ class ModelTest < ActiveSupport::TestCase
   end
   
   def test_defaults_to_private_policy
-    model=Model.new(:title=>"A sop with no policy")
+    model=Model.new(:title=>"A sop with no policy",:project=>projects(:sysmo_project))
     model.save!
     model.reload
     assert_not_nil model.policy

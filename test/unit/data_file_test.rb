@@ -44,7 +44,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
   
   def test_defaults_to_private_policy
-    df=DataFile.new(:title=>"A df with no policy")
+    df=DataFile.new(:title=>"A df with no policy",:project=>projects(:sysmo_project))
     df.save!
     df.reload
     assert_not_nil df.policy

@@ -14,7 +14,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed 
-    sop=Sop.new(:title=>" test sop")
+    sop=Sop.new(:title=>" test sop",:project=>projects(:sysmo_project))
     sop.save!
     assert_equal("test sop",sop.title)
   end
@@ -39,7 +39,7 @@ class SopTest < ActiveSupport::TestCase
   end
   
   def test_defaults_to_private_policy
-    sop=Sop.new(:title=>"A sop with no policy")
+    sop=Sop.new(:title=>"A sop with no policy",:project=>projects(:sysmo_project))
     sop.save!
     sop.reload
     assert_not_nil sop.policy
@@ -53,7 +53,7 @@ class SopTest < ActiveSupport::TestCase
 
   def test_version_created_for_new_sop
 
-    sop=Sop.new(:title=>"test sop")
+    sop=Sop.new(:title=>"test sop",:project=>projects(:sysmo_project))
 
     assert sop.save
 
