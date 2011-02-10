@@ -47,7 +47,7 @@
 
 <% form_remote_tag :url     =>{:action=>:update_tags_ajax},
                    :method  =>:post,
-                   :loading =>"show_ajax_loader('tag_cloud');" do
+                   :loading =>"$('tags_submit_button').value='Updating...';$('tags_submit_button').disabled=true;show_ajax_loader('tag_cloud');" do
 %>
     <p>
     <%= hidden_field_tag "prefix", name -%>
@@ -66,7 +66,7 @@
     </div>
     </p>
     <p>
-      <%= submit_tag "Update", :disable_with=>"Updating ..." -%>
+      <%= submit_tag "Update", :id=>"tags_submit_button" -%>
     </p>
 <% end -%>
 </div>
