@@ -19,6 +19,17 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal Model.find(:all).sort_by { |m| m.updated_at.to_i * -1 }, Model.find(:all)
   end
 
+  test "validation" do
+    asset=Model.new :title=>"fred",:project=>projects(:sysmo_project)
+    assert asset.valid?
+
+    asset=Model.new :project=>projects(:sysmo_project)
+    assert !asset.valid?
+
+    asset=Model.new :title=>"fred"
+    assert !asset.valid?
+  end
+
   test "is asset?" do
     assert Model.is_asset?
     assert models(:teusink).is_asset?

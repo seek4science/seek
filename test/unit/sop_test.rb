@@ -19,6 +19,17 @@ class SopTest < ActiveSupport::TestCase
     assert_equal("test sop",sop.title)
   end
 
+  test "validation" do
+    asset=Sop.new :title=>"fred",:project=>projects(:sysmo_project)
+    assert asset.valid?
+
+    asset=Sop.new :project=>projects(:sysmo_project)
+    assert !asset.valid?
+
+    asset=Sop.new :title=>"fred"
+    assert !asset.valid?
+  end
+
   def test_avatar_key
     assert_nil sops(:editable_sop).avatar_key
     assert sops(:editable_sop).use_mime_type_for_avatar?
