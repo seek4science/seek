@@ -11,8 +11,6 @@ class Publication < ActiveRecord::Base
   
   grouped_pagination
   
-  validates_presence_of :title
-  validates_presence_of :project
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
