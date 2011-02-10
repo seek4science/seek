@@ -29,6 +29,7 @@ module Acts #:nodoc:
         acts_as_authorized
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
+        validates_presence_of :project
         acts_as_taggable
 
         has_many :relationships,

@@ -499,24 +499,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal "This is a new revision",m.versions[1].revision_comments
     
   end
-  
-  def valid_model
-    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt')}
-  end
-  
-  def valid_model_with_url
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}
-  end
-  
-  def valid_sharing
-    {
-      :use_whitelist=>"0",
-      :user_blacklist=>"0",
-      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
-      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
-    }
-  end
-  
+
   def test_should_add_nofollow_to_links_in_show_page
     get :show, :id=> models(:model_with_links_in_description)    
     assert_select "div#description" do
@@ -615,6 +598,23 @@ class ModelsControllerTest < ActionController::TestCase
     model.reload
     assert_equal ["golf","soup"],model.tag_counts.collect(&:name).sort
 
+  end
+
+  def valid_model
+    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project=>projects(:sysmo_project)}
+  end
+
+  def valid_model_with_url
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
+  end
+
+  def valid_sharing
+    {
+      :use_whitelist=>"0",
+      :user_blacklist=>"0",
+      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
+      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
+    }
   end
   
 end
