@@ -3,7 +3,7 @@ module SpreadsheetHelper
   def generate_spreadsheet_html(workbook)
     html = ""
     
-    html << generate_spreadsheet_styles(workbook.styles)
+    html << generate_spreadsheet_styles(workbook.styles)    
     html << generate_spreadsheet_annotations(workbook.annotations)
     
     html << "<div class=\"spreadsheet_viewer\">"
@@ -95,7 +95,7 @@ module SpreadsheetHelper
     html = ""
     unless annotations.empty?
       html << "<div id=\"hidden_annotations\">\n"
-      html << "<h1>ANNOTATIONS</h1>"
+      html << "<h1>HIDDEN ANNOTATIONS</h1>"
       annotations.each do |a|
         html << "\t <div class=\"annotation\" id=\"annotation_#{a.id}\">\n"
         html << "\t\t #{a.content}"
@@ -112,8 +112,7 @@ module SpreadsheetHelper
       html << "<script type=\"text/javascript\">\n"
       html << "\t$(function () {\n"
       annotations.each do |a|
-        cell_id = "cell_#{to_alpha(a.start_column)}#{a.start_row}"
-        html << "\t\t$(\"td\##{cell_id}\").click(function (e) {show_annotation(#{a.id},e.pageX,e.pageY);});"
+        html << "\t\t$(\"table.active_sheet tr\").slice(#{a.start_row},#{a.end_row+1}).each(function() {$(this).children(\"td.cell\").slice(#{a.start_column-1},#{a.end_column}).addClass(\"annotated_cell\").click(function (e) {show_annotation(#{a.id},e.pageX,e.pageY);});});"
       end
       html << "\t});\n"
       html << "</script>\n\n"
