@@ -1467,4 +1467,10 @@ li#upload_options {
     padding-left: 1em;
     display: inline-block;
 }
-  
+
+
+li.author_avatar {
+    float:left;
+    margin-right: 0.5em;
+    text-align:center;
+}
