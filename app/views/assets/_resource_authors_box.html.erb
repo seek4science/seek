@@ -6,7 +6,8 @@
 <%
 
 title||="Creators"
-creators = [resource.contributor.nil? ? nil : resource.contributor.person] | resource.creators
+creators ||= resource.creators unless resource.respond_to?(:contributor)
+creators ||= [resource.contributor.nil? ? nil : resource.contributor.person] | resource.creators
 
 %>
 <div class="contribution_section_box">  
@@ -14,18 +15,7 @@ creators = [resource.contributor.nil? ? nil : resource.contributor.person] | res
     <%= help_icon("The authors are the people who originally created this file.") -%>
     <%= h(title) -%>
   </p>
-
- <style>
-   ul.author_list {
-        
-   }
-
-   li.author_avatar {
-        float:left;
-        margin-right: 0.5em;
-        text-align:center;
-   }
- </style>
+ 
   <ul class="author_list">
   <% creators.each do |creator| %>
     <% if creators.count < 6 #display full avatar if not too many authors %>
