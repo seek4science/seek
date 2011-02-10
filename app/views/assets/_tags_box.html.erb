@@ -7,8 +7,12 @@
    no_tags_message||=""
    name||="tag"
    item_tags = object.owner_tags_on(current_user, :tags)
+   title||="Tags"
 %>
 
+<p class="heading">
+    <%= h(title) -%>
+</p>
 
 <div id="tag_cloud">
 
@@ -25,22 +29,20 @@
             <% end -%>
           </div>
       <% else -%>
-          <span class="none_text">This item is yet to be tagged</span>
+          <p class="none_text">This item has not yet been tagged</p>
       <% end -%>
     </div>
   </div>
 
 </div>
-<% unless tags.blank? %>
+
 <small>
   [
-<%= link_to_function "Edit tags", visual_effect(:toggle_blind,"create_a_tag",:duration=>0.3) %>
+<%= link_to_function "Add your tags", visual_effect(:toggle_blind,"create_a_tag",:duration=>0.3) %>
   ]
 </small>
 <div id="create_a_tag" style="display:none;">
-<% else %>
-<div id="create_a_tag">
-<% end -%>
+
 <% form_remote_tag :url     =>{:action=>:update_tags_ajax},
                    :method  =>:post,
                    :loading =>"show_ajax_loader('tag_cloud');" do
