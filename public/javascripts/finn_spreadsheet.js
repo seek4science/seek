@@ -41,7 +41,8 @@ $(function () {
   $("table.sheet td.cell")
     .mousedown(function () {
       isMouseDown = true;
-      $("table.active_sheet td.selected_cell").removeClass("selected_cell");
+      $("table.active_sheet .selected_cell").removeClass("selected_cell");
+      $("table.active_sheet .selected_heading").removeClass("selected_heading");
       minRow = 0;
       maxRow = 0;
       minCol = 0;
@@ -51,6 +52,11 @@ $(function () {
       minRow = startRow;
       minCol = startCol;
       $(this).addClass("selected_cell");
+      //"Select" cell's column headings
+      $("table.active_sheet th").slice(minCol,minCol+1).addClass("selected_heading");      
+      //"Select" cell's row headings
+      $("table.active_sheet td.row_heading").slice(minRow-1,minRow).addClass("selected_heading");
+      
       //Update the cell info box to contain either the value of the cell or the formula
       if($(this).attr("title"))
       {
@@ -82,13 +88,20 @@ $(function () {
         }
        
         //Clear currently selected cells
-        $("table.active_sheet td.selected_cell").removeClass("selected_cell");
+        $("table.active_sheet .selected_cell").removeClass("selected_cell");
+        $("table.active_sheet .selected_heading").removeClass("selected_heading");
         
         //"Select" dragged cells
         $("table.active_sheet tr").slice(minRow,maxRow+1).each(function() {
           $(this).children("td.cell").slice(minCol-1,maxCol).addClass("selected_cell");
         });
         
+        //"Select" dragged cells' column headings
+        $("table.active_sheet th").slice(minCol,maxCol+1).addClass("selected_heading");
+        
+        //"Select" dragged cells' row headings
+        $("table.active_sheet td.row_heading").slice(minRow-1,maxRow).addClass("selected_heading");
+
         //DEBUG
         $('#debug').html(
           "r1 " + minRow +
