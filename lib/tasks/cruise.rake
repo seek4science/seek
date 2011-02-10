@@ -22,7 +22,8 @@ task :cruise do
   Rake::Task["db:create:all"].invoke
   Rake::Task["db:test:load"].invoke
   Rake::Task["db:test:prepare"].invoke
-  Rake::Task["seek:seed"].invoke
+  Rake::Task["seek:refresh_controlled_vocabs"].invoke
+  Rake::Task["seek:default_tags"].invoke
   Rake::Task["test"].invoke
   
 end
