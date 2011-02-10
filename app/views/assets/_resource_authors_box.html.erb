@@ -18,9 +18,9 @@ title||="Creators"
   <p>
   <% creators.each do |creator| %>
     <% if creators.count < 4 #display full avatar if not too many authors %>
-      <%= favouritable_icon(creator, 60) -%><br/>
+      <%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%><br/>
     <% end %>
-    <%= link_to(h(creator.name), url_for(creator)) -%><br/>
+    <%= creator.nil? ? "The JERM" : link_to(h(creator.name), url_for(creator)) -%><br/>
   <% end %>
   </p>
 </div>
