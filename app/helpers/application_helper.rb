@@ -4,6 +4,7 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
 
   @@creatable_model_classes ||= nil
+  @@models_loaded=false
 
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
   #returns a list of all types that respond_to and return true for user_creatable?
@@ -20,9 +21,12 @@ module ApplicationHelper
   end 
 
   def ensure_models_loaded
-    Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
-      model_name = file.gsub(".rb","").split(File::SEPARATOR).last
-      model_name.camelize.constantize
+    unless @@models_loaded
+      Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
+        model_name = file.gsub(".rb","").split(File::SEPARATOR).last
+        model_name.camelize.constantize
+      end
+      @@models_loaded=true
     end
   end
 

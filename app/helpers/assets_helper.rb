@@ -1,9 +1,21 @@
 module AssetsHelper
 
+  @@asset_model_classes=nil
+
   def request_request_label resource
     icon_filename=icon_filename_for_key("message")
     resource_type=resource.class.name.humanize
     return '<span class="icon">' + image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}</span>";
+  end
+
+  #returns all the classes for models that return true for is_asset?
+  def asset_model_classes
+    return @@asset_model_classes if @@asset_model_classes
+    ensure_models_loaded
+    @@asset_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
+      c if !c.nil? && c.is_asset?
+    end
+    @@asset_model_classes = @@asset_model_classes.compact
   end
 
   def resource_version_selection versioned_resource,displayed_resource_version

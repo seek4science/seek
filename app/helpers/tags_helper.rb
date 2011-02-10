@@ -18,4 +18,12 @@ module TagsHelper
     tag_cloud(tags,classes,:overall_total, &block)
   end
 
+  def aggregated_asset_tags
+    tags = []
+    asset_model_classes.each do |c|
+      tags |= c.tag_counts if c.taggable?
+    end
+    tags
+  end
+
 end

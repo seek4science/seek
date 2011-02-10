@@ -13,7 +13,7 @@
     Tags
   </div>
   <div class="foldContent">
-    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>model_class.tag_counts, :item_tags=>object.owner_tags_on(current_user,:tags), :name=>"tag"} -%>
+    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>aggregated_asset_tags, :item_tags=>object.owner_tags_on(current_user,:tags), :name=>"tag"} -%>
   </div>
 </div>
 </p>
