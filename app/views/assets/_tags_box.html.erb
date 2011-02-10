@@ -8,6 +8,8 @@
    name||="tag"
    item_tags = object.owner_tags_on(current_user, :tags)
    title||="Tags"
+
+   create_tag_link_text = item_tags.empty? ? "Add your tags" : "Update your tags"
 %>
 
 <p class="heading">
@@ -38,7 +40,7 @@
 
 <small>
   [
-<%= link_to_function "Add your tags", visual_effect(:toggle_blind,"create_a_tag",:duration=>0.3) %>
+<%= link_to_function create_tag_link_text,  visual_effect(:toggle_blind,"create_a_tag",:duration=>0.3) %>
   ]
 </small>
 <div id="create_a_tag" style="display:none;">

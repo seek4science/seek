@@ -20,6 +20,9 @@
         </p>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "DataFile",   # this is only for presentation, not for any processing
         :project_hash => current_user.generate_own_project_id_name_hash } -%>
+
+        <%= render :partial=>"assets/select_tags" -%>
+      
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>

@@ -364,6 +364,8 @@ class ModelsController < ApplicationController
       @model = Model.new(params[:model])
       @model.contributor = current_user
       @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
+
+      update_tags @model
       
       respond_to do |format|
         if @model.save
@@ -418,7 +420,9 @@ class ModelsController < ApplicationController
       # update 'last_used_at' timestamp on the Model
       params[:model][:last_used_at] = Time.now
     end
-    
+
+    update_tags @model
+
     respond_to do |format|
       if @model.update_attributes(params[:model])
         # the Model was updated successfully, now need to apply updated policy / permissions settings to it

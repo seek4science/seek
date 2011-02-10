@@ -72,6 +72,8 @@ class DataFilesController < ApplicationController
       @data_file = DataFile.new params[:data_file]
       @data_file.contributor=current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+
+      update_tags @data_file
       
       respond_to do |format|
         if @data_file.save
@@ -135,6 +137,8 @@ class DataFilesController < ApplicationController
       # update 'last_used_at' timestamp on the DataFile
       params[:data_file][:last_used_at] = Time.now
     end
+
+    update_tags @data_file
     
     respond_to do |format|
       if @data_file.update_attributes(params[:data_file])

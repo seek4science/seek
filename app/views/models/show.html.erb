@@ -49,7 +49,7 @@
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>
 <%= render :partial => "layouts/usage_info", :locals => { :resource => @model } -%>
 <div class="show_basic">
-    <div class="main_content_left_box">
+    <div class="main_content_left_box_narrower">
         <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
         <div class="box_about_actor">
             <p>
