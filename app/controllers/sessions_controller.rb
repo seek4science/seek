@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
     create
   end
 
-  def index
+  def index    
     redirect_to login_url
   end
 
