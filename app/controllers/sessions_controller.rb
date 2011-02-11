@@ -14,6 +14,14 @@ class SessionsController < ApplicationController
     create
   end
 
+  def index    
+    redirect_to login_url
+  end
+
+  def show
+    redirect_to login_url
+  end
+
   def create   
     if using_open_id?
       open_id_authentication

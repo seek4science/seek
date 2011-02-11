@@ -31,7 +31,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 7,Person.latest_limit  
   end
 
-  def test_paginate_no_options
+  def test_paginate_no_options    
     @people=Person.paginate :default_page=>"first"
     assert_equal(("A".."Z").to_a, @people.pages)
     assert @people.size>0
@@ -95,21 +95,25 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   #should jump to the first page that has content if :page=> isn't defined. Will use first page if no content is available
   def test_jump_to_first_page_with_content
     #delete those with A
-    Person.find(:all,:conditions=>["first_letter = ?","A"]).each {|p| p.destroy }
+    Person.find(:all,:conditions=>["first_letter = ?","A"]).each {|p| p.destroy }    
     @people=Person.paginate :default_page=>"first"
     assert @people.size>0
     assert_equal "B",@people.page
 
-    @people=Person.paginate :page=>"A", :default_page=>"first"
+    @people=Person.paginate :page=>"A"
     assert_equal 0,@people.size
     assert_equal "A",@people.page
 
     #delete every person, and check it still returns the first page with empty content
     Person.find(:all).each{|x| x.destroy}
-    @people=Person.paginate  :default_page=>"first"
+    @people=Person.paginate :default_page=>"first"
     assert_equal 0,@people.size
     assert_equal "A",@people.page
     
+  end
+
+  def test_default_page_accessor    
+    assert Person.default_page == "latest" || Person.default_page == "all"
   end
 
   def test_extra_condition_as_array_direct

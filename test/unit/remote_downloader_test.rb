@@ -6,12 +6,18 @@ class RemoteDownloaderTest < ActiveSupport::TestCase
     @downloader = Seek::RemoteDownloader.new
   end
 
-  def test_simple_download
-    
+  def test_simple_download    
     res = @downloader.get_remote_data("http://sysmo-db.googlecode.com/hg/lib/tasks/seek.rake","","")
     assert_not_nil res[:data_tmp_path]
     assert File.exists?(res[:data_tmp_path])
     assert_equal "seek.rake",res[:filename]
+  end
+
+  test "test authorisation error" do
+    #added whilst fixing a wierd problem downloading http://www.mygrid.org.uk/dev/wiki/download/thumbnails/8454210/IMG_20110209_155704.jpg,
+    #if this test starts failing due to the above URL going missing, just delete this test
+    data_url = "http://www.mygrid.org.uk/dev/wiki/download/thumbnails/8454210/IMG_20110209_155704.jpg"
+    data_hash = @downloader.get_remote_data data_url,nil,nil,nil,true
   end
 
   def test_caching
