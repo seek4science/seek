@@ -7,7 +7,7 @@ module IndexPager
     objects = eval("@"+controller)
     objects.size
     @hidden=0
-    params[:page] ||= "all"
+    params[:page] ||= model_class.default_page
     
     if !objects.empty? && Authorization::authorization_supported?(objects.first)
       authorized=[]
@@ -43,8 +43,7 @@ module IndexPager
     
   end
   
-  def find_assets
-    params[:page]||="all"
+  def find_assets    
     controller = self.controller_name.downcase
     model_name=controller.classify
     model_class=eval(model_name)

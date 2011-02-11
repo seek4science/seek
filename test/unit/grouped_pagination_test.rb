@@ -31,9 +31,8 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal 7,Person.latest_limit  
   end
 
-  def test_paginate_no_options
-    Person.default_page = 'first'
-    @people=Person.paginate
+  def test_paginate_no_options    
+    @people=Person.paginate :default_page=>"first"
     assert_equal(("A".."Z").to_a, @people.pages)
     assert @people.size>0
     assert_equal "A", @people.page
@@ -107,7 +106,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
     #delete every person, and check it still returns the first page with empty content
     Person.find(:all).each{|x| x.destroy}
-    @people=Person.paginate
+    @people=Person.paginate :default_page=>"first"
     assert_equal 0,@people.size
     assert_equal "A",@people.page
     
