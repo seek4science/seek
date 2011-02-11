@@ -59,12 +59,12 @@ class Policy < ActiveRecord::Base
   end
 
   def self.new_for_upload_tool(resource, recipient)
-    permissions = [Permission.new :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE]
-    return Policy.new(:name               => 'auto',
-                      :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
-                      :access_type        => Policy::NO_ACCESS,
-                      :use_custom_sharing => Policy::TRUE_VALUE,
-                      :permissions        => permissions)
+    policy = resource.create_policy(:name               => 'auto',
+                                    :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
+                                    :access_type        => Policy::NO_ACCESS,
+                                    :use_custom_sharing => Policy::TRUE_VALUE)
+    policy.permissions.create :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
+    return policy
   end
   
   def self.create_or_update_policy(resource, user, params)

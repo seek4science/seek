@@ -75,21 +75,23 @@ class DataFilesController < ApplicationController
 
       @data_file.contributor  = current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
-      @data_file.policy       = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+      Policy.new_for_upload_tool(@data_file, params[:recipient_id])
       @data_file.creators << current_user.person
 
-      respond_to do |format|
-        if @data_file.save
-          flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-          format.html { redirect_to data_file_path(@data_file) }
-        else
-          format.html { render :action => "new" }
-        end
+      if @data_file.save
+        time = Time.now
+        logger.info "TIME: total for upload tool #{t1 - time}"
+        logger.info "TIME: after handle_data #{t2 - time}"
+        @data_file.creators = [current_user.person]
+        flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+        render :text => flash.now[:notice]
+      else
+        time = Time.now
+        logger.info "TIME: total for upload tool #{t1 - time}"
+        logger.info "TIME: after handle_data #{t2 - time}"
+        render :text => (@data_file.errors.map { |e| e.join(" ") }.join("\n")), :status => 500
       end
     end
-    time = Time.now
-    logger.info "TIME: total for upload tool #{t1 - time}"
-    logger.info "TIME: after handle_data #{t2 - time}"
   end
   
   def create
