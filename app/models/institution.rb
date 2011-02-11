@@ -8,7 +8,7 @@ class Institution < ActiveRecord::Base
 
   acts_as_yellow_pages
 
-  grouped_pagination
+  grouped_pagination :default_page => "latest"
 
   validates_uniqueness_of :name
 
