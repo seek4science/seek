@@ -61,7 +61,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
                         :member => {:set_openid => :put}
 
-  map.resource :session, :collection=>{:auto_openid=>:get}
+  map.resource :session, :collection=>{:auto_openid=>:get,:show=>:get,:index=>:get},:member=>{:show=>:get}
   
   #help pages
   map.resources :help_documents, :as => :help do |h|
