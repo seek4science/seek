@@ -118,7 +118,10 @@ $(function () {
     .mouseup(function () {
       if (isMouseDown)
       {
+        
         isMouseDown = false;
+        //Hide annotations
+        $('div.annotation').hide();
         
         //Update the selection display e.g A3:B2
         selection = "";

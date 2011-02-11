@@ -26,9 +26,9 @@ module SpreadsheetHelper
       
       #Alphabetical column headers
       sheet_html << "\t<tr>"
-      sheet_html << "\t\t<th class=\"col_heading\"></th>"
+      sheet_html << "\t\t<th class=\"col_heading\" style=\"width:3em\"></th>"
       sheet.columns.each do |col|
-        sheet_html << "\t\t<th #{col.width.nil? ? "" : "style =\"width:"+(col.width.to_f/256).to_s+"em\""} class=\"col_heading\">#{to_alpha(col.index)}</th>"
+        sheet_html << "\t\t<th #{col.width.nil? ? "" : "style =\"width:"+(col.width.to_f/31).to_s+"px\""} class=\"col_heading\">#{to_alpha(col.index)}</th>"
       end
       sheet_html << "\t</tr>"
       
@@ -95,9 +95,9 @@ module SpreadsheetHelper
     html = ""
     unless annotations.empty?
       html << "<div id=\"hidden_annotations\">\n"
-      html << "<h1>HIDDEN ANNOTATIONS</h1>"
       annotations.each do |a|
         html << "\t <div class=\"annotation\" id=\"annotation_#{a.id}\">\n"
+        html << "\t\t <b>TEST ANNOTATION</b><br/>"
         html << "\t\t #{a.content}"
         html << "\t</div>\n\n"
       end

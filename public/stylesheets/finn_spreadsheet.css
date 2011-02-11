@@ -2,17 +2,21 @@ table.sheet {
   border: 1px solid #CCC;
   background-color: #DDD;
   table-layout: fixed;
+  width: 1px;
 }
 
 table.sheet tr td {
-  width: 50px;
-  height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 2px 5px;
 }
 
 th.col_heading, td.row_heading {
   border: 1px outset #FFF;
   background: #DDD;
   text-align: center;
+  width: 2em;
+  padding: 2px 5px;
 }
 
 th.selected_heading, td.selected_heading{
@@ -36,7 +40,7 @@ td.primary_selected_cell {
 }
 
 td.annotated_cell {
-  border: 1px solid #FF7;
+  border: 3px ridge #7F4;
 }
 
 div.sheet {
