@@ -13,11 +13,14 @@ class RemoteDownloaderTest < ActiveSupport::TestCase
     assert_equal "seek.rake",res[:filename]
   end
 
-  test "test authorisation error" do
+  test "test authorisation error with no username/password" do
     #added whilst fixing a wierd problem downloading http://www.mygrid.org.uk/dev/wiki/download/thumbnails/8454210/IMG_20110209_155704.jpg,
     #if this test starts failing due to the above URL going missing, just delete this test
+    #the original problem was caused by passing nils for the username and password for the authorization params.
     data_url = "http://www.mygrid.org.uk/dev/wiki/download/thumbnails/8454210/IMG_20110209_155704.jpg"
     data_hash = @downloader.get_remote_data data_url,nil,nil,nil,true
+    assert_not_nil data_hash[:data_tmp_path]
+    assert File.exists?(data_hash[:data_tmp_path])
   end
 
   def test_caching
