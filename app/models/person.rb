@@ -14,7 +14,7 @@ class Person < ActiveRecord::Base
   #load the configuration for the pagination
   configpath=File.join(RAILS_ROOT,"config/paginate.yml")
   config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["people"]["index"]
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => config["people"]["index"]
 
   validates_presence_of :email
 

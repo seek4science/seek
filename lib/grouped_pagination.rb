@@ -65,7 +65,7 @@ module GroupedPagination
       
       result
     end   
-    
+
   end
   
   module SingletonMethods
