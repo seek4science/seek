@@ -4,7 +4,19 @@ module Seek
     
     #required to get the icon_filename_for_key
     include ImagesHelper
-    
+
+    #this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page
+    def init_asset_for_render params
+      c     = self.controller_name.singularize
+      model = c.camelize.constantize
+      symb  =c.to_sym
+      params[symb].delete 'data_url'
+      params[symb].delete 'data'
+      params[symb].delete 'local_copy'
+      obj=model.new params[symb]
+      eval "@#{c.singularize} = obj"
+    end
+
     def url_response_code asset_url
       url = URI.parse(asset_url)
       code=""
@@ -118,12 +130,14 @@ module Seek
     end
     
     def handle_data render_action_on_error=:new
+      #FIXME: too many nested if,else and rescue blocks. This method needs refactoring.
       c = self.controller_name.downcase    
       symb=c.singularize.to_sym
       
       if (params[symb][:data]).blank? && (params[symb][:data_url]).blank?
         flash.now[:error] = "Please select a file to upload or provide a URL to the data."
         if render_action_on_error
+          init_asset_for_render params
           respond_to do |format|
             format.html do 
               render :action => render_action_on_error
@@ -134,6 +148,7 @@ module Seek
       elsif !(params[symb][:data]).blank? && (params[symb][:data]).size == 0 && (params[symb][:data_url]).blank?
         flash.now[:error] = "The file that you are uploading is empty. Please check your selection and try again!"
         if render_action_on_error
+          init_asset_for_render params
           respond_to do |format|          
             format.html do 
               render :action => render_action_on_error
@@ -168,6 +183,7 @@ module Seek
             else
               flash.now[:error] = "Processing the URL responded with a response code (#{code}), indicating the URL is inaccessible."
               if render_action_on_error
+                init_asset_for_render params
                 respond_to do |format|                  
                   format.html do 
                     render :action => render_action_on_error
@@ -180,6 +196,7 @@ module Seek
         rescue Seek::IncompatibleProtocolException=>e
           flash.now[:error] = e.message
           if render_action_on_error
+            init_asset_for_render params
             respond_to do |format|            
               format.html do 
                 render :action => render_action_on_error
@@ -190,6 +207,7 @@ module Seek
         rescue Exception=>e              
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
+            init_asset_for_render params
             respond_to do |format|            
               format.html do 
                 render :action => render_action_on_error
@@ -234,4 +252,5 @@ module Seek
       end
     end
   end
+
 end
