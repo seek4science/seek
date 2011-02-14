@@ -8,7 +8,11 @@ class Event < ActiveRecord::Base
 
   acts_as_authorized
   acts_as_uniquely_identifiable
-  grouped_pagination
+
+  #load the configuration file for the pagination
+  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+  config=YAML::load_file(configpath)
+  grouped_pagination :default_page => config["events"]["index"]
 
   #FIXME: Move to Libs
   Array.class_eval do

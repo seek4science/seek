@@ -28,7 +28,18 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
   
   def test_latest_limit
-    assert_equal 7,Person.latest_limit  
+    assert_equal PAGINATE_LATEST_LIMIT,Person.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Project.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Institution.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Investigation.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Study.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Assay.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,DataFile.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Model.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Sop.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Publication.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Event.latest_limit
+
   end
 
   def test_paginate_no_options    
@@ -177,4 +188,21 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     result = Sop.paginate_after_fetch(sops)
     assert !result.empty? #Check there's something on the first page    
   end
+
+  test "paginate default page" do
+    configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+    config=YAML::load_file(configpath)
+    assert_equal Person.paginate.page, config["people"]["index"]
+    assert_equal Project.paginate.page, config["projects"]["index"]
+    assert_equal Institution.paginate.page, config["institutions"]["index"]
+    assert_equal Investigation.paginate.page, config["investigations"]["index"]
+    assert_equal Study.paginate.page, config["studies"]["index"]
+    assert_equal Assay.paginate.page, config["assays"]["index"]
+    assert_equal DataFile.paginate.page, config["data_files"]["index"]
+    assert_equal Model.paginate.page, config["models"]["index"]
+    assert_equal Sop.paginate.page, config["sops"]["index"]
+    assert_equal Publication.paginate.page, config["publications"]["index"]
+    assert_equal Event.paginate.page, config["events"]["index"]
+  end
+
 end

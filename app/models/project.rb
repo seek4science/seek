@@ -13,7 +13,11 @@ class Project < ActiveRecord::Base
   
   validates_uniqueness_of :name
 
-  grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for project
+  #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for project
+  #load the configuration file for the pagination
+  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+  config=YAML::load_file(configpath)
+  grouped_pagination :default_page => config["projects"]["index"]
   
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true

@@ -71,3 +71,6 @@ end
   HEADER_IMAGE_TITLE=DM_PROJECT_NAME unless defined? HEADER_IMAGE_TITLE
 
   NOREPLY_SENDER="no-reply@sysmo-db.org" unless defined? NOREPLY_SENDER
+
+# limit list of the entry in a page
+PAGINATE_LATEST_LIMIT= 7 unless defined? PAGINATE_LATEST_LIMIT
