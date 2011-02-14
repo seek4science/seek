@@ -9,3 +9,13 @@
 <% end %>
 
 <%= render :partial => "assets/resource_list", :locals => { :collection => @models, :authorization_for_showing_already_done=>true } %>
+
+<% if @models.page == "latest"%>
+    <% filter_hash = {:filter => params[:filter]} %>
+    <div class="alphabetcal_pagination">
+      <ul>
+          <li><%= link_to "See All", {:id => params[:id], :page => "all"}.merge(filter_hash) %></li>
+      </ul>
+      <%=  link_to("Clear Filter", CGI::unescape(request.url).gsub(/filter\[.+\]=[0-9]*[&]?/,""), :style => "display:none") unless params[:filter].blank? %>
+    </div>
+<% end %>

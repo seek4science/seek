@@ -14,7 +14,9 @@ class Sop < ActiveRecord::Base
   
   has_many :favourites, 
     :as => :resource,
-    :dependent => :destroy  
+    :dependent => :destroy
+
+  validates_presence_of :title
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
@@ -26,8 +28,11 @@ class Sop < ActiveRecord::Base
   has_one :investigation,:through=>:study
              
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
-  
-  grouped_pagination  
+
+   #load the configuration for the pagination
+  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+  config=YAML::load_file(configpath)
+  grouped_pagination :default_page => config["sops"]["index"]
   
   acts_as_uniquely_identifiable  
 

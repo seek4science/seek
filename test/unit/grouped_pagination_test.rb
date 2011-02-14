@@ -28,7 +28,17 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
   
   def test_latest_limit
-    assert_equal 7,Person.latest_limit  
+    assert_equal PAGINATE_LATEST_LIMIT,Person.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Project.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Institution.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Investigation.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Study.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Assay.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,DataFile.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Model.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Sop.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Publication.latest_limit
+    assert_equal PAGINATE_LATEST_LIMIT,Event.latest_limit
   end
 
   def test_paginate_no_options    
@@ -177,4 +187,34 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     result = Sop.paginate_after_fetch(sops)
     assert !result.empty? #Check there's something on the first page    
   end
+
+  test "pagination for default page" do
+    configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+    config=YAML::load_file(configpath)
+    @people=Person.paginate
+    assert_equal @people.page, config["people"]["index"]
+    @projects=Project.paginate
+    assert_equal @projects.page, config["projects"]["index"]
+    @institutions=Institution.paginate
+    assert_equal @institutions.page, config["institutions"]["index"]
+    @investigations=Investigation.paginate
+    assert_equal @investigations.page, config["investigations"]["index"]
+    @studies=Study.paginate
+    assert_equal @studies.page, config["studies"]["index"]
+    @assays=Assay.paginate
+    assert_equal @assays.page, config["assays"]["index"]
+    @data_files=DataFile.paginate
+    assert_equal @data_files.page, config["data_files"]["index"]
+    @models=Model.paginate
+    assert_equal @models.page, config["models"]["index"]
+    @sops=Sop.paginate
+    assert_equal @sops.page, config["sops"]["index"]
+    @publications=Publication.paginate
+    assert_equal @publications.page, config["publications"]["index"]
+    @events=Event.paginate
+    assert_equal @events.page, config["events"]["index"]
+
+  end
+
+
 end
