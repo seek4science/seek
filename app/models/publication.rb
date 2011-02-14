@@ -8,8 +8,8 @@ class Publication < ActiveRecord::Base
   title_trimmer
 
   acts_as_asset
-  
-  #load the configuration file for the pagination
+
+  #load the configuration for the pagination
   configpath=File.join(RAILS_ROOT,"config/paginate.yml")
   config=YAML::load_file(configpath)
   grouped_pagination :default_page => config["publications"]["index"]

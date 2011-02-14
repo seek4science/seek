@@ -39,7 +39,6 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal PAGINATE_LATEST_LIMIT,Sop.latest_limit
     assert_equal PAGINATE_LATEST_LIMIT,Publication.latest_limit
     assert_equal PAGINATE_LATEST_LIMIT,Event.latest_limit
-
   end
 
   def test_paginate_no_options    
@@ -189,20 +188,21 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert !result.empty? #Check there's something on the first page    
   end
 
-  test "paginate default page" do
+  test "pagination for default page" do
     configpath=File.join(RAILS_ROOT,"config/paginate.yml")
     config=YAML::load_file(configpath)
-    assert_equal Person.paginate.page, config["people"]["index"]
-    assert_equal Project.paginate.page, config["projects"]["index"]
-    assert_equal Institution.paginate.page, config["institutions"]["index"]
-    assert_equal Investigation.paginate.page, config["investigations"]["index"]
-    assert_equal Study.paginate.page, config["studies"]["index"]
-    assert_equal Assay.paginate.page, config["assays"]["index"]
-    assert_equal DataFile.paginate.page, config["data_files"]["index"]
-    assert_equal Model.paginate.page, config["models"]["index"]
-    assert_equal Sop.paginate.page, config["sops"]["index"]
-    assert_equal Publication.paginate.page, config["publications"]["index"]
-    assert_equal Event.paginate.page, config["events"]["index"]
+    assert_equal Person.paginate, config["people"]["index"]
+    assert_equal Project.paginate, config["projects"]["index"]
+    assert_equal Institution.paginate, config["institutions"]["index"]
+    assert_equal Investigation.paginate, config["investigations"]["index"]
+    assert_equal Study.paginate, config["studies"]["index"]
+    assert_equal Assay.paginate, config["assays"]["index"]
+    assert_equal DataFile.paginate, config["data_files"]["index"]
+    assert_equal Model.paginate, config["models"]["index"]
+    assert_equal Sop.paginate, config["sops"]["index"]
+    assert_equal Publication.paginate, config["publications"]["index"]
+    assert_equal Event.paginate, config["events"]["index"]
   end
+
 
 end

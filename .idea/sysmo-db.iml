@@ -124,20 +124,20 @@
     <orderEntry type="library" scope="PROVIDED" name="[gem] actionmailer (v2.3.8, /usr/lib/ruby/gems/1.8/gems/actionmailer-2.3.8)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] mysql (v2.8.1, /usr/lib/ruby/gems/1.8/gems/mysql-2.8.1)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] bundler (v1.0.10, /usr/lib/ruby/gems/1.8/gems/bundler-1.0.10)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] spreadsheet (v0.6.4.1, /usr/lib/ruby/gems/1.8/gems/spreadsheet-0.6.4.1)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] rmagick (v2.12.2, /usr/lib/ruby/gems/1.8/gems/rmagick-2.12.2)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] simple-spreadsheet-extractor (v0.3.5, /usr/lib/ruby/gems/1.8/gems/simple-spreadsheet-extractor-0.3.5)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] sqlite3-ruby (v1.2.5, /usr/lib/ruby/gems/1.8/gems/sqlite3-ruby-1.2.5)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] libxml-ruby (v1.1.3, /usr/lib/ruby/gems/1.8/gems/libxml-ruby-1.1.3)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] calendar_date_select (v1.16.2, /usr/lib/ruby/gems/1.8/gems/calendar_date_select-1.16.2)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] hpricot (v0.8.3, /usr/lib/ruby/gems/1.8/gems/hpricot-0.8.3)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] rmagick (v2.12.2, /usr/lib/ruby/gems/1.8/gems/rmagick-2.12.2)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] RedCloth (v4.2.3, /usr/lib/ruby/gems/1.8/gems/RedCloth-4.2.3)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] spreadsheet (v0.6.4.1, /usr/lib/ruby/gems/1.8/gems/spreadsheet-0.6.4.1)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] sqlite3-ruby (v1.2.5, /usr/lib/ruby/gems/1.8/gems/sqlite3-ruby-1.2.5)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] rack-openid (v1.1.0, /usr/lib/ruby/gems/1.8/gems/rack-openid-1.1.0)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] rest-client (v1.6.1, /usr/lib/ruby/gems/1.8/gems/rest-client-1.6.1)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] fastercsv (v1.5.1, /usr/lib/ruby/gems/1.8/gems/fastercsv-1.5.1)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] ruby-openid (v2.1.8, /usr/lib/ruby/gems/1.8/gems/ruby-openid-2.1.8)" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] rubaidh-google_analytics (v1.1.4, /usr/lib/ruby/gems/1.8/gems/rubaidh-google_analytics-1.1.4)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] uuidtools (v2.1.1, /usr/lib/ruby/gems/1.8/gems/uuidtools-2.1.1)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] rest-client (v1.6.1, /usr/lib/ruby/gems/1.8/gems/rest-client-1.6.1)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] ruby-openid (v2.1.8, /usr/lib/ruby/gems/1.8/gems/ruby-openid-2.1.8)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] hpricot (v0.8.3, /usr/lib/ruby/gems/1.8/gems/hpricot-0.8.3)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] rubaidh-google_analytics (v1.1.4, /usr/lib/ruby/gems/1.8/gems/rubaidh-google_analytics-1.1.4)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] calendar_date_select (v1.16.2, /usr/lib/ruby/gems/1.8/gems/calendar_date_select-1.16.2)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] simple-spreadsheet-extractor (v0.3.5, /usr/lib/ruby/gems/1.8/gems/simple-spreadsheet-extractor-0.3.5)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] ruby-ole (v1.2.11.1, /usr/lib/ruby/gems/1.8/gems/ruby-ole-1.2.11.1)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] mime-types (v1.16, /usr/lib/ruby/gems/1.8/gems/mime-types-1.16)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] open4 (v1.0.1, /usr/lib/ruby/gems/1.8/gems/open4-1.0.1)" level="application" />
