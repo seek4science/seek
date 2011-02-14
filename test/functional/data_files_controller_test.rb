@@ -49,7 +49,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle bad data url" do
-    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png"}    
+    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:project=>projects(:sysmo_project)}
     assert_no_difference('DataFile.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :data_file => df, :sharing=>valid_sharing
