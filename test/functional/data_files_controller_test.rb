@@ -206,13 +206,19 @@ class DataFilesControllerTest < ActionController::TestCase
         post :upload_for_tool, :data_file => valid_data_file, :recipient_id => people(:quentin_person).id
       end
     end
-    assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner),assigns(:data_file).contributor
+    assert_response :success
+    df = assigns(:data_file)
+    df.reload
+    assert_equal users(:datafile_owner), df.contributor
 
-    assert !assigns(:data_file).content_blob.data_io_object.read.nil?
-    assert assigns(:data_file).content_blob.url.blank?
-    assert assigns(:data_file).policy.permissions
-    assert_equal assigns(:data_file).policy.permissions.first.contributor, people(:quentin_person)
+    assert !df.content_blob.data_io_object.read.nil?
+    assert df.content_blob.url.blank?
+    assert df.policy
+    assert df.policy.permissions
+    assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
+    assert df.creators
+    p df.creators
+    assert_equal df.creators.first, users(:datafile_owner).person
   end
   
   def test_missing_sharing_should_default_to_private

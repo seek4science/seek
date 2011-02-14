@@ -99,8 +99,8 @@ class ContentBlob < ActiveRecord::Base
         logger.info "Moving #{@tmp_io_object.path} to #{filepath}"
         FileUtils.mv @tmp_io_object.path, filepath
         @tmp_io_object = nil
-      rescue
-        logger.info "Falling back to ruby copy"
+      rescue Exception => e
+        logger.info "Falling back to ruby copy because of: #{e.message}"
         @tmp_io_object.rewind
 
         File.open(filepath, "w+") do |f|
