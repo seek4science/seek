@@ -171,8 +171,7 @@ class SopsController < ApplicationController
       format.html { redirect_to(sops_path) }
     end
   end
-  
-  
+    
   def preview
     
     element=params[:element]

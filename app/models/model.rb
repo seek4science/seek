@@ -10,8 +10,8 @@ class Model < ActiveRecord::Base
   title_trimmer
   
   acts_as_asset
-  acts_as_trashable
-  
+  acts_as_trashable  
+
   has_many :favourites, 
     :as => :resource,
     :dependent => :destroy
