@@ -40,8 +40,17 @@ GOOGLE_ANALYTICS_TRACKER_ID = 'XX-XXXXXXX-X'
 #Enable managing of assay and technology types by "admins", "pals", "users" or "none"
 TYPE_MANAGERS = "admins"
 
+#To allow publications from PubMed to be registered, an email address is required for the API call. No registration required.
+PUBMED_API_EMAIL = ""
+
+#To all DOI based publications to be registered, an email address is required for the API call. You also need to register this email
+#address with http://www.crossref.org/
+CROSSREF_API_EMAIL = ""
+
+
 #this is needed for the xlinks in the REST API.
 #SITE_BASE_HOST="http://localhost:3000"
+
 
 #Mailer settings
 ActionMailer::Base.smtp_settings= {
