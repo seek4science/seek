@@ -200,54 +200,10 @@ class SopsController < ApplicationController
   
   protected
   
-  
-  
   def find_display_sop
     if @sop
       @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
     end
-  end
-  
-  
-  def set_parameters_for_sharing_form
-    policy = nil
-    policy_type = ""
-    
-    # obtain a policy to use
-    if @sop
-      if (policy = @sop.policy)
-        # SOP exists and has a policy associated with it - normal case
-        policy_type = "asset"
-      elsif @sop.project && (policy = @sop.project.default_policy)
-        # SOP exists, but policy not attached - try to use project default policy, if exists
-        policy_type = "project"
-      end
-    end
-    
-    unless policy
-      policy = Policy.default()
-      policy_type = "system"
-    end
-    
-    # set the parameters
-    # ..from policy
-    @policy = policy
-    @policy_type = policy_type
-    @sharing_mode = policy.sharing_scope
-    @access_mode = policy.access_type
-    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
-    @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
-    @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
-    
-    # ..other
-    @resource_type = "SOP"
-    @favourite_groups = current_user.favourite_groups
-    @resource = @sop
-    
-    @all_people_as_json = Person.get_all_as_json
-    
-    @enable_black_white_listing = @resource.nil? || !@resource.contributor.nil?
-    
   end
   
 end
