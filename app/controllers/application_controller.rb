@@ -217,8 +217,8 @@ class ApplicationController < ActionController::Base
     
     object=current_user if c=="sessions" #logging in and out is a special case    
     
-    #don't log if the object is not valid, as this will a validation error on update or create
-    return if object.nil? || (object.respond_to?("errors") && !object.errors.empty?)        
+    #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
+    return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
     
     case c
       when "sessions"
