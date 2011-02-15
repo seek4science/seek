@@ -15,7 +15,8 @@ module GroupedPagination
     #this is limit to the list when showing 'latest', 7. Can be set with the options[:latest_limit] in grouped_pagination definition in model
     attr_reader :latest_limit
 
-    attr_accessor :default_page
+    #this is the default page to use if :page is not provided when paginating.
+    attr_reader :default_page
     
     def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a + ["?"]
