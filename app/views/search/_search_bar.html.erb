@@ -19,7 +19,7 @@
     <div id="search_box">
       <%= text_field_tag :search_query, @search_query,:size=>30 %>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
-      <%= submit_tag "Go", :disable_with=>"Searching ..."  -%>
+      <%= submit_tag "Go" -%>
     </div>
   <% end  -%>
 <% end %>
