@@ -17,6 +17,16 @@ class SessionsControllerTest < ActionController::TestCase
     @response   = ActionController::TestResponse.new
   end
 
+  test "sessions#index redirects to session#new" do
+    get :index
+    assert_redirected_to login_url
+  end
+
+  test "session#show redirects to session#new" do
+    get :show
+    assert_redirected_to login_url
+  end
+
   def test_index_not_logged_in
     get :new
     assert_response :success

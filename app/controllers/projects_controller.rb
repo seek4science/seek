@@ -195,7 +195,7 @@ class ProjectsController < ApplicationController
   protected
   
   def find_projects
-    @projects = Project.paginate :page=>params[:page], :default_page => "all"
+    @projects = Project.paginate :page=>params[:page]
   end
   
 

@@ -76,7 +76,11 @@
                                                                         :related_publications => @assay.related_publications} -%>
                                                                         
 <p style="margin-top: 2em; text-align: center;" >
-  <%= f.submit(action==:edit ? "Update" : "Create") -%>
+  <%
+     button_text=action==:edit ? "Update" : "Create"
+     disabled_text=action==:edit ? "Updating..." : "Creating..."
+  %>
+  <%= f.submit button_text,:disable_with=>disabled_text -%>
   or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>
 </p>
 

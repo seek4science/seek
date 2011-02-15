@@ -14,11 +14,14 @@ module GroupedPagination
     
     #this is limit to the list when showing 'latest', 7. Can be set with the options[:latest_limit] in grouped_pagination definition in model
     attr_reader :latest_limit
+
+    attr_accessor :default_page
     
     def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a + ["?"]
       @field = options[:field] || "first_letter"
-      @latest_limit = options[:latest_limit] || 7
+      @latest_limit = options[:latest_limit] || PAGINATE_LATEST_LIMIT
+      @default_page = options[:default_page] || 'all'
       
       before_save :update_first_letter
       
@@ -30,7 +33,7 @@ module GroupedPagination
       options=args.pop unless args.nil?
       options ||= {}
       
-      default_page = options[:default_page] || "all"
+      default_page = options[:default_page] || @default_page
       default_page = @pages.first if default_page == "first"      
       
       page = options[:page] || default_page            
@@ -62,7 +65,7 @@ module GroupedPagination
       
       result
     end   
-    
+
   end
   
   module SingletonMethods
@@ -73,15 +76,15 @@ module GroupedPagination
       conditions << optional_conditions if optional_conditions
       conditions=merge_conditions(*conditions)
       return conditions
-    end
+    end    
     
     def paginate(*args)
       options=args.pop unless args.nil?
-      options ||= {}
-      
-      default_page = options[:default_page] || "all"
-      default_page = @pages.first if default_page == "first"      
-      
+      options ||= {}                
+
+      default_page = options[:default_page] || @default_page
+      default_page = @pages.first if default_page == "first"  
+
       page = options[:page] || default_page
     
       records=[]

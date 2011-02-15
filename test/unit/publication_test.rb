@@ -21,6 +21,23 @@ class PublicationTest < ActiveSupport::TestCase
     x.save!
     assert_equal("a pub",x.title)
   end
+
+  test "validation" do
+    asset=Publication.new :title=>"fred",:project=>projects(:sysmo_project),:doi=>"111"
+    assert asset.valid?
+
+    asset=Publication.new :title=>"fred",:project=>projects(:sysmo_project),:pubmed_id=>"111"
+    assert asset.valid?
+
+    asset=Publication.new :title=>"fred",:project=>projects(:sysmo_project)
+    assert !asset.valid?
+
+    asset=Publication.new :project=>projects(:sysmo_project),:doi=>"111"
+    assert !asset.valid?
+
+    asset=Publication.new :title=>"fred",:doi=>"111"
+    assert !asset.valid?
+  end
   
   test "creators order is returned in the order they were added" do
     p=Publication.new(:title=>"The meaining of life",:abstract=>"Chocolate",:pubmed_id=>"777",:project=>projects(:sysmo_project))

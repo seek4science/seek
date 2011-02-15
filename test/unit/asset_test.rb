@@ -2,6 +2,8 @@ require 'test_helper'
 
 class AssetTest < ActiveSupport::TestCase
   fixtures :all
+
+  
   
   test "classifying and authorizing resources" do
     resource_array = []

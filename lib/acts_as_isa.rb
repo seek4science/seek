@@ -1,4 +1,4 @@
-require 'title_trimmer'
+      require 'title_trimmer'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
 
