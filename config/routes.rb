@@ -1,4 +1,4 @@
-ActionController::Routing::Routes.draw do |map|
+  ActionController::Routing::Routes.draw do |map|
   map.resources :events
 
   map.resources :strains
