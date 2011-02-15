@@ -216,5 +216,30 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   end
 
+  test "pagination for default page using rails-setting plugin" do
+    @people=Person.paginate
+    assert_equal @people.page, Settings.index[:people]
+    @projects=Project.paginate
+    assert_equal @projects.page, Settings.index[:projects]
+    @institutions=Institution.paginate
+    assert_equal @institutions.page, Settings.index[:institutions]
+    @investigations=Investigation.paginate
+    assert_equal @investigations.page, Settings.index[:investigations]
+    @studies=Study.paginate
+    assert_equal @studies.page, Settings.index[:studies]
+    @assays=Assay.paginate
+    assert_equal @assays.page, Settings.index[:assays]
+    @data_files=DataFile.paginate
+    assert_equal @data_files.page, Settings.index[:data_files]
+    @models=Model.paginate
+    assert_equal @models.page, Settings.index[:models]
+    @sops=Sop.paginate
+    assert_equal @sops.page, Settings.index[:sops]
+    @publications=Publication.paginate
+    assert_equal @publications.page, Settings.index[:publications]
+    @events=Event.paginate
+    assert_equal @events.page, Settings.index[:events]
+
+  end
 
 end

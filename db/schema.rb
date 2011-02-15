@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110211092358) do
+ActiveRecord::Schema.define(:version => 20110215133806) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -585,6 +585,17 @@ ActiveRecord::Schema.define(:version => 20110211092358) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "settings", :force => true do |t|
+    t.string   "var",                       :null => false
+    t.text     "value"
+    t.integer  "target_id"
+    t.string   "target_type", :limit => 30
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "settings", ["target_type", "target_id", "var"], :name => "index_settings_on_target_type_and_target_id_and_var", :unique => true
 
   create_table "site_announcement_categories", :force => true do |t|
     t.string   "title"

@@ -10,10 +10,13 @@ class Event < ActiveRecord::Base
   acts_as_uniquely_identifiable
 
   #load the configuration for the pagination
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+=begin
+configpath=File.join(RAILS_ROOT,"config/paginate.yml")
   config=YAML::load_file(configpath)
   grouped_pagination :default_page => config["events"]["index"]
+=end
 
+  grouped_pagination :default_page => Settings.index[:events]
   #FIXME: Move to Libs
   Array.class_eval do
     def contains_duplicates?

@@ -16,7 +16,8 @@ class Project < ActiveRecord::Base
  #load the configuration for the pagination
   configpath=File.join(RAILS_ROOT,"config/paginate.yml")
   config=YAML::load_file(configpath)
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => config["projects"]["index"] #shouldn't need "Other" tab for project
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Settings.index[:projects] #shouldn't need "Other" tab for project
+  
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
