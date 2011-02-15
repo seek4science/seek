@@ -27,11 +27,6 @@ class DataFile < ActiveRecord::Base
   
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
   
-    #load the configuration for the pagination
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["data_files"]["index"] 
-  
   acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do

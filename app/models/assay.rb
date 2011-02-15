@@ -3,10 +3,6 @@ require 'acts_as_isa'
 class Assay < ActiveRecord::Base
   acts_as_isa
 
-  #load the configuration for the pagination
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["assays"]["index"]
 
   belongs_to :assay_type
   belongs_to :technology_type  
