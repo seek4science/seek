@@ -28,12 +28,8 @@ class Model < ActiveRecord::Base
   
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if SOLR_ENABLED
 
-  has_many :created_datas
-  
-  #load the configuration for the pagination
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["models"]["index"]
+  has_many :created_datas    
+
   
   acts_as_uniquely_identifiable
   

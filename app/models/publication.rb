@@ -9,11 +9,8 @@ class Publication < ActiveRecord::Base
 
   acts_as_asset
 
-  #load the configuration for the pagination
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["publications"]["index"]
-  
+  validates_presence_of :title
+  validates_presence_of :project
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
