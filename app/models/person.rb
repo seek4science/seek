@@ -10,7 +10,11 @@ class Person < ActiveRecord::Base
 
   acts_as_notifiee
 
-  grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
+  #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
+  #load the configuration for the pagination
+  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+  config=YAML::load_file(configpath)
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => config["people"]["index"]
 
   validates_presence_of :email
 

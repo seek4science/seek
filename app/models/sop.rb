@@ -28,8 +28,11 @@ class Sop < ActiveRecord::Base
   has_one :investigation,:through=>:study
              
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
-  
-  grouped_pagination
+
+   #load the configuration for the pagination
+  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
+  config=YAML::load_file(configpath)
+  grouped_pagination :default_page => config["sops"]["index"]
   
   acts_as_uniquely_identifiable  
 

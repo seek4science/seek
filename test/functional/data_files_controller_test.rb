@@ -145,7 +145,7 @@ class DataFilesControllerTest < ActionController::TestCase
   
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 401 url" do
-    df = {:title=>"401",:data_url=>"http://www.myexperiment.org/workflow.xml?id=82"}
+    df = {:title=>"401",:data_url=>"http://www.myexperiment.org/workflow.xml?id=82",:project=>projects(:sysmo_project)}
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         post :create, :data_file => df, :sharing=>valid_sharing
@@ -168,7 +168,7 @@ class DataFilesControllerTest < ActionController::TestCase
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 302 url" do
     
-    df = {:title=>"302",:data_url=>"http://demo.sysmo-db.org/models/1/download"}
+    df = {:title=>"302",:data_url=>"http://demo.sysmo-db.org/models/1/download",:project=>projects(:sysmo_project)}
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         post :create, :data_file => df, :sharing=>valid_sharing
@@ -491,15 +491,15 @@ class DataFilesControllerTest < ActionController::TestCase
   private
   
   def valid_data_file
-    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png')}
+    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
   end
   
   def valid_data_file_with_http_url
-    { :title=>"Test HTTP",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"}
+    { :title=>"Test HTTP",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
   end
   
   def valid_data_file_with_ftp_url
-    { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt"}
+    { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
   end
   
   def valid_sharing
