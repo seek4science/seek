@@ -73,6 +73,18 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_redirected_to institution_path(assigns(:institution))
   end
 
+    def test_user_project_manager
+    login_as(:project_manager)
+    get :show, :id=>institutions(:two)
+    assert_select "a",:text=>/Edit Institution/,:count=>1
+
+    get :edit, :id=>institutions(:two)
+    assert_response :success
+
+    put :update, :id=>institutions(:two).id,:institution=>{}
+    assert_redirected_to institution_path(assigns(:institution))
+  end
+
   def test_user_cant_edit_project
     login_as(:cant_edit)
     get :show, :id=>institutions(:two)

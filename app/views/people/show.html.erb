@@ -97,7 +97,8 @@
         <% if current_user.is_admin? -%>
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
         <ul>
-            <%= "<li><b>This person is a #{DM_PROJECT_NAME} PAL</b><li><li>&nbsp;</li>" if @person.is_pal? %>
+            <%= "<li><b>This person is a #{DM_PROJECT_NAME} PAL</b><li><li>&nbsp;</li>" if @person.is_pal? %><br/>
+            <%= "<li><b>This person is a Project Manager</b><li><li>&nbsp;</li>" if @person.is_project_manager? %>
             <li>
                 Editing <b>projects</b>, where this person is involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
             </li>

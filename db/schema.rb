@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110203144227) do
+ActiveRecord::Schema.define(:version => 20110208125657) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -469,6 +469,7 @@ ActiveRecord::Schema.define(:version => 20110203144227) do
     t.boolean  "can_edit_projects",                   :default => false
     t.boolean  "can_edit_institutions",               :default => false
     t.boolean  "is_admin",                            :default => false
+    t.boolean  "is_project_manager",                  :default => false
   end
 
   create_table "permissions", :force => true do |t|

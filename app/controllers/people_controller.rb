@@ -314,7 +314,7 @@ class PeopleController < ApplicationController
   
   def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
-    unless @person == current_user.person || current_user.is_admin?
+    unless @person == current_user.person || current_user.is_admin? || current_user.person.is_project_manager?
       error("Not the current person", "is invalid (not owner)")
       return false
     end

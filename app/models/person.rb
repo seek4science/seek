@@ -180,6 +180,10 @@ class Person < ActiveRecord::Base
     created_data_files | created_models | created_sops | created_publications
   end
 
+  def can_be_edited_by?(subject)
+    return((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
+  end
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin

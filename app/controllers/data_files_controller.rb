@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url]
   before_filter :find_display_data_file, :only=>[:show,:download]
     
   def new_version
@@ -62,6 +62,34 @@ class DataFilesController < ApplicationController
       else
         flash[:error] = "You are not authorized to upload new Data files. Only members of known projects, institutions or work groups are allowed to create new content."
         format.html { redirect_to data_files_path }
+      end
+    end
+  end
+
+  def upload_for_tool
+    t1 = Time.now
+    if handle_data
+      t2 = Time.now
+
+      @data_file = DataFile.new params[:data_file]
+
+      @data_file.contributor  = current_user
+      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+      @data_file.creators << current_user.person
+
+      if @data_file.save
+        time = Time.now
+        logger.info "TIME: total for upload tool #{t1 - time}"
+        logger.info "TIME: after handle_data #{t2 - time}"
+        @data_file.creators = [current_user.person]
+        flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+        render :text => flash.now[:notice]
+      else
+        time = Time.now
+        logger.info "TIME: total for upload tool #{t1 - time}"
+        logger.info "TIME: after handle_data #{t2 - time}"
+        render :text => (@data_file.errors.map { |e| e.join(" ") }.join("\n")), :status => 500
       end
     end
   end
