@@ -6,6 +6,7 @@
 <%
 title||="Creators"
 %>
+
 <div class="contribution_section_box" style="padding: 0.5em 0 1em 0;">
   <p class="heading">
     <%= help_icon("The authors are the people who originally created this file.") -%>
@@ -15,12 +16,12 @@ title||="Creators"
       <p style="text-align:center; margin: 0; padding: 0;"><small>[ <%= link_to "edit", edit_polymorphic_path(resource) %> ]</small></p>
     <% end %>
   </p>
-  <p>
+      
   <% creators.each do |creator| %>
-    <% if creators.count < 4 #display full avatar if not too many authors %>
+    <% if creators.count < 4 #display full avatar if not too many authors %>            
       <%= favouritable_icon(creator, 60) -%><br/>
     <% end %>
     <%= link_to(h(creator.name), url_for(creator)) -%><br/>
   <% end %>
-  </p>
+
 </div>
