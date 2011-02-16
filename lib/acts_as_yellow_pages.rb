@@ -1,5 +1,6 @@
 require 'acts_as_editable'
 require 'acts_as_uniquely_identifiable'
+require 'acts_as_favouritable'
 
 module Acts #:nodoc:
   module Yellow_Pages #:nodoc:
@@ -13,16 +14,14 @@ module Acts #:nodoc:
 
     module ClassMethods
       def acts_as_yellow_pages
+        acts_as_favouritable
+
         default_scope :order => "#{self.table_name}.name"
 
         validates_presence_of :name
 
         #TODO: refactor to remove :name entirely
         alias_attribute :title, :name
-
-        has_many :favourites,
-                 :as        => :resource,
-                 :dependent => :destroy
 
         has_many :avatars,
                  :as        => :owner,

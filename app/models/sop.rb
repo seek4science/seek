@@ -11,10 +11,6 @@ class Sop < ActiveRecord::Base
   acts_as_trashable
   
   title_trimmer
-  
-  has_many :favourites, 
-    :as => :resource,
-    :dependent => :destroy
 
   validates_presence_of :title
 

@@ -1,6 +1,8 @@
 require 'acts_as_authorized'
 require 'acts_as_uniquely_identifiable'
 require 'grouped_pagination'
+require 'acts_as_favouritable'
+
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
 
@@ -8,6 +10,7 @@ class Event < ActiveRecord::Base
 
   acts_as_authorized
   acts_as_uniquely_identifiable
+  acts_as_favouritable
 
   grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(:events)
 

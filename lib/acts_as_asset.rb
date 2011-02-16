@@ -9,6 +9,7 @@
 # * See license.txt for details.
 # ********************************************************************************
 require 'acts_as_authorized'
+require 'acts_as_favouritable'
 
 module Acts #:nodoc:
   module Asset #:nodoc:
@@ -27,6 +28,7 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_asset
         acts_as_authorized
+        acts_as_favouritable
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
         validates_presence_of :title

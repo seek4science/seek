@@ -43,7 +43,7 @@ TYPE_MANAGERS = "admins"
 #To allow publications from PubMed to be registered, an email address is required for the API call. No registration required.
 PUBMED_API_EMAIL = ""
 
-#To all DOI based publications to be registered, an email address is required for the API call. You also need to register this email
+#To allow DOI based publications to be registered, an email address is required for the API call. You also need to register this email
 #address with http://www.crossref.org/
 CROSSREF_API_EMAIL = ""
 

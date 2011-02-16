@@ -10,11 +10,7 @@ class DataFile < ActiveRecord::Base
   acts_as_asset
   acts_as_trashable
   
-  title_trimmer
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
+  title_trimmer  
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
