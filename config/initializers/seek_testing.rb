@@ -9,7 +9,5 @@ if Rails.env.test?
 
   CROSSREF_API_EMAIL = "sowen@cs.man.ac.uk"
 
-  PAGINATION_CONFIG_FILE = "config/paginate.yml"
-
   EVENTS_ENABLED = true
 end

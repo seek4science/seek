@@ -9,11 +9,6 @@ class Institution < ActiveRecord::Base
   acts_as_yellow_pages
 
   #load the configuration for the pagination
-=begin
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["institutions"]["index"]
-=end
   grouped_pagination :default_page => Settings.index[:institutions]
   validates_uniqueness_of :name
 

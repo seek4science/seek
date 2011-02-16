@@ -26,14 +26,6 @@ class DataFile < ActiveRecord::Base
   acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED  
   
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
-  
-=begin
-    #load the configuration for the pagination
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["data_files"]["index"]
-=end
-  grouped_pagination :default_page => Settings.index[:data_files]
 
   acts_as_uniquely_identifiable  
 

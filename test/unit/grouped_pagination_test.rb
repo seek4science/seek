@@ -188,34 +188,6 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert !result.empty? #Check there's something on the first page    
   end
 
-  test "pagination for default page" do
-    configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-    config=YAML::load_file(configpath)
-    @people=Person.paginate
-    assert_equal @people.page, config["people"]["index"]
-    @projects=Project.paginate
-    assert_equal @projects.page, config["projects"]["index"]
-    @institutions=Institution.paginate
-    assert_equal @institutions.page, config["institutions"]["index"]
-    @investigations=Investigation.paginate
-    assert_equal @investigations.page, config["investigations"]["index"]
-    @studies=Study.paginate
-    assert_equal @studies.page, config["studies"]["index"]
-    @assays=Assay.paginate
-    assert_equal @assays.page, config["assays"]["index"]
-    @data_files=DataFile.paginate
-    assert_equal @data_files.page, config["data_files"]["index"]
-    @models=Model.paginate
-    assert_equal @models.page, config["models"]["index"]
-    @sops=Sop.paginate
-    assert_equal @sops.page, config["sops"]["index"]
-    @publications=Publication.paginate
-    assert_equal @publications.page, config["publications"]["index"]
-    @events=Event.paginate
-    assert_equal @events.page, config["events"]["index"]
-
-  end
-
   test "pagination for default page using rails-setting plugin" do
     @people=Person.paginate
     assert_equal @people.page, Settings.index[:people]

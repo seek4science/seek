@@ -3,13 +3,6 @@ require 'acts_as_isa'
 class Study < ActiveRecord::Base  
   acts_as_isa
 
-  #load the configuration for the pagination
-=begin
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["studies"]["index"]
-=end
-  grouped_pagination :default_page => Settings.index[:studies]
   belongs_to :investigation
   
   has_many :assays

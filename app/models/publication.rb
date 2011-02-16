@@ -9,13 +9,6 @@ class Publication < ActiveRecord::Base
 
   acts_as_asset
 
-  #load the configuration for the pagination
-=begin
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["publications"]["index"]
-=end
-  grouped_pagination :default_page => Settings.index[:publications]
   validates_presence_of :title
   validates_presence_of :project
   validate :check_identifier_present

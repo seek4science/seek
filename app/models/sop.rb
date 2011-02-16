@@ -29,13 +29,6 @@ class Sop < ActiveRecord::Base
              
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
 
-   #load the configuration for the pagination
-=begin
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["sops"]["index"]
-=end
-  grouped_pagination :default_page => Settings.index[:sops]
   acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do
