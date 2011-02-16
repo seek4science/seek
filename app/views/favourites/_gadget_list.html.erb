@@ -1,4 +1,9 @@
-<% favourites=Favourite.find_all_by_user_id(current_user.id) %>
+<%
+   favourites=Favourite.find_all_by_user_id(current_user.id)
+
+   #this shouldn't be necessry thanks to acts_as_favouritable, but acts as a safety net for an old bug that left old Favourites with nil resources [SYSMO-520]
+   favourites = favourites.select{|f| !f.resource.nil?}
+%>
 <% show_as_list = false -%>
 <% if favourites.empty? %>
   <span class="none_text" style="vertical-align:middle;height:100%;">

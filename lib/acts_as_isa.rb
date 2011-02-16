@@ -1,6 +1,7 @@
 require 'title_trimmer'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
+require 'acts_as_favouritable'
 
 module Acts #:nodoc:
   module Isa #:nodoc:
@@ -14,6 +15,8 @@ module Acts #:nodoc:
 
     module ClassMethods
       def acts_as_isa
+        acts_as_favouritable
+        
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
         title_trimmer

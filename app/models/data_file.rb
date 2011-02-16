@@ -10,11 +10,7 @@ class DataFile < ActiveRecord::Base
   acts_as_asset
   acts_as_trashable
   
-  title_trimmer
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
+  title_trimmer  
 
   validates_presence_of :title
 

@@ -11,10 +11,6 @@ class Model < ActiveRecord::Base
   
   acts_as_asset
   acts_as_trashable  
-
-  has_many :favourites, 
-    :as => :resource,
-    :dependent => :destroy
   
   validates_presence_of :title
   

@@ -1,4 +1,8 @@
+require 'acts_as_favouritable'
+
 class Organism < ActiveRecord::Base
+
+  acts_as_favouritable
 
   linked_to_bioportal :email=>"stuart.owen@manchester.ac.uk"
   
