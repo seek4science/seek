@@ -12,7 +12,7 @@ class Person < ActiveRecord::Base
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
   #load the configuration for the pagination
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Settings.index[:people]
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
 
   validates_presence_of :email
 

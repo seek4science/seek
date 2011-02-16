@@ -10,7 +10,7 @@ class Event < ActiveRecord::Base
   acts_as_uniquely_identifiable
 
   #load the configuration for the pagination
-  grouped_pagination :default_page => Settings.index[:events]
+  grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
 
   #FIXME: Move to Libs
   Array.class_eval do
