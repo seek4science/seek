@@ -4,7 +4,7 @@
     <p>
       <label>Search for:</label><br/>
       <%= text_field_tag :search_term, search_term, :style=>"min-width:25em;" %><br/>
-      <%= submit_tag "Search",:disable_with=>"Searching ..." %>
+      <%= submit_tag "Search", :disable_with=>"Searching ..." %>
     </p>
 <% end -%>
 <% if !search_results.empty? -%>
