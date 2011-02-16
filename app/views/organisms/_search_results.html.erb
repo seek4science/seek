@@ -1,56 +1,58 @@
-<div id="organism_search_results">
-    <% form_remote_tag :url=>url_for(:action=>:search_ajax,:controller=>:organisms),
-    :before=>"show_ajax_loader('search_results');" do -%>
-    <%= hidden_field_tag :pagenum,1 -%>
-    <span style="font-weight:bold;">Search for:</span>
-    <br/>
-    <%= text_field_tag :search_term,search_term,:style=>"padding-left: 0.5em;padding-right:0.5em;min-width:15em;" %>
-    <%= submit_tag "Search" %>
-    <% end -%>
-    <% if !search_results.empty? -%>
-    <h3><%= link_to_remote image("arrow_left"),:url=>url_for(:action=>:search_ajax,:controller=>:organisms,:pagenum=>pagenum.to_i-1,:search_term=>search_term),:before=>"show_ajax_loader('search_results');" unless pagenum.to_i <= 1 -%>
-        <%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%>
-        <%= link_to_remote image("arrow_right"),:url=>url_for(:action=>:search_ajax,:controller=>:organisms,:pagenum=>pagenum.to_i+1,:search_term=>search_term),:before=>"show_ajax_loader('search_results');" unless pagenum.to_i >= pages.to_i -%>
+<% form_remote_tag :url   =>url_for(:action=>:search_ajax, :controller=>:organisms),
+                   :before=>"show_ajax_loader('search_results');" do -%>
+    <%= hidden_field_tag :pagenum, 1 -%>
+    <p>
+      <label>Search for:</label><br/>
+      <%= text_field_tag :search_term, search_term, :style=>"min-width:25em;" %><br/>
+      <%= submit_tag "Search",:disable_with=>"Searching ..." %>
+    </p>
+<% end -%>
+<% if !search_results.empty? -%>
+    <h3><%= link_to_remote image("arrow_left"), :url=>url_for(:action=>:search_ajax, :controller=>:organisms, :pagenum=>pagenum.to_i-1, :search_term=>search_term), :before=>"show_ajax_loader('search_results');" unless pagenum.to_i <= 1 -%>
+      <%= "Page #{pagenum.to_s}  of #{pages.to_s}" -%>
+      <%= link_to_remote image("arrow_right"), :url=>url_for(:action=>:search_ajax, :controller=>:organisms, :pagenum=>pagenum.to_i+1, :search_term=>search_term), :before=>"show_ajax_loader('search_results');" unless pagenum.to_i >= pages.to_i -%>
     </h3>
     <table>
-        <tr>
-            <th>
-                Ontology label
-            </th>
-            <th>
-                Ontology ID
-            </th>
-            <th>
-                Version ID
-            </th>
-            <th>
-                Concept id
-            </th>
-            <th>
-                Preferred name (click to select)
-            </th>
-        </tr>
-        <% search_results.each do |result| %>
-        <tr>
+      <tr>
+        <th>
+          Ontology label
+        </th>
+        <th>
+          Ontology ID
+        </th>
+        <th>
+          Version ID
+        </th>
+        <th>
+          Concept id
+        </th>
+        <th>
+          Preferred name (click to select)
+        </th>
+      </tr>
+      <% search_results.each do |result| %>
+          <tr>
             <td>
-                <%= h(result[:ontology_display_label]) -%>
+              <%= h(result[:ontology_display_label]) -%>
             </td>
             <td>
-                <%= link_to_ontology(result[:ontology_id],result[:ontology_id]) -%>
+              <%= link_to_ontology(result[:ontology_id], result[:ontology_id]) -%>
             </td>
             <td>
-                <%= link_to_ontology_version(result[:ontology_version_id],result[:ontology_version_id]) -%>
-                <%= link_to_ontology_version_visualize("Explore",result[:ontology_version_id]) -%>
-                <%= link_to_download_ontology("Download",result[:ontology_version_id]) -%>
+              <%= link_to_ontology_version(result[:ontology_version_id], result[:ontology_version_id]) -%>
+              <%= link_to_ontology_version_visualize("Explore", result[:ontology_version_id]) -%>
+              <%= link_to_download_ontology("Download", result[:ontology_version_id]) -%>
             </td>
             <td>
-                <%= result[:concept_id_short] -%>
+              <%= result[:concept_id_short] -%>
             </td>
             <td>
-                <%= link_to_function(h(result[:preferred_name]),"add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id_short]}');") -%>
-            </td
-        </tr>
-        <% end %>
+              <%= link_to_function(h(result[:preferred_name]), "add_concept('#{result[:preferred_name]}',#{result[:ontology_id]},#{result[:ontology_version_id]},'#{result[:concept_id_short]}');") -%>
+            </td>
+          </tr>
+      <% end %>
     </table>
-    <% end -%>
-</div>
+<% elsif !search_term.blank? %>
+    <br/>
+    <span class="none_text">No matches found for <b><%= h(search_term) -%></b></span>
+<% end -%>
