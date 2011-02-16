@@ -19,7 +19,9 @@ module ApplicationHelper
       c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
     end
     @@creatable_model_classes.delete(Event) unless EVENTS_ENABLED
-    @@creatable_model_classes = @@creatable_model_classes.compact.sort{|a,b| a.name <=> b.name}    
+
+    #sorted by name, assets first, then isa, then anything else  
+    @@creatable_model_classes = @@creatable_model_classes.compact.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
   end
 
   #joins the list with seperator and the last item with an 'and'
