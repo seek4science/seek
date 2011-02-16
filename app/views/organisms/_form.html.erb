@@ -1,47 +1,61 @@
+<div class="show_basic" id="edit_organisms">
 
-<div id="edit_organism">
-    <% form_for(@organism) do |f| %>
-    <ul>
-        <li>
-            <span>
-                Display name
-            </span><br/>
-            <%= f.text_field :title %>
-        </li>
-        <li>
-            <span>
-                Ontology ID
-            </span><br/>
-            <%= f.text_field :ontology_id %>
-        </li>
-        <li>
-            <span>
-                Ontology version ID
-            </span><br/>
-            <%= f.text_field :ontology_version_id %>
-        </li>
-        <li>
-            <span>
-                Concept URI
-            </span><br/>
-            <%= f.text_field :concept_uri %>
-        </li>
-    </ul>
-    <%= f.submit @organism.id ? "Update" : "Create" -%>
-    <% end %>
+  <% form_for(@organism) do |f| %>
+
+      <%= f.error_messages -%>
+
+      <div style="width: 95%;">
+        <p>
+          <%= f.label :display_name -%><span class="required">*</span><br/>
+          <%= f.text_field :title, :style => "width: 350px;" -%>
+        </p>
+
+        <h2>BioPortal ontology details</h2>
+
+        <p class="box_infotext">
+          By providing ontology details about the organism, the information about it will be richer.</br>
+          The easiest way to populate these values is the use the NCBI search tool below.</br>
+          You can also manually discover these values by using
+          the <%= link_to "BioPortal website", "http://bioportal.bioontology.org/", :target=>"_blank" -%>
+        </p>
+
+        <p>
+          <%= f.label :ontology_id -%><br/>
+          <%= f.text_field :ontology_id, :style => "width: 350px;" -%>
+        </p>
+
+        <p>
+          <%= f.label :ontology_version_id -%><br/>
+          <%= f.text_field :ontology_version_id, :style => "width: 350px;" -%>
+        </p>
+
+        <p>
+          <%= f.label :concept_uri -%><br/>
+          <%= f.text_field :concept_uri, :style => "width: 350px;" -%>
+        </p>
+      </div>
+      <%= f.submit @organism.id ? "Update" : "Create", :disable_with=>@organism.id ? "Updating..." : "Creating..." -%>
+  <% end %>
 </div>
 <br/>
-<h3>Search</h3>
-<div id="search_results">
-    <%= render :partial=>"search_results",:object=>[],:locals=>{:search_term=>@organism.title,:pagenum=>1} %>
-</div>
+<div class="show_basic">
+  <h2>Search the NCBI Ontology at BioPortal:</h2>
 
+  <p class="box_infotext">
+    Search the NCBI Ontology for the organism you are looking for, and the click then preferred name to populate the
+    fields above.
+  </p>
+
+  <div id="search_results">
+    <%= render :partial=>"search_results", :object=>[], :locals=>{:search_term=>@organism.title, :pagenum=>1} %>
+  </div>
+</div>
 <script type="text/javascript">
-      function add_concept(label,ont_id,ont_version_id,conc_id) {
-        $('organism_title').value=label;
-        $('organism_ontology_id').value=ont_id;
-        $('organism_ontology_version_id').value=ont_version_id;
-        $('organism_concept_uri').value=conc_id;		
-		new Effect.Highlight("edit_organism");
-      }
+    function add_concept(label, ont_id, ont_version_id, conc_id) {
+        $('organism_title').value = label;
+        $('organism_ontology_id').value = ont_id;
+        $('organism_ontology_version_id').value = ont_version_id;
+        $('organism_concept_uri').value = conc_id;
+        new Effect.Highlight("edit_organism");
+    }
 </script>

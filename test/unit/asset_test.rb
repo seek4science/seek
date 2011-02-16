@@ -2,9 +2,15 @@ require 'test_helper'
 
 class AssetTest < ActiveSupport::TestCase
   fixtures :all
+  include ApplicationHelper
 
-  
-  
+  test "creatable classes order" do
+    EVENTS_ENABLED=true
+    creatables = user_creatable_classes
+    assert !creatables.empty?
+    assert_equal [DataFile,Model,Publication,Sop,Assay,Investigation,Study,Event],creatables
+  end
+
   test "classifying and authorizing resources" do
     resource_array = []
     sop=sops(:my_first_sop)
@@ -32,7 +38,5 @@ class AssetTest < ActiveSupport::TestCase
     assert result["Model"].include?(model_version2)
     assert result["DataFile"].include?(data_file)
   end
-  
 
-  
 end

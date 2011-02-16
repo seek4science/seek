@@ -17,8 +17,10 @@ module ApplicationHelper
       c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
     end
     @@creatable_model_classes.delete(Event) unless EVENTS_ENABLED
-    @@creatable_model_classes = @@creatable_model_classes.compact.sort{|a,b| a.name <=> b.name}    
-  end 
+
+    #sorted by name, assets first, then isa, then anything else  
+    @@creatable_model_classes = @@creatable_model_classes.compact.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+  end
 
   def ensure_models_loaded
     unless @@models_loaded
@@ -249,7 +251,34 @@ module ApplicationHelper
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
     return "#{APPLICATION_TITLE} "+name
-  end  
+  end
+
+  # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/
+  def windowed_pagination_links(pagingEnum, options)
+    link_to_current_page = options[:link_to_current_page]
+    always_show_anchors = options[:always_show_anchors]
+    padding = options[:window_size]
+
+    current_page = pagingEnum.page
+    html = ''
+
+    #Calculate the window start and end pages
+    padding = padding < 0 ? 0 : padding
+    first = pagingEnum.page_exists?(current_page  - padding) ? current_page - padding : 1
+    last = pagingEnum.page_exists?(current_page + padding) ? current_page + padding : pagingEnum.last_page
+
+    # Print start page if anchors are enabled
+    html << yield(1) if always_show_anchors and not first == 1
+
+    # Print window pages
+    first.upto(last) do |page|
+      (current_page == page && !link_to_current_page) ? html << page : html << yield(page)
+    end
+
+    # Print end page if anchors are enabled
+    html << yield(pagingEnum.last_page) if always_show_anchors and not last == pagingEnum.last_page
+    html
+  end
 
   def show_tag?(tag)
     #FIXME: not sure this is required or works any more. was originally to work around a bug in acts-as-taggable-on
