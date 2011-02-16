@@ -10,8 +10,8 @@ class Model < ActiveRecord::Base
   title_trimmer
   
   acts_as_asset
-  acts_as_trashable
-  
+  acts_as_trashable  
+
   has_many :favourites, 
     :as => :resource,
     :dependent => :destroy
@@ -31,12 +31,7 @@ class Model < ActiveRecord::Base
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if SOLR_ENABLED
 
   has_many :created_datas
-  
-  #load the configuration for the pagination
-  configpath=File.join(RAILS_ROOT,"config/paginate.yml")
-  config=YAML::load_file(configpath)
-  grouped_pagination :default_page => config["models"]["index"]
-  
+
   acts_as_uniquely_identifiable
   
   explicit_versioning(:version_column => "version") do

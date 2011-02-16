@@ -1,6 +1,6 @@
 class AdminController < ApplicationController
   before_filter :login_required
-  before_filter :is_user_admin_auth  
+  before_filter :is_user_admin_auth
 
   def show
     respond_to do |format|
@@ -161,8 +161,5 @@ class AdminController < ApplicationController
     sorted_keys=x.keys.sort
     (sorted_keys.first..sorted_keys.last).collect{|i| x[i].nil? ? 0 : x[i]  }
   end
-  
-  
-
 
 end

@@ -24,8 +24,7 @@ module Acts #:nodoc:
                  :as        => :resource,
                  :dependent => :destroy
 
-
-        grouped_pagination
+        grouped_pagination :default_page => Settings.index[self.name.underscore.pluralize.to_sym]
 
         acts_as_uniquely_identifiable
 
