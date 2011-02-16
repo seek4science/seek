@@ -138,7 +138,7 @@ class ModelsControllerTest < ActionController::TestCase
   end    
   
   test "should correctly handle bad data url" do
-    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png"}
+    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:project=>projects(:sysmo_project)}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :model => model, :sharing=>valid_sharing
