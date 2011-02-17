@@ -1,4 +1,4 @@
-      require 'title_trimmer'
+require 'title_trimmer'
 require 'grouped_pagination'
 require 'acts_as_uniquely_identifiable'
 
@@ -24,7 +24,7 @@ module Acts #:nodoc:
                  :as        => :resource,
                  :dependent => :destroy
 
-        grouped_pagination :default_page => Settings.index[self.name.underscore.pluralize.to_sym]
+        grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
 
         acts_as_uniquely_identifiable
 
