@@ -7,6 +7,7 @@
 <div class="show_basic">
   <input size="10" readonly="readonly" id="selection_data"></input>
   <input size="60" readonly="readonly" id="cell_info"></input><br/><br/>
+  <%= render :partial => "annotations/annotation", :collection=>@spreadsheet.annotations %>
   <%= generate_spreadsheet_html(@spreadsheet) %>   
 </div>
 

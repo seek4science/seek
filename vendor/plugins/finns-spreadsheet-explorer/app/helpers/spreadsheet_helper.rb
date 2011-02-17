@@ -4,7 +4,6 @@ module SpreadsheetHelper
     html = ""
     
     html << generate_spreadsheet_styles(workbook.styles)    
-    html << generate_spreadsheet_annotations(workbook.annotations)
     
     html << "<div class=\"spreadsheet_viewer\">"
         

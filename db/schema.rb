@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110202235621) do
+ActiveRecord::Schema.define(:version => 20110217231555) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -629,11 +629,11 @@ ActiveRecord::Schema.define(:version => 20110202235621) do
     t.integer  "end_row"
     t.integer  "end_column"
     t.integer  "source_id"
-    t.integer  "source_type"
     t.string   "annotation_type"
     t.text     "content"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "source_type"
   end
 
   create_table "strains", :force => true do |t|

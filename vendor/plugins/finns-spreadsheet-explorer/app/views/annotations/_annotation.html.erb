@@ -1,0 +1,6 @@
+<div class="annotation" id="annotation_<%=annotation.id-%>">
+  <b><%= annotation.cell_coverage %></b><br/>
+  <%= annotation.content %><br/>
+  <i>-<%= annotation.source.person.name %></i><br/>
+  <i>-<%= annotation.created_at.strftime('%d/%m/%Y @ %H:%M:%S') %></i>
+</div>
