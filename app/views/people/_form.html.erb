@@ -101,15 +101,17 @@
 	        they work in.
 	    </label>
 	    <br/>
-    <% end -%>    
-    <label for="is_pal" style="font-weight: normal;">
-        <%= f.check_box :is_pal -%>
-        This person is a certified <b><%= DM_PROJECT_NAME %> PAL</b>
-    </label><br/>
-    <label for="is_project_manager" style="font-weight: normal;">
-      <%= f.check_box :is_project_manager -%>
-      This person is a <b>Project Manager</b>
-    </label>
+    <% end -%>
+    <% if current_user.is_admin? %>
+        <label for="is_pal" style="font-weight: normal;">
+            <%= f.check_box :is_pal -%>
+            This person is a certified <b><%= DM_PROJECT_NAME %> PAL</b>
+        </label><br/>
+        <label for="is_project_manager" style="font-weight: normal;">
+            <%= f.check_box :is_project_manager -%>
+            This person is a <b>Project Manager</b>
+        </label>
+     <% end %>
 </p>
 <% end -%>
 <p style="text-align: center; margin-top: 1.5em;">
