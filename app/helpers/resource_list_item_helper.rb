@@ -21,7 +21,12 @@ module ResourceListItemHelper
     avatar_partial
   end
 
-  def list_item_title resource, title=nil, url=nil
+  def list_item_title resource, options={}
+    title=options[:title]
+    url=options[:url]
+    include_avatar=options[:include_avatar]
+    include_avatar=true if include_avatar.nil?
+
     if title.nil?
       title = get_object_title(resource)
     end
@@ -31,7 +36,7 @@ module ResourceListItemHelper
     if resource.class.name.split("::")[0] == "Person"
       html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
     else
-      if resource.avatar_key || resource.use_mime_type_for_avatar?
+      if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
         image=nil
 
         if resource.avatar_key

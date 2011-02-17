@@ -251,7 +251,15 @@ module Seek
           else
             redirect_to asset
           end
+        rescue Jerm::JermException=>de
+          flash[:error]=de.message
+          if (asset.class.name.include?("::Version"))
+            redirect_to asset.parent,:version=>asset.version
+          else
+            redirect_to asset
+          end
         end
+
       end
     end
   end

@@ -3,10 +3,6 @@ require 'uuidtools'
 require 'fileutils'
 
 module Seek
-
-  class DownloadException < Exception
-
-  end
   
   OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
   
