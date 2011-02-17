@@ -17,7 +17,7 @@
     <%= link_to "Visualise ontology term",visualise_organism_path(@organism),:popup=>true %> | <%= link_to_ncbi_taxonomy_browser @organism,"NCBI taxonomy browser",:popup=>true %>
   <% end -%>
 
-  <h2>Strains</h2>
+  <h2>Cell Type/Tissue</h2>
   
   <ul class="horiz_list_items">
     <% @organism.strains.each do |strain| -%>

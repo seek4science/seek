@@ -6,14 +6,14 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can associate the assay with specific organisms and strains.") -%>
+    <%= help_icon("Here you can associate the assay with specific organisms and cell types/tissues.") -%>
     Organisms
   </div>
 
   <div id="organisms_fold_content" class="foldContent" style="display: block;">
     <div class="yui-u first">
       <p style="color: #666666;">
-        The following Organism and strains are involved in this <%= "#{@assay_text}" -%>:
+        The following Organism and cell types/tissues are involved in this <%= "#{@assay_text}" -%>:
       </p>
       <div id="organism_to_list" class="box_editing_inner" style="line-height: 1.5;">
         <span class="none_text" id="organisms">Loading...</span>
@@ -36,7 +36,7 @@
           <br/>
         </div>
         <div class="association_step">
-          <b>Step 3</b> - Specify a strain (optional)<br/>
+          <b>Step 3</b> - Specify a cell type or tissue (optional)<br/>
           <div id="existing_strains"></div>
           <%= text_field_tag :strain %>
           <br/>
