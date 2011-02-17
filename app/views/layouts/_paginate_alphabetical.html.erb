@@ -1,8 +1,8 @@
 <% filter_hash = {:filter => params[:filter]} %>
 <div class="alphabetcal_pagination">
   <ul>
-    <li class="<%= current_page == "latest" ? "current_page" : "" %>"><%= link_to "Latest ", {:id => params[:id], :page => "latest"}.merge(filter_hash) %></li>
-    <li class="<%= current_page == "all" ? "current_page" : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"}.merge(filter_hash) %></li>
+    <li class="<%= current_page == "latest" ? "current_page" : "" %>"><%= link_to "Latest ", {:id => params[:id], :page => "latest"}.merge(filter_hash) %></li>&nbsp;
+    <li class="<%= current_page == "all" ? "current_page" : "" %>"><%= link_to "All", {:id => params[:id], :page => "all"}.merge(filter_hash) %></li>&nbsp;
     <% for page in pages -%>
         <% current_page_class = page==current_page ? "current_page" : "" -%>
 		<% page_title = page=="?" ? "Other" : page -%>
