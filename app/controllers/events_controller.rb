@@ -94,6 +94,19 @@ class EventsController < ApplicationController
     end
   end
 
+  def preview
+    element=params[:element]
+    event=Event.find_by_id(params[:id])
+
+    render :update do |page|
+      if event && Authorization.is_authorized?("show", nil, event, current_user)
+        page.replace_html element,:partial=>"events/resource_list_item",:locals=>{:resource=>event}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
+      end
+    end
+  end
+
   private
 
   #filter to check if events are enabled using the EVENTS_ENABLED configuration flag
@@ -106,19 +119,6 @@ class EventsController < ApplicationController
       return false
     end
     true
-  end
-
-  def preview
-    element=params[:element]
-    event=event.find_by_id(params[:id])
-
-    render :update do |page|
-      if event && Authorization.is_authorized?("show", nil, @event, current_user)
-        page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>event}
-      else
-        page.replace_html element,:text=>"Nothing is selected to preview."
-      end
-    end
   end
 
 end

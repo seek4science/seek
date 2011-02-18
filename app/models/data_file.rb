@@ -9,13 +9,14 @@ class DataFile < ActiveRecord::Base
 
   acts_as_asset
   acts_as_trashable
-  
+
   title_trimmer
   
   has_many :favourites, 
            :as => :resource, 
            :dependent => :destroy
 
+  has_and_belongs_to_many :events
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users

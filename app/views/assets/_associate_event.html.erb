@@ -18,7 +18,7 @@
       <p style="color: #666666;">
         The following Events are involved in this <%= resource_text -%>:
       </p>
-      <div id="event_file_to_list" class="box_editing_inner" style="line-height: 1.5">
+      <div id="event_to_list" class="box_editing_inner" style="line-height: 1.5">
         <span class="none_text" id="event_files">Loading...</span>
       </div>
       <div class="association_step">  
@@ -33,14 +33,8 @@
         
         <%= select_tag :event_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
         
-        <% if show_relationships -%>
-          <br/>
-          <%= label_tag "Relationship between the event and the model" %><br/>
-          <%= select_tag :event_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
-        <% end -%>
-        
         <br/>
-        
+
         <%= check_box_tag :include_other_project_events, nil, false, {:onchange=>"toggle_event_list();",:style=>"margin-top:0.5em;"} -%> Include Events from other projects?
       </div>
 	  <br/>
@@ -58,66 +52,51 @@
   
 
 <script type="text/javascript">
-  function toggle_event_list() {
-    var checked = $('include_other_project_events').checked;
-    var selection_box = $('possible_events');
-    var option;
-            
-    selection_box.options.length=0;
+    var events_array = new Array();
+    function toggle_event_list() {
+        var checked = $('include_other_project_events').checked;
+        var selection_box = $('possible_events');
+        var option;
 
-    if (checked) {
-<% ([["Select Event ...",0]]|all_events.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
-        option = document.createElement("OPTION");
-        option.text = '<%= escape_javascript(df_details[0]) -%>';
-        option.value = '<%= df_details[1] -%>';
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-<% end -%>
-    }
-    else {
-<% ([["Select Event ...",0]]|project_events.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
-        option = document.createElement("OPTION");
-        option.text = '<%= escape_javascript(df_details[0]) -%>';
-        option.value = '<%= df_details[1] -%>';
-        try {
-          selection_box.add(option); //for older IE version
-        }
-        catch (ex) {
-          selection_box.add(option, null);
-        }
-<% end -%>
-    }
-    selection_box.selectedIndex=0;
-    selection_box.onchange();
-  }
+        selection_box.options.length = 0;
 
-<% @events = Event.find(:all)-%>
-<% @events.each do |event| -%>
-  <% if Authorization.is_authorized?("show",nil,event,current_user) -%>
-      event_id = '<%= event.id -%>';
-      event_title = '<%= escape_javascript(event.title) -%>';
-      <% if resource.instance_of? Assay %>
-        relationship_type = '<%= escape_javascript(event.relationship_type(resource).try(:title) || "None") -%>';
-      <%  else %>
-        relationship_type = "None";
-      <%  end %>
-      addEvent(event_title,event_id,relationship_type);
-  <% end -%>
-<% end -%>
+        if (checked) {
+        <% ([["Select Event ...",0]]|all_events.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(df_details[0]) -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        else {
+        <% ([["Select Event ...",0]]|project_events.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(df_details[0]) -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        selection_box.selectedIndex = 0;
+        selection_box.onchange();
+    }
 
 <% if params[:event_ids] %>
   <% params[:event_ids].each do |id_and_rel_id| -%>
-    <% a_id, r_type = id_and_rel_id.split(",") %>
     <% event = Event.find(a_id) %>
     <% if Authorization.is_authorized?("show",nil,event,current_user) -%>
         event_id = '<%= event.id -%>';
         event_title = '<%= escape_javascript(event.title) -%>';
-        relationship_type = '<%= r_type -%>';
-        addEvent(event_title, event_id, relationship_type);
+        events_array.push([event_title, event_id]);
     <% end -%>
   <% end -%>
 <% end -%>
@@ -125,15 +104,72 @@
 //  updateEventFiles();
 
   function check_show_add_event() {
-  i=$('possible_data_files').selectedIndex;
-    selected_id=$('possible_data_files').options[i].value;
+  i=$('possible_events').selectedIndex;
+    selected_id=$('possible_events').options[i].value;
     if (selected_id=='0') {
-      $('add_data_file_link').hide();
+      $('add_event_link').hide();
     }
     else {
-      $('add_data_file_link').show();
+      $('add_event_link').show();
     }
   }
 
   check_show_add_event();
+  function addSelectedEvent() {
+    selected_option_index=$("possible_events").selectedIndex;
+    selected_option=$("possible_events").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
+
+    if(checkNotInList(id,events_array)) {
+        events_array.push([title,id]);
+        updateEvents();
+    }
+    else {
+        alert('The following Event had already been added:\n\n' +
+            title);
+    }
+}
+
+
+
+function updateEvents() {
+    event_text='<ul class="related_asset_list">'
+    for (var i=0;i<events_array.length;i++) {
+        event=events_array[i];
+        title=event[0];
+        id=event[1];
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        event_text += '<li>' + titleText +
+        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '[<a href="" onclick="javascript:events_array.splice('+i+', 1);updateEvents(); return(false);">remove</a>]</small></li>';
+    }
+
+    event_text += '</ul>';
+
+    // update the page
+    if(events_array.length == 0) {
+        $('event_to_list').innerHTML = '<span class="none_text">No data files</span>';
+    }
+    else {
+        $('event_to_list').innerHTML = event_text;
+    }
+
+    clearList('event_ids');
+
+    select=$('event_ids');
+    for (i=0;i<events_array.length;i++) {
+        id=events_array[i][1];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+    }
+}
 </script>
