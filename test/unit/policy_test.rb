@@ -35,7 +35,16 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal false,pol.use_blacklist
     assert_equal false,pol.use_custom_sharing
     assert pol.permissions.empty?
-    
+  end
+
+  test "default policy" do
+    pol=Policy.default
+    assert_equal Policy::PRIVATE, pol.sharing_scope
+    assert_equal Policy::NO_ACCESS, pol.access_type
+    assert_equal false,pol.use_whitelist
+    assert_equal false,pol.use_blacklist
+    assert_equal false,pol.use_custom_sharing
+    assert pol.permissions.empty?
   end
 
 end
