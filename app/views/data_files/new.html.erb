@@ -22,7 +22,7 @@
         :project_hash => current_user.generate_own_project_id_name_hash } -%>
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
 
-        <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+      <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
         </p>
