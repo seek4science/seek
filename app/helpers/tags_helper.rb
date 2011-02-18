@@ -1,5 +1,6 @@
 module TagsHelper
   include ActsAsTaggableOn::TagsHelper
+  include ActsAsTaggableOn
 
   def tag_cloud(tags, classes,counter_method=:count)
     tags = tags.sort_by(&:name)
@@ -16,6 +17,16 @@ module TagsHelper
 
   def overall_tag_cloud(tags, classes,&block)
     tag_cloud(tags,classes,:overall_total, &block)
+  end
+
+  #all tags, but seeded tags that have only a dummy tagging are stripped out
+  def tag_cloud_tags
+    #FIXME: use direct SQL query
+    Tag.all.select{|t| !t.taggings.detect{|tg| !tg.taggable.nil?}.nil?}
+  end
+
+  def tags_for_context context
+    Tag.find(:all).select{|t| !t.taggings.detect{|tg| tg.context==context.to_s}.nil? }
   end
 
   def aggregated_asset_tags

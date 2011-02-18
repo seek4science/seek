@@ -411,7 +411,7 @@ namespace :seek do
   end
 
   desc "The newer acts-as-taggable-on plugin is case insensitve. Older tags are case sensitive, leading to some odd behaviour. This task resolves the old tags"
-  task :resolve_duplicate_tags=>:environment do
+  task :resolve_dupicate_tags=>:environment do
     tags=ActsAsTaggableOn::Tag.find :all
     skip_tags = []
     tags.each do |tag|

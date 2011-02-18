@@ -2,7 +2,7 @@ module ActsAsTaggableExtensions
 
   module TagExtensions
     def overall_total
-      taggings.count
+      taggings.select{|tg| !tg.taggable.nil?}.count
     end
   end
 

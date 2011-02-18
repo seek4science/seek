@@ -9,9 +9,8 @@
       <div class="hTagcloud">
         <div class="popularity">
           <%
-          min_count = TAG_THRESHOLD
-          tag_cloud = ActsAsTaggableOn::Tag.all
-          all_tags= tag_cloud.select{|tag| tag.overall_total>=min_count}
+          tag_cloud = tag_cloud_tags
+          all_tags= tag_cloud.select{|tag| tag.overall_total>=TAG_THRESHOLD}
           show_tags= tag_cloud.sort{|a,b| b.overall_total<=>a.overall_total}[0...MAX_VISIBLE_TAGS]
           hidden_tags=all_tags.size != show_tags.size
           hidden_class="merged_tag_hidden"
