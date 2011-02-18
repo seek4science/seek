@@ -1,7 +1,8 @@
 class TagsController < ApplicationController
+  
   def show
-    @tag = ActsAsTaggableOn::Tag.find_by_id(params[:id])
-    taggings = @tag.taggings
+    @tag = ActsAsTaggableOn::Tag.find(params[:id])
+    taggings = @tag.taggings.select{|tg| !tg.taggable.nil?}
     @tagged_objects = select_authorised taggings.collect{|tagging| tagging.taggable}.uniq
     
     if @tagged_objects.empty?
@@ -20,4 +21,5 @@ class TagsController < ApplicationController
   def select_authorised collection
     collection.select {|el| Authorization.is_authorized?("show", nil, el, current_user)}
   end
+
 end

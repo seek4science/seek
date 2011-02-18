@@ -18,15 +18,11 @@ module TagsHelper
   def overall_tag_cloud(tags, classes,&block)
     tag_cloud(tags,classes,:overall_total, &block)
   end
-
-  #all tags, but seeded tags that have only a dummy tagging are stripped out
-  def tag_cloud_tags
-    #FIXME: use direct SQL query
-    Tag.all.select{|t| !t.taggings.detect{|tg| !tg.taggable.nil?}.nil?}
-  end
+  
 
   def tags_for_context context
-    Tag.find(:all).select{|t| !t.taggings.detect{|tg| tg.context==context.to_s}.nil? }
+    #Tag.find(:all).select{|t| !t.taggings.detect{|tg| tg.context==context.to_s}.nil? }
+    Tag.find(:all,:group=>"tags.id",:joins=>:taggings,:conditions=>["taggings.context = ?",context.to_s])
   end
 
   def aggregated_asset_tags
