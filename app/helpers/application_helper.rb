@@ -421,21 +421,17 @@ module ApplicationHelper
           policy = object.default_policy
           policy_type ="project"
         else
-          policy = Policy.system_default
-          policy.sharing_scope = Policy::ALL_REGISTERED_USERS
+          policy = Policy.default
           policy_type = "system"
         end
       elsif (policy = object.policy)
         # object exists and has a policy associated with it - normal case
         policy_type = "asset"
-      elsif object.project && (policy = object.project.default_policy)
-        # object exists, but policy not attached - try to use project default policy, if exists
-        policy_type = "project"
       end
     end
 
     unless policy
-      policy = Policy.default()
+      policy = Policy.default
       policy_type = "system"
     end
 
