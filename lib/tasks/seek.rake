@@ -410,6 +410,34 @@ namespace :seek do
     File.open("config/default_data/help/help_documents.yml", 'w') { |f| f.write template.result(binding) }
   end
 
+  desc "The newer acts-as-taggable-on plugin is case insensitve. Older tags are case sensitive, leading to some odd behaviour. This task resolves the old tags"
+  task :resolve_duplicate_tags=>:environment do
+    tags=ActsAsTaggableOn::Tag.find :all
+    skip_tags = []
+    tags.each do |tag|
+      unless skip_tags.include? tag
+        matching = tags.select{|t| t.name.downcase.strip == tag.name.downcase.strip && t.id != tag.id}
+        unless matching.empty?
+          matching.each do |m|
+            puts "#{m.name}(#{m.id}) - #{tag.name}(#{tag.id})"
+            m.taggings.each do |tagging|
+              unless tag.taggings.detect{|t| t.context==tagging.context && t.taggable==tagging.taggable}
+                puts "Updating tagging #{tagging.id} to point to #{tag.name}:#{tag.id}"
+                tagging.tag = tag
+                tagging.save!
+              else
+                puts "Deleting duplicate tagging #{tagging.id}"
+                tagging.delete
+              end
+            end
+            m.delete
+            skip_tags << m  
+          end
+        end
+      end
+    end
+  end
+
   desc "Overwrite footer layouts with generic, rebranded alternatives"
   task :rebrand_layouts do
     dir = 'config/rebrand/'
