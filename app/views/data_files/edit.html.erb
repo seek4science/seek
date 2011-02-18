@@ -31,7 +31,8 @@
 					:related_publications=>@data_file.related_publications
 				} 
     -%>
-
+    <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+          
     <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Data_file",  # this is only for presentation, not for any processing
             :selected_project_id => @data_file.project_id,
             :project_hash => current_user.generate_own_project_id_name_hash

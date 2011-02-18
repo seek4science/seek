@@ -1,4 +1,17 @@
 <% resource_text ||= resource.class.name.downcase %>
+<script type="text/javascript">
+function check_show_add_event() {
+  i=$('possible_events').selectedIndex;
+    selected_id=$('possible_events').options[i].value;
+    if (selected_id=='0') {
+      $('add_event_link').hide();
+    }
+    else {
+      $('add_event_link').show();
+    }
+  }
+</script>
+
 <div class="fold">
 
   <div class="foldTitle">
@@ -89,10 +102,17 @@
         selection_box.selectedIndex = 0;
         selection_box.onchange();
     }
+<% resource.events.each do |event| -%>
+  <% if Authorization.is_authorized?("show",nil,event,current_user) -%>
+      event_id = '<%= event.id -%>';
+      event_title = '<%= escape_javascript(event.title) -%>';
+      events_array.push([event_title,event_id]);
+  <% end -%>
+<% end -%>
 
 <% if params[:event_ids] %>
-  <% params[:event_ids].each do |id_and_rel_id| -%>
-    <% event = Event.find(a_id) %>
+  <% params[:event_ids].each do |id| -%>
+    <% event = Event.find(id) %>
     <% if Authorization.is_authorized?("show",nil,event,current_user) -%>
         event_id = '<%= event.id -%>';
         event_title = '<%= escape_javascript(event.title) -%>';
@@ -101,18 +121,7 @@
   <% end -%>
 <% end -%>
 
-//  updateEventFiles();
-
-  function check_show_add_event() {
-  i=$('possible_events').selectedIndex;
-    selected_id=$('possible_events').options[i].value;
-    if (selected_id=='0') {
-      $('add_event_link').hide();
-    }
-    else {
-      $('add_event_link').show();
-    }
-  }
+  updateEvents();
 
   check_show_add_event();
   function addSelectedEvent() {
@@ -130,8 +139,6 @@
             title);
     }
 }
-
-
 
 function updateEvents() {
     event_text='<ul class="related_asset_list">'

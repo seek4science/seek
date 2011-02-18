@@ -94,7 +94,7 @@ class EventsController < ApplicationController
     end
   end
 
-  def preview
+    def preview
     element=params[:element]
     event=Event.find_by_id(params[:id])
 
@@ -105,8 +105,8 @@ class EventsController < ApplicationController
         page.replace_html element,:text=>"Nothing is selected to preview."
       end
     end
-  end
-
+    end
+  
   private
 
   #filter to check if events are enabled using the EVENTS_ENABLED configuration flag

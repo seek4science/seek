@@ -38,6 +38,7 @@ class PublicationsController < ApplicationController
   # GET /publications/new
   # GET /publications/new.xml
   def new
+    @publication = Publication.new()
     respond_to do |format|
       format.html # new.html.erb
       format.xml 
@@ -52,6 +53,7 @@ class PublicationsController < ApplicationController
   # POST /publications.xml
   def create
     @publication = Publication.new(params[:publication])
+    @publication.event_ids = params[:event_ids] || []
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
     
@@ -193,6 +195,7 @@ class PublicationsController < ApplicationController
         format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
       end
     end
+    
   end
   
   #Try and relate non_seek_authors to people in SEEK based on name and project

@@ -22,7 +22,7 @@ class Publication < ActiveRecord::Base
     :class_name => 'Relationship',
     :as => :object,
     :dependent => :destroy
-   
+  has_and_belongs_to_many :events
   alias :seek_authors :creators
   
   acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
