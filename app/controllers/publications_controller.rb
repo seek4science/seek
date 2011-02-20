@@ -38,7 +38,6 @@ class PublicationsController < ApplicationController
   # GET /publications/new
   # GET /publications/new.xml
   def new
-    @publication = Publication.new()
     respond_to do |format|
       format.html # new.html.erb
       format.xml 
@@ -53,7 +52,6 @@ class PublicationsController < ApplicationController
   # POST /publications.xml
   def create
     @publication = Publication.new(params[:publication])
-    @publication.event_ids = params[:event_ids] || []
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
     
@@ -117,7 +115,9 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      if valid && @publication.update_attributes(params[:publication])
+      attributes = params[:publication]
+      attributes[:event_ids] = params[:event_ids]
+      if valid && @publication.update_attributes(attributes)
         to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}
         
