@@ -2,6 +2,7 @@ var sops_assets=new Array();
 var models_assets=new Array();
 var assays=new Array();
 var data_files_assets=new Array();
+var publications_array = new Array();
 var organisms = new Array();
 
 function postInvestigationData() {
@@ -427,6 +428,73 @@ function updateOrganisms() {
         }
         catch (ex) {
             select.add(o,null);
+        }
+    }
+}
+
+function check_show_add_publication() {
+    i = $('possible_publications').selectedIndex;
+    selected_id = $('possible_publications').options[i].value;
+    if (selected_id == '0') {
+        $('add_publication_link').hide();
+    }
+    else {
+        $('add_publication_link').show();
+    }
+}
+
+function addSelectedPublication() {
+    selected_option_index = $("possible_publications").selectedIndex;
+    selected_option = $("possible_publications").options[selected_option_index];
+    title = selected_option.text;
+    id = selected_option.value;
+
+    if (checkNotInList(id, publications_array)) {
+        publications_array.push([title,id]);
+        updatePublications();
+    }
+    else {
+        alert('The following Publication had already been added:\n\n' +
+                title);
+    }
+}
+
+function updatePublications() {
+    publication_text = '<ul class="related_asset_list">'
+    for (var i = 0; i < publications_array.length; i++) {
+        publication = publications_array[i];
+        title = publication[0];
+        id = publication[1];
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        publication_text += '<li>' + titleText +
+                '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+                + '[<a href="" onclick="javascript:publications_array.splice(' + i + ', 1);updatePublications(); return(false);">remove</a>]</small></li>';
+    }
+
+    publication_text += '</ul>';
+
+    // update the page
+    if (publications_array.length == 0) {
+        $('publication_to_list').innerHTML = '<span class="none_text">No publications</span>';
+    }
+    else {
+        $('publication_to_list').innerHTML = publication_text;
+    }
+
+    clearList('publication_ids');
+
+    select = $('publication_ids');
+    for (i = 0; i < publications_array.length; i++) {
+        id = publications_array[i][1];
+        o = document.createElement('option');
+        o.value = id;
+        o.text = id;
+        o.selected = true;
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o, null);
         }
     }
 }

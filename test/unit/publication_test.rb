@@ -3,7 +3,17 @@ require 'test_helper'
 class PublicationTest < ActiveSupport::TestCase
   
   fixtures :all
-  
+
+  test "event association" do
+    publication = publications(:one)
+    assert publication.events.empty?
+    event = event(:event_with_no_files)
+    publication.events << event
+    assert publication.valid?
+    assert publication.save
+    assert_equal 1, publication.event.count
+  end
+
   test "test uuid generated" do
     x = publications(:one)
     assert_nil x.attributes["uuid"]

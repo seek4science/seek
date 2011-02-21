@@ -60,6 +60,8 @@
                                                                               :allow_nil           => true} -%>
             <% end -%>
 
+            <%= render :partial => "assets/associate_publication", :locals=>{:f=>f, :resource => @event} -%>
+            <br/>
             <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
             <% if current_user_authorized_to_manage -%>
                 <p>
