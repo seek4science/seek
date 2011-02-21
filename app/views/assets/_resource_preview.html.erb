@@ -3,7 +3,7 @@
     <p class="title">
       <%= h resource.title -%>
     </p>
-    
+
     <%= list_item_attribute "Version", resource.version -%>
     
     <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project -%>
@@ -15,3 +15,4 @@
     <%= list_item_description resource.description -%>  
   </div>
 <% end -%>
+_resource_preview.html.erb

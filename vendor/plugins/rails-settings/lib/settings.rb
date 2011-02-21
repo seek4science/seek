@@ -1,10 +1,9 @@
 class Settings < ActiveRecord::Base
   class SettingNotFound < RuntimeError; end
-  
+
   cattr_accessor :defaults
   @@defaults = {}.with_indifferent_access
-  
-  # Support old plugin
+   # Support old plugin
   if defined?(SettingsDefaults::DEFAULTS)
     @@defaults = SettingsDefaults::DEFAULTS.with_indifferent_access
   end

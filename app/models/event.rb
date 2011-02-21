@@ -3,6 +3,7 @@ require 'acts_as_uniquely_identifiable'
 require 'grouped_pagination'
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
+  has_and_belongs_to_many :publications
 
   default_scope :order => "#{self.table_name}.start_date DESC"
 
