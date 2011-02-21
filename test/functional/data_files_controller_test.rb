@@ -31,7 +31,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal assigns(:data_files).sort_by(&:id), Authorization.authorize_collection("view", assigns(:data_files), users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
   end
-  
+
   test "should get new" do
     get :new
     assert_response :success
@@ -226,7 +226,14 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should show data file" do
     d = data_files(:picture)
-    d.save
+    get :show, :id => d
+    assert_response :success
+  end
+
+  test "svg handles quotes in title" do
+    d = data_files(:picture)
+    d.title="\"Title with quote"
+    d.save!
     get :show, :id => d
     assert_response :success
   end

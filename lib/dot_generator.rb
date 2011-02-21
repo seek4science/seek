@@ -126,7 +126,7 @@ module DotGenerator
       asset_type = asset.class.name
     end
     if Authorization.is_authorized?("view",nil,asset,current_user)
-      title = multiline(asset.title)
+      title = multiline(asset.title)      
       title = "#{asset_type.upcase}\\n #{title}" unless title.downcase.starts_with?(asset_type.downcase)
       dot << "#{asset.class.name}_#{asset.id} [label=\"#{title}\",width=2,tooltip=\"#{tooltip(asset)}\",shape=box,fontsize=7,style=filled,fillcolor=\"#{FILL_COLOURS[asset.class]}\",#{highlight_attribute}URL=\"#{polymorphic_path(asset,:version=>version)}\",target=\"_top\"];\n"
       if show_publications
@@ -152,6 +152,7 @@ module DotGenerator
   end
   
   def tooltip resource
+    return "fred"
     resource.class.name.upcase + ": " + resource.title.strip
   end
   
@@ -163,9 +164,7 @@ module DotGenerator
     file.close    
     post_process_svg(`dot -Tsvg #{tmpfile.path}`)
   end
-  
-  
-  
+
   def to_png root_item,deep=false,current_item=nil
     tmpfile = Tempfile.new("#{root_item.class.name}_dot")
     file = File.new(tmpfile.path,'w')
@@ -189,7 +188,7 @@ module DotGenerator
       unless title.include?("--")
         object_class,object_id = title.split("_")        
         if ["Sop","Model","DataFile","Publication","Study","Assay","Investigation"].include?(object_class)
-          a = node.find_first(".//svg:a")
+          a = node.find_first(".//svg:a")          
           polygon = a.find_first(".//svg:polygon")
           points = polygon.attributes["points"]
           points = points.split(" ")
@@ -203,10 +202,10 @@ module DotGenerator
           #ADD THE CORRECT AVATAR, HERE
           if self.respond_to?("avatar")
             object = eval("#{object_class}.find(#{object_id})")
-            av_url = avatar(object, 14, true).match(/src=\"[^\"]*\"/).to_s.gsub("src=","").gsub("\"","") 
+            av_url = avatar(object, 14, true).match(/src=\"[^\"]*\"/).to_s.gsub("src=","").gsub("\"","")
             rect_node = LibXML::XML::Node.new("rect width=\"18\" height=\"18\" x=\"#{x2.to_f + 3}\" y=\"#{y2.to_f + 3}\" style=\"fill: rgb(255,255,255);stroke:rgb(120,120,120);\"")
             image_node = LibXML::XML::Node.new("image width=\"14\" height=\"14\" x=\"#{x2.to_f + 5}\" y=\"#{y2.to_f + 5}\" xlink:href=\"#{av_url}\"")
-            a.add_element(rect_node)  
+            a.add_element(rect_node)
             a.add_element(image_node)
           end
           
