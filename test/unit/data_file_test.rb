@@ -14,13 +14,13 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "event association" do
-    datafile = datafiles(:picture)
+    datafile = data_files(:picture)
     assert datafile.events.empty?
-    event = event(:event_with_no_files)
+    event = events(:event_with_no_files)
     datafile.events << event
     assert datafile.valid?
     assert datafile.save
-    assert_equal 1, datafile.event.count
+    assert_equal 1, datafile.events.count
   end
 
   test "sort by updated_at" do

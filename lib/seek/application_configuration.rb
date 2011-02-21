@@ -3,6 +3,7 @@ module Seek
 
     def self.default_page controller
       Settings.uncached do
+
         Settings.index[controller.to_sym]
       end
     end

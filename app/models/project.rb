@@ -27,7 +27,7 @@ class Project < ActiveRecord::Base
   has_many :models
   has_many :sops
   has_many :publications
-  
+    
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
   # (no links to the default policy will be made from elsewhere; instead, when
