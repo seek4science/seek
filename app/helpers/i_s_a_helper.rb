@@ -22,9 +22,14 @@ module ISAHelper
     return text
   end
   
-  def embedded_isa_svg root_item,deep=true,current_item=nil    
-    current_item||=root_item
-    "<div id='isa_svg'><script type=\'image/svg+xml'>#{to_svg(root_item,deep,current_item)}</script></div>"
+  def embedded_isa_svg root_item,deep=true,current_item=nil
+    begin
+      current_item||=root_item
+      "<div id='isa_svg'><script type=\'image/svg+xml'>#{to_svg(root_item,deep,current_item)}</script></div>"
+    rescue Exception=>e
+      "<div id='isa_svg' class='none_text'>Currently unable to display the graph for this item</div>"
+    end
+
   end
   
 end
