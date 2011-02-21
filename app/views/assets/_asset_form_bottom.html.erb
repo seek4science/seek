@@ -9,6 +9,7 @@ show_publications=true if show_publications.nil?
 <p>
     <%= render :partial => "assets/sharing_form" -%>
 </p>
+
 <p>
     <%= render :partial => "assets/attribution_form", :locals => { :resource_type => resource_type,  # this is only for presentation, not for any processing
     :existing_attributions => existing_attributions,

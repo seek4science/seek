@@ -568,7 +568,6 @@ class SopsControllerTest < ActionController::TestCase
 
     sop.reload
 
-
     assert_equal ["fish","golf"],sop.owner_tags_on(user,:tags).collect(&:name).sort
     assert_equal ["fish"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
     assert_equal ["fish","golf"],sop.tag_counts.collect(&:name).sort
