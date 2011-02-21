@@ -209,6 +209,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_redirected_to sop_path(assigns(:sop))
   end
 
+
   test "should destroy sop" do
     login_as(:owner_of_my_first_sop)
     assert_difference('Sop.count', -1) do
@@ -450,12 +451,127 @@ class SopsControllerTest < ActionController::TestCase
 
     assert sop.tag_counts.empty?, "This sop should have no tags for the test"
 
+    #another owners tags. that should be preserved
+    user2 = users(:aaron)
+    user2.tag sop,:with=>"golf, sparrow",:on=>:tags
+
     assert_difference("ActsAsTaggableOn::Tag.count") do
       xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id}
     end
 
     sop.reload
+    assert_equal ["golf","soup","sparrow"],sop.tag_counts.collect(&:name).sort
+    assert_equal ["golf","soup"],sop.owner_tags_on(user,:tags).collect(&:name).sort
+    assert_equal ["golf","sparrow"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
+
+  end
+
+  test "should update sop tags" do
+    login_as(:owner_of_my_first_sop)
+    user = users(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+
+    assert sop.tag_counts.empty?, "This sop should have no tags"
+
+    golf_tags=tags(:golf)
+
+    #give it somme existing tags that should be removed
+    user.tag sop,:with=>"fish, apple",:on=>:tags
+
+    sop.save!
+
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
+    sop.reload
+
+    assert_equal ["golf","soup"],sop.owner_tags_on(user,:tags).collect(&:name).sort
     assert_equal ["golf","soup"],sop.tag_counts.collect(&:name).sort
+  end
+
+  test "should update sop tags with correct ownership" do
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    user_owner = users(:owner_of_my_first_sop)
+    user2 = users(:aaron)
+    user3 = users(:datafile_owner)
+
+    assert sop.tag_counts.empty?, "This sop should have no tags"
+
+    user_owner.tag sop,:with=>"fish",:on=>:tags
+    user2.tag sop,:with=>"fish, golf",:on=>:tags
+    user3.tag sop, :with=>"apple",:on=>:tags
+
+    sop.reload
+
+    assert_equal ["fish"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
+    assert_equal ["fish","golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
+    assert_equal ["apple"],sop.owner_tags_on(user3,:tags).collect(&:name).sort
+    assert_equal ["apple","fish","golf"],sop.tag_counts.collect(&:name).sort
+
+    golf_tags=tags(:golf)
+
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
+    sop.reload
+
+    assert_equal ["soup"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
+    assert_equal ["golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
+    assert_equal [],sop.owner_tags_on(user3,:tags).collect(&:name).sort
+    assert_equal ["golf","soup"],sop.tag_counts.collect(&:name).sort
+
+  end
+
+  test "should update sop tags with correct ownership2" do
+    #a specific case where a tag to keep was added by both the owner and another user.
+    #Test checks that the correct tag ownership is preserved.
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    user_owner = users(:owner_of_my_first_sop)
+    user2 = users(:aaron)
+
+    assert sop.tag_counts.empty?, "This sop should have no tags"
+
+    user_owner.tag sop,:with=>"fish,golf",:on=>:tags
+    user2.tag sop,:with=>"apple, golf",:on=>:tags
+
+    sop.reload
+
+    assert_equal ["fish","golf"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
+    assert_equal ["apple","golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
+    assert_equal ["apple","fish","golf"],sop.tag_counts.collect(&:name).sort
+
+    golf_tags=tags(:golf)
+
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
+    sop.reload
+
+    assert_equal ["golf"],sop.owner_tags_on(user_owner,:tags).collect(&:name).sort
+    assert_equal ["golf"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
+    assert_equal ["golf"],sop.tag_counts.collect(&:name).sort
+
+  end
+
+  test "update tags with known tags passed as unrecognised" do
+    #checks that when a known tag is incorrectly passed as a new tag, it is correctly handled
+    #this can happen when a tag is typed in full, rather than relying on autocomplete, and can affect the correct preservation of ownership
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    user = users(:owner_of_my_first_sop)
+    user2 = users(:aaron)
+
+    assert sop.tag_counts.empty?, "This sop should have no tags"
+
+    golf_tags=tags(:golf)
+
+    user.tag sop, :with=>"fish, golf", :on=>:tags
+    user2.tag sop, :with=>"fish, soup", :on=>:tags
+
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>golf_tags.id,:sop=>{}, :sharing=>valid_sharing
+
+    sop.reload
+
+
+    assert_equal ["fish","golf"],sop.owner_tags_on(user,:tags).collect(&:name).sort
+    assert_equal ["fish"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
+    assert_equal ["fish","golf"],sop.tag_counts.collect(&:name).sort
 
   end
 

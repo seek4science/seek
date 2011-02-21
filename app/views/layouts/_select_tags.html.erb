@@ -9,12 +9,12 @@
  %>
 
 <%
-
 suggested_limit ||= 30
 suggested_tags = all_tags.sort{|a,b| a.count <=> b.count}[0...suggested_limit]
 suggested_tags.sort!{|a,b| a.name <=> b.name}
 all_tags.sort!{|a,b| a.name <=> b.name}
 no_tags_message ||= ""
+owned_tags ||= nil
 %>
 
 <div id="facebook" class="clearfix">
@@ -51,4 +51,4 @@ no_tags_message ||= ""
 
 <% end -%>
 
-<%= render :partial=>"tagging/autocompleter_javascript", :locals=>{:name=>name,:all_tags=>all_tags,:item_tags=>item_tags} %>
+<%= render :partial=>"tagging/autocompleter_javascript", :locals=>{:name=>name,:all_tags=>all_tags,:owned_tags=>owned_tags,:item_tags=>item_tags} %>
