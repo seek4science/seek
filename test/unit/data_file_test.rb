@@ -23,14 +23,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal 1, datafile.event.count
   end
 
-  test "associations" do
-    datafile=data_files(:picture)
-    assert_equal users(:datafile_owner),datafile.contributor
-
-    blob=content_blobs(:picture_blob)
-    assert_equal blob,datafile.content_blob
-  end
-
   test "sort by updated_at" do
     assert_equal DataFile.find(:all).sort_by { |df| df.updated_at.to_i * -1 }, DataFile.find(:all)
   end
