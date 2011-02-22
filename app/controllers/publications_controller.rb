@@ -2,6 +2,7 @@ class PublicationsController < ApplicationController
   
   include IndexPager
   include DotGenerator
+  include Seek::TaggingCommon
   
   require 'pubmed_query_tool'
   
@@ -113,6 +114,8 @@ class PublicationsController < ApplicationController
       @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
       valid = false
     end
+
+    update_tags @publication
 
     respond_to do |format|
       if valid && @publication.update_attributes(params[:publication])

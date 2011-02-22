@@ -17,8 +17,7 @@
         <%= text_area(:publication, :abstract, :cols => 90, :rows => 8) %>
       </p>
     <% end %>
-    
-    
+
     <h2>Associate authors</h2>  
  
     <% project = @publication.project %>
@@ -62,11 +61,15 @@
         <span class="none_text">No associated authors</span>
       <% end %>
     </div>
+
+    <p>
+        <%= render :partial=>"assets/select_tags" -%>
+    </p>
     
     <br style="clear: both"/>
   
     <p style="text-align: center;">
-      <%= submit_tag 'Update' %>
+      <%= submit_tag 'Update',:disable_with=>"Updating..." %>
     </p>
   <% end %>
 </div>
