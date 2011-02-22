@@ -3,17 +3,22 @@ module Seek
   module TaggingCommon
 
     def update_tags_ajax
-
       entity=controller_name.singularize.camelize.constantize.find(params[:id])
-      update_owned_tags entity
+      if Authorization.is_authorized?("view",nil,entity,current_user)
+        update_owned_tags entity
 
-      eval("@#{controller_name.singularize} = entity")
+        eval("@#{controller_name.singularize} = entity")
 
-      render :update do |page|
-        page.replace_html 'tags_box', :partial=>'assets/tags_box'
-        page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/merged_tag_cloud_gadget'
-        page.visual_effect :highlight, 'tags_box'
-        page.visual_effect :highlight, 'sidebar_tag_cloud'
+        render :update do |page|
+          page.replace_html 'tags_box', :partial=>'assets/tags_box'
+          page.replace_html 'sidebar_tag_cloud', :partial=>'gadgets/merged_tag_cloud_gadget'
+          page.visual_effect :highlight, 'tags_box'
+          page.visual_effect :highlight, 'sidebar_tag_cloud'
+        end
+      else
+        render :update do |page|
+          #this is to prevent a missing template error. If permission is not allowed, then the entity is silently left unchanged
+        end
       end
     end
 
@@ -24,15 +29,15 @@ module Seek
     def update_tags entity, owner=current_user
 
       existing_tags = entity.tag_counts
-      owner_tags    = entity.owner_tags_on(owner, :tags)
+      owner_tags = entity.owner_tags_on(owner, :tags)
 
-      new_tags      = params[:tag_autocompleter_unrecognized_items] || []
+      new_tags = params[:tag_autocompleter_unrecognized_items] || []
       known_tag_ids =params[:tag_autocompleter_selected_ids] || []
-      known_tags    = known_tag_ids.collect { |id| ActsAsTaggableOn::Tag.find(id) }
+      known_tags = known_tag_ids.collect { |id| ActsAsTaggableOn::Tag.find(id) }
 
       new_tags, known_tags = check_if_new_tags_are_known new_tags, known_tags
 
-      new_names   =[]
+      new_names =[]
       tags_to_keep=[]
       known_tags.each do |tag|
         new_names << tag.name unless tag.nil? || (existing_tags.include?(tag) && !owner_tags.include?(tag))
@@ -63,13 +68,13 @@ module Seek
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
     #to the current user - it doesn't affect other peoples tags for that item.
     def update_owned_tags entity, owner=current_user
-      new_tags     = params[:tag_autocompleter_unrecognized_items] || []
+      new_tags = params[:tag_autocompleter_unrecognized_items] || []
       known_tag_ids=params[:tag_autocompleter_selected_ids] || []
-      known_tags    = known_tag_ids.collect { |id| ActsAsTaggableOn::Tag.find(id) }
+      known_tags = known_tag_ids.collect { |id| ActsAsTaggableOn::Tag.find(id) }
 
       new_tags, known_tags = check_if_new_tags_are_known new_tags, known_tags
 
-      tags         =""
+      tags =""
       known_tags.each do |tag|
         tags << tag.name << "," unless tag.nil?
       end unless known_tag_ids.nil?

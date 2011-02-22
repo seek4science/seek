@@ -474,6 +474,36 @@ class DataFilesControllerTest < ActionController::TestCase
      assert_equal Policy::NO_ACCESS,df.policy.access_type,"policy should have been updated"
   end
 
+  test "update with ajax only applied when viewable" do
+    login_as(:aaron)
+    user=users(:aaron)
+    df=data_files(:downloadable_data_file)
+    assert df.tag_counts.empty?,"This should have no tags for this test to work"
+    golf_tags=tags(:golf)
+
+    assert_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    df.reload
+
+    assert_equal ["golf"],df.tag_counts.collect(&:name)
+
+    df=data_files(:private_data_file)
+    assert df.tag_counts.empty?,"This should have no tags for this test to work"
+
+    assert !df.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+
+    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    df.reload
+
+    assert df.tag_counts.empty?,"This should still have no tags"
+
+  end
+
   test "update tags with ajax" do
     df=data_files(:picture)
     golf_tags=tags(:golf)

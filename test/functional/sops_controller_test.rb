@@ -444,6 +444,36 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, sop.policy.access_type, "policy should have been updated"
   end
 
+  test "update with ajax only applied when viewable" do
+    login_as(:aaron)
+    user=users(:aaron)
+    sop=sops(:sop_with_fully_public_policy)
+    assert sop.tag_counts.empty?,"This should have no tags for this test to work"
+    golf_tags=tags(:golf)
+    
+    assert_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    sop.reload
+
+    assert_equal ["golf"],sop.tag_counts.collect(&:name)
+
+    sop=sops(:private_sop)
+    assert sop.tag_counts.empty?,"This should have no tags for this test to work"
+    
+    assert !sop.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+
+    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    sop.reload
+
+    assert sop.tag_counts.empty?,"This should still have no tags"
+
+  end
+
   test "update tags with ajax" do
     sop=sops(:my_first_sop)
     golf_tags=tags(:golf)
@@ -456,7 +486,7 @@ class SopsControllerTest < ActionController::TestCase
     user2.tag sop,:with=>"golf, sparrow",:on=>:tags
 
     assert_difference("ActsAsTaggableOn::Tag.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id}
+      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf_tags.id]}
     end
 
     sop.reload

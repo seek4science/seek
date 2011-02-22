@@ -585,6 +585,37 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, model.policy.access_type, "policy should have been updated"
   end
 
+  test "update with ajax only applied when viewable" do
+    login_as(:aaron)
+    user=users(:aaron)
+    model=models(:jws_model)
+    assert model.tag_counts.empty?,"This should have no tags for this test to work"
+    golf_tags=tags(:golf)
+
+    assert_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    model.reload
+
+    assert_equal ["golf"],model.tag_counts.collect(&:name)
+
+    model=models(:private_model)
+    
+    assert model.tag_counts.empty?,"This should have no tags for this test to work"
+
+    assert !model.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+
+    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>model.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    model.reload
+
+    assert model.tag_counts.empty?,"This should still have no tags"
+
+  end
+
   test "update tags with ajax" do
     model=models(:teusink)
     golf_tags=tags(:golf)

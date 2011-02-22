@@ -155,3 +155,15 @@ model_jws_incompatible:
   project: sysmo_project
   policy: sysmo_member_edit
   
+private_model:
+  title: Private model
+  description: It is a private model
+  original_filename: file_picture.png
+  content_blob: picture_blob
+  content_type: image/png
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
+  project: sysmo_project
+  policy: private_policy

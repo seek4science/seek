@@ -31,6 +31,20 @@ sop_with_fully_public_policy:
   project: other_project # not linked to any project for now
   policy: fully_public_policy
 
+private_sop:
+  contributor: owner_of_fully_public_policy (User)
+  title: "Private SOP"
+  description: "This is a SOP with a private policy."
+  original_filename: "little_file.txt"
+  content_type: "text/plain"
+  content_blob: content_blob_with_little_file
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+  last_used_at: <%= 1.days.ago.to_s :db %>
+  version: 1
+  project: sysmo_project # not linked to any project for now
+  policy: private_policy
+
 sop_with_all_registered_users_policy:
   contributor: owner_of_download_for_all_registered_users_policy (User)
   title: "SOP with all registered users policy"
