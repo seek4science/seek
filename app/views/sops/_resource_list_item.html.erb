@@ -4,6 +4,7 @@
 <%= list_item_simple_list resource.creators, "Creator" -%>
 
 <%= list_item_contributor resource -%>
+
 </div>
 
 <div class="list_item_right_column">
@@ -14,7 +15,9 @@
 
 </div>
 <div class="list_item_whole_width">
-<%= list_item_timestamp resource %>
+<%= list_item_tag_list resource %>
 
 <%= list_item_description resource.description %>
+
+<%= list_item_timestamp resource %>  
 </div>

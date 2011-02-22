@@ -57,6 +57,10 @@ module ResourceListItemHelper
     html << "</div>"
   end
 
+  def list_item_tag_list resource
+    list_item_simple_list(resource.tag_counts, "Tags") {|i| link_for_tag(i, :type=>:tool)}
+  end
+
   def list_item_simple_list items, attribute
     html = "<p class=\"list_item_attribute\"><b>#{attribute}:</b> "
     if items.empty?
@@ -114,7 +118,7 @@ module ResourceListItemHelper
   end
 
   def list_item_timestamp resource
-    html = "<p class=\"list_item_attribute\"><b>Created:</b> " + resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S')
+    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Created:</b> " + resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S')
     unless resource.created_at == resource.updated_at
       html << " <b>Last updated:</b> " + resource.updated_at.strftime('%d/%m/%Y @ %H:%M:%S')
     end

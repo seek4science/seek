@@ -48,6 +48,7 @@ module AssetsHelper
     icon
   end
 
+
   def get_original_model_name(model)
     class_name = model.class.name
     if class_name.end_with?("::Version")
