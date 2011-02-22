@@ -59,6 +59,11 @@ module Acts #:nodoc:
         self.parent.can_delete?(user)
       end
 
+      #assumes all versioned resources are also taggable
+      def tag_counts
+          self.parent.tag_counts
+      end
+
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers
