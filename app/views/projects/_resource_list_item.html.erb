@@ -1,15 +1,17 @@
-<% project = resource %>
-
-<% truncate_projects_institutions_length = 25 -%>
-
 <%= list_item_title resource %>
 
-<%= list_item_description resource.description %>
+<div class="list_item_left_column">
+  <%= list_item_optional_attribute "Public web page", h(resource.web_page), h(resource.web_page) %>
 
-<%= list_item_optional_attribute "Public web page", h(resource.web_page), h(resource.web_page) %>    
+  <% unless hide_contact_details? %>
+      <%= list_item_optional_attribute "Internal web page", h(resource.wiki_page), h(resource.wiki_page) %>
+  <% end %>
+</div>
 
-<% unless hide_contact_details? %>
-  <%= list_item_optional_attribute "Internal web page", h(resource.wiki_page), h(resource.wiki_page) %>          
-<% end %>
-      
-<%= list_item_simple_list resource.organisms, "Organisms" %>
+<div class="list_item_right_column">
+  <%= list_item_simple_list resource.organisms, "Organisms" %>
+</div>
+<div class="list_item_whole_width">
+  <%= list_item_description resource.description %>
+</div>
+

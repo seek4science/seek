@@ -1,17 +1,20 @@
 <%= list_item_title resource, :include_avatar=>false %>
 
-<%= list_item_attribute "ID", resource.id %>
+<div class="list_item_left_column">
+  <%= list_item_attribute "ID", resource.id %>
+  <%= list_item_attribute "Investigation", resource.investigation.title, resource.investigation %>
+</div>
 
-<%= list_item_description resource.description %>
 
-<%= list_item_attribute "Project", resource.project.title, resource.project %>
+<div class="list_item_right_column">
+  <%= list_item_attribute "Project", resource.project.title, resource.project %>
+  <%= list_item_optional_attribute "Person responsible", resource.person_responsible.try(:name), resource.person_responsible, "Not specified" %>
+</div>
 
-<%= list_item_attribute "Investigation", resource.investigation.title, resource.investigation %>
+<div class="list_item_whole_width">
+  <%= list_item_simple_list resource.assays, "Assays" %>
+  
+  <%= list_item_timestamp resource %>
 
-<%= list_item_optional_attribute "Person responsible", resource.person_responsible.try(:name), resource.person_responsible, "Not specified" %>
-
-<%= list_item_simple_list resource.assays, "Assays" %>
-
-<% study = resource %>
-      
-<%= list_item_timestamp resource %>
+  <%= list_item_description resource.description %>
+</div>
