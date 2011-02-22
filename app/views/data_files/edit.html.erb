@@ -19,9 +19,7 @@
         <b>Description:</b>
         <br/>
         <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
-    </p>
-
-    <%= render :partial=>"assets/select_tags" -%>
+    </p>    
 
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>

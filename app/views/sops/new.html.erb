@@ -19,9 +19,7 @@
             <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
-        :project_hash => current_user.generate_own_project_id_name_hash } -%>
-
-        <%= render :partial=>"assets/select_tags" -%>
+        :project_hash => current_user.generate_own_project_id_name_hash } -%>        
         
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Sop",:show_publications=>false} -%>
 		
