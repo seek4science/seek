@@ -19,7 +19,7 @@ creators ||= [resource.contributor.nil? ? nil : resource.contributor.person] | r
   <p class="author_list">
   <% creators.each do |creator| %>
     <% if creators.count < 6 %>
-            <%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%>
+            <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
     <% else %>
             <%= creator.nil? ? "The JERM" : link_to(h(creator.name), url_for(creator)) -%>
     <% end %>
