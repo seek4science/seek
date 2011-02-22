@@ -29,9 +29,9 @@ function addSelectedEvent() {
 function updateEvents() {
     event_text = '<ul class="related_asset_list">'
     for (var i = 0; i < events_array.length; i++) {
-        event = events_array[i];
-        title = event[0];
-        id = event[1];
+        var event = events_array[i];
+        var title = event[0];
+        var id = event[1];
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         event_text += '<li>' + titleText +
                 '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
@@ -42,7 +42,7 @@ function updateEvents() {
 
     // update the page
     if (events_array.length == 0) {
-        $('event_to_list').innerHTML = '<span class="none_text">No data files</span>';
+        $('event_to_list').innerHTML = '<span class="none_text">No events</span>';
     }
     else {
         $('event_to_list').innerHTML = event_text;
