@@ -21,7 +21,7 @@
 
 
 <p style="margin-top: 2em; text-align: center;" >
-  <%= f.submit(action==:edit ? "Update" : "Create") -%>
+  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
   or <%= link_to 'Cancel', (@investigation.id ? investigation_path(@investigation.id) : investigations_path) -%>
 </p>
 
