@@ -475,7 +475,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "update tags with ajax" do
-    sop=sops(:my_first_sop)
+    sop=sops(:downloadable_sop)
     golf_tags=tags(:golf)
     user=users(:quentin)
 
