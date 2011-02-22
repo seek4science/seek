@@ -62,6 +62,10 @@
 </table>
 <br style="clear:both"/>
 
+<p>
+  <%= render :partial=>"assets/select_tags" -%>
+</p>
+
 <%= render :partial=>"assays/select_organisms" -%>
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>

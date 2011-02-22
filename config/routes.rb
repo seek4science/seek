@@ -19,7 +19,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :studies
   
-  map.resources :assays
+  map.resources :assays,:member=>{:update_tags_ajax=>:post}
 
   map.resources :saved_searches
 

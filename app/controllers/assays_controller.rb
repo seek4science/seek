@@ -2,14 +2,13 @@ class AssaysController < ApplicationController
 
   include DotGenerator
   include IndexPager
+  include Seek::TaggingCommon
 
   before_filter :find_assays,:only=>[:index]
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :check_is_project_pal, :only=>[:edit, :update, :destroy]
   before_filter :delete_allowed,:only=>[:destroy]  
-
-  
 
   def new
     @assay=Assay.new
@@ -38,6 +37,8 @@ class AssaysController < ApplicationController
     sop_ids = params[:assay_sop_ids] || []
     data_file_ids = params[:data_file_ids] || []
     model_ids = params[:assay_model_ids] || []
+
+    update_tags @assay
     
     @assay.owner=current_user.person     
     
@@ -83,6 +84,8 @@ class AssaysController < ApplicationController
     sop_ids = params[:assay_sop_ids] || []
     data_file_ids = params[:data_file_ids] || []
     model_ids = params[:assay_model_ids] || []
+
+    update_tags @assay
     
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
 

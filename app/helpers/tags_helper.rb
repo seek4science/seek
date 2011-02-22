@@ -27,7 +27,7 @@ module TagsHelper
 
   def aggregated_asset_tags
     tags = []
-    asset_model_classes.each do |c|
+    (asset_model_classes | [Assay]).each do |c|
       tags |= c.tag_counts if c.taggable?
     end
     tags

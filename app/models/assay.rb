@@ -3,6 +3,7 @@ require 'acts_as_isa'
 class Assay < ActiveRecord::Base
   acts_as_isa
 
+  acts_as_taggable
 
   belongs_to :assay_type
   belongs_to :technology_type  
