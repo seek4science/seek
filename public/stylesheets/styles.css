@@ -884,6 +884,7 @@ div.list_item_avatar {
 div.list_item_actions {
     float: right;
     width: 80px;
+    font-size: smaller;
 }
 
 div.list_item_desc {
@@ -916,6 +917,7 @@ p.list_item_attribute {
 div.list_item_left_column{
     float: left;
     width: 45%;
+    border-right: 1px dotted black;
 }
 
 div.list_item_right_column{
@@ -924,13 +926,13 @@ div.list_item_right_column{
     margin-left: 1em;
     padding-left: 1em;
     width: 45%;
-    border-left: 1px dotted black;
 }
 
 div.list_item_whole_width{
     float: left;
+    margin-top: 0.1em;
     margin-right: 1em;
-    width: 90%;
+    width: 100%;
 }
 
 div#logged_in_as {
