@@ -16,15 +16,15 @@ creators ||= [resource.contributor.nil? ? nil : resource.contributor.person] | r
     <%= h(title) -%>
   </p>
  
-  <ul class="author_list">
+  <p class="author_list">
   <% creators.each do |creator| %>
     <% if creators.count < 6 %>
-            <li class='author_avatar'><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></li>
+            <%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%>
     <% else %>
-            <li><%= creator.nil? ? "The JERM" : link_to(h(creator.name), url_for(creator)) -%></li>
+            <%= creator.nil? ? "The JERM" : link_to(h(creator.name), url_for(creator)) -%>
     <% end %>
   <% end %>
-  </ul>
+  </p>
 
   <% if resource.respond_to?(:other_creators) && !resource.other_creators.blank? -%>
 
