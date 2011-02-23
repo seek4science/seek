@@ -234,6 +234,8 @@ module ImagesHelper
       "crystal_project/32x32/devices/Globe2.png"
       when "jws_builder"
         "misc_icons/jws_builder24x24.png"
+      when "spreadsheet"
+      "famfamfam_silk/table.png"
     else
       return nil
     end

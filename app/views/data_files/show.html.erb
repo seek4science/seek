@@ -23,6 +23,12 @@
       <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@data_file} %>
     </li>
   <% end -%>
+  
+  <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
+    <li>
+      <%= image_tag_for_key('spreadsheet', explore_data_file_url, "Explore Data file", nil, "Explore Data file") -%>
+    </li>
+  <% end -%>
 
 </ul>
 

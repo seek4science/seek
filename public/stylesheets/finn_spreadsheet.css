@@ -83,4 +83,30 @@ div.annotation
   padding: 0.5em;
   position: absolute;
   display:none;
+  width:20em;
+}
+
+div.annotation_body
+{
+  border-top: 1px dashed #AAA;
+  border-bottom: 1px dashed #AAA;
+  background-color: #FFF;
+  padding: 0.5em;
+  margin: 0.5em
+}
+
+div.annotation_header
+{
+}
+
+div.annotation_header img
+{
+  vertical-align: middle;
+}
+
+
+div.annotation_footer
+{
+  text-align: right;  
+  color: #79B; 
 }

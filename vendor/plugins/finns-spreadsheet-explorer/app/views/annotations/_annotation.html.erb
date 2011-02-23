@@ -1,6 +1,12 @@
 <div class="annotation" id="annotation_<%=annotation.id-%>">
-  <b><%= annotation.cell_coverage %></b><br/>
-  <%= annotation.content %><br/>
-  <i>-<%= annotation.source.person.name %></i><br/>
-  <i>-<%= annotation.created_at.strftime('%d/%m/%Y @ %H:%M:%S') %></i>
+  <div class="annotation_header">
+    <%= avatar(annotation.source.person, 24) -%> <%= link_to(annotation.source.person.name, annotation.source.person)%> - 
+    <%= time_ago_in_words(annotation.created_at) %> ago   
+  </div>
+  <div class="annotation_body">
+    <%= annotation.content %>
+  </div>
+  <div class="annotation_footer">
+    <%= annotation.cell_coverage %>    
+  </div>
 </div>
