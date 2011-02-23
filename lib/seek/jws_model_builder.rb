@@ -8,8 +8,8 @@ module Seek
     
     include ModelTypeDetection
     
-    BASE_URL = "http://jjj.mib.ac.uk//webMathematica/Examples/"    
-    SIMULATE_URL = "http://jjj.mib.ac.uk/webMathematica/upload/uploadNEW.jsp"    
+    BASE_URL = "http://130.88.195.112/webMathematica/Examples/"
+    SIMULATE_URL = "http://130.88.195.112/webMathematica/upload/uploadNEW.jsp"
     
     def is_supported? model      
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))  
@@ -151,9 +151,9 @@ module Seek
       element.to_s
     end        
     
-    def process_response_body body                           
-      
-      #puts body
+    def process_response_body body
+
+      puts body
       
       parser = LibXML::XML::Parser.string(body,:encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse
@@ -187,8 +187,8 @@ module Seek
         if ["reactionImage","kineticsImage"].include?(id)
           url=node.content.strip
           url = BASE_URL + "JWSconstructor_panels/" + url
-          element_id = id =="reactionImage" ? "resizeableElement" : "resizeableElement2"
-          objects_hash[id] = %!<object data="#{url}" id="#{element_id}" alt="Network structure" class="reContent"></object>!
+          objects_hash[id]=url
+          #objects_hash[id] = %!<object data="#{url}" id="#{element_id}" alt="Network structure" class="reContent"></object>!
         end
       end      
       objects_hash

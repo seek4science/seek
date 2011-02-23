@@ -118,21 +118,8 @@
                                 Reactions help
                             </button>
                             <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
-                            <% if @objects_hash["reactionImage"] -%>
-                            <%= hidden_field_tag "plotGraphPanel","on" -%>
-                            <%= @objects_hash["reactionImage"] -%>
-                            <script type="text/javascript">
-                                var rc = new ResizeableContainer('resizeableElement');
-                                rc.GetContainer().style.left = '10px';
-                                rc.GetContainer().style.top = '10px';
-                                rc.SetMaxWidth(600);
-                                rc.SetMaxHeight(800);
-                                rc.SetCurrentWidth2(600);
-                                rc.SetCurrentHeight(300);
-                            </script>
-                            <% else -%>
-                            <%= hidden_field_tag "plotGraphPanel","off" -%>
-                            <% end -%>
+                            <%= render :partial=>"models/builder/object_block",
+                                :locals=>{:objects_hash=>@objects_hash,:key=>"reactionImage",:hidden_id=>"plotGraphPanel",:object_element_id=>"resizeableElement",:javascript_var=>"rc"} -%>
                         </p>
                     </div>
                 </div>
@@ -167,21 +154,9 @@
                                 Rate equations help
                             </button>
                             <input value="Show eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide eqs graph" type="button" onclick="create_panel_cookies();$('plotKineticsPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable_2 script -->
-                            <% if @objects_hash["kineticsImage"] -%>
-                            <%= hidden_field_tag "plotKineticsPanel","on" -%>
-                            <%= @objects_hash["kineticsImage"] -%>
-                            <script type="text/javascript"> 
-						        var rc2 = new ResizeableContainer('resizeableElement2');
-						        rc2.GetContainer().style.left = '10px';
-						        rc2.GetContainer().style.top = '10px';
-								rc2.SetCurrentWidth2(600);
-								rc2.SetCurrentHeight(300);
-						        rc2.SetMaxWidth(600);
-						        rc2.SetMaxHeight(800);
-						      </script>
-                            <% else -%>
-                            <%= hidden_field_tag "plotKineticsPanel","off" -%>
-                            <% end -%>
+
+                            <%= render :partial=>"models/builder/object_block",
+                                :locals=>{:objects_hash=>@objects_hash,:key=>"kineticsImage",:hidden_id=>"plotKineticsPanel",:object_element_id=>"resizeableElement2",:javascript_var=>"rc2"} -%>
                         </p>
                     </div>
                 </div><img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
