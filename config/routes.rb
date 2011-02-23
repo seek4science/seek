@@ -25,6 +25,8 @@ ActionController::Routing::Routes.draw do |map|
     data_file.resources :studied_factors
   end
   
+  map.resources :spreadsheet_annotations,:collection=>{:fucker=>:post}
+  
   map.resources :uuids
 
   map.resources :expertise

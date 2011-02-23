@@ -1,4 +1,6 @@
-$(function () {
+var $j = jQuery.noConflict();
+
+$j(document).ready(function ($) {
   //Worksheet tabs
   $("a.sheet_tab")
     .click(function () {
@@ -152,7 +154,7 @@ function num2alpha(col)
 
 function show_annotation(id,x,y)
 {
-  $("#annotation_" + id).css('left',x+30);  
-  $("#annotation_" + id).css('top',y);
-  $("#annotation_" + id).show();  
+  $j("#annotation_" + id).css('left',x+30);  
+  $j("#annotation_" + id).css('top',y);
+  $j("#annotation_" + id).show();  
 }

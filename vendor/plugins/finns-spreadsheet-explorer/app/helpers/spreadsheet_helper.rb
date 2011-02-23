@@ -109,9 +109,9 @@ module SpreadsheetHelper
     html = ""
     unless annotations.empty?
       html << "<script type=\"text/javascript\">\n"
-      html << "\t$(function () {\n"
+      html << "\t$j(function () {\n"
       annotations.each do |a|
-        html << "\t\t$(\"table.active_sheet tr\").slice(#{a.start_row},#{a.end_row+1}).each(function() {$(this).children(\"td.cell\").slice(#{a.start_column-1},#{a.end_column}).addClass(\"annotated_cell\").click(function (e) {show_annotation(#{a.id},e.pageX,e.pageY);});});"
+        html << "\t\t$j(\"table.active_sheet tr\").slice(#{a.start_row},#{a.end_row+1}).each(function() {$j(this).children(\"td.cell\").slice(#{a.start_column-1},#{a.end_column}).addClass(\"annotated_cell\").click(function (e) {show_annotation(#{a.id},e.pageX,e.pageY);});});"
       end
       html << "\t});\n"
       html << "</script>\n\n"

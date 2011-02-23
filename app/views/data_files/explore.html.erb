@@ -7,14 +7,18 @@
 <div class="show_basic">
   <input size="10" readonly="readonly" id="selection_data"></input>
   <input size="60" readonly="readonly" id="cell_info"></input><br/><br/>
-  <% form_remote_tag(:url =>create_spreadsheet_annotation_url, 
-                   :update => {:success => 'publication_preview_container', :failure => 'publication_error'}, 
-                   :success => "Element.show('publication_preview_container'); Element.hide('publication_error'); new Effect.Highlight('publication_preview_container', { duration: 1.0 });",
-                   :failure => "Element.show('publication_error'); Element.hide('publication_preview_container');new Effect.Highlight('publication_error', { duration: 1.0, startcolor: '#FF5555' });", 
-                   :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",
-                   :complete => "Element.hide('spinner');$('fetch_button').disabled=false;") do %>
-  <br/>
-  <%= render :partial => "annotations/annotation", :collection=>@spreadsheet.annotations %>
+  
+  <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"fucker"},   
+                   :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
+                   :loading => "Element.show('spinner');",
+                   :complete => "Element.hide('spinner');") do %>
+    <%= submit_tag 'Add Annotation',:id=>"fetch_button" %>
+  <% end %>
+  <%= image_tag "ajax-loader-large.gif", :id => 'spinner', :style => 'display:none;' -%><br/>
+    
+  <div id="hidden_annotations">
+    <%= render :partial => "annotations/annotation", :collection=>@spreadsheet.annotations %>
+  </div>
   <%= generate_spreadsheet_html(@spreadsheet) %>   
 </div>
 
