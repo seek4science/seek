@@ -161,6 +161,65 @@
                     </div>
                 </div><img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
             </div>
+
+            <div id="annotated_reaction_top" class="builder_box">
+              <div class="squarebox">
+                    <div id="annotated_reaction_caption" class="squareboxgradientcaption" onclick="togglePanel('annotated_reaction');" style="height:20px; cursor: pointer;">
+                        <div style="float: left">
+                            Annotated Reactions
+                        </div>
+                        <div style="float: right; vertical-align: middle">
+                            <img id="annotated_reaction_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                        </div>
+                    </div>
+                    <div id="annotated_reaction_panel" class="squareboxcontent" style="display: none">
+                        <!-- initial values script -->
+                        <script type="text/javascript">
+							var rtAnnotatedReactions = new ResizeableTextbox('annotatedReactions');
+							rtAnnotatedReactions.SetText("<%= @params_hash['annotationsReactions'] -%>");
+							rtAnnotatedReactions.GetContainer().style.left = '10px';
+							rtAnnotatedReactions.GetContainer().style.top = '10px';
+							rtAnnotatedReactions.SetCurrentWidth(600);
+							rtAnnotatedReactions.SetCurrentHeight(400);
+							rtAnnotatedReactions.SetMaxWidth(600);
+							rtAnnotatedReactions.SetMaxHeight(800);
+							</script>
+                        <p>
+                        </p>
+                    </div>
+                </div>
+                <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
+            </div>
+
+            <div id="annotated_species_top" class="builder_box">
+              <div class="squarebox">
+                    <div id="annotated_species_caption" class="squareboxgradientcaption" onclick="togglePanel('annotated_species');" style="height:20px; cursor: pointer;">
+                        <div style="float: left">
+                            Annotated Species
+                        </div>
+                        <div style="float: right; vertical-align: middle">
+                            <img id="annotated_species_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
+                        </div>
+                    </div>
+                    <div id="annotated_species_panel" class="squareboxcontent" style="display: none">
+                        <!-- initial values script -->
+                        <script type="text/javascript">
+							var rtAnnotatedSpecies = new ResizeableTextbox('annotatedSpecies');
+							rtAnnotatedSpecies.SetText("<%= @params_hash['annotationsSpecies'] -%>");
+							rtAnnotatedSpecies.GetContainer().style.left = '10px';
+							rtAnnotatedSpecies.GetContainer().style.top = '10px';
+							rtAnnotatedSpecies.SetCurrentWidth(600);
+							rtAnnotatedSpecies.SetCurrentHeight(400);
+							rtAnnotatedSpecies.SetMaxWidth(600);
+							rtAnnotatedSpecies.SetMaxHeight(800);
+							</script>
+                        <p>
+                        </p>
+                    </div>
+                </div>
+                <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
+            </div>
+
             <div id="initial_top" class="builder_box">
                 <div class="squarebox">
                     <div id="initial_caption" class="squareboxgradientcaption" onclick="togglePanel('initial');" style="height:20px; cursor: pointer;">

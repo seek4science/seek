@@ -1,0 +1,151 @@
+<builder>
+
+
+  <errorinfo>
+    <error id="reaction">
+      0
+    </error>
+
+    <error id="kinetics">
+      0
+    </error>
+
+    <error id="initVal">
+      0
+    </error>
+
+    <error id="parameters">
+      0
+    </error>
+
+    <error id="functions">
+      1
+    </error>
+
+    <error id="assRules">
+      0
+    </error>
+
+    <error id="events">
+      0
+    </error>
+  </errorinfo>
+
+  <form id="uploadDatFile">
+    <action>
+      DatFileReader.jsp
+    </action>
+  </form>
+
+
+  <form id="uploadSBMLFile">
+    <action>
+      ../../upload/uploadNEW.jsp?SBMLFilePostedToIFC=true&amp;xmlOutput=true
+    </action>
+    <parameters>
+      <parameter id="SBMLFilePostedToIFC">
+        true
+      </parameter>
+    </parameters>
+  </form>
+
+
+  <form id="main">
+
+    <action>
+      DatFileReader.jsp
+    </action>
+    <parameters>
+      <parameter id="modelname">
+        teusink
+      </parameter>
+      <parameter id="reaction">
+        Reactions
+      </parameter>
+
+      <parameter id="annotationsReactions">
+        Annotations for Reactions
+      </parameter>
+
+      <parameter id="annotationsSpecies">
+        Annotations for Species
+      </parameter>
+
+      <parameter id="kinetics">
+        Kintetics
+      </parameter>
+
+
+      <parameter id="initVal">
+        GLCi[0] = 0.087\nPrb[0] = 5\nG6P[0] = 1.39\nF6P[0] = 0.28\nF16P[0] = 0.1\nTRIO[0] = 5.17\nNAD[0] = 1.2\nBPG[0] = 0.0\nNADH[0] = 0.39\nP3G[0] = 0.1\nP2G[0] = 0.1\nPEP[0] = 0.1\nPYR[0] = 3.36\nACE[0] = 0.04\n\n
+      </parameter>
+
+
+      <parameter id="parameterset">
+        params
+      </parameter>
+
+
+      <parameter id="assignmentRules">
+        \n
+      </parameter>
+
+
+      <parameter id="functions">
+        \n*Power[?] := ?\n
+      </parameter>
+
+
+      <parameter id="events">
+        \n
+      </parameter>
+    </parameters>
+
+    <objects>
+
+
+    </objects>
+
+    <annotations>
+      <annotations></annotations>
+    </annotations>
+
+  </form>
+
+
+  <form id="simulate">
+    <action>
+      ../../upload/uploadNEW.jsp?inputFileConstructor=true&amp;savedfile=teusink201122319618552765.dat&amp;xmlOutput=true
+    </action>
+    <parameters>
+      <parameter id="savedfile">
+        teusink201122319618552765.dat
+      </parameter>
+    </parameters>
+
+  </form>
+
+
+  <form id="BuildSBMLFile">
+    <action>
+      datToSBMLstageII.jsp
+    </action>
+    <parameters>
+      <parameter id="modelName">
+        teusink201122319618552765
+      </parameter>
+    </parameters>
+
+  </form>
+
+
+  <form id="BuildJWSFile">
+    <action>
+      teusink201122319618552765.dat
+    </action>
+    <parameters>
+    </parameters>
+  </form>
+
+
+</builder>

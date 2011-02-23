@@ -22,8 +22,11 @@ function toggleContent() {
   var contentId6 = document.getElementById("parameters_panel");
   var contentId7 = document.getElementById("functions_panel");
   var contentId8 = document.getElementById("events_panel");
+  var contentId9 = document.getElementById("annotated_reaction_panel");
+  var contentId10 = document.getElementById("annotated_species_panel");
   // Toggle 
-	if (contentId.style.display == 'block') {contentId.style.display = 'none';contentId2.style.display='none'; contentId3.style.display='none';contentId4.style.display='none'; contentId5.style.display='none'; contentId6.style.display='none'; contentId7.style.display='none'; contentId8.style.display='none'} else { contentId.style.display = 'block';contentId2.style.display='block'; contentId3.style.display='block';contentId4.style.display='block'; contentId5.style.display='block'; contentId6.style.display='block'; contentId7.style.display='block'; contentId8.style.display='block'}
+  if (contentId.style.display == 'block') {contentId.style.display = 'none';contentId2.style.display='none'; contentId3.style.display='none';contentId4.style.display='none'; contentId5.style.display='none'; contentId6.style.display='none'; contentId7.style.display='none'; contentId8.style.display='none'; contentId9.style.display='none'; contentId10.style.display='none'}
+  else { contentId.style.display = 'block';contentId2.style.display='block'; contentId3.style.display='block';contentId4.style.display='block'; contentId5.style.display='block'; contentId6.style.display='block'; contentId7.style.display='block'; contentId8.style.display='block'; contentId9.style.display='block'; contentId10.style.display='block'}
 }
 
 // current animated collapsible panel content
@@ -193,6 +196,8 @@ document.getElementById("initial_panel").style.display=readCookie('initial_panel
 document.getElementById("parameters_panel").style.display=readCookie('parameters_panel');
 document.getElementById("functions_panel").style.display=readCookie('functions_panel');
 document.getElementById("events_panel").style.display=readCookie('events_panel');
+document.getElementById("annotated_reaction_panel").style.display=readCookie('annotated_reaction_panel');
+document.getElementById("annotated_species_panel").style.display=readCookie('annotated_species_panel');
 rtmodelname.SetCurrentWidth(cookieToArray('rtmodelname')[0]);
 rtmodelname.SetCurrentHeight(cookieToArray('rtmodelname')[1]);
 rtreaction.SetCurrentWidth(cookieToArray('rtreaction')[0]);
@@ -209,6 +214,13 @@ rtfunctions.SetCurrentWidth(cookieToArray('rtfunctions')[0]);
 rtfunctions.SetCurrentHeight(cookieToArray('rtfunctions')[1]);
 rtevents.SetCurrentWidth(cookieToArray('rtevents')[0]);
 rtevents.SetCurrentHeight(cookieToArray('rtevents')[1]);
+
+rtAnnotatedReactions.SetCurrentWidth(cookieToArray('annotatedReactions')[0]);
+rtAnnotatedReactions.SetCurrentHeight(cookieToArray('annotatedReactions')[1]);
+
+rtAnnotatedSpecies.SetCurrentWidth(cookieToArray('annotatedSpecies')[0]);
+rtAnnotatedSpecies.SetCurrentHeight(cookieToArray('annotatedSpecies')[1]);
+
 document.form.plotGraphPanel.value=readCookie('plotGraphPanel');
 document.form.plotKineticsPanel.value=readCookie('plotKineticsPanel');
 if(document.form.plotGraphPanel.checked==true) {

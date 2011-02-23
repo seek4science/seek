@@ -60,13 +60,14 @@ class ModelsController < ApplicationController
       end
     rescue Exception=>e
       error=e
+      logger.error "Error submitting to JWS Online OneStop - #{e.message}"
       raise e
     end
     
     respond_to do |format|
       if error
         flash[:error]="JWS Online encountered a problem processing this model."
-        format.html { redirect_to model_path(@model,:version=>@display_model.version)}                      
+        format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}        
