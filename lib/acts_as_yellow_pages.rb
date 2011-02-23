@@ -1,4 +1,3 @@
-require 'acts_as_editable'
 require 'acts_as_uniquely_identifiable'
 require 'acts_as_favouritable'
 
@@ -32,9 +31,6 @@ module Acts #:nodoc:
         belongs_to :avatar
 
         acts_as_uniquely_identifiable
-
-        acts_as_editable
-
 
         class_eval do
           extend Acts::Yellow_Pages::SingletonMethods

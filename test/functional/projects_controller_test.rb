@@ -83,6 +83,18 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(assigns(:project))
   end
 
+  def test_user_project_manager
+    login_as(:project_manager)
+    get :show, :id=>projects(:three)
+    assert_select "a",:text=>/Edit Project/,:count=>1
+
+    get :edit, :id=>projects(:three)
+    assert_response :success
+
+    put :update, :id=>projects(:three).id,:project=>{}
+    assert_redirected_to project_path(assigns(:project))
+  end
+
   def test_user_cant_edit_project
     login_as(:cant_edit)
     get :show, :id=>projects(:three)

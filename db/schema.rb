@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110203144227) do
+ActiveRecord::Schema.define(:version => 20110218163214) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20110203144227) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 16777215
+    t.text     "data",                   :limit => 2147483647
     t.string   "controller_name"
   end
 
@@ -223,6 +223,11 @@ ActiveRecord::Schema.define(:version => 20110203144227) do
     t.string   "contributor_type"
     t.string   "first_letter",     :limit => 1
     t.string   "uuid"
+  end
+
+  create_table "events_publications", :id => false, :force => true do |t|
+    t.integer "publication_id"
+    t.integer "event_id"
   end
 
   create_table "experimental_conditions", :force => true do |t|
@@ -469,6 +474,7 @@ ActiveRecord::Schema.define(:version => 20110203144227) do
     t.boolean  "can_edit_projects",                   :default => false
     t.boolean  "can_edit_institutions",               :default => false
     t.boolean  "is_admin",                            :default => false
+    t.boolean  "is_project_manager",                  :default => false
   end
 
   create_table "permissions", :force => true do |t|
@@ -584,6 +590,17 @@ ActiveRecord::Schema.define(:version => 20110203144227) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "settings", :force => true do |t|
+    t.string   "var",                       :null => false
+    t.text     "value"
+    t.integer  "target_id"
+    t.string   "target_type", :limit => 30
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "settings", ["target_type", "target_id", "var"], :name => "index_settings_on_target_type_and_target_id_and_var", :unique => true
 
   create_table "site_announcement_categories", :force => true do |t|
     t.string   "title"

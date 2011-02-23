@@ -47,6 +47,13 @@ class InstitutionTest < ActiveSupport::TestCase
     i=institutions(:one)
     assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :can_edit as he is not a member"
 
+    u=users(:project_manager)
+    i=institutions(:two)
+    assert i.can_be_edited_by?(u),"Institution :two should be editable by user :project_manager"
+
+    i=institutions(:one)
+    assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :project_manager as he is not a member"
+
     u=users(:quentin)
     assert i.can_be_edited_by?(u),"Institution :one should be editable by user :quentin as he's an admin"
 

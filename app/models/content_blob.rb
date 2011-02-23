@@ -93,18 +93,27 @@ class ContentBlob < ActiveRecord::Base
   
   def dump_tmp_io_object_to_file
     raise Exception.new("You cannot define both :data content and a :tmp_io_object") unless @data.nil? || @tmp_io_object.nil?
+    t1 = Time.now
     unless @tmp_io_object.nil?
-      @tmp_io_object.rewind
-      
-      File.open(filepath,"w+") do |f|
-        buffer=""
-        while @tmp_io_object.read(16384,buffer)
-          f << buffer
-        end        
+      begin
+        logger.info "Moving #{@tmp_io_object.path} to #{filepath}"
+        FileUtils.mv @tmp_io_object.path, filepath
+        @tmp_io_object = nil
+      rescue Exception => e
+        logger.info "Falling back to ruby copy because of: #{e.message}"
+        @tmp_io_object.rewind
+
+        File.open(filepath, "w+") do |f|
+          buffer=""
+          while @tmp_io_object.read(16384, buffer)
+            f << buffer
+          end
+        end
+        @tmp_io_object.rewind
+        @tmp_io_object=nil
       end
-      @tmp_io_object.rewind
-      @tmp_io_object=nil
     end
+    logger.info "TIME: dump_tmp_io_object_to_file took #{Time.now - t1}"
   end
   
 end

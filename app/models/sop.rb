@@ -23,8 +23,8 @@ class Sop < ActiveRecord::Base
                
   has_one :investigation,:through=>:study
              
-  has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'    
-  
+  has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
+
   acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do

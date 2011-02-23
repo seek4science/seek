@@ -8,8 +8,8 @@ class Institution < ActiveRecord::Base
 
   acts_as_yellow_pages
 
-  grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(:institutions)
-
+  #load the configuration for the pagination
+  grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
   validates_uniqueness_of :name
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -26,8 +26,13 @@ class Institution < ActiveRecord::Base
     end
     #TODO: write a test to check they are ordered
     return res.sort{|a,b| a.last_name <=> b.last_name}
-  end  
-  
+  end
+
+   def can_be_edited_by?(subject)
+    return(subject.is_admin? ||
+          (self.people.include?(subject.person) && (subject.can_edit_institutions? || subject.is_project_manager?)))
+  end
+
   # get a listing of all known institutions
   def self.get_all_institutions_listing
     institutions = Institution.find(:all)

@@ -118,7 +118,9 @@ class PublicationsController < ApplicationController
     update_tags @publication
 
     respond_to do |format|
-      if valid && @publication.update_attributes(params[:publication])
+      publication_params = params[:publication]||{}
+      publication_params[:event_ids] = params[:event_ids]
+      if valid && @publication.update_attributes(publication_params)
         to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}
         
@@ -196,6 +198,7 @@ class PublicationsController < ApplicationController
         format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
       end
     end
+    
   end
   
   #Try and relate non_seek_authors to people in SEEK based on name and project

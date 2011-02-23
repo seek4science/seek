@@ -109,7 +109,13 @@ module AssetsHelper
     end
 
     case name
-      when "DataFile","Sop","Model"
+      when "DataFile"
+        related["Project"][:items]     = [resource.project]
+        related["Study"][:items]       = resource.studies
+        related["Assay"][:items]       = resource.assays
+        related["Publication"][:items] = resource.related_publications
+        related["Event"][:items]      = resource.events
+      when "Sop","Model"
         related["Project"][:items] = [resource.project]
         related["Study"][:items] = resource.studies   
         related["Assay"][:items] = resource.assays
@@ -171,12 +177,14 @@ module AssetsHelper
         related["DataFile"][:items] = resource.related_data_files
         related["Model"][:items] = resource.related_models
         related["Assay"][:items] = resource.related_assays
+        related["Event"][:items] = resource.events
       when "Event"
         {#"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
-         "Project" => [resource.project],
-         "DataFile" => resource.data_files}.each do |k,v|
-            related[k][:items] = v unless v.nil?
-         end
+         "Project"     => [resource.project],
+         "DataFile"    => resource.data_files,
+         "Publication" => resource.publications}.each do |k, v|
+          related[k][:items] = v unless v.nil?
+        end
       else
     end
     

@@ -13,7 +13,9 @@ class Project < ActiveRecord::Base
   
   validates_uniqueness_of :name
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::ApplicationConfiguration.default_page(:projects)
+
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize) #shouldn't need "Other" tab for project
+  
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -25,7 +27,7 @@ class Project < ActiveRecord::Base
   has_many :models
   has_many :sops
   has_many :publications
-  
+    
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
   # (no links to the default policy will be made from elsewhere; instead, when
@@ -140,6 +142,10 @@ class Project < ActiveRecord::Base
     project_memberships = work_groups.collect{|w| w.group_memberships}.flatten
     person_project_membership = person.group_memberships & project_memberships
     return person_project_membership.roles
-  end 
+  end
+
+  def can_be_edited_by?(subject)
+    return(subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
+  end
   
 end

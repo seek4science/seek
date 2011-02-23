@@ -26,9 +26,8 @@ class Model < ActiveRecord::Base
   
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if SOLR_ENABLED
 
-  has_many :created_datas    
+  has_many :created_datas
 
-  
   acts_as_uniquely_identifiable
   
   explicit_versioning(:version_column => "version") do

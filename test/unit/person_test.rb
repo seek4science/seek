@@ -9,6 +9,14 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2,p.work_groups.size
   end
 
+  def test_can_be_edited_by?
+    Person.all.each do |p|
+      assert p.can_be_edited_by? users(:quentin) unless p.is_admin?
+      assert p.can_be_edited_by? users(:project_manager) unless p.is_admin?
+      assert !p.can_be_edited_by?(users(:can_edit))
+    end
+  end
+
   def test_ordered_by_last_name
     sorted = Person.find(:all).sort_by do |p|
       lname = "" || p.last_name.try(:downcase)

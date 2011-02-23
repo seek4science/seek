@@ -13,6 +13,16 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal blob,datafile.content_blob    
   end
 
+  test "event association" do
+    datafile = data_files(:picture)
+    assert datafile.events.empty?
+    event = events(:event_with_no_files)
+    datafile.events << event
+    assert datafile.valid?
+    assert datafile.save
+    assert_equal 1, datafile.events.count
+  end
+
   test "sort by updated_at" do
     assert_equal DataFile.find(:all).sort_by { |df| df.updated_at.to_i * -1 }, DataFile.find(:all)
   end

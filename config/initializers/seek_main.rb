@@ -24,7 +24,6 @@ HIDE_DETAILS=false unless defined? HIDE_DETAILS
 EVENTS_ENABLED=true unless defined? EVENTS_ENABLED
 PUBMED_API_EMAIL = "" unless defined? PUBMED_API_EMAIL
 CROSSREF_API_EMAIL = "" unless defined? CROSSREF_API_EMAIL
-PAGINATION_CONFIG_FILE = "config/paginate.yml" unless defined? PAGINATION_CONFIG_FILE
 
 #this is needed for the xlinks in the REST API.
 SITE_BASE_HOST="http://localhost:3000" unless defined? SITE_BASE_HOST

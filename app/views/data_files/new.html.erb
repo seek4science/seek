@@ -1,4 +1,5 @@
 <%= javascript_include_tag "sharing.js" -%>
+<%= javascript_include_tag "associate_events.js" %>
 <h1>New Data file</h1>
 <div class="show_basic">
     <% form_tag({:action => :create}, :multipart => true) do -%>
@@ -23,6 +24,8 @@
         
       
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
+
+      <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
         </p>

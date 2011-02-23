@@ -104,6 +104,12 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, :id=> people(:aaron_person)
     assert_redirected_to root_path
   end
+
+  def test_project_manager_can_edit_others
+    login_as(:project_manager)
+    get :edit, :id=> people(:aaron_person)
+    assert_response :success
+  end
   
   def test_admin_can_edit_others
     get :edit, :id=>people(:aaron_person)

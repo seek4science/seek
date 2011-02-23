@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
   before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_data_file, :only=>[:show,:download]
     
   def new_version
@@ -65,11 +65,40 @@ class DataFilesController < ApplicationController
       end
     end
   end
+
+  def upload_for_tool
+    t1 = Time.now
+    if handle_data
+      t2 = Time.now
+
+      @data_file = DataFile.new params[:data_file]
+
+      @data_file.contributor  = current_user
+      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+      if @data_file.save
+        time = Time.now
+        logger.info "TIME: total for upload tool #{time - t1}"
+        logger.info "TIME: after handle_data #{time - t2}"
+        @data_file.creators = [current_user.person]
+        flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+        render :text => flash.now[:notice]
+      else
+        time = Time.now
+        logger.info "TIME: total for upload tool #{time - t1}"
+        logger.info "TIME: after handle_data #{time - t2}"
+        errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
+        logger.debug errors
+        render :text => errors, :status => 500
+      end
+    end
+  end
   
   def create
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
+      @data_file.event_ids = params[:event_ids] || []
       @data_file.contributor=current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
@@ -141,7 +170,9 @@ class DataFilesController < ApplicationController
     update_tags @data_file
     
     respond_to do |format|
-      if @data_file.update_attributes(params[:data_file])
+      data_file_params = params[:data_file]
+      data_file_params[:event_ids] = params[:event_ids]
+      if @data_file.update_attributes(data_file_params)
         # the Data file was updated successfully, now need to apply updated policy / permissions settings to it
         policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
         

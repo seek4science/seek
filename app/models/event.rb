@@ -5,6 +5,7 @@ require 'acts_as_favouritable'
 
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
+  has_and_belongs_to_many :publications
 
   default_scope :order => "#{self.table_name}.start_date DESC"
 
@@ -12,7 +13,8 @@ class Event < ActiveRecord::Base
   acts_as_uniquely_identifiable
   acts_as_favouritable
 
-  grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(:events)
+  #load the configuration for the pagination
+  grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
 
   #FIXME: Move to Libs
   Array.class_eval do

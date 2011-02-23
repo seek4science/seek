@@ -10,7 +10,9 @@ class Person < ActiveRecord::Base
 
   acts_as_notifiee
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::ApplicationConfiguration.default_page(:people)
+  #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
+  #load the configuration for the pagination
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
 
   validates_presence_of :email
 
@@ -174,6 +176,10 @@ class Person < ActiveRecord::Base
 
   def assets
     created_data_files | created_models | created_sops | created_publications
+  end
+
+  def can_be_edited_by?(subject)
+    return((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
   end
 
   private

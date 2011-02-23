@@ -205,5 +205,13 @@ duplicate_2:
   first_name: "I Am a"
   last_name: "duplicate"
   email: "dup2@email.com"
+
+person_for_project_manager:
+  first_name: "Project"
+  last_name: "Manager"
+  is_admin: false
+  can_edit_projects: false
+  can_edit_institutions: false
+  is_project_manager: true
   
 

@@ -84,7 +84,7 @@
     </div>
 </div>
 <% end -%>
-<% if current_user.is_admin? -%>
+<% if current_user.is_admin? || current_user.person.is_project_manager?-%>
 <h2 style="margin-top: 1.5em;">Choose Project / Institution&nbsp;&nbsp;&nbsp;<span class="admin_warning">(This section is visible only to admins)</span></h2>
 <%= render :partial => "work_groups", :locals=> { :person => (person ? person : Person.new) } -%>
 <%# only makes sense to display these settings when the person has "user" associated with it; -%>
@@ -101,11 +101,17 @@
 	        they work in.
 	    </label>
 	    <br/>
-    <% end -%>    
-    <label for="is_pal" style="font-weight: normal;">
-        <%= f.check_box :is_pal -%>
-        This person is a certified <b><%= DM_PROJECT_NAME %> PAL</b>
-    </label>    
+    <% end -%>
+    <% if current_user.is_admin? %>
+        <label for="is_pal" style="font-weight: normal;">
+            <%= f.check_box :is_pal -%>
+            This person is a certified <b><%= DM_PROJECT_NAME %> PAL</b>
+        </label><br/>
+        <label for="is_project_manager" style="font-weight: normal;">
+            <%= f.check_box :is_project_manager -%>
+            This person is a <b>Project Manager</b>
+        </label>
+     <% end %>
 </p>
 <% end -%>
 <p style="text-align: center; margin-top: 1.5em;">
