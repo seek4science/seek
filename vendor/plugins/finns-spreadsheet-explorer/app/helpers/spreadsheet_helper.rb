@@ -65,7 +65,6 @@ module SpreadsheetHelper
     end
     html << "</div>"
     html << "</div>"
-    html << link_annotations(workbook.annotations)
     return html
   end
   
@@ -87,35 +86,6 @@ module SpreadsheetHelper
       end
     end
     html << "</style>\n"
-    return html
-  end
-  
-  def generate_spreadsheet_annotations(annotations)
-    html = ""
-    unless annotations.empty?
-      html << "<div id=\"hidden_annotations\">\n"
-      annotations.each do |a|
-        html << "\t <div class=\"annotation\" id=\"annotation_#{a.id}\">\n"
-        html << "\t\t <b>TEST ANNOTATION</b><br/>"
-        html << "\t\t #{a.content}"
-        html << "\t</div>\n\n"
-      end
-    end
-    html << "</div>\n"
-    return html
-  end
-  
-  def link_annotations(annotations)
-    html = ""
-    unless annotations.empty?
-      html << "<script type=\"text/javascript\">\n"
-      html << "\t$j(function () {\n"
-      annotations.each do |a|
-        html << "\t\t$j(\"table.active_sheet tr\").slice(#{a.start_row},#{a.end_row+1}).each(function() {$j(this).children(\"td.cell\").slice(#{a.start_column-1},#{a.end_column}).addClass(\"annotated_cell\").click(function (e) {show_annotation(#{a.id},e.pageX,e.pageY);});});"
-      end
-      html << "\t});\n"
-      html << "</script>\n\n"
-    end
     return html
   end
   

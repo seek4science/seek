@@ -1,0 +1,12 @@
+<script type="text/javascript">
+  $j(function () {
+  <% annotations.each do |a| %>
+    $j("table.active_sheet tr").slice(<%= a.start_row-%>,<%= a.end_row+1-%>).each(
+                              function() {
+                                $j(this).children("td.cell").slice(<%= a.start_column-1-%>,<%= a.end_column-%>).addClass("annotated_cell")
+                                  .click(function (e) {show_annotation(<%=a.id-%>,e.pageX,e.pageY);});
+                              }
+    );
+  <% end %>
+  });
+</script>

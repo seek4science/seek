@@ -18,7 +18,10 @@
     
   <div id="hidden_annotations">
     <%= render :partial => "annotations/annotation", :collection=>@spreadsheet.annotations %>
+    <%= render :partial => "annotations/annotation_javascript", :locals => {:annotations => @spreadsheet.annotations} %>
   </div>
+  
+  
   <%= generate_spreadsheet_html(@spreadsheet) %>   
 </div>
 
