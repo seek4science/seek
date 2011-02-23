@@ -1,0 +1,10 @@
+<style type="text/css" id="generated_spreadsheet_styles">
+  <% styles.each_key do |style_name| %> 
+    td.<%= style_name -%> {
+    <% styles[style_name].attributes.each_key do |a| %>
+      <%= a + ": " + styles[style_name][a] + ";" %>
+    <% end %>
+    }
+  <% end %>
+</style>
+  

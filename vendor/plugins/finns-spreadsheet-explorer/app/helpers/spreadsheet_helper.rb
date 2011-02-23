@@ -1,12 +1,8 @@
 module SpreadsheetHelper
   
   def generate_spreadsheet_html(workbook)
-    html = ""
-    
-    html << generate_spreadsheet_styles(workbook.styles)    
-    
-    html << "<div class=\"spreadsheet_viewer\">"
-        
+    html = "<div class=\"spreadsheet_viewer\">"
+            
     #List of tabs
     first_sheet = true
     workbook.sheets.each do |sheet|
@@ -69,25 +65,6 @@ module SpreadsheetHelper
   end
   
   private
-  
-  def generate_spreadsheet_styles(styles)
-    html = ""
-    unless styles.empty?
-      html << "<style type=\"text/css\" id=\"generated_spreadsheet_styles\">\n"
-      styles.each_key do |k|
-        style = styles[k]
-        #declare the CSS class
-        html << "\t td.#{k} {\n"
-        #output each CSS attribute and its value
-        style.attributes.each_key do |a|
-          html << "\t\t#{a}: #{style[a]};\n"
-        end
-        html << "\t}\n\n"
-      end
-    end
-    html << "</style>\n"
-    return html
-  end
   
   def to_alpha(col)
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)    
