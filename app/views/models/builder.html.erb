@@ -162,34 +162,7 @@
                 </div><img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
             </div>
 
-            <div id="annotated_reactions_top" class="builder_box">
-              <div class="squarebox">
-                    <div id="annotated_reactions_caption" class="squareboxgradientcaption" onclick="togglePanel('annotated_reactions');" style="height:20px; cursor: pointer;">
-                        <div style="float: left">
-                            Annotations for processes
-                        </div>
-                        <div style="float: right; vertical-align: middle">
-                            <img id="annotated_reactions_chevron" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
-                        </div>
-                    </div>
-                    <div id="annotated_reactions_panel" class="squareboxcontent" style="display: none">
-                        <!-- initial values script -->
-                        <script type="text/javascript">
-							var rtAnnotatedReactions = new ResizeableTextbox('annotationsReactions');
-							rtAnnotatedReactions.SetText("<%= @params_hash['annotationsReactions'] -%>");
-							rtAnnotatedReactions.GetContainer().style.left = '10px';
-							rtAnnotatedReactions.GetContainer().style.top = '10px';
-							rtAnnotatedReactions.SetCurrentWidth(600);
-							rtAnnotatedReactions.SetCurrentHeight(400);
-							rtAnnotatedReactions.SetMaxWidth(600);
-							rtAnnotatedReactions.SetMaxHeight(800);
-							</script>
-                        <p>
-                        </p>
-                    </div>
-                </div>
-                <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
-            </div>
+            <%= render :partial=>"models/builder/builder_box",:locals=>{:title=>"Annotations for processes",:prefix=>"annotated_reactions",:key=>"annotationsReactions",:javascript_var=>"rtAnnotatedReactions"} -%>
 
             <div id="annotated_species_top" class="builder_box">
               <div class="squarebox">
