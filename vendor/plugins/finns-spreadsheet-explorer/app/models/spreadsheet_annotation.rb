@@ -6,12 +6,12 @@ class SpreadsheetAnnotation < ActiveRecord::Base
              :polymorphic => true
   
   def cell_coverage
-    return to_alpha(start_column)+start_row.to_s + (end_column.nil? ? "" : ":" + to_alpha(end_column)+end_row.to_s)    
+    return SpreadsheetAnnotation.to_alpha(start_column)+start_row.to_s + (end_column.nil? ? "" : ":" + SpreadsheetAnnotation.to_alpha(end_column)+end_row.to_s)    
   end
   
 private
 
-  def to_alpha(col)
+  def self.to_alpha(col)
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)    
     result = ""
     col = col-1
@@ -23,4 +23,13 @@ private
     result
   end
   
+  def self.from_alpha(col)
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)    
+    result = 0
+    col = col.split(//)
+    (0..col.length-1).reverse_each do |x|
+      result += ((alphabet.index(col[x])+1) * (26 ** ((col.length - 1) - x)))
+    end
+    result
+  end
 end

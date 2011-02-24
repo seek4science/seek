@@ -8,20 +8,18 @@
   <input size="10" readonly="readonly" id="selection_data"></input>
   <input size="60" readonly="readonly" id="cell_info"></input><br/><br/>
   
-  <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"fucker"},   
-                   :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
-                   :loading => "Element.show('spinner');",
-                   :complete => "Element.hide('spinner');") do %>
-    <%= submit_tag 'Add Annotation',:id=>"fetch_button" %>
-  <% end %>
-  <%= image_tag "ajax-loader-large.gif", :id => 'spinner', :style => 'display:none;' -%><br/>
+  <%= render :partial => "annotations/annotation_form" %>
     
   <div id="hidden_annotations">
-    <%= render :partial => "annotations/annotation", :collection=>@spreadsheet.annotations %>
-    <%= render :partial => "annotations/annotation_javascript", :locals => {:annotations => @spreadsheet.annotations} %>
+    <%= render :partial => "annotations/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
   </div>
   
   <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
+  <style type="text/css">
+    td.selected_cell {
+      border-color: #00F;
+    }
+  </style>
   <%= generate_spreadsheet_html(@spreadsheet) %>   
 </div>
 

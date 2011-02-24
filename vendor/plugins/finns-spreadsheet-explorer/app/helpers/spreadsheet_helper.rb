@@ -5,9 +5,11 @@ module SpreadsheetHelper
             
     #List of tabs
     first_sheet = true
+    sheet_index = 0
     workbook.sheets.each do |sheet|
-      html << "<a class=\"sheet_tab #{"selected_tab" if first_sheet}\" href=\"#\">#{sheet.name}</a>"
+      html << "<a index=\"#{sheet_index}\" class=\"sheet_tab #{"selected_tab" if first_sheet}\" href=\"#\">#{sheet.name}</a>"
       first_sheet = false
+      sheet_index += 1
     end
 
     html << "<div class=\"spreadsheet_container\">"

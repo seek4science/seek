@@ -16,6 +16,8 @@ $j(document).ready(function ($) {
       $("table.active_sheet td.selected_cell").removeClass("selected_cell");
       //Clear selection box
       $('#selection_data').val("");
+      //Record current sheet in annotation form
+      $('input#sheet_id').attr("value",$(this).attr("index"));
       //Reset variables
       isMouseDown = false,
       startRow = 0,
@@ -133,6 +135,9 @@ $j(document).ready(function ($) {
           selection += (":" + num2alpha(maxCol).toString() + maxRow.toString());
           
         $('#selection_data').val(selection);
+        
+        //Update cell coverage in annotation form
+        $('input#cell_coverage').attr("value",selection);
       }
     });
 });
