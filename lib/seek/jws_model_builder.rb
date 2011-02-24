@@ -52,7 +52,7 @@ module Seek
       url
     end
     
-    def construct model,params
+    def construct params
       
       required_params=["assignmentRules","annotationsReactions","annotationsSpecies","modelname","parameterset","kinetics","functions","initVal","reaction","events","steadystateanalysis","plotGraphPanel","plotKineticsPanel",""]
       url = builder_url

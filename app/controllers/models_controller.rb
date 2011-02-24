@@ -80,7 +80,7 @@ class ModelsController < ApplicationController
   def submit_to_jws
     following_action=params.delete("following_action")    
     
-    @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct @display_model,params
+    @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
     if (@error_keys.empty?)
       if following_action == "simulate"
         @applet=@@model_builder.simulate @saved_file
