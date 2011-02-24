@@ -106,7 +106,7 @@ function highlight_error(prefix){
     Effect.BlindDown(panel, {
         duration: 0.3
     });
-    chevronExpand(prefix)
+    chevronExpand(prefix);
     Element.removeClassName(caption, "squareboxgradientcaption");
     $(caption).addClassName("squareboxgradientcaption2");
     new Effect.Highlight(panel, {
