@@ -76,11 +76,22 @@ class ModelsController < ApplicationController
       end
     end
   end    
-  
+
+#  def annotator
+#    respond_to do |format|
+#      format.html
+#    end
+#  end
+
   def submit_to_jws
     following_action=params.delete("following_action")    
-    
-    @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
+
+    if following_action == "annotate"
+      @params_hash,@species_names,@reaction_names,@saved_file,@error_keys = @@model_builder.annotate params
+    else
+      @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
+    end
+
     if (@error_keys.empty?)
       if following_action == "simulate"
         @applet=@@model_builder.simulate @saved_file
@@ -104,16 +115,20 @@ class ModelsController < ApplicationController
         end
       end
     end
+
     respond_to do |format|      
-      if @error_keys.empty? && following_action == "simulate"        
+      if @error_keys.empty? && following_action == "simulate"
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
+      elsif @error_keys.empty? && following_action == "annotate"
+        format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
-        create_new_version new_version_comments
+        create_new_version(new_version_comments)
         format.html {redirect_to model_path(@model,:version=>@model.version) }
       else        
         format.html { render :action=>"builder" }
       end      
     end
+    
   end
   
   def simulate

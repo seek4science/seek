@@ -4,6 +4,13 @@ function check_clicked(){
     $('form').submit();
 }
 
+function annotate_clicked(){
+    $('annotate_button').value = "Submitting ...";
+    $('annotate_button').disabled = true;
+    $('form').following_action.value = "annotate";
+    $('form').submit();
+}
+
 function simulate_clicked(){
     $('simulate_button').value = "Submitting ...";
     $('simulate_button').disabled = true;

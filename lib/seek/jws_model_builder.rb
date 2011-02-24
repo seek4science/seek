@@ -8,8 +8,8 @@ module Seek
 
     include ModelTypeDetection
 
-    BASE_URL = "http://130.88.195.112/webMathematica/Examples/"
-    SIMULATE_URL = "http://130.88.195.112/webMathematica/upload/uploadNEW.jsp"
+    BASE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/Examples/"
+    SIMULATE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/upload/uploadNEW.jsp"
     MOCKED_RESPONSE=true
 
     def is_supported? model
@@ -26,6 +26,10 @@ module Seek
 
     def builder_url
       "#{BASE_URL}JWSconstructor_panels/DatFileReader_xml.jsp"
+    end
+
+    def annotator_url
+      "#{BASE_URL}JWSconstructor_panels/AnnotatorReader_xml.jsp"
     end
 
     def upload_dat_url
@@ -147,6 +151,49 @@ module Seek
       process_response_body(response.body)
     end
 
+    #ANNOTATOR STUFF
+
+    def annotator_url
+
+    end
+
+    def annotate params
+      return process_annotator_response_body(dummy_annotator_response_xml) if MOCKED_RESPONSE
+
+    end
+
+    def process_annotator_response_body body
+      parser = LibXML::XML::Parser.string(body, :encoding => LibXML::XML::Encoding::UTF_8)
+      doc = parser.parse
+
+      params_hash = extract_main_parameters doc
+      saved_file = determine_saved_file doc
+      fields_with_errors = find_reported_errors doc
+      species_names,reaction_names = extract_species_and_reaction_names doc
+
+      return params_hash, species_names,reaction_names, saved_file,fields_with_errors
+    end
+
+    def extract_species_and_reaction_names doc
+      species = []
+      reactions = []
+      species_names_node = doc.find_first("//speciesNames")
+      species_names_node.children.each do |child|
+        if !child.nil? && child.name == "name"
+          species << child.content.strip
+        end
+      end unless species_names_node.nil?
+
+      reaction_names_node = doc.find_first("//reactionsNames")
+      reaction_names_node.children.each do |child|
+        if !child.nil? && child.name == "name"
+          reactions << child.content.strip
+        end
+      end unless reaction_names_node.nil?
+
+      return species,reactions
+    end
+
     private
 
     def extract_applet body
@@ -157,8 +204,6 @@ module Seek
     end
 
     def process_response_body body
-
-      puts body
 
       parser = LibXML::XML::Parser.string(body, :encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse
@@ -226,6 +271,11 @@ module Seek
       File.open(path, "rb").read
     end
 
+    #only used for testing and development purposes
+    def dummy_annotator_response_xml
+      path="#{RAILS_ROOT}/test/annotator_jws_response.xml"
+      File.open(path, "rb").read
+    end
   end
 
 end
