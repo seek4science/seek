@@ -3,6 +3,7 @@
     caption_id=prefix+"_caption"
     panel_id=prefix+"_panel"
     chevron_id=prefix+"_chevron"
+    help_button||=nil
 -%>
 
 <div id="<%= top_id -%>" class="builder_box">
@@ -29,6 +30,11 @@
 							container.SetMaxHeight(800);
 							</script>
                         <p>
+                          <% if help_button -%>
+                            <button title="<%= help_button[:title] -%>" onclick="window.open('<%= help_button[:link_url] -%>','<%= help_button[:link_text] -%>', 'width=300,height=300,toolbar=0'); return false;">
+                                <%= help_button[:text] -%>
+                            </button>
+                          <% end -%>
                         </p>
                     </div>
                 </div>

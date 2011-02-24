@@ -22,7 +22,7 @@ function toggleContent() {
   var contentId6 = document.getElementById("parameters_panel");
   var contentId7 = document.getElementById("functions_panel");
   var contentId8 = document.getElementById("events_panel");
-  var contentId9 = document.getElementById("annotated_reaction_panel");
+  var contentId9 = document.getElementById("annotated_reactions_panel");
   var contentId10 = document.getElementById("annotated_species_panel");
   // Toggle 
   if (contentId.style.display == 'block') {contentId.style.display = 'none';contentId2.style.display='none'; contentId3.style.display='none';contentId4.style.display='none'; contentId5.style.display='none'; contentId6.style.display='none'; contentId7.style.display='none'; contentId8.style.display='none'; contentId9.style.display='none'; contentId10.style.display='none'}
