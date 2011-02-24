@@ -2,8 +2,9 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  
-  
+
+  self.mod_porter_secret = PORTER_SECRET
+
   include ExceptionNotifiable 
   self.error_layout="errors" 
   self.silent_exceptions = []

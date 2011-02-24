@@ -66,3 +66,5 @@ NOREPLY_SENDER="no-reply@sysmo-db.org" unless defined? NOREPLY_SENDER
 
 # limit list of the entry in a page
 PAGINATE_LATEST_LIMIT= 7 unless defined? PAGINATE_LATEST_LIMIT
+
+PORTER_SECRET = "" unless defined? PORTER_SECRET
