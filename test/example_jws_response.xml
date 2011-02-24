@@ -29,6 +29,15 @@
     <error id="events">
       0
     </error>
+    
+    <error id="annotated_reactions">
+      1
+    </error>
+
+    <error id="annotated_species">
+      1
+    </error>
+
   </errorinfo>
 
   <form id="uploadDatFile">

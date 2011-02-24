@@ -7,7 +7,9 @@ module ModelsHelper
     "parameters"=>"Parameter values",
     "functions"=>"Functions",
     "assRules"=>"Assignment rules",
-    "events"=>"Events"
+    "events"=>"Events",
+    "annotated_reactions"=>"Annotations for processes",
+    "annotated_species"=>"Annotations for species"
   }
   
   JWS_ERROR_TO_PREFIX={
@@ -17,7 +19,9 @@ module ModelsHelper
     "parameters"=>"parameters",
     "functions"=>"functions",
     "assRules"=>"assignments",
-    "events"=>"events"
+    "events"=>"events",
+    "annotated_reactions"=>"annotated_reactions",
+    "annotated_species"=>"annotated_species"
   }
 
   def model_environment_text model
