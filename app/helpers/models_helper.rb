@@ -57,6 +57,14 @@ module ModelsHelper
     builder = Seek::JWSModelBuilder.new
     builder.is_supported? model
   end
+
+  def jws_annotator_hidden_fields params_hash
+    required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]
+    required_params.collect do |param|
+      value = params_hash[param] || ""
+      text_area_tag(param, value.html_safe).html_safe+"<br/>".html_safe
+    end
+  end
   
   def jws_key_to_text key
     JWS_ERROR_TO_PANEL_NAMES[key]

@@ -14,6 +14,27 @@
   Annotator
 </h1>
 
+<script type="text/javascript">
+  function submit_annotations() {
+      update_annotation_field("annotationsSpecies",species_annotations);
+      update_annotation_field("annotationsReactions",reactions_annotations);
+      $('form').submit();
+  }
+
+  function update_annotation_field(element_id,annotations) {
+      for (var key in annotations) {
+          text=""
+          triplets=annotations[key]
+          for (var i=0;i<triplets.length;i++) {
+              if (triplets[i]!=undefined) {
+                text=text+key+" "+triplets[i].urn+" "+triplets[i].full_name+"\n"
+              }
+          }
+          $(element_id).innerHTML=text;
+      }
+  }
+</script>
+
 Param Keys = <%= @params_hash.keys.join(", ") -%>
 <br/>
 Species annotations keys = <%= @species_annotations.keys.join(", ") -%>
@@ -24,8 +45,12 @@ Search results keys = <%= @search_results.keys.join(", ") -%>
 <br/>
 Cached annotation keys = <%= @cached_annotations.keys.join(", ") -%>
 <br/>
+<input type="Button" value="Submit" onclick="submit_annotations();">
+<% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
+        <%= jws_annotator_hidden_fields @params_hash -%>
+        <%= hidden_field_tag :following_action, "" -%>
+<% end -%>
 
 <%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"species",:title=>"Annotations for species",:type=>"species",:cached_annotations=>@cached_annotations, :annotation_hash=>@species_annotations} -%>
 
-
-<%# render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"reactions",:title=>"Annotations for processes",:type=>"reactions", :annotation_hash=>@reaction_annotations} -%>
+<%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"reactions",:title=>"Annotations for processes",:type=>"reactions", :annotation_hash=>@reaction_annotations} -%>

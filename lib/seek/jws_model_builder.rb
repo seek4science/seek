@@ -19,7 +19,8 @@ module Seek
 
     BASE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/Examples/"
     SIMULATE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/upload/uploadNEW.jsp"
-    MOCKED_RESPONSE=true
+    
+    MOCKED_RESPONSE=false
 
     def is_supported? model
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))
@@ -38,7 +39,7 @@ module Seek
     end
 
     def annotator_url
-      "#{BASE_URL}JWSconstructor_panels/AnnotatorReader_xml.jsp"
+      "#{BASE_URL}JWSconstructor_panels/Annotator_xml.jsp"
     end
 
     def upload_dat_url
@@ -71,7 +72,7 @@ module Seek
 
       return process_response_body(dummy_response_xml) if MOCKED_RESPONSE
 
-      required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel", ""]
+      required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]
       url = builder_url
       form_data = {}
       required_params.each do |p|
@@ -177,11 +178,15 @@ module Seek
         raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
       end
 
-      process_response_body(response.body)
+      process_annotator_response_body(response.body)
 
     end
 
     def process_annotator_response_body body
+      puts "XXXXXXXXXXXXXXXXXXXXXX"
+      puts body
+      puts "XXXXXXXXXXXXXXXXXXXXXX"
+      
       parser = LibXML::XML::Parser.string(body, :encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse
 
@@ -287,8 +292,7 @@ module Seek
       objects_hash = create_objects_hash doc
       fields_with_errors = find_reported_errors doc
 
-      #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
-      fields_with_errors.delete("functions")
+
       return param_values, saved_file, objects_hash, fields_with_errors
     end
 
@@ -301,7 +305,10 @@ module Seek
         errors << name unless value=="0"
       end
 
-      return errors
+      #FIXME: temporary fix to as the builder validator always reports a problem with "functions"
+      errors.delete("functions")
+      
+      errors
     end
 
     def create_objects_hash doc
