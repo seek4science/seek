@@ -4,6 +4,15 @@ require 'libxml'
 
 module Seek
 
+  class AnnotationTriplet
+    attr_accessor :full_name,:urn,:qualifier
+    def initialize full_name,urn,qualifier
+      @full_name=full_name
+      @urn=urn
+      @qualifier=qualifier
+    end
+  end
+
   class JWSModelBuilder
 
     include ModelTypeDetection
@@ -169,9 +178,64 @@ module Seek
       params_hash = extract_main_parameters doc
       saved_file = determine_saved_file doc
       fields_with_errors = find_reported_errors doc
-      species_names,reaction_names = extract_species_and_reaction_names doc
+      search_results = extract_search_results doc
+      cached_annotations = extract_cached_annotations doc
+      assigned_species_annotations,assigned_reactions_annotations = extract_assigned_annotations doc
 
-      return params_hash, species_names,reaction_names, saved_file,fields_with_errors
+      return params_hash, assigned_species_annotations,assigned_reactions_annotations,search_results,cached_annotations,saved_file,fields_with_errors
+    end
+
+    def extract_cached_annotations doc
+      extract_annotation_symbols "//annotations/cached",doc
+    end
+
+    def extract_search_results doc
+      search_node=doc.find_first("//annotations/search")
+      search_results = {}
+      if search_node
+        search_term = search_node.find_first("parameter").content.strip
+        search_results[search_term]=extract_annotation_symbols "results",search_node
+      end
+      search_results
+    end
+
+    def extract_assigned_annotations doc
+      species_names,reaction_names = extract_species_and_reaction_names doc
+      species_annotation_hash = extract_annotation_symbols "//annotations/assigned/species",doc
+      species_annotation_hash = synchronise_hash species_names,species_annotation_hash
+
+      reactions_annotation_hash = extract_annotation_symbols "//annotations/assigned/reactions",doc
+      reactions_annotation_hash = synchronise_hash reaction_names,reactions_annotation_hash
+
+      return species_annotation_hash,reactions_annotation_hash
+
+    end
+
+    def synchronise_hash keys,hash,default=[]
+      (hash.keys - keys).each {|key| hash.delete(key)}
+      keys.each do |key|
+        hash[key]=default unless hash.has_key?(key)
+      end
+      hash
+    end
+
+    def extract_annotation_symbols root_xpath,doc
+      root_xpath += "/" unless root_xpath.end_with? "/"
+      xpath=root_xpath + "symbol"
+      symbols={}
+      doc.find(xpath).each do |symbol|
+        symbols[symbol.attributes["id"]] = extract_triplets(symbol)
+      end
+      symbols
+    end
+
+    def extract_triplets symbol
+      symbol.find("triplet").collect do |triplet|
+        full_name = triplet.find_first("ReadName").content
+        urn = triplet.find_first("URN").content
+        qualifier = triplet.find_first("Qualifier").content
+        AnnotationTriplet.new full_name,urn,qualifier
+      end
     end
 
     def extract_species_and_reaction_names doc

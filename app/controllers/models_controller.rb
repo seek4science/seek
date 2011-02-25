@@ -87,7 +87,7 @@ class ModelsController < ApplicationController
     following_action=params.delete("following_action")    
 
     if following_action == "annotate"
-      @params_hash,@species_names,@reaction_names,@saved_file,@error_keys = @@model_builder.annotate params
+      @params_hash,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
     else
       @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
     end
