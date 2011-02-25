@@ -25,7 +25,7 @@ Search results keys = <%= @search_results.keys.join(", ") -%>
 Cached annotation keys = <%= @cached_annotations.keys.join(", ") -%>
 <br/>
 
-<%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"species",:title=>"Annotations for species",:type=>"species", :annotation_hash=>@species_annotations} -%>
+<%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"species",:title=>"Annotations for species",:type=>"species",:cached_annotations=>@cached_annotations, :annotation_hash=>@species_annotations} -%>
 
 
 <%# render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"reactions",:title=>"Annotations for processes",:type=>"reactions", :annotation_hash=>@reaction_annotations} -%>
