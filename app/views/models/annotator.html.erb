@@ -1,3 +1,15 @@
+<%= javascript_include_tag "jws/JWSconstructor_panels.js","jws/webMathematica.js","jws/addEvent.js","jws/sweetTitles.js","jws/Resizeable_Textbox/javascript.js","jws/Resizeable_Container/javascript.js","jws/jws_builder.js" -%>
+
+<%= stylesheet_link_tag 'jws/JWSconstructor_panels','jws/Resizeable_Textbox/style.css','jws/Resizeable_Container/style.css','jws/jws_builder' -%>
+<style>
+    .builder_box {
+        width: 50em;
+        padding: 3px;
+        float: left;
+    }
+</style>
+
+
 <h1>
   Annotator
 </h1>
@@ -11,3 +23,9 @@ Reaction annotation keys = <%= @reaction_annotations.keys.join(", ") -%>
 Search results keys = <%= @search_results.keys.join(", ") -%>
 <br/>
 Cached annotation keys = <%= @cached_annotations.keys.join(", ") -%>
+<br/>
+
+<%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"species",:title=>"Annotations for species",:type=>"species", :annotation_hash=>@species_annotations} -%>
+
+
+<%# render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"reactions",:title=>"Annotations for processes",:type=>"reactions", :annotation_hash=>@reaction_annotations} -%>

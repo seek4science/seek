@@ -1,0 +1,113 @@
+<%
+   top_id=prefix+"_top"
+   caption_id=prefix+"_caption"
+   panel_id=prefix+"_panel"
+   chevron_id=prefix+"_chevron"
+   help_button||=nil
+   annotation_hash ||= {}
+-%>
+
+<style>
+  .builder_box table {
+      width: 100%;
+  }
+
+  .builder_box table.annotation_keys {
+      width: 6em;
+  }
+</style>
+
+<div id="<%= top_id -%>" class="builder_box">
+  <div class="squarebox">
+    <div id="<%= caption_id -%>" class="squareboxgradientcaption" onclick="togglePanel('<%= prefix -%>');" style="height:20px; cursor: pointer;">
+      <div style="float: left">
+        <%= title -%>
+      </div>
+      <div style="float: right; vertical-align: middle">
+        <img id="<%= chevron_id -%>" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13"/>
+      </div>
+    </div>
+    <div id="<%= panel_id -%>" class="squareboxcontent" style="display: none">
+      <table border="1">
+        <tbody>
+        <tr>
+          <td valign="top">
+            <table border="1" class="annotation_keys">
+              <tbody>
+                <% annotation_hash.keys.each do |key| -%>
+                    <tr>
+                      <td>
+                        <%= link_to_function h(key),"#{prefix}_annotation_selected('#{key}')" -%>
+                      </td>
+                    </tr>
+                <% end -%>
+              </tbody>
+            </table>
+          </td>
+          <td>
+            <p>
+              Annotations assigned to:
+              <span id="<%= prefix -%>_selected_annotation"></span>
+            </p>
+            <p>
+              <table id="<%= prefix -%>_assigned_annotations">
+
+              </table>
+            </p>
+            <p id="show_annotations_panel">
+              <hr>
+              Find URN's for <%= type -%>:
+              <%= text_field_tag prefix+"_search" -%>
+            </p>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <p>
+        <% if help_button -%>
+            <button title="<%= help_button[:title] -%>" onclick="window.open('<%= help_button[:link_url] -%>','<%= help_button[:link_text] -%>', 'width=300,height=300,toolbar=0'); return false;">
+              <%= help_button[:text] -%>
+            </button>
+        <% end -%>
+      </p>
+    </div>
+  </div>
+  <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%"/>
+</div>
+
+<script type="text/javascript">
+  var <%= prefix -%>_annotations = new Array();
+  <% annotation_hash.keys.each do |key| -%>
+
+    triplets = new Array();
+    <% annotation_hash[key].each do |triplet| -%>
+        triplet = {"urn" : '<%= triplet.urn -%>',"full_name" : '<%= triplet.full_name -%>' , "qualifier" : '<%= triplet.qualifier -%>' };
+        triplets.push(triplet);
+    <% end -%>
+   <%= prefix -%>_annotations['<%= key -%>'] = triplets;
+  <% end -%>
+
+  function <%= prefix -%>_annotation_selected(key) {
+    triplets = <%= prefix -%>_annotations[key];
+    $('<%= prefix -%>_selected_annotation').innerHTML = key;
+    table = $('<%= prefix -%>_assigned_annotations');
+    table.innerHTML = "";
+    for (var i=0;i<triplets.length;i++) {
+        trip = triplets[i];
+        row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
+        js="javascript:<%= prefix -%>_drop_annotation('"+key+"',"+i+");";
+        row = row + "<td><a href=\""+js+"\">Drop</a></td></tr>";
+        table.innerHTML=table.innerHTML + row;
+    }
+  }
+
+  function <%= prefix -%>_drop_annotation(key,index) {
+    <%= prefix -%>_annotations[key].splice(index,1);
+    <%= prefix -%>_annotation_selected(key);
+  }
+
+  <% unless annotation_hash.empty? -%>
+  <%= prefix -%>_annotation_selected('PEP');
+  <% end -%>
+
+</script>

@@ -1,4 +1,4 @@
-<builder>
+<annotator>
 
 
   <errorinfo>
@@ -19,7 +19,7 @@
     </error>
 
     <error id="functions">
-      1
+      0
     </error>
 
     <error id="assRules">
@@ -29,15 +29,6 @@
     <error id="events">
       0
     </error>
-
-    <error id="annotated_reactions">
-      0
-    </error>
-
-    <error id="annotated_species">
-      0
-    </error>
-
   </errorinfo>
 
   <form id="uploadDatFile">
@@ -60,7 +51,6 @@
 
 
   <form id="main">
-
     <action>
       DatFileReader.jsp
     </action>
@@ -69,29 +59,129 @@
         teusink
       </parameter>
       <parameter id="reaction">
-        Reactions
+        v[1] {1}GLCi + {1}Prb = {1}G6P\nv[2] {1}G6P = {1}F6P\nv[3] {1}G6P + {1}Prb = {1}$Glyc\nv[4] {2}G6P + {1}Prb =
+        {1}$Trh\nv[5] {1}F6P + {1}Prb = {1}F16P\nv[6] {1}F16P = {2}TRIO\nv[7] {1}TRIO + {1}NAD = {1}BPG + {1}NADH\nv[8]
+        {1}BPG = {1}P3G + {1}Prb\nv[9] {1}P3G = {1}P2G\nv[10] {1}P2G = {1}PEP\nv[11] {1}PEP = {1}PYR + {1}Prb\nv[12]
+        {1}PYR = {1}$CO2 + {1}ACE\nv[13] {2}ACE + {3}NAD = {1}$SUCC + {3}NADH\nv[14] {1}$GLCo = {1}GLCi\nv[15] {1}ACE +
+        {1}NADH = {1}NAD + {1}$ETOH\nv[16] {1}TRIO + {1}NADH = {1}NAD + {1}$GLY\nv[17] {1}Prb = {1}$X\n
       </parameter>
 
       <parameter id="annotationsReactions">
-        Annotations for Reactions
+        \nv[1] urn:miriam:obo.go:GO:0015758 glucose transport\nv[2] urn:miriam:kegg.reaction:R00299 ATP:D-glucose
+        6-phosphotransferase\nv[5] urn:miriam:kegg.reaction:R02740 alpha-D-Glucose 6-phosphate ketol-isomerase\nv[6]
+        urn:miriam:kegg.reaction:R04779 ATP:D-fructose-6-phosphate 1-phosphotransferase\nv[7]
+        urn:miriam:kegg.reaction:R01068 D-fructose-1,6-bisphosphate
+        D-glyceraldehyde-3-phosphate-lyase(glycerone-phosphate-forming)\nv[8] urn:miriam:kegg.reaction:R01061
+        D-glyceraldehyde-3-phosphate:NAD+ oxidoreductase (phosphorylating)\nv[9] urn:miriam:kegg.reaction:R01512
+        ATP:3-phospho-D-glycerate 1-phosphotransferase\nv[10] urn:miriam:kegg.reaction:R01518 2-Phospho-D-glycerate
+        2,3-phosphomutase\nv[11] urn:miriam:kegg.reaction:R00658 2-phospho-D-glycerate hydro-lyase
+        (phosphoenolpyruvate-forming)\nv[12] urn:miriam:kegg.reaction:R00200 ATP:pyruvate 2-O-phosphotransferase\nv[13]
+        urn:miriam:kegg.reaction:R00224 pyruvate carboxy-lyase (acetaldehyde-forming)\nv[15]
+        urn:miriam:kegg.reaction:R00754 ethanol:NAD+ oxidoreductase\nv[17] urn:miriam:obo.go:GO:0006200 ATP catabolic
+        process\n
       </parameter>
 
       <parameter id="annotationsSpecies">
-        Annotations for Species
+        \nBPG urn:miriam:obo.chebi:CHEBI:28907 1,3-bisphosphoglyceric acid\nBPG urn:miriam:kegg.compound:C00236
+        1,3-bisphosphoglyceric acid\nF16P urn:miriam:obo.chebi:CHEBI:16905 D-fructose 1,6-bisphosphate\nF16P
+        urn:miriam:kegg.compound:C00354 D-fructose 1,6-bisphosphate\nF6P urn:miriam:obo.chebi:CHEBI:15946 D-fructose
+        6-phosphate\nF6P urn:miriam:kegg.compound:C00085 D-fructose 6-phosphate\nG6P urn:miriam:obo.chebi:CHEBI:17665
+        alpha-D-glucose 6-phosphate\nG6P urn:miriam:kegg.compound:C00092 alpha-D-glucose 6-phosphate\nGlci
+        urn:miriam:obo.chebi:CHEBI:17634 D-glucose\nGlci urn:miriam:kegg.compound:C00031 D-glucose\nNAD
+        urn:miriam:obo.chebi:CHEBI:15846 NAD(+)\nPEP urn:miriam:obo.chebi:CHEBI:18021 phosphoenolpyruvate\nPEP
+        urn:miriam:kegg.compound:C00074 phosphoenolpyruvate\nP2G urn:miriam:obo.chebi:CHEBI:17835 2-phospho-D-glyceric
+        acid\nP2G urn:miriam:kegg.compound:C00631 2-phospho-D-glyceric acid\nP3G urn:miriam:obo.chebi:CHEBI:17794
+        3-phospho-D-glyceric acid\nP3G urn:miriam:kegg.compound:C00197 3-phospho-D-glyceric acid\nATP
+        urn:miriam:obo.chebi:CHEBI:15422 ATP\nATP urn:miriam:kegg.compound:C00002 ATP\nNADH
+        urn:miriam:obo.chebi:CHEBI:16908 NADH\nNADH urn:miriam:kegg.compound:C00004 NADH\nPYR
+        urn:miriam:obo.chebi:CHEBI:15361 pyruvate\nPYR urn:miriam:kegg.compound:C00022 pyruvate\nPYR
+        urn:miriam:3dmet:B01956 Parapyruvate\n
       </parameter>
 
       <parameter id="kinetics">
-        Kintetics
+        v[14] = (VmGLT*(GLCo - GLCi[t]/KeqGLT))/(KmGLTGLCo*(1 + GLCo/KmGLTGLCo + GLCi[t]/KmGLTGLCi +
+        (0.91*GLCo*GLCi[t])/(KmGLTGLCi*KmGLTGLCo)))\nv[1] = (VmGLK*(-((G6P[t]*(SUMAXP - (SUMAXP^2 - 2*SUMAXP*Prb[t] +
+        8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5))/((1 - 4*KeqAK)*KeqGLK)) + (GLCi[t]*(-SUMAXP + Prb[t]
+        - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5))/(2 -
+        8*KeqAK)))/ (KmGLKATP*KmGLKGLCi*(1 + G6P[t]/KmGLKG6P + GLCi[t]/KmGLKGLCi)*(1 + (SUMAXP - (SUMAXP^2 -
+        2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)/ ((1 - 4*KeqAK)*KmGLKADP) + (-SUMAXP
+        + Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5)/((2 - 8*KeqAK)*KmGLKATP)))\nv[2] = VmPGI/KmPGIG6P*(G6P[t] - F6P[t]/KeqPGI)/(1 +
+        G6P[t]/KmPGIG6P + F6P[t]/KmPGIF6P)\nv[3] = KGLYCOGEN\nv[4] = KTREHALOSE\nv[5] = (gR*VmPFK*F6P[t]*(-SUMAXP +
+        Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5)*(1 + F6P[t]/KmPFKF6P + (-SUMAXP + Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] +
+        8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)/((2 - 8*KeqAK)*KmPFKATP) + (gR*F6P[t]*(-SUMAXP +
+        Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5))/((2 - 8*KeqAK)*KmPFKATP*KmPFKF6P)))/((2 - 8*KeqAK)*KmPFKATP*KmPFKF6P*((L0*(1 +
+        (CPFKF26BP*F26BP)/KPFKF26BP + (CPFKF16BP*F16P[t])/KPFKF16BP)^2*(1 + (2*CPFKAMP*KeqAK*(SUMAXP - (SUMAXP^2 -
+        2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)^2)/((-1 + 4*KeqAK)*KPFKAMP*(SUMAXP -
+        Prb[t] + 4*KeqAK*Prb[t] - (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5)))^2*(1 + (CiPFKATP*(-SUMAXP + Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] +
+        8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5))/((2 - 8*KeqAK)*KiPFKATP))^2*(1 + (CPFKATP*(-SUMAXP +
+        Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5))/((2 - 8*KeqAK)*KmPFKATP))^2)/((1 + F26BP/KPFKF26BP + F16P[t]/KPFKF16BP)^2*(1 +
+        (2*KeqAK*(SUMAXP - (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5)^2)/((-1 + 4*KeqAK)*KPFKAMP*(SUMAXP - Prb[t] + 4*KeqAK*Prb[t] - (SUMAXP^2 -
+        2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)))^2*(1 + (-SUMAXP + Prb[t] -
+        4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)/((2 -
+        8*KeqAK)*KiPFKATP))^2) + (1 + F6P[t]/KmPFKF6P + (-SUMAXP + Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t]
+        + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)/((2 - 8*KeqAK)*KmPFKATP) + (gR*F6P[t]*(-SUMAXP +
+        Prb[t] - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5))/((2 - 8*KeqAK)*KmPFKATP*KmPFKF6P))^2))\nv[6] = (VmALD*(F16P[t] -
+        (KeqTPI*TRIO[t]^2)/(KeqALD*(1 + KeqTPI)^2)))/(KmALDF16P*(1 + F16P[t]/KmALDF16P + TRIO[t]/((1 +
+        KeqTPI)*KmALDDHAP) + (KeqTPI*TRIO[t])/((1 + KeqTPI)*KmALDGAP) + (KeqTPI*F16P[t]*TRIO[t])/((1 +
+        KeqTPI)*KmALDF16P*KmALDGAPi) + (KeqTPI*TRIO[t]^2)/((1 + KeqTPI)^2*KmALDDHAP*KmALDGAP)))\nv[16] =
+        (VmG3PDH*(-((GLY*NAD[t])/KeqG3PDH) + (NADH[t]*TRIO[t])/(1 + KeqTPI)))/(KmG3PDHDHAP*KmG3PDHNADH*(1 +
+        NAD[t]/KmG3PDHNAD + NADH[t]/KmG3PDHNADH)*(1 + GLY/KmG3PDHGLY + TRIO[t]/((1 + KeqTPI)*KmG3PDHDHAP)))\nv[7] =
+        (-((VmGAPDHr*BPG[t]*NADH[t])/(KmGAPDHBPG*KmGAPDHNADH)) + (KeqTPI*VmGAPDHf*NAD[t]*TRIO[t])/((1 +
+        KeqTPI)*KmGAPDHGAP*KmGAPDHNAD))/((1 + NAD[t]/KmGAPDHNAD + NADH[t]/KmGAPDHNADH)*(1 + BPG[t]/KmGAPDHBPG +
+        (KeqTPI*TRIO[t])/((1 + KeqTPI)*KmGAPDHGAP)))\nv[8] = (VmPGK*((KeqPGK*BPG[t]*(SUMAXP - (SUMAXP^2 -
+        2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5))/(1 - 4*KeqAK) - ((-SUMAXP + Prb[t]
+        - 4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 -
+        4*KeqAK*Prb[t]^2)^0.5)*P3G[t])/(2 - 8*KeqAK)))/(KmPGKATP*KmPGKP3G*(1 + (SUMAXP - (SUMAXP^2 - 2*SUMAXP*Prb[t] +
+        8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)/((1 - 4*KeqAK)*KmPGKADP) + (-SUMAXP + Prb[t] -
+        4*KeqAK*Prb[t] + (SUMAXP^2 - 2*SUMAXP*Prb[t] + 8*KeqAK*SUMAXP*Prb[t] + Prb[t]^2 - 4*KeqAK*Prb[t]^2)^0.5)/((2 -
+        8*KeqAK)*KmPGKATP))*(1 + BPG[t]/KmPGKBPG + P3G[t]/KmPGKP3G))\nv[9] = VmPGM/KmPGMP3G*(P3G[t] - P2G[t]/KeqPGM)/(1
+        + P3G[t]/KmPGMP3G + P2G[t]/KmPGMP2G)\nv[10] = VmENO/KmENOP2G*(P2G[t] - PEP[t]/KeqENO)/(1 + P2G[t]/KmENOP2G +
+        PEP[t]/KmENOPEP)\nv[11] = VmPYK/(KmPYKPEP*KmPYKADP)*(PEP[t]*(SUMAXP - (Prb[t]^2 - 4*KeqAK*Prb[t]^2 -
+        2*Prb[t]*SUMAXP + 8*KeqAK*Prb[t]*SUMAXP + SUMAXP^2)^0.5)/(1 - 4*KeqAK) - PYR[t]*((Prb[t] - 4*KeqAK*Prb[t] -
+        SUMAXP + (Prb[t]^2 - 4*KeqAK*Prb[t]^2 - 2*Prb[t]*SUMAXP + 8*KeqAK*Prb[t]*SUMAXP + SUMAXP^2)^0.5)/(2 -
+        8*KeqAK))/KeqPYK)/((1 + PEP[t]/KmPYKPEP + PYR[t]/KmPYKPYR)*(1 + ((Prb[t] - 4*KeqAK*Prb[t] - SUMAXP + (Prb[t]^2 -
+        4*KeqAK*Prb[t]^2 - 2*Prb[t]*SUMAXP + 8*KeqAK*Prb[t]*SUMAXP + SUMAXP^2)^0.5)/(2 - 8*KeqAK))/KmPYKATP + (SUMAXP -
+        (Prb[t]^2 - 4*KeqAK*Prb[t]^2 - 2*Prb[t]*SUMAXP + 8*KeqAK*Prb[t]*SUMAXP + SUMAXP^2)^0.5)/(1 -
+        4*KeqAK)/KmPYKADP))\nv[12] = VmPDC*(PYR[t]^(nPDC)/KmPDCPYR^(nPDC))/(1 + PYR[t]^(nPDC)/KmPDCPYR^(nPDC))\nv[13] =
+        KSUCC*ACE[t]\nv[15] = -(VmADH/(KiADHNAD*KmADHETOH)*(NAD[t]*ETOH - NADH[t]*ACE[t]/KeqADH)/(1 + NAD[t]/KiADHNAD +
+        KmADHNAD*ETOH/(KiADHNAD*KmADHETOH) + KmADHNADH*ACE[t]/(KiADHNADH*KmADHACE) + NADH[t]/KiADHNADH +
+        NAD[t]*ETOH/(KiADHNAD*KmADHETOH) + KmADHNADH*NAD[t]*ACE[t]/(KiADHNAD*KiADHNADH*KmADHACE) +
+        KmADHNAD*ETOH*NADH[t]/(KiADHNAD*KmADHETOH*KiADHNADH) + NADH[t]*ACE[t]/(KiADHNADH*KmADHACE)+
+        NAD[t]*ETOH*ACE[t]/(KiADHNAD*KmADHETOH*KiADHACE) + ETOH*NADH[t]*ACE[t]/(KiADHETOH*KiADHNADH*KmADHACE)))\nv[17] =
+        KATPASE*((Prb[t] - 4*KeqAK*Prb[t] - SUMAXP + (Prb[t]^2 - 4*KeqAK*Prb[t]^2 - 2*Prb[t]*SUMAXP +
+        8*KeqAK*Prb[t]*SUMAXP + SUMAXP^2)^0.5)/(2 - 8*KeqAK))\n\n
       </parameter>
 
 
       <parameter id="initVal">
-        GLCi[0] = 0.087\nPrb[0] = 5\nG6P[0] = 1.39\nF6P[0] = 0.28\nF16P[0] = 0.1\nTRIO[0] = 5.17\nNAD[0] = 1.2\nBPG[0] = 0.0\nNADH[0] = 0.39\nP3G[0] = 0.1\nP2G[0] = 0.1\nPEP[0] = 0.1\nPYR[0] = 3.36\nACE[0] = 0.04\n\n
+        GLCi[0] = 0.087\nG6P[0] = 1.39\nF6P[0] = 0.28\nF16P[0] = 0.1\nTRIO[0] = 5.17\nBPG[0] = 0\nP3G[0] = 0.1\nP2G[0] =
+        0.1\nPEP[0] = 0.1\nPYR[0] = 3.36\nACE[0] = 0.04\nPrb[0] = 5\nNAD[0] = 1.2\nNADH[0] = 0.39\n\n
       </parameter>
 
 
       <parameter id="parameterset">
-        params
+        \nVmGLT = 97.264\nKeqGLT = 1\nKmGLTGLCo = 1.1918\nKmGLTGLCi = 1.1918\nVmGLK = 226.452\nKeqGLK = 3800\nKmGLKGLCi
+        = 0.08\nKmGLKG6P = 30\nKmGLKATP = 0.15\nKmGLKADP = 0.23\nVmPGI = 339.677\nKeqPGI = 0.314\nKmPGIG6P =
+        1.4\nKmPGIF6P = 0.3\nVmPFK = 182.903\ngR = 5.12\nL0 = 0.66\nKmPFKF6P = 0.1\nCPFKF6P = 0\nKmPFKATP =
+        0.71\nCPFKATP = 3\nKPFKAMP = 0.0995\nCPFKAMP = 0.0845\nKiPFKATP = 0.65\nCiPFKATP = 100\nKPFKF26BP =
+        0.000682\nCPFKF26BP = 0.0174\nKPFKF16BP = 0.111\nCPFKF16BP = 0.397\nVmALD = 322.258\nKeqALD = 0.069\nKmALDF16P =
+        0.3\nKmALDGAP = 2\nKmALDDHAP = 2.4\nKmALDGAPi = 10\nVmGAPDHf = 1184.52\nVmGAPDHr = 6549.68\nKmGAPDHGAP =
+        0.21\nKmGAPDHBPG = 0.0098\nKmGAPDHNAD = 0.09\nKmGAPDHNADH = 0.06\nVmG3PDH = 70.15\nKeqG3PDH = 4300\nKmG3PDHDHAP
+        = 0.4\nKmG3PDHNADH = 0.023\nKmG3PDHNAD = 0.93\nKmG3PDHGLY = 1\nVmPGK = 1306.45\nKeqPGK = 3200\nKmPGKBPG =
+        0.003\nKmPGKP3G = 0.53\nKmPGKADP = 0.2\nKmPGKATP = 0.3\nVmPGM = 2525.81\nKeqPGM = 0.19\nKmPGMP3G = 1.2\nKmPGMP2G
+        = 0.08\nVmENO = 365.806\nKeqENO = 6.7\nKmENOP2G = 0.04\nKmENOPEP = 0.5\nVmPYK = 1088.71\nKeqPYK = 6500\nKmPYKPEP
+        = 0.14\nKmPYKPYR = 21\nKmPYKADP = 0.53\nKmPYKATP = 1.5\nVmPDC = 174.194\nKmPDCPYR = 4.33\nnPDC = 1.9\nVmADH =
+        810\nKeqADH = 0.000069\nKmADHACE = 1.11\nKmADHETOH = 17\nKmADHNADH = 0.11\nKmADHNAD = 0.17\nKiADHACE =
+        1.1\nKiADHETOH = 90\nKiADHNADH = 0.031\nKiADHNAD = 0.92\nKATPASE = 39.5\nKGLYCOGEN = 6\nKTREHALOSE = 2.4\nKSUCC
+        = 21.4\nF26BP = 0.02\nSUMAXP = 4.1\nKeqAK = 0.45\nKeqTPI = 0.045\nCO2 = 1\nETOH = 50\nGlyc = 0\nTrh = 0\nGLY =
+        0.15\nSUCC = 0\nGLCo = 50\nX = 0\n\n
       </parameter>
 
 
@@ -101,12 +191,39 @@
 
 
       <parameter id="functions">
-        \n*Power[?] := ?\n
+        \n
       </parameter>
 
 
       <parameter id="events">
         \n
+      </parameter>
+
+
+      <parameter id="citationURL">
+        http://www.bio.vu.nl/hwconf/papers/basmodel.pdf
+      </parameter>
+      <parameter id="citationURN">
+        urn:miriam:jws:teusink
+      </parameter>
+      <parameter id="modelURN">
+        teusink
+      </parameter>
+      <parameter id="authors">
+        Jacky,Snoep,jls@sun.ac.za,Stellenbosch University\n
+      </parameter>
+      <parameter id="creationDate">
+        01 Jan 2001 12:00
+      </parameter>
+      <parameter id="modificationDate">
+        01 Jan 2001 12:00
+      </parameter>
+      <parameter id="TOD">
+        Freedom of use
+      </parameter>
+      <parameter id="notes">
+        The model description lacks the 4 ATPs that are used during the production of succinate in the glyoxylate shunt
+        in the publication.
       </parameter>
     </parameters>
 
@@ -115,20 +232,781 @@
 
     </objects>
 
+
+    <speciesNames>
+      <name>GLCi</name>
+      <name>Prb</name>
+      <name>G6P</name>
+      <name>F6P</name>
+      <name>F16P</name>
+      <name>TRIO</name>
+      <name>NAD</name>
+      <name>BPG</name>
+      <name>P3G</name>
+      <name>P2G</name>
+      <name>PEP</name>
+      <name>PYR</name>
+      <name>ACE</name>
+      <name>NADH</name>
+
+    </speciesNames>
+
+    <reactionsNames>
+      <name>v[1]</name>
+      <name>v[2]</name>
+      <name>v[3]</name>
+      <name>v[4]</name>
+      <name>v[5]</name>
+      <name>v[6]</name>
+      <name>v[7]</name>
+      <name>v[8]</name>
+      <name>v[9]</name>
+      <name>v[10]</name>
+      <name>v[11]</name>
+      <name>v[12]</name>
+      <name>v[13]</name>
+      <name>v[14]</name>
+      <name>v[15]</name>
+      <name>v[16]</name>
+      <name>v[17]</name>
+
+    </reactionsNames>
+
     <annotations>
-      <annotations></annotations>
+      <search>
+        <parameter id="nameToSearch">
+          fructose-1,6-phosphate
+        </parameter>
+
+        <results>
+          <script>var e=document.getElementById("results");e.style.display='none';</script>
+          <symbol id="searchTerm" name="searchTerm">
+            <triplet>
+              <URN>urn:miriam:obo.go:GO0004082</URN>
+              <ReadName>bisphosphoglycerate mutase activity</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:ec-code:5.4.2.4</URN>
+              <ReadName>bisphosphoglycerate mutase activity</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI29865</URN>
+              <ReadName>benzo[a]pyrene</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C07535</URN>
+              <ReadName>benzo[a]pyrene</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:pubchem.substance:9738</URN>
+              <ReadName>benzo[a]pyrene</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:uniprot:P07738</URN>
+              <ReadName>Phosphoglycerate mutase 1</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:insdc:AAH73742.1</URN>
+              <ReadName>Phosphoglycerate mutase 1</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:uniprot:P18669</URN>
+              <ReadName>Phosphoglycerate mutase 1</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:uniprot:P15259</URN>
+              <ReadName>bisphosphoglycerate mutase activity</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:uniprot:Q8N0Y7</URN>
+              <ReadName>bisphosphoglycerate mutase activity</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:obo.go:GO0016868</URN>
+              <ReadName>intramolecular transferase activity, phosphotransferases</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI22716</URN>
+              <ReadName>benzo[a]pyrene</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI3045</URN>
+              <ReadName>benzo[a]pyrene</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI35300</URN>
+              <ReadName>ortho- and peri-fused polycyclic arene</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+        </results>
+      </search>
+
+      <assigned>
+
+        <species>
+          <script>var e=document.getElementById("species");e.style.display='none';</script>
+          <symbol id="BPG" name="BPG">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:28907</URN>
+              <ReadName>1,3-bisphosphoglyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00236</URN>
+              <ReadName>1,3-bisphosphoglyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="F16P" name="F16P">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:16905</URN>
+              <ReadName>D-fructose 1,6-bisphosphate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00354</URN>
+              <ReadName>D-fructose 1,6-bisphosphate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="F6P" name="F6P">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:15946</URN>
+              <ReadName>D-fructose 6-phosphate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00085</URN>
+              <ReadName>D-fructose 6-phosphate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="G6P" name="G6P">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:17665</URN>
+              <ReadName>alpha-D-glucose 6-phosphate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00092</URN>
+              <ReadName>alpha-D-glucose 6-phosphate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="Glci" name="Glci">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:17634</URN>
+              <ReadName>D-glucose</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00031</URN>
+              <ReadName>D-glucose</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="NAD" name="NAD">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:15846</URN>
+              <ReadName>NAD(+)</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="PEP" name="PEP">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:18021</URN>
+              <ReadName>phosphoenolpyruvate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00074</URN>
+              <ReadName>phosphoenolpyruvate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="P2G" name="P2G">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:17835</URN>
+              <ReadName>2-phospho-D-glyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00631</URN>
+              <ReadName>2-phospho-D-glyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="P3G" name="P3G">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:17794</URN>
+              <ReadName>3-phospho-D-glyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00197</URN>
+              <ReadName>3-phospho-D-glyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="ATP" name="ATP">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:15422</URN>
+              <ReadName>ATP</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00002</URN>
+              <ReadName>ATP</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="NADH" name="NADH">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:16908</URN>
+              <ReadName>NADH</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00004</URN>
+              <ReadName>NADH</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+          <symbol id="PYR" name="PYR">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:15361</URN>
+              <ReadName>pyruvate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00022</URN>
+              <ReadName>pyruvate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:3dmet:B01956</URN>
+              <ReadName>Parapyruvate</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+        </species>
+
+        <species>
+          <script>var e=document.getElementById("species");e.style.display='none';</script>
+          <symbol id="BPG" name="BPG">
+            <triplet>
+              <URN>urn:miriam:obo.chebi:CHEBI:28907</URN>
+              <ReadName>1,3-bisphosphoglyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+              <URN>urn:miriam:kegg.compound:C00236</URN>
+              <ReadName>1,3-bisphosphoglyceric acid</ReadName>
+              <Qualifier>is</Qualifier>
+            </triplet>
+          </symbol>
+        </species>
+
+      </assigned>
+
+      <cached>
+        <script>var e=document.getElementById("cached");e.style.display='none';</script>
+        <symbol id="NAD" name="NAD">
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI13389</URN>
+            <ReadName>NAD</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:interpro:IPR005623</URN>
+            <ReadName>NapD</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:insdc:BAA15990.1</URN>
+            <ReadName>NapD</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:P0A9I5</URN>
+            <ReadName>NapD</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI25523</URN>
+            <ReadName>NADP</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:interpro:IPR006420</URN>
+            <ReadName>NAD pyrophosphatase/5-nucleotidase NadN</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.go:GO0003951</URN>
+            <ReadName>NAD+ kinase activity</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:sgd:S000003810</URN>
+            <ReadName>NAD+ kinase activity</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:ec-code:2.7.1.23</URN>
+            <ReadName>NAD+ kinase activity</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:3dmet:B01127</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI16908</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.compound:C00004</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:3306</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:3dmet:B01126</URN>
+            <ReadName>NAD(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI15846</URN>
+            <ReadName>NAD(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.compound:C00003</URN>
+            <ReadName>NAD(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:3305</URN>
+            <ReadName>NAD(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI44215</URN>
+            <ReadName>NAD zwitterion</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI25524</URN>
+            <ReadName>NAD(P)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:3dmet:B01129</URN>
+            <ReadName>NADP(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI18009</URN>
+            <ReadName>NADP(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.compound:C00006</URN>
+            <ReadName>NADP(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:3308</URN>
+            <ReadName>NADP(+)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI44409</URN>
+            <ReadName>NADP zwitterion</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:interpro:IPR006179</URN>
+            <ReadName>5'-Nucleotidase/apyrase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:O83142</URN>
+            <ReadName>NAD pyrophosphatase/5-nucleotidase NadN</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.go:GO0016773</URN>
+            <ReadName>phosphotransferase activity, alcohol group as acceptor</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:O95544</URN>
+            <ReadName>ATP-NAD/AcoX kinase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.go:GO0016301</URN>
+            <ReadName>kinase activity</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI13395</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI7423</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI21902</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI13396</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI44216</URN>
+            <ReadName>NADH</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI13392</URN>
+            <ReadName>NAD(P)H</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+        </symbol>
+        <symbol id="pyruvate" name="pyruvate">
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI15361</URN>
+            <ReadName>pyruvate</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI15730</URN>
+            <ReadName>pyruvate oxime</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.compound:C02193</URN>
+            <ReadName>pyruvate oxime</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:5262</URN>
+            <ReadName>pyruvate oxime</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:3dmet:B01956</URN>
+            <ReadName>Parapyruvate</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.compound:C06033</URN>
+            <ReadName>Parapyruvate</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:8305</URN>
+            <ReadName>Parapyruvate</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:7890143</URN>
+            <ReadName>Pyruvamide</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:3dmet:B00786</URN>
+            <ReadName>3-sulfopyruvic acid</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI16894</URN>
+            <ReadName>3-sulfopyruvic acid</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.compound:C05528</URN>
+            <ReadName>3-sulfopyruvic acid</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:7871</URN>
+            <ReadName>3-sulfopyruvic acid</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.compound:C07409</URN>
+            <ReadName>Pyrantel</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pubchem.substance:9613</URN>
+            <ReadName>Pyrantel</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:interpro:IPR005930</URN>
+            <ReadName>Pyruvate carboxylase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI45163</URN>
+            <ReadName>disulfate(2-)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI14987</URN>
+            <ReadName>pyruvate</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI35179</URN>
+            <ReadName>2-oxo monocarboxylic acid anions</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI26462</URN>
+            <ReadName>pyruvate</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI8686</URN>
+            <ReadName>pyruvate oxime</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI26464</URN>
+            <ReadName>pyruvate oxime</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI24983</URN>
+            <ReadName>ketoximes</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI14988</URN>
+            <ReadName>pyruvate oxime</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI38031</URN>
+            <ReadName>carboxyalkanesulfonic acids</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI11891</URN>
+            <ReadName>3-sulfopyruvic acid</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI1669</URN>
+            <ReadName>3-sulfopyruvic acid</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI45736</URN>
+            <ReadName>3-sulfopyruvic acid</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:kegg.drug:D08451</URN>
+            <ReadName>Pyrantel (INN)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:Q9KWU4</URN>
+            <ReadName>Pyruvate carboxylase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:pirsf:PIRSF001594</URN>
+            <ReadName>Pyruvate carboxylase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:P11154</URN>
+            <ReadName>Pyruvate carboxylase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:Q05920</URN>
+            <ReadName>Pyruvate carboxylase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:O17732</URN>
+            <ReadName>Single hybrid motif</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:uniprot:P11498</URN>
+            <ReadName>Pyruvate carboxylase</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI48154</URN>
+            <ReadName>sulfur oxides</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI33482</URN>
+            <ReadName>sulfur oxoanions</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI29212</URN>
+            <ReadName>disulfate(2-)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+
+          <triplet>
+            <URN>urn:miriam:obo.chebi:CHEBI45160</URN>
+            <ReadName>disulfate(2-)</ReadName>
+            <Qualifier>is</Qualifier>
+          </triplet>
+        </symbol>
+      </cached>
+
+
     </annotations>
+
 
   </form>
 
 
   <form id="simulate">
     <action>
-      ../../upload/uploadNEW.jsp?inputFileConstructor=true&amp;savedfile=teusink201122319618552765.dat&amp;xmlOutput=true
+      ../../upload/uploadNEW.jsp?inputFileConstructor=true&amp;savedfile=teusink2011225125649838528.dat&amp;xmlOutput=true
     </action>
     <parameters>
       <parameter id="savedfile">
-        teusink201122319618552765.dat
+        teusink2011225125649838528.dat
       </parameter>
     </parameters>
 
@@ -141,7 +1019,7 @@
     </action>
     <parameters>
       <parameter id="modelName">
-        teusink201122319618552765
+        teusink2011225125649838528
       </parameter>
     </parameters>
 
@@ -150,11 +1028,12 @@
 
   <form id="BuildJWSFile">
     <action>
-      teusink201122319618552765.dat
+      teusink2011225125649838528.dat
     </action>
     <parameters>
     </parameters>
   </form>
 
 
-</builder>
+</annotator>
+

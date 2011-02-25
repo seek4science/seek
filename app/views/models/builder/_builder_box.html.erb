@@ -1,42 +1,43 @@
 <%
-    top_id=prefix+"_top"
-    caption_id=prefix+"_caption"
-    panel_id=prefix+"_panel"
-    chevron_id=prefix+"_chevron"
-    help_button||=nil
+   top_id=prefix+"_top"
+   caption_id=prefix+"_caption"
+   panel_id=prefix+"_panel"
+   chevron_id=prefix+"_chevron"
+   help_button||=nil
 -%>
 
 <div id="<%= top_id -%>" class="builder_box">
-              <div class="squarebox">
-                    <div id="<%= caption_id -%>" class="squareboxgradientcaption" onclick="togglePanel('<%= prefix -%>');" style="height:20px; cursor: pointer;">
-                        <div style="float: left">
-                            <%= title -%>
-                        </div>
-                        <div style="float: right; vertical-align: middle">
-                            <img id="<%= chevron_id -%>" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13" />
-                        </div>
-                    </div>
-                    <div id="<%= panel_id -%>" class="squareboxcontent" style="display: none">
-                        <!-- initial values script -->
-                        <script type="text/javascript">
-							var <%= javascript_var -%> = new ResizeableTextbox('<%= key -%>');
-                            container=<%= javascript_var -%>;
-							container.SetText("<%= @params_hash[key] -%>");
-							container.GetContainer().style.left = '10px';
-							container.GetContainer().style.top = '10px';
-							container.SetCurrentWidth(600);
-							container.SetCurrentHeight(400);
-							container.SetMaxWidth(600);
-							container.SetMaxHeight(800);
-							</script>
-                        <p>
-                          <% if help_button -%>
-                            <button title="<%= help_button[:title] -%>" onclick="window.open('<%= help_button[:link_url] -%>','<%= help_button[:link_text] -%>', 'width=300,height=300,toolbar=0'); return false;">
-                                <%= help_button[:text] -%>
-                            </button>
-                          <% end -%>
-                        </p>
-                    </div>
-                </div>
-                <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%" />
-            </div>
+  <div class="squarebox">
+    <div id="<%= caption_id -%>" class="squareboxgradientcaption" onclick="togglePanel('<%= prefix -%>');" style="height:20px; cursor: pointer;">
+      <div style="float: left">
+        <%= title -%>
+      </div>
+      <div style="float: right; vertical-align: middle">
+        <img id="<%= chevron_id -%>" title="Show/Hide" src="/images/jws/expand.gif" border="0" height="14" alt="Show/Hide" width="13"/>
+      </div>
+    </div>
+    <div id="<%= panel_id -%>" class="squareboxcontent" style="display: none">
+      <!-- initial values script -->
+      <script type="text/javascript">
+          var <%= javascript_var -%> =
+          new ResizeableTextbox('<%= key -%>');
+          container =<%= javascript_var -%>;
+          container.SetText("<%= @params_hash[key] -%>");
+          container.GetContainer().style.left = '10px';
+          container.GetContainer().style.top = '10px';
+          container.SetCurrentWidth(600);
+          container.SetCurrentHeight(400);
+          container.SetMaxWidth(600);
+          container.SetMaxHeight(800);
+      </script>
+      <p>
+        <% if help_button -%>
+            <button title="<%= help_button[:title] -%>" onclick="window.open('<%= help_button[:link_url] -%>','<%= help_button[:link_text] -%>', 'width=300,height=300,toolbar=0'); return false;">
+              <%= help_button[:text] -%>
+            </button>
+        <% end -%>
+      </p>
+    </div>
+  </div>
+  <img src="/images/jws/shadow2.gif" height="10" alt="" width="100%"/>
+</div>
