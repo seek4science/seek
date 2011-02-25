@@ -162,12 +162,22 @@ module Seek
 
     #ANNOTATOR STUFF
 
-    def annotator_url
-
-    end
-
     def annotate params
       return process_annotator_response_body(dummy_annotator_response_xml) if MOCKED_RESPONSE
+      required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel", ""]
+      url = annotator_url
+      form_data = {}
+      required_params.each do |p|
+        form_data[p]=params[p] if params.has_key?(p)
+      end
+
+      response = Net::HTTP.post_form(URI.parse(url), form_data)
+
+      if response.instance_of?(Net::HTTPInternalServerError)
+        raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
+      end
+
+      process_response_body(response.body)
 
     end
 
