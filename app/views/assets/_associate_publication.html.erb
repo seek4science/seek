@@ -34,7 +34,7 @@
           )+";check_show_add_publication();return(false);"
         } -%>
         
-        <%= select_tag :publication_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+        <%= select_tag :related_publication_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
         
         <br/>
 
@@ -111,6 +111,15 @@
 <% end -%>
 
   updatePublications();
-
+  function check_show_add_publication() {
+      i = $('possible_publications').selectedIndex;
+      selected_id = $('possible_publications').options[i].value;
+      if (selected_id == '0') {
+          $('add_publication_link').hide();
+      }
+      else {
+          $('add_publication_link').show();
+      }
+  }
   check_show_add_publication();
 </script>
