@@ -1,5 +1,6 @@
 <script type="text/javascript">
   $j(function () {
+    $j("td.annotated_cell").removeClass("annotated_cell")
   <% annotations.each do |a| %>
     $j("table.sheet:eq(<%= a.sheet -%>) tr").slice(<%= a.start_row-%>,<%= a.end_row+1-%>).each(
       function() {

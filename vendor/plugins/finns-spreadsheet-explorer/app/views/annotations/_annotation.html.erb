@@ -12,8 +12,12 @@
   </div>
   <div class="annotation_footer">
     <% if annotation.source == current_user %>
-      <%= image_tag_for_key('edit', spreadsheet_annotation_path, nil, nil, "") -%>
-      <%= image_tag_for_key('destroy', spreadsheet_annotation_path, nil, { :confirm => 'This deletes the Data file and all metadata. Are you sure?', :method => :delete },"") -%>
+      <%= link_to_remote(image('destroy'), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
+                 :method => :delete,   
+                 :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
+                 :loading => "Element.show('spinner');",
+                 :complete => "Element.hide('spinner');") -%>
+      <%= image_tag_for_key('edit', spreadsheet_annotation_path, nil, nil, "") -%>      
     <% end -%>
 
     <span style="vertical-align: middle"><%= annotation.cell_coverage %></span>    

@@ -53,7 +53,7 @@ class SpreadsheetAnnotationsController < ApplicationController
   end 
   
   def destroy
-    annotation = SpreadsheetAnnotation.find(params[:annotation_id])
+    annotation = SpreadsheetAnnotation.find(params[:id])
     data_file = annotation.data_file
             
     if annotation.destroy

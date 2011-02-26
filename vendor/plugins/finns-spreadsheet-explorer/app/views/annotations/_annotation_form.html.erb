@@ -1,4 +1,4 @@
-<div class="annotation_form" id="annotation_form" style="display:block">
+<div class="annotation_form" id="annotation_form" style="display:none">
     <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"create"},   
                    :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
                    :loading => "Element.show('spinner');",
