@@ -17,7 +17,8 @@
                  :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
                  :loading => "Element.show('spinner');",
                  :complete => "Element.hide('spinner');") -%>
-      <%= image_tag_for_key('edit', spreadsheet_annotation_path, nil, nil, "") -%>      
+      <%= image_tag_for_key('edit', edit_spreadsheet_annotation_path(annotation), nil, nil, "") -%>     
+      <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%> 
     <% end -%>
 
     <span style="vertical-align: middle"><%= annotation.cell_coverage %></span>    

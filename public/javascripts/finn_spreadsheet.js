@@ -157,7 +157,7 @@ function select_cells(startCol, startRow, endCol, endRow)
   selection = "";
   selection += (num2alpha(minCol).toString() + minRow.toString());
   
-  if(maxRow != minRow && maxCol != minCol)
+  if(maxRow != minRow || maxCol != minCol)
     selection += (":" + num2alpha(maxCol).toString() + maxRow.toString());
     
   $j('#selection_data').val(selection);
