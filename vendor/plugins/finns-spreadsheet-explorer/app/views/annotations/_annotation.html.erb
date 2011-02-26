@@ -1,7 +1,11 @@
 <div class="annotation" id="annotation_<%=annotation.id-%>">
   <div class="annotation_header">
-    <%= avatar(annotation.source.person, 24) -%> <%= link_to(annotation.source.person.name, annotation.source.person)%> - 
-    <%= time_ago_in_words(annotation.created_at) %> ago   
+    <%= avatar(annotation.source.person, 24) -%>
+    <div style="float: left">
+      <%= link_to(annotation.source.person.name, annotation.source.person)%><br/> 
+      <%= time_ago_in_words(annotation.created_at) %> ago
+    </div>
+    <br style="clear:both"/>
   </div>
   <div class="annotation_body">
     <%= annotation.content %>
