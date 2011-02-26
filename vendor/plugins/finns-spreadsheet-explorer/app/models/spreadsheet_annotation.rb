@@ -6,7 +6,7 @@ class SpreadsheetAnnotation < ActiveRecord::Base
              :polymorphic => true
   
   def cell_coverage
-    return SpreadsheetAnnotation.to_alpha(start_column)+start_row.to_s + (end_column.nil? ? "" : ":" + SpreadsheetAnnotation.to_alpha(end_column)+end_row.to_s)    
+    return SpreadsheetAnnotation.to_alpha(start_column)+start_row.to_s + ( (end_column == start_column && end_row == start_row) ? "" : ":" + SpreadsheetAnnotation.to_alpha(end_column)+end_row.to_s)    
   end
   
 private
