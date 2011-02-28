@@ -122,7 +122,8 @@ div#annotation_form
 }
 
 div.spreadsheet_layout {
-  width: 90%;
+  width: 70%;
+  min-width: 800px;
   margin-left: auto;
   margin-right: auto;
   padding: 1em;
