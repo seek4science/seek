@@ -23,6 +23,7 @@
 
   function submit_search(prefix) {
       $('form').following_action.value = "annotate";
+      
       if (prefix == "species") {
           $('reactions_search_box').value="";
           $('reactions_selected_symbol').value="";
@@ -52,17 +53,14 @@
   }
 </script>
 
-Param Keys = <%= @params_hash.keys.join(", ") -%>
-<br/>
-Species annotations keys = <%= @species_annotations.keys.join(", ") -%>
-<br/>
-Reaction annotation keys = <%= @reaction_annotations.keys.join(", ") -%>
-<br/>
-Search results keys = <%= @search_results.keys.join(", ") -%>
-<br/>
-Cached annotation keys = <%= @cached_annotations.keys.join(", ") -%>
-<br/>
+<% if @search_results  -%>
+    Search Term: <%= @search_results.search_term -%>
+    Selected Symbol = <%= @search_results.selected_symbol -%>
+    Results size = <%= @search_results.results.size -%>
+<% end -%>
+
 <input type="Button" value="Submit" onclick="submit_annotations();">
+
 <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <%= jws_annotator_hidden_fields @params_hash -%>
         <%= hidden_field_tag :following_action, "" -%>

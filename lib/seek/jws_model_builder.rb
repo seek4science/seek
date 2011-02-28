@@ -13,6 +13,15 @@ module Seek
     end
   end
 
+  class SearchResults
+    attr_accessor :search_term,:selected_symbol,:results
+
+    def initialize
+      @results = []
+    end
+
+  end
+
   class JWSModelBuilder
 
     include ModelTypeDetection
@@ -20,7 +29,7 @@ module Seek
     BASE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/Examples/"
     SIMULATE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/upload/uploadNEW.jsp"
     
-    MOCKED_RESPONSE=false
+    MOCKED_RESPONSE=true
 
     def is_supported? model
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))
@@ -216,10 +225,17 @@ module Seek
 
     def extract_search_results doc
       search_node=doc.find_first("//annotations/search")
-      search_results = {}
-      if search_node
-        search_term = search_node.find_first("parameter").content.strip
-        search_results[search_term]=extract_annotation_symbols "results",search_node
+      search_results = nil
+      if search_node && search_node.find_first("parameter[@id='nameToSearch']") && search_node.find_first("parameter[@id='selected']")
+        search_results = SearchResults.new
+
+        search_results.search_term = search_node.find_first("parameter[@id='nameToSearch']").content.strip
+
+        search_results.selected_symbol = search_node.find_first("parameter[@id='selected']").content.strip
+
+        search_symbols = extract_annotation_symbols("results",search_node)
+        results = search_symbols.keys.empty? ? [] : search_symbols[search_symbols.keys.first]
+        search_results.results=results
       end
       search_results
     end

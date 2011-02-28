@@ -185,16 +185,36 @@
     	 <annotations>
     	 <search>
     	     <parameter id="searchStatus">
-    	     <pre>urnSearchFeedback</pre>
+     	       successful search
     	     </parameter>
 	    	 <parameter id="nameToSearch">
-			 	<pre>urlEncode[$$nameToSearch]</pre>
+			   glucose
 	    	 </parameter>
-
+             <parameter id="selected">
+			   ACE
+	    	 </parameter>
          <results>
-	<script>var e=document.getElementById("results");e.style.display='none';</script>
+	      <symbol id="searchTerm" name="searchTerm" >
+            <triplet>
+                <URN>urn:miriam:kegg.compound:C00293</URN>
+                <ReadName>glucose</ReadName>
+                <Qualifier>is</Qualifier>
+            </triplet>
 
-</results>
+            <triplet>
+                <URN>urn:miriam:obo.chebi:CHEBI17234</URN>
+                <ReadName>glucose</ReadName>
+                <Qualifier>is</Qualifier>
+            </triplet>
+
+            <triplet>
+                <URN>urn:miriam:pubchem.substance:3587</URN>
+                <ReadName>glucose</ReadName>
+                <Qualifier>is</Qualifier>
+            </triplet>
+           </symbol>
+
+        </results>
          </search>
 
 		 <assigned>
