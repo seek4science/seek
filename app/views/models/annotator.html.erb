@@ -22,6 +22,8 @@
   function submit_annotations() {
       update_annotation_field("annotationsSpecies","species",annotations);
       update_annotation_field("annotationsReactions","reactions",annotations);
+      $('submit_annotations_button').disabled=true;
+      $('submit_annotations_button').value = "Submitting ...";
       $('form').submit();
   }
 
@@ -39,7 +41,9 @@
           $('species_selected_symbol').value="";
           $('nameToSearch').value=$('reactions_search_box').value;
       }
-
+      button=$(prefix+"_search_button");
+      button.disabled = true;
+      button.value = "Searching ...";
       submit_annotations();
   }
 
@@ -200,7 +204,7 @@
     Search Status = <%= @search_results.search_status -%><br/>
 <% end -%>
 
-<input type="Button" value="Submit" onclick="submit_annotations();">
+<input type="Button" id="submit_annotations_button" value="Submit" onclick="submit_annotations();">
 
 <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <%= jws_annotator_hidden_fields @params_hash -%>

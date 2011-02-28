@@ -9,6 +9,9 @@
 -%>
 
 <style>
+  .builder_box {
+      width: 55em;
+  }
   .builder_box table {
       width: 100%;
   }
@@ -60,7 +63,7 @@
               <%= text_field_tag "#{prefix}_search_box" -%>
               <input type="Button" value="Search" id='<%= prefix -%>_search_button' onclick="submit_search('<%= prefix -%>');">
             </p>
-            <div id='<%= prefix -%>_cached_annotations' style="max-height:20em;overflow-y:scroll;">
+            <div id='<%= prefix -%>_cached_annotations' style="max-height:30em;overflow-y:scroll;">
               
             </div>
             <div id='<%= prefix -%>_search_results' style="display:none;">
