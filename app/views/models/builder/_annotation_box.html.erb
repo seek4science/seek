@@ -38,7 +38,7 @@
                 <% annotation_hash.keys.each do |key| -%>
                     <tr>
                       <td>
-                        <%= link_to_function h(key),"#{prefix}_annotation_selected('#{key}')" -%>
+                        <%= link_to_function h(key),"annotation_selected('#{prefix}','#{key}')" -%>
                       </td>
                     </tr>
                 <% end -%>
@@ -51,10 +51,8 @@
               <span style="font-weight:bolder" id="<%= prefix -%>_selected_annotation"></span>
               <%= hidden_field_tag "#{prefix}_selected_symbol" -%>
             </p>
-            <p>
-              <table id="<%= prefix -%>_assigned_annotations">
-
-              </table>
+            <p id="<%= prefix -%>_assigned_annotations">
+              
             </p>
             <p id="show_annotations_panel">
               <hr>
@@ -62,11 +60,9 @@
               <%= text_field_tag "#{prefix}_search_box" -%>
               <input type="Button" value="Search" id='<%= prefix -%>_search_button' onclick="submit_search('<%= prefix -%>');">
             </p>
-            <p>
-                <table id="<%= prefix -%>_search_results">
-                  
-                </table>
-            </p>
+            <div id='<%= prefix -%>_cached_annotations'>
+              
+            </div>
           </td>
         </tr>
         </tbody>
@@ -92,83 +88,22 @@
             triplet = {"urn" : '<%= triplet.urn -%>',"full_name" : '<%= escape_javascript(triplet.full_name) -%>' , "qualifier" : '<%= triplet.qualifier -%>' };
             triplets.push(triplet);
         <% end -%>
-    cached_annotations['<%= key -%>'] = triplets;
+        store_cached_annotations('<%= prefix -%>','<%= key -%>',triplets);
+        draw_cached_annotation_table('<%= prefix -%>','<%= key -%>',triplets);
     <% end -%>
   <% end -%>
 
-  var <%= prefix -%>_annotations = new Array();
   <% annotation_hash.keys.each do |key| -%>
-
     triplets = new Array();
     <% annotation_hash[key].each do |triplet| -%>
         triplet = {"urn" : '<%= triplet.urn -%>',"full_name" : '<%= escape_javascript(triplet.full_name) -%>' , "qualifier" : '<%= triplet.qualifier -%>' };
         triplets.push(triplet);
     <% end -%>
-   <%= prefix -%>_annotations['<%= key -%>'] = triplets;
+    store_annotations('<%= prefix -%>','<%= key -%>',triplets);
   <% end -%>
 
-  function <%= prefix -%>_display_cached_search_results(key) {
-      triplets = cached_annotations[key];
-      table = $('<%= prefix -%>_search_results');
-      table.innerHTML = "";
-      if (triplets != undefined) {
-          for (var i=0;i<triplets.length;i++) {
-             trip = triplets[i];
-             row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
-             js="javascript:<%= prefix -%>_add_cached_annotation('"+key+"',"+i+");";
-             row = row + "<td><a href=\""+js+"\">Add</a></td></tr>";
-             table.innerHTML=table.innerHTML + row;
-          }
-      }
-  }
-
-  function <%= prefix -%>_display_assigned_annotations(key) {
-    triplets = <%= prefix -%>_annotations[key];
-    table = $('<%= prefix -%>_assigned_annotations');
-    table.innerHTML = "";
-    if (triplets != undefined) {
-        for (var i=0;i<triplets.length;i++) {
-            trip = triplets[i];
-            row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
-            js="javascript:<%= prefix -%>_drop_annotation('"+key+"',"+i+");";
-            row = row + "<td><a href=\""+js+"\">Drop</a></td></tr>";
-            table.innerHTML=table.innerHTML + row;
-        }
-    }
-  }
-
-  function <%= prefix -%>_annotation_selected(key) {
-    <%= prefix -%>_display_assigned_annotations(key);
-    <%= prefix -%>_display_cached_search_results(key);
-    $('<%= prefix -%>_selected_annotation').innerHTML = key;
-    $('<%= prefix -%>_search_box').value = key;
-    $('<%= prefix -%>_selected_symbol').value = key;
-  }
-
-  function <%= prefix -%>_drop_annotation(key,index) {
-    <%= prefix -%>_annotations[key].splice(index,1);
-    <%= prefix -%>_annotation_selected(key);
-  }
-
-  function <%= prefix -%>_add_cached_annotation(key,index) {
-      triplet = cached_annotations[key][index];
-      found=false;
-      annotations = <%= prefix -%>_annotations[key];
-      for (var i=0;i<annotations.length;i++) {
-          if (annotations[i].urn == triplet.urn) {
-              alert("That annotation already exists for '"+key+"'");
-              found = true;
-              break;
-          }
-      }
-      if (!found) {
-        annotations.push(triplet);
-        <%= prefix -%>_annotation_selected(key);
-      }
-  }
-
   <% unless annotation_hash.empty? -%>
-  <%= prefix -%>_annotation_selected('PEP');
+    annotation_selected('<%= prefix -%>','<%= annotation_hash.keys.first -%>');
   <% end -%>
 
 </script>

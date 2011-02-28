@@ -15,10 +15,88 @@
 </h1>
 
 <script type="text/javascript">
+  var annotations = new Array();
+  var cached_annotations = new Array();
+
   function submit_annotations() {
       update_annotation_field("annotationsSpecies",species_annotations);
       update_annotation_field("annotationsReactions",reactions_annotations);
       $('form').submit();
+  }
+
+  function draw_cached_annotation_table(prefix,key,triplets) {
+      parent_element = $(prefix+"_cached_annotations");
+      table_id=encodeURI(key)+"_table";
+      table = "<table id='"+table_id+"' style='display:block;'>"
+      for (var i=0;i<triplets.length;i++) {
+          trip = triplets[i];
+              row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
+              js="javascript:add_cached_annotation('"+prefix+"'.'"+key+"',"+i+");";
+
+              row = row + "<td><a href=\""+js+"\">Drop</a></td></tr>";
+              table=table+row;
+      }
+      parent_element.innerHTML=parent_element.innerHTML+table;
+  }
+
+  function draw_assigned_annotation_table(prefix,key) {
+      if (annotations[prefix]!=undefined && annotations[prefix][key] != undefined) {
+          triplets = annotations[prefix][key];
+          table="<table>";
+          for (var i=0;i<triplets.length;i++) {
+              trip = triplets[i];
+              row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
+              js="javascript:drop_annotation('"+prefix+"','"+key+"',"+i+");"
+              row = row + "<td><a href=\""+js+"\">Drop</a></td></tr>";
+              table=table+row;
+          }
+          table=table+"</table>";
+          $(prefix+"_assigned_annotations").innerHTML = table;
+      }
+  }
+
+  function drop_annotation(prefix,key,index) {
+      if (annotations[prefix]!=undefined && annotations[prefix][key] != undefined) {
+        annotations[prefix][key].splice(index,1);
+        draw_assigned_annotation_table(prefix,key);
+      }      
+  }
+
+  function store_annotations(prefix,key,triplets) {
+      if (annotations[prefix] == undefined) {
+          annotations[prefix] = new Array();
+      }
+      annotations[prefix][key] = triplets;
+  }
+
+  function store_cached_annotations(prefix,key,triplets) {
+      if (cached_annotations[prefix] == undefined) {
+          cached_annotations[prefix] = new Array();
+      }
+      cached_annotations[prefix][key] = triplets;
+  }
+
+  function display_cached_annotation_table(prefix,key) {
+      for (var k in cached_annotations[prefix]) {
+          table_id=encodeURI(k)+"_table";
+          el=$(table_id);
+          if (el != undefined) {
+              if (k == key) {
+                 el.style.display="block";
+              }
+              else {
+                  el.style.display="none";
+              }
+          }
+      }
+  }
+
+  function annotation_selected(prefix,key) {
+    draw_assigned_annotation_table(prefix,key);
+    display_cached_annotation_table(prefix,key);
+    $(prefix+'_selected_annotation').innerHTML = key;
+    $(prefix+'_search_box').value = key;
+    $(prefix+'_selected_symbol').value = key;
   }
 
   function submit_search(prefix) {
