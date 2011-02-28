@@ -165,7 +165,18 @@ module Seek
 
     def annotate params
       return process_annotator_response_body(dummy_annotator_response_xml) if MOCKED_RESPONSE
-      required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel", ""]
+
+      param_translation={"species_selected_symbol"=>"selectedSymbol",
+                         "species_search_box"=>"urnsearchbox",
+                         "reaction_selected_symbol"=>"selectedReactionSymbol",
+                         "reaction_search_box"=>"urnsearchboxReaction"}
+
+      param_translation.keys.each do |key|
+        new_key = param_translation[key]
+        params[new_key]=params[key]
+      end
+
+      required_params=["nameToSearch","urnsearchbox","selectedSymbol","urnsearchboxReaction","selectedReactionSymbol","assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel", ""]
       url = annotator_url
       form_data = {}
       required_params.each do |p|
@@ -183,6 +194,8 @@ module Seek
     end
 
     def process_annotator_response_body body
+
+      puts body
       
       parser = LibXML::XML::Parser.string(body, :encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse

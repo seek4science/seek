@@ -86,7 +86,7 @@ class ModelsController < ApplicationController
   def submit_to_jws
     following_action=params.delete("following_action")    
 
-    if following_action == "annotate"
+    if following_action == "annotate" 
       @params_hash,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
     else
       @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params

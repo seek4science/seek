@@ -21,17 +21,34 @@
       $('form').submit();
   }
 
+  function submit_search(prefix) {
+      $('form').following_action.value = "annotate";
+      if (prefix == "species") {
+          $('reactions_search_box').value="";
+          $('reactions_selected_symbol').value="";
+          $('nameToSearch').value=$('species_search_box').value;
+      }
+
+      if (prefix == "reactions") {
+          $('species_search_box').value="";
+          $('species_selected_symbol').value="";
+          $('nameToSearch').value=$('reactions_search_box').value;
+      }
+
+      $('form').submit();
+  }
+
   function update_annotation_field(element_id,annotations) {
+      text=""
       for (var key in annotations) {
-          text=""
           triplets=annotations[key]
           for (var i=0;i<triplets.length;i++) {
               if (triplets[i]!=undefined) {
                 text=text+key+" "+triplets[i].urn+" "+triplets[i].full_name+"\n"
               }
           }
-          $(element_id).innerHTML=text;
       }
+      $(element_id).value=text;
   }
 </script>
 
@@ -49,8 +66,11 @@ Cached annotation keys = <%= @cached_annotations.keys.join(", ") -%>
 <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <%= jws_annotator_hidden_fields @params_hash -%>
         <%= hidden_field_tag :following_action, "" -%>
-<% end -%>
+        <%= hidden_field_tag :nameToSearch, "" -%>
+
 
 <%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"species",:title=>"Annotations for species",:type=>"species",:cached_annotations=>@cached_annotations, :annotation_hash=>@species_annotations} -%>
 
 <%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"reactions",:title=>"Annotations for processes",:type=>"reactions", :annotation_hash=>@reaction_annotations} -%>
+
+<% end -%>
