@@ -63,6 +63,7 @@ module ModelsHelper
     required_params.collect do |param|
       value = params_hash[param] || ""
       html=hidden_field_tag(param, "")
+      #using javascript to decode the escaped strings (like \\n) as the URI.decode in ruby doesn't do this.
       html+="<script type='text/javascript'>$('#{param}').value=decodeURI('#{value}');</script>".html_safe
       html
     end
