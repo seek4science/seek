@@ -62,7 +62,13 @@ module ModelsHelper
     required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]
     required_params.collect do |param|
       value = params_hash[param] || ""
-      text_area_tag(param, value.html_safe).html_safe+"<br/>".html_safe
+#      value=value.split("\\n").join("\n")
+#      value=value.split("\\r").join("\r")
+#      value=value.split("\\t").join("\t")
+      html=text_area_tag(param, "")
+      html+="<br/>".html_safe
+      html+="<script type='text/javascript'>$('#{param}').value=unescape('#{value}');</script>".html_safe
+      html
     end
   end
   

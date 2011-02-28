@@ -183,9 +183,6 @@ module Seek
     end
 
     def process_annotator_response_body body
-      puts "XXXXXXXXXXXXXXXXXXXXXX"
-      puts body
-      puts "XXXXXXXXXXXXXXXXXXXXXX"
       
       parser = LibXML::XML::Parser.string(body, :encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse
