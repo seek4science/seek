@@ -1,0 +1,12 @@
+.builder_box {
+    width: 58em;
+    padding: 3px;
+}
+
+.builder_box table {
+    width: 100%;
+}
+
+.builder_box table.annotation_keys {
+    width: 6em;
+}
