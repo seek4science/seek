@@ -62,8 +62,7 @@ module ModelsHelper
     required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]
     required_params.collect do |param|
       value = params_hash[param] || ""
-      html=text_area_tag(param, "")
-      html+="<br/>".html_safe
+      html=hidden_field_tag(param, "")
       html+="<script type='text/javascript'>$('#{param}').value=decodeURI('#{value}');</script>".html_safe
       html
     end
