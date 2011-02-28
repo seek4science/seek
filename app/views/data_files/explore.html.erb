@@ -1,6 +1,11 @@
 <%= stylesheet_link_tag('finn_spreadsheet') %>
 <%= javascript_include_tag 'jquery-1.4.3.js', 'finn_spreadsheet.js' %>
 
+<ul class="sectionIcons">
+    <li>
+        <%= image_tag_for_key('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%>
+    </li>
+</ul>
 
 <h1>Exploring Data File</h1>
 
