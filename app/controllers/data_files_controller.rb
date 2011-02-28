@@ -228,7 +228,7 @@ class DataFilesController < ApplicationController
       @spreadsheet = parse_spreadsheet_xml(xml)
       @spreadsheet.annotations = @data_file.spreadsheet_annotations
       respond_to do |format|
-        format.html { render :layout=>"no_sidebar" }
+        format.html { render :layout=>"minimal" }
       end
     else
      respond_to do |format|

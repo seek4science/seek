@@ -115,8 +115,17 @@ div.annotation_footer
 
 div#annotation_form
 {
-  width: 50%;
+  width: 30em;
   border: 1px solid #CCC;
   padding: 0.5em;
   margin: 0.5em;
+}
+
+div.spreadsheet_layout {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 1em;
+  background-color: #FFF;
+  text-align: left;
 }

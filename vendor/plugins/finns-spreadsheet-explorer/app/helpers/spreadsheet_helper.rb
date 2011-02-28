@@ -18,7 +18,7 @@ module SpreadsheetHelper
     workbook.sheets.each do |sheet|
       max_col = sheet.last_col
       max_row = sheet.last_row      
-      sheet_html = "<div #{"style=\"display:none\"" unless first_sheet} class=\"sheet\" id=\"spreadsheet_#{sheet.name}\">"
+      sheet_html = "<div #{"style=\"display:none\"" unless first_sheet} class=\"sheet #{"active_sheet" if first_sheet}\" id=\"spreadsheet_#{sheet.name}\">"
       sheet_html << "<table class=\"sheet #{"active_sheet" if first_sheet}\" cellspacing=\"1\">"
       
       #Alphabetical column headers
