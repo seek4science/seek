@@ -17,6 +17,7 @@
 <script type="text/javascript">
   var annotations = new Array();
   var cached_annotations = new Array();
+  var search_results = new Array();
 
   function submit_annotations() {
       update_annotation_field("annotationsSpecies",species_annotations);
@@ -27,13 +28,13 @@
   function draw_cached_annotation_table(prefix,key,triplets) {
       parent_element = $(prefix+"_cached_annotations");
       table_id=encodeURI(key)+"_table";
-      table = "<table id='"+table_id+"' style='display:block;'>"
+      table = "<table id='"+table_id+"' style='display:none;'>"
       for (var i=0;i<triplets.length;i++) {
           trip = triplets[i];
               row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
-              js="javascript:add_cached_annotation('"+prefix+"'.'"+key+"',"+i+");";
+              js="javascript:add_cached_annotation('"+prefix+"','"+key+"',"+i+");";
 
-              row = row + "<td><a href=\""+js+"\">Drop</a></td></tr>";
+              row = row + "<td><a href=\""+js+"\">Add</a></td></tr>";
               table=table+row;
       }
       parent_element.innerHTML=parent_element.innerHTML+table;
@@ -76,23 +77,81 @@
       cached_annotations[prefix][key] = triplets;
   }
 
+  function store_search_results(triplets) {
+      search_results = triplets;
+  }
+
   function display_cached_annotation_table(prefix,key) {
+      hide_all_cached_annotation_tables(prefix);
+      table_id=encodeURI(key)+"_table";
+      el=$(table_id);
+      if (el != undefined) {
+        el.style.display="block";
+      }
+  }
+
+  function hide_all_cached_annotation_tables(prefix) {
       for (var k in cached_annotations[prefix]) {
           table_id=encodeURI(k)+"_table";
           el=$(table_id);
           if (el != undefined) {
-              if (k == key) {
-                 el.style.display="block";
-              }
-              else {
-                  el.style.display="none";
-              }
+            el.style.display="none";
           }
       }
   }
 
+  function add_search_result(prefix,key,index) {
+      if (annotations[prefix] == undefined) {
+          annotations[prefix]=new Array();
+      }
+      if (annotations[prefix][key] == undefined) {
+          annotations[prefix][key] = new Array();
+      }
+      triplet = search_results[index];
+      annotations[prefix][key].push(triplet);
+      draw_assigned_annotation_table(prefix,key);
+  }
+
+  function add_cached_annotation(prefix,key,index) {
+      if (annotations[prefix] == undefined) {
+          annotations[prefix]=new Array();
+      }
+      if (annotations[prefix][key] == undefined) {
+          annotations[prefix][key] = new Array();
+      }
+      triplet = cached_annotations[prefix][key][index];
+      annotations[prefix][key].push(triplet);
+      draw_assigned_annotation_table(prefix,key);
+  }
+
+  function display_search_results(prefix,key,search_term,triplets) {
+      annotation_selected(prefix,key);
+      hide_all_cached_annotation_tables(prefix);
+      parent_element = $(prefix+"_search_results");
+      table_id=encodeURI(key)+"_table";
+      table = "<table>"
+      for (var i=0;i<triplets.length;i++) {
+          trip = triplets[i];
+              row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
+              js="javascript:add_search_result('"+prefix+"','"+key+"',"+i+");";
+
+              row = row + "<td><a href=\""+js+"\">Add</a></td></tr>";
+              table=table+row;
+      }
+      $(prefix+"_search_box").value=search_term;
+      parent_element.innerHTML=table;
+      parent_element.style.display = "block";
+  }
+
+  function hide_search_results(prefix) {
+      parent_element = $(prefix+"_search_results");
+      parent_element.style.display="none";
+
+  }
+
   function annotation_selected(prefix,key) {
     draw_assigned_annotation_table(prefix,key);
+    hide_search_results(prefix);
     display_cached_annotation_table(prefix,key);
     $(prefix+'_selected_annotation').innerHTML = key;
     $(prefix+'_search_box').value = key;
@@ -150,3 +209,18 @@
 <%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"reactions",:title=>"Annotations for processes",:type=>"reactions", :annotation_hash=>@reaction_annotations} -%>
 
 <% end -%>
+<script type="text/javascript">
+<% if @search_results -%>
+<%
+   prefix = @species_annotations.keys.include?(@search_results.selected_symbol) ? "species" : "reactions"
+-%>
+   triplets = new Array();
+    <% @search_results.results.each do |triplet| -%>
+        triplet = {"urn" : '<%= triplet.urn -%>',"full_name" : '<%= escape_javascript(triplet.full_name) -%>' , "qualifier" : '<%= triplet.qualifier -%>' };
+        triplets.push(triplet);
+    <% end -%>
+    store_search_results(triplets);
+    display_search_results('<%= prefix -%>','<%= @search_results.selected_symbol -%>','<%= @search_results.search_term -%>',triplets);
+
+<% end -%>
+</script>

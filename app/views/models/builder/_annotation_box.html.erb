@@ -35,7 +35,7 @@
           <td valign="top">
             <table border="1" class="annotation_keys">
               <tbody>
-                <% annotation_hash.keys.each do |key| -%>
+                <% annotation_hash.keys.sort.each do |key| -%>
                     <tr>
                       <td>
                         <%= link_to_function h(key),"annotation_selected('#{prefix}','#{key}')" -%>
@@ -60,8 +60,11 @@
               <%= text_field_tag "#{prefix}_search_box" -%>
               <input type="Button" value="Search" id='<%= prefix -%>_search_button' onclick="submit_search('<%= prefix -%>');">
             </p>
-            <div id='<%= prefix -%>_cached_annotations'>
+            <div id='<%= prefix -%>_cached_annotations' style="max-height:20em;overflow-y:scroll;">
               
+            </div>
+            <div id='<%= prefix -%>_search_results' style="display:none;">
+
             </div>
           </td>
         </tr>
@@ -102,8 +105,12 @@
     store_annotations('<%= prefix -%>','<%= key -%>',triplets);
   <% end -%>
 
+
   <% unless annotation_hash.empty? -%>
-    annotation_selected('<%= prefix -%>','<%= annotation_hash.keys.first -%>');
+      annotation_selected('<%= prefix -%>','<%= annotation_hash.keys.first -%>');
   <% end -%>
+
+
+
 
 </script>
