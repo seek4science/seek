@@ -1,15 +1,22 @@
-<div class="annotation_form" id="annotation_form" style="display:none">
+<div class="annotation_form" id="annotation_form" style="">
     <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"create"},   
                    :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
                    :loading => "Element.show('spinner');",
                    :complete => "Element.hide('spinner');") do %>
                    
-    <%= hidden_field_tag :data_file_id, @data_file.id %>
-    
+    <%= hidden_field_tag :data_file_id, @data_file.id %>    
     <%= hidden_field_tag :sheet_id, "0" %>
-    <%= hidden_field_tag :cell_coverage %>
     
-    <%= text_area_tag :content %>                   
+    <p>
+      Cell Range:<br/>
+      <%= text_field_tag :cell_coverage %>
+    </p>
+    
+    <p>
+      Content:<br/>
+      <%= text_area_tag :content %>
+    </p>
+                       
     <%= submit_tag 'Add Annotation',:id=>"fetch_button" %>
   <% end %>
   <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>

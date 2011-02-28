@@ -112,3 +112,11 @@ div.annotation_footer
   text-align: right;  
   color: #79B; 
 }
+
+div#annotation_form
+{
+  width: 50%;
+  border: 1px solid #CCC;
+  padding: 0.5em;
+  margin: 0.5em;
+}

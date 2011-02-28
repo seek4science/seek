@@ -11,23 +11,29 @@ $j(document).ready(function ($) {
       //Select the tab
       $(this).addClass('selected_tab');
       
-      //Disable old table
+      //Disable old table + sheet
       $('.active_sheet').removeClass('active_sheet');
       
       //Hide sheets
       $('div.sheet').hide();
       
-      //Show the div
-      $("#spreadsheet_" + $(this).html()).show();
+      //Show the div + set sheet active
+      $("div#spreadsheet_" + $(this).html()).show().addClass('active_sheet');
+      
+      //Reset scrollbars
+      $("div#spreadsheet_" + $(this).html()).scrollTop(0).scrollLeft(0);
       
       //Set table active
-      $("#spreadsheet_" + $(this).html() + " table").addClass('active_sheet');
-      
+      $("div#spreadsheet_" + $(this).html() + " table").addClass('active_sheet');
+
       //Deselect any cells
       $("table.active_sheet td.selected_cell").removeClass("selected_cell");
       
       //Clear selection box
       $('#selection_data').val("");
+      
+      //Clear cell info box
+      $('#cell_info').val("");      
       
       //Record current sheet in annotation form
       $('input#sheet_id').attr("value",$(this).attr("index"));
@@ -43,8 +49,7 @@ $j(document).ready(function ($) {
   ;
   
   
-  //Selecting cells
-    
+  //Selecting cells    
   var isMouseDown = false,
     startRow,
     startCol,
@@ -89,10 +94,17 @@ $j(document).ready(function ($) {
         //Hide annotations
         $('div.annotation').hide();        
       }
-    });
+    })
+  ;
+    
+  $('input#selection_data')
+    .keyup(function(e) {
+      if(e.keyCode == 13) {
+        select_range($(this).val());   
+      }
+    })
+  ;
 });
-
-
 
 function num2alpha(col)
 {
@@ -110,6 +122,14 @@ function num2alpha(col)
 }
 
 
+function alpha2num(col)
+{
+  var result = 0;
+  for(var i = col.length-1; i >= 0; i--){
+    result += Math.pow(26,((col.length - 1) - i)) * (String.charCodeAt(col.charAt(i)) - 64);
+  }
+  return result;
+}
 
 function show_annotation(id,x,y)
 {
@@ -118,7 +138,38 @@ function show_annotation(id,x,y)
   $j("#annotation_" + id).show();  
 }
 
+function select_range(range)
+{
+  //Split into component parts (top-left cell, bottom-right cell of a rectangle range)
+  var array = range.split(":",2);
+  
+  //Get a numeric value for the row and column of each component  
+  var startCol = alpha2num(array[0].replace(/[0-9]+/,""));
+  var startRow = parseInt(array[0].replace(/[A-Z]+/,""));
+  var endCol;
+  var endRow;
+  
+  //If only a single cell specified...
+  if(array[1] == undefined) {
+    endCol = startCol;
+    endRow = startRow;
+  }
+  else {
+    endCol = alpha2num(array[1].replace(/[0-9]+/,""));
+    endRow = parseInt(array[1].replace(/[A-Z]+/,""));
+  }
+  
 
+  if(startRow && startCol && endRow && endCol)
+    select_cells(startCol, startRow, endCol, endRow);
+    
+  //Scroll to selected cells
+  row = $j("table.active_sheet tr").slice(startRow,endRow+1).first();
+  cell = row.children("td.cell").slice(startCol-1,endCol).first();
+  
+  $j('div.active_sheet').scrollTop(row.position().top + $j('div.active_sheet').scrollTop() - 500);
+  $j('div.active_sheet').scrollLeft(cell.position().left + $j('div.active_sheet').scrollLeft() - 500);    
+}
 
 function select_cells(startCol, startRow, endCol, endRow)
 {
@@ -126,7 +177,7 @@ function select_cells(startCol, startRow, endCol, endRow)
   var minCol = startCol;
   var maxRow = endRow;
   var maxCol = endCol;
-  
+   
   //To ensure minRow/minCol is always less than maxRow/maxCol
   // no matter which direction the box is dragged
   if(endRow <= startRow) {
@@ -137,7 +188,7 @@ function select_cells(startCol, startRow, endCol, endRow)
     minCol = endCol;
     maxCol = startCol;
   }
- 
+
   //Clear currently selected cells
   $j("table.active_sheet .selected_cell").removeClass("selected_cell");
   $j("table.active_sheet .selected_heading").removeClass("selected_heading");
