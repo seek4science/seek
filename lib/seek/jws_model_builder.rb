@@ -14,7 +14,7 @@ module Seek
   end
 
   class SearchResults
-    attr_accessor :search_term,:selected_symbol,:results
+    attr_accessor :search_term,:selected_symbol,:results, :search_status, :error_code
 
     def initialize
       @results = []
@@ -29,7 +29,7 @@ module Seek
     BASE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/Examples/"
     SIMULATE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/upload/uploadNEW.jsp"
     
-    MOCKED_RESPONSE=true
+    MOCKED_RESPONSE=false
 
     def is_supported? model
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))
@@ -177,8 +177,8 @@ module Seek
 
       param_translation={"species_selected_symbol"=>"selectedSymbol",
                          "species_search_box"=>"urnsearchbox",
-                         "reaction_selected_symbol"=>"selectedReactionSymbol",
-                         "reaction_search_box"=>"urnsearchboxReaction"}
+                         "reactions_selected_symbol"=>"selectedReactionSymbol",
+                         "reactions_search_box"=>"urnsearchboxReaction"}
 
       param_translation.keys.each do |key|
         new_key = param_translation[key]
@@ -232,6 +232,10 @@ module Seek
         search_results.search_term = search_node.find_first("parameter[@id='nameToSearch']").content.strip
 
         search_results.selected_symbol = search_node.find_first("parameter[@id='selected']").content.strip
+
+        search_results.error_code = search_node.find_first("parameter[@id='errorCode']").content.strip
+
+        search_results.search_status = search_node.find_first("parameter[@id='searchStatus']").content.strip
 
         search_symbols = extract_annotation_symbols("results",search_node)
         results = search_symbols.keys.empty? ? [] : search_symbols[search_symbols.keys.first]

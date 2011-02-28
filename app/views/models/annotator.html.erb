@@ -20,9 +20,27 @@
   var search_results = new Array();
 
   function submit_annotations() {
-      update_annotation_field("annotationsSpecies",species_annotations);
-      update_annotation_field("annotationsReactions",reactions_annotations);
+      update_annotation_field("annotationsSpecies","species",annotations);
+      update_annotation_field("annotationsReactions","reactions",annotations);
       $('form').submit();
+  }
+
+  function submit_search(prefix) {
+      $('form').following_action.value = "annotate";
+
+      if (prefix == "species") {
+          $('reactions_search_box').value="";
+          $('reactions_selected_symbol').value="";
+          $('nameToSearch').value=$('species_search_box').value;
+      }
+
+      if (prefix == "reactions") {
+          $('species_search_box').value="";
+          $('species_selected_symbol').value="";
+          $('nameToSearch').value=$('reactions_search_box').value;
+      }
+
+      submit_annotations();
   }
 
   function draw_cached_annotation_table(prefix,key,triplets) {
@@ -158,28 +176,12 @@
     $(prefix+'_selected_symbol').value = key;
   }
 
-  function submit_search(prefix) {
-      $('form').following_action.value = "annotate";
-      
-      if (prefix == "species") {
-          $('reactions_search_box').value="";
-          $('reactions_selected_symbol').value="";
-          $('nameToSearch').value=$('species_search_box').value;
-      }
 
-      if (prefix == "reactions") {
-          $('species_search_box').value="";
-          $('species_selected_symbol').value="";
-          $('nameToSearch').value=$('reactions_search_box').value;
-      }
 
-      $('form').submit();
-  }
-
-  function update_annotation_field(element_id,annotations) {
+  function update_annotation_field(element_id,prefix,annotations) {
       text=""
-      for (var key in annotations) {
-          triplets=annotations[key]
+      for (var key in annotations[prefix]) {
+          triplets=annotations[prefix][key]
           for (var i=0;i<triplets.length;i++) {
               if (triplets[i]!=undefined) {
                 text=text+key+" "+triplets[i].urn+" "+triplets[i].full_name+"\n"
@@ -191,9 +193,11 @@
 </script>
 
 <% if @search_results  -%>
-    Search Term: <%= @search_results.search_term -%>
-    Selected Symbol = <%= @search_results.selected_symbol -%>
-    Results size = <%= @search_results.results.size -%>
+    Search Term: <%= @search_results.search_term -%><br/>
+    Selected Symbol = <%= @search_results.selected_symbol -%><br/>
+    Results size = <%= @search_results.results.size -%><br/>
+    Error code = <%= @search_results.error_code -%><br/>
+    Search Status = <%= @search_results.search_status -%><br/>
 <% end -%>
 
 <input type="Button" value="Submit" onclick="submit_annotations();">
