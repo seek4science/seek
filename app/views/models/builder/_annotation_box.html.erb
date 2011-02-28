@@ -109,12 +109,14 @@
       triplets = cached_annotations[key];
       table = $('<%= prefix -%>_search_results');
       table.innerHTML = "";
-      for (var i=0;i<triplets.length;i++) {
-         trip = triplets[i];
-         row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
-         js="javascript:<%= prefix -%>_add_cached_annotation('"+key+"',"+i+");";
-         row = row + "<td><a href=\""+js+"\">Add</a></td></tr>";
-         table.innerHTML=table.innerHTML + row;
+      if (triplets != undefined) {
+          for (var i=0;i<triplets.length;i++) {
+             trip = triplets[i];
+             row = "<tr><td>"+trip.urn+"</td><td>" + trip.full_name +"</td>";
+             js="javascript:<%= prefix -%>_add_cached_annotation('"+key+"',"+i+");";
+             row = row + "<td><a href=\""+js+"\">Add</a></td></tr>";
+             table.innerHTML=table.innerHTML + row;
+          }
       }
   }
 
