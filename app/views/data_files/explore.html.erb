@@ -22,10 +22,5 @@
   </div>
   
   <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
-  <style type="text/css">
-    td.selected_cell {
-      border-color: #00F;
-    }
-  </style>
   <%= generate_spreadsheet_html(@spreadsheet) %>   
 </div>

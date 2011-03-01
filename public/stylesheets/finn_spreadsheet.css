@@ -1,6 +1,6 @@
 table.sheet {
   border: 1px solid #CCC;
-  background-color: #DDD;
+  background-color: #69F;
   table-layout: fixed;
   width: 1px;
 }
@@ -20,8 +20,8 @@ th.col_heading, td.row_heading {
 }
 
 th.selected_heading, td.selected_heading{
-  border: 1px outset #9CF;
-  background: #9CF;
+  border: 1px outset #69F;
+  background: #69F;
   text-align: center;
 }
 
@@ -32,7 +32,8 @@ td.cell {
 }
 
 td.selected_cell {
-  background: #9CF;
+  opacity: 0.5;
+  filter:alpha(opacity=50);
 }
 
 td.primary_selected_cell {
