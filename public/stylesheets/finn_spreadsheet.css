@@ -86,7 +86,7 @@ div.annotation
   width:20em;
 }
 
-div.annotation_body
+div.annotation_content
 {
   border-top: 1px dashed #AAA;
   border-bottom: 1px dashed #AAA;
@@ -113,7 +113,7 @@ div.annotation_footer
   color: #79B; 
 }
 
-div#annotation_form
+div.annotation_form
 {
   width: 30em;
   border: 1px solid #CCC;
@@ -129,4 +129,26 @@ div.spreadsheet_layout {
   padding: 1em;
   background-color: #FFF;
   text-align: left;
+}
+
+div.annotation textarea[readonly]
+{
+  background-color: #FFF;
+  border: none;
+  width: 100%;
+}
+
+div.annotation textarea
+{
+  background-color: #FFD;
+  border: 1px dashed #F99;
+  width: 100%;
+}
+
+div#annotation_controls
+{
+  text-align: center;
+  margin: 0.5em; 
+  border-top: 1px dashed #AAA; 
+  padding: 0.5em;
 }

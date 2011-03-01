@@ -214,5 +214,17 @@ function select_cells(startCol, startRow, endCol, endRow)
   $j('#selection_data').val(selection);
   
   //Update cell coverage in annotation form
-  $j('input#cell_coverage').attr("value",selection);
+  $j('input#annotation_cell_coverage').attr("value",selection);
 }
+
+function toggle_annotation_form(annotation_id)
+{
+  var elem = 'div#annotation_' + annotation_id
+  var content = $j(elem + ' textarea#annotation_content');
+  if(content.attr("readonly"))
+    content.removeAttr("readonly");
+  else
+    content.attr("readonly","readonly");
+  $j(elem + ' #annotation_controls').toggle();
+}
+

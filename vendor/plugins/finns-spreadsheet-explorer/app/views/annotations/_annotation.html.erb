@@ -1,4 +1,10 @@
 <div class="annotation" id="annotation_<%=annotation.id-%>">
+  <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"update", :id => annotation.id}, 
+                 :method => :put,  
+                 :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
+                 :loading => "Element.show('spinner');",
+                 :complete => "Element.hide('spinner');", :html => {:id => "annotation_form"}) do %>
+      
   <div class="annotation_header">
     <%= avatar(annotation.source.person, 24) -%>
     <div style="float: left">
@@ -7,9 +13,9 @@
     </div>
     <br style="clear:both"/>
   </div>
-  <div class="annotation_body">
-    <%= annotation.content %>
-  </div>
+  <div class="annotation_content">
+    <%= text_area_tag :annotation_content, annotation.content, :readonly => true %>
+  </div>  
   <div class="annotation_footer">
     <% if annotation.source == current_user %>
       <%= link_to_remote(image('destroy'), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
@@ -17,10 +23,14 @@
                  :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
                  :loading => "Element.show('spinner');",
                  :complete => "Element.hide('spinner');") -%>
-      <%= image_tag_for_key('edit', edit_spreadsheet_annotation_path(annotation), nil, nil, "") -%>     
+      <%= link_to(image('edit'), '#', :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") -%>     
       <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%> 
     <% end -%>
 
-    <span style="vertical-align: middle"><%= annotation.cell_coverage %></span>    
+    <span style="vertical-align: middle"><%= annotation.cell_coverage -%></span>
+    <div id="annotation_controls" style="display:none">
+      <%= submit_tag 'Save Changes',:id=>"fetch_button" %> or <%= link_to "Cancel", "", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;"-%>
+    </div>
   </div>
+  <% end %>
 </div>
