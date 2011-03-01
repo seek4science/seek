@@ -226,8 +226,8 @@ ActiveRecord::Schema.define(:version => 20110218163214) do
   end
 
   create_table "events_publications", :id => false, :force => true do |t|
-    t.integer "publication_id"
-    t.integer "event_id"
+    t.integer "event_id",       :null => false
+    t.integer "publication_id", :null => false
   end
 
   create_table "experimental_conditions", :force => true do |t|
