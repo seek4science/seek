@@ -29,7 +29,7 @@ module Seek
     BASE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/Examples/"
     SIMULATE_URL = "#{JWS_ONLINE_ROOT}/webMathematica/upload/uploadNEW.jsp"
     
-    MOCKED_RESPONSE=true
+    MOCKED_RESPONSE=false
 
     def is_supported? model
       model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))
