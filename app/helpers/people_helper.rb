@@ -12,11 +12,11 @@ module PeopleHelper
   end
 
   def pal_icon person
-    person.is_pal? ? image("pal",:alt=>"Pal",:title=>tooltip_title_attrib("Official #{DM_PROJECT_NAME} Pal"), :style=>"vertical-align: middle")  : ""
+    person.is_pal? ? image("pal",:alt=>"Pal",:title=>tooltip_title_attrib("Official #{Seek::ApplicationConfiguration.get_dm_project_name} Pal"), :style=>"vertical-align: middle")  : ""
   end
 
   def admin_icon person
-    person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("#{DM_PROJECT_NAME} Administrator"), :style=>"vertical-align: middle") : ""
+    person.is_admin? ? image("admin",:alt=>"Admin",:title=>tooltip_title_attrib("#{Seek::ApplicationConfiguration.get_dm_project_name} Administrator"), :style=>"vertical-align: middle") : ""
   end
 
   def discipline_list person

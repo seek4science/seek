@@ -10,8 +10,8 @@
         <div class="popularity">
           <%
           tag_cloud = ActsAsTaggableOn::Tag.all_tags_for_cloud
-          all_tags= tag_cloud.select{|tag| tag.overall_total>=TAG_THRESHOLD}
-          show_tags= tag_cloud.sort{|a,b| b.overall_total<=>a.overall_total}[0...MAX_VISIBLE_TAGS]
+          all_tags= tag_cloud.select{|tag| tag.overall_total>=Seek::ApplicationConfiguration.get_tag_threshold}
+          show_tags= tag_cloud.sort{|a,b| b.overall_total<=>a.overall_total}[0...Seek::ApplicationConfiguration.get_max_visible_tags]
           hidden_tags=all_tags.size != show_tags.size
           hidden_class="merged_tag_hidden"
           %>

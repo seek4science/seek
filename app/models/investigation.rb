@@ -12,7 +12,7 @@ class Investigation < ActiveRecord::Base
 
   has_many :assays,:through=>:studies
 
-  acts_as_solr(:fields=>[:description,:title]) if SOLR_ENABLED
+  acts_as_solr(:fields=>[:description,:title]) if Seek::ApplicationConfiguration.get_solr_enabled
 
   def can_edit? user
     user.person.projects.include?(project)

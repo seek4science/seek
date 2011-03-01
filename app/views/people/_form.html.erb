@@ -105,7 +105,7 @@
     <% if current_user.is_admin? %>
         <label for="is_pal" style="font-weight: normal;">
             <%= f.check_box :is_pal -%>
-            This person is a certified <b><%= DM_PROJECT_NAME %> PAL</b>
+            This person is a certified <b><%= Seek::ApplicationConfiguration.get_dm_project_name %> PAL</b>
         </label><br/>
         <label for="is_project_manager" style="font-weight: normal;">
             <%= f.check_box :is_project_manager -%>

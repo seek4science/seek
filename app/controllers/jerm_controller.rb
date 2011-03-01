@@ -130,7 +130,7 @@ class JermController < ApplicationController
   
   
   def jerm_enabled
-    if (!JERM_ENABLED)
+    if (!Seek::ApplicationConfiguration.get_jerm_enabled)
       error("JERM is not enabled","invalid action")
       return false
     end
@@ -147,7 +147,7 @@ class JermController < ApplicationController
     resources.each_key do |author|
       begin
         unless author.nil? || author.user.nil?
-          Mailer.deliver_resources_harvested(resources[author], author.user, base_host) if EMAIL_ENABLED
+          Mailer.deliver_resources_harvested(resources[author], author.user, base_host) if Seek::ApplicationConfiguration.get_email_enabled
         end
       rescue Exception=>e
         #FIXME: report exception back with the response

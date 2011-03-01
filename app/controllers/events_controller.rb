@@ -45,12 +45,11 @@ class EventsController < ApplicationController
     end
     params.delete :data_file_ids
 
-    publication_ids = params[:publication_ids] || []
-    publication_ids.each do |text|
-      a_id, r_type = text.split(",")
-      @event.publications << Publication.find(a_id)
+    publication_ids = params[:related_publication_ids] || []
+    publication_ids.each do |id|
+      @event.publications << Publication.find(id)
     end
-    params.delete :publication_ids
+    params.delete :related_publication_ids
 
     respond_to do | format |
       if @event.save
@@ -84,13 +83,12 @@ class EventsController < ApplicationController
     end
     params.delete :data_file_ids
 
-    publication_ids = params[:publication_ids] || []
+    publication_ids = params[:related_publication_ids] || []
     @event.publications = []
-    publication_ids.each do |text|
-      a_id, r_type = text.split(",")
-      @event.publications << Publication.find(a_id)
+    publication_ids.each do |id|
+      @event.publications << Publication.find(id)
     end
-    params.delete :publication_ids
+    params.delete :related_publication_ids
 
     respond_to do | format |
       if @event.update_attributes params[:event]
@@ -127,7 +125,7 @@ class EventsController < ApplicationController
 
   #filter to check if events are enabled using the EVENTS_ENABLED configuration flag
   def check_events_enabled
-    if !EVENTS_ENABLED
+    if !Seek::ApplicationConfiguration.get_events_enabled
       respond_to do |format|
         flash[:error]="Events are currently disabled"
         format.html { redirect_to root_path }

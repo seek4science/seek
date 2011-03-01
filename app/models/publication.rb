@@ -25,7 +25,7 @@ class Publication < ActiveRecord::Base
   has_and_belongs_to_many :events
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
+  acts_as_solr(:fields=>[:title,:abstract,:journal]) if Seek::ApplicationConfiguration.get_solr_enabled
   
   acts_as_uniquely_identifiable
 
