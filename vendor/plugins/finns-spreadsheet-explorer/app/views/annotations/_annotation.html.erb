@@ -2,8 +2,8 @@
   <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"update", :id => annotation.id}, 
                  :method => :put,  
                  :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
-                 :loading => "Element.show('spinner');",
-                 :complete => "Element.hide('spinner');", :html => {:id => "annotation_form"}) do %>
+                 :loading => "$j('img.spinner').show();",
+                 :complete => "$j('img.spinner').hide();", :html => {:id => "annotation_form"}) do %>
       
   <div class="annotation_header">
     <%= avatar(annotation.source.person, 24) -%>
@@ -21,10 +21,10 @@
       <%= link_to_remote(image('destroy'), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
                  :method => :delete,   
                  :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
-                 :loading => "Element.show('spinner');",
-                 :complete => "Element.hide('spinner');") -%>
+                 :loading => "$j('img.spinner').show();",
+                 :complete => "$j('img.spinner').hide();") -%>
       <%= link_to(image('edit'), '#', :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") -%>     
-      <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%> 
+      <%= image_tag "ajax-loader.gif", :class => 'spinner', :style => 'display:none;' -%> 
     <% end -%>
 
     <span style="vertical-align: middle"><%= annotation.cell_coverage -%></span>

@@ -92,7 +92,7 @@ $j(document).ready(function ($) {
       {        
         isMouseDown = false;
         //Hide annotations
-        $('div.annotation').hide();        
+        $('div.annotation').hide();   
       }
     })
   ;
@@ -133,9 +133,10 @@ function alpha2num(col)
 
 function show_annotation(id,x,y)
 {
-  $j("#annotation_" + id).css('left',x+30);  
-  $j("#annotation_" + id).css('top',y);
-  $j("#annotation_" + id).show();  
+  var ann = $j("#annotation_" + id);
+  ann.css('left',x+30);  
+  ann.css('top',y);
+  ann.show();  
 }
 
 function select_range(range)
@@ -222,9 +223,14 @@ function toggle_annotation_form(annotation_id)
   var elem = 'div#annotation_' + annotation_id
   var content = $j(elem + ' textarea#annotation_content');
   if(content.attr("readonly"))
+  {
+    select_range($j(elem + " div.annotation_footer span").html());
     content.removeAttr("readonly");
+  }
   else
+  {
     content.attr("readonly","readonly");
+  }
   $j(elem + ' #annotation_controls').toggle();
 }
 
