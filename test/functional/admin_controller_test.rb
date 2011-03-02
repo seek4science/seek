@@ -1,10 +1,34 @@
 require 'test_helper'
+require 'settings'
 
 class AdminControllerTest < ActionController::TestCase
 
   fixtures :all
 
   include AuthenticatedTestHelper
+  test "should show project" do
+    login_as(:quentin)
+    get :project
+    assert_response :success
+  end
+
+  test "should show features enabled" do
+    login_as(:quentin)
+    get :features_enabled
+    assert_response :success
+  end
+
+  test "should show pagination" do
+    login_as(:quentin)
+    get :pagination
+    assert_response :success
+  end
+
+  test "should show others" do
+    login_as(:quentin)
+    get :others
+    assert_response :success
+  end
 
   test "visible to admin" do
     login_as(:quentin)

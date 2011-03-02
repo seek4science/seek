@@ -1,3 +1,8 @@
+require 'rubygems'
+require 'rake'
+require 'fileutils'
+require 'bundler'
+
 begin
   require "rubygems"
   require "bundler"
@@ -18,3 +23,4 @@ rescue Bundler::GemNotFound
   raise RuntimeError, "Bundler couldn't find some gems." +
     "Did you run `bundle install`?"
 end
+

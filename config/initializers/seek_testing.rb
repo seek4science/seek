@@ -11,5 +11,13 @@ if Rails.env.test?
     Settings.crossref_api_email = "sowen@cs.man.ac.uk"
 
     Settings.events_enabled = true
+    Settings.solr_enabled = false
+    Settings.email_enabled = false
+    Settings.exception_notification_enabled = false
+    Settings.hide_details_enabled = false
+    Settings.activation_required_enabled = false
+    Settings.google_analytics_enabled = false
+    Settings.header_image_enabled = false
+    Settings.copyright_addendum_enabled = false
   end
 end
