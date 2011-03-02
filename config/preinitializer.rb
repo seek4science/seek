@@ -1,8 +1,3 @@
-require 'rubygems'
-require 'rake'
-require 'fileutils'
-require 'bundler'
-
 begin
   require "rubygems"
   require "bundler"

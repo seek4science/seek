@@ -24,7 +24,6 @@ require 'active_record_extensions'
   Settings.defaults[:copyright_addendum_enabled] = false
   Settings.defaults[:copyright_addendum_content] = 'Additions copyright ...'
 
-=begin
   #Mailer settings
   ActionMailer::Base.smtp_settings= {
     :address => Settings.smtp_settings[:address],
@@ -49,7 +48,6 @@ require 'active_record_extensions'
   else
     ExceptionNotifier.render_only = true
   end
-=end
 
 
 #Project
