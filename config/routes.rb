@@ -89,6 +89,9 @@ ActionController::Routing::Routes.draw do |map|
   # page for admin tasks
   map.admin '/admin/', :controller=>'admin',:action=>'show'
 
+  #temporary location for the data/models simulation prototyping
+  map.data_fuse '/data_fuse/',:controller=>'data_fuse',:action=>'show'
+
   #feedback form
   map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get
   map.send_feedback '/home/send_feedback',:controller=>'home',:action=>'send_feedback',:method=>:post
