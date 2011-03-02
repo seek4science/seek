@@ -20,4 +20,4 @@ postdoc:
 
 pal:
   id: 6
-  name: <%= Seek::ApplicationConfiguration.get_dm_project_name %> Pal
+  name: <%= Seek::ApplicationConfiguration.dm_project_name %> Pal
