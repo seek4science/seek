@@ -301,6 +301,19 @@ class DataFilesControllerTest < ActionController::TestCase
     schema_path=File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
     validate_xml_against_schema(xml,schema_path)     
   end
+
+  test "should fetch data content as csv" do
+    login_as(:model_owner)
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv"
+    assert_response :success
+    csv=@response.body
+    assert csv.include?(%!,,"fish","bottle","ggg,gg","“hello”"!)
+
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:sheet=>"2"
+    assert_response :success
+    csv=@response.body
+    assert csv.include?(%!,,"a",1.0,TRUE,,FALSE!)
+  end
   
   test "should not expose non downloadable spreadsheet" do
     login_as(:model_owner)
