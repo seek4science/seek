@@ -43,7 +43,7 @@ class HomeController < ApplicationController
       flash[:error]="You must provide a Subject and details"
       render :action=>:feedback
     else
-      if (Seek::ApplicationConfiguration.get_email_enabled)
+      if (Seek::ApplicationConfiguration.email_enabled)
         Mailer.deliver_feedback(current_user,subject,details,anon,base_host)
       end
       flash[:notice]="Your feedback has been delivered. Thank You."

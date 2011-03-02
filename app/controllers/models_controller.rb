@@ -532,7 +532,7 @@ class ModelsController < ApplicationController
   end
   
   def jws_enabled
-    unless Seek::ApplicationConfiguration.get_jws_enabled
+    unless Seek::ApplicationConfiguration.jws_enabled
       respond_to do |format|
         flash[:error] = "Interaction with JWS Online is currently disabled"
         format.html { redirect_to model_path(@model,:version=>@display_model.version) }

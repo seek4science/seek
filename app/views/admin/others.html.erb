@@ -3,37 +3,37 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Type manager enabled:   <%= check_box_tag(:type_managers_enabled, 1, Seek::ApplicationConfiguration.get_type_managers_enabled) %>
+    Type manager enabled:   <%= check_box_tag(:type_managers_enabled, 1, Seek::ApplicationConfiguration.type_managers_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Managed by:    <%= text_field_tag(:type_managers, Seek::ApplicationConfiguration.get_type_managers) %>
+    Managed by:    <%= text_field_tag(:type_managers, Seek::ApplicationConfiguration.type_managers) %>
     <br style="clear:both;"/>
     <br/>
-    Global passphrase:    <%= text_field_tag(:global_passphrase, Seek::ApplicationConfiguration.get_global_passphrase) %>
+    Global passphrase:    <%= text_field_tag(:global_passphrase, Seek::ApplicationConfiguration.global_passphrase) %>
     <br style="clear:both;"/>
     <br/>
-    Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::ApplicationConfiguration.get_pubmed_api_email) %>
+    Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::ApplicationConfiguration.pubmed_api_email) %>
     <br style="clear:both;"/>
     <br/>
-    Crossref api email:    <%= text_field_tag(:crossref_api_email, Seek::ApplicationConfiguration.get_crossref_api_email) %>
+    Crossref api email:    <%= text_field_tag(:crossref_api_email, Seek::ApplicationConfiguration.crossref_api_email) %>
     <br style="clear:both;"/>
     <br/>
-    Site base host:    <%= text_field_tag(:site_base_host, Seek::ApplicationConfiguration.get_site_base_host) %>
+    Site base host:    <%= text_field_tag(:site_base_host, Seek::ApplicationConfiguration.site_base_host) %>
     <br style="clear:both;"/>
     <br/>
-    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::ApplicationConfiguration.get_tag_threshold, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
+    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::ApplicationConfiguration.tag_threshold, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
     <br style="clear:both;"/>
     <br/>
-    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::ApplicationConfiguration.get_max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
+    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::ApplicationConfiguration.max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
     <br style="clear:both;"/>
     <br/>
-    Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::ApplicationConfiguration.get_open_id_authentication_store) %>
+    Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::ApplicationConfiguration.open_id_authentication_store) %>
     <br style="clear:both;"/>
     <br/>
     Asset order:
     <br style="clear:both;"/>
     <br/>
-        <%= select_tag 'asset_order', options_for_select(Seek::ApplicationConfiguration.get_asset_order), :multiple => true, :size => 13 %>
+        <%= select_tag 'asset_order', options_for_select(Seek::ApplicationConfiguration.asset_order), :multiple => true, :size => 13 %>
         <br style="clear:both;"/>
         <br/>
         <input style="position:absolute;left:130px;top:360px" type="button" value="Up" onClick="Selectbox.moveOptionUp(this.form.elements.asset_order)">

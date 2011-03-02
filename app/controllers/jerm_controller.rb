@@ -130,7 +130,7 @@ class JermController < ApplicationController
   
   
   def jerm_enabled
-    if (!Seek::ApplicationConfiguration.get_jerm_enabled)
+    if (!Seek::ApplicationConfiguration.jerm_enabled)
       error("JERM is not enabled","invalid action")
       return false
     end

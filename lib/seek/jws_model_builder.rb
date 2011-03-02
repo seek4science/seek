@@ -26,8 +26,8 @@ module Seek
 
     include ModelTypeDetection
 
-    BASE_URL = "#{Seek::ApplicationConfiguration.get_jws_online_root}/webMathematica/Examples/"
-    SIMULATE_URL = "#{Seek::ApplicationConfiguration.get_jws_online_root}/webMathematica/upload/uploadNEW.jsp"
+    BASE_URL = "#{Seek::ApplicationConfiguration.jws_online_root}/webMathematica/Examples/"
+    SIMULATE_URL = "#{Seek::ApplicationConfiguration.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
     
     MOCKED_RESPONSE=false
 

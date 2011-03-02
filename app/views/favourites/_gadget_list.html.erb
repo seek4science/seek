@@ -11,7 +11,7 @@
   </span>
 <% else %>
   <%= "<ul class='favourites'>"  if show_as_list -%>
-  <% favourites.sort_by{|a| Seek::ApplicationConfiguration.get_asset_order.index(a.resource_type)}.each do |fav| %>
+  <% favourites.sort_by{|a| Seek::ApplicationConfiguration.asset_order.index(a.resource_type)}.each do |fav| %>
     <% if show_as_list -%>
       <li class="fav_list_item">
         <%= fav_line_tag(fav) %>

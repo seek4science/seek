@@ -49,7 +49,7 @@ class Assay < ActiveRecord::Base
     :as => :subject,
     :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::ApplicationConfiguration.get_solr_enabled
+  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::ApplicationConfiguration.solr_enabled
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title

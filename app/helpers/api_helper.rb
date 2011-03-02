@@ -150,7 +150,7 @@ module ApiHelper
 #      api_partial_collection builder,object.parent.attributions
 #    end if object.parent.respond_to?("attributions")  
         
-    unless Seek::ApplicationConfiguration.get_hide_details_enabled
+    unless Seek::ApplicationConfiguration.hide_details_enabled
       builder.tag! "email",object.email if object.respond_to?("email")
       builder.tag! "webpage",object.webpage if object.respond_to?("webpage")
       builder.tag! "internal_webpage",object.internal_webpage if object.respond_to?("internal_webpage")

@@ -61,7 +61,7 @@ help_documents:
   - - "8"
     - metadata-guidelines
     - Metadata Guidelines
-    - "h1. Minimum Metadata Guidelines for the <%= Seek::ApplicationConfiguration.get_application_name %> \r\n\
+    - "h1. Minimum Metadata Guidelines for the <%= Seek::ApplicationConfiguration.application_name %> \r\n\
       \r\n\
       The more metadata you provide for your assets in the SEEK, the easier it is to find them and to compare them with other assets. If you provide assets with very little metadata, these will also be displayed (in accordance with access control policies set by you), but they may be hard to interpret for other people.\r\n\
       \r\n\
@@ -72,7 +72,7 @@ help_documents:
       \r\n\
       *Name* (of the data uploader). This is the person responsible for the data and responsible for setting sharing and dissemination policies. If more than one person was involved in the experiment, you can credit these people separately \r\n\
       *SEEK ID* \xE2\x80\x93 (Of the above person). This helps us identify each person within SEEK. \r\n\
-      *Project* \xE2\x80\x93 The name of the project that the asset relates to. If your data is being uploaded by a JERM harvester, we will know which project it belongs to, but if you are uploading directly to SEEK and you are in more than one <%= Seek::ApplicationConfiguration.get_project_name %>  project, it is important to specify. Typically, an asset will belong to only one project.\r\n\
+      *Project* \xE2\x80\x93 The name of the project that the asset relates to. If your data is being uploaded by a JERM harvester, we will know which project it belongs to, but if you are uploading directly to SEEK and you are in more than one <%= Seek::ApplicationConfiguration.project_name %>  project, it is important to specify. Typically, an asset will belong to only one project.\r\n\
       *Upload Date (yymmdd)*. This is the date of publication to SEEK rather than the date of the experiment. Depending on the system your project uses, we will try to automatically detect when changes are made to a file. Each upload will automatically receive its own timestamp when uploaded directly into SEEK\r\n\
       *Experiment Date (yymmdd)*. This is the date the experiment was performed\r\n\
       *Title* \xE2\x80\x93 a unique name for your asset file. If you upload manually, you will receive an error message if the file title is not unique within your project. If your asset is uploaded via a JERM Harvester without a title, you will receive an email notification.\r\n\
@@ -93,7 +93,7 @@ help_documents:
       *Title* \xE2\x80\x93 as described above. All assets should have a title\r\n\
       *Description* \xE2\x80\x93 free text describing the purpose of the study\r\n\
       *Person Responsible* \xE2\x80\x93 the creator of the study description\r\n\
-      *Experimentalists* \xE2\x80\x93 other scientists involved in any of the work in the study. If they are in <%= Seek::ApplicationConfiguration.get_project_name %>, please give their SEEK ID, so we can link to their profiles in SEEK. If they are not in SEEK, their names will still be displayed, but not linked. People\xE2\x80\x99s involvement can also be inferred from anyone named in included assays.\r\n\
+      *Experimentalists* \xE2\x80\x93 other scientists involved in any of the work in the study. If they are in <%= Seek::ApplicationConfiguration.project_name %>, please give their SEEK ID, so we can link to their profiles in SEEK. If they are not in SEEK, their names will still be displayed, but not linked. People\xE2\x80\x99s involvement can also be inferred from anyone named in included assays.\r\n\
       *Project* \xE2\x80\x93 as described above. All assets should be associated with a project\r\n\
       *Investigation title* \xE2\x80\x93 The name of the investigation the study belongs to. \r\n\
       \r\n\
@@ -116,7 +116,7 @@ help_documents:
       *SOP Titles* \xE2\x80\x93 the title of one or many SOPs used to execute this assay\r\n\
       \r\n\
       \r\n\
-      h2. <%= Seek::ApplicationConfiguration.get_project_name %> Assets\r\n\
+      h2. <%= Seek::ApplicationConfiguration.project_name %> Assets\r\n\
       \r\n\
       h3. Data\r\n\
       \r\n\
@@ -149,8 +149,8 @@ help_documents:
       \r\n\
       h3. Publications\r\n\
       \r\n\
-      *PubmedID or DOI* \xE2\x80\x93 the SEEK can extract publication abstracts from PubMed, when supplied with a PubmedID. When the paper abstract is retrieved, you can verify which people from a drop-down list are authors from within the <%= Seek::ApplicationConfiguration.get_project_type %>, so that we can link to their profile\r\n\
-      Currently, publications are linked to people and projects. In the next version, publications will be linked to other <%= Seek::ApplicationConfiguration.get_project_name %> assets to allow you to use the SEEK as a supplementary data store\r\n\
+      *PubmedID or DOI* \xE2\x80\x93 the SEEK can extract publication abstracts from PubMed, when supplied with a PubmedID. When the paper abstract is retrieved, you can verify which people from a drop-down list are authors from within the <%= Seek::ApplicationConfiguration.project_type %>, so that we can link to their profile\r\n\
+      Currently, publications are linked to people and projects. In the next version, publications will be linked to other <%= Seek::ApplicationConfiguration.project_name %> assets to allow you to use the SEEK as a supplementary data store\r\n\
       \r\n\
       \r\n\
       *Attribution* \xE2\x80\x93 Some assets are based on others, for example, a model may use data from an experimental assay, or a SOP may be a modified version of another. The attribution section allows you to specify when this is the case\r\n"
@@ -159,7 +159,7 @@ help_documents:
   - - "9"
     - transcriptomics-guidelines
     - Transcriptomics Guidelines
-    - "h1. Transcriptomics: Guidelines for <%= Seek::ApplicationConfiguration.get_project_name %> Templates\r\n\
+    - "h1. Transcriptomics: Guidelines for <%= Seek::ApplicationConfiguration.project_name %> Templates\r\n\
       \r\n\
       The MIAME standard and the associated MAGE-ML format are well established in the transcriptomics community and adherence to MAGE-ML is becoming increasingly important for publishing data. \r\n\
       \r\n\
@@ -185,11 +185,11 @@ help_documents:
       \r\n\
       There are also tools to help you construct MAGE-TAB templates on the web. For example, there is the \"ArrayExpress submission help system\":http://www.ebi.ac.uk/cgi-bin/microarray/magetab.cgi and there is the \"ISA curator tool from the ISA-TAB group\":http://isatab.sourceforge.net/isacreator.html\r\n\
       \r\n\
-      h2. Notes and additions for <%= Seek::ApplicationConfiguration.get_project_name %>\r\n\
+      h2. Notes and additions for <%= Seek::ApplicationConfiguration.project_name %>\r\n\
       \r\n\
       h3. IDF\r\n\
       \r\n\
-      Many of the personal details in the IDF sheet can be automatically extracted from your <%= Seek::ApplicationConfiguration.get_application_name %> profile. If you add your SEEK ID as an additional field (called SEEK ID), we can extract all your personal details from your profile so there is no need to complete these personal details fields. \r\n\
+      Many of the personal details in the IDF sheet can be automatically extracted from your <%= Seek::ApplicationConfiguration.application_name %> profile. If you add your SEEK ID as an additional field (called SEEK ID), we can extract all your personal details from your profile so there is no need to complete these personal details fields. \r\n\
       Similarly, you can refer to protocols (SOPs in SEEK) by their SEEK ID, and we can automatically extract their name and brief description.\r\n\
       This worksheet also contains fields to link to publications. In many cases, data could be shared in SEEK before publication. If so, please leave these fields blank, but do not remove them.\r\n\
       \r\n\
@@ -218,19 +218,19 @@ help_documents:
   - - "10"
     - faq
     - Frequently Asked Questions
-    - "h6. What is the <%= Seek::ApplicationConfiguration.get_application_name %>? \r\n\
+    - "h6. What is the <%= Seek::ApplicationConfiguration.application_name %>? \r\n\
       \r\n\
-      The SEEK is a catalogue of assets held by the <%= Seek::ApplicationConfiguration.get_project_long_name %>. You can use the SEEK searching interface to find Data, Models, SOPs and protocols. You can also use it to find people, their institutions and their expertise\r\n\
+      The SEEK is a catalogue of assets held by the <%= Seek::ApplicationConfiguration.project_long_name %>. You can use the SEEK searching interface to find Data, Models, SOPs and protocols. You can also use it to find people, their institutions and their expertise\r\n\
       \r\n\
       \r\n\
       h6. What is the Yellow Page?\r\n\
       \r\n\
-      A directory of all the current and past members of the <%= Seek::ApplicationConfiguration.get_project_long_name %>, their project associates, their institutions and their expertise and experience\r\n\
+      A directory of all the current and past members of the <%= Seek::ApplicationConfiguration.project_long_name %>, their project associates, their institutions and their expertise and experience\r\n\
       \r\n\
       \r\n\
-      h6. Are the <%= Seek::ApplicationConfiguration.get_project_name %> Assets (Data, Models, and SOPs) kept in SEEK?\r\n\
+      h6. Are the <%= Seek::ApplicationConfiguration.project_name %> Assets (Data, Models, and SOPs) kept in SEEK?\r\n\
       \r\n\
-      Not normally. SEEK links to the repositories of each <%= Seek::ApplicationConfiguration.get_project_name %> project, so it is a catalogue of what is available rather than a repository. You can, however, upload files if you wish.\r\n\
+      Not normally. SEEK links to the repositories of each <%= Seek::ApplicationConfiguration.project_name %> project, so it is a catalogue of what is available rather than a repository. You can, however, upload files if you wish.\r\n\
       \r\n\
       \r\n\
       h6. What kind of models can I store/link to?\r\n\
@@ -250,7 +250,7 @@ help_documents:
       \r\n\
       h6. What is the Investigations Tab for?\r\n\
       \r\n\
-      Investigations are high level descriptions of the research carried out by a particular <%= Seek::ApplicationConfiguration.get_project_name %> project. They typically reflect the general aims of the project, for example, carbon metabolism or anaerobic/aerobic transitions.\r\n\
+      Investigations are high level descriptions of the research carried out by a particular <%= Seek::ApplicationConfiguration.project_name %> project. They typically reflect the general aims of the project, for example, carbon metabolism or anaerobic/aerobic transitions.\r\n\
       \r\n\
       \r\n\
       h6. What is the Studies Tab for?\r\n\
@@ -281,13 +281,13 @@ help_documents:
     - proteomics-guidelines
     - Proteomics Guidelines
     - |-
-      h1. Proteomics: Suggestions for <%= Seek::ApplicationConfiguration.get_project_name %> Templates
+      h1. Proteomics: Suggestions for <%= Seek::ApplicationConfiguration.project_name %> Templates
 
       The MIAPE standard (Minimum Information About a Proteomics Experiment) follows the same principles as the longer established MIAME standard for transcriptomics. It is a set of guidelines describing the minimum information required to adequately record a proteomics experiment (i.e. where the samples came from, how they were analysed and what equipment was used etc) to allow others to understand and potentially reuse data.
 
       There is growing interest in the MIAPE standard from publishers, and some journals now require MAIPE compliant data in order to publish. This is not yet as widespread as the requirement for MIAME compliance in transcriptomics, but it is still increasing.
 
-      For <%= Seek::ApplicationConfiguration.get_application_name %>, we recommend you adopt a MIAPE compliant data template where possible.
+      For <%= Seek::ApplicationConfiguration.application_name %>, we recommend you adopt a MIAPE compliant data template where possible.
 
       Proteomics experiments vary widely and cover many different techniques. MIAPE is therefore a collection of reporting guidelines for the different technologies available. Examples include:
 
@@ -340,27 +340,27 @@ help_documents:
     - ISA Best Practice
     - "h1. ISA Best Practice Guide\r\n\
       \r\n\
-      The ISA Infrastructure (Investigation, Study, Assay) is a general purpose framework for describing how experiments relate to one another. It describes both metadata (samples, characteristics, technologies, etc) and data (transcriptomics, proteomics etc), but the data itself is stored separately, and can therefore be as public or private as required. The ISA descriptions are visible to the rest of the <%= Seek::ApplicationConfiguration.get_project_long_name %>.\r\n\
-      The original purpose of the ISA infrastructure was to provide a common framework for relating multiple omics data and to provide a single mechanism for submission to omics data silos (such as ArrayExpress for Microarray data, or PRIDE, for proteomics data). <%= Seek::ApplicationConfiguration.get_project_name %> data often involves omics data and generally relies on the integration of multiple data types, so the ISA infrastructure will provide a mechanism for <%= Seek::ApplicationConfiguration.get_project_name %> data export as well as providing a common framework for navigation. \r\n\
+      The ISA Infrastructure (Investigation, Study, Assay) is a general purpose framework for describing how experiments relate to one another. It describes both metadata (samples, characteristics, technologies, etc) and data (transcriptomics, proteomics etc), but the data itself is stored separately, and can therefore be as public or private as required. The ISA descriptions are visible to the rest of the <%= Seek::ApplicationConfiguration.project_long_name %>.\r\n\
+      The original purpose of the ISA infrastructure was to provide a common framework for relating multiple omics data and to provide a single mechanism for submission to omics data silos (such as ArrayExpress for Microarray data, or PRIDE, for proteomics data). <%= Seek::ApplicationConfiguration.project_name %> data often involves omics data and generally relies on the integration of multiple data types, so the ISA infrastructure will provide a mechanism for <%= Seek::ApplicationConfiguration.project_name %> data export as well as providing a common framework for navigation. \r\n\
       For more information on the ISA community work, please see: \r\n\
       \"http://isatab.sourceforge.net/index.html\":http://isatab.sourceforge.net/index.html\r\n\
       \r\n\
       h2. Examples\r\n\
       \r\n\
-      There are many ways to describe your projects and the relationships between the different work-packages and research topics. The following guidelines provide a general description of the ISA Infrastructure and examples of how this may fit with your <%= Seek::ApplicationConfiguration.get_project_name %> project. We use examples from the Bioinvestigation Index (BII \"http://www.ebi.ac.uk/bioinvindex/\":http://www.ebi.ac.uk/bioinvindex/), which is a public database of ISA compliant data. We also use examples already available in <%= Seek::ApplicationConfiguration.get_project_name %>\r\n\
+      There are many ways to describe your projects and the relationships between the different work-packages and research topics. The following guidelines provide a general description of the ISA Infrastructure and examples of how this may fit with your <%= Seek::ApplicationConfiguration.project_name %> project. We use examples from the Bioinvestigation Index (BII \"http://www.ebi.ac.uk/bioinvindex/\":http://www.ebi.ac.uk/bioinvindex/), which is a public database of ISA compliant data. We also use examples already available in <%= Seek::ApplicationConfiguration.project_name %>\r\n\
       \r\n\
-      * *Investigation:* a high level description of the area and the main aims of a project\r\n    ** In <%= Seek::ApplicationConfiguration.get_project_name %>, this may be the overall aims as stated on the <%= Seek::ApplicationConfiguration.get_project_name %> website. \r\n\
-      If your project has several subprojects that do not share any data, you should define an investigation for each.\r\n    ** *BII Example:* Growth control of the eukaryote cell: a systems biology study in yeast\r\n    ** *<%= Seek::ApplicationConfiguration.get_project_name %> Example* Analysis of Central Carbon Metabolism of Sulfolobus solfataricus under varying temperatures\r\n\
+      * *Investigation:* a high level description of the area and the main aims of a project\r\n    ** In <%= Seek::ApplicationConfiguration.project_name %>, this may be the overall aims as stated on the <%= Seek::ApplicationConfiguration.project_name %> website. \r\n\
+      If your project has several subprojects that do not share any data, you should define an investigation for each.\r\n    ** *BII Example:* Growth control of the eukaryote cell: a systems biology study in yeast\r\n    ** *<%= Seek::ApplicationConfiguration.project_name %> Example* Analysis of Central Carbon Metabolism of Sulfolobus solfataricus under varying temperatures\r\n\
       \r\n\
-      * *Study:* a particular biological hypothesis or analysis\r\n   ** In <%= Seek::ApplicationConfiguration.get_project_name %>, these studies may contain only experimental assays, only modelling analyses, only informatics analyses, \r\n\
+      * *Study:* a particular biological hypothesis or analysis\r\n   ** In <%= Seek::ApplicationConfiguration.project_name %>, these studies may contain only experimental assays, only modelling analyses, only informatics analyses, \r\n\
       or a mixture of all \r\n   ** *BII Example:* Study of the impact of changes in flux on the transcriptome, proteome, endometabolome and exometabolome \r\n\
-      of the yeast Saccharomyces cerevisiae under different nutrient limitations\r\n   ** *<%= Seek::ApplicationConfiguration.get_project_name %> Example:* Comparison of S. solfataricus grown at 70 and 80 degrees\r\n\
+      of the yeast Saccharomyces cerevisiae under different nutrient limitations\r\n   ** *<%= Seek::ApplicationConfiguration.project_name %> Example:* Comparison of S. solfataricus grown at 70 and 80 degrees\r\n\
       \r\n\
-      * *Assay:* specific, individual experiments required to be undertaken together in order to address the study hypotheses.\r\n   ** In <%= Seek::ApplicationConfiguration.get_project_name %>, this may be one single microarray experiment, or one flux balance analysis, for example\r\n   ** *BII Example:* \r\n      *** Transcriptional profiling\r\n      *** DNA Microarray\r\n   ** *<%= Seek::ApplicationConfiguration.get_project_name %> Example:*\r\n      *** Comparison of transcriptome 70 and 80c (Cdna microarray)\r\n      *** Comparison of proteome at 70 and 80c (Protein expression profiling)\r\n      *** Intracellular metabolomics of s. solfataricus at 70 and 80c (Metabolomics)\r\n\
+      * *Assay:* specific, individual experiments required to be undertaken together in order to address the study hypotheses.\r\n   ** In <%= Seek::ApplicationConfiguration.project_name %>, this may be one single microarray experiment, or one flux balance analysis, for example\r\n   ** *BII Example:* \r\n      *** Transcriptional profiling\r\n      *** DNA Microarray\r\n   ** *<%= Seek::ApplicationConfiguration.project_name %> Example:*\r\n      *** Comparison of transcriptome 70 and 80c (Cdna microarray)\r\n      *** Comparison of proteome at 70 and 80c (Protein expression profiling)\r\n      *** Intracellular metabolomics of s. solfataricus at 70 and 80c (Metabolomics)\r\n\
       \r\n\
       \r\n\
       \r\n\
-      h1. Required Fields in the <%= Seek::ApplicationConfiguration.get_project_name %> ISA\r\n\
+      h1. Required Fields in the <%= Seek::ApplicationConfiguration.project_name %> ISA\r\n\
       \r\n\
       A short guide to creating a new ISA file\r\n\
       \r\n\
@@ -377,7 +377,7 @@ help_documents:
       *Title* \xE2\x80\x93 The name of the Study. All assets should have a title\r\n\
       *Description* \xE2\x80\x93 free text describing the purpose of the study\r\n\
       *Person Responsible* \xE2\x80\x93 the creator of the study description\r\n\
-      *Experimentalists* \xE2\x80\x93 other scientists involved in any of the work in the study. If they are in <%= Seek::ApplicationConfiguration.get_project_name %>, please give their SEEK ID, so we can link to their profiles in SEEK. If they are not in SEEK, their names will still be displayed, but not linked. People\xE2\x80\x99s involvement can also be inferred from anyone named in included assays.\r\n\
+      *Experimentalists* \xE2\x80\x93 other scientists involved in any of the work in the study. If they are in <%= Seek::ApplicationConfiguration.project_name %>, please give their SEEK ID, so we can link to their profiles in SEEK. If they are not in SEEK, their names will still be displayed, but not linked. People\xE2\x80\x99s involvement can also be inferred from anyone named in included assays.\r\n\
       *Project* \xE2\x80\x93 The project that the study belongs to. All assets should be associated with a project\r\n\
       *Investigation title* \xE2\x80\x93 The name of the investigation the study belongs to. \r\n\
       \r\n\

@@ -125,7 +125,7 @@ class EventsController < ApplicationController
 
   #filter to check if events are enabled using the EVENTS_ENABLED configuration flag
   def check_events_enabled
-    if !Seek::ApplicationConfiguration.get_events_enabled
+    if !Seek::ApplicationConfiguration.events_enabled
       respond_to do |format|
         flash[:error]="Events are currently disabled"
         format.html { redirect_to root_path }

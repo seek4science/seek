@@ -21,7 +21,7 @@ module GroupedPagination
     def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a + ["?"]
       @field = options[:field] || "first_letter"
-      @latest_limit = options[:latest_limit] || Seek::ApplicationConfiguration.get_limit_latest
+      @latest_limit = options[:latest_limit] || Seek::ApplicationConfiguration.limit_latest
       @default_page = options[:default_page] || 'all'
       
       before_save :update_first_letter

@@ -232,7 +232,7 @@ class UsersController < ApplicationController
   end
   
   def activation_required?
-    Seek::ApplicationConfiguration.get_activation_required_enabled && User.count>1
+    Seek::ApplicationConfiguration.activation_required_enabled && User.count>1
   end
 
 end

@@ -26,7 +26,7 @@
     </center>
   </div>
   <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
-    <% Seek::ApplicationConfiguration.get_asset_order.each do |resource_type| -%>  
+    <% Seek::ApplicationConfiguration.asset_order.each do |resource_type| -%>
       <% visible_resource_type = resource_type.titleize.pluralize -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
       <% hidden_count = 0 %>
