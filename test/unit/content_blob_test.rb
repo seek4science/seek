@@ -120,8 +120,9 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
   
   def test_tmp_io_object
-    file_path=File.expand_path(__FILE__) #use the current file
-    io_object = File.new(file_path,"r")
+    io_object = Tempfile.new('tmp_io_object_test')
+    io_object.write("blah blah\nmonkey_business")
+    
     blob=ContentBlob.new(:tmp_io_object=>io_object)
     assert_difference("ContentBlob.count") do
       blob.save!
@@ -134,10 +135,9 @@ class ContentBlobTest < ActiveSupport::TestCase
     File.open(blob.filepath,"rb") do |f|
       data=f.read
     end
-    io_object.rewind
-    io_data = io_object.read
+    
     assert_not_nil data
-    assert_equal io_data.to_s,data.to_s
+    assert_equal "blah blah\nmonkey_business",data.to_s
   end
   
   def test_string_io_object
