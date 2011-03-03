@@ -24,23 +24,22 @@ require 'active_record_extensions'
   Settings.defaults[:copyright_addendum_enabled] = false
   Settings.defaults[:copyright_addendum_content] = 'Additions copyright ...'
 
-=begin
   #Mailer settings
   ActionMailer::Base.smtp_settings= {
-    :address => Settings.smtp_settings[:address],
-    :port => Settings.smtp_settings[:port],
-    :domain => Settings.smtp_settings[:domain],
-    :authentication => Settings.smtp_settings[:authentication],
-    :user_name => Settings.smtp_settings[:user_name],
-    :password  => Settings.smtp_settings[:password]
+    :address => Settings.defaults[:smtp_settings][:address],
+    :port => Settings.defaults[:smtp_settings][:port],
+    :domain => Settings.defaults[:smtp_settings][:domain],
+    :authentication => Settings.defaults[:smtp_settings][:authentication],
+    :user_name => Settings.defaults[:smtp_settings][:user_name],
+    :password  => Settings.defaults[:smtp_settings][:password]
   }
-  if Settings.google_analytics_enabled
-    Rubaidh::GoogleAnalytics.tracker_id = Settings.google_analytics_tracker_id
+  if Settings.defaults[:google_analytics_enabled]
+    Rubaidh::GoogleAnalytics.tracker_id = Settings.defaults[:google_analytics_tracker_id]
   else
     Rubaidh::GoogleAnalytics.tracker_id = "000-000"
   end
 
-  if Settings.exception_notification_enabled
+  if Settings.defaults[:exception_notification_enabled]
     ExceptionNotifier.render_only = false
     ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
     ExceptionNotifier.sender_address = %w(no-reply@sysmo-db.org)
@@ -49,30 +48,13 @@ require 'active_record_extensions'
   else
     ExceptionNotifier.render_only = true
   end
-=end
 
 
 #Project
   Settings.defaults[:project_name] = 'SysMO'
   Settings.defaults[:project_type] = 'Consortium'
   Settings.defaults[:project_link] = 'http://www.sysmo.net'
-
-=begin
-  Settings.defaults[:project_long_name] = "#{Settings.project_name} #{Settings.project_type}"
-  Settings.defaults[:project_title] = Settings.project_long_name
-  Settings.defaults[:dm_project_name] = Settings.project_name
-  Settings.defaults[:dm_project_title] = Settings.project_title
-  Settings.defaults[:dm_project_link] = Settings.project_link
-
-  Settings.defaults[:application_name] = "#{Settings.project_name} SEEK"
-  Settings.defaults[:application_title] = Settings.application_name
-=end
-
   Settings.defaults[:header_image_enabled] = false
-=begin
-  Settings.defaults[:header_image_link] = Settings.dm_project_link
-  Settings.defaults[:header_image_title] = Settings.dm_project_name
-=end
 
 #Pagination
   Settings.defaults[:index] = {:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest',
@@ -92,33 +74,4 @@ require 'active_record_extensions'
   Settings.defaults[:open_id_authentication_store] = :memory
   Settings.defaults[:asset_order] = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event']
 
-#  OpenIdAuthentication.store = Settings.open_id_authentication_store
-  begin
-    #Mailer settings
-    ActionMailer::Base.smtp_settings= {
-      :address => Settings.smtp_settings[:address],
-      :port => Settings.smtp_settings[:port],
-      :domain => Settings.smtp_settings[:domain],
-      :authentication => Settings.smtp_settings[:authentication],
-      :user_name => Settings.smtp_settings[:user_name],
-      :password  => Settings.smtp_settings[:password]
-    }
-    if Settings.google_analytics_enabled
-      Rubaidh::GoogleAnalytics.tracker_id = Settings.google_analytics_tracker_id
-    else
-      Rubaidh::GoogleAnalytics.tracker_id = "000-000"
-    end
-
-    if Settings.exception_notification_enabled
-      ExceptionNotifier.render_only = false
-      ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
-      ExceptionNotifier.sender_address = %w(no-reply@sysmo-db.org)
-      ExceptionNotifier.email_prefix = "[SEEK-#{RAILS_ENV.capitalize} ERROR] "
-      ExceptionNotifier.exception_recipients = %w(joe@example.com bill@example.com)
-    else
-      ExceptionNotifier.render_only = true
-    end
-    OpenIdAuthentication.store = Settings.open_id_authentication_store
-  rescue Exception => e
-  	puts "The settings table doesn't exist yet:#{e.message}"
-  end
+  OpenIdAuthentication.store = Settings.defaults[:open_id_authentication_store]

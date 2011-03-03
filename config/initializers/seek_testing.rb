@@ -6,6 +6,7 @@ if Rails.env.test?
     Settings.defaults[:project_name] = 'Sysmo'
     Settings.defaults[:project_title] = 'The Sysmo Consortium'
     Settings.defaults[:dm_project_name] = 'Sysmo-DB'
+
     Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
 
     Settings.defaults[:crossref_api_email] = "sowen@cs.man.ac.uk"
