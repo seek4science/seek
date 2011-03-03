@@ -35,7 +35,9 @@ module Seek
       model.content_blob.file_exists? && is_jws_supported?(model)
     end
 
-    def
+    def data_fuse_url
+      "#{BASE_URL}DataFuse.jsp"
+    end
 
     def dat_to_sbml_url
       "#{BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"

@@ -12,6 +12,15 @@
 
   <%= @parameter_keys.join(", ") -%>
 
+  Matched Keys:
+
+  <%= @matched_keys.join(", ") -%>
+
+  <br/>
+  CVS:
+
+  <%= @matching_csv -%>
+
   <% form_tag({:action=>:submit},:method=>:post) do -%>
     <%= hidden_field_tag :data_file_id,@data_file.id -%>
     <%= hidden_field_tag :model_id,@model.id -%>
