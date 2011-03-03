@@ -7,6 +7,7 @@ require 'asset'
 require 'calendar_date_select'
 require 'active_record_extensions'
 require 'acts_as_taggable_extensions'
+require 'modporter_extensions'
 
 #JWS_ENABLED=true unless defined? JWS_ENABLED
 #JERM_ENABLED=true unless defined? JERM_ENABLED
@@ -71,3 +72,5 @@ end
 
 # limit list of the entry in a page
 #PAGINATE_LATEST_LIMIT= 7 unless defined? PAGINATE_LATEST_LIMIT
+
+PORTER_SECRET = "" unless defined? PORTER_SECRET
