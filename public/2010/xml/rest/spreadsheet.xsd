@@ -7,13 +7,52 @@
 
 	<xsd:complexType name="Workbook">
 		<xsd:sequence>
+			<xsd:element name="styles" type="Styles" minOccurs="1"
+				maxOccurs="1" />
 			<xsd:element name="sheet" type="Sheet" minOccurs="0"
 				maxOccurs="unbounded" />
 		</xsd:sequence>
 	</xsd:complexType>
 
+	<xsd:complexType name="Styles">
+		<xsd:sequence>
+			<xsd:element name="style" type="Style" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="Style">
+		<xsd:sequence>
+			<xsd:element name="border-top" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="border-bottom" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="border-left" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="border-right" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="background-color" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="font-weight" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="font-style" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="text-decoration" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="font-size" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="font-family" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+			<xsd:element name="color" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+		</xsd:sequence>
+		<xsd:attribute name="id" type="xsd:string" use="required"></xsd:attribute>
+	</xsd:complexType>
+
 	<xsd:complexType name="Sheet">
 		<xsd:sequence>
+			<xsd:element name="columns" type="Columns" minOccurs="1"
+				maxOccurs="1" />
 			<xsd:element name="row" type="Row" minOccurs="0"
 				maxOccurs="unbounded" />
 		</xsd:sequence>
@@ -29,6 +68,26 @@
 			use="required"></xsd:attribute>
 	</xsd:complexType>
 
+	<xsd:complexType name="Columns">
+		<xsd:sequence>
+			<xsd:element name="column" type="Column" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="first_column" type="xsd:positiveInteger"
+			use="required"></xsd:attribute>
+		<xsd:attribute name="last_column" type="xsd:positiveInteger"
+			use="required"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="Column">
+		<xsd:attribute name="index" type="xsd:positiveInteger"
+			use="required"></xsd:attribute>
+		<xsd:attribute name="column_alpha" type="xsd:string"
+		        use="required"></xsd:attribute>
+		<xsd:attribute name="width" type="xsd:positiveInteger"
+			use="optional"></xsd:attribute>
+	</xsd:complexType>
+
 	<xsd:complexType name="Row">
 		<xsd:sequence>
 			<xsd:element name="cell" type="Cell" minOccurs="0"
@@ -36,6 +95,8 @@
 		</xsd:sequence>
 		<xsd:attribute name="index" type="xsd:positiveInteger"
 			use="required"></xsd:attribute>
+		<xsd:attribute name="height" type="xsd:string"
+			use="optional"></xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="Cell">
@@ -49,6 +110,7 @@
 					use="required"></xsd:attribute>
 				<xsd:attribute name="type" type="xsd:string" use="required"></xsd:attribute>
 				<xsd:attribute name="formula" type="xsd:string" use="optional"></xsd:attribute>
+				<xsd:attribute name="style" type="xsd:string" use="optional"></xsd:attribute>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
