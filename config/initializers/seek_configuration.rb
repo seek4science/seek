@@ -75,3 +75,5 @@ require 'active_record_extensions'
   Settings.defaults[:asset_order] = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event']
 
   OpenIdAuthentication.store = Settings.defaults[:open_id_authentication_store]
+
+  ACTIVITY_LOG_ENABLED = true
