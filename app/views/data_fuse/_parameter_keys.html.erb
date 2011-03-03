@@ -5,7 +5,7 @@
       <th>Use?</th>
       </thead>
       <tbody>
-      <% keys.each do |k| -%>
+      <% keys.sort.each do |k| -%>
           <tr>
             <td><%= h(k) -%></td>
             <td><%= check_box_tag "parameter_keys[#{k}]", "1", true -%></td>

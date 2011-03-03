@@ -16,8 +16,7 @@
   <%= @matched_keys.join(", ") -%>
   <br/>
 
-  CSV:<br/>
-  <%= simple_format(@matching_csv) -%>
+  <%= render :partial=>"csv_view",:locals=>{:csv=>@matching_csv,:highlight_first_row=>true} -%>
   <br/>
 
   <% form_tag({:action=>:submit},:method=>:post) do -%>
