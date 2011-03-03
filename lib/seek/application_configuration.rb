@@ -137,7 +137,7 @@ module Seek
     end
 
     def self.project_title
-        Settings.project_title || Settings.project_long_name
+        Settings.project_title || self.project_long_name
     end
     def self.project_title= value
          Settings.project_title = value
@@ -151,7 +151,7 @@ module Seek
     end
 
     def self.dm_project_title
-         Settings.dm_project_title || Settings.project_title
+         Settings.dm_project_title || self.project_title
     end
     def self.dm_project_title= value
          Settings.dm_project_title = value
@@ -172,7 +172,7 @@ module Seek
     end
 
     def self.application_title
-         Settings.application_title || Settings.application_name
+         Settings.application_title || self.application_name
     end
     def self.application_title= value
          Settings.application_title = value
@@ -186,13 +186,13 @@ module Seek
     end
 
     def self.header_image_link
-         Settings.header_image_link || Settings.dm_project_link
+         Settings.header_image_link || self.dm_project_link
     end
     def self.header_image_link= value
          Settings.header_image_link = value
     end
     def self.header_image_title
-         Settings.header_image_title || Settings.dm_project_name
+         Settings.header_image_title || self.dm_project_name
     end
     def self.header_image_title= value
          Settings.header_image_title = value

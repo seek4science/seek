@@ -78,11 +78,9 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
   test "header_image_enabled" do
     assert_equal false,Seek::ApplicationConfiguration.header_image_enabled
   end
-=begin
   test "header_image_link" do
       assert_equal "http://www.sysmo.net",Seek::ApplicationConfiguration.header_image_link
   end
-=end
   test "header_image_title" do
     assert_equal "Sysmo-DB",Seek::ApplicationConfiguration.header_image_title
   end

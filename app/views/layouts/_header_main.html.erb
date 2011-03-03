@@ -9,7 +9,7 @@
         <%= render :partial=>"layouts/header_text_main" -%>
       </td>
       <td style="text-align:right;">
-        <%if Seek::ApplicationConfiguration.header_image_enabled%><%= link_to image_tag(Seek::ApplicationConfiguration.header_image_enabled,:alt=>Seek::ApplicationConfiguration.header_image_link,:title=>Seek::ApplicationConfiguration.header_image_title),
+        <%if Seek::ApplicationConfiguration.header_image_enabled%><%= link_to image_tag(Seek::ApplicationConfiguration.header_image_title,:alt=>Seek::ApplicationConfiguration.header_image_link,:title=>Seek::ApplicationConfiguration.header_image_title),
           Seek::ApplicationConfiguration.header_image_link %><%end%>
       </td>
     </tr>
