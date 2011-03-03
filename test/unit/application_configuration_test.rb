@@ -54,27 +54,21 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
     test "project_link" do
     assert_equal "http://www.sysmo.net",Seek::ApplicationConfiguration.project_link
   end
-=begin
   test "project_long_name" do
-    assert_equal "Sysmo Consortium" ,Seek::ApplicationConfiguration.get_project_long_name
+    assert_equal "Sysmo Consortium" ,Seek::ApplicationConfiguration.project_long_name
   end
-=end
   test "project_title" do
     assert_equal "The Sysmo Consortium",Seek::ApplicationConfiguration.project_title
   end
   test "dm_project_name" do
     assert_equal "Sysmo-DB",Seek::ApplicationConfiguration.dm_project_name
   end
-=begin
   test "dm_project_title" do
-    assert_equal "The Sysmo Consortium",Seek::ApplicationConfiguration.get_dm_project_title
+    assert_equal "The Sysmo Consortium",Seek::ApplicationConfiguration.dm_project_title
   end
-=end
-=begin
   test "dm_project_link" do
-    assert_equal "http://www.sysmo.net",Seek::ApplicationConfiguration.get_dm_project_link
+    assert_equal "http://www.sysmo.net",Seek::ApplicationConfiguration.dm_project_link
   end
-=end
   test "application_name" do
     assert_equal "Sysmo SEEK",Seek::ApplicationConfiguration.application_name
   end
@@ -86,14 +80,12 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
   end
 =begin
   test "header_image_link" do
-    assert_equal "http://www.sysmo.net",Seek::ApplicationConfiguration.header_image_link
+      assert_equal "http://www.sysmo.net",Seek::ApplicationConfiguration.header_image_link
   end
 =end
-=begin
   test "header_image_title" do
     assert_equal "Sysmo-DB",Seek::ApplicationConfiguration.header_image_title
   end
-=end
 #pagination
   test "default page" do
     assert_equal "latest",Seek::ApplicationConfiguration.default_page("sops")

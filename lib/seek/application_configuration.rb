@@ -54,7 +54,16 @@ module Seek
          Settings.exception_notification_enabled
     end
     def self.exception_notification_enabled= value
-         Settings.exception_notification_enabled = value
+        Settings.exception_notification_enabled = value
+        if Settings.exception_notification_enabled
+          ExceptionNotifier.render_only = false
+          ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
+          ExceptionNotifier.sender_address = %w(no-reply@sysmo-db.org)
+          ExceptionNotifier.email_prefix = "[SEEK-#{RAILS_ENV.capitalize} ERROR] "
+          ExceptionNotifier.exception_recipients = %w(joe@example.com bill@example.com)
+        else
+          ExceptionNotifier.render_only = true
+        end
     end
 
     def self.hide_details_enabled
@@ -83,6 +92,12 @@ module Seek
     end
     def self.google_analytics_enabled= value
          Settings.google_analytics_enabled = value
+         if Settings.google_analytics_enabled
+           Rubaidh::GoogleAnalytics.tracker_id = Settings.google_analytics_tracker_id
+         else
+           Rubaidh::GoogleAnalytics.tracker_id = "000-000"
+         end
+
     end
 
     def self.google_analytics_tracker_id
@@ -115,48 +130,49 @@ module Seek
     end
 
     def self.project_long_name
-         Settings.project_long_name
+         Settings.project_long_name || "#{Settings.project_name} #{Settings.project_type}"
     end
     def self.project_long_name= value
          Settings.project_long_name = value
     end
 
     def self.project_title
-         Settings.project_title
+        Settings.project_title || Settings.project_long_name
     end
     def self.project_title= value
          Settings.project_title = value
     end
+
     def self.dm_project_name
-         Settings.dm_project_name
+         Settings.dm_project_name || Settings.project_name
     end
     def self.dm_project_name= value
          Settings.dm_project_name = value
     end
 
     def self.dm_project_title
-         Settings.dm_project_title
+         Settings.dm_project_title || Settings.project_title
     end
     def self.dm_project_title= value
          Settings.dm_project_title = value
     end
 
     def self.dm_project_link
-         Settings.dm_project_link
+         Settings.dm_project_link || Settings.project_link
     end
     def self.dm_project_link= value
          Settings.dm_project_link = value
     end
 
     def self.application_name
-         Settings.application_name
+         Settings.application_name || "#{Settings.project_name}-SEEK"
     end
     def self.application_name= value
          Settings.application_name = value
     end
 
     def self.application_title
-         Settings.application_title
+         Settings.application_title || Settings.application_name
     end
     def self.application_title= value
          Settings.application_title = value
@@ -170,13 +186,13 @@ module Seek
     end
 
     def self.header_image_link
-         Settings.header_image_link
+         Settings.header_image_link || Settings.dm_project_link
     end
     def self.header_image_link= value
          Settings.header_image_link = value
     end
     def self.header_image_title
-         Settings.header_image_title
+         Settings.header_image_title || Settings.dm_project_name
     end
     def self.header_image_title= value
          Settings.header_image_title = value
@@ -257,7 +273,15 @@ module Seek
         Settings.smtp_settings[field.to_sym]
     end
     def self.set_smtp_settings (field, value)
-        Settings.merge! :smtp_settings, field.to_sym => value
+      Settings.merge! :smtp_settings, field.to_sym => value
+      ActionMailer::Base.smtp_settings= {
+        :address => Settings.smtp_settings[:address],
+        :port => Settings.smtp_settings[:port],
+        :domain => Settings.smtp_settings[:domain],
+        :authentication => Settings.smtp_settings[:authentication],
+        :user_name => Settings.smtp_settings[:user_name],
+        :password  => Settings.smtp_settings[:password]
+      }
     end
 
     def self.open_id_authentication_store
@@ -265,6 +289,7 @@ module Seek
     end
     def self.open_id_authentication_store= value
         Settings.open_id_authentication_store = value
+        OpenIdAuthentication.store = Settings.open_id_authentication_store
     end
 
     def self.asset_order
@@ -287,5 +312,6 @@ module Seek
     def self.copyright_addendum_content= value
         Settings.copyright_addendum_content = value
     end
+
  end
 end
