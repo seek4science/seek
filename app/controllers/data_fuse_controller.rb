@@ -1,10 +1,12 @@
 require 'libxml'
 require 'fastercsv'
+require 'simple-spreadsheet-extractor'
 
 class DataFuseController < ApplicationController
   include Seek::MimeTypes
   include Seek::ModelProcessing
   include SysMODB::SpreadsheetExtractor
+  include Seek::DataFuse
   
   before_filter :login_required
 
@@ -46,6 +48,14 @@ class DataFuseController < ApplicationController
 
     Seek::CSVHandler.resolve_model_parameter_keys parameter_keys,csv
     
+  end
+
+  def submit
+    @model=Model.find(params[:model_id])
+    parameter_csv=params[:parameter_csv]
+    matching_keys=params[:matching_keys]
+
+    submit_parameter_values_to_jws_online @model,matching_keys,parameter_csv
   end
 
 

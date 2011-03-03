@@ -1,30 +1,32 @@
 <div class="show_basic">
 
-  DataFile:
-
+  DataFile:<br/>
   <%= render :partial => "layouts/resource_list_item",:object=>@data_file -%>
-
-  Model:
-
-  <%= render :partial => "layouts/resource_list_item",:object=>@model -%>
-
-  Keys:
-
-  <%= @parameter_keys.join(", ") -%>
-
-  Matched Keys:
-
-  <%= @matched_keys.join(", ") -%>
-
   <br/>
-  CVS:
 
-  <%= @matching_csv -%>
+  Model:<br/>
+  <%= render :partial => "layouts/resource_list_item",:object=>@model -%>
+  <br/>
+
+  Keys:<br/>
+  <%= @parameter_keys.join(", ") -%>
+  <br/>
+
+  Matched Keys:<br/>
+  <%= @matched_keys.join(", ") -%>
+  <br/>
+
+  CSV:<br/>
+  <%= simple_format(@matching_csv) -%>
+  <br/>
 
   <% form_tag({:action=>:submit},:method=>:post) do -%>
     <%= hidden_field_tag :data_file_id,@data_file.id -%>
     <%= hidden_field_tag :model_id,@model.id -%>
     <%= hidden_field_tag :parameter_keys,@parameter_keys -%>
+    <%= hidden_field_tag :matching_keys,@matching_keys -%>
+    <%= hidden_field_tag :parameter_csv,@matching_csv -%>
+
     <%= submit_tag "Go!",:disable_with=>"Sending..." -%>
   <% end -%>
 
