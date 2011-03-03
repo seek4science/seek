@@ -16,7 +16,7 @@ class ContentBlob < ActiveRecord::Base
   #if the file doesn't exist an error occurs
   attr_writer :tmp_io_object
   
-  acts_as_uniquely_identifiable    
+  acts_as_uniquely_identifiable
   
   #this action saves the contents of @data or the contents contained within the @tmp_io_object to the storage file.
   #an Exception is raised if both are defined
