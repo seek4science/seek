@@ -4,11 +4,20 @@ require 'libxml'
 module Seek
   module DataFuse
 
+    MOCKED_RESPONSE=true
+
+    class DataFuseResult
+      attr_accessor :graph_url,:csv_url,:id,:name
+    end
+
     def data_fuse_url
       "#{Seek::JWSModelBuilder::BASE_URL}DataFuse.jsp"
     end
 
     def submit_parameter_values_to_jws_online model,matching_keys,parameter_values_csv
+
+        return process_data_fuse_response(dummy_data_fuse_response_xml) if MOCKED_RESPONSE
+
         filepath=model.content_blob.filepath
 
         #this is necessary to get the correct filename and especially extension, which JWS relies on
@@ -46,12 +55,28 @@ module Seek
         #process_response_body(response.body)
         puts response.body
 
-        process data_fuse_response(response.body)
+        process_data_fuse_response(response.body)
 
     end
 
     def process_data_fuse_response response
-      
+      parser = LibXML::XML::Parser.string(response, :encoding => LibXML::XML::Encoding::UTF_8)
+      doc = parser.parse
+      doc.find("//data_fuse_results/result").collect do |node|
+        r=DataFuseResult.new
+        r.name = node.attributes["name"]
+        r.id = node.attributes["name"]
+        r.graph_url = node.find_first("graph_url").content.strip unless node.find_first("graph_url").nil?
+        r.csv_url = node.find_first("csv_url").content.strip unless node.find_first("csv_url").nil?
+        r
+      end
+
+    end
+
+    #only used for testing and development purposes
+    def dummy_data_fuse_response_xml
+      path="#{RAILS_ROOT}/test/data_fuse_example.xml"
+      File.open(path, "rb").read
     end
 
   end

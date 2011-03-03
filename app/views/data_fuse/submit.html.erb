@@ -1,0 +1,43 @@
+<style>
+  ul.data_fuse_results {
+      list-style:none;
+  }
+  ul.data_fuse_results li{
+      list-style-type:none;
+  }
+  .data_fuse_results p.title {
+      font-weight:bolder;
+      text-decoration:underline;
+  }
+  .data_fuse_results .graph img {
+      width: 100%;
+  }
+  .data_fuse_results .csv_download {
+      width: 15em;
+
+  }
+
+</style>
+<ul class="data_fuse_results">
+    <% @results.each do |result| -%>
+    <li>
+      <p class="title">
+        <%= result.id -%>
+      </p>
+        <p>
+        <span class="csv_download">
+        <%= link_to "Download as CSV",result.csv_url -%> | 
+        <%= link_to "View Results",url_for(:action=>"view_result_csv",:url=>result.csv_url) -%>
+        </span>
+      </p>
+      </p>
+        <span class="graph">
+        <%= image_tag result.graph_url -%>
+        </span>
+      <p/>
+
+      <hr/>
+
+    </li>
+    <% end -%>
+</ul>

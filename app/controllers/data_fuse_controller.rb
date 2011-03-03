@@ -1,6 +1,7 @@
 require 'libxml'
 require 'fastercsv'
 require 'simple-spreadsheet-extractor'
+require 'open-uri'
 
 class DataFuseController < ApplicationController
   include Seek::MimeTypes
@@ -76,7 +77,11 @@ class DataFuseController < ApplicationController
     parameter_csv=params[:parameter_csv]
     matching_keys=params[:matching_keys]
 
-    submit_parameter_values_to_jws_online @model,matching_keys,parameter_csv
+    @results = submit_parameter_values_to_jws_online @model,matching_keys,parameter_csv
+
+    respond_to do |format|
+      format.html
+    end
   end
 
 
@@ -109,6 +114,14 @@ class DataFuseController < ApplicationController
       else
         page.replace_html element, :text=>"Model not found, or not authorized to examine"
       end
+    end
+  end
+
+  def view_result_csv
+    url = params[:url]
+    @csv=open(url).read
+    respond_to do |format|
+      format.html
     end
   end
 
