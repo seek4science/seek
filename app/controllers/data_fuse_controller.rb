@@ -1,6 +1,12 @@
+require 'libxml'
+require 'fastercsv'
+require 'simple-spreadsheet-extractor'
+
 class DataFuseController < ApplicationController
   include Seek::MimeTypes
   include Seek::ModelProcessing
+  include SysMODB::SpreadsheetExtractor
+  include Seek::DataFuse
   
   before_filter :login_required
 
@@ -22,14 +28,50 @@ class DataFuseController < ApplicationController
   def assets_selected
     @data_file = DataFile.find(params[:data_file_id])
     @model=Model.find(params[:model_id])
+    params[:parameter_keys] ||= {}
 
     #FIXME: temporary way of making sure it isn't exploited to get at data. Should never get here if used through the UI
     raise Exception.new("Unauthorized") unless Authorization.is_authorized?("download", nil, @model, current_user) && Authorization.is_authorized?("download", nil, @data_file, current_user)
 
     @parameter_keys = params[:parameter_keys].keys
+
+    @matching_csv,@matched_keys = matching_csv(@data_file,@parameter_keys)
+
     respond_to do |format|
       format.html
     end
+  end
+
+  def matching_csv data_file,parameter_keys
+    last_sheet_index = find_last_sheet_index(data_file)
+    csv = spreadsheet_to_csv(open(data_file.content_blob.filepath),last_sheet_index,true)
+
+    Seek::CSVHandler.resolve_model_parameter_keys parameter_keys,csv
+    
+  end
+
+  def submit
+    @model=Model.find(params[:model_id])
+    parameter_csv=params[:parameter_csv]
+    matching_keys=params[:matching_keys]
+
+    submit_parameter_values_to_jws_online @model,matching_keys,parameter_csv
+  end
+
+
+
+  def find_last_sheet_index data_file
+    #FIXME: this currently uses the XML to find the number of sheets. The spreadsheet extractor will be updated to provide a summary including this
+    #information in the future which will be more efficient
+
+    xml = spreadsheet_to_xml(open(data_file.content_blob.filepath))
+
+    parser = LibXML::XML::Parser.string(xml)
+    doc = parser.parse
+    doc.root.namespaces.default_prefix="ss"
+
+    doc.find("//ss:workbook/ss:sheet").count
+
   end
 
   def parameter_keys

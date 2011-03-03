@@ -35,8 +35,6 @@ module Seek
       model.content_blob.file_exists? && is_jws_supported?(model)
     end
 
-    def
-
     def dat_to_sbml_url
       "#{BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"
     end

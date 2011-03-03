@@ -8,7 +8,7 @@
       <% keys.each do |k| -%>
           <tr>
             <td><%= h(k) -%></td>
-            <td><%= check_box_tag "parameter_keys[#{k}]", "1", false -%></td>
+            <td><%= check_box_tag "parameter_keys[#{k}]", "1", true -%></td>
           </tr>
       <% end -%>
       </tbody>
