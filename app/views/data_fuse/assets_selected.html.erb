@@ -1,0 +1,22 @@
+<div class="show_basic">
+
+  DataFile:
+
+  <%= render :partial => "layouts/resource_list_item",:object=>@data_file -%>
+
+  Model:
+
+  <%= render :partial => "layouts/resource_list_item",:object=>@model -%>
+
+  Keys:
+
+  <%= @parameter_keys.join(", ") -%>
+
+  <% form_tag({:action=>:submit},:method=>:post) do -%>
+    <%= hidden_field_tag :data_file_id,@data_file.id -%>
+    <%= hidden_field_tag :model_id,@model.id -%>
+    <%= hidden_field_tag :parameter_keys,@parameter_keys -%>
+    <%= submit_tag "Go!",:disable_with=>"Sending..." -%>
+  <% end -%>
+
+</div>
