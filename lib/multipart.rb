@@ -23,9 +23,7 @@ class Multipart
     
     post_stream = MultipartStream.new( parts )
 
-    puts "POST URL = #{to_url}"
     url = URI.parse( to_url )
-    puts "PARSED URL = #{url.to_s}"
     
     req = Net::HTTP::Post.new(url.request_uri)
     req.content_length = post_stream.size

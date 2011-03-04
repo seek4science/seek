@@ -1,20 +1,35 @@
 <%
+   require 'open-uri'
    data_url=objects_hash[key]
 
 -%>
 <% if data_url -%>
     <%= hidden_field_tag hidden_id, "on" -%>
     <% if data_url.end_with?(".svg") -%>
+        <%
+#           svg_content = open(data_url).read
+#           uuid=UUIDTools::UUID.random_create.to_s
+#           f=open("/tmp/#{uuid}.svg","w")
+#           f.write svg_content
+#           f.flush
+#           url = svg_path(:id=>uuid)
+#           puts "###############################################"
+#           puts url
+#           puts "###############################################"
+           url = data_url
+           -%>
         <!--[if !IE]>-->
-                <object data="<%= data_url -%>" type="image/svg+xml" id="<%= object_element_id -%>">
+                <object data="<%= url -%>" type="image/svg+xml" id="<%= object_element_id -%>" width="640" height="480">
           <!--<![endif]-->
           <!--[if lt IE 9]>
-                <object src="<%= data_url -%>" classid="image/svg+xml" id="<%= object_element_id -%>">
+                <object src="<%= url -%>" classid="image/svg+xml" id="<%= object_element_id -%>" width="640" height="480">
                                   <![endif]-->
           <!--[if gte IE 9]>
-                <object data="<%= data_url -%>" type="image/svg+xml" id="<%= object_element_id -%>">
+                <object data="<%= url -%>" type="image/svg+xml" id="<%= object_element_id -%>" width="640" height="480">
                                    <![endif]-->
         </object>
+        <br/>
+        <%= link_to "View in new tab",data_url,:target=>"_blank" -%>
     <% else -%>
         <!--[if !IE]>-->
                 <object data="<%= data_url -%>" id="<%= object_element_id -%>" class="reContent">
@@ -26,18 +41,18 @@
                 <object data="<%= data_url -%>" id="<%= object_element_id -%>" class="reContent">
         <![endif]-->
         </object>
+        <script type="text/javascript">
+            var <%= javascript_var -%> = new ResizeableContainer('<%= object_element_id -%>');
+            container = <%= javascript_var -%>;
+            container.GetContainer().style.left = '10px';
+            container.GetContainer().style.top = '10px';
+            container.SetMaxWidth(600);
+            container.SetMaxHeight(800);
+            container.SetCurrentWidth2(600);
+            container.SetCurrentHeight(300);
+        </script>
     <% end -%>
 
-    <script type="text/javascript">
-        var <%= javascript_var -%> = new ResizeableContainer('<%= object_element_id -%>');
-        container = <%= javascript_var -%>;
-        container.GetContainer().style.left = '10px';
-        container.GetContainer().style.top = '10px';
-        container.SetMaxWidth(600);
-        container.SetMaxHeight(800);
-        container.SetCurrentWidth2(600);
-        container.SetCurrentHeight(300);
-    </script>
 <% else -%>
     <%= hidden_field_tag hidden_id, "off" -%>
 <% end -%>
