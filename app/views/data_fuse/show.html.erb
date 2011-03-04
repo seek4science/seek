@@ -34,11 +34,18 @@
             :url=>{:action=>"preview",:controller=>"data_files",:element=>"data_file_preview"},
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('data_file_preview')"
+          )+";"+remote_function(
+            :url=>{:action=>"data_file_csv",:controller=>"data_fuse",:element=>"csv_view"},
+            :with=>"'id='+this.value",
+            :before=>"show_ajax_loader('csv_view')"
           )
    } -%>
 
   <div id="data_file_preview" class="preview_box">
     
+  </div>
+  <div id="csv_view">
+
   </div>
   <%= submit_tag "Send",:disable_with=>"Sending..." -%>
   <% end -%>

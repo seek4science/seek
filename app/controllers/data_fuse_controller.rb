@@ -1,6 +1,7 @@
 require 'libxml'
 require 'fastercsv'
 require 'simple-spreadsheet-extractor'
+require 'open-uri'
 
 class DataFuseController < ApplicationController
   include Seek::MimeTypes
@@ -9,9 +10,26 @@ class DataFuseController < ApplicationController
   include Seek::DataFuse
   
   before_filter :login_required
-  before_filter :is_user_admin_auth
 
   @@model_builder = Seek::JWSModelBuilder.new
+
+  def data_file_csv
+
+    element=params[:element]
+    data_file=DataFile.find_by_id(params[:id])
+
+    last_sheet = find_last_sheet_index(data_file)
+    csv = spreadsheet_to_csv(open(data_file.content_blob.filepath),last_sheet,true)
+
+    render :update do |page|
+      if data_file && Authorization.is_authorized?("download", nil, data_file, current_user)
+        page.replace_html element, :partial=>"data_fuse/csv_view", :locals=>{:csv=>csv}
+      else
+        page.replace_html element, :text=>"Data File not found, or not authorized to examine"
+      end
+    end
+
+  end
 
   def show
     xls_types = mime_types_for_extension("xls")
@@ -36,7 +54,7 @@ class DataFuseController < ApplicationController
 
     @parameter_keys = params[:parameter_keys].keys
 
-    @matching_csv,@matched_keys = matching_csv(@data_file,@parameter_keys)
+    @matching_csv,@matching_keys = matching_csv(@data_file,@parameter_keys)
 
     respond_to do |format|
       format.html
@@ -47,6 +65,9 @@ class DataFuseController < ApplicationController
     last_sheet_index = find_last_sheet_index(data_file)
     csv = spreadsheet_to_csv(open(data_file.content_blob.filepath),last_sheet_index,true)
 
+    #FIXME: temporary way of making sure it isn't exploited to get at data. Should never get here if used through the UI
+    raise Exception.new("Unauthorized") unless Authorization.is_authorized?("download", nil, @model, current_user)
+
     Seek::CSVHandler.resolve_model_parameter_keys parameter_keys,csv
     
   end
@@ -56,7 +77,11 @@ class DataFuseController < ApplicationController
     parameter_csv=params[:parameter_csv]
     matching_keys=params[:matching_keys]
 
-    submit_parameter_values_to_jws_online @model,matching_keys,parameter_csv
+    @results = submit_parameter_values_to_jws_online @model,matching_keys,parameter_csv
+
+    respond_to do |format|
+      format.html
+    end
   end
 
 
@@ -89,6 +114,14 @@ class DataFuseController < ApplicationController
       else
         page.replace_html element, :text=>"Model not found, or not authorized to examine"
       end
+    end
+  end
+
+  def view_result_csv
+    url = params[:url]
+    @csv=open(url).read
+    respond_to do |format|
+      format.html
     end
   end
 

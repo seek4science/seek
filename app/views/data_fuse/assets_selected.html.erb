@@ -8,16 +8,12 @@
   <%= render :partial => "layouts/resource_list_item",:object=>@model -%>
   <br/>
 
-  Keys:<br/>
-  <%= @parameter_keys.join(", ") -%>
+  Symbols you selected that were not found in the data:
+  <b><%= (@parameter_keys - @matching_keys).sort.join(", ") -%></b>
   <br/>
 
-  Matched Keys:<br/>
-  <%= @matched_keys.join(", ") -%>
-  <br/>
-
-  CSV:<br/>
-  <%= simple_format(@matching_csv) -%>
+  Parameters summary:<br/>
+  <%= render :partial=>"csv_view",:locals=>{:csv=>@matching_csv,:highlight_first_row=>true} -%>
   <br/>
 
   <% form_tag({:action=>:submit},:method=>:post) do -%>
