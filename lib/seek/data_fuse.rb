@@ -4,19 +4,22 @@ require 'libxml'
 module Seek
   module DataFuse
 
-    MOCKED_RESPONSE=true
+    MOCKED_RESPONSE=false
 
     class DataFuseResult
       attr_accessor :graph_url,:csv_url,:id,:name
     end
 
     def data_fuse_url
-      "#{Seek::JWSModelBuilder::BASE_URL}DataFuse.jsp"
+      "#{Seek::JWSModelBuilder::SIMULATE_URL}"
     end
 
     def submit_parameter_values_to_jws_online model,matching_keys,parameter_values_csv
 
         return process_data_fuse_response(dummy_data_fuse_response_xml) if MOCKED_RESPONSE
+
+        puts "Paremeter values = #{parameter_values_csv}"
+        puts "Upload URL = #{data_fuse_url}"
 
         filepath=model.content_blob.filepath
 

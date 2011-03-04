@@ -1,3 +1,6 @@
+<%
+   checked_by_default=true
+-%>
 
     <table border="1">
       <thead>
@@ -8,7 +11,7 @@
       <% keys.sort.each do |k| -%>
           <tr>
             <td><%= h(k) -%></td>
-            <td><%= check_box_tag "parameter_keys[#{k}]", "1", false -%></td>
+            <td><%= check_box_tag "parameter_keys[#{k}]", "1", checked_by_default -%></td>
           </tr>
       <% end -%>
       </tbody>
