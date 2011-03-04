@@ -38,7 +38,7 @@ class DataFuseController < ApplicationController
       xls_types.include?(df.content_type)
     end
 
-    @models=Authorization.authorize_collection("download", Model.all, current_user).select { |m| @@model_builder.is_supported?(m) }
+    @models=Authorization.authorize_collection("download", Model.all, current_user).select { |m| @@model_builder.is_sbml?(m) }
     respond_to do |format|
       format.html
     end
