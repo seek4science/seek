@@ -18,10 +18,6 @@ module Seek
 
         return process_data_fuse_response(dummy_data_fuse_response_xml) if MOCKED_RESPONSE
 
-        puts "Paremeter values = #{parameter_values_csv}"
-        puts "Matching keys = #{matching_keys}"
-        puts "Upload URL = #{data_fuse_url}"
-
         filepath=model.content_blob.filepath
 
         #this is necessary to get the correct filename and especially extension, which JWS relies on
@@ -44,21 +40,11 @@ module Seek
           else
             raise Exception.new("Expected a redirection from JWS Online but got #{response.code}, for url: #{upload_sbml_url}")
           end
-#          response = RestClient.post(data_fuse_url, :upfile=>tmpfile,:parametercsv=>parameter_values_csv,:matchingsymbols=>matching_keys, :filename=>model.original_filename, :multipart=>true) { |response, request, result, &block |
-#          if [301, 302, 307].include? response.code
-#            response.follow_redirection(request, result, &block)
-#          else
-#            response.return!(request, result, &block)
-#          end
-#          }
 
 
         if response.instance_of?(Net::HTTPInternalServerError)
           raise Exception.new(response.body.gsub(/<head\>.*<\/head>/, ""))
         end
-
-        #process_response_body(response.body)
-        puts response.body
 
         process_data_fuse_response(response.body)
 

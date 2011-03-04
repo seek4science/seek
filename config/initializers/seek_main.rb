@@ -24,8 +24,7 @@ HIDE_DETAILS=false unless defined? HIDE_DETAILS
 EVENTS_ENABLED=true unless defined? EVENTS_ENABLED
 PUBMED_API_EMAIL = "" unless defined? PUBMED_API_EMAIL
 CROSSREF_API_EMAIL = "" unless defined? CROSSREF_API_EMAIL
-#JWS_ONLINE_ROOT = "http://jjj.mib.ac.uk" unless defined? JWS_ONLINE_ROOT
-JWS_ONLINE_ROOT = "http://130.88.195.112" unless defined? JWS_ONLINE_ROOT
+JWS_ONLINE_ROOT = "http://jjj.mib.ac.uk" unless defined? JWS_ONLINE_ROOT
 
 #this is needed for the xlinks in the REST API.
 SITE_BASE_HOST="http://localhost:3000" unless defined? SITE_BASE_HOST
