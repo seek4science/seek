@@ -54,7 +54,7 @@ class DataFuseController < ApplicationController
 
     @parameter_keys = params[:parameter_keys].keys
 
-    @matching_csv,@matched_keys = matching_csv(@data_file,@parameter_keys)
+    @matching_csv,@matching_keys = matching_csv(@data_file,@parameter_keys)
 
     respond_to do |format|
       format.html
