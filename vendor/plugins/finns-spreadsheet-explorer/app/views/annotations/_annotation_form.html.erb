@@ -2,7 +2,7 @@
     <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"create"},   
                    :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
                    :loading => "Element.show('spinner');",
-                   :complete => "Element.hide('spinner');", :html => {:id => "annotation_form"}) do %>
+                   :complete => "Element.hide('spinner');Element.hide('annotation_form');", :html => {:id => "annotation_form"}) do %>
     
     <%= hidden_field_tag :annotation_id %>                
     <%= hidden_field_tag :annotation_data_file_id, @data_file.id %>    

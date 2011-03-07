@@ -41,7 +41,10 @@ td.primary_selected_cell {
 }
 
 td.annotated_cell {
-  border: 3px ridge #7F4;
+  border: 1px dotted #4477FF;
+  background-image: url('images/famfamfam_silk/tag_blue.png');
+  background-repeat:no-repeat;
+  background-position:right middle;
 }
 
 div.sheet {
@@ -82,9 +85,11 @@ div.annotation
   border: 1px solid #CCC;
   background-color: #FFF;
   padding: 0.5em;
-  position: absolute;
+  position: relative;
   display:none;
   width:20em;
+  z-index: 1;
+  margin-bottom: 0.5em;
 }
 
 div.annotation_content
@@ -152,4 +157,9 @@ div#annotation_controls
   margin: 0.5em; 
   border-top: 1px dashed #AAA; 
   padding: 0.5em;
+}
+
+div#annotation_container
+{
+  position: absolute;
 }

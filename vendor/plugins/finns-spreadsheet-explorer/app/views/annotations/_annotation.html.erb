@@ -18,12 +18,12 @@
   </div>  
   <div class="annotation_footer">
     <% if annotation.source == current_user %>
-      <%= link_to_remote(image('destroy'), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
+      <%= link_to_remote(image('spreadsheet_annotation_destroy'), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
                  :method => :delete,   
                  :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
                  :loading => "$j('img.spinner').show();",
                  :complete => "$j('img.spinner').hide();") -%>
-      <%= link_to(image('edit'), '#', :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") -%>     
+      <%= link_to(image('spreadsheet_annotation_edit'), '#', :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") -%>     
       <%= image_tag "ajax-loader.gif", :class => 'spinner', :style => 'display:none;' -%> 
     <% end -%>
 

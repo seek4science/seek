@@ -36,7 +36,7 @@ $j(document).ready(function ($) {
       $('#cell_info').val("");      
       
       //Record current sheet in annotation form
-      $('input#sheet_id').attr("value",$(this).attr("index"));
+      $('input#annotation_sheet_id').attr("value",$(this).attr("index"));
       
       //Reset variables
       isMouseDown = false,
@@ -131,13 +131,18 @@ function alpha2num(col)
   return result;
 }
 
+
+//To display the annotations
 function show_annotation(id,x,y)
 {
-  var ann = $j("#annotation_" + id);
-  ann.css('left',x+30);  
-  ann.css('top',y);
-  ann.show();  
+  var annotation_container = $j("#annotation_container");
+  var annotation = $j("#annotation_" + id);
+  annotation_container.css('left',x+20);  
+  annotation_container.css('top',y-20);
+  annotation.show();  
 }
+
+
 
 function select_range(range)
 {
