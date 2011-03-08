@@ -6,7 +6,7 @@
   <h2>Selected data file</h2>
   <%= render :partial => "layouts/resource_list_item",:object=>@data_file -%>
 
-  <h2>Matching paramter symbols and values</h2>
+  <h2>Matching parameter symbols and values</h2>
   <%= render :partial=>"csv_view",:locals=>{:csv=>@matching_csv,:highlight_first_row=>true} -%>
 
   <h2>Parameter symbols you selected that were not found in the data file</h2>
