@@ -96,9 +96,6 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
     assert_equal "admins",Seek::ApplicationConfiguration.type_managers
   end
 
-  test "global_passphrase" do
-    assert_equal "ohx0ipuk2baiXah",Seek::ApplicationConfiguration.global_passphrase
-  end
   test "pubmed_api_email" do
     assert_equal nil,Seek::ApplicationConfiguration.pubmed_api_email
   end
@@ -110,9 +107,6 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
   end
   test "open_id_authentication_store" do
     assert_equal :memory,Seek::ApplicationConfiguration.open_id_authentication_store
-  end
-  test "asset_order" do
-    assert_equal ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event'], Seek::ApplicationConfiguration.asset_order
   end
   test "copyright_addendum_enabled" do
     assert_equal false,Seek::ApplicationConfiguration.copyright_addendum_enabled

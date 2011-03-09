@@ -39,6 +39,7 @@ require 'active_record_extensions'
     Rubaidh::GoogleAnalytics.tracker_id = "000-000"
   end
 
+
   if Settings.defaults[:exception_notification_enabled]
     ExceptionNotifier.render_only = false
     ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
@@ -67,13 +68,9 @@ require 'active_record_extensions'
   Settings.defaults[:type_managers] = 'admins'
   Settings.defaults[:tag_threshold] = 1
   Settings.defaults[:max_visible_tags] = 20
-  Settings.defaults[:global_passphrase] = "ohx0ipuk2baiXah"
   Settings.defaults[:pubmed_api_email] = nil
   Settings.defaults[:crossref_api_email] = nil
   Settings.defaults[:site_base_host] = "http://localhost:3000"
   Settings.defaults[:open_id_authentication_store] = :memory
-  Settings.defaults[:asset_order] = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event']
 
   OpenIdAuthentication.store = Settings.defaults[:open_id_authentication_store]
-
-  ACTIVITY_LOG_ENABLED = true

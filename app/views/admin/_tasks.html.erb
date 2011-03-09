@@ -27,7 +27,7 @@
   <h3>Application Configuration</h3>
   <ul>
     <li><%= link_to "Features enabled", url_for(:action=>"features_enabled", :controller=>"admin") %></li>
-    <li><%= link_to "Project", url_for(:action=>"project", :controller=>"admin") %></li>
+    <li><%= link_to "Rebrand", url_for(:action=>"rebrand", :controller=>"admin") %></li>
     <li><%= link_to "Pagination", url_for(:action=>"pagination", :controller=>"admin") %></li>
     <li><%= link_to "Others", url_for(:action=>"others", :controller=>"admin") %></li>
     <li><%= button_to ('Restart server', {:action => 'restart_server', :controller => 'admin'}, :confirm => 'Are you sure you want to restart the server?')%></li>

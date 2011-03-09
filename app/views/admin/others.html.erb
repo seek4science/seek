@@ -3,13 +3,10 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Type manager enabled:   <%= check_box_tag(:type_managers_enabled, 1, Seek::ApplicationConfiguration.type_managers_enabled) %>
+    Type manager enabled:   <%= check_box_tag(:type_managers_enabled, 1, Seek::ApplicationConfiguration.type_managers_enabled, :disabled => true) %>
     <br style="clear:both;"/>
     <br/>
-    Managed by:    <%= text_field_tag(:type_managers, Seek::ApplicationConfiguration.type_managers) %>
-    <br style="clear:both;"/>
-    <br/>
-    Global passphrase:    <%= text_field_tag(:global_passphrase, Seek::ApplicationConfiguration.global_passphrase) %>
+    Managed by:    <%= text_field_tag(:type_managers, Seek::ApplicationConfiguration.type_managers, :disabled => true) %>
     <br style="clear:both;"/>
     <br/>
     Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::ApplicationConfiguration.pubmed_api_email) %>
@@ -30,77 +27,10 @@
     Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::ApplicationConfiguration.open_id_authentication_store) %>
     <br style="clear:both;"/>
     <br/>
-    Asset order:
-    <br style="clear:both;"/>
-    <br/>
-        <%= select_tag 'asset_order', options_for_select(Seek::ApplicationConfiguration.asset_order), :multiple => true, :size => 13 %>
-        <br style="clear:both;"/>
-        <br/>
-        <input style="position:absolute;left:130px;top:360px" type="button" value="Up" onClick="Selectbox.moveOptionUp(this.form.elements.asset_order)">
-        <input style="position:absolute;left:130px;top:390px" type="button" value="Down" onClick="Selectbox.moveOptionDown(this.form.elements.asset_order)">
-
     <br style="clear:both;"/>
     <br/>
     <br style="clear:both;"/>
-    <br/>
-        <%= submit_tag "Update", :onclick => "javascript: Selectbox.selectAllOptions(this.form.elements.asset_order)" %>
+    <br/>   
+        <%= submit_tag "Update"%>
   </div>
 <% end -%>
-
-<script type="text/javascript">
-    var Selectbox = {};
-
-    Selectbox.hasOptions = function(obj) {
-      return (obj!=null && typeof(obj.options)!="undefined" && obj.options!=null);
-    };
-
-    Selectbox.moveOptionUp = function(obj) {
-      if (!this.hasOptions(obj)) { return false; }
-      for (i=0; i<obj.options.length; i++) {
-        if (obj.options[i].selected) {
-          if (i>0 && !obj.options[i-1].selected) {
-            this.swapOptions(obj,i,i-1);
-            obj.options[i-1].selected = true;
-          }
-        }
-      }
-      return true;
-    };
-
-    Selectbox.moveOptionDown = function(obj) {
-      if (!this.hasOptions(obj)) { return false; }
-      for (i=obj.options.length-1; i>=0; i--) {
-        if (obj.options[i].selected) {
-          if (i != (obj.options.length-1) && ! obj.options[i+1].selected) {
-            this.swapOptions(obj,i,i+1);
-            obj.options[i+1].selected = true;
-          }
-        }
-      }
-      return true;
-    };
-
-    Selectbox.swapOptions = function(obj,i,j) {
-      if (!this.hasOptions(obj)) { return false; }
-      var o = obj.options;
-      if (i<0 || i>=o.length || j<0 || j>=o.length) { return false; }
-      var i_selected = o[i].selected;
-      var j_selected = o[j].selected;
-      var temp = new Option(o[i].text, o[i].value, o[i].defaultSelected, o[i].selected);
-      var temp2= new Option(o[j].text, o[j].value, o[j].defaultSelected, o[j].selected);
-      o[i] = temp2;
-      o[j] = temp;
-      o[i].selected = j_selected;
-      o[j].selected = i_selected;
-      return true;
-    };
-
-    Selectbox.selectAllOptions = function(obj) {
-      if (!this.hasOptions(obj)) { return false; }
-      for (var i=0; i<obj.options.length; i++) {
-        obj.options[i].selected = true;
-      }
-      return true;
-    };
-
-</script>

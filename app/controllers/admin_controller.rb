@@ -99,27 +99,18 @@ class AdminController < ApplicationController
     else
       Seek::ApplicationConfiguration.google_analytics_enabled= false
     end
-
-    if params[:copyright_addendum_enabled] == "1"
-      Seek::ApplicationConfiguration.copyright_addendum_enabled= true
-    else
-      Seek::ApplicationConfiguration.copyright_addendum_enabled= false
-    end
-
     Seek::ApplicationConfiguration.google_analytics_tracker_id= params[:google_analytics_tracker_id]
-    Seek::ApplicationConfiguration.copyright_addendum_content= params[:copyright_addendum_content]
-
     flash[:notice] = 'To apply the change, please restart the server'
     redirect_to :action=>:show
   end
 
-  def project
+  def rebrand
       respond_to do |format|
       format.html
     end
   end
 
-  def update_project
+  def update_rebrand
     Seek::ApplicationConfiguration.project_name= params[:project_name]
     Seek::ApplicationConfiguration.project_type= params[:project_type]
     Seek::ApplicationConfiguration.project_link= params[:project_link]
@@ -140,6 +131,12 @@ class AdminController < ApplicationController
     end
     Seek::ApplicationConfiguration.header_image_link= params[:header_image_link]
     Seek::ApplicationConfiguration.header_image_title= params[:header_image_title]
+    if params[:copyright_addendum_enabled] == "1"
+      Seek::ApplicationConfiguration.copyright_addendum_enabled= true
+    else
+      Seek::ApplicationConfiguration.copyright_addendum_enabled= false
+    end
+    Seek::ApplicationConfiguration.copyright_addendum_content= params[:copyright_addendum_content]
     flash[:notice] = 'To apply the change, please restart the server'
     redirect_to :action=>:show
   end
@@ -168,12 +165,10 @@ class AdminController < ApplicationController
      Seek::ApplicationConfiguration.type_managers_enabled= false
     end
     Seek::ApplicationConfiguration.type_managers= params[:type_managers]
-    Seek::ApplicationConfiguration.global_passphrase= params[:global_passphrase]
     Seek::ApplicationConfiguration.pubmed_api_email= params[:pubmed_api_email]
     Seek::ApplicationConfiguration.crossref_api_email= params[:crossref_api_email]
     Seek::ApplicationConfiguration.site_base_host= params[:site_base_host]
     Seek::ApplicationConfiguration.open_id_authentication_store= params[:open_id_authentication_store]
-    Seek::ApplicationConfiguration.asset_order= params[:asset_order]
     Seek::ApplicationConfiguration.tag_threshold= params[:tag_threshold]
     Seek::ApplicationConfiguration.max_visible_tags= params[:max_visible_tags]
     flash[:notice] = 'To apply the change, please restart the server'
@@ -181,7 +176,7 @@ class AdminController < ApplicationController
   end
 
   def restart_server
-    system ("touch tmp/restart.txt")
+    system ("touch #{RAILS_ROOT}/tmp/restart.txt")
     flash[:notice] = 'The server was restarted'
     redirect_to :action=>:show
   end

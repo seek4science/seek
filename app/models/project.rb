@@ -123,13 +123,13 @@ class Project < ActiveRecord::Base
   def set_credentials
     unless site_username.nil? && site_password.nil?
       cred={:username=>site_username,:password=>site_password}
-      self.site_credentials=encrypt(cred,generate_key(Seek::ApplicationConfiguration.global_passphrase))
+      self.site_credentials=encrypt(cred,generate_key(GLOBAL_PASSPHRASE))
     end
   end
 
   def decrypt_credentials
     begin
-      cred=decrypt(site_credentials,generate_key(Seek::ApplicationConfiguration.global_passphrase))
+      cred=decrypt(site_credentials,generate_key(GLOBAL_PASSPHRASE))
       self.site_password=cred[:password]
       self.site_username=cred[:username]
     rescue

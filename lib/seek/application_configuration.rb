@@ -207,7 +207,7 @@ module Seek
     end
 
     def self.limit_latest
-        Settings.limit_latest
+        Settings.limit_latest.to_i
     end
     def self.limit_latest= value
         Settings.limit_latest = value
@@ -239,13 +239,6 @@ module Seek
     end
     def self.max_visible_tags= value
         Settings.max_visible_tags = value
-    end
-
-    def self.global_passphrase
-        Settings.global_passphrase
-    end
-    def self.global_passphrase= value
-         Settings.global_passphrase = value
     end
 
     def self.pubmed_api_email
@@ -290,13 +283,6 @@ module Seek
     def self.open_id_authentication_store= value
         Settings.open_id_authentication_store = value
         OpenIdAuthentication.store = Settings.open_id_authentication_store
-    end
-
-    def self.asset_order
-        Settings.asset_order
-    end
-    def self.asset_order= value
-        Settings.asset_order = value
     end
 
     def self.copyright_addendum_enabled

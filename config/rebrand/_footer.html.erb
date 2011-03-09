@@ -3,11 +3,12 @@
   <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %>
   and
   <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
-  <% if defined? COPYRIGHT_ADDENDUM  %>
+  <% if Seek::ApplicationConfiguration.copyright_addendum_enabled  %>
     <p class="copyright">
-      <%= COPYRIGHT_ADDENDUM %>
+      <%= Seek::ApplicationConfiguration.copyright_addendum_content %>
     </p>
   <%end%>
+  
 </p>
 
 <% if logged_in? -%>

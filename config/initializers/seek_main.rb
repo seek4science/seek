@@ -16,10 +16,10 @@ require 'modporter_extensions'
 #EMAIL_ENABLED=false unless defined? EMAIL_ENABLED
 #ACTIVATION_REQUIRED=false unless defined? ACTIVATION_REQUIRED
 #EXCEPTION_NOTIFICATION_ENABLED=false unless defined? EXCEPTION_NOTIFICATION_ENABLED
-#ENABLE_GOOGLE_ANALYTICS=false unless defined? ENABLE_GOOGLE_ANALYTICS
+#ENABLE_GOOGLE_ANALYTICS=true unless defined? ENABLE_GOOGLE_ANALYTICS
 #TAG_THRESHOLD=1 unless defined? TAG_THRESHOLD
 #MAX_VISIBLE_TAGS=20 unless defined? MAX_VISIBLE_TAGS
-#GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
+GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 #TYPE_MANAGERS="admins" unless defined? TYPE_MANAGERS
 #HIDE_DETAILS=false unless defined? HIDE_DETAILS
 #EVENTS_ENABLED=true unless defined? EVENTS_ENABLED
@@ -37,7 +37,7 @@ if ENABLE_GOOGLE_ANALYTICS
 else
   Rubaidh::GoogleAnalytics.tracker_id = "000-000"
 end
-
+=begin
 if EXCEPTION_NOTIFICATION_ENABLED
   ExceptionNotifier.render_only = false
 else
@@ -47,7 +47,7 @@ end
 
 
 #The order in which asset tabs appear
-#ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event']
+ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event']
 
 #OpenIdAuthentication.store = :memory
 

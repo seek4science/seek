@@ -1261,6 +1261,7 @@ div.help_upload_box div.image_thumbnail div.thumb {
 div.collapsable_div {
   border: 1px solid #999;
   margin: 3px 0;
+
 }
 
 div.collapsable_div_header {
@@ -1471,4 +1472,10 @@ li.author_avatar {
     float:left;
     margin-right: 0.5em;
     text-align:center;
+}
+
+div.email_configuration{
+    border: 1px solid #999;
+    margin: 3px 0;
+    width: 500px
 }

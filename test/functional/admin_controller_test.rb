@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'settings'
 
 class AdminControllerTest < ActionController::TestCase
 

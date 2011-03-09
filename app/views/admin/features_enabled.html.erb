@@ -9,31 +9,10 @@
     Jerm enabled:    <%= check_box_tag(:jerm_enabled, 1, Seek::ApplicationConfiguration.jerm_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Email enabled:    <%= check_box_tag(:email_enabled, 1, Seek::ApplicationConfiguration.email_enabled) %>
-    <br style="clear:both;"/>
-    <br/>
-    SMTP mailer setting:
-        <ul>
-        <li> Email address:    <%= text_field_tag(:address, Seek::ApplicationConfiguration.smtp_settings('address')) %> </li>
-        <li>Port:    <%= text_field_tag(:port, Seek::ApplicationConfiguration.smtp_settings('port'), :onkeypress => "javascript: return onlyNumbers(event);") %> (only number) </li>
-        <li>Domain:    <%= text_field_tag(:domain, Seek::ApplicationConfiguration.smtp_settings('domain')) %> </li>
-        <li>Authentication:    <%= text_field_tag(:authentication, Seek::ApplicationConfiguration.smtp_settings('authentication')) %> </li>
-        <li>User name:    <%= text_field_tag(:user_name, Seek::ApplicationConfiguration.smtp_settings('user_name')) %> </li>
-        <li>Password:    <%= text_field_tag(:password, Seek::ApplicationConfiguration.smtp_settings('password')) %> </li>
-        </ul>
-    Noreply sender:    <%= text_field_tag(:noreply_sender, Seek::ApplicationConfiguration.noreply_sender) %>
-    <br style="clear:both;"/>
-    <br/>
     Solr enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::ApplicationConfiguration.solr_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Jws enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::ApplicationConfiguration.jws_enabled) %>
-    <br style="clear:both;"/>
-    <br/>
-    Jws online root:    <%= text_field_tag(:jws_online_root, Seek::ApplicationConfiguration.jws_online_root) %>
-    <br style="clear:both;"/>
-    <br/>
-    Exception notification enabled:    <%= check_box_tag(:exception_notification_enabled, 1, Seek::ApplicationConfiguration.exception_notification_enabled) %>
+    Exception notification enabled:    <%= check_box_tag(:exception_notification_enabled, 1, Seek::ApplicationConfiguration.exception_notification_enabled, :disabled => true) %>
     <br style="clear:both;"/>
     <br/>
     Hide details enabled:    <%= check_box_tag(:hide_details_enabled, 1, Seek::ApplicationConfiguration.hide_details_enabled) %>
@@ -45,18 +24,19 @@
     Activation required enabled: <%= check_box_tag(:activation_required_enabled, 1, Seek::ApplicationConfiguration.activation_required_enabled) %>
     <br style="clear:both;"/>
     <br/>
+    Jws enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::ApplicationConfiguration.jws_enabled) %>
+    <br style="clear:both;"/>
+    <br/>
+    Jws online root:    <%= text_field_tag(:jws_online_root, Seek::ApplicationConfiguration.jws_online_root) %>
+    <br style="clear:both;"/>
+    <br/>
     Google analytics enabled:    <%= check_box_tag(:google_analytics_enabled, 1, Seek::ApplicationConfiguration.google_analytics_enabled) %>
     <br style="clear:both;"/>
     <br/>
     Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::ApplicationConfiguration.google_analytics_tracker_id) %>
     <br style="clear:both;"/>
     <br/>
-    Copyright addendum enabled:    <%= check_box_tag(:copyright_addendum_enabled, 1, Seek::ApplicationConfiguration.copyright_addendum_enabled) %>
-    <br style="clear:both;"/>
-    <br/>
-    Copyright addendum content:    <%= text_field_tag(:copyright_addendum_content, Seek::ApplicationConfiguration.copyright_addendum_content) %>
-    <br style="clear:both;"/>
-    <br/>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Email", :partial => 'admin/email', :div_options => { :class => 'email_configuration'}} %>
     <br style="clear:both;"/>
     <br/>
     <%= submit_tag "Update" %>
