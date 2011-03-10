@@ -1,7 +1,6 @@
 require 'digest/md5'
 require 'net/http'
 require 'open-uri'
-require 'acts_as_uniquely_identifiable'
 require 'tmpdir'
 
 class ContentBlob < ActiveRecord::Base

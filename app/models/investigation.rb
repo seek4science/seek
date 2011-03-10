@@ -1,4 +1,3 @@
-require 'acts_as_isa'
 
 class Investigation < ActiveRecord::Base    
   acts_as_isa

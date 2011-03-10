@@ -2,7 +2,6 @@ require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base

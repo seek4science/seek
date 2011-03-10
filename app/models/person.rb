@@ -1,5 +1,4 @@
 require 'grouped_pagination'
-require 'acts_as_yellow_pages'
 
 class Person < ActiveRecord::Base
 

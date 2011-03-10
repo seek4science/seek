@@ -1,4 +1,3 @@
-require 'acts_as_favouritable'
 
 class SavedSearch < ActiveRecord::Base
   belongs_to :user
