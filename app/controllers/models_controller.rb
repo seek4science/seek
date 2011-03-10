@@ -61,7 +61,6 @@ class ModelsController < ApplicationController
     rescue Exception=>e
       error=e
       logger.error "Error submitting to JWS Online OneStop - #{e.message}"
-      raise e
     end
     
     respond_to do |format|
