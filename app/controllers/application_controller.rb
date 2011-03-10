@@ -1,4 +1,4 @@
-# Filters added to this controller apply to all controllers in the application.
+	# Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
@@ -19,10 +19,11 @@ class ApplicationController < ActionController::Base
   local_addresses.clear
 
   exception_data :additional_exception_notifier_data
-  
-  if Settings.activity_log_enabled
+
+  if Seek::ApplicationConfiguration.activity_log_enabled
     after_filter :log_event
-  end  
+  end
+
   include AuthenticatedSystem
   
   helper :all

@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'rake'
+
 module Seek
   class ApplicationConfiguration
 #Features enabled
@@ -37,10 +40,10 @@ module Seek
          if Settings.solr_enabled
            #start the solr server and reindex
             system ("rake solr:reindex")
-            system ("rake solr:start")
+            system ("rake solr:start RAILS_ENV=#{RAILS_ENV}")
          elsif Settings.solr_enabled == false
            #stop the solr server
-            system ("rake solr:stop")
+            system ("rake solr:stop RAILS_ENV=#{RAILS_ENV}")
          end
     end
 

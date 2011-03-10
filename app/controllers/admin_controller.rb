@@ -100,7 +100,7 @@ class AdminController < ApplicationController
       Seek::ApplicationConfiguration.google_analytics_enabled= false
     end
     Seek::ApplicationConfiguration.google_analytics_tracker_id= params[:google_analytics_tracker_id]
-    flash[:notice] = 'To apply the change, please restart the server'
+    flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
     redirect_to :action=>:show
   end
 
@@ -138,7 +138,7 @@ class AdminController < ApplicationController
       Seek::ApplicationConfiguration.copyright_addendum_enabled= false
     end
     Seek::ApplicationConfiguration.copyright_addendum_content= params[:copyright_addendum_content]
-    flash[:notice] = 'To apply the change, please restart the server'
+    flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
     redirect_to :action=>:show
   end
 
@@ -155,7 +155,7 @@ class AdminController < ApplicationController
    Seek::ApplicationConfiguration.set_default_page "publications", params[:publications]
    Seek::ApplicationConfiguration.set_default_page "events", params[:events]
    Seek::ApplicationConfiguration.limit_latest= params[:limit_latest]
-   flash[:notice] = 'To apply the change, please restart the server'
+   flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
    redirect_to :action=>:show
   end
 
@@ -172,7 +172,7 @@ class AdminController < ApplicationController
     Seek::ApplicationConfiguration.open_id_authentication_store= params[:open_id_authentication_store]
     Seek::ApplicationConfiguration.tag_threshold= params[:tag_threshold]
     Seek::ApplicationConfiguration.max_visible_tags= params[:max_visible_tags]
-    flash[:notice] = 'To apply the change, please restart the server'
+    flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
     redirect_to :action=>:show
   end
 

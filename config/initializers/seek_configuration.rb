@@ -10,7 +10,7 @@ require 'active_record_extensions'
   Settings.defaults[:jerm_enabled] = true
   Settings.defaults[:test_enabled] = false
   Settings.defaults[:email_enabled] = false
-  Settings.defaults[:smtp_settings] = {:address => '', :port => '25', :domain => '', :authentication  => :plain, :user_name => '', :password => ''}
+  Settings.defaults[:smtp_settings] = {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
   Settings.defaults[:noreply_sender] = 'no-reply@sysmo-db.org'  
   Settings.defaults[:solr_enabled] = false
   Settings.defaults[:jws_enabled] = true
