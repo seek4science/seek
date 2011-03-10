@@ -91,6 +91,7 @@ ActionController::Routing::Routes.draw do |map|
 
   #temporary location for the data/models simulation prototyping
   map.data_fuse '/data_fuse/',:controller=>'data_fuse',:action=>'show'
+  map.svg '/svg/',:controller=>'svg',:action=>'show'
 
   #feedback form
   map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get

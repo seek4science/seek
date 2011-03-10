@@ -103,9 +103,12 @@
                             <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
+                          <% if @objects_hash["reactionImage"] -%>
+                            <%# render :partial=>"models/builder/schema_navigate" -%>
+                          <% end -%>
                             <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
                             <%= render :partial=>"models/builder/object_block",
-                                :locals=>{:objects_hash=>@objects_hash,:key=>"reactionImage",:hidden_id=>"plotGraphPanel",:object_element_id=>"resizeableElement",:javascript_var=>"rc"} -%>
+                                :locals=>{:objects_hash=>@objects_hash,:key=>"reactionImage",:hidden_id=>"plotGraphPanel",:object_element_id=>"svgObj",:javascript_var=>"rc"} -%>
                         </p>
                     </div>
                 </div>

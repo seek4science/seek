@@ -1,21 +1,18 @@
 <div class="show_basic">
 
-  DataFile:<br/>
-  <%= render :partial => "layouts/resource_list_item",:object=>@data_file -%>
-  <br/>
-
-  Model:<br/>
+  <h2>Selected model</h2>
   <%= render :partial => "layouts/resource_list_item",:object=>@model -%>
-  <br/>
+  
+  <h2>Selected data file</h2>
+  <%= render :partial => "layouts/resource_list_item",:object=>@data_file -%>
 
-  Symbols you selected that were not found in the data:
-  <b><%= (@parameter_keys - @matching_keys).sort.join(", ") -%></b>
-  <br/>
-
-  Parameters summary:<br/>
+  <h2>Matching parameter symbols and values</h2>
   <%= render :partial=>"csv_view",:locals=>{:csv=>@matching_csv,:highlight_first_row=>true} -%>
-  <br/>
 
+  <h2>Parameter symbols you selected that were not found in the data file</h2>
+  <%= (@parameter_keys - @matching_keys).sort.join(",  ") -%>
+
+  <hr/>
   <% form_tag({:action=>:submit},:method=>:post) do -%>
     <%= hidden_field_tag :data_file_id,@data_file.id -%>
     <%= hidden_field_tag :model_id,@model.id -%>
@@ -23,7 +20,7 @@
     <%= hidden_field_tag :matching_keys,@matching_keys -%>
     <%= hidden_field_tag :parameter_csv,@matching_csv -%>
 
-    <%= submit_tag "Go!",:disable_with=>"Sending..." -%>
+    <%= submit_tag "Submit to JWS Online",:disable_with=>"Sending..." -%>
   <% end -%>
 
 </div>
