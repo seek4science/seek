@@ -37,5 +37,11 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "a#adminmode[href=?]",admin_path,:count=>1
   end
 
+  test "SOP tab should be capitalized" do
+    login_as(:quentin)
+    get :index
+    assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+  end
+
 
 end
