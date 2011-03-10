@@ -1,6 +1,5 @@
 require 'grouped_pagination'
 require 'simple_crypt'
-require 'acts_as_yellow_pages'
 require 'title_trimmer'
 
 class Project < ActiveRecord::Base

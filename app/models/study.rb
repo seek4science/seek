@@ -1,4 +1,3 @@
-require 'acts_as_isa'
 
 class Study < ActiveRecord::Base  
   acts_as_isa

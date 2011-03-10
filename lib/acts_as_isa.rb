@@ -1,7 +1,5 @@
 require 'title_trimmer'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
-require 'acts_as_favouritable'
 
 module Acts #:nodoc:
   module Isa #:nodoc:
