@@ -44,20 +44,17 @@ class SiteAnnouncementsController < ApplicationController
   end
   
   def notification_settings
-    key=params[:key]
-    error=false
-    @info=NotifieeInfo.find_by_unique_key(key) 
-    error=true if !@info.nil?
+    @info=NotifieeInfo.find_by_unique_key(params[:key])
     
     respond_to do |format|
-      if error 
-        format.html
-      else
+      if @info.nil?
         flash[:error]="Invalid Key"
         redirect_to root_url
+      else
+        format.html
       end
-      
     end
+    
   end
   
   def new

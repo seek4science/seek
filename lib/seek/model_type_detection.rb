@@ -10,6 +10,10 @@ module Seek
       return false if !model.original_filename.end_with?(".xml")      
       check_content model.content_blob.filepath,"<sbml"
     end
+
+    def is_jws_supported? model
+      is_dat?(model) || is_sbml?(model)
+    end
     
     def check_content filepath, str, max_length=1500      
       char_count=0      

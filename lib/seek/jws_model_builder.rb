@@ -32,7 +32,7 @@ module Seek
     MOCKED_RESPONSE=false
 
     def is_supported? model
-      model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))
+      model.content_blob.file_exists? && is_jws_supported?(model)
     end
 
     def dat_to_sbml_url

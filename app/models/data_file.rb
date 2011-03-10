@@ -62,6 +62,10 @@ class DataFile < ActiveRecord::Base
 
     return datafiles_with_contributors.to_json
   end
+
+  def self.spreadsheets
+    
+  end
   
 
   def relationship_type(assay)
