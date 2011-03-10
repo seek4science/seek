@@ -17,6 +17,23 @@ class JWSTests < ActiveSupport::TestCase
     model.content_blob.dump_data_to_file
     assert !builder.is_supported?(model)
   end
+
+  test "is supported no longer relies on extension" do
+    builder = Seek::JWSModelBuilder.new
+    model=models(:teusink)
+    model.original_filename = "teusink.txt"
+    model.content_blob.dump_data_to_file
+    assert builder.is_sbml?(model)
+    assert !builder.is_dat?(model)
+    assert builder.is_supported?(model)
+
+    model=models(:jws_model)
+    model.original_filename = "jws.txt"
+    model.content_blob.dump_data_to_file
+    assert !builder.is_sbml?(model)
+    assert builder.is_dat?(model)
+    assert builder.is_supported?(model)
+  end
   
   test "is supported with versioned model" do
     builder = Seek::JWSModelBuilder.new
@@ -72,7 +89,7 @@ class JWSTests < ActiveSupport::TestCase
     model=models(:invalid_sbml_xml)
     params_hash,saved_file,objects_hash,error_keys = builder.builder_content model.versions.first
     assert !error_keys.empty?
-    assert error.keys.include?("parameters")
+    assert error_keys.include?("parameters")
   end
   
 end
