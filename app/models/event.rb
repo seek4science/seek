@@ -1,7 +1,5 @@
 require 'acts_as_authorized'
-require 'acts_as_uniquely_identifiable'
 require 'grouped_pagination'
-require 'acts_as_favouritable'
 
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files

@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'acts_as_uniquely_identifiable'
 
 class User < ActiveRecord::Base
 
