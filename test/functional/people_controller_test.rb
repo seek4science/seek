@@ -288,4 +288,13 @@ class PeopleControllerTest < ActionController::TestCase
     get :index, :filter => {:project => project.id}
     assert_response :success
   end
+
+  test "finding by role" do
+    role=roles(:member)
+    get :index,:role_id=>role.id
+    assert_response :success
+    assert assigns(:people)
+    assert assigns(:people).include?(people(:person_for_model_owner))
+  end
+  
 end
