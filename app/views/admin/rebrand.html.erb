@@ -1,5 +1,5 @@
 
-<% form_tag :action=>"update_project" do -%>
+<% form_tag :action=>"update_rebrand" do -%>
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
@@ -28,8 +28,6 @@
     DM project link:    <%= text_field_tag(:dm_project_link, Seek::ApplicationConfiguration.dm_project_link) %>
     <br style="clear:both;"/>
     <br/>
-
-
     Application name:    <%= text_field_tag(:application_name, Seek::ApplicationConfiguration.application_name) %>
     <br style="clear:both;"/>
     <br/>
@@ -40,10 +38,21 @@
     Header image enabled:    <%= check_box_tag(:header_image_enabled, 1, Seek::ApplicationConfiguration.header_image_enabled) %>
     <br style="clear:both;"/>
     <br/>
+    Header image:    <%= text_field_tag(:header_image, Seek::ApplicationConfiguration.header_image) %>
+    <br style="clear:both;"/>
+    <br/>
     Header image link:    <%= text_field_tag(:header_image_link, Seek::ApplicationConfiguration.header_image_link) %>
     <br style="clear:both;"/>
     <br/>
     Header image title:    <%= text_field_tag(:header_image_title, Seek::ApplicationConfiguration.header_image_title) %>
+    <br style="clear:both;"/>
+    <br/>
+    Copyright addendum enabled:    <%= check_box_tag(:copyright_addendum_enabled, 1, Seek::ApplicationConfiguration.copyright_addendum_enabled) %>
+    <br style="clear:both;"/>
+    <br/>
+    Copyright addendum content:    <%= text_field_tag(:copyright_addendum_content, Seek::ApplicationConfiguration.copyright_addendum_content) %>
+    <br style="clear:both;"/>
+    <br/>
     <br style="clear:both;"/>
     <br/>
 
