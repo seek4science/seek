@@ -5,9 +5,9 @@ class AdminControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  test "should show project" do
+  test "should show rebrand" do
     login_as(:quentin)
-    get :project
+    get :rebrand
     assert_response :success
   end
 

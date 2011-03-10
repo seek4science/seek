@@ -10,7 +10,7 @@ require 'active_record_extensions'
   Settings.defaults[:jerm_enabled] = true
   Settings.defaults[:test_enabled] = false
   Settings.defaults[:email_enabled] = false
-  Settings.defaults[:smtp_settings] = {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
+  Settings.defaults[:smtp_settings] = {:address => '', :port => '25', :domain => '', :authentication  => :plain, :user_name => '', :password => ''}
   Settings.defaults[:noreply_sender] = 'no-reply@sysmo-db.org'  
   Settings.defaults[:solr_enabled] = false
   Settings.defaults[:jws_enabled] = true
@@ -56,6 +56,8 @@ require 'active_record_extensions'
   Settings.defaults[:project_type] = 'Consortium'
   Settings.defaults[:project_link] = 'http://www.sysmo.net'
   Settings.defaults[:header_image_enabled] = false
+  Settings.defaults[:header_image] = 'sysmo-db-logo_smaller.png'
+
 
 #Pagination
   Settings.defaults[:index] = {:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest',

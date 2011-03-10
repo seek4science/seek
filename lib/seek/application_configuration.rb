@@ -34,6 +34,14 @@ module Seek
     end
     def self.solr_enabled= value
          Settings.solr_enabled = value
+         if Settings.solr_enabled
+           #start the solr server and reindex
+            system ("rake solr:reindex")
+            system ("rake solr:start")
+         elsif Settings.solr_enabled == false
+           #stop the solr server
+            system ("rake solr:stop")
+         end
     end
 
     def self.jws_enabled
@@ -183,6 +191,13 @@ module Seek
     end
     def self.header_image_enabled= value
          Settings.header_image_enabled = value
+    end
+
+    def self.header_image
+         Settings.header_image
+    end
+    def self.header_image= value
+         Settings.header_image = value
     end
 
     def self.header_image_link

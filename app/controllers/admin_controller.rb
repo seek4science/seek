@@ -129,6 +129,7 @@ class AdminController < ApplicationController
     else
      Seek::ApplicationConfiguration.header_image_enabled= false
     end
+    Seek::ApplicationConfiguration.header_image= params[:header_image]
     Seek::ApplicationConfiguration.header_image_link= params[:header_image_link]
     Seek::ApplicationConfiguration.header_image_title= params[:header_image_title]
     if params[:copyright_addendum_enabled] == "1"

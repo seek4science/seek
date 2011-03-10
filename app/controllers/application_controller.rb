@@ -23,8 +23,7 @@ class ApplicationController < ActionController::Base
   if Settings.activity_log_enabled
     after_filter :log_event
   end  
-  
-  include AuthenticatedSystem  
+  include AuthenticatedSystem
   
   helper :all
   
