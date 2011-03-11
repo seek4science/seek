@@ -11,6 +11,12 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "only admin can restart the server" do
+    login_as(:aaron)
+    post :restart_server
+    assert_not_nil flash[:error]
+  end
+
   test "should show features enabled" do
     login_as(:quentin)
     get :features_enabled

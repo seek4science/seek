@@ -39,8 +39,8 @@ module Seek
          Settings.solr_enabled = value
          if Settings.solr_enabled
            #start the solr server and reindex
-            system ("rake solr:reindex")
-            system ("rake solr:start RAILS_ENV=#{RAILS_ENV}")
+           system ("rake solr:start RAILS_ENV=#{RAILS_ENV}")
+           system ("rake solr:reindex")
          elsif Settings.solr_enabled == false
            #stop the solr server
             system ("rake solr:stop RAILS_ENV=#{RAILS_ENV}")
