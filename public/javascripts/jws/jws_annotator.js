@@ -11,6 +11,35 @@ var annotations = new Array();
       $('form').submit();
   }
 
+  var n_authors = 0;
+  function new_author() {
+      add_author("","","","");
+  }
+
+  function remove_author(element_id) {
+      el=$(element_id);
+      if (confirm("Are you sure you wish to remove this Author?")) {
+        el.remove();
+        n_authors -= 1;
+      }
+
+  }
+
+  function add_author(first_name,last_name,email,institution) {
+      n_authors += 1;
+      panel=$('authors_panel');
+      el = document.createElement("div");
+      el.id="author_"+n_authors;
+      html="<h2>Author</h2><br/>";
+      html+="First name: <input name='firstName' id='first_name_"+n_authors+"' type='text' value='"+decodeURI(first_name)+"'/>"
+      html+="Last name: <input name='last_name' id='last_name_"+n_authors+"' type='text' value='"+decodeURI(last_name)+"'/><br/>"
+      html+="Email: <input name='email' id='email_"+n_authors+"' type='text' value='"+decodeURI(email)+"'/>"
+      html+="Institution: <input name='institution' id='institution_"+n_authors+"' type='text' value='"+decodeURI(institution)+"'/><br/>"
+      html+="<a href=\"javascript:remove_author('"+el.id+"');\">Remove author</a>";
+      el.innerHTML=html;
+      panel.appendChild(el);
+  }
+
   function update_authors_field() {
       authors=$('authors');
       authors.value="";

@@ -48,33 +48,19 @@
           <span class="annotation_title">Terms of distribution:</span><%= text_field_tag "TOD",annotations.terms_of_distribution -%>
         </li>
       </ul>
+      <%= link_to_function "Add author","new_author();" -%>
+      <hr/>
       <div id="authors_panel">
         
       </div>
-      <%= link_to_function "Add author","new_author();" -%>
+
     </div>
 
   </div>
 </div>
 
 <script>
-  var n_authors = 0;
-  function new_author() {
-      add_author("","","","");
-  }
-  function add_author(first_name,last_name,email,institution) {
-      n_authors += 1;
-      panel=$('authors_panel');
-      el = document.createElement("div");
-      el.name="author";
-      html="<h2>Author - "+n_authors+"</h2><br/>";
-      html+="First name: <input name='firstName' id='first_name_"+n_authors+"' type='text' value='"+decodeURI(first_name)+"'/>"
-      html+="Last name: <input name='last_name' id='last_name_"+n_authors+"' type='text' value='"+decodeURI(last_name)+"'/>"
-      html+="Email: <input name='email' id='email_"+n_authors+"' type='text' value='"+decodeURI(email)+"'/>"
-      html+="Institution: <input name='institution' id='institution_"+n_authors+"' type='text' value='"+decodeURI(institution)+"'/>"
-      el.innerHTML=html;
-      panel.appendChild(el);
-  }
+
   <% annotations.authors.each do |author|
         author_details=author.split(",")
   %>
