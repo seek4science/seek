@@ -76,7 +76,7 @@
                                        :link_title=>"model name help window"
                                }
                        } -%>
-            
+            <%= render :partial=>"models/builder/hidden_attribution_annotation_fields",:locals=>{:annotations=>@attribution_annotations} -%>
             <div id="reactions_top" class="builder_box">
                 <div class="squarebox">
                     <div id="reactions_caption" class="squareboxgradientcaption" onclick="togglePanel('reactions');" style="height:20px; cursor: pointer;">

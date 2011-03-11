@@ -5,9 +5,23 @@ var annotations = new Array();
   function submit_annotations() {
       update_annotation_field("annotationsSpecies","species",annotations);
       update_annotation_field("annotationsReactions","reactions",annotations);
+      update_authors_field();
       $('submit_annotations_button').disabled=true;
       $('submit_annotations_button').value = "Submitting ...";
       $('form').submit();
+  }
+
+  function update_authors_field() {
+      authors=$('authors');
+      authors.value="";
+      author_panel = $('authors_panel');
+      author_elements = author_panel.getElementsByTagName("div");
+      for (var i=0;i<author_elements.length;i++) {
+          author_element=author_elements[i];
+          inputs=author_element.getElementsByTagName("input");
+          str=inputs[0].value+","+inputs[1].value+","+inputs[2].value+","+inputs[3].value+"\n";
+          authors.value=authors.value+str;
+      }
   }
 
   function submit_search(prefix) {

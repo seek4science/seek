@@ -200,7 +200,15 @@
       </parameter>
 
 
-      <parameter id="citationURL">
+
+    </parameters>
+
+    <objects>
+
+
+    </objects>
+
+    <parameter id="citationURL">
         http://www.bio.vu.nl/hwconf/papers/basmodel.pdf
       </parameter>
       <parameter id="citationURN">
@@ -210,7 +218,7 @@
         teusink
       </parameter>
       <parameter id="authors">
-        Jacky,Snoep,jls@sun.ac.za,Stellenbosch University\n
+        Fred,Bloggs,fred@email.com,Manchester Uni\nMary,Smith,mary@email.com,London University\n
       </parameter>
       <parameter id="creationDate">
         01 Jan 2001 12:00
@@ -225,12 +233,6 @@
         The model description lacks the 4 ATPs that are used during the production of succinate in the glyoxylate shunt
         in the publication.
       </parameter>
-    </parameters>
-
-    <objects>
-
-
-    </objects>
 
 
     <speciesNames>

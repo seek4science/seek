@@ -105,31 +105,35 @@
                 \n
             </parameter>
 
-
-         <parameter id="citationURL">
-
-         </parameter>
+            <parameter id="modelname">
+			  lin3201131112201427301
+            </parameter>
+            <parameter id="citationURL">
+			  \nhttp://google.com
+            </parameter>
          <parameter id="citationURN">
-
+			\nsss:sss:sss
          </parameter>
          <parameter id="modelURN">
-			teusink
+			lin3201131112201427301
          </parameter>
          <parameter id="authors">
-
+			Fred,Bloggs,fred@email.com,Manchester Uni\nMary,Smith,mary@email.com,London University\n
          </parameter>
          <parameter id="creationDate">
-
+			11/02/2011
          </parameter>
          <parameter id="modificationDate">
-
+			15/02/2011
          </parameter>
          <parameter id="TOD">
-
+			on my terms
          </parameter>
          <parameter id="notes">
 
          </parameter>
+
+
         </parameters>
 
         <objects>
@@ -138,6 +142,8 @@
 
 
         </objects>
+
+
 
 
 
