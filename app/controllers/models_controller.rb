@@ -135,7 +135,7 @@ class ModelsController < ApplicationController
     begin
       supported = @@model_builder.is_supported?(@display_model)
       if supported
-        @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
+        @data_script_hash,attribution_annotations,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
         @applet=@@model_builder.simulate saved_file
       end
     rescue Exception=>e
