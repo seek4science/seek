@@ -1,9 +1,9 @@
 <div class="annotation" id="annotation_<%=annotation.id-%>">
   <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"update", :id => annotation.id}, 
                  :method => :put,  
-                 :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
-                 :loading => "$j('img.spinner').show();",
-                 :complete => "$j('img.spinner').hide();", :html => {:id => "annotation_form"}) do %>
+                 :update => { :success => "annotations", :failure => "annotations"},
+                 :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
+                 :complete => "$j('#spinner" + annotation.id.to_s + "').hide();", :html => {:id => "annotation_form"}) do %>
       
   <div class="annotation_header">
     <%= avatar(annotation.source.person, 24) -%>
@@ -20,14 +20,14 @@
     <% if annotation.source == current_user %>
       <%= link_to_remote(image('spreadsheet_annotation_destroy'), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
                  :method => :delete,   
-                 :update => { :success => "hidden_annotations", :failure => "hidden_annotations"},
-                 :loading => "$j('img.spinner').show();",
-                 :complete => "$j('img.spinner').hide();") -%>
+                 :update => { :success => "annotations", :failure => "annotations"},
+                 :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
+                 :complete => "$j('#spinner" + annotation.id.to_s + "').hide();") -%>
       <%= link_to(image('spreadsheet_annotation_edit'), '#', :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") -%>     
-      <%= image_tag "ajax-loader.gif", :class => 'spinner', :style => 'display:none;' -%> 
+      <%= image_tag "ajax-loader.gif", :id => "spinner"+annotation.id.to_s, :class => 'spinner', :style => 'display:none;' -%> 
     <% end -%>
 
-    <span style="vertical-align: middle"><%= annotation.cell_coverage -%></span>
+    <span class="cell_coverage"><%= annotation.cell_coverage -%></span>
     <div id="annotation_controls" style="display:none">
       <%= submit_tag 'Save Changes',:id=>"fetch_button" %> or <%= link_to "Cancel", "", :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;"-%>
     </div>

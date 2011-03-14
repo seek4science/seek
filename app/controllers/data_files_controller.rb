@@ -224,7 +224,19 @@ class DataFilesController < ApplicationController
   def explore
     @data_file =  DataFile.find(params[:id])
     if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
-      xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath))
+      
+      #CACHING HACK TO AVOID SEGFAULT!! - DELETE THIS
+      xml = nil
+      filename = "spreadsheet_xml_" + @data_file.id.to_s
+      if File.exist?(filename)
+        puts "FILE EXISTS - READING FROM DISK"
+        xml = File.open(filename, "r") {|f| f.read}
+      else
+        xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath)) #Original code
+        File.open(filename, "w") {|f| f.write(xml)} 
+      end
+      #END OF HACK
+
       @spreadsheet = parse_spreadsheet_xml(xml)
       @spreadsheet.annotations = @data_file.spreadsheet_annotations
       respond_to do |format|

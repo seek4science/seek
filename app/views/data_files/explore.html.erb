@@ -16,11 +16,10 @@
   <br/><br/>
   
   <%= render :partial => "annotations/annotation_form" %>
-    
-  <div id="hidden_annotations">
+  <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
+  <%= generate_spreadsheet_html(@spreadsheet) %>
+  
+  <div id="annotations">
     <%= render :partial => "annotations/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
   </div>
-  
-  <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
-  <%= generate_spreadsheet_html(@spreadsheet) %>   
 </div>

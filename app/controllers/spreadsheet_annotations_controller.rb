@@ -25,6 +25,8 @@ class SpreadsheetAnnotationsController < ApplicationController
       respond_to do |format|
         format.html { render :partial => "annotations/annotations", :locals=>{ :annotations => annotations} } 
       end
+    else
+      new_annotation.errors.each_full {|m| puts m}
     end
   end 
 

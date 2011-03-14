@@ -5,6 +5,9 @@ $j(document).ready(function ($) {
   
   $("a.sheet_tab")
     .click(function () {
+      //Hide annotations
+      $('div.annotation').hide();  
+      
       //Deselect previous tab
       $('a.selected_tab').removeClass('selected_tab'); 
       
@@ -82,9 +85,7 @@ $j(document).ready(function ($) {
         select_cells(startCol, startRow, endCol, endRow);
       }    
     })
-  ;
-  
-  
+  ;  
 
   $(document)
     .mouseup(function () {
@@ -229,6 +230,7 @@ function toggle_annotation_form(annotation_id)
   var content = $j(elem + ' textarea#annotation_content');
   if(content.attr("readonly"))
   {
+    //The footer contains the annotation's cell range
     select_range($j(elem + " div.annotation_footer span").html());
     content.removeAttr("readonly");
   }
@@ -238,4 +240,17 @@ function toggle_annotation_form(annotation_id)
   }
   $j(elem + ' #annotation_controls').toggle();
 }
-
+  
+  
+function show_annotation_stub(id, sheet, range)
+{
+  $j('div.annotation').hide();
+  //Go to the right sheet  
+  $j("a.sheet_tab:eq(" + sheet +")").trigger('click');      
+  //Show annotation in middle of sheet
+  var sheetDiv = $j('div.active_sheet');
+  show_annotation(id,
+    sheetDiv.position().left + (sheetDiv.width() / 2),
+    sheetDiv.position().top + (sheetDiv.height() / 2));
+  select_range(range);
+}

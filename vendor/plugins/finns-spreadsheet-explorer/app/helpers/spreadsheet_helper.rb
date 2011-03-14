@@ -12,7 +12,7 @@ module SpreadsheetHelper
       sheet_index += 1
     end
 
-    html << "<div class=\"spreadsheet_container\">"
+    html << "<div class=\"spreadsheet_container\" onselectstart=\"return false;\" >"
     
     first_sheet = true
     workbook.sheets.each do |sheet|

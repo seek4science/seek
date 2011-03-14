@@ -4,6 +4,12 @@ class SpreadsheetAnnotation < ActiveRecord::Base
   
   belongs_to :source,
              :polymorphic => true
+             
+  validates_presence_of :content
+  #validates_presence_of :annotation_type
+  validates_presence_of :source
+  validates_presence_of :data_file
+  validates_numericality_of :sheet, :start_row, :start_column, :end_row, :end_column, :allow_nil => false, :only_integer => true, :greater_than_or_equal_to => 0
   
   def cell_coverage
     return SpreadsheetAnnotation.to_alpha(start_column)+start_row.to_s + 
