@@ -1,16 +1,14 @@
 require 'test_helper'
 
-class JWSTests < ActionController::TestCase
+class JwsTest < ActionController::TestCase
   tests ModelsController
 
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   def setup
     login_as(:model_owner)
-    @object=models(:teusink)
   end
 
   test "show builder with versioned sbml format" do
