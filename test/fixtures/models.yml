@@ -32,7 +32,7 @@ jws_model:
   contributor: model_owner (User)
   title: Model in JWS Dat format
   description: Model in JWS Dat format
-  original_filename: JWSModel.dat
+  original_filename: JWS Model.dat
   content_blob: jws_model_blob
   content_type: text/xml  
   recommended_environment: jws
