@@ -485,7 +485,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def valid_data_file_with_ftp_url
-    { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
+      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
   end
   
   def valid_sharing
