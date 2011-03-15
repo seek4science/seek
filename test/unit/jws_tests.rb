@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class JWSTests < ActiveSupport::TestCase  
+class JwsTest < ActiveSupport::TestCase
   fixtures :all           
   
   test "is supported" do

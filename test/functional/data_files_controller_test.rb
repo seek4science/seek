@@ -307,13 +307,11 @@ class DataFilesControllerTest < ActionController::TestCase
     get :data, :id => data_files(:downloadable_data_file),:format=>"csv"
     assert_response :success
     csv=@response.body
-    puts "CVS1=#{csv}"
     assert csv.include?(%!,,"fish","bottle","ggg,gg"!)
 
     get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:sheet=>"2"
     assert_response :success
     csv=@response.body
-    puts "CVS2=#{csv}"
     assert csv.include?(%!,,"a",1.0,TRUE,,FALSE!)
   end
   
