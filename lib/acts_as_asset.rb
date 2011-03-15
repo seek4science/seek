@@ -9,7 +9,6 @@
 # * See license.txt for details.
 # ********************************************************************************
 require 'acts_as_authorized'
-require 'acts_as_favouritable'
 
 module Acts #:nodoc:
   module Asset #:nodoc:
