@@ -264,19 +264,7 @@ class ApplicationController < ActionController::Base
 
   def permitted_filters
     #placed this in a seperate method so that other controllers could override it if necessary
-    ensure_models_loaded
-    Object.subclasses_of(ActiveRecord::Base).select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
-  end
-
-  @@models_loaded = false
-  def ensure_models_loaded
-    unless @@models_loaded
-      Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
-        model_name = file.gsub(".rb","").split(File::SEPARATOR).last
-        model_name.camelize.constantize
-      end
-      @@models_loaded=true
-    end
+    Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
   end
 
   def apply_filters(resources)

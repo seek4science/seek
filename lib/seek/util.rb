@@ -11,6 +11,26 @@ module Seek
       special_params = %w( id format controller action commit ).concat(additional_to_remove)
       return params.reject { |k,v| special_params.include?(k.to_s.downcase) }
     end
+
+    @@models_loaded = false
+    def self.ensure_models_loaded
+      unless @@models_loaded
+        Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
+          model_name = file.gsub(".rb","").split(File::SEPARATOR).last
+          model_name.camelize.constantize
+        end
+        @@models_loaded=true
+      end
+    end
+
+    @@persistent_classes = nil
+    def self.persistent_classes
+      ensure_models_loaded
+      unless @@persistent_classes
+        @@persistent_classes = Object.subclasses_of(ActiveRecord::Base)
+      end
+      @@persistent_classes
+    end
     
   end
 end
