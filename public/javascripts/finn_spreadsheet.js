@@ -149,6 +149,8 @@ function show_annotation(id,x,y)
 
 function select_range(range)
 {
+  
+  
   //Split into component parts (top-left cell, bottom-right cell of a rectangle range)
   var array = range.split(":",2);
   
@@ -199,8 +201,8 @@ function select_cells(startCol, startRow, endCol, endRow)
   }
 
   //Clear currently selected cells
-  $j("table.active_sheet .selected_cell").removeClass("selected_cell");
-  $j("table.active_sheet .selected_heading").removeClass("selected_heading");
+  $j(".selected_cell").removeClass("selected_cell");
+  $j(".selected_heading").removeClass("selected_heading");
   
   //"Select" dragged cells
   $j("table.active_sheet tr").slice(minRow,maxRow+1).each(function() {
@@ -238,13 +240,15 @@ function toggle_annotation_form(annotation_id)
   
 function show_annotation_stub(id, sheet, range)
 {
+  //Hide annotations
   $j('div.annotation').hide();
   //Go to the right sheet  
   $j("a.sheet_tab:eq(" + sheet +")").trigger('click');      
-  //Show annotation in middle of sheet
-  var sheetDiv = $j('div.active_sheet');
-  show_annotation(id,
-    sheetDiv.position().left + (sheetDiv.width() / 2),
-    sheetDiv.position().top + (sheetDiv.height() / 2));
+  //Select the cell range
   select_range(range);
+  //Show annotation in middle of sheet
+  var cells = $j('.selected_cell');
+  show_annotation(id,
+    cells.position().left + cell.outerWidth(),
+    cells.position().top);
 }
