@@ -1,8 +1,9 @@
 var sops_assets=new Array();
 var models_assets=new Array();
-var assays=new Array();
 var data_files_assets=new Array();
 var organisms = new Array();
+var assays_array = new Array();
+var id_rel_array = new Array();
 
 function postInvestigationData() {
     request = new Ajax.Request(CREATE_INVESTIGATION_LINK,
@@ -271,70 +272,75 @@ function updateModels() {
 
 
 //Assays
+function check_show_add_assay() {
+    i = $('possible_assays').selectedIndex;
+    selected_id = $('possible_assays').options[i].value;
+    if (selected_id == '0') {
+        $('add_assay_link').hide();
+    }
+    else {
+        $('add_assay_link').show();
+    }
+}
+
+
+function addAssay(title,id,relationshipType) {
+    assays_array.push([title,id,relationshipType]);
+}
+
 function addSelectedAssay() {
     selected_option_index=$("possible_assays").selectedIndex;
     selected_option=$("possible_assays").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
+    if ($("assay_relationship_type")) {
+        relationshipType = $("assay_relationship_type").options[$("assay_relationship_type").selectedIndex].text;
+    }
+    else
+    {
+        relationshipType="None"
+    }
 
-    if(checkNotInList(id,assays)) {
-        addAssay(title,id);
+    if(checkNotInList(id,assays_array)) {
+        addAssay(title,id,relationshipType);
         updateAssays();
     }
     else {
-        alert('The following Assay had already been added:\n\n' +
+        alert('The following Data file had already been added:\n\n' +
             title);
     }
 }
 
-function removeAssay(id) {
-    // remove the actual record for the attribution
-    for(var i = 0; i < assays.length; i++)
-        if(assays[i][1] == id) {
-            assays.splice(i, 1);
-            break;
-        }
-
-    // update the page
-    updateAssays();
-}
-
 function updateAssays() {
-    assay_text='';
-    type="Assay";
-    assay_ids=new Array();
-
-    for (var i=0;i<assays.length;i++) {
-        assay=assays[i];
+    assay_text = '<ul class="related_asset_list">'
+    for (var i=0;i<assays_array.length;i++) {
+        assay=assays_array[i];
         title=assay[0];
         id=assay[1];
-        assay_text += '<b>' + type + '</b>: ' + title
-        //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
-        + '[<a href="" onclick="javascript:removeAssay('+id+'); return(false);">remove</a>]</small><br/>';
-        assay_ids.push(id);
+        relationshipType = assay[2];
+        relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        assay_text += '<li>' + titleText + relationshipText +
+        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '[<a href="" onclick="javascript:removeAssay('+i+'); return(false);">remove</a>]</small></li>';
     }
-
-    // remove the last line break
-    if(assay_text.length > 0) {
-        assay_text = assay_text.slice(0,-5);
-    }
+    assay_text += '</ul>';
 
     // update the page
-    if(assay_text.length == 0) {
+    if (assays_array.length == 0) {
         $('assay_to_list').innerHTML = '<span class="none_text">No assays</span>';
     }
     else {
         $('assay_to_list').innerHTML = assay_text;
     }
 
-    clearList('study_assay_ids');
-
-    select=$('study_assay_ids');
-    for (i=0;i<assay_ids.length;i++) {
-        id=assay_ids[i];
+    clearList('assay_ids');
+    select=$('assay_ids');
+    for (i=0;i<assays_array.length;i++) {
+        id=assays_array[i][1];
+        relationshipType=assays_array[i][2];
         o=document.createElement('option');
-        o.value=id;
+        o.value=id + "," + relationshipType;
         o.text=id;
         o.selected=true;
         try {
@@ -346,9 +352,12 @@ function updateAssays() {
     }
 }
 
-function addAssay(title,id) {
-    assays.push([title,id]);
+function removeAssay(index) {
+    assays_array.splice(index, 1);
+    // update the page
+    updateAssays();
 }
+
 
 function addOrganism(title,id,strain,culture_growth) {
     organisms.push([title,id,strain,culture_growth]);

@@ -41,7 +41,7 @@ class AssaysController < ApplicationController
     update_tags @assay
     
     @assay.owner=current_user.person     
-    
+
     respond_to do |format|
       if @assay.save
         data_file_ids.each do |text|
@@ -156,7 +156,20 @@ class AssaysController < ApplicationController
       page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
     end
   end
-  
+
+  def preview
+    element=params[:element]
+    assay=Assay.find_by_id(params[:id])
+
+    render :update do |page|
+      if assay && Authorization.is_authorized?("show", nil, assay, current_user)
+        page.replace_html element,:partial=>"assays/resource_list_item",:locals=>{:resource=>assay}
+      else
+        page.replace_html element,:text=>"Nothing is selected to preview."
+      end
+    end
+  end
+
   private  
   
   def find_assays
