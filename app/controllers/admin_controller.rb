@@ -176,7 +176,7 @@ class AdminController < ApplicationController
 
   def finalize_config_changes
     flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
-    #expires all fragement caching
+    #expires all fragment caching
     expire_all_fragments
     redirect_to :action=>:show
   end
