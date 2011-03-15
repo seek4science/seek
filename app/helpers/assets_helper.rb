@@ -11,11 +11,10 @@ module AssetsHelper
   #returns all the classes for models that return true for is_asset?
   def asset_model_classes
     return @@asset_model_classes if @@asset_model_classes
-    ensure_models_loaded
-    @@asset_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
-      c if !c.nil? && c.is_asset?
+    @@asset_model_classes = Seek::Util.persistent_classes.select do |c|
+      !c.nil? && c.is_asset?
     end
-    @@asset_model_classes = @@asset_model_classes.compact
+    @@asset_model_classes = @@asset_model_classes
   end
 
   def resource_version_selection versioned_resource,displayed_resource_version
