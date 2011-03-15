@@ -44,7 +44,7 @@ td.annotated_cell {
   border: 1px dotted #4477FF;
   background-image: url('../images/famfamfam_silk/tag_blue.png');
   background-repeat:no-repeat;
-  background-position:right middle;
+  background-position: 5px 1px;
 }
 
 div.sheet {
@@ -94,37 +94,37 @@ div.annotation
 
 div.annotation_content
 {
-  border-top: 1px dashed #AAA;
-  border-bottom: 1px dashed #AAA;
   background-color: #FFF;
-  padding: 0.5em;
-  margin: 0.5em
+  margin-bottom: 0.5em
 }
 
-div.annotation_header
-{
-}
-
-div.annotation_header img
+div.annotation_content img
 {
   vertical-align: middle;
-  float: left;
   margin-right: 0.5em;
 }
 
+div.annotation_avatar
+{
+  width: 3em;
+  float: left;
+}
+
+div.annotation_text
+{
+  width: 17em;
+  float: right;  
+}
 
 div.annotation_footer
 {
   text-align: right;  
-  color: #79B; 
+  color: #999; 
 }
 
-div.annotation_form
+div.annotation_footer img
 {
-  width: 30em;
-  border: 1px solid #CCC;
-  padding: 0.5em;
-  margin: 0.5em;
+  vertical-align: middle;
 }
 
 div.spreadsheet_layout {
@@ -137,18 +137,12 @@ div.spreadsheet_layout {
   text-align: left;
 }
 
-div.annotation textarea[readonly]
-{
-  background-color: #FFF;
-  border: none;
-  width: 100%;
-}
-
 div.annotation textarea
 {
   background-color: #FFD;
   border: 1px dashed #F99;
-  width: 100%;
+  width: 16em;
+  height: 8em;
 }
 
 div#annotation_controls
@@ -168,9 +162,26 @@ span.cell_coverage, span.sheet_location
 {
 }
 
+
+div#annotation_form
+{
+  width: 18em;
+  border: 1px solid #CCC;
+  padding: 0.5em;
+  margin: 0.5em;
+  background-color: #FFFFFF;
+  position: absolute;
+  z-index: 2;
+}
+
 div#annotation_overview
 {
-  margin-top: 10px;  
+  border: 1px solid #CCC;
+  padding: 0.5em;
+  margin: 0.5em;
+  background-color: #FFFFFF;
+  position: absolute;
+  z-index: 2;  
 }
 
 div#annotation_overview table td
@@ -186,4 +197,39 @@ div#annotation_overview table tr.source_header td
 div#annotation_overview table tr
 {
   cursor: pointer;
+}
+
+div.spreadsheet_controls
+{
+  margin: 0.5em;
+}
+
+a.spreadsheet_button
+{
+  border: 1px outset #444;
+  background-color: #EEE;
+  padding: 0.2em 0.5em;  
+  display: inline-block;
+}
+
+a.spreadsheet_button:hover
+{
+  background-color: #DDF;
+}
+
+a.spreadsheet_button:active
+{
+  border: 1px inset #444;
+  background-color: #DDF;
+}
+
+a.spreadsheet_button img
+{
+  vertical-align: middle;
+}
+
+div.spreadsheet_box_title
+{
+  background-color: #DDF;
+  padding: 5px;
 }

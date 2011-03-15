@@ -1,7 +1,7 @@
 module SpreadsheetHelper
   
   def generate_spreadsheet_html(workbook)
-    html = "<div class=\"spreadsheet_viewer\">"
+    html = ""
             
     #List of tabs
     first_sheet = true
@@ -62,7 +62,7 @@ module SpreadsheetHelper
       first_sheet = false    
     end
     html << "</div>"
-    html << "</div>"
+    html << ""
     return html
   end
   

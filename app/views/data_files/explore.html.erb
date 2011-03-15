@@ -12,14 +12,22 @@
 <div class="show_basic">
   <input size="10" id="selection_data"></input>
   <input size="60" id="cell_info"></input>
-  <%= link_to image('spreadsheet_annotation_add') + " Annotate", "#", :onclick =>"$j('div#annotation_form').toggle();return false;" %>
-  <br/><br/>
+  <div class="spreadsheet_controls">
+    <%= link_to image('spreadsheet_annotation_add') + " Add Annotation", "#", :onclick =>"$j('div#annotation_overview').hide(); $j('div#annotation_form').toggle();return false;",
+          :title => "Add new annotation", :class => "spreadsheet_button" %>
+    <%= link_to image('spreadsheet') + " List Annotations", "#", :onclick =>"$j('div#annotation_form').hide(); $j('div#annotation_overview').toggle();return false;", 
+          :title => "Add new annotation", :class => "spreadsheet_button" %>
+  </div>
+
   
-  <%= render :partial => "annotations/annotation_form" %>
   <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
-  <%= generate_spreadsheet_html(@spreadsheet) %>
   
-  <div id="annotations">
-    <%= render :partial => "annotations/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
+  <div class="spreadsheet_viewer">
+    <%= render :partial => "annotations/annotation_form" %>
+    <div id="annotations">
+      <%= render :partial => "annotations/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
+    </div>
+    <%= generate_spreadsheet_html(@spreadsheet) %>
+
   </div>
 </div>

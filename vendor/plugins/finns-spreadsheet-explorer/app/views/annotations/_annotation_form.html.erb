@@ -1,4 +1,9 @@
-<div class="annotation_form" id="annotation_form" style="display:none">
+<div id="annotation_form" style="display:none">
+  <div class="spreadsheet_box_title">
+    <div style="float: left">New Annotation</div>
+    <div style="float: right"><a href="#" onclick="$j('#annotation_form').hide(); return false;">Close</a></div>
+    <br style="clear:both"/>
+  </div>
     <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"create"},   
                    :update => { :success => "annotations", :failure => "annotations"},
                    :loading => "Element.show('spinner');",

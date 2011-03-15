@@ -2,7 +2,12 @@
   <%= render :partial => "annotations/annotation_javascript", :locals => {:annotations => annotations} %>
   <%= render :partial => "annotations/annotation", :collection=>annotations %>
 </div>
-<div id="annotation_overview">
+<div id="annotation_overview" style="display:none">
+  <div class="spreadsheet_box_title">
+    <div style="float: left">Listing Annotations</div>
+    <div style="float: right"><a href="#" onclick="$j('#annotation_overview').hide(); return false;">Close</a></div>
+    <br style="clear:both"/>
+  </div>
   <table>
     <% annotations.group_by(&:source).each do |source, annotation_subset| %>    
       <tr class="source_header" id="annotation_from_<%= source.class.name + source.id.to_s -%>">

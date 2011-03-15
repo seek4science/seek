@@ -1,8 +1,10 @@
 var $j = jQuery.noConflict(); //To prevent conflicts with prototype
 
 $j(document).ready(function ($) {
-  //Worksheet tabs
+  //Record current sheet in annotation form
+  $('input#annotation_sheet_id').attr("value",0);
   
+  //Worksheet tabs  
   $("a.sheet_tab")
     .click(function () {
       //Hide annotations
@@ -227,17 +229,9 @@ function select_cells(startCol, startRow, endCol, endRow)
 function toggle_annotation_form(annotation_id)
 {
   var elem = 'div#annotation_' + annotation_id
-  var content = $j(elem + ' textarea#annotation_content');
-  if(content.attr("readonly"))
-  {
-    //The footer contains the annotation's cell range
-    select_range($j(elem + " div.annotation_footer span").html());
-    content.removeAttr("readonly");
-  }
-  else
-  {
-    content.attr("readonly","readonly");
-  }
+
+  $j(elem + ' div.annotation_text').toggle();
+  $j(elem + ' div.annotation_edit_text').toggle();
   $j(elem + ' #annotation_controls').toggle();
 }
   
