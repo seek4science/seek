@@ -1,5 +1,3 @@
-require 'rubygems'
-require 'rake'
 
 module Seek
   class ApplicationConfiguration
