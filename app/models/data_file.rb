@@ -11,7 +11,14 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
-  has_and_belongs_to_many :events
+  if Seek::ApplicationConfiguration.events_enabled
+    has_and_belongs_to_many :events
+  else
+    def events
+      []
+    end
+  end
+
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users

@@ -35,7 +35,10 @@
 					:related_publications=>@data_file.related_publications
 				} 
     -%>
-    <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+
+    <% if Seek::ApplicationConfiguration.events_enabled -%>
+        <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+    <% end -%>
     <%= render :partial => "assets/associate_assay", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
           
     <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Data_file",  # this is only for presentation, not for any processing

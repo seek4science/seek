@@ -11,5 +11,6 @@ if Rails.env.test?
 
     Settings.defaults[:crossref_api_email] = "sowen@cs.man.ac.uk"
     Settings.defaults[:jws_enabled] = true
+    Settings.defaults[:events_enabled] = true
   end
 end

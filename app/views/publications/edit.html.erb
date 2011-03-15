@@ -69,7 +69,9 @@
     
     <br style="clear: both"/>
 
-    <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
+    <% if Seek::ApplicationConfiguration.events_enabled -%>
+        <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
+    <% end -%>
 
     <p style="text-align: center;">
       <%= submit_tag 'Update',:disable_with=>"Updating..." %>
