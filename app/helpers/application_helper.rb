@@ -13,13 +13,13 @@ module ApplicationHelper
 
     ensure_models_loaded
 
-    @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
-      c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
+    @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).select do |c|
+      c.respond_to?("user_creatable?") && c.user_creatable?
     end
     @@creatable_model_classes.delete(Event) unless Seek::ApplicationConfiguration.events_enabled
 
     #sorted by name, assets first, then isa, then anything else  
-    @@creatable_model_classes = @@creatable_model_classes.compact.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+    @@creatable_model_classes = @@creatable_model_classes.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
   end
 
   def ensure_models_loaded
