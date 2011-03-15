@@ -7,7 +7,11 @@ class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
   has_and_belongs_to_many :publications
 
+  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.start_date DESC"
+  def sort events
+    events.sort_by &:start_date
+  end
 
   acts_as_authorized
   acts_as_uniquely_identifiable

@@ -29,8 +29,11 @@ class Publication < ActiveRecord::Base
   
   acts_as_uniquely_identifiable
 
+  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.published_date DESC"
-    
+  def sort publications
+    publications.sort_by &:published_date
+  end
 
   def extract_pubmed_metadata(pubmed_record)
     self.title = pubmed_record.title.chop #remove full stop
