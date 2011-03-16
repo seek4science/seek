@@ -36,7 +36,7 @@
         <%= tab_definition :controllers=>["forums","topics"], :gap_before=>true -%>
 
         <!-- Events tab -->
-        <%= tab_definition :controllers=>["events"], :gap_before=>true if Seek::ApplicationConfiguration.events_enabled -%>
+        <%= tab_definition :controllers=>["events"], :gap_before=>true if Seek::Config.events_enabled -%>
 
         <!-- Help tab -->
         <%= tab_definition :controllers=>["help_documents"],:title=>"Help",:gap_before=>true -%>

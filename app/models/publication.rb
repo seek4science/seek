@@ -23,7 +23,7 @@ class Publication < ActiveRecord::Base
     :dependent => :destroy
 
   
-  if Seek::ApplicationConfiguration.events_enabled
+  if Seek::Config.events_enabled
     has_and_belongs_to_many :events
   else
     def events
@@ -33,7 +33,7 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields=>[:title,:abstract,:journal]) if Seek::Config.solr_enabled
   
   acts_as_uniquely_identifiable
 

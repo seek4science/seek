@@ -15,7 +15,7 @@ class Study < ActiveRecord::Base
 
   validates_uniqueness_of :title
 
-  acts_as_solr(:fields=>[:description,:title]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
 
   def data_files
     assays.collect{|a| a.data_files}.flatten.uniq

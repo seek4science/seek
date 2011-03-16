@@ -16,7 +16,7 @@ module ApplicationHelper
     @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
       c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
     end
-    @@creatable_model_classes.delete(Event) unless Seek::ApplicationConfiguration.events_enabled
+    @@creatable_model_classes.delete(Event) unless Seek::Config.events_enabled
 
     #sorted by name, assets first, then isa, then anything else  
     @@creatable_model_classes = @@creatable_model_classes.compact.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
@@ -250,7 +250,7 @@ module ApplicationHelper
     name=PAGE_TITLES[controller_name]
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
-    return "#{Seek::ApplicationConfiguration.application_title} "+name
+    return "#{Seek::Config.application_title} "+name
   end
 
   # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/
@@ -352,7 +352,7 @@ module ApplicationHelper
   #Current decided by HIDE_DETAILS flag in environment_local.rb
   #Defaults to false
   def hide_contact_details?
-    Seek::ApplicationConfiguration.hide_details_enabled
+    Seek::Config.hide_details_enabled
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible

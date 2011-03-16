@@ -28,17 +28,17 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
   
   def test_latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Person.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Project.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Institution.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Investigation.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Study.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Assay.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,DataFile.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Model.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Sop.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Publication.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Event.latest_limit
+    assert_equal Seek::Config.limit_latest,Person.latest_limit
+    assert_equal Seek::Config.limit_latest,Project.latest_limit
+    assert_equal Seek::Config.limit_latest,Institution.latest_limit
+    assert_equal Seek::Config.limit_latest,Investigation.latest_limit
+    assert_equal Seek::Config.limit_latest,Study.latest_limit
+    assert_equal Seek::Config.limit_latest,Assay.latest_limit
+    assert_equal Seek::Config.limit_latest,DataFile.latest_limit
+    assert_equal Seek::Config.limit_latest,Model.latest_limit
+    assert_equal Seek::Config.limit_latest,Sop.latest_limit
+    assert_equal Seek::Config.limit_latest,Publication.latest_limit
+    assert_equal Seek::Config.limit_latest,Event.latest_limit
   end
 
   def test_paginate_no_options    

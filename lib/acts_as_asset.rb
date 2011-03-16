@@ -53,7 +53,7 @@ module Acts #:nodoc:
         has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
         has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
-        grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
+        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
         class_eval do
           extend Acts::Asset::SingletonMethods

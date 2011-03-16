@@ -19,7 +19,7 @@ class JwsTest < ActionController::TestCase
     assert assigns(:model)
     assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
     assert_select "script",:text=>/VmGLT = 97.264/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
   test "show builder with space in filename" do
     m=models(:teusink_with_space)
@@ -29,7 +29,7 @@ class JwsTest < ActionController::TestCase
     assert assigns(:model)
     assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
     assert_select "script",:text=>/VmGLT = 97.264/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
   test "show builder with sbml format" do
     m=models(:teusink)
@@ -39,7 +39,7 @@ class JwsTest < ActionController::TestCase
     assert assigns(:model)
     assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
     assert_select "script",:text=>/VmGLT = 97.264/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
   test "show builder with jws format" do
     m=models(:jws_model)
@@ -49,7 +49,7 @@ class JwsTest < ActionController::TestCase
     assert assigns(:model)
     assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
     assert_select "script",:text=>/VmGLT = 97.264/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
   test "save new version with jws builder" do
     m=models(:jws_model)
@@ -75,7 +75,7 @@ class JwsTest < ActionController::TestCase
     assert_nil flash[:error]
 
 
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
   test "changing model with jws builder" do
     m=models(:jws_model)
@@ -89,7 +89,7 @@ class JwsTest < ActionController::TestCase
     assert_response :success
     assert_select "div#reactions_panel",:count=>1 #check for one of the boxes - the reactions box
     assert_select "script",:text=>/VmGLT = 99.999/,:count=>1 #check that one of the parameter sets has been recognized from the uploaded file
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
   test "simulate model through builder" do
     #submits to jws, but passes the following_action param as 'simulate'
@@ -104,7 +104,7 @@ class JwsTest < ActionController::TestCase
       "steadystateanalysis"=>"on"
     assert_response :success
     assert_select "object[type='application/x-java-applet']",:count=>1
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
   test "simulate model" do
     m=models(:teusink)
@@ -112,6 +112,6 @@ class JwsTest < ActionController::TestCase
     post :simulate,:id=>m,:version=>m.version
     assert_response :success
     assert_select "object[type='application/x-java-applet']",:count=>1
-  end if Seek::ApplicationConfiguration.jws_enabled
+  end if Seek::Config.jws_enabled
 
 end

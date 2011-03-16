@@ -25,7 +25,7 @@ module Acts #:nodoc:
                  :as        => :resource,
                  :dependent => :destroy
 
-        grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
+        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
         acts_as_uniquely_identifiable
 

@@ -36,7 +36,7 @@
 				} 
     -%>
 
-    <% if Seek::ApplicationConfiguration.events_enabled -%>
+    <% if Seek::Config.events_enabled -%>
         <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
     <% end -%>
     <%= render :partial => "assets/associate_assay", :locals=>{:resource => @data_file, :show_relationships=>true} -%>

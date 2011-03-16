@@ -3,28 +3,28 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Type manager enabled:   <%= check_box_tag(:type_managers_enabled, 1, Seek::ApplicationConfiguration.type_managers_enabled, :disabled => true) %>
+    Type manager enabled:   <%= check_box_tag(:type_managers_enabled, 1, Seek::Config.type_managers_enabled, :disabled => true) %>
     <br style="clear:both;"/>
     <br/>
-    Managed by:    <%= text_field_tag(:type_managers, Seek::ApplicationConfiguration.type_managers, :disabled => true) %>
+    Managed by:    <%= text_field_tag(:type_managers, Seek::Config.type_managers, :disabled => true) %>
     <br style="clear:both;"/>
     <br/>
-    Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::ApplicationConfiguration.pubmed_api_email) %>
+    Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::Config.pubmed_api_email) %>
     <br style="clear:both;"/>
     <br/>
-    Crossref api email:    <%= text_field_tag(:crossref_api_email, Seek::ApplicationConfiguration.crossref_api_email) %>
+    Crossref api email:    <%= text_field_tag(:crossref_api_email, Seek::Config.crossref_api_email) %>
     <br style="clear:both;"/>
     <br/>
-    Site base host:    <%= text_field_tag(:site_base_host, Seek::ApplicationConfiguration.site_base_host) %>
+    Site base host:    <%= text_field_tag(:site_base_host, Seek::Config.site_base_host) %>
     <br style="clear:both;"/>
     <br/>
-    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::ApplicationConfiguration.tag_threshold, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
+    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::Config.tag_threshold, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
     <br style="clear:both;"/>
     <br/>
-    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::ApplicationConfiguration.max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
+    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
     <br style="clear:both;"/>
     <br/>
-    Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::ApplicationConfiguration.open_id_authentication_store) %>
+    Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::Config.open_id_authentication_store) %>
     <br style="clear:both;"/>
     <br/>
     <br style="clear:both;"/>

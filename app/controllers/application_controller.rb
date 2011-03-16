@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
 
   exception_data :additional_exception_notifier_data
 
-  if Seek::ApplicationConfiguration.activity_log_enabled
+  if Seek::Config.activity_log_enabled
     after_filter :log_event
   end
 
@@ -62,7 +62,7 @@ class ApplicationController < ActionController::Base
   end
   
   def is_user_activated
-    if Seek::ApplicationConfiguration.activation_required_enabled && current_user && !current_user.active?
+    if Seek::Config.activation_required_enabled && current_user && !current_user.active?
       error("Activation of this account it required for gaining full access", "Activation required?")
       false
     end
@@ -121,12 +121,12 @@ class ApplicationController < ActionController::Base
   
   
   def check_allowed_to_manage_types
-    unless Seek::ApplicationConfiguration.type_managers_enabled
+    unless Seek::Config.type_managers_enabled
       error("Type management disabled", "...")
       return false
     end
     
-    case Seek::ApplicationConfiguration.type_managers
+    case Seek::Config.type_managers
       when "admins"
       if current_user.is_admin? 
         return true
@@ -173,7 +173,7 @@ class ApplicationController < ActionController::Base
   end
   
   def email_enabled?
-    Seek::ApplicationConfiguration.email_enabled    
+    Seek::Config.email_enabled
   end
 
   def find_and_auth

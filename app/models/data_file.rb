@@ -11,7 +11,7 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
-  if Seek::ApplicationConfiguration.events_enabled
+  if Seek::Config.events_enabled
     has_and_belongs_to_many :events
   else
     def events
@@ -26,7 +26,7 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename]) if Seek::Config.solr_enabled
   
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
   

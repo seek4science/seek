@@ -13,7 +13,7 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :name
 
 
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize) #shouldn't need "Other" tab for project
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize) #shouldn't need "Other" tab for project
   
 
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
@@ -45,7 +45,7 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :organisms  
   
-  acts_as_solr(:fields => [ :name , :description, :locations],:include=>[:organisms]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields => [ :name , :description, :locations],:include=>[:organisms]) if Seek::Config.solr_enabled
 
   attr_accessor :site_username,:site_password
 

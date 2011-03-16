@@ -33,75 +33,75 @@ class AdminController < ApplicationController
 
   def update_features_enabled
     if params[:events_enabled] == "1"
-      Seek::ApplicationConfiguration.events_enabled=true
+      Seek::Config.events_enabled=true
     else
-      Seek::ApplicationConfiguration.events_enabled=false
+      Seek::Config.events_enabled=false
     end
 
     if params[:jerm_enabled] == "1"
-      Seek::ApplicationConfiguration.jerm_enabled=true
+      Seek::Config.jerm_enabled=true
     else
-      Seek::ApplicationConfiguration.jerm_enabled=false
+      Seek::Config.jerm_enabled=false
     end
 
     if params[:email_enabled] == "1"
-      Seek::ApplicationConfiguration.email_enabled=true
+      Seek::Config.email_enabled=true
     else
-      Seek::ApplicationConfiguration.email_enabled=false
+      Seek::Config.email_enabled=false
     end
-    Seek::ApplicationConfiguration.set_smtp_settings 'email', params[:email]
-    Seek::ApplicationConfiguration.set_smtp_settings 'port', params[:port]
-    Seek::ApplicationConfiguration.set_smtp_settings 'domain', params[:domain]
-    Seek::ApplicationConfiguration.set_smtp_settings 'authentication', params[:authentication]
-    Seek::ApplicationConfiguration.set_smtp_settings 'user_name', params[:user_name]
-    Seek::ApplicationConfiguration.set_smtp_settings 'password', params[:password]
+    Seek::Config.set_smtp_settings 'email', params[:email]
+    Seek::Config.set_smtp_settings 'port', params[:port]
+    Seek::Config.set_smtp_settings 'domain', params[:domain]
+    Seek::Config.set_smtp_settings 'authentication', params[:authentication]
+    Seek::Config.set_smtp_settings 'user_name', params[:user_name]
+    Seek::Config.set_smtp_settings 'password', params[:password]
 
-    Seek::ApplicationConfiguration.noreply_sender=params[:noreply_sender]
+    Seek::Config.noreply_sender=params[:noreply_sender]
 
     if params[:solr_enabled] == "1"
-      Seek::ApplicationConfiguration.solr_enabled= true
+      Seek::Config.solr_enabled= true
     else
-      Seek::ApplicationConfiguration.solr_enabled= false
+      Seek::Config.solr_enabled= false
     end
 
     if params[:jws_enabled] == "1"
-      Seek::ApplicationConfiguration.jws_enabled= true
+      Seek::Config.jws_enabled= true
     else
-      Seek::ApplicationConfiguration.jws_enabled= false
+      Seek::Config.jws_enabled= false
     end
 
-    Seek::ApplicationConfiguration.jws_online_root= params[:jws_online_root]
+    Seek::Config.jws_online_root= params[:jws_online_root]
 
     if params[:exception_notification_enabled] == "1"
-      Seek::ApplicationConfiguration.exception_notification_enabled= true
+      Seek::Config.exception_notification_enabled= true
     else
-      Seek::ApplicationConfiguration.exception_notification_enabled= false
+      Seek::Config.exception_notification_enabled= false
     end
 
     if params[:hide_details_enabled] == "1"
-      Seek::ApplicationConfiguration.hide_details_enabled= true
+      Seek::Config.hide_details_enabled= true
     else
-      Seek::ApplicationConfiguration.hide_details_enabled= false
+      Seek::Config.hide_details_enabled= false
     end
 
     if params[:activity_log_enabled] == "1"
-      Seek::ApplicationConfiguration.activity_log_enabled= true
+      Seek::Config.activity_log_enabled= true
     else
-      Seek::ApplicationConfiguration.activity_log_enabled= false
+      Seek::Config.activity_log_enabled= false
     end
 
     if params[:activation_required_enabled] == "1"
-      Seek::ApplicationConfiguration.activation_required_enabled= true
+      Seek::Config.activation_required_enabled= true
     else
-      Seek::ApplicationConfiguration.activation_required_enabled= false
+      Seek::Config.activation_required_enabled= false
     end
 
     if params[:google_analytics_enabled] == "1"
-      Seek::ApplicationConfiguration.google_analytics_enabled= true
+      Seek::Config.google_analytics_enabled= true
     else
-      Seek::ApplicationConfiguration.google_analytics_enabled= false
+      Seek::Config.google_analytics_enabled= false
     end
-    Seek::ApplicationConfiguration.google_analytics_tracker_id= params[:google_analytics_tracker_id]
+    Seek::Config.google_analytics_tracker_id= params[:google_analytics_tracker_id]
     finalize_config_changes
   end
 
@@ -112,65 +112,65 @@ class AdminController < ApplicationController
   end
 
   def update_rebrand
-    Seek::ApplicationConfiguration.project_name= params[:project_name]
-    Seek::ApplicationConfiguration.project_type= params[:project_type]
-    Seek::ApplicationConfiguration.project_link= params[:project_link]
-    Seek::ApplicationConfiguration.project_title= params[:project_title]
-    Seek::ApplicationConfiguration.project_long_name= params[:project_long_name]
+    Seek::Config.project_name= params[:project_name]
+    Seek::Config.project_type= params[:project_type]
+    Seek::Config.project_link= params[:project_link]
+    Seek::Config.project_title= params[:project_title]
+    Seek::Config.project_long_name= params[:project_long_name]
 
-    Seek::ApplicationConfiguration.dm_project_name= params[:dm_project_name]
-    Seek::ApplicationConfiguration.dm_project_title= params[:dm_project_title]
-    Seek::ApplicationConfiguration.dm_project_link= params[:dm_project_link]
+    Seek::Config.dm_project_name= params[:dm_project_name]
+    Seek::Config.dm_project_title= params[:dm_project_title]
+    Seek::Config.dm_project_link= params[:dm_project_link]
 
-    Seek::ApplicationConfiguration.application_name= params[:application_name]
-    Seek::ApplicationConfiguration.application_title= params[:application_title]
+    Seek::Config.application_name= params[:application_name]
+    Seek::Config.application_title= params[:application_title]
 
     if params[:header_image_enabled] == "1"
-     Seek::ApplicationConfiguration.header_image_enabled= true
+     Seek::Config.header_image_enabled= true
     else
-     Seek::ApplicationConfiguration.header_image_enabled= false
+     Seek::Config.header_image_enabled= false
     end
-    Seek::ApplicationConfiguration.header_image= params[:header_image]
-    Seek::ApplicationConfiguration.header_image_link= params[:header_image_link]
-    Seek::ApplicationConfiguration.header_image_title= params[:header_image_title]
+    Seek::Config.header_image= params[:header_image]
+    Seek::Config.header_image_link= params[:header_image_link]
+    Seek::Config.header_image_title= params[:header_image_title]
     if params[:copyright_addendum_enabled] == "1"
-      Seek::ApplicationConfiguration.copyright_addendum_enabled= true
+      Seek::Config.copyright_addendum_enabled= true
     else
-      Seek::ApplicationConfiguration.copyright_addendum_enabled= false
+      Seek::Config.copyright_addendum_enabled= false
     end
-    Seek::ApplicationConfiguration.copyright_addendum_content= params[:copyright_addendum_content]
+    Seek::Config.copyright_addendum_content= params[:copyright_addendum_content]
     finalize_config_changes
   end
 
   def update_pagination
-   Seek::ApplicationConfiguration.set_default_page "people",params[:people]
-   Seek::ApplicationConfiguration.set_default_page "projects", params[:projects]
-   Seek::ApplicationConfiguration.set_default_page "institutions", params[:institutions]
-   Seek::ApplicationConfiguration.set_default_page "investigations", params[:investigations]
-   Seek::ApplicationConfiguration.set_default_page "studies", params[:studies]
-   Seek::ApplicationConfiguration.set_default_page "assays", params[:assays]
-   Seek::ApplicationConfiguration.set_default_page "data_files", params[:data_files]
-   Seek::ApplicationConfiguration.set_default_page "models", params[:models]
-   Seek::ApplicationConfiguration.set_default_page "sops", params[:sops]
-   Seek::ApplicationConfiguration.set_default_page "publications", params[:publications]
-   Seek::ApplicationConfiguration.set_default_page "events", params[:events]
-   Seek::ApplicationConfiguration.limit_latest= params[:limit_latest]
+   Seek::Config.set_default_page "people",params[:people]
+   Seek::Config.set_default_page "projects", params[:projects]
+   Seek::Config.set_default_page "institutions", params[:institutions]
+   Seek::Config.set_default_page "investigations", params[:investigations]
+   Seek::Config.set_default_page "studies", params[:studies]
+   Seek::Config.set_default_page "assays", params[:assays]
+   Seek::Config.set_default_page "data_files", params[:data_files]
+   Seek::Config.set_default_page "models", params[:models]
+   Seek::Config.set_default_page "sops", params[:sops]
+   Seek::Config.set_default_page "publications", params[:publications]
+   Seek::Config.set_default_page "events", params[:events]
+   Seek::Config.limit_latest= params[:limit_latest]
    finalize_config_changes
   end
 
   def update_others
     if params[:type_managers_enabled] == "1"
-     Seek::ApplicationConfiguration.type_managers_enabled= true
+     Seek::Config.type_managers_enabled= true
     else
-     Seek::ApplicationConfiguration.type_managers_enabled= false
+     Seek::Config.type_managers_enabled= false
     end
-    Seek::ApplicationConfiguration.type_managers= params[:type_managers]
-    Seek::ApplicationConfiguration.pubmed_api_email= params[:pubmed_api_email]
-    Seek::ApplicationConfiguration.crossref_api_email= params[:crossref_api_email]
-    Seek::ApplicationConfiguration.site_base_host= params[:site_base_host]
-    Seek::ApplicationConfiguration.open_id_authentication_store= params[:open_id_authentication_store]
-    Seek::ApplicationConfiguration.tag_threshold= params[:tag_threshold]
-    Seek::ApplicationConfiguration.max_visible_tags= params[:max_visible_tags]
+    Seek::Config.type_managers= params[:type_managers]
+    Seek::Config.pubmed_api_email= params[:pubmed_api_email]
+    Seek::Config.crossref_api_email= params[:crossref_api_email]
+    Seek::Config.site_base_host= params[:site_base_host]
+    Seek::Config.open_id_authentication_store= params[:open_id_authentication_store]
+    Seek::Config.tag_threshold= params[:tag_threshold]
+    Seek::Config.max_visible_tags= params[:max_visible_tags]
 
   end
 
@@ -265,7 +265,7 @@ class AdminController < ApplicationController
       when "invalid"
         collection = {}
         type = "invalid_users"
-        pal_role=Role.find(:first,:conditions=>{:name=>"#{Seek::ApplicationConfiguration.dm_project_name} Pal"})
+        pal_role=Role.find(:first,:conditions=>{:name=>"#{Seek::Config.dm_project_name} Pal"})
         collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.roles.include?(pal_role)}
         collection[:duplicates] = Person.duplicates
         collection[:no_person] = User.without_profile
@@ -274,7 +274,7 @@ class AdminController < ApplicationController
         collection = User.not_activated
         type = "users"
       when "projectless"
-        title = "Users not in a #{Seek::ApplicationConfiguration.project_name} project"
+        title = "Users not in a #{Seek::Config.project_name} project"
         collection = Person.without_group.registered
         type = "users"
       when "contents"

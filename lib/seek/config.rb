@@ -1,6 +1,6 @@
 
 module Seek
-  class ApplicationConfiguration
+  class Config
 #Features enabled
     def self.events_enabled
          Settings.events_enabled

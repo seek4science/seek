@@ -30,7 +30,7 @@
     <% end -%>
 </ul>
 
-<% if Seek::ApplicationConfiguration.jws_enabled && jws_supported?(@display_model) -%>
+<% if Seek::Config.jws_enabled && jws_supported?(@display_model) -%>
 	<ul class="sectionIcons">
 		<% if Authorization.is_authorized?("edit", nil, @model, current_user) -%>
 		    <li>
