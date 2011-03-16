@@ -235,7 +235,7 @@ module ImagesHelper
       when "jws_builder"
         "misc_icons/jws_builder24x24.png"
       when "event_avatar"
-        "crystal_project/32x32/devices/Globe2.png"
+        "crystal_project/32x32/apps/vcalendar.png"
     else
       return nil
     end
