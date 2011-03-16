@@ -1,0 +1,19 @@
+<% cache "super_tag_cloud" do -%>
+<div class="contribution_title">
+  <h1>All tags</h1>
+</div>
+<div class="show_basic">
+  <div class="tags_smaller">
+    <div class="hTagcloud">
+      <div class="popularity">
+        <%
+            all_tags = ActsAsTaggableOn::Tag.all_tags_for_cloud
+        -%>
+        <% overall_tag_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => css_class -%>
+        <% end -%>
+      </div>
+    </div>
+  </div>
+</div>
+<% end -%>

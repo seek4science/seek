@@ -197,8 +197,6 @@ class PeopleController < ApplicationController
       @person.notifiee_info.save if @person.notifiee_info.changed?
     end
 
-    #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-    expire_fragment("sidebar_tag_cloud")
     
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
@@ -277,7 +275,7 @@ class PeopleController < ApplicationController
   private
 
   def set_tools_and_expertise person,params
-    
+
       tags=""
       params[:tools_autocompleter_selected_ids].each do |selected_id|        
         tag=ActsAsTaggableOn::Tag.find(selected_id)        
@@ -298,6 +296,10 @@ class PeopleController < ApplicationController
         tags << item << ","
       end unless params[:expertise_autocompleter_unrecognized_items].nil?
       person.expertise_list=tags
+
+      #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag. Also should only expire when they have changed.
+      expire_fragment("sidebar_tag_cloud")
+      expire_fragment("super_tag_cloud")
 
   end
   

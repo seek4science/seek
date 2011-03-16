@@ -23,7 +23,8 @@ module CommonSweepers
   end
 
   def expire_tag_fragments
-    expire_fragment("sidebar_tag_cloud")
+    expire_fragment "sidebar_tag_cloud"
+    expire_fragment "super_tag_cloud"
   end  
 
   #expires ALL fragment caches related to favourites
