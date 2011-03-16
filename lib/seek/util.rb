@@ -23,13 +23,11 @@ module Seek
       end
     end
 
-    @@persistent_classes = nil
     def self.persistent_classes
-      ensure_models_loaded
-      unless @@persistent_classes
-        @@persistent_classes = Object.subclasses_of(ActiveRecord::Base)
+      @@persistent_classes ||= begin
+        ensure_models_loaded
+        Object.subclasses_of(ActiveRecord::Base)
       end
-      @@persistent_classes
     end
     
   end
