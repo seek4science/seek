@@ -14,6 +14,13 @@ class TagsControllerTest< ActionController::TestCase
     assert_response :success
   end
 
+  test "index" do
+    get :index
+    assert_response :success
+    fishing_tag = tags(:fishing)
+    assert_select "div#super_tag_cloud a[href=?]",show_tag_path(fishing_tag),:text=>fishing_tag.name,:count=>1
+  end
+
   test "dont show duplicates for same tag for expertise and tools" do
     q=people(:pal)
     q.tool_list="zzzzz"

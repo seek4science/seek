@@ -25,6 +25,25 @@ module TagsHelper
     Tag.find(:all,:group=>"tags.id",:joins=>:taggings,:conditions=>["taggings.context = ?",context.to_s])
   end
 
+  def show_tag?(tag)
+    #FIXME: not sure this is required or works any more. was originally to work around a bug in acts-as-taggable-on
+    tag.taggings.size>1 || (tag.taggings.size==1 && tag.taggings[0].taggable_id)
+  end
+
+  def link_for_tag tag, options={}
+    length=options[:truncate_length]
+    length||=150
+    link = show_tag_path(tag)
+    link_to h(truncate(tag.name,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.name)
+  end
+
+  def list_item_tags_list tags,options={}
+    tags.map do |t|
+      divider=tags.last==t ? "" : "<span class='spacer'>,</span> ".html_safe
+      link_for_tag(t,options)+divider
+    end
+  end
+
   def aggregated_asset_tags
     tags = []
     (asset_model_classes | [Assay]).each do |c|
