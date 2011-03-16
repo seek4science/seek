@@ -12,14 +12,13 @@ module Seek
       return params.reject { |k,v| special_params.include?(k.to_s.downcase) }
     end
 
-    @@models_loaded = false
     def self.ensure_models_loaded
-      unless @@models_loaded
+      @@models_loaded ||= begin
         Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
           model_name = file.gsub(".rb","").split(File::SEPARATOR).last
           model_name.camelize.constantize
         end
-        @@models_loaded=true
+        true
       end
     end
 
