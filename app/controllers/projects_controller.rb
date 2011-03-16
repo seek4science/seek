@@ -4,7 +4,7 @@ class ProjectsController < ApplicationController
   include WhiteListHelper
   include IndexPager
   
-  before_filter :find_projects, :only=>[:index]
+  before_filter :find_assets, :only=>[:index]
   before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update,:admin]
@@ -191,13 +191,6 @@ class ProjectsController < ApplicationController
       }
     end
   end
-  
-  protected
-  
-  def find_projects
-    @projects = Project.paginate :page=>params[:page]
-  end
-  
 
   private  
 

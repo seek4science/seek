@@ -4,32 +4,19 @@ module ApplicationHelper
   include SavageBeast::ApplicationHelper
 
   @@creatable_model_classes ||= nil
-  @@models_loaded=false
 
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
   #returns a list of all types that respond_to and return true for user_creatable?
   def user_creatable_classes
     return @@creatable_model_classes if @@creatable_model_classes
 
-    ensure_models_loaded
-
-    @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
-      c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
+    @@creatable_model_classes = Seek::Util.persistent_classes.select do |c|
+      c.respond_to?("user_creatable?") && c.user_creatable?
     end
     @@creatable_model_classes.delete(Event) unless Seek::ApplicationConfiguration.events_enabled
 
     #sorted by name, assets first, then isa, then anything else  
-    @@creatable_model_classes = @@creatable_model_classes.compact.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
-  end
-
-  def ensure_models_loaded
-    unless @@models_loaded
-      Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
-        model_name = file.gsub(".rb","").split(File::SEPARATOR).last
-        model_name.camelize.constantize
-      end
-      @@models_loaded=true
-    end
+    @@creatable_model_classes = @@creatable_model_classes.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
   end
 
   #joins the list with seperator and the last item with an 'and'
