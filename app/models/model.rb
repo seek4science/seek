@@ -23,7 +23,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_type
   belongs_to :model_format
   
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name,:tag_counts]) if Seek::Config.solr_enabled
 
   has_many :created_datas
 

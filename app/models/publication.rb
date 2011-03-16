@@ -33,7 +33,7 @@ class Publication < ActiveRecord::Base
 
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:title,:abstract,:journal,:tag_counts]) if Seek::Config.solr_enabled
   
   acts_as_uniquely_identifiable
 

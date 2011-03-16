@@ -16,7 +16,7 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  acts_as_solr(:fields=>[:description, :title, :original_filename]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description, :title, :original_filename,:tag_counts]) if Seek::Config.solr_enabled
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
                
