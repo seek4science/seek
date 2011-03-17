@@ -1,29 +1,23 @@
-require 'rubygems'
+require 'forwardable'
 
 module Seek
   class Config
 
+    extend SingleForwardable
+
+
     #settings that require simple accessors. Avoids writing many duplicated getters and setters.
-    simple_settings = [:events_enabled, :jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
+    simple_settings = [:events_enabled,:jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
                        :jws_online_root, :hide_details_enabled, :activity_log_enabled,
                        :activation_required_enabled, :google_analytics_tracker_id, :project_name,
                        :project_type, :project_link, :header_image_enabled, :header_image,
                        :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
                        :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender]
 
+    
     simple_settings.each do |sym|
-      (
-      class << self;
-        self;
-      end).instance_eval do
-        define_method(sym) do
-          Settings.send sym
-        end
-        set_method=sym.to_s+"="
-        define_method(set_method) do |x|
-          Settings.send set_method, x
-        end
-      end
+      def_delegator Settings,sym
+      def_delegator Settings,sym.to_s+"="
     end
 
 
