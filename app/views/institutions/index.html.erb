@@ -9,6 +9,6 @@
   <%= render :partial=>"layouts/resource_list_item", :collection=>@institutions %>
 </div>
 
-<% if @institutions.page == "latest"%>
+<% if @institutions.page == "latest" && @institutions.length > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>
