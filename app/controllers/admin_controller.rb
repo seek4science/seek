@@ -171,7 +171,7 @@ class AdminController < ApplicationController
     Seek::ApplicationConfiguration.open_id_authentication_store= params[:open_id_authentication_store]
     Seek::ApplicationConfiguration.tag_threshold= params[:tag_threshold]
     Seek::ApplicationConfiguration.max_visible_tags= params[:max_visible_tags]
-
+    finalize_config_changes
   end
 
   def finalize_config_changes

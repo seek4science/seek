@@ -11,7 +11,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:aaron)
     @object=assays(:metabolomics_assay)
   end
-  
+
   test "modelling assay validates with schema" do
     a=assays(:modelling_assay_with_data_and_relationship)
     get :show, :id=>a, :format=>"xml"
@@ -29,7 +29,13 @@ class AssaysControllerTest < ActionController::TestCase
     
     validate_xml_against_schema(@response.body)
   end
-  
+
+  test "shouldn't show unauthorized assays" do
+    get :index, :page=>"all",:format=>"xml"
+    assert_response :success
+    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("show", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
+  end
+
   def test_title
     get :index
     assert_select "title",:text=>/The Sysmo SEEK Assays.*/, :count=>1

@@ -36,5 +36,8 @@ module AssaysHelper
     result
   end
 
-  
+  def authorised_assays
+    assays=Assay.find(:all)
+    Authorization.authorize_collection("show",assays,current_user)
+  end
 end

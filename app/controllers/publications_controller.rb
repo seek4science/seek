@@ -57,6 +57,7 @@ class PublicationsController < ApplicationController
     @publication.doi=nil if @publication.doi.blank?
     
     result = get_data(@publication, @publication.pubmed_id, @publication.doi)
+    assay_ids = params[:assay_ids] || []
     @publication.contributor = current_user    
     respond_to do |format|
       if @publication.save
@@ -67,7 +68,11 @@ class PublicationsController < ApplicationController
           pa.last_name = author.last_name
           pa.save
         end
-        
+
+        assay_ids.each do |id|
+          @assay = Assay.find(id)
+          Relationship.create_or_update_attributions(@assay,["Publication", @publication.id].to_json, Relationship::RELATED_TO_PUBLICATION)
+        end
         #Make a policy
         policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
         @publication.policy = policy
@@ -117,13 +122,36 @@ class PublicationsController < ApplicationController
 
     update_tags @publication
 
+    assay_ids = params[:assay_ids] || []
+
     respond_to do |format|
       publication_params = params[:publication]||{}
-      publication_params[:event_ids] = params[:event_ids]
+      publication_params[:event_ids] = params[:event_ids]||[]
       if valid && @publication.update_attributes(publication_params)
         to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}
-        
+
+        # Update relationship
+        assay_ids.each do |assay_id|
+          @assay = Assay.find(assay_id)
+          logger.info Relationship.find_all_by_object_id( @publication.id, :conditions => "subject_id = #{assay_id}")
+          Relationship.create_or_update_attributions(@assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) unless Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay_id}").length > 0
+        end
+        #Destroy relationship that aren't needed
+        associate_relationships = Relationship.find_all_by_object_id(@publication.id)
+        logger.info associate_relationships
+        associate_relationships.each do |associate_relationship|
+          flag = false
+          assay_ids.each do |id|
+            if associate_relationship.subject_id.to_s == id
+              flag = true
+            end
+          end
+          if flag == false
+             Relationship.destroy(associate_relationship.id)
+          end
+        end
+
         #Create policy if not present (should be)
         if @publication.policy.nil?
           @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)

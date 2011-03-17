@@ -3,7 +3,7 @@ var models_assets=new Array();
 var data_files_assets=new Array();
 var organisms = new Array();
 var assays_array = new Array();
-var id_rel_array = new Array();
+
 
 function postInvestigationData() {
     request = new Ajax.Request(CREATE_INVESTIGATION_LINK,
@@ -284,8 +284,8 @@ function check_show_add_assay() {
 }
 
 
-function addAssay(title,id,relationshipType) {
-    assays_array.push([title,id,relationshipType]);
+function addAssay(title,id) {
+    assays_array.push([title,id]);
 }
 
 function addSelectedAssay() {
@@ -293,16 +293,9 @@ function addSelectedAssay() {
     selected_option=$("possible_assays").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
-    if ($("assay_relationship_type")) {
-        relationshipType = $("assay_relationship_type").options[$("assay_relationship_type").selectedIndex].text;
-    }
-    else
-    {
-        relationshipType="None"
-    }
 
     if(checkNotInList(id,assays_array)) {
-        addAssay(title,id,relationshipType);
+        addAssay(title,id);
         updateAssays();
     }
     else {
@@ -317,10 +310,8 @@ function updateAssays() {
         assay=assays_array[i];
         title=assay[0];
         id=assay[1];
-        relationshipType = assay[2];
-        relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
-        assay_text += '<li>' + titleText + relationshipText +
+        assay_text += '<li>' + titleText +
         '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeAssay('+i+'); return(false);">remove</a>]</small></li>';
     }
@@ -338,9 +329,8 @@ function updateAssays() {
     select=$('assay_ids');
     for (i=0;i<assays_array.length;i++) {
         id=assays_array[i][1];
-        relationshipType=assays_array[i][2];
         o=document.createElement('option');
-        o.value=id + "," + relationshipType;
+        o.value=id;
         o.text=id;
         o.selected=true;
         try {
@@ -357,6 +347,7 @@ function removeAssay(index) {
     // update the page
     updateAssays();
 }
+
 
 
 function addOrganism(title,id,strain,culture_growth) {

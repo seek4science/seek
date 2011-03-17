@@ -1,6 +1,6 @@
 <%= javascript_include_tag "sharing.js" %>
 <%= javascript_include_tag "associate_events.js" %>
-<%= javascript_include_tag "assays.js" %>
+<%= javascript_include_tag "associate_datafile_assays.js" %>
 
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @data_file, current_user) -%>
 <ul class="sectionIcons">
@@ -39,7 +39,7 @@
     <% if Seek::ApplicationConfiguration.events_enabled -%>
         <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
     <% end -%>
-    <%= render :partial => "assets/associate_assay", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+    <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
           
     <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Data_file",  # this is only for presentation, not for any processing
             :selected_project_id => @data_file.project_id,

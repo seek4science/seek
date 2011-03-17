@@ -1,3 +1,4 @@
+require 'rubygems'
 
 module Seek
   class ApplicationConfiguration

@@ -382,7 +382,7 @@ class ModelsController < ApplicationController
       @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
       update_tags @model
-      
+      assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
           # the Model was saved successfully, now need to apply policy / permissions settings to it
@@ -403,6 +403,10 @@ class ModelsController < ApplicationController
           else
             flash[:notice] = "Model was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+          end
+          assay_ids.each do |id|
+              @assay = Assay.find(id)
+              @assay.relate(@model)
           end
         else
           format.html {
@@ -439,6 +443,7 @@ class ModelsController < ApplicationController
 
     update_tags @model
 
+    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @model.update_attributes(params[:model])
         # the Model was updated successfully, now need to apply updated policy / permissions settings to it
@@ -459,6 +464,24 @@ class ModelsController < ApplicationController
         else
           flash[:notice] = "Model metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
           format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+        end
+        # Update new assay_asset
+        assay_ids.each do |id|
+          @assay = Assay.find(id)
+          @assay.relate(@model)
+        end
+        #Destroy AssayAssets that aren't needed
+        assay_assets = AssayAsset.find_all_by_asset_id(@model.id)
+        assay_assets.each do |assay_asset|
+          flag = false
+          assay_ids.each do |id|
+            if assay_asset.assay_id.to_s == id
+              flag = true
+            end
+          end
+          if flag == false
+             AssayAsset.destroy(assay_asset.id)
+          end
         end
       else
         format.html {

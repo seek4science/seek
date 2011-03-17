@@ -24,7 +24,7 @@ GEM
     mime-types (1.16)
     mysql (2.8.1)
     open4 (1.0.1)
-    rack (1.1.2)
+    rack (1.1.1)
     rack-openid (1.1.0)
       rack (>= 0.4)
       ruby-openid (>= 2.0.3)

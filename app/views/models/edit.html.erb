@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js","models.js" -%>
+<%= javascript_include_tag "sharing.js","models.js", "assays.js" -%>
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @model, current_user) -%>
 <ul class="sectionIcons">
     <li>
@@ -52,7 +52,8 @@
 					:related_publications=>@model.related_publications
 				} 
     	-%>
-		
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
+
         <% end -%>
         <p>
             <%= f.submit "Update", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(false); return(false);" -%> or <%= link_to "Cancel", model_path(@model) -%>

@@ -13,7 +13,12 @@
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
-        all_assays=Assay.find(:all).sort{|a, b| a.title<=>b.title}
+        all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
+        if resource_text == "model"
+            all_assays.each do |assay|
+                all_assays.delete(assay) if assay.assay_class_id == 1
+            end
+        end
         project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
         select_truncate_length=120
       -%>
@@ -31,14 +36,10 @@
             :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('assay_preview')"
-          )+";check_show_add_assay();selected_assay();return(false);"
+          )+";check_show_add_assay();return(false);"
         } -%>
           <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
           <br/>
-            <% if show_relationships -%>
-                <%= label_tag "Relationship between the data and the model" %><br/>
-                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}), :disabled => true %>
-            <% end %>
         <br/>
         <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Include Assays from other projects?
       </div>
@@ -58,19 +59,6 @@
   
 
 <script type="text/javascript">
-    function selected_assay(){
-       i = $('possible_assays').selectedIndex;
-       id = $('possible_assays').options[i].value;
-       for (var j = 0; j < id_rel_array.length; j++) {
-           if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'true'))  {
-              $('assay_relationship_type').disabled = false;
-           }
-           else if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'false'))  {
-              $('assay_relationship_type').selectedIndex = 0;
-              $('assay_relationship_type').disabled = true;
-           }
-       }
-    }
     function toggle_assay_list() {
         var checked = $('include_other_project_assays').checked;
         var selection_box = $('possible_assays');
@@ -115,19 +103,11 @@
       <% if assay && Authorization.is_authorized?("show",nil,assay,current_user) -%>
         assay_id = '<%= assay.id -%>';
         assay_title = '<%= assay.title -%>';
-        relationship_type = '<%= escape_javascript(resource.relationship_type(assay).try(:title) || "None") -%>';
-        addAssay(assay_title,assay_id,relationship_type);
+        addAssay(assay_title,assay_id);
       <% end %>
   <% end -%>
 <% end -%>
 
-
-
-<% all_assays.each do |assay|%>
-    assay_id = '<%= assay.id -%>';
-    assay_relationship = '<%=(assay.is_modelling?) -%>';
-    id_rel_array.push([assay_id, assay_relationship])
-<% end -%>
 
 <% if params[:assay_ids] %>
   <% params[:assay_ids].each do |id| -%>
@@ -135,8 +115,7 @@
     <% if Authorization.is_authorized?("show",nil,assay,current_user) -%>
         assay_id = '<%= assay.id -%>';
         assay_title = '<%= escape_javascript(assay.title) -%>';
-        relationship_type = '<%= escape_javascript(resource.relationship_type(assay).try(:title) || "None") -%>';
-        addAssay(assay_title,assay_id,relationship_type);
+        addAssay(assay_title,assay_id);
     <% end -%>
   <% end -%>
 <% end -%>

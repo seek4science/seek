@@ -1,0 +1,149 @@
+<% resource_text ||= resource.class.name.downcase %>
+<script type="text/javascript">
+</script>
+
+<div class="fold">
+
+  <div class="foldTitle">
+    <%= help_icon("Here you associate assay in SEEK to this #{resource_text}.") -%>
+    Associate Assay
+  </div>
+
+  <div id="associate_assay_fold_content" class="foldContent" style="display: block;">
+    <div class="yui-u first" style="width:66%; float:left">
+      
+      <%
+        all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
+        project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
+        select_truncate_length=120
+      -%>
+      
+      <p style="color: #666666;">
+        The following Assays are involved in this <%= resource_text -%>:
+      </p>
+      <div id="assay_to_list" class="box_editing_inner" style="line-height: 1.5">
+        <span class="none_text" id="assay_files">Loading...</span>
+      </div>
+      <div class="association_step">
+        <%= select_tag :possible_assays,
+          options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+          {:style=>"width:90%",:onchange=>remote_function(
+            :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
+            :with=>"'id='+this.value",
+            :before=>"show_ajax_loader('assay_preview')"
+          )+";check_show_add_assay();selected_assay();return(false);"
+        } -%>
+          <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+          <br/>
+            <% if show_relationships -%>
+                <%= label_tag "Relationship between the data and the model" %><br/>
+                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}), :disabled => true %>
+            <% end %>
+        <br/>
+        <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Include Assays from other projects?
+      </div>
+
+	  <br/>
+      <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedAssay(); return(false);", :id=>"add_assay_link", :class=>"block_link", :style => "width: 11em" %>
+    </div>
+  
+    <div id="assay_preview" class="yui-u preview_box"  style="float:right">
+      <div style="text-align: center;">Assay preview</div>
+    </div>
+ 
+    <br style="clear:both"/>
+  
+  </div>
+</div>
+  
+
+<script type="text/javascript">
+    function selected_assay(){
+       i = $('possible_assays').selectedIndex;
+       id = $('possible_assays').options[i].value;
+       for (var j = 0; j < id_rel_array.length; j++) {
+           if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'true'))  {
+              $('assay_relationship_type').disabled = false;
+           }
+           else if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'false'))  {
+              $('assay_relationship_type').selectedIndex = 0;
+              $('assay_relationship_type').disabled = true;
+           }
+       }
+    }
+    function toggle_assay_list() {
+        var checked = $('include_other_project_assays').checked;
+        var selection_box = $('possible_assays');
+        var option;
+
+        selection_box.options.length = 0;
+
+        if (checked) {
+        <% ([["Select Assay ...",0]]|all_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(df_details[0]) -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        else {
+        <% ([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |df_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(df_details[0]) -%>';
+            option.value = '<%= df_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        selection_box.selectedIndex = 0;
+        selection_box.onchange();
+    }
+
+<% assay_assets = AssayAsset.find_all_by_asset_id(resource.id) %>
+  <% if assay_assets%>
+    <% assay_assets.each do |assay_asset|%>
+      <% assay = Assay.find(assay_asset.assay_id) %>
+      <% if assay && Authorization.is_authorized?("show",nil,assay,current_user) -%>
+        assay_id = '<%= assay.id -%>';
+        assay_title = '<%= assay.title -%>';
+        relationship_type = '<%= escape_javascript(resource.relationship_type(assay).try(:title) || "None") -%>';
+        addAssay(assay_title,assay_id,relationship_type);
+      <% end %>
+  <% end -%>
+<% end -%>
+
+
+
+<% all_assays.each do |assay|%>
+    assay_id = '<%= assay.id -%>';
+    assay_relationship = '<%=(assay.is_modelling?) -%>';
+    id_rel_array.push([assay_id, assay_relationship])
+<% end -%>
+
+<% if params[:assay_ids] %>
+  <% params[:assay_ids].each do |id| -%>
+    <% assay = Assay.find(id) %>
+    <% if Authorization.is_authorized?("show",nil,assay,current_user) -%>
+        assay_id = '<%= assay.id -%>';
+        assay_title = '<%= escape_javascript(assay.title) -%>';
+        relationship_type = '<%= escape_javascript(resource.relationship_type(assay).try(:title) || "None") -%>';
+        addAssay(assay_title,assay_id,relationship_type);
+    <% end -%>
+  <% end -%>
+<% end -%>
+
+
+
+  updateAssays();
+
+  check_show_add_assay();
+</script>
