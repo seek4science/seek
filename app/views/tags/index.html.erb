@@ -7,7 +7,7 @@
     <div class="hTagcloud">
       <div class="popularity">
         <% overall_tag_cloud ActsAsTaggableOn::Tag.all_tags_for_cloud, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => css_class -%>
+                <%= link_for_tag tag,:truncate_length=>40, :class => css_class -%>
         <% end -%>
       </div>
     </div>

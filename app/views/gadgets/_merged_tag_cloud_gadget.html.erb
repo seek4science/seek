@@ -22,12 +22,11 @@
               <% if show_tag?(tag) -%>
                 <%
                   hide_tag=!show_tags.include?(tag)
-                  type = tag.taggings.first.context.to_sym                  
                   tag_class="#{css_class}"
                   tag_class << " #{hidden_class}" if hide_tag
                   style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
                 %>
-                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>          
+                <%= link_for_tag tag,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>
               <% end -%>
             <% end -%>
           
