@@ -3,20 +3,17 @@
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
 
-  @@creatable_model_classes ||= nil
 
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
   #returns a list of all types that respond_to and return true for user_creatable?
   def user_creatable_classes
-    return @@creatable_model_classes if @@creatable_model_classes
-
-    @@creatable_model_classes = Seek::Util.persistent_classes.select do |c|
-      c.respond_to?("user_creatable?") && c.user_creatable?
-    end
-    @@creatable_model_classes.delete(Event) unless Seek::Config.events_enabled
-
-    #sorted by name, assets first, then isa, then anything else  
-    @@creatable_model_classes = @@creatable_model_classes.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+    @@creatable_model_classes ||= begin
+      classes=Seek::Util.persistent_classes.select do |c|
+        c.respond_to?("user_creatable?") && c.user_creatable?
+      end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+      classes.delete(Event) unless Seek::Config.events_enabled
+      classes
+    end    
   end
 
   #joins the list with seperator and the last item with an 'and'
@@ -33,7 +30,7 @@ module ApplicationHelper
         end
       end
     end
-    return result
+    result
   end
 
   def tab_definition(options={})
