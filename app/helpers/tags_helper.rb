@@ -3,7 +3,7 @@ module TagsHelper
   include ActsAsTaggableOn
 
   def tag_cloud(tags, classes,counter_method=:count)
-    tags = tags.sort_by(&:name)
+    tags = tags.sort_by{|t| t.name.downcase}
     max_count = tags.max_by(&counter_method).send(counter_method).to_f
     if max_count < 1
       max_count = 1
