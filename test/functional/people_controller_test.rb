@@ -27,6 +27,14 @@ class PeopleControllerTest < ActionController::TestCase
     get :new
     assert_response :success
   end
+
+  test "personal tags are shown" do
+    person=people(:pal)
+    tag=tags(:fishing)
+    get :show,:id=>person
+    assert :success
+    assert_select "div#personal_tags a[href=?]",show_tag_path(tag),:text=>tag.name,:count=>1
+  end
   
   def test_first_registered_person_is_admin
     Person.destroy_all

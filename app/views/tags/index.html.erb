@@ -3,14 +3,8 @@
   <h1>All tags</h1>
 </div>
 <div class="show_basic">
-  <div id="super_tag_cloud" class="tags_smaller">
-    <div class="hTagcloud">
-      <div class="popularity">
-        <% overall_tag_cloud ActsAsTaggableOn::Tag.all_tags_for_cloud, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-                <%= link_for_tag tag,:truncate_length=>40, :class => css_class -%>
-        <% end -%>
-      </div>
-    </div>
-  </div>
+
+   <%= render :partial=>"layouts/tag_cloud",:locals=>{:tags=>ActsAsTaggableOn::Tag.all_tags_for_cloud,:show_overall_count=>true,:id=>"super_tag_cloud",:tags_smaller=>false} %>
+
 </div>
 <%# end -%>

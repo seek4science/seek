@@ -18,7 +18,7 @@
 <% end %>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@person} %>
 <div class="show_basic">
-    <div class="main_content_left_box">
+    <div class="main_content_left_box_narrower">
         <div class="box_about_actor">
             <p>
                 <b>Name:</b> 
@@ -75,8 +75,9 @@
             </p>
         </div>
     </div>
-    <div class="main_content_right_box">
+    <div class="main_content_right_box_wider">
         <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @person, :drag_id => drag_id } -%>
+        <%= render :partial=>"personal_tags",:locals=>{:person=>@person} %>
     </div>
     <div style="clear:both;">
         <br/>
