@@ -1,24 +1,26 @@
-<% resource_text ||= resource.class.name.downcase %>
+<%
+   resource_text ||= resource.class.name.downcase
+%>
 <script type="text/javascript">
 </script>
 
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate assay in SEEK to this #{resource_text}.") -%>
+    <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}.") -%>
     Associate Assay
   </div>
 
-  <div id="associate_assay_fold_content" class="foldContent" style="display: block;">
+  <div id="associate_assay_fold_content" class="foldContent" style="display: none;">
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
-        all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
-        if resource_text == "model"
-            all_assays.each do |assay|
-                all_assays.delete(assay) if assay.assay_class_id == 1
-            end
-        end
+        all_assays=authorised_assays.sort_by &:title
+
+        all_assays = all_assays.select do |assay|
+            assay.is_modelling?
+        end if resource.is_a? Model
+
         project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
         select_truncate_length=120
       -%>
