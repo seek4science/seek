@@ -37,7 +37,6 @@ module AssaysHelper
   end
 
   def authorised_assays
-    assays=Assay.find(:all)
-    Authorization.authorize_collection("show",assays,current_user)
+    Assay.all.select{|assay| assay.can_edit?(current_user)}
   end
 end
