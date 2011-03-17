@@ -114,4 +114,15 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
   test "copyright_addendum_content" do
     assert_equal 'Additions copyright ...',Seek::Config.copyright_addendum_content
   end
+
+  test "changing a setting" do
+    Seek::Config.pubmed_api_email="fred@email.com"
+    assert_equal "fred@email.com",Seek::Config.pubmed_api_email
+  end
+
+  test "invalid setting accessor" do
+    assert_raises(NoMethodError) {Seek::Config.xxxxx}
+    assert_raises(NoMethodError) {Seek::Config.xxxxx=true}
+  end
+
 end
