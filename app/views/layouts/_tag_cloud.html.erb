@@ -1,0 +1,18 @@
+<%
+   show_overall||=false
+   method= show_overall_count ? :overall_total : :count
+   no_tags_text||=""
+%>
+<div id="<%= id -%>" <%= "class='tags_smaller'" if tags_smaller -%>>
+  <div class="hTagcloud">
+    <% unless tags.blank? -%>
+    <div class="popularity">
+      <% tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular), method do |tag, css_class| -%>
+          <%= link_for_tag tag, :truncate_length=>40, :class => css_class -%>
+      <% end -%>
+    </div>
+    <% else -%>
+        <p class="none_text"><%= h(no_tags_text) -%></p>
+    <% end -%>
+  </div>
+</div>

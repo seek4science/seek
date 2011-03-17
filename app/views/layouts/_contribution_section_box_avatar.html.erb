@@ -3,10 +3,10 @@
 <%# 2) "drag_id" - id for dragging-dropping avatar into "favourites" gadget; -%>
 
 <% if object.instance_of?(Person) -%>
-  <span style="float:right;padding-top:0.5em;padding-right:0.5em;"><%= no_user_for_admins_img object %></span>  
+    
 <% end -%>
 
-<div class="contribution_section_box" style="padding-top: 3em; padding-bottom: 3em;">  
+<div class="contribution_section_box">
   <div>
     <%= favouritable_icon(object, 60) -%>    
   </div>
