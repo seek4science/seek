@@ -8,6 +8,7 @@ namespace :solr do
   desc 'Starts Solr. Options accepted: RAILS_ENV=your_env, PORT=XX. Defaults to development if none.'
   task :start do
     require "#{File.dirname(__FILE__)}/../../config/solr_environment.rb"
+
     begin
       http = Net::HTTP.new('127.0.0.1', SOLR_PORT)
       http.request_head('/').value 
@@ -25,8 +26,8 @@ namespace :solr do
         File.open("#{SOLR_PIDS_PATH}/#{ENV['RAILS_ENV']}_pid", "w"){ |f| f << pid}
         puts "#{ENV['RAILS_ENV']} Solr started successfully on #{SOLR_PORT}, pid: #{pid}."
       end      
-    end        
-  end  
+    end
+  end
   
   desc 'Stops Solr. Specify the environment by using: RAILS_ENV=your_env. Defaults to development if none.'
   task :stop do
@@ -116,7 +117,7 @@ namespace :solr do
       puts "Shutting down Solr server..."
       Rake::Task["solr:stop"].invoke 
     end
-    
+
   end
   
   def env_array_to_constants(env)
@@ -132,5 +133,5 @@ namespace :solr do
     else default
     end
   end
-  
+
 end

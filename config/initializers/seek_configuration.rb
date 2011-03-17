@@ -50,7 +50,19 @@ require 'active_record_extensions'
     ExceptionNotifier.render_only = true
   end
 
-
+# start and reindex solr server when it is set enable
+  begin
+      if Settings.solr_enabled == true
+        #start the solr server
+        system ("rake solr:start RAILS_ENV=#{RAILS_ENV}")
+        #system ("rake solr:reindex RAILS_ENV=#{RAILS_ENV}")
+      end
+  rescue
+      if Settings.defaults[:solr_enabled] == true
+        #start the solr server
+        system ("rake solr:start RAILS_ENV=#{RAILS_ENV}")
+      end
+  end
 #Project
   Settings.defaults[:project_name] = 'SysMO'
   Settings.defaults[:project_type] = 'Consortium'
@@ -76,3 +88,4 @@ require 'active_record_extensions'
   Settings.defaults[:open_id_authentication_store] = :memory
 
   OpenIdAuthentication.store = Settings.defaults[:open_id_authentication_store]
+
