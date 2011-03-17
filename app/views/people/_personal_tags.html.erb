@@ -3,11 +3,11 @@
    if !person.user.nil?
        tags=person.user.owned_tags
    end
-
 -%>
 
 <div class="contribution_section_box">
   <p class="heading">
+    <%= help_icon("These are the tags that #{person.first_name.capitalize} has used to tag items in #{Seek::Config.application_name}. The weight of the tag indicates how often it has been used within #{Seek::Config.application_name}.") -%>
     <%= "#{person.first_name.capitalize}'s tags" -%>
   </p>
 
