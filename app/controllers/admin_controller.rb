@@ -49,7 +49,7 @@ class AdminController < ApplicationController
     else
       Seek::Config.email_enabled=false
     end
-    Seek::Config.set_smtp_settings 'email', params[:email]
+    Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'port', params[:port]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
     Seek::Config.set_smtp_settings 'authentication', params[:authentication]

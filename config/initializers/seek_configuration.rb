@@ -53,13 +53,13 @@ require 'active_record_extensions'
 # start and reindex solr server when it is set enable
   begin
       if Settings.solr_enabled == true
-        #start the solr server and reindex
+        #start the solr server
         system ("rake solr:start RAILS_ENV=#{RAILS_ENV}")
         #system ("rake solr:reindex RAILS_ENV=#{RAILS_ENV}")
       end
   rescue
       if Settings.defaults[:solr_enabled] == true
-        #start the solr server and reindex
+        #start the solr server
         system ("rake solr:start RAILS_ENV=#{RAILS_ENV}")
       end
   end
