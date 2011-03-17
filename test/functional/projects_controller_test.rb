@@ -162,6 +162,14 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "filter projects by person" do
+    get :index, :filter => {:person => 1}
+    assert_response :success
+    projects = assigns(:projects)
+    assert_equal Project.all.select {|proj|proj.people.include? Person.find_by_id(1)}, projects
+    assert projects.count < Project.all.count
+  end
+
   test "no pals displayed for project with no pals" do
     get :show,:id=>projects(:myexperiment_project)
     assert_select "div.box_about_actor p.pals" do

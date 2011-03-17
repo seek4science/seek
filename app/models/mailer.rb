@@ -2,9 +2,9 @@ class Mailer < ActionMailer::Base
   helper UsersHelper  
 
   def feedback user,topic,details,send_anonymously,base_host
-    subject "#{Seek::ApplicationConfiguration.application_name} Feedback provided - #{topic}"
+    subject "#{Seek::Config.application_name} Feedback provided - #{topic}"
     recipients admin_emails
-    from Seek::ApplicationConfiguration.noreply_sender
+    from Seek::Config.noreply_sender
     reply_to user.person.email_with_name unless send_anonymously
     sent_on Time.now
 
@@ -13,9 +13,9 @@ class Mailer < ActionMailer::Base
 
   def request_resource(user,resource,details,base_host)
 
-    subject "A #{Seek::ApplicationConfiguration.application_name} member requested a protected file: #{resource.title}"
+    subject "A #{Seek::Config.application_name} member requested a protected file: #{resource.title}"
     recipients resource.managers.collect{|m| m.email_with_name}
-    from Seek::ApplicationConfiguration.noreply_sender
+    from Seek::Config.noreply_sender
     reply_to user.person.email_with_name
     sent_on Time.now
     
@@ -23,36 +23,36 @@ class Mailer < ActionMailer::Base
   end
 
   def signup(user,base_host)
-    subject     "#{Seek::ApplicationConfiguration.application_name} account activation"
+    subject     "#{Seek::Config.application_name} account activation"
     recipients  user.person.email_with_name
-    from        Seek::ApplicationConfiguration.noreply_sender
+    from        Seek::Config.noreply_sender
     sent_on     Time.now
 
     body        :username=>user.login,:openid=>user.openid, :name=>user.person.name, :admins=>admins, :activation_code=>user.activation_code, :host=>base_host
   end
 
   def forgot_password(user,base_host)
-    subject    "#{Seek::ApplicationConfiguration.application_name} - Password reset"
+    subject    "#{Seek::Config.application_name} - Password reset"
     recipients user.person.email_with_name
-    from       Seek::ApplicationConfiguration.noreply_sender
+    from       Seek::Config.noreply_sender
     sent_on    Time.now
     
     body       :username=>user.login, :name=>user.person.name, :reset_code => user.reset_password_code, :host=>base_host
   end
 
   def welcome(user,base_host)
-    subject    "Welcome to #{Seek::ApplicationConfiguration.application_name}"
+    subject    "Welcome to #{Seek::Config.application_name}"
     recipients user.person.email_with_name
-    from       Seek::ApplicationConfiguration.noreply_sender
+    from       Seek::Config.noreply_sender
     sent_on    Time.now
     
     body       :name=>user.person.name,:person=>user.person, :host=>base_host
   end
   
   def welcome_no_projects(user,base_host)
-    subject    "Welcome to #{Seek::ApplicationConfiguration.application_name}"
+    subject    "Welcome to #{Seek::Config.application_name}"
     recipients user.person.email_with_name
-    from       Seek::ApplicationConfiguration.noreply_sender
+    from       Seek::Config.noreply_sender
     sent_on    Time.now
     
     body       :name=>user.person.name,:person=>user.person, :host=>base_host
@@ -60,9 +60,9 @@ class Mailer < ActionMailer::Base
 
   def contact_admin_new_user_no_profile(details,user,base_host)
     
-    subject    "#{Seek::ApplicationConfiguration.application_name} member signed up"
+    subject    "#{Seek::Config.application_name} member signed up"
     recipients admin_emails
-    from       Seek::ApplicationConfiguration.noreply_sender
+    from       Seek::Config.noreply_sender
     reply_to   user.person.email_with_name
     sent_on    Time.now
     
@@ -73,16 +73,16 @@ class Mailer < ActionMailer::Base
     subject_text = (harvester_responses.size > 1) ? 'New resources registered with SEEK' : 'New resource registered with SEEK'
     subject    subject_text
     recipients user.person.email_with_name
-    from       Seek::ApplicationConfiguration.noreply_sender
+    from       Seek::Config.noreply_sender
     sent_on    Time.now
     
     body       :resources => harvester_responses, :person=>user.person, :host=>base_host
   end
   
   def announcement_notification(site_announcement, notifiee_info,base_host)
-    subject "#{Seek::ApplicationConfiguration.application_name} Announcement: #{site_announcement.title}"
+    subject "#{Seek::Config.application_name} Announcement: #{site_announcement.title}"
     recipients notifiee_info.notifiee.email_with_name    
-    from       Seek::ApplicationConfiguration.noreply_sender
+    from       Seek::Config.noreply_sender
     sent_on    Time.now
     
     sent_on Time.now

@@ -3,37 +3,37 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Events enabled:    <%= check_box_tag(:events_enabled, 1,Seek::ApplicationConfiguration.events_enabled) %>
+    Events enabled:    <%= check_box_tag(:events_enabled, 1,Seek::Config.events_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Jerm enabled:    <%= check_box_tag(:jerm_enabled, 1, Seek::ApplicationConfiguration.jerm_enabled) %>
+    Jerm enabled:    <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Solr enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::ApplicationConfiguration.solr_enabled) %>
+    Solr enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Exception notification enabled:    <%= check_box_tag(:exception_notification_enabled, 1, Seek::ApplicationConfiguration.exception_notification_enabled, :disabled => true) %>
+    Exception notification enabled:    <%= check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled, :disabled => true) %>
     <br style="clear:both;"/>
     <br/>
-    Hide details enabled:    <%= check_box_tag(:hide_details_enabled, 1, Seek::ApplicationConfiguration.hide_details_enabled) %>
+    Hide details enabled:    <%= check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Activity log enabled:    <%= check_box_tag(:activity_log_enabled, 1, Seek::ApplicationConfiguration.activity_log_enabled) %>
+    Activity log enabled:    <%= check_box_tag(:activity_log_enabled, 1, Seek::Config.activity_log_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Activation required enabled: <%= check_box_tag(:activation_required_enabled, 1, Seek::ApplicationConfiguration.activation_required_enabled) %>
+    Activation required enabled: <%= check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Jws enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::ApplicationConfiguration.jws_enabled) %>
+    Jws enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Jws online root:    <%= text_field_tag(:jws_online_root, Seek::ApplicationConfiguration.jws_online_root) %>
+    Jws online root:    <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
     <br style="clear:both;"/>
     <br/>
-    Google analytics enabled:    <%= check_box_tag(:google_analytics_enabled, 1, Seek::ApplicationConfiguration.google_analytics_enabled) %>
+    Google analytics enabled:    <%= check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::ApplicationConfiguration.google_analytics_tracker_id) %>
+    Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
     <br style="clear:both;"/>
     <br/>
     <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Email", :partial => 'admin/email', :div_options => { :class => 'email_configuration'}} %>

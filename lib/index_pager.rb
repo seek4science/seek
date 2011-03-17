@@ -49,6 +49,7 @@ module IndexPager
     model_class=eval(model_name)
     if params[:page]=="latest"
       found = model_class.find(:all, :order => "created_at DESC")
+      found = model_class.sort(found) if model_class.respond_to? :sort
     else
       found = model_class.find(:all)
     end

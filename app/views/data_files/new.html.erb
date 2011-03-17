@@ -25,7 +25,7 @@
         
       
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
-        <% if Seek::ApplicationConfiguration.events_enabled -%>
+        <% if Seek::Config.events_enabled -%>
             <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
         <% end -%>
         <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>

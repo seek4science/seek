@@ -30,7 +30,7 @@
     <% end -%>
 </ul>
 
-<% if Seek::ApplicationConfiguration.jws_enabled && jws_supported?(@display_model) -%>
+<% if Seek::Config.jws_enabled && jws_supported?(@display_model) -%>
 	<ul class="sectionIcons">
 		<% if Authorization.is_authorized?("edit", nil, @model, current_user) -%>
 		    <li>
@@ -39,11 +39,25 @@
 	    <% end -%>
 	    <% if Authorization.is_authorized?("download", nil, @model, current_user) -%>
 		    <li>
-		        <%= image_tag_for_key('execute', simulate_model_path(@model,:version=>@display_model.version),nil,{:method=>:post},"Simulate Model") -%>
+		        <%= image_tag_for_key('execute', simulate_model_path(@model,:version=>@display_model.version),nil,{:method=>:post},"Simulate Model on JWS") -%>
 		    </li>
-	    <% end -%>	    
+	    <% end -%>
 	</ul>
 <% end -%>
+
+<% if @display_model.model_format && @display_model.model_format.title == "SBML" %>
+  <ul class="sectionIcons">
+    <li>
+      <span class="icon">
+        <% form_tag("http://172.16.3.190:8080/sycamore/submission.jsp", :id=>'sycamore-form', :target => '_blank') do -%>
+          <%= hidden_field_tag 'sbml_model', h(IO.read(@display_model.content_blob.filepath).gsub(/\n/, '')) -%>
+          <%= hidden_field_tag 'sender', 'seek' -%>
+          <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Sycamore", "$('sycamore-form').submit()" -%>
+        <% end -%>
+      </span>
+    </li>
+  </ul>
+<% end %>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@model} %>

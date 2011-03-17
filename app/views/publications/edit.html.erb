@@ -69,7 +69,7 @@
     </div>
     <br style="clear: both"/>
 
-    <% if Seek::ApplicationConfiguration.events_enabled -%>
+    <% if Seek::Config.events_enabled -%>
         <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
     <% end -%>
     <%= render :partial => "assays/associate_publication_assays", :locals=>{:resource => @publication} -%>

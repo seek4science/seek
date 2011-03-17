@@ -11,7 +11,7 @@ class Person < ActiveRecord::Base
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
   #load the configuration for the pagination
-  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
+  grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   validates_presence_of :email
 
@@ -42,7 +42,7 @@ class Person < ActiveRecord::Base
   has_many :created_sops, :through => :assets_creators, :source => :asset, :source_type => "Sop"
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
 
-  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :description ]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :description ]) if Seek::Config.solr_enabled
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
