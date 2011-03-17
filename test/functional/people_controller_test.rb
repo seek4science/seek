@@ -30,9 +30,8 @@ class PeopleControllerTest < ActionController::TestCase
 
   test "personal tags are shown" do
     person=people(:pal)
-    puts person.user.owned_tags.count
-    assert person.user.owned_tags.collect(&:name).include?("fishing"), "This person must own the tag fishing for this test to work."
-    tag=tags(:fishing)
+    assert person.user.owned_tags.collect(&:name).include?("cricket"), "This person must own the tag fishing for this test to work."
+    tag=tags(:cricket)
     get :show,:id=>person
     assert :success
     assert_select "div#personal_tags a[href=?]",show_tag_path(tag),:text=>tag.name,:count=>1

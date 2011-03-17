@@ -13,9 +13,9 @@ golf_modeller_person:
   taggable: modeller_person(Person)
   context: "expertise"
 
-fishing_owned_tag:
-  tag: fishing
-  taggable: teusink(Model)
+cricket_owned_tag:
+  tag: cricket
+  taggable: jws_model(Model)
   tagger: pal_user(User)
   context: "tags"
   
