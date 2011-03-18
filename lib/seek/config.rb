@@ -5,7 +5,6 @@ module Seek
 
     extend SingleForwardable
 
-
     #settings that require simple accessors. Avoids writing many duplicated getters and setters.
     simple_settings = [:events_enabled,:jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
                        :jws_online_root, :hide_details_enabled, :activity_log_enabled,
@@ -19,7 +18,6 @@ module Seek
       def_delegator Settings,sym
       def_delegator Settings,sym.to_s+"="
     end
-
 
     def self.solr_enabled
       Settings.solr_enabled
@@ -36,7 +34,6 @@ module Seek
         system ("rake solr:stop RAILS_ENV=#{RAILS_ENV}")
       end
     end
-
 
     def self.exception_notification_enabled
       Settings.exception_notification_enabled
@@ -159,14 +156,7 @@ module Seek
     end
 
 #Others
-    def self.type_managers_enabled
-      Settings.type_managers_enabled
-    end
-
-    def self.type_managers_enabled= value
-      Settings.type_managers_enabled = value
-    end
-
+    
     def self.tag_threshold
       Settings.tag_threshold.to_i
     end
