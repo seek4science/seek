@@ -50,7 +50,6 @@ class AdminController < ApplicationController
       Seek::Config.email_enabled=false
     end
     Seek::Config.set_smtp_settings 'address', params[:address]
-    Seek::Config.set_smtp_settings 'port', params[:port]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
     Seek::Config.set_smtp_settings 'authentication', params[:authentication]
     Seek::Config.set_smtp_settings 'user_name', params[:user_name]
@@ -102,7 +101,16 @@ class AdminController < ApplicationController
       Seek::Config.google_analytics_enabled= false
     end
     Seek::Config.google_analytics_tracker_id= params[:google_analytics_tracker_id]
-    finalize_config_changes
+
+    begin
+       Integer(params[:port])
+       Seek::Config.set_smtp_settings 'port', params[:port]
+       finalize_config_changes
+    rescue
+      flash[:error] = 'Please enter the correct port'
+      redirect_to :action=>:features_enabled
+    end
+
   end
 
   def rebrand
@@ -154,8 +162,14 @@ class AdminController < ApplicationController
    Seek::Config.set_default_page "sops", params[:sops]
    Seek::Config.set_default_page "publications", params[:publications]
    Seek::Config.set_default_page "events", params[:events]
-   Seek::Config.limit_latest= params[:limit_latest]
-   finalize_config_changes
+   begin
+       raise if Integer(params[:limit_latest]) == 0
+       Seek::Config.limit_latest= params[:limit_latest]
+       finalize_config_changes
+   rescue
+      flash[:error] = 'Please enter the correct paginate latest limit'
+      redirect_to :action=>:pagination
+   end
   end
 
   def update_others
@@ -169,9 +183,17 @@ class AdminController < ApplicationController
     Seek::Config.crossref_api_email= params[:crossref_api_email]
     Seek::Config.site_base_host= params[:site_base_host]
     Seek::Config.open_id_authentication_store= params[:open_id_authentication_store]
-    Seek::Config.tag_threshold= params[:tag_threshold]
-    Seek::Config.max_visible_tags= params[:max_visible_tags]
-    finalize_config_changes
+
+    begin
+       raise if Integer(params[:max_visible_tags]) == 0
+       Integer(params[:tag_threshold])
+       Seek::Config.tag_threshold= params[:tag_threshold]
+       Seek::Config.max_visible_tags= params[:max_visible_tags]
+       finalize_config_changes
+    rescue
+      flash[:error] = 'Please enter the correct tag threshold or maximum visible tags'
+      redirect_to :action=>:others
+    end
   end
 
   def finalize_config_changes

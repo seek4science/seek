@@ -168,7 +168,7 @@ module Seek
     end
 
     def self.tag_threshold
-      Integer(Settings.tag_threshold)
+      Settings.tag_threshold.to_i
     end
 
     def self.tag_threshold= value
@@ -176,7 +176,7 @@ module Seek
     end
 
     def self.max_visible_tags
-      Integer(Settings.max_visible_tags)
+      Settings.max_visible_tags.to_i
     end
 
     def self.max_visible_tags= value
@@ -194,7 +194,7 @@ module Seek
           :port           => Settings.smtp_settings[:port],
           :domain         => Settings.smtp_settings[:domain],
           :authentication => Settings.smtp_settings[:authentication],
-          :user_name      => Settings.smtp_settings[:user_name],
+          :user_name      => Settings.smtp_settings[  :user_name],
           :password       => Settings.smtp_settings[:password]
       }
     end

@@ -1,4 +1,4 @@
-<% javascript_include_tag 'sharing.js' %>
+<%= javascript_include_tag 'sharing.js' %>
 <% form_tag :action=>"update_features_enabled" do -%>
   <br style="clear:both;"/>
   <br/>
@@ -36,7 +36,7 @@
     Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
     <br style="clear:both;"/>
     <br/>
-    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Email", :partial => 'admin/email', :div_options => { :class => 'email_configuration'}} %>
+    <%= render :partial => 'layouts/collapsable_div', :locals => {:title => "Email", :partial => 'admin/email', :div_options => { :class => 'email_configuration'}, :start_open => true} %>
     <br style="clear:both;"/>
     <br/>
     <%= submit_tag "Update" %>

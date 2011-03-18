@@ -1,4 +1,4 @@
-<% javascript_include_tag 'sharing.js' %>
+<%= javascript_include_tag 'sharing.js' %>
 <% form_tag :action=>"update_others" do -%>
   <br style="clear:both;"/>
   <br/>
@@ -18,10 +18,10 @@
     Site base host:    <%= text_field_tag(:site_base_host, Seek::Config.site_base_host) %>
     <br style="clear:both;"/>
     <br/>
-    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::Config.tag_threshold, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
+    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::Config.tag_threshold, :onkeypress => "javascript: return onlyNumbers(event);") %>
     <br style="clear:both;"/>
     <br/>
-    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %> (only number)
+    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %>
     <br style="clear:both;"/>
     <br/>
     Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::Config.open_id_authentication_store) %>
@@ -34,3 +34,7 @@
         <%= submit_tag "Update"%>
   </div>
 <% end -%>
+
+<script type="text/javascript">
+
+</script>

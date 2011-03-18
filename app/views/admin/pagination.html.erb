@@ -1,4 +1,4 @@
-<% javascript_include_tag 'sharing.js' %>
+<%= javascript_include_tag 'sharing.js' %>
 <% form_tag :action=>"update_pagination" do -%>
   <br style="clear:both;"/>
   <br/>
@@ -205,7 +205,7 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Paginate latest limit: <%= text_field_tag(:limit_latest, Settings.limit_latest, :onkeypress => "javascript: return onlyNumbers(event);") %>(only number)
+    Paginate latest limit: <%= text_field_tag(:limit_latest, Settings.limit_latest, :onkeypress => "javascript: return onlyNumbers(event);") %>
     <br style="clear:both;"/>
     <br/>
     <br style="clear:both;"/>
