@@ -9,7 +9,7 @@
     <br style="clear:both"/>
   </div>
   <table>
-    <% annotations.group_by(&:source).each do |source, annotation_subset| %>    
+    <% annotations.reverse.group_by(&:source).each do |source, annotation_subset| %>    
       <tr class="source_header" id="annotation_from_<%= source.class.name + source.id.to_s -%>">
         <td colspan="3">Annotations from <%= link_to source.person.name, source.person -%></td>        
       </tr>

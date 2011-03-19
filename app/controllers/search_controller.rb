@@ -32,17 +32,20 @@ class SearchController < ApplicationController
     when ("models")
       @results = Model.multi_solr_search(downcase_query, :limit=>100, :models=>[Model]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     when ("data files")
-      @results = DataFile.multi_solr_search(downcase_query, :limit=>100, :models=>[DataFile]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
-   when ("investigations")
+      @results = DataFile.multi_solr_search(downcase_query, :limit=>100, :models=>[DataFile, SpreadsheetAnnotation]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
+    when ("investigations")
       @results = Investigation.multi_solr_search(downcase_query, :limit=>100, :models=>[Investigation]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
-   when ("assays")
+    when ("assays")
       @results = Assay.multi_solr_search(downcase_query, :limit=>100, :models=>[Assay]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
-   when ("publications")
+    when ("publications")
       @results = Publication.multi_solr_search(downcase_query, :limit=>100, :models=>[Publication]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     else
-      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Study,DataFile,Assay,Investigation, Publication]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
+      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Study,DataFile,Assay,Investigation, Publication, SpreadsheetAnnotation]).results if (SOLR_ENABLED and !downcase_query.nil? and !downcase_query.strip.empty?)
     end
-
+    
+    #Get data file associated with spreadsheet annotation
+    @results = @results.collect {|r| r.class == SpreadsheetAnnotation ? r.data_file : r }
+    
     @results = select_authorised @results    
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."

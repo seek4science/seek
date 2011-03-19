@@ -189,19 +189,22 @@ div#annotation_overview table td
   text-align: left;
 }
 
-div#annotation_overview table tr.source_header td
+div#annotation_overview table tr.source_header
 {
   background-color: #ddd;
+  color: #000000;
 }
 
-div#annotation_overview table tr
+div#annotation_overview table tr.annotation_stub
 {
   cursor: pointer;
+  color: #000099;
 }
 
-div#annotation_overview table tr:hover
+div#annotation_overview table tr.annotation_stub:hover
 {
   background-color: #ffd;
+  color: #FF0000;
 }
 
 div.spreadsheet_controls

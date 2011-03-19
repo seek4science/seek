@@ -82,12 +82,31 @@ $j(document).ready(function ($) {
       }
       return false; // prevent text selection
     })
-    .mouseover(function () {
+    .mouseover(function (e) {
       if (isMouseDown) {
         endRow = parseInt($(this).attr("row"));
         endCol = parseInt($(this).attr("col"));
 
         select_cells(startCol, startRow, endCol, endRow);
+        /*
+        var spreadsheetContainer = $('div.spreadsheet_container');
+        var scroll = false;
+        if(e.pageX >= (spreadsheetContainer.position().left + spreadsheetContainer.outerWidth())-100)
+        {
+          $('div.active_sheet').scrollLeft($('div.active_sheet').scrollLeft()+10);
+          scroll = true;
+        }
+        if(e.pageY >= (spreadsheetContainer.position().top + spreadsheetContainer.outerHeight())-100)
+        {
+          $('div.active_sheet').scrollTop($('div.active_sheet').scrollTop()+10);
+          scroll = true;
+        }
+        if(scroll)
+        {
+          $(this).trigger('mouseover', e);
+          $(this).html(Math.random());
+        }
+        */
       }    
     })
   ;  
