@@ -11,7 +11,7 @@
     </div>
     <div class="annotation_text">
       <%= link_to(annotation.source.person.name, annotation.source.person)%><br/> 
-      <%= annotation.content %><br/>      
+      <%= h annotation.content %><br/>      
     </div>
     <div class="annotation_edit_text" style="display:none;">
       <%= link_to(annotation.source.person.name, annotation.source.person)%><br/> 

@@ -191,12 +191,17 @@ div#annotation_overview table td
 
 div#annotation_overview table tr.source_header td
 {
-  background-color: #DDDDFF;
+  background-color: #ddd;
 }
 
 div#annotation_overview table tr
 {
   cursor: pointer;
+}
+
+div#annotation_overview table tr:hover
+{
+  background-color: #ffd;
 }
 
 div.spreadsheet_controls
@@ -231,5 +236,6 @@ a.spreadsheet_button img
 div.spreadsheet_box_title
 {
   background-color: #DDF;
-  padding: 5px;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
 }

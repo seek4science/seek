@@ -2,5 +2,5 @@
   <td>
     <span class="sheet_location">Sheet<%= annotation.sheet + 1-%>.</span><span class="cell_coverage"><%= annotation.cell_coverage -%></span>
   </td>
-  <td><%= truncate(annotation.content, :length => 40, :omission => "...") -%></td>
+  <td><%= h truncate(annotation.content, :length => 40, :omission => "...") -%></td>
 </tr>

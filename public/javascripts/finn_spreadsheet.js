@@ -22,14 +22,17 @@ $j(document).ready(function ($) {
       //Hide sheets
       $('div.sheet').hide();
       
+      var sheetName = $(this).html().replace(" ","_");
+      var activeSheet = $("div#spreadsheet_" + sheetName);
+      
       //Show the div + set sheet active
-      $("div#spreadsheet_" + $(this).html()).show().addClass('active_sheet');
+      activeSheet.show().addClass('active_sheet');
       
       //Reset scrollbars
-      $("div#spreadsheet_" + $(this).html()).scrollTop(0).scrollLeft(0);
+      activeSheet.scrollTop(0).scrollLeft(0);
       
       //Set table active
-      $("div#spreadsheet_" + $(this).html() + " table").addClass('active_sheet');
+      activeSheet.find("table").addClass('active_sheet');
 
       //Deselect any cells
       $("table.active_sheet td.selected_cell").removeClass("selected_cell");
