@@ -12,7 +12,7 @@
 <div class="show_basic">
   <div id="spreadsheet_errors"></div>
   <input size="10" id="selection_data"></input>
-  <input size="60" id="cell_info"></input>
+  <input size="60" id="cell_info" readonly="readonly"></input>
   <div class="spreadsheet_controls">
     <%= link_to image('spreadsheet_annotation_add') + " Add Annotation", "#", :onclick =>"$j('div#annotation_overview').hide(); $j('div#annotation_form').toggle();return false;",
           :title => "Add new annotation", :class => "spreadsheet_button" %>

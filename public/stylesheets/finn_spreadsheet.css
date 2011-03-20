@@ -260,3 +260,12 @@ div.spreadsheet_errors ul li
 {
   list-style: disc inside none;
 }
+
+#annotation_drag
+{
+  height: 8px;
+  background-color: #DDD;
+  margin: 2px 0;
+  border: 2px outset #999;
+  text-align: middle;
+}
