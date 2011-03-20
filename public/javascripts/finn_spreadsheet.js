@@ -1,6 +1,8 @@
 var $j = jQuery.noConflict(); //To prevent conflicts with prototype
 
+function callJS(){//FIXME: Hacky
 $j(document).ready(function ($) {
+  
   //To disable text-selection
   //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
   $.fn.disableSelection = function() {
@@ -13,7 +15,7 @@ $j(document).ready(function ($) {
 
   
   //Record current sheet in annotation form
-  $('input#annotation_sheet_id').attr("value",0);
+  $('input#annotation_sheet_id').attr("value",$('a.selected_tab').attr("index"));
   
   //Worksheet tabs  
   $("a.sheet_tab")
@@ -134,7 +136,13 @@ $j(document).ready(function ($) {
       dragY = e.pageY - $(this).offset().top;
       dragged = $('#annotation_container');
     })
-    .disableSelection()    
+    .mousemove(function (e) {
+      if (isDragging)
+      {
+        dragged.offset({ top: e.pageY-dragY, left: e.pageX-dragX });
+      }
+    })
+    .disableSelection()
   ;
 
   $(document)
@@ -152,12 +160,6 @@ $j(document).ready(function ($) {
         dragged = null;
       } 
     })
-    .mousemove(function (e) {
-      if (isDragging)
-      {
-        dragged.offset({ top: e.pageY-dragY, left: e.pageX-dragX });
-      }
-    })
   ;
     
   $('input#selection_data')
@@ -168,6 +170,7 @@ $j(document).ready(function ($) {
     })
   ;
 });
+}
 
 function num2alpha(col)
 {
@@ -194,7 +197,6 @@ function alpha2num(col)
   return result;
 }
 
-
 //To display the annotations
 function show_annotation(id,x,y)
 {
@@ -205,8 +207,6 @@ function show_annotation(id,x,y)
   annotation_container.show();
   annotation.show();  
 }
-
-
 
 function select_range(range)
 {

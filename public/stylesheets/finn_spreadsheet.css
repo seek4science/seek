@@ -268,4 +268,5 @@ div.spreadsheet_errors ul li
   margin: 2px 0;
   border: 2px outset #999;
   text-align: middle;
+  z-index: 10;
 }
