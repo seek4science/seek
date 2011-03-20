@@ -11,7 +11,8 @@ class SpreadsheetAnnotation < ActiveRecord::Base
   #validates_presence_of :annotation_type
   validates_presence_of :source
   validates_presence_of :data_file
-  validates_numericality_of :sheet, :start_row, :start_column, :end_row, :end_column, :allow_nil => false, :only_integer => true, :greater_than_or_equal_to => 0
+  validate :valid_cell_range #FIXME: NEED TO MAKE THIS BETTER, TOO MUCH VALIDATION DONE IN CONTROLLER
+  validates_numericality_of :sheet, :allow_nil => false, :only_integer => true, :greater_than_or_equal_to => 0
   
   def cell_coverage
     return SpreadsheetAnnotation.to_alpha(start_column)+start_row.to_s + 
@@ -41,4 +42,14 @@ private
     end
     result
   end
+  
+  def valid_cell_range
+    [self.start_row, self.start_column, self.end_row, self.end_column].each do |attr|
+      if !(attr.kind_of?(Fixnum)) || attr < 0 || attr.nil?
+        errors.add_to_base("Invalid cell range")
+        break
+      end
+    end     
+  end
+  
 end

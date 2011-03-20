@@ -1,7 +1,9 @@
 <div class="annotation" id="annotation_<%=annotation.id-%>">
   <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"update", :id => annotation.id}, 
                  :method => :put,  
-                 :update => { :success => "annotations", :failure => "annotations"},
+                 :update => { :success => "annotations", :failure => "spreadsheet_errors"},
+                 :success => "$j('#spreadsheet_errors').hide();",
+                 :failure => "$j('#spreadsheet_errors').show();",
                  :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
                  :complete => "$j('#spinner" + annotation.id.to_s + "').hide();", :html => {:id => "annotation_form"}) do %>
       
@@ -25,8 +27,10 @@
       <% if annotation.source == current_user %>
         <%= link_to_remote(image('spreadsheet_annotation_destroy', :title => "Delete Annotation"), :url=>{:controller=>"spreadsheet_annotations", :action=>"destroy", :id => annotation.id},
                    :method => :delete,   
-                   :update => { :success => "annotations", :failure => "annotations"},
+                   :update => { :success => "annotations", :failure => "spreadsheet_errors"},
                    :loading => "$j('#spinner" + annotation.id.to_s + "').show();",
+                   :success => "$j('#spreadsheet_errors').hide();",
+                   :failure => "$j('#spreadsheet_errors').show();",
                    :complete => "$j('#spinner" + annotation.id.to_s + "').hide();") -%>
         <%= link_to(image('spreadsheet_annotation_edit', :title => "Edit Annotation"), '#', :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") -%>     
         <%= image_tag "ajax-loader.gif", :id => "spinner"+annotation.id.to_s, :class => 'spinner', :style => 'display:none;' -%> 

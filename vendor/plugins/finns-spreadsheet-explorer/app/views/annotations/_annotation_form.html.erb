@@ -5,7 +5,9 @@
     <br style="clear:both"/>
   </div>
     <% form_remote_tag(:url=>{:controller=>"spreadsheet_annotations", :action=>"create"},   
-                   :update => { :success => "annotations", :failure => "annotations"},
+                   :update => { :success => "annotations", :failure => "spreadsheet_errors"},
+                   :success => "$j('#spreadsheet_errors').hide();",
+                   :failure => "$j('#spreadsheet_errors').show();",
                    :loading => "Element.show('spinner');",
                    :complete => "Element.hide('spinner');Element.hide('annotation_form');", :html => {:id => "annotation_form"}) do %>
     

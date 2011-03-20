@@ -242,3 +242,21 @@ div.spreadsheet_box_title
   padding: 0.5em;
   margin-bottom: 0.5em;
 }
+
+div.spreadsheet_errors
+{
+  margin: 0.5em;
+  padding: 0.5em;
+  border: 3px solid red;
+}
+
+div.spreadsheet_errors h1
+{
+  color: #FF0000;
+  text-align: left;
+}
+
+div.spreadsheet_errors ul li
+{
+  list-style: disc inside none;
+}
