@@ -32,23 +32,10 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
-    if params[:events_enabled] == "1"
-      Seek::Config.events_enabled=true
-    else
-      Seek::Config.events_enabled=false
-    end
+    Seek::Config.events_enabled= string_to_boolean params[:events_enabled]
+    Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
+    Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
 
-    if params[:jerm_enabled] == "1"
-      Seek::Config.jerm_enabled=true
-    else
-      Seek::Config.jerm_enabled=false
-    end
-
-    if params[:email_enabled] == "1"
-      Seek::Config.email_enabled=true
-    else
-      Seek::Config.email_enabled=false
-    end
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
     Seek::Config.set_smtp_settings 'authentication', params[:authentication]
@@ -57,60 +44,19 @@ class AdminController < ApplicationController
 
     Seek::Config.noreply_sender=params[:noreply_sender]
 
-    if params[:solr_enabled] == "1"
-      Seek::Config.solr_enabled= true
-    else
-      Seek::Config.solr_enabled= false
-    end
-
-    if params[:jws_enabled] == "1"
-      Seek::Config.jws_enabled= true
-    else
-      Seek::Config.jws_enabled= false
-    end
-
+    Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
+    Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
 
-    if params[:exception_notification_enabled] == "1"
-      Seek::Config.exception_notification_enabled= true
-    else
-      Seek::Config.exception_notification_enabled= false
-    end
-
-    if params[:hide_details_enabled] == "1"
-      Seek::Config.hide_details_enabled= true
-    else
-      Seek::Config.hide_details_enabled= false
-    end
-
-    if params[:activity_log_enabled] == "1"
-      Seek::Config.activity_log_enabled= true
-    else
-      Seek::Config.activity_log_enabled= false
-    end
-
-    if params[:activation_required_enabled] == "1"
-      Seek::Config.activation_required_enabled= true
-    else
-      Seek::Config.activation_required_enabled= false
-    end
-
-    if params[:google_analytics_enabled] == "1"
-      Seek::Config.google_analytics_enabled= true
-    else
-      Seek::Config.google_analytics_enabled= false
-    end
+    Seek::Config.exception_notification_enabled= string_to_boolean params[:exception_notification_enabled]
+    Seek::Config.hide_details_enabled= string_to_boolean params[:hide_details_enabled]
+    Seek::Config.activity_log_enabled= string_to_boolean params[:activity_log_enabled]
+    Seek::Config.activation_required_enabled= string_to_boolean params[:activation_required_enabled]
+    Seek::Config.google_analytics_enabled= string_to_boolean params[:google_analytics_enabled]
     Seek::Config.google_analytics_tracker_id= params[:google_analytics_tracker_id]
 
-    begin
-       Integer(params[:port])
-       Seek::Config.set_smtp_settings 'port', params[:port]
-       finalize_config_changes
-    rescue
-      flash[:error] = 'Please enter the correct port'
-      redirect_to :action=>:features_enabled
-    end
-
+    Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
+    update_redirect_to (only_integer params[:port], "port"),'features_enabled'
   end
 
   def rebrand
@@ -133,24 +79,18 @@ class AdminController < ApplicationController
     Seek::Config.application_name= params[:application_name]
     Seek::Config.application_title= params[:application_title]
 
-    if params[:header_image_enabled] == "1"
-     Seek::Config.header_image_enabled= true
-    else
-     Seek::Config.header_image_enabled= false
-    end
+    Seek::Config.header_image_enabled= string_to_boolean params[:header_image_enabled]
     Seek::Config.header_image= params[:header_image]
     Seek::Config.header_image_link= params[:header_image_link]
     Seek::Config.header_image_title= params[:header_image_title]
-    if params[:copyright_addendum_enabled] == "1"
-      Seek::Config.copyright_addendum_enabled= true
-    else
-      Seek::Config.copyright_addendum_enabled= false
-    end
+
+    Seek::Config.copyright_addendum_enabled= string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content= params[:copyright_addendum_content]
-    finalize_config_changes
+    update_redirect_to true,'rebrand'
   end
 
   def update_pagination
+   update_flag = true
    Seek::Config.set_default_page "people",params[:people]
    Seek::Config.set_default_page "projects", params[:projects]
    Seek::Config.set_default_page "institutions", params[:institutions]
@@ -162,38 +102,23 @@ class AdminController < ApplicationController
    Seek::Config.set_default_page "sops", params[:sops]
    Seek::Config.set_default_page "publications", params[:publications]
    Seek::Config.set_default_page "events", params[:events]
-   begin
-       raise if Integer(params[:limit_latest]) == 0
-       Seek::Config.limit_latest= params[:limit_latest]
-       finalize_config_changes
-   rescue
-      flash[:error] = 'Please enter the correct paginate latest limit'
-      redirect_to :action=>:pagination
-   end
+   Seek::Config.limit_latest= params[:limit_latest] if only_positive_integer params[:limit_latest], "latest limit"
+   update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'),'pagination'
   end
 
   def update_others
-    if params[:type_managers_enabled] == "1"
-     Seek::Config.type_managers_enabled= true
-    else
-     Seek::Config.type_managers_enabled= false
-    end
+    update_flag = true
+    Seek::Config.copyright_addendum_enabled= string_to_boolean params[:type_managers_enabled]
     Seek::Config.type_managers= params[:type_managers]
-    Seek::Config.pubmed_api_email= params[:pubmed_api_email]
-    Seek::Config.crossref_api_email= params[:crossref_api_email]
     Seek::Config.site_base_host= params[:site_base_host]
     Seek::Config.open_id_authentication_store= params[:open_id_authentication_store]
-
-    begin
-       raise if Integer(params[:max_visible_tags]) == 0
-       Integer(params[:tag_threshold])
-       Seek::Config.tag_threshold= params[:tag_threshold]
-       Seek::Config.max_visible_tags= params[:max_visible_tags]
-       finalize_config_changes
-    rescue
-      flash[:error] = 'Please enter the correct tag threshold or maximum visible tags'
-      redirect_to :action=>:others
-    end
+    #check valid email
+    Seek::Config.pubmed_api_email= params[:pubmed_api_email] if params[:pubmed_api_email] == '' || (check_valid_email params[:pubmed_api_email], "pubmed api email")
+    Seek::Config.crossref_api_email= params[:crossref_api_email] if params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")
+    Seek::Config.tag_threshold= params[:tag_threshold] if only_integer params[:tag_threshold], "tag threshold"
+    Seek::Config.max_visible_tags= params[:max_visible_tags] if only_positive_integer params[:max_visible_tags], "maximum visible tags"
+    update_flag = (params[:pubmed_api_email] == '' ||(check_valid_email params[:pubmed_api_email], "pubmed api email")) & (params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")) & (only_integer params[:tag_threshold], "tag threshold") & (only_positive_integer params[:max_visible_tags], "maximum visible tags")
+    update_redirect_to update_flag,'others'
   end
 
   def finalize_config_changes
@@ -342,4 +267,55 @@ class AdminController < ApplicationController
     (sorted_keys.first..sorted_keys.last).collect{|i| x[i].nil? ? 0 : x[i]  }
   end
 
+  def check_valid_email email_address, field
+    if email_address =~ /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/
+      return true
+    else
+      flash[:error] = "Please input the correct #{field}"
+      return false
+    end
+  end
+
+  def only_integer input, field
+     begin
+       Integer(input)
+       return true
+     rescue
+       flash[:error] = "Please enter the correct #{field}"
+       return false
+     end
+  end
+
+  def only_positive_integer input, field
+     begin
+       if Integer(input) > 0
+         return true
+       else
+         flash[:error] = "Please enter the correct #{field}"
+         return false
+       end
+     rescue
+       flash[:error] = "Please enter the correct #{field}"
+       return false
+     end
+  end
+
+  def string_to_boolean string
+      if string == '1'
+        return true
+      else
+        return false
+      end
+  end
+
+  def update_redirect_to flag, action
+     if flag
+       flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
+       #expires all fragment caching
+       expire_all_fragments
+       redirect_to :action=>:show
+     else
+       redirect_to :action=> action.to_s
+     end
+  end
 end

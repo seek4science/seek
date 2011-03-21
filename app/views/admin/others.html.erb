@@ -24,7 +24,7 @@
     Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %>
     <br style="clear:both;"/>
     <br/>
-    Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::Config.open_id_authentication_store) %>
+    Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::Config.open_id_authentication_store, :disabled => true) %>
     <br style="clear:both;"/>
     <br/>
     <br style="clear:both;"/>

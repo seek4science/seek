@@ -48,6 +48,30 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :redirect
     assert_not_nil flash[:error]
   end
+
+  test 'string to boolean' do
+    login_as(:quentin)
+    post :update_features_enabled, :events_enabled => '1'
+    assert_equal true, Seek::Config.events_enabled
+  end
+
+  test 'invalid email address' do
+    login_as(:quentin)
+    post :update_others, :pubmed_api_email => 'quentin', :crossref_api_email => 'quentin@example.com', :tag_threshold => '', :max_visible_tags => '20'
+    assert_not_nil flash[:error]
+  end
+
+  test 'should input integer' do
+    login_as(:quentin)
+    post :update_others, :pubmed_api_email => 'quentin@example.com', :crossref_api_email => 'quentin@example.com', :tag_threshold => '', :max_visible_tags => '20'
+    assert_not_nil flash[:error]
+  end
+
+  test 'should input positive integer' do
+    login_as(:quentin)
+    post :update_others, :pubmed_api_email => 'quentin@example.com', :crossref_api_email => 'quentin@example.com', :tag_threshold => '1', :max_visible_tags => '0'
+    assert_not_nil flash[:error]
+  end
 #
 #  test "show graphs" do
 #

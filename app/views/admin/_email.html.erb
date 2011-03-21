@@ -11,5 +11,5 @@
         <li>User name:    <%= text_field_tag(:user_name, Seek::Config.smtp_settings('user_name')) %> </li>
         <li>Password:    <%= password_field_tag(:password, Seek::Config.smtp_settings('password')) %> </li>
         </ul>
-    Noreply sender:    <%= text_field_tag(:noreply_sender, Seek::Config.noreply_sender) %>
+    Noreply sender:    <%= text_field_tag(:noreply_sender, Seek::Config.noreply_sender, :disabled => true) %>
 </div>

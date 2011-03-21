@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ApplicationConfigurationTest < ActiveSupport::TestCase
+class ConfigTest < ActiveSupport::TestCase
 #Features enabled
   test "events enabled" do
     assert_equal true ,Seek::Config.events_enabled
