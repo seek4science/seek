@@ -42,7 +42,7 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal false ,Seek::Config.google_analytics_enabled
   end
   test "google_analytics_tracker_id" do
-    assert_equal 'XX-XXXXXXX-X' ,Seek::Config.google_analytics_tracker_id
+    assert_equal '000-000' ,Seek::Config.google_analytics_tracker_id
   end
 #Project
   test "project_name" do
