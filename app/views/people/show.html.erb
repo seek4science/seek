@@ -77,8 +77,6 @@
     </div>
     <div style="clear:both;">
         <br/>
-
-        <br/>
         <%= render :partial=>"people/contact_details" unless hide_contact_details? %>
         <%= render :partial=>"people/roles",:locals=>{:editable=>false} %>
         <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
@@ -87,16 +85,22 @@
         <%# this is because it's not needed then: admins can see everything anyway -%>
         <% if current_user.is_admin? -%>
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
-        <ul>
-            <%= "<li><b>This person is a #{Seek::Config.dm_project_name} PAL</b><li><li>&nbsp;</li>" if @person.is_pal? %><br/>
-            <%= "<li><b>This person is a Project Manager</b><li><li>&nbsp;</li>" if @person.is_project_manager? %>
+          <ul>
+
+            <%= "<li>This person is a <b>#{Seek::Config.dm_project_name} PAL</b></li>" if @person.is_pal? %>
+
+
+            <%= "<li>This person is a <b>project manager</b></li>" if @person.is_project_manager? %>
+
             <li>
-                Editing <b>projects</b>, where this person is involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+              Editing <b>projects</b>, where this person is
+              involved: <%= @person.can_edit_projects? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
             </li>
             <li>
-                Editing <b>institutions</b>, where this person works with: <%= @person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
+              Editing <b>institutions</b>, where this person works
+              with: <%= @person.can_edit_institutions? ? "<span class='allowed_text'>allowed</span>" : "<span class='denied_text'>denied</span>" -%>
             </li>
-        </ul>
+          </ul>
         <% end -%>
     </div>
 </div>
