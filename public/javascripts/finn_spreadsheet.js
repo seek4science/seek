@@ -86,13 +86,16 @@ $j(document).ready(function ($) {
       select_cells(startCol, startRow, startCol, startRow);
       
       //Update the cell info box to contain either the value of the cell or the formula
+      // also make hovering over the info box display all the text.
       if($(this).attr("title"))
       {
         $('#cell_info').val("=" + $(this).attr("title"));
+        $('#cell_info').attr("title", $(this).attr("title"));
       }
       else
       {
         $('#cell_info').val($(this).html());
+        $('#cell_info').attr("title", $(this).html());
       }
       return false; // prevent text selection
     })
