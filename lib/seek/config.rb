@@ -1,29 +1,39 @@
 module Seek
-  class SettingDefaulter
-    @manager = nil
-    def initialize manager
-      @manager = manager
-    end
-
-    def method_missing method, *args
-      @manager.send "#{method}_default=", *args
-    end
-  end
-
   class SettingManager
     @@settings = []
-    def self.setting setting, options={}, &block
+    def self.setting setting, options={}, &side_effect
       @@settings << setting
-      side_effect = block || options[:side_effect]
+
+      side_effect ||= options[:side_effect]
+      setting_propagator setting, options[:plugin], options[:plugin_setting], &side_effect
+
+      #default can either be a callable (proc) or a symbol referring to a method, like another setting
       default = options[:default].respond_to?(:call) ? options[:default] : proc {self.send options[:default]} if options[:default]
       setting_reader setting, &default
-      setting_writer setting, options[:plugin], options[:plugin_setting], options[:conversion], &side_effect
+
+      setting_writer setting, &options[:conversion]
     end
 
     def self.defaults &block
-      SettingDefaulter.new(self).instance_exec &block
+      me = self
+      
+      #old_self is used for anything that is not a setting
+      old_self = eval "self", block.binding
+      rewriter = Class.new do
+        @@me = me
+        @@old_self = old_self
+        def self.method_missing method, *args, &other_block
+          new_method = "#{method}_default="
+          if @@me.respond_to? new_method
+            @@me.send new_method, *args, &other_block
+          else
+            @@old_self.send method, *args, &other_block
+          end
+        end
+      end
+      rewriter.instance_exec &block
     end
-    
+
     def self.propagate_all in_initializer=true
       @@initializing = true if in_initializer
       @@settings.each {|setting| self.send "propagate_#{setting}"}
@@ -36,30 +46,13 @@ module Seek
 
     @@initializing=false
 
-    def self.define_class_method method ,*args, &block
-      singleton_class.instance_eval { define_method method.to_sym, *args, &block }
-    end
-
     def self.persist_settings?
       Settings.table_exists?
     end
 
-    def self.setting_reader setting, &block
-      if persist_settings?
-        define_class_method setting do
-          unless value = Settings.send(setting)
-            value = block.call if block
-          end
-          value
-        end
-      else
-        define_class_method setting do
-          Settings.defaults[setting] || block.try(:call)
-        end
-      end
-    end
-
-    def self.setting_writer setting, plugin=nil, plugin_setting=nil, conversion=nil, &block
+    private
+    #These three methods aren't really intended to be used seperately, see SettingManager#setting
+    def self.setting_propagator setting, plugin=nil, plugin_setting=nil, &block
       define_class_method "propagate_#{setting}" do
         if plugin
           plugin_setting ||= setting
@@ -70,7 +63,28 @@ module Seek
           block.call self.send(setting)
         end
       end
+    end
 
+    def self.setting_reader setting, &side_effect
+      #if the settings can't be stored, look them up in the defaults instead
+      if persist_settings?
+        define_class_method setting do
+          unless value = Settings.send(setting)
+            value = side_effect.call if side_effect
+          end
+          value
+        end
+      else
+        define_class_method setting do
+          unless value = Settings.defaults[setting]
+            value = side_effect.call if side_effect
+          end
+          value
+        end
+      end
+    end
+
+    def self.setting_writer setting, &conversion
       define_class_method "#{setting}_default=" do |value|
         value = conversion.call value if conversion
         Settings.defaults[setting] = value
@@ -90,16 +104,20 @@ module Seek
         end
       end
     end
+
+    def self.define_class_method method ,*args, &block
+      singleton_class.instance_eval { define_method method.to_sym, *args, &block }
+    end
   end
 
   class Config < SettingManager
     #settings that require simple accessors.
     simple_settings = [:events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
-                       :jws_online_root, :hide_details_enabled, :activity_log_enabled,
-                       :activation_required_enabled, :project_name,
-                       :project_type, :project_link, :header_image_enabled, :header_image,
-                       :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
-                       :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest]
+      :jws_online_root, :hide_details_enabled, :activity_log_enabled,
+      :activation_required_enabled, :project_name,
+      :project_type, :project_link, :header_image_enabled, :header_image,
+      :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
+      :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest]
 
     simple_settings.each do |sym|
       setting sym
@@ -147,7 +165,7 @@ module Seek
     setting :open_id_authentication_store, :plugin => OpenIdAuthentication, :plugin_setting => :store
     setting :default_pages
 
-#Pagination
+    #Pagination
     def self.default_page controller
       self.default_pages[controller.to_sym]
     end
