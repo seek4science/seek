@@ -36,7 +36,7 @@ module Seek
 
     def self.propagate_all in_initializer=true
       @@initializing = true if in_initializer
-      @@settings.each {|setting| self.send "propagate_#{setting}"}
+      @@settings.each {|setting| self.send "propagate_#{setting}" if self.respond_to? "propagate_#{setting}"}
       @@initializing = false
     end
 
@@ -52,32 +52,34 @@ module Seek
 
     private
     #These three methods aren't really intended to be used seperately, see SettingManager#setting
-    def self.setting_propagator setting, plugin=nil, plugin_setting=nil, &block
-      define_class_method "propagate_#{setting}" do
-        if plugin
-          plugin_setting ||= setting
-          value = self.send(setting)
-          plugin.send "#{plugin_setting}=", value
-        end
-        if block
-          block.call self.send(setting)
+    def self.setting_propagator setting, plugin=nil, plugin_setting=nil, &side_effect
+      if plugin or side_effect
+        define_class_method "propagate_#{setting}" do
+          if plugin
+            plugin_setting ||= setting
+            value = self.send(setting)
+            plugin.send "#{plugin_setting}=", value
+          end
+          if side_effect
+            side_effect.call self.send(setting)
+          end
         end
       end
     end
 
-    def self.setting_reader setting, &side_effect
+    def self.setting_reader setting, &default
       #if the settings can't be stored, look them up in the defaults instead
       if persist_settings?
         define_class_method setting do
           unless value = Settings.send(setting)
-            value = side_effect.call if side_effect
+            value = default.call if default
           end
           value
         end
       else
         define_class_method setting do
           unless value = Settings.defaults[setting]
-            value = side_effect.call if side_effect
+            value = default.call if default
           end
           value
         end
@@ -95,7 +97,7 @@ module Seek
         define_class_method "#{setting}=" do |value|
           value = conversion.call value if conversion
           Settings.send "#{setting}=", value
-          self.send "propagate_#{setting}"
+          self.send "propagate_#{setting}" if self.respond_to? "propagate_#{setting}"
           value
         end
       else
@@ -119,6 +121,59 @@ module Seek
       :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
       :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest]
 
+#    # setting creates three or four methods per setting, and adds it to the list of settings. For simple settings they look like this.
+#    if persist_settings? # <-checks if the db/tables exist for storing settings
+#      def self.events_enabled
+#        Settings.events_enabled
+#      end
+#      def self.events_enabled= value
+#        Settings.events_enabled= value
+#      end
+#    else
+#      def self.events_enabled
+#        Settings.defaults[:events_enabled]
+#      end
+#      def self.events_enabled= value
+#        raise "You can't store Settings, perhaps the settings table is missing in your database?"
+#      end
+#    end
+#
+#    def self.events_enabled_default= value
+#      Settings.defaults[:events_enabled]= value
+#    end
+#
+#    # And then I add it to the list of all settings. Right now this
+#    # is only used by propagate_all, so if you skipped this it would
+#    # still work, but I'd do it anyway, just in case a list of all
+#    # settings is ever useful.
+#    @@settings << :events_enabled
+#
+#    # If this was all the setting method did, then you could define it like so..
+#    def self.setting name
+#      @@settings << name
+#      if persist_settings?
+#        define_class_method name do
+#          Settings.send name
+#        end
+#        define_class_method "#{name}=" do |value|
+#          Settings.send "#{name}=", value
+#        end
+#      else
+#        define_class_method name do
+#          Settings.defaults[name]
+#        end
+#        define_class_method "#{name}=" do |value|
+#          raise "You can't store Settings, perhaps the settings table is missing in your database?"
+#        end
+#      end
+#      define_class_method "#{name}_default=" do |value|
+#        Settings.defaults[name] = value
+#      end
+#    end
+
+    # Its more complicated than this because there are a bunch of special cases,
+    # for side_effect's, conversion's, storing values into plugins, and 'calculated defaults' (like how if project_title = nil, it uses project_long_name instead)
+
     simple_settings.each do |sym|
       setting sym
     end
@@ -133,6 +188,65 @@ module Seek
         system "rake solr:stop RAILS_ENV=#{RAILS_ENV}"
       end
     }
+
+#    # Writing solr_enabled by hand would look like this
+#    if persist_settings? # <-checks if the db/tables exist for storing settings
+#      def self.solr_enabled
+#        Settings.solr_enabled
+#      end
+#      def self.solr_enabled= value
+#        Settings.solr_enabled= value
+#        propagate_solr_enabled
+#      end
+#    else
+#      def self.solr_enabled
+#        Settings.defaults[:solr_enabled]
+#      end
+#      def self.solr_enabled= value
+#        raise "You can't store Settings, perhaps the settings table is missing in your database?"
+#      end
+#    end
+#
+#    def self.solr_enabled_default= value
+#      Settings.defaults[:solr_enabled]= value
+#    end
+#
+#    def self.propagate_solr_enabled
+#      if solr_enabled
+#        # start the solr server and reindex
+#        system "rake solr:start RAILS_ENV=#{RAILS_ENV}"
+#        system "rake solr:reindex RAILS_ENV=#{RAILS_ENV}" unless initializing?
+#      elsif solr_enabled == false
+#        # stop the solr server
+#        system "rake solr:stop RAILS_ENV=#{RAILS_ENV}"
+#      end
+#    end
+#    @@settings << :solr_enabled
+
+
+    # Ok, I'm going to stop with the real examples now, though I can add them if wanted.
+    # :conversion is something called on the value passed to setting before it is stored.
+    #
+    # :plugin and :plugin_setting are a more specific version of side effect, for when
+    # the side effect is just passing the value into some other place.
+    #
+    # :default is called to produce a default to use if Settings returns nil, it can also
+    # accept the name of another setting.
+    #
+    # The really important point, is that if you want to do something that the library doesn't support,
+    # you don't neccessarily need to change the library. Lets say you want to store your default somewhere other than Settings.defaults[].
+#
+#    setting :my_setting_with_weird_defaults, :side_effect => ..some sort of side effect ..
+#
+#    def self.my_setting_with_weird_defaults_default= value
+#      OtherPlaceToStore.defaults.weird_default = value
+#    end
+#
+#    def self.my_setting_with_weird_defaults_default
+#      OtherPlaceToStore.defaults.weird_default
+#    end
+#
+    # Of course, if you end up needing to change where _all_ the defaults live, it would be easier to edit the library, but you don't _need_ to.
 
     setting :exception_notification_enabled, :side_effect => proc { |enabled|
       if enabled
