@@ -275,7 +275,9 @@ module Seek
 
     setting :tag_threshold, :conversion => (method :Integer)
     setting :max_visible_tags, :conversion => (method :Integer)
-    setting :smtp, :plugin => ActionMailer::Base, :plugin_setting => :smtp_settings
+    setting :smtp, :plugin => ActionMailer::Base, :plugin_setting => :smtp_settings, :conversion => proc { |smtp_hash|
+      smtp_hash[:authentication] = blank_to_nil (smtp_hash[:authentication])
+    }
     setting :open_id_authentication_store, :plugin => OpenIdAuthentication, :plugin_setting => :store
     setting :default_pages
 
@@ -294,6 +296,10 @@ module Seek
 
     def self.set_smtp_settings (field, value)
       self.smtp = smtp.merge field.to_sym => value
+    end
+
+    def self.blank_to_nil value
+      value.blank? ? nil : value
     end
   end
 end
