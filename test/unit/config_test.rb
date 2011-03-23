@@ -99,6 +99,13 @@ class ConfigTest < ActiveSupport::TestCase
   test "default page" do
     assert_equal "latest",Seek::Config.default_page("sops")
   end
+
+  test "change default page" do
+    assert_equal "latest",Seek::Config.default_page("models")
+    Seek::Config.set_default_page "models","all"
+    assert_equal "all",Seek::Config.default_page("models")
+  end
+
   test "limit_latest" do
     assert_equal 7,Seek::Config.limit_latest
   end
