@@ -23,6 +23,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 1,Seek::Config.tag_threshold
   end
 
+  test "tag to integer conversion" do
+    Seek::Config.tag_threshold="5"
+    assert_equal 5,Seek::Config.tag_threshold
+  end
+
   test "smtp_settings authentication" do
     assert_equal :plain ,Seek::Config.smtp_settings("authentication")
   end

@@ -121,5 +121,4 @@ class JwsTest < ActionController::TestCase
     end
   end
 
-
 end
