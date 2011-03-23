@@ -1,15 +1,66 @@
 module Seek
-  
   class Config
 
     def self.define_class_method method ,*args, &block
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
 
+    if Settings.table_exists?
+      def self.get_value getter
+        Settings.send getter
+      end
+    else
+      def self.get_value getter
+        Settings.defaults[getter.to_sym]
+      end
+    end
+
+    def self.setting setting,options={}
+      setter="#{setting.to_s}="
+      getter="#{setting.to_s}"
+      propagate="#{setter}_propagate"
+      fallback="#{getter}_fallback"
+      if self.respond_to?(fallback)
+        define_class_method getter do
+          Settings.send(getter) || self.send(fallback)
+        end
+      else
+        if options[:convert]
+          conv=options[:convert]
+          define_class_method getter do
+            get_value(getter).send conv
+          end
+        else
+          define_class_method getter do
+            get_value(getter)
+          end
+        end
+      end
+
+      define_class_method setter do |val|
+        Settings.send setter,val
+        self.send propagate if self.respond_to?(propagate)
+      end
+    end
+
+    settings = [:events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
+      :jws_online_root, :hide_details_enabled, :activity_log_enabled,
+      :activation_required_enabled, :project_name, :smtp,
+      :project_type, :project_link, :header_image_enabled, :header_image,
+      :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
+      :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest, :solr_enabled,
+      :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
+      :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,:google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store]
+
+    setting :tag_threshold,:convert=>"to_i"
+    setting :limit_latest,:convert=>"to_i"
+    setting :max_visible_tags,:convert=>"to_i"
+
     def self.default setting,value
       Settings.defaults[setting]=value
     end
 
+    #fallback attributes
     def self.project_long_name_fallback
       "#{self.project_name} #{self.project_type}"
     end
@@ -54,6 +105,7 @@ module Seek
       self.smtp[field]=value
     end
 
+    #propagate methods
     def self.google_analytics_enabled_propagate
       if self.google_analytics_enabled
           Rubaidh::GoogleAnalytics.tracker_id = self.google_analytics_tracker_id
@@ -74,51 +126,12 @@ module Seek
       end
     end
 
-    def self.setting setting,options={}
-      setter="#{setting.to_s}="
-      getter="#{setting.to_s}"
-      propagate="#{setter}_propagate"
-      fallback="#{getter}_fallback"
-      if self.respond_to?(fallback)
-        define_class_method getter do
-          Settings.send(getter) || self.send(fallback)
-        end
-      else
-        if options[:convert]
-          conv=options[:convert]
-          define_class_method getter do
-            val = Settings.send(getter)
-            val.send conv
-          end
-        else
-          define_class_method getter do
-            Settings.send getter
-          end
-        end
-      end
 
-      define_class_method setter do |val|
-        Settings.send setter,val
-        self.send propagate if self.respond_to?(propagate)
-      end
-    end
 
-    settings = [:events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
-      :jws_online_root, :hide_details_enabled, :activity_log_enabled,
-      :activation_required_enabled, :project_name, :smtp,
-      :project_type, :project_link, :header_image_enabled, :header_image,
-      :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
-      :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest, :solr_enabled,
-      :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
-      :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,:google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store]
 
     settings.each do |sym|
       setting sym
     end
-
-    setting :tag_threshold,:convert=>"to_i"
-    setting :limit_latest,:convert=>"to_i"
-    setting :max_visible_tags,:convert=>"to_i"
 
     def self.default_page controller
       Settings.index[controller.to_sym]
