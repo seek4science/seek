@@ -480,6 +480,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "fail gracefullly when trying to access a missing data file" do
+    get :show,:id=>99999
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+  end
+
   test "owner should be able to update sharing" do
      user = users(:datafile_owner)
      df = data_files(:editable_data_file)
