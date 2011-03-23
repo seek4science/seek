@@ -114,6 +114,10 @@ module Seek
       end
     end
 
+    def open_id_authentication_store_propagate
+      OpenIdAuthentication.store = self.open_id_authentication_store
+    end
+
     def solr_enabled_propagate
       #for now do nothing.
     end
@@ -124,11 +128,12 @@ module Seek
         eval m
       end
     end
+
   end
 
   #Custom accessors for settings that are not a simple mapping
   module CustomAccessors
-    
+
     def smtp_settings field
       self.smtp[field.to_sym]
     end
@@ -149,7 +154,6 @@ module Seek
   end
 
   class Config
-
     extend Wiring
     extend Fallbacks
     extend Propagators
@@ -163,7 +167,8 @@ module Seek
       :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
       :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
-      :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,:google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store]
+      :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
+      :google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"
@@ -173,7 +178,6 @@ module Seek
     settings.each do |sym|
       setting sym
     end
-    
   end
 
 end
