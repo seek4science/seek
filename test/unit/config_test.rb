@@ -14,9 +14,15 @@ class ConfigTest < ActiveSupport::TestCase
   test "email_enabled" do
     assert_equal false ,Seek::Config.email_enabled
   end
+
   test "smtp_settings port" do
-    assert_equal 25 ,Seek::Config.smtp_settings("port").to_i
+    assert_equal 25 ,Seek::Config.smtp_settings("port")
   end
+
+  test "tag_threshold" do
+    assert_equal 1,Seek::Config.tag_threshold
+  end
+
   test "smtp_settings authentication" do
     assert_equal :plain ,Seek::Config.smtp_settings("authentication")
   end

@@ -115,6 +115,10 @@ class JwsTest < ActionController::TestCase
       assert_response :success
       assert_select "object[type='application/x-java-applet']", :count=>1
     end
+  else
+    test "jws disabled" do
+      fail("JWS has become disabled for the functional tests")
+    end
   end
 
 
