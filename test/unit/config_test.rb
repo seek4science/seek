@@ -104,6 +104,8 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal "latest",Seek::Config.default_page("models")
     Seek::Config.set_default_page "models","all"
     assert_equal "all",Seek::Config.default_page("models")
+    #seem to have to put it back else other tests fail later:
+    Seek::Config.set_default_page "models","latest"
   end
 
   test "limit_latest" do
