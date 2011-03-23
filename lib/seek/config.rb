@@ -1,56 +1,7 @@
 module Seek
 
-  module Wiring
-
-    def default setting,value
-      Settings.defaults[setting]=value
-    end
-
-    def define_class_method method ,*args, &block
-      singleton_class.instance_eval { define_method method.to_sym, *args, &block }
-    end
-
-    if Settings.table_exists?
-      def get_value getter
-        Settings.send getter
-      end
-    else
-      def get_value getter
-        Settings.defaults[getter.to_sym]
-      end
-    end
-
-    def setting setting,options={}
-      setter="#{setting.to_s}="
-      getter="#{setting.to_s}"
-      propagate="#{setter}_propagate"
-      fallback="#{getter}_fallback"
-      if self.respond_to?(fallback)
-        define_class_method getter do
-          Settings.send(getter) || self.send(fallback)
-        end
-      else
-        if options[:convert]
-          conv=options[:convert]
-          define_class_method getter do
-            get_value(getter).send conv
-          end
-        else
-          define_class_method getter do
-            get_value(getter)
-          end
-        end
-      end
-
-      define_class_method setter do |val|
-        Settings.send setter,val
-        self.send propagate if self.respond_to?(propagate)
-      end
-    end
-  end
-
-  #Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
-  #Convention to create a new fallback is to name the method <setting_name>_fallback
+  # Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
+  # Convention to create a new fallback is to name the method <setting_name>_fallback
   module Fallbacks
     #fallback attributes
     def project_long_name_fallback
@@ -90,8 +41,8 @@ module Seek
     end
   end
 
-  #Propagator methods that are triggered when a setting is changed.
-  #Convention for creating a new propagator is to add a method named <setting_name>_propagate
+  # Propagator methods that are triggered after a setting is changed.
+  # Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
 
     def google_analytics_enabled_propagate
@@ -153,6 +104,58 @@ module Seek
 
   end
 
+  #The inner wiring. Ideally this should be hidden away,
+  module Wiring
+
+    def default setting,value
+      Settings.defaults[setting]=value
+    end
+
+    def define_class_method method ,*args, &block
+      singleton_class.instance_eval { define_method method.to_sym, *args, &block }
+    end
+
+    if Settings.table_exists?
+      def get_value getter
+        Settings.send getter
+      end
+    else
+      def get_value getter
+        Settings.defaults[getter.to_sym]
+      end
+    end
+
+    def setting setting,options={}
+      setter="#{setting.to_s}="
+      getter="#{setting.to_s}"
+      propagate="#{setter}_propagate"
+      fallback="#{getter}_fallback"
+      if self.respond_to?(fallback)
+        define_class_method getter do
+          Settings.send(getter) || self.send(fallback)
+        end
+      else
+        if options[:convert]
+          conv=options[:convert]
+          define_class_method getter do
+            get_value(getter).send conv
+          end
+        else
+          define_class_method getter do
+            get_value(getter)
+          end
+        end
+      end
+
+      define_class_method setter do |val|
+        Settings.send setter,val
+        self.send propagate if self.respond_to?(propagate)
+      end
+    end
+  end
+
+  # Configuration class.
+  # FIXME: move to the top, but without moving the Fallback, Propagators and CustomAccessors into another file.
   class Config
     extend Wiring
     extend Fallbacks
