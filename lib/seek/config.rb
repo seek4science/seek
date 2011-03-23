@@ -49,8 +49,8 @@ module Seek
     end
   end
 
-  #Fallback attribute, which if defined will be the result if the stored/default value is nil
-  #Convention to provide a call back is to name the method <setting_name>_fallback
+  #Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
+  #Convention to create a new fallback is to name the method <setting_name>_fallback
   module Fallbacks
     #fallback attributes
     def project_long_name_fallback
@@ -91,9 +91,9 @@ module Seek
   end
 
   #Propagator methods that are triggered when a setting is changed.
-  #Convention for a propagator is <setting_name>_propagate
+  #Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
-    #propagate methods
+
     def google_analytics_enabled_propagate
       if self.google_analytics_enabled
           Rubaidh::GoogleAnalytics.tracker_id = self.google_analytics_tracker_id
@@ -143,12 +143,12 @@ module Seek
     end
 
     def default_page controller
-      self.index[controller.to_sym]
+      self.default_pages[controller.to_sym]
     end
 
     #FIXME: change to standard setter=
     def set_default_page (controller, value)
-      self.index[controller.to_sym] = value
+      self.default_pages[controller.to_sym] = value
     end
 
   end
@@ -162,7 +162,7 @@ module Seek
     #Basic settings
     settings = [:events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
       :jws_online_root, :hide_details_enabled, :activity_log_enabled,
-      :activation_required_enabled, :project_name, :smtp, :index,
+      :activation_required_enabled, :project_name, :smtp, :default_pages,
       :project_type, :project_link, :header_image_enabled, :header_image,
       :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
       :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest, :solr_enabled,

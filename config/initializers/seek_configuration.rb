@@ -26,7 +26,7 @@ Seek::Config.default :header_image_enabled,false
 Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
 #
 #  #Pagination
-Seek::Config.default :index,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
+Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
 Seek::Config.default :limit_latest,7
 #
 #  #Others
