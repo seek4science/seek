@@ -16,7 +16,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test "smtp_settings port" do
-    assert_equal 25 ,Seek::Config.smtp_settings("port")
+    assert_equal "25" ,Seek::Config.smtp_settings("port")
   end
 
   test "tag_threshold" do

@@ -26,7 +26,6 @@ class HomeControllerTest < ActionController::TestCase
   test "admin link not visible to non admin" do
     login_as(:aaron)
     get :index
-    puts @response.body
     assert_response :success
     assert_select "a#adminmode[href=?]",admin_path,:count=>0
   end
