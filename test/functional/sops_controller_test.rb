@@ -40,6 +40,12 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test "fail gracefullly when trying to access a missing sop" do
+    get :show,:id=>99999
+    assert_redirected_to sops_path
+    assert_not_nil flash[:error]
+  end
+
   test "should not create sop with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url ="file://"+file_path

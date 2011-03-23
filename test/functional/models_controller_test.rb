@@ -140,6 +140,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal assigns(:models).sort_by(&:id), Authorization.authorize_collection("view", assigns(:models), users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
+
+  test "fail gracefullly when trying to access a missing model" do
+    get :show,:id=>99999
+    assert_redirected_to models_path
+    assert_not_nil flash[:error]
+  end
   
   test "should get new" do
     get :new    
