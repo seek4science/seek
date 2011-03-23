@@ -47,13 +47,14 @@
 		<button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
             Open/Close all panels
         </button>
-        <% if @error_keys.empty? -%>
+        <% recognised_errors = @error_keys.collect{|k| jws_key_to_text(k)}.compact -%>
+        <% if recognised_errors.empty? -%>
 			<div class="jws_success">
 	            Model validated successfully.
 	        </div>
 		<% else -%>
 	        <div class="jws_errors">
-	            There were problems reported with: <%= join_with_and(@error_keys.collect{|k| jws_key_to_text(k)}) -%>
+	            There were problems reported with: <%= join_with_and(recognised_errors) -%>
 	        </div>
 	        <script type="text/javascript">
 	            $('simulate_button').disabled = true;
@@ -221,7 +222,7 @@
 </script>
 
 <%= render :partial=>"models/builder/new_version_details" -%>
-<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.each do |prefix| -%>
+<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.compact.each do |prefix| -%>
 <script type="text/javascript">
     highlight_error("<%= prefix -%>");
 </script>
