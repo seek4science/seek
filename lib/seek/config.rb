@@ -45,6 +45,10 @@ module Seek
   # Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
 
+    def smtp_propagate
+      ActionMailer::Base.smtp_settings = self.smtp
+    end
+
     def google_analytics_enabled_propagate
       if self.google_analytics_enabled
           Rubaidh::GoogleAnalytics.tracker_id = self.google_analytics_tracker_id
@@ -90,7 +94,16 @@ module Seek
     end
 
     def set_smtp_settings (field, value)
-      self.smtp[field]=value
+      if field == :authentication || field == 'authentication'
+        if value.blank?
+          value = nil
+        else
+          value = value.to_sym
+        end
+      end
+      current = self.smtp
+      current[field] = value
+      self.smtp = current
     end
 
     def default_page controller
@@ -99,7 +112,9 @@ module Seek
 
     #FIXME: change to standard setter=
     def set_default_page (controller, value)
-      self.default_pages[controller.to_sym] = value
+      current = self.default_pages
+      current[controller.to_sym] = value
+      self.default_pages = current
     end
 
   end
@@ -138,7 +153,7 @@ module Seek
         if options[:convert]
           conv=options[:convert]
           define_class_method getter do
-            get_value(getter).send conv
+            get_value(getter) ? get_value(getter).send(conv) : get_value(getter)
           end
         else
           define_class_method getter do
@@ -177,6 +192,7 @@ module Seek
     setting :tag_threshold,:convert=>"to_i"
     setting :limit_latest,:convert=>"to_i"
     setting :max_visible_tags,:convert=>"to_i"
+    setting :open_id_authentication_store, :convert=>"to_sym"
 
     settings.each do |sym|
       setting sym

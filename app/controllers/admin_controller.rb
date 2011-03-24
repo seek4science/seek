@@ -42,8 +42,6 @@ class AdminController < ApplicationController
     Seek::Config.set_smtp_settings 'user_name', params[:user_name]
     Seek::Config.set_smtp_settings 'password', params[:password]
 
-    Seek::Config.noreply_sender=params[:noreply_sender]
-
     Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
@@ -109,9 +107,7 @@ class AdminController < ApplicationController
   def update_others
     update_flag = true
     Seek::Config.copyright_addendum_enabled= string_to_boolean params[:type_managers_enabled]
-    Seek::Config.type_managers= params[:type_managers]
     Seek::Config.site_base_host= params[:site_base_host]
-    Seek::Config.open_id_authentication_store= params[:open_id_authentication_store]
     #check valid email
     Seek::Config.pubmed_api_email= params[:pubmed_api_email] if params[:pubmed_api_email] == '' || (check_valid_email params[:pubmed_api_email], "pubmed api email")
     Seek::Config.crossref_api_email= params[:crossref_api_email] if params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")
