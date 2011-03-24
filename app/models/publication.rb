@@ -35,6 +35,10 @@ class Publication < ActiveRecord::Base
     publications.sort_by &:published_date
   end
 
+  def contributor_credited?
+    false
+  end
+
   def extract_pubmed_metadata(pubmed_record)
     self.title = pubmed_record.title.chop #remove full stop
     self.abstract = pubmed_record.abstract
