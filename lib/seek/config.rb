@@ -134,9 +134,15 @@ module Seek
       def get_value getter
         Settings.send getter
       end
+      def set_value setter, val
+        Settings.send setter, val
+      end
     else
       def get_value getter
         Settings.defaults[getter.to_sym]
+      end
+      def set_value setter, val
+        Settings.defaults[setter.to_sym] = val
       end
     end
 
@@ -150,20 +156,17 @@ module Seek
           Settings.send(getter) || self.send(fallback)
         end
       else
-        if options[:convert]
-          conv=options[:convert]
-          define_class_method getter do
-            get_value(getter) ? get_value(getter).send(conv) : get_value(getter)
-          end
-        else
-          define_class_method getter do
-            get_value(getter)
-          end
+        define_class_method getter do
+           get_value(getter)
         end
       end
 
       define_class_method setter do |val|
-        Settings.send setter,val
+        if options[:convert]
+          conv = options[:convert]
+          val = val.send conv
+        end
+        set_value(setter,val)
         self.send propagate if self.respond_to?(propagate)
       end
     end
@@ -183,7 +186,7 @@ module Seek
       :activation_required_enabled, :project_name, :smtp, :default_pages,
       :project_type, :project_link, :header_image_enabled, :header_image,
       :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,
-      :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :limit_latest, :solr_enabled,
+      :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
       :google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store]
@@ -192,7 +195,6 @@ module Seek
     setting :tag_threshold,:convert=>"to_i"
     setting :limit_latest,:convert=>"to_i"
     setting :max_visible_tags,:convert=>"to_i"
-    setting :open_id_authentication_store, :convert=>"to_sym"
 
     settings.each do |sym|
       setting sym
