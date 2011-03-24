@@ -45,7 +45,7 @@
 	</ul>
 <% end -%>
 
-<% if @display_model.model_format && @display_model.model_format.title == "SBML" %>
+<% if Seek::ApplicationConfiguration.sycamore_enabled and @display_model.content_blob.file_exists? && Seek::ModelTypeDetection.is_sbml?(@display_model) %>
   <ul class="sectionIcons">
     <li>
       <span class="icon">
