@@ -47,13 +47,14 @@
 		<button onclick="toggleContent()" title="Opens or closes all the input panels simultaneously">
             Open/Close all panels
         </button>
-        <% if @error_keys.empty? -%>
+        <% recognised_errors = @error_keys.collect{|k| jws_key_to_text(k)}.compact -%>
+        <% if recognised_errors.empty? -%>
 			<div class="jws_success">
 	            Model validated successfully.
 	        </div>
 		<% else -%>
 	        <div class="jws_errors">
-	            There were problems reported with: <%= join_with_and(@error_keys.collect{|k| jws_key_to_text(k)}) -%>
+	            There were problems reported with: <%= join_with_and(recognised_errors) -%>
 	        </div>
 	        <script type="text/javascript">
 	            $('simulate_button').disabled = true;
@@ -76,7 +77,7 @@
                                        :link_title=>"model name help window"
                                }
                        } -%>
-            
+            <%= render :partial=>"models/builder/hidden_attribution_annotation_fields",:locals=>{:annotations=>@attribution_annotations} -%>
             <div id="reactions_top" class="builder_box">
                 <div class="squarebox">
                     <div id="reactions_caption" class="squareboxgradientcaption" onclick="togglePanel('reactions');" style="height:20px; cursor: pointer;">
@@ -103,9 +104,12 @@
                             <button title="Examples of model reactions:<br> v[1] {1}$sink + {1.5}b = {1}c + {1}d <br> vGLK {1}glc + {1}ATP = {1}g6p + {1}ADP" onclick="window.open('http://jjj.mib.ac.uk/webMathematica//Examples/JWSconstructor_panels/text/helpReactions.html','model reactions help window', 'width=400,height=600,toolbar=0'); return false;">
                                 Reactions help
                             </button>
+                          <% if @objects_hash["reactionImage"] -%>
+                            <%# render :partial=>"models/builder/schema_navigate" -%>
+                          <% end -%>
                             <input value="Show schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='on';this.form.submit();" alt="Evaluate" width="175" />&nbsp;<input value="Hide schema" type="button" onclick="create_panel_cookies();$('plotGraphPanel').value='off';this.form.submit();" alt="Evaluate" width="175" /><!-- resizable? script -->
                             <%= render :partial=>"models/builder/object_block",
-                                :locals=>{:objects_hash=>@objects_hash,:key=>"reactionImage",:hidden_id=>"plotGraphPanel",:object_element_id=>"resizeableElement",:javascript_var=>"rc"} -%>
+                                :locals=>{:objects_hash=>@objects_hash,:key=>"reactionImage",:hidden_id=>"plotGraphPanel",:object_element_id=>"svgObj",:javascript_var=>"rc"} -%>
                         </p>
                     </div>
                 </div>
@@ -218,7 +222,7 @@
 </script>
 
 <%= render :partial=>"models/builder/new_version_details" -%>
-<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.each do |prefix| -%>
+<% @error_keys.collect{|err_key| jws_key_to_prefix(err_key)}.compact.each do |prefix| -%>
 <script type="text/javascript">
     highlight_error("<%= prefix -%>");
 </script>

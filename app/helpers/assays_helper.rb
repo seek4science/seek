@@ -36,5 +36,7 @@ module AssaysHelper
     result
   end
 
-  
+  def authorised_assays
+    Assay.all.select{|assay| assay.can_edit?(current_user)}
+  end
 end

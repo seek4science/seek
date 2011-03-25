@@ -2,7 +2,6 @@ require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
 
 class Model < ActiveRecord::Base
@@ -24,7 +23,7 @@ class Model < ActiveRecord::Base
   belongs_to :model_type
   belongs_to :model_format
   
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name,:tag_counts]) if Seek::Config.solr_enabled
 
   has_many :created_datas
 

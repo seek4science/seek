@@ -15,6 +15,22 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal blob,model.content_blob
   end
 
+  test "assay association" do
+    model = models(:teusink)
+    assay = assays(:modelling_assay_with_data_and_relationship)
+    assay_asset = assay_assets(:metabolomics_assay_asset1)
+    assert_not_equal assay_asset.asset, model
+    assert_not_equal assay_asset.assay, assay
+    assay_asset.asset = model
+    assay_asset.assay = assay
+    assay_asset.save!
+    assay_asset.reload
+    assert assay_asset.valid?
+    assert_equal assay_asset.asset, model
+    assert_equal assay_asset.assay, assay
+
+  end
+
   test "sort by updated_at" do
     assert_equal Model.find(:all).sort_by { |m| m.updated_at.to_i * -1 }, Model.find(:all)
   end

@@ -1,4 +1,3 @@
-require 'acts_as_isa'
 
 class Investigation < ActiveRecord::Base    
   acts_as_isa
@@ -12,7 +11,7 @@ class Investigation < ActiveRecord::Base
 
   has_many :assays,:through=>:studies
 
-  acts_as_solr(:fields=>[:description,:title]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
 
   def can_edit? user
     user.person.projects.include?(project)

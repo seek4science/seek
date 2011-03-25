@@ -79,6 +79,7 @@ ActionController::Routing::Routes.draw do |map|
   #map.saved_search '/search/:id',:controller=>'search',:action=>'show'
   
   #tags
+  map.all_tags '/tags',:controller=>'tags',:action=>'index'
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
   
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
@@ -88,6 +89,10 @@ ActionController::Routing::Routes.draw do |map|
 
   # page for admin tasks
   map.admin '/admin/', :controller=>'admin',:action=>'show'
+
+  #temporary location for the data/models simulation prototyping
+  map.data_fuse '/data_fuse/',:controller=>'data_fuse',:action=>'show'
+  map.svg '/svg/',:controller=>'svg',:action=>'show'
 
   #feedback form
   map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get

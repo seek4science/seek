@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js" %>
+<%= javascript_include_tag "sharing.js", "assays.js" %>
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
 <ul class="sectionIcons">
     <li>
@@ -40,7 +40,7 @@
 					:show_publications=>false
 				}
     	-%>
-		
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
         <% end -%>
         <p>
             <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>

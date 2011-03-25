@@ -105,5 +105,12 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     assert_equal "a feed announcement",ann.title
     
   end
+
+  test "feed with empty announcements" do
+    login_as(:aaron)
+    SiteAnnouncement.delete_all
+    get :feed,:format=>"atom"
+    assert_response :success
+  end
   
 end

@@ -29,6 +29,8 @@
 
 <%= render :partial=>"models/builder/annotation_box",:locals=>{:prefix=>"reactions",:title=>"Annotations for processes",:type=>"reactions", :annotation_hash=>@reaction_annotations} -%>
 
+<%= render :partial=>"models/builder/attribution_annotations_box",:locals=>{:annotations=>@attribution_annotations} -%>
+
 <% end -%>
 </div>
 

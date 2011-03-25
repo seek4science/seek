@@ -2,6 +2,8 @@ module Seek
 
   module TaggingCommon
 
+    include CommonSweepers
+
     def update_tags_ajax
       entity=controller_name.singularize.camelize.constantize.find(params[:id])
       if Authorization.is_authorized?("view",nil,entity,current_user)
@@ -61,7 +63,7 @@ module Seek
 
       owner.tag entity, :with=>new_names.join(","), :on=>:tags
 
-      expire_tag_caches
+      expire_tag_fragments
 
     end
 
@@ -85,13 +87,10 @@ module Seek
 
       owner.tag entity, :with=>tags, :on=>:tags
 
-      expire_tag_caches
+      expire_tag_fragments
 
     end
-
-    def expire_tag_caches
-      expire_fragment("sidebar_tag_cloud")
-    end
+   
 
     #double checks and resolves if any new tags are actually known. This can occur when the tag has been typed completely rather than
     #relying on autocomplete. If not fixed, this could have an impact on preserving tag ownership.

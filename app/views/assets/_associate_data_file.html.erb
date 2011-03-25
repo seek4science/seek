@@ -28,7 +28,7 @@
             :url=>{:action=>"preview",:controller=>"data_files",:element=>"data_file_preview"},
             :with=>"'id='+this.value",
             :before=>"show_ajax_loader('data_file_preview')"
-          )+";check_show_add_data_file();return(false);"
+          )+";check_show_add_data_file();return(false)"
         } -%>
         
         <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>

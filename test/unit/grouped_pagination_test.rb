@@ -28,17 +28,17 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
   
   def test_latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Person.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Project.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Institution.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Investigation.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Study.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Assay.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,DataFile.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Model.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Sop.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Publication.latest_limit
-    assert_equal Seek::ApplicationConfiguration.limit_latest,Event.latest_limit
+    assert_equal Seek::Config.limit_latest,Person.latest_limit
+    assert_equal Seek::Config.limit_latest,Project.latest_limit
+    assert_equal Seek::Config.limit_latest,Institution.latest_limit
+    assert_equal Seek::Config.limit_latest,Investigation.latest_limit
+    assert_equal Seek::Config.limit_latest,Study.latest_limit
+    assert_equal Seek::Config.limit_latest,Assay.latest_limit
+    assert_equal Seek::Config.limit_latest,DataFile.latest_limit
+    assert_equal Seek::Config.limit_latest,Model.latest_limit
+    assert_equal Seek::Config.limit_latest,Sop.latest_limit
+    assert_equal Seek::Config.limit_latest,Publication.latest_limit
+    assert_equal Seek::Config.limit_latest,Event.latest_limit
   end
 
   def test_paginate_no_options    
@@ -190,27 +190,27 @@ class GroupedPaginationTest < ActiveSupport::TestCase
 
   test "pagination for default page using rails-setting plugin" do
     @people=Person.paginate
-    assert_equal @people.page, Settings.index[:people]
+    assert_equal @people.page, Seek::Config.default_page("people")
     @projects=Project.paginate
-    assert_equal @projects.page, Settings.index[:projects]
+    assert_equal @projects.page, Seek::Config.default_page("projects")
     @institutions=Institution.paginate
-    assert_equal @institutions.page, Settings.index[:institutions]
+    assert_equal @institutions.page, Seek::Config.default_pages[:institutions]
     @investigations=Investigation.paginate
-    assert_equal @investigations.page, Settings.index[:investigations]
+    assert_equal @investigations.page, Seek::Config.default_pages[:investigations]
     @studies=Study.paginate
-    assert_equal @studies.page, Settings.index[:studies]
+    assert_equal @studies.page, Seek::Config.default_pages[:studies]
     @assays=Assay.paginate
-    assert_equal @assays.page, Settings.index[:assays]
+    assert_equal @assays.page, Seek::Config.default_pages[:assays]
     @data_files=DataFile.paginate
-    assert_equal @data_files.page, Settings.index[:data_files]
+    assert_equal @data_files.page, Seek::Config.default_pages[:data_files]
     @models=Model.paginate
-    assert_equal @models.page, Settings.index[:models]
+    assert_equal @models.page, Seek::Config.default_page ("models")
     @sops=Sop.paginate
-    assert_equal @sops.page, Settings.index[:sops]
+    assert_equal @sops.page, Seek::Config.default_pages[:sops]
     @publications=Publication.paginate
-    assert_equal @publications.page, Settings.index[:publications]
+    assert_equal @publications.page, Seek::Config.default_pages[:publications]
     @events=Event.paginate
-    assert_equal @events.page, Settings.index[:events]
+    assert_equal @events.page, Seek::Config.default_pages[:events]
 
   end
 

@@ -1,15 +1,20 @@
 require 'test_helper'
-require 'settings'
 
 class AdminControllerTest < ActionController::TestCase
 
   fixtures :all
 
   include AuthenticatedTestHelper
-  test "should show project" do
+  test "should show rebrand" do
     login_as(:quentin)
-    get :project
+    get :rebrand
     assert_response :success
+  end
+
+  test "only admin can restart the server" do
+    login_as(:aaron)
+    post :restart_server
+    assert_not_nil flash[:error]
   end
 
   test "should show features enabled" do
@@ -41,6 +46,30 @@ class AdminControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :show
     assert_response :redirect
+    assert_not_nil flash[:error]
+  end
+
+  test 'string to boolean' do
+    login_as(:quentin)
+    post :update_features_enabled, :events_enabled => '1'
+    assert_equal true, Seek::Config.events_enabled
+  end
+
+  test 'invalid email address' do
+    login_as(:quentin)
+    post :update_others, :pubmed_api_email => 'quentin', :crossref_api_email => 'quentin@example.com', :tag_threshold => '', :max_visible_tags => '20'
+    assert_not_nil flash[:error]
+  end
+
+  test 'should input integer' do
+    login_as(:quentin)
+    post :update_others, :pubmed_api_email => 'quentin@example.com', :crossref_api_email => 'quentin@example.com', :tag_threshold => '', :max_visible_tags => '20'
+    assert_not_nil flash[:error]
+  end
+
+  test 'should input positive integer' do
+    login_as(:quentin)
+    post :update_others, :pubmed_api_email => 'quentin@example.com', :crossref_api_email => 'quentin@example.com', :tag_threshold => '1', :max_visible_tags => '0'
     assert_not_nil flash[:error]
   end
 #

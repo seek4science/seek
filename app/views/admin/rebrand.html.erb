@@ -1,0 +1,66 @@
+
+<% form_tag :action=>"update_rebrand" do -%>
+  <br style="clear:both;"/>
+  <br/>
+  <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
+    Project name:    <%= text_field_tag(:project_name, Seek::Config.project_name) %>
+    <br style="clear:both;"/>
+    <br/>
+    Project type:    <%= text_field_tag(:project_type, Seek::Config.project_type) %>
+    <br style="clear:both;"/>
+    <br/>
+    Project link:    <%= text_field_tag(:project_link, Seek::Config.project_link) %>
+    <br style="clear:both;"/>
+    <br/>
+    Project title:    <%= text_field_tag(:project_title, Seek::Config.project_title) %>
+    <br style="clear:both;"/>
+    <br/>
+    Project long name:    <%= text_field_tag(:project_long_name, Seek::Config.project_long_name) %>
+    <br style="clear:both;"/>
+    <br/>
+
+    DM project name:    <%= text_field_tag(:dm_project_name, Seek::Config.dm_project_name) %>
+    <br style="clear:both;"/>
+    <br/>
+    DM project title:    <%= text_field_tag(:dm_project_title, Seek::Config.dm_project_title) %>
+    <br style="clear:both;"/>
+    <br/>
+    DM project link:    <%= text_field_tag(:dm_project_link, Seek::Config.dm_project_link) %>
+    <br style="clear:both;"/>
+    <br/>
+    Application name:    <%= text_field_tag(:application_name, Seek::Config.application_name) %>
+    <br style="clear:both;"/>
+    <br/>
+    Application title:    <%= text_field_tag(:application_title, Seek::Config.application_title) %>
+    <br style="clear:both;"/>
+    <br/>
+
+    Header image enabled:    <%= check_box_tag(:header_image_enabled, 1, Seek::Config.header_image_enabled) %>
+    <br style="clear:both;"/>
+    <br/>
+    Header image:    <%= text_field_tag(:header_image, Seek::Config.header_image) %>
+    <br style="clear:both;"/>
+    <br/>
+    Header image link:    <%= text_field_tag(:header_image_link, Seek::Config.header_image_link) %>
+    <br style="clear:both;"/>
+    <br/>
+    Header image title:    <%= text_field_tag(:header_image_title, Seek::Config.header_image_title) %>
+    <br style="clear:both;"/>
+    <br/>
+    Copyright addendum enabled:    <%= check_box_tag(:copyright_addendum_enabled, 1, Seek::Config.copyright_addendum_enabled) %>
+    <br style="clear:both;"/>
+    <br/>
+    Copyright addendum content:    <%= text_field_tag(:copyright_addendum_content, Seek::Config.copyright_addendum_content) %>
+    <br style="clear:both;"/>
+    <br/>
+    <br style="clear:both;"/>
+    <br/>
+
+    <%= submit_tag "Update" %>
+  </div>
+<% end -%>
+
+
+
+
+

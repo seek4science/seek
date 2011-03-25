@@ -58,7 +58,7 @@ module ResourceListItemHelper
   end
 
   def list_item_tag_list resource
-    list_item_simple_list(resource.tag_counts, "Tags") {|i| link_for_tag(i, :type=>:tool)}
+    list_item_simple_list(resource.tag_counts, "Tags") {|i| link_for_tag(i)}
   end
 
   def list_item_simple_list items, attribute
@@ -176,7 +176,7 @@ module ResourceListItemHelper
         title = "Custom Policy"
         html << image('manage', :title=>title, :class => "visibility_icon")
       when 2
-        title = "Visible to all #{Seek::ApplicationConfiguration.project_name} projects"
+        title = "Visible to all #{Seek::Config.project_name} projects"
         html << image('open', :title=>title, :class => "visibility_icon")
       when 3
         title = "Visible to all registered users"

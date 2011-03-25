@@ -13,26 +13,49 @@ module Seek
     end
   end
 
+  class AttributionAnnotations
+    attr_accessor :citation_url,:citation_urn,:model_urn,:authors,:creation_date,:modification_date,:terms_of_distribution,:notes, :model_name
+
+    def initialize
+      @authors = []
+    end
+
+    def authors_encoded
+      str=""
+      @authors.each do |a|
+        str << a << "\\n"
+      end
+      str
+    end
+
+    def authors= authors
+      if authors.kind_of?(Array)
+        @authors = authors
+      else
+        @authors = authors.split("\\n")
+      end
+    end
+  end
+
   class SearchResults
     attr_accessor :search_term,:selected_symbol,:results, :search_status, :error_code
 
     def initialize
       @results = []
     end
-
   end
 
   class JWSModelBuilder
 
     include ModelTypeDetection
 
-    BASE_URL = "#{Seek::ApplicationConfiguration.jws_online_root}/webMathematica/Examples/"
-    SIMULATE_URL = "#{Seek::ApplicationConfiguration.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
+    BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
+    SIMULATE_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
     
     MOCKED_RESPONSE=false
 
     def is_supported? model
-      model.content_blob.file_exists? && (is_sbml?(model) || is_dat?(model))
+      model.content_blob.file_exists? && is_jws_supported?(model)
     end
 
     def dat_to_sbml_url
@@ -76,12 +99,16 @@ module Seek
       end
       url
     end
+    
+    def jws_post_parameters
+      ["nameToSearch", "urnsearchbox", "selectedSymbol", "urnsearchboxReaction", "selectedReactionSymbol", "assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel","citationURL","citationURN","modelURN","creationTime","modificationTime","authors","TOD","notes"]
+    end
 
     def construct params
 
       return process_response_body(dummy_response_xml) if MOCKED_RESPONSE
 
-      required_params=["assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel"]
+      required_params=jws_post_parameters
       url = builder_url
       form_data = {}
       required_params.each do |p|
@@ -118,7 +145,7 @@ module Seek
           part=Multipart.new("upfile", filepath, model.original_filename)
           response = part.post(upload_sbml_url)
           if response.code == "302"
-            uri = URI.parse(response['location'])
+            uri = URI.parse(URI.encode(response['location']))
             req = Net::HTTP::Get.new(uri.request_uri)
             response = Net::HTTP.start(uri.host, uri.port) { |http|
               http.request(req)
@@ -185,7 +212,7 @@ module Seek
         params[new_key]=params[key]
       end
 
-      required_params=["nameToSearch","urnsearchbox","selectedSymbol","urnsearchboxReaction","selectedReactionSymbol","assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel", ""]
+      required_params=jws_post_parameters
       url = annotator_url
       form_data = {}
       required_params.each do |p|
@@ -213,8 +240,9 @@ module Seek
       search_results = extract_search_results doc
       cached_annotations = extract_cached_annotations doc
       assigned_species_annotations,assigned_reactions_annotations = extract_assigned_annotations doc
+      attribution_annotations = find_attribution_annotations params_hash
 
-      return params_hash, assigned_species_annotations,assigned_reactions_annotations,search_results,cached_annotations,saved_file,fields_with_errors
+      return params_hash,attribution_annotations,assigned_species_annotations,assigned_reactions_annotations,search_results,cached_annotations,saved_file,fields_with_errors
     end
 
     def extract_cached_annotations doc
@@ -319,9 +347,26 @@ module Seek
       saved_file = determine_saved_file doc
       objects_hash = create_objects_hash doc
       fields_with_errors = find_reported_errors doc
+      attribution_annotations = find_attribution_annotations param_values
 
 
-      return param_values, saved_file, objects_hash, fields_with_errors
+      return param_values,  attribution_annotations, saved_file, objects_hash, fields_with_errors
+    end
+
+    def find_attribution_annotations param_values
+      annotations = AttributionAnnotations.new
+
+      annotations.model_name=param_values["modelname"] || ""
+      annotations.citation_url=param_values["citationURL"] || ""
+      annotations.citation_urn=param_values["citationURN"] || ""
+      annotations.model_urn=param_values["modelURN"] || ""
+      annotations.authors=param_values["authors"] || ""
+      annotations.creation_date=param_values["creationDate"] || ""
+      annotations.modification_date=param_values["modificationDate"]
+      annotations.terms_of_distribution=param_values["TOD"] || ""
+      annotations.notes = param_values["notes"] || ""
+
+      annotations
     end
 
     def find_reported_errors doc
@@ -361,6 +406,15 @@ module Seek
           params[id]=node.content.strip
         end
       end
+
+      #FIXME: this is only required until the parameters for attributions are moved to the parameters block
+      doc.find("//form[@id='main']/parameter").each do |node|
+        unless node.attributes['id'].nil?
+          id=node.attributes['id']
+          params[id]=node.content.strip
+        end
+      end
+
       params
     end
 

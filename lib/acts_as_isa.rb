@@ -1,7 +1,5 @@
 require 'title_trimmer'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
-require 'acts_as_favouritable'
 
 module Acts #:nodoc:
   module Isa #:nodoc:
@@ -27,7 +25,7 @@ module Acts #:nodoc:
                  :as        => :resource,
                  :dependent => :destroy
 
-        grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
+        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
         acts_as_uniquely_identifiable
 

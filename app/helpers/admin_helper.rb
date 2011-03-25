@@ -22,4 +22,6 @@ module AdminHelper
     words.join(", ")
   end
 
+
+
 end

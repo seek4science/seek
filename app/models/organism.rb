@@ -1,5 +1,3 @@
-require 'acts_as_favouritable'
-
 class Organism < ActiveRecord::Base
 
   acts_as_favouritable

@@ -1,6 +1,13 @@
-atom_feed do |feed|
+atom_feed(:url => site_announcements_url(:format => :atom),
+          :root_url => site_announcements_url,
+          :schema_date => "2009") do |feed|
+
   feed.title("SEEK Announcements")
-  feed.updated(@site_announcements.first.updated_at)
+  if @site_announcements.empty?
+    feed.updated Time.now
+  else
+    feed.updated @site_announcements.first.updated_at
+  end
 
   for announcement in @site_announcements
     next if announcement.updated_at.blank?

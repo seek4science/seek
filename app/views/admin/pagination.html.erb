@@ -1,4 +1,4 @@
-<% javascript_include_tag 'sharing.js' %>
+<%= javascript_include_tag 'sharing.js' %>
 <% form_tag :action=>"update_pagination" do -%>
   <br style="clear:both;"/>
   <br/>
@@ -6,12 +6,12 @@
     Pagination index for :
     <br style="clear:both;"/>
     <br/>
-    People:                 <% if Seek::ApplicationConfiguration.default_page("people") == "latest" %>
+    People:                 <% if Seek::Config.default_page("people") == "latest" %>
                             <%= radio_button_tag(:people, "latest", true) %>
                             <%= label_tag(:people_latest, "latest") %>
                             <%= radio_button_tag(:people, "all") %>
                             <%= label_tag(:people_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("people") == "all"%>
+                         <% elsif Seek::Config.default_page("people") == "all"%>
                             <%= radio_button_tag(:people, "latest") %>
                             <%= label_tag(:people_latest, "latest") %>
                             <%= radio_button_tag(:people, "all", true) %>
@@ -25,12 +25,12 @@
 
     <br style="clear:both;"/>
     <br/>
-    Projects:            <% if Seek::ApplicationConfiguration.default_page("projects") == "latest" %>
+    Projects:            <% if Seek::Config.default_page("projects") == "latest" %>
                             <%= radio_button_tag(:projects, "latest", true) %>
                             <%= label_tag(:projects_latest, "latest") %>
                             <%= radio_button_tag(:projects, "all") %>
                             <%= label_tag(:projects_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("projects") == "all"%>
+                         <% elsif Seek::Config.default_page("projects") == "all"%>
                             <%= radio_button_tag(:projects, "latest") %>
                             <%= label_tag(:projects_latest, "latest") %>
                             <%= radio_button_tag(:projects, "all", true) %>
@@ -43,12 +43,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Institutions:         <% if Seek::ApplicationConfiguration.default_page("institutions") == "latest" %>
+    Institutions:         <% if Seek::Config.default_page("institutions") == "latest" %>
                             <%= radio_button_tag(:institutions, "latest", true) %>
                             <%= label_tag(:institutions_latest, "latest") %>
                             <%= radio_button_tag(:institutions, "all") %>
                             <%= label_tag(:institutions_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("institutions") == "all"%>
+                         <% elsif Seek::Config.default_page("institutions") == "all"%>
                             <%= radio_button_tag(:institutions, "latest") %>
                             <%= label_tag(:institutions_latest, "latest") %>
                             <%= radio_button_tag(:institutions, "all", true) %>
@@ -61,12 +61,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-     Investigations:      <% if Seek::ApplicationConfiguration.default_page("investigations") == "latest" %>
+     Investigations:      <% if Seek::Config.default_page("investigations") == "latest" %>
                             <%= radio_button_tag(:investigations, "latest", true) %>
                             <%= label_tag(:investigations_latest, "latest") %>
                             <%= radio_button_tag(:investigations, "all") %>
                             <%= label_tag(:investigations_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("investigations") == "all"%>
+                         <% elsif Seek::Config.default_page("investigations") == "all"%>
                             <%= radio_button_tag(:investigations, "latest") %>
                             <%= label_tag(:investigations_latest, "latest") %>
                             <%= radio_button_tag(:investigations, "all", true) %>
@@ -79,12 +79,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Studies:              <% if Seek::ApplicationConfiguration.default_page("studies") == "latest" %>
+    Studies:              <% if Seek::Config.default_page("studies") == "latest" %>
                             <%= radio_button_tag(:studies, "latest", true) %>
                             <%= label_tag(:studies_latest, "latest") %>
                             <%= radio_button_tag(:studies, "all") %>
                             <%= label_tag(:studies_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("studies") == "all"%>
+                         <% elsif Seek::Config.default_page("studies") == "all"%>
                             <%= radio_button_tag(:studies, "latest") %>
                             <%= label_tag(:studies_latest, "latest") %>
                             <%= radio_button_tag(:studies, "all", true) %>
@@ -97,12 +97,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Assays:               <% if Seek::ApplicationConfiguration.default_page("assays") == "latest" %>
+    Assays:               <% if Seek::Config.default_page("assays") == "latest" %>
                             <%= radio_button_tag(:assays, "latest", true) %>
                             <%= label_tag(:assays_latest, "latest") %>
                             <%= radio_button_tag(:assays, "all") %>
                             <%= label_tag(:assays_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("assays") == "all"%>
+                         <% elsif Seek::Config.default_page("assays") == "all"%>
                             <%= radio_button_tag(:assays, "latest") %>
                             <%= label_tag(:assays_latest, "latest") %>
                             <%= radio_button_tag(:assays, "all", true) %>
@@ -115,12 +115,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Data files:           <% if Seek::ApplicationConfiguration.default_page("data_files") == "latest" %>
+    Data files:           <% if Seek::Config.default_page("data_files") == "latest" %>
                             <%= radio_button_tag(:data_files, "latest", true) %>
                             <%= label_tag(:data_files_latest, "latest") %>
                             <%= radio_button_tag(:data_files, "all") %>
                             <%= label_tag(:data_files_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("data_files") == "all"%>
+                         <% elsif Seek::Config.default_page("data_files") == "all"%>
                             <%= radio_button_tag(:data_files, "latest") %>
                             <%= label_tag(:data_files_latest, "latest") %>
                             <%= radio_button_tag(:data_files, "all", true) %>
@@ -133,12 +133,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Models:               <% if Seek::ApplicationConfiguration.default_page("models") == "latest" %>
+    Models:               <% if Seek::Config.default_page("models") == "latest" %>
                             <%= radio_button_tag(:models, "latest", true) %>
                             <%= label_tag(:models_latest, "latest") %>
                             <%= radio_button_tag(:models, "all") %>
                             <%= label_tag(:models_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("models") == "all"%>
+                         <% elsif Seek::Config.default_page("models") == "all"%>
                             <%= radio_button_tag(:models, "latest") %>
                             <%= label_tag(:models_latest, "latest") %>
                             <%= radio_button_tag(:models, "all", true) %>
@@ -151,12 +151,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Sops:                 <% if Seek::ApplicationConfiguration.default_page("sops") == "latest" %>
+    Sops:                 <% if Seek::Config.default_page("sops") == "latest" %>
                             <%= radio_button_tag(:sops, "latest", true) %>
                             <%= label_tag(:sops_latest, "latest") %>
                             <%= radio_button_tag(:sops, "all") %>
                             <%= label_tag(:sops_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("sops") == "all"%>
+                         <% elsif Seek::Config.default_page("sops") == "all"%>
                             <%= radio_button_tag(:sops, "latest") %>
                             <%= label_tag(:sops_latest, "latest") %>
                             <%= radio_button_tag(:sops, "all", true) %>
@@ -169,12 +169,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Publications:         <% if Seek::ApplicationConfiguration.default_page("publications") == "latest" %>
+    Publications:         <% if Seek::Config.default_page("publications") == "latest" %>
                             <%= radio_button_tag(:publications, "latest", true) %>
                             <%= label_tag(:publications_latest, "latest") %>
                             <%= radio_button_tag(:publications, "all") %>
                             <%= label_tag(:publications_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("publications") == "all"%>
+                         <% elsif Seek::Config.default_page("publications") == "all"%>
                             <%= radio_button_tag(:publications, "latest") %>
                             <%= label_tag(:publications_latest, "latest") %>
                             <%= radio_button_tag(:publications, "all", true) %>
@@ -187,12 +187,12 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Events:               <% if Seek::ApplicationConfiguration.default_page("events") == "latest" %>
+    Events:               <% if Seek::Config.default_page("events") == "latest" %>
                             <%= radio_button_tag(:events, "latest", true) %>
                             <%= label_tag(:events_latest, "latest") %>
                             <%= radio_button_tag(:events, "all") %>
                             <%= label_tag(:events_all, "all") %>
-                         <% elsif Seek::ApplicationConfiguration.default_page("events") == "all"%>
+                         <% elsif Seek::Config.default_page("events") == "all"%>
                             <%= radio_button_tag(:events, "latest") %>
                             <%= label_tag(:events_latest, "latest") %>
                             <%= radio_button_tag(:events, "all", true) %>
@@ -205,7 +205,7 @@
                          <% end %>
     <br style="clear:both;"/>
     <br/>
-    Paginate latest limit: <%= text_field_tag(:limit_latest, Settings.limit_latest, :onkeypress => "javascript: return onlyNumbers(event);") %>(only number)
+    Paginate latest limit: <%= text_field_tag(:limit_latest, Settings.limit_latest, :onkeypress => "javascript: return onlyNumbers(event);") %>
     <br style="clear:both;"/>
     <br/>
     <br style="clear:both;"/>

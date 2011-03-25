@@ -1,5 +1,4 @@
-require 'acts_as_uniquely_identifiable'
-require 'acts_as_favouritable'
+
 
 module Acts #:nodoc:
   module Yellow_Pages #:nodoc:

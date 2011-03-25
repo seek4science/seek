@@ -1,21 +1,21 @@
 #MySQL
 development:
   adapter: mysql
-  database: seekhub_development
+  database: seek_development
   username: mysqluser
   password: mysqluser
   #socket: /var/run/mysqld/mysqld.sock 
 
 test:
   adapter: mysql
-  database: seekhub_test
+  database: seek_test
   username: mysqluser
   password: mysqluser
   #socket: /var/run/mysqld/mysqld.sock 
 
 production:
   adapter: mysql
-  database: seekhub_production
+  database: seek_production
   username: mysqluser
   password: mysqluser
 

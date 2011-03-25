@@ -12,3 +12,10 @@ golf_modeller_person:
   tag: golf
   taggable: modeller_person(Person)
   context: "expertise"
+
+cricket_owned_tag:
+  tag: cricket
+  taggable: francos_model(Model)
+  tagger: pal_user(User)
+  context: "tags"
+  

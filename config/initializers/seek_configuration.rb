@@ -1,79 +1,42 @@
-require 'settings'
-require 'authorization'
-require 'save_without_timestamping'
-require 'asset'
-require 'calendar_date_select'
-require 'active_record_extensions'
+require 'seek/config'
 
-#Features enabled
-  Settings.defaults[:events_enabled] = true
-  Settings.defaults[:jerm_enabled] = true
-  Settings.defaults[:test_enabled] = false
-  Settings.defaults[:email_enabled] = false
-  Settings.defaults[:smtp_settings] = {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
-  Settings.defaults[:noreply_sender] = 'no-reply@sysmo-db.org'  
-  Settings.defaults[:solr_enabled] = false
-  Settings.defaults[:jws_enabled] = true
-  Settings.defaults[:jws_online_root] = "http://jjj.mib.ac.uk"
-  Settings.defaults[:exception_notification_enabled] = false
-  Settings.defaults[:hide_details_enabled] = false
-  Settings.defaults[:activity_log_enabled] = true
-  Settings.defaults[:activation_required_enabled] = false
-  Settings.defaults[:google_analytics_enabled] = false
-  Settings.defaults[:google_analytics_tracker_id] = 'XX-XXXXXXX-X'
-  Settings.defaults[:copyright_addendum_enabled] = false
-  Settings.defaults[:copyright_addendum_content] = 'Additions copyright ...'
+Seek::Config.default :events_enabled,true
+Seek::Config.default :jerm_enabled,true
+Seek::Config.default :test_enabled, false
+Seek::Config.default :email_enabled,false
+Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
+Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
+Seek::Config.default :solr_enabled,false
+Seek::Config.default :jws_enabled, true
+Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk"
+Seek::Config.default :exception_notification_enabled,false
+Seek::Config.default :hide_details_enabled,false
+Seek::Config.default :activity_log_enabled,true
+Seek::Config.default :activation_required_enabled,false
+Seek::Config.default :google_analytics_enabled, false
+Seek::Config.default :google_analytics_tracker_id, '000-000'
+Seek::Config.default :copyright_addendum_enabled,false
+Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
+#
+#  #Project
+Seek::Config.default :project_name,'SysMO'
+Seek::Config.default :project_type,'Consortium'
+Seek::Config.default :project_link,'http://www.sysmo.net'
+Seek::Config.default :header_image_enabled,false
+Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
+#
+#  #Pagination
+Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
+Seek::Config.default :limit_latest,7
+#
+#  #Others
+Seek::Config.default :type_managers_enabled,true
+Seek::Config.default :type_managers,'admins'
+Seek::Config.default :tag_threshold,1
+Seek::Config.default :max_visible_tags,20
+Seek::Config.default :pubmed_api_email,nil
+Seek::Config.default :crossref_api_email,nil
+Seek::Config.default :site_base_host,"http://localhost:3000"
+Seek::Config.default :open_id_authentication_store,:memory
 
-  #Mailer settings
-  ActionMailer::Base.smtp_settings= {
-    :address => Settings.defaults[:smtp_settings][:address],
-    :port => Settings.defaults[:smtp_settings][:port],
-    :domain => Settings.defaults[:smtp_settings][:domain],
-    :authentication => Settings.defaults[:smtp_settings][:authentication],
-    :user_name => Settings.defaults[:smtp_settings][:user_name],
-    :password  => Settings.defaults[:smtp_settings][:password]
-  }
-  if Settings.defaults[:google_analytics_enabled]
-    Rubaidh::GoogleAnalytics.tracker_id = Settings.defaults[:google_analytics_tracker_id]
-  else
-    Rubaidh::GoogleAnalytics.tracker_id = "000-000"
-  end
-
-  if Settings.defaults[:exception_notification_enabled]
-    ExceptionNotifier.render_only = false
-    ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
-    ExceptionNotifier.sender_address = %w(no-reply@sysmo-db.org)
-    ExceptionNotifier.email_prefix = "[SEEK-#{RAILS_ENV.capitalize} ERROR] "
-    ExceptionNotifier.exception_recipients = %w(joe@example.com bill@example.com)
-  else
-    ExceptionNotifier.render_only = true
-  end
-
-
-#Project
-  Settings.defaults[:project_name] = 'SysMO'
-  Settings.defaults[:project_type] = 'Consortium'
-  Settings.defaults[:project_link] = 'http://www.sysmo.net'
-  Settings.defaults[:header_image_enabled] = false
-
-#Pagination
-  Settings.defaults[:index] = {:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest',
-                    :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
-  Settings.defaults[:limit_latest] = 7
-
-#Others
-
-  Settings.defaults[:type_managers_enabled] = true  
-  Settings.defaults[:type_managers] = 'admins'
-  Settings.defaults[:tag_threshold] = 1
-  Settings.defaults[:max_visible_tags] = 20
-  Settings.defaults[:global_passphrase] = "ohx0ipuk2baiXah"
-  Settings.defaults[:pubmed_api_email] = nil
-  Settings.defaults[:crossref_api_email] = nil
-  Settings.defaults[:site_base_host] = "http://localhost:3000"
-  Settings.defaults[:open_id_authentication_store] = :memory
-  Settings.defaults[:asset_order] = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event']
-
-  OpenIdAuthentication.store = Settings.defaults[:open_id_authentication_store]
-
-  ACTIVITY_LOG_ENABLED = true
+Seek::Config.propagate_all

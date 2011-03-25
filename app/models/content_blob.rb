@@ -1,7 +1,6 @@
 require 'digest/md5'
 require 'net/http'
 require 'open-uri'
-require 'acts_as_uniquely_identifiable'
 require 'tmpdir'
 
 class ContentBlob < ActiveRecord::Base
@@ -16,7 +15,7 @@ class ContentBlob < ActiveRecord::Base
   #if the file doesn't exist an error occurs
   attr_writer :tmp_io_object
   
-  acts_as_uniquely_identifiable    
+  acts_as_uniquely_identifiable
   
   #this action saves the contents of @data or the contents contained within the @tmp_io_object to the storage file.
   #an Exception is raised if both are defined
@@ -97,6 +96,7 @@ class ContentBlob < ActiveRecord::Base
     unless @tmp_io_object.nil?
       begin
         logger.info "Moving #{@tmp_io_object.path} to #{filepath}"
+        @tmp_io_object.flush
         FileUtils.mv @tmp_io_object.path, filepath
         @tmp_io_object = nil
       rescue Exception => e

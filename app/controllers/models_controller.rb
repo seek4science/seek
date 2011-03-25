@@ -53,15 +53,14 @@ class ModelsController < ApplicationController
     begin
       if saved_file
         supported=true
-        @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
+        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
         supported = @@model_builder.is_supported?(@display_model)
-        @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported
       end
     rescue Exception=>e
       error=e
       logger.error "Error submitting to JWS Online OneStop - #{e.message}"
-      raise e
     end
     
     respond_to do |format|
@@ -87,9 +86,9 @@ class ModelsController < ApplicationController
     following_action=params.delete("following_action")    
 
     if following_action == "annotate" 
-      @params_hash,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
+      @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
     else
-      @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
+      @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
     end
 
     if (@error_keys.empty?)
@@ -136,7 +135,7 @@ class ModelsController < ApplicationController
     begin
       supported = @@model_builder.is_supported?(@display_model)
       if supported
-        @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
+        @data_script_hash,attribution_annotations,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
         @applet=@@model_builder.simulate saved_file
       end
     rescue Exception=>e
@@ -383,7 +382,7 @@ class ModelsController < ApplicationController
       @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
       update_tags @model
-      
+      assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
           # the Model was saved successfully, now need to apply policy / permissions settings to it
@@ -404,6 +403,10 @@ class ModelsController < ApplicationController
           else
             flash[:notice] = "Model was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+          end
+          assay_ids.each do |id|
+              @assay = Assay.find(id)
+              @assay.relate(@model)
           end
         else
           format.html {
@@ -440,6 +443,7 @@ class ModelsController < ApplicationController
 
     update_tags @model
 
+    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @model.update_attributes(params[:model])
         # the Model was updated successfully, now need to apply updated policy / permissions settings to it
@@ -460,6 +464,24 @@ class ModelsController < ApplicationController
         else
           flash[:notice] = "Model metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
           format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+        end
+        # Update new assay_asset
+        assay_ids.each do |id|
+          @assay = Assay.find(id)
+          @assay.relate(@model)
+        end
+        #Destroy AssayAssets that aren't needed
+        assay_assets = AssayAsset.find_all_by_asset_id(@model.id)
+        assay_assets.each do |assay_asset|
+          flag = false
+          assay_ids.each do |id|
+            if assay_asset.assay_id.to_s == id
+              flag = true
+            end
+          end
+          if flag == false
+             AssayAsset.destroy(assay_asset.id)
+          end
         end
       else
         format.html {
@@ -532,7 +554,7 @@ class ModelsController < ApplicationController
   end
   
   def jws_enabled
-    unless Seek::ApplicationConfiguration.jws_enabled
+    unless Seek::Config.jws_enabled
       respond_to do |format|
         flash[:error] = "Interaction with JWS Online is currently disabled"
         format.html { redirect_to model_path(@model,:version=>@display_model.version) }

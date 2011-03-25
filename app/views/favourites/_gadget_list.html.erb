@@ -1,5 +1,5 @@
 <%
-   favourites=Favourite.find_all_by_user_id(current_user.id)
+   favourites=Favourite.for_user(current_user)
 
    #this shouldn't be necessry thanks to acts_as_favouritable, but acts as a safety net for an old bug that left old Favourites with nil resources [SYSMO-520]
    favourites = favourites.select{|f| !f.resource.nil?}
@@ -11,7 +11,7 @@
   </span>
 <% else %>
   <%= "<ul class='favourites'>"  if show_as_list -%>
-  <% favourites.sort_by{|a| Seek::ApplicationConfiguration.asset_order.index(a.resource_type)}.each do |fav| %>
+  <% favourites.sort_by{|a| ASSET_ORDER.index(a.resource_type)}.each do |fav| %>
     <% if show_as_list -%>
       <li class="fav_list_item">
         <%= fav_line_tag(fav) %>

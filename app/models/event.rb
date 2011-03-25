@@ -1,7 +1,5 @@
 require 'acts_as_authorized'
-require 'acts_as_uniquely_identifiable'
 require 'grouped_pagination'
-require 'acts_as_favouritable'
 
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
@@ -18,7 +16,7 @@ class Event < ActiveRecord::Base
   acts_as_favouritable
 
   #load the configuration for the pagination
-  grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
+  grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   #FIXME: Move to Libs
   Array.class_eval do

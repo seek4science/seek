@@ -1,0 +1,18 @@
+<%
+   checked_by_default=true
+-%>
+<h3>Available Parameter keys</h3>
+    <table border="1">
+      <thead>
+      <th>Key</th>
+      <th>Use?</th>
+      </thead>
+      <tbody>
+      <% keys.sort.each do |k| -%>
+          <tr>
+            <td><%= h(k) -%></td>
+            <td><%= check_box_tag "parameter_keys[#{k}]", "1", checked_by_default -%></td>
+          </tr>
+      <% end -%>
+      </tbody>
+    </table>

@@ -103,7 +103,8 @@ class DataFilesController < ApplicationController
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
       update_tags @data_file
-      
+
+      assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @data_file.save
           # the Data file was saved successfully, now need to apply policy / permissions settings to it
@@ -124,6 +125,12 @@ class DataFilesController < ApplicationController
           else
             flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
+          end
+
+          assay_ids.each do |text|
+            a_id, r_type = text.split(",")
+            @assay = Assay.find(a_id)
+            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
           end
         else
           format.html {
@@ -168,7 +175,7 @@ class DataFilesController < ApplicationController
     end
 
     update_tags @data_file
-    
+    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       data_file_params = params[:data_file]
       data_file_params[:event_ids] = params[:event_ids]
@@ -193,13 +200,35 @@ class DataFilesController < ApplicationController
           flash[:notice] = "Data file metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
           format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
         end
+
+        # Update new assay_asset
+        assay_ids.each do |text|
+          a_id, r_type = text.split(",")
+          @assay = Assay.find(a_id)
+          @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+        end
+        #Destroy AssayAssets that aren't needed
+        assay_assets = AssayAsset.find_all_by_asset_id(@data_file.id)
+        assay_assets.each do |assay_asset|
+          flag = false
+          assay_ids.each do |text|
+            a_id, r_type = text.split(",")
+            if assay_asset.assay_id.to_s == a_id
+              flag = true
+            end
+          end
+          if flag == false
+             AssayAsset.destroy(assay_asset.id)
+          end
+        end
       else
         format.html {
           render :action => "edit"
         }
       end
     end
-  end
+end
+
   
   # GET /data_files/1/download
   def download
@@ -213,11 +242,13 @@ class DataFilesController < ApplicationController
   
   def data
     @data_file =  DataFile.find(params[:id])
+    sheet = params[:sheet] || 1
     if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
-      xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath))
+
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
-        format.xml {render :xml=>xml }
+        format.xml {render :xml=>spreadsheet_to_xml(open(@data_file.content_blob.filepath)) }
+        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet) }
       end
     else
       respond_to do |format|

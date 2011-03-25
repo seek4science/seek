@@ -301,6 +301,19 @@ class DataFilesControllerTest < ActionController::TestCase
     schema_path=File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
     validate_xml_against_schema(xml,schema_path)     
   end
+
+  test "should fetch data content as csv" do
+    login_as(:model_owner)
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv"
+    assert_response :success
+    csv=@response.body
+    assert csv.include?(%!,,"fish","bottle","ggg,gg"!)
+
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:sheet=>"2"
+    assert_response :success
+    csv=@response.body
+    assert csv.include?(%!,,"a",1.0,TRUE,,FALSE!)
+  end
   
   test "should not expose non downloadable spreadsheet" do
     login_as(:model_owner)
@@ -480,6 +493,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "fail gracefullly when trying to access a missing data file" do
+    get :show,:id=>99999
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+  end
+
   test "owner should be able to update sharing" do
      user = users(:datafile_owner)
      df = data_files(:editable_data_file)
@@ -551,7 +570,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def valid_data_file_with_ftp_url
-    { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
+      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
   end
   
   def valid_sharing

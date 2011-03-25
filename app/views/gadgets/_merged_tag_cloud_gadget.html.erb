@@ -2,6 +2,7 @@
   
   <div class="header">
     Tags
+    <%= link_to "[show all]",all_tags_path -%>
   </div>
 
   <div class="contents">
@@ -10,8 +11,8 @@
         <div class="popularity">
           <%
           tag_cloud = ActsAsTaggableOn::Tag.all_tags_for_cloud
-          all_tags= tag_cloud.select{|tag| tag.overall_total>=Seek::ApplicationConfiguration.tag_threshold}
-          show_tags= tag_cloud.sort{|a,b| b.overall_total<=>a.overall_total}[0...Seek::ApplicationConfiguration.max_visible_tags]
+          all_tags= tag_cloud.select{|tag| tag.overall_total>=Seek::Config.tag_threshold}
+          show_tags= tag_cloud.sort{|a,b| b.overall_total<=>a.overall_total}[0...Seek::Config.max_visible_tags]
           hidden_tags=all_tags.size != show_tags.size
           hidden_class="merged_tag_hidden"
           %>
@@ -21,12 +22,11 @@
               <% if show_tag?(tag) -%>
                 <%
                   hide_tag=!show_tags.include?(tag)
-                  type = tag.taggings.first.context.to_sym                  
                   tag_class="#{css_class}"
                   tag_class << " #{hidden_class}" if hide_tag
                   style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
                 %>
-                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>          
+                <%= link_for_tag tag,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>
               <% end -%>
             <% end -%>
           

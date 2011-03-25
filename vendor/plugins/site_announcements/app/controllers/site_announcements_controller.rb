@@ -44,20 +44,17 @@ class SiteAnnouncementsController < ApplicationController
   end
   
   def notification_settings
-    key=params[:key]
-    error=false
-    @info=NotifieeInfo.find_by_unique_key(key) 
-    error=true if !@info.nil?
+    @info=NotifieeInfo.find_by_unique_key(params[:key])
     
     respond_to do |format|
-      if error 
-        format.html
-      else
+      if @info.nil?
         flash[:error]="Invalid Key"
         redirect_to root_url
+      else
+        format.html
       end
-      
     end
+    
   end
   
   def new
@@ -87,7 +84,13 @@ class SiteAnnouncementsController < ApplicationController
   def send_announcement_emails site_announcement
     if email_enabled?
       NotifieeInfo.find(:all,:conditions=>["receive_notifications=?",true]).each do |notifiee_info|
-        Mailer.deliver_announcement_notification(site_announcement, notifiee_info,base_host)                     
+        begin
+          Mailer.deliver_announcement_notification(site_announcement, notifiee_info,base_host)
+        rescue Exception=>e
+          if defined? RAILS_DEFAULT_LOGGER
+            RAILS_DEFAULT_LOGGER.error "There was a problem sending an announcement email to #{notifiee_info.notifiee.email} - #{e.message}."
+          end
+        end
       end  
     end
   end

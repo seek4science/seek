@@ -24,6 +24,6 @@
   <%= render :partial => "layouts/resource_list_item", :collection=>@people %>
 </div>
 
-<% if @people.page == "latest"%>
+<% if @people.respond_to?(:page) && @people.page == "latest" && @people.length > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>

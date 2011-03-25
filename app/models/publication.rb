@@ -1,6 +1,5 @@
 require 'acts_as_asset'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
 
 class Publication < ActiveRecord::Base
@@ -22,10 +21,19 @@ class Publication < ActiveRecord::Base
     :class_name => 'Relationship',
     :as => :object,
     :dependent => :destroy
-  has_and_belongs_to_many :events
+
+  
+  if Seek::Config.events_enabled
+    has_and_belongs_to_many :events
+  else
+    def events
+      []
+    end
+  end
+
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal]) if Seek::ApplicationConfiguration.solr_enabled
+  acts_as_solr(:fields=>[:title,:abstract,:journal,:tag_counts]) if Seek::Config.solr_enabled
   
   acts_as_uniquely_identifiable
 
