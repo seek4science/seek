@@ -230,7 +230,6 @@ module Seek
     end
 
     def process_annotator_response_body body
-
       parser = LibXML::XML::Parser.string(body, :encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse
 
@@ -339,7 +338,6 @@ module Seek
     end
 
     def process_response_body body
-
       parser = LibXML::XML::Parser.string(body, :encoding => LibXML::XML::Encoding::UTF_8)
       doc = parser.parse
       param_values = extract_main_parameters doc
