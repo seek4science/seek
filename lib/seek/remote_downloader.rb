@@ -120,7 +120,7 @@ module Seek
       return nil if res.nil? || !File.exists?(res[:data_tmp_path])
       
       if (res[:time_stored] + 3600) < Time.now
-        FileUtils.delete res[:data_tmp_path]
+        FileUtils.rm res[:data_tmp_path]
         return nil
       end
             
