@@ -46,7 +46,10 @@ module Seek
   module Propagators
 
     def smtp_propagate
-      ActionMailer::Base.smtp_settings = self.smtp
+      smtp_hash = self.smtp
+      password =  self.smtp_settings 'password'
+      smtp_hash.merge! :password => password
+      ActionMailer::Base.smtp_settings = smtp_hash
     end
 
     def google_analytics_enabled_propagate
@@ -88,9 +91,16 @@ module Seek
 
   #Custom accessors for settings that are not a simple mapping
   module CustomAccessors
+    include SimpleCrypt
 
     def smtp_settings field
-      self.smtp[field.to_sym]
+      value = self.smtp[field.to_sym]
+      if field == :password || field == 'password'
+        if !value.blank?
+          value = decrypt(value,generate_key(GLOBAL_PASSPHRASE))
+        end
+      end
+      value
     end
 
     def set_smtp_settings (field, value)
@@ -99,6 +109,12 @@ module Seek
           value = nil
         else
           value = value.to_sym
+        end
+      end
+
+      if field == :password || field == 'password'
+        if !value.blank?
+          value = encrypt(value,generate_key(GLOBAL_PASSPHRASE))
         end
       end
       merge! :smtp, {field => value}

@@ -145,4 +145,9 @@ class ConfigTest < ActiveSupport::TestCase
     assert_raises(NoMethodError) {Seek::Config.xxxxx=true}
   end
 
+  test "encrypt/decrypt smtp password" do
+    Seek::Config.set_smtp_settings 'password', 'abcd'
+    assert_equal Seek::Config.smtp_settings('password'), 'abcd'
+    assert_equal ActionMailer::Base.smtp_settings[:password], 'abcd'
+  end
 end
