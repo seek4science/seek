@@ -101,7 +101,8 @@ module Seek
           value = value.to_sym
         end
       end
-      self.smtp.merge! field.to_sym => value
+      merge! :smtp, {field => value}
+      value
     end
 
     def default_page controller
@@ -110,7 +111,8 @@ module Seek
 
     #FIXME: change to standard setter=
     def set_default_page (controller, value)
-      self.default_pages.merge! controller.to_sym => value
+      merge! :default_pages, {controller => value}
+      value
     end
 
   end
@@ -142,10 +144,16 @@ module Seek
       end
     end
 
+    def merge! var, value
+      result = Settings.merge! var, value
+      self.send "#{var}_propagate" if self.respond_to? "#{var}_propagate"
+      result
+    end
+
     def setting setting,options={}
       setter="#{setting.to_s}="
       getter="#{setting.to_s}"
-      propagate="#{setter}_propagate"
+      propagate="#{getter}_propagate"
       fallback="#{getter}_fallback"
       if self.respond_to?(fallback)
         define_class_method getter do
