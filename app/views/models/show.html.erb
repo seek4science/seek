@@ -29,7 +29,6 @@
     </li>
     <% end -%>
 </ul>
-
 <% if Seek::ApplicationConfiguration.jws_enabled && jws_supported?(@display_model) -%>
 	<ul class="sectionIcons">
 		<% if Authorization.is_authorized?("edit", nil, @model, current_user) -%>
@@ -45,14 +44,14 @@
 	</ul>
 <% end -%>
 
-<% if Seek::ApplicationConfiguration.sycamore_enabled and @display_model.content_blob.file_exists? && Seek::ModelTypeDetection.is_sbml?(@display_model) %>
+<% if Seek::ApplicationConfiguration.sycamore_enabled and @display_model.content_blob.file_exists? && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
   <ul class="sectionIcons">
     <li>
       <span class="icon">
         <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id=>'sycamore-form', :target => '_blank') do -%>
           <%= hidden_field_tag 'sbml_model', h(IO.read(@display_model.content_blob.filepath).gsub(/\n/, '')) -%>
           <%= hidden_field_tag 'sender', 'seek' -%>
-          <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Sycamore", "$('sycamore-form').submit()" -%>
+          <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Simulate Model on Sycamore", "$('sycamore-form').submit()" -%>
         <% end -%>
       </span>
     </li>
