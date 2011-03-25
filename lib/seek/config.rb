@@ -101,9 +101,7 @@ module Seek
           value = value.to_sym
         end
       end
-      current = self.smtp
-      current[field] = value
-      self.smtp = current
+      self.smtp.merge! field.to_sym => value
     end
 
     def default_page controller
@@ -112,9 +110,7 @@ module Seek
 
     #FIXME: change to standard setter=
     def set_default_page (controller, value)
-      current = self.default_pages
-      current[controller.to_sym] = value
-      self.default_pages = current
+      self.default_pages.merge! controller.to_sym => value
     end
 
   end

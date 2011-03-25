@@ -10,7 +10,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal users(:datafile_owner),datafile.contributor    
 
     blob=content_blobs(:picture_blob)
-    assert_equal blob,datafile.content_blob    
+    assert_equal blob,datafile.content_blob
   end
 
   test "event association" do
