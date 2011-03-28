@@ -55,6 +55,7 @@ module Seek
           Rubaidh::GoogleAnalytics.tracker_id = self.google_analytics_tracker_id
       else
           Rubaidh::GoogleAnalytics.tracker_id = "000-000"
+      end
     end
 
     def exception_notification_enabled_propagate
