@@ -70,9 +70,13 @@
     <br style="clear: both"/>
 
     <% if Seek::Config.events_enabled -%>
-        <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
+          <p>
+            <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
+          </p>
     <% end -%>
-    <%= render :partial => "assays/associate_publication_assays", :locals=>{:resource => @publication} -%>
+      <p>
+        <%= render :partial => "assays/associate_publication_assays", :locals=>{:resource => @publication} -%>
+      </p>
     <p style="text-align: center;">
       <%= submit_tag 'Update',:disable_with=>"Updating..." %>
     </p>
