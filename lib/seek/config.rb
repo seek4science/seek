@@ -53,6 +53,7 @@ module Seek
     end
 
     def google_analytics_enabled_propagate
+      Rubaidh::GoogleAnalytics.enabled = self.google_analytics_enabled
       if self.google_analytics_enabled
           Rubaidh::GoogleAnalytics.tracker_id = self.google_analytics_tracker_id
       else
