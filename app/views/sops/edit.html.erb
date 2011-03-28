@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js", "assays.js" %>
+<%= javascript_include_tag "sharing.js", "assays.js","attribution.js" %>
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
 <ul class="sectionIcons">
     <li>
