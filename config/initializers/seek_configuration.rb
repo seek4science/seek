@@ -1,6 +1,5 @@
 require 'seek/config'
 
-Seek::Config.default :public_seek_enabled,false
 Seek::Config.default :events_enabled,true
 Seek::Config.default :jerm_enabled,true
 Seek::Config.default :test_enabled, false

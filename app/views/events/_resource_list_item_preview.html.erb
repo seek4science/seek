@@ -1,0 +1,15 @@
+<%= list_item_title resource -%>
+
+<%= list_item_attribute "Start Date", resource.start_date.strftime('%d/%m/%Y') %>
+
+<%= list_item_attribute "End Date", resource.end_date.strftime('%d/%m/%Y') %>
+
+<%= list_item_attribute "Country", (text_or_not_specified resource.country, :link_as_country => true) %>
+
+<%= list_item_optional_attribute "City", h(resource.city) %>
+
+<%= list_item_optional_attribute "Event Website", h(resource.url), h(resource.url) %>
+
+<%= list_item_description resource.description %>
+
+<%= list_item_timestamp resource %>
