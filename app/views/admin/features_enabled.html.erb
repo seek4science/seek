@@ -3,6 +3,9 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
+    Public SEEK enabled:    <%= check_box_tag(:public_seek_enabled, 1,Seek::Config.public_seek_enabled) %>
+    <br style="clear:both;"/>
+    <br/>
     Events enabled:    <%= check_box_tag(:events_enabled, 1,Seek::Config.events_enabled) %>
     <br style="clear:both;"/>
     <br/>
