@@ -25,11 +25,14 @@
         
       
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
-        <% if Seek::Config.events_enabled -%>
-            <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
-        <% end -%>
-        <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
-
+        <p>
+            <% if Seek::Config.events_enabled -%>
+                <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
+            <% end -%>
+        </p>
+        <p>
+            <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+        </p>
         <p>
             <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
         </p>
