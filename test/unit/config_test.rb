@@ -140,6 +140,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal "fred@email.com",Seek::Config.pubmed_api_email
   end
 
+  test "convert setting from database" do
+    Settings.limit_latest="6"
+    assert_equal 6,Seek::Config.limit_latest
+  end
+
   test "invalid setting accessor" do
     assert_raises(NoMethodError) {Seek::Config.xxxxx}
     assert_raises(NoMethodError) {Seek::Config.xxxxx=true}

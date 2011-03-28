@@ -26,6 +26,7 @@ class Project < ActiveRecord::Base
   has_many :models
   has_many :sops
   has_many :publications
+  has_many :events
     
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
@@ -80,7 +81,7 @@ class Project < ActiveRecord::Base
 
     return locations
   end
-  
+
   def people
     #TODO: look into doing this with a named_scope or direct query
     res=[]

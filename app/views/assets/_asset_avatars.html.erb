@@ -1,7 +1,7 @@
 <%
 creators = []
 creators = resource.creators if resource.respond_to? :creators
-(creators = creators + [resource.contributor.try(:person)])
+(creators = creators + [resource.contributor.try(:person)]) if resource.contributor_credited?
 creators = creators.compact.uniq
 %>
 <div style="text-align: center">

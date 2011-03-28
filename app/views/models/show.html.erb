@@ -45,14 +45,14 @@
 	</ul>
 <% end -%>
 
-<% if @display_model.model_format && @display_model.model_format.title == "SBML" %>
+<% if Seek::Config.sycamore_enabled and @display_model.content_blob.file_exists? && Class.new.extend(Seek::ModelTypeDetection).is_sbml?(@display_model) %>
   <ul class="sectionIcons">
     <li>
       <span class="icon">
-        <% form_tag("http://172.16.3.190:8080/sycamore/submission.jsp", :id=>'sycamore-form', :target => '_blank') do -%>
+        <% form_tag("http://sycamore.eml.org/sycamore/submission.jsp", :id=>'sycamore-form', :target => '_blank') do -%>
           <%= hidden_field_tag 'sbml_model', h(IO.read(@display_model.content_blob.filepath).gsub(/\n/, '')) -%>
           <%= hidden_field_tag 'sender', 'seek' -%>
-          <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Sycamore", "$('sycamore-form').submit()" -%>
+          <%= link_to_function "#{image_tag(icon_filename_for_key 'execute')}Simulate Model on Sycamore", "$('sycamore-form').submit()" -%>
         <% end -%>
       </span>
     </li>

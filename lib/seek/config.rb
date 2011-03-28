@@ -53,6 +53,7 @@ module Seek
     end
 
     def google_analytics_enabled_propagate
+      Rubaidh::GoogleAnalytics.enabled = self.google_analytics_enabled
       if self.google_analytics_enabled
           Rubaidh::GoogleAnalytics.tracker_id = self.google_analytics_tracker_id
       else
@@ -145,17 +146,23 @@ module Seek
     end
 
     if Settings.table_exists?
-      def get_value getter
-        Settings.send getter
+      def get_value getter,conversion=nil
+        val = Settings.send getter
+        val = val.send(conversion) if conversion && val
+        val
       end
-      def set_value setter, val
+      def set_value setter, val, conversion=nil
+        val = val.send(conversion) if conversion && val
         Settings.send setter, val
       end
     else
-      def get_value getter
-        Settings.defaults[getter.to_sym]
+      def get_value getter,conversion=nil
+        val = Settings.defaults[getter.to_sym]
+        val = val.send(conversion) if conversion && val
+        val
       end
       def set_value setter, val
+        val = val.send(conversion) if conversion && val
         Settings.defaults[setter.to_sym] = val
       end
     end
@@ -173,20 +180,16 @@ module Seek
       fallback="#{getter}_fallback"
       if self.respond_to?(fallback)
         define_class_method getter do
-          Settings.send(getter) || self.send(fallback)
+          get_value(getter,options[:convert]) || self.send(fallback)
         end
       else
         define_class_method getter do
-           get_value(getter)
+           get_value(getter,options[:convert])
         end
       end
 
       define_class_method setter do |val|
-        if options[:convert]
-          conv = options[:convert]
-          val = val.send conv
-        end
-        set_value(setter,val)
+        set_value(setter,val,options[:convert])
         self.send propagate if self.respond_to?(propagate)
       end
     end
@@ -209,7 +212,7 @@ module Seek
       :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
-      :google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store]
+      :google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store, :sycamore_enabled]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"

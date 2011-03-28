@@ -1,6 +1,4 @@
-<%= javascript_include_tag "sharing.js" %>
-<%= javascript_include_tag "associate_events.js" %>
-<%= javascript_include_tag "associate_datafile_assays.js" %>
+<%= javascript_include_tag "sharing.js","associate_events.js","associate_datafile_assays.js","attribution.js","resource.js" %>
 
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @data_file, current_user) -%>
 <ul class="sectionIcons">
@@ -26,7 +24,13 @@
 
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>
-	
+          
+	<%= render :partial => "assets/project_selector", :locals => { :resource_type => "Data_file",  # this is only for presentation, not for any processing
+            :selected_project_id => @data_file.project_id,
+            :project_hash => current_user.generate_own_project_id_name_hash
+            }
+    %>
+
 	<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "DataFile",
 					:existing_attributions=>Authorization.authorize_collection("show", @data_file.attributions_objects, current_user),
@@ -36,16 +40,14 @@
 				} 
     -%>
 
-    <% if Seek::Config.events_enabled -%>
-        <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
-    <% end -%>
-    <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
-          
-    <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Data_file",  # this is only for presentation, not for any processing
-            :selected_project_id => @data_file.project_id,
-            :project_hash => current_user.generate_own_project_id_name_hash
-            }
-    %>
+    <p>
+        <% if Seek::Config.events_enabled -%>
+            <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
+        <% end -%>
+    </p>
+    <p>
+        <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+    </p>
     
     <% end -%>
     <p>

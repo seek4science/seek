@@ -39,6 +39,9 @@ module Acts #:nodoc:
       # this method will take attributions' association and return a collection of resources,
       # to which the current resource is attributed
 
+      def contributor_credited?
+        true
+      end
 
       def policy_or_default
         if self.policy.nil?
@@ -87,5 +90,8 @@ end
 
 ActiveRecord::Base.class_eval do
   include Acts::Authorized
+  def contributor_credited?
+    false
+  end
 end
 
