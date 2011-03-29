@@ -3,12 +3,6 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Type manager enabled:   <%= check_box_tag(:type_managers_enabled, 1, Seek::Config.type_managers_enabled, :disabled => true) %>
-    <br style="clear:both;"/>
-    <br/>
-    Managed by:    <%= text_field_tag(:type_managers, Seek::Config.type_managers, :disabled => true) %>
-    <br style="clear:both;"/>
-    <br/>
     Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::Config.pubmed_api_email) %>
     <br style="clear:both;"/>
     <br/>
