@@ -100,6 +100,20 @@ module Seek
         extract_applet(response.body)
       end
 
+      def sbml_download_url savedfile
+        modelname=savedfile.gsub("\.dat", "")
+        url=""
+        response = RestClient.post(dat_to_sbml_url, :modelName=>modelname) do |response, request, result,
+          &block |
+          if [301, 302, 307].include? response.code
+            url=response.headers[:location]
+          else
+            raise Exception.new("Redirection expected to converted dat file")
+          end
+        end
+        url
+      end
+
       private
 
       def jws_post_parameters
@@ -120,20 +134,6 @@ module Seek
 
       def upload_sbml_url
         "#{Seek::JWS::SIMULATE_URL}?SBMLFilePostedToIFC=true&xmlOutput=true"
-      end
-
-      def sbml_download_url savedfile
-        modelname=savedfile.gsub("\.dat", "")
-        url=""
-        response = RestClient.post(dat_to_sbml_url, :modelName=>modelname) do |response, request, result,
-          &block |
-          if [301, 302, 307].include? response.code
-            url=response.headers[:location]
-          else
-            raise Exception.new("Redirection expected to converted dat file")
-          end
-        end
-        url
       end
 
       def saved_file_builder_content saved_file
