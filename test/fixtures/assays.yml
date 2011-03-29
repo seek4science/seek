@@ -131,4 +131,3 @@ assay_with_a_publication:
   study: metabolomics_study2
   owner: person_for_model_owner
   assay_class: experimental_assay_class    
-  
