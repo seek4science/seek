@@ -106,7 +106,6 @@ class AdminController < ApplicationController
 
   def update_others
     update_flag = true
-    Seek::Config.copyright_addendum_enabled= string_to_boolean params[:type_managers_enabled]
     Seek::Config.site_base_host= params[:site_base_host]
     #check valid email
     Seek::Config.pubmed_api_email= params[:pubmed_api_email] if params[:pubmed_api_email] == '' || (check_valid_email params[:pubmed_api_email], "pubmed api email")
