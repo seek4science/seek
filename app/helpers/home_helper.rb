@@ -55,6 +55,12 @@ module HomeHelper
       break if selected_publications.size>=RECENT_SIZE
     end
 
+    selected_events = []
+    Event.find(:all,:order=>'updated_at DESC').each do |e|
+      selected_events << e if projects.include?(e.project)
+      break if selected_events.size>=RECENT_SIZE
+    end
+
     item_hash=classify_for_tabs(selected_people)
     item_hash.merge! classify_for_tabs(selected_models)
     item_hash.merge! classify_for_tabs(selected_sops)
@@ -63,6 +69,7 @@ module HomeHelper
     item_hash.merge! classify_for_tabs(selected_studies)
     item_hash.merge! classify_for_tabs(selected_investigations)
     item_hash.merge! classify_for_tabs(selected_publications)
+    item_hash.merge! classify_for_tabs(selected_events)
 
     return item_hash
 
@@ -74,10 +81,15 @@ module HomeHelper
     selected_models=[]
     selected_data_files=[]
     selected_sops=[]
+    selected_events=[]
     selected_assays=Assay.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE)
     selected_studies=Study.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE)
     selected_investigations=Investigation.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE)
     selected_publications=Publication.find(:all,:order=>'updated_at DESC',:limit=>RECENT_SIZE)
+    Event.find(:all,:order=>"updated_at DESC",:limit=>RECENT_SIZE).each do |e|
+      selected_events << e if e.can_view?(current_user)
+      break if selected_events.size>=RECENT_SIZE
+    end
 
     Model.find(:all,:order=>'updated_at DESC').each do |m|
       selected_models << m if m.can_view?(current_user)
@@ -103,6 +115,7 @@ module HomeHelper
     item_hash.merge! classify_for_tabs(selected_studies)
     item_hash.merge! classify_for_tabs(selected_investigations)
     item_hash.merge! classify_for_tabs(selected_publications)
+    item_hash.merge! classify_for_tabs(selected_events)
 
     return item_hash
   end
