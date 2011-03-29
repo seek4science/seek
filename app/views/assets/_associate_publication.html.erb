@@ -1,4 +1,4 @@
-<% resource_text ||= resource.class.name.downcase %>
+<% resource_text ||= resource.class.name.humanize %>
 <script type="text/javascript">
 </script>
 
@@ -6,7 +6,7 @@
 
   <div class="foldTitle">
     <%= help_icon("Here you associate publication in SEEK to this #{resource_text}.") -%>
-    Associate publication
+    Associate publications
   </div>
 
   <div id="associate_publication_fold_content" class="foldContent" style="display: block;">

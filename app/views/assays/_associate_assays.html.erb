@@ -1,5 +1,5 @@
 <%
-   resource_text ||= resource.class.name.downcase
+   resource_text ||= text_for_resource(resource)
 %>
 <script type="text/javascript">
 </script>
@@ -8,7 +8,7 @@
 
   <div class="foldTitle">
     <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}.") -%>
-    Associate Assay
+    Associate Assays
   </div>
 
   <div id="associate_assay_fold_content" class="foldContent" style="display: none;">

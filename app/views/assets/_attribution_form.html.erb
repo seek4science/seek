@@ -14,11 +14,12 @@
   <% when "model" -%>
   <% resource_type_attributed_to_types = "Models" -%>
   <% when "datafile" -%>
-  <% resource_type_attributed_to_types = "DataFiles" -%>
+  <% resource_type_attributed_to_types = "Data files" -%>
 <% else -%>
   <% resource_type_attributed_to_types = "THIS MUST BE A NEW TYPE OF RESOURCE FOR WHICH ATTRIBUTIONS ARE INTRODUCED - ADD IT HERE" -%>
 <% end -%>
 
+<% resource_type = text_for_resource(resource_type) -%>
 
 <div class="fold">
 
