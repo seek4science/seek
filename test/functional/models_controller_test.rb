@@ -47,6 +47,17 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
+  test "should show only modelling assays in associate assay form" do
+    login_as(:model_owner)
+    get :new
+    assert_response :success
+    assert_select 'select#possible_assays' do
+      assert_select "option", :text=>/Select Assay .../,:count=>1
+      assert_select "option", :text=>/Modelling Assay/,:count=>1
+      assert_select "option", :text=>/Metabolomics Assay/,:count=>0
+    end
+  end
+
   test "fail gracefullly when trying to access a missing model" do
     get :show,:id=>99999
     assert_redirected_to models_path

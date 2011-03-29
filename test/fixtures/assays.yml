@@ -131,3 +131,11 @@ assay_with_a_publication:
   study: metabolomics_study2
   owner: person_for_model_owner
   assay_class: experimental_assay_class    
+
+modelling_assay:
+  title: Modelling Assay
+  assay_type: metabolomics
+  owner: person_for_model_owner
+  description: modelling assay
+  study: study_with_modelling_assay
+  assay_class: modelling_assay_class

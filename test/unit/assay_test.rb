@@ -3,6 +3,13 @@ require 'test_helper'
 class AssayTest < ActiveSupport::TestCase
   fixtures :all
 
+
+  test "shouldnt edit the assay" do
+    user = users(:aaron)
+    assay = assays(:modelling_assay_with_data_and_relationship)
+    assert_equal false, assay.can_edit?(user)
+  end
+
   test "sops association" do
     assay=assays(:metabolomics_assay)
     assert_equal 2,assay.sops.size
