@@ -20,7 +20,13 @@ class AssaysControllerTest < ActionController::TestCase
     validate_xml_against_schema(@response.body)
     
   end
-  
+
+  test "shouldnt edit the assay" do
+    login_as(:aaron)
+    user = users(:aaron)
+    assay = assays(:modelling_assay_with_data_and_relationship)
+    assert_equal false, assay.can_edit?(user)
+  end
   test "index includes modelling validates with schema" do
     get :index, :page=>"all",:format=>"xml"
     assert_response :success
