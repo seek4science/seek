@@ -43,5 +43,13 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
   end
 
+  test "SOP upload option should be capitlized" do
+    login_as(:quentin)
+    get :index
+    assert_select "select#new_resource_type",:count=>1 do
+      assert_select "option[value=?]","sop",:text=>"SOP"
+    end
+  end
+
 
 end
