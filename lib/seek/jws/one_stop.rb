@@ -17,6 +17,10 @@ module Seek
         model.content_blob.file_exists? && is_jws_supported?(model)
       end
 
+      def saved_dat_download_url savedfile
+        "#{Seek::JWS::BASE_URL}JWSconstructor_panels/#{savedfile}"
+      end
+
       def construct params
 
         required_params=jws_post_parameters
@@ -98,12 +102,12 @@ module Seek
 
       private
 
-      def dat_to_sbml_url
-        "#{Seek::JWS::BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"
+      def jws_post_parameters
+        ["nameToSearch", "urnsearchbox", "selectedSymbol", "urnsearchboxReaction", "selectedReactionSymbol", "assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel","citationURL","citationURN","modelURN","creationTime","modificationTime","authors","TOD","notes"]
       end
 
-      def saved_dat_download_url savedfile
-        "#{Seek::JWS::BASE_URL}JWSconstructor_panels/#{savedfile}"
+      def dat_to_sbml_url
+        "#{Seek::JWS::BASE_URL}JWSconstructor_panels/datToSBMLstageII.jsp"
       end
 
       def builder_url
@@ -220,23 +224,6 @@ module Seek
         objects_hash
       end
 
-
-      def jws_post_parameters
-        ["nameToSearch", "urnsearchbox", "selectedSymbol", "urnsearchboxReaction", "selectedReactionSymbol", "assignmentRules", "annotationsReactions", "annotationsSpecies", "modelname", "parameterset", "kinetics", "functions", "initVal", "reaction", "events", "steadystateanalysis", "plotGraphPanel", "plotKineticsPanel","citationURL","citationURN","modelURN","creationTime","modificationTime","authors","TOD","notes"]
-      end
-
-      #only used for testing and development purposes
-      def dummy_response_xml
-        path="#{RAILS_ROOT}/test/example_jws_response.xml"
-        File.open(path, "rb").read
-      end
-
-      #only used for testing and development purposes
-      def dummy_annotator_response_xml
-        path="#{RAILS_ROOT}/test/annotator_jws_response.xml"
-        File.open(path, "rb").read
-      end
     end
-
   end
 end
