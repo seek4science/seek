@@ -9,16 +9,7 @@
 <%= hidden_field_tag "sharing[permissions][contributor_types]", "" -%>
 <%= hidden_field_tag "sharing[permissions][values]", "" -%>
 
-<%# @resource_type -%>
-<%# @favourite_groups -%>
-<%# @all_projects -%>
-
-<%# @policy_type -%>
-<%# @sharing_mode -%>
-<%# @access_mode -%>
-<%# @use_custom_sharing -%>
-<%# @use_whitelist -%>
-<%# @use_blacklist -%>
+<%= @resource_type = text_for_resource(@resource_type) -%>
 
 <div class="fold">
 

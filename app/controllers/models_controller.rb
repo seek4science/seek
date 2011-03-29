@@ -15,7 +15,7 @@ class ModelsController < ApplicationController
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
   
-  @@model_builder = Seek::JWSModelBuilder.new
+  @@model_builder = Seek::JWS::OneStop.new
   
   # GET /models
   # GET /models.xml
@@ -109,7 +109,7 @@ class ModelsController < ApplicationController
           File.open(data_hash[:data_tmp_path],"r") do |f|
             @model.content_blob=ContentBlob.new(:data=>f.read)
           end                      
-          @model.content_type=data_hash[:content_type]
+          @model.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
           @model.original_filename=new_version_filename
         end
       end
@@ -122,7 +122,7 @@ class ModelsController < ApplicationController
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version(new_version_comments)
-        format.html {redirect_to model_path(@model,:version=>@model.version) }
+        format.html {redirect_to  model_path(@model,:version=>@model.version) }
       else        
         format.html { render :action=>"builder" }
       end      

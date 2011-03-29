@@ -7,8 +7,7 @@
    object ||= model_class.new
    item_tags = object.tag_counts
    item_tags = [] if object.id.nil? #acts-as-taggable-on appears to have a bug, where for new items .tag_counts includes some tags from other items
-   type_name = controller_name.singularize.humanize
-   type_name.upcase! if type_name.downcase == "sop"
+   type_name = text_for_resource(object)
 %>
 
 
