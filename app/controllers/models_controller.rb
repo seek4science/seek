@@ -15,7 +15,7 @@ class ModelsController < ApplicationController
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
   
-  @@model_builder = Seek::JWSModelBuilder.new
+  @@model_builder = Seek::JWS::OneStop.new
   
   # GET /models
   # GET /models.xml
