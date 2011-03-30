@@ -7,12 +7,13 @@ module Seek
 
     BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
     SIMULATE_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
+    MOCKED = true
 
     class OneStop
 
       include Seek::ModelTypeDetection
       include Annotator
-      include MockedResponses
+      include MockedResponses if MOCKED
 
       def is_supported? model
         model.content_blob.file_exists? && is_jws_supported?(model)

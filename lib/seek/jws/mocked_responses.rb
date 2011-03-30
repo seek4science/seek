@@ -1,6 +1,5 @@
 module Seek
   module JWS
-    MOCKED = true
     module MockedResponses
 
       def process_mocked_response

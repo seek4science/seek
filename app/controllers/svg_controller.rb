@@ -17,4 +17,5 @@ class SvgController < ApplicationController
       format.svg { render :file=>path}
     end
   end
+  
 end
