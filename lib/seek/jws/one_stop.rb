@@ -7,7 +7,7 @@ module Seek
 
     BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
     SIMULATE_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
-    MOCKED = true
+    MOCKED = false
 
     class OneStop
 

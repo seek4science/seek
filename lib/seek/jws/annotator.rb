@@ -8,6 +8,8 @@ module Seek
 
       def annotate params
 
+        return process_mocked_annotator_response if Seek::JWS::MOCKED
+
         param_translation={"species_selected_symbol"=>"selectedSymbol",
                            "species_search_box"=>"urnsearchbox",
                            "reactions_selected_symbol"=>"selectedReactionSymbol",

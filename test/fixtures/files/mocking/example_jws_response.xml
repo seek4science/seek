@@ -197,7 +197,7 @@
         </action>
         <parameters>
             <parameter id="modelname">
-                teusinkmock
+                teusink
             </parameter>
             <parameter id="reaction">
                 v[v1] {1.0}GLCi + {1.0}Prb = {1.0}G6P\nv[v2] {1.0}G6P = {1.0}F6P\nv[v3] {1.0}G6P + {1.0}Prb = {1.0}$Glyc\nv[v4] {1.0}Prb + {2.0}G6P = {1.0}$Trh\nv[v5] {1.0}F6P + {1.0}Prb = {1.0}F16P\nv[v6] {1.0}F16P = {2.0}TRIO\nv[v7] {1.0}NAD + {1.0}TRIO = {1.0}BPG + {1.0}NADH\nv[v8] {1.0}BPG = {1.0}P3G + {1.0}Prb\nv[v9] {1.0}P3G = {1.0}P2G\nv[v10] {1.0}P2G = {1.0}PEP\nv[v11] {1.0}PEP = {1.0}Prb + {1.0}PYR\nv[v12] {1.0}PYR = {1.0}ACE + {1.0}$CO2\nv[v13] {2.0}ACE + {3.0}NAD = {1.0}$SUCC + {3.0}NADH\nv[v14] {1.0}$GLCo = {1.0}GLCi\nv[v15] {1.0}ACE + {1.0}NADH = {1.0}NAD + {1.0}$ETOH\nv[v16] {1.0}NADH + {1.0}TRIO = {1.0}NAD + {1.0}$GLY\nv[v17] {1.0}Prb = {1.0}$X\n
@@ -243,7 +243,7 @@
             </parameter>
             
             <parameter id="modelname">
-			teusink-mocked
+			teusink
             </parameter>
             <parameter id="citationURL">
 		   	
