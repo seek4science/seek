@@ -54,13 +54,6 @@ module Seek
           FileUtils.cp(filepath, tmpfile.path)
 
           if (is_sbml? model)
-            #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
-            #          if [301, 302, 307].include? response.code
-            #            response.follow_redirection(request, result, &block)
-            #          else
-            #            response.return!(request, result, &block)
-            #          end
-            #        }
             part=Multipart.new("upfile", filepath, model.original_filename)
             response = part.post(upload_sbml_url)
             if response.code == "302"
@@ -224,7 +217,6 @@ module Seek
             url=node.content.strip
             url = BASE_URL + "JWSconstructor_panels/" + url
             objects_hash[id]=url
-            #objects_hash[id] = %!<object data="#{url}" id="#{element_id}" alt="Network structure" class="reContent"></object>!
           end
         end
         objects_hash
