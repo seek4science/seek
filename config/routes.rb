@@ -31,6 +31,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :expertise
 
+
   map.resources :institutions,
     :collection => { :request_all => :get } do |institution|
     # avatars / pictures 'owned by' institution
@@ -58,6 +59,8 @@ ActionController::Routing::Routes.draw do |map|
     sop.resources :experimental_conditions
   end
 
+
+
   map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
                         :member => {:set_openid => :put}
 
@@ -77,7 +80,9 @@ ActionController::Routing::Routes.draw do |map|
   map.save_search '/search/save',:controller=>'search',:action=>'save'
   map.delete_search '/search/delete',:controller=>'search',:action=>'delete'
   #map.saved_search '/search/:id',:controller=>'search',:action=>'show'
-  
+
+  map.svg 'svg/:id.:format',:controller=>'svg',:action=>'show'
+
   #tags
   map.all_tags '/tags',:controller=>'tags',:action=>'index'
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
@@ -92,7 +97,6 @@ ActionController::Routing::Routes.draw do |map|
 
   #temporary location for the data/models simulation prototyping
   map.data_fuse '/data_fuse/',:controller=>'data_fuse',:action=>'show'
-  map.svg '/svg/',:controller=>'svg',:action=>'show'
 
   #feedback form
   map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get

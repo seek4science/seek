@@ -12,6 +12,7 @@ module Seek
 
       include Seek::ModelTypeDetection
       include Annotator
+      include MockedResponses
 
       def is_supported? model
         model.content_blob.file_exists? && is_jws_supported?(model)
@@ -22,6 +23,8 @@ module Seek
       end
 
       def construct params
+
+        return process_mocked_response if Seek::JWS::MOCKED
 
         required_params=jws_post_parameters
         url = builder_url
@@ -40,6 +43,8 @@ module Seek
       end
 
       def builder_content model
+
+          return process_mocked_response if Seek::JWS::MOCKED
 
           filepath=model.content_blob.filepath
 
