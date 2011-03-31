@@ -32,7 +32,6 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
-    Seek::Config.events_enabled= string_to_boolean params[:events_enabled]
     Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
 
@@ -46,9 +45,7 @@ class AdminController < ApplicationController
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
 
-    Seek::Config.exception_notification_enabled= string_to_boolean params[:exception_notification_enabled]
     Seek::Config.hide_details_enabled= string_to_boolean params[:hide_details_enabled]
-    Seek::Config.activity_log_enabled= string_to_boolean params[:activity_log_enabled]
     Seek::Config.activation_required_enabled= string_to_boolean params[:activation_required_enabled]
     Seek::Config.google_analytics_enabled= string_to_boolean params[:google_analytics_enabled]
     Seek::Config.google_analytics_tracker_id= params[:google_analytics_tracker_id]
@@ -78,7 +75,7 @@ class AdminController < ApplicationController
     Seek::Config.application_title= params[:application_title]
 
     Seek::Config.header_image_enabled= string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image= params[:header_image]
+    Seek::Config.header_image= params[:header_image][:data]
     Seek::Config.header_image_link= params[:header_image_link]
     Seek::Config.header_image_title= params[:header_image_title]
 
