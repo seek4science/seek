@@ -3,13 +3,19 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Event:    <%= check_box_tag(:events_enabled, 1,Seek::Config.events_enabled) %>
+    Events enabled:    <%= check_box_tag(:events_enabled, 1,Seek::Config.events_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Jerm:    <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
+    Jerm enabled:    <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Solr:    <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function') %>
+    Search enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function') %>
+    <br style="clear:both;"/>
+    <br/>
+    Exception notification enabled: <%= check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled) %>
+    <br style="clear:both;"/>
+    <br/>
+    Exception notification recipients:    <%= text_field_tag(:exception_notification_recipients, Seek::Config.exception_notification_recipients) %>
     <br style="clear:both;"/>
     <br/>
     Hide contact details:    <%= check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled) %>
