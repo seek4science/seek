@@ -7,17 +7,9 @@
     <%= hidden_field_tag hidden_id, "on" -%>
     <% if data_url.end_with?(".svg") -%>
         <%
-#           svg_content = open(data_url).read
-#           uuid=UUIDTools::UUID.random_create.to_s
-#           f=open("/tmp/#{uuid}.svg","w")
-#           f.write svg_content
-#           f.flush
-#           url = svg_path(:id=>uuid)
-#           puts "###############################################"
-#           puts url
-#           puts "###############################################"
-           url = data_url
-           -%>
+           url = serve_svg_locally data_url #the svg viewer correctly doesn't trust svg served from a different host or port
+
+        -%>
         <!--[if !IE]>-->
                 <object data="<%= url -%>" type="image/svg+xml" id="<%= object_element_id -%>" width="640" height="480">
           <!--<![endif]-->
@@ -29,7 +21,6 @@
                                    <![endif]-->
         </object>
         <br/>
-        <%= link_to "View in new tab",data_url,:target=>"_blank" -%>
     <% else -%>
         <!--[if !IE]>-->
                 <object data="<%= data_url -%>" id="<%= object_element_id -%>" class="reContent">
