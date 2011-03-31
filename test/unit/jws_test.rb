@@ -86,6 +86,6 @@ class JwsTest < ActiveSupport::TestCase
     params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content model.versions.first
     assert !error_keys.empty?
     assert error_keys.include?("parameters")
-  end
+  end if Seek::Config.jws_enabled
   
 end
