@@ -3,6 +3,9 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
+    Event:    <%= check_box_tag(:events_enabled, 1,Seek::Config.events_enabled) %>
+    <br style="clear:both;"/>
+    <br/>
     Jerm:    <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
     <br style="clear:both;"/>
     <br/>
