@@ -1,0 +1,343 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<builder>
+
+
+<errorinfo>
+<error id="reaction">
+0
+</error>
+
+<error id="kinetics">
+0
+</error>
+
+<error id="initVal">
+0
+</error>
+
+<error id="parameters">
+0
+</error>
+
+<error id="functions">
+0
+</error>
+
+<error id="assRules">
+0
+</error>
+
+<error id="events">
+0
+</error>
+
+<error id="speciesAnnoErrors">
+0
+</error>
+
+<error id="reacsAnnoErrors">
+0
+</error>
+
+</errorinfo>
+
+<form id="uploadDatFile">
+   <action>
+       DatFileReader.jsp
+   </action>
+</form>
+
+
+    <form id="uploadSBMLFile">
+        <action>
+            ../../upload/uploadNEW.jsp?SBMLFilePostedToIFC=true&amp;xmlOutput=true
+        </action>
+        <parameters>
+            <parameter id="SBMLFilePostedToIFC">
+                true
+            </parameter>
+        </parameters>
+    </form>
+
+
+
+
+
+
+<form id="main">
+        <action>
+            DatFileReader.jsp
+        </action>
+        <parameters>
+            <parameter id="modelname">
+                teusink
+            </parameter>
+            <parameter id="reaction">
+                v[v1] {1.0}GLCi + {1.0}Prb = {1.0}G6P\nv[v2] {1.0}G6P = {1.0}F6P\nv[v3] {1.0}G6P + {1.0}Prb = {1.0}$Glyc\nv[v4] {1.0}Prb + {2.0}G6P = {1.0}$Trh\nv[v5] {1.0}F6P + {1.0}Prb = {1.0}F16P\nv[v6] {1.0}F16P = {2.0}TRIO\nv[v7] {1.0}NAD + {1.0}TRIO = {1.0}BPG + {1.0}NADH\nv[v8] {1.0}BPG = {1.0}P3G + {1.0}Prb\nv[v9] {1.0}P3G = {1.0}P2G\nv[v10] {1.0}P2G = {1.0}PEP\nv[v11] {1.0}PEP = {1.0}Prb + {1.0}PYR\nv[v12] {1.0}PYR = {1.0}ACE + {1.0}$CO2\nv[v13] {2.0}ACE + {3.0}NAD = {1.0}$SUCC + {3.0}NADH\nv[v14] {1.0}$GLCo = {1.0}GLCi\nv[v15] {1.0}ACE + {1.0}NADH = {1.0}NAD + {1.0}$ETOH\nv[v16] {1.0}NADH + {1.0}TRIO = {1.0}NAD + {1.0}$GLY\nv[v17] {1.0}Prb = {1.0}$X\n
+            </parameter>
+            
+            <parameter id="annotationsReactions">
+            
+			</parameter>
+			
+			<parameter id="annotationsSpecies">
+			
+            </parameter>
+            
+            <parameter id="kinetics">
+				v[v1] = (VmGLK*(-(G6P[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KeqGLK))+GLCi[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(2-8*KeqAK))/(KmGLKATP*KmGLKGLCi*(1+G6P[t]/KmGLKG6P+GLCi[t]/KmGLKGLCi)*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmGLKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmGLKATP))))\nv[v2] = VmPGI*(-(F6P[t]/KeqPGI)+G6P[t])/(KmPGIG6P*(1+F6P[t]/KmPGIF6P+G6P[t]/KmPGIG6P))\nv[v3] = KGLYCOGEN\nv[v4] = KTREHALOSE\nv[v5] = gR*VmPFK*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])*(1+F6P[t]/KmPFKF6P+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP)+gR*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP*KmPFKF6P))/((2-8*KeqAK)*KmPFKATP*KmPFKF6P*(L0*Power[1+CPFKF26BP*F26BP/KPFKF26BP+CPFKF16BP*F16P[t]/KPFKF16BP,2]*Power[1+2*CPFKAMP*KeqAK*Power[SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5],2]/((-1+4*KeqAK)*KPFKAMP*(SUMAXP-Prb[t]+4*KeqAK*Prb[t]-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])),2]*Power[1+CiPFKATP*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KiPFKATP),2]*Power[1+CPFKATP*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP),2]/(Power[1+F26BP/KPFKF26BP+F16P[t]/KPFKF16BP,2]*Power[1+2*KeqAK*Power[SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5],2]/((-1+4*KeqAK)*KPFKAMP*(SUMAXP-Prb[t]+4*KeqAK*Prb[t]-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])),2]*Power[1+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KiPFKATP),2])+Power[1+F6P[t]/KmPFKF6P+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP)+gR*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP*KmPFKF6P),2]))\nv[v6] = VmALD*(F16P[t]-KeqTPI*Power[TRIO[t],2]/(KeqALD*Power[1+KeqTPI,2]))/(KmALDF16P*(1+F16P[t]/KmALDF16P+TRIO[t]/((1+KeqTPI)*KmALDDHAP)+KeqTPI*TRIO[t]/((1+KeqTPI)*KmALDGAP)+KeqTPI*F16P[t]*TRIO[t]/((1+KeqTPI)*KmALDF16P*KmALDGAPi)+KeqTPI*Power[TRIO[t],2]/(Power[1+KeqTPI,2]*KmALDDHAP*KmALDGAP)))\nv[v7] = (-(VmGAPDHr*BPG[t]*NADH[t]/(KmGAPDHBPG*KmGAPDHNADH))+KeqTPI*VmGAPDHf*NAD[t]*TRIO[t]/((1+KeqTPI)*KmGAPDHGAP*KmGAPDHNAD))/((1+NAD[t]/KmGAPDHNAD+NADH[t]/KmGAPDHNADH)*(1+BPG[t]/KmGAPDHBPG+KeqTPI*TRIO[t]/((1+KeqTPI)*KmGAPDHGAP)))\nv[v8] = VmPGK*(KeqPGK*BPG[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(1-4*KeqAK)-P3G[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(2-8*KeqAK))/(KmPGKATP*KmPGKP3G*(1+BPG[t]/KmPGKBPG+P3G[t]/KmPGKP3G)*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmPGKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPGKATP)))\nv[v9] = VmPGM*(-(P2G[t]/KeqPGM)+P3G[t])/(KmPGMP3G*(1+P2G[t]/KmPGMP2G+P3G[t]/KmPGMP3G))\nv[v10] = VmENO*(P2G[t]-PEP[t]/KeqENO)/(KmENOP2G*(1+P2G[t]/KmENOP2G+PEP[t]/KmENOPEP))\nv[v11] = VmPYK*(PEP[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(1-4*KeqAK)-(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])*PYR[t]/((2-8*KeqAK)*KeqPYK))/(KmPYKADP*KmPYKPEP*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmPYKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPYKATP))*(1+PEP[t]/KmPYKPEP+PYR[t]/KmPYKPYR))\nv[v12] = VmPDC*Power[PYR[t],nPDC]/(Power[KmPDCPYR,nPDC]*(1+Power[PYR[t],nPDC]/Power[KmPDCPYR,nPDC]))\nv[v13] = KSUCC*ACE[t]\nv[v14] = VmGLT*(GLCo-GLCi[t]/KeqGLT)/(KmGLTGLCo*(1+GLCo/KmGLTGLCo+GLCi[t]/KmGLTGLCi+0.91*GLCo*GLCi[t]/(KmGLTGLCi*KmGLTGLCo)))\nv[v15] = -(VmADH*(ETOH*NAD[t]-ACE[t]*NADH[t]/KeqADH)/(KiADHNAD*KmADHETOH*(1+ETOH*KmADHNAD/(KiADHNAD*KmADHETOH)+KmADHNADH*ACE[t]/(KiADHNADH*KmADHACE)+NAD[t]/KiADHNAD+ETOH*NAD[t]/(KiADHNAD*KmADHETOH)+ETOH*ACE[t]*NAD[t]/(KiADHACE*KiADHNAD*KmADHETOH)+KmADHNADH*ACE[t]*NAD[t]/(KiADHNAD*KiADHNADH*KmADHACE)+NADH[t]/KiADHNADH+ETOH*KmADHNAD*NADH[t]/(KiADHNAD*KiADHNADH*KmADHETOH)+ACE[t]*NADH[t]/(KiADHNADH*KmADHACE)+ETOH*ACE[t]*NADH[t]/(KiADHETOH*KiADHNADH*KmADHACE))))\nv[v16] = VmG3PDH*(-(GLY*NAD[t]/KeqG3PDH)+NADH[t]*TRIO[t]/(1+KeqTPI))/(KmG3PDHDHAP*KmG3PDHNADH*(1+NAD[t]/KmG3PDHNAD+NADH[t]/KmG3PDHNADH)*(1+GLY/KmG3PDHGLY+TRIO[t]/((1+KeqTPI)*KmG3PDHDHAP)))\nv[v17] = KATPASE*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(2-8*KeqAK)\n\n
+            </parameter>
+            
+
+            
+            
+            <parameter id="initVal">
+				GLCi[0] = 0.087\nPrb[0] = 5\nG6P[0] = 1.39\nF6P[0] = 0.28\nF16P[0] = 0.1\nTRIO[0] = 5.17\nNAD[0] = 1.2\nBPG[0] = 0.0\nNADH[0] = 0.39\nP3G[0] = 0.1\nP2G[0] = 0.1\nPEP[0] = 0.1\nPYR[0] = 3.36\nACE[0] = 0.04\n\n
+            </parameter>
+
+            
+            <parameter id="parameterset">
+                \nCiPFKATP = 100\ncompartment = 1\nCPFKAMP = 0.0845\nCPFKATP = 3\nCPFKF16BP = 0.397\nCPFKF26BP = 0.0174\nCPFKF6P = 0.0\nF26BP = 0.02\ngR = 5.12\nKATPASE = 39.5\nKeqADH = \&quot;6.9e-5\&quot;\nKeqAK = 0.45\nKeqALD = 0.069\nKeqENO = 6.7\nKeqG3PDH = 4300\nKeqGLK = 3800\nKeqGLT = 1\nKeqPGI = 0.314\nKeqPGK = 3200\nKeqPGM = 0.19\nKeqPYK = 6500\nKeqTPI = 0.045\nKGLYCOGEN = 6\nKiADHACE = 1.1\nKiADHETOH = 90\nKiADHNAD = 0.92\nKiADHNADH = 0.031\nKiPFKATP = 0.65\nKmADHACE = 1.11\nKmADHETOH = 17\nKmADHNAD = 0.17\nKmADHNADH = 0.11\nKmALDDHAP = 2.4\nKmALDF16P = 0.3\nKmALDGAP = 2\nKmALDGAPi = 10\nKmENOP2G = 0.04\nKmENOPEP = 0.5\nKmG3PDHDHAP = 0.4\nKmG3PDHGLY = 1\nKmG3PDHNAD = 0.93\nKmG3PDHNADH = 0.023\nKmGAPDHBPG = 0.0098\nKmGAPDHGAP = 0.21\nKmGAPDHNAD = 0.09\nKmGAPDHNADH = 0.06\nKmGLKADP = 0.23\nKmGLKATP = 0.15\nKmGLKG6P = 30\nKmGLKGLCi = 0.08\nKmGLTGLCi = 1.1918\nKmGLTGLCo = 1.1918\nKmPDCPYR = 4.33\nKmPFKATP = 0.71\nKmPFKF6P = 0.1\nKmPGIF6P = 0.3\nKmPGIG6P = 1.4\nKmPGKADP = 0.2\nKmPGKATP = 0.3\nKmPGKBPG = 0.003\nKmPGKP3G = 0.53\nKmPGMP2G = 0.08\nKmPGMP3G = 1.2\nKmPYKADP = 0.53\nKmPYKATP = 1.5\nKmPYKPEP = 0.14\nKmPYKPYR = 21\nKPFKAMP = 0.0995\nKPFKF16BP = 0.111\nKPFKF26BP = 0.000682\nKSUCC = 21.4\nKTREHALOSE = 2.4\nL0 = 0.66\nnPDC = 1.9\nSUMAXP = 4.1\nVmADH = 810\nVmALD = 322.258\nVmENO = 365.806\nVmG3PDH = 70.15\nVmGAPDHf = 1184.52\nVmGAPDHr = 6549.68\nVmGLK = 226.452\nVmGLT = 97.264\nVmPDC = 174.194\nVmPFK = 182.903\nVmPGI = 339.677\nVmPGK = 1306.45\nVmPGM = 2525.81\nVmPYK = 1088.71\nEXTERNAL = 0.0\ncompartment0 = 1\nGlyc = 0.0\nTrh = 0.0\nCO2 = 1\nSUCC = 0.0\nGLCo = 50\nETOH = 50\nGLY = 0.15\nX = 0.0\n\n
+            </parameter>
+            
+
+            <parameter id="assignmentRules">
+                \n
+            </parameter>
+            
+            
+            <parameter id="functions">
+                \n
+            </parameter>
+            
+            
+            <parameter id="events">
+                \n
+            </parameter>
+            
+            <parameter id="modelname">
+			teusink
+            </parameter>
+            <parameter id="citationURL">
+		   	
+            </parameter>
+            <parameter id="citationURN">
+			
+            </parameter>
+            <parameter id="modelURN">
+			
+            </parameter>
+            <parameter id="authors">
+			
+            </parameter>
+            <parameter id="creationDate">
+			
+            </parameter>
+            <parameter id="creationTime">
+			
+            </parameter>
+            <parameter id="modificationDate">
+		   	
+            </parameter>
+            <parameter id="modificationTime">
+   			
+            </parameter>            
+            <parameter id="TOD">
+			
+            </parameter>
+            <parameter id="notes">
+			
+            </parameter>             
+            
+        </parameters>
+        
+        <objects>
+        
+            <object id="reactionImage">
+                schemas/teusink2011330143341641175.svg
+            </object>
+            
+                    
+            
+        </objects>
+        
+         
+                       
+         
+ 
+        
+    </form>
+
+
+
+
+
+
+    <form id="simulate">
+        <action>
+            ../../upload/uploadNEW.jsp?inputFileConstructor=true&amp;savedfile=teusink2011330143341641175.dat&amp;xmlOutput=true
+        </action>
+        <parameters>
+            <parameter id="savedfile">
+                teusink2011330143341641175.dat
+            </parameter>
+        </parameters>
+        
+    </form>
+
+
+
+
+    <form id="BuildSBMLFile">
+        <action>
+            datToSBMLstageII.jsp
+        </action>
+        <parameters>
+            <parameter id="modelName">
+	            teusink2011330143341641175
+            </parameter>
+        </parameters>
+        
+    </form>
+
+    
+    <form id="BuildJWSFile">
+        <action>
+			teusink2011330143341641175.dat
+        </action>
+        <parameters>
+        </parameters>
+    </form>
+
+
+</builder>
+
+
+

@@ -2,22 +2,20 @@
 
 <%= stylesheet_link_tag 'jws/JWSconstructor_panels','jws/Resizeable_Textbox/style.css','jws/Resizeable_Container/style.css','jws/jws_builder.css',"jws/jws_annotator.css" -%>
 
+<%= render :partial=>"models/builder/annotator_header" -%>
 
-
-<h1>
-  Annotator
-</h1>
-
-<div class="show_basic">
-<% if @search_results  -%>
-    Search Term: <%= @search_results.search_term -%><br/>
-    Selected Symbol = <%= @search_results.selected_symbol -%><br/>
-    Results size = <%= @search_results.results.size -%><br/>
-    Error code = <%= @search_results.error_code -%><br/>
-    Search Status = <%= @search_results.search_status -%><br/>
-<% end -%>
-
-<input type="Button" id="submit_annotations_button" value="Submit" onclick="submit_annotations();">
+<div class="yui-gf">
+    <div class="yui-u first builder_actions" style="width:19%;">
+      <h6>Store</h6>
+      <input type="Button" id="submit_annotations_button" value="Store" onclick="submit_annotations();">
+      <br/>
+    </div>
+    <div class="yui-u" style="width: 80%; height: 100%; margin-left: 0.1em;">
+      <% if @search_results.error_code != "0" -%>
+          <div class="jws_errors">
+            Error: <%= @search_results.search_status -%>
+          </div>
+     <% end -%>
 
 <% form_tag submit_to_jws_model_path(@model,:version=>@display_model.version),:name=>"form",:id=>"form" do -%>
         <%= jws_annotator_hidden_fields @params_hash -%>
@@ -32,7 +30,9 @@
 <%= render :partial=>"models/builder/attribution_annotations_box",:locals=>{:annotations=>@attribution_annotations} -%>
 
 <% end -%>
+    </div>
 </div>
+
 
 <script type="text/javascript">
 <% if @search_results -%>

@@ -7,11 +7,13 @@ module Seek
 
     BASE_URL = "#{Seek::Config.jws_online_root}/webMathematica/Examples/"
     SIMULATE_URL = "#{Seek::Config.jws_online_root}/webMathematica/upload/uploadNEW.jsp"
+    MOCKED = false
 
     class OneStop
 
       include Seek::ModelTypeDetection
       include Annotator
+      include MockedResponses if MOCKED
 
       def is_supported? model
         model.content_blob.file_exists? && is_jws_supported?(model)
@@ -22,6 +24,8 @@ module Seek
       end
 
       def construct params
+
+        return process_mocked_response if Seek::JWS::MOCKED
 
         required_params=jws_post_parameters
         url = builder_url
@@ -41,6 +45,8 @@ module Seek
 
       def builder_content model
 
+          return process_mocked_response if Seek::JWS::MOCKED
+
           filepath=model.content_blob.filepath
 
           #this is necessary to get the correct filename and especially extension, which JWS relies on
@@ -48,13 +54,6 @@ module Seek
           FileUtils.cp(filepath, tmpfile.path)
 
           if (is_sbml? model)
-            #        response = RestClient.post(upload_sbml_url,:upfile=>tmpfile.path,:multipart=>true) { |response, request, result, &block|
-            #          if [301, 302, 307].include? response.code
-            #            response.follow_redirection(request, result, &block)
-            #          else
-            #            response.return!(request, result, &block)
-            #          end
-            #        }
             part=Multipart.new("upfile", filepath, model.original_filename)
             response = part.post(upload_sbml_url)
             if response.code == "302"
@@ -218,7 +217,6 @@ module Seek
             url=node.content.strip
             url = BASE_URL + "JWSconstructor_panels/" + url
             objects_hash[id]=url
-            #objects_hash[id] = %!<object data="#{url}" id="#{element_id}" alt="Network structure" class="reContent"></object>!
           end
         end
         objects_hash
