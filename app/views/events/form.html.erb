@@ -9,71 +9,65 @@
   <% form_for @event do |f| %>
       <div class="asset_form">
         <%= f.error_messages %>
-
         <h2>Event Information</h2>
+        <p>
+          <%= f.label :title -%>
+          <span class="required">*</span>
+          <%= f.text_field :title, :style => "width: 100%;", :rows=>2 -%>
+        </p>
 
-        <div style="text-align: center;">
-          <div style="width: 95%;">
+        <p>
+          <%= f.label :description %><br/>
+          <%= f.text_area :description, :style => "width:100%", :rows => 10 %>
+        </p>
+
+        <p>
+          <%= f.label :start_date %>
+          <span class="required">*</span>
+          <%= f.calendar_date_select :start_date, :time => :mixed %>
+        </p>
+
+        <p>
+          <%= f.label :end_date %>
+          <span class="required">*</span>
+          <%= f.calendar_date_select :end_date, :time => :mixed%>
+        </p>
+
+        <p>
+          <%= f.label "Event Website" -%><br/>
+          <%= f.text_field :url, :style => "width:100%" -%>
+        </p>
+
+        <p style="margin-top: 1.5em;">
+          <%= f.label :address -%><br/>
+          <%= f.text_area :address, :style => "width: 100%;", :rows => 4 -%>
+        </p>
+
+        <p>
+          <%= f.label :city -%><br/>
+          <%= f.text_field :city, :style => "width: 100%;" -%>
+        </p>
+
+        <p>
+          <%= f.label :country -%><br/>
+          <%= f.country_select :country, nil, {}, :style => "width: 100%;" -%>
+        </p>
+
+        <% if current_user_authorized_to_manage -%>
+            <%= render :partial => "assets/project_selector", :locals => {:resource_type       => "Event", # this is only for presentation, not for any processing
+                                                                          :selected_project_id => @event.project_id,
+                                                                          :project_hash        => current_user.generate_own_project_id_name_hash,
+                                                                          :allow_nil           => true} -%>
+        <% end -%>
+
+        <%= render :partial => "assets/associate_publication", :locals=>{:f=>f, :resource => @event} -%>
+        <br/>
+        <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
+        <% if current_user_authorized_to_manage -%>
             <p>
-              <%= f.label :title -%>
-              <span class="required">*</span>
-              <%= f.text_field :title, :style => "width: 100%;", :rows=>2 -%>
+              <%= render :partial => "assets/sharing_form" -%>
             </p>
-
-            <p>
-              <%= f.label :description %><br/>
-              <%= f.text_area :description, :style => "width:100%", :rows => 10 %>
-            </p>
-
-            <p>
-              <%= f.label :start_date %>
-              <span class="required">*</span>
-              <%= f.calendar_date_select :start_date, :time => :mixed %>
-            </p>
-
-            <p>
-              <%= f.label :end_date %>
-              <span class="required">*</span>
-              <%= f.calendar_date_select :end_date, :time => :mixed%>
-            </p>
-
-            <p>
-              <%= f.label "Event Website" -%><br/>
-              <%= f.text_field :url, :style => "width:100%" -%>
-            </p>
-
-            <p style="margin-top: 1.5em;">
-              <%= f.label :address -%><br/>
-              <%= f.text_area :address, :style => "width: 100%;", :rows => 4 -%>
-            </p>
-
-            <p>
-              <%= f.label :city -%><br/>
-              <%= f.text_field :city, :style => "width: 100%;" -%>
-            </p>
-
-            <p>
-              <%= f.label :country -%><br/>
-              <%= f.country_select :country, nil, {}, :style => "width: 100%;" -%>
-            </p>
-
-            <% if current_user_authorized_to_manage -%>
-                <%= render :partial => "assets/project_selector", :locals => {:resource_type       => "Event", # this is only for presentation, not for any processing
-                                                                              :selected_project_id => @event.project_id,
-                                                                              :project_hash        => current_user.generate_own_project_id_name_hash,
-                                                                              :allow_nil           => true} -%>
-            <% end -%>
-
-            <%= render :partial => "assets/associate_publication", :locals=>{:f=>f, :resource => @event} -%>
-            <br/>
-            <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
-            <% if current_user_authorized_to_manage -%>
-                <p>
-                  <%= render :partial => "assets/sharing_form" -%>
-                </p>
-            <% end %>
-          </div>
-        </div>
+        <% end %>
       </div>
       <p>
         <%= f.submit(@new ? "Create" : "Update", :disable_with=>(@new ? "Creating..." :"Updating...")) %>
