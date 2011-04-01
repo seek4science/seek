@@ -13,11 +13,11 @@ class Investigation < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
 
-  def can_edit? user
+  def can_edit? user=User.current_user
     user.person.projects.include?(project)
   end
 
-  def can_delete? user
+  def can_delete? user=nil
     studies.empty? && can_edit?(user)
   end
   

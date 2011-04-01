@@ -53,7 +53,8 @@ module Acts #:nodoc:
         Authorization.is_authorized? "edit", nil, self, user
       end
 
-      def can_view? user
+      def can_view? user=nil
+        user ||= User.current_user
         Authorization.is_authorized? "show", nil, self, user
       end
 

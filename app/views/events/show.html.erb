@@ -1,12 +1,12 @@
 <ul class="sectionIcons">
-  <% if Authorization.is_authorized?("manage", nil, @event, current_user) -%>
+  <% if @event.can_manage? -%>
     <li><%= image_tag_for_key('manage', edit_event_path(@event), nil, nil, 'Manage Event') -%></li>
-  <% elsif Authorization.is_authorized?("edit", nil, @event, current_user) -%>
+  <% elsif @event.can_edit?-%>
   <%# this is not owner, but current user can edit -%>
     <li><%= image_tag_for_key('edit', edit_event_path(@event), nil, nil, 'Edit Event') -%></li>
   <% end -%>
 
-  <% if Authorization.is_authorized?("destroy", nil, @event, current_user) -%>
+  <% if @event.can_delete? -%>
     <li><%= image_tag_for_key('destroy', event_path(@event), nil, { :confirm => 'This deletes the Event listing. Are you sure?', :method => :delete }, 'Delete Event') -%></li>
   <% end -%>
 </ul>

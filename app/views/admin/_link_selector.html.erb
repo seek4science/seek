@@ -14,7 +14,7 @@
       </thead>
       <tbody class="scrollContent" id="<%= resource_id + "_source_table_body"-%>">
         <% left_collection.each do |item| -%>
-          <% if authorization_for_showing_already_done || Authorization.is_authorized?("show", nil, item, current_user) -%>
+          <% if authorization_for_showing_already_done || item.can_view? -%>
             <tr id="<%= resource_id + "_" + item.id.to_s + "_source_row" -%>">
               <td id="<%= resource_id + "_" + item.id.to_s + "_source_cell"
                   -%>" onclick="javascript:checkItem('<%= item.id.to_s -%>', 'source', '<%= resource_id -%>')">
@@ -37,7 +37,7 @@
       </thead>
       <tbody class="scrollContent" id="<%= resource_id + "_target_table_body"-%>">
         <% left_collection.each do |item| -%>
-          <% if authorization_for_showing_already_done || Authorization.is_authorized?("show", nil, item, current_user) -%>
+          <% if authorization_for_showing_already_done || item.can_view? -%>
             <tr id="<%= resource_id + "_" + item.id.to_s + "_target_row" -%>" style="display:none;">
               <td id="<%= resource_id + "_" + item.id.to_s + "_target_cell"
                   -%>" onclick="javascript:checkItem('<%= item.id.to_s -%>', 'target', '<%= resource_id -%>')">

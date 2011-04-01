@@ -5,7 +5,7 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate assays in SEEK to this #{resource_text}.") -%>
+    <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}.") -%>
     Associate Assays
   </div>
 
@@ -13,7 +13,7 @@
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
-        all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
+        all_assays=authorised_assays.sort_by &:title
         project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
         select_truncate_length=120
       -%>
@@ -108,17 +108,15 @@
         selection_box.onchange();
     }
 
-<% assay_assets = AssayAsset.find_all_by_asset_id(resource.id) %>
-  <% if assay_assets%>
-    <% assay_assets.each do |assay_asset|%>
-      <% assay = Assay.find(assay_asset.assay_id) %>
-      <% if assay && Authorization.is_authorized?("show",nil,assay,current_user) -%>
-        assay_id = '<%= assay.id -%>';
-        assay_title = '<%= assay.title -%>';
-        relationship_type = '<%= escape_javascript(resource.relationship_type(assay).try(:title) || "None") -%>';
-        addAssay(assay_title,assay_id,relationship_type);
-      <% end %>
-  <% end -%>
+<% associated_assay_ids = resource.assays.collect &:id %>
+  <% associated_assay_ids.each do |associated_assay_id|%>
+    <% assay = Assay.find(associated_assay_id) %>
+    <% if assay.try :can_view? -%>
+      assay_id = '<%= assay.id -%>';
+      assay_title = '<%= assay.title -%>';
+      relationship_type = '<%= escape_javascript(resource.relationship_type(assay).try(:title) || "None") -%>';
+      addAssay(assay_title,assay_id,relationship_type);
+    <% end %>
 <% end -%>
 
 
@@ -132,7 +130,7 @@
 <% if params[:assay_ids] %>
   <% params[:assay_ids].each do |id| -%>
     <% assay = Assay.find(id) %>
-    <% if Authorization.is_authorized?("show",nil,assay,current_user) -%>
+    <% if assay.can_view?-%>
         assay_id = '<%= assay.id -%>';
         assay_title = '<%= escape_javascript(assay.title) -%>';
         relationship_type = '<%= escape_javascript(resource.relationship_type(assay).try(:title) || "None") -%>';

@@ -5,7 +5,7 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate assays in SEEK to this #{resource_text}.") -%>
+    <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}.") -%>
     Associate Assays
   </div>
 
@@ -13,12 +13,12 @@
     <div class="yui-u first" style="width:66%; float:left">
       
       <%
-        all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
-        if resource_text == "model"
-            all_assays.each do |assay|
-                all_assays.delete(assay) if assay.assay_class_id == 1
-            end
-        end
+        all_assays=authorised_assays.sort_by &:title
+
+        all_assays = all_assays.select do |assay|
+            assay.is_modelling?
+        end if resource.is_a? Model
+
         project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
         select_truncate_length=120
       -%>
@@ -96,23 +96,21 @@
         selection_box.onchange();
     }
 
-<% associate_assay_ids = Relationship.find_all_by_object_id(resource.id).select{|a| a.subject_type == "Assay"}.collect{|b| b.subject_id} %>
-<% if associate_assay_ids %>
-   <% associate_assay_ids.each do |associate_assay_id| %>
-      <% assay = Assay.find(associate_assay_id) %>
-      <% if assay && Authorization.is_authorized?("show",nil,assay,current_user) -%>
-        assay_id = '<%= assay.id -%>';
-        assay_title = '<%= assay.title -%>';
-        addAssay(assay_title,assay_id);
-        <% end %>
-    <% end -%>
+<% associated_assay_ids = resource.related_assays.collect &:id %>
+  <% associated_assay_ids.each do |associated_assay_id|%>
+    <% assay = Assay.find(associated_assay_id) %>
+    <% if assay.try :can_view? -%>
+      assay_id = '<%= assay.id -%>';
+      assay_title = '<%= assay.title -%>';
+      addAssay(assay_title,assay_id);
+    <% end %>
 <% end -%>
 
 
 <% if params[:assay_ids] %>
   <% params[:assay_ids].each do |id| -%>
     <% assay = Assay.find(id) %>
-    <% if Authorization.is_authorized?("show",nil,assay,current_user) -%>
+    <% if assay.can_view? -%>
         assay_id = '<%= assay.id -%>';
         assay_title = '<%= escape_javascript(assay.title) -%>';
         addAssay(assay_title,assay_id);

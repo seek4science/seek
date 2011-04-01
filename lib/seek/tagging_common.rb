@@ -6,7 +6,7 @@ module Seek
 
     def update_tags_ajax
       entity=controller_name.singularize.camelize.constantize.find(params[:id])
-      if Authorization.is_authorized?("view",nil,entity,current_user)
+      if entity.can_view?
         update_owned_tags entity
 
         eval("@#{controller_name.singularize} = entity")

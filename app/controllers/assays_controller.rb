@@ -162,7 +162,7 @@ class AssaysController < ApplicationController
     assay=Assay.find_by_id(params[:id])
 
     render :update do |page|
-      if assay && Authorization.is_authorized?("show", nil, assay, current_user)
+      if assay.try :can_view?
         page.replace_html element,:partial=>"assays/associate_resource_list_item",:locals=>{:resource=>assay}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

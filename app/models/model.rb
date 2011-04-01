@@ -52,7 +52,7 @@ class Model < ActiveRecord::Base
     all_models = Model.find(:all, :order => "ID asc")
 
     models_with_contributors = all_models.collect{ |m|
-      Authorization.is_authorized?("show", nil, m, user) ?
+      m.can_view?(user) ?
         (contributor = m.contributor;
         { "id" => m.id,
           "title" => m.title,

@@ -88,7 +88,7 @@
     }  
   
     <% @assay.sop_masters.each do |s| -%>    
-      <% if Authorization.is_authorized?("show",nil,s,current_user) -%>
+      <% if s.can_view? -%>
         sop_id = '<%= s.id -%>';
         sop_title = '<%= escape_javascript(s.title) -%>';
         addSop(sop_title, sop_id);
@@ -98,7 +98,7 @@
     <% if params[:assay_sop_ids] %>
       <% params[:assay_sop_ids].each do |id| -%>
         <% sop = Sop.find(id) %>
-          <% if Authorization.is_authorized?("show",nil,sop,current_user) -%>
+          <% if sop.can_view?-%>
         sop_id = '<%= sop.id -%>';
         sop_title = '<%= escape_javascript(sop.title) -%>';
         addSop(sop_title, sop_id);

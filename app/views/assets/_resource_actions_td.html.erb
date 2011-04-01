@@ -1,10 +1,10 @@
 <%= image_tag_for_key "show", show_resource_path(resource), nil, nil, "View" -%>
-<% if Authorization.is_authorized?("download", nil, resource, current_user) -%>
+<% if resource.can_download?-%>
   <%= image_tag_for_key "download", download_resource_path(resource) -%>
 <% end -%>
-<% if Authorization.is_authorized?("manage", nil, resource, current_user) -%>
+<% if resource.can_manage? -%>
   <%= image_tag_for_key "manage", edit_resource_path(resource), nil, nil, "Manage" -%>
-<% elsif Authorization.is_authorized?("edit", nil, resource, current_user) -%>
+<% elsif resource.can_edit? -%>
   <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
 <% end -%>
 <!---

@@ -95,7 +95,7 @@
   }
 
 <% resource.data_file_masters.each do |data_file| -%>
-  <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
+  <% if data_file.can_view? -%>
       data_file_id = '<%= data_file.id -%>';
       data_title = '<%= escape_javascript(data_file.title) -%>';
       <% if resource.instance_of? Assay %>
@@ -111,7 +111,7 @@
   <% params[:data_file_ids].each do |id_and_rel_id| -%>
     <% a_id, r_type = id_and_rel_id.split(",") %>
     <% data_file = DataFile.find(a_id) %>
-    <% if Authorization.is_authorized?("show",nil,data_file,current_user) -%>
+    <% if data_file.can_view? -%>
         data_file_id = '<%= data_file.id -%>';
         data_title = '<%= escape_javascript(data_file.title) -%>';
         relationship_type = '<%= r_type -%>';

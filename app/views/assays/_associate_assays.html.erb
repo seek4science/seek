@@ -98,23 +98,21 @@
         selection_box.onchange();
     }
 
-<% assay_assets = AssayAsset.find_all_by_asset_id(resource.id) %>
-  <% if assay_assets%>
-    <% assay_assets.each do |assay_asset|%>
-      <% assay = Assay.find(assay_asset.assay_id) %>
-      <% if assay && Authorization.is_authorized?("show",nil,assay,current_user) -%>
-        assay_id = '<%= assay.id -%>';
-        assay_title = '<%= assay.title -%>';
-        addAssay(assay_title,assay_id);
-      <% end %>
-  <% end -%>
+<% associated_assay_ids = resource.assays.collect &:id %>
+  <% associated_assay_ids.each do |associated_assay_id|%>
+    <% assay = Assay.find(associated_assay_id) %>
+    <% if assay.try :can_view? -%>
+      assay_id = '<%= assay.id -%>';
+      assay_title = '<%= assay.title -%>';
+      addAssay(assay_title,assay_id);
+    <% end %>
 <% end -%>
 
 
 <% if params[:assay_ids] %>
   <% params[:assay_ids].each do |id| -%>
     <% assay = Assay.find(id) %>
-    <% if Authorization.is_authorized?("show",nil,assay,current_user) -%>
+    <% if assay.can_view? -%>
         assay_id = '<%= assay.id -%>';
         assay_title = '<%= escape_javascript(assay.title) -%>';
         addAssay(assay_title,assay_id);

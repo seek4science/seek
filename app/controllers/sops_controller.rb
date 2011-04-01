@@ -205,7 +205,7 @@ class SopsController < ApplicationController
     sop=Sop.find_by_id(params[:id])
     
     render :update do |page|
-      if sop && Authorization.is_authorized?("show", nil, sop, current_user)
+      if sop.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>sop}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

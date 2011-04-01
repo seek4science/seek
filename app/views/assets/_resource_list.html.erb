@@ -5,7 +5,7 @@
   <div class="list_items_container">
 
     <% collection.each do |item| -%>
-		  <% if authorization_for_showing_already_done || Authorization.is_authorized?("show", nil, item, current_user) -%>  
+		  <% if authorization_for_showing_already_done || item.can_view? -%>  
 				<%= render :partial => "layouts/resource_list_item",:object=>item -%>
 			<% end -%>
 		<% end -%>

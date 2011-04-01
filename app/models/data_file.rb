@@ -56,7 +56,7 @@ class DataFile < ActiveRecord::Base
   def self.get_all_as_json(user)
     all_datafiles = DataFile.find(:all, :order => "ID asc")
     datafiles_with_contributors = all_datafiles.collect{ |d|
-        Authorization.is_authorized?("show", nil, d, user) ?
+        d.can_view?(user) ?
         (contributor = d.contributor;
         { "id" => d.id,
           "title" => d.title,
