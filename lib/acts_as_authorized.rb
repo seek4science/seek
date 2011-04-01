@@ -49,7 +49,8 @@ module Acts #:nodoc:
         end
       end
 
-      def can_edit? user
+      def can_edit? user=nil
+        user ||= User.current_user
         Authorization.is_authorized? "edit", nil, self, user
       end
 
@@ -58,15 +59,18 @@ module Acts #:nodoc:
         Authorization.is_authorized? "show", nil, self, user
       end
 
-      def can_download? user
+      def can_download? user=nil
+        user ||= User.current_user
         Authorization.is_authorized? "download", nil, self, user
       end
 
-      def can_delete? user
+      def can_delete? user=nil
+        user ||= User.current_user
         Authorization.is_authorized? "destroy", nil, self, user
       end
 
-      def can_manage? user
+      def can_manage? user=nil
+        user ||= User.current_user
         Authorization.is_authorized? "manage", nil, self, user
       end
 
@@ -91,8 +95,31 @@ end
 
 ActiveRecord::Base.class_eval do
   include Acts::Authorized
+
+  #I placed these here instead of active_record_extensions.rb because
+  #they should only be used in conjunction with acts_as_authorized
   def contributor_credited?
     false
+  end
+
+  def can_edit? user=nil
+    true
+  end
+
+  def can_view? user=nil
+    true
+  end
+
+  def can_download? user=nil
+    true
+  end
+
+  def can_delete? user=nil
+    true
+  end
+
+  def can_manage? user=nil
+    true
   end
 end
 
