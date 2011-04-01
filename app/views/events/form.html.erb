@@ -21,17 +21,20 @@
           <%= f.text_area :description, :style => "width:100%", :rows => 10 %>
         </p>
 
-        <p>
-          <%= f.label :start_date %>
-          <span class="required">*</span>
-          <%= f.calendar_date_select :start_date, :time => :mixed %>
-        </p>
+        <ul style="padding-bottom:1em;padding-top:0.5em;">
+          <li style="float:left;padding-right:3em;">
+            <%= f.label :start_date %>
+            <span class="required">*</span><br/>
+            <%= f.calendar_date_select :start_date, :time => :mixed %>
+          </li>
+          <li>
+            <%= f.label :end_date %>
+            <span class="required">*</span><br/>
+            <%= f.calendar_date_select :end_date, :time => :mixed%>
+          </li>
+        </ul>
 
-        <p>
-          <%= f.label :end_date %>
-          <span class="required">*</span>
-          <%= f.calendar_date_select :end_date, :time => :mixed%>
-        </p>
+        
 
         <p>
           <%= f.label "Event Website" -%><br/>
