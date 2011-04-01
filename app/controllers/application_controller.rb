@@ -24,7 +24,10 @@ class ApplicationController < ActionController::Base
   end
 
   include AuthenticatedSystem
-  before_filter { |c| User.current_user = c.instance_eval {current_user} }
+  before_filter :set_current_user
+  def set_current_user
+    User.current_user = current_user
+  end
 
   helper :all
   
