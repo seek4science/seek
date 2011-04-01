@@ -235,45 +235,45 @@
 </script>
 
 <table>
-<thead>
-<tr>
-<th>Zoom</th>
-<th>Move</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
+  <thead>
+  <tr>
+    <th>Zoom</th>
+    <th>Move</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>
 <span title="Zoom">
 <input id="zoomin" type="button" value="+" title="Zoom in" onclick="zoom(1.25);zoomLevel=zoomLevel*1.25">
 <input id="zoomout" type="button" value="-" title="Zoom out" onclick="zoom(0.75);zoomLevel=zoomLevel*0.75">
 </span>
-</td>
-<td>
-<!-- Yeah yeah, I know styling with tables is ugly... ;-) -->
-<table title="Move">
-<tbody>
-<tr>
-<td rowspan="3" valign="middle" class="layout">
-<input id="panleft" type="button" value="←" title="Pan left" onclick="pan(30/zoomLevel, 0)">
-</td>
-<td class="layout">
-<input id="panup" type="button" value="↑" title="Pan up" onclick="pan(0, 30/zoomLevel)">
-</td>
-<td rowspan="3" valign="middle" class="layout">
-<input id="panright" type="button" value="→" title="Pan right" onclick="pan(-30/zoomLevel, 0)">
-</td>
-</tr>
-<tr></tr>
-<tr>
-<td class="layout">
-<input id="pandown" type="button" value="↓" title="Pan down" onclick="pan(0, -30/zoomLevel)">
-</td>
-</tr>
-</tbody>
-</table>
-</td>
+    </td>
+    <td>
+      <!-- Yeah yeah, I know styling with tables is ugly... ;-) -->
+      <table title="Move">
+        <tbody>
+        <tr>
+          <td rowspan="3" valign="middle" class="layout">
+            <input id="panleft" type="button" value="←" title="Pan left" onclick="pan(30/zoomLevel, 0)">
+          </td>
+          <td class="layout">
+            <input id="panup" type="button" value="↑" title="Pan up" onclick="pan(0, 30/zoomLevel)">
+          </td>
+          <td rowspan="3" valign="middle" class="layout">
+            <input id="panright" type="button" value="→" title="Pan right" onclick="pan(-30/zoomLevel, 0)">
+          </td>
+        </tr>
+        <tr></tr>
+        <tr>
+          <td class="layout">
+            <input id="pandown" type="button" value="↓" title="Pan down" onclick="pan(0, -30/zoomLevel)">
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </td>
 
-</tr>
-</tbody>
+  </tr>
+  </tbody>
 </table>
