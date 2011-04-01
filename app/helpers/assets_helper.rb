@@ -29,11 +29,11 @@ module AssetsHelper
       options << " selected='selected'" if v.version==displayed_resource_version.version
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
-    "<form onsubmit='showResourceVersion(this); return false;' style='text-align:right;'>"+select_tag(:resource_versions,
+    select_tag(:resource_versions,
       options,
       :disabled=>disabled,
-      :onchange=>"showResourceVersion(this.form);"
-    )+"</form>"    
+      :onchange=>"showResourceVersion($('show_version_form'));"
+    ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
   end
   
   def resource_title_draggable_avatar resource    
