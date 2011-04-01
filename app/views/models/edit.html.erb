@@ -1,5 +1,5 @@
 <%= javascript_include_tag "sharing.js","models.js", "assays.js" -%>
-<% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @model, current_user) -%>
+<% current_user_authorized_to_manage = @model.can_manage? -%>
 <ul class="sectionIcons">
     <li>
         <%= image_tag_for_key('arrow_left', model_path(@model), 'Return to Model', nil, 'Return to Model') -%>

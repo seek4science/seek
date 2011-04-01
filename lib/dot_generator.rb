@@ -125,7 +125,7 @@ module DotGenerator
       asset = asset.parent
       asset_type = asset.class.name
     end
-    if Authorization.is_authorized?("view",nil,asset,current_user)
+    if asset.can_view?
       title = multiline(asset.title)      
       title = "#{asset_type.upcase}\\n #{title}" unless title.downcase.starts_with?(asset_type.downcase)
       dot << "#{asset.class.name}_#{asset.id} [label=\"#{title}\",width=2,tooltip=\"#{tooltip(asset)}\",shape=box,fontsize=7,style=filled,fillcolor=\"#{FILL_COLOURS[asset.class]}\",#{highlight_attribute}URL=\"#{polymorphic_path(asset,:version=>version)}\",target=\"_top\"];\n"

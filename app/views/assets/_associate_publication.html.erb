@@ -92,7 +92,7 @@
         selection_box.onchange();
     }
 <% resource.publications.each do |publication| -%>
-  <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
+  <% if publication.can_view? -%>
       publication_id = '<%= publication.id -%>';
       publication_title = '<%= escape_javascript(publication.title) -%>';
       publications_array.push([publication_title,publication_id]);
@@ -102,7 +102,7 @@
 <% if params[:publication_ids] %>
   <% params[:publication_ids].each do |id| -%>
     <% publication = Publication.find(id) %>
-    <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
+    <% if publication.can_view? -%>
         publication_id = '<%= publication.id -%>';
         publication_title = '<%= escape_javascript(publication.title) -%>';
         publications_array.push([publication_title, publication_id]);

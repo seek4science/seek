@@ -508,7 +508,7 @@ class ModelsController < ApplicationController
     model = Model.find_by_id(params[:id])
     
     render :update do |page|
-      if model && Authorization.is_authorized?("show", nil, model, current_user)
+      if model.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>model}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

@@ -92,7 +92,7 @@
         selection_box.onchange();
     }
 <% resource.events.each do |event| -%>
-  <% if Authorization.is_authorized?("show",nil,event,current_user) -%>
+  <% if event.can_view? -%>
       event_id = '<%= event.id -%>';
       event_title = '<%= escape_javascript(event.title) -%>';
       events_array.push([event_title,event_id]);
@@ -102,7 +102,7 @@
 <% if params[:event_ids] %>
   <% params[:event_ids].each do |id| -%>
     <% event = Event.find(id) %>
-    <% if Authorization.is_authorized?("show",nil,event,current_user) -%>
+    <% if event.can_view?-%>
         event_id = '<%= event.id -%>';
         event_title = '<%= escape_javascript(event.title) -%>';
         events_array.push([event_title, event_id]);

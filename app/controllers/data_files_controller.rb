@@ -263,7 +263,7 @@ end
     data_file=DataFile.find_by_id(params[:id])
     
     render :update do |page|
-      if data_file && Authorization.is_authorized?("show", nil, data_file, current_user)
+      if data_file.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>data_file}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

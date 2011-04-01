@@ -84,7 +84,7 @@
     
     
     <% related_publications.each do |publication| -%>    
-      <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
+      <% if publication.can_view?-%>
           publication_id = '<%= publication.id -%>';
           publication_title = '<%= escape_javascript(publication.title) -%>';
           relationship_type = '<%= escape_javascript("None") -%>';
@@ -96,7 +96,7 @@
       <% params[:related_publication_ids].each do |id_and_rel_id| -%>
         <% a_id, r_type = id_and_rel_id.split(",") %>
         <% publication = Publication.find(a_id) %>
-        <% if Authorization.is_authorized?("show",nil,publication,current_user) -%>
+        <% if publication.can_view? -%>
             publication_id = '<%= publication.id -%>';
             publication_title = '<%= escape_javascript(publication.title) -%>';
             relationship_type = '<%= r_type -%>';

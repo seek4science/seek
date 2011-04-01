@@ -113,7 +113,7 @@ class EventsController < ApplicationController
     event=Event.find_by_id(params[:id])
 
     render :update do |page|
-      if event && Authorization.is_authorized?("show", nil, event, current_user)
+      if event.try :can_view?
         page.replace_html element,:partial=>"events/resource_list_item",:locals=>{:resource=>event}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

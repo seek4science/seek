@@ -2,19 +2,18 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-
   self.mod_porter_secret = PORTER_SECRET
 
-  include ExceptionNotifiable 
-  self.error_layout="errors" 
+  include ExceptionNotifiable
+  self.error_layout="errors"
   self.silent_exceptions = []
-  self.rails_error_classes = { 
-    ActiveRecord::RecordNotFound => "404",
-    ::ActionController::UnknownController => "406",
-    ::ActionController::UnknownAction => "406",
-    ::ActionController::RoutingError => "404",
-    ::ActionView::MissingTemplate => "406",
-    ::ActionView::TemplateError => "500"
+  self.rails_error_classes = {
+  ActiveRecord::RecordNotFound => "404",
+  ::ActionController::UnknownController => "406",
+  ::ActionController::UnknownAction => "406",
+  ::ActionController::RoutingError => "404",
+  ::ActionView::MissingTemplate => "406",
+  ::ActionView::TemplateError => "500"
   }
   local_addresses.clear
 
@@ -25,7 +24,8 @@ class ApplicationController < ActionController::Base
   end
 
   include AuthenticatedSystem
-  
+  before_filter { |c| User.current_user = c.instance_eval {current_user} }
+
   helper :all
   
   layout "main"

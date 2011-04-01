@@ -48,7 +48,7 @@ module ResourceListItemHelper
         icon  = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
 
         html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
-        html << list_item_visibility(resource.policy) if resource.authorization_supported? && Authorization.is_authorized?("manage", nil, resource, current_user)
+        html << list_item_visibility(resource.policy) if resource.authorization_supported? && resource.can_manage?
         html << "<br style=\"clear:both\"/>"
       else
         html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"

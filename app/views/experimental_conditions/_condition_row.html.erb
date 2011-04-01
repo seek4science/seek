@@ -11,7 +11,7 @@
     </li>
         
 
-    <% if Authorization.is_authorized?("edit",exp_condition.sop,current_user) -%>
+    <% if exp_condition.sop.can_edit? -%>
     <% style="display:none;" unless show_delete %>
     <li class="destroy_experimental_condition" style="<%= style %>">
        <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete experimental condition"),

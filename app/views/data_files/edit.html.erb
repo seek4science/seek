@@ -2,7 +2,7 @@
 <%= javascript_include_tag "associate_events.js" %>
 <%= javascript_include_tag "associate_datafile_assays.js" %>
 
-<% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @data_file, current_user) -%>
+<% current_user_authorized_to_manage = @data_file.can_manage? -%>
 <ul class="sectionIcons">
     <li>
         <%= image_tag_for_key('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%>

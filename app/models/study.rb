@@ -25,11 +25,11 @@ class Study < ActiveRecord::Base
     assays.collect{|a| a.sops}.flatten.uniq
   end 
 
-  def can_edit? user
+  def can_edit? user=User.current_user
     user.person && user.person.projects.include?(project)
   end
 
-  def can_delete? user
+  def can_delete? user=nil
     assays.empty? && can_edit?(user)
   end
 

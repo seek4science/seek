@@ -60,11 +60,11 @@ class Assay < ActiveRecord::Base
     investigation.nil? ? nil : investigation.project
   end
 
-  def can_edit? user
+  def can_edit? user=User.current_user
     project.pals.include?(user.person) || user.person == owner
   end
 
-  def can_delete? user
+  def can_delete? user=nil
     can_edit?(user) && assets.empty? && related_publications.empty?
   end
 
