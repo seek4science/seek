@@ -24,7 +24,8 @@ module HomeHelper
     classes.each do |c|
       valid=[]
       c.find(:all,:order=>'updated_at DESC').each do |i|
-        valid << i if projects.include?(i.project) && (!i.respond_to?(:can_view) || i.can_view?(current_user))
+        valid << i if projects.include?(i.project) && (!i.authorization_supported? || i.can_view?(current_user))
+        break if valid.size >= RECENT_SIZE
       end
       item_hash.merge! classify_for_tabs(valid)
     end
@@ -47,7 +48,7 @@ module HomeHelper
     classes.each do |c|
       valid=[]
       c.find(:all,:order=>"updated_at DESC").each do |i|
-        valid << i if !i.respond_to?(:can_view) || i.can_view?(current_user)
+        valid << i if !i.authorization_supported? || i.can_view?(current_user)
         break if valid.size>=RECENT_SIZE
       end
       item_hash.merge! classify_for_tabs(valid)

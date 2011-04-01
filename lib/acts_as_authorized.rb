@@ -54,7 +54,7 @@ module Acts #:nodoc:
       end
 
       def can_view? user
-        Authorization.is_authorized? "view", nil, self, user
+        Authorization.is_authorized? "show", nil, self, user
       end
 
       def can_download? user

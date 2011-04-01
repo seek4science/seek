@@ -51,5 +51,16 @@ class HomeControllerTest < ActionController::TestCase
     end
   end
 
+  test "hidden items do not appear in recent items" do
+    model = models(:private_model)
+    model.title="An updated private model"
+    model.save! #to make sure it a recent item
+
+    get :index
+
+    #difficult to use assert_select, because of the way the tabbernav tabs are constructed with javascript onLoad
+    assert !@response.body.include?(model.title)
+  end
+
 
 end
