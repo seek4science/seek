@@ -9,7 +9,7 @@
         <li>Domain:    <%= text_field_tag(:domain, Seek::Config.smtp_settings('domain')) %> </li>
         <li>Authentication:    <%= text_field_tag(:authentication, Seek::Config.smtp_settings('authentication')) %> </li>
         <li>User name:    <%= text_field_tag(:user_name, Seek::Config.smtp_settings('user_name')) %> </li>
-        <li>Password:    <%= password_field_tag(:password, Seek::Config.smtp_settings('password')) %> </li>
+        <li>Password:    <%= password_field_tag(:password, Seek::Config.smtp_settings('password'), :autocomplete => 'off') %> </li>
         </ul>
     Noreply sender:    <%= text_field_tag(:noreply_sender, Seek::Config.noreply_sender, :disabled => true) %>
 </div>

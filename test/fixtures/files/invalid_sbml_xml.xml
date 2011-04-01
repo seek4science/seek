@@ -33,6 +33,7 @@
     <parameter id="CiPFKATP" name="CiPFKATP" value="100"/>
     <parameter id="compartment" name="compartment" value="1"/>
     <parameter id="compartment0" name="compartment0" value="1"/>
+    <parameter id="compartment0" name="compartment0" value="1"/> 
     <parameter id="CPFKAMP" name="CPFKAMP" value="0.0845"/>
     <parameter id="CPFKATP" name="CPFKATP" value="3"/>
     <parameter id="CPFKF16BP" name="CPFKF16BP" value="0.397"/>

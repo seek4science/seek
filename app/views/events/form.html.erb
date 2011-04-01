@@ -16,6 +16,7 @@
           <div style="width: 95%;">
             <p>
               <%= f.label :title -%>
+              <span class="required">*</span>
               <%= f.text_field :title, :style => "width: 100%;", :rows=>2 -%>
             </p>
 
@@ -26,11 +27,13 @@
 
             <p>
               <%= f.label :start_date %>
+              <span class="required">*</span>
               <%= f.calendar_date_select :start_date, :time => :mixed %>
             </p>
 
             <p>
               <%= f.label :end_date %>
+              <span class="required">*</span>
               <%= f.calendar_date_select :end_date, :time => :mixed%>
             </p>
 

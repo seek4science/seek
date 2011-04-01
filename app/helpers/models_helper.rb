@@ -54,7 +54,7 @@ module ModelsHelper
   end  
   
   def jws_supported? model
-    builder = Seek::JWSModelBuilder.new
+    builder = Seek::JWS::OneStop.new
     builder.is_supported? model
   end
 

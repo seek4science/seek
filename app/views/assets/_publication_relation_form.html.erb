@@ -1,3 +1,4 @@
+<% resource_type=resource_type.underscore.humanize -%>
 <div class="fold">
     <div class="foldTitle">
         <%= help_icon("Here you attribute this #{resource_type} to any publications registered in SEEK, or vice versa.") -%>
@@ -11,7 +12,7 @@
             select_truncate_length=120
             show_relationships=false -%>
             <p class="pale_text">
-                The following publications are related to this resource:
+                The following publications are related to this <%= resource_type -%>:
             </p>
             <div id="publication_to_list" class="box_editing_inner" style="line-height: 1.5">
                 <span class="none_text" id="publications">Loading...</span>

@@ -140,9 +140,19 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal "fred@email.com",Seek::Config.pubmed_api_email
   end
 
+  test "convert setting from database" do
+    Settings.limit_latest="6"
+    assert_equal 6,Seek::Config.limit_latest
+  end
+
   test "invalid setting accessor" do
     assert_raises(NoMethodError) {Seek::Config.xxxxx}
     assert_raises(NoMethodError) {Seek::Config.xxxxx=true}
   end
 
+  test "encrypt/decrypt smtp password" do
+    Seek::Config.set_smtp_settings 'password', 'abcd'
+    assert_equal Seek::Config.smtp_settings('password'), 'abcd'
+    assert_equal ActionMailer::Base.smtp_settings[:password], 'abcd'
+  end
 end

@@ -20,7 +20,7 @@ class AssaysControllerTest < ActionController::TestCase
     validate_xml_against_schema(@response.body)
     
   end
-  
+
   test "index includes modelling validates with schema" do
     get :index, :page=>"all",:format=>"xml"
     assert_response :success

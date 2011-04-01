@@ -12,7 +12,7 @@ class DataFuseController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth
 
-  @@model_builder = Seek::JWSModelBuilder.new
+  @@model_builder = Seek::JWS::OneStop.new
 
   def data_file_csv
 

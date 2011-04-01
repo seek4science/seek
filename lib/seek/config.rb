@@ -46,7 +46,10 @@ module Seek
   module Propagators
 
     def smtp_propagate
-      ActionMailer::Base.smtp_settings = self.smtp
+      smtp_hash = self.smtp
+      password =  self.smtp_settings 'password'
+      smtp_hash.merge! :password => password
+      ActionMailer::Base.smtp_settings = smtp_hash
     end
 
     def google_analytics_enabled_propagate
@@ -89,9 +92,16 @@ module Seek
 
   #Custom accessors for settings that are not a simple mapping
   module CustomAccessors
+    include SimpleCrypt
 
     def smtp_settings field
-      self.smtp[field.to_sym]
+      value = self.smtp[field.to_sym]
+      if field == :password || field == 'password'
+        if !value.blank?
+          value = decrypt(value,generate_key(GLOBAL_PASSPHRASE))
+        end
+      end
+      value
     end
 
     def set_smtp_settings (field, value)
@@ -100,6 +110,12 @@ module Seek
           value = nil
         else
           value = value.to_sym
+        end
+      end
+
+      if field == :password || field == 'password'
+        if !value.blank?
+          value = encrypt(value,generate_key(GLOBAL_PASSPHRASE))
         end
       end
       merge! :smtp, {field => value}
@@ -130,17 +146,23 @@ module Seek
     end
 
     if Settings.table_exists?
-      def get_value getter
-        Settings.send getter
+      def get_value getter,conversion=nil
+        val = Settings.send getter
+        val = val.send(conversion) if conversion && val
+        val
       end
-      def set_value setter, val
+      def set_value setter, val, conversion=nil
+        val = val.send(conversion) if conversion && val
         Settings.send setter, val
       end
     else
-      def get_value getter
-        Settings.defaults[getter.to_sym]
+      def get_value getter,conversion=nil
+        val = Settings.defaults[getter.to_sym]
+        val = val.send(conversion) if conversion && val
+        val
       end
       def set_value setter, val
+        val = val.send(conversion) if conversion && val
         Settings.defaults[setter.to_sym] = val
       end
     end
@@ -158,20 +180,16 @@ module Seek
       fallback="#{getter}_fallback"
       if self.respond_to?(fallback)
         define_class_method getter do
-          Settings.send(getter) || self.send(fallback)
+          get_value(getter,options[:convert]) || self.send(fallback)
         end
       else
         define_class_method getter do
-           get_value(getter)
+           get_value(getter,options[:convert])
         end
       end
 
       define_class_method setter do |val|
-        if options[:convert]
-          conv = options[:convert]
-          val = val.send conv
-        end
-        set_value(setter,val)
+        set_value(setter,val,options[:convert])
         self.send propagate if self.respond_to?(propagate)
       end
     end

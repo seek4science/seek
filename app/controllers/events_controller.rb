@@ -114,7 +114,7 @@ class EventsController < ApplicationController
 
     render :update do |page|
       if event.try :can_view?
-        page.replace_html element,:partial=>"events/resource_list_item",:locals=>{:resource=>event}
+        page.replace_html element,:partial=>"events/resource_list_item_preview",:locals=>{:resource=>event}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."
       end
