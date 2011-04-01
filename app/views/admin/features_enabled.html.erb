@@ -9,28 +9,28 @@
     Jerm enabled:    <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Solr enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled) %>
+    Search enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function') %>
     <br style="clear:both;"/>
     <br/>
-    Exception notification enabled:    <%= check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled, :disabled => true) %>
+    Exception notification enabled: <%= check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Hide details enabled:    <%= check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled) %>
+    Exception notification recipients:    <%= text_field_tag(:exception_notification_recipients, Seek::Config.exception_notification_recipients) %>
     <br style="clear:both;"/>
     <br/>
-    Activity log enabled:    <%= check_box_tag(:activity_log_enabled, 1, Seek::Config.activity_log_enabled) %>
+    Hide contact details:    <%= check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Activation required enabled: <%= check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled) %>
+    Activation for new account: <%= check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled, :title => 'when the user register for an account, an email sent to ask for activating the account') %>
     <br style="clear:both;"/>
     <br/>
-    Jws enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled) %>
+    Jws:    <%= check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :title => 'enable JWS Online for building and simulating SBML models') %>
     <br style="clear:both;"/>
     <br/>
     Jws online root:    <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
     <br style="clear:both;"/>
     <br/>
-    Google analytics enabled:    <%= check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled) %>
+    Google analytics:    <%= check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled, :title => 'generating detailed statistics about the visitors to this website') %>
     <br style="clear:both;"/>
     <br/>
     Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>

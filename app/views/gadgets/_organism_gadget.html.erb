@@ -5,7 +5,7 @@
 
   <div class="contents">
     <ul>
-      <% Organism.all.each do |organism| %>
+      <% Organism.all.sort_by(&:title).each do |organism| %>
         <li>
           <%= link_to organism.title, organism %>
         </li>
