@@ -46,12 +46,14 @@ class AdminController < ApplicationController
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
 
-    Seek::Config.exception_notification_enabled= string_to_boolean params[:exception_notification_enabled]
+    Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
+    Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
+
     Seek::Config.hide_details_enabled= string_to_boolean params[:hide_details_enabled]
-    Seek::Config.activity_log_enabled= string_to_boolean params[:activity_log_enabled]
     Seek::Config.activation_required_enabled= string_to_boolean params[:activation_required_enabled]
-    Seek::Config.google_analytics_enabled= string_to_boolean params[:google_analytics_enabled]
+
     Seek::Config.google_analytics_tracker_id= params[:google_analytics_tracker_id]
+    Seek::Config.google_analytics_enabled= string_to_boolean params[:google_analytics_enabled]
 
     Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
     update_redirect_to (only_integer params[:port], "port"),'features_enabled'
@@ -78,7 +80,7 @@ class AdminController < ApplicationController
     Seek::Config.application_title= params[:application_title]
 
     Seek::Config.header_image_enabled= string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image= params[:header_image]
+    Seek::Config.header_image= params[:header_image][:data]
     Seek::Config.header_image_link= params[:header_image_link]
     Seek::Config.header_image_title= params[:header_image_title]
 

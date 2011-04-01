@@ -37,9 +37,15 @@ class ConfigTest < ActiveSupport::TestCase
   test "jws enabled" do
     assert_equal true ,Seek::Config.jws_enabled
   end
+
   test "exception_notification_enabled" do
     assert_equal false ,Seek::Config.exception_notification_enabled
   end
+
+  test "exception_notification_recipients" do
+    assert_equal "" ,Seek::Config.exception_notification_recipients
+  end
+
   test "hide_details_enabled" do
     assert_equal false ,Seek::Config.hide_details_enabled
   end

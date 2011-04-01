@@ -67,7 +67,7 @@ module Seek
         ExceptionNotifier.send_email_error_codes = %W( 400 406 403 405 410 500 501 503 )
         ExceptionNotifier.sender_address         = %w(no-reply@sysmo-db.org)
         ExceptionNotifier.email_prefix           = "[SEEK-#{RAILS_ENV.capitalize} ERROR] "
-        ExceptionNotifier.exception_recipients   = %w(joe@example.com bill@example.com)
+        ExceptionNotifier.exception_recipients   = self.exception_notification_recipients.split %r([, ])
       else
         ExceptionNotifier.render_only = true
       end
@@ -212,7 +212,7 @@ module Seek
       :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
-      :google_analytics_tracker_id,:exception_notification_enabled,:open_id_authentication_store, :sycamore_enabled]
+      :google_analytics_tracker_id,:exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"

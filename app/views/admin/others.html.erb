@@ -3,29 +3,24 @@
   <br style="clear:both;"/>
   <br/>
   <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::Config.pubmed_api_email) %>
+    Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::Config.pubmed_api_email, :title => 'any of your email address') %>
     <br style="clear:both;"/>
     <br/>
-    Crossref api email:    <%= text_field_tag(:crossref_api_email, Seek::Config.crossref_api_email) %>
+    Crossref api email:    <%= text_field_tag(:crossref_api_email, Seek::Config.crossref_api_email, :title => 'registered email to use crossref API for DOI lookup') %>
     <br style="clear:both;"/>
     <br/>
-    Site base host:    <%= text_field_tag(:site_base_host, Seek::Config.site_base_host) %>
+    Site base host:    <%= text_field_tag(:site_base_host, Seek::Config.site_base_host, :title => 'this is needed for the xlinks in the REST API') %>
     <br style="clear:both;"/>
     <br/>
-    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::Config.tag_threshold, :onkeypress => "javascript: return onlyNumbers(event);") %>
+    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::Config.tag_threshold, :title => 'id of the tag which from this id, the tags are displayed in the tag cloud when the expand icon is clicked',:onkeypress => "javascript: return onlyNumbers(event);") %>
     <br style="clear:both;"/>
     <br/>
-    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :onkeypress => "javascript: return onlyNumbers(event);") %>
-    <br style="clear:both;"/>
-    <br/>
-    Open ID authentication store:    <%= text_field_tag(:open_id_authentication_store, Seek::Config.open_id_authentication_store, :disabled => true) %>
+    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :title => 'maximum number of tags appeared in the tag cloud', :onkeypress => "javascript: return onlyNumbers(event);") %>
     <br style="clear:both;"/>
     <br/>
     <br style="clear:both;"/>
     <br/>
-    <br style="clear:both;"/>
-    <br/>   
-        <%= submit_tag "Update"%>
+    <%= submit_tag "Update"%>
   </div>
 <% end -%>
 
