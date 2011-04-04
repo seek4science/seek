@@ -1,15 +1,61 @@
+<style>
+    ul.settings {
+        padding-left:2em;
+    }
+    .setting_description {
+        padding-bottom:0.5em;
+        display:inline-block;
+        min-width: 20em;
+    }
+    .setting_name {
+        width: 20em;
+        display:inline-block;
+    }
+    .setting_field {
+        width: 20em;
+    }
+</style>
+
 <h1>Enable or disable features</h1>
-<div class="show_basic" style="padding-left:2em;">
-<% form_tag :action=>"update_features_enabled" do -%>
-  <p>
-    Event asset types enabled:    <%= check_box_tag(:events_enabled, 1,Seek::Config.events_enabled) %>
-  </p>
-  <p>
-    JERM enabled:    <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
-  </p>
-  <p>
-    Search enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function') %>
-  </p>
+<div class="show_basic">
+  <% form_tag :action=>"update_features_enabled" do -%>
+  <ul class='settings'>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Something about the feature",
+            :name=>"Events enabled",
+            :field=>check_box_tag(:events_enabled, 1,Seek::Config.events_enabled)
+    } -%> 
+
+    <li>
+      <span class='box_infotext setting_description'>
+        Something about the feature
+      </span>
+      <br/>
+      <span class='setting_name'>
+        JERM harvesting enabled:
+      </span>
+      <span class='setting_field'>
+        <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
+      </span>
+    </li>
+
+    <li>
+      <span class='box_infotext setting_description'>
+        Something about the feature
+      </span>
+      <br/>
+      <span class='setting_name'>
+        Search enabled:
+      </span>
+      <span class='setting_field'>
+        <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function') %>
+      </span>
+    </li>
+
+    <li>
+      <%= render :partial => 'admin/email'  %>
+    </li>
+  </ul>
 
   <p>
     Hide contact details:    <%= check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled) %>
@@ -29,10 +75,8 @@
         Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
     </div>
   </p>
-  <h3>Email</h3>
-  <p>
-    <%= render :partial => 'admin/email'  %>
-  </p>
+
+
 
     <%= submit_tag "Update" %>
   </div>
