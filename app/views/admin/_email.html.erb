@@ -1,6 +1,6 @@
 <div>
-    Email enabled: <%= check_box_tag :email_enabled, 1, Seek::Config.email_enabled ,:onchange=>"Effect.toggle('email_settings','slide');" -%>
-    <div id="email_settings" style="padding-left:2em;display:<%= Seek::Config.email_enabled ? 'block' : 'none' -%>;">
+    Email enabled: <%= check_box_tag :email_enabled, 1, Seek::Config.email_enabled ,:onchange=>toggle_appear_javascript('email_settings') -%>
+    <div id="email_settings" style="padding-left:2em;<%= show_or_hide_block(Seek::Config.email_enabled) -%>;">
         <ul>
             <li>Address: <%= text_field_tag(:address, Seek::Config.smtp_settings('address')) %> </li>
             <li>Port: <%= text_field_tag(:port, Seek::Config.smtp_settings('port'), :onkeypress => "javascript: return onlyNumbers(event);") %></li>
@@ -9,5 +9,12 @@
             <li>User name: <%= text_field_tag(:user_name, Seek::Config.smtp_settings('user_name')) %> </li>
             <li>Password: <%= password_field_tag(:password, Seek::Config.smtp_settings('password'), :autocomplete => 'off') %> </li>
         </ul>
+        <p>
+        Exception notification enabled: <%= check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled, :onchange=>toggle_appear_javascript('exception_notification_block')) -%>
+        <div id="exception_notification_block" style="<%= show_or_hide_block(Seek::Config.exception_notification_enabled) -%>;">
+        Exception notification recipients:    <%= text_field_tag(:exception_notification_recipients, Seek::Config.exception_notification_recipients) %>
+        </div>
+        </p>
     </div>
+
 </div>

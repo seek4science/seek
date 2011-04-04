@@ -363,7 +363,15 @@ module ApplicationHelper
   def can_manage_announcements?
     return current_user.is_admin?
   end
-  
+
+  def show_or_hide_block visible=true
+    "display:" + (visible ? 'block' : 'none')
+  end
+
+  def toggle_appear_javascript block_id
+    "Effect.toggle(#{block_id},'slide',{duration:0.5})"
+  end
+
   def count_actions(object, actions=nil)
     count = 0
     if actions.nil?

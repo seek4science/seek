@@ -18,26 +18,22 @@
     Activation required for new accounts: <%= check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled, :title => 'when the user register for an account, an email sent to ask for activating the account') %>
   </p>
   <p>
-    JWS Online integration enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :title => 'enable JWS Online for building and simulating SBML models') %>
-
-    <br/>
-    JWS Online Root URL:    <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
+    JWS Online integration enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :onchange=>toggle_appear_javascript('jws_online_root_block'),:title => 'enable JWS Online for building and simulating SBML models') %>
+    <div id="jws_online_root_block" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
+        JWS Online Root URL:    <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
+    </div>
   </p>
   <p>
-    Google analytics enabled: <%= check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled, :title => 'generating detailed statistics about the visitors to this website') %>
-
-    <br/>
-    Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
+    Google analytics enabled: <%= check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,:onchange=>toggle_appear_javascript('google_anaylitics_block'), :title => 'generating detailed statistics about the visitors to this website') %>
+    <div id="google_anaylitics_block" style="<%= show_or_hide_block Seek::Config.google_analytics_enabled -%>">
+        Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
+    </div>
   </p>
   <h3>Email</h3>
   <p>
     <%= render :partial => 'admin/email'  %>
   </p>
-  <p>
-    Exception notification enabled: <%= check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled) %>
-    <br/>
-    Exception notification recipients:    <%= text_field_tag(:exception_notification_recipients, Seek::Config.exception_notification_recipients) %>
-  </p>
+
     <%= submit_tag "Update" %>
   </div>
 <% end -%>
