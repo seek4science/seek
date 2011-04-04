@@ -38,10 +38,9 @@
     Header image enabled:    <%= check_box_tag(:header_image_enabled, 1, Seek::Config.header_image_enabled) %>
     <br style="clear:both;"/>
     <br/>
-    Header image:    <%= file_field(:header_image, :data, :value => Seek::Config.header_image) %>
+    Header image:    <%= text_field_tag(:header_image, Seek::Config.header_image) %>
     <br style="clear:both;"/>
     <br/>
-
     Header image link:    <%= text_field_tag(:header_image_link, Seek::Config.header_image_link) %>
     <br style="clear:both;"/>
     <br/>
