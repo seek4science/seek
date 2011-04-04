@@ -359,7 +359,7 @@ class ModelsController < ApplicationController
   def new    
     @model=Model.new
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new Models. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -550,7 +550,7 @@ class ModelsController < ApplicationController
   def translate_action action
     action="download" if action == "simulate"
     action="edit" if ["submit_to_jws","builder"].include?(action)
-    action
+    super action
   end
   
   def jws_enabled

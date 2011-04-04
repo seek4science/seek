@@ -47,7 +47,7 @@ class ExperimentalConditionsController < ApplicationController
       sop = Sop.find(params[:sop_id])
       the_action=action_name
       the_action="edit" if the_action=="destroy" #we are not destroying the sop, just editing its exp conditions
-      if Authorization.is_authorized?(the_action, nil, sop, current_user)
+      if sop.can_perform? translate_action(the_action)
         @sop = sop
         @display_sop = params[:version] ? @sop.find_version(params[:version]) : @sop.latest_version
       else

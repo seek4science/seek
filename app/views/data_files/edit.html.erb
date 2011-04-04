@@ -33,7 +33,7 @@
 
 	<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "DataFile",
-					:existing_attributions=>Authorization.authorize_collection("show", @data_file.attributions_objects, current_user),
+					:existing_attributions=>Authorization.authorize_collection("view", @data_file.attributions_objects, current_user),
 					:existing_creators=>@data_file.creators,
 					:other_creators=>@data_file.other_creators,
 					:related_publications=>@data_file.related_publications

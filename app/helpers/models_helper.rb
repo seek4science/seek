@@ -50,7 +50,7 @@ module ModelsHelper
   
   def authorised_models
     models=Model.find(:all)
-    Authorization.authorize_collection("show",models,current_user)
+    Authorization.authorize_collection("view",models,current_user)
   end  
   
   def jws_supported? model

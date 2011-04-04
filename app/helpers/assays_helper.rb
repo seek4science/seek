@@ -13,7 +13,7 @@ module AssaysHelper
   def data_files_for_assay_association
     data_files=DataFile.find(:all,:include=>:asset)
     data_files=data_files.select{|df| current_user.person.projects.include?(df.project)}
-    Authorization.authorize_collection("show",data_files,current_user)
+    Authorization.authorize_collection("view",data_files,current_user)
   end
 
   def assay_organism_list_item assay_organism

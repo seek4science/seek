@@ -31,7 +31,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test "should create hidden event by default" do
     post :create, :event => valid_event
-    assert !Authorization.is_authorized?("view", nil, assigns(:event), users(:aaron)) #must be a user other than the one you are logged in as
+    assert !assigns(:event).can_view?(users(:aaron)) #must be a user other than the one you are logged in as
   end
 
   test "should show event" do

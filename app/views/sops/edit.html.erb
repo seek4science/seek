@@ -34,7 +34,7 @@
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "Sop",
-					:existing_attributions=>Authorization.authorize_collection("show", @sop.attributions_objects, current_user),
+					:existing_attributions=>Authorization.authorize_collection("view", @sop.attributions_objects, current_user),
 					:existing_creators=>@sop.creators,
 					:other_creators=>@sop.other_creators,
 					:related_publications=>@sop.related_publications,

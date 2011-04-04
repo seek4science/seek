@@ -126,6 +126,10 @@ class Person < ActiveRecord::Base
     return res
   end
 
+  def member?
+    !projects.empty?
+  end
+
   def locations
     # infer all person's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }

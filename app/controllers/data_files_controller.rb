@@ -57,7 +57,7 @@ class DataFilesController < ApplicationController
   def new
     @data_file = DataFile.new
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new Data files. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -67,9 +67,7 @@ class DataFilesController < ApplicationController
   end
 
   def upload_for_tool
-    t1 = Time.now
     if handle_data
-      t2 = Time.now
 
       @data_file = DataFile.new params[:data_file]
 
@@ -77,18 +75,11 @@ class DataFilesController < ApplicationController
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
       if @data_file.save
-        time = Time.now
-        logger.info "TIME: total for upload tool #{time - t1}"
-        logger.info "TIME: after handle_data #{time - t2}"
         @data_file.creators = [current_user.person]
         flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
         render :text => flash.now[:notice]
       else
-        time = Time.now
-        logger.info "TIME: total for upload tool #{time - t1}"
-        logger.info "TIME: after handle_data #{time - t2}"
         errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
-        logger.debug errors
         render :text => errors, :status => 500
       end
     end
@@ -292,7 +283,7 @@ end
 
   def translate_action action
     action="download" if action=="data"
-    action
+    super action
   end
 
 end

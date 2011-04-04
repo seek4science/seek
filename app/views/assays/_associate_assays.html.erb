@@ -1,6 +1,4 @@
-<%
-   resource_text ||= text_for_resource(resource)
-%>
+<% resource_text ||= text_for_resource(resource) %>
 <script type="text/javascript">
 </script>
 
@@ -112,7 +110,7 @@
 <% if params[:assay_ids] %>
   <% params[:assay_ids].each do |id| -%>
     <% assay = Assay.find(id) %>
-    <% if assay.can_view? -%>
+    <% if assay.can_view?-%>
         assay_id = '<%= assay.id -%>';
         assay_title = '<%= escape_javascript(assay.title) -%>';
         addAssay(assay_title,assay_id);
