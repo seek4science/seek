@@ -1,0 +1,22 @@
+ul.settings {
+    padding-left: 2em;
+}
+
+.setting_description {
+    padding-bottom: 0.5em;
+    display: inline-block;
+    min-width: 20em;
+}
+
+.setting_name {
+    width: 20em;
+    display: inline-block;
+}
+
+.setting_field {
+    width: 20em;
+}
+
+.additional_settings {
+    padding-left: 1em;
+}
