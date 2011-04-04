@@ -4,10 +4,10 @@ class AssaysController < ApplicationController
   include IndexPager
   include Seek::TaggingCommon
 
-  before_filter :find_assays,:only=>[:index]
+  before_filter :find_assets,:only=>[:index]
   before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
-  before_filter :check_is_project_pal, :only=>[:edit, :update, :destroy]
+  before_filter :check_can_edit, :only=>[:edit, :update, :destroy]
   before_filter :delete_allowed,:only=>[:destroy]  
 
   def new
@@ -190,7 +190,7 @@ class AssaysController < ApplicationController
     end
   end
 
-  def check_is_project_pal
+  def check_can_edit
     @assay=Assay.find(params[:id])
     if @assay.can_edit?(current_user)
       return true

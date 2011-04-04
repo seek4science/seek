@@ -27,8 +27,8 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "authorization supported?" do
-    assert !Assay.authorization_supported?
-    assert !assays(:metabolomics_assay).authorization_supported?
+    assert Assay.authorization_supported?
+    assert assays(:metabolomics_assay).authorization_supported?
   end
 
   test "avatar_key" do

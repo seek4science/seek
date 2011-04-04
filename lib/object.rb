@@ -11,7 +11,8 @@ class Object
     send method if respond_to? method
   end
 
-  #caller_method_name and parse_caller are from Dzone snippets.. is this a problem for licensing?
+  #caller_method_name and parse_caller are from Dzone snippets
+  # http://snippets.dzone.com/posts/show/2787
   def caller_method_name
     parse_caller(caller(2).first).last
   end

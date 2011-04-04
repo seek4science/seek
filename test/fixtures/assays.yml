@@ -7,6 +7,7 @@ metabolomics_assay:
   study: metabolomics_study  
   owner: person_for_model_owner
   assay_class: experimental_assay_class  
+  policy: policy_for_viewable_data_file
 
 
 metabolomics_assay2:
@@ -17,7 +18,8 @@ metabolomics_assay2:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   uuid: pppp-kkkk-eeee-wwww
-  
+  policy: policy_for_viewable_data_file
+
 metabolomics_assay3:
   title: Metabolomics Assay3
   assay_type: metabolomics
@@ -25,7 +27,8 @@ metabolomics_assay3:
   study: study_with_overlapping_assay_sops
   owner: person_for_model_owner
   assay_class: experimental_assay_class
-  
+  policy: policy_for_viewable_data_file
+
 assay_with_just_a_study:
   title: Assay with just a Study
   assay_type: metabolomics
@@ -33,6 +36,7 @@ assay_with_just_a_study:
   study: metabolomics_study2
   owner: person_for_model_owner
   assay_class: experimental_assay_class
+  policy: policy_for_viewable_data_file
 
 assay_with_no_study_or_files:
   title: Assay with no Study or files
@@ -41,6 +45,7 @@ assay_with_no_study_or_files:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
+  policy: policy_for_viewable_data_file
 
 assay_with_no_study_but_has_some_files:
   title: Assay with no Study but has some files
@@ -49,6 +54,7 @@ assay_with_no_study_but_has_some_files:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
+  policy: policy_for_viewable_data_file
 
 assay_with_no_study_but_has_some_sops:
   title: Assay with no Study but has some sops
@@ -57,6 +63,7 @@ assay_with_no_study_but_has_some_sops:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
+  policy: policy_for_viewable_data_file
   
 assay_type_test_assay1:
   title: assay_type_test_assay1
@@ -65,6 +72,7 @@ assay_type_test_assay1:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
+  policy: policy_for_viewable_data_file
 
 assay_type_test_assay2:
   title: assay_type_test_assay2
@@ -73,6 +81,7 @@ assay_type_test_assay2:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
+  policy: policy_for_viewable_data_file
 
 technology_type_test_assay1:
   title: technology_type_test_assay1
@@ -81,6 +90,7 @@ technology_type_test_assay1:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
+  policy: policy_for_viewable_data_file
 
 technology_type_test_assay2:
   title: technology_type_test_assay2
@@ -89,7 +99,8 @@ technology_type_test_assay2:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   study: junk_study
-  
+  policy: policy_for_viewable_data_file
+
 assay_with_links_in_description:
   title: Assay with links in description
   assay_type: metabolomics
@@ -98,6 +109,7 @@ assay_with_links_in_description:
   description: Visit my site http://www.sysmo-db.org
   study: study_with_links_in_description
   assay_class: experimental_assay_class
+  policy: policy_for_viewable_data_file
 
 assay_with_public_and_private_sops_and_datafiles:
   title: Assay with 2 sops, and 2 datafiles - one of each public & private
@@ -107,7 +119,8 @@ assay_with_public_and_private_sops_and_datafiles:
   description: Visit my site http://www.sysmo-db.org
   study: study_with_assay_with_public_private_sops_and_datafile
   assay_class: experimental_assay_class
-  
+  policy: policy_for_viewable_data_file
+
 modelling_assay_with_data_and_relationship:
   title: Modelling Assay with Data
   assay_type: metabolomics  
@@ -115,14 +128,16 @@ modelling_assay_with_data_and_relationship:
   description: modelling assay
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
-  
+  policy: policy_for_viewable_data_file
+
 assay_with_a_model:
   title: Assay with model
   assay_type: metabolomics
   technology_type: gas_chromatography
   study: metabolomics_study2
   owner: person_for_model_owner
-  assay_class: experimental_assay_class 
+  assay_class: experimental_assay_class
+  policy: policy_for_viewable_data_file
   
 assay_with_a_publication:
   title: Assay with publication 
@@ -131,6 +146,7 @@ assay_with_a_publication:
   study: metabolomics_study2
   owner: person_for_model_owner
   assay_class: experimental_assay_class    
+  policy: policy_for_viewable_data_file
 
 modelling_assay:
   title: Modelling Assay
@@ -139,3 +155,4 @@ modelling_assay:
   description: modelling assay
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
+  policy: policy_for_viewable_data_file
