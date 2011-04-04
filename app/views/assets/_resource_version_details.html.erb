@@ -3,14 +3,15 @@
     <table>
       <tbody>
       <tr>
-        <td class="heading" style="vertical-align: top;">
+        <td class="heading">
           <span><%= "Version #{displayed_resource.version.to_s} #{resource.describe_version(displayed_resource.version.to_s)}" -%></span>
           <span class="count_text">(of <%= resource.versions.length -%>)</span>
           <a name="versions"></a>
         </td>
-        <td>
+        <td style="text-align:right">
           <% if resource.version > 1 %>
-              <b>View version: </b><%= resource_version_selection resource, displayed_resource -%>
+              <span style="font-weight: bold;">View version: </span>
+              <%= resource_version_selection resource, displayed_resource -%>
           <% end %>
         </td>
       </tr>
