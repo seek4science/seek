@@ -80,7 +80,7 @@ class AdminController < ApplicationController
     Seek::Config.application_title= params[:application_title]
 
     Seek::Config.header_image_enabled= string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image= params[:header_image][:data]
+    Seek::Config.header_image= params[:header_image]
     Seek::Config.header_image_link= params[:header_image_link]
     Seek::Config.header_image_title= params[:header_image_title]
 
