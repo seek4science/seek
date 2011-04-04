@@ -14,6 +14,10 @@
     .setting_field {
         width: 20em;
     }
+
+    .additional_settings {
+        padding-left: 1em;
+    }
 </style>
 
 <h1>Enable or disable features</h1>
@@ -24,61 +28,60 @@
             :description=>"Something about the feature",
             :name=>"Events enabled",
             :field=>check_box_tag(:events_enabled, 1,Seek::Config.events_enabled)
-    } -%> 
+    } -%>
 
-    <li>
-      <span class='box_infotext setting_description'>
-        Something about the feature
-      </span>
-      <br/>
-      <span class='setting_name'>
-        JERM harvesting enabled:
-      </span>
-      <span class='setting_field'>
-        <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
-      </span>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Something about the feature",
+            :name=>"JERM harvesting enabled",
+            :field=>check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled)
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Something about the feature",
+            :name=>"Search enabled",
+            :field=>check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function')
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Something about the feature",
+            :name=>"Hide contact details",
+            :field=>check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled)
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Something about the feature",
+            :name=>"Activation required",
+            :field=>check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled, :title => 'when the user register for an account, an email sent to ask for activating the account')
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Something about the feature",
+            :name=>"JWS Online enabled",
+            :field=>check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :onchange=>toggle_appear_javascript('jws_online_details'),:title => 'enable JWS Online for building and simulating SBML models')
+    } -%>
+
+    <li id="jws_online_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
+        JWS Online Root URL: <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
     </li>
 
-    <li>
-      <span class='box_infotext setting_description'>
-        Something about the feature
-      </span>
-      <br/>
-      <span class='setting_name'>
-        Search enabled:
-      </span>
-      <span class='setting_field'>
-        <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function') %>
-      </span>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Something about the feature",
+            :name=>"Google analytics enabled",
+            :field=>check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,:onchange=>toggle_appear_javascript('google_anaylitics_block'), :title => 'generating detailed statistics about the visitors to this website')
+    } -%>
+
+    <li id="google_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.google_analytics_enabled -%>">
+        Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
     </li>
 
     <li>
       <%= render :partial => 'admin/email'  %>
     </li>
+
+    <li><%= submit_tag "Update",:disable_with=>"Updating ..." %></li>
   </ul>
 
-  <p>
-    Hide contact details:    <%= check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled) %>
-  </p>
-  <p>
-    Activation required for new accounts: <%= check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled, :title => 'when the user register for an account, an email sent to ask for activating the account') %>
-  </p>
-  <p>
-    JWS Online integration enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :onchange=>toggle_appear_javascript('jws_online_root_block'),:title => 'enable JWS Online for building and simulating SBML models') %>
-    <div id="jws_online_root_block" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
-        JWS Online Root URL:    <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
-    </div>
-  </p>
-  <p>
-    Google analytics enabled: <%= check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,:onchange=>toggle_appear_javascript('google_anaylitics_block'), :title => 'generating detailed statistics about the visitors to this website') %>
-    <div id="google_anaylitics_block" style="<%= show_or_hide_block Seek::Config.google_analytics_enabled -%>">
-        Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
-    </div>
-  </p>
-
-
-
-    <%= submit_tag "Update" %>
+      <% end -%>
   </div>
-<% end -%>
+
 
