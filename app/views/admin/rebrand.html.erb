@@ -35,24 +35,23 @@
     <br style="clear:both;"/>
     <br/>
 
-    Header image enabled:    <%= check_box_tag(:header_image_enabled, 1, Seek::Config.header_image_enabled) %>
-    <br style="clear:both;"/>
+    Header image enabled:    <%= check_box_tag :header_image_enabled, 1, Seek::Config.header_image_enabled,:onchange=>toggle_appear_javascript('header_image_details') %>
+    <div id="header_image_details" style="<%= show_or_hide_block(Seek::Config.header_image_enabled) -%>">
+        <br/>
+        Header image:    <%= text_field_tag(:header_image, Seek::Config.header_image) %>
+        <br/><br/>
+        Header image link:    <%= text_field_tag(:header_image_link, Seek::Config.header_image_link) %>
+        <br/><br/>
+        Header image title:    <%= text_field_tag(:header_image_title, Seek::Config.header_image_title) %>
+        <br/>
+    </div>
     <br/>
-    Header image:    <%= text_field_tag(:header_image, Seek::Config.header_image) %>
-    <br style="clear:both;"/>
-    <br/>
-    Header image link:    <%= text_field_tag(:header_image_link, Seek::Config.header_image_link) %>
-    <br style="clear:both;"/>
-    <br/>
-    Header image title:    <%= text_field_tag(:header_image_title, Seek::Config.header_image_title) %>
-    <br style="clear:both;"/>
-    <br/>
-    Copyright addendum enabled:    <%= check_box_tag(:copyright_addendum_enabled, 1, Seek::Config.copyright_addendum_enabled) %>
-    <br style="clear:both;"/>
-    <br/>
-    Copyright addendum content:    <%= text_field_tag(:copyright_addendum_content, Seek::Config.copyright_addendum_content) %>
-    <br style="clear:both;"/>
-    <br/>
+    Copyright addendum enabled:    <%= check_box_tag(:copyright_addendum_enabled, 1, Seek::Config.copyright_addendum_enabled,:onchange=>toggle_appear_javascript('copyright_details')) %>
+
+    <div id='copyright_details' style="<%= show_or_hide_block(Seek::Config.copyright_addendum_enabled) -%>">
+        Copyright addendum content:    <%= text_field_tag(:copyright_addendum_content, Seek::Config.copyright_addendum_content) %>
+        <br/>
+    </div>
     <br style="clear:both;"/>
     <br/>
 
