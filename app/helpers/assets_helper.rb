@@ -232,7 +232,7 @@ module AssetsHelper
   #provides a list of assets, according to the class, that are authorized to 'show'
   def authorised_assets asset_class
     assets=asset_class.find(:all)
-    Authorization.authorize_collection("show",assets,current_user)
+    Authorization.authorize_collection("view",assets,current_user)
   end
 
 end

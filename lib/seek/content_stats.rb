@@ -21,15 +21,15 @@ module Seek
       end
       
       def visible_data_files
-        authorised_assets data_files,"show"
+        authorised_assets data_files,"view"
       end
       
       def visible_sops
-        authorised_assets sops,"show"
+        authorised_assets sops,"view"
       end
       
       def visible_models
-        authorised_assets models,"show"
+        authorised_assets models,"view"
       end
       
       def accessible_data_files
@@ -51,7 +51,7 @@ module Seek
       private 
       
       def authorised_assets assets,action
-        assets.select{|asset| Authorization.is_authorized?(action,nil,asset,@user)}
+        assets.select{|asset| asset.can_perform? action, @user}
       end
       
       def assets_size assets

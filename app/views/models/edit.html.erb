@@ -47,7 +47,7 @@
 		
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "Model",
-					:existing_attributions=>Authorization.authorize_collection("show", @model.attributions_objects, current_user),
+					:existing_attributions=>Authorization.authorize_collection("view", @model.attributions_objects, current_user),
 					:existing_creators=>@model.creators,
 					:other_creators=>@model.other_creators,
 					:related_publications=>@model.related_publications

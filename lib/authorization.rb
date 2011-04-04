@@ -18,26 +18,11 @@ module Authorization
 
   
   # 1) action_name - name of the action that is about to happen with the "thing"
-  # 2) thing_type - class name of the thing that needs to be authorized;
-  #                 use NIL as a value of this parameter if an instance of the object to be authorized is supplied as "thing";
+  # 2) thing_type - this parameter is deprecated
   # 3) thing - instance of resource to be authorized
   # 4) user - instance of user
-  def self.is_authorized?(action_name, thing_type, thing, user=nil)    
-    # ***************************************
-    #      Pre-checks on the Parameters
-    # ***************************************
+  def self.is_authorized?(action, thing_type, thing, user=nil)
 
-    #Don't try and authorize things that don't have policies!
-    return true unless authorization_supported?(thing)
-    
-    # check first if the action that is being executed is know
-    # - it should be, if not there's a bug in the code
-    action = categorize_action(action_name)
-    
-    # ***************************************
-    #      Actual Authorization Begins 
-    # ***************************************
-    
     # initially not authorized, so if all tests fail -
     # safe result of being not authorized will get returned 
     is_authorized = false
@@ -147,7 +132,7 @@ module Authorization
   def self.authorize_collection(action_name, item_array, user, keep_nil_records=false)
     # otherwise perform authorization for every item
     authorized_items = item_array.collect do |item|
-      Authorization.is_authorized?(action_name, nil, item, user) ? item : nil
+     item.can_perform?(action_name, user) ? item : nil
     end
     
     # not authorized items have been turned into NILs - remove these
@@ -158,39 +143,8 @@ module Authorization
     return authorized_items
   end
   
-  #Delete this after fixing refs
-  def self.is_member?(person_id, what, whatever)
-    !Person.find_by_id(person_id).projects.empty?
-  end
-  
   private
-  
-  def self.categorize_action(action_name)
-    case action_name
-      when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
-           'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-           'tag',  'items', 'statistics', 'tag_suggestions','preview'
-        action = 'view'
-        
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute'
-        action = 'download'
-        
-      when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
-           'destroy_version', 'edit_version', 'update_version', 'new_item',
-           'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link'
-        action = 'edit'
-        
-      when 'destroy', 'destroy_item', 'manage'
-        action = 'destroy'
 
-      else
-        # unknown action
-        action = nil
-    end
-    
-    return action
-  end
-  
   # checks if a person belongs to a blacklist of a particular user
   def self.is_person_in_blacklist?(person, blacklist_owner)
     return blacklist_owner.get_blacklist.people.include?(person)
@@ -210,7 +164,9 @@ module Authorization
         return access_type >= Policy::ACCESSIBLE
       when "edit"
         return access_type >= Policy::EDITING
-      when "destroy"
+      when "delete"
+        return access_type >= Policy::MANAGING
+      when "manage"
         return access_type >= Policy::MANAGING
     else
       # any other type of action is not allowed by permissions

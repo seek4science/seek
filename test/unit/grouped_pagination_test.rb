@@ -204,7 +204,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     @data_files=DataFile.paginate
     assert_equal @data_files.page, Seek::Config.default_pages[:data_files]
     @models=Model.paginate
-    assert_equal @models.page, Seek::Config.default_page ("models")
+    assert_equal @models.page, Seek::Config.default_page("models")
     @sops=Sop.paginate
     assert_equal @sops.page, Seek::Config.default_pages[:sops]
     @publications=Publication.paginate

@@ -45,7 +45,7 @@ class StudiedFactorsController < ApplicationController
       data_file = DataFile.find(params[:data_file_id])
       the_action=action_name
       the_action="edit" if the_action=="destroy" #we are not destroying the sop, just editing its exp conditions
-      if Authorization.is_authorized?(the_action, nil, data_file, current_user)
+      if data_file.can_perform? translate_action(the_action)
         @data_file = data_file
         @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
       else

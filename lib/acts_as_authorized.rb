@@ -66,7 +66,7 @@ module Acts #:nodoc:
 
       def can_delete? user=nil
         user ||= User.current_user
-        Authorization.is_authorized? "destroy", nil, self, user
+        Authorization.is_authorized? "delete", nil, self, user
       end
 
       def can_manage? user=nil
@@ -100,6 +100,10 @@ ActiveRecord::Base.class_eval do
   #they should only be used in conjunction with acts_as_authorized
   def contributor_credited?
     false
+  end
+
+  def can_perform? action, user=nil
+    send "can_#{action}?", user
   end
 
   def can_edit? user=nil

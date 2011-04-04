@@ -33,7 +33,7 @@ class AssaysControllerTest < ActionController::TestCase
   test "shouldn't show unauthorized assays" do
     get :index, :page=>"all",:format=>"xml"
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("show", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("view", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
   end
 
   def test_title
@@ -533,10 +533,10 @@ end
     assert assay.data_files.include?(data_files(:downloadable_data_file).find_version(1))
     assert assay.data_files.include?(data_files(:private_data_file).find_version(1))
 
-    assert Authorization.is_authorized?("show",nil,sops(:sop_with_fully_public_policy),user)
-    assert !Authorization.is_authorized?("show",nil,sops(:sop_with_private_policy_and_custom_sharing),user)
-    assert Authorization.is_authorized?("show",nil,data_files(:downloadable_data_file),user)
-    assert !Authorization.is_authorized?("show",nil,data_files(:private_data_file),user)
+    assert sops(:sop_with_fully_public_policy).can_view? user
+    assert !sops(:sop_with_private_policy_and_custom_sharing).can_view?(user)
+    assert data_files(:downloadable_data_file).can_view?(user)
+    assert !data_files(:private_data_file).can_view?(user)
   end
   
   test "filtering by study" do

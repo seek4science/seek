@@ -314,7 +314,7 @@ class PublicationsController < ApplicationController
     begin
       publication = Publication.find(params[:id])            
       
-      if Authorization.is_authorized?(action_name, nil, publication, current_user)
+      if publication.can_perform? translate_action(action_name)
         @publication = publication
       else
         respond_to do |format|

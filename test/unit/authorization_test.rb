@@ -42,14 +42,14 @@ class AuthorizationTest < ActiveSupport::TestCase
   # testing: is_member?(person_id, group_type, group_id)
   # member of any SysMO projects at all? (e.g. a "SysMO user": person who is associated with at least one project / institution ('workgroup'), not just a registered user)
   def test_is_member_associated_with_any_projects_true
-    res = Authorization.is_member?(people(:random_userless_person), nil, nil)
+    res = people(:random_userless_person).member?
     
     assert res, "person associated with some SysMO projects was thought not to be associated with any"
   end
   
   # member of any SysMO projects at all?
   def test_is_member_associated_with_any_projects_false
-    res = Authorization.is_member?(people(:person_not_associated_with_any_projects), nil, nil)
+    res = people(:person_not_associated_with_any_projects).member?
     
     assert !res, "person not associated with any SysMO projects was thought to be a member of some"
   end
@@ -62,35 +62,35 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !Authorization.access_type_allows_action?("view", Policy::NO_ACCESS), "'view' action should NOT have been allowed with access_type set to 'Policy::NO_ACCESS'"
     assert !Authorization.access_type_allows_action?("download", Policy::NO_ACCESS), "'download' action should NOT have been allowed with access_type set to 'Policy::NO_ACCESS'"
     assert !Authorization.access_type_allows_action?("edit", Policy::NO_ACCESS), "'edit' action should have NOT been allowed with access_type set to 'Policy::NO_ACCESS'"
-    assert !Authorization.access_type_allows_action?("destroy", Policy::NO_ACCESS), "'destroy' action should have NOT been allowed with access_type set to 'Policy::NO_ACCESS'"
+    assert !Authorization.access_type_allows_action?("delete", Policy::NO_ACCESS), "'delete' action should have NOT been allowed with access_type set to 'Policy::NO_ACCESS'"
   end
   
   def test_access_type_allows_action_viewing_only
     assert Authorization.access_type_allows_action?("view", Policy::VISIBLE), "'view' action should have been allowed with access_type set to 'Policy::VISIBLE'"
     assert !Authorization.access_type_allows_action?("download", Policy::VISIBLE), "'download' action should NOT have been allowed with access_type set to 'Policy::VISIBLE'"
     assert !Authorization.access_type_allows_action?("edit", Policy::VISIBLE), "'edit' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
-    assert !Authorization.access_type_allows_action?("destroy", Policy::VISIBLE), "'destroy' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
+    assert !Authorization.access_type_allows_action?("delete", Policy::VISIBLE), "'delete' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
   end
   
   def test_access_type_allows_action_viewing_and_downloading_only
     assert Authorization.access_type_allows_action?("view", Policy::ACCESSIBLE), "'view' action should have been allowed with access_type set to 'Policy::ACCESSIBLE' (cascading permissions)"
     assert Authorization.access_type_allows_action?("download", Policy::ACCESSIBLE), "'download' action should have been allowed with access_type set to 'Policy::ACCESSIBLE'"
     assert !Authorization.access_type_allows_action?("edit", Policy::ACCESSIBLE), "'edit' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
-    assert !Authorization.access_type_allows_action?("destroy", Policy::ACCESSIBLE), "'destroy' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
+    assert !Authorization.access_type_allows_action?("delete", Policy::ACCESSIBLE), "'delete' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
   end
   
   def test_access_type_allows_action_editing
     assert Authorization.access_type_allows_action?("view", Policy::EDITING), "'view' action should have been allowed with access_type set to 'Policy::EDITING' (cascading permissions)"
     assert Authorization.access_type_allows_action?("download", Policy::EDITING), "'download' action should have been allowed with access_type set to 'Policy::EDITING' (cascading permissions)"
     assert Authorization.access_type_allows_action?("edit", Policy::EDITING), "'edit' action should have been allowed with access_type set to 'Policy::EDITING'"
-    assert !Authorization.access_type_allows_action?("destroy", Policy::EDITING), "'destroy' action should have NOT been allowed with access_type set to 'Policy::EDITING'"
+    assert !Authorization.access_type_allows_action?("delete", Policy::EDITING), "'delete' action should have NOT been allowed with access_type set to 'Policy::EDITING'"
   end
   
   def test_access_type_allows_action_managing
     assert Authorization.access_type_allows_action?("view", Policy::MANAGING), "'view' action should have been allowed with access_type set to 'Policy::MANAGING' (cascading permissions)"
     assert Authorization.access_type_allows_action?("download", Policy::MANAGING), "'download' action should have been allowed with access_type set to 'Policy::MANAGING' (cascading permissions)"
     assert Authorization.access_type_allows_action?("edit", Policy::MANAGING), "'edit' action should have been allowed with access_type set to 'Policy::MANAGING'"
-    assert Authorization.access_type_allows_action?("destroy", Policy::MANAGING), "'destroy' action should have been allowed with access_type set to 'Policy::MANAGING'"
+    assert Authorization.access_type_allows_action?("delete", Policy::MANAGING), "'delete' action should have been allowed with access_type set to 'Policy::MANAGING'"
   end
   
   
@@ -218,11 +218,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert res, "Quentin should not be able to view his model_owner's model"
   end
   
-  # testing that asset owners can destroy (plus verifying different options fur submitting the 'thing' and the 'user')
+  # testing that asset owners can delete (plus verifying different options fur submitting the 'thing' and the 'user')
   
-  def test_is_authorized_owner_who_is_not_policy_admin_can_destroy
-    res = Authorization.is_authorized?("destroy", nil, sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
-    assert res, "owner of asset who isn't its policy admin couldn't destroy the asset"
+  def test_is_authorized_owner_who_is_not_policy_admin_can_delete
+    res = Authorization.is_authorized?("delete", nil, sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
+    assert res, "owner of asset who isn't its policy admin couldn't delete the asset"
   end
   
   # testing whitelist / blacklist
@@ -274,13 +274,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = sops(:sop_with_all_sysmo_users_policy).policy.use_blacklist
     assert temp, "use_blacklist should have been set to 'true'"
     
-    temp = Authorization.is_member?(people(:person_for_owner_of_my_first_sop), nil, nil)
+    temp = people(:person_for_owner_of_my_first_sop).member?
     assert temp, "test person is associated with some SysMO projects, but was thought not to be associated with any"
     
     temp = Authorization.is_person_in_blacklist?(people(:person_for_owner_of_my_first_sop), sops(:sop_with_all_sysmo_users_policy).contributor)
     assert !temp, "test person shouldn't have been in the blacklist of the sop owner"
     
-    res = Authorization.is_authorized?("show", nil, sops(:sop_with_all_sysmo_users_policy), people(:person_for_owner_of_my_first_sop).user)
+    res = sops(:sop_with_all_sysmo_users_policy).can_view? people(:person_for_owner_of_my_first_sop).user
     assert res, "test user is SysMO user and is not in blacklist - should have been authorized for viewing"
   end
   
@@ -488,7 +488,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = sops(:sop_with_all_sysmo_users_policy).policy.use_blacklist
     assert temp, "use_blacklist should have been set to 'true'"
 
-    temp = Authorization.is_member?(people(:person_for_sysmo_user_in_blacklist), nil, nil)
+    temp = people(:person_for_sysmo_user_in_blacklist).member?
     assert temp, "test person is associated with some SysMO projects, but was thought not to be associated with any"
 
     temp = Authorization.is_person_in_blacklist?(people(:person_for_sysmo_user_in_blacklist), sops(:sop_with_all_sysmo_users_policy).contributor)
@@ -500,7 +500,7 @@ class AuthorizationTest < ActiveSupport::TestCase
                                                people(:person_for_sysmo_user_in_blacklist).user, people(:person_for_sysmo_user_in_blacklist))
     assert temp, "test user is SysMO user and should have been authorized by policy"
 
-    res = Authorization.is_authorized?("show", nil, sops(:sop_with_all_sysmo_users_policy), people(:person_for_sysmo_user_in_blacklist).user)
+    res = Authorization.is_authorized?("view", nil, sops(:sop_with_all_sysmo_users_policy), people(:person_for_sysmo_user_in_blacklist).user)
     assert !res, "test user is SysMO user, but is also in blacklist - should not have been authorized for viewing"
   end
 
@@ -690,9 +690,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert permissions[0].contributor_type == "WorkGroup", "expected to have permission for 'WorkGroup'"
     assert permissions[0].access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
     
-    # verify that test user is a member of the group in the permission
-    temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person, permissions[0].contributor_type, permissions[0].contributor_id)
-    
     # verify that group permissions work and access is granted
     res = Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_workgroups), users(:owner_of_fully_public_policy))
     assert res, "test user should have been allowed to 'download' the SOP - because of group permission"
@@ -720,9 +717,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert permissions.length == 1, "expected to have one permission for workgroups in that policy, not #{permissions.length}"
     assert permissions[0].contributor_type == "WorkGroup", "expected to have permission for 'WorkGroup'"
     assert permissions[0].access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
-    
-    # verify that test user is a member of the group in the permission
-    temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person, permissions[0].contributor_type, permissions[0].contributor_id)
     
     # verify that group permissions won't be applied and access is still prohibited
     res = Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_workgroups_no_custom_sharing), users(:owner_of_fully_public_policy))
@@ -763,9 +757,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !perm.nil?, "couldn't find correct permission for the test"
     assert perm.access_type == Policy::EDITING, "expected that the permission would give the test user edit access to the test SOP"
     
-    # verify that test user is a member of the project in the permission
-    temp = Authorization.is_member?(users(:owner_of_download_for_all_registered_users_policy).person, perm.contributor_type, perm.contributor_id)
-    
     # verify that group permissions work and access is granted
     res = Authorization.is_authorized?("edit", nil, sops(:sop_for_test_with_projects_institutions), users(:owner_of_download_for_all_registered_users_policy))
     assert res, "test user should have been allowed to 'download' the SOP - because of group permission: shared with test user's project"
@@ -800,9 +791,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
     assert !perm.nil?, "couldn't find correct permission for the test"
     assert perm.access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
-    
-    # verify that test user is a member of the institution in the permission
-    temp = Authorization.is_member?(users(:owner_of_fully_public_policy).person, perm.contributor_type, perm.contributor_id)
     
     # verify that group permissions work and access is granted
     res = Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_projects_institutions), users(:owner_of_fully_public_policy))
@@ -902,7 +890,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     sop.policy.use_custom_sharing=true
     sop.policy.save!
     
-    assert Authorization.is_authorized?("manage",Sop,sop,user), "The sop should now be managable to the pal"
+    assert sop.can_manage?(user), "The sop should now be managable to the pal"
   end
   
   
