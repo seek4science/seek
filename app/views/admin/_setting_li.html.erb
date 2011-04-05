@@ -1,7 +1,10 @@
+<% description ||= nil -%>
 <li>
-      <span class='box_infotext setting_description'>
-        <%= description -%>
-      </span>
+      <% if description -%>
+          <span class='box_infotext setting_description'>
+            <%= description -%>
+          </span>
+      <% end -%>
       <br/>
       <span class='setting_name'>
         <%= name -%>

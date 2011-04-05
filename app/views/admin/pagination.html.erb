@@ -1,219 +1,121 @@
+<%= stylesheet_link_tag "settings" -%>
 
-<% form_tag :action=>"update_pagination" do -%>
-  <br style="clear:both;"/>
-  <br/>
-  <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Pagination index for :
-    <br style="clear:both;"/>
-    <br/>
-    People:                 <% if Seek::Config.default_page("people") == "latest" %>
-                            <%= radio_button_tag(:people, "latest", true) %>
-                            <%= label_tag(:people_latest, "latest") %>
-                            <%= radio_button_tag(:people, "all") %>
-                            <%= label_tag(:people_all, "all") %>
-                         <% elsif Seek::Config.default_page("people") == "all"%>
-                            <%= radio_button_tag(:people, "latest") %>
-                            <%= label_tag(:people_latest, "latest") %>
-                            <%= radio_button_tag(:people, "all", true) %>
-                            <%= label_tag(:people_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:people, "latest") %>
-                            <%= label_tag(:people_latest, "latest") %>
-                            <%= radio_button_tag(:people, "all") %>
-                            <%= label_tag(:people_all, "all") %>
-                         <% end %>
+<h1>Index page behaviour</h1>
+<div class='show_basic'>
+  <ul class='settings'>
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"People",
+            :field=>(radio_button_tag(:people, "latest", Seek::Config.default_page("people") == "latest") +
+                    label_tag(:people_latest, "latest") +
+                    radio_button_tag(:people, "all",Seek::Config.default_page("people") == "all") +
+                    label_tag(:people_all, "all"))
 
-    <br style="clear:both;"/>
-    <br/>
-    Projects:            <% if Seek::Config.default_page("projects") == "latest" %>
-                            <%= radio_button_tag(:projects, "latest", true) %>
-                            <%= label_tag(:projects_latest, "latest") %>
-                            <%= radio_button_tag(:projects, "all") %>
-                            <%= label_tag(:projects_all, "all") %>
-                         <% elsif Seek::Config.default_page("projects") == "all"%>
-                            <%= radio_button_tag(:projects, "latest") %>
-                            <%= label_tag(:projects_latest, "latest") %>
-                            <%= radio_button_tag(:projects, "all", true) %>
-                            <%= label_tag(:projects_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:projects, "latest") %>
-                            <%= label_tag(:projects_latest, "latest") %>
-                            <%= radio_button_tag(:projects, "all") %>
-                            <%= label_tag(:projects_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Institutions:         <% if Seek::Config.default_page("institutions") == "latest" %>
-                            <%= radio_button_tag(:institutions, "latest", true) %>
-                            <%= label_tag(:institutions_latest, "latest") %>
-                            <%= radio_button_tag(:institutions, "all") %>
-                            <%= label_tag(:institutions_all, "all") %>
-                         <% elsif Seek::Config.default_page("institutions") == "all"%>
-                            <%= radio_button_tag(:institutions, "latest") %>
-                            <%= label_tag(:institutions_latest, "latest") %>
-                            <%= radio_button_tag(:institutions, "all", true) %>
-                            <%= label_tag(:institutions_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:institutions, "latest") %>
-                            <%= label_tag(:institutions_latest, "latest") %>
-                            <%= radio_button_tag(:institutions, "all") %>
-                            <%= label_tag(:institutions_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-     Investigations:      <% if Seek::Config.default_page("investigations") == "latest" %>
-                            <%= radio_button_tag(:investigations, "latest", true) %>
-                            <%= label_tag(:investigations_latest, "latest") %>
-                            <%= radio_button_tag(:investigations, "all") %>
-                            <%= label_tag(:investigations_all, "all") %>
-                         <% elsif Seek::Config.default_page("investigations") == "all"%>
-                            <%= radio_button_tag(:investigations, "latest") %>
-                            <%= label_tag(:investigations_latest, "latest") %>
-                            <%= radio_button_tag(:investigations, "all", true) %>
-                            <%= label_tag(:investigations_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:investigations, "latest") %>
-                            <%= label_tag(:investigations_latest, "latest") %>
-                            <%= radio_button_tag(:investigations, "all") %>
-                            <%= label_tag(:investigations_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Studies:              <% if Seek::Config.default_page("studies") == "latest" %>
-                            <%= radio_button_tag(:studies, "latest", true) %>
-                            <%= label_tag(:studies_latest, "latest") %>
-                            <%= radio_button_tag(:studies, "all") %>
-                            <%= label_tag(:studies_all, "all") %>
-                         <% elsif Seek::Config.default_page("studies") == "all"%>
-                            <%= radio_button_tag(:studies, "latest") %>
-                            <%= label_tag(:studies_latest, "latest") %>
-                            <%= radio_button_tag(:studies, "all", true) %>
-                            <%= label_tag(:studies_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:studies, "latest") %>
-                            <%= label_tag(:studies_latest, "latest") %>
-                            <%= radio_button_tag(:studies, "all") %>
-                            <%= label_tag(:studies_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Assays:               <% if Seek::Config.default_page("assays") == "latest" %>
-                            <%= radio_button_tag(:assays, "latest", true) %>
-                            <%= label_tag(:assays_latest, "latest") %>
-                            <%= radio_button_tag(:assays, "all") %>
-                            <%= label_tag(:assays_all, "all") %>
-                         <% elsif Seek::Config.default_page("assays") == "all"%>
-                            <%= radio_button_tag(:assays, "latest") %>
-                            <%= label_tag(:assays_latest, "latest") %>
-                            <%= radio_button_tag(:assays, "all", true) %>
-                            <%= label_tag(:assays_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:assays, "latest") %>
-                            <%= label_tag(:assays_latest, "latest") %>
-                            <%= radio_button_tag(:assays, "all") %>
-                            <%= label_tag(:assays_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Data files:           <% if Seek::Config.default_page("data_files") == "latest" %>
-                            <%= radio_button_tag(:data_files, "latest", true) %>
-                            <%= label_tag(:data_files_latest, "latest") %>
-                            <%= radio_button_tag(:data_files, "all") %>
-                            <%= label_tag(:data_files_all, "all") %>
-                         <% elsif Seek::Config.default_page("data_files") == "all"%>
-                            <%= radio_button_tag(:data_files, "latest") %>
-                            <%= label_tag(:data_files_latest, "latest") %>
-                            <%= radio_button_tag(:data_files, "all", true) %>
-                            <%= label_tag(:data_files_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:data_files, "latest") %>
-                            <%= label_tag(:data_files_latest, "latest") %>
-                            <%= radio_button_tag(:data_files, "all") %>
-                            <%= label_tag(:data_files_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Models:               <% if Seek::Config.default_page("models") == "latest" %>
-                            <%= radio_button_tag(:models, "latest", true) %>
-                            <%= label_tag(:models_latest, "latest") %>
-                            <%= radio_button_tag(:models, "all") %>
-                            <%= label_tag(:models_all, "all") %>
-                         <% elsif Seek::Config.default_page("models") == "all"%>
-                            <%= radio_button_tag(:models, "latest") %>
-                            <%= label_tag(:models_latest, "latest") %>
-                            <%= radio_button_tag(:models, "all", true) %>
-                            <%= label_tag(:models_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:models, "latest") %>
-                            <%= label_tag(:models_latest, "latest") %>
-                            <%= radio_button_tag(:models, "all") %>
-                            <%= label_tag(:models_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Sops:                 <% if Seek::Config.default_page("sops") == "latest" %>
-                            <%= radio_button_tag(:sops, "latest", true) %>
-                            <%= label_tag(:sops_latest, "latest") %>
-                            <%= radio_button_tag(:sops, "all") %>
-                            <%= label_tag(:sops_all, "all") %>
-                         <% elsif Seek::Config.default_page("sops") == "all"%>
-                            <%= radio_button_tag(:sops, "latest") %>
-                            <%= label_tag(:sops_latest, "latest") %>
-                            <%= radio_button_tag(:sops, "all", true) %>
-                            <%= label_tag(:sops_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:sops, "latest") %>
-                            <%= label_tag(:sops_latest, "latest") %>
-                            <%= radio_button_tag(:sops, "all") %>
-                            <%= label_tag(:sops_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Publications:         <% if Seek::Config.default_page("publications") == "latest" %>
-                            <%= radio_button_tag(:publications, "latest", true) %>
-                            <%= label_tag(:publications_latest, "latest") %>
-                            <%= radio_button_tag(:publications, "all") %>
-                            <%= label_tag(:publications_all, "all") %>
-                         <% elsif Seek::Config.default_page("publications") == "all"%>
-                            <%= radio_button_tag(:publications, "latest") %>
-                            <%= label_tag(:publications_latest, "latest") %>
-                            <%= radio_button_tag(:publications, "all", true) %>
-                            <%= label_tag(:publications_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:publications, "latest") %>
-                            <%= label_tag(:publications_latest, "latest") %>
-                            <%= radio_button_tag(:publications, "all") %>
-                            <%= label_tag(:publications_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Events:               <% if Seek::Config.default_page("events") == "latest" %>
-                            <%= radio_button_tag(:events, "latest", true) %>
-                            <%= label_tag(:events_latest, "latest") %>
-                            <%= radio_button_tag(:events, "all") %>
-                            <%= label_tag(:events_all, "all") %>
-                         <% elsif Seek::Config.default_page("events") == "all"%>
-                            <%= radio_button_tag(:events, "latest") %>
-                            <%= label_tag(:events_latest, "latest") %>
-                            <%= radio_button_tag(:events, "all", true) %>
-                            <%= label_tag(:events_all, "all") %>
-                         <% else %>
-                            <%= radio_button_tag(:events, "latest") %>
-                            <%= label_tag(:events_latest, "latest") %>
-                            <%= radio_button_tag(:events, "all") %>
-                            <%= label_tag(:events_all, "all") %>
-                         <% end %>
-    <br style="clear:both;"/>
-    <br/>
-    Paginate latest limit: <%= text_field_tag(:limit_latest, Settings.limit_latest, :onkeypress => "javascript: return onlyNumbers(event);") %>
-    <br style="clear:both;"/>
-    <br/>
-    <br style="clear:both;"/>
-    <br/>
-    <%= submit_tag "Update"%>
-  </div>
-<% end -%>
+    } -%>
 
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Projects",
+            :field=>(radio_button_tag(:projects, "latest", Seek::Config.default_page("projects") == "latest") +
+                    label_tag(:projects_latest, "latest") +
+                    radio_button_tag(:projects, "all",Seek::Config.default_page("projects") == "all") +
+                    label_tag(:projects_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Institutions",
+            :field=>(radio_button_tag(:institutions, "latest", Seek::Config.default_page("institutions") == "latest") +
+                    label_tag(:institutions_latest, "latest") +
+                    radio_button_tag(:institutions, "all",Seek::Config.default_page("institutions") == "all") +
+                    label_tag(:institutions_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Investigations",
+            :field=>(radio_button_tag(:investigations, "latest", Seek::Config.default_page("investigations") == "latest") +
+                    label_tag(:investigations_latest, "latest") +
+                    radio_button_tag(:investigations, "all",Seek::Config.default_page("investigations") == "all") +
+                    label_tag(:investigations_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Studies",
+            :field=>(radio_button_tag(:studies, "latest", Seek::Config.default_page("studies") == "latest") +
+                    label_tag(:studies_latest, "latest") +
+                    radio_button_tag(:studies, "all",Seek::Config.default_page("studies") == "all") +
+                    label_tag(:studies_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Assays",
+            :field=>(radio_button_tag(:assays, "latest", Seek::Config.default_page("assays") == "latest") +
+                    label_tag(:assays_latest, "latest") +
+                    radio_button_tag(:assays, "all",Seek::Config.default_page("assays") == "all") +
+                    label_tag(:assays_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Data files",
+            :field=>(radio_button_tag(:data_files, "latest", Seek::Config.default_page("data_files") == "latest") +
+                    label_tag(:data_files_latest, "latest") +
+                    radio_button_tag(:data_files, "all",Seek::Config.default_page("data_files") == "all") +
+                    label_tag(:data_files_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Models",
+            :field=>(radio_button_tag(:models, "latest", Seek::Config.default_page("models") == "latest") +
+                    label_tag(:models_latest, "latest") +
+                    radio_button_tag(:models, "all",Seek::Config.default_page("models") == "all") +
+                    label_tag(:models_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"SOPs",
+            :field=>(radio_button_tag(:sops, "latest", Seek::Config.default_page("sops") == "latest") +
+                    label_tag(:sops_latest, "latest") +
+                    radio_button_tag(:sops, "all",Seek::Config.default_page("sops") == "all") +
+                    label_tag(:sops_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :name=>"Publications",
+            :field=>(radio_button_tag(:publications, "latest", Seek::Config.default_page("publications") == "latest") +
+                    label_tag(:publications_latest, "latest") +
+                    radio_button_tag(:publications, "all",Seek::Config.default_page("publications") == "all") +
+                    label_tag(:publications_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{            
+            :name=>"Events",
+            :field=>(radio_button_tag(:events, "latest", Seek::Config.default_page("events") == "latest") +
+                    label_tag(:events_latest, "latest") +
+                    radio_button_tag(:events, "all",Seek::Config.default_page("events") == "all") +
+                    label_tag(:events_all, "all"))
+
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Some text about this feature",
+            :name=>"Latest list length",
+            :field=>text_field_tag(:limit_latest, Settings.limit_latest, :onkeypress => "javascript: return onlyNumbers(event);")
+
+    } -%>
+
+    <li>
+      <%= submit_tag "Update", :disable_with=>"Updating..." -%>
+    </li>
+
+  </ul>
+
+</div>
 
 
 
