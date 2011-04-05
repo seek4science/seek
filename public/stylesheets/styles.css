@@ -318,8 +318,7 @@ span.disabled_icon {
 
 .show_basic li {
     list-style-type:none;
-    margin: 0px 0px 0px 0px;    
-    white-space:nowrap;
+    margin: 0px 0px 0px 0px;        
 }
 
 #expertise_people a.current_user {
