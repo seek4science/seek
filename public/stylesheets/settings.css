@@ -4,7 +4,8 @@ ul.settings {
 
 .setting_description {
     padding-bottom: 0.5em;
-    display: block;
+    display:block;
+    max-width: 95%;
     font-size: smaller;
     color: #777;
 }
