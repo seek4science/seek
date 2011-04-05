@@ -111,7 +111,7 @@ module Seek
         end
       end
 
-      if field.to_sym == :authentication
+      if field.to_sym == :authentication and value
         value = value.to_sym
       end
       if field.to_sym == :password
