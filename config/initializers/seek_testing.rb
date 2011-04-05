@@ -4,7 +4,6 @@ if Rails.env.test?
     Settings.defaults[:application_title] = 'The Sysmo SEEK'
     Settings.defaults[:project_name] = 'Sysmo'
     Settings.defaults[:project_title] = 'The Sysmo Consortium'
-    Settings.defaults[:dm_project_name] = 'Sysmo-DB'
 
     Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
 
