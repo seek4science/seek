@@ -217,7 +217,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.policy.permissions
     assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
     assert df.creators
-    p df.creators
     assert_equal df.creators.first, users(:datafile_owner).person
   end
   
