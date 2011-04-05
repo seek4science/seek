@@ -105,7 +105,7 @@ module Seek
     end
 
     def set_smtp_settings (field, value)
-      if [:password, :user, :authentication].include? field.to_sym
+      if [:password, :user_name, :authentication].include? field.to_sym
         if value.blank?
           value = nil
         end
