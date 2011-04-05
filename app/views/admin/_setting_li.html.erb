@@ -3,7 +3,7 @@
       <span class='setting_name'>
         <%= name -%>
       </span>
-      <span class='<%= field.include?("checkbox") ? "setting_checkbox" : "setting_field" -%>' >
+      <span class='<%= field.include?(%!type="text"!) ? "setting_field" : "setting_checkbox" -%>' >
         <%= field -%>
       </span>
       <% if description -%>

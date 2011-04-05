@@ -15,8 +15,8 @@ ul.settings {
     display: inline-block;
 }
 
-.setting_field {
-    width: 10em;
+.setting_checkbox input {
+    width: 5em;
 }
 
 .setting_field input {

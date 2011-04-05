@@ -4,6 +4,9 @@
 <div class='show_basic'>
   <% form_tag :action=>"update_pagination" do -%>
   <ul class='settings'>
+    <li class="setting_description">
+      When clicking on each tab above, either All items are listed, or only the Latest. On this page you can select the default for each tab.
+    </li>
     <%= render :partial=>'setting_li',:locals=>{
             :name=>"People",
             :field=>(radio_button_tag(:people, "latest", Seek::Config.default_page("people") == "latest") +
@@ -104,7 +107,7 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
-            :description=>"Some text about this feature",
+            :description=>"This is the maximum number of items that are listed when viewing 'latest'.",
             :name=>"Latest list length",
             :field=>text_field_tag(:limit_latest, Settings.limit_latest, :onkeypress => "javascript: return onlyNumbers(event);")
 
