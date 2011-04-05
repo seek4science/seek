@@ -42,6 +42,7 @@
 
     <li id="jws_online_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
         JWS Online Root URL: <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
+      <span class='setting_description'>Some text</span>
     </li>
 
     <%= render :partial=>'setting_li',:locals=>{

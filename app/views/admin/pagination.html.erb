@@ -2,6 +2,7 @@
 
 <h1>Index page behaviour</h1>
 <div class='show_basic'>
+  <% form_tag :action=>"update_pagination" do -%>
   <ul class='settings'>
     <%= render :partial=>'setting_li',:locals=>{
             :name=>"People",
@@ -110,11 +111,11 @@
     } -%>
 
     <li>
-      <%= submit_tag "Update", :disable_with=>"Updating..." -%>
+      <%= submit_tag "Update",:disable_with=>"Updating..." -%>
     </li>
 
   </ul>
-
+  <% end -%>
 </div>
 
 

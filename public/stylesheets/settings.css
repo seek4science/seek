@@ -4,19 +4,26 @@ ul.settings {
 
 .setting_description {
     padding-bottom: 0.5em;
-    display: inline-block;
-    min-width: 20em;
+    display: block;
+    font-size: smaller;
+    color: #777;
 }
 
 .setting_name {
-    width: 20em;
+    width: 15em;
     display: inline-block;
 }
 
 .setting_field {
-    width: 20em;
+    width: 10em;
+}
+
+.setting_field input {
+    min-width: 25em;
+    text-align:left;
 }
 
 .additional_settings {
     padding-left: 1em;
+    padding-bottom: 0.3em;
 }
