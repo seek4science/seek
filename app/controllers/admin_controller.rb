@@ -1,8 +1,14 @@
 class AdminController < ApplicationController
   include CommonSweepers
+
+  RESTART_MSG = "You settings have been updated. If you enabled search you need to restart your server.
+                 If deployed in conjunction with Passenger Phusion you can use the button at the bottom of this page,
+                 otherwise you need to restart manually."
   
   before_filter :login_required
   before_filter :is_user_admin_auth
+
+
 
   def show
     respond_to do |format|
@@ -119,7 +125,7 @@ class AdminController < ApplicationController
   end
 
   def finalize_config_changes
-    flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
+    flash[:notice] = RESTART_MSG
     #expires all fragment caching
     expire_all_fragments
     redirect_to :action=>:show
@@ -307,7 +313,7 @@ class AdminController < ApplicationController
 
   def update_redirect_to flag, action
      if flag
-       flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
+       flash[:notice] = RESTART_MSG
        #expires all fragment caching
        expire_all_fragments
        redirect_to :action=>:show
