@@ -27,6 +27,10 @@ Seek::Config.default :google_analytics_tracker_id, '000-000'
 Seek::Config.default :project_name,'SysMO'
 Seek::Config.default :project_type,'Consortium'
 Seek::Config.default :project_link,'http://www.sysmo.net'
+
+Seek::Config.default :application_name,"SEEK"
+Seek::Config.default :dm_project_name,"SysMO-DB"
+Seek::Config.default :dm_project_link,"http://www.sysmo-db.org"
 Seek::Config.default :header_image_enabled,true
 Seek::Config.default :header_image_title, "SysMO-DB"
 Seek::Config.default :header_image_link,"http://www.sysmo-db.org"
