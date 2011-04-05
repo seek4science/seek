@@ -3,12 +3,13 @@
 <%= stylesheet_link_tag 'jws/JWSconstructor_panels','jws/Resizeable_Textbox/style.css','jws/Resizeable_Container/style.css','jws/jws_builder.css',"jws/jws_annotator.css" -%>
 
 <%= render :partial=>"models/builder/annotator_header" -%>
+
 <div class="show_basic">
     <div class="yui-gf">
         <div class="yui-u first builder_actions" style="width:19%;">
-          <h6>Store</h6>
+          <h6>Store annotations</h6>
           <input type="Button" id="submit_annotations_button" value="Store" onclick="submit_annotations();">
-          <br/>
+          <div style="padding-bottom:1em;"></div>
         </div>
         <div class="yui-u" style="width: 80%; height: 100%; margin-left: 0.1em;">
           <% if @search_results.error_code != "0" -%>
