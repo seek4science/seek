@@ -152,7 +152,6 @@ module DotGenerator
   end
   
   def tooltip resource
-    return "fred"
     resource.class.name.upcase + ": " + resource.title.strip
   end
   

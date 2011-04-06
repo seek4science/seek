@@ -105,15 +105,16 @@ module Seek
     end
 
     def set_smtp_settings (field, value)
-      if field == :authentication || field == 'authentication'
+      if [:password, :user_name, :authentication].include? field.to_sym
         if value.blank?
           value = nil
-        else
-          value = value.to_sym
         end
       end
 
-      if field == :password || field == 'password'
+      if field.to_sym == :authentication and value
+        value = value.to_sym
+      end
+      if field.to_sym == :password
         if !value.blank?
           value = encrypt(value,generate_key(GLOBAL_PASSPHRASE))
         end
