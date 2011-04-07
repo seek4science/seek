@@ -25,4 +25,5 @@ end
 group :test do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
   gem "timocratic-test_benchmark"
+  gem "ruby-prof"
 end

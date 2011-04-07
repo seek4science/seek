@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 require 'test_benchmark'
 require 'rest_test_cases'
+require 'ruby-prof'
 
 class ActiveSupport::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method
@@ -28,7 +29,7 @@ class ActiveSupport::TestCase
   # test cases which use the @david style and don't mind the speed hit (each
   # instantiated fixtures translates to a database query per test method),
   # then set this back to true.
-  self.use_instantiated_fixtures  = false
+  self.use_instantiated_fixtures = false
 
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
   #
@@ -43,4 +44,18 @@ class ActiveSupport::TestCase
   set_fixture_class :tags=>ActsAsTaggableOn::Tag
 
   # Add more helper methods to be used by all tests here...
+
+  #profiling
+
+  def start_profiling
+    RubyProf.start
+  end
+
+  def stop_profiling prefix="profile"
+    results = RubyProf.stop
+
+    File.open "#{RAILS_ROOT}/tmp/#{prefix}-graph.html", 'w' do |file|
+      RubyProf::GraphHtmlPrinter.new(results).print(file)
+    end
+  end
 end
