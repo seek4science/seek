@@ -205,7 +205,7 @@ module Seek
     extend CustomAccessors
 
     #Basic settings
-    settings = [:events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
+    settings = [:public_seek_enabled, :events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
       :jws_online_root, :hide_details_enabled, :activity_log_enabled,
       :activation_required_enabled, :project_name, :smtp, :default_pages,
       :project_type, :project_link, :header_image_enabled, :header_image,
