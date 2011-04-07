@@ -6,7 +6,7 @@ class TagsController < ApplicationController
     @tagged_objects = select_authorised taggings.collect{|tagging| tagging.taggable}.uniq
     
     if @tagged_objects.empty?
-      flash.now[:notice]="No objects tagged with '<b>#{@tag.name}</b>'."
+      flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{@tag.name}</b>'."
     else
       flash.now[:notice]="#{@tagged_objects.size} #{@tagged_objects.size==1 ? 'item' : 'items'} tagged with '<b>#{@tag.name}</b>'."
     end
