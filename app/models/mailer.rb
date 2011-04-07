@@ -3,13 +3,25 @@ class Mailer < ActionMailer::Base
 
   def feedback user,topic,details,send_anonymously,base_host
     subject "#{Seek::Config.application_name} Feedback provided - #{topic}"
-    recipients admin_emails
+    recipients [admin_emails,user.person.email_with_name]
     from Seek::Config.noreply_sender
     reply_to user.person.email_with_name unless  send_anonymously
     sent_on Time.now
 
     body :topic=>topic,:details=>details,:anon=>send_anonymously,:host=>base_host,:person=>user.person
-  end    
+  end
+
+  def file_uploaded uploader,receiver,file,base_host
+    subject "#{Seek::Config.application_name} - File Upload"
+    recipients [uploader.person.email_with_name,receiver.email_with_name]
+    from     Seek::Config.noreply_sender
+    reply_to uploader.person.email_with_name
+    sent_on Time.now
+
+    body :host=>base_host,:uploader=>uploader.person, :receiver => receiver,:data_file => file
+
+
+  end
 
   def request_resource(user,resource,details,base_host)
 
