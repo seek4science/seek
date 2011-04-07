@@ -78,12 +78,10 @@ class DataFilesController < ApplicationController
 
       if @data_file.save
         @data_file.creators = [current_user.person]
-        ############################################
-        #send email to the file uploader and receiver
 
+        #send email to the file uploader and receiver
         Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
 
-        ############################################
         flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
         render :text => flash.now[:notice]
       else

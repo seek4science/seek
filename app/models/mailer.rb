@@ -3,7 +3,7 @@ class Mailer < ActionMailer::Base
 
   def feedback user,topic,details,send_anonymously,base_host
     subject "#{Seek::Config.application_name} Feedback provided - #{topic}"
-    recipients [admin_emails,user.person.email_with_name]
+    recipients admin_emails
     from Seek::Config.noreply_sender
     reply_to user.person.email_with_name unless  send_anonymously
     sent_on Time.now
