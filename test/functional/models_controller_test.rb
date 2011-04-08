@@ -513,9 +513,39 @@ class ModelsControllerTest < ActionController::TestCase
     put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
     assert_redirected_to model_path(model)
     model.reload
-
     assert_equal "new title", model.title
     assert_equal Policy::NO_ACCESS, model.policy.access_type, "policy should have been updated"
+  end
+
+  test "owner should be able to choose policy 'share with everyone' when creating a model" do
+    model=valid_model
+    post :create, :model => model, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, :access_type_4=>Policy::VISIBLE}
+    assert_redirected_to model_path(assigns(:model))
+    assert_equal users(:model_owner),assigns(:model).contributor
+    assert assigns(:model)
+
+    model=assigns(:model)
+    assert_equal Policy::EVERYONE,model.policy.sharing_scope
+    assert_equal Policy::VISIBLE,model.policy.access_type
+    #check it doesn't create an error when retreiving the index
+    get :index
+    assert_response :success
+  end
+
+  test "owner should be able to choose policy 'share with everyone' when updating a model" do
+    login_as(:model_owner)
+    user = users(:model_owner)
+    model   = models(:model_with_links_in_description)
+    assert model.can_edit?(user), "model should be editable and manageable for this test"
+    assert model.can_manage?(user), "model should be editable and manageable for this test"
+    assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
+    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, :access_type_4=>Policy::VISIBLE}
+    assert_redirected_to model_path(model)
+    model.reload
+
+    assert_equal "new title", model.title
+    assert_equal Policy::EVERYONE, model.policy.sharing_scope, "policy should have been changed to everyone"
+    assert_equal Policy::VISIBLE, model.policy.access_type, "policy should have been updated to visible"
   end
 
   test "update with ajax only applied when viewable" do
