@@ -14,11 +14,6 @@
       
       <%
         all_assays=authorised_assays.sort_by &:title
-
-        all_assays = all_assays.select do |assay|
-            assay.is_modelling?
-        end if resource.is_a? Model
-
         project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
         select_truncate_length=120
       -%>
