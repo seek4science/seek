@@ -125,10 +125,29 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "can delete?" do
-    assert assays(:assay_with_just_a_study).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_a_model).can_delete?(users(:model_owner))
+    user = User.current_user = Factory(:user)
+    assert Factory(:assay, :owner => user.person).can_delete?
+
+    assay = Factory(:assay, :owner => user.person)
+    assay.relate Factory(:data_file)
+    assert !assay.can_delete?
+
+    assay = Factory(:assay, :owner => user.person)
+    assay.relate Factory(:sop)
+    assert !assay.can_delete?
+
+    assay = Factory(:assay, :owner => user.person)
+    assay.relate Factory(:model)
+    assert !assay.can_delete?
+
+    pal = Factory :pal
+    #create an assay with project = to the project for which the pal is a pal
+    assay = Factory(:assay,
+                    :study => Factory(:study,
+                                      :investigation => Factory(:investigation,
+                                                                :project => (pal.projects.find {|p| p.pals.include? pal}))))
+    assert !assay.can_delete?(pal.user)
+    
     assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
   end
 

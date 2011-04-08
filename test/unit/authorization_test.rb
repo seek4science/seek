@@ -63,6 +63,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !Authorization.access_type_allows_action?("download", Policy::NO_ACCESS), "'download' action should NOT have been allowed with access_type set to 'Policy::NO_ACCESS'"
     assert !Authorization.access_type_allows_action?("edit", Policy::NO_ACCESS), "'edit' action should have NOT been allowed with access_type set to 'Policy::NO_ACCESS'"
     assert !Authorization.access_type_allows_action?("delete", Policy::NO_ACCESS), "'delete' action should have NOT been allowed with access_type set to 'Policy::NO_ACCESS'"
+    assert !Authorization.access_type_allows_action?("manage", Policy::NO_ACCESS), "'manage' action should have NOT been allowed with access_type set to 'Policy::NO_ACCESS'"
   end
   
   def test_access_type_allows_action_viewing_only
@@ -70,6 +71,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !Authorization.access_type_allows_action?("download", Policy::VISIBLE), "'download' action should NOT have been allowed with access_type set to 'Policy::VISIBLE'"
     assert !Authorization.access_type_allows_action?("edit", Policy::VISIBLE), "'edit' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
     assert !Authorization.access_type_allows_action?("delete", Policy::VISIBLE), "'delete' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
+    assert !Authorization.access_type_allows_action?("manage", Policy::VISIBLE), "'manage' action should have NOT been allowed with access_type set to 'Policy::VISIBLE'"
   end
   
   def test_access_type_allows_action_viewing_and_downloading_only
@@ -77,6 +79,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert Authorization.access_type_allows_action?("download", Policy::ACCESSIBLE), "'download' action should have been allowed with access_type set to 'Policy::ACCESSIBLE'"
     assert !Authorization.access_type_allows_action?("edit", Policy::ACCESSIBLE), "'edit' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
     assert !Authorization.access_type_allows_action?("delete", Policy::ACCESSIBLE), "'delete' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
+    assert !Authorization.access_type_allows_action?("manage", Policy::ACCESSIBLE), "'manage' action should have NOT been allowed with access_type set to 'Policy::ACCESSIBLE'"
   end
   
   def test_access_type_allows_action_editing
@@ -84,6 +87,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert Authorization.access_type_allows_action?("download", Policy::EDITING), "'download' action should have been allowed with access_type set to 'Policy::EDITING' (cascading permissions)"
     assert Authorization.access_type_allows_action?("edit", Policy::EDITING), "'edit' action should have been allowed with access_type set to 'Policy::EDITING'"
     assert !Authorization.access_type_allows_action?("delete", Policy::EDITING), "'delete' action should have NOT been allowed with access_type set to 'Policy::EDITING'"
+    assert !Authorization.access_type_allows_action?("manage", Policy::EDITING), "'manage' action should have NOT been allowed with access_type set to 'Policy::EDITING'"
   end
   
   def test_access_type_allows_action_managing
@@ -91,6 +95,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert Authorization.access_type_allows_action?("download", Policy::MANAGING), "'download' action should have been allowed with access_type set to 'Policy::MANAGING' (cascading permissions)"
     assert Authorization.access_type_allows_action?("edit", Policy::MANAGING), "'edit' action should have been allowed with access_type set to 'Policy::MANAGING'"
     assert Authorization.access_type_allows_action?("delete", Policy::MANAGING), "'delete' action should have been allowed with access_type set to 'Policy::MANAGING'"
+    assert Authorization.access_type_allows_action?("manage", Policy::MANAGING), "'manage' action should have been allowed with access_type set to 'Policy::MANAGING'"
   end
   
   
@@ -215,7 +220,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   def test_is_not_authorized_for_model
     res = Authorization.is_authorized?("view", "Model", models(:teusink), users(:quentin))
-    assert res, "Quentin should not be able to view his model_owner's model"
+    assert res, "Quentin should not be able to view the model_owner's model"
   end
   
   # testing that asset owners can delete (plus verifying different options fur submitting the 'thing' and the 'user')
@@ -892,10 +897,66 @@ class AuthorizationTest < ActiveSupport::TestCase
     
     assert sop.can_manage?(user), "The sop should now be managable to the pal"
   end
-  
-  
+
+  def test_anyone_can_do_anything_for_policy_free_items
+    item = Factory :person
+    User.current_user = Factory :user
+    actions.each {|a| assert item.can_perform? a}
+    assert item.can_edit?
+    assert item.can_view?
+    assert item.can_download?
+    assert item.can_delete?
+    assert item.can_manage?
+  end
+
+  def test_contributor_can_do_anything
+    item = Factory :sop, :policy => Factory(:private_policy)
+    User.current_user = item.contributor
+    actions.each {|a| assert item.can_perform? a}
+    assert item.can_edit?
+    assert item.can_view?
+    assert item.can_download?
+    assert item.can_delete?
+    assert item.can_manage?
+  end
+
+  def test_private_item_does_not_allow_anything
+    item = Factory :sop, :policy => Factory(:private_policy)
+    User.current_user = Factory :user
+    actions.each {|a| assert !item.can_perform?(a)}
+    assert !item.can_edit?
+    assert !item.can_view?
+    assert !item.can_download?
+    assert !item.can_delete?
+    assert !item.can_manage?
+  end
+
+  def test_permissions
+    User.current_user = Factory :user
+    access_levels = {Policy::MANAGING => actions, 
+                     Policy::NO_ACCESS => [],
+                     Policy::VISIBLE => [:view],
+                     Policy::ACCESSIBLE => [:view, :download],
+                     Policy::EDITING => [:view, :download, :edit]}
+    access_levels.each do |access, allowed|
+      policy = Factory :private_policy, :use_custom_sharing => true
+      policy.permissions << Factory(:permission, :contributor => User.current_user.person, :access_type => access, :policy => policy)
+      item = Factory :sop, :policy => policy
+      actions.each {|action| assert_equal allowed.include?(action), item.can_perform?(action), "User should #{allowed.include?(action) ? nil : "not "}be allowed to #{action}"}
+      assert_equal item.can_view?, allowed.include?(:view)
+      assert_equal item.can_edit?, allowed.include?(:edit)
+      assert_equal item.can_download?, allowed.include?(:download)
+      assert_equal item.can_delete?, allowed.include?(:delete)
+      assert_equal item.can_manage?, allowed.include?(:manage)
+    end
+  end
+
   private 
-  
+
+  def actions
+    [:view, :edit, :download, :delete, :manage]
+  end
+
   #To save me re-writing lots of tests. Code copied from authorization.rb
   #Mimics how authorized_by_policy method used to work, but with my changes.
   def temp_authorized_by_policy?(policy, thing, action, user, not_used_2)
