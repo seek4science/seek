@@ -14,11 +14,6 @@
       
       <%
         all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
-        if resource_text == "model"
-            all_assays.each do |assay|
-                all_assays.delete(assay) if assay.assay_class_id == 1
-            end
-        end
         project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
         select_truncate_length=120
       -%>
