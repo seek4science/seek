@@ -47,4 +47,18 @@ class PolicyTest < ActiveSupport::TestCase
     assert pol.permissions.empty?
   end
 
+  test "policy access type presedence" do
+    assert Policy::NO_ACCESS < Policy::VISIBLE
+    assert Policy::VISIBLE < Policy::ACCESSIBLE
+    assert Policy::ACCESSIBLE < Policy::EDITING
+    assert Policy::EDITING < Policy::MANAGING
+  end
+
+  test "policy sharing scope presedence" do
+    assert Policy::PRIVATE < Policy::CUSTOM_PERMISSIONS_ONLY
+    assert Policy::CUSTOM_PERMISSIONS_ONLY < Policy::ALL_SYSMO_USERS
+    assert Policy::ALL_SYSMO_USERS < Policy::ALL_REGISTERED_USERS
+    assert Policy::ALL_REGISTERED_USERS < Policy::EVERYONE
+  end
+
 end

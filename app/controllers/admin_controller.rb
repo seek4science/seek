@@ -1,8 +1,14 @@
 class AdminController < ApplicationController
   include CommonSweepers
+
+  RESTART_MSG = "You settings have been updated. If you enabled search you need to restart your server.
+                 If deployed in conjunction with Passenger Phusion you can use the button at the bottom of this page,
+                 otherwise you need to restart manually."
   
   before_filter :login_required
   before_filter :is_user_admin_auth
+
+
 
   def show
     respond_to do |format|
@@ -32,6 +38,7 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
+    Seek::Config.public_seek_enabled= string_to_boolean params[:public_seek_enabled]
     Seek::Config.events_enabled= string_to_boolean params[:events_enabled]
     Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
@@ -119,7 +126,7 @@ class AdminController < ApplicationController
   end
 
   def finalize_config_changes
-    flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
+    flash[:notice] = RESTART_MSG
     #expires all fragment caching
     expire_all_fragments
     redirect_to :action=>:show
@@ -160,7 +167,7 @@ class AdminController < ApplicationController
       end
 
       @tag=ActsAsTaggableOn::Tag.find(params[:id])
-      
+
       @tag.destroy if @tag.taggings.select{|t| !t.taggable.nil?}.empty?
 
       #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
@@ -307,7 +314,7 @@ class AdminController < ApplicationController
 
   def update_redirect_to flag, action
      if flag
-       flash[:notice] = 'To apply the change, please click the "Restart server" button if your webserver is Apache, or manually restart the server'
+       flash[:notice] = RESTART_MSG
        #expires all fragment caching
        expire_all_fragments
        redirect_to :action=>:show

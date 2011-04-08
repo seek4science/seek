@@ -1,44 +1,74 @@
+<%= stylesheet_link_tag "settings" -%>
+
 <h1>Enable or disable features</h1>
-<div class="show_basic" style="padding-left:2em;">
-<% form_tag :action=>"update_features_enabled" do -%>
-  <p>
-    Event asset types enabled:    <%= check_box_tag(:events_enabled, 1,Seek::Config.events_enabled) %>
-  </p>
-  <p>
-    JERM enabled:    <%= check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled) %>
-  </p>
-  <p>
-    Search enabled:    <%= check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function') %>
-  </p>
+<div class="show_basic">
+  <% form_tag :action=>"update_features_enabled" do -%>
+  <ul class='settings'>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether the Public SEEK is enabled.",
+            :name=>"Public SEEK enabled",
+            :field=>check_box_tag(:public_seek_enabled, 1,Seek::Config.public_seek_enabled)
+    } -%>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether the Events are displayed and can be added.",
+            :name=>"Events enabled",
+            :field=>check_box_tag(:events_enabled, 1,Seek::Config.events_enabled)
+    } -%>
 
-  <p>
-    Hide contact details:    <%= check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled) %>
-  </p>
-  <p>
-    Activation required for new accounts: <%= check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled, :title => 'when the user register for an account, an email sent to ask for activating the account') %>
-  </p>
-  <p>
-    JWS Online integration enabled:    <%= check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :title => 'enable JWS Online for building and simulating SBML models') %>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether JERM harvesting is enabled. You probably want this disabled. If enabled you need to administer a project to setup the connection and default sharing policy.",
+            :name=>"JERM harvesting enabled",
+            :field=>check_box_tag(:jerm_enabled, 1, Seek::Config.jerm_enabled)
+    } -%>
 
-    <br/>
-    JWS Online Root URL:    <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
-  </p>
-  <p>
-    Google analytics enabled: <%= check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled, :title => 'generating detailed statistics about the visitors to this website') %>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart the server after chanign this setting.",
+            :name=>"Search enabled",
+            :field=>check_box_tag(:solr_enabled, 1, Seek::Config.solr_enabled, :title => 'enable search function')
+    } -%>
 
-    <br/>
-    Google analytics tracker id:    <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
-  </p>
-  <h3>Email</h3>
-  <p>
-    <%= render :partial => 'admin/email'  %>
-  </p>
-  <p>
-    Exception notification enabled: <%= check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled) %>
-    <br/>
-    Exception notification recipients:    <%= text_field_tag(:exception_notification_recipients, Seek::Config.exception_notification_recipients) %>
-  </p>
-    <%= submit_tag "Update" %>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Hides email addresses, skype and internal web addresses.",
+            :name=>"Hide contact details",
+            :field=>check_box_tag(:hide_details_enabled, 1, Seek::Config.hide_details_enabled)
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether activation is required when registering, as an additional check that the person is genuine and provided a correct email address. Since an activation email is sent, you need to make sure email is setup and working",
+            :name=>"Activation required",
+            :field=>check_box_tag(:activation_required_enabled, 1, Seek::Config.activation_required_enabled)
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models, and editing them using JWS OneStop",
+            :name=>"JWS Online enabled",
+            :field=>check_box_tag(:jws_enabled, 1, Seek::Config.jws_enabled, :onchange=>toggle_appear_javascript('jws_online_details'),:title => 'enable JWS Online for building and simulating SBML models')
+    } -%>
+
+    <li id="jws_online_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
+        JWS Online Root URL: <%= text_field_tag(:jws_online_root, Seek::Config.jws_online_root) %>
+      <span class='setting_description'>This is the root URL for the JWS Online server SEEK communicates with, e.g. http://jjj.mib.ac.uk .</span>
+    </li>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID",
+            :name=>"Google analytics enabled",
+            :field=>check_box_tag(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,:onchange=>toggle_appear_javascript('google_anaylitics_block'), :title => 'generating detailed statistics about the visitors to this website')
+    } -%>
+
+    <li id="google_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.google_analytics_enabled -%>">
+      Google analytics tracker id: <%= text_field_tag(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id) %>
+      <span class="setting_description">The tracker ID provided to you by Google.</span>
+    </li>
+
+    <li>
+      <%= render :partial => 'admin/email'  %>
+    </li>
+
+    <li><%= submit_tag "Update",:disable_with=>"Updating ..." %></li>
+  </ul>
+
+      <% end -%>
   </div>
-<% end -%>
+
 

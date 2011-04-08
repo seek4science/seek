@@ -1,0 +1,14 @@
+<% description ||= nil -%>
+<li>
+      <span class='setting_name'>
+        <%= name -%>
+      </span>
+      <span class='<%= field.include?(%!type="text"!) ? "setting_field" : "setting_checkbox" -%>' >
+        <%= field -%>
+      </span>
+      <% if description -%>
+          <span class='setting_description'>
+            <%= description -%>
+          </span>
+      <% end -%>
+</li>
