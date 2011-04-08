@@ -5,6 +5,11 @@
   <% form_tag :action=>"update_features_enabled" do -%>
   <ul class='settings'>
     <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Whether the Public SEEK is enabled.",
+            :name=>"Public SEEK enabled",
+            :field=>check_box_tag(:public_seek_enabled, 1,Seek::Config.public_seek_enabled)
+    } -%>
+    <%= render :partial=>'setting_li',:locals=>{
             :description=>"Whether the Events are displayed and can be added.",
             :name=>"Events enabled",
             :field=>check_box_tag(:events_enabled, 1,Seek::Config.events_enabled)

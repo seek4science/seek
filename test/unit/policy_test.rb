@@ -46,5 +46,4 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal false,pol.use_custom_sharing
     assert pol.permissions.empty?
   end
-
 end

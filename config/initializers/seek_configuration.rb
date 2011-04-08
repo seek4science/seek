@@ -4,6 +4,7 @@
 require 'seek/config'
 
 #Features enabled
+Seek::Config.default :public_seek_enabled,false
 Seek::Config.default :sycamore_enabled,false
 Seek::Config.default :events_enabled,false
 Seek::Config.default :jerm_enabled,true

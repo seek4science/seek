@@ -38,6 +38,7 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
+    Seek::Config.public_seek_enabled= string_to_boolean params[:public_seek_enabled]
     Seek::Config.events_enabled= string_to_boolean params[:events_enabled]
     Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
