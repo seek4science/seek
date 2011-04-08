@@ -1,22 +1,21 @@
 <% resource_text ||= text_for_resource(resource) %>
+<%
+        all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
+        project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
+        select_truncate_length=120
+-%>
 <script type="text/javascript">
 </script>
 
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate assays in SEEK to this #{resource_text}.") -%>
+    <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}. You can only associate assays you are authorized to edit.") -%>
     Associate Assays
   </div>
 
   <div id="associate_assay_fold_content" class="foldContent" style="display: none;">
     <div class="yui-u first" style="width:66%; float:left">
-      
-      <%
-        all_assays=authorised_assays.sort{|a, b| a.title<=>b.title}
-        project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
-        select_truncate_length=120
-      -%>
       
       <p style="color: #666666;">
         The following Assays are involved in this <%= resource_text -%>:
@@ -35,12 +34,13 @@
         } -%>
           <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
           <br/>
+          <div id="relationship" style="display:none;">
             <% if show_relationships -%>
                 <%= label_tag "Relationship between the data and the model" %><br/>
-                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}), :disabled => true %>
+                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
             <% end %>
+          </div>
         <br/>
-        <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Include Assays from other projects?
       </div>
 
 	  <br/>
@@ -63,11 +63,11 @@
        id = $('possible_assays').options[i].value;
        for (var j = 0; j < id_rel_array.length; j++) {
            if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'true'))  {
-              $('assay_relationship_type').disabled = false;
+              Effect.Appear('relationship',{duration:0.2});
            }
            else if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'false'))  {
               $('assay_relationship_type').selectedIndex = 0;
-              $('assay_relationship_type').disabled = true;
+              Effect.Fade('relationship',{duration:0.2});
            }
        }
     }

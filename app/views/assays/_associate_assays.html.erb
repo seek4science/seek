@@ -7,7 +7,7 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}.") -%>
+    <%= help_icon("Here you can associate assays in SEEK to this #{resource_text}. You can only associate assays you are authorized to edit.") -%>
     Associate Assays
   </div>
 
@@ -43,7 +43,6 @@
           <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
           <br/>
         <br/>
-        <%= check_box_tag :include_other_project_assays, nil, false, {:onchange=>"toggle_assay_list();",:style=>"margin-top:0.5em;"} -%> Include Assays from other projects?
       </div>
 
 	  <br/>
