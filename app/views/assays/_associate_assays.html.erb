@@ -1,8 +1,14 @@
 <%
    resource_text ||= text_for_resource(resource)
+   all_assays=authorised_assays.sort_by &:title
+
+    all_assays = all_assays.select do |assay|
+        assay.is_modelling?
+    end if resource.is_a? Model
+
+    project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
+    select_truncate_length=120
 %>
-<script type="text/javascript">
-</script>
 
 <div class="fold">
 
@@ -13,17 +19,6 @@
 
   <div id="associate_assay_fold_content" class="foldContent" style="display: none;">
     <div class="yui-u first" style="width:66%; float:left">
-      
-      <%
-        all_assays=authorised_assays.sort_by &:title
-
-        all_assays = all_assays.select do |assay|
-            assay.is_modelling?
-        end if resource.is_a? Model
-
-        project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
-        select_truncate_length=120
-      -%>
       
       <p style="color: #666666;">
         The following Assays are involved in this <%= resource_text -%>:
