@@ -67,6 +67,7 @@ class DataFilesController < ApplicationController
   end
 
   def upload_for_tool
+
     if handle_data
 
       @data_file = DataFile.new params[:data_file]
@@ -74,9 +75,14 @@ class DataFilesController < ApplicationController
       @data_file.contributor  = current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+
       if @data_file.save
         @data_file.creators = [current_user.person]
-        flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+
+        #send email to the file uploader and receiver
+        Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
+
+        flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
         render :text => flash.now[:notice]
       else
         errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
