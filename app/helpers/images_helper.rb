@@ -10,7 +10,7 @@ module ImagesHelper
   end
   
   def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false)
-    
+
     if (label == 'Destroy')
       label = 'Delete';
     end
