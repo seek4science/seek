@@ -83,6 +83,25 @@ fully_public_policy:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
+public_policy_visible_only:
+  name: "auto"
+  sharing_scope: <%= Policy::EVERYONE %>
+  access_type: <%= Policy::VISIBLE %>
+  use_custom_sharing: false
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
+
+public_policy_access:
+  name: "auto"
+  sharing_scope: <%= Policy::EVERYONE %>
+  access_type: <%= Policy::ACCESSIBLE %>
+  use_custom_sharing: false
+  use_whitelist: false
+  use_blacklist: false
+  created_at: <%= 2.days.ago.to_s :db %>
+  updated_at: <%= 2.days.ago.to_s :db %>
 
 policy_with_complex_permissions:  
   name: "auto"
