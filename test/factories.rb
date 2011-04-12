@@ -83,12 +83,22 @@
     f.association :assay_type
   end
 
+  Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
+    f.title 'Modelling Assay'
+    f.key 'MODEL'
+  end
+
+  Factory.define(:experimental_assay_class, :class => AssayClass) do |f|
+    f.title 'Experimental Assay'
+    f.key 'EXP'
+  end
+
   Factory.define(:modelling_assay, :parent => :assay_base) do |f|
-    f.assay_class AssayClass.for_type("modelling")
+    f.association :assay_class, :factory => :modelling_assay_class
   end
 
   Factory.define(:experimental_assay, :parent => :assay_base) do |f|
-    f.assay_class AssayClass.for_type("experimental")
+    f.association :assay_class, :factory => :experimental_assay_class
     f.association :technology_type
   end
 
