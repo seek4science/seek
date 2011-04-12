@@ -79,8 +79,6 @@ class Assay < ActiveRecord::Base
     investigation.nil? ? nil : investigation.project
   end
 
-    user == nil ? false : project.pals.include?(user.person) || user.person == owner
-
   def can_delete? user=nil
     mixin_super(user) && assets.empty? && related_publications.empty?
   end

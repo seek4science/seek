@@ -19,7 +19,7 @@ ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation
 
 PORTER_SECRET = "" unless defined? PORTER_SECRET
 
-#PiwikAnalytics::Config.id_site = 1
-#PiwikAnalytics::Config.url = nil
+PiwikAnalytics::Config.id_site = 1
+PiwikAnalytics::Config.url = 'localhost'
 
 Seek::Config.propagate_all
