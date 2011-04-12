@@ -29,6 +29,15 @@ class Publication < ActiveRecord::Base
     def events
       []
     end
+
+    def event_ids
+      []
+    end
+
+    def event_ids= events_ids
+
+    end
+    
   end
 
   alias :seek_authors :creators
