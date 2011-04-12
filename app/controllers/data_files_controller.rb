@@ -98,7 +98,7 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.event_ids = params[:event_ids] || []
+      @data_file.event_ids = params[:event_ids] || [] 
       @data_file.contributor=current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
