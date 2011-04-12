@@ -33,11 +33,7 @@
             <%= image_tag_for_key "user", current_user.person, current_user.person.name, {}, current_user.person.name -%>
             | <%= image_tag_for_key "logout", logout_path, "Logout", {}, "Logout" -%>
           </div>
-        <% else %>
-          <div id="logged_in_as">
-            <%= image_tag_for_key "login", login_path, "Login", {}, "Login" -%>
-          </div>
-        <% end %>
+         <% end %>
         <div id="header">
           <%= render :partial=>"layouts/header_main" %>
         </div>

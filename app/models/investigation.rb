@@ -28,6 +28,4 @@ class Investigation < ActiveRecord::Base
   def sops
     assays.collect{|assay| assay.sops}.flatten.uniq
   end
-
-  
 end
