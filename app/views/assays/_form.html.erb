@@ -3,6 +3,7 @@
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
 %>
 <%= javascript_include_tag "assays.js"  %>
+<%= javascript_include_tag "sharing.js" %>
 
 <%= f.error_messages -%>
 
@@ -61,6 +62,10 @@
   </tr>
 </table>
 <br style="clear:both"/>
+
+<p>
+  <%= render :partial=>"assets/sharing_form" if @assay.can_manage? -%>
+</p>
 
 <p>
   <%= render :partial=>"assets/select_tags" -%>

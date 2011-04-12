@@ -4,6 +4,8 @@ require 'test_help'
 require 'test_benchmark'
 require 'rest_test_cases'
 require 'ruby-prof'
+require 'factory_girl'
+Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 class ActiveSupport::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method

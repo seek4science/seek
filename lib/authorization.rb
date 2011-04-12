@@ -36,9 +36,9 @@ module Authorization
     if user.nil?
       scope = Policy::EVERYONE
     else
-      if thing.contributor == user #Warning to future refactorers, this would pass in the case that
-                                   #  the user was nil (not logged in) and the contributor was also nil (jerm resource)
-                                   #  IF we didn't already check for a nil user above.
+      if thing.contributor == user || thing.contributor == user.person #Warning to future refactorers, this would pass in the case that
+                                                                       #  the user was nil (not logged in) and the contributor was also nil (jerm resource)
+                                                                       #  IF we didn't already check for a nil user above.
         scope = Policy::PRIVATE
         return true #contributor is always authorized 
         # have to do this because of inconsistancies with access_type that mess up later on
