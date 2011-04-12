@@ -1,5 +1,5 @@
 <ul class="sectionIcons">
-    <% if @investigation.can_edit?(current_user) -%>
+    <% if @investigation.can_edit? -%>
     <li>
         <%= image_tag_for_key('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%>
     </li>

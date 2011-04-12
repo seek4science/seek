@@ -5,7 +5,7 @@ class ModelsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   
-  before_filter :login_required
+  #before_filter :login_required
   
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   

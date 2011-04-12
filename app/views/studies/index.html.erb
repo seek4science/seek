@@ -1,6 +1,8 @@
-<ul class="sectionIcons">
-	<li><%= image_tag_for_key "new", new_study_path, "New study", nil, "New study" %></li>
-</ul>
+<% if logged_in? and current_user.person.member?%>
+    <ul class="sectionIcons">
+        <li><%= image_tag_for_key "new", new_study_path, "New study", nil, "New study" %></li>
+    </ul>
+<% end %>
 
 <% if @studies.public_methods.include?("page_totals") %>
   <!-- only do the page links if the collection supports it -->

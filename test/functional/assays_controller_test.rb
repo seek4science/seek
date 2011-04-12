@@ -46,6 +46,12 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assays)
   end
+
+  test "should show index in xml" do
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:assays)
+  end
   
   test "should update assay with new version of same sop" do
     login_as(:model_owner)

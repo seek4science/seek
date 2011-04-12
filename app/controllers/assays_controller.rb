@@ -5,7 +5,7 @@ class AssaysController < ApplicationController
   include Seek::TaggingCommon
 
   before_filter :find_assays,:only=>[:index]
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :check_is_project_pal, :only=>[:edit, :update, :destroy]
   before_filter :delete_allowed,:only=>[:destroy]  
