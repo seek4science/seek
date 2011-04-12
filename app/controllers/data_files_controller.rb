@@ -9,7 +9,7 @@ class DataFilesController < ApplicationController
   include DotGenerator  
   include Seek::AssetsCommon
 
-  before_filter :login_required
+  #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]

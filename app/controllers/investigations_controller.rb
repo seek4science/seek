@@ -4,7 +4,7 @@ class InvestigationsController < ApplicationController
   include IndexPager
 
   before_filter :find_investigations, :only=>[:index]
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
   before_filter :make_investigation_and_auth,:only=>[:create]
   before_filter :investigation_auth_project,:only=>[:edit,:update]

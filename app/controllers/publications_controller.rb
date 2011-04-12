@@ -6,7 +6,7 @@ class PublicationsController < ApplicationController
   
   require 'pubmed_query_tool'
   
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
@@ -74,7 +74,7 @@ class PublicationsController < ApplicationController
           Relationship.create_or_update_attributions(@assay,["Publication", @publication.id].to_json, Relationship::RELATED_TO_PUBLICATION)
         end
         #Make a policy
-        policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        policy = Policy.create(:name => "publication_policy", :sharing_scope => 4, :access_type => 1, :use_custom_sharing => true)
         @publication.policy = policy
         @publication.save
         #add managers (authors + contributor)
@@ -154,7 +154,7 @@ class PublicationsController < ApplicationController
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
-          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => 4, :access_type => 1, :use_custom_sharing => true)
           @publication.save
         end
         

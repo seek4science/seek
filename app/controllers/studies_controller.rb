@@ -3,7 +3,7 @@ class StudiesController < ApplicationController
   include DotGenerator
   include IndexPager
   
-  before_filter :login_required
+  #before_filter :login_required
     
   before_filter :find_studies,:only=>[:index]
   before_filter :is_project_member,:only=>[:create,:new]

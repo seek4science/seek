@@ -4,7 +4,7 @@ class SopsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon  
   
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_sop, :only=>[:show,:download]

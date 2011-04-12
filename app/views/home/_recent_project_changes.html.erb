@@ -1,3 +1,4 @@
+<% if logged_in? -%>
 <% item_hash=recent_project_changes_hash -%>
 
 <h2>New or recently changed items within your Projects</h2>
@@ -8,3 +9,4 @@
     :tabs_id=>"recent_changed_in_project_tabber",
     :authorization_already_done => true } -%>
 </div>
+<% end %>

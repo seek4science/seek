@@ -26,7 +26,7 @@ class Study < ActiveRecord::Base
   end 
 
   def can_edit? user=User.current_user
-    user.person && user.person.projects.include?(project)
+    user == nil ? false : user.person && user.person.projects.include?(project)
   end
 
   def can_delete? user=nil
