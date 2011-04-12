@@ -34,7 +34,7 @@ class Publication < ActiveRecord::Base
       []
     end
 
-    def event_ids=
+    def event_ids= events_ids
 
     end
     
