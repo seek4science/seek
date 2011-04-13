@@ -4,6 +4,14 @@ module AuthenticatedTestHelper
     @request.session[:user_id] = user ? users(user).id : nil
   end
 
+  def logout
+    @request.
+    current_user.forget_me if logged_in?
+    cookies.delete :auth_token
+    cookies.delete :open_id
+    reset_session
+  end
+
   def authorize_as(user)
     @request.env["HTTP_AUTHORIZATION"] = user ? ActionController::HttpAuthentication::Basic.encode_credentials(users(user).login, 'test') : nil
   end

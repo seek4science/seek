@@ -68,7 +68,6 @@ class ProjectsControllerTest < ActionController::TestCase
     
   end
 
-
   #Checks that the edit option is availabe to the user
   #with can_edit_project set and he belongs to that project
   def test_user_can_edit_project
