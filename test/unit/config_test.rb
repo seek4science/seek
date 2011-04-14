@@ -73,7 +73,7 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 1 ,Seek::Config.piwik_analytics_id_site
   end
   test "piwik_analytics_url" do
-    assert_equal 'localhost:8093',Seek::Config.piwik_analytics_url
+    assert_equal 'localhost/piwik/',Seek::Config.piwik_analytics_url
   end
 
 #Project
