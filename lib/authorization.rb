@@ -53,8 +53,9 @@ module Authorization
     end
     
     # Check the user is "in scope" and also is performing an action allowed under the given access type
-    is_authorized = is_authorized || (scope <= policy.sharing_scope && 
-                                      access_type_allows_action?(action, policy.access_type))
+    is_authorized = (scope <= policy.sharing_scope &&
+                     access_type_allows_action?(action, policy.access_type))
+
     # == END BASIC POLICY
     
     if policy.use_custom_sharing && user
