@@ -271,7 +271,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should show data file" do
-    d = data_files(:)
+    d = data_files(:picture)
     get :show, :id => d
     assert_response :success
   end
