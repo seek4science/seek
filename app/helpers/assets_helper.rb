@@ -192,7 +192,7 @@ module AssetsHelper
     end
     
     #Authorize
-    related.each do |resource_hash|
+    related.each_value do |resource_hash|
       unless resource_hash[:items].empty?
         total_count = resource_hash[:items].size
         resource_hash[:items] = resource_hash[:items].select &:can_view?
