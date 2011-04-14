@@ -192,11 +192,11 @@ module AssetsHelper
     end
     
     #Authorize
-    related.keys.each do |resource_type|
-      unless related[asset_type][:items].empty?
-        total_count = related[asset_type][:items].size
-        related[asset_type][:items] = related[asset_type][:items].select &:can_view?
-        related[asset_type][:hidden_count] = total_count - related[asset_type][:items].size
+    related.each do |resource_hash|
+      unless resource_hash[:items].empty?
+        total_count = resource_hash[:items].size
+        resource_hash[:items] = resource_hash[:items].select &:can_view?
+        resource_hash[:hidden_count] = total_count - resource_hash[:items].size
       end
     end    
     
