@@ -31,9 +31,11 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "shouldn't show unauthorized assays" do
+    hidden = Factory(:assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
     get :index, :page=>"all",:format=>"xml"
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("view", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("view", assigns(:assays), User.current_user).sort_by(&:id), "assays haven't been authorized"
+    assert !assigns(:assays).include?(hidden)
   end
 
   def test_title
@@ -96,7 +98,7 @@ class AssaysControllerTest < ActionController::TestCase
 
 end
 
-  
+
 
   test "should update timestamp when associating datafile" do
     login_as(:model_owner)
@@ -214,7 +216,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not delete assay when not project pal" do
@@ -224,7 +226,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not edit assay when not project pal" do
@@ -232,7 +234,7 @@ end
     login_as(:datafile_owner)
     get :edit, :id => a
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "admin should not edit somebody elses assay" do
@@ -240,7 +242,7 @@ end
     login_as(:quentin)
     get :edit, :id => a
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
 
   test "should not delete assay with data files" do
@@ -250,8 +252,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]    
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not delete assay with model" do
@@ -261,8 +262,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not delete assay with publication" do
@@ -272,8 +272,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
 
   test "should not delete assay with sops" do
@@ -283,8 +282,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
 
   test "get new presents options for class" do

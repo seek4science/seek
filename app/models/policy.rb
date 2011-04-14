@@ -76,10 +76,6 @@ class Policy < ActiveRecord::Base
     #FIXME: this error will be an empty string if params[:sharing] is missins
     return error_msg unless params[:sharing]
     
-    # this variable will hold current settings of the policy in case something
-    # goes wrong and a revert would be needed at some point
-    last_saved_policy = nil
-    
     # obtain parameters from params[] hash
     sharing_scope = params[:sharing][:sharing_scope].to_i
     access_type = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::NO_ACCESS : params[:sharing]["access_type_#{sharing_scope}"])

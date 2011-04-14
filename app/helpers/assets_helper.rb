@@ -192,11 +192,11 @@ module AssetsHelper
     end
     
     #Authorize
-    ["Sop","Model","DataFile","Event"].each do |asset_type|
-      unless related[asset_type][:items].empty?
-        total_count = related[asset_type][:items].size
-        related[asset_type][:items] = Asset.classify_and_authorize_homogeneous_resources(related[asset_type][:items], true, current_user)
-        related[asset_type][:hidden_count] = total_count - related[asset_type][:items].size
+    related.each_value do |resource_hash|
+      unless resource_hash[:items].empty?
+        total_count = resource_hash[:items].size
+        resource_hash[:items] = resource_hash[:items].select &:can_view?
+        resource_hash[:hidden_count] = total_count - resource_hash[:items].size
       end
     end    
     

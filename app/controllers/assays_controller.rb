@@ -5,10 +5,8 @@ class AssaysController < ApplicationController
   include Seek::TaggingCommon
 
   before_filter :find_assets, :only=>[:index]
-  #before_filter :login_required
   before_filter :is_project_member, :only=>[:create, :new]
-  before_filter :check_can_edit, :only=>[:edit, :update, :destroy]
-  before_filter :delete_allowed, :only=>[:destroy]
+  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   def new
     @assay=Assay.new
@@ -22,8 +20,6 @@ class AssaysController < ApplicationController
   end
 
   def edit
-    @assay=Assay.find(params[:id])
-
     respond_to do |format|
       format.html
       format.xml
@@ -63,7 +59,7 @@ class AssaysController < ApplicationController
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
-        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
+        policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
 
         if policy_err_msg.blank?
           flash[:notice] = 'Assay was successfully created.'
@@ -81,7 +77,6 @@ class AssaysController < ApplicationController
   end
 
   def update
-    @assay                =Assay.find(params[:id])
 
     #FIXME: would be better to resolve the differences, rather than keep clearing and reading the assets and organisms
     #DOES resolve differences for assets now
@@ -124,7 +119,7 @@ class AssaysController < ApplicationController
         @assay.updated_at=Time.now
         @assay.save!
 
-        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
+        policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
 
         if policy_err_msg.blank?
           flash[:notice] = 'Assay was successfully updated.'
@@ -142,7 +137,6 @@ class AssaysController < ApplicationController
   end
 
   def show
-    @assay=Assay.find(params[:id])
     respond_to do |format|
       format.html
       format.xml
@@ -182,39 +176,6 @@ class AssaysController < ApplicationController
       else
         page.replace_html element, :text=>"Nothing is selected to preview."
       end
-    end
-  end
-
-  private
-
-  def find_assays
-    @assays = Assay.find(:all)
-    @assays =apply_filters(@assays)
-  end
-
-  def delete_allowed
-    @assay=Assay.find(params[:id])
-    if @assay.can_delete?(current_user) || current_user.is_admin?
-      return true
-    else
-      respond_to do |format|
-        flash[:error] = "You cannot delete an assay that has items associated with it"
-        format.html { redirect_to @assay }
-      end
-      return false
-    end
-  end
-
-  def check_can_edit
-    @assay=Assay.find(params[:id])
-    if @assay.can_edit?(current_user)
-      return true
-    else
-      respond_to do |format|
-        flash[:error] = "You are not permitted to edit this assay."
-        format.html { redirect_to @assay }
-      end
-      return false
     end
   end
 end
