@@ -94,22 +94,26 @@ module DotGenerator
     current_item||=assay
     dot = ""
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if assay==current_item
-    dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",width=2,tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute}URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"    
-    if (show_assets)            
-      assay.assay_assets.each do |assay_asset|
-        dot << to_dot_asset(assay_asset.versioned_asset, current_item)
-        label=""
-        if assay_asset.relationship_type
-          label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
-        end   
-        dot << "Assay_#{assay.id} -- #{assay_asset.asset_type}_#{assay_asset.asset_id} #{label} ;\n"        
+    if assay.can_view?
+      dot << "Assay_#{assay.id} [label=\"#{multiline(assay.title)}\",width=2,tooltip=\"#{tooltip(assay)}\",shape=folder,style=filled,fillcolor=\"#{FILL_COLOURS[Assay]}\",#{highlight_attribute}URL=\"#{polymorphic_path(assay)}\",target=\"_top\"];\n"
+      if (show_assets)
+        assay.assay_assets.each do |assay_asset|
+          dot << to_dot_asset(assay_asset.versioned_asset, current_item)
+          label=""
+          if assay_asset.relationship_type
+            label = " [label=\"#{assay_asset.relationship_type.title}\" fontsize=9]"
+          end
+          dot << "Assay_#{assay.id} -- #{assay_asset.asset_type}_#{assay_asset.asset_id} #{label} ;\n"
+        end
+        assay.related_publications.each do |publication|
+          dot << to_dot_publication(publication, current_item)
+          dot << "Assay_#{assay.id} -- Publication_#{publication.id}; \n"
+        end
       end
-      assay.related_publications.each do |publication|
-        dot << to_dot_publication(publication, current_item)
-        dot << "Assay_#{assay.id} -- Publication_#{publication.id}; \n"        
-      end            
-    end  
-    
+    else
+      dot << "Assay_#{assay.id} [label=\"Hidden Item\",width=2,tooltip=\"Hidden Item\",shape=folder,fontsize=6,style=filled,fillcolor=lightgray];\n"
+    end
+
     return dot
   end
   
