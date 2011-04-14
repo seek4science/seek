@@ -369,7 +369,7 @@ module ApplicationHelper
   end
 
   def toggle_appear_javascript block_id
-    "Effect.toggle(#{block_id},'slide',{duration:0.5})"
+    "Effect.toggle('#{block_id}','slide',{duration:0.5})"
   end
 
   def count_actions(object, actions=nil)
