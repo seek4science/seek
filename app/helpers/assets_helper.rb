@@ -192,10 +192,10 @@ module AssetsHelper
     end
     
     #Authorize
-    ["Sop","Model","DataFile","Event"].each do |asset_type|
+    related.keys.each do |asset_type|
       unless related[asset_type][:items].empty?
         total_count = related[asset_type][:items].size
-        related[asset_type][:items] = Asset.classify_and_authorize_homogeneous_resources(related[asset_type][:items], true, current_user)
+        related[asset_type][:items] = related[asset_type][:items].select &:can_view?
         related[asset_type][:hidden_count] = total_count - related[asset_type][:items].size
       end
     end    
