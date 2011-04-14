@@ -5,11 +5,7 @@ module AuthenticatedTestHelper
   end
 
   def logout
-    @request.
-    current_user.forget_me if logged_in?
-    cookies.delete :auth_token
-    cookies.delete :open_id
-    reset_session
+    @request.session[:user_id] = nil
   end
 
   def authorize_as(user)

@@ -24,7 +24,33 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:data_files)
   end
-  
+
+  test 'should show index for non-project member, non-login user' do
+    login_as(:registered_user_with_no_projects)
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+
+    logout
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+  end
+
+  test 'shouldnt show upload button for non-project member and non-login user' do
+    login_as(:registered_user_with_no_projects)
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+    assert_select "a",:text=>/Upload a datafile/,:count=>0
+
+    logout
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+    assert_select "a",:text=>/Upload a datafile/,:count=>0
+  end
+
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -245,7 +271,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should show data file" do
-    d = data_files(:picture)
+    d = data_files(:)
     get :show, :id => d
     assert_response :success
   end
