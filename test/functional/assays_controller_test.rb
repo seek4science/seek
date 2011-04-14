@@ -252,7 +252,6 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]    
-    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assays_path
   end
   
@@ -263,7 +262,6 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assays_path
   end
   
@@ -274,7 +272,6 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assays_path
   end
 
@@ -285,7 +282,6 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
     assert_redirected_to assays_path
   end
 

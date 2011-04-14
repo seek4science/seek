@@ -218,7 +218,8 @@ class ApplicationController < ActionController::Base
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
+          #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
+          flash[:error] = "You may not perform this action"
           format.html { redirect_to eval "#{self.controller_name}_path" }
           #FIXME: this isn't the right response - should return with an unauthorized status code
           format.xml { redirect_to eval "#{self.controller_name}_path(:format=>'xml')" }
