@@ -51,6 +51,23 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Upload a datafile/,:count=>0
   end
 
+  test 'non-project member and non-login user can edit datafile with public policy and editable' do
+    login_as(:registered_user_with_no_projects)
+    data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
+    get :show, :id => data_file
+    assert_response :success
+    put :update, :id => data_file, :data_file => {:title => 'new title'}
+    assert_equal 'new title', assigns(:data_file).title
+
+    logout
+    data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
+    get :show, :id => data_file
+    assert_response :success
+    put :update, :id => data_file, :data_file => {:title => 'new title'}
+    assert_equal 'new title', assigns(:data_file).title
+
+  end
+
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"

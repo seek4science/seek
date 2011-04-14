@@ -129,7 +129,6 @@ data_file_with_no_contributor:
   project: sysmo_project
   policy: sysmo_member_edit
 
-
 viewable_data_file:
   contributor: datafile_owner (User)
   title: Can Only Be Viewed
