@@ -15,7 +15,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "assay association" do
-    publication = publications(:two)
+    publication = publications(:pubmed_2)
     assay = assays(:modelling_assay_with_data_and_relationship)
     assay_asset = assay_assets(:metabolomics_assay_asset1)
     assert_not_equal assay_asset.asset, publication
@@ -28,6 +28,12 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal assay_asset.asset, publication
     assert_equal assay_asset.assay, assay
 
+  end
+
+  test "model and datafile association" do
+    publication = publications(:pubmed_2)
+    assert publication.related_models.include?(models(:teusink))
+    assert publication.related_data_files.include?(data_files(:picture))
   end
 
   test "test uuid generated" do
