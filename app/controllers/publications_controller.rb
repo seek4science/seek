@@ -74,15 +74,15 @@ class PublicationsController < ApplicationController
           Relationship.create_or_update_attributions(@assay,["Publication", @publication.id].to_json, Relationship::RELATED_TO_PUBLICATION)
         end
         #Make a policy
-        policy = Policy.create(:name => "publication_policy", :sharing_scope => 4, :access_type => 1, :use_custom_sharing => true)
+        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
         @publication.policy = policy
         @publication.save
         #add managers (authors + contributor)
         @publication.creators.each do |author|
-          policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => 4)
+          policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
         end
         #Add contributor
-        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => 4)
+        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => Policy::MANAGING)
         
         flash[:notice] = 'Publication was successfully created.'
         format.html { redirect_to(edit_publication_url(@publication)) }
@@ -146,17 +146,17 @@ class PublicationsController < ApplicationController
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
-          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => 4, :access_type => 1, :use_custom_sharing => true)
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
           @publication.save
         end
         
         #Update policy so current authors have manage permissions
         @publication.creators.each do |author|
           @publication.policy.permissions.clear
-          @publication.policy.permissions << Permission.create(:contributor => author, :policy => @publication.policy, :access_type => 4)
+          @publication.policy.permissions << Permission.create(:contributor => author, :policy => @publication.policy, :access_type => Policy::MANAGING)
         end      
         #Add contributor
-        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => 4)
+        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => Policy::MANAGING)
         
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
