@@ -20,26 +20,35 @@
         <!-- Assays tab -->
         <%= tab_definition :controllers=>["assays"] -%>
 
+        <!-- Experiments tab -->
+        <%= tab_definition :controllers=>["experiments"], :gap_before => true -%>
+
+         <!-- Samples tab -->
+        <%= tab_definition :controllers=>["samples"] -%>
+
+        <!-- Specimens tab -->
+        <%= tab_definition :controllers=>["specimens"] -%>
+
         <!-- Data tab -->
-        <%= tab_definition :controllers=>["data_files"],:title=>"Data", :gap_before=>true -%>
+        <%= tab_definition :controllers=>["data_files"], :title=>"Data", :gap_before=>true -%>
 
         <!-- Models tab -->
         <%= tab_definition :controllers=>["models"] -%>
 
         <!-- SOPs tab -->
-        <%= tab_definition :controllers=>["sops"],:title=>"SOPs" -%>
+        <%= tab_definition :controllers=>["sops"], :title=>"SOPs" -%>
 
         <!-- Publications tab -->
         <%= tab_definition :controllers=>["publications"] -%>
 
         <!-- Forums tab -->
-        <%= tab_definition :controllers=>["forums","topics"], :gap_before=>true -%>
+        <%= tab_definition :controllers=>["forums", "topics"], :gap_before=>true -%>
 
         <!-- Events tab -->
         <%= tab_definition :controllers=>["events"], :gap_before=>true if Seek::Config.events_enabled -%>
 
         <!-- Help tab -->
-        <%= tab_definition :controllers=>["help_documents"],:title=>"Help",:gap_before=>true -%>
+        <%= tab_definition :controllers=>["help_documents"], :title=>"Help", :gap_before=>true -%>
       </ul>
     </div>
 <% end -%>

@@ -1,0 +1,74 @@
+<% truncate_length_for_boxes = 22 -%>
+
+<ul class="sectionIcons">
+  <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample Details", nil, 'Edit Sample Details') %></li>
+  <li><%= image_tag_for_key "destroy", sample_path(@sample), "Delete Sample", {:confirm => 'Are you sure?', :method => :delete}, "Delete Sample" -%></li>
+</ul>
+
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
+
+<div class="show_basic">
+
+  <div class="main_content_left_box">
+
+    <div class="box_about_actor">
+      <p>
+        <label>ID:</label>
+        <%= text_or_not_specified(@sample.id) %>
+      </p>
+
+      <p>
+        <label>Specimen:</label>
+        <%= text_or_not_specified(@sample.specimen.title) %>
+      </p>
+
+      <p>
+        <label>Explantation time:</label>
+        <%= text_or_not_specified(@sample.explantation) %>
+      </p>
+
+      <p>
+        <label>Lab internal No.:</label>
+        <%= text_or_not_specified(@sample.lab_internal_number) %>
+      </p>
+
+
+      <p>
+        <label>Date of donation:</label>
+
+
+        <% if @sample.donation_date.nil? %>
+            <%= text_or_not_specified nil %>
+        <% else %>
+
+            <% if @sample.donation_date.hour == 0 and @sample.donation_date.min == 0 and @sample.donation_date.sec == 0 then %>
+                <%= h @sample.donation_date.strftime('%d/%m/%Y') %>
+            <% else %>
+                <%= h @sample.donation_date.strftime('%d/%m/%Y @ %H:%M:%S') %>
+            <% end %>
+
+        <% end %>
+      </p>
+
+    </div>
+  </div>
+  <!--  <div class="main_content_right_box">
+    <#%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
+  </div>-->
+  <div style="clear:both;">
+    <p style="margin-top: 1em;">
+      <b>About the sample:</b>
+
+    <div id="description" class="box_standout">
+      <%= text_or_not_specified(@sample.comments, :description=>true, :auto_link=>true) %>
+    </div>
+    </p>
+  </div>
+
+
+  <div style="clear:both">
+
+    <%= render :partial=>"layouts/items_related_to", :object => @sample %>
+  </div>
+
+</div>

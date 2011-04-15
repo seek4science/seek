@@ -1,0 +1,38 @@
+<%= f.error_messages %>
+<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
+<%= stylesheet_link_tag 'calendar_date_select/default' %>
+
+
+<h2>Experiment Details</h2>
+
+<div style="text-align: center;">
+  <div style="width: 95%;">
+   <p>
+      <%= f.label "Title:" -%><span class="required">*</span><br/>
+      <%= f.text_field :title, :style => "width: 350px;" -%>
+    </p>
+    <p>
+      <%= f.label "Sample specimen" %> <span class="required">*</span><br/>
+      <%= collection_select(:experiment, :sample_id, Sample.all, :id, :title) %>
+    </p>
+
+    <p>
+      <%= f.label :date -%><span class="required">*</span><br/>
+      <%= f.calendar_date_select :date, :time => "mixed" -%>
+    </p>
+
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
+    </p>
+
+
+  </div>
+</div>
+
+
+
+<p style="margin-top: 2em; text-align: center;">
+  <%= f.submit(experiment ? "Update" : "Create", :disable_with=>(experiment ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (experiment ? experiment_path(experiment.id) : experiments_path) -%>
+</p>

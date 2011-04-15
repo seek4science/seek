@@ -1,0 +1,17 @@
+<%= list_item_title resource %>
+
+<div class="list_item_left_column">
+  <%= list_item_optional_attribute "Organism specimen", resource.specimen.try(:title),resource.specimen %>
+  <%= list_item_optional_attribute "Explantation time after treatment", resource.explantation %>
+
+</div>
+
+<div class="list_item_right_column">
+  <%= list_item_attribute "Lab internal number", resource.lab_internal_number %>
+  <%= list_item_attribute "Date of donation", resource.donation_date.strftime('%d/%m/%Y') %>
+
+
+</div>
+<div class="list_item_whole_width">
+  <%= list_item_description resource.description %>
+</div>

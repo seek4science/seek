@@ -1,0 +1,18 @@
+<%= list_item_title resource %>
+
+<div class="list_item_left_column">
+  <%= list_item_attribute "Title", resource.title %>
+  <%= list_item_optional_attribute "Sample", resource.sample.try(:title),resource.sample %>
+
+</div>
+
+<div class="list_item_right_column">
+
+  <%= list_item_optional_attribute "Institution", resource.institution.try(:name), resource.institution %>
+
+ <%= list_item_optional_attribute "Person responsible", resource.person.try(:name), resource.person %>
+ <%= list_item_attribute "Date of experiment", resource.date.strftime('%d/%m/%Y') %>
+</div>
+<div class="list_item_whole_width">
+  <%= list_item_description resource.description %>
+</div>

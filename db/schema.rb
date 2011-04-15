@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110315124941) do
+ActiveRecord::Schema.define(:version => 20110408162149) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -241,6 +241,21 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.integer  "sop_version"
   end
 
+  create_table "experiments", :force => true do |t|
+    t.string   "title"
+    t.integer  "sample_id"
+    t.string   "description"
+    t.integer  "project_id"
+    t.integer  "institution_id"
+    t.integer  "people_id"
+    t.datetime "date"
+    t.string   "first_letter"
+    t.string   "comments"
+    t.integer  "policy_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "favourite_group_memberships", :force => true do |t|
     t.integer  "person_id"
     t.integer  "favourite_group_id"
@@ -441,6 +456,11 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.datetime "updated_at"
   end
 
+  create_table "notifiers", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
@@ -583,6 +603,19 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.datetime "updated_at"
   end
 
+  create_table "samples", :force => true do |t|
+    t.string   "title"
+    t.integer  "specimen_id"
+    t.string   "lab_internal_number"
+    t.datetime "donation_date"
+    t.string   "explantation"
+    t.string   "comments"
+    t.string   "first_letter"
+    t.integer  "policy_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "saved_searches", :force => true do |t|
     t.integer  "user_id"
     t.text     "search_query"
@@ -661,6 +694,26 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.string   "uuid"
     t.integer  "project_id"
     t.integer  "policy_id"
+  end
+
+  create_table "specimens", :force => true do |t|
+    t.string   "donor_number"
+    t.integer  "organism_id"
+    t.integer  "strain_id"
+    t.integer  "age"
+    t.string   "treatment"
+    t.string   "lab_internal_number"
+    t.integer  "person_id"
+    t.integer  "institution_id"
+    t.string   "comments"
+    t.string   "first_letter"
+    t.integer  "policy_id"
+    t.text     "other_creators"
+    t.integer  "project_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "strains", :force => true do |t|

@@ -1,0 +1,70 @@
+<%= javascript_include_tag "sharing.js" -%>
+
+<%= f.error_messages %>
+
+
+
+<h2>Specimen Details</h2>
+
+<div style="text-align: center;">
+  <div style="width: 95%;">
+    <p>
+      <%= f.label :donor_number -%><span class="required">*</span><br/>
+      <%= f.text_field :donor_number, :style => "width: 350px;" -%>
+    </p>
+
+    <p>
+      <%= f.label "Choose an organism" %> <span class="required">*</span><br/>
+      <%= collection_select(:specimen, :organism_id, Organism.all, :id, :title) %>
+    </p>
+
+    <p>
+      <%= f.label "Choose a strain" %> <span class="required">*</span><br/>
+      <%= collection_select(:specimen, :strain_id, Strain.all, :id, :title) %>
+    </p>
+
+    <p>
+      <%= f.label :age -%><br/>
+      <%= f.text_field :age, :style => "width: 150px;" -%> weeks
+
+    </p>
+
+    <p>
+      <%= f.label :treatment -%><br/>
+      <%= f.text_field :treatment, :style => "width: 350px;" -%>
+    </p>
+
+    <p>
+      <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
+      <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+    </p>
+
+    <p>
+      <%= f.label "Institution" %> <span class="required">*</span><br/>
+      <%= collection_select(:specimen, :institution_id, Institution.all, :id, :title) %>
+    </p>
+
+    <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Specimen",   # this is only for presentation, not for any processing
+        :project_hash => current_user.generate_own_project_id_name_hash } -%>
+
+    <%= render :partial=>"assets/asset_form_bottom", :locals=> {
+            :resource_type => "Specimen",
+            :attribution_enable => false,
+            :show_publications => false,
+            } -%>
+
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
+    </p>
+
+
+  </div>
+</div>
+
+
+
+<p style="margin-top: 2em; text-align: center;">
+  <%= f.submit(specimen ? "Update" : "Create", :disable_with=>(specimen ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (specimen ? specimen_path(specimen.id) : specimens_path) -%>
+</p>

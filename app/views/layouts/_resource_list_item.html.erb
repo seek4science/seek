@@ -3,7 +3,7 @@
 <% resource = resource_list_item %>
 <% content_partial = get_list_item_content_partial(resource) %>
 <% actions_partial = get_list_item_actions_partial(resource) %>
-<% avatar_partial = get_list_item_avatar_partial(resource) %>
+<% avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?%>
 <% box_width = 75 %>
 <% box_width += 10 if actions_partial.blank? %>
 <% box_width += 12 if avatar_partial.blank? %>

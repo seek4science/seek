@@ -1,0 +1,19 @@
+
+
+<ul class="sectionIcons">
+    <li><%= image_tag_for_key "new", new_sample_path, "New sample", nil, "New sample" %></li>
+</ul>
+
+<% if @samples.public_methods.include?("page_totals") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @samples.pages, :page_totals=>@samples.page_totals,:current_page=>@samples.page } -%>
+<% end %>
+
+<div class="list_items_container">
+  <%= render :partial=>"layouts/resource_list_item", :collection=>@samples %>
+</div>
+<% if @samples.page == "latest" && Sample.find(:all).length > Seek::Config.limit_latest%>
+    <%= render :partial => "layouts/paginate_see_all"%>
+<% end %>
+
+

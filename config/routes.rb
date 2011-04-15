@@ -1,10 +1,14 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :specimens
+  map.resources :samples
+  map.resources :experiments
+
   map.resources :events
 
   map.resources :strains
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_tags_ajax=>:post}
-  
+
   map.resources :created_datas
 
   map.resources :assay_types, :collection=>{:manage=>:get}
@@ -14,11 +18,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :technology_types, :collection=>{:manage=>:get}
 
   map.resources :measured_items
-  
+
   map.resources :investigations
 
   map.resources :studies
-  
+
   map.resources :assays,:member=>{:update_tags_ajax=>:post}
 
   map.resources :saved_searches

@@ -1,0 +1,19 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  sample_specimen_id: 1
+  description: MyString
+  project: MyString
+  lab: MyString
+  experimentor: MyString
+  date: 2011-04-08 18:21:49
+  comments: MyString
+
+two:
+  sample_specimen_id: 1
+  description: MyString
+  project: MyString
+  lab: MyString
+  experimentor: MyString
+  date: 2011-04-08 18:21:49
+  comments: MyString
