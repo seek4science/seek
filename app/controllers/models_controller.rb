@@ -102,7 +102,6 @@ class ModelsController < ApplicationController
           @applet=@@model_builder.simulate @saved_file
         rescue Exception => e
           error=e
-          raise e
         end
       elsif following_action == "save_new_version"
         model_format=params.delete("saved_model_format") #only used for saving as a new version
