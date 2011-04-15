@@ -137,19 +137,11 @@ class PublicationsController < ApplicationController
           logger.info Relationship.find_all_by_object_id( @publication.id, :conditions => "subject_id = #{assay_id}")
           Relationship.create_or_update_attributions(@assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) unless Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay_id}").length > 0
         end
-        #Destroy relationship that aren't needed
-        associate_relationships = Relationship.find_all_by_object_id(@publication.id)
+        #Destroy Assay relationship that aren't needed
+        associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
         logger.info associate_relationships
         associate_relationships.each do |associate_relationship|
-          flag = false
-          assay_ids.each do |id|
-            if associate_relationship.subject_id.to_s == id
-              flag = true
-            end
-          end
-          if flag == false
-             Relationship.destroy(associate_relationship.id)
-          end
+          Relationship.destroy(associate_relationship.id) unless assay_ids.include?(associate_relationship.subject_id)
         end
 
         #Create policy if not present (should be)
