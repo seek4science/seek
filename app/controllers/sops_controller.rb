@@ -118,8 +118,8 @@ class SopsController < ApplicationController
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
           end
           assay_ids.each do |id|
-              @assay = Assay.find(id)
-              @assay.relate(@sop)
+              assay = Assay.find(id)
+              assay.relate(@sop) if assay.can_edit?
           end
         else
           format.html { 
@@ -164,23 +164,15 @@ class SopsController < ApplicationController
           format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
         end
         # Update new assay_asset
-        assay_ids.each do |id|
-          @assay = Assay.find(id)
-          @assay.relate(@sop)
+        assay_rels = assay_ids.map {|text| a_id, r_type =  text.split(','); [Assay.find(a_id), RelationshipType.find_by_title(r_type)]}
+        assay_rels.each do |assay_r_type|
+          assay, r_type = assay_r_type
+          assay.relate(@sop, r_type) if assay.can_edit?
         end
         #Destroy AssayAssets that aren't needed
+        assays = assay_rels.map &:first
         assay_assets = AssayAsset.find_all_by_asset_id(@sop.id)
-        assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |id|
-            if assay_asset.assay_id.to_s == id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
-          end
-        end
+        assay_assets.each {|aa| aa.destroy if aa.assay.can_edit? and !assays.include?(aa.assay)}
       else
         format.html { 
           render :action => "edit" 

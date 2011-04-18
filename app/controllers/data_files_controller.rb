@@ -126,8 +126,8 @@ class DataFilesController < ApplicationController
 
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
-            @assay = Assay.find(a_id)
-            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+            assay = Assay.find(a_id)
+            assay.relate(@data_file, RelationshipType.find_by_title(r_type)) if assay.can_edit?
           end
         else
           format.html {
@@ -199,25 +199,15 @@ class DataFilesController < ApplicationController
         end
 
         # Update new assay_asset
-        assay_ids.each do |text|
-          a_id, r_type = text.split(",")
-          @assay = Assay.find(a_id)
-          @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+        assay_rels = assay_ids.map {|text| a_id, r_type =  text.split(','); [Assay.find(a_id), RelationshipType.find_by_title(r_type)]}
+        assay_rels.each do |assay_r_type|
+          assay, r_type = assay_r_type
+          assay.relate(@data_file, r_type) if assay.can_edit?
         end
         #Destroy AssayAssets that aren't needed
+        assays = assay_rels.map &:first
         assay_assets = AssayAsset.find_all_by_asset_id(@data_file.id)
-        assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |text|
-            a_id, r_type = text.split(",")
-            if assay_asset.assay_id.to_s == a_id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
-          end
-        end
+        assay_assets.each {|aa| aa.destroy if aa.assay.can_edit? and !assays.include?(aa.assay)}
       else
         format.html {
           render :action => "edit"
