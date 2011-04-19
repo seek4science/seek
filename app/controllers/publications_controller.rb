@@ -69,10 +69,10 @@ class PublicationsController < ApplicationController
           pa.save
         end
 
-        assay_ids.each do |id|
-          @assay = Assay.find(id)
-          Relationship.create_or_update_attributions(@assay,["Publication", @publication.id].to_json, Relationship::RELATED_TO_PUBLICATION)
+        Assay.find(assay_ids).each do |assay|
+          Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?(current_user)
         end
+
         #Make a policy
         policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
         @publication.policy = policy
@@ -132,16 +132,18 @@ class PublicationsController < ApplicationController
         to_remove.each {|a| a.destroy}
 
         # Update relationship
-        assay_ids.each do |assay_id|
-          @assay = Assay.find(assay_id)
-          logger.info Relationship.find_all_by_object_id( @publication.id, :conditions => "subject_id = #{assay_id}")
-          Relationship.create_or_update_attributions(@assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) unless Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay_id}").length > 0
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit?(current_user) && Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay.id}").empty?
+            Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION)
+          end
         end
         #Destroy Assay relationship that aren't needed
         associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
         logger.info associate_relationships
         associate_relationships.each do |associate_relationship|
-          Relationship.destroy(associate_relationship.id) unless assay_ids.include?(associate_relationship.subject_id)
+          if associate_relationship.subject.can_edit?(current_user) && !assay_ids.include?(associate_relationship.subject_id.to_s)
+            Relationship.destroy(associate_relationship.id)
+          end
         end
 
         #Create policy if not present (should be)
