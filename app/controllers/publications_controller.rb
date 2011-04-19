@@ -71,7 +71,7 @@ class PublicationsController < ApplicationController
 
         assay_ids.each do |id|
           assay = Assay.find(id)
-          Relationship.create_or_update_attributions(@assay,["Publication", @publication.id].to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
+          Relationship.create_or_update_attributions(assay,["Publication", @publication.id].to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
         end
         #Make a policy
         policy = Policy.create(:name => "publication_policy", :sharing_scope => 4, :access_type => 1, :use_custom_sharing => true)
@@ -132,9 +132,8 @@ class PublicationsController < ApplicationController
         to_remove.each {|a| a.destroy}
 
         # Update relationship
-        assays = Assay.find assay_ids
-        assays.each do |assay|
-          Relationship.create_or_update_attributions(@assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit? and Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay_id}").empty?
+        Assay.find(assay_ids).each do |assay|
+          Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit? and Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay.id}").empty?
         end
         #Destroy relationship that aren't needed
         associate_relationships = Relationship.find_all_by_object_id(@publication.id)
