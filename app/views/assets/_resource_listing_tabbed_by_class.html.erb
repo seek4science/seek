@@ -26,7 +26,11 @@
     </center>
   </div>
   <div <%= "id='#{tabs_id}'" if tabs_id -%> class="tabber" style="display:none;">
-    <% ASSET_ORDER.each do |resource_type| -%>
+    <% assets = resource_hash.keys.sort_by do |asset|
+        ASSET_ORDER.index(asset) || 10000000 #Anything not specified in asset_order shows up at the end
+       end
+    %>
+    <% assets.each do |resource_type| -%>
       <% visible_resource_type = resource_type.titleize.pluralize -%>
       <% visible_resource_type = "SOPs" if visible_resource_type=="Sops" %>
       <% hidden_count = 0 %>
