@@ -69,9 +69,9 @@
     } -%>
     <li id="piwik_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.piwik_analytics_enabled -%>">
       Piwik analytics id site: <%= text_field_tag(:piwik_analytics_id_site, Seek::Config.piwik_analytics_id_site) %>
-      <span class="setting_description">the ID of your website inside Piwik.The value is 1 or 2</span>
+      <span class="setting_description">the ID of your website inside Piwik. It is the numeric value corresponding to the ID of the site created in Piwik.</span>
       Piwik analytics url: <%= text_field_tag(:piwik_analytics_url, Seek::Config.piwik_analytics_url) %>
-      <span class="setting_description">The URL to your Piwik installation.For example 'localhost/piwikfolder/'. It doesn't contain 'http://'</span>
+      <span class="setting_description">The URL to your Piwik installation, withouth the http:// or https://, e.g. 'localhost/piwikfolder/'</span>
     </li>
 
     <li>
