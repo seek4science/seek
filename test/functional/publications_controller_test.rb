@@ -32,11 +32,15 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should create publication" do
+    assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id }
+      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id },:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
+    p=assigns(:publication)
+    assert_equal 1,p.related_assays.count
+    assert p.related_assays.include? assay
   end
   
   test "should create doi publication" do
@@ -67,7 +71,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay=assays(:metabolomics_assay)
     assert new_assay.related_publications.empty?
     
-    put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id]
+    put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
