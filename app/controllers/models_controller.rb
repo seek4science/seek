@@ -5,8 +5,6 @@ class ModelsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   
-  #before_filter :login_required
-  
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
@@ -485,17 +483,9 @@ class ModelsController < ApplicationController
           @assay.relate(@model)
         end
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@model.id)
+        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @model.id, 'Model'])
         assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |id|
-            if assay_asset.assay_id.to_s == id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
-          end
+          AssayAsset.destroy(assay_asset.id) unless assay_ids.include?(assay_asset.assay_id.to_s)
         end
       else
         format.html {

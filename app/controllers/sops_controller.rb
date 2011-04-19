@@ -169,17 +169,9 @@ class SopsController < ApplicationController
           @assay.relate(@sop)
         end
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@sop.id)
+        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @sop.id, 'SOP'])
         assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |id|
-            if assay_asset.assay_id.to_s == id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
-          end
+          AssayAsset.destroy(assay_asset.id) unless assay_ids.include?(assay_asset.assay_id.to_s)
         end
       else
         format.html { 

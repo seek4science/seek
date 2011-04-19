@@ -32,7 +32,10 @@
     <%= tab_definition :controllers=>["publications"] -%>
 
     <!-- Forums tab -->
-    <%= tab_definition :controllers=>["forums","topics"], :gap_before=>true -%>
+    <!-- Be hiden for unlogin user -->
+    <% if logged_in? %>
+        <%= tab_definition :controllers=>["forums","topics"], :gap_before=>true -%>
+    <% end %>
 
     <!-- Events tab -->
     <%= tab_definition :controllers=>["events"], :gap_before=>true if Seek::Config.events_enabled -%>

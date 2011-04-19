@@ -199,24 +199,18 @@ class DataFilesController < ApplicationController
         end
 
         # Update new assay_asset
+        a_ids = []
         assay_ids.each do |text|
           a_id, r_type = text.split(",")
+          a_ids.push(a_id)
           @assay = Assay.find(a_id)
           @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
         end
+
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@data_file.id)
+        assay_assets = AssayAsset.find(:all, :conditions => ["asset_id = ? and asset_type = ?", @data_file.id, 'DataFile'])
         assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |text|
-            a_id, r_type = text.split(",")
-            if assay_asset.assay_id.to_s == a_id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
-          end
+          AssayAsset.destroy(assay_asset.id) unless a_ids.include?(assay_asset.assay_id.to_s)
         end
       else
         format.html {
