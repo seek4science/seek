@@ -81,13 +81,17 @@ module DotGenerator
     dot = ""
     
     highlight_attribute=HIGHLIGHT_ATTRIBUTE if study==current_item
-    
-    dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",width=2,tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Study]}\",#{highlight_attribute}URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
-    study.assays.each do |assay|
-      dot << to_dot_assay(assay, show_assets,current_item)
-      dot << "Study_#{study.id} -- Assay_#{assay.id}; \n"
+
+    if study.can_view?
+      dot << "Study_#{study.id} [label=\"#{multiline(study.title)}\",width=2,tooltip=\"#{tooltip(study)}\",shape=box,style=filled,fillcolor=\"#{FILL_COLOURS[Study]}\",#{highlight_attribute}URL=\"#{polymorphic_path(study)}\",target=\"_top\"];\n"
+      study.assays.each do |assay|
+        dot << to_dot_assay(assay, show_assets,current_item)
+        dot << "Study_#{study.id} -- Assay_#{assay.id}; \n"
+      end
+    else
+      dot << "Study_#{study.id} [label=\"Hidden Item\",width=2,tooltip=\"Hidden Item\",shape=folder,fontsize=6,style=filled,fillcolor=lightgray];\n"
     end
-    return dot  
+    return dot
   end
   
   def to_dot_assay assay, show_assets=true,current_item=nil
@@ -113,7 +117,6 @@ module DotGenerator
     else
       dot << "Assay_#{assay.id} [label=\"Hidden Item\",width=2,tooltip=\"Hidden Item\",shape=folder,fontsize=6,style=filled,fillcolor=lightgray];\n"
     end
-
     return dot
   end
   

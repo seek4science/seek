@@ -1,3 +1,5 @@
+ <%= javascript_include_tag "sharing.js" %>
+
 <%= error_messages_for :study %>
 
 
@@ -64,8 +66,11 @@
         <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
       </div>
     </p>
-    
+
   </div>
+  <p>
+    <%= render :partial=>"assets/sharing_form" if @study.can_manage? -%>
+  </p>
 
 </div>
 

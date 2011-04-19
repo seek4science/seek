@@ -85,7 +85,7 @@ ActiveRecord::Base.class_eval do
   end
 
   def can_perform? action, user=nil
-    send "can_#{action}?", user
+    user ? send("can_#{action}?", user) : send("can_#{action}?")
   end
 
   def can_edit? user=nil
