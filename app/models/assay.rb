@@ -8,7 +8,7 @@ class Assay < ActiveRecord::Base
     alias_attribute :contributor, :owner
 
     def project_id
-      project.id
+      project.try :id
     end
 
     before_save :policy_or_default
