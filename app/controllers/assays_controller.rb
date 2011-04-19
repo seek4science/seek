@@ -10,8 +10,8 @@ class AssaysController < ApplicationController
 
   def new
     @assay=Assay.new
-    study = Study.find(params[:study_id])
-    @assay.study = study if params[:study_id] if study.can_edit?
+    study = Study.find(params[:study_id]) if params[:study_id]
+    @assay.study = study if params[:study_id] if study.try :can_edit?
     @assay_class=params[:class]
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
     respond_to do |format|
