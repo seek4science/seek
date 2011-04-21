@@ -127,7 +127,9 @@ class DataFilesController < ApplicationController
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
-            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+            if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id = #{@assay.id}"]).empty?
+              @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+            end
           end
         else
           format.html {
@@ -204,13 +206,17 @@ class DataFilesController < ApplicationController
           a_id, r_type = text.split(",")
           a_ids.push(a_id)
           @assay = Assay.find(a_id)
-          @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+          if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id =  #{@assay.id}"]).empty?
+            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+          end
         end
 
         #Destroy AssayAssets that aren't needed
         assay_assets = AssayAsset.find(:all, :conditions => ["asset_id = ? and asset_type = ?", @data_file.id, 'DataFile'])
         assay_assets.each do |assay_asset|
-          AssayAsset.destroy(assay_asset.id) unless a_ids.include?(assay_asset.assay_id.to_s)
+          if assay_asset.assay.can_edit? and !a_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
+          end
         end
       else
         format.html {

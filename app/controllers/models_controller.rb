@@ -415,9 +415,10 @@ class ModelsController < ApplicationController
             flash[:notice] = "Model was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
           end
-          assay_ids.each do |id|
-              @assay = Assay.find(id)
-              @assay.relate(@model)
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit? and AssayAsset.find_all_by_asset_id(@model.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+              assay.relate(@model)
+            end
           end
         else
           format.html {
@@ -477,14 +478,17 @@ class ModelsController < ApplicationController
           format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
         end
         # Update new assay_asset
-        assay_ids.each do |id|
-          @assay = Assay.find(id)
-          @assay.relate(@model)
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit? and AssayAsset.find_all_by_asset_id(@model.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+            assay.relate(@model)
+          end
         end
         #Destroy AssayAssets that aren't needed
         assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @model.id, 'Model'])
         assay_assets.each do |assay_asset|
-          AssayAsset.destroy(assay_asset.id) unless assay_ids.include?(assay_asset.assay_id.to_s)
+          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
+          end
         end
       else
         format.html {

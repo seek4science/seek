@@ -41,7 +41,7 @@
 					:show_publications=>false
 				}
     	-%>
-		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
         <% end -%>
         <p>
             <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>

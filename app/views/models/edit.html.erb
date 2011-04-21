@@ -53,7 +53,7 @@
 					:related_publications=>@model.related_publications
 				} 
     	-%>
-		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
 
         <% end -%>
         <p>

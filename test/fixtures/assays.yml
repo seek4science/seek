@@ -156,3 +156,30 @@ modelling_assay:
   study: study_with_modelling_assay
   assay_class: modelling_assay_class
   policy: policy_for_viewable_data_file
+
+assay_can_edit_by_datafile_owner:
+  title: Modelling Assay
+  assay_type: metabolomics
+  owner: person_for_datafile_owner
+  description: modelling assay
+  study: study_with_modelling_assay
+  assay_class: modelling_assay_class
+  policy: policy_for_viewable_data_file
+
+assay_can_edit_by_my_first_sop_owner1:
+  title: Modelling Assay
+  assay_type: metabolomics
+  owner: person_for_owner_of_my_first_sop
+  description: modelling assay
+  study: study_with_modelling_assay
+  assay_class: modelling_assay_class
+  policy: policy_for_viewable_data_file
+
+assay_can_edit_by_my_first_sop_owner2:
+  title: Modelling Assay
+  assay_type: metabolomics
+  owner: person_for_owner_of_my_first_sop
+  description: modelling assay
+  study: study_with_modelling_assay
+  assay_class: modelling_assay_class
+  policy: policy_for_viewable_data_file
