@@ -41,7 +41,8 @@ class EventsController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     data_file_ids.each do |text|
       a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
+      d = DataFile.find(a_id)
+      @event.data_files << d if d.can_view?
     end
     params.delete :data_file_ids
 
@@ -79,7 +80,8 @@ class EventsController < ApplicationController
     @event.data_files = []
     data_file_ids.each do |text|
       a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
+      d = DataFile.find(a_id)
+      @event.data_files << d if d.can_view?
     end
     params.delete :data_file_ids
 
