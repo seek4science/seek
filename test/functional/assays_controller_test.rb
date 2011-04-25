@@ -31,6 +31,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "shouldn't show unauthorized assays" do
+    login_as Factory(:user)
     hidden = Factory(:assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
     get :index, :page=>"all",:format=>"xml"
     assert_response :success
@@ -234,7 +235,7 @@ end
     login_as(:datafile_owner)
     get :edit, :id => a
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
   
   test "admin should not edit somebody elses assay" do
@@ -242,7 +243,7 @@ end
     login_as(:quentin)
     get :edit, :id => a
     assert flash[:error]
-    assert_redirected_to assays_path
+    assert_redirected_to a
   end
 
   test "should not delete assay with data files" do

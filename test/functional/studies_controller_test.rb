@@ -109,12 +109,12 @@ class StudiesControllerTest < ActionController::TestCase
   test "unauthorized user can't update" do
     login_as(Factory(:user))
     s=Factory :study, :policy => Factory(:private_policy)
+    Factory :permission, :contributor => User.current_user, :policy=> s.policy, :access_type => Policy::VISIBLE
+
     put :update, :id=>s.id,:study=>{:title=>"test"}
 
     assert_redirected_to study_path(s)
-    assert assigns(:study)
     assert flash[:error]
-    assert_equal "A Metabolomics Study",assigns(:study).title
   end
 
   test "authorized user can delete if no assays" do
