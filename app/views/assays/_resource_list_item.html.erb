@@ -21,7 +21,7 @@
 </div>
 
 <div class="list_item_right_column">
-  <%= list_item_attribute "Owner", resource.owner.name, resource.owner %>
+  <%= list_item_attribute "Owner", resource.owner.try(:name), resource.owner %>
 
   <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
 

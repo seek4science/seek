@@ -24,7 +24,72 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:data_files)
   end
-  
+
+  test 'should show index for non-project member, non-login user' do
+    login_as(:registered_user_with_no_projects)
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+
+    logout
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+  end
+
+  test 'shouldnt show upload button for non-project member and non-login user' do
+    login_as(:registered_user_with_no_projects)
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+    assert_select "a",:text=>/Upload a datafile/,:count=>0
+
+    logout
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+    assert_select "a",:text=>/Upload a datafile/,:count=>0
+  end
+
+  test 'non-project member and non-login user can edit datafile with public policy and editable' do
+    login_as(:registered_user_with_no_projects)
+    data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
+    get :show, :id => data_file
+    assert_response :success
+    put :update, :id => data_file, :data_file => {:title => 'new title'}
+    assert_equal 'new title', assigns(:data_file).title
+
+    logout
+    data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
+    get :show, :id => data_file
+    assert_response :success
+    put :update, :id => data_file, :data_file => {:title => 'new title'}
+    assert_equal 'new title', assigns(:data_file).title
+
+  end
+
+  test "associates assay" do
+    login_as(:model_owner) #can edit assay
+    d = data_files(:picture)
+    original_assay = assays(:metabolomics_assay)
+    asset_ids = original_assay.related_asset_ids 'DataFile'
+    assert asset_ids.include? d.id
+
+    new_assay=assays(:metabolomics_assay2)
+    new_asset_ids = new_assay.related_asset_ids 'DataFile'
+    assert !new_asset_ids.include?(d.id)
+
+    put :update, :id => d, :data_file =>{}, :assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to data_file_path(d)
+    d.reload
+    original_assay.reload
+    new_assay.reload
+
+    assert !original_assay.related_asset_ids('DataFile').include?(d.id)
+    assert new_assay.related_asset_ids('DataFile').include?(d.id)
+  end
+
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -188,9 +253,11 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should create data file" do
+    login_as(:datafile_owner) #can edit assay
+    assay=assays(:assay_can_edit_by_datafile_owner)
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file, :sharing=>valid_sharing
+        post :create, :data_file => valid_data_file, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -198,6 +265,8 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.url.blank?
+    assay.reload
+    assert assay.related_asset_ids('DataFile').include? assigns(:data_file).id
   end
 
   test "should create data file for upload tool" do

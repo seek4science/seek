@@ -33,7 +33,7 @@
         <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
 
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Model"} -%>
-        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
+        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
         </p>

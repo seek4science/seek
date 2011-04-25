@@ -3,9 +3,9 @@
 unassigned_author_one:
   first_name: J
   last_name: Bloggs
-  publication: two
+  publication: pubmed_2
   
 unassigned_author_two:
   first_name: J
   last_name: Bauer
-  publication: two
+  publication: pubmed_2

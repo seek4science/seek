@@ -117,9 +117,10 @@ class SopsController < ApplicationController
             flash[:notice] = "SOP was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
           end
-          assay_ids.each do |id|
-              assay = Assay.find(id)
-              assay.relate(@sop) if assay.can_edit?
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit? and AssayAsset.find_all_by_asset_id(@sop.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+              assay.relate(@sop)
+            end
           end
         else
           format.html { 
@@ -164,15 +165,19 @@ class SopsController < ApplicationController
           format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
         end
         # Update new assay_asset
-        assay_rels = assay_ids.map {|text| a_id, r_type =  text.split(','); [Assay.find(a_id), RelationshipType.find_by_title(r_type)]}
-        assay_rels.each do |assay_r_type|
-          assay, r_type = assay_r_type
-          assay.relate(@sop, r_type) if assay.can_edit?
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit? and AssayAsset.find_all_by_asset_id(@sop.id, :conditions => ["assay_id =  #{assay.id}"]).empty?
+            assay.relate(@sop)
+          end
         end
+
         #Destroy AssayAssets that aren't needed
-        assays = assay_rels.map &:first
-        assay_assets = AssayAsset.find_all_by_asset_id(@sop.id)
-        assay_assets.each {|aa| aa.destroy if aa.assay.can_edit? and !assays.include?(aa.assay)}
+        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @sop.id, 'SOP'])
+        assay_assets.each do |assay_asset|
+          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
+          end
+        end
       else
         format.html { 
           render :action => "edit" 

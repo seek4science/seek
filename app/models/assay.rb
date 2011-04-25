@@ -140,6 +140,10 @@ class Assay < ActiveRecord::Base
     self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
   end
 
+  def related_asset_ids asset_type
+    self.assay_assets.select {|a| a.asset_type == asset_type}.collect { |a| a.asset_id }
+  end
+
   def avatar_key
     type = is_modelling? ? "modelling" : "experimental"
     "assay_#{type}_avatar"

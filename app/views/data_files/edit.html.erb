@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js","associate_events.js","associate_datafile_assays.js","attribution.js","resource.js" %>
+<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" %>
 
 <% current_user_authorized_to_manage = @data_file.can_manage? -%>
 <ul class="sectionIcons">
@@ -46,7 +46,7 @@
         <% end -%>
     </p>
     <p>
-        <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
     </p>
     
     <% end -%>

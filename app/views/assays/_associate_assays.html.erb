@@ -1,10 +1,10 @@
 <%
-   resource_text ||= text_for_resource(resource)
-   all_assays=authorised_assays.sort_by &:title
+    resource_text ||= text_for_resource(resource)
+    all_assays=authorised_assays.sort_by &:title
 
     all_assays = all_assays.select do |assay|
-        assay.is_modelling?
-    end if resource.is_a? Model
+            assay.is_modelling?
+        end if resource.is_a? Model
 
     project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
     select_truncate_length=120
@@ -27,17 +27,35 @@
         <span class="none_text" id="assay_files">Loading...</span>
       </div>
       <div class="association_step">
-        <%= select_tag :possible_assays,
-          options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
-          {:style=>"width:90%",:onchange=>remote_function(
-            :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
-            :with=>"'id='+this.value",
-            :before=>"show_ajax_loader('assay_preview')"
-          )+";check_show_add_assay();return(false);"
-        } -%>
-          <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-          <br/>
-        <br/>
+        <% if show_relationships -%>
+            <%= select_tag :possible_assays,
+              options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+              {:style=>"width:90%",:onchange=>remote_function(
+                :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
+                :with=>"'id='+this.value",
+                :before=>"show_ajax_loader('assay_preview')"
+              )+";check_show_add_assay();selected_assay();return(false);"
+            } -%>
+              <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+              <br/>
+              <div id="relationship" style="display:none;">
+                <%= label_tag "Relationship between the data and the model" %><br/>
+                <%= select_tag :assay_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}) %>
+              </div>
+              <br/>
+        <% else %>
+            <%= select_tag :possible_assays,
+                  options_for_select([["Select Assay ...",0]]|project_assays.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+                  {:style=>"width:90%",:onchange=>remote_function(
+                    :url=>{:action=>"preview",:controller=>"assays",:element=>"assay_preview"},
+                    :with=>"'id='+this.value",
+                    :before=>"show_ajax_loader('assay_preview')"
+                  )+";check_show_add_assay();return(false);"
+            } -%>
+            <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
+            <br/>
+            <br/>
+        <% end %>
       </div>
 
 	  <br/>
@@ -55,6 +73,19 @@
   
 
 <script type="text/javascript">
+  function selected_assay(){
+       i = $('possible_assays').selectedIndex;
+       id = $('possible_assays').options[i].value;
+       for (var j = 0; j < id_rel_array.length; j++) {
+           if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'true'))  {
+              Effect.Appear('relationship',{duration:0.2});
+           }
+           else if ((id == id_rel_array[j][0]) && (id_rel_array[j][1] == 'false'))  {
+              $('assay_relationship_type').selectedIndex = 0;
+              Effect.Fade('relationship',{duration:0.2});
+           }
+       }
+    }
     function toggle_assay_list() {
         var checked = $('include_other_project_assays').checked;
         var selection_box = $('possible_assays');
@@ -92,24 +123,31 @@
         selection_box.onchange();
     }
 
-<% associated_assay_ids = resource.assays.collect &:id %>
+<% associated_assay_ids = resource.is_a?(Publication) ? resource.related_assays.collect(&:id) : resource.assays.collect(&:id) %>
   <% associated_assay_ids.each do |associated_assay_id|%>
     <% assay = Assay.find(associated_assay_id) %>
     <% if assay.try :can_view? -%>
       assay_id = '<%= assay.id -%>';
       assay_title = '<%= assay.title -%>';
-      addAssay(assay_title,assay_id);
+      relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None'-%>';
+      addAssay(assay_title,assay_id,relationship_type);
     <% end %>
 <% end -%>
 
+<% all_assays.each do |assay|%>
+    assay_id = '<%= assay.id -%>';
+    assay_relationship = '<%=(assay.is_modelling?) -%>';
+    id_rel_array.push([assay_id, assay_relationship])
+<% end -%>
 
 <% if params[:assay_ids] %>
   <% params[:assay_ids].each do |id| -%>
     <% assay = Assay.find(id) %>
-    <% if assay.try :can_view?-%>
+    <% if assay.can_view?-%>
         assay_id = '<%= assay.id -%>';
         assay_title = '<%= escape_javascript(assay.title) -%>';
-        addAssay(assay_title,assay_id);
+        relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None' -%>';
+        addAssay(assay_title,assay_id,relationship_type);
     <% end -%>
   <% end -%>
 <% end -%>

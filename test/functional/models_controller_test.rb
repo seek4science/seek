@@ -89,13 +89,36 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash.now[:error]
   end
-  
+    test "associates assay" do
+    login_as(:model_owner) #can edit assay_can_edit_by_my_first_sop_owner
+    m = models(:teusink)
+    original_assay = assays(:assay_with_a_model)
+    asset_ids = original_assay.related_asset_ids 'Model'
+    assert asset_ids.include? m.id
+    new_assay=assays(:modelling_assay)
+    new_asset_ids = new_assay.related_asset_ids 'Model'
+    assert !new_asset_ids.include?(m.id)
+
+    put :update, :id => m, :model =>{}, :assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to model_path(m)
+    m.reload
+    original_assay.reload
+    new_assay.reload
+    assert !original_assay.related_asset_ids('Model').include?(m.id)
+    assert new_assay.related_asset_ids('Model').include?(m.id)
+    end
+
   test "should create model" do
+    login_as(:model_owner)
+    assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, :model => valid_model, :sharing=>valid_sharing
+      post :create, :model => valid_model, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
     end
     
     assert_redirected_to model_path(assigns(:model))
+    assay.reload
+    assert assay.related_asset_ids('Model').include? assigns(:model).id
   end
   
   def test_missing_sharing_should_default_to_private

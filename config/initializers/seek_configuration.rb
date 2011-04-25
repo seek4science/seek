@@ -24,7 +24,7 @@ Seek::Config.default :google_analytics_enabled, false
 Seek::Config.default :google_analytics_tracker_id, '000-000'
 Seek::Config.default :piwik_analytics_enabled, false
 Seek::Config.default :piwik_analytics_id_site, 1
-Seek::Config.default :piwik_analytics_url, 'localhost:8093'
+Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
 
 
 

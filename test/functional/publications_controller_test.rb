@@ -31,12 +31,28 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should create publication" do
+  test "should not relate assays thay are not authorized for edit during create publication" do
+    assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id }
+      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id },:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
+    p=assigns(:publication)
+    assert_equal 0,p.related_assays.count
+  end
+
+  test "should create publication" do
+    login_as(:model_owner) #can edit assay
+    assay=assays(:metabolomics_assay)
+    assert_difference('Publication.count') do
+      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id },:assay_ids=>[assay.id.to_s]
+    end
+
+    assert_redirected_to edit_publication_path(assigns(:publication))
+    p=assigns(:publication)
+    assert_equal 1,p.related_assays.count
+    assert p.related_assays.include? assay
   end
   
   test "should create doi publication" do
@@ -48,17 +64,83 @@ class PublicationsControllerTest < ActionController::TestCase
   end  
 
   test "should show publication" do
-    get :show, :id => publications(:one).to_param
+    get :show, :id => publications(:one)
     assert_response :success
   end
 
   test "should get edit" do
-    get :edit, :id => publications(:one).to_param
+    get :edit, :id => publications(:one)
     assert_response :success
   end
 
+  test "associates assay" do
+    login_as(:model_owner) #can edit assay
+    p = publications(:taverna_paper_pubmed)
+    original_assay = assays(:assay_with_a_publication)
+    assert p.related_assays.include?(original_assay)
+    assert original_assay.related_publications.include?(p)
+
+    new_assay=assays(:metabolomics_assay)
+    assert new_assay.related_publications.empty?
+    
+    put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    original_assay.reload
+    new_assay.reload
+
+    assert_equal 1, p.related_assays.count
+
+    assert !p.related_assays.include?(original_assay)
+    assert !original_assay.related_publications.include?(p)
+
+    assert p.related_assays.include?(new_assay)
+    assert new_assay.related_publications.include?(p)
+
+  end
+
+  test "do not associate assays unauthorized for edit" do
+    p = publications(:taverna_paper_pubmed)
+    original_assay = assays(:assay_with_a_publication)
+    assert p.related_assays.include?(original_assay)
+    assert original_assay.related_publications.include?(p)
+
+    new_assay=assays(:metabolomics_assay)
+    assert new_assay.related_publications.empty?
+
+    put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    original_assay.reload
+    new_assay.reload
+
+    assert_equal 1, p.related_assays.count
+
+    assert p.related_assays.include?(original_assay)
+    assert original_assay.related_publications.include?(p)
+
+    assert !p.related_assays.include?(new_assay)
+    assert !new_assay.related_publications.include?(p)
+
+  end
+
+  test "should keep model and data associations after update" do
+    p = publications(:pubmed_2)
+    put :update, :id => p,:author=>{},:assay_ids=>[]
+
+    assert_redirected_to publication_path(p)
+    p.reload
+
+    assert p.related_assays.empty?
+    assert p.related_models.include?(models(:teusink))
+    assert p.related_data_files.include?(data_files(:picture))
+  end
+
+
   test "should associate authors" do
-    p = publications(:two)
+    p = publications(:pubmed_2)
     assert_equal 2, p.non_seek_authors.size
     assert_equal 0, p.creators.size
     
