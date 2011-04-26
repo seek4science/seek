@@ -1,49 +1,54 @@
-<%= f.error_messages %>
 <%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
 <%= stylesheet_link_tag 'calendar_date_select/default' %>
 
 
+<%= f.error_messages %>
+
+
 <h2>Sample Details</h2>
 
-<div style="text-align: center;">
-  <div style="width: 95%;">
-     <p>
-      <%= f.label "Sample name:" -%><span class="required">*</span><br/>
-      <%= f.text_field :title, :style => "width: 350px;" -%>
-    </p>
-    <p>
-      <%= f.label "Organism specimen" %> <span class="required">*</span><br/>
-      <%= collection_select(:sample, :specimen_id, Specimen.all, :id, :title) %>
-    </p>
+<div style="width: 85%;">
 
-    <p>
-      <%= f.label :explantation -%><br/>
-      <%= f.text_field :explantation, :style => "width: 350px;" -%>
-    </p>
+  <p>
+    <%= f.label "Sample name:" -%><span class="required">*</span><br/>
+    <%= f.text_field :title, :style => "width: 350px;" -%>
+  </p>
 
-    <p>
-      <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
-      <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
-    </p>
+  <p>
+    <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
+    <%= collection_select(:sample, :specimen_id, Specimen.all, :id, :title) %>
+  </p>
+
+  <p>
+    <%= f.label :explantation -%><br/>
+    <%= f.text_field :explantation, :style => "width: 350px;" -%>
+  </p>
+
+  <p>
+    <%= f.label :lab_internal_number -%><br/>
+    <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+  </p>
+  <p>
+    <%= f.label :donation_date -%><br/>
+    <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
+  </p>
+
+  <p>
+    <%= f.label :description -%><br/>
+    <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+  </p>
+
+  <br style="clear:both"/>
+
+  <%= render :partial =>"samples/select_strains", :locals => {:resource => @sample } -%>
 
 
-    <p>
-      <%= f.label :donation_date -%><span class="required">*</span><br/>
-      <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
-    </p>
 
-    <p>
-      <%= f.label :description -%><br/>
-      <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
-    </p>
-
-
-  </div>
 </div>
 
 
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(sample ? "Update" : "Create", :disable_with=>(sample ? "Updating..." : "Creating...")) -%>
-  or <%= link_to 'Cancel', (sample ? sample_path(sample.id) : samples_path) -%>
+  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (@sample.id ? sample_path(@sample.id) : samples_path) -%>
 </p>

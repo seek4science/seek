@@ -2,6 +2,6 @@
 
 <div class="show_basic">
   <% form_for(@specimen) do |f| %>
-    <%= render :partial => "form", :locals => { :f => f, :specimen => @specimen } -%>
+    <%= render :partial => "form", :locals => { :f => f, :action=>:edit} -%>
   <% end %>
 </div>

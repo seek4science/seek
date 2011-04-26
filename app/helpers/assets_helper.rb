@@ -102,7 +102,7 @@ module AssetsHelper
     name = resource.class.name.split("::")[0]
 
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "Experiment" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Event" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "Experiment" => {},"DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Event" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -196,6 +196,16 @@ module AssetsHelper
 
       when "Sample"
         related["Specimen"][:items] = [resource.specimen]
+        related["Institution"][:items] = [resource.institution]
+        related["Project"][:items] = [resource.project]
+
+      when "Experiment"
+        related["Institution"][:items] = [resource.institution]
+        related["Person"][:items] = resource.creators
+        related["Project"][:items] = [resource.project]
+        related["Sample"][:items] = [resource.sample]
+        related["DataFile"][:items] = resource.data_files
+        related["Publication"][:items] = resource.related_publications
 
       else
 
@@ -237,6 +247,12 @@ module AssetsHelper
       when "Person"
         filter_text = "(:filter => {:person => #{context_resource.id}},:page=>'all')"
 
+      when "Experiment"
+        filter_text = "(:filter => {:experiment => #{context_resource.id}},:page=>'all')"
+      when "Sample"
+        filter_text = "(:filter => {:sample=> #{context_resource.id}},:page=>'all')"
+      when "Specimen"
+        filter_text = "(:filter => {:specimen => #{context_resource.id}},:page=>'all')"
 
 
     end

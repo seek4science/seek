@@ -1,20 +1,21 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
+  <%= list_item_optional_attribute "Contributor", resource.contributor.person.try (:name), resource.contributor.person %>
   <%= list_item_simple_list resource.creators, "Creator(s)" -%>
 
-  <%= list_item_optional_attribute "Organism", resource.organism.try(:title),resource.organism %>
-  <%= list_item_optional_attribute "Strain", resource.strain.try(:title),resource.strain %>
+  <%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>
+  <%= list_item_optional_attribute "Strain", resource.strain.try(:title), resource.strain %>
   <%= list_item_attribute "Age", resource.age_in_weeks %>
   <%= list_item_attribute "Treatment", resource.treatment %>
 
 </div>
 
 <div class="list_item_right_column">
-  <%= list_item_attribute "Lab internal number", resource.lab_internal_number %>
 
-  <%= list_item_optional_attribute "Lab", resource.institution.try(:name), resource.institution %>
-  <%= list_item_optional_attribute "Contributor", resource.contributor.person.try (:name), resource.contributor.person %>
+  <%= list_item_optional_attribute "Project", resource.project.try(:name), resource.project %>
+  <%= list_item_optional_attribute "Institution", resource.institution.try(:name), resource.institution %>
+
 </div>
 <div class="list_item_whole_width">
   <%= list_item_description resource.description %>

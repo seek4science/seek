@@ -12,26 +12,10 @@
   <div class="main_content_left_box">
 
     <div class="box_about_actor">
-      <p>
-        <label>Title:</label>
-        <%= text_or_not_specified(@experiment.title) %>
-      </p>
 
       <p>
         <label>Sample:</label>
         <%= text_or_not_specified(@experiment.sample.title) %>
-      </p>
-
-
-
-      <p>
-        <label>Institution:</label>
-        <%= text_or_not_specified(@experiment.institution.try(:name)) %>
-      </p>
-
-      <p>
-        <label>Person responsible:</label>
-        <%= text_or_not_specified(@experiment.person.try(:name)) %>
       </p>
 
       <p>
@@ -59,7 +43,7 @@
       <b>About the experiment:</b>
 
     <div id="description" class="box_standout">
-      <%= text_or_not_specified(@experiment.comments, :description=>true, :auto_link=>true) %>
+      <%= text_or_not_specified(@experiment.description, :description=>true, :auto_link=>true) %>
     </div>
     </p>
 

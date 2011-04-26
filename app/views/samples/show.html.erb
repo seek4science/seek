@@ -12,15 +12,16 @@
   <div class="main_content_left_box">
 
     <div class="box_about_actor">
-      <p>
-        <label>ID:</label>
-        <%= text_or_not_specified(@sample.id) %>
-      </p>
 
       <p>
         <label>Specimen:</label>
         <%= text_or_not_specified(@sample.specimen.title) %>
       </p>
+
+       <p>
+          <label>Strains:</label>
+          <%= sample_strains_list @sample.strains -%>
+        </p>
 
       <p>
         <label>Explantation time:</label>

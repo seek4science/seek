@@ -1,39 +1,50 @@
 class SpecimensController < ApplicationController
   # To change this template use File | Settings | File Templates.
 
-  before_filter :find_specimens, :only => [:index]
-  before_filter :find_specimen, :only => [:show, :update, :edit,:destroy]
+  #before_filter :find_specimens, :only => [:index]
+  #before_filter :find_specimen, :only => [:show, :update, :edit, :destroy]
+
+
+  before_filter :find_assets, :only => [:index]
+  before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
 
   before_filter :login_required
   include IndexPager
 
-  def find_specimen
-    @specimen = Specimen.find params[:id]
-
-  end
-
-   def find_specimens
-    @specimens = apply_filters( Specimen.find(:all)  )
-   end
-
-
   def new
     @specimen = Specimen.new
-      respond_to do |format|
-      format.html # new.html.erb
-      format.xml
-  end
+    respond_to do |format|
+      if current_user.person.member?
+        format.html # new.html.erb
+      else
+        flash[:error] = "You are not authorized to create new specimen. Only members of known projects, institutions or work groups are allowed to create new content."
+        format.html { redirect_to specimens_path }
+      end
+    end
 
   end
 
   def create
-     @specimen = Specimen.new(params[:specimen])
-     @specimen.contributor = current_user
+    @specimen = Specimen.new(params[:specimen])
+    @specimen.contributor = current_user
+    @specimen.project_id= params[:project_id]
+
+
     respond_to do |format|
       if @specimen.save
-      #Add creators
-          AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-      format.html { redirect_to(@specimen)}
+
+       # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+        #Add creators
+        AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
+
+        #if policy_err_msg.blank?
+        #  flash.now[:notice] = 'Specimen was successfully created.' if flash.now[:notice].nil?
+          format.html { redirect_to @specimen }
+       # else
+        #  flash[:notice] = "Specimen was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+        #  format.html { redirect_to :controller => 'specimens', :id => @specimen, :action => "edit" }
+       # end
+
 
       else
         format.html { render :action => "new" }
@@ -44,11 +55,16 @@ class SpecimensController < ApplicationController
   def update
     respond_to do |format|
       if @specimen.update_attributes params[:specimen]
-
-         #update creators
+         # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+        #update creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-        flash[:notice] = 'Specimen was successfully updated.'
-        format.html { redirect_to(@specimen) }
+         #if policy_err_msg.blank?
+         # flash.now[:notice] = 'Specimen was successfully updated.' if flash.now[:notice].nil?
+          format.html { redirect_to @specimen }
+       # else
+         # flash[:notice] = "Specimen was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+        #  format.html { redirect_to :controller => 'specimens', :id => @specimen, :action => "edit" }
+       # end
       else
         format.html { render :action => "edit" }
       end
@@ -69,6 +85,21 @@ class SpecimensController < ApplicationController
     end
   end
 
+
+  def project_selected_ajax
+
+    if params[:project_id] && params[:project_id]!="0"
+      ins=Project.find(params[:project_id]).institutions
+
+    end
+    ins||=[]
+
+    render :update do |page|
+
+      page.replace_html "institution_collection", :partial=>"specimens/institutions_list", :locals=>{:ins=>ins, :project_id=>params[:project_id]}
+    end
+
+  end
 
 
 end

@@ -1,14 +1,16 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-  <%= list_item_optional_attribute "Organism specimen", resource.specimen.try(:title),resource.specimen %>
-  <%= list_item_optional_attribute "Explantation time after treatment", resource.explantation %>
+  <%= list_item_optional_attribute "Contributor", resource.contributor.person.try (:name), resource.contributor.person %>
+
+  <%= list_item_optional_attribute "Specimen", resource.specimen.try(:title),resource.specimen %>
+
 
 </div>
 
 <div class="list_item_right_column">
-  <%= list_item_attribute "Lab internal number", resource.lab_internal_number %>
-  <%= list_item_attribute "Date of donation", resource.donation_date.strftime('%d/%m/%Y') %>
+
+  <%= list_item_attribute "Date of donation", resource.donation_date %>
 
 
 </div>

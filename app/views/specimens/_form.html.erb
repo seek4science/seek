@@ -39,23 +39,45 @@
       <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
     </p>
 
+
     <p>
-      <%= f.label "Institution" %> <span class="required">*</span><br/>
-      <%= collection_select(:specimen, :institution_id, Institution.all, :id, :title) %>
+      <%= f.label :project %><span class="required">*</span><br/>
+      <%
+         selected_project=@specimen.project.try(:id)
+      %>
+      <%=
+          select_tag :project_id,
+                     options_for_select([["Select project ..", 0]]|current_user.person.projects.collect { |p| [h(p.name), p.id] }, selected_project),
+                     {:onchange=>remote_function(
+                             :url=>{:action=>"project_selected_ajax"},
+                             :with=>"'project_id='+this.value",
+                             :before=>"show_ajax_loader('institution_collection')"
+                     ), :style=>"width:82%"
+
+                     }
+      %>
     </p>
 
-    <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Specimen",   # this is only for presentation, not for any processing
-        :project_hash => current_user.generate_own_project_id_name_hash } -%>
+    <p>
+      <%= f.label :institution %><br/>
+
+    <div id="institution_collection">
+      <% ins = @specimen.project ? @specimen.project.institutions : [] -%>
+      <%= render :partial=>"specimens/institutions_list", :locals=>{:ins => ins} -%>
+    </div>
+    </p>
 
     <%= render :partial=>"assets/asset_form_bottom", :locals=> {
             :resource_type => "Specimen",
             :attribution_enable => false,
             :show_publications => false,
-            } -%>
+            :existing_creators=>@specimen.creators,
+            :other_creators=>@specimen.other_creators,
+    } -%>
 
     <p>
       <%= f.label :description -%><br/>
-      <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
+      <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
     </p>
 
 
@@ -65,6 +87,6 @@
 
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(specimen ? "Update" : "Create", :disable_with=>(specimen ? "Updating..." : "Creating...")) -%>
-  or <%= link_to 'Cancel', (specimen ? specimen_path(specimen.id) : specimens_path) -%>
+  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
 </p>

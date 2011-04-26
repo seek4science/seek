@@ -70,10 +70,8 @@ class DataFilesController < ApplicationController
 
     if handle_data
 
-      @data_file = DataFile.new params[:data_file]
-
-      @data_file.contributor  = current_user
-      @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
+      _file = DataFile.new params[:data_file]
+         b = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
       if @data_file.save
@@ -99,6 +97,7 @@ class DataFilesController < ApplicationController
       @data_file.contributor=current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
+
       update_tags @data_file
 
       assay_ids = params[:assay_ids] || []
@@ -114,6 +113,7 @@ class DataFilesController < ApplicationController
           Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
           #Add creators
+
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
           
           if policy_err_msg.blank?
@@ -188,6 +188,7 @@ class DataFilesController < ApplicationController
         
         
         #update creators
+
         AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
         
         if policy_err_msg.blank?
