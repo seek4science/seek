@@ -251,16 +251,13 @@ ActiveRecord::Schema.define(:version => 20110419145348) do
     t.string   "title"
     t.integer  "sample_id"
     t.string   "description"
+    t.integer  "project_id"
     t.integer  "institution_id"
-    t.integer  "person_id"
+    t.integer  "people_id"
     t.datetime "date"
     t.string   "first_letter"
     t.string   "comments"
     t.integer  "policy_id"
-    t.integer  "project_id"
-    t.text     "other_creators"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -465,11 +462,6 @@ ActiveRecord::Schema.define(:version => 20110419145348) do
     t.datetime "updated_at"
   end
 
-  create_table "notifiers", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
@@ -621,10 +613,6 @@ ActiveRecord::Schema.define(:version => 20110419145348) do
     t.string   "comments"
     t.string   "first_letter"
     t.integer  "policy_id"
-    t.text     "other_creators"
-    t.integer  "project_id"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
