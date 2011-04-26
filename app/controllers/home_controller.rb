@@ -1,7 +1,6 @@
 class HomeController < ApplicationController
   
-  #before_filter :login_required
-  
+
   #layout :select_layout
   
   def index
