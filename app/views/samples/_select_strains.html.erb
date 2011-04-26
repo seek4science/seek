@@ -1,0 +1,159 @@
+<%
+   select_truncate_length=120
+   all_strains = Strain.find(:all, :order => :title)
+   resource_text ||= resource.class.name.downcase
+%>
+
+
+<div class="fold">
+
+  <div class="foldTitle">
+    <%= help_icon("Here you can associate the sample with specific strains") -%>
+    Strains
+  </div>
+
+  <div id="strains_fold_content" class="foldContent" style="display:block;">
+
+    <div class="yui-u first">
+      <p style="color:#666666;">
+        The following Strains are involved in this <%= "#{resource_text}" %>
+      </p>
+
+      <div id="strain_to_list" class="box_editing_inner" style="line-height:1.5;">
+        <span class="none_text" id="strains"> Loading...</span>
+      </div>
+
+      <div class="association_step">
+        Choose an strain<br/><br/>
+        <%= select_tag :possible_strains,
+                       options_for_select([["Select Strain ...", 0]]|all_strains.collect { |s| [truncate(h(s.title), :length=>select_truncate_length), s.id] }),
+                       {:style=>"width:90%",
+
+                        :onchange=>"check_show_add_strain();return(false);"} -%>
+        <%= select_tag :sample_strain_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+      </div>
+      <br/>
+      <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedStrain(); return(false);", :id=>"add_strain_link", :class=>"block_link", :style => "width: 13em" %>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<script type="text/javascript">
+    var strains = new Array();
+
+    <% params[:sample_strain_ids] = resource.strain_ids%>
+
+    <%if params[:sample_strain_ids]%>
+        <% params[:sample_strain_ids].each do |s_id| %>
+        <% strain = Strain.find  s_id %>
+        title = '<%=strain.title %>';
+        id = '<%= strain.id %>';
+        addStrain(title, id);
+        <%end%>
+    <%end-%>
+    updateStrains();
+
+    function check_show_add_strain() {
+        i = $('possible_strains').selectedIndex;
+        selected_id = $('possible_strains').options[i].value;
+        if (selected_id == '0') {
+            $('add_strain_link').hide();
+        }
+        else {
+            $('add_strain_link').show();
+        }
+    }
+    check_show_add_strain();
+
+    function checkStrainNotInList(strain_title, strain_id) {
+        toAdd = true;
+
+        for (var i = 0; i < strains.length; i++)
+            if (strains[i][0] == strain_title && strains[i][2] == strain_id) {
+                toAdd = false;
+                break;
+            }
+
+        return toAdd;
+    }
+
+    function addStrain(title, id) {
+        if (checkStrainNotInList(title, id)) {
+            strains.push([title,id]);
+            updateStrains();
+        }
+
+
+    }
+
+    function addSelectedStrain() {
+        selected_option_index = $("possible_strains").selectedIndex;
+        selected_option = $("possible_strains").options[selected_option_index];
+        title = selected_option.text;
+        id = selected_option.value;
+
+
+        addStrain(title, id);
+
+    }
+
+    function removeStrain(index) {
+        // remove according to the index
+
+        strains.splice(index, 1);
+        // update the page
+        updateStrains();
+    }
+
+    function updateStrains() {
+        strain_text = '<ul class="related_asset_list">';
+
+        for (var i = 0; i < strains.length; i++) {
+            strain = strains[i];
+            title = strain[0];
+            id = strain[1];
+
+            titleText = '<span title="' + title + '">' + title.truncate(100);
+
+
+            titleText += '</span>';
+            strain_text += '<li>' + titleText +
+                    '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+                    '[<a href=\"\" onclick=\"javascript:removeStrain(' + i + '); return(false);\">remove</a>]</small></li>';
+        }
+
+        strain_text += '</ul>';
+
+        // update the page
+        if (strains.length == 0) {
+            $('strain_to_list').innerHTML = '<span class="none_text">No strains</span>';
+        }
+        else {
+            $('strain_to_list').innerHTML = strain_text;
+        }
+
+        clearList('sample_strain_ids');
+
+        select = $('sample_strain_ids')
+        for (i = 0; i < strains.length; i++) {
+            strain = strains[i];
+            title = strain[0];
+            id = strain[1];
+
+            o = document.createElement('option');
+            o.value = id;
+            o.text = title;
+            o.selected = true;
+
+            try {
+                select.add(o); //for older IE version
+            }
+            catch (ex) {
+                select.add(o, null);
+            }
+        }
+
+    }
+</script>
