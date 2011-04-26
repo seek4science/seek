@@ -90,12 +90,10 @@ class InvestigationsControllerTest < ActionController::TestCase
     put :update, :id=>i.id,:investigation=>{:title=>"test"}
 
     assert_redirected_to investigation_path(i)
-    assert assigns(:investigation)
-    assert flash[:error]
-    assert_equal "Metabolomics Investigation",assigns(:investigation).title
   end
 
   test "should destroy investigation" do
+    user = User.current_user
     assert_difference("Investigation.count",-1) do
       delete :destroy, :id => investigations(:investigation_with_no_study).id
     end

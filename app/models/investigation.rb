@@ -17,7 +17,7 @@ class Investigation < ActiveRecord::Base
     user == nil ? false : user.person.projects.include?(project)
   end
 
-  def can_delete? user=nil
+  def can_delete? user=User.current_user
     studies.empty? && can_edit?(user)
   end
   
