@@ -42,13 +42,16 @@ class AssaysController < ApplicationController
       if @assay.save
         data_file_ids.each do |text|
           a_id, r_type = text.split(",")
-          @assay.relate(DataFile.find(a_id), RelationshipType.find_by_title(r_type))
+          d = DataFile.find(a_id)
+          @assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
         end
         model_ids.each do |a_id|
-          @assay.relate(Model.find(a_id))
+          m = Model.find(a_id)
+          @assay.relate(m) if m.can_view?
         end
         sop_ids.each do |a_id|
-          @assay.relate(Sop.find(a_id))
+          s = Sop.find(a_id)
+          @assay.relate(s) if s.can_view?
         end
         organisms.each do |text|
           o_id, strain, culture_growth_type_text=text.split(",")
@@ -95,13 +98,16 @@ class AssaysController < ApplicationController
       if @assay.update_attributes(params[:assay])
         data_file_ids.each do |text|
           a_id, r_type = text.split(",")
-          assay_assets_to_keep << @assay.relate(DataFile.find(a_id), RelationshipType.find_by_title(r_type))
+          d = DataFile.find(a_id)
+          assay_assets_to_keep << @assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
         end
         model_ids.each do |a_id|
-          assay_assets_to_keep << @assay.relate(Model.find(a_id))
+          m = Model.find(a_id)
+          assay_assets_to_keep << @assay.relate(m) if m.can_view?
         end
         sop_ids.each do |a_id|
-          assay_assets_to_keep << @assay.relate(Sop.find(a_id))
+          s = Sop.find(a_id)
+          assay_assets_to_keep << @assay.relate(s) if s.can_view?
         end
         #Destroy AssayAssets that aren't needed
         (@assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
