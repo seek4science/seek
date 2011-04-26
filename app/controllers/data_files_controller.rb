@@ -131,7 +131,7 @@ class DataFilesController < ApplicationController
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
-            if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id = #{@assay.id}"]).empty?
+            if @assay.can_edit?
               @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
             end
           end
@@ -215,7 +215,7 @@ class DataFilesController < ApplicationController
           a_id, r_type = text.split(",")
           a_ids.push(a_id)
           @assay = Assay.find(a_id)
-          if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id =  #{@assay.id}"]).empty?
+          if @assay.can_edit?
             @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
           end
         end

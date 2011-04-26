@@ -118,7 +118,7 @@ class SopsController < ApplicationController
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
           end
           Assay.find(assay_ids).each do |assay|
-            if assay.can_edit? and AssayAsset.find_all_by_asset_id(@sop.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+            if assay.can_edit?
               assay.relate(@sop)
             end
           end
@@ -166,7 +166,7 @@ class SopsController < ApplicationController
         end
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
-          if assay.can_edit? and AssayAsset.find_all_by_asset_id(@sop.id, :conditions => ["assay_id =  #{assay.id}"]).empty?
+          if assay.can_edit?
             assay.relate(@sop)
           end
         end
