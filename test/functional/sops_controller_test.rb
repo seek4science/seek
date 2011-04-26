@@ -123,8 +123,16 @@ class SopsControllerTest < ActionController::TestCase
     new_asset_ids = new_assay.related_asset_ids 'Sop'
     assert !new_asset_ids.include?(s.id)
 
+    p 'Before update'
+    p s.can_edit?
+    p original_assay.can_edit?
+    p new_assay.can_edit?
     put :update, :id => s.id, :sop =>{}, :assay_ids=>[new_assay.id.to_s]
 
+    p 'After update'
+    p s.can_edit?
+    p original_assay.can_edit?
+    p new_assay.can_edit?
     assert_redirected_to sop_path(s)
 
     s.reload
