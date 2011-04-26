@@ -56,8 +56,8 @@ class StudiesController < ApplicationController
           format.html { redirect_to(@study) }
           format.xml  { head :ok }
         else
-          flash[:notice] = "Assay metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to assay_edit_path(@assay) }
+          flash[:notice] = "Study metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to study_edit_path(@study) }
         end
       else
         format.html { render :action => "edit" }
@@ -84,8 +84,16 @@ class StudiesController < ApplicationController
     
     respond_to do |format|
       if @study.save
-        format.html { redirect_to(@study) }
-        format.xml { render :xml => @study, :status => :created, :location => @study }
+
+        policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
+
+        if policy_err_msg.blank?
+          format.html { redirect_to(@study) }
+          format.xml { render :xml => @study, :status => :created, :location => @study }
+        else
+          flash[:notice] = "Study metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to study_edit_path(@study) }
+        end
       else
         format.html {render :action=>"new"}
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }
