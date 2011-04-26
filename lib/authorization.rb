@@ -109,7 +109,7 @@ module Authorization
     # 2. Check if they're not in the blacklist (overrules whitelist)
     contributor = thing.contributor
     contributor = contributor.user if contributor.respond_to? :user
-    if contributor
+    if contributor && user
       # == WHITE LIST
       if policy.use_whitelist && contributor.get_whitelist
         is_authorized = true if is_person_in_whitelist?(user.person, contributor) && access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
