@@ -33,17 +33,17 @@ class SpecimensController < ApplicationController
     respond_to do |format|
       if @specimen.save
 
-       # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+        # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
         #Add creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
         #if policy_err_msg.blank?
         #  flash.now[:notice] = 'Specimen was successfully created.' if flash.now[:notice].nil?
-          format.html { redirect_to @specimen }
-       # else
+        format.html { redirect_to @specimen }
+        # else
         #  flash[:notice] = "Specimen was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
         #  format.html { redirect_to :controller => 'specimens', :id => @specimen, :action => "edit" }
-       # end
+        # end
 
 
       else
@@ -55,16 +55,16 @@ class SpecimensController < ApplicationController
   def update
     respond_to do |format|
       if @specimen.update_attributes params[:specimen]
-         # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+        # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
         #update creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-         #if policy_err_msg.blank?
-         # flash.now[:notice] = 'Specimen was successfully updated.' if flash.now[:notice].nil?
-          format.html { redirect_to @specimen }
-       # else
-         # flash[:notice] = "Specimen was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+        #if policy_err_msg.blank?
+        # flash.now[:notice] = 'Specimen was successfully updated.' if flash.now[:notice].nil?
+        format.html { redirect_to @specimen }
+        # else
+        # flash[:notice] = "Specimen was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
         #  format.html { redirect_to :controller => 'specimens', :id => @specimen, :action => "edit" }
-       # end
+        # end
       else
         format.html { render :action => "edit" }
       end

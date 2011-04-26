@@ -39,13 +39,11 @@ class ExperimentsController < ApplicationController
     params.delete :data_file_ids
 
 
-
-
     respond_to do |format|
       if @experiment.save
         AssetsCreator.add_or_update_creator_list(@experiment, params[:creators])
         # update related publications
-        Relationship.create_or_update_attributions(@experiment, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@experiment, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
         format.html { redirect_to(@experiment) }
 
@@ -67,12 +65,11 @@ class ExperimentsController < ApplicationController
     params.delete :data_file_ids
 
 
-
     respond_to do |format|
       if @experiment.update_attributes params[:experiment]
         AssetsCreator.add_or_update_creator_list(@experiment, params[:creators])
         # update related publications
-        Relationship.create_or_update_attributions(@experiment, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@experiment, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
         flash[:notice] = 'Experiment was successfully updated.'
         format.html { redirect_to(@experiment) }

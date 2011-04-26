@@ -20,7 +20,7 @@ class SamplesController < ApplicationController
 
     sample_strain_ids = params[:sample_strain_ids] || []
 
-    @sample.strains = Strain.find sample_strain_ids.collect {|s| s.split(',')}
+    @sample.strains = Strain.find sample_strain_ids.collect { |s| s.split(',') }
 
 
     respond_to do |format|
@@ -39,7 +39,7 @@ class SamplesController < ApplicationController
 
     sample_strain_ids = params[:sample_strain_ids] || []
 
-    @sample.strains = Strain.find sample_strain_ids.collect {|s| s.split(',')}
+    @sample.strains = Strain.find sample_strain_ids.collect { |s| s.split(',') }
 
     respond_to do |format|
 
