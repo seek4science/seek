@@ -26,14 +26,14 @@
   <body id="body">
 
     <div id="custom-doc" class="yui-t2">
-      <div id="hd">
+
         <% if logged_in? %>
           <div id="logged_in_as">
             Logged in as
             <%= image_tag_for_key "user", current_user.person, current_user.person.name, {}, current_user.person.name -%>
             | <%= image_tag_for_key "logout", logout_path, "Logout", {}, "Logout" -%>
           </div>
-        <% end %>
+         <% end %>
         <div id="header">
           <%= render :partial=>"layouts/header_main" %>
         </div>
@@ -41,7 +41,7 @@
         <div id="topbar">
           <%= render :partial=>"search/search_bar" %>
         </div>
-      </div>
+
       <div id="bd">
         <div id="yui-main">
           <div class="yui-b" id="content">

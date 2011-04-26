@@ -2,6 +2,10 @@ require 'test_helper'
 
 class ConfigTest < ActiveSupport::TestCase
 #Features enabled
+  test "public seek enabled" do
+    assert_equal false ,Seek::Config.public_seek_enabled
+  end
+
   test "events enabled" do
     assert_equal true ,Seek::Config.events_enabled
   end
@@ -61,6 +65,17 @@ class ConfigTest < ActiveSupport::TestCase
   test "google_analytics_tracker_id" do
     assert_equal '000-000' ,Seek::Config.google_analytics_tracker_id
   end
+
+  test "piwik_analytics_enabled" do
+    assert_equal false ,Seek::Config.piwik_analytics_enabled
+  end
+  test "piwik_analytics_id_site" do
+    assert_equal 1 ,Seek::Config.piwik_analytics_id_site
+  end
+  test "piwik_analytics_url" do
+    assert_equal 'localhost/piwik/',Seek::Config.piwik_analytics_url
+  end
+
 #Project
   test "project_name" do
     assert_equal "Sysmo" ,Seek::Config.project_name
@@ -78,28 +93,28 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal "The Sysmo Consortium",Seek::Config.project_title
   end
   test "dm_project_name" do
-    assert_equal "Sysmo-DB",Seek::Config.dm_project_name
+    assert_equal "SysMO-DB",Seek::Config.dm_project_name
   end
   test "dm_project_title" do
     assert_equal "The Sysmo Consortium",Seek::Config.dm_project_title
   end
   test "dm_project_link" do
-    assert_equal "http://www.sysmo.net",Seek::Config.dm_project_link
+    assert_equal "http://www.sysmo-db.org",Seek::Config.dm_project_link
   end
   test "application_name" do
-    assert_equal "Sysmo SEEK",Seek::Config.application_name
+    assert_equal "SEEK",Seek::Config.application_name
   end
   test "application_title" do
     assert_equal "The Sysmo SEEK",Seek::Config.application_title
   end
   test "header_image_enabled" do
-    assert_equal false,Seek::Config.header_image_enabled
+    assert_equal true,Seek::Config.header_image_enabled
   end
   test "header_image_link" do
-      assert_equal "http://www.sysmo.net",Seek::Config.header_image_link
+      assert_equal "http://www.sysmo-db.org",Seek::Config.header_image_link
   end
   test "header_image_title" do
-    assert_equal "Sysmo-DB",Seek::Config.header_image_title
+    assert_equal "SysMO-DB",Seek::Config.header_image_title
   end
 #pagination
   test "default page" do

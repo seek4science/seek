@@ -112,20 +112,46 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
   end
 
+  test "associates assay" do
+    login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
+    s = sops(:my_first_sop)
+    original_assay = assays(:assay_can_edit_by_my_first_sop_owner1)
+    asset_ids = original_assay.related_asset_ids 'Sop'
+    assert asset_ids.include? s.id
+
+    new_assay=assays(:assay_can_edit_by_my_first_sop_owner2)
+    new_asset_ids = new_assay.related_asset_ids 'Sop'
+    assert !new_asset_ids.include?(s.id)
+
+    put :update, :id => s.id, :sop =>{}, :assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to sop_path(s)
+
+    s.reload
+    original_assay.reload
+    new_assay.reload
+    assert !original_assay.related_asset_ids('Sop').include?(s.id)
+    assert new_assay.related_asset_ids('Sop').include?(s.id)
+  end
+
   test "should create sop" do
+    login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
+    assay=assays(:assay_can_edit_by_my_first_sop_owner1)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => valid_sop, :sharing=>valid_sharing
+        post :create, :sop => valid_sop, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
       end
     end
 
     assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin), assigns(:sop).contributor
+    assert_equal users(:owner_of_my_first_sop), assigns(:sop).contributor
 
     assert assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
     assert_equal "file_picture.png", assigns(:sop).original_filename
+    assay.reload
+    assert assay.related_asset_ids('Sop').include? assigns(:sop).id
   end
 
   def test_missing_sharing_should_default_to_private
@@ -309,7 +335,7 @@ class SopsControllerTest < ActionController::TestCase
       post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
     end
 
-    assert_redirected_to sops_path
+    assert_redirected_to sop_path(s)
     assert_not_nil flash[:error]
 
     s=Sop.find(s.id)

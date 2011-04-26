@@ -36,9 +36,9 @@ module Authorization
     if user.nil?
       scope = Policy::EVERYONE
     else
-      if thing.contributor == user #Warning to future refactorers, this would pass in the case that
-                                   #  the user was nil (not logged in) and the contributor was also nil (jerm resource)
-                                   #  IF we didn't already check for a nil user above.
+      if thing.contributor == user || thing.contributor == user.person #Warning to future refactorers, this would pass in the case that
+                                                                       #  the user was nil (not logged in) and the contributor was also nil (jerm resource)
+                                                                       #  IF we didn't already check for a nil user above.
         scope = Policy::PRIVATE
         return true #contributor is always authorized 
         # have to do this because of inconsistancies with access_type that mess up later on
@@ -53,10 +53,10 @@ module Authorization
     end
     
     # Check the user is "in scope" and also is performing an action allowed under the given access type
-    is_authorized = is_authorized || (scope <= policy.sharing_scope && 
-                                      access_type_allows_action?(action, policy.access_type))
+    is_authorized = (scope <= policy.sharing_scope &&
+                     access_type_allows_action?(action, policy.access_type))
+
     # == END BASIC POLICY
-    
     if policy.use_custom_sharing && user
       # == CUSTOM PERMISSIONS
       # 1. Check if there is a specific permission relating to the user
@@ -107,15 +107,17 @@ module Authorization
     # == BLACK/WHITE LISTS
     # 1. Check if they're in the whitelist
     # 2. Check if they're not in the blacklist (overrules whitelist)
-    if thing.contributor
+    contributor = thing.contributor
+    contributor = contributor.user if contributor.respond_to? :user
+    if contributor
       # == WHITE LIST
-      if policy.use_whitelist && thing.contributor.get_whitelist
-        is_authorized = true if is_person_in_whitelist?(user.person, thing.contributor) && access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
+      if policy.use_whitelist && contributor.get_whitelist
+        is_authorized = true if is_person_in_whitelist?(user.person, contributor) && access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
       end
       # == END WHITE LIST
       # == BLACK LIST
-      if policy.use_blacklist && thing.contributor.get_blacklist
-        is_authorized = false if is_person_in_blacklist?(user.person, thing.contributor)
+      if policy.use_blacklist && contributor.get_blacklist
+        is_authorized = false if is_person_in_blacklist?(user.person, contributor)
       end
       # == END BLACK LIST
     end

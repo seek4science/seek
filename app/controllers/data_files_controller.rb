@@ -9,7 +9,7 @@ class DataFilesController < ApplicationController
   include DotGenerator  
   include Seek::AssetsCommon
 
-  before_filter :login_required
+  #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
@@ -93,7 +93,7 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.event_ids = params[:event_ids] || []
+      @data_file.event_ids = params[:event_ids] || [] 
       @data_file.contributor=current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
@@ -127,7 +127,9 @@ class DataFilesController < ApplicationController
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
-            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+            if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id = #{@assay.id}"]).empty?
+              @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+            end
           end
         else
           format.html {
@@ -200,23 +202,21 @@ class DataFilesController < ApplicationController
         end
 
         # Update new assay_asset
+        a_ids = []
         assay_ids.each do |text|
           a_id, r_type = text.split(",")
+          a_ids.push(a_id)
           @assay = Assay.find(a_id)
-          @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-        end
-        #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@data_file.id)
-        assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |text|
-            a_id, r_type = text.split(",")
-            if assay_asset.assay_id.to_s == a_id
-              flag = true
-            end
+          if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id =  #{@assay.id}"]).empty?
+            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
           end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
+        end
+
+        #Destroy AssayAssets that aren't needed
+        assay_assets = AssayAsset.find(:all, :conditions => ["asset_id = ? and asset_type = ?", @data_file.id, 'DataFile'])
+        assay_assets.each do |assay_asset|
+          if assay_asset.assay.can_edit? and !a_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
           end
         end
       else

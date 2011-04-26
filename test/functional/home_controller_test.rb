@@ -5,10 +5,9 @@ class HomeControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
-  def test_redirected_to_login_if_not_logged_in
+  def test_should_be_accesable_to_seek_even_if_not_logged_in
     get :index
-    assert_response :redirect
-    assert_redirected_to :controller => 'sessions', :action => 'new'
+    assert_response :success
   end
 
   def test_title

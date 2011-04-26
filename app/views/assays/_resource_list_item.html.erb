@@ -12,16 +12,16 @@
       <%= list_item_attribute "Technology type", resource.technology_type.title.capitalize, resource.technology_type %>
   <% end -%>
 
-  <%= list_item_optional_attribute "Investigation", resource.investigation.try(:title), resource.investigation %>
+  <%= list_item_optional_attribute "Investigation", resource.investigation.try(:title), resource.investigation if resource.investigation.can_view?%>
 
-  <%= list_item_optional_attribute "Study", resource.study.try(:title), resource.study %>
+  <%= list_item_optional_attribute "Study", resource.study.try(:title), resource.study if resource.study.can_view?%>
 
   <%= list_item_authorized_list(resource.models, "Models", true, 50, true) if resource.is_modelling? %>
 
 </div>
 
 <div class="list_item_right_column">
-  <%= list_item_attribute "Owner", resource.owner.name, resource.owner %>
+  <%= list_item_attribute "Owner", resource.owner.try(:name), resource.owner %>
 
   <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
 

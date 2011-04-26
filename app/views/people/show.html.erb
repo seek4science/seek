@@ -9,7 +9,7 @@
         <%= image_tag_for_key "lock", url_for({:controller=>:users, :action=>:edit, :id=>@person.user}), "Manage Account", nil, "Manage Account" -%>
     </li>
     <% end -%>
-    <% if current_user.is_admin? -%>
+    <% if current_user.try :is_admin? -%>
     <li>
         <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", { :confirm => 'Are you sure?', :method => :delete }, "Delete Person" -%>
     </li>
@@ -24,7 +24,7 @@
                 <b>Name:</b> 
 				<%= h @person.name %>
             </p>
-            <% if current_user.person == @person %>
+            <% if current_user != nil and current_user.person == @person %>
                 <p>
                     <b>Seek ID: </b>
                     <%= @person.id %>
@@ -83,7 +83,7 @@
         <%= render :partial=>"layouts/items_related_to",:object => @person %>
         <%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
         <%# this is because it's not needed then: admins can see everything anyway -%>
-        <% if current_user.is_admin? -%>
+        <% if current_user.try :is_admin? -%>
         <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
           <ul>
 

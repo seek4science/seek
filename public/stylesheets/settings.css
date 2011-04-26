@@ -1,0 +1,30 @@
+ul.settings {
+    padding-left: 2em;
+}
+
+.setting_description {
+    padding-bottom: 0.5em;
+    display:block;
+    max-width: 95%;
+    font-size: smaller;
+    color: #777;
+}
+
+.setting_name {
+    width: 15em;
+    display: inline-block;
+}
+
+.setting_checkbox input {
+    width: 5em;
+}
+
+.setting_field input {
+    min-width: 25em;
+    text-align:left;
+}
+
+.additional_settings {
+    padding-left: 1em;
+    padding-bottom: 0.3em;
+}

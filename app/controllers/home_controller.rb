@@ -1,8 +1,8 @@
 class HomeController < ApplicationController
   
-  before_filter :login_required  
+  #before_filter :login_required
   
-  layout :select_layout
+  #layout :select_layout
   
   def index
     respond_to do |format|

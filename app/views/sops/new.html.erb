@@ -22,7 +22,7 @@
         :project_hash => current_user.generate_own_project_id_name_hash } -%>        
         
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Sop",:show_publications=>false} -%>
-		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
         </p>

@@ -61,6 +61,13 @@ module Seek
       end
     end
 
+    def piwik_analytics_enabled_propagate
+      if self.piwik_analytics_enabled
+          PiwikAnalytics::Config.id_site = self.piwik_analytics_id_site
+          PiwikAnalytics::Config.url = self.piwik_analytics_url
+      end
+    end
+
     def exception_notification_enabled_propagate
       if self.exception_notification_enabled
         ExceptionNotifier.render_only            = false
@@ -205,7 +212,7 @@ module Seek
     extend CustomAccessors
 
     #Basic settings
-    settings = [:events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
+    settings = [:public_seek_enabled, :events_enabled, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
       :jws_online_root, :hide_details_enabled, :activity_log_enabled,
       :activation_required_enabled, :project_name, :smtp, :default_pages,
       :project_type, :project_link, :header_image_enabled, :header_image,
@@ -213,12 +220,13 @@ module Seek
       :site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
-      :google_analytics_tracker_id,:exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled]
+      :google_analytics_tracker_id,:piwik_analytics_enabled,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"
     setting :limit_latest,:convert=>"to_i"
     setting :max_visible_tags,:convert=>"to_i"
+    setting :piwik_analytics_id_site, :convert=>"to_i"
 
     settings.each do |sym|
       setting sym

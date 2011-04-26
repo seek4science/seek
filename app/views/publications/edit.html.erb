@@ -68,7 +68,6 @@
         <%= render :partial=>"assets/select_tags" -%>
     </p>
     </div>
-    <br style="clear: both"/>
 
     <% if Seek::Config.events_enabled -%>
           <p>
@@ -76,7 +75,7 @@
           </p>
     <% end -%>
       <p>
-        <%= render :partial => "assays/associate_publication_assays", :locals=>{:resource => @publication} -%>
+        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication, :show_relationships => false} -%>
       </p>
     <p style="text-align: center;">
       <%= submit_tag 'Update',:disable_with=>"Updating..." %>

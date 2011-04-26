@@ -7,7 +7,7 @@
 
   <%= delete_ISA_icon @study,current_user -%>
   
-  <% if current_user.person.projects.include?(@study.project) -%>
+  <% if @study.can_edit? -%>
     <li>
       <%= image_tag_for_key('new', new_assay_path(:study_id=>@study), "Create an Assay for this study", nil, 'Create an Assay for this study') -%>
     </li>

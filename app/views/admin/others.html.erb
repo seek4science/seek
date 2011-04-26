@@ -1,29 +1,44 @@
+<%= stylesheet_link_tag "settings" -%>
+<h1>Additional settings</h1>
 
-<% form_tag :action=>"update_others" do -%>
-  <br style="clear:both;"/>
-  <br/>
-  <div style="width:100%;text-align:left;padding-right:4em;position:absolute;left:100px">
-    Pubmed api email:    <%= text_field_tag(:pubmed_api_email, Seek::Config.pubmed_api_email, :title => 'any of your email address') %>
-    <br style="clear:both;"/>
-    <br/>
-    Crossref api email:    <%= text_field_tag(:crossref_api_email, Seek::Config.crossref_api_email, :title => 'registered email to use crossref API for DOI lookup') %>
-    <br style="clear:both;"/>
-    <br/>
-    Site base host:    <%= text_field_tag(:site_base_host, Seek::Config.site_base_host, :title => 'this is needed for the xlinks in the REST API') %>
-    <br style="clear:both;"/>
-    <br/>
-    Tag threshold:    <%= text_field_tag(:tag_threshold, Seek::Config.tag_threshold, :title => 'id of the tag which from this id, the tags are displayed in the tag cloud when the expand icon is clicked',:onkeypress => "javascript: return onlyNumbers(event);") %>
-    <br style="clear:both;"/>
-    <br/>
-    Maximum visible tags:    <%= text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :title => 'maximum number of tags appeared in the tag cloud', :onkeypress => "javascript: return onlyNumbers(event);") %>
-    <br style="clear:both;"/>
-    <br/>
-    <br style="clear:both;"/>
-    <br/>
-    <%= submit_tag "Update"%>
-  </div>
-<% end -%>
+<div class='show_basic'>
+  <% form_tag :action=>"update_others" do -%>
+  <ul class='settings'>
 
-<script type="text/javascript">
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"When adding a publication from PubMed, an email address is required to use the API. No registration is required.",
+            :name=>"Pubmed API email",
+            :field=>text_field_tag(:pubmed_api_email, Seek::Config.pubmed_api_email, :title => 'any of your email address')
+    } -%>
 
-</script>
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"When adding a publication from a DOI, an email address is required to use the API. The email address needs registering at http://www.crossref.org/",
+            :name=>"CrossRef API email",
+            :field=>text_field_tag(:crossref_api_email, Seek::Config.crossref_api_email, :title => 'registered email to use crossref API for DOI lookup')
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"This base URL for this SEEK installation. This is required for the REST API",
+            :name=>"Site base URL",
+            :field=>text_field_tag(:site_base_host, Seek::Config.site_base_host, :title => 'this is needed for the xlinks in the REST API')
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Tags must have a count above or equal to this value to appear in either expanded or collapsed left hand tag cloud.",
+            :name=>"Tag threshold",
+            :field=>text_field_tag(:tag_threshold, Seek::Config.tag_threshold, :title => 'id of the tag which from this id, the tags are displayed in the tag cloud when the expand icon is clicked',:onkeypress => "javascript: return onlyNumbers(event);")
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"The maximum number of tags that will appear in the left hand tag cloud in its collapsed state.",
+            :name=>"Maximum visible tags",
+            :field=>text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :title => 'maximum number of tags appeared in the tag cloud', :onkeypress => "javascript: return onlyNumbers(event);")
+    } -%>
+
+    <li>
+        <%= submit_tag "Update",:disable_with=>"Updating..." -%>
+    </li>
+  </ul>
+  <% end -%>
+  
+</div>

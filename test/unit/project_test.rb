@@ -85,7 +85,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 3,project.publications.count
     
     assert project.publications.include?(publications(:one))
-    assert project.publications.include?(publications(:two))
+    assert project.publications.include?(publications(:pubmed_2))
     assert project.publications.include?(publications(:taverna_paper_pubmed))
   end
 

@@ -2,6 +2,8 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
+
   self.mod_porter_secret = PORTER_SECRET
 
   include ExceptionNotifiable
@@ -24,9 +26,14 @@ class ApplicationController < ActionController::Base
   end
 
   include AuthenticatedSystem
-  before_filter :set_current_user
-  def set_current_user
+  around_filter :with_current_user
+  def with_current_user
     User.current_user = current_user
+    begin
+      yield
+    ensure
+      User.current_user = nil
+    end
   end
 
   helper :all
@@ -216,10 +223,17 @@ class ApplicationController < ActionController::Base
         params.delete :sharing unless object.can_manage?(current_user)
       else
         respond_to do |format|
-          flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to eval "#{self.controller_name}_path" }
-          #FIXME: this isn't the right response - should return with an unauthorized status code
-          format.xml { redirect_to eval "#{self.controller_name}_path(:format=>'xml')" }
+          #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
+          flash[:error] = "You may not #{action} #{name}:#{params[:id]}"
+          format.html do
+            case action
+              when 'manage'   then redirect_to eval("#{self.controller_name}_edit_path(object)")
+              when 'edit'     then redirect_to object
+              when 'download' then redirect_to object
+              else                 redirect_to eval "#{self.controller_name}_path"
+            end
+          end
+          format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         end
         return false
       end

@@ -11,6 +11,7 @@ require 'acts_as_isa'
 require 'acts_as_yellow_pages'
 require 'seek/acts_as_uniquely_identifiable'
 require 'acts_as_favouritable'
+require 'object'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 

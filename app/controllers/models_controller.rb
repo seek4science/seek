@@ -5,8 +5,6 @@ class ModelsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   
-  before_filter :login_required
-  
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
@@ -65,7 +63,7 @@ class ModelsController < ApplicationController
     
     respond_to do |format|
       if error
-        flash[:error]="JWS Online encountered a problem processing this model."
+        flash.now[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
@@ -84,46 +82,59 @@ class ModelsController < ApplicationController
 
   def submit_to_jws
     following_action=params.delete("following_action")    
-
-    if following_action == "annotate" 
-      @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
-    else
-      @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
+    error=nil
+    begin
+      if following_action == "annotate"
+        @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
+      else
+        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
+      end
+    rescue Exception => e
+      error=e
     end
 
-    if (@error_keys.empty?)
+    if (!error && @error_keys.empty?)
+
       if following_action == "simulate"
-        @applet=@@model_builder.simulate @saved_file
+        begin
+          @applet=@@model_builder.simulate @saved_file
+        rescue Exception => e
+          error=e
+        end
       elsif following_action == "save_new_version"
         model_format=params.delete("saved_model_format") #only used for saving as a new version
         new_version_filename=params.delete("new_version_filename")
         new_version_comments=params.delete("new_version_comments")
         if model_format == "dat"
-          url=@@model_builder.saved_dat_download_url @saved_file                    
+          url=@@model_builder.saved_dat_download_url @saved_file
         elsif model_format == "sbml"
-          url=@@model_builder.sbml_download_url @saved_file          
+          url=@@model_builder.sbml_download_url @saved_file
         end
         if url
           downloader=Seek::RemoteDownloader.new
           data_hash = downloader.get_remote_data url
           File.open(data_hash[:data_tmp_path],"r") do |f|
             @model.content_blob=ContentBlob.new(:data=>f.read)
-          end                      
+          end
           @model.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
           @model.original_filename=new_version_filename
         end
       end
     end
 
-    respond_to do |format|      
-      if @error_keys.empty? && following_action == "simulate"
+
+    respond_to do |format|
+      if error
+        flash.now[:error]="JWS Online encountered a problem processing this model."
+        format.html { render :action=>"builder" }
+      elsif @error_keys.empty? && following_action == "simulate"
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
       elsif @error_keys.empty? && following_action == "annotate"
         format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
         create_new_version(new_version_comments)
         format.html {redirect_to  model_path(@model,:version=>@model.version) }
-      else        
+      else
         format.html { render :action=>"builder" }
       end      
     end
@@ -144,7 +155,7 @@ class ModelsController < ApplicationController
     
     respond_to do |format|
       if error
-        flash[:error]="JWS Online encountered a problem processing this model."
+        flash.now[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to(@model,:version=>@display_model.version)}                      
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
@@ -404,9 +415,10 @@ class ModelsController < ApplicationController
             flash[:notice] = "Model was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
           end
-          assay_ids.each do |id|
-              @assay = Assay.find(id)
-              @assay.relate(@model)
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit? and AssayAsset.find_all_by_asset_id(@model.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+              assay.relate(@model)
+            end
           end
         else
           format.html {
@@ -466,21 +478,16 @@ class ModelsController < ApplicationController
           format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
         end
         # Update new assay_asset
-        assay_ids.each do |id|
-          @assay = Assay.find(id)
-          @assay.relate(@model)
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit? and AssayAsset.find_all_by_asset_id(@model.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+            assay.relate(@model)
+          end
         end
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@model.id)
+        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @model.id, 'Model'])
         assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |id|
-            if assay_asset.assay_id.to_s == id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
+          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
           end
         end
       else

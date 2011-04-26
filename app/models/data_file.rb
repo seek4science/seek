@@ -17,6 +17,14 @@ class DataFile < ActiveRecord::Base
     def events
       []
     end
+
+    def event_ids
+      []
+    end
+
+    def event_ids= events_ids
+      
+    end
   end
 
   validates_presence_of :title

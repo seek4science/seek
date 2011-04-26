@@ -67,10 +67,10 @@ class SessionsController < ApplicationController
     if @user.person.nil?
       flash[:notice] = "You have successfully registered your account, but now must select a profile, or create your own."
       redirect_to(select_people_path)
-	elsif !@user.active?
+	  elsif !@user.active?
       failed_login "You still need to activate your account. You should have been sent a validation email."
-    elsif @user.person && !@user.is_admin? && @user.person.projects.empty?
-      failed_login "You have not yet been assigned to a project by an administrator."
+    #elsif @user.person && !@user.is_admin? && @user.person.projects.empty?
+      #failed_login "You have not yet been assigned to a project by an administrator."
     else      
       successful_login
     end   

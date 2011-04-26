@@ -49,29 +49,11 @@ module Acts #:nodoc:
         end
       end
 
-      def can_edit? user=nil
-        user ||= User.current_user
-        Authorization.is_authorized? "edit", nil, self, user
-      end
-
-      def can_view? user=nil
-        user ||= User.current_user
-        Authorization.is_authorized? "view", nil, self, user
-      end
-
-      def can_download? user=nil
-        user ||= User.current_user
-        Authorization.is_authorized? "download", nil, self, user
-      end
-
-      def can_delete? user=nil
-        user ||= User.current_user
-        Authorization.is_authorized? "delete", nil, self, user
-      end
-
-      def can_manage? user=nil
-        user ||= User.current_user
-        Authorization.is_authorized? "manage", nil, self, user
+      [:view, :edit, :download, :delete, :manage].each do |action|
+        define_method "can_#{action}?" do |*args|
+          user = args[0] || User.current_user
+          new_record? or Authorization.is_authorized? action.to_s, nil, self, user
+        end
       end
 
       #returns a list of the people that can manage this file
@@ -103,8 +85,9 @@ ActiveRecord::Base.class_eval do
   end
 
   def can_perform? action, user=nil
-    send "can_#{action}?", user
+    user ? send("can_#{action}?", user) : send("can_#{action}?")
   end
+
 
   def can_edit? user=nil
     true

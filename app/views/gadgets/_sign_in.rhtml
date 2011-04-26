@@ -17,13 +17,13 @@
                     Login:
                 </p>
                 <p>
-                    <%= text_field_tag 'login', nil, :class => 'field' -%>
+                    <%= text_field_tag 'login', nil, :class => 'field', :style => 'width:auto'-%>
                 </p>
                 <p class="label">
                     Password:
                 </p>
                 <p>
-                    <%= password_field_tag 'password', nil, :class => 'field' -%>
+                    <%= password_field_tag 'password', nil, :class => 'field', :style => 'width:auto'-%>
                 </p>
                 <p class="label">
                     Remember me: <%= check_box_tag 'remember_me',nil,false, {:style=>"width:2em;"} %>
@@ -34,7 +34,7 @@
                     <a href="http://openid.net/" target="_blank"><%= image_tag "openid-16x16.gif" %>OpenID:</a>
                 </p>
                 <p>
-                    <%= text_field_tag 'openid_identifier', nil, :class => 'field' -%>
+                    <%= text_field_tag 'openid_identifier', nil, :class => 'field', :style => 'width:auto' -%>
                 </p>
             </div>
             <p>

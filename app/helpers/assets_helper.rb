@@ -208,16 +208,14 @@ module AssetsHelper
         related["Publication"][:items] = resource.related_publications
 
       else
-
-
     end
 
     #Authorize
-    ["Sop", "Model", "DataFile", "Event"].each do |asset_type|
-      unless related[asset_type][:items].empty?
-        total_count = related[asset_type][:items].size
-        related[asset_type][:items] = Asset.classify_and_authorize_homogeneous_resources(related[asset_type][:items], true, current_user)
-        related[asset_type][:hidden_count] = total_count - related[asset_type][:items].size
+    related.each_value do |resource_hash|
+      unless resource_hash[:items].empty?
+        total_count = resource_hash[:items].size
+        resource_hash[:items] = resource_hash[:items].select &:can_view?
+        resource_hash[:hidden_count] = total_count - resource_hash[:items].size
       end
     end
 
@@ -234,29 +232,9 @@ module AssetsHelper
   end
 
   def filter_url(resource_type, context_resource)
-    filter_text = ""
-    case context_resource.class.name
-      when "Project"
-        filter_text = "(:filter => {:project => #{context_resource.id}},:page=>'all')"
-      when "Investigation"
-        filter_text = "(:filter => {:investigation => #{context_resource.id}},:page=>'all')" #
-      when "Study"
-        filter_text = "(:filter => {:study => #{context_resource.id}},:page=>'all')"
-      when "Assay"
-        filter_text = "(:filter => {:assay => #{context_resource.id}},:page=>'all')"
-      when "Person"
-        filter_text = "(:filter => {:person => #{context_resource.id}},:page=>'all')"
-
-      when "Experiment"
-        filter_text = "(:filter => {:experiment => #{context_resource.id}},:page=>'all')"
-      when "Sample"
-        filter_text = "(:filter => {:sample=> #{context_resource.id}},:page=>'all')"
-      when "Specimen"
-        filter_text = "(:filter => {:specimen => #{context_resource.id}},:page=>'all')"
-
-
-    end
-    return eval("#{resource_type.underscore.pluralize}_path" + filter_text)
+    #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
+    filter_text = "(:filter => {:#{context_resource.class.name.downcase} => #{context_resource.id}},:page=>'all')"
+    eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
   #provides a list of assets, according to the class, that are authorized to 'show'

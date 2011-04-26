@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110408162149) do
+ActiveRecord::Schema.define(:version => 20110419145348) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -86,6 +86,7 @@ ActiveRecord::Schema.define(:version => 20110408162149) do
     t.string   "first_letter",       :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
+    t.integer  "policy_id"
   end
 
   create_table "assets", :force => true do |t|
@@ -191,6 +192,11 @@ ActiveRecord::Schema.define(:version => 20110408162149) do
     t.integer "event_id"
   end
 
+  create_table "data_files_experiments", :id => false, :force => true do |t|
+    t.integer "data_file_id"
+    t.integer "experiment_id"
+  end
+
   create_table "db_files", :force => true do |t|
     t.binary "data", :limit => 2147483647
   end
@@ -245,13 +251,16 @@ ActiveRecord::Schema.define(:version => 20110408162149) do
     t.string   "title"
     t.integer  "sample_id"
     t.string   "description"
-    t.integer  "project_id"
     t.integer  "institution_id"
-    t.integer  "people_id"
+    t.integer  "person_id"
     t.datetime "date"
     t.string   "first_letter"
     t.string   "comments"
     t.integer  "policy_id"
+    t.integer  "project_id"
+    t.text     "other_creators"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -612,8 +621,17 @@ ActiveRecord::Schema.define(:version => 20110408162149) do
     t.string   "comments"
     t.string   "first_letter"
     t.integer  "policy_id"
+    t.text     "other_creators"
+    t.integer  "project_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "samples_strains", :id => false, :force => true do |t|
+    t.integer "sample_id"
+    t.integer "strain_id"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -748,6 +766,7 @@ ActiveRecord::Schema.define(:version => 20110408162149) do
     t.datetime "updated_at"
     t.string   "first_letter",          :limit => 1
     t.string   "uuid"
+    t.integer  "policy_id"
   end
 
   create_table "taggings", :force => true do |t|
