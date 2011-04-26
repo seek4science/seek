@@ -213,20 +213,9 @@ module AssetsHelper
   end
   
   def filter_url(resource_type, context_resource)
-    filter_text = ""
-    case context_resource.class.name
-      when "Project"
-        filter_text = "(:filter => {:project => #{context_resource.id}},:page=>'all')"
-      when "Investigation"
-        filter_text = "(:filter => {:investigation => #{context_resource.id}},:page=>'all')"#
-      when "Study"
-        filter_text = "(:filter => {:study => #{context_resource.id}},:page=>'all')"
-      when "Assay"
-        filter_text = "(:filter => {:assay => #{context_resource.id}},:page=>'all')"
-      when "Person"
-        filter_text = "(:filter => {:person => #{context_resource.id}},:page=>'all')"
-    end
-    return eval("#{resource_type.underscore.pluralize}_path" + filter_text)
+    #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
+    filter_text = "(:filter => {:#{context_resource.class.name.downcase} => #{context_resource.id}},:page=>'all')"
+    eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
   #provides a list of assets, according to the class, that are authorized to 'show'
