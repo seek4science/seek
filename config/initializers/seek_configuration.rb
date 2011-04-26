@@ -44,7 +44,7 @@ Seek::Config.default :copyright_addendum_enabled,false
 Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
 # Pagination
-Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
+Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :experiments =>'latest',:samples =>'latest',:specimens =>'latest',:data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
 Seek::Config.default :limit_latest,7
 
 # Others
