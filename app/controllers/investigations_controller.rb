@@ -3,9 +3,10 @@ class InvestigationsController < ApplicationController
   include DotGenerator
   include IndexPager
 
-  before_filter :find_assets, :only=>[:index]
+  before_filter :find_investigations, :only=>[:index]
   #before_filter :login_required
   before_filter :is_project_member,:only=>[:create,:new]
+  before_filter :make_investigation_and_auth,:only=>[:create]
   before_filter :find_and_auth,:only=>[:create, :edit, :update, :destroy]
 
   def destroy    
@@ -74,5 +75,16 @@ class InvestigationsController < ApplicationController
   end
 
   private
+
+  def make_investigation_and_auth
+    @investigation=Investigation.new(params[:investigation])
+    unless current_user.person.projects.include?(@investigation.project)
+      respond_to do |format|
+        flash[:error] = "You cannot create a investigation for a project you are not a member of."
+        format.html { redirect_to studies_path }
+      end
+      return false
+    end
+  end
   
 end
