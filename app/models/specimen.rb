@@ -18,14 +18,11 @@ class Specimen < ActiveRecord::Base
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
-  validates_presence_of :donor_number
-  validates_presence_of :organism_id
-  validates_presence_of :strain_id
-  validates_presence_of :lab_internal_number
-  validates_presence_of :institution_id
+
 
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
+  validates_presence_of :donor_number
 
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
