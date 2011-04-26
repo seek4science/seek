@@ -22,8 +22,10 @@ class Object
   #Acts like super(), except sends to a method from an included module,
   #instead of to the super class. It only works for instance methods.
   def mixin_super *args, &block
-    method         = caller_method_name.to_sym
-    unbound_method = self.class.included_modules.find { |mod| mod.method_defined? method }.instance_method method
+    method = caller_method_name.to_sym
+    mixin = self.class.included_modules.find { |mod| mod.method_defined? method }
+    raise NoMethodError.new "No mixin defining #{method}", method, args unless mixin
+    unbound_method = mixin.instance_method method
     unbound_method.bind(self).call *args, &block
   end
 end
