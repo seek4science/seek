@@ -1,3 +1,4 @@
+<%= javascript_include_tag "sharing.js" %>
 <%= f.error_messages -%>
 
 <center>
@@ -15,6 +16,10 @@
     <p>
       <%= f.label :project -%><br/>
       <%= f.collection_select :project_id,current_user.person.projects,:id,:name %>
+    </p>
+
+    <p>
+      <%= render :partial=>"assets/sharing_form" if @investigation.can_manage? -%>
     </p>
   </div>
 </center>
