@@ -127,9 +127,16 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_redirected_to sop_path(s)
 
+    p @response
+
     s.reload
     original_assay.reload
+
     new_assay.reload
+
+    p original_assay.assay_assets
+    p new_assay.assay_assets
+
     assert !original_assay.related_asset_ids('Sop').include?(s.id)
     assert new_assay.related_asset_ids('Sop').include?(s.id)
   end
