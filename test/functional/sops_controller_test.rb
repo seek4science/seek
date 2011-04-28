@@ -127,21 +127,9 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_redirected_to sop_path(s)
 
-    p @response
-
     s.reload
-    p original_assay.assay_assets
     original_assay.reload
-
-    copy_of_original_assay = Assay.find original_assay.id
-
     new_assay.reload
-
-    p copy_of_original_assay
-    p copy_of_original_assay.assay_assets
-
-    p original_assay.assay_assets
-    p new_assay.assay_assets
 
     assert !original_assay.related_asset_ids('Sop').include?(s.id)
     assert new_assay.related_asset_ids('Sop').include?(s.id)
