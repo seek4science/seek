@@ -99,6 +99,7 @@ class Assay < ActiveRecord::Base
     assay_asset = assay_assets.select {|aa| aa.asset_id == asset.id}.first
 
     if assay_asset.nil?
+      raise "ASSAY ASSET SHOULD NOT BE NIL"
       assay_asset = AssayAsset.new
       assay_asset.assay = self             
     end
