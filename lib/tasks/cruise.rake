@@ -24,7 +24,6 @@ task :cruise do
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:refresh_controlled_vocabs"].invoke
   Rake::Task["seek:default_tags"].invoke
-  ENV['TEST'] = 'test/functional/sops_controller_test.rb'
-  Rake::Task["test:functionals"].invoke
+  Rake::Task["test"].invoke
   
 end
