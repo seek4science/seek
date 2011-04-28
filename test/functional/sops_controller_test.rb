@@ -130,9 +130,14 @@ class SopsControllerTest < ActionController::TestCase
     p @response
 
     s.reload
+    p original_assay.assay_assets
     original_assay.reload
 
+    copy_of_original_assay = Assay.find original_assay.id
+
     new_assay.reload
+
+    p copy_of_original_assay
 
     p original_assay.assay_assets
     p new_assay.assay_assets
