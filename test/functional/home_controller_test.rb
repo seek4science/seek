@@ -62,11 +62,15 @@ class HomeControllerTest < ActionController::TestCase
   end
 
   test 'root should route to sign_up when no user, otherwise to home' do
-    if User.count == 0
-      assert_routing '/', { :controller => 'users', :action => 'new'}
-    else
-      assert_routing '/', { :controller => "home", :action => "index"}
+    User.find(:all).each do |u|
+      u.delete
     end
+    get :index
+    assert_redirected_to :controller => 'users', :action => 'new'
+
+    Factory(:user)
+    get :index
+    assert_response :success
   end
 
   test 'should hide the forum tab for unlogin user' do

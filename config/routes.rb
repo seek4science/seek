@@ -165,12 +165,8 @@ ActionController::Routing::Routes.draw do |map|
   
   # used by the "sharing" form to get settings from an existing policy 
   map.request_policy_settings '/policies/request_settings', :controller => 'policies', :action => 'send_policy_data'
-  
-  if User.count == 0
-    map.root :controller => 'users', :action => 'new'
-  else
-    map.root :controller=>"home"
-  end
+
+  map.root :controller=>"home"
 
   # See how all your routes lay out with "rake routes"
 
