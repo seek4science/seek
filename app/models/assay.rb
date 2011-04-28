@@ -95,8 +95,7 @@ class Assay < ActiveRecord::Base
   
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
-    # FIXME: Is this right? assay_asset->asset is a polymorphic connection, so couldn't this return a false positive?
-    assay_asset = assay_assets.select {|aa| aa.asset_id == asset.id}.first
+    assay_asset = assay_assets.select {|aa| aa.asset == asset}.first
 
     if assay_asset.nil?
       assay_asset = AssayAsset.new
