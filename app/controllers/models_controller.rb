@@ -416,7 +416,7 @@ class ModelsController < ApplicationController
             format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
           end
           Assay.find(assay_ids).each do |assay|
-            if assay.can_edit? and AssayAsset.find_all_by_asset_id(@model.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+            if assay.can_edit?
               assay.relate(@model)
             end
           end
@@ -479,7 +479,7 @@ class ModelsController < ApplicationController
         end
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
-          if assay.can_edit? and AssayAsset.find_all_by_asset_id(@model.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+          if assay.can_edit?
             assay.relate(@model)
           end
         end

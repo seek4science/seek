@@ -118,7 +118,7 @@ class SopsController < ApplicationController
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
           end
           Assay.find(assay_ids).each do |assay|
-            if assay.can_edit? and AssayAsset.find_all_by_asset_id(@sop.id, :conditions => ["assay_id = #{assay.id}"]).empty?
+            if assay.can_edit?
               assay.relate(@sop)
             end
           end
@@ -166,13 +166,13 @@ class SopsController < ApplicationController
         end
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
-          if assay.can_edit? and AssayAsset.find_all_by_asset_id(@sop.id, :conditions => ["assay_id =  #{assay.id}"]).empty?
+          if assay.can_edit?
             assay.relate(@sop)
           end
         end
 
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @sop.id, 'SOP'])
+        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @sop.id, 'Sop'])
         assay_assets.each do |assay_asset|
           if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
             AssayAsset.destroy(assay_asset.id)

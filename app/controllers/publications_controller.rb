@@ -132,7 +132,7 @@ class PublicationsController < ApplicationController
 
         # Update relationship
         Assay.find(assay_ids).each do |assay|
-          if assay.can_edit? && Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay.id}").empty?
+          if assay.can_edit?
             Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION)
           end
         end
