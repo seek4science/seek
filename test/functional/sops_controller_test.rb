@@ -138,6 +138,7 @@ class SopsControllerTest < ActionController::TestCase
     new_assay.reload
 
     p copy_of_original_assay
+    p copy_of_original_assay.assay_assets
 
     p original_assay.assay_assets
     p new_assay.assay_assets
