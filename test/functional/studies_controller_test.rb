@@ -41,9 +41,9 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end  
   
-  test "shouldn't show edit for non-project member" do
-    login_as(:owner_of_fully_public_policy)
-    s = studies(:metabolomics_study)
+  test "shouldn't show edit for unauthorized users" do
+    login_as(Factory(:user))
+    s = Factory :study, :policy => Factory(:private_policy)
     get :edit, :id=>s
     assert_redirected_to study_path(s)
     assert flash[:error]
@@ -93,9 +93,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert s.assays.include?(assays(:metabolomics_assay))
   end
 
-  test "no edit button in show for person not in project" do
-    login_as(:aaron)
-    get :show, :id=>studies(:metabolomics_study)
+  test "no edit button shown for people who can't edit the study" do
+    login_as Factory(:user)
+    study = Factory :study, :policy => Factory(:private_policy)
+    get :show, :id=>study
     assert_select "a",:text=>/Edit study/,:count=>0
   end
 
@@ -104,28 +105,23 @@ class StudiesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Edit study/,:count=>1
   end
 
-  test "study project member can't edit" do
-    login_as(:aaron)
-    s=studies(:metabolomics_study)
-    get :edit, :id=>s.id
-    assert_redirected_to study_path(s)
-    assert flash[:error]
-  end
 
-  test "study project member can't update" do
-    login_as(:aaron)
-    s=studies(:metabolomics_study)
+  test "unauthorized user can't update" do
+    login_as(Factory(:user))
+    s=Factory :study, :policy => Factory(:private_policy)
+    Factory :permission, :contributor => User.current_user, :policy=> s.policy, :access_type => Policy::VISIBLE
+
     put :update, :id=>s.id,:study=>{:title=>"test"}
 
     assert_redirected_to study_path(s)
-    assert assigns(:study)
     assert flash[:error]
-    assert_equal "A Metabolomics Study",assigns(:study).title
   end
 
-  test "study project member can delete if no assays" do
+  test "authorized user can delete if no assays" do
+    study = Factory(:study, :contributor => Factory(:person))
+    login_as study.contributor.user
     assert_difference('Study.count',-1) do
-      delete :destroy, :id => studies(:study_with_no_assays).id
+      delete :destroy, :id => study.id
     end    
     assert !flash[:error]
     assert_redirected_to studies_path

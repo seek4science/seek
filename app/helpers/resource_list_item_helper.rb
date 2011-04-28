@@ -79,8 +79,8 @@ module ResourceListItemHelper
   end
 
   def list_item_authorized_list items, attribute, sort=true, max_length=75, count_hidden_items=false
-    html  = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     items = Authorization.authorize_collection("view", items, current_user, count_hidden_items)
+    html  = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     if items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else

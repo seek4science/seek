@@ -41,13 +41,15 @@ class EventsController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     data_file_ids.each do |text|
       a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
+      d = DataFile.find(a_id)
+      @event.data_files << d if d.can_view? and !@event.data_files.include?d
     end
     params.delete :data_file_ids
 
     publication_ids = params[:related_publication_ids] || []
     publication_ids.each do |id|
-      @event.publications << Publication.find(id)
+      p = Publication.find(id)
+      @event.publications << p if !@event.publications.include?p
     end
     params.delete :related_publication_ids
 
@@ -79,14 +81,16 @@ class EventsController < ApplicationController
     @event.data_files = []
     data_file_ids.each do |text|
       a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
+      d = DataFile.find(a_id)
+      @event.data_files << d if d.can_view? and !@event.data_files.include?d
     end
     params.delete :data_file_ids
 
     publication_ids = params[:related_publication_ids] || []
     @event.publications = []
     publication_ids.each do |id|
-      @event.publications << Publication.find(id)
+      p = Publication.find(id)
+      @event.publications << p if !@event.publications.include?p
     end
     params.delete :related_publication_ids
 

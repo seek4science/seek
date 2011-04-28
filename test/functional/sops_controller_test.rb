@@ -335,7 +335,7 @@ class SopsControllerTest < ActionController::TestCase
       post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
     end
 
-    assert_redirected_to sops_path
+    assert_redirected_to sop_path(s)
     assert_not_nil flash[:error]
 
     s=Sop.find(s.id)

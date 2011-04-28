@@ -26,9 +26,14 @@ class ApplicationController < ActionController::Base
   end
 
   include AuthenticatedSystem
-  before_filter :set_current_user
-  def set_current_user
+  around_filter :with_current_user
+  def with_current_user
     User.current_user = current_user
+    begin
+      yield
+    ensure
+      User.current_user = nil
+    end
   end
 
   helper :all
@@ -219,10 +224,16 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
-          flash[:error] = "You may not perform this action"
-          format.html { redirect_to eval "#{self.controller_name}_path" }
-          #FIXME: this isn't the right response - should return with an unauthorized status code
-          format.xml { redirect_to eval "#{self.controller_name}_path(:format=>'xml')" }
+          flash[:error] = "You may not #{action} #{name}:#{params[:id]}"
+          format.html do
+            case action
+              when 'manage'   then redirect_to eval("#{self.controller_name}_edit_path(object)")
+              when 'edit'     then redirect_to object
+              when 'download' then redirect_to object
+              else                 redirect_to eval "#{self.controller_name}_path"
+            end
+          end
+          format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         end
         return false
       end

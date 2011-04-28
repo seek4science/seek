@@ -4,12 +4,12 @@ class StudiesController < ApplicationController
   include IndexPager
   
   #before_filter :login_required
-    
-  before_filter :find_studies,:only=>[:index]
-  before_filter :is_project_member,:only=>[:create,:new]
+
+  before_filter :find_assets, :only=>[:index]
+  before_filter :is_project_member, :only=>[:create, :new]
+  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
-  before_filter :study_auth_project,:only=>[:edit,:update]
-  before_filter :delete_allowed,:only=>[:destroy]
   
 
   def new
@@ -47,9 +47,18 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.update_attributes(params[:study])
-        flash[:notice] = 'Study was successfully updated.'
-        format.html { redirect_to(@study) }
-        format.xml  { head :ok }
+        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+
+        policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
+
+        if policy_err_msg.blank?
+          flash[:notice] = 'Study was successfully updated.'
+          format.html { redirect_to(@study) }
+          format.xml  { head :ok }
+        else
+          flash[:notice] = "Assay metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to assay_edit_path(@assay) }
+        end
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }
@@ -70,7 +79,8 @@ class StudiesController < ApplicationController
   end  
 
   def create
-    @study = Study.new(params[:study])    
+    @study = Study.new(params[:study])
+    @study.person_responsible = current_user.person unless @study.person_responsible
     
     respond_to do |format|
       if @study.save
@@ -127,28 +137,4 @@ class StudiesController < ApplicationController
       end
     end
   end
-
-  def study_auth_project
-    @study=Study.find(params[:id])
-    unless @study.can_edit?(current_user)
-      flash[:error] = "You cannot edit a Study for a project you are not a member."
-      redirect_to @study
-    end
-  end
-
-  def delete_allowed
-    @study=Study.find(params[:id])
-    unless @study.can_delete?(current_user)
-      respond_to do |format|
-        flash[:error] = "You cannot delete a Study related to a project or which you are not a member, or that has assays associated"
-        format.html { redirect_to studies_path }
-      end
-      return false
-    end
-  end
-  
-  def find_studies
-    @studies=apply_filters(Study.find(:all))    
-  end
-  
 end

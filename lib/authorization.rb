@@ -57,7 +57,6 @@ module Authorization
                      access_type_allows_action?(action, policy.access_type))
 
     # == END BASIC POLICY
-    
     if policy.use_custom_sharing && user
       # == CUSTOM PERMISSIONS
       # 1. Check if there is a specific permission relating to the user
@@ -108,15 +107,17 @@ module Authorization
     # == BLACK/WHITE LISTS
     # 1. Check if they're in the whitelist
     # 2. Check if they're not in the blacklist (overrules whitelist)
-    if thing.contributor
+    contributor = thing.contributor
+    contributor = contributor.user if contributor.respond_to? :user
+    if contributor && user
       # == WHITE LIST
-      if policy.use_whitelist && thing.contributor.get_whitelist
-        is_authorized = true if is_person_in_whitelist?(user.person, thing.contributor) && access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
+      if policy.use_whitelist && contributor.get_whitelist
+        is_authorized = true if is_person_in_whitelist?(user.person, contributor) && access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
       end
       # == END WHITE LIST
       # == BLACK LIST
-      if policy.use_blacklist && thing.contributor.get_blacklist
-        is_authorized = false if is_person_in_blacklist?(user.person, thing.contributor)
+      if policy.use_blacklist && contributor.get_blacklist
+        is_authorized = false if is_person_in_blacklist?(user.person, contributor)
       end
       # == END BLACK LIST
     end

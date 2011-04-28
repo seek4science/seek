@@ -357,7 +357,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "shouldn't download" do
     login_as(:aaron)
     get :download, :id => data_files(:viewable_data_file)
-    assert_redirected_to data_files_path
+    assert_redirected_to data_file_path(data_files(:viewable_data_file))
     assert flash[:error]    
   end
   
@@ -386,8 +386,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not expose non downloadable spreadsheet" do
     login_as(:model_owner)
     get :data, :id => data_files(:viewable_data_file),:format=>"xml"    
-    assert_redirected_to data_files_path(:format=>"xml")
-    assert_not_nil flash[:error]         
+    assert_response 403
   end
   
   def test_should_not_expose_contents_for_picture
@@ -399,7 +398,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not expose spreadsheet contents if not authorized" do
     login_as(:aaron)
     get :data, :id => data_files(:viewable_data_file)
-    assert_redirected_to data_files_path
+    assert_redirected_to data_file_path(data_files(:viewable_data_file))
     assert flash[:error]    
   end
   

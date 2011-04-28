@@ -95,7 +95,11 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.event_ids = params[:event_ids] || [] 
+      event_ids = params[:event_ids] || []
+      event_ids = event_ids.select do |id|
+         Event.find(id).can_view?
+      end
+      @data_file.event_ids = event_ids
       @data_file.contributor=current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
@@ -127,7 +131,7 @@ class DataFilesController < ApplicationController
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
-            if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id = #{@assay.id}"]).empty?
+            if @assay.can_edit?
               @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
             end
           end
@@ -177,7 +181,12 @@ class DataFilesController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       data_file_params = params[:data_file]
-      data_file_params[:event_ids] = params[:event_ids]
+      event_ids = params[:event_ids] || []
+      event_ids = event_ids.select do |id|
+         Event.find(id).can_view?
+      end
+      data_file_params[:event_ids] = event_ids
+
       if @data_file.update_attributes(data_file_params)
         # the Data file was updated successfully, now need to apply updated policy / permissions settings to it
         policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
@@ -206,7 +215,7 @@ class DataFilesController < ApplicationController
           a_id, r_type = text.split(",")
           a_ids.push(a_id)
           @assay = Assay.find(a_id)
-          if @assay.can_edit? and AssayAsset.find_all_by_asset_id(@data_file.id, :conditions => ["assay_id =  #{@assay.id}"]).empty?
+          if @assay.can_edit?
             @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
           end
         end
