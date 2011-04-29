@@ -18,7 +18,6 @@ class Object
     end
   end
 
-
   #Acts like super(), except sends to a method from an included module,
   #instead of to the super class. It only works for instance methods.
   def mixin_super *args, &block
@@ -27,5 +26,22 @@ class Object
     raise NoMethodError.new "No mixin defining #{method}", method, args unless mixin
     unbound_method = mixin.instance_method method
     unbound_method.bind(self).call *args, &block
+  end
+
+  #instead of a and a.b and a.b.c and a.b.c.d?
+  #try_block {a.b.c.d?}
+  #in addition for being useful for nil's, works for any object that doesn't provide the required method
+  #so instead of a.respond_to? :b? and a.b? try_block { a.b? }
+  def try_block
+    yield
+  rescue NoMethodError
+    nil
+  end
+
+end
+
+class NilClass
+  def try_block
+    nil
   end
 end
