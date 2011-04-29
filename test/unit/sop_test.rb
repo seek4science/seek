@@ -63,7 +63,6 @@ class SopTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
     assert_equal false,sop.policy.use_whitelist
     assert_equal false,sop.policy.use_blacklist
-    assert_equal false,sop.policy.use_custom_sharing
     assert sop.policy.permissions.empty?
   end
 

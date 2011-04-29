@@ -170,7 +170,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal private_policy.access_type, sop.policy.access_type
     assert_equal private_policy.use_whitelist, sop.policy.use_whitelist
     assert_equal private_policy.use_blacklist, sop.policy.use_blacklist
-    assert_equal false, sop.policy.use_custom_sharing
     assert sop.policy.permissions.empty?
 
     #check it doesn't create an error when retreiving the index

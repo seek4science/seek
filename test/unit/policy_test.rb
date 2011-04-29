@@ -12,11 +12,10 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal policy.access_type,copy.access_type
     assert_equal policy.name,copy.name
     assert_not_equal policy.id,copy.id
-    
-    assert policy.use_custom_sharing
-    assert copy.use_custom_sharing
 
     assert policy.permissions.size>0,"needs to have custom permissions to make this test meaningful"
+    assert copy.permissions.size>0,"needs to have custom permissions to make this test meaningful"
+
     assert_equal policy.permissions.size,copy.permissions.size
 
     policy.permissions.each_with_index do |perm,i|
@@ -33,7 +32,6 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, pol.access_type
     assert_equal false,pol.use_whitelist
     assert_equal false,pol.use_blacklist
-    assert_equal false,pol.use_custom_sharing
     assert pol.permissions.empty?
   end
 
@@ -43,7 +41,6 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, pol.access_type
     assert_equal false,pol.use_whitelist
     assert_equal false,pol.use_blacklist
-    assert_equal false,pol.use_custom_sharing
     assert pol.permissions.empty?
   end
 

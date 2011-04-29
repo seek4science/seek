@@ -57,7 +57,7 @@ module Authorization
                      access_type_allows_action?(action, policy.access_type))
 
     # == END BASIC POLICY
-    if policy.use_custom_sharing && user
+    if !policy.permissions.empty? && user
       # == CUSTOM PERMISSIONS
       # 1. Check if there is a specific permission relating to the user
       # 2. Check if there is a permission for a FavouriteGroup they're in
@@ -87,23 +87,23 @@ module Authorization
         project_ids = user.person.projects.collect {|p| p.id}
         permissions = policy.permissions.select {|p| p.contributor_type == "Project" && project_ids.include?(p.contributor_id)}
       end
-      
+
       # Institution permissions
       if permissions.empty?
         institution_ids = user.person.institutions.collect {|i| i.id}
         permissions = policy.permissions.select {|p| p.contributor_type == "Institution" && institution_ids.include?(p.contributor_id)}
       end
-      
+
       unless permissions.empty?
         #Get max access level from permissions (in the event there is more than 1... there shouldn't be)
         max_access_type = permissions.sort_by{|p| p.access_type}.last.access_type
         #override current authorization status
         is_authorized = access_type_allows_action?(action, max_access_type)
       end
-      
+
       # == END CUSTOM PERMISSIONS
     end
-    
+
     # == BLACK/WHITE LISTS
     # 1. Check if they're in the whitelist
     # 2. Check if they're not in the blacklist (overrules whitelist)
@@ -122,7 +122,7 @@ module Authorization
       # == END BLACK LIST
     end
     # == END BLACK/WHITE LISTS
-    
+
     return is_authorized    
   end
 

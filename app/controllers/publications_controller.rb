@@ -73,7 +73,7 @@ class PublicationsController < ApplicationController
         end
 
         #Make a policy
-        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
+        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
         @publication.policy = policy
         @publication.save
         #add managers (authors + contributor)
@@ -146,7 +146,7 @@ class PublicationsController < ApplicationController
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
-          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
           @publication.save
         end
         

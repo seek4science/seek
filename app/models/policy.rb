@@ -61,8 +61,7 @@ class Policy < ActiveRecord::Base
   def self.new_for_upload_tool(resource, recipient)
     policy = resource.create_policy(:name               => 'auto',
                                     :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
-                                    :access_type        => Policy::NO_ACCESS,
-                                    :use_custom_sharing => Policy::TRUE_VALUE)
+                                    :access_type        => Policy::NO_ACCESS)
     policy.permissions.create :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
     return policy
   end
@@ -91,7 +90,6 @@ class Policy < ActiveRecord::Base
       policy = Policy.new(:name => 'auto',                          
                           :sharing_scope => sharing_scope,
                           :access_type => access_type,
-                          :use_custom_sharing => use_custom_sharing,
                           :use_whitelist => use_whitelist,
                           :use_blacklist => use_blacklist)
       resource.policy = policy  # by doing this the new policy object is saved implicitly too
@@ -102,7 +100,6 @@ class Policy < ActiveRecord::Base
        
        policy.sharing_scope = sharing_scope
        policy.access_type = access_type
-       policy.use_custom_sharing = use_custom_sharing
        policy.use_whitelist = use_whitelist
        policy.use_blacklist = use_blacklist
        policy.save
@@ -121,15 +118,15 @@ class Policy < ActiveRecord::Base
       contributor_types = []
       new_permission_data = {}
     end
-    
+
     # NB! if "use_custom_sharing" is not set after the policy data was processed - this means that there can be
     # no more permissions: and any existing ones should be deleted; the line below ensures that the synchronisation
-    # mechanism will "think" that no permission selections were made and all old ones need to be removed 
-    unless (policy.use_custom_sharing == true || policy.use_custom_sharing == Policy::TRUE_VALUE)
+    # mechanism will "think" that no permission selections were made and all old ones need to be removed
+    unless (use_custom_sharing == true || use_custom_sharing == Policy::TRUE_VALUE)
       new_permission_data = {}
     end
-    
-    
+
+
     # --- Synchronise All Permissions for the Policy ---
     # first delete any old memberships that are no longer valid
     changes_made = false
@@ -199,7 +196,6 @@ class Policy < ActiveRecord::Base
       policy = Policy.new(:name => 'auto',                          
                           :sharing_scope => sharing_scope,
                           :access_type => access_type,
-                          :use_custom_sharing => use_custom_sharing,
                           :use_whitelist => use_whitelist,
                           :use_blacklist => use_blacklist)
       project.default_policy = policy  # by doing this the new policy object is saved implicitly too
@@ -210,7 +206,6 @@ class Policy < ActiveRecord::Base
        
        policy.sharing_scope = sharing_scope
        policy.access_type = access_type
-       policy.use_custom_sharing = use_custom_sharing
        policy.use_whitelist = use_whitelist
        policy.use_blacklist = use_blacklist
        policy.save
@@ -230,15 +225,15 @@ class Policy < ActiveRecord::Base
       contributor_types = []
       new_permission_data = {}
     end
-    
+
     # NB! if "use_custom_sharing" is not set after the policy data was processed - this means that there can be
     # no more permissions: and any existing ones should be deleted; the line below ensures that the synchronisation
-    # mechanism will "think" that no permission selections were made and all old ones need to be removed 
-    unless (policy.use_custom_sharing == true || policy.use_custom_sharing == Policy::TRUE_VALUE)
+    # mechanism will "think" that no permission selections were made and all old ones need to be removed
+    unless (use_custom_sharing == true || use_custom_sharing == Policy::TRUE_VALUE)
       new_permission_data = {}
     end
-    
-    
+
+
     # --- Synchronise All Permissions for the Policy ---
     # first delete any old memberships that are no longer valid
     changes_made = false
@@ -292,7 +287,6 @@ class Policy < ActiveRecord::Base
     policy = Policy.new(:name => "default private",                        
                         :sharing_scope => PRIVATE,
                         :access_type => NO_ACCESS,
-                        :use_custom_sharing => false,
                         :use_whitelist => false,
                         :use_blacklist => false)
                         
@@ -331,7 +325,6 @@ class Policy < ActiveRecord::Base
     settings = {}
     settings['sharing_scope'] = self.sharing_scope
     settings['access_type'] = self.access_type
-    settings['use_custom_sharing'] = self.use_custom_sharing
     settings['use_whitelist'] = self.use_whitelist
     settings['use_blacklist'] = self.use_blacklist
     return settings
