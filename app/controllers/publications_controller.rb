@@ -69,7 +69,7 @@ class PublicationsController < ApplicationController
         end
 
         Assay.find(assay_ids).each do |assay|
-          Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
+          Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
         end
 
         #Make a policy
@@ -133,7 +133,7 @@ class PublicationsController < ApplicationController
         # Update relationship
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?
-            Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION)
+            Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
           end
         end
         #Destroy Assay relationship that aren't needed
