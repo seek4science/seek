@@ -4,7 +4,7 @@ class ExperimentsController < ApplicationController
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
 
-  before_filter :login_required
+  #before_filter :login_required
   include IndexPager
 
 

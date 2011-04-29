@@ -1,8 +1,12 @@
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
-  <li><%= image_tag_for_key('edit', edit_experiment_path(@experiment), "Edit experiment Details", nil, 'Edit experiment Details') %></li>
-  <li><%= image_tag_for_key "destroy", experiment_path(@experiment), "Delete experiment", {:confirm => 'Are you sure?', :method => :delete}, "Delete experiment" -%></li>
+  <% if @experiment.can_edit? %>
+      <li><%= image_tag_for_key('edit', edit_experiment_path(@experiment), "Edit experiment Details", nil, 'Edit experiment Details') %></li>
+  <% end %>
+  <% if @experiment.can_delete? %>
+      <li><%= image_tag_for_key "destroy", experiment_path(@experiment), "Delete experiment", {:confirm => 'Are you sure?', :method => :delete}, "Delete experiment" -%></li>
+  <% end %>
 </ul>
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@experiment} %>
@@ -52,7 +56,7 @@
 
   <div style="clear:both">
 
-        <%= render :partial=>"layouts/items_related_to",:object => @experiment %>
-    </div>
+    <%= render :partial=>"layouts/items_related_to", :object => @experiment %>
+  </div>
 
 </div>

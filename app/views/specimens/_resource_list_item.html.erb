@@ -1,7 +1,7 @@
 <%= list_item_title resource %>
 
 <div class="list_item_left_column">
-  <%= list_item_optional_attribute "Contributor", resource.contributor.person.try (:name), resource.contributor.person %>
+  <%= list_item_optional_attribute "Contributor", resource.contributor.person.try(:name), resource.contributor.person %>
   <%= list_item_simple_list resource.creators, "Creator(s)" -%>
 
   <%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>

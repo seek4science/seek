@@ -1,8 +1,12 @@
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
-  <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample Details", nil, 'Edit Sample Details') %></li>
-  <li><%= image_tag_for_key "destroy", sample_path(@sample), "Delete Sample", {:confirm => 'Are you sure?', :method => :delete}, "Delete Sample" -%></li>
+  <% if @sample.can_edit? %>
+      <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample Details", nil, 'Edit Sample Details') %></li>
+  <% end %>
+  <% if @sample.can_delete? %>
+      <li><%= image_tag_for_key "destroy", sample_path(@sample), "Delete Sample", {:confirm => 'Are you sure?', :method => :delete}, "Delete Sample" -%></li>
+  <% end %>
 </ul>
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
@@ -18,10 +22,10 @@
         <%= text_or_not_specified(@sample.specimen.title) %>
       </p>
 
-       <p>
-          <label>Strains:</label>
-          <%= sample_strains_list @sample.strains -%>
-        </p>
+      <p>
+        <label>Strains:</label>
+        <%= sample_strains_list @sample.strains -%>
+      </p>
 
       <p>
         <label>Explantation time:</label>
