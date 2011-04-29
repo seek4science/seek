@@ -1,16 +1,14 @@
 require 'grouped_pagination'
-require 'acts_as_asset'
+require 'acts_as_authorized'
 
 class Experiment < ActiveRecord::Base
   belongs_to :sample
 
   belongs_to :institution
-  belongs_to :project
   belongs_to :assay
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
-  belongs_to :contributor, :polymorphic => true
-  belongs_to :policy
+
 
   has_and_belongs_to_many :data_files
 
@@ -25,6 +23,7 @@ class Experiment < ActiveRecord::Base
 
   validates_presence_of :date
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
+  acts_as_authorized
 
   def related_publications
     self.relationships.select { |a| a.object_type == "Publication" }.collect { |a| a.object }
