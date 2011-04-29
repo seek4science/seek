@@ -63,44 +63,9 @@ module Authorization
       # 2. Check if there is a permission for a FavouriteGroup they're in
       # 3. Check if there is a permission for their project
       # 4. Check the action is allowed by the access_type of the permission
-      permissions = []
-      
-      # Person permissions
-      permissions = policy.permissions.select {|p| p.contributor == user.person}
-      
-      # FavouriteGroup permissions
-      if permissions.empty?
-        favourite_group_ids = policy.permissions.select {|p| p.contributor_type == "FavouriteGroup"}.collect {|p| p.contributor_id}
-        #Use favourite_group_membership in place of permission, because the access_type is stored in it for some reason.
-        # Duck typing will save us.
-        permissions = user.person.favourite_group_memberships.select {|x| favourite_group_ids.include?(x.favourite_group_id)}
-      end
-
-      # WorkGroup permissions
-      if permissions.empty?
-        work_group_ids = user.person.work_group_ids
-        permissions = policy.permissions.select {|p| p.contributor_type == "WorkGroup" && work_group_ids.include?(p.contributor_id)}
-      end
-     
-      # Project permissions
-      if permissions.empty?
-        project_ids = user.person.projects.collect {|p| p.id}
-        permissions = policy.permissions.select {|p| p.contributor_type == "Project" && project_ids.include?(p.contributor_id)}
-      end
-
-      # Institution permissions
-      if permissions.empty?
-        institution_ids = user.person.institutions.collect {|i| i.id}
-        permissions = policy.permissions.select {|p| p.contributor_type == "Institution" && institution_ids.include?(p.contributor_id)}
-      end
-
-      unless permissions.empty?
-        #Get max access level from permissions (in the event there is more than 1... there shouldn't be)
-        max_access_type = permissions.sort_by{|p| p.access_type}.last.access_type
-        #override current authorization status
-        is_authorized = access_type_allows_action?(action, max_access_type)
-      end
-
+      permissions_for_user = policy.permissions.select { |p| p.controls_access_for? user.person }
+      permission = Permission.choose_for(user.person, permissions_for_user)
+      is_authorized = permission.allows_action? action, user.person if permission
       # == END CUSTOM PERMISSIONS
     end
 
