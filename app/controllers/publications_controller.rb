@@ -139,8 +139,9 @@ class PublicationsController < ApplicationController
         #Destroy Assay relationship that aren't needed
         associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
         associate_relationships.each do |associate_relationship|
-          if associate_relationship.subject.can_edit? && !assay_ids.include?(associate_relationship.subject_id.to_s)
-            Relationship.destroy(associate_relationship.id)
+          assay = associate_relationship.subject
+          if assay.can_edit? && !assay_ids.include?(assay.id.to_s)
+            associate_relationship.destroy
           end
         end
 

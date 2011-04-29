@@ -484,7 +484,7 @@ class ModelsController < ApplicationController
           end
         end
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @model.id, 'Model'])
+        assay_assets = @model.assay_assets
         assay_assets.each do |assay_asset|
           if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
             AssayAsset.destroy(assay_asset.id)
