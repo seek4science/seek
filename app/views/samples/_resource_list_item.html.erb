@@ -10,7 +10,7 @@
 
 <div class="list_item_right_column">
 
-  <%= list_item_attribute "Date of donation", resource.donation_date %>
+  <%= list_item_attribute "Date of donation", resource.donation_date.strftime("%d/%m/%y")%>
 
 
 </div>

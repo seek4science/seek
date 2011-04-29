@@ -29,7 +29,7 @@
     <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
   </p>
   <p>
-    <%= f.label :donation_date -%><br/>
+    <%= f.label :donation_date -%><span class="required">*</span><br/>
     <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
   </p>
 
