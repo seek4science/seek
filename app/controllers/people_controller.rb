@@ -6,7 +6,9 @@ class PeopleController < ApplicationController
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
-  before_filter :auth_params,:only=>[:update,:create]  
+  before_filter :auth_params,:only=>[:update,:create]
+
+  skip_before_filter :project_membership_required
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   
