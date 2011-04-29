@@ -8,7 +8,7 @@ class SpecimensController < ApplicationController
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
 
-  before_filter :login_required
+  #before_filter :login_required
   include IndexPager
 
   def new
@@ -27,13 +27,13 @@ class SpecimensController < ApplicationController
   def create
     @specimen = Specimen.new(params[:specimen])
     @specimen.contributor = current_user
-    @specimen.project_id= params[:project_id]
+    @specimen.project= Project.find params[:project_id]
 
 
     respond_to do |format|
       if @specimen.save
 
-        # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+         #policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
         #Add creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
