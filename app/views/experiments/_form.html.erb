@@ -17,7 +17,10 @@
       <%= f.label "Sample specimen" %> <span class="required">*</span><br/>
       <%= collection_select(:experiment, :sample_id, Sample.all, :id, :title) %>
     </p>
-
+     <p>
+      <%= f.label "Choose assay" %> <br/>
+      <%= collection_select(:experiment, :assay_id, Assay.all, :id, :title) %>
+    </p>
     <p>
       <%= f.label :date -%><span class="required">*</span><br/>
       <%= f.calendar_date_select :date, :time => "mixed" -%>
