@@ -99,7 +99,6 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, model.policy.access_type
     assert_equal false,model.policy.use_whitelist
     assert_equal false,model.policy.use_blacklist
-    assert_equal false,model.policy.use_custom_sharing
     assert model.policy.permissions.empty?
   end
 

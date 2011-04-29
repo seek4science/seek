@@ -81,7 +81,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, df.policy.access_type
     assert_equal false,df.policy.use_whitelist
     assert_equal false,df.policy.use_blacklist
-    assert_equal false,df.policy.use_custom_sharing
     assert df.policy.permissions.empty?
   end
 

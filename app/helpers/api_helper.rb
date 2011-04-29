@@ -201,7 +201,6 @@ module ApiHelper
         dc_core_xml builder,policy
         builder.tag! "sharing_scope",policy.sharing_scope
         builder.tag! "access_type",policy.access_type
-        builder.tag! "use_custom_sharing",policy.use_custom_sharing ? policy.use_custom_sharing : false
         builder.tag! "use_blacklist",policy.use_blacklist ? policy.use_blacklist : false
         builder.tag! "use_whitelist",policy.use_whitelist ? policy.use_whitelist : false
         builder.tag! "permissions" do

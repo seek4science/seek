@@ -314,7 +314,7 @@ namespace :seek do
     count = 0
     Publication.all.each do |pub|
       if pub.asset.policy.nil?
-        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1)
         count            += 1
         pub.asset.save
       end

@@ -69,11 +69,11 @@ class PublicationsController < ApplicationController
         end
 
         Assay.find(assay_ids).each do |assay|
-          Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
+          Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
         end
 
         #Make a policy
-        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
+        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
         @publication.policy = policy
         @publication.save
         #add managers (authors + contributor)
@@ -133,7 +133,7 @@ class PublicationsController < ApplicationController
         # Update relationship
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?
-            Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION)
+            Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
           end
         end
         #Destroy Assay relationship that aren't needed
@@ -147,7 +147,7 @@ class PublicationsController < ApplicationController
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
-          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
           @publication.save
         end
         
