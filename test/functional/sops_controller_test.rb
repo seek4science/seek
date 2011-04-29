@@ -130,6 +130,7 @@ class SopsControllerTest < ActionController::TestCase
     s.reload
     original_assay.reload
     new_assay.reload
+
     assert !original_assay.related_asset_ids('Sop').include?(s.id)
     assert new_assay.related_asset_ids('Sop').include?(s.id)
   end
