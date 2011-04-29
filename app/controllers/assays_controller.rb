@@ -5,7 +5,6 @@ class AssaysController < ApplicationController
   include Seek::TaggingCommon
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_project_member, :only=>[:create, :new]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   def new
