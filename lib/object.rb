@@ -34,7 +34,7 @@ class Object
   #so instead of a.respond_to? :b? and a.b? try_block { a.b? }
   def try_block
     yield
-  rescue NoMethodError
+  rescue NoMethodError, NameError
     nil
   end
 
