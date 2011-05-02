@@ -7,7 +7,7 @@ class SpecimensController < ApplicationController
 
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
-  before_filter :is_project_member, :only => [:new, :create]
+  #before_filter :is_project_member, :only => [:new, :create]
   #before_filter :login_required
   include IndexPager
 
