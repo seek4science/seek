@@ -300,6 +300,16 @@ class SeekNode < DotGenerator::Node
     hide unless item.can_view?
   end
 
+  def to_s
+    #hidden items with no real child nodes that want to display themselves, are removed
+    @string ||= if !item.can_view? and child_nodes.collect(&:to_s).join.blank? then "" else super end
+  end
+
+  def edge other, attributes = {}
+    #don't draw edges to me if I'm blank
+    if to_s.blank? then "" else super end
+  end
+
   #SeekNode should be used as the default node type
   def self.is_node_class_for? item
     true
