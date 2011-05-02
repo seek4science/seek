@@ -86,8 +86,12 @@ module DotGenerator
       item.class.name
     end
 
+    def item_id
+      item.id.to_s
+    end
+
     def entry_identifier
-      item_type + '_' + item.id.to_s
+      item_type + '_' + item_id
     end
 
     def tooltip
@@ -95,7 +99,7 @@ module DotGenerator
     end
 
     def label
-      item.id.to_s
+      item_id
     end
 
     def include_defaults
@@ -369,19 +373,27 @@ class AssayNode < SeekNode
   end
 end
 
+class VersionedAssetNode < AssetNode
+  def self.is_node_class_for? item
+    super and item.class.name.end_with? "::Version"
+  end
+
+  def initialize versioned_asset
+    @version = versioned_asset.version
+    super versioned_asset.parent
+  end
+
+  def url
+    controller.polymorphic_path(item, :version => @version)
+  end
+
+end
+
 #AssayAssetNode is only used for children of Assay
-class AssayAssetNode < AssetNode
+class AssayAssetNode < VersionedAssetNode
   def initialize assay_asset
     @assay_asset = assay_asset
     super assay_asset.versioned_asset
-  end
-
-  def item_type
-    if item.respond_to?(:parent) and item.class.name.end_with?('::Version')
-      item.parent.class.name
-    else
-      super
-    end
   end
 
   def edge other, attributes={}
