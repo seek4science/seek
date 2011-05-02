@@ -11,9 +11,11 @@ class StudiedFactorsController < ApplicationController
   end
 
   def create
+
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
+    @studied_factor.compound = find_compound
 
     render :update do |page|
       if @studied_factor.save
@@ -68,6 +70,14 @@ class StudiedFactorsController < ApplicationController
     @studied_factor=StudiedFactor.new(:data_file=>@data_file)
   end
 
+  def find_compound
+    params.each do |name, value|
+      if name =~ /(.+)_id$/
+        return $1.classify.constantize.find(value)
+      end
+    end
+    nil
+  end
 
   
 end
