@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110427134457) do
+ActiveRecord::Schema.define(:version => 20110429085237) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -251,16 +251,13 @@ ActiveRecord::Schema.define(:version => 20110427134457) do
     t.string   "title"
     t.integer  "sample_id"
     t.string   "description"
+    t.integer  "project_id"
     t.integer  "institution_id"
-    t.integer  "person_id"
+    t.integer  "people_id"
     t.datetime "date"
     t.string   "first_letter"
     t.string   "comments"
     t.integer  "policy_id"
-    t.integer  "project_id"
-    t.text     "other_creators"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "assay_id"
@@ -469,15 +466,9 @@ ActiveRecord::Schema.define(:version => 20110427134457) do
     t.datetime "updated_at"
   end
 
-  create_table "notifiers", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
-    t.string   "strain"
     t.string   "genotype"
     t.string   "phenotype"
     t.datetime "created_at"
@@ -521,9 +512,8 @@ ActiveRecord::Schema.define(:version => 20110427134457) do
 
   create_table "policies", :force => true do |t|
     t.string   "name"
-    t.integer  "sharing_scope",      :limit => 1
-    t.integer  "access_type",        :limit => 1
-    t.boolean  "use_custom_sharing"
+    t.integer  "sharing_scope", :limit => 1
+    t.integer  "access_type",   :limit => 1
     t.boolean  "use_whitelist"
     t.boolean  "use_blacklist"
     t.datetime "created_at"
@@ -625,10 +615,6 @@ ActiveRecord::Schema.define(:version => 20110427134457) do
     t.string   "comments"
     t.string   "first_letter"
     t.integer  "policy_id"
-    t.text     "other_creators"
-    t.integer  "project_id"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
