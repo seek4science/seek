@@ -23,12 +23,16 @@
 
       <p>
         <label>Organism:</label>
-        <%= text_or_not_specified(@specimen.organism.title) %>
+        <% if !@specimen.organism.nil? %>
+            <%= text_or_not_specified(@specimen.organism.title) %>
+        <% end %>
       </p>
 
       <p>
         <label>Strain:</label>
-        <%= text_or_not_specified(@specimen.strain.title) %>
+        <% if !@specimen.strain.nil? %>
+            <%= text_or_not_specified(@specimen.strain.title) %>
+        <% end %>
       </p>
 
       <p>

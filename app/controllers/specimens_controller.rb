@@ -7,21 +7,16 @@ class SpecimensController < ApplicationController
 
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
-
+  before_filter :is_project_member, :only => [:new, :create]
   #before_filter :login_required
   include IndexPager
 
   def new
     @specimen = Specimen.new
     respond_to do |format|
-      if current_user.person.member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to create new specimen. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to specimens_path }
-      end
-    end
 
+      format.html # new.html.erb
+    end
   end
 
   def create
@@ -33,7 +28,7 @@ class SpecimensController < ApplicationController
     respond_to do |format|
       if @specimen.save
 
-         #policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+        #policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
         #Add creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
