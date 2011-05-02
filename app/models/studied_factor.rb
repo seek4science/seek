@@ -4,6 +4,7 @@ class StudiedFactor < ActiveRecord::Base
   belongs_to :measured_item
   belongs_to :unit
   belongs_to :data_file
+  belongs_to :compound, :polymorphic => true
 
   validates_presence_of :unit,:measured_item,:start_value,:data_file
 
