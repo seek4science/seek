@@ -36,6 +36,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  before_filter :project_membership_required,:only=>[:create,:new]
+
   helper :all
 
   layout "main"
@@ -113,10 +115,11 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def is_project_member
-    if !current_user.person.member?
+  def project_membership_required
+    unless try_block {current_user.person.member?}
+#    if current_user and current_user.person and current_user.person.member?
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
-      redirect_to studies_path
+      try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
     end
 
   end
@@ -340,5 +343,5 @@ class ApplicationController < ActionController::Base
         :current_logged_in_user=>current_user
     }
   end
-  
+
 end

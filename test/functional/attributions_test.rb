@@ -146,7 +146,6 @@ class AttributionsTest < ActionController::TestCase
       :access_type => Policy::VISIBLE,
       :use_whitelist => false,
       :use_blacklist => false,
-      :use_custom_sharing => false,
       :permissions => { :contributor_types => ActiveSupport::JSON.encode([]), :values => ActiveSupport::JSON.encode({}) }
     }
   end

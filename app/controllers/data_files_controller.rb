@@ -115,7 +115,7 @@ class DataFilesController < ApplicationController
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
           
           # update related publications
-          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
@@ -195,7 +195,7 @@ class DataFilesController < ApplicationController
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
         
         # update related publications        
-        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
         
         #update creators
@@ -221,7 +221,7 @@ class DataFilesController < ApplicationController
         end
 
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find(:all, :conditions => ["asset_id = ? and asset_type = ?", @data_file.id, 'DataFile'])
+        assay_assets = @data_file.assay_assets
         assay_assets.each do |assay_asset|
           if assay_asset.assay.can_edit? and !a_ids.include?(assay_asset.assay_id.to_s)
             AssayAsset.destroy(assay_asset.id)

@@ -32,8 +32,12 @@ class Relationship < ActiveRecord::Base
   # before, then these will not get deleted (and re-created afterwards, but
   # will be kept intact in first place)
   def self.create_or_update_attributions(resource, attributions_from_params, predicate = Relationship::ATTRIBUTED_TO)
-    received_attributions = (attributions_from_params.blank? ? [] : ActiveSupport::JSON.decode(attributions_from_params)) 
-    
+    unless attributions_from_params.instance_of? Array
+       received_attributions = (attributions_from_params.blank? ? [] : ActiveSupport::JSON.decode(attributions_from_params))
+    else
+       received_attributions = (attributions_from_params.blank? ? [] : attributions_from_params)
+    end
+
     # build a more convenient hash structure with attribution parameters
     # (this will be classified by resource type)
     new_attributions = {}
@@ -41,8 +45,7 @@ class Relationship < ActiveRecord::Base
       new_attributions[a[0]] = [] unless new_attributions[a[0]]
       new_attributions[a[0]] << a[1]
     end
-    
-    
+
     # --- Perform the full synchronisation of attributions ---
     
     # first delete any old attributions that are no longer valid

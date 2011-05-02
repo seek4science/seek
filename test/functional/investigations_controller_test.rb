@@ -41,6 +41,12 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert assigns(:investigation)
   end
 
+  test "logged out user can't see new" do
+    logout
+    get :new
+    assert_redirected_to investigations_path
+  end
+
   test "should show edit" do
     get :edit, :id=>investigations(:metabolomics_investigation)
     assert_response :success
