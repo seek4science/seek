@@ -380,6 +380,7 @@ class VersionedAssetNode < AssetNode
 
   def initialize versioned_asset
     @version = versioned_asset.version
+    #this means that all versioned_assets with the same parent will get the same entry_identifier. Is that really correct? I think that means that later nodes can 'shadow' earlier ones, only displaying the last one.
     super versioned_asset.parent
   end
 
