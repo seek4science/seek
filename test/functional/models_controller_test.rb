@@ -137,7 +137,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal private_policy.access_type,model.policy.access_type
     assert_equal private_policy.use_whitelist,model.policy.use_whitelist
     assert_equal private_policy.use_blacklist,model.policy.use_blacklist
-    assert_equal false,model.policy.use_custom_sharing
     assert model.policy.permissions.empty?
     
     #check it doesn't create an error when retreiving the index

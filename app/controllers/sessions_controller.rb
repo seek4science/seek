@@ -4,6 +4,7 @@ class SessionsController < ApplicationController
   layout 'logged_out'
 
   before_filter :signup_admin_if_not_users,:only=>:new
+  skip_before_filter :project_membership_required
   
   # render new.rhtml
   def new

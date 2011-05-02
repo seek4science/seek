@@ -66,7 +66,6 @@ module Jerm
               return {:response=>:fail,:message=>MESSAGES[:unknown_auth],:author=>author,:response_code=>RESPONSE_CODES[:unknown_auth]}                                        
             end
             
-            resource_model.policy.use_custom_sharing = true
             resource_model.policy.save!
             resource_model.creators << author
             resource_model.project=project
@@ -94,7 +93,6 @@ module Jerm
       Policy.new(:name=>'auto',
                 :sharing_scope=>Policy::ALL_SYSMO_USERS,
                 :access_type=>Policy::ACCESSIBLE,
-                :use_custom_sharing=>true,
                 :use_whitelist=>false,
                 :use_blacklist=>false)      
     end
@@ -103,7 +101,6 @@ module Jerm
       policy=Policy.new(:name=>'auto',
                 :sharing_scope=>Policy::ALL_SYSMO_USERS,
                 :access_type=>Policy::VISIBLE,
-                :use_custom_sharing=>true,
                 :use_whitelist=>false,
                 :use_blacklist=>false) 
       policy.save!

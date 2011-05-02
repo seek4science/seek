@@ -305,7 +305,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal private_policy.access_type,df.policy.access_type
     assert_equal private_policy.use_whitelist,df.policy.use_whitelist
     assert_equal private_policy.use_blacklist,df.policy.use_blacklist
-    assert_equal false,df.policy.use_custom_sharing
     assert df.policy.permissions.empty?
     
     #check it doesn't create an error when retreiving the index

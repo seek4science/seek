@@ -403,7 +403,7 @@ class ModelsController < ApplicationController
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
           # update related publications
-          Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+          Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
@@ -465,7 +465,7 @@ class ModelsController < ApplicationController
         Relationship.create_or_update_attributions(@model, params[:attributions])
         
         # update related publications
-        Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@model, params[:creators])
@@ -484,7 +484,7 @@ class ModelsController < ApplicationController
           end
         end
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find(:all, :conditions => ['asset_id = ? and asset_type = ?', @model.id, 'Model'])
+        assay_assets = @model.assay_assets
         assay_assets.each do |assay_asset|
           if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
             AssayAsset.destroy(assay_asset.id)

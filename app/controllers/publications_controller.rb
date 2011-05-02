@@ -69,11 +69,11 @@ class PublicationsController < ApplicationController
         end
 
         Assay.find(assay_ids).each do |assay|
-          Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
+          Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
         end
 
         #Make a policy
-        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
+        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
         @publication.policy = policy
         @publication.save
         #add managers (authors + contributor)
@@ -133,20 +133,21 @@ class PublicationsController < ApplicationController
         # Update relationship
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?
-            Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION)
+            Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
           end
         end
         #Destroy Assay relationship that aren't needed
         associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
         associate_relationships.each do |associate_relationship|
-          if associate_relationship.subject.can_edit? && !assay_ids.include?(associate_relationship.subject_id.to_s)
-            Relationship.destroy(associate_relationship.id)
+          assay = associate_relationship.subject
+          if assay.can_edit? && !assay_ids.include?(assay.id.to_s)
+            associate_relationship.destroy
           end
         end
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
-          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE, :use_custom_sharing => true)
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
           @publication.save
         end
         

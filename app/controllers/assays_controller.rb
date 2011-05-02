@@ -5,7 +5,6 @@ class AssaysController < ApplicationController
   include Seek::TaggingCommon
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_project_member, :only=>[:create, :new]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   def new
@@ -61,7 +60,7 @@ class AssaysController < ApplicationController
         end
 
         # update related publications
-        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
         policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
 
@@ -120,7 +119,7 @@ class AssaysController < ApplicationController
         end
 
         # update related publications
-        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
         #FIXME: required to update timestamp. :touch=>true on AssayAsset association breaks acts_as_trashable
         @assay.updated_at=Time.now

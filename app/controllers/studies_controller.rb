@@ -2,11 +2,8 @@ class StudiesController < ApplicationController
 
   include DotGenerator
   include IndexPager
-  
-  #before_filter :login_required
 
   before_filter :find_assets, :only=>[:index]
-  before_filter :is_project_member, :only=>[:create, :new]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
@@ -47,7 +44,7 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.update_attributes(params[:study])
-        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
         policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
 

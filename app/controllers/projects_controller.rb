@@ -7,7 +7,9 @@ class ProjectsController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update,:admin]
-  
+
+  skip_before_filter :project_membership_required
+
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
 
   def auto_complete_for_organism_name
