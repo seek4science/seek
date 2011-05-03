@@ -27,8 +27,8 @@
     </p>
 
     <p>
-      <%= f.label :description -%><br/>
-      <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+      <%= f.label :description -%><span class="required">*</span><br/>
+      <%= f.text_area :description, :style => "width: 85%;", :rows => 5 -%>
     </p>
 
 
@@ -51,7 +51,7 @@
     </p>
 
     <p>
-      <%= f.label :institution %><br/>
+      <%= f.label :institution %><span class="required">*</span><br/>
 
     <div id="institution_collection">
       <% ins = @experiment.project ? @experiment.project.institutions : [] -%>

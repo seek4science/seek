@@ -10,9 +10,6 @@
 <div class="list_item_right_column">
 
   <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
-
-  <%= list_item_optional_attribute "Institution", resource.institution.try(:name), resource.institution %>
-
   <%= list_item_attribute "Date of experiment", resource.date.strftime('%d/%m/%Y') %>
 </div>
 <div class="list_item_whole_width">

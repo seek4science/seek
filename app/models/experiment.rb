@@ -17,11 +17,11 @@ class Experiment < ActiveRecord::Base
            :as => :subject,
            :dependent => :destroy
 
-  validates_presence_of :title
+  validates_presence_of :title,:project,:institution,:contributor,:date,:description
   validates_uniqueness_of :title
   alias_attribute :data_file_masters, :data_files
 
-  validates_presence_of :date
+
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
   acts_as_authorized
 

@@ -23,6 +23,11 @@
       </p>
 
       <p>
+        <label>Experimenter:</label>
+        <%= text_or_not_specified(@experiment.contributor.person.try(:name)) %>
+      </p>
+
+      <p>
         <label>Date of experiment:</label>
         <% if @experiment.date.nil? %>
             <%= text_or_not_specified nil %>
@@ -37,6 +42,15 @@
         <% end %>
       </p>
 
+      <p>
+        <label>Project:</label>
+        <%= text_or_not_specified(@experiment.project.title) %>
+      </p>
+
+      <p>
+        <label>Institution:</label>
+        <%= text_or_not_specified(@experiment.institution.title) %>
+      </p>
     </div>
   </div>
   <!--  <div class="main_content_right_box">
