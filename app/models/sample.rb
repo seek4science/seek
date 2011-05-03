@@ -21,4 +21,9 @@ class Sample < ActiveRecord::Base
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   acts_as_authorized
+
+
+  def can_delete? user=User.current_user
+    experiments.empty? && mixin_super(user)
+  end
 end

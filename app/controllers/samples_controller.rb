@@ -20,12 +20,10 @@ class SamplesController < ApplicationController
 
     sample_strain_ids = params[:sample_strain_ids] || []
 
-    @sample.strains = Strain.find sample_strain_ids.collect {|s| s.split(',') }
-
 
     respond_to do |format|
       if @sample.save
-
+        @sample.strains = Strain.find sample_strain_ids.collect { |s| s.split(',') }
         format.html { redirect_to(@sample) }
 
       else
@@ -39,12 +37,11 @@ class SamplesController < ApplicationController
 
     sample_strain_ids = params[:sample_strain_ids] || []
 
-    @sample.strains = Strain.find sample_strain_ids.collect {|s| s.split(',') }
 
     respond_to do |format|
 
       if @sample.update_attributes params[:sample]
-
+        @sample.strains = Strain.find sample_strain_ids.collect { |s| s.split(',') }
 
         flash[:notice] = 'Sample was successfully updated'
         format.html { redirect_to @sample }
