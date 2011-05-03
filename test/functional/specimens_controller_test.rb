@@ -22,11 +22,11 @@ class SpecimensControllerTest < ActionController::TestCase
   end
   test "should create" do
     assert_difference("Specimen.count") do
-      post :create, :specimen => {:donor_number => "running mouse NO2"}, :project_id => projects(:one).id
+      post :create, :specimen =>  {:donor_number => "running mouse NO.1",:lab_internal_number =>"Do232",:contributor => Factory(:user),:organism => Factory(:organism),:strain => Factory(:strain),:institution => Factory(:institution)}, :project_id => projects(:one).id
     end
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
-    assert_equal "running mouse NO2", s.donor_number
+    assert_equal "running mouse NO.1", s.donor_number
   end
   test "should get show" do
     get :show, :id => Factory(:specimen, :donor_number=>"running mouse NO2", :policy =>policies(:editing_for_all_sysmo_users_policy))
