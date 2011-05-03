@@ -9,7 +9,7 @@ module ActsAsTrashable
     def acts_as_trashable
       extend ClassMethods
       include InstanceMethods
-      alias_method_chain :destroy, :trash
+      after_destroy :store_trash
     end
   end
   
@@ -33,12 +33,10 @@ module ActsAsTrashable
   end
   
   module InstanceMethods
-    def destroy_with_trash
-      return destroy_without_trash if @acts_as_trashable_disabled
-      TrashRecord.transaction do
+    def store_trash
+      unless @acts_as_trashable_disabled
         trash = TrashRecord.new(self)
         trash.save!
-        return destroy_without_trash
       end
     end
     
