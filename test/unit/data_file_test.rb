@@ -182,7 +182,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'update checks authorization' do
     unupdated_title = "Unupdated Title"
     df = Factory :data_file, :title => unupdated_title
-    User.current_user = df.contributor
+    User.current_user = nil
 
     assert !df.update_attributes(:title => "Updated Title")
     assert_equal unupdated_title, df.reload.title
