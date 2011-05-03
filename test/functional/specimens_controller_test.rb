@@ -22,7 +22,13 @@ class SpecimensControllerTest < ActionController::TestCase
   end
   test "should create" do
     assert_difference("Specimen.count") do
-      post :create, :specimen => {:donor_number => "running mouse NO.1", :lab_internal_number =>"Do232", :contributor => Factory(:user), :organism => Factory(:organism), :strain => Factory(:strain), :institution => Factory(:institution)}, :project_id => projects(:one).id
+      post :create, :specimen => {:donor_number => "running mouse NO.1",
+                                  :lab_internal_number =>"Do232",
+                                  :contributor => Factory(:user),
+                                  :organism => Factory(:organism),
+                                  :strain => Factory(:strain),
+                                  :institution => Factory(:institution)},
+           :project_id => projects(:one).id
     end
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
@@ -98,8 +104,15 @@ class SpecimensControllerTest < ActionController::TestCase
     end
     assert flash[:error]
     assert_redirected_to specimens_path
-
-
   end
-
+  test "should not destroy specimen related to an existing sample" do
+    sample = Factory :sample
+    specimen = Factory :specimen
+    specimen.samples = [sample]
+    assert_no_difference("Specimen.count") do
+      delete :destroy, :id => specimen.id
+    end
+    assert flash[:error]
+    assert_redirected_to specimens_path
+  end
 end

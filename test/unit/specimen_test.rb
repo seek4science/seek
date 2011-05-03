@@ -14,23 +14,23 @@ class SpecimenTest < ActiveSupport::TestCase
     specimen.donor_number = ""
     assert !specimen.valid?
 
-    specimen = Factory :specimen
+    specimen.reload
     specimen.contributor = nil
     assert !specimen.valid?
 
-    specimen = Factory :specimen
+    specimen.reload
     specimen.organism = nil
     assert !specimen.valid?
 
-    specimen = Factory :specimen
+    specimen.reload
     specimen.strain = nil
     assert !specimen.valid?
 
-    specimen = Factory :specimen
+    specimen.reload
     specimen.project= nil
     assert !specimen.valid?
 
-    specimen = Factory :specimen
+    specimen.reload
     specimen.institution= nil
     assert !specimen.valid?
   end

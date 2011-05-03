@@ -11,7 +11,7 @@ end
 
 Factory.define(:person, :parent => :brand_new_person) do |f|
   f.association :user, :factory => :activated_user
-  f.group_memberships { [Factory :group_membership] }
+  f.group_memberships { [Factory(:group_membership)] }
 end
 
 Factory.define(:pal, :parent => :person) do |f|
@@ -116,25 +116,44 @@ Factory.define(:investigation) do |f|
   f.association :project
   f.sequence(:title) { |n| "Investigation#{n}" }
 end
-#organism
+
+#Organism
 Factory.define(:organism) do |f|
- f.sequence(:title){|n|"Organism#{n}"}
+  f.sequence(:title) { |n| "Organism#{n}" }
 end
 
-#strain
+#Strain
 Factory.define(:strain) do |f|
-  f.sequence(:title){|n|"Strain#{n}"}
+  f.sequence(:title) { |n| "Strain#{n}" }
 end
-#specimen
+
+#Specimen
 Factory.define(:specimen) do |f|
   f.sequence(:donor_number) { |n| "Specimen#{n}" }
-  f.sequence(:lab_internal_number){|n|"Lab#{n}"}
+  f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.association :contributor, :factory => :user
   f.association :organism
   f.association :strain
   f.association :project
   f.association :institution
 end
+
+#Sample
+Factory.define(:sample) do |f|
+  f.sequence(:title) { |n| "Sample#{n}" }
+  f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+  f.donation_date Date.today
+  f.strains { [Factory :strain] }
+  f.association :specimen
+end
+
+#Experiment
+Factory.define(:experiment) do |f|
+  f.sequence(:title){|n|"Experiment#{n}"}
+  f.date Date.today
+  f.association :sample
+end
+
 #Data File
 Factory.define(:data_file) do |f|
   f.title "A Data File"

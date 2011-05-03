@@ -33,7 +33,10 @@ class Specimen < ActiveRecord::Base
     if !age.nil?
       age.to_s + " (weeks)"
     end
+  end
 
+  def can_delete? user=User.current_user
+    samples.empty? && mixin_super(user)
   end
 
 end
