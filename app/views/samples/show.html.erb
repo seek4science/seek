@@ -2,7 +2,7 @@
 
 <ul class="sectionIcons">
   <% if @sample.can_edit? %>
-      <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample Details", nil, 'Edit Sample Details') %></li>
+      <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample", nil, 'Edit Sample') %></li>
   <% end %>
   <% if @sample.can_delete? %>
       <li><%= image_tag_for_key "destroy", sample_path(@sample), "Delete Sample", {:confirm => 'Are you sure?', :method => :delete}, "Delete Sample" -%></li>

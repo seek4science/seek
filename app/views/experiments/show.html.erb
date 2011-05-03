@@ -2,7 +2,7 @@
 
 <ul class="sectionIcons">
   <% if @experiment.can_edit? %>
-      <li><%= image_tag_for_key('edit', edit_experiment_path(@experiment), "Edit experiment Details", nil, 'Edit experiment Details') %></li>
+      <li><%= image_tag_for_key('edit', edit_experiment_path(@experiment), "Edit experiment", nil, 'Edit experiment') %></li>
   <% end %>
   <% if @experiment.can_delete? %>
       <li><%= image_tag_for_key "destroy", experiment_path(@experiment), "Delete experiment", {:confirm => 'Are you sure?', :method => :delete}, "Delete experiment" -%></li>

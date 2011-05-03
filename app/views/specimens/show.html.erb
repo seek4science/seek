@@ -2,7 +2,7 @@
 
 <ul class="sectionIcons">
   <% if @specimen.can_edit? %>
-      <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit Specimen Details", nil, 'Edit Specimen Details') %></li>
+      <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit Specimen", nil, 'Edit Specimen') %></li>
   <% end %>
   <% if @specimen.can_delete? %>
       <li><%= image_tag_for_key "destroy", specimen_path(@specimen), "Delete Specimen", {:confirm => 'Are you sure?', :method => :delete}, "Delete Specimen" -%></li>
@@ -23,12 +23,16 @@
 
       <p>
         <label>Organism:</label>
-        <%= text_or_not_specified(@specimen.organism.title) %>
+        <% if !@specimen.organism.nil? %>
+            <%= text_or_not_specified(@specimen.organism.title) %>
+        <% end %>
       </p>
 
       <p>
         <label>Strain:</label>
-        <%= text_or_not_specified(@specimen.strain.title) %>
+        <% if !@specimen.strain.nil? %>
+            <%= text_or_not_specified(@specimen.strain.title) %>
+        <% end %>
       </p>
 
       <p>
@@ -44,6 +48,10 @@
       <p>
         <label>Lab internal No.:</label>
         <%= text_or_not_specified(@specimen.lab_internal_number) %>
+      </p>
+      <p>
+        <label>Institution:</label>
+        <%= text_or_not_specified(@specimen.institution.name) %>
       </p>
 
 
