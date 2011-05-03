@@ -33,9 +33,11 @@ class SpecimenTest < ActiveSupport::TestCase
     specimen = Factory :specimen
     specimen.institution= nil
     assert !specimen.valid?
-
-
   end
 
+  test "age in weeks" do
+    specimen = Factory :specimen,:age => 12
+    assert_equal "#{specimen.age} (weeks)",specimen.age_in_weeks
+  end
 
 end

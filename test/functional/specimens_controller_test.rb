@@ -22,7 +22,7 @@ class SpecimensControllerTest < ActionController::TestCase
   end
   test "should create" do
     assert_difference("Specimen.count") do
-      post :create, :specimen =>  {:donor_number => "running mouse NO.1",:lab_internal_number =>"Do232",:contributor => Factory(:user),:organism => Factory(:organism),:strain => Factory(:strain),:institution => Factory(:institution)}, :project_id => projects(:one).id
+      post :create, :specimen => {:donor_number => "running mouse NO.1", :lab_internal_number =>"Do232", :contributor => Factory(:user), :organism => Factory(:organism), :strain => Factory(:strain), :institution => Factory(:institution)}, :project_id => projects(:one).id
     end
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
@@ -47,17 +47,59 @@ class SpecimensControllerTest < ActionController::TestCase
     assert_redirected_to specimen_path(s)
     assert_equal "test", s.donor_number
   end
+
+  test "should destroy" do
+    s = Factory :specimen, :contributor => User.current_user
+    assert_difference("Specimen.count", -1, "A specimen should be deleted") do
+      delete :destroy, :id => s.id
+    end
+  end
   test "unauthorized users cannot add new specimens" do
     login_as Factory(:user)
     get :new
     assert_response :redirect
   end
-  test "unauthorized user cannot update" do
+  test "unauthorized user cannot edit specimen" do
     login_as Factory(:user)
-    s = Factory(:specimen, :policy => Factory(:private_policy))
+    s = Factory :specimen, :policy => Factory(:private_policy)
+    get :edit, :id =>s.id
+    assert_redirected_to specimen_path(s)
+    assert flash[:error]
+  end
+  test "unauthorized user cannot update specimen" do
+    login_as Factory(:user)
+    s = Factory :specimen, :policy => Factory(:private_policy)
 
     put :update, :id=> s.id, :specimen =>{:donor_number =>"test"}
     assert_redirected_to specimen_path(s)
     assert flash[:error]
   end
+
+  test "unauthorized user cannot delete specimen" do
+    login_as Factory(:user)
+    s = Factory :specimen, :policy => Factory(:private_policy)
+    assert_no_difference("Specimen.count") do
+      delete :destroy, :id => s.id
+    end
+    assert flash[:error]
+    assert_redirected_to specimens_path
+  end
+
+  test "only current user can delete specimen" do
+
+    s = Factory :specimen, :contributor => User.current_user
+    assert_difference("Specimen.count", -1, "A specimen should be deleted") do
+      delete :destroy, :id => s.id
+    end
+
+    s = Factory :specimen
+    assert_no_difference("Specimen.count") do
+      delete :destroy, :id => s.id
+    end
+    assert flash[:error]
+    assert_redirected_to specimens_path
+
+
+  end
+
 end
