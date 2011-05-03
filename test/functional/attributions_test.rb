@@ -64,6 +64,7 @@ class AttributionsTest < ActionController::TestCase
     sop_instance = Sop.find(assigns(:sop).id)
     assert_difference('Sop.count', -1) do
       assert_difference('Relationship.count', -2) do
+        User.current_user = sop_instance.contributor
         sop_instance.destroy
       end
     end

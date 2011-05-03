@@ -148,3 +148,7 @@
   Factory.define(:assay_type) do |f|
     f.sequence(:title) {|n| "An AssayType#{n}"}
   end
+
+  Factory.define(:organism) do |f|
+    f.title "An Organism"
+  end

@@ -5,7 +5,7 @@ module ResourceListItemHelper
   end
 
   def get_list_item_actions_partial resource
-    if resource.authorization_supported? && resource.is_downloadable_asset?
+    if try_block{resource.authorization_supported? && resource.is_downloadable_asset? }
       actions_partial = "assets/resource_actions_td"
     else
       actions_partial = nil

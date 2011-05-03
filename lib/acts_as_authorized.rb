@@ -108,5 +108,7 @@ ActiveRecord::Base.class_eval do
   def can_manage? user=nil
     true
   end
-end
 
+  validate_on_update :can_edit?
+  before_destroy :can_delete?
+end

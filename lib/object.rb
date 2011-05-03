@@ -40,8 +40,3 @@ class Object
 
 end
 
-class NilClass
-  def try_block
-    nil
-  end
-end

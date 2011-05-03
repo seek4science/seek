@@ -143,6 +143,7 @@ class SopTest < ActiveSupport::TestCase
     sop = sops(:my_first_sop)
     assert_equal 1,sop.versions.size,"There should be 1 version of this SOP"   
     assert_difference(["Sop.count","Sop::Version.count"],-1) do
+      User.current_user = sop.contributor
       sop.destroy
     end    
   end
@@ -153,6 +154,7 @@ class SopTest < ActiveSupport::TestCase
     cb=sop.content_blob
     assert_difference("Sop.count",-1) do
       assert_no_difference("ContentBlob.count") do
+        User.current_user = sop.contributor
         sop.destroy
       end
     end
@@ -161,6 +163,7 @@ class SopTest < ActiveSupport::TestCase
 
   test "is restorable after destroy" do
     sop = sops(:my_first_sop)
+    User.current_user = sop.contributor
     assert_difference("Sop.count",-1) do
       sop.destroy
     end
@@ -169,6 +172,14 @@ class SopTest < ActiveSupport::TestCase
       Sop.restore_trash!(sop.id)
     end
     assert_not_nil Sop.find_by_id(sop.id)
+  end
+
+  test 'failing to delete due to can_delete does not create trash' do
+    sop = Factory :sop, :policy => Factory(:private_policy)
+    assert_no_difference("Sop.count") do
+      sop.destroy
+    end
+    assert_nil Sop.restore_trash(sop.id)
   end
 
   test "test uuid generated" do
