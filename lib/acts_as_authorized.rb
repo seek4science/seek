@@ -109,6 +109,6 @@ ActiveRecord::Base.class_eval do
     true
   end
 
-  validate_on_update :can_edit?
+  before_update :can_edit?
   before_destroy :can_delete?
 end

@@ -237,6 +237,7 @@ class ApplicationController < ActionController::Base
             end
           end
           format.xml { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
+          format.json { render :text => "You may not #{action} #{name}:#{params[:id]}", :status => :forbidden }
         end
         return false
       end
