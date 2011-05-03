@@ -119,7 +119,12 @@ end
 #specimen
 Factory.define(:specimen) do |f|
   f.sequence(:donor_number) { |n| "Specimen#{n}" }
+  f.sequence(:lab_internal_number){|n|"Lab#{n}"}
   f.association :contributor, :factory => :user
+  f.association :organism
+  f.association :strain
+  f.association :project
+  f.association :institution
 end
 #Data File
 Factory.define(:data_file) do |f|

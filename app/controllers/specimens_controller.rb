@@ -1,14 +1,10 @@
 class SpecimensController < ApplicationController
   # To change this template use File | Settings | File Templates.
 
-  #before_filter :find_specimens, :only => [:index]
-  #before_filter :find_specimen, :only => [:show, :update, :edit, :destroy]
-
 
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :update, :edit, :destroy]
-  #before_filter :is_project_member, :only => [:new, :create]
-  #before_filter :login_required
+
   include IndexPager
 
   def new
@@ -28,18 +24,10 @@ class SpecimensController < ApplicationController
     respond_to do |format|
       if @specimen.save
 
-        #policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+
         #Add creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-
-        #if policy_err_msg.blank?
-        #  flash.now[:notice] = 'Specimen was successfully created.' if flash.now[:notice].nil?
         format.html { redirect_to @specimen }
-        # else
-        #  flash[:notice] = "Specimen was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-        #  format.html { redirect_to :controller => 'specimens', :id => @specimen, :action => "edit" }
-        # end
-
 
       else
         format.html { render :action => "new" }
@@ -50,16 +38,9 @@ class SpecimensController < ApplicationController
   def update
     respond_to do |format|
       if @specimen.update_attributes params[:specimen]
-        # policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
         #update creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-        #if policy_err_msg.blank?
-        # flash.now[:notice] = 'Specimen was successfully updated.' if flash.now[:notice].nil?
         format.html { redirect_to @specimen }
-        # else
-        # flash[:notice] = "Specimen was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-        #  format.html { redirect_to :controller => 'specimens', :id => @specimen, :action => "edit" }
-        # end
       else
         format.html { render :action => "edit" }
       end

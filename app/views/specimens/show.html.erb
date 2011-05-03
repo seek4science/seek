@@ -49,6 +49,10 @@
         <label>Lab internal No.:</label>
         <%= text_or_not_specified(@specimen.lab_internal_number) %>
       </p>
+      <p>
+        <label>Institution:</label>
+        <%= text_or_not_specified(@specimen.institution.name) %>
+      </p>
 
 
     </div>

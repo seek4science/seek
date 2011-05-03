@@ -14,12 +14,12 @@
     </p>
 
     <p>
-      <%= f.label "Choose an organism" %><br/>
+      <%= f.label "Choose an organism" %><span class="required">*</span><br/>
       <%= collection_select(:specimen, :organism_id, Organism.all, :id, :title) %>
     </p>
 
     <p>
-      <%= f.label "Choose a strain" %><br/>
+      <%= f.label "Choose a strain" %><span class="required">*</span><br/>
       <%= collection_select(:specimen, :strain_id, Strain.all, :id, :title) %>
     </p>
 
@@ -35,7 +35,7 @@
     </p>
 
     <p>
-      <%= f.label :lab_internal_number -%><br/>
+      <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
       <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
     </p>
 
@@ -59,7 +59,7 @@
     </p>
 
     <p>
-      <%= f.label :institution %><br/>
+      <%= f.label :institution %><span class="required">*</span><br/>
 
     <div id="institution_collection">
       <% ins = @specimen.project ? @specimen.project.institutions : [] -%>
