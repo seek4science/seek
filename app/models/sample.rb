@@ -13,7 +13,7 @@ class Sample < ActiveRecord::Base
   alias_attribute :description, :comments
   validates_presence_of :title
   validates_uniqueness_of :title
-  validates_presence_of :specimen_id
+  validates_presence_of :specimen,:lab_internal_number,:strains
   validates_presence_of :donation_date
 
   has_and_belongs_to_many :strains

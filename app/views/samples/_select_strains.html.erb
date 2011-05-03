@@ -24,7 +24,7 @@
       </div>
 
       <div class="association_step">
-        Choose an strain<br/><br/>
+        Choose a strain <span class="required">*</span> <br/><br/>
         <%= select_tag :possible_strains,
                        options_for_select([["Select Strain ...", 0]]|all_strains.collect { |s| [truncate(h(s.title), :length=>select_truncate_length), s.id] }),
                        {:style=>"width:90%",
