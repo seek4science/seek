@@ -185,3 +185,4 @@ end
 Factory.define(:assay_type) do |f|
   f.sequence(:title) { |n| "An AssayType#{n}" }
 end
+

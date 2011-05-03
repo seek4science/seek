@@ -4,7 +4,6 @@ class DataFileTest < ActiveSupport::TestCase
 
   fixtures :all
 
-  # Replace this with your real tests.
   test "associations" do
     datafile=data_files(:picture)
     assert_equal users(:datafile_owner),datafile.contributor    
@@ -91,6 +90,7 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "versions destroyed as dependent" do
     df=data_files(:sysmo_data_file)
+    User.current_user = df.contributor
     assert_equal 1,df.versions.size,"There should be 1 version of this DataFile"
     assert_difference(["DataFile.count","DataFile::Version.count"],-1) do
       df.destroy
@@ -109,6 +109,7 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "make sure content blob is preserved after deletion" do
     df = data_files(:picture)
+    User.current_user = df.contributor
     assert_not_nil df.content_blob,"Must have an associated content blob for this test to work"
     cb=df.content_blob
     assert_difference("DataFile.count",-1) do
@@ -121,6 +122,7 @@ class DataFileTest < ActiveSupport::TestCase
 
   test "is restorable after destroy" do
     df = data_files(:picture)
+    User.current_user = df.contributor
     assert_difference("DataFile.count",-1) do
       df.destroy
     end
@@ -129,6 +131,14 @@ class DataFileTest < ActiveSupport::TestCase
       DataFile.restore_trash!(df.id)
     end
     assert_not_nil DataFile.find_by_id(df.id)
+  end
+
+  test 'failing to delete due to can_delete does not create trash' do
+    df = Factory :data_file, :policy => Factory(:private_policy)
+    assert_no_difference("DataFile.count") do
+      df.destroy
+    end
+    assert_nil DataFile.restore_trash(df.id)
   end
   
   test "test uuid generated" do
@@ -157,5 +167,24 @@ class DataFileTest < ActiveSupport::TestCase
     df = data_file_versions(:picture_v1)
     assay = assays(:modelling_assay_with_data_and_relationship)
     assert_equal relationship_types(:validation_data), df.relationship_type(assay)
+  end
+
+  test "delete checks authorization" do
+    df = Factory :data_file
+
+    User.current_user = nil
+    assert !df.destroy
+
+    User.current_user = df.contributor
+    assert df.destroy
+  end
+
+  test 'update checks authorization' do
+    unupdated_title = "Unupdated Title"
+    df = Factory :data_file, :title => unupdated_title
+    User.current_user = nil
+
+    assert !df.update_attributes(:title => "Updated Title")
+    assert_equal unupdated_title, df.reload.title
   end
 end
