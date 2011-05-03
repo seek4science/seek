@@ -116,6 +116,15 @@ Factory.define(:investigation) do |f|
   f.association :project
   f.sequence(:title) { |n| "Investigation#{n}" }
 end
+#organism
+Factory.define(:organism) do |f|
+ f.sequence(:title){|n|"Organism#{n}"}
+end
+
+#strain
+Factory.define(:strain) do |f|
+  f.sequence(:title){|n|"Strain#{n}"}
+end
 #specimen
 Factory.define(:specimen) do |f|
   f.sequence(:donor_number) { |n| "Specimen#{n}" }
