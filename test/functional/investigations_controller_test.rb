@@ -8,8 +8,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   include RestTestCases
   
   def setup
-    login_as(:model_owner)
-    @object=investigations(:metabolomics_investigation)
+    login_as(:quentin)
+    @object= Factory(:investigation, :policy => Factory(:public_policy))
   end
 
   def test_title
