@@ -68,6 +68,7 @@ class Policy < ActiveRecord::Base
   
   def self.create_or_update_policy(resource, user, params)
     # this method will return an error message is something goes wrong (empty string in case of success)
+    #FIXME: this method always returns an empty string, and therefore indicates success - can this be removed?
     error_msg = ""
     
     # if no data about sharing is contained in params[], it should be some user (not the onwer!)

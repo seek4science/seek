@@ -8,7 +8,8 @@ class FavouriteGroupsController < ApplicationController
   before_filter :set_no_layout, :only => [ :new, :edit ]
   
   protect_from_forgery :except => [:create, :update, :destroy]
-  
+
+  skip_before_filter :project_membership_required
   
   def new
     @f_group = FavouriteGroup.new
