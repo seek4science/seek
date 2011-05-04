@@ -3,6 +3,7 @@ module Acts #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
       mod.before_destroy :can_delete?
+      mod.before_update :changes_authorized?
     end
 
     def authorization_supported?
@@ -24,12 +25,14 @@ module Acts #:nodoc:
       end
     end
 
+    def can_edit_attributes() attributes.keys.map(&:to_sym) end
     def changes_requiring_can_edit
-      changed_attributes
+      changed_attributes.dup.delete_if {|key,v| !can_edit_attributes.include? key.to_sym}
     end
 
+    def can_manage_attributes() [] end
     def changes_requiring_can_manage
-      {}
+      changed_attributes.dup.delete_if {|key,v| !can_manage_attributes.include? key.to_sym}
     end
 
     def changes_authorized?
@@ -57,14 +60,6 @@ module Acts #:nodoc:
       def authorization_supported?
         include?(Acts::Authorized::InstanceMethods)
       end
-
-      def attribute_exempted
-
-      end
-
-      def attribute_requires
-
-      end
     end
 
     module SingletonMethods
@@ -73,6 +68,10 @@ module Acts #:nodoc:
     module InstanceMethods
       def contributor_credited?
         true
+      end
+
+      def can_edit_attributes
+        super - [:uuid, :first_letter]
       end
 
       def policy_or_default

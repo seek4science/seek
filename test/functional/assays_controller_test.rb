@@ -70,8 +70,10 @@ class AssaysControllerTest < ActionController::TestCase
     assay.reload
     stored_sop = assay.assay_assets.detect{|aa| aa.asset_id=sop.id}.versioned_asset
     assert_equal sop.version, stored_sop.version
-    
+
+    login_as sop.contributor
     sop.save_as_new_version
+    login_as(:model_owner)
     
     put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
     

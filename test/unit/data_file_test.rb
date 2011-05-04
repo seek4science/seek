@@ -18,6 +18,7 @@ class DataFileTest < ActiveSupport::TestCase
     event = events(:event_with_no_files)
     datafile.events << event
     assert datafile.valid?
+    User.current_user = datafile.contributor
     assert datafile.save
     assert_equal 1, datafile.events.count
   end
