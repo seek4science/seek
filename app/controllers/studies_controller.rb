@@ -44,9 +44,9 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.update_attributes(params[:study])
-        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@study, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
-        policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
+        policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
 
         if policy_err_msg.blank?
           flash[:notice] = 'Study was successfully updated.'
