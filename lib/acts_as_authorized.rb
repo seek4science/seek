@@ -2,7 +2,7 @@ module Acts #:nodoc:
   module Authorized #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
-      before_destroy :can_delete?
+      mod.before_destroy :can_delete?
     end
 
     def authorization_supported?
