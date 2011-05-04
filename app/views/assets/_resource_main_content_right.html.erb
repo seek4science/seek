@@ -3,9 +3,9 @@
 <div class="main_content_right_box_wider">  
   <%= render :partial => "assets/resource_authors_box", :locals => { :title=>"Uploader and creators",:resource => resource, :truncate_to => truncate_length_for_boxes } if resource.respond_to?("creators") -%>
   <% if resource.class.taggable? -%>
-  <div id="tags_box" class="contribution_section_box">
-        <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
-  </div>
+
+  <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
+
   <% end -%>
   <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => resource, :attributed_to => Authorization.authorize_collection("view", resource.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
 </div>

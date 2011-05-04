@@ -38,6 +38,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert !assay.is_modelling?
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.save!
@@ -57,6 +58,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_experimental" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert assay.is_experimental?
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.save!
@@ -188,7 +190,8 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 1,assay.assay_assets.size
     assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
-    
+
+    User.current_user = sop.contributor
     sop.save_as_new_version
     
     assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
@@ -213,6 +216,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "associate organism" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     organism=organisms(:yeast)
     #test with numeric ID
     assert_difference("AssayOrganism.count") do
@@ -243,6 +247,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "disassociating organisms removes AssayOrganism" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert_equal 2,assay.assay_organisms.count
     assert_difference("AssayOrganism.count",-2) do
       assay.assay_organisms.clear

@@ -8,6 +8,7 @@ module AuthenticatedTestHelper
 
   def logout
     @request.session[:user_id] = nil
+    User.current_user = nil
   end
 
   def authorize_as(user)

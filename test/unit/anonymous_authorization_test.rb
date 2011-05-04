@@ -39,12 +39,8 @@ class AnonymousAuthorizationTest < ActiveSupport::TestCase
   end
 
   test "anonymous can view but not edit or access publically viewable sop" do
-    sop=sops(:sop_with_all_registered_users_policy)
-    sop.policy = policies(:public_policy_visible_only)
-    sop.save!
-
-    assert_equal Policy::EVERYONE,sop.policy.sharing_scope
-    assert_equal Policy::VISIBLE,sop.policy.access_type
+    User.current_user = nil
+    sop = Factory :sop, :policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
 
     assert sop.can_view?
     assert !sop.can_edit?
@@ -53,13 +49,8 @@ class AnonymousAuthorizationTest < ActiveSupport::TestCase
   end
 
   test "anonymous can view and download but not edit publically viewable sop" do
-    sop=sops(:sop_with_all_registered_users_policy)
-
-    sop.policy = policies(:public_policy_access)
-    sop.save!
-
-    assert_equal Policy::EVERYONE,sop.policy.sharing_scope
-    assert_equal Policy::ACCESSIBLE,sop.policy.access_type
+    User.current_user = nil
+    sop=Factory :sop, :policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::ACCESSIBLE)
 
     assert sop.can_view?
     assert sop.can_download?

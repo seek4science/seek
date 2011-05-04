@@ -119,7 +119,13 @@ class ApplicationController < ActionController::Base
     unless try_block {current_user.person.member?}
 #    if current_user and current_user.person and current_user.person.member?
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
-      try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+      respond_to do |format|
+        format.html do
+          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+        end
+        format.json { render :json => {:status => 401, :error_message => flash[:error] } }
+      end
+
     end
 
   end

@@ -70,8 +70,10 @@ class AssaysControllerTest < ActionController::TestCase
     assay.reload
     stored_sop = assay.assay_assets.detect{|aa| aa.asset_id=sop.id}.versioned_asset
     assert_equal sop.version, stored_sop.version
-    
+
+    login_as sop.contributor
     sop.save_as_new_version
+    login_as(:model_owner)
     
     put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
     
@@ -140,6 +142,14 @@ end
 
     assert_select "p#assay_type",:text=>/Metabalomics/,:count=>1
     assert_select "p#technology_type",:text=>/Gas chromatography/,:count=>1
+  end
+
+  test "should not show tagging when not logged in" do
+    logout
+    public_assay = Factory(:assay, :policy => Factory(:public_policy))
+    get :show,:id=>public_assay
+    assert_response :success
+    assert_select "div#tags_box",:count=>0
   end
   
   test "should show svg item" do
