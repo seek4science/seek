@@ -2,10 +2,38 @@ module Acts #:nodoc:
   module Authorized #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
+      before_destroy :can_delete?
     end
 
     def authorization_supported?
       self.class.authorization_supported?
+    end
+
+    def contributor_credited?
+      false
+    end
+
+    def can_perform? action, user=nil
+      user ? send("can_#{action}?", user) : send("can_#{action}?")
+    end
+
+    AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
+    AUTHORIZATION_ACTIONS.each do |action|
+      define_method "can_#{action}?" do
+        true
+      end
+    end
+
+    def changes_requiring_can_edit
+      changed_attributes
+    end
+
+    def changes_requiring_can_manage
+      {}
+    end
+
+    def changes_authorized?
+      (changes_requiring_can_edit.empty? || can_edit?) and (changes_requiring_can_manage.empty? || can_manage?)
     end
 
     module ClassMethods
@@ -30,15 +58,19 @@ module Acts #:nodoc:
         include?(Acts::Authorized::InstanceMethods)
       end
 
+      def attribute_exempted
+
+      end
+
+      def attribute_requires
+
+      end
     end
 
     module SingletonMethods
     end
 
     module InstanceMethods
-      # this method will take attributions' association and return a collection of resources,
-      # to which the current resource is attributed
-
       def contributor_credited?
         true
       end
@@ -49,7 +81,7 @@ module Acts #:nodoc:
         end
       end
 
-      [:view, :edit, :download, :delete, :manage].each do |action|
+      AUTHORIZATION_ACTIONS.each do |action|
         define_method "can_#{action}?" do |*args|
           user = args[0] || User.current_user
           new_record? or Authorization.is_authorized? action.to_s, nil, self, user
@@ -66,49 +98,10 @@ module Acts #:nodoc:
         end
         people.uniq
       end
-
-      # def asset; return self; end
-      # def resource; return self; end
-
     end
   end
 end
 
-
 ActiveRecord::Base.class_eval do
   include Acts::Authorized
-
-  #I placed these here instead of active_record_extensions.rb because
-  #they should only be used in conjunction with acts_as_authorized
-  def contributor_credited?
-    false
-  end
-
-  def can_perform? action, user=nil
-    user ? send("can_#{action}?", user) : send("can_#{action}?")
-  end
-
-
-  def can_edit? user=nil
-    true
-  end
-
-  def can_view? user=nil
-    true
-  end
-
-  def can_download? user=nil
-    true
-  end
-
-  def can_delete? user=nil
-    true
-  end
-
-  def can_manage? user=nil
-    true
-  end
-
-  before_update :can_edit?
-  before_destroy :can_delete?
 end
