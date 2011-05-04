@@ -66,6 +66,21 @@ class StudiesControllerTest < ActionController::TestCase
     assert_redirected_to study_path(s)
   end  
 
+  test "should update sharing permissions" do
+    login_as(Factory(:user))
+    s = Factory :study,:contributor => Factory(:person), :policy => Factory(:public_policy)
+    assert s.can_manage?(Factory(:user)),"This user should be able to manage this study"
+    
+    assert_equal Policy::MANAGING,s.policy.sharing_scope
+    assert_equal Policy::EVERYONE,s.policy.access_type
+
+    put :update,:id=>s,:study=>{:title=>"test"},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    s=assigns(:study)
+    assert_redirected_to study_path(s)
+    assert_equal Policy::PRIVATE,s.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS,s.policy.access_type
+  end
+
   test "should not create with assay already related to study" do
     assert_no_difference("Study.count") do
       post :create,:study=>{:title=>"test",:investigation=>investigations(:metabolomics_investigation),:assay_ids=>[assays(:metabolomics_assay3).id]}
@@ -214,5 +229,7 @@ class StudiesControllerTest < ActionController::TestCase
     project=projects(:sysmo_project)
     get :index, :filter => {:project => project.id}
     assert_response :success
-  end  
+  end
+
+
 end
