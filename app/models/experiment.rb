@@ -17,7 +17,7 @@ class Experiment < ActiveRecord::Base
            :as => :subject,
            :dependent => :destroy
 
-  validates_presence_of :title,:project,:institution,:contributor,:date,:description
+  validates_presence_of :title,:project,:institution,:contributor,:date,:description,:sample
   validates_uniqueness_of :title
   alias_attribute :data_file_masters, :data_files
 
