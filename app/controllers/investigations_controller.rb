@@ -93,7 +93,7 @@ class InvestigationsController < ApplicationController
     unless current_user.person.projects.include?(@investigation.project)
       respond_to do |format|
         flash[:error] = "You cannot create a investigation for a project you are not a member of."
-        format.html { redirect_to studies_path }
+        format.html { redirect_to investigations_path }
       end
       return false
     end
