@@ -98,6 +98,7 @@ class SopTest < ActiveSupport::TestCase
 
   def test_create_new_version
     sop=sops(:my_first_sop)
+    User.current_user = sop.contributor
     sop.save!
     sop=Sop.find(sop.id)
     assert_equal 1,sop.version
