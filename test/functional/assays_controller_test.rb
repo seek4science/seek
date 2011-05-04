@@ -141,6 +141,14 @@ end
     assert_select "p#assay_type",:text=>/Metabalomics/,:count=>1
     assert_select "p#technology_type",:text=>/Gas chromatography/,:count=>1
   end
+
+  test "should not show tagging when not logged in" do
+    logout
+    public_assay = Factory(:assay, :policy => Factory(:public_policy))
+    get :show,:id=>public_assay
+    assert_response :success
+    assert_select "div#tags_box",:count=>0
+  end
   
   test "should show svg item" do
     get :show, :id=>assays(:metabolomics_assay),:format=>"svg"
