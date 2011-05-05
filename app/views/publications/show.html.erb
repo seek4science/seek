@@ -82,7 +82,7 @@
   	<%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @publication, :title=>"Registered by" } -%>  
 	<%= render :partial => "assets/resource_authors_box", :locals => { :resource => @publication, :creators => @publication.creators, :truncate_to => 20, :title=>"Authors" } -%>
 
-    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
+    <%= item_tags_and_tag_entry -%>
 
   </div>
   
