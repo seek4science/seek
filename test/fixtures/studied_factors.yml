@@ -1,17 +1,17 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  measured_item_id: MyString  
-  start_value: 1.5
-  end_value: 1.5
+FS_with_concentration_with_title:
+  measured_item: concentration
+  compound: compound_with_title
+  start_value: 1
+  end_value: 10
   unit_id: 1
   time_point: 1
-  
 
-two:
-  measured_item_id: MyString  
-  start_value: 1.5
-  end_value: 1.5
+FS_with_concentration_without_title:
+  measured_item: concentration
+  compound: compound_without_title
+  start_value: 1
+  end_value: 10
   unit_id: 1
   time_point: 1
-  

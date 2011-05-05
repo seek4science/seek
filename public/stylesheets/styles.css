@@ -644,9 +644,10 @@ ul.users_details li p {
 
 }
 
-table.conditions_or_factors {
+div.conditions_or_factors {
     border: dotted #999999 1px;
-    margin-top: 1em;
+    position: center;
+    width: 55em;
 }
 
 ul.conditions_or_factors li {        
@@ -1477,4 +1478,13 @@ div.email_configuration{
     border: 1px solid #999;
     margin: 3px 0;
     width: 500px
+}
+
+div.compound{
+    position:relative;
+    left: -165px;
+    top: 10px;
+    margin-bottom: 2em;
+    width: 20em;
+
 }

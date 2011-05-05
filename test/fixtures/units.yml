@@ -1,10 +1,8 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  title: MyString
-
-two:
-  title: MyString
+second:
+  symbol: s
+  comment: second
 
 gram:
   symbol: g

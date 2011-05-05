@@ -11,12 +11,10 @@ class StudiedFactorsController < ApplicationController
   end
 
   def create
-
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
-    @studied_factor.compound = find_compound
-
+    @studied_factor.compound = find_or_create_compound 'Compound'
     render :update do |page|
       if @studied_factor.save
         page.insert_html :bottom,"studied_factors_rows",:partial=>"factor_row",:object=>@studied_factor,:locals=>{:show_delete=>true}
@@ -25,7 +23,6 @@ class StudiedFactorsController < ApplicationController
         page.alert(@studied_factor.errors.full_messages)
       end
     end
-
   end
 
   def destroy
@@ -70,14 +67,41 @@ class StudiedFactorsController < ApplicationController
     @studied_factor=StudiedFactor.new(:data_file=>@data_file)
   end
 
-  def find_compound
-    params.each do |name, value|
-      if name =~ /(.+)_id$/
-        return $1.classify.constantize.find(value)
+  def find_or_create_compound compound_class
+    compound_class = compound_class.capitalize.constantize
+    new_compounds = params[:tag_autocompleter_unrecognized_items] || []
+    known_compounds_ids =params[:tag_autocompleter_selected_ids] || []
+    known_compounds = known_compounds_ids.collect { |id| compound_class.find(id) }
+    new_compounds, known_compounds = check_if_new_compounds_are_known new_compounds, known_compounds
+
+    if (new_compounds.size + known_compounds.size) == 1
+      if !known_compounds.empty?
+        known_compounds.first
+      else
+        c = compound_class.new(:name => new_compounds.first)
+          if  c.save
+            c
+          else
+            nil
+          end
       end
     end
-    nil
   end
 
-  
+  protected
+
+    #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
+    #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
+    def check_if_new_compounds_are_known new_compounds, known_compounds
+      fixed_new_compounds = []
+      new_compounds.each do |new_compound|
+        compound=Compound.find_by_name(new_compound.strip)
+        if compound.nil?
+          fixed_new_compounds << new_compound
+        else
+          known_compounds << compound unless known_compounds.include?(compound)
+        end
+      end
+      return new_compounds, known_compounds
+    end
 end

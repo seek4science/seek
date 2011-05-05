@@ -7,7 +7,11 @@
     </li>
 
     <li id="measured_item">
-      <%= h studied_factor.measured_item.title %>
+      <%if  studied_factor.measured_item.title == 'concentration' and studied_factor.compound.try(:name)%>
+        <%= h studied_factor.measured_item.title + ' of ' + studied_factor.compound.name %>
+      <%else%>
+        <%= h studied_factor.measured_item.title %>
+      <%end%>
     </li>
     
     <li id="values">

@@ -1,2 +1,8 @@
 weight:
-  title: weight  
+  title: weight
+
+concentration:
+  title: concentration
+
+time:
+  title: time

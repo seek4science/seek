@@ -52,4 +52,10 @@ module TagsHelper
     tags
   end
 
+  def all_tags
+    tags = []
+    tags |= Compound.find(:all)
+    tags
+  end
+
 end
