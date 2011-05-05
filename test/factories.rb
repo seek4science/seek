@@ -9,9 +9,12 @@
     f.last_name "Last"
   end
 
-  Factory.define(:person, :parent => :brand_new_person) do |f|
-    f.association :user, :factory => :activated_user
+  Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
     f.group_memberships {[Factory :group_membership]}
+  end
+
+  Factory.define(:person, :parent => :person_in_project) do |f|
+    f.association :user, :factory => :activated_user
   end
 
   Factory.define(:pal, :parent => :person) do |f|
@@ -33,7 +36,7 @@
   end
 
   Factory.define(:user, :parent => :activated_user) do |f|
-    f.association :person, :factory => :brand_new_person
+    f.association :person, :factory => :person_in_project
   end
 
 #Project
