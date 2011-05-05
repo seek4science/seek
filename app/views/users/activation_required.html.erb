@@ -1,14 +1,20 @@
-<div class="box_infotext">
-	<p>
-    In the next few minutes you should receive an email address containing a link which you must click on to activate your account. This is to ensure that you are really who you say you are.
-    </p>
-    <p>
-      Please contact one of the SEEK administrators if you do not receive the email, or you do receive it and it contains incorrect information.
-    </p>
-    <p>
-      The administrators are:&nbsp;<%= admin_mail_to_links %>
-    </p>
+<h1>Account activation required</h1>
 
+<div class="show_basic">
+    <div class="box_infotext">
+        <p>
+        In the next few minutes you should receive an email address containing a link which you must click on to activate your account. This is to ensure that you are really who you say you are.
+        </p>
+        <p>
+          Please contact one of the SEEK administrators if you do not receive the email, or you do receive it and it contains incorrect information.
+        </p>
+        <p>
+          The administrators are:&nbsp;<%= admin_mail_to_links %>
+        </p>
+
+    </div>
+    <br/>
+    <%= link_to "Back to front page",root_path %>
 </div>
-<br/>
-<%= link_to "Back to login",login_path %>
+
+

@@ -1,5 +1,5 @@
 <ul class="sectionIcons">
-  <% if current_user.is_admin? -%>
+  <% if admin_logged_in? -%>
     <li><%= image_tag_for_key('back', help_documents_path, "Return to index", nil, "Return to index") -%></li>
   <% end -%>
 </ul>

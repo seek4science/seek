@@ -366,7 +366,7 @@ module ApplicationHelper
   end
 
   def can_manage_announcements?
-    return current_user.is_admin?
+    return admin_logged_in?
   end
 
   def show_or_hide_block visible=true
