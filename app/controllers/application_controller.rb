@@ -95,7 +95,7 @@ class ApplicationController < ActionController::Base
   end
 
   def is_user_admin_auth
-    unless current_user.is_admin?
+    unless User.admin_logged_in?
       error("Admin rights required", "is invalid (not admin)")
       return false
     end
@@ -103,7 +103,7 @@ class ApplicationController < ActionController::Base
   end
 
   def can_manage_announcements?
-    current_user && current_user.is_admin?
+    User.admin_logged_in?
   end
 
   def logout_user
@@ -131,7 +131,7 @@ class ApplicationController < ActionController::Base
   end
 
   def pal_or_admin_required
-    unless current_user.is_admin? || (!current_user.person.nil? && current_user.person.is_pal?)
+    unless User.admin_logged_in? || (User.pal_logged_in?)
       error("Admin or PAL rights required", "is invalid (not admin)")
       return false
     end
@@ -146,14 +146,14 @@ class ApplicationController < ActionController::Base
 
     case Seek::Config.type_managers
       when "admins"
-      if current_user.is_admin?
+      if User.admin_logged_in?
         return true
       else
         error("Admin rights required to manage types", "...")
         return false
       end
       when "pals"
-      if current_user.is_admin? || current_user.person.is_pal?
+      if User.admin_logged_in? || User.pal_logged_in?
         return true
       else
         error("Admin or PAL rights required to manage types", "...")
@@ -187,7 +187,7 @@ class ApplicationController < ActionController::Base
 
   #required for the Savage Beast
   def admin?
-    current_user && current_user.is_admin?
+    User.admin_logged_in?
   end
 
   def email_enabled?

@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
-  cattr_accessor :current_user
+
   include SavageBeast::UserInit
 
   acts_as_tagger
@@ -42,6 +42,26 @@ class User < ActiveRecord::Base
   named_scope :without_profile,:conditions=>['person_id IS NULL']  
   
   acts_as_uniquely_identifiable
+
+  cattr_accessor :current_user
+
+  def self.admin_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_admin?
+  end
+
+  #a person can be logged in but not fully registered during
+  #the registration process whilst selecting or creating a profile
+  def self.logged_in_and_registered?
+    self.logged_in? && self.current_user.person
+  end
+
+  def self.logged_in?
+    self.current_user
+  end
+
+  def self.pal_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_pal?
+  end
 
   # Activates the user in the database.
   def activate

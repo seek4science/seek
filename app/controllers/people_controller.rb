@@ -301,7 +301,7 @@ class PeopleController < ApplicationController
   
   def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
-    unless @person == current_user.person || current_user.is_admin? || current_user.person.is_project_manager?
+    unless @person == current_user.person || User.admin_logged_in? || current_user.person.is_project_manager?
       error("Not the current person", "is invalid (not owner)")
       return false
     end
@@ -316,7 +316,7 @@ class PeopleController < ApplicationController
   end
 
   def is_user_admin_or_personless
-    unless current_user.is_admin? || current_user.person.nil?
+    unless User.admin_logged_in? || current_user.person.nil?
       error("You do not have permission to create new people","Is invalid (not admin)")
       return false
     end
@@ -333,10 +333,10 @@ class PeopleController < ApplicationController
   def auth_params
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
-    restricted_params={:is_pal                => current_user.is_admin?,
-                       :is_admin              => current_user.is_admin?,
-                       :can_edit_projects     => (current_user.is_admin? or current_user.is_project_manager?),
-                       :can_edit_institutions => (current_user.is_admin? or current_user.is_project_manager?)}
+    restricted_params={:is_pal                => User.admin_logged_in?,
+                       :is_admin              => User.admin_logged_in?,
+                       :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
+                       :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?)}
     restricted_params.each do |param, allowed|
       params[:person].delete(param) if params[:person] and not allowed
     end
