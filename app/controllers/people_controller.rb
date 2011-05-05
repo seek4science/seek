@@ -70,7 +70,7 @@ class PeopleController < ApplicationController
     @person = Person.new
 
     respond_to do |format|
-      format.html { render :action=>"new",:layout=>"logged_out" }
+      format.html { render :action=>"new" }
       format.xml  { render :xml => @person }
     end
   end
@@ -125,7 +125,7 @@ class PeopleController < ApplicationController
     @userless_projects.sort!{|a,b|a.name<=>b.name}
     @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
-    render :action=>"select",:layout=>"logged_out"
+    render :action=>"select"
   end
 
   # POST /people
@@ -165,7 +165,7 @@ class PeopleController < ApplicationController
           if registration && !current_user.is_admin?
             logout_user
             flash[:notice]="Profile successfully created. You can log in when an administrator has assigned you to a project."
-            format.html { redirect_to :controller => "sessions", :action=>"new"}
+            format.html { redirect_to :controller => "home"}
           else
             flash[:notice] = 'Person was successfully created.'
             format.html { redirect_to(@person) }
@@ -174,7 +174,7 @@ class PeopleController < ApplicationController
         end
         
       else        
-        format.html { render :action => redirect_action,:layout=>"logged_out" }
+        format.html { render :action => redirect_action }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end

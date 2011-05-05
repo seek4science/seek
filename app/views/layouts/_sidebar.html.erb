@@ -1,4 +1,5 @@
-<% if logged_in? -%>
+<% if logged_in_and_registered? -%>
+
   <%= render :partial => "gadgets/new_object_gadget" -%>
   <%= render :partial=>"gadgets/announcements_gadget" %>
   <%= render :partial => "gadgets/favourites" -%>
@@ -12,7 +13,9 @@
   <%= render :partial=>"gadgets/organism_gadget" %>
 
 <% else -%>
+
   <%= render :partial => "gadgets/sign_in" -%>
+
 <% end -%>
 
 
