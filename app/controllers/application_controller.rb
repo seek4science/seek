@@ -3,6 +3,8 @@
 
 class ApplicationController < ActionController::Base
 
+  skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
+
   self.mod_porter_secret = PORTER_SECRET
 
   include ExceptionNotifiable 
