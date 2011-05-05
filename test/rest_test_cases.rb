@@ -4,11 +4,16 @@ require 'libxml'
 require 'pp'
 
 module RestTestCases
-    
+
   
   SCHEMA_FILE_PATH = File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
+
+  def run_rest_tests?
+    false
+  end
   
   def test_index_xml
+    return unless run_rest_tests?
     get :index, :format=>"xml"
     assert_response :success
 
@@ -18,6 +23,7 @@ module RestTestCases
   end
 
   def test_get_xml
+    return unless run_rest_tests?
     get :show,:id=>@object, :format=>"xml"
     perform_api_checks
   end
