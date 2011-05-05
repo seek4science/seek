@@ -70,6 +70,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal "test",assigns(:investigation).title
   end
 
+  test "should create" do
+    login_as(Factory :user)
+    put :create, :investigation=>Factory(:investigation, :project => User.current_user.person.projects.first).attributes
+    assert_response :success
+    assert assigns(:investigation)
+  end
+
   test "no edit button in show for unauthorized user" do
     login_as(Factory(:user))
     get :show, :id=>Factory(:investigation, :policy => Factory(:private_policy))
