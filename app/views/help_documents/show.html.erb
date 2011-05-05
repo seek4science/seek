@@ -1,5 +1,5 @@
 <ul class="sectionIcons">
-  <% if current_user && current_user.is_admin? -%>
+  <% if admin_logged_in? -%>
     <% if @help_document.identifier == "index" -%>
       <li><%= image_tag_for_key('new', new_help_document_path, "Create New Page", nil, "Create New Page") -%></li>
     <% end %>

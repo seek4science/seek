@@ -103,7 +103,7 @@ class ApplicationController < ActionController::Base
   end
 
   def can_manage_announcements?
-    return current_user.is_admin?
+    current_user && current_user.is_admin?
   end
 
   def logout_user

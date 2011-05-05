@@ -1,4 +1,4 @@
-<% if logged_in? && current_user.is_admin? -%>
+<% if admin_logged_in? -%>
   <ul class="sectionIcons">
     <li><%= image_tag_for_key('edit', edit_organism_path(@organism), "Edit Organism", nil, 'Edit Organism') -%></li>
 	<li><%= image_tag_for_key('new', new_organism_path, "Add Organism", nil, 'Add Organism') -%></li>
