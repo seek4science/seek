@@ -36,24 +36,9 @@
     </tr>
 
   </table>
-  <div class="compound">
-    <div id="facebook" class="clearfix" style="display:none">
-      Substance name:
-      <div tabindex="-1" id="tag_ids" class="clearfix tokenizer" onclick="$('tag_autocomplete_input').focus();">
-        <span class="tokenizer_stretcher">^_^</span>
-        <span class="tab_stop"><input type="text" id="tag_hidden_input" tabindex="-1"></span>
-        <div id="tag_autocomplete_display" class="tokenizer_input">
-          <input type="text" size="1" tabindex="" id="tag_autocomplete_input"/>
-        </div>
-      </div>
-    </div>
-    <div id="tag_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
-       <div class="typeahead_message"></div>
-    </div>
-    <%= render :partial=>"tagging/autocompleter_javascript", :locals=>{:name=> 'tag', :all_tags =>all_substances ,:item_tags=>[]} %>
-  </div>
 
-</div>
+    <%= render :partial=>"studied_factors/substances_autocomplete"%>
+  </div>
 
 <% end -%>
 

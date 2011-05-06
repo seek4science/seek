@@ -1,17 +1,1 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-FS_with_concentration_with_title:
-  measured_item: concentration
-  compound: compound_with_title
-  start_value: 1
-  end_value: 10
-  unit_id: 1
-  time_point: 1
-
-FS_with_concentration_without_title:
-  measured_item: concentration
-  compound: compound_without_title
-  start_value: 1
-  end_value: 10
-  unit_id: 1
-  time_point: 1

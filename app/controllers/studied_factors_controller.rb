@@ -79,8 +79,11 @@ class StudiedFactorsController < ApplicationController
       known_substances.push(type.find(id)) if type.find(id)
     end
     new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
-
-    if (new_substances.size + known_substances.size) == 1
+    #no substance
+    if (new_substances.size + known_substances.size) == 0
+      nil
+    #one substance
+    elsif (new_substances.size + known_substances.size) == 1
       if !known_substances.empty?
         known_substances.first
       else
@@ -91,6 +94,9 @@ class StudiedFactorsController < ApplicationController
             nil
           end
       end
+    #FIXME: update code when mixture table is created
+    else
+      nil
     end
   end
 
