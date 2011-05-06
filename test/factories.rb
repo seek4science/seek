@@ -155,3 +155,9 @@
   Factory.define(:organism) do |f|
     f.title "An Organism"
   end
+
+  Factory.define(:event) do |f|
+    f.title "An Event"
+    f.start_date Time.now
+    f.end_date 1.days.from_now
+  end
