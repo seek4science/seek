@@ -5,7 +5,7 @@ class InvestigationsController < ApplicationController
 
   before_filter :find_assets, :only=>[:index]
   before_filter :make_investigation_and_auth,:only=>[:create]
-  before_filter :find_and_auth,:only=>[:create, :edit, :update, :destroy]
+  before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
 
   def destroy    
     @investigation.destroy

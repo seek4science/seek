@@ -9,15 +9,18 @@ Factory.define(:brand_new_person, :class => Person) do |f|
   f.last_name "Last"
 end
 
-Factory.define(:person, :parent => :brand_new_person) do |f|
-  f.association :user, :factory => :activated_user
-  f.group_memberships { [Factory(:group_membership)] }
-end
+  Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
+    f.group_memberships {[Factory :group_membership]}
+  end
 
-Factory.define(:pal, :parent => :person) do |f|
-  f.is_pal true
-  f.after_create { |pal| pal.group_memberships.first.roles << Role.pal_role }
-end
+  Factory.define(:person, :parent => :person_in_project) do |f|
+    f.association :user, :factory => :activated_user
+  end
+
+  Factory.define(:pal, :parent => :person) do |f|
+    f.is_pal true
+    f.after_create { |pal| pal.group_memberships.first.roles << Role.pal_role}
+  end
 
 #User
 Factory.define(:brand_new_user, :class => User) do |f|
@@ -32,9 +35,9 @@ Factory.define(:activated_user, :parent => :brand_new_user) do |f|
   f.after_create { |user| user.activate }
 end
 
-Factory.define(:user, :parent => :activated_user) do |f|
-  f.association :person, :factory => :brand_new_person
-end
+  Factory.define(:user, :parent => :activated_user) do |f|
+    f.association :person, :factory => :person_in_project
+  end
 
 #Project
 Factory.define(:project) do |f|
@@ -117,11 +120,6 @@ Factory.define(:investigation) do |f|
   f.sequence(:title) { |n| "Investigation#{n}" }
 end
 
-#Organism
-Factory.define(:organism) do |f|
-  f.sequence(:title) { |n| "Organism#{n}" }
-end
-
 #Strain
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
@@ -190,3 +188,12 @@ Factory.define(:assay_type) do |f|
   f.sequence(:title) { |n| "An AssayType#{n}" }
 end
 
+  Factory.define(:organism) do |f|
+    f.title "An Organism"
+  end
+
+  Factory.define(:event) do |f|
+    f.title "An Event"
+    f.start_date Time.now
+    f.end_date 1.days.from_now
+  end

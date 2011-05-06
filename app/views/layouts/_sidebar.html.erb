@@ -1,4 +1,5 @@
-<% if logged_in? -%>
+<% if logged_in_and_registered? -%>
+
   <%= render :partial => "gadgets/new_object_gadget" -%>
   <%= render :partial=>"gadgets/announcements_gadget" %>
   <%= render :partial => "gadgets/favourites" -%>
@@ -12,7 +13,17 @@
   <%= render :partial=>"gadgets/organism_gadget" %>
 
 <% else -%>
+
   <%= render :partial => "gadgets/sign_in" -%>
+
+  <% cache "sidebar_tag_cloud" do -%>
+      <div id="sidebar_tag_cloud">
+        <%= render :partial=>"gadgets/merged_tag_cloud_gadget" %>
+      </div>
+  <% end -%>
+
+  <%= render :partial=>"gadgets/organism_gadget" %>
+
 <% end -%>
 
 

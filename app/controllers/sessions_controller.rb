@@ -1,7 +1,5 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
- 
-  layout 'logged_out'
 
   before_filter :signup_admin_if_not_users,:only=>:new
   skip_before_filter :project_membership_required

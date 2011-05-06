@@ -9,6 +9,17 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   def setup
     login_as(:quentin)
   end
+
+  test "should be available to non logged in users" do
+    logout
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:help_documents)
+
+    get :show, :id => help_documents(:one).to_param
+    assert_response :success
+    assert_not_nil assigns(:help_document)
+  end
   
   test "should get index" do
     get :index
@@ -54,6 +65,13 @@ class HelpDocumentsControllerTest < ActionController::TestCase
   
   test "shouldn't allow non-admins to create" do
     login_as(:aaron)
+    get :new
+    assert_response :redirect
+    assert_not_nil flash[:error]
+  end
+
+  test "shouldn't allow anonymous users to create" do
+    logout
     get :new
     assert_response :redirect
     assert_not_nil flash[:error]

@@ -1,7 +1,6 @@
 class HomeController < ApplicationController
   
 
-  #layout :select_layout
   before_filter :redirect_to_sign_up_when_no_user
 
   def index
@@ -16,14 +15,6 @@ class HomeController < ApplicationController
     end
   end
   
-  def select_layout
-    if logged_in?
-      return 'main'
-    else
-      return 'logged_out'
-    end
-  end
-
   def feedback
     respond_to do |format|
       format.html

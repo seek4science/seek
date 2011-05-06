@@ -34,6 +34,12 @@ class EventsControllerTest < ActionController::TestCase
     assert !assigns(:event).can_view?(users(:aaron)) #must be a user other than the one you are logged in as
   end
 
+  test "xml for projectless event" do
+    id = Factory(:event).id
+    get :show, :id => id, :format => :xml
+    assert_response :success
+  end
+
   test "should show event" do
     get :show, :id => events(:event_with_no_files).id
     assert_response :success

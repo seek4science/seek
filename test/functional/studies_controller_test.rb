@@ -8,10 +8,10 @@ class StudiesControllerTest < ActionController::TestCase
   include RestTestCases
 
   def setup
-    login_as(:model_owner)
-    @object=studies(:metabolomics_study)
+    login_as(:quentin)
+    @object=Factory :study, :policy => Factory(:public_policy)
   end
-  
+
   test "should get index" do
     get :index
     assert_response :success

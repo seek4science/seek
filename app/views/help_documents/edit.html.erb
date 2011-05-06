@@ -1,5 +1,5 @@
 <ul class="sectionIcons">
-  <% if current_user.is_admin? -%>
+  <% if admin_logged_in? -%>
     <li><%= image_tag_for_key('back', help_document_path(@help_document), "Return to document", nil, "Return to document") -%></li>
     <li><%= image_tag_for_key('destroy', help_document_path(@help_document), nil, { :confirm => 'Are you sure you wish to remove this page?', :method => :delete }, 'Remove') -%></li>
   <% end -%>
