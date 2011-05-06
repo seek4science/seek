@@ -21,7 +21,6 @@ class SamplesControllerTest < ActionController::TestCase
     get :index, :format =>"xml"
     assert_response :success
     assert_not_nil assigns(:samples)
-
     validate_xml_against_schema(@response.body)
 
   end
@@ -33,7 +32,6 @@ class SamplesControllerTest < ActionController::TestCase
     get :show, :id => s, :format =>"xml"
     assert_response :success
     assert_not_nil assigns(:sample)
-    display_xml  @response.body
     validate_xml_against_schema(@response.body)
   end
 
