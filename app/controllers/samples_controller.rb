@@ -17,13 +17,10 @@ class SamplesController < ApplicationController
   def create
     @sample = Sample.new(params[:sample])
     @sample.contributor = current_user
-
-    sample_strain_ids = params[:sample_strain_ids] || []
-
-
+    @sample.strain_ids = params[:sample_strain_ids]
     respond_to do |format|
       if @sample.save
-        @sample.strains = Strain.find sample_strain_ids.collect { |s| s.split(',') }
+
         format.html { redirect_to(@sample) }
 
       else
@@ -35,14 +32,11 @@ class SamplesController < ApplicationController
 
   def update
 
-    sample_strain_ids = params[:sample_strain_ids] || []
+      @sample.strain_ids = params[:sample_strain_ids]
 
-
-    respond_to do |format|
+      respond_to do |format|
 
       if @sample.update_attributes params[:sample]
-        @sample.strains = Strain.find sample_strain_ids.collect { |s| s.split(',') }
-
         flash[:notice] = 'Sample was successfully updated'
         format.html { redirect_to @sample }
       else
@@ -61,6 +55,12 @@ class SamplesController < ApplicationController
         format.html { render :action => "show" }
       end
     end
+  end
+
+  def strains_selected_ajax
+      if params[:sample_strain_ids] && params[:sample_strain_ids]!="0"
+      @sample.strains = Strain.find(params[:sample_strain_ids])
+     end
   end
 
 end

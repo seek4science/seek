@@ -28,8 +28,9 @@
         <%= select_tag :possible_strains,
                        options_for_select([["Select Strain ...", 0]]|all_strains.collect { |s| [truncate(h(s.title), :length=>select_truncate_length), s.id] }),
                        {:style=>"width:90%",
-
-                        :onchange=>"check_show_add_strain();return(false);"} -%>
+                        :onchange=>remote_function(
+                             :url=>{:action=>"strains_selected_ajax"}
+                     )+";check_show_add_strain();return(false);"} -%>
         <%= select_tag :sample_strain_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
       <br/>
@@ -42,8 +43,9 @@
 
 <script type="text/javascript">
     var strains = new Array();
-
-    <% params[:sample_strain_ids] = resource.strain_ids%>
+    var strain_ids = new Array();
+    <%strain_ids = resource.strain_ids%>
+    <% params[:sample_strain_ids] = strain_ids%>
 
     <%if params[:sample_strain_ids]%>
         <% params[:sample_strain_ids].each do |s_id| %>
