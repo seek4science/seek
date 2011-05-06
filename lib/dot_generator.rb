@@ -367,7 +367,7 @@ class AssetNode < SeekNode
         string << SeekNode.node_for(assay).to_s
       end
     else
-      SeekNode.node_for(asset).to_s
+      super
     end
   end
 end

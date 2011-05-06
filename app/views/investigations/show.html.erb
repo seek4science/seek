@@ -1,8 +1,8 @@
 <ul class="sectionIcons">
-    <% if @investigation.can_edit? -%>
-    <li>
-        <%= image_tag_for_key('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%>
-    </li>
+    <% if @investigation.can_manage? -%>
+      <li><%= image_tag_for_key('manage', edit_investigation_path, nil, nil, 'Manage investigation') -%></li>
+    <% elsif @investigation.can_edit?-%>
+      <li><%= image_tag_for_key('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%></li>
     <% end -%>
     <%= delete_ISA_icon @investigation,current_user -%>
 </ul>
