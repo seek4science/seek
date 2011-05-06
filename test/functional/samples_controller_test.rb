@@ -3,10 +3,37 @@ require "test_helper"
 class SamplesControllerTest < ActionController::TestCase
   fixtures :all
   include AuthenticatedTestHelper
+  include RestTestCases
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
     login_as :owner_of_fully_public_policy
+    @object = Factory(:sample,:contributor => User.current_user,
+            :title=> "test1",
+            :policy => policies(:policy_for_viewable_data_file))
+  end
+
+  test "index xml validates with schema" do
+    Factory(:sample,
+            :title=> "test2",
+            :policy => policies(:policy_for_viewable_data_file))
+    Factory :sample, :policy => policies(:editing_for_all_sysmo_users_policy)
+    get :index, :format =>"xml"
+    assert_response :success
+    assert_not_nil assigns(:samples)
+
+    validate_xml_against_schema(@response.body)
+
+  end
+
+  test "show xml validates with schema" do
+    s = Factory(:sample,:contributor => User.current_user,
+                :title => "test sample",
+                :policy => policies(:policy_for_viewable_data_file))
+    get :show, :id => s, :format =>"xml"
+    assert_response :success
+    assert_not_nil assigns(:sample)
+    validate_xml_against_schema(@response.body)
   end
 
   test "should get index" do
