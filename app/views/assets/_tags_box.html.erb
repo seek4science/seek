@@ -1,7 +1,4 @@
 <%
-   #only show the tag box if a user is logged in
-   return unless current_user
-
    entity=controller_name.singularize
    object=eval("@"+entity)
    model_class=entity.camelize.constantize
@@ -14,7 +11,6 @@
 
    create_tag_link_text = item_tags.empty? ? "Add your tags" : "Update your tags"
 %>
-<div id="tags_box" class="contribution_section_box">
 
   <p class="heading">
     <%= help_icon("Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") -%>
@@ -57,6 +53,5 @@
         </p>
     <% end -%>
   </div>
-</div>
 
 <%= render :partial=>"tagging/autocompleter_javascript", :locals=>{:name=>name, :all_tags=>all_tags, :item_tags=>item_tags} %>

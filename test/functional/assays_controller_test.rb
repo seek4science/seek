@@ -8,8 +8,8 @@ class AssaysControllerTest < ActionController::TestCase
   include RestTestCases
 
   def setup
-    login_as(:aaron)
-    @object=assays(:metabolomics_assay)
+    login_as(:quentin)
+    @object=Factory(:assay, :policy => Factory(:public_policy))
   end
 
   test "modelling assay validates with schema" do

@@ -8,8 +8,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   include RestTestCases
   
   def setup
-    login_as(:model_owner)
-    @object=investigations(:metabolomics_investigation)
+    login_as(:quentin)
+    @object= Factory(:investigation, :policy => Factory(:public_policy))
   end
 
   def test_title
@@ -68,6 +68,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_redirected_to investigation_path(i)
     assert assigns(:investigation)
     assert_equal "test",assigns(:investigation).title
+  end
+
+  test "should create" do
+    login_as(Factory :user)
+    put :create, :investigation=>Factory(:investigation, :project => User.current_user.person.projects.first).attributes
+    assert_response :success
+    assert assigns(:investigation)
   end
 
   test "no edit button in show for unauthorized user" do

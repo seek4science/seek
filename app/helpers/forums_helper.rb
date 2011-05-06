@@ -17,7 +17,7 @@ module ForumsHelper
 		end
 
   def admin?
-    current_user.is_admin?
+    admin_logged_in?
   end
 
 end
