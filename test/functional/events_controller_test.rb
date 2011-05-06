@@ -35,7 +35,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test "xml for projectless event" do
-    id = Factory(:event).id
+    id = Factory(:event, :policy => Factory(:public_policy)).id
     get :show, :id => id, :format => :xml
     assert_response :success
   end
