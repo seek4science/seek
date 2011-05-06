@@ -285,6 +285,7 @@
                        minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="organisms" type="OrganismItems"
                        minOccurs="0" maxOccurs="1"></xsd:element>
+          <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
                        maxOccurs="1" minOccurs="1"></xsd:element>
           <xsd:element name="assay_class" type="ResourceLink"
@@ -399,6 +400,7 @@
                        minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="creators" type="Creators" minOccurs="1"
                        maxOccurs="1"></xsd:element>
+          <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
                        minOccurs="1" maxOccurs="1"></xsd:element>
 
@@ -460,6 +462,7 @@
                        minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="creators" type="Creators" minOccurs="1"
                        maxOccurs="1"></xsd:element>
+          <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="associated" type="AssociatedItems"
                        minOccurs="1" maxOccurs="1"></xsd:element>
         </xsd:sequence>
