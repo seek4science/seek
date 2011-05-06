@@ -140,11 +140,11 @@ module ApiHelper
       organisms=object.organisms if object.respond_to?("organisms")
       organisms << object.organism if object.respond_to?("organism") && object.organism
       api_partial_collection builder,organisms
-    end if object.respond_to?("organism") || object.respond_to?("organisms")                
+    end if object.respond_to?("organism") || object.respond_to?("organisms")
         
     builder.tag! "creators" do      
       api_partial_collection builder,object.creators
-    end if object.respond_to?("creators") 
+    end if object.respond_to?("creators") and object.creators
     
 #    builder.tag! "attributions" do      
 #      api_partial_collection builder,object.parent.attributions
@@ -185,7 +185,7 @@ module ApiHelper
     
     policy_xml builder,object if current_user.person.is_admin? && object.respond_to?("policy")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
-    api_partial builder,object.project if object.respond_to?("project")  
+    api_partial builder,object.project if object.respond_to?("project") and object.project
     
     if object.respond_to?("avatar")
       builder.tag! "avatars" do
@@ -271,7 +271,7 @@ module ApiHelper
   
   def api_partial builder,object, is_root=false
     parent_object =  object.class.name.include?("::Version") ? object.parent : object
-    path=api_partial_path_for_item(parent_object)    
+    path=api_partial_path_for_item(parent_object)
     classname=parent_object.class.name.underscore
     render :partial=>path,:locals=>{:parent_xml => builder,:is_root=>is_root,classname.to_sym=>object}
   end
