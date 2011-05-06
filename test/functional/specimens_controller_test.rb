@@ -4,11 +4,38 @@ class SpecimensControllerTest < ActionController::TestCase
 
   fixtures :all
   include AuthenticatedTestHelper
+  include RestTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
+    @object = Factory(:specimen, :contributor => User.current_user,
+            :donor_number => "test1",
+            :policy => policies(:policy_for_viewable_data_file))
   end
 
+  test "index xml validates with schema" do
+    Factory(:specimen, :contributor => User.current_user,
+            :donor_number => "test2",
+            :policy => policies(:policy_for_viewable_data_file))
+    Factory :specimen, :policy => policies(:editing_for_all_sysmo_users_policy)
+    get :index, :format =>"xml"
+    assert_response :success
+    assert_not_nil assigns(:specimens)
+
+    validate_xml_against_schema(@response.body)
+
+  end
+
+  test "show xml validates with schema" do
+    s =Factory(:specimen, :contributor => User.current_user,
+               :donor_number => "test2",
+               :policy => policies(:policy_for_viewable_data_file))
+    get :show, :id => s, :format =>"xml"
+    assert_response :success
+    assert_not_nil assigns(:specimen)
+
+    validate_xml_against_schema(@response.body)
+  end
   test "should get index" do
     get :index
     assert_response :success
@@ -35,7 +62,9 @@ class SpecimensControllerTest < ActionController::TestCase
     assert_equal "running mouse NO.1", s.donor_number
   end
   test "should get show" do
-    get :show, :id => Factory(:specimen, :donor_number=>"running mouse NO2", :policy =>policies(:editing_for_all_sysmo_users_policy))
+    get :show, :id => Factory(:specimen,
+                              :donor_number=>"running mouse NO2",
+                              :policy =>policies(:editing_for_all_sysmo_users_policy))
     assert_response :success
     assert_not_nil assigns(:specimen)
   end

@@ -384,6 +384,125 @@
     </xsd:complexContent>
   </xsd:complexType>
 
+  <xsd:element name="specimens" type="Specimens"></xsd:element>
+  <xsd:element name="specimen" type="Specimen"></xsd:element>
+
+  <xsd:complexType name="Specimen">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalType">
+        <xsd:sequence>
+          <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
+
+          <xsd:element name="submitter" type="Submitter"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="organisms" type="OrganismItems"
+                       minOccurs="0" maxOccurs="1"></xsd:element>
+          <xsd:element name="creators" type="Creators" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
+          <xsd:element name="project" type="ProjectItem"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+
+          <xsd:element name="associated" type="AssociatedItems"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Specimens">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalIndex">
+        <xsd:sequence>
+          <xsd:element name="parameters" type="Parameters"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="statistics" type="PagedStatistics"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="items" type="SpecimenItems" maxOccurs="1"
+                       minOccurs="1"></xsd:element>
+          <xsd:element name="related" type="xsd:anyType"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="SpecimenItems">
+    <xsd:sequence>
+      <xsd:element name="specimen" type="SpecimenItem" maxOccurs="unbounded"
+                   minOccurs="0"></xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="SpecimenItem">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalType">
+        <xsd:sequence>
+          <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+   <xsd:element name="samples" type="Samples"></xsd:element>
+  <xsd:element name="sample" type="Sample"></xsd:element>
+
+  <xsd:complexType name="Sample">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalType">
+        <xsd:sequence>
+          <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
+          <xsd:element name="submitter" type="Submitter"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+          <xsd:element name="organisms" type="OrganismItems"
+                       minOccurs="0" maxOccurs="1"></xsd:element>
+          <xsd:element name="creators" type="Creators" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
+          <xsd:element name="associated" type="AssociatedItems"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Samples">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalIndex">
+        <xsd:sequence>
+          <xsd:element name="parameters" type="Parameters"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="statistics" type="PagedStatistics"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="items" type="SampleItems" maxOccurs="1"
+                       minOccurs="1"></xsd:element>
+          <xsd:element name="related" type="xsd:anyType"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="SampleItems">
+    <xsd:sequence>
+      <xsd:element name="sample" type="SampleItem" maxOccurs="unbounded"
+                   minOccurs="0"></xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="SampleItem">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalType">
+        <xsd:sequence>
+          <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
 
   <xsd:element name="models" type="Models"></xsd:element>
   <xsd:element name="model" type="Model"></xsd:element>
@@ -1139,6 +1258,11 @@
       <xsd:enumeration value="AssayType"></xsd:enumeration>
       <xsd:enumeration value="TechnologyType"></xsd:enumeration>
       <xsd:enumeration value="CultureGrowthType"></xsd:enumeration>
+
+      <xsd:enumeration value="Specimen"></xsd:enumeration>
+      <xsd:enumeration value="Specimens"></xsd:enumeration>
+      <xsd:enumeration value="Sample"></xsd:enumeration>
+      <xsd:enumeration value="Samples"></xsd:enumeration>
     </xsd:restriction>
   </xsd:simpleType>
 
