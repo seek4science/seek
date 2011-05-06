@@ -6,7 +6,7 @@ class ExperimentsControllerTest < ActionController::TestCase
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    login_as :owner_of_fully_public_policy
+    login_as Factory(:user)
   end
 
   test "should get index" do
@@ -70,19 +70,20 @@ class ExperimentsControllerTest < ActionController::TestCase
   end
 
   test "unauthorized users cannot add new experiments" do
-    login_as Factory(:user)
+    user =  Factory(:user,:person => Factory(:brand_new_person))
+    login_as user
     get :new
-    assert_redirected_to experiments_path
+    assert !assigns(:experiment)
   end
   test "unauthorized user cannot edit experiment" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :experiment,:policy => policies(:editing_for_all_sysmo_users_policy)
     get :edit, :id =>s.id
     assert_response :redirect
     assert flash[:error]
   end
   test "unauthorized user cannot update experiment" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :experiment,:policy => policies(:editing_for_all_sysmo_users_policy)
 
     put :update, :id=> s.id, :experiment =>{:title =>"test"}
@@ -103,7 +104,7 @@ class ExperimentsControllerTest < ActionController::TestCase
     assert_redirected_to experiments_path
 
     logout
-    login_as Factory(:user)
+    login_as Factory(:brand_new_user)
     s = Factory :experiment,:contributor => User.current_user
     assert_no_difference("Experiment.count") do
       delete :destroy, :id => s.id

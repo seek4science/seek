@@ -7,7 +7,7 @@ class SamplesControllerTest < ActionController::TestCase
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    login_as :owner_of_fully_public_policy
+    login_as Factory(:user,:person => Factory(:person,:is_admin=> false))#:owner_of_fully_public_policy
     @object = Factory(:sample,:contributor => User.current_user,
             :title=> "test1",
             :policy => policies(:policy_for_viewable_data_file))
@@ -27,12 +27,13 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "show xml validates with schema" do
-    s = Factory(:sample,:contributor => User.current_user,
+    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:person,:is_admin=> true)),
                 :title => "test sample",
                 :policy => policies(:policy_for_viewable_data_file))
     get :show, :id => s, :format =>"xml"
     assert_response :success
     assert_not_nil assigns(:sample)
+    display_xml  @response.body
     validate_xml_against_schema(@response.body)
   end
 
@@ -51,9 +52,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference("Sample.count") do
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
-                                :strains =>[Factory(:strain), Factory(:strain)],
+                                #:strain_ids =>[Factory(:strain).id, Factory(:strain).id],
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen)}
+                                :specimen => Factory(:specimen)},
+      :sample_strain_ids => [Factory(:strain).id, Factory(:strain).id]
     end
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
@@ -74,7 +76,7 @@ class SamplesControllerTest < ActionController::TestCase
   test "should update" do
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy))
     assert_not_equal "test", s.title
-    put "update", :id=>s, :sample =>{:title =>"test"}
+    put "update", :id=>s, :sample =>{:title =>"test"},:sample_strain_ids => [Factory(:strain).id, Factory(:strain).id]
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "test", s.title
@@ -87,19 +89,19 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
   test "unauthorized users cannot add new samples" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     get :new
     assert_response :redirect
   end
   test "unauthorized user cannot edit sample" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :sample, :policy => Factory(:private_policy)
     get :edit, :id =>s.id
     assert_redirected_to sample_path(s)
     assert flash[:error]
   end
   test "unauthorized user cannot update sample" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :sample, :policy => Factory(:private_policy)
 
     put :update, :id=> s.id, :sample =>{:title =>"test"}
@@ -108,7 +110,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "unauthorized user cannot delete sample" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :sample, :policy => Factory(:private_policy)
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id

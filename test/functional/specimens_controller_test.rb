@@ -90,19 +90,19 @@ class SpecimensControllerTest < ActionController::TestCase
     end
   end
   test "unauthorized users cannot add new specimens" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     get :new
     assert_response :redirect
   end
   test "unauthorized user cannot edit specimen" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :specimen, :policy => Factory(:private_policy)
     get :edit, :id =>s.id
     assert_redirected_to specimen_path(s)
     assert flash[:error]
   end
   test "unauthorized user cannot update specimen" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :specimen, :policy => Factory(:private_policy)
 
     put :update, :id=> s.id, :specimen =>{:donor_number =>"test"}
@@ -111,7 +111,7 @@ class SpecimensControllerTest < ActionController::TestCase
   end
 
   test "unauthorized user cannot delete specimen" do
-    login_as Factory(:user)
+    login_as Factory(:user,:person => Factory(:brand_new_person))
     s = Factory :specimen, :policy => Factory(:private_policy)
     assert_no_difference("Specimen.count") do
       delete :destroy, :id => s.id
