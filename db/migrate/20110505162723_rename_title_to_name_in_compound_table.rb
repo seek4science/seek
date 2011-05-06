@@ -4,5 +4,6 @@ class RenameTitleToNameInCompoundTable < ActiveRecord::Migration
   end
 
   def self.down
+    rename_column :compounds,:name, :title
   end
 end

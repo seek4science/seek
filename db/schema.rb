@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110505162723) do
+ActiveRecord::Schema.define(:version => 20110506130953) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -687,8 +687,8 @@ ActiveRecord::Schema.define(:version => 20110505162723) do
     t.datetime "updated_at"
     t.float    "standard_deviation"
     t.integer  "data_file_version"
-    t.integer  "compound_id"
-    t.string   "compound_type"
+    t.integer  "substance_id"
+    t.string   "substance_type"
   end
 
   create_table "studies", :force => true do |t|
@@ -703,6 +703,14 @@ ActiveRecord::Schema.define(:version => 20110505162723) do
     t.datetime "updated_at"
     t.string   "first_letter",          :limit => 1
     t.string   "uuid"
+  end
+
+  create_table "synonyms", :force => true do |t|
+    t.string   "name"
+    t.integer  "substance_id"
+    t.string   "substance_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "taggings", :force => true do |t|

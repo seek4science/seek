@@ -4,10 +4,10 @@ class StudiedFactor < ActiveRecord::Base
   belongs_to :measured_item
   belongs_to :unit
   belongs_to :data_file
-  belongs_to :compound, :polymorphic => true
+  belongs_to :substance, :polymorphic => true
 
   validates_presence_of :unit,:measured_item,:start_value,:data_file
-  validates_presence_of :compound, :if => :is_concentration?
+  validates_presence_of :substance, :if => :is_concentration?
 
 
 
