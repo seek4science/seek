@@ -193,6 +193,7 @@ module AssetsHelper
     
     #Authorize
     related.each_value do |resource_hash|
+      resource_hash[:items].compact!
       unless resource_hash[:items].empty?
         total_count = resource_hash[:items].size
         resource_hash[:items] = resource_hash[:items].select &:can_view?
@@ -202,7 +203,6 @@ module AssetsHelper
     
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      related[key][:items] = related[key][:items].compact
       if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay","Person"].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]        
