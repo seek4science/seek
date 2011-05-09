@@ -18,13 +18,11 @@ class SpecimensController < ApplicationController
   def create
     @specimen = Specimen.new(params[:specimen])
     @specimen.contributor = current_user
-    @specimen.project= Project.find params[:project_id]
+    @specimen.project_id = params[:project_id]
 
 
     respond_to do |format|
       if @specimen.save
-
-
         #Add creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
         format.html { redirect_to @specimen }
@@ -36,7 +34,11 @@ class SpecimensController < ApplicationController
   end
 
   def update
-    respond_to do |format|
+
+    #update project
+    @specimen.project_id = params[:project_id]
+
+     respond_to do |format|
       if @specimen.update_attributes params[:specimen]
         #update creators
         AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
