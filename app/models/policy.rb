@@ -93,13 +93,8 @@ class Policy < ActiveRecord::Base
                           :use_whitelist => use_whitelist,
                           :use_blacklist => use_blacklist)
       resource.policy = policy  # by doing this the new policy object is saved implicitly too
-      if resource.save
-        p "%%%%%%%%%%%%%% resource saved"
-      else
-        p "############### resource not saved"
-      end
+      #resource.save
     else
-      p "§§§§§§§§§ resource has policy"
        policy = resource.policy
        #last_saved_policy = policy.clone # clone required, not 'dup' (which still works through reference, so the values in both get changed anyway - which is not what's needed here)
        
@@ -114,20 +109,7 @@ class Policy < ActiveRecord::Base
     # NOW PROCESS THE PERMISSIONS
     # policy of an asset; pemissions will be applied to it
     policy = resource.policy
-    if policy.nil?
-      p "!!!!!!!!!!policy is nil"
-    else
-      p resource
-      p resource.policy
-      p policy
-      p policy.permissions
-    end
-    if resource.nil?
-      p "resource is nil"
-    else
-      p  "resource is not nil"
-    end
-
+    
     # read the permission data from params[]
     unless params[:sharing][:permissions].blank?
       contributor_types = ActiveSupport::JSON.decode(params[:sharing][:permissions][:contributor_types])
