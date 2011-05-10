@@ -78,7 +78,7 @@ class Policy < ActiveRecord::Base
     # obtain parameters from params[] hash
     sharing_scope = params[:sharing][:sharing_scope].to_i
     access_type = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::NO_ACCESS : params[:sharing]["access_type_#{sharing_scope}"])
-    use_custom_sharing = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : params[:sharing]["include_custom_sharing_#{sharing_scope}"])
+    use_custom_sharing = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : params[:sharing]["include_custom_sharing_#{sharing_scope}"]).to_i
     use_whitelist = params[:sharing][:use_whitelist]
     use_blacklist = params[:sharing][:use_blacklist]
     
