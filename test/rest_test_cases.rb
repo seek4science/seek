@@ -24,7 +24,7 @@ module RestTestCases
 
   def test_get_xml
     return unless run_rest_tests?
-    get :show,:id=>@object, :format=>"xml"
+    get :show,:id=>@object, :format=>:xml
     perform_api_checks
   end
   
