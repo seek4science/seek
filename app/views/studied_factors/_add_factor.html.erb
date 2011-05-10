@@ -1,4 +1,4 @@
-
+<%= javascript_include_tag "sharing.js" -%>
 <% remote_form_for :studied_factor ,@studied_factor,
   :url=>data_file_studied_factors_path(:data_file_id=>@data_file,:id=>@studied_factor),
   :before=>"$('studied_factor_submit').disabled=true;",
@@ -20,7 +20,7 @@
 
       <td><%= f.text_field :time_point,:size=>4 %></td>
 
-      <td><%=  f.collection_select :measured_item_id, sorted_measured_items(true),:id,:title, {}, {:onchange => "displayCompoundTextField()"} %></td>
+      <td><%=  f.collection_select :measured_item_id, sorted_measured_items(true),:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('studied_factor_measured_item_id')"} %></td>
 
       <td><%=  f.collection_select :unit_id, Unit.find(:all, :conditions => "factors_studied = true"),:id,:symbol %></td>
 
@@ -37,22 +37,7 @@
 
   </table>
 
-    <%= render :partial=>"studied_factors/substances_autocomplete"%>
+    <%= render :partial=>"layouts/substances_autocomplete"%>
   </div>
 
 <% end -%>
-
-<script type="text/javascript">
-    function displayCompoundTextField(){
-        //check if the selected entry is concentration
-        selectedIndex = $("studied_factor_measured_item_id").selectedIndex
-        option_select = $("studied_factor_measured_item_id").options[selectedIndex]
-
-        if (option_select.text == 'concentration'){
-            $('facebook').show()
-
-        }else{
-           $('facebook').hide()
-        }
-    }
-</script>

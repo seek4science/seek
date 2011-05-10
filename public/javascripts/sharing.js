@@ -1143,7 +1143,19 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
     return(true);
 }
 
+function showOrHideSubstanceTextField(selectedItem){
+    //check if the selected entry is concentration
+    "studied_factor_measured_item_id"
+    selectedIndex = $(selectedItem).selectedIndex
+    option_select = $(selectedItem).options[selectedIndex]
 
+    if (option_select.text == 'concentration'){
+        $('facebook').show()
+
+    }else{
+       $('facebook').hide()
+    }
+}
 
 
 

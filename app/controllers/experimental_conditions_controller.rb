@@ -3,6 +3,8 @@ class ExperimentalConditionsController < ApplicationController
   before_filter :find_and_auth_sop  
   before_filter :create_new_condition, :only=>[:index]
 
+  include StudiedFactorsHelper
+
   def index
     respond_to do |format|
       format.html
@@ -14,6 +16,7 @@ class ExperimentalConditionsController < ApplicationController
     @experimental_condition=ExperimentalCondition.new(params[:experimental_condition])
     @experimental_condition.sop=@sop
     @experimental_condition.sop_version = params[:version]
+    @experimental_condition.substance = find_or_create_substance
     
     render :update do |page|
       if @experimental_condition.save
@@ -67,10 +70,8 @@ class ExperimentalConditionsController < ApplicationController
 
   end
 
-
-
-
   def create_new_condition
     @experimental_condition=ExperimentalCondition.new(:sop=>@sop)
   end
 end
+
