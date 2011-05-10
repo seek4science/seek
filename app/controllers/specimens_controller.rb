@@ -45,7 +45,7 @@ class SpecimensController < ApplicationController
     #update project
     @specimen.project_id = params[:project_id]
 
-   policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+    policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|

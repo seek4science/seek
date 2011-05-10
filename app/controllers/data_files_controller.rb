@@ -106,11 +106,12 @@ class DataFilesController < ApplicationController
       update_tags @data_file
 
       assay_ids = params[:assay_ids] || []
+      #apply policy / permissions settings
+      policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
+
       respond_to do |format|
         if @data_file.save
-          # the Data file was saved successfully, now need to apply policy / permissions settings to it
-          policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-          
+
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
           
@@ -179,6 +180,9 @@ class DataFilesController < ApplicationController
 
     update_tags @data_file
     assay_ids = params[:assay_ids] || []
+    # updated policy / permissions settings
+    policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
+
     respond_to do |format|
       data_file_params = params[:data_file]
       event_ids = params[:event_ids] || []
@@ -188,9 +192,7 @@ class DataFilesController < ApplicationController
       data_file_params[:event_ids] = event_ids
 
       if @data_file.update_attributes(data_file_params)
-        # the Data file was updated successfully, now need to apply updated policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-        
+
         # update attributions
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
         

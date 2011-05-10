@@ -37,6 +37,7 @@ class AssaysController < ApplicationController
     update_tags @assay
 
     @assay.owner=current_user.person
+    policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
 
     respond_to do |format|
       if @assay.save
@@ -62,7 +63,7 @@ class AssaysController < ApplicationController
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
-        policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
+
 
         if policy_err_msg.blank?
           flash[:notice] = 'Assay was successfully created.'
@@ -93,6 +94,7 @@ class AssaysController < ApplicationController
     update_tags @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
+    policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
 
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
@@ -125,7 +127,7 @@ class AssaysController < ApplicationController
         @assay.updated_at=Time.now
         @assay.save!
 
-        policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
+
 
         if policy_err_msg.blank?
           flash[:notice] = 'Assay was successfully updated.'

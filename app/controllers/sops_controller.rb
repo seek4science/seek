@@ -99,11 +99,12 @@ class SopsController < ApplicationController
 
       update_tags @sop
       assay_ids = params[:assay_ids] || []
+      # apply policy / permissions settings to sop
+      policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
+
       respond_to do |format|
         if @sop.save
-          # the SOP was saved successfully, now need to apply policy / permissions settings to it
-          policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
-          
+
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           
@@ -146,11 +147,12 @@ class SopsController < ApplicationController
 
     update_tags @sop
     assay_ids = params[:assay_ids] || []
+    # apply updated policy / permissions settings to sop
+    policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
+
     respond_to do |format|
       if @sop.update_attributes(params[:sop])
-        # the SOP was updated successfully, now need to apply updated policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
-        
+
         # update attributions
         Relationship.create_or_update_attributions(@sop, params[:attributions])
         

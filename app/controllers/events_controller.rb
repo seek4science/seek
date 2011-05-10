@@ -52,10 +52,10 @@ class EventsController < ApplicationController
       @event.publications << p if !@event.publications.include?p
     end
     params.delete :related_publication_ids
+    policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
 
     respond_to do | format |
       if @event.save
-        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
 
         if policy_err_msg.blank?
           flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
@@ -93,11 +93,11 @@ class EventsController < ApplicationController
       @event.publications << p if !@event.publications.include?p
     end
     params.delete :related_publication_ids
+    policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
 
     respond_to do | format |
       if @event.update_attributes params[:event]
-        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
- 
+
         if policy_err_msg.blank?
           flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
           format.html { redirect_to @event }

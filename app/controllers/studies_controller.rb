@@ -41,10 +41,10 @@ class StudiesController < ApplicationController
   
   def update
     @study=Study.find(params[:id])
+    policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
 
     respond_to do |format|
       if @study.update_attributes(params[:study])
-        policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
 
         if policy_err_msg.blank?
           flash[:notice] = 'Study was successfully updated.'
@@ -62,7 +62,7 @@ class StudiesController < ApplicationController
   end
 
   def show
-    @study=Study.find(params[:id])    
+    @study=Study.find(params[:id])
     respond_to do |format|
       format.html
       format.xml
@@ -71,16 +71,15 @@ class StudiesController < ApplicationController
       format.png { render :text=>to_png(@study.investigation,params[:deep]=='true',@study)}
     end
 
-  end  
+  end
 
   def create
     @study = Study.new(params[:study])
     @study.person_responsible = current_user.person unless @study.person_responsible
-    
+    policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
+
     respond_to do |format|
       if @study.save
-
-        policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
 
         if policy_err_msg.blank?
           format.html { redirect_to(@study) }

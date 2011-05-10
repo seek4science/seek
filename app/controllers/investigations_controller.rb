@@ -29,9 +29,10 @@ class InvestigationsController < ApplicationController
 
   def create
     @investigation.contributor = current_user
+    policy_err_msg = Policy.create_or_update_policy(@investigation, current_user, params)
+
     respond_to do |format|
       if @investigation.save
-        policy_err_msg = Policy.create_or_update_policy(@investigation, current_user, params)
 
         if policy_err_msg.blank?
           flash[:notice] = 'The Investigation was successfully created.'
@@ -67,10 +68,11 @@ class InvestigationsController < ApplicationController
 
   def update
     @investigation=Investigation.find(params[:id])
+    policy_err_msg = Policy.create_or_update_policy(@investigation, current_user, params)
 
     respond_to do |format|
       if @investigation.update_attributes(params[:investigation])
-        policy_err_msg = Policy.create_or_update_policy(@investigation, current_user, params)
+
         if policy_err_msg.blank?
           flash[:notice] = 'Investigation was successfully updated.'
           format.html { redirect_to(@investigation) }

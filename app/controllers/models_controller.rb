@@ -394,11 +394,12 @@ class ModelsController < ApplicationController
 
       update_tags @model
       assay_ids = params[:assay_ids] || []
+      # apply policy / permissions settings
+      policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
+
       respond_to do |format|
         if @model.save
-          # the Model was saved successfully, now need to apply policy / permissions settings to it
-          policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
-          
+
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
@@ -456,11 +457,12 @@ class ModelsController < ApplicationController
     update_tags @model
 
     assay_ids = params[:assay_ids] || []
+    # apply updated policy / permissions settings
+    policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
+
     respond_to do |format|
       if @model.update_attributes(params[:model])
-        # the Model was updated successfully, now need to apply updated policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
-        
+
         # update attributions
         Relationship.create_or_update_attributions(@model, params[:attributions])
         
