@@ -396,7 +396,8 @@ class ModelsController < ApplicationController
       assay_ids = params[:assay_ids] || []
       # apply policy / permissions settings
       policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
-
+      #Add creators
+      AssetsCreator.add_or_update_creator_list(@model, params[:creators])
       respond_to do |format|
         if @model.save
 
@@ -406,8 +407,7 @@ class ModelsController < ApplicationController
           # update related publications
           Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+
           
           if policy_err_msg.blank?
             flash[:notice] = 'Model was successfully uploaded and saved.'
@@ -459,6 +459,8 @@ class ModelsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     # apply updated policy / permissions settings
     policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
+    #update creators
+    AssetsCreator.add_or_update_creator_list(@model, params[:creators])
 
     respond_to do |format|
       if @model.update_attributes(params[:model])
@@ -469,8 +471,7 @@ class ModelsController < ApplicationController
         # update related publications
         Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@model, params[:creators])
+
         
         if policy_err_msg.blank?
           flash[:notice] = 'Model metadata was successfully updated.'

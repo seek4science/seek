@@ -101,6 +101,8 @@ class SopsController < ApplicationController
       assay_ids = params[:assay_ids] || []
       # apply policy / permissions settings to sop
       policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
+      #Add creators
+      AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
 
       respond_to do |format|
         if @sop.save
@@ -108,9 +110,7 @@ class SopsController < ApplicationController
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
-          
+
           if policy_err_msg.blank?
             flash[:notice] = 'SOP was successfully uploaded and saved.'
             format.html { redirect_to sop_path(@sop) }
@@ -149,6 +149,8 @@ class SopsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     # apply updated policy / permissions settings to sop
     policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
+    #update authors
+    AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
 
     respond_to do |format|
       if @sop.update_attributes(params[:sop])
@@ -156,9 +158,7 @@ class SopsController < ApplicationController
         # update attributions
         Relationship.create_or_update_attributions(@sop, params[:attributions])
         
-        #update authors
-        AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
-        
+
         if policy_err_msg.blank?
           flash[:notice] = 'SOP metadata was successfully updated.'
           format.html { redirect_to sop_path(@sop) }

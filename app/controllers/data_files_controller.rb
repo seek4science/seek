@@ -108,7 +108,8 @@ class DataFilesController < ApplicationController
       assay_ids = params[:assay_ids] || []
       #apply policy / permissions settings
       policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-
+      #Add creators
+      AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
       respond_to do |format|
         if @data_file.save
 
@@ -118,8 +119,7 @@ class DataFilesController < ApplicationController
           # update related publications
           Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
-          #Add creators
-          AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
+
           
           if policy_err_msg.blank?
             flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
@@ -182,6 +182,8 @@ class DataFilesController < ApplicationController
     assay_ids = params[:assay_ids] || []
     # updated policy / permissions settings
     policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
+    #update creators
+    AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
 
     respond_to do |format|
       data_file_params = params[:data_file]
@@ -200,9 +202,7 @@ class DataFilesController < ApplicationController
         Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
         
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-        
+
         if policy_err_msg.blank?
           flash[:notice] = 'Data file metadata was successfully updated.'
           format.html { redirect_to data_file_path(@data_file) }

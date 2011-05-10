@@ -38,10 +38,10 @@ class ExperimentsController < ApplicationController
     end
     params.delete :data_file_ids
 
-
+    AssetsCreator.add_or_update_creator_list(@experiment, params[:creators])
     respond_to do |format|
       if @experiment.save
-        AssetsCreator.add_or_update_creator_list(@experiment, params[:creators])
+
         # update related publications
         Relationship.create_or_update_attributions(@experiment, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
@@ -64,11 +64,11 @@ class ExperimentsController < ApplicationController
     end
     params.delete :data_file_ids
 
-
+    AssetsCreator.add_or_update_creator_list(@experiment, params[:creators])
     respond_to do |format|
       if @experiment.update_attributes params[:experiment]
-        AssetsCreator.add_or_update_creator_list(@experiment, params[:creators])
-        # update related publications
+
+        # update related publications in relationship
         Relationship.create_or_update_attributions(@experiment, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 
         flash[:notice] = 'Experiment was successfully updated.'
