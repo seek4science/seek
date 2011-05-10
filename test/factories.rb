@@ -111,7 +111,7 @@ Factory.define(:assay, :parent => :modelling_assay) {}
 Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
   f.association :investigation
-  f.association :person_responsible, :factory => :person
+  f.association :contributor, :factory => :person
 end
 
 #Investigation
