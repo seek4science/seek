@@ -419,6 +419,7 @@ module ApplicationHelper
     @policy_type = policy_type
     @sharing_mode = policy.sharing_scope
     @access_mode = policy.access_type
+    @use_custom_sharing = !policy.permissions.empty?
     @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
     @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
 
