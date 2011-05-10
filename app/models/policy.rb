@@ -283,36 +283,6 @@ class Policy < ActiveRecord::Base
     # returns some message in case of errors (or empty string in case of success)
     return error_msg
   end
-  
-  # This method returns a "default" policy.
-  # (that is it will contain default sharing options and default 
-  #  permissions, if any are applicable)
-  #
-  # if "project" parameter not specified, system default policy
-  # is used without any attempt to obtain default policy of the
-  # project, where an asset that is supposed to be governed by
-  # the default policy would be associated with
-  def self.default(project=nil)
-    rtn = nil
-    
-    if project
-      rtn = self.project_default(project)
-      
-      # if a default policy for a project was set (i.e. not nil returned) - use that as a result;
-      #
-      # NB! This method is only to be used for reading, and the "default" policy read here should 
-      # never be linked to anything; the standard use case is to read the default policy and show
-      # its settings (and settings from all the linked permissions) in the "Sharing" option selector
-      # screen - after which the "deep" copy of default policy-permissions structure can be recreated
-      # on "saving" the resource, if necessary
-      return rtn if rtn
-    end
-    
-    # project default policy wasn't found or is not set, use system default
-    rtn = self.system_default()
-    
-    return rtn
-  end
     
   # returns a default policy for a project
   # (all the related permissions will still be linked to the returned policy)
@@ -332,19 +302,10 @@ class Policy < ActiveRecord::Base
                         
     return policy
   end
-  
-  
-  # returns a default system policy with "contributor" assigned as an admin;
-  # as of now, default system policy is that assets are private to the uploader
-  def self.system_default()
-    policy = Policy.new(:name => "system default",                        
-                        :sharing_scope => PRIVATE,
-                        :access_type => NO_ACCESS,
-                        :use_custom_sharing => false,
-                        :use_whitelist => false,
-                        :use_blacklist => false)
-                        
-    return policy
+
+  #The default policy to use when creating authorized items if no other policy is specified
+  def self.default
+    private_policy
   end
    
   # translates access type codes into human-readable form

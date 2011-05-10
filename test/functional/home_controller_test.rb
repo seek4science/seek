@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class HomeControllerTest < ActionController::TestCase
-  fixtures :people, :users
+  fixtures :all
 
   include AuthenticatedTestHelper
 
@@ -35,6 +35,31 @@ class HomeControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "a#adminmode[href=?]",admin_path,:count=>1
+  end
+
+  test "SOP tab should be capitalized" do
+    login_as(:quentin)
+    get :index
+    assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+  end
+
+  test "SOP upload option should be capitlized" do
+    login_as(:quentin)
+    get :index
+    assert_select "select#new_resource_type",:count=>1 do
+      assert_select "option[value=?]","sop",:text=>"SOP"
+    end
+  end
+
+  test "hidden items do not appear in recent items" do
+    model = models(:private_model)
+    model.title="An updated private model"
+    model.save! #to make sure it a recent item
+
+    get :index
+
+    #difficult to use assert_select, because of the way the tabbernav tabs are constructed with javascript onLoad
+    assert !@response.body.include?(model.title)
   end
 
 

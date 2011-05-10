@@ -3,7 +3,7 @@ class FailController < ApplicationController
   
   before_filter :is_user_admin_auth
   
-  # GET /fail/:http_code
+  # GET /fail/?http_code=:code
   def index
     puts "Current codes to send emails: #{ExceptionNotifier.send_email_error_codes.inspect}"
     

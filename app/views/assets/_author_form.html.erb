@@ -11,6 +11,8 @@
 
 <% resource_type_attributed_to_types = "Creators" -%>
 
+<% resource_type = text_for_resource(resource_type) -%>
+
 
 <div class="fold">
 
@@ -22,7 +24,7 @@
   <div id="creator_fold_content" class="foldContent" style="display: none;">
 
     <p>
-      If this <%= resource_type %> was created by, or together with, other <%= PROJECT_NAME %> members, please list their names below
+      If this <%= resource_type %> was created by, or together with, other <%= Seek::Config.project_name %> members, please list their names below
     </p>
 
     <div class="box_editing">

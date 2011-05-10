@@ -9,8 +9,8 @@
         <%= render :partial=>"layouts/header_text_main" -%>
       </td>
       <td style="text-align:right;">
-        <%if HEADER_IMAGE%><%= link_to image_tag(HEADER_IMAGE,:alt=>HEADER_IMAGE_LINK,:title=>HEADER_IMAGE_TITLE),
-          HEADER_IMAGE_LINK %><%end%>
+        <%if Seek::Config.header_image_enabled%><%= link_to image_tag(Seek::Config.header_image,:alt=>Seek::Config.header_image_link,:title=>Seek::Config.header_image_title),
+          Seek::Config.header_image_link %><%end%>
       </td>
     </tr>
   </table>

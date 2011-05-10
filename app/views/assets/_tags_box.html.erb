@@ -1,0 +1,56 @@
+<%
+   entity=controller_name.singularize
+   object=eval("@"+entity)
+   model_class=entity.camelize.constantize
+   tags=object.tag_counts
+   all_tags=aggregated_asset_tags
+   no_tags_message||=""
+   name||="tag"
+   item_tags = object.owner_tags_on(current_user, :tags)
+   title||="Tags"
+
+   create_tag_link_text = item_tags.empty? ? "Add your tags" : "Update your tags"
+%>
+
+<p class="heading">
+    <%= help_icon("Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") -%>
+    <%= h(title) -%>
+</p>
+
+<%= render :partial=>"layouts/tag_cloud",:locals=>{:tags=>tags,:show_overall_count=>false,:id=>"tag_cloud",:tags_smaller=>true,:no_tags_text=>"This item has not yet been tagged."} %>
+
+
+<small>
+  [
+<%= link_to_function create_tag_link_text,  visual_effect(:toggle_blind,"create_a_tag",:duration=>0.3) %>
+  ]
+</small>
+<div id="create_a_tag" style="display:none;">
+
+<% form_remote_tag :url     =>{:action=>:update_tags_ajax},
+                   :method  =>:post,
+                   :loading =>"$('tags_submit_button').value='Updating...';$('tags_submit_button').disabled=true;show_ajax_loader('tag_cloud');" do
+%>
+    <p>
+    <%= hidden_field_tag "prefix", name -%>
+    <div id="facebook" class="clearfix">
+      <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
+        <span class="tokenizer_stretcher">^_^</span>
+        <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
+
+        <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
+          <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
+        </div>
+      </div>
+      <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list">
+        <div class="typeahead_message"><%= no_tags_message -%></div>
+      </div>
+    </div>
+    </p>
+    <p>
+      <%= submit_tag "Update", :id=>"tags_submit_button" -%>
+    </p>
+<% end -%>
+</div>
+
+<%= render :partial=>"tagging/autocompleter_javascript", :locals=>{:name=>name,:all_tags=>all_tags,:item_tags=>item_tags} %>

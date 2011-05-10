@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Wed Jan 19 11:49:15 +0000 2011</td>
+      <td>Tue Apr 05 19:58:21 +0100 2011</td>
     </tr>
     </table>
   </div>
@@ -77,7 +77,7 @@ installation of SEEK up and running, some background reading on Ruby on
 Rails would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at <a
 href="http://rubyonrails.org/documentation">rubyonrails.org/documentation</a>.
-Since SEEK uses v2.3.5 of Rails, <a
+Since SEEK uses v2.3.8 of Rails, <a
 href="http://guides.rubyonrails.org/v2.3.8">guides.rubyonrails.org/v2.3.8</a>/
 and <a
 href="http://api.rubyonrails.org/v2.3.8">api.rubyonrails.org/v2.3.8</a> may
@@ -85,8 +85,8 @@ be useful as well.
 </p>
 <p>
 We recommend that you run SEEK on a Linux system. All of the examples here
-describe installing on an Ubuntu or Debian system, but should be easily
-transferrable to other Linux systems such as Fedora.
+describe installing on an Ubuntu (10.04 LTS) or Debian system, but should
+be easily transferrable to other Linux systems such as Fedora.
 </p>
 <p>
 Although possible, installing and running Ruby on Rails on a Windows system
@@ -117,7 +117,17 @@ installed. We use the Sun Java 1.6 package <em>sun-java6-jdk</em>
 </p>
 <p>
 <b>Note:</b>If using Ubuntu, you will need to enable Partner sources to
-install sun-java6-jdk (if you are unsure of how to do this, see <a
+install sun-java6-jdk . To do this edit <em>/etc/apt/sources.list</em> and
+uncomment the lines so that they appear as follows:
+</p>
+<pre>
+  ## This software is not part of Ubuntu, but is offered by Canonical and the
+  ## respective vendors as a service to Ubuntu users.
+  deb http://archive.canonical.com/ubuntu lucid partner
+  deb-src http://archive.canonical.com/ubuntu lucid partner
+</pre>
+<p>
+(if you need more information, see <a
 href="https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories">help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories</a>).
 </p>
 <p>
@@ -135,8 +145,9 @@ if you are intending to develop SEEK you will probably also want to use:
   sudo apt-get install curl irb
 </pre>
 <p>
-if setting up for production deployment using the Passenger Phusion Apache
-module you can save a step later by also using:
+if setting up for production deployment using the <a
+href="http://www.modrails.com/">Passenger Phusion (modrails)</a> module you
+can save a step later by also using:
 </p>
 <pre>
   sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
@@ -168,17 +179,17 @@ as the version control system.
 </p>
 <p>
 For a stable version, you should check out according to a stable tag. Our
-current tag is v0.10.2, so to retrieve this version you should use:
+current tag is v0.10.5, so to retrieve this version you should use:
 </p>
 <pre>
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.10.2 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.10.5 seek
 </pre>
 <p>
 <a href="http://gembundler.com/">Bundler</a> is used to manage gems, so to
 install the required gems you first need to install the bundler gem:
 </p>
 <pre>
-  sudo gem install -d bundler rake
+  gem install -d bundler rake
 </pre>
 <p>
 Then from within the sysmo-seek directory run
@@ -213,15 +224,15 @@ To insert your application/project name into the help documents for SEEK,
 and to remove the logos/links to SEEK&#8216;s &#8216;related projects and
 friends&#8217; use
 </p>
-<p>
-rake seek:rebrand
-</p>
+<pre>
+  rake seek:rebrand
+</pre>
 <p>
 If you only want to change the help documents, you can instead use
 </p>
-<p>
-rake seek:rebrand_help_docs
-</p>
+<pre>
+  rake seek:rebrand_help_docs
+</pre>
 <h2>Configuring the database</h2>
 <p>
 Copy config/database.default.yml to config/database.yml and edit

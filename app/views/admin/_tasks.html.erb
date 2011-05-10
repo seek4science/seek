@@ -14,13 +14,14 @@
   
   <h3>Manage</h3>
   <ul>
-    <li><%= link_to "Manage tags", url_for(:action=>"tags", :controller=>"admin") %></li>
     <li><%= link_to "Manage assay types", url_for(:action=>"manage", :controller=>"assay_types") %></li>
     <li><%= link_to "Manage technology types", url_for(:action=>"manage", :controller=>"technology_types") %></li>
   </ul>
-  
-  <h3>JERM</h3>
-  <ul>  
-    <li><%= link_to "Run a harvester", jerm_path %> </li>
-  </ul>
-</div>
+  <% if Seek::Config.jerm_enabled -%>
+      <h3>JERM</h3>
+      <ul>
+        <li><%= link_to "Run a harvester", jerm_path %> </li>
+      </ul>
+  <% end -%>
+
+ </div>

@@ -1,4 +1,4 @@
-<%= javascript_include_tag "associate_events.js" %>
+<%= javascript_include_tag "associate_events.js", "assays.js" %>
 <ul class="sectionIcons">
   <li><%= image_tag_for_key('arrow_left', publication_path(@publication), 'Return to publication', nil, 'Return to publication') -%></li>
 </ul>
@@ -18,8 +18,7 @@
         <%= text_area(:publication, :abstract, :cols => 90, :rows => 8) %>
       </p>
     <% end %>
-    
-    
+
     <h2>Associate authors</h2>  
  
     <% project = @publication.project %>
@@ -63,13 +62,23 @@
         <span class="none_text">No associated authors</span>
       <% end %>
     </div>
-    
     <br style="clear: both"/>
+    <div>
+    <p>
+        <%= render :partial=>"assets/select_tags" -%>
+    </p>
+    </div>
 
-    <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
-
+    <% if Seek::Config.events_enabled -%>
+          <p>
+            <%= render :partial => "assets/associate_event", :locals=>{:resource => @publication} -%>
+          </p>
+    <% end -%>
+      <p>
+        <%= render :partial => "assays/associate_publication_assays", :locals=>{:resource => @publication} -%>
+      </p>
     <p style="text-align: center;">
-      <%= submit_tag 'Update' %>
+      <%= submit_tag 'Update',:disable_with=>"Updating..." %>
     </p>
   <% end %>
 </div>

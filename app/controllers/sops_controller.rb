@@ -2,11 +2,11 @@ class SopsController < ApplicationController
   
   include IndexPager
   include DotGenerator
-  include Seek::AssetsCommon
+  include Seek::AssetsCommon  
   
   before_filter :login_required
-  before_filter :find_assets, :only => [ :index ]  
-  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview , :test_asset_url]
+  before_filter :find_assets, :only => [ :index ]
+  before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_sop, :only=>[:show,:download]
   
   
@@ -90,13 +90,15 @@ class SopsController < ApplicationController
   end
   
   # POST /sops
-  def create
+  def create    
+
     if handle_data            
-      
       @sop = Sop.new(params[:sop])
       @sop.contributor=current_user
       @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
-      
+
+      update_tags @sop
+      assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @sop.save
           # the SOP was saved successfully, now need to apply policy / permissions settings to it
@@ -114,6 +116,10 @@ class SopsController < ApplicationController
           else
             flash[:notice] = "SOP was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
+          end
+          assay_ids.each do |id|
+              @assay = Assay.find(id)
+              @assay.relate(@sop)
           end
         else
           format.html { 
@@ -136,7 +142,9 @@ class SopsController < ApplicationController
       # update 'last_used_at' timestamp on the SOP
       params[:sop][:last_used_at] = Time.now
     end
-    
+
+    update_tags @sop
+    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @sop.update_attributes(params[:sop])
         # the SOP was updated successfully, now need to apply updated policy / permissions settings to it
@@ -155,6 +163,24 @@ class SopsController < ApplicationController
           flash[:notice] = "SOP metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
           format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
         end
+        # Update new assay_asset
+        assay_ids.each do |id|
+          @assay = Assay.find(id)
+          @assay.relate(@sop)
+        end
+        #Destroy AssayAssets that aren't needed
+        assay_assets = AssayAsset.find_all_by_asset_id(@sop.id)
+        assay_assets.each do |assay_asset|
+          flag = false
+          assay_ids.each do |id|
+            if assay_asset.assay_id.to_s == id
+              flag = true
+            end
+          end
+          if flag == false
+             AssayAsset.destroy(assay_asset.id)
+          end
+        end
       else
         format.html { 
           render :action => "edit" 
@@ -171,7 +197,8 @@ class SopsController < ApplicationController
       format.html { redirect_to(sops_path) }
     end
   end
-    
+
+  
   def preview
     
     element=params[:element]
@@ -196,7 +223,7 @@ class SopsController < ApplicationController
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end
-  
+
   protected
   
   def find_display_sop

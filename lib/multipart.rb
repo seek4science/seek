@@ -1,6 +1,6 @@
 class Multipart
   
-  def initialize( file_param_name,filepath,filename )
+  def initialize( file_param_name,filepath,filename)
     @file_param_name=file_param_name
     @filepath=filepath
     @filename=filename    
@@ -22,8 +22,8 @@ class Multipart
     parts << StringPart.new( "\r\n--" + boundary + "--\r\n" )
     
     post_stream = MultipartStream.new( parts )
-    
-    url = URI.parse( to_url )    
+
+    url = URI.parse( to_url )
     
     req = Net::HTTP::Post.new(url.request_uri)
     req.content_length = post_stream.size

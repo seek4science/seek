@@ -1,0 +1,2257 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<annotator>
+
+
+<errorinfo>
+<error id="reaction">
+0
+</error>
+
+<error id="kinetics">
+0
+</error>
+
+<error id="initVal">
+0
+</error>
+
+<error id="parameters">
+0
+</error>
+
+<error id="functions">
+0
+</error>
+
+<error id="assRules">
+0
+</error>
+
+<error id="events">
+0
+</error>
+
+<error id="speciesAnnoErrors">
+0
+</error>
+
+<error id="reacsAnnoErrors">
+0
+</error>
+
+</errorinfo>
+
+<form id="uploadDatFile">
+   <action>
+       DatFileReader.jsp
+   </action>
+</form>
+
+
+    <form id="uploadSBMLFile">
+        <action>
+            ../../upload/uploadNEW.jsp?SBMLFilePostedToIFC=true&amp;xmlOutput=true
+        </action>
+        <parameters>
+            <parameter id="SBMLFilePostedToIFC">
+                true
+            </parameter>
+        </parameters>
+    </form>
+
+
+
+
+
+
+<form id="main">
+        <action>
+            DatFileReader.jsp
+        </action>
+        <parameters>
+            <parameter id="modelname">
+                teusinkmocked
+            </parameter>
+            <parameter id="reaction">
+                v[v1] {1.0}GLCi + {1.0}Prb = {1.0}G6P\nv[v2] {1.0}G6P = {1.0}F6P\nv[v3] {1.0}G6P + {1.0}Prb = {1.0}$Glyc\nv[v4] {1.0}Prb + {2.0}G6P = {1.0}$Trh\nv[v5] {1.0}F6P + {1.0}Prb = {1.0}F16P\nv[v6] {1.0}F16P = {2.0}TRIO\nv[v7] {1.0}NAD + {1.0}TRIO = {1.0}BPG + {1.0}NADH\nv[v8] {1.0}BPG = {1.0}P3G + {1.0}Prb\nv[v9] {1.0}P3G = {1.0}P2G\nv[v10] {1.0}P2G = {1.0}PEP\nv[v11] {1.0}PEP = {1.0}Prb + {1.0}PYR\nv[v12] {1.0}PYR = {1.0}ACE + {1.0}$CO2\nv[v13] {2.0}ACE + {3.0}NAD = {1.0}$SUCC + {3.0}NADH\nv[v14] {1.0}$GLCo = {1.0}GLCi\nv[v15] {1.0}ACE + {1.0}NADH = {1.0}NAD + {1.0}$ETOH\nv[v16] {1.0}NADH + {1.0}TRIO = {1.0}NAD + {1.0}$GLY\nv[v17] {1.0}Prb = {1.0}$X\n
+            </parameter>
+            
+            <parameter id="annotationsReactions">
+            
+			</parameter>
+			
+			<parameter id="annotationsSpecies">
+			
+            </parameter>
+            
+            <parameter id="kinetics">
+				v[v1] = (VmGLK*(-(G6P[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KeqGLK))+GLCi[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(2-8*KeqAK))/(KmGLKATP*KmGLKGLCi*(1+G6P[t]/KmGLKG6P+GLCi[t]/KmGLKGLCi)*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmGLKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmGLKATP))))\nv[v2] = VmPGI*(-(F6P[t]/KeqPGI)+G6P[t])/(KmPGIG6P*(1+F6P[t]/KmPGIF6P+G6P[t]/KmPGIG6P))\nv[v3] = KGLYCOGEN\nv[v4] = KTREHALOSE\nv[v5] = gR*VmPFK*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])*(1+F6P[t]/KmPFKF6P+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP)+gR*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP*KmPFKF6P))/((2-8*KeqAK)*KmPFKATP*KmPFKF6P*(L0*Power[1+CPFKF26BP*F26BP/KPFKF26BP+CPFKF16BP*F16P[t]/KPFKF16BP,2]*Power[1+2*CPFKAMP*KeqAK*Power[SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5],2]/((-1+4*KeqAK)*KPFKAMP*(SUMAXP-Prb[t]+4*KeqAK*Prb[t]-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])),2]*Power[1+CiPFKATP*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KiPFKATP),2]*Power[1+CPFKATP*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP),2]/(Power[1+F26BP/KPFKF26BP+F16P[t]/KPFKF16BP,2]*Power[1+2*KeqAK*Power[SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5],2]/((-1+4*KeqAK)*KPFKAMP*(SUMAXP-Prb[t]+4*KeqAK*Prb[t]-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])),2]*Power[1+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KiPFKATP),2])+Power[1+F6P[t]/KmPFKF6P+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP)+gR*F6P[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPFKATP*KmPFKF6P),2]))\nv[v6] = VmALD*(F16P[t]-KeqTPI*Power[TRIO[t],2]/(KeqALD*Power[1+KeqTPI,2]))/(KmALDF16P*(1+F16P[t]/KmALDF16P+TRIO[t]/((1+KeqTPI)*KmALDDHAP)+KeqTPI*TRIO[t]/((1+KeqTPI)*KmALDGAP)+KeqTPI*F16P[t]*TRIO[t]/((1+KeqTPI)*KmALDF16P*KmALDGAPi)+KeqTPI*Power[TRIO[t],2]/(Power[1+KeqTPI,2]*KmALDDHAP*KmALDGAP)))\nv[v7] = (-(VmGAPDHr*BPG[t]*NADH[t]/(KmGAPDHBPG*KmGAPDHNADH))+KeqTPI*VmGAPDHf*NAD[t]*TRIO[t]/((1+KeqTPI)*KmGAPDHGAP*KmGAPDHNAD))/((1+NAD[t]/KmGAPDHNAD+NADH[t]/KmGAPDHNADH)*(1+BPG[t]/KmGAPDHBPG+KeqTPI*TRIO[t]/((1+KeqTPI)*KmGAPDHGAP)))\nv[v8] = VmPGK*(KeqPGK*BPG[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(1-4*KeqAK)-P3G[t]*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(2-8*KeqAK))/(KmPGKATP*KmPGKP3G*(1+BPG[t]/KmPGKBPG+P3G[t]/KmPGKP3G)*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmPGKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPGKATP)))\nv[v9] = VmPGM*(-(P2G[t]/KeqPGM)+P3G[t])/(KmPGMP3G*(1+P2G[t]/KmPGMP2G+P3G[t]/KmPGMP3G))\nv[v10] = VmENO*(P2G[t]-PEP[t]/KeqENO)/(KmENOP2G*(1+P2G[t]/KmENOP2G+PEP[t]/KmENOPEP))\nv[v11] = VmPYK*(PEP[t]*(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(1-4*KeqAK)-(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])*PYR[t]/((2-8*KeqAK)*KeqPYK))/(KmPYKADP*KmPYKPEP*(1+(SUMAXP-Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((1-4*KeqAK)*KmPYKADP)+(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/((2-8*KeqAK)*KmPYKATP))*(1+PEP[t]/KmPYKPEP+PYR[t]/KmPYKPYR))\nv[v12] = VmPDC*Power[PYR[t],nPDC]/(Power[KmPDCPYR,nPDC]*(1+Power[PYR[t],nPDC]/Power[KmPDCPYR,nPDC]))\nv[v13] = KSUCC*ACE[t]\nv[v14] = VmGLT*(GLCo-GLCi[t]/KeqGLT)/(KmGLTGLCo*(1+GLCo/KmGLTGLCo+GLCi[t]/KmGLTGLCi+0.91*GLCo*GLCi[t]/(KmGLTGLCi*KmGLTGLCo)))\nv[v15] = -(VmADH*(ETOH*NAD[t]-ACE[t]*NADH[t]/KeqADH)/(KiADHNAD*KmADHETOH*(1+ETOH*KmADHNAD/(KiADHNAD*KmADHETOH)+KmADHNADH*ACE[t]/(KiADHNADH*KmADHACE)+NAD[t]/KiADHNAD+ETOH*NAD[t]/(KiADHNAD*KmADHETOH)+ETOH*ACE[t]*NAD[t]/(KiADHACE*KiADHNAD*KmADHETOH)+KmADHNADH*ACE[t]*NAD[t]/(KiADHNAD*KiADHNADH*KmADHACE)+NADH[t]/KiADHNADH+ETOH*KmADHNAD*NADH[t]/(KiADHNAD*KiADHNADH*KmADHETOH)+ACE[t]*NADH[t]/(KiADHNADH*KmADHACE)+ETOH*ACE[t]*NADH[t]/(KiADHETOH*KiADHNADH*KmADHACE))))\nv[v16] = VmG3PDH*(-(GLY*NAD[t]/KeqG3PDH)+NADH[t]*TRIO[t]/(1+KeqTPI))/(KmG3PDHDHAP*KmG3PDHNADH*(1+NAD[t]/KmG3PDHNAD+NADH[t]/KmG3PDHNADH)*(1+GLY/KmG3PDHGLY+TRIO[t]/((1+KeqTPI)*KmG3PDHDHAP)))\nv[v17] = KATPASE*(-SUMAXP+Prb[t]-4*KeqAK*Prb[t]+Power[Power[SUMAXP,2]-2*SUMAXP*Prb[t]+8*KeqAK*SUMAXP*Prb[t]+Power[Prb[t],2]-4*KeqAK*Power[Prb[t],2],0.5])/(2-8*KeqAK)\n\n
+            </parameter>
+            
+
+            
+            
+            <parameter id="initVal">
+				GLCi[0] = 0.087\nPrb[0] = 5\nG6P[0] = 1.39\nF6P[0] = 0.28\nF16P[0] = 0.1\nTRIO[0] = 5.17\nNAD[0] = 1.2\nBPG[0] = 0.0\nNADH[0] = 0.39\nP3G[0] = 0.1\nP2G[0] = 0.1\nPEP[0] = 0.1\nPYR[0] = 3.36\nACE[0] = 0.04\n\n
+            </parameter>
+
+            
+            <parameter id="parameterset">
+                \nCiPFKATP = 100\ncompartment = 1\nCPFKAMP = 0.0845\nCPFKATP = 3\nCPFKF16BP = 0.397\nCPFKF26BP = 0.0174\nCPFKF6P = 0.0\nF26BP = 0.02\ngR = 5.12\nKATPASE = 39.5\nKeqADH = \&quot;6.9e-5\&quot;\nKeqAK = 0.45\nKeqALD = 0.069\nKeqENO = 6.7\nKeqG3PDH = 4300\nKeqGLK = 3800\nKeqGLT = 1\nKeqPGI = 0.314\nKeqPGK = 3200\nKeqPGM = 0.19\nKeqPYK = 6500\nKeqTPI = 0.045\nKGLYCOGEN = 6\nKiADHACE = 1.1\nKiADHETOH = 90\nKiADHNAD = 0.92\nKiADHNADH = 0.031\nKiPFKATP = 0.65\nKmADHACE = 1.11\nKmADHETOH = 17\nKmADHNAD = 0.17\nKmADHNADH = 0.11\nKmALDDHAP = 2.4\nKmALDF16P = 0.3\nKmALDGAP = 2\nKmALDGAPi = 10\nKmENOP2G = 0.04\nKmENOPEP = 0.5\nKmG3PDHDHAP = 0.4\nKmG3PDHGLY = 1\nKmG3PDHNAD = 0.93\nKmG3PDHNADH = 0.023\nKmGAPDHBPG = 0.0098\nKmGAPDHGAP = 0.21\nKmGAPDHNAD = 0.09\nKmGAPDHNADH = 0.06\nKmGLKADP = 0.23\nKmGLKATP = 0.15\nKmGLKG6P = 30\nKmGLKGLCi = 0.08\nKmGLTGLCi = 1.1918\nKmGLTGLCo = 1.1918\nKmPDCPYR = 4.33\nKmPFKATP = 0.71\nKmPFKF6P = 0.1\nKmPGIF6P = 0.3\nKmPGIG6P = 1.4\nKmPGKADP = 0.2\nKmPGKATP = 0.3\nKmPGKBPG = 0.003\nKmPGKP3G = 0.53\nKmPGMP2G = 0.08\nKmPGMP3G = 1.2\nKmPYKADP = 0.53\nKmPYKATP = 1.5\nKmPYKPEP = 0.14\nKmPYKPYR = 21\nKPFKAMP = 0.0995\nKPFKF16BP = 0.111\nKPFKF26BP = 0.000682\nKSUCC = 21.4\nKTREHALOSE = 2.4\nL0 = 0.66\nnPDC = 1.9\nSUMAXP = 4.1\nVmADH = 810\nVmALD = 322.258\nVmENO = 365.806\nVmG3PDH = 70.15\nVmGAPDHf = 1184.52\nVmGAPDHr = 6549.68\nVmGLK = 226.452\nVmGLT = 97.264\nVmPDC = 174.194\nVmPFK = 182.903\nVmPGI = 339.677\nVmPGK = 1306.45\nVmPGM = 2525.81\nVmPYK = 1088.71\nEXTERNAL = 0.0\ncompartment0 = 1\nGlyc = 0.0\nTrh = 0.0\nCO2 = 1\nSUCC = 0.0\nGLCo = 50\nETOH = 50\nGLY = 0.15\nX = 0.0\n\n
+            </parameter>
+            
+
+            <parameter id="assignmentRules">
+                \n
+            </parameter>
+            
+            
+            <parameter id="functions">
+                \n
+            </parameter>
+            
+            
+            <parameter id="events">
+                \n
+            </parameter>
+            
+            
+         <parameter id="citationURL">
+			
+         </parameter>
+         <parameter id="citationURN">
+			
+         </parameter>
+         <parameter id="modelURN">
+			
+         </parameter>
+         <parameter id="authors">
+			
+         </parameter>
+         <parameter id="creationDate">
+			
+         </parameter>
+         <parameter id="creationTime">
+			
+         </parameter>
+         <parameter id="modificationDate">
+			
+         </parameter>
+         <parameter id="modificationTime">
+			
+         </parameter>
+
+         <parameter id="TOD">
+			
+         </parameter>
+         <parameter id="notes">
+			
+         </parameter>
+        </parameters>
+        
+        <objects>
+        
+            <object id="reactionImage">
+                schemas/teusinkmocked20113301722308955.svg
+            </object>
+            
+                    
+            
+        </objects>
+        
+         
+         
+         
+         
+         <speciesNames>
+           	<name>GLCi</name>
+<name>Prb</name>
+<name>G6P</name>
+<name>F6P</name>
+<name>F16P</name>
+<name>NAD</name>
+<name>TRIO</name>
+<name>BPG</name>
+<name>P3G</name>
+<name>P2G</name>
+<name>PEP</name>
+<name>PYR</name>
+<name>ACE</name>
+<name>NADH</name>
+         
+         </speciesNames>
+         
+         <reactionsNames>
+         	<name>v[v1]</name>
+<name>v[v2]</name>
+<name>v[v3]</name>
+<name>v[v4]</name>
+<name>v[v5]</name>
+<name>v[v6]</name>
+<name>v[v7]</name>
+<name>v[v8]</name>
+<name>v[v9]</name>
+<name>v[v10]</name>
+<name>v[v11]</name>
+<name>v[v12]</name>
+<name>v[v13]</name>
+<name>v[v14]</name>
+<name>v[v15]</name>
+<name>v[v16]</name>
+<name>v[v17]</name>
+         		
+         </reactionsNames>
+         
+    	 <annotations>
+    	 <search>
+    	     <parameter id="searchStatus">
+    	     <pre>urnSearchFeedback</pre>
+    	     </parameter>
+    	     
+    	     <parameter id="errorCode">
+    	     0
+    	     </parameter>
+    	     
+    	     
+    	     <parameter id="selected">
+       	     		
+    	     </parameter>
+    	     
+  
+	    	 <parameter id="nameToSearch">
+			 	
+	    	 </parameter>
+		
+         <pre>&lt;results style=&quot;display: none&quot; &gt;	&lt;&gt;
+
+ 
+&gt;   (	&lt;symbol id=&quot;searchTerm&quot; name=&quot;searchTerm&quot; &gt;&lt;&gt;
+ 
+&gt;      (           &lt;&gt;(URN /. (triplet /. annoData))&lt;&gt;&lt;/URN&gt;       &lt;&gt;
+        		&lt;triplet&gt;                                  			&lt;ReadName&gt;
+        			&lt;URN&gt;
+ 
+&gt;         (ReadName /. (triplet /. annoData))&lt;&gt;&lt;/ReadName&gt;   &lt;&gt;
+                                               			&lt;Qualifier&gt;
+ 
+&gt;         (is /. (triplet /. annoData))&lt;&gt;&lt;/Qualifier&gt;)[[           &lt;&gt;
+                                         		&lt;/triplet&gt;   		&lt;triplet&gt;
+                                                        			&lt;URN&gt;
+ 
+&gt;        (URN /. (triplet /. 2))&lt;&gt;&lt;/URN&gt;       &lt;&gt;
+                                  			&lt;ReadName&gt;
+ 
+&gt;        (ReadName /. (triplet /. 2))&lt;&gt;&lt;/ReadName&gt;   &lt;&gt;
+                                       			&lt;Qualifier&gt;
+ 
+&gt;        (is /. (triplet /. 2))&lt;&gt;&lt;/Qualifier&gt;]]&lt;&gt;	&lt;/symbol&gt; /. 
+                                 		&lt;/triplet&gt;
+
+ 
+&gt;     	&lt;symbol id=&quot;searchTerm&quot; name=&quot;searchTerm&quot; &gt;&lt;&gt;4&lt;&gt;	&lt;/symbol&gt;)&lt;&gt;
+                                                                    &lt;/results&gt;</pre>
+         </search>
+		 
+		 <assigned>
+
+		 		<species style="display: none" >	
+
+</species>
+
+
+		 		
+
+		 </assigned>
+		 
+		 
+		 
+
+			 <cached style="display: none" >	
+	<symbol id="GLCi" name="GLCi" >
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00293</URN>
+			<ReadName>glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI17234</URN>
+			<ReadName>glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3587</URN>
+			<ReadName>glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:3dmet:B01136</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI15428</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00037</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3339</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0009518</URN>
+			<ReadName>PSI associated light-harvesting complex I</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:interpro:IPR011831</URN>
+			<ReadName>Glucose-1-phosphate adenylyltransferase</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C01811</URN>
+			<ReadName>glucosamine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI5417</URN>
+			<ReadName>glucosamine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:interpro:IPR004490</URN>
+			<ReadName>Glycolate oxidase subunit GlcD</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0043879</URN>
+			<ReadName>glycolate transmembrane transporter activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:sgd:S000004928</URN>
+			<ReadName>YMR311C</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004721</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:sgd:S000002292</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:3.1.3.16</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33917</URN>
+			<ReadName>aldohexoses</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI14313</URN>
+			<ReadName>glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33929</URN>
+			<ReadName>glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI24277</URN>
+			<ReadName>glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI5418</URN>
+			<ReadName>glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37624</URN>
+			<ReadName>L-glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37663</URN>
+			<ReadName>aldehydo-glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37661</URN>
+			<ReadName>glucopyranose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI17634</URN>
+			<ReadName>D-glucose</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI24368</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI42964</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI10792</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI5460</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI14344</URN>
+			<ReadName>glycine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00045</URN>
+			<ReadName>alpha-amino acids</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33704</URN>
+			<ReadName>alpha-amino acids</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3347</URN>
+			<ReadName>alpha-amino acids</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.drug:D00011</URN>
+			<ReadName>Glycine (JP15/USP)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0030083</URN>
+			<ReadName>PSI associated light-harvesting complex I, LHCIa subcomplex</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0030084</URN>
+			<ReadName>PSI associated light-harvesting complex I, LHCIb subcomplex</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0009503</URN>
+			<ReadName>thylakoid light-harvesting complex</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P15280</URN>
+			<ReadName>ADP-glucose pyrophosphorylase, conserved site</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P39669</URN>
+			<ReadName>ADP-glucose pyrophosphorylase, conserved site</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P52415</URN>
+			<ReadName>ADP-glucose pyrophosphorylase, conserved site</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P55228</URN>
+			<ReadName>ADP-glucose pyrophosphorylase, conserved site</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:A5GLA9</URN>
+			<ReadName>ADP-glucose pyrophosphorylase, conserved site</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI17315</URN>
+			<ReadName>D-glucosamine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI24271</URN>
+			<ReadName>glucosamines</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P0AEP9</URN>
+			<ReadName>Glycolate oxidase subunit GlcD</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0008514</URN>
+			<ReadName>organic anion transmembrane transporter activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAA36475.1</URN>
+			<ReadName>Bis(5'-nucleosyl)-tetraphosphatase, symmetrical</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P16298</URN>
+			<ReadName>Bis(5'-nucleosyl)-tetraphosphatase, symmetrical</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0008330</URN>
+			<ReadName>protein tyrosine/threonine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0008138</URN>
+			<ReadName>protein tyrosine/serine/threonine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8WUK0</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH05821.1</URN>
+			<ReadName>Phosphatidylinositol-3,4,5-trisphosphate 3-phosphatase and dual-specificity protein phosphatase PTEN</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P60484</URN>
+			<ReadName>Phosphatidylinositol-3,4,5-trisphosphate 3-phosphatase and dual-specificity protein phosphatase PTEN</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9Y5B0</URN>
+			<ReadName>FCP1-like phosphatase, phosphatase domain</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH64381.1</URN>
+			<ReadName>Protein phosphatase 1B</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O75688</URN>
+			<ReadName>Protein phosphatase 1B</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0016791</URN>
+			<ReadName>phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH37236.1</URN>
+			<ReadName>Dual specificity protein phosphatase 6</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q16828</URN>
+			<ReadName>Dual specificity protein phosphatase 6</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH63243.1</URN>
+			<ReadName>Integrin-linked kinase-associated serine/threonine phosphatase 2C</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q80Z30</URN>
+			<ReadName>Integrin-linked kinase-associated serine/threonine phosphatase 2C</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0033549</URN>
+			<ReadName>MAP kinase phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:A6NG73</URN>
+			<ReadName>RNA polymerase II subunit A</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P51452</URN>
+			<ReadName>Dual specificity phosphatase, subfamily A</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004722</URN>
+			<ReadName>protein serine/threonine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004725</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:sgd:S000002474</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:3.1.3.48</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH62452.1</URN>
+			<ReadName>Probable protein phosphatase 1B-like</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8N819</URN>
+			<ReadName>Probable protein phosphatase 1B-like</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9UNI6</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P49593</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9NP77</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9UNH5</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:A4D256</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9GZU7</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH22463.1</URN>
+			<ReadName>Dual specificity protein phosphatase 1</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P28562</URN>
+			<ReadName>Dual specificity protein phosphatase 1</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O95476</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q68J44</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9Y6W6</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9UII6</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O15194</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8NEJ0</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8WTR2</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9H596</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9NRW4</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9BVJ7</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9BV47</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q4G0W2</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q16690</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q16829</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q13202</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q99956</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O95278</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q6B8I1</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q96HS1</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O60346</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q6ZVD8</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P67775</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P62714</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P48454</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0019198</URN>
+			<ReadName>transmembrane receptor protein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O14830</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P60510</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O15355</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH14565.1</URN>
+			<ReadName>Dual specificity protein phosphatase 4</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q13115</URN>
+			<ReadName>Dual specificity protein phosphatase 4</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q5JR12</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q05923</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q5SGD2</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O14595</URN>
+			<ReadName>Dullard-like phosphatase domain</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O00743</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9BY84</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:A6NK39</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:A8MSY0</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8WYL5</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q76I76</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8TE77</URN>
+			<ReadName>protein tyrosine phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P53041</URN>
+			<ReadName>Serine/threonine phosphatase, PPP5</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O95147</URN>
+			<ReadName>Dual specificity phosphatase</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8WVY7</URN>
+			<ReadName>HAD-superfamily hydrolase, subfamily IIID</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O60729</URN>
+			<ReadName>Dual specificity phosphatase, subgroup, catalytic domain</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH64965.1</URN>
+			<ReadName>Cyclin-dependent kinase inhibitor 3</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q16667</URN>
+			<ReadName>Cyclin-dependent kinase inhibitor 3</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O14829</URN>
+			<ReadName>Serine/threonine protein phosphatase, EF-hand-containing</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q9ULR3</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH68267.1</URN>
+			<ReadName>Putative tyrosine phosphatase 123R</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q196Z3</URN>
+			<ReadName>Putative tyrosine phosphatase 123R</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8N3J5</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:sgd:S000000480</URN>
+			<ReadName>YBR276C</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8NI37</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q96MI6</URN>
+			<ReadName>phosphoprotein phosphatase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="G6P" name="G6P" >
+		<triplet>
+			<URN>urn:miriam:3dmet:B01991</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI17345</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C06193</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:8443</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004345</URN>
+			<ReadName>glucose-6-phosphate dehydrogenase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:1.1.1.49</URN>
+			<ReadName>glucose-6-phosphate dehydrogenase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37021</URN>
+			<ReadName>purine ribonucleoside 5'-monophosphates</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37121</URN>
+			<ReadName>guanosine 5'-phosphates</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI42647</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI47450</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI14381</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI40119</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI5228</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI13341</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI24449</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI24450</URN>
+			<ReadName>GMP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:sgd:S000005185</URN>
+			<ReadName>YNL241C</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0016616</URN>
+			<ReadName>oxidoreductase activity, acting on the CH-OH group of donors, NAD or NADP as acceptor</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P11413</URN>
+			<ReadName>druggable</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="F6P" name="F6P" >
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI30201</URN>
+			<ReadName>hexafluorophosphate(1-)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37188</URN>
+			<ReadName>hexafluoroplumbate(2-)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37378</URN>
+			<ReadName>phosphorus halides</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37185</URN>
+			<ReadName>lead coordination entities</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="F16P" name="F16P" >
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI30201</URN>
+			<ReadName>hexafluorophosphate(1-)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37188</URN>
+			<ReadName>hexafluoroplumbate(2-)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37378</URN>
+			<ReadName>phosphorus halides</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI37185</URN>
+			<ReadName>lead coordination entities</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="NAD" name="NAD" >
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI13389</URN>
+			<ReadName>NAD</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:interpro:IPR005623</URN>
+			<ReadName>NapD</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:BAA15990.1</URN>
+			<ReadName>NapD</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P0A9I5</URN>
+			<ReadName>NapD</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI25523</URN>
+			<ReadName>NADP</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:interpro:IPR006420</URN>
+			<ReadName>NAD pyrophosphatase/5-nucleotidase NadN</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0003951</URN>
+			<ReadName>NAD+ kinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:sgd:S000003810</URN>
+			<ReadName>NAD+ kinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:2.7.1.23</URN>
+			<ReadName>NAD+ kinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:3dmet:B01127</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI16908</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00004</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3306</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:3dmet:B01126</URN>
+			<ReadName>NAD(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI15846</URN>
+			<ReadName>NAD(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00003</URN>
+			<ReadName>NAD(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3305</URN>
+			<ReadName>NAD(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI44215</URN>
+			<ReadName>NAD zwitterion</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI25524</URN>
+			<ReadName>NAD(P)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:3dmet:B01129</URN>
+			<ReadName>NADP(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI18009</URN>
+			<ReadName>NADP(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00006</URN>
+			<ReadName>NADP(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3308</URN>
+			<ReadName>NADP(+)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI44409</URN>
+			<ReadName>NADP zwitterion</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:interpro:IPR006179</URN>
+			<ReadName>5'-Nucleotidase/apyrase</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O83142</URN>
+			<ReadName>NAD pyrophosphatase/5-nucleotidase NadN</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0016773</URN>
+			<ReadName>phosphotransferase activity, alcohol group as acceptor</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O95544</URN>
+			<ReadName>ATP-NAD/AcoX kinase</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0016301</URN>
+			<ReadName>kinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI13395</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI7423</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI21902</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI13396</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI44216</URN>
+			<ReadName>NADH</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI13392</URN>
+			<ReadName>NAD(P)H</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="TRIO" name="TRIO" >
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33331</URN>
+			<ReadName>yttrium</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI27136</URN>
+			<ReadName>triol</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33385</URN>
+			<ReadName>thorium</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI29234</URN>
+			<ReadName>triton</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI46053</URN>
+			<ReadName>2,4,6-trinitrotoluene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C16391</URN>
+			<ReadName>2,4,6-trinitrotoluene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:47205689</URN>
+			<ReadName>2,4,6-trinitrotoluene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI29238</URN>
+			<ReadName>tritium</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI27137</URN>
+			<ReadName>trioses</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI51254</URN>
+			<ReadName>amoxicillin trihydrate</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:3dmet:B00738</URN>
+			<ReadName>5-hydroxy-6-methylpyridine-3,4-dicarboxylic acid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI17978</URN>
+			<ReadName>5-hydroxy-6-methylpyridine-3,4-dicarboxylic acid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C15771</URN>
+			<ReadName>5-hydroxy-6-methylpyridine-3,4-dicarboxylic acid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:47205097</URN>
+			<ReadName>5-hydroxy-6-methylpyridine-3,4-dicarboxylic acid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33376</URN>
+			<ReadName>terbium</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33335</URN>
+			<ReadName>scandium group elements</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI52622</URN>
+			<ReadName>yttrium-89</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33561</URN>
+			<ReadName>d-block elements</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33321</URN>
+			<ReadName>rare earth metal</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI46097</URN>
+			<ReadName>Htris</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI9754</URN>
+			<ReadName>tris</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C07182</URN>
+			<ReadName>tris</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:9391</URN>
+			<ReadName>tris</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI26191</URN>
+			<ReadName>polyol</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.drug:D00028</URN>
+			<ReadName>glycerol</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:3dmet:B00032</URN>
+			<ReadName>glycerol</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00116</URN>
+			<ReadName>glycerol</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI17754</URN>
+			<ReadName>glycerol</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3416</URN>
+			<ReadName>glycerol</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI22707</URN>
+			<ReadName>benzenetriols</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33320</URN>
+			<ReadName>actinoid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33562</URN>
+			<ReadName>f-block element</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00080</URN>
+			<ReadName>hydron</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI15378</URN>
+			<ReadName>hydron</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:3380</URN>
+			<ReadName>hydron</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI27135</URN>
+			<ReadName>trinitrotoluenes</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI19337</URN>
+			<ReadName>2,4,6-trinitrotoluene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI46051</URN>
+			<ReadName>2,4,6-trinitrotoluene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI49637</URN>
+			<ReadName>hydrogen</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C06698</URN>
+			<ReadName>monosaccharide</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35381</URN>
+			<ReadName>monosaccharide</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:8923</URN>
+			<ReadName>monosaccharide</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI24982</URN>
+			<ReadName>ketotrioses</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33923</URN>
+			<ReadName>ketoaldotrioses</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33914</URN>
+			<ReadName>aldotrioses</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35505</URN>
+			<ReadName>hydrate</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.drug:D00229</URN>
+			<ReadName>Amoxicillin hydrate (JP15)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI25340</URN>
+			<ReadName>methylpyridines</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI38182</URN>
+			<ReadName>monohydroxypyridines</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI1518</URN>
+			<ReadName>5-hydroxy-6-methylpyridine-3,4-dicarboxylic acid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI20037</URN>
+			<ReadName>5-hydroxy-6-methylpyridine-3,4-dicarboxylic acid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33319</URN>
+			<ReadName>lanthanoid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="BPG" name="BPG" >
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004082</URN>
+			<ReadName>bisphosphoglycerate mutase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:5.4.2.4</URN>
+			<ReadName>bisphosphoglycerate mutase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI29865</URN>
+			<ReadName>benzo[a]pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C07535</URN>
+			<ReadName>benzo[a]pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:9738</URN>
+			<ReadName>benzo[a]pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P07738</URN>
+			<ReadName>Phosphoglycerate mutase 1</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:insdc:AAH73742.1</URN>
+			<ReadName>Phosphoglycerate mutase 1</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P18669</URN>
+			<ReadName>Phosphoglycerate mutase 1</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:P15259</URN>
+			<ReadName>bisphosphoglycerate mutase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q8N0Y7</URN>
+			<ReadName>bisphosphoglycerate mutase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0016868</URN>
+			<ReadName>intramolecular transferase activity, phosphotransferases</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI22716</URN>
+			<ReadName>benzo[a]pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI3045</URN>
+			<ReadName>benzo[a]pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35300</URN>
+			<ReadName>ortho- and peri-fused polycyclic arene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="P2G" name="P2G" >
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33472</URN>
+			<ReadName>diphosphorus</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33475</URN>
+			<ReadName>diatomic phosphorus</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="PEP" name="PEP" >
+		<triplet>
+			<URN>urn:miriam:insdc:BAE97237.1</URN>
+			<ReadName>DNA-directed RNA polymerase subunit alpha</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q14FC5</URN>
+			<ReadName>DNA-directed RNA polymerase subunit alpha</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:3.4.14.11</URN>
+			<ReadName>Xaa-Pro dipeptidyl-peptidase</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004612</URN>
+			<ReadName>phosphoenolpyruvate carboxykinase (ATP) activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:4.1.1.49</URN>
+			<ReadName>phosphoenolpyruvate carboxykinase (ATP) activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.drug:D08350</URN>
+			<ReadName>Pheneticillin (INN)</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004611</URN>
+			<ReadName>phosphoenolpyruvate carboxykinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:sgd:S000001805</URN>
+			<ReadName>YKR097W</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI52427</URN>
+			<ReadName>phenethicillin</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>	<symbol id="PYR" name="PYR" >
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0033862</URN>
+			<ReadName>UMP kinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:2.7.4.22</URN>
+			<ReadName>UMP kinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:3dmet:B00165</URN>
+			<ReadName>pyridine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI16227</URN>
+			<ReadName>pyridine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C00747</URN>
+			<ReadName>pyridine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:4009</URN>
+			<ReadName>pyridine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI49828</URN>
+			<ReadName>praseodymium</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:interpro:IPR004020</URN>
+			<ReadName>Pyrin</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI39106</URN>
+			<ReadName>pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:kegg.compound:C14335</URN>
+			<ReadName>pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:pubchem.substance:17395335</URN>
+			<ReadName>pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35594</URN>
+			<ReadName>pyran</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0047405</URN>
+			<ReadName>pyrimidine-5'-nucleotide nucleosidase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:ec-code:3.2.2.10</URN>
+			<ReadName>pyrimidine-5'-nucleotide nucleosidase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0043767</URN>
+			<ReadName>pyrrolysyl-tRNA synthetase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0009041</URN>
+			<ReadName>uridylate kinase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35555</URN>
+			<ReadName>mancude organic heteromonocyclic parent</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI38179</URN>
+			<ReadName>monocyclic heteroarenes</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI50893</URN>
+			<ReadName>azaarene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI8662</URN>
+			<ReadName>pyridine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI26415</URN>
+			<ReadName>pyridine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI14974</URN>
+			<ReadName>pyridine</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI26421</URN>
+			<ReadName>pyridines</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI49827</URN>
+			<ReadName>praseodymium</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33562</URN>
+			<ReadName>f-block element</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33319</URN>
+			<ReadName>lanthanoid</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI33370</URN>
+			<ReadName>praseodymium</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:O15553</URN>
+			<ReadName>Pyrin</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:Q08619</URN>
+			<ReadName>HIN-200/IF120x</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:interpro:IPR011029</URN>
+			<ReadName>DEATH-like</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:uniprot:A6QLE5</URN>
+			<ReadName>Pyrin</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI34940</URN>
+			<ReadName>pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI29860</URN>
+			<ReadName>pyrene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35300</URN>
+			<ReadName>ortho- and peri-fused polycyclic arene</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35592</URN>
+			<ReadName>2H-pyran</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI35593</URN>
+			<ReadName>4H-pyran</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.chebi:CHEBI26407</URN>
+			<ReadName>pyrans</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0016799</URN>
+			<ReadName>hydrolase activity, hydrolyzing N-glycosyl compounds</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+
+		<triplet>
+			<URN>urn:miriam:obo.go:GO0004812</URN>
+			<ReadName>aminoacyl-tRNA ligase activity</ReadName>
+			<Qualifier>is</Qualifier>
+		</triplet>
+	</symbol>
+</cached>
+
+         
+		 </annotations>
+		 
+                           
+         
+ 
+        
+    </form>
+
+
+
+
+    <form id="Builder">
+        <action>
+            javascript:unparseAnnotations();unparseAuthors();changeAction();document.form.submit()
+        </action>
+        <parameters>
+        </parameters>        
+    </form>
+
+
+
+
+</annotator>
+
+
+

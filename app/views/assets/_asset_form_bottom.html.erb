@@ -4,11 +4,19 @@ existing_creators||=[current_user.person]
 related_publications||=[]
 other_creators||=nil
 show_publications=true if show_publications.nil?
+taggable = resource_type.constantize.respond_to?("is_taggable?") && resource_type.constantize.is_taggable?
 %>
 
 <p>
     <%= render :partial => "assets/sharing_form" -%>
 </p>
+
+<% if taggable -%>
+<p>
+  <%= render :partial=>"assets/select_tags" -%>
+</p>
+<% end -%>
+
 <p>
     <%= render :partial => "assets/attribution_form", :locals => { :resource_type => resource_type,  # this is only for presentation, not for any processing
     :existing_attributions => existing_attributions,

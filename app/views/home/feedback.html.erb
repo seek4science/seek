@@ -8,7 +8,7 @@
       Your feedback, error reports and suggestions are valuable to us.
     </p>
     <p>
-      Please provide the details below, and your message will be forwarded to the <%= DM_PROJECT_NAME %> Team.
+      Please provide the details below, and your message will be forwarded to the <%= Seek::Config.dm_project_name %> Team.
     </p>
 
   </div>
@@ -42,9 +42,9 @@
       <%= text_area_tag :details,"",:cols=>60,:rows=>15 -%>
     </p>
 
-    <span style="float:right;padding-right:16em;">
-      <%= submit_tag "Send feedback",:onclick=>"return check_form();" -%>
-    </span>
+
+    <%= submit_tag "Send feedback",:onclick=>"return check_form();" -%>
+
 
 
   <% end -%>

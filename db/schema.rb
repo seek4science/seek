@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110218163214) do
+ActiveRecord::Schema.define(:version => 20110315124941) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -226,8 +226,8 @@ ActiveRecord::Schema.define(:version => 20110218163214) do
   end
 
   create_table "events_publications", :id => false, :force => true do |t|
-    t.integer "event_id",       :null => false
-    t.integer "publication_id", :null => false
+    t.integer "publication_id"
+    t.integer "event_id"
   end
 
   create_table "experimental_conditions", :force => true do |t|

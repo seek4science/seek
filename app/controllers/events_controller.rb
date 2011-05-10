@@ -114,7 +114,7 @@ class EventsController < ApplicationController
 
     render :update do |page|
       if event && Authorization.is_authorized?("show", nil, event, current_user)
-        page.replace_html element,:partial=>"events/resource_list_item",:locals=>{:resource=>event}
+        page.replace_html element,:partial=>"events/resource_list_item_preview",:locals=>{:resource=>event}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."
       end
@@ -125,7 +125,7 @@ class EventsController < ApplicationController
 
   #filter to check if events are enabled using the EVENTS_ENABLED configuration flag
   def check_events_enabled
-    if !EVENTS_ENABLED
+    if !Seek::Config.events_enabled
       respond_to do |format|
         flash[:error]="Events are currently disabled"
         format.html { redirect_to root_path }

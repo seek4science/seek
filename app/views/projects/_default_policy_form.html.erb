@@ -44,7 +44,7 @@
           <p>
             You may:
             <ul>
-              <li>Share with all <%= PROJECT_NAME %> project members</li>
+              <li>Share with all <%= Seek::Config.project_name %> project members</li>
               <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> Using custom sharing permissions you can share within your Project/Institution only,<br/> specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
             </ul>
           </p>
@@ -85,7 +85,7 @@
       <label for="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>">
         <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]"
               value="<%= Policy::ALL_SYSMO_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_SYSMO_USERS -%>);" />
-        - All users associated with any of the <%= PROJECT_NAME %> projects for
+        - All users associated with any of the <%= Seek::Config.project_name %> projects for
       </label>
       <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
         :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>

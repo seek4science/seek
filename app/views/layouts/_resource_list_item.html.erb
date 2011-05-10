@@ -4,8 +4,8 @@
 <% content_partial = get_list_item_content_partial(resource) %>
 <% actions_partial = get_list_item_actions_partial(resource) %>
 <% avatar_partial = get_list_item_avatar_partial(resource) %>
-<% box_width = 72 %>
-<% box_width += 13 if actions_partial.blank? %>
+<% box_width = 75 %>
+<% box_width += 10 if actions_partial.blank? %>
 <% box_width += 12 if avatar_partial.blank? %>
 
 <div class="list_item">

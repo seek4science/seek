@@ -19,7 +19,7 @@ module Seek
       uri = ""
       
       unless path.blank?
-        uri = URI.join(SITE_BASE_HOST, path).to_s
+        uri = URI.join(Seek::Config.site_base_host, path).to_s
         uri = append_params(uri, options[:params]) unless options[:params].blank?
       end
       
@@ -39,7 +39,7 @@ module Seek
       uri = ""
       
       unless resource_name.blank?
-        uri = URI.join(SITE_BASE_HOST, resource_name).to_s
+        uri = URI.join(Seek::Config.site_base_host, resource_name).to_s
         uri = append_params(uri, options[:params]) unless options[:params].blank?
       end
       
@@ -62,7 +62,7 @@ module Seek
           sub_path = "/#{sub_path}" unless sub_path.starts_with?('/')
           resource_part += sub_path
         end
-        uri = URI.join(SITE_BASE_HOST, resource_part).to_s
+        uri = URI.join(Seek::Config.site_base_host, resource_part).to_s
         uri = append_params(uri, options[:params]) unless options[:params].blank?
       end
       
@@ -73,12 +73,12 @@ module Seek
     # Returns nil if the URI is an invalid resource URI, or if the object doesn't exist anymore.
     def self.object_for_uri(uri)
       return nil if uri.blank?
-      return nil unless uri.downcase.include?(SITE_BASE_HOST.downcase)
+      return nil unless uri.downcase.include?(Seek::Config.site_base_host.downcase)
       
       obj = nil
       
       begin
-        pieces = uri.downcase.gsub(SITE_BASE_HOST.downcase, '').split('/').delete_if { |s| s.blank? }
+        pieces = uri.downcase.gsub(Seek::Config.site_base_host.downcase, '').split('/').delete_if { |s| s.blank? }
         obj = pieces[0].singularize.camelize.constantize.find(pieces[1])
       rescue Exception => ex
         BioCatalogue::Util.log_exception(ex, :warning, "BioCatalogue::Api.object_for_uri failed to find an object for the uri '#{uri}'")

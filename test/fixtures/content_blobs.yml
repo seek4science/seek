@@ -43,7 +43,7 @@ picture_blob:
   uuid: <%= init_blob('file_picture.png') %>
   
 spreadsheet_blob:  
-  uuid: <%= init_blob('spreadsheet.xls') %>
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
   
 url_content_blob:
   url: http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png  

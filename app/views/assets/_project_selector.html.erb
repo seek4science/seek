@@ -16,7 +16,7 @@
 		<%= help_icon("#{front_part_of_msg}") -%>
 		
 		<% unless disable_project_select -%>
-          <b>Project:</b><span class="required">*</span>
+          <b>Project:</b><% unless allow_nil %><span class="required">*</span><% end %>
 	  <% else -%>
           <b>This <%= resource_type -%> is associated with the following project</b>
 		<% end -%>

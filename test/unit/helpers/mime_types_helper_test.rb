@@ -22,7 +22,20 @@ class MimeTypesHelperTest < ActionView::TestCase
       assert_not_equal "Unknown file type", mime_nice_name(type),"Didn't recognise mime type #{type}"
     end
   end
-  
+
+  def test_mimes_for_extension
+    mime_types = mime_types_for_extension("xls")
+    EXCEL.each do |type|
+      assert mime_types.include?(type)
+    end
+
+    EXCELX.each do |type|
+      assert !mime_types.include?(type)
+    end
+
+    assert !mime_types.include?(nil)
+  end
+
   def test_common_types
     EXCEL.each do |type|
       assert_equal "xls",mime_extension(type)

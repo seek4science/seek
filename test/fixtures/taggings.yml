@@ -1,20 +1,21 @@
-fishing_quentin:
+fishing_pal:
   tag: fishing
-  taggable_id: 1
-  tagger_id: 1
-  taggable_type: "Person"
+  taggable: pal(Person)
   context: "expertise"
 
-golf_quentin:
+golf_pal:
   tag: golf
-  taggable_id: 1
-  tagger_id: 1
-  taggable_type: "Person"
+  taggable: pal(Person)
   context: "expertise"
 
-golf_aaron:
+golf_modeller_person:
   tag: golf
-  taggable_id: 2
-  tagger_id: 2
-  taggable_type: "Person"
+  taggable: modeller_person(Person)
   context: "expertise"
+
+cricket_owned_tag:
+  tag: cricket
+  taggable: francos_model(Model)
+  tagger: pal_user(User)
+  context: "tags"
+  

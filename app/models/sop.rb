@@ -1,7 +1,6 @@
 require 'acts_as_asset'
 require 'explicit_versioning'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
 require 'acts_as_versioned_resource'
 
@@ -11,22 +10,16 @@ class Sop < ActiveRecord::Base
   acts_as_trashable
   
   title_trimmer
-  
-  has_many :favourites, 
-    :as => :resource,
-    :dependent => :destroy
 
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  acts_as_solr(:fields=>[:description, :title, :original_filename]) if SOLR_ENABLED
+  acts_as_solr(:fields=>[:description, :title, :original_filename,:tag_counts]) if Seek::Config.solr_enabled
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
                
-  has_one :investigation,:through=>:study
-             
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
 
   acts_as_uniquely_identifiable  

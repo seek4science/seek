@@ -19,7 +19,7 @@ class FavouritesController < ApplicationController
     f.user=current_user
     f.resource = resource
         
-    if resource && Favourite.find_by_user_id_and_resource_type_and_resource_id(current_user,f.resource_type,f.resource_id).nil? && f.save
+    if resource && resource.is_favouritable? && Favourite.find_by_user_id_and_resource_type_and_resource_id(current_user,f.resource_type,f.resource_id).nil? && f.save
       render :update, :status=>:created do |page|
           page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
           page.visual_effect :highlight, "drop_favourites", :startcolor=>"#DDDDFF"

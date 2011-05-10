@@ -6,6 +6,20 @@ module AssetsHelper
     return '<span class="icon">' + image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}</span>";
   end
 
+  #returns all the classes for models that return true for is_asset?
+  def asset_model_classes
+    @@asset_model_classes ||= Seek::Util.persistent_classes.select do |c|
+      !c.nil? && c.is_asset?
+    end
+  end
+
+  def text_for_resource resource_or_text
+    text=resource_or_text.is_a?(String) ? resource_or_text : resource_or_text.class.name
+    text = text.underscore.humanize
+    text = text.upcase if text.downcase=="sop"
+    text
+  end
+
   def resource_version_selection versioned_resource,displayed_resource_version
     versions=versioned_resource.versions.reverse
     disabled=versions.size==1
@@ -15,11 +29,11 @@ module AssetsHelper
       options << " selected='selected'" if v.version==displayed_resource_version.version
       options << "> #{v.version.to_s} #{versioned_resource.describe_version(v.version)} </option>"
     end
-    "<form onsubmit='showResourceVersion(this); return false;' style='text-align:right;'>"+select_tag(:resource_versions,
+    select_tag(:resource_versions,
       options,
       :disabled=>disabled,
-      :onchange=>"showResourceVersion(this.form);"
-    )+"</form>"    
+      :onchange=>"showResourceVersion($('show_version_form'));"
+    ) + "<form id='show_version_form' onsubmit='showResourceVersion(this); return false;'></form>".html_safe
   end
   
   def resource_title_draggable_avatar resource    
@@ -35,6 +49,7 @@ module AssetsHelper
     icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     icon
   end
+
 
   def get_original_model_name(model)
     class_name = model.class.name
@@ -149,6 +164,7 @@ module AssetsHelper
         related["Project"][:items] = resource.projects
         related["Person"][:items] = resource.people
       when "Project"
+        related["Event"][:items] = resource.events
         related["Person"][:items] = resource.people
         related["Institution"][:items] = resource.institutions
         related["Investigation"][:items] = resource.investigations

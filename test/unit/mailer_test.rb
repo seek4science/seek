@@ -5,7 +5,7 @@ class MailerTest < ActionMailer::TestCase
   fixtures :all
 
   test "signup" do
-    @expected.subject = 'Sysmo SEEK account activation'
+    @expected.subject = 'SEEK account activation'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date    = Time.now
@@ -19,7 +19,7 @@ class MailerTest < ActionMailer::TestCase
   end
   
   test "signup_open_id" do
-    @expected.subject = 'Sysmo SEEK account activation'
+    @expected.subject = 'SEEK account activation'
     @expected.to = "Aaron Openid Spiggle <aaron_openid@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date    = Time.now
@@ -34,7 +34,7 @@ class MailerTest < ActionMailer::TestCase
   
   test "announcement notification" do
     announcement = site_announcements(:mail)
-    @expected.subject = "Sysmo SEEK Announcement: #{announcement.title}"
+    @expected.subject = "SEEK Announcement: #{announcement.title}"
     @expected.to = "Fred Blogs <fred@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date    = Time.now
@@ -48,7 +48,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "feedback anonymously" do
-    @expected.subject = 'Sysmo SEEK Feedback provided - This is a test feedback'
+    @expected.subject = 'SEEK Feedback provided - This is a test feedback'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"    
     @expected.date    = Time.now
@@ -60,7 +60,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "feedback non anonymously" do
-    @expected.subject = 'Sysmo SEEK Feedback provided - This is a test feedback'
+    @expected.subject = 'SEEK Feedback provided - This is a test feedback'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -73,7 +73,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request resource" do
-    @expected.subject = "A Sysmo SEEK member requested a protected file: Picture"
+    @expected.subject = "A SEEK member requested a protected file: Picture"
     #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
     @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
     @expected.from = "no-reply@sysmo-db.org"
@@ -91,7 +91,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request resource no details" do
-    @expected.subject = "A Sysmo SEEK member requested a protected file: Picture"
+    @expected.subject = "A SEEK member requested a protected file: Picture"
     #TODO: hardcoding the formating rather than passing an array was require for rails 2.3.8 upgrade
     @expected.to = "Datafile Owner <data_file_owner@email.com>,\r\n\t OwnerOf MyFirstSop <owner@sop.com>"
     @expected.from = "no-reply@sysmo-db.org"
@@ -109,7 +109,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "forgot_password" do
-    @expected.subject = 'Sysmo SEEK - Password reset'
+    @expected.subject = 'SEEK - Password reset'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date    = Time.now
@@ -126,7 +126,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "contact_admin_new_user_no_profile" do
-    @expected.subject = 'Sysmo SEEK member signed up'
+    @expected.subject = 'SEEK member signed up'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
@@ -142,7 +142,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "welcome" do
-    @expected.subject = 'Welcome to Sysmo SEEK'
+    @expected.subject = 'Welcome to SEEK'
     @expected.to = "Quentin Jones <quentin@email.com>"
     @expected.from    = "no-reply@sysmo-db.org"
     @expected.date = Time.now

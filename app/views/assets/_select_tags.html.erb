@@ -1,0 +1,31 @@
+<%
+   entity=controller_name.singularize
+   object=eval("@"+entity)
+   model_class=entity.camelize.constantize
+   #FIXME: this is required for some cases where the page is rendered from an error, but the @entity doesn't exist. Mainly when rendering from a caught Exception AssetsCommon.handle_data
+   #the correct fix is to fix AssetsCommon.handle_data to correctly create an instance of @entity
+   object ||= model_class.new
+   item_tags = object.tag_counts
+   item_tags = [] if object.id.nil? #acts-as-taggable-on appears to have a bug, where for new items .tag_counts includes some tags from other items
+   type_name = text_for_resource(object)
+%>
+
+
+<div class="fold">
+  <div class="foldTitle">
+    <%= help_icon("Here you can provide some tags to help describe, and other people find, your #{type_name}.") -%>
+    Tags
+  </div>
+  <div class="foldContent" style="display:none;">
+    <p class="box_infotext" style="margin-bottom: 0.5em;">
+      <% if object.id.nil? -%>
+      Here you can provide some initial tags to help describe this <%= type_name -%>. You can change these tags (including those provided by other people), anytime in the future.
+      Tags should be seperated by a comma, and known tags will appear in the drop-down box as you type.
+      <% else -%>
+      You are able to edit all tags, including both the tags you have added and tags added by other people. Any new tags you add will be added as your own tags. Tags you remove, even those added by other people, will be completely removed from this <%= type_name %>.
+      Tags should be seperated by a comma, and known tags will appear in the drop-down box as you type.
+      <% end %>
+    </p>
+    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>aggregated_asset_tags,:owned_tags=>object.owner_tags_on(current_user,:tags), :item_tags=>item_tags, :name=>"tag"} -%>
+  </div>
+</div>

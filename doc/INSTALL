@@ -2,9 +2,9 @@
 
 SEEK is based upon the Ruby on Rails platform. Although the information on this page should provide you with everything you need to get a basic installation of
 SEEK up and running, some background reading on Ruby on Rails would be beneficial if it is new to you. Documentation and resources describing Ruby on Rails can be found
-at http://rubyonrails.org/documentation. Since SEEK uses v2.3.5 of Rails, http://guides.rubyonrails.org/v2.3.8/ and http://api.rubyonrails.org/v2.3.8 may be useful as well.
+at http://rubyonrails.org/documentation. Since SEEK uses v2.3.8 of Rails, http://guides.rubyonrails.org/v2.3.8/ and http://api.rubyonrails.org/v2.3.8 may be useful as well.
 
-We recommend that you run SEEK on a Linux system. All of the examples here describe installing on an Ubuntu or Debian system, but should be easily transferrable to other Linux systems such as Fedora.
+We recommend that you run SEEK on a Linux system. All of the examples here describe installing on an Ubuntu (10.04 LTS) or Debian system, but should be easily transferrable to other Linux systems such as Fedora.
 
 Although possible, installing and running Ruby on Rails on a Windows system is troublesome and is not covered here.
 
@@ -20,7 +20,16 @@ You will need a minimal build environment, as some of the ruby gems require comp
 
 SEEK uses Lucene as its search engine, and this requires that java is installed. We use the Sun Java 1.6 package <em>sun-java6-jdk</em>
 
-<b>Note:</b>If using Ubuntu, you will need to enable Partner sources to install sun-java6-jdk (if you are unsure of how to do this, see https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories).
+<b>Note:</b>If using Ubuntu, you will need to enable Partner sources to install sun-java6-jdk . To do this edit <em>/etc/apt/sources.list</em> and uncomment the lines so that they appear
+as follows:
+
+  ## This software is not part of Ubuntu, but is offered by Canonical and the
+  ## respective vendors as a service to Ubuntu users.
+  deb http://archive.canonical.com/ubuntu lucid partner
+  deb-src http://archive.canonical.com/ubuntu lucid partner
+
+(if you need more information, see https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories).
+
 
 If using Ubuntu or Debian, the following commands should install most the packages you need:
 
@@ -31,7 +40,7 @@ if you are intending to develop SEEK you will probably also want to use:
 
   sudo apt-get install curl irb
   
-if setting up for production deployment using the Passenger Phusion Apache module you can save a step later by also using:
+if setting up for production deployment using the {Passenger Phusion (modrails)}[http://www.modrails.com/] module you can save a step later by also using:
 
   sudo apt-get install apache2-mpm-prefork apache2-prefork-dev libapr1-dev libaprutil1-dev libcurl4-openssl-dev
 
@@ -53,13 +62,13 @@ The following commands should install rubygems for you on a Ubuntu/Debian system
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current tag is v0.10.2, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current tag is v0.10.5, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.10.2 sysmo-seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.10.5 seek
   
 Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
-  sudo gem install -d bundler rake
+  gem install -d bundler rake
   
 Then from within the sysmo-seek directory run
 
@@ -83,17 +92,19 @@ If you are running SEEK for a project other than SysMO, copy config/initializers
 
 To insert your application/project name into the help documents for SEEK, and to remove the logos/links to SEEK's 'related projects and friends' use
 
-rake seek:rebrand
+  rake seek:rebrand
 
 If you only want to change the help documents, you can instead use
 
-rake seek:rebrand_help_docs
+  rake seek:rebrand_help_docs
 
 == Configuring the database
 
 Copy config/database.default.yml to config/database.yml and edit accordingly - either MySQL or SQLite3 should work (you will need to install the <em>sqlite3-dev</em> package and the <em>sqlite3-ruby</em> gem)
 
-To add users to the MySQL database, first login to the database as an administrator (root by default) and issue a GRANT command along the lines of the example below (for clarity, this uses a username of <em>mysqluser</em> and password <em>mysqlpassword</em>. <b>You are obviously recommended to use a different username and password</b> on a server exposed to the internet).
+To add users to the MySQL database, first login to the database as an administrator (root by default) and issue a GRANT command along the lines of the example below
+(for clarity, this uses a username of <em>mysqluser</em> and password <em>mysqlpassword</em>.
+<b>You are obviously recommended to use a different username and password</b> on a server exposed to the internet).
 
     > mysql -uroot -p
     Enter password:

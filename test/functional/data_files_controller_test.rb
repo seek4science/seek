@@ -31,7 +31,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal assigns(:data_files).sort_by(&:id), Authorization.authorize_collection("view", assigns(:data_files), users(:aaron)).sort_by(&:id), "data files haven't been authorized properly"
   end
-  
+
   test "should get new" do
     get :new
     assert_response :success
@@ -217,7 +217,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.policy.permissions
     assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
     assert df.creators
-    p df.creators
     assert_equal df.creators.first, users(:datafile_owner).person
   end
   
@@ -247,7 +246,14 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should show data file" do
     d = data_files(:picture)
-    d.save
+    get :show, :id => d
+    assert_response :success
+  end
+
+  test "svg handles quotes in title" do
+    d = data_files(:picture)
+    d.title="\"Title with quote"
+    d.save!
     get :show, :id => d
     assert_response :success
   end
@@ -293,6 +299,19 @@ class DataFilesControllerTest < ActionController::TestCase
     xml=@response.body
     schema_path=File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'spreadsheet.xsd')
     validate_xml_against_schema(xml,schema_path)     
+  end
+
+  test "should fetch data content as csv" do
+    login_as(:model_owner)
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv"
+    assert_response :success
+    csv=@response.body
+    assert csv.include?(%!,,"fish","bottle","ggg,gg"!)
+
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:sheet=>"2"
+    assert_response :success
+    csv=@response.body
+    assert csv.include?(%!,,"a",1.0,TRUE,,FALSE!)
   end
   
   test "should not expose non downloadable spreadsheet" do
@@ -473,6 +492,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test "fail gracefullly when trying to access a missing data file" do
+    get :show,:id=>99999
+    assert_redirected_to data_files_path
+    assert_not_nil flash[:error]
+  end
+
   test "owner should be able to update sharing" do
      user = users(:datafile_owner)
      df = data_files(:editable_data_file)
@@ -487,6 +512,51 @@ class DataFilesControllerTest < ActionController::TestCase
      assert_equal "new title",df.title
      assert_equal Policy::NO_ACCESS,df.policy.access_type,"policy should have been updated"
   end
+
+  test "update with ajax only applied when viewable" do
+    login_as(:aaron)
+    user=users(:aaron)
+    df=data_files(:downloadable_data_file)
+    assert df.tag_counts.empty?,"This should have no tags for this test to work"
+    golf_tags=tags(:golf)
+
+    assert_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    df.reload
+
+    assert_equal ["golf"],df.tag_counts.collect(&:name)
+
+    df=data_files(:private_data_file)
+    assert df.tag_counts.empty?,"This should have no tags for this test to work"
+
+    assert !df.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+
+    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
+    end
+
+    df.reload
+
+    assert df.tag_counts.empty?,"This should still have no tags"
+
+  end
+
+  test "update tags with ajax" do
+    df=data_files(:picture)
+    golf_tags=tags(:golf)
+
+    assert df.tag_counts.empty?, "This sop should have no tags for the test"
+
+    assert_difference("ActsAsTaggableOn::Tag.count") do
+      xml_http_request :post, :update_tags_ajax,{:id=>df.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>golf_tags.id}
+    end
+
+    df.reload
+    assert_equal ["golf","soup"],df.tag_counts.collect(&:name).sort
+
+  end
   
   private
   
@@ -499,7 +569,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def valid_data_file_with_ftp_url
-    { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
+      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
   end
   
   def valid_sharing

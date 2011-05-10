@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js","models.js" -%>
+<%= javascript_include_tag "sharing.js","models.js", "assays.js","attribution.js","resource.js" -%>
 <h1>New Model</h1>
 <div class="show_basic">
     <% form_tag({:action => :create}, :multipart => true) do -%>
@@ -31,7 +31,9 @@
             </div>
         </p>
         <%= render :partial => "organisms/select_organism",:locals=>{:model=>Model} -%>
+
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Model"} -%>
+        <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
         </p>

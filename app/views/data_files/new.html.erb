@@ -1,5 +1,5 @@
-<%= javascript_include_tag "sharing.js" -%>
-<%= javascript_include_tag "associate_events.js" %>
+<%= javascript_include_tag "sharing.js","associate_events.js","associate_datafile_assays.js","attribution.js","resource.js" -%>
+
 <h1>New Data file</h1>
 <div class="show_basic">
     <% form_tag({:action => :create}, :multipart => true) do -%>
@@ -21,9 +21,17 @@
         </p>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "DataFile",   # this is only for presentation, not for any processing
         :project_hash => current_user.generate_own_project_id_name_hash } -%>
+        
+      
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
-
-      <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
+        <p>
+            <% if Seek::Config.events_enabled -%>
+                <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file} -%>
+            <% end -%>
+        </p>
+        <p>
+            <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+        </p>
         <p>
             <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
         </p>

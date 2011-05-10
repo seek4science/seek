@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js" -%>
+<%= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" -%>
 <h1>New SOP</h1>
 <div class="show_basic">
     <% form_tag({:action => :create}, :multipart => true) do -%>
@@ -19,10 +19,10 @@
             <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
-        :project_hash => current_user.generate_own_project_id_name_hash } -%>
+        :project_hash => current_user.generate_own_project_id_name_hash } -%>        
         
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Sop",:show_publications=>false} -%>
-		
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
         <p>
             <%= submit_tag "Upload and Save", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(true); return(false);" -%> or <%= link_to 'Cancel', sops_path -%>
         </p>

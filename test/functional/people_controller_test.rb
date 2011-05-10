@@ -27,6 +27,15 @@ class PeopleControllerTest < ActionController::TestCase
     get :new
     assert_response :success
   end
+
+  test "personal tags are shown" do
+    person=people(:pal)
+    assert person.user.owned_tags.collect(&:name).include?("cricket"), "This person must own the tag fishing for this test to work."
+    tag=tags(:cricket)
+    get :show,:id=>person
+    assert :success
+    assert_select "div#personal_tags a[href=?]",show_tag_path(tag),:text=>tag.name,:count=>1
+  end
   
   def test_first_registered_person_is_admin
     Person.destroy_all
@@ -257,9 +266,9 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal ["one","two","three"],p.expertise_list
     assert_equal ["four"],p.tool_list
     
-    one=Tag.find(:first,:conditions=>{:name=>"one"})
-    two=Tag.find(:first,:conditions=>{:name=>"two"})
-    four=Tag.find(:first,:conditions=>{:name=>"four"})
+    one=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"one"})
+    two=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"two"})
+    four=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"four"})
     post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:tools_autocompleter_selected_ids=>[four.id],:tools_autocompleter_unrecognized_items=>"three"
     
     p=Person.find(p.id)
@@ -288,4 +297,13 @@ class PeopleControllerTest < ActionController::TestCase
     get :index, :filter => {:project => project.id}
     assert_response :success
   end
+
+  test "finding by role" do
+    role=roles(:member)
+    get :index,:role_id=>role.id
+    assert_response :success
+    assert assigns(:people)
+    assert assigns(:people).include?(people(:person_for_model_owner))
+  end
+  
 end

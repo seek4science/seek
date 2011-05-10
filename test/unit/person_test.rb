@@ -84,10 +84,10 @@ class PersonTest < ActiveSupport::TestCase
   end
   
   def test_expertise
-    p=people(:quentin_person)
+    p=people(:pal)
     assert_equal 2, p.expertise.size
     
-    p=people(:aaron_person)
+    p=people(:modeller_person)
     assert_equal 1, p.expertise.size
     assert_equal "golf",p.expertise[0].name
   end

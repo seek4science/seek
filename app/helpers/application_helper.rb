@@ -1,27 +1,19 @@
 # Methods added to this helper will be available to all templates in the application.
 
-module ApplicationHelper
-  include TagsHelper
+module ApplicationHelper  
   include SavageBeast::ApplicationHelper
 
-  @@creatable_model_classes ||= nil
 
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
   #returns a list of all types that respond_to and return true for user_creatable?
   def user_creatable_classes
-    return @@creatable_model_classes if @@creatable_model_classes
-    Dir.glob(RAILS_ROOT + '/app/models/*.rb').each do |file|
-      model_name = file.gsub(".rb","").split(File::SEPARATOR).last
-      model_name.camelize.constantize
-    end
-
-    @@creatable_model_classes = Object.subclasses_of(ActiveRecord::Base).collect do |c|
-      c if !c.nil? && c.respond_to?("user_creatable?") && c.user_creatable?
-    end
-    @@creatable_model_classes.delete(Event) unless EVENTS_ENABLED
-
-    #sorted by name, assets first, then isa, then anything else  
-    @@creatable_model_classes = @@creatable_model_classes.compact.sort_by {|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+    @@creatable_model_classes ||= begin
+      classes=Seek::Util.persistent_classes.select do |c|
+        c.respond_to?("user_creatable?") && c.user_creatable?
+      end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+      classes.delete(Event) unless Seek::Config.events_enabled
+      classes
+    end    
   end
 
   #joins the list with seperator and the last item with an 'and'
@@ -38,7 +30,7 @@ module ApplicationHelper
         end
       end
     end
-    return result
+    result
   end
 
   def tab_definition(options={})
@@ -51,18 +43,6 @@ module ApplicationHelper
 
     link=link_to options[:title], options[:path]
     "<li #{attributes}>#{link}</li>"
-  end
-
-  def tag_cloud(tags, classes)
-    max_count = tags.sort_by(&:total).last.total.to_f
-    if max_count < 1
-      max_count = 1
-    end
-
-    tags.each do |tag|
-      index = ((tag.total / max_count) * (classes.size - 1)).round
-      yield tag, classes[index]
-    end
   end
 
   #returns true if the current user is associated with a profile that is marked as a PAL
@@ -105,7 +85,7 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection
-    select_tag :new_resource_type, options_for_select(user_creatable_classes.collect{|c| [c.name.underscore.humanize,c.name.underscore] })
+    select_tag :new_resource_type, options_for_select(user_creatable_classes.collect{|c| [(c.name.underscore.humanize == "Sop" ? "SOP" : c.name.underscore.humanize),c.name.underscore] })
   end
   
   def is_nil_or_empty? thing
@@ -254,7 +234,7 @@ module ApplicationHelper
     name=PAGE_TITLES[controller_name]
     name ||=""
     name += " (Development)" if RAILS_ENV=="development"
-    return "#{APPLICATION_TITLE} "+name
+    return "#{Seek::Config.application_title} "+name
   end
 
   # http://www.igvita.com/blog/2006/09/10/faster-pagination-in-rails/
@@ -282,24 +262,6 @@ module ApplicationHelper
     # Print end page if anchors are enabled
     html << yield(pagingEnum.last_page) if always_show_anchors and not last == pagingEnum.last_page
     html
-  end
-
-  def show_tag?(tag)
-    tag.taggings.size>1 || (tag.taggings.size==1 && tag.taggings[0].taggable_id)
-  end
-
-  def link_for_tag tag, options={}
-    length=options[:truncate_length]
-    length||=150
-    link = show_tag_path(tag)
-    link_to h(truncate(tag.name,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.name)
-  end
-
-  def list_item_tags_list tags,options={}
-    tags.map do |t|
-      divider=tags.last==t ? "" : "<span class='spacer'>,</span> ".html_safe
-      link_for_tag(t,options)+divider
-    end
   end
 
   def favourite_group_popup_link_action_new
@@ -355,7 +317,7 @@ module ApplicationHelper
   #Current decided by HIDE_DETAILS flag in environment_local.rb
   #Defaults to false
   def hide_contact_details?
-    (defined? HIDE_DETAILS) ? HIDE_DETAILS : false
+    Seek::Config.hide_details_enabled
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
@@ -401,7 +363,15 @@ module ApplicationHelper
   def can_manage_announcements?
     return current_user.is_admin?
   end
-  
+
+  def show_or_hide_block visible=true
+    "display:" + (visible ? 'block' : 'none')
+  end
+
+  def toggle_appear_javascript block_id
+    "Effect.toggle('#{block_id}','slide',{duration:0.5})"
+  end
+
   def count_actions(object, actions=nil)
     count = 0
     if actions.nil?
@@ -424,21 +394,17 @@ module ApplicationHelper
           policy = object.default_policy
           policy_type ="project"
         else
-          policy = Policy.system_default
-          policy.sharing_scope = Policy::ALL_REGISTERED_USERS
+          policy = Policy.default
           policy_type = "system"
         end
       elsif (policy = object.policy)
         # object exists and has a policy associated with it - normal case
         policy_type = "asset"
-      elsif object.project && (policy = object.project.default_policy)
-        # object exists, but policy not attached - try to use project default policy, if exists
-        policy_type = "project"
       end
     end
 
     unless policy
-      policy = Policy.default()
+      policy = Policy.default
       policy_type = "system"
     end
 

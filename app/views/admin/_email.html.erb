@@ -1,0 +1,30 @@
+<div>
+    Email enabled: <%= check_box_tag :email_enabled, 1, Seek::Config.email_enabled ,:onchange=>toggle_appear_javascript('email_settings') -%>
+    <span class='setting_description'>
+      Allows email support, for sending notifications, requesting feedback, and requesting access to other users files.
+    </span>
+    <div id="email_settings" style="padding-left:2em;<%= show_or_hide_block(Seek::Config.email_enabled) -%>;">
+        <ul>
+            <li>Address: <%= text_field_tag(:address, Seek::Config.smtp_settings('address')) %> </li>
+            <li>Port: <%= text_field_tag(:port, Seek::Config.smtp_settings('port'), :onkeypress => "javascript: return onlyNumbers(event);") %></li>
+            <li>Domain: <%= text_field_tag(:domain, Seek::Config.smtp_settings('domain')) %> </li>
+            <li>Authentication: <%= text_field_tag(:authentication, Seek::Config.smtp_settings('authentication')) %> </li>
+            <li>User name: <%= text_field_tag(:user_name, Seek::Config.smtp_settings('user_name')) %> </li>
+            <li>Password: <%= password_field_tag(:password, Seek::Config.smtp_settings('password'), :autocomplete => 'off') %> </li>
+        </ul>
+        <ul>
+          <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Allows notifications of certain exceptions, allowing unexpected errors to be picked up quickly and fixed.",
+            :name=>"Exception notification enabled",
+            :field=>check_box_tag(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled, :onchange=>toggle_appear_javascript('exception_notification_block'))
+           } -%>
+          <li id="exception_notification_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.exception_notification_enabled) -%>;">
+               Exception notification recipients: <%= text_field_tag(:exception_notification_recipients, Seek::Config.exception_notification_recipients) %>
+              <span class='setting_description'>
+                A comma or space seperated list of email address for those that will receive exception notifications.
+              </span>
+          </li>
+        </ul>
+    </div>
+
+</div>

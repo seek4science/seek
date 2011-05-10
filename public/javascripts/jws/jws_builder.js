@@ -4,6 +4,13 @@ function check_clicked(){
     $('form').submit();
 }
 
+function annotate_clicked(){
+    $('annotate_button').value = "Submitting ...";
+    $('annotate_button').disabled = true;
+    $('form').following_action.value = "annotate";
+    $('form').submit();
+}
+
 function simulate_clicked(){
     $('simulate_button').value = "Submitting ...";
     $('simulate_button').disabled = true;
@@ -34,9 +41,9 @@ function create_panel_cookies() {
     create_panel_cookies_by_id('functions_panel');
     create_panel_cookies_by_id('events_panel');
     
-    if ($('plotGraphPanel').value == "on") {
-        createCookie5(rc, rtreaction, 1, 'rc');
-    }
+//    if ($('plotGraphPanel').value == "on") {
+//        createCookie5(rc, rtreaction, 1, 'rc');
+//    }
     if ($('plotKineticsPanel').value == "on") {
         createCookie6(rc2, rtkinetics, 1, 'rc2');
     }        
@@ -79,8 +86,8 @@ function read_panel_cookies(){
     read_panel_cookies_from_id('events_panel');
     
     if ($('plotGraphPanel').value == "on") {
-        rc.SetCurrentWidth2(cookieToArray('rc')[0]);
-        rc.SetCurrentHeight(cookieToArray('rc')[1]);
+//        rc.SetCurrentWidth2(cookieToArray('rc')[0]);
+//        rc.SetCurrentHeight(cookieToArray('rc')[1]);
     };
     if ($('plotKineticsPanel').value == "on") {
         rc2.SetCurrentWidth2(cookieToArray('rc2')[0]);
@@ -106,7 +113,7 @@ function highlight_error(prefix){
     Effect.BlindDown(panel, {
         duration: 0.3
     });
-    chevronExpand(prefix)
+    chevronExpand(prefix);
     Element.removeClassName(caption, "squareboxgradientcaption");
     $(caption).addClassName("squareboxgradientcaption2");
     new Effect.Highlight(panel, {

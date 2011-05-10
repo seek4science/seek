@@ -57,10 +57,10 @@ class Settings < ActiveRecord::Base
     elsif @@defaults[var_name.to_s]
       @@defaults[var_name.to_s]
     else
-      nil
+      @@defaults[var_name.to_s]      
     end
   end
-  
+
   #set a setting value by [] notation
   def self.[]=(var_name, value)
     var_name = var_name.to_s

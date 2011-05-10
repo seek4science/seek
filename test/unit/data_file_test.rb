@@ -10,7 +10,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal users(:datafile_owner),datafile.contributor    
 
     blob=content_blobs(:picture_blob)
-    assert_equal blob,datafile.content_blob    
+    assert_equal blob,datafile.content_blob
   end
 
   test "event association" do
@@ -21,6 +21,25 @@ class DataFileTest < ActiveSupport::TestCase
     assert datafile.valid?
     assert datafile.save
     assert_equal 1, datafile.events.count
+  end
+
+  test "assay association" do
+    datafile = data_files(:picture)
+    assay = assays(:modelling_assay_with_data_and_relationship)
+    relationship = relationship_types(:validation_data)
+    assay_asset = assay_assets(:metabolomics_assay_asset1)
+    assert_not_equal assay_asset.asset, datafile
+    assert_not_equal assay_asset.assay, assay
+    assay_asset.asset = datafile
+    assay_asset.assay = assay
+    assay_asset.relationship_type = relationship
+    assay_asset.save!
+    assay_asset.reload
+
+    assert assay_asset.valid?
+    assert_equal assay_asset.asset, datafile
+    assert_equal assay_asset.assay, assay
+    assert_equal assay_asset.relationship_type, relationship
   end
 
   test "sort by updated_at" do

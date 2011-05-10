@@ -1,4 +1,5 @@
 <% unless resource.nil? -%>
+    
   <div title='<%= tooltip_title_attrib(h(resource.description), 1000) %>'>
     <p class="title">
       <%= h resource.title -%>
@@ -14,5 +15,5 @@
     
     <%= list_item_description resource.description -%>  
   </div>
+
 <% end -%>
-_resource_preview.html.erb

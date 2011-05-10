@@ -144,7 +144,7 @@ module Rubaidh # :nodoc:
     def self.enabled?(format)
       # Modified by Jits on 2009-06-24 to be able to disable Google Analytics
       #raise Rubaidh::GoogleAnalyticsConfigurationError if tracker_id.blank? || analytics_url.blank?
-      ENABLE_GOOGLE_ANALYTICS && environments.include?(RAILS_ENV) && formats.include?(format.to_sym)
+      Seek::Config.google_analytics_enabled && environments.include?(RAILS_ENV) && formats.include?(format.to_sym)
     end
     
     # Construct the javascript code to be inserted on the calling page. The +ssl+

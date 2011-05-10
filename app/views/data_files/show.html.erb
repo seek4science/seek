@@ -34,7 +34,7 @@
 
 
 <div class="show_basic">
-  <div class="main_content_left_box">
+  <div class="main_content_left_box_narrower">
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
       <p>
@@ -68,15 +68,15 @@
           </p>
         <% end -%>
       </p>
-      <p>
-        <%= embedded_isa_svg(@data_file, true, @data_file) -%>
-      </p>
+
     </div>
   </div>
   <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file } %>
   
   <div style="clear:both;">
-
+    <p>
+        <%= embedded_isa_svg(@data_file, true, @data_file) -%>
+      </p>
     <p>
       <h2>Factors studied:</h2>
       <%= render :partial=>"data_files/studied_factors" %>

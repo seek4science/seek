@@ -11,7 +11,11 @@ class SettingsTest < Test::Unit::TestCase
   def teardown
     Settings.delete_all
   end
-  
+  def tests_defaults_false
+    Settings.defaults[:foo] = false
+    assert_equal false, Settings.foo
+  end
+
   def test_defaults
     Settings.defaults[:foo] = 'default foo'
     

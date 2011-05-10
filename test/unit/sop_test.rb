@@ -30,6 +30,22 @@ class SopTest < ActiveSupport::TestCase
     assert !asset.valid?
   end
 
+  test "assay association" do
+    sop = sops(:sop_with_fully_public_policy)
+    assay = assays(:modelling_assay_with_data_and_relationship)
+    assay_asset = assay_assets(:metabolomics_assay_asset1)
+    assert_not_equal assay_asset.asset, sop
+    assert_not_equal assay_asset.assay, assay
+    assay_asset.asset = sop
+    assay_asset.assay = assay
+    assay_asset.save!
+    assay_asset.reload
+    assert assay_asset.valid?
+    assert_equal assay_asset.asset, sop
+    assert_equal assay_asset.assay, assay
+
+  end
+
   def test_avatar_key
     assert_nil sops(:editable_sop).avatar_key
     assert sops(:editable_sop).use_mime_type_for_avatar?

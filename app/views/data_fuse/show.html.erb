@@ -1,0 +1,62 @@
+<% select_truncate_length = 50 -%>
+
+
+<h1>Data Fuse Prototype</h1>
+
+<div class="show_basic">
+  <% form_tag({:action=>:assets_selected},:method=>:post) do -%>
+  <h2>Model (SBML)</h2>
+
+  <%= select_tag :model_id,
+      options_for_select([["Select Model file ...",0]]|@models.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+          {:style=>"width:55em;",:class=>"data_fuse_select",:onchange=>remote_function(
+            :url=>{:action=>"preview",:controller=>"models",:element=>"model_preview"},
+            :with=>"'id='+this.value",
+            :before=>"show_ajax_loader('model_preview')"
+          )+";"+remote_function(
+            :url=>{:action=>"parameter_keys",:controller=>"data_fuse",:element=>"parameter_keys"},
+            :with=>"'id='+this.value",
+            :before=>"show_ajax_loader('parameter_keys')"
+          )
+   }
+
+  -%>
+
+
+  <div id="parameter_keys" style="overflow-y:scroll;max-height:35em;width: 20em;padding-bottom:1em;float:right;">
+        <h3>Available Parameter keys</h3>
+        <span class="none_text">No model selected</span>
+  </div>
+
+  <div id="model_preview" class="preview_box">
+     <span class="none_text">No model selected</span>
+  </div>
+
+  <div style="clear:both;"></div>
+
+  <h2>Data File (Spreadsheet)</h2>
+  <%= select_tag :data_file_id,
+          options_for_select([["Select Data file ...",0]]|@data_files.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}),
+          {:style=>"width:55em;",:onchange=>remote_function(
+            :url=>{:action=>"preview",:controller=>"data_files",:element=>"data_file_preview"},
+            :with=>"'id='+this.value",
+            :before=>"show_ajax_loader('data_file_preview')"
+          )+";"+remote_function(
+            :url=>{:action=>"data_file_csv",:controller=>"data_fuse",:element=>"csv_view"},
+            :with=>"'id='+this.value",
+            :before=>"show_ajax_loader('csv_view')"
+          )
+   } -%>
+
+  <div id="data_file_preview" class="preview_box">
+    <span class="none_text">No data file selected</span>
+  </div>
+
+  <h3>Contents summary (last sheet)</h3>
+  <div id="csv_view">
+    <span class="none_text">No data file selected</span>
+  </div>
+      <br/>
+  <%= submit_tag "Next",:disable_with=>"Submitting..." -%>
+  <% end -%>
+</div>

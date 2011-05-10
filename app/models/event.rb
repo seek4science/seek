@@ -1,17 +1,22 @@
 require 'acts_as_authorized'
-require 'acts_as_uniquely_identifiable'
 require 'grouped_pagination'
+
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files
   has_and_belongs_to_many :publications
 
+  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.start_date DESC"
+  def self.sort events
+    events.sort_by &:start_date
+  end
 
   acts_as_authorized
   acts_as_uniquely_identifiable
+  acts_as_favouritable
 
   #load the configuration for the pagination
-  grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
+  grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   #FIXME: Move to Libs
   Array.class_eval do

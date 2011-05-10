@@ -21,7 +21,7 @@ module GroupedPagination
     def grouped_pagination(options={})
       @pages = options[:pages] || ("A".."Z").to_a + ["?"]
       @field = options[:field] || "first_letter"
-      @latest_limit = options[:latest_limit] || PAGINATE_LATEST_LIMIT
+      @latest_limit = options[:latest_limit] || Seek::Config.limit_latest
       @default_page = options[:default_page] || 'all'
       
       before_save :update_first_letter
@@ -44,6 +44,7 @@ module GroupedPagination
         records=collection
       elsif page == "latest"
         records=collection.sort{|x,y| y.created_at <=> x.created_at}[0...@latest_limit]
+        records = records.sort_by {|r| collection.index r}
       elsif @pages.include?(page)           
         records=collection.select {|i| i.first_letter == page}        
       end

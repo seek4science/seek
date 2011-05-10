@@ -2,7 +2,6 @@ require 'acts_as_asset'
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
@@ -11,12 +10,23 @@ class DataFile < ActiveRecord::Base
   acts_as_trashable
 
   title_trimmer
-  
-  has_many :favourites, 
-           :as => :resource, 
-           :dependent => :destroy
 
-  has_and_belongs_to_many :events
+  if Seek::Config.events_enabled
+    has_and_belongs_to_many :events
+  else
+    def events
+      []
+    end
+
+    def event_ids
+      []
+    end
+
+    def event_ids= events_ids
+      
+    end
+  end
+
   validates_presence_of :title
 
   # allow same titles, but only if these belong to different users
@@ -24,10 +34,10 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename]) if SOLR_ENABLED  
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
   
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
-
+  
   acts_as_uniquely_identifiable  
 
   explicit_versioning(:version_column => "version") do
@@ -65,6 +75,10 @@ class DataFile < ActiveRecord::Base
     datafiles_with_contributors.delete(nil)
 
     return datafiles_with_contributors.to_json
+  end
+
+  def self.spreadsheets
+    
   end
   
 

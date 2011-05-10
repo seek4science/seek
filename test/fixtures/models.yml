@@ -13,12 +13,26 @@ teusink:
   version: 2  
   project: sysmo_project
   policy: policy_for_test_with_projects_institutions
+
+teusink_with_space:
+  contributor: model_owner (User)
+  title: Teusink with space
+  description: Teusink from JWS Online
+  original_filename: Teusink (1).xml
+  content_blob: teusink_blob
+  content_type: text/xml
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
+  project: sysmo_project
+  policy: policy_for_test_with_projects_institutions
   
 jws_model:
   contributor: model_owner (User)
   title: Model in JWS Dat format
   description: Model in JWS Dat format
-  original_filename: Teusink2010921171725.dat
+  original_filename: JWS Model.dat
   content_blob: jws_model_blob
   content_type: text/xml  
   recommended_environment: jws
@@ -155,3 +169,15 @@ model_jws_incompatible:
   project: sysmo_project
   policy: sysmo_member_edit
   
+private_model:
+  title: Private model
+  description: It is a private model
+  original_filename: file_picture.png
+  content_blob: picture_blob
+  content_type: image/png
+  recommended_environment: jws
+  result_graph: Grapsh
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
+  project: sysmo_project
+  policy: private_policy

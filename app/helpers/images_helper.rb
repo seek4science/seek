@@ -215,7 +215,7 @@ module ImagesHelper
       when "organism_avatar"
       "misc_icons/green_virus-64x64.png"
       when "publication_avatar"
-     "crystal_project/64x64/filesystems/file_doc.png"
+     "crystal_project/64x64/mimetypes/wordprocessing.png"
       when "saved_search_avatar","saved_search"
       "crystal_project/32x32/actions/find.png"
       when "visit_pubmed"
@@ -235,7 +235,7 @@ module ImagesHelper
       when "jws_builder"
         "misc_icons/jws_builder24x24.png"
       when "event_avatar"
-        "crystal_project/32x32/devices/Globe2.png"
+        "crystal_project/32x32/apps/vcalendar.png"
     else
       return nil
     end

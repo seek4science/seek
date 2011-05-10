@@ -27,9 +27,13 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_asset
         acts_as_authorized
+        acts_as_favouritable
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
+        validates_presence_of :title
         validates_presence_of :project
+        
+        acts_as_taggable
 
         has_many :relationships,
                  :class_name => 'Relationship',
@@ -49,7 +53,7 @@ module Acts #:nodoc:
         has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
         has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 
-        grouped_pagination :default_page => Seek::ApplicationConfiguration.default_page(self.name.underscore.pluralize)
+        grouped_pagination :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
         class_eval do
           extend Acts::Asset::SingletonMethods

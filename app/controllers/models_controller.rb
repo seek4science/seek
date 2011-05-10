@@ -10,12 +10,12 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url]
+  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_tags_ajax]
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
   
-  @@model_builder = Seek::JWSModelBuilder.new
+  @@model_builder = Seek::JWS::OneStop.new
   
   # GET /models
   # GET /models.xml
@@ -53,19 +53,20 @@ class ModelsController < ApplicationController
     begin
       if saved_file
         supported=true
-        @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
+        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.saved_file_builder_content saved_file
       else
         supported = @@model_builder.is_supported?(@display_model)
-        @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported  
+        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.builder_content @display_model if supported
       end
     rescue Exception=>e
-      error=e            
+      error=e
+      logger.error "Error submitting to JWS Online OneStop - #{e.message}"
     end
     
     respond_to do |format|
       if error
-        flash[:error]="JWS Online encountered a problem processing this model."
-        format.html { redirect_to model_path(@model,:version=>@display_model.version)}                      
+        flash.now[:error]="JWS Online encountered a problem processing this model."
+        format.html { redirect_to model_path(@model,:version=>@display_model.version)}
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
         format.html { redirect_to model_path(@model,:version=>@display_model.version)}        
@@ -74,44 +75,72 @@ class ModelsController < ApplicationController
       end
     end
   end    
-  
+
+#  def annotator
+#    respond_to do |format|
+#      format.html
+#    end
+#  end
+
   def submit_to_jws
     following_action=params.delete("following_action")    
-    
-    @params_hash,@saved_file,@objects_hash,@error_keys = @@model_builder.construct @display_model,params
-    if (@error_keys.empty?)
+    error=nil
+    begin
+      if following_action == "annotate"
+        @params_hash,@attribution_annotations,@species_annotations,@reaction_annotations,@search_results,@cached_annotations,@saved_file,@error_keys = @@model_builder.annotate params
+      else
+        @params_hash,@attribution_annotations,@saved_file,@objects_hash,@error_keys = @@model_builder.construct params
+      end
+    rescue Exception => e
+      error=e
+    end
+
+    if (!error && @error_keys.empty?)
+
       if following_action == "simulate"
-        @applet=@@model_builder.simulate @saved_file
+        begin
+          @applet=@@model_builder.simulate @saved_file
+        rescue Exception => e
+          error=e
+        end
       elsif following_action == "save_new_version"
         model_format=params.delete("saved_model_format") #only used for saving as a new version
         new_version_filename=params.delete("new_version_filename")
         new_version_comments=params.delete("new_version_comments")
         if model_format == "dat"
-          url=@@model_builder.saved_dat_download_url @saved_file                    
+          url=@@model_builder.saved_dat_download_url @saved_file
         elsif model_format == "sbml"
-          url=@@model_builder.sbml_download_url @saved_file          
+          url=@@model_builder.sbml_download_url @saved_file
         end
         if url
           downloader=Seek::RemoteDownloader.new
           data_hash = downloader.get_remote_data url
           File.open(data_hash[:data_tmp_path],"r") do |f|
             @model.content_blob=ContentBlob.new(:data=>f.read)
-          end                      
-          @model.content_type=data_hash[:content_type]
+          end
+          @model.content_type=model_format=="sbml" ? "text/xml" : "text/plain"
           @model.original_filename=new_version_filename
         end
       end
     end
-    respond_to do |format|      
-      if @error_keys.empty? && following_action == "simulate"        
+
+
+    respond_to do |format|
+      if error
+        flash.now[:error]="JWS Online encountered a problem processing this model."
+        format.html { render :action=>"builder" }
+      elsif @error_keys.empty? && following_action == "simulate"
         format.html {render :action=>"simulate",:layout=>"no_sidebar"}
+      elsif @error_keys.empty? && following_action == "annotate"
+        format.html {render :action=>"annotator"}
       elsif @error_keys.empty? && following_action == "save_new_version"
-        create_new_version new_version_comments
-        format.html {redirect_to model_path(@model,:version=>@model.version) }
-      else        
+        create_new_version(new_version_comments)
+        format.html {redirect_to  model_path(@model,:version=>@model.version) }
+      else
         format.html { render :action=>"builder" }
       end      
     end
+    
   end
   
   def simulate
@@ -119,7 +148,7 @@ class ModelsController < ApplicationController
     begin
       supported = @@model_builder.is_supported?(@display_model)
       if supported
-        @data_script_hash,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
+        @data_script_hash,attribution_annotations,saved_file,@objects_hash = @@model_builder.builder_content @display_model    
         @applet=@@model_builder.simulate saved_file
       end
     rescue Exception=>e
@@ -128,7 +157,7 @@ class ModelsController < ApplicationController
     
     respond_to do |format|
       if error
-        flash[:error]="JWS Online encountered a problem processing this model."
+        flash.now[:error]="JWS Online encountered a problem processing this model."
         format.html { redirect_to(@model,:version=>@display_model.version)}                      
       elsif !supported
         flash[:error]="This model is of neither SBML or JWS Online (Dat) format so cannot be used with JWS Online"
@@ -364,7 +393,9 @@ class ModelsController < ApplicationController
       @model = Model.new(params[:model])
       @model.contributor = current_user
       @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
-      
+
+      update_tags @model
+      assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
           # the Model was saved successfully, now need to apply policy / permissions settings to it
@@ -385,6 +416,10 @@ class ModelsController < ApplicationController
           else
             flash[:notice] = "Model was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+          end
+          assay_ids.each do |id|
+              @assay = Assay.find(id)
+              @assay.relate(@model)
           end
         else
           format.html {
@@ -418,7 +453,10 @@ class ModelsController < ApplicationController
       # update 'last_used_at' timestamp on the Model
       params[:model][:last_used_at] = Time.now
     end
-    
+
+    update_tags @model
+
+    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @model.update_attributes(params[:model])
         # the Model was updated successfully, now need to apply updated policy / permissions settings to it
@@ -439,6 +477,24 @@ class ModelsController < ApplicationController
         else
           flash[:notice] = "Model metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
           format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
+        end
+        # Update new assay_asset
+        assay_ids.each do |id|
+          @assay = Assay.find(id)
+          @assay.relate(@model)
+        end
+        #Destroy AssayAssets that aren't needed
+        assay_assets = AssayAsset.find_all_by_asset_id(@model.id)
+        assay_assets.each do |assay_asset|
+          flag = false
+          assay_ids.each do |id|
+            if assay_asset.assay_id.to_s == id
+              flag = true
+            end
+          end
+          if flag == false
+             AssayAsset.destroy(assay_asset.id)
+          end
         end
       else
         format.html {
@@ -511,7 +567,7 @@ class ModelsController < ApplicationController
   end
   
   def jws_enabled
-    unless JWS_ENABLED      
+    unless Seek::Config.jws_enabled
       respond_to do |format|
         flash[:error] = "Interaction with JWS Online is currently disabled"
         format.html { redirect_to model_path(@model,:version=>@display_model.version) }

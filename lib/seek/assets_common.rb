@@ -1,22 +1,25 @@
-module Seek  
+module Seek
   module AssetsCommon
     require 'net/ftp'
-    
-    #required to get the icon_filename_for_key
-    include ImagesHelper
 
-    #this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page
-    def init_asset_for_render params
-      c     = self.controller_name.singularize
-      model = c.camelize.constantize
-      symb  =c.to_sym
-      params[symb].delete 'data_url'
-      params[symb].delete 'data'
-      params[symb].delete 'local_copy'
-      obj=model.new params[symb]
-      eval "@#{c.singularize} = obj"
+    include Seek::TaggingCommon
+
+    #required to get the icon_filename_for_key
+    include ImagesHelper    
+
+#this is required to initialise the @<model> (e.g. @sop), before re-rendering the :new page 
+    def init_asset_for_render params                                                            
+        c     = self.controller_name.singularize                                                  
+        model = c.camelize.constantize                                                            
+        symb  =c.to_sym                                                                           
+        params[symb].delete 'data_url'                                                            
+        params[symb].delete 'data'                                                                
+        params[symb].delete 'local_copy'                                                          
+        obj=model.new params[symb]                                                                
+        eval "@#{c.singularize} = obj"                                                            
     end
 
+    
     def url_response_code asset_url
       url = URI.parse(asset_url)
       code=""
@@ -157,7 +160,7 @@ module Seek
         end
         return false
       else
-        #upload takes precendence if both params are present
+        #upload takes precedence if both params are present
         begin
           if !(params[symb][:data]).blank?
             # store properties and contents of the file temporarily and remove the latter from params[],
@@ -193,7 +196,7 @@ module Seek
               return false
             end            
           end
-        rescue Seek::IncompatibleProtocolException=>e
+        rescue Seek::IncompatibleProtocolException=>e          
           flash.now[:error] = e.message
           if render_action_on_error
             init_asset_for_render params
@@ -204,7 +207,7 @@ module Seek
             end
           end
           return false
-        rescue Exception=>e              
+        rescue Exception=>e
           flash.now[:error] = "Unable to read from the URL."
           if render_action_on_error
             init_asset_for_render params
@@ -248,7 +251,15 @@ module Seek
           else
             redirect_to asset
           end
+        rescue Jerm::JermException=>de
+          flash[:error]=de.message
+          if (asset.class.name.include?("::Version"))
+            redirect_to asset.parent,:version=>asset.version
+          else
+            redirect_to asset
+          end
         end
+
       end
     end
   end

@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js" %>
+<%= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" %>
 <% current_user_authorized_to_manage = Authorization.is_authorized?("manage", nil, @sop, current_user) -%>
 <ul class="sectionIcons">
     <li>
@@ -19,7 +19,8 @@
             <b>Description:</b>
             <br/>
             <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
-        </p>
+        </p>        
+      
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
         <% if current_user_authorized_to_manage -%>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
@@ -39,7 +40,7 @@
 					:show_publications=>false
 				}
     	-%>
-		
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
         <% end -%>
         <p>
             <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>

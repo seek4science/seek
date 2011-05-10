@@ -1,7 +1,8 @@
-<div id="merged_tag_cloud" class="sysmo_gadget"  >
+<div class="sysmo_gadget"  >
   
   <div class="header">
     Tags
+    <%= link_to "[show all]",all_tags_path -%>
   </div>
 
   <div class="contents">
@@ -9,25 +10,23 @@
       <div class="hTagcloud">
         <div class="popularity">
           <%
-          min_count = MERGED_TAG_THRESHOLD
-          tag_cloud = Tag.find(:all)
-          all_tags=tag_cloud.select{|tag| tag.total>=min_count}
-          show_tags=tag_cloud.sort{|a,b| b.total<=>a.total}[0..9]
+          tag_cloud = ActsAsTaggableOn::Tag.all_tags_for_cloud
+          all_tags= tag_cloud.select{|tag| tag.overall_total>=Seek::Config.tag_threshold}
+          show_tags= tag_cloud.sort{|a,b| b.overall_total<=>a.overall_total}[0...Seek::Config.max_visible_tags]
           hidden_tags=all_tags.size != show_tags.size
           hidden_class="merged_tag_hidden"
           %>
           
           <% unless all_tags.blank? -%>
-            <% tag_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+            <% overall_tag_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
               <% if show_tag?(tag) -%>
                 <%
                   hide_tag=!show_tags.include?(tag)
-                  type = tag.taggings.first.context.to_sym                  
                   tag_class="#{css_class}"
                   tag_class << " #{hidden_class}" if hide_tag
                   style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
                 %>
-                <%= link_for_tag tag,:type=>type,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>          
+                <%= link_for_tag tag,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>
               <% end -%>
             <% end -%>
           

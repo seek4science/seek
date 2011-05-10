@@ -1,14 +1,16 @@
 module Seek
   module ModelTypeDetection
     
-    def is_dat? model      
-      return false if !model.original_filename.end_with?(".dat")
+    def is_dat? model
       check_content model.content_blob.filepath,"begin name",25000
     end                      
     
-    def is_sbml? model            
-      return false if !model.original_filename.end_with?(".xml")      
+    def is_sbml? model                        
       check_content model.content_blob.filepath,"<sbml"
+    end
+
+    def is_jws_supported? model
+      is_dat?(model) || is_sbml?(model)
     end
     
     def check_content filepath, str, max_length=1500      

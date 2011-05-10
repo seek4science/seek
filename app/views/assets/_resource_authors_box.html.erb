@@ -4,23 +4,37 @@
 <%# - truncate_to - length of the texts after which truncation is activated -%>
 <%# - title - the title of the box (defaults to Creators if missing) -%>
 <%
+
 title||="Creators"
+creators ||= resource.creators unless resource.respond_to?(:contributor)
+creators ||= [resource.contributor.nil? ? nil : resource.contributor.person] | resource.creators
+
 %>
-<div class="contribution_section_box" style="padding: 0.5em 0 1em 0;">
+<div class="contribution_section_box">  
   <p class="heading">
     <%= help_icon("The authors are the people who originally created this file.") -%>
     <%= h(title) -%>
-    <a name="authors"></a>
-    <% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
-      <p style="text-align:center; margin: 0; padding: 0;"><small>[ <%= link_to "edit", edit_polymorphic_path(resource) %> ]</small></p>
-    <% end %>
   </p>
-  <p>
+ 
+  <p class="author_list">
   <% creators.each do |creator| %>
-    <% if creators.count < 4 #display full avatar if not too many authors %>
-      <%= favouritable_icon(creator, 60) -%><br/>
+    <% if creators.count < 6 %>
+            <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator, 50) -%></span>
+    <% else %>
+            <%= creator.nil? ? "The JERM" : link_to(h(creator.name), url_for(creator)) -%>
     <% end %>
-    <%= link_to(h(creator.name), url_for(creator)) -%><br/>
   <% end %>
   </p>
+
+  <% if resource.respond_to?(:other_creators) && !resource.other_creators.blank? -%>
+
+  <p class="heading">
+    <%= help_icon("Non-SEEK members who helped with the creation of this file.") -%>
+    Other Creators        
+  </p>
+  <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
+    <%= resource.other_creators%>
+  </div>
+  <% end -%>
+
 </div>

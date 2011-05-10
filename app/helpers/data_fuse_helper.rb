@@ -1,0 +1,2 @@
+module DataFuseHelper
+end

@@ -6,8 +6,7 @@ class PeopleController < ApplicationController
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
-  before_filter :auth_params,:only=>[:update,:create]
-  before_filter :set_tagging_parameters,:only=>[:edit,:new,:create,:update]
+  before_filter :auth_params,:only=>[:update,:create]  
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   
@@ -65,10 +64,7 @@ class PeopleController < ApplicationController
 
   # GET /people/new
   # GET /people/new.xml
-  def new
-    @tags_tools = Person.tool_counts.sort{|a,b| a.name<=>b.name}
-    @tags_expertise = Person.expertise_counts.sort{|a,b| a.name<=>b.name}
-
+  def new    
     @person = Person.new
 
     respond_to do |format|
@@ -79,10 +75,6 @@ class PeopleController < ApplicationController
 
   # GET /people/1/edit
   def edit
-    recommended_tag_limit = 30
-    @tags_tools = Person.tool_counts.sort{|a,b| b.total<=>a.total}[0...recommended_tag_limit].sort{|a,b| a.name<=>b.name}
-    @tags_expertise = Person.expertise_counts.sort{|a,b| b.total<=>a.total}[0...recommended_tag_limit].sort{|a,b| a.name<=>b.name}
-
     @person = Person.find(params[:id])
     
     possible_unsaved_data = "unsaved_#{@person.class.name}_#{@person.id}".to_sym
@@ -190,7 +182,6 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
-    old_tags=@person.tool_list + @person.expertise_list
     
     @person.disciplines.clear if params[:discipline_ids].nil?
 
@@ -205,11 +196,7 @@ class PeopleController < ApplicationController
       @person.notifiee_info.receive_notifications = (params[:receive_notifications] ? true : false) 
       @person.notifiee_info.save if @person.notifiee_info.changed?
     end
-    
-    new_tags=@person.tool_list + @person.expertise_list
 
-    #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag
-    expire_fragment("tag_clouds") if (old_tags != new_tags)
     
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
@@ -288,10 +275,10 @@ class PeopleController < ApplicationController
   private
 
   def set_tools_and_expertise person,params
-    
+
       tags=""
       params[:tools_autocompleter_selected_ids].each do |selected_id|        
-        tag=Tag.find(selected_id)        
+        tag=ActsAsTaggableOn::Tag.find(selected_id)        
         tags << tag.name << ","
       end unless params[:tools_autocompleter_selected_ids].nil?
       params[:tools_autocompleter_unrecognized_items].each do |item|
@@ -302,13 +289,17 @@ class PeopleController < ApplicationController
     
       tags=""
       params[:expertise_autocompleter_selected_ids].each do |selected_id|
-        tag=Tag.find(selected_id)
+        tag=ActsAsTaggableOn::Tag.find(selected_id)
         tags << tag.name << ","
       end unless params[:expertise_autocompleter_selected_ids].nil?
       params[:expertise_autocompleter_unrecognized_items].each do |item|
         tags << item << ","
       end unless params[:expertise_autocompleter_unrecognized_items].nil?
       person.expertise_list=tags
+
+      #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag. Also should only expire when they have changed.
+      expire_fragment("sidebar_tag_cloud")
+      expire_fragment("super_tag_cloud")
 
   end
   
@@ -355,11 +346,4 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_tagging_parameters
-    tools=Person.tool_counts.sort{|a,b| a.id<=>b.id}.collect{|t| {'id'=>t.id,'name'=>t.name}}
-    @all_tools_as_json=tools.to_json
-
-    expertise=Person.expertise_counts.sort{|a,b| a.id<=>b.id}.collect{|t|{'id'=>t.id,'name'=>t.name}}
-    @all_expertise_as_json=expertise.to_json
-  end
 end

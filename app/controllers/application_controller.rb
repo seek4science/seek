@@ -1,7 +1,9 @@
-# Filters added to this controller apply to all controllers in the application.
+	# Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+
+  skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
 
   self.mod_porter_secret = PORTER_SECRET
 
@@ -19,12 +21,12 @@ class ApplicationController < ActionController::Base
   local_addresses.clear
 
   exception_data :additional_exception_notifier_data
-  
-  if ACTIVITY_LOG_ENABLED
+
+  if Seek::Config.activity_log_enabled
     after_filter :log_event
-  end  
-  
-  include AuthenticatedSystem  
+  end
+
+  include AuthenticatedSystem
   
   helper :all
   
@@ -62,7 +64,7 @@ class ApplicationController < ActionController::Base
   end
   
   def is_user_activated
-    if ACTIVATION_REQUIRED && current_user && !current_user.active?
+    if Seek::Config.activation_required_enabled && current_user && !current_user.active?
       error("Activation of this account it required for gaining full access", "Activation required?")
       false
     end
@@ -121,12 +123,12 @@ class ApplicationController < ActionController::Base
   
   
   def check_allowed_to_manage_types
-    unless defined? TYPE_MANAGERS
+    unless Seek::Config.type_managers_enabled
       error("Type management disabled", "...")
       return false
     end
     
-    case TYPE_MANAGERS
+    case Seek::Config.type_managers
       when "admins"
       if current_user.is_admin? 
         return true
@@ -173,7 +175,7 @@ class ApplicationController < ActionController::Base
   end
   
   def email_enabled?
-    EMAIL_ENABLED    
+    Seek::Config.email_enabled
   end
 
   def find_and_auth
@@ -199,7 +201,7 @@ class ApplicationController < ActionController::Base
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
         flash[:error] = "Couldn't find the #{name.humanize} or you are not authorized to view it"
-        format.html { redirect_to object }
+        format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false
     end
@@ -261,50 +263,37 @@ class ApplicationController < ActionController::Base
       end
     end
   end
-  
+
+  def permitted_filters
+    #placed this in a seperate method so that other controllers could override it if necessary
+    Seek::Util.persistent_classes.select {|c| c.respond_to? :find_by_id}.map {|c| c.name.underscore}
+  end
+
   def apply_filters(resources)
-    set = resources
-    unless params[:filter].blank? || (params[:filter][:project].blank? && params[:filter][:assay].blank? &&
-      params[:filter][:study].blank? && params[:filter][:investigation].blank? && params[:filter][:person].blank?)
-      set = resources.select do |res|
-        pass = true
-        unless params[:filter][:project].blank?
-          if res.class.name == "Person" || res.class.name == "Institution"
-            pass = pass && (res.projects.include?(Project.find_by_id(params[:filter][:project].to_i)))
-          else
-            pass = pass && (res.project.id == params[:filter][:project].to_i)            
-          end
-        end        
-        unless params[:filter][:study].blank?
-          if res.class.name == "Assay"
-            pass = pass && (res.study_id == params[:filter][:study].to_i)
-          else
-            pass = pass && (res.assays.collect{|a| a.study_id}.include?(params[:filter][:study].to_i))
-          end
+    filters = params[:filter] || {}
+    #apply_filters will be dispatching to methods based on the symbols in params[:filter].
+    #Permitted filters protects us from shennanigans like params[:filter] => {:destroy => 'This will destroy your data'}
+    filters.delete_if {|k,v| not (permitted_filters.include? k.to_s) }
+    resources.select do |res|
+      filters.all? do |filter, value|
+        filter = filter.to_s
+        klass = filter.camelize.constantize
+        value = klass.find_by_id value.to_i
+
+        case
+        #first the special cases
+        when (filter == 'investigation' and res.respond_to? :assays) then res.assays.collect{|a| a.study.investigation_id}.include? value.id
+        when (filter == 'study' and res.respond_to? :assays) then res.assays.collect{|a| a.study_id}.include? value.id
+        when (filter == 'person' and res.class.is_asset?)    then (res.creators.include?(value) or res.contributor.try(:person) == value)
+        when (filter == 'person' and res.respond_to? :owner) then res.send(:owner) == value
+        #then the general case
+        when res.respond_to?(filter)                         then res.send(filter) == value
+        when res.respond_to?(filter.pluralize)               then res.send(filter.pluralize).include? value
+        #defaults to true, if a filter is irrelevant then it is silently ignored
+        else true
         end
-        unless params[:filter][:investigation].blank?
-          if res.class.name == "Study" || res.class.name == "Assay"
-            pass = pass && (res.investigation.id == params[:filter][:investigation].to_i)
-          else
-            pass = pass && (res.assays.collect{|a| a.study.investigation_id}.include?(params[:filter][:investigation].to_i))
-          end
-        end
-        unless params[:filter][:assay].blank?
-          pass = pass && (res.assay_ids.include?(params[:filter][:assay].to_i))
-        end
-        unless params[:filter][:person].blank?
-          if (res.class.is_asset?) #an asset that acts_as_asset
-            #succeeds if and/or the creators contains the person, or the contributor is the person
-            pass = pass && (res.creators.include?(Person.find_by_id(params[:filter][:person].to_i)) || (!res.contributor.nil? && res.contributor.person.id == params[:filter][:person].to_i))
-          end          
-          if (res.respond_to?("owner")) #assays
-            pass = pass && (!res.owner.nil? && res.owner.id == params[:filter][:person].to_i)
-          end
-        end
-        pass
       end
     end
-    set
   end
 
   def additional_exception_notifier_data

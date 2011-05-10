@@ -11,6 +11,6 @@
   <%= render :partial => "layouts/resource_list_item", :collection=>@assays %>
 </div>
 
-<% if @assays.page == "latest"%>
+<% if @assays.page == "latest" && Assay.find(:all).length > Seek::Config.limit_latest%>
     <%= render :partial => "layouts/paginate_see_all"%>
 <% end %>

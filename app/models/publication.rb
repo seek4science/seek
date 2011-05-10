@@ -1,6 +1,5 @@
 require 'acts_as_asset'
 require 'grouped_pagination'
-require 'acts_as_uniquely_identifiable'
 require 'title_trimmer'
 
 class Publication < ActiveRecord::Base
@@ -22,15 +21,40 @@ class Publication < ActiveRecord::Base
     :class_name => 'Relationship',
     :as => :object,
     :dependent => :destroy
-  has_and_belongs_to_many :events
+
+  
+  if Seek::Config.events_enabled
+    has_and_belongs_to_many :events
+  else
+    def events
+      []
+    end
+
+    def event_ids
+      []
+    end
+
+    def event_ids= events_ids
+
+    end
+    
+  end
+
   alias :seek_authors :creators
   
-  acts_as_solr(:fields=>[:title,:abstract,:journal]) if SOLR_ENABLED  
+  acts_as_solr(:fields=>[:title,:abstract,:journal,:tag_counts]) if Seek::Config.solr_enabled
   
   acts_as_uniquely_identifiable
 
+  #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.published_date DESC"
-    
+  def self.sort publications
+    publications.sort_by &:published_date
+  end
+
+  def contributor_credited?
+    false
+  end
 
   def extract_pubmed_metadata(pubmed_record)
     self.title = pubmed_record.title.chop #remove full stop

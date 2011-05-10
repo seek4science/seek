@@ -1,8 +1,8 @@
-require 'acts_as_isa'
 
 class Assay < ActiveRecord::Base
   acts_as_isa
 
+  acts_as_taggable
 
   belongs_to :assay_type
   belongs_to :technology_type  
@@ -48,7 +48,7 @@ class Assay < ActiveRecord::Base
     :as => :subject,
     :dependent => :destroy
           
-  acts_as_solr(:fields=>[:description,:title],:include=>[:assay_type,:technology_type,:organisms,:strains]) if SOLR_ENABLED
+  acts_as_solr(:fields=>[:description,:title,:tag_counts],:include=>[:assay_type,:technology_type,:organisms,:strains]) if Seek::Config.solr_enabled
   
   def short_description
     type=assay_type.nil? ? "No type" : assay_type.title

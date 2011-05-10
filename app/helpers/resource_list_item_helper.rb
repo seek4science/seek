@@ -21,7 +21,12 @@ module ResourceListItemHelper
     avatar_partial
   end
 
-  def list_item_title resource, title=nil, url=nil
+  def list_item_title resource, options={}
+    title=options[:title]
+    url=options[:url]
+    include_avatar=options[:include_avatar]
+    include_avatar=true if include_avatar.nil?
+
     if title.nil?
       title = get_object_title(resource)
     end
@@ -31,7 +36,7 @@ module ResourceListItemHelper
     if resource.class.name.split("::")[0] == "Person"
       html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
     else
-      if resource.avatar_key || resource.use_mime_type_for_avatar?
+      if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
         image=nil
 
         if resource.avatar_key
@@ -50,6 +55,10 @@ module ResourceListItemHelper
       end
     end
     html << "</div>"
+  end
+
+  def list_item_tag_list resource
+    list_item_simple_list(resource.tag_counts, "Tags") {|i| link_for_tag(i)}
   end
 
   def list_item_simple_list items, attribute
@@ -109,7 +118,7 @@ module ResourceListItemHelper
   end
 
   def list_item_timestamp resource
-    html = "<p class=\"list_item_attribute\"><b>Created:</b> " + resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S')
+    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Created:</b> " + resource.created_at.strftime('%d/%m/%Y @ %H:%M:%S')
     unless resource.created_at == resource.updated_at
       html << " <b>Last updated:</b> " + resource.updated_at.strftime('%d/%m/%Y @ %H:%M:%S')
     end
@@ -167,7 +176,7 @@ module ResourceListItemHelper
         title = "Custom Policy"
         html << image('manage', :title=>title, :class => "visibility_icon")
       when 2
-        title = "Visible to all #{PROJECT_NAME} projects"
+        title = "Visible to all #{Seek::Config.project_name} projects"
         html << image('open', :title=>title, :class => "visibility_icon")
       when 3
         title = "Visible to all registered users"

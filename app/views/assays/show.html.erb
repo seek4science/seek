@@ -10,7 +10,7 @@
 </ul>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@assay} %>
 <div class="show_basic">
-   <div class="main_content_left_box">
+   <div class="main_content_left_box_narrower">
       <%= render :partial => "layouts/usage_info", :locals => { :resource => @assay } -%>
       <% if @assay.study.nil? -%>
       <div class="warning">
@@ -114,15 +114,19 @@
           <% end %>
       </div>
       <% end %>
-	  
-	  <%= embedded_isa_svg(@assay.study, true, @assay) -%>
+
 	  
     </div>
 		
 	
-    <div class="main_content_right_box">
+    <div class="main_content_right_box_wider">
       <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @assay, :creators => [@assay.owner]} -%>
+      <div id="tags_box" class="contribution_section_box">
+        <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
+      </div>
     </div>
-    <br style="clear:both"/>
-    <%= render :partial=>"layouts/items_related_to",:object => @assay %>
+    <div style="clear:both">
+        <%= embedded_isa_svg(@assay.study, true, @assay) -%>
+        <%= render :partial=>"layouts/items_related_to",:object => @assay %>
+    </div>
 </div>
