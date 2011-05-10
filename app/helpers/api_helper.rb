@@ -143,13 +143,9 @@ module ApiHelper
     end if object.respond_to?("organism") || object.respond_to?("organisms")
         
     builder.tag! "creators" do      
-      api_partial_collection builder,object.creators
-    end if object.respond_to?("creators") and object.creators
-    
-#    builder.tag! "attributions" do      
-#      api_partial_collection builder,object.parent.attributions
-#    end if object.parent.respond_to?("attributions")  
-        
+      api_partial_collection builder,(object.creators || [])
+    end if object.respond_to?("creators")
+            
     unless Seek::Config.hide_details_enabled
       builder.tag! "email",object.email if object.respond_to?("email")
       builder.tag! "webpage",object.webpage if object.respond_to?("webpage")
@@ -185,7 +181,13 @@ module ApiHelper
     
     policy_xml builder,object if current_user.person.is_admin? && object.respond_to?("policy")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
-    api_partial builder,object.project if object.respond_to?("project") and object.project
+    if object.respond_to?("project")
+      if object.project
+        api_partial builder,object.project
+      else
+        builder.tag! "project",{"xsi:nil"=>"true","xlink:href"=>"","resourceType"=>"Project"}
+      end      
+    end
     
     if object.respond_to?("avatar")
       builder.tag! "avatars" do
