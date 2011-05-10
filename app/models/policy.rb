@@ -299,18 +299,18 @@ class Policy < ActiveRecord::Base
   end
    
   # translates access type codes into human-readable form
-  def self.get_access_type_wording(access_type)
+  def self.get_access_type_wording(access_type, resource=nil)
     case access_type
       when Policy::DETERMINED_BY_GROUP
         return "Individual access rights for each member"
       when Policy::NO_ACCESS
         return "No access"
       when Policy::VISIBLE
-        return "View summary only"
+        return resource.try(:is_downloadable?) ? "View summary only" : "View summary"
       when Policy::ACCESSIBLE
-        return "View summary and get contents"
+        return resource.try(:is_downloadable?) ? "View summary and get contents" : "View summary"
       when Policy::EDITING
-        return "View and edit summary and contents"
+        return resource.try(:is_downloadable?) ? "View and edit summary and contents" : "View and edit summary"
       when Policy::MANAGING
         return "Manage"
       else
