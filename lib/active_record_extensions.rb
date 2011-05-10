@@ -19,6 +19,10 @@ module ActiveRecordExtensions
   def show_contributor_avatars?
     self.respond_to?(:contributor) || self.respond_to?(:creators)
   end
+
+  def is_downloadable?
+    respond_to?(:content_blob)
+  end
   
 end
 

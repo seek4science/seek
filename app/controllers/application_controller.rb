@@ -116,8 +116,7 @@ class ApplicationController < ActionController::Base
   private
 
   def project_membership_required
-    unless try_block {current_user.person.member?}
-#    if current_user and current_user.person and current_user.person.member?
+    unless try_block {current_user.person.member? or User.admin_logged_in?}
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do

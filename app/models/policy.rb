@@ -78,7 +78,7 @@ class Policy < ActiveRecord::Base
     # obtain parameters from params[] hash
     sharing_scope = params[:sharing][:sharing_scope].to_i
     access_type = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::NO_ACCESS : params[:sharing]["access_type_#{sharing_scope}"])
-    use_custom_sharing = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : params[:sharing]["include_custom_sharing_#{sharing_scope}"])
+    use_custom_sharing = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : params[:sharing]["include_custom_sharing_#{sharing_scope}"]).to_i
     use_whitelist = params[:sharing][:use_whitelist]
     use_blacklist = params[:sharing][:use_blacklist]
     
@@ -299,18 +299,18 @@ class Policy < ActiveRecord::Base
   end
    
   # translates access type codes into human-readable form
-  def self.get_access_type_wording(access_type)
+  def self.get_access_type_wording(access_type, resource=nil)
     case access_type
       when Policy::DETERMINED_BY_GROUP
         return "Individual access rights for each member"
       when Policy::NO_ACCESS
         return "No access"
       when Policy::VISIBLE
-        return "View summary only"
+        return resource.try(:is_downloadable?) ? "View summary only" : "View summary"
       when Policy::ACCESSIBLE
-        return "View summary and get contents"
+        return resource.try(:is_downloadable?) ? "View summary and get contents" : "View summary"
       when Policy::EDITING
-        return "View and edit summary and contents"
+        return resource.try(:is_downloadable?) ? "View and edit summary and contents" : "View and edit summary"
       when Policy::MANAGING
         return "Manage"
       else
