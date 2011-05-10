@@ -20,14 +20,21 @@ class SpecimensController < ApplicationController
     @specimen.contributor = current_user
     @specimen.project_id = params[:project_id]
 
+    policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+    #Add creators
+    AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
     respond_to do |format|
       if @specimen.save
-        #Add creators
-        AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-        format.html { redirect_to @specimen }
-
+        if policy_err_msg.blank?
+          flash[:notice] = 'Specimen was successfully created.'
+          format.html { redirect_to(@specimen) }
+          format.xml  { head :ok }
+        else
+          flash[:notice] = "Specimen metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+        end
       else
+       # Policy.create_or_update_policy(@specimen, current_user, params)
         format.html { render :action => "new" }
       end
     end
@@ -38,11 +45,18 @@ class SpecimensController < ApplicationController
     #update project
     @specimen.project_id = params[:project_id]
 
+   policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+    #update creators
+    AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|
       if @specimen.update_attributes params[:specimen]
-        #update creators
-        AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-        format.html { redirect_to @specimen }
+        if policy_err_msg.blank?
+          flash[:notice] = 'Specimen was successfully updated.'
+          format.html { redirect_to(@specimen) }
+          format.xml  { head :ok }
+        else
+          flash[:notice] = "Specimen metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+        end
       else
         format.html { render :action => "edit" }
       end
