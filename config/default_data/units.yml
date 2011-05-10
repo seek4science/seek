@@ -17,14 +17,17 @@ hour:
 hour-1:
   symbol: h-1
   comment: rate
+  factors_studied: false
 
 min-1:
   symbol: min-1
   comment: rate
+  factors_studied: false
 
 sec-1:
   symbol: sec-1
   comment: rate
+  factors_studied: false
 
 litre:
   symbol: L
@@ -57,6 +60,7 @@ mL/min:
 metre:
   symbol: m
   comment: metre
+  factors_studied: false
 
 gram:
   symbol: g
@@ -105,30 +109,37 @@ grams_per_litre:
 g/g_DW:
   symbol: g/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
 
 mg/g_DW:
   symbol: mg/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
 
 muMol-g_DW:
   symbol: muMol/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
 
 mmol/g_DW:
   symbol: mmol/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
 
 µmol/L_CV:
   symbol: µmol/L_CV
   comment: specific concentration per litre of cytoplasmic volume
+  factors_studied: false
 
 mmol/L_CV:
   symbol: mmol/L_CV
   comment: specific concentration per litre of cytoplasmic volume
+  factors_studied: false
 
 µmol/(g_DW*min):
   symbol: µmol/(g_DW*min)
   comment: specific rate per gram of dry weigh biomass
+  factors_studied: false
 
 µm:
   symbol: µm

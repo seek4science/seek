@@ -10,7 +10,7 @@
   <table >
     <tr>
       <th>Time point</th>
-      <th>Measured item</th>
+      <th>Item</th>
       <th>Unit</th>
       <th>Start value</th>
       <th>End value</th>
@@ -20,9 +20,9 @@
 
       <td><%= f.text_field :time_point,:size=>4 %></td>
 
-      <td><%=  f.collection_select :measured_item_id, sorted_measured_items,:id,:title, {}, {:onchange => "displayCompoundTextField()"} %></td>
+      <td><%=  f.collection_select :measured_item_id, sorted_measured_items(true),:id,:title, {}, {:onchange => "displayCompoundTextField()"} %></td>
 
-      <td><%=  f.collection_select :unit_id, Unit.find(:all),:id,:symbol %></td>
+      <td><%=  f.collection_select :unit_id, Unit.find(:all, :conditions => "factors_studied = true"),:id,:symbol %></td>
 
       <td><%= f.text_field :start_value,:size=>4 %></td>
 
