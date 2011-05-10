@@ -14,7 +14,7 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can specify who can <b>see</b>, <b>download</b> and <b>edit</b> this #{@resource_type}.") -%>
+    <%= help_icon("Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") -%>
     Sharing
   </div>
 
@@ -22,7 +22,7 @@
 
     <div class="box_infotext">
       <p>
-        Here you can specify who can <b>view</b> the summary of, <b>get</b> access to the content of, and <b>edit</b> the <%= @resource_type -%>.
+        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type -%>.
         <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3) -%>
       </p>
       <div id="more_sharing_info" class="box_simple" style="display: none;">        
@@ -202,7 +202,7 @@
                   <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
 
                   <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-                    <%= policy_selection_options [Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] -%>
+                    <%= policy_selection_options [Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING], @resource -%>
                   </select>
                 </div>
 
@@ -263,7 +263,7 @@
                     </div>
 
                     <select name="individual_people_access_type_select" id="individual_people_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;">
-                      <%= policy_selection_options -%>
+                      <%= policy_selection_options nil, @resource -%>
                     </select>
                   </td>
 
