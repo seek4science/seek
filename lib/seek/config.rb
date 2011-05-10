@@ -65,6 +65,7 @@ module Seek
       if self.piwik_analytics_enabled
           PiwikAnalytics::Config.id_site = self.piwik_analytics_id_site
           PiwikAnalytics::Config.url = self.piwik_analytics_url
+          PiwikAnalytics::Config.use_async = true
       end
     end
 
