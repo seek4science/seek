@@ -55,7 +55,7 @@ class SpecimensControllerTest < ActionController::TestCase
                                   :organism => Factory(:organism),
                                   :strain => Factory(:strain),
                                   :institution => Factory(:institution)},
-           :project_id => projects(:one).id
+           :project_id => Factory(:project).id
     end
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
@@ -77,7 +77,7 @@ class SpecimensControllerTest < ActionController::TestCase
   test "should update" do
     specimen = Factory(:specimen, :donor_number=>"Running mouse NO3", :policy =>policies(:editing_for_all_sysmo_users_policy))
     assert_not_equal "test", specimen.donor_number
-    put "update", :id=>specimen.id, :specimen =>{:donor_number =>"test"}
+    put "update", :id=>specimen.id, :specimen =>{:donor_number =>"test",:project_id => Factory(:project).id}
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
     assert_equal "test", s.donor_number
