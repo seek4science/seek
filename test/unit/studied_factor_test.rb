@@ -28,6 +28,11 @@ class StudiedFactorTest < ActiveSupport::TestCase
   end
 
   test "should create FS with the concentration of the compound's synonym" do
-
+    measured_item = measured_items(:concentration)
+    unit = units(:gram)
+    synonym = synonyms(:glucose_synonym)
+    data_file = data_files(:editable_data_file)
+    fs = StudiedFactor.new(:data_file => data_file, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => synonym)
+    assert fs.save, "should create the new factor studied with the concentration of the compound's synonym "
   end
 end

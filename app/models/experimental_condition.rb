@@ -7,7 +7,7 @@ class ExperimentalCondition < ActiveRecord::Base
   belongs_to :substance, :polymorphic => true
 
   validates_presence_of :unit,:measured_item,:start_value,:sop
-  validates_presence_of :substance, :if => Proc.new{|e| e.measured_item.title = 'concentration'}
+  validates_presence_of :substance, :if => Proc.new{|e| e.measured_item.title == 'concentration'}
 
 
   def range_text
