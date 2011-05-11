@@ -11,6 +11,7 @@ class StudiesController < ApplicationController
 
   def new
     @study = Study.new
+    investigation = nil
     investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
     
     if investigation
