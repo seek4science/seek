@@ -31,7 +31,7 @@ module StudiesHelper
 
   def sorted_measured_items factors_studied = false
     if factors_studied
-      items=MeasuredItem.find(:all, :conditions => "factors_studied = 1")
+      items=MeasuredItem.for_factors_studied?
     else
       items=MeasuredItem.find(:all)
     end
