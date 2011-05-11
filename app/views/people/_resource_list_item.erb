@@ -1,32 +1,34 @@
 <% person = resource %>
 
-<%= list_item_title resource, resource.name %>
+<%= list_item_title resource, :title=>resource.name %>
 
-<%= list_item_description resource.description %>
-      
-<div class="list_item_left_column">      
+<div class="list_item_left_column">
   <%= list_item_simple_list(resource.disciplines, "Disciplines") {|i| link_to i.title, people_path(:discipline_id=>i.id)} %>
-  
+
   <%= list_item_simple_list(resource.roles, "Roles") {|i| link_to i.title, people_path(:role_id=>i.id)} %>
-  
+
   <%= list_item_simple_list(resource.expertise, "Expertise") {|i| link_for_tag(i, :type=>:expertise)} %>
-  
-  <%= list_item_simple_list(resource.tools, "Tools") {|i| link_for_tag(i, :type=>:tool)} %>
+
+  <% unless hide_contact_details? %>
+    <%= list_item_optional_attribute "Email", mail_to(h(resource.email)) %>
+
+    <%= list_item_optional_attribute "Web page", h(resource.web_page), h(resource.web_page) %>
+  <% end  %>
+
 </div>
 
 <div class="list_item_right_column">
-  <% unless hide_contact_details? %>
-    <%= list_item_optional_attribute "Email", mail_to(h(resource.email)) %>
-    
-    <%= list_item_optional_attribute "Web page", h(resource.web_page), h(resource.web_page) %>    
-    
-    <%= list_item_optional_attribute "Phone", h(resource.phone)%> 
-    
-    <%= list_item_optional_attribute "Skype", h(resource.skype_name)%>
-  <% end  %>
-</div>
-<div class="list_item_whole_width">    
   <%= list_item_simple_list resource.projects, "Projects" %>
   <%= list_item_simple_list resource.institutions, "Institutions" %>
+  <%= list_item_simple_list(resource.tools, "Tools") {|i| link_for_tag(i, :type=>:tool)} %>
+
+  <% unless hide_contact_details? %>
+    <%= list_item_optional_attribute "Phone", h(resource.phone)%>
+
+    <%= list_item_optional_attribute "Skype", h(resource.skype_name)%>
+  <% end -%>
 </div>
 
+<div class="list_item_whole_width">
+  <%= list_item_description resource.description %>
+</div>
