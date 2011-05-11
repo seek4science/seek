@@ -10,11 +10,17 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    last = 0
+    last = 9999999999999 #safe until the year 318857 !
+    #add a couple more sops with a 1s delay between to ensure some timestamp differences
+    sleep 1
+    Factory(:sop)
+    sleep 1
+    Factory(:sop,:title=>"Another SOP")
     sops = Sop.find(:all)
-    assert sops.count >= 3, "This test is pointless with less than 3 sops (even just 3 is pushing it)"
+
     sops.each do |sop|
-      assert sop.updated_at.to_i >= last
+      assert sop.updated_at.to_i <= last
+      puts sop.updated_at.to_i
       last=sop.updated_at.to_i
     end
   end
