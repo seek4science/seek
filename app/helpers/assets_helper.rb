@@ -102,7 +102,7 @@ module AssetsHelper
     name = resource.class.name.split("::")[0]
 
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "Experiment" => {},"DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Event" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Event" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -198,15 +198,7 @@ module AssetsHelper
         related["Specimen"][:items] = [resource.specimen]
         related["Institution"][:items] = [resource.institution]
         related["Project"][:items] = [resource.project]
-
-      when "Experiment"
-        related["Institution"][:items] = [resource.institution]
-        related["Person"][:items] = resource.creators
-        related["Project"][:items] = [resource.project]
-        related["Sample"][:items] = [resource.sample]
-        related["DataFile"][:items] = resource.data_files
-        related["Publication"][:items] = resource.related_publications
-        related["Assay"][:items] = [resource.assay]
+        related["Assay"][:items] = resource.assays
 
       else
     end
@@ -223,7 +215,7 @@ module AssetsHelper
 
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample", "Experiment"].include?(resource.class.name)
+      if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample"].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]
       end

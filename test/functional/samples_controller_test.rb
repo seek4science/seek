@@ -131,10 +131,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_redirected_to samples_path
   end
 
-  test "should not destroy sample related to an existing experiment" do
-    e = Factory :experiment
+  test "should not destroy sample related to an existing assay" do
+    a = Factory :assay
     s = Factory :sample
-    s.experiments = [e]
+    s.assays = [a]
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id
     end

@@ -1288,7 +1288,7 @@
       <xsd:element name="data_files" type="AssociatedDataFiles"></xsd:element>
       <xsd:element name="events" type="AssociatedEvents"></xsd:element>
       <xsd:element name="sops" type="AssociatedSops"></xsd:element>
-      <xsd:element name="experiments" type="AssociatedExperiments"></xsd:element>
+
     </xsd:sequence>
   </xsd:complexType>
 
@@ -1436,17 +1436,6 @@
       <xsd:extension base="AssociatedLinks">
         <xsd:sequence>
           <xsd:element name="sample" type="ResourceLink"
-                       minOccurs="0" maxOccurs="unbounded"></xsd:element>
-        </xsd:sequence>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="AssociatedExperiments">
-    <xsd:complexContent>
-      <xsd:extension base="AssociatedLinks">
-        <xsd:sequence>
-          <xsd:element name="experiment" type="ResourceLink"
                        minOccurs="0" maxOccurs="unbounded"></xsd:element>
         </xsd:sequence>
       </xsd:extension>

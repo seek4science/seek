@@ -1,7 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :specimens
   map.resources :samples
-  map.resources :experiments
 
   map.resources :events
 

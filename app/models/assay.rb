@@ -22,7 +22,7 @@ class Assay < ActiveRecord::Base
   #end of acts_as_authorized stuff
 
   acts_as_taggable
-
+  belongs_to :sample
   belongs_to :assay_type
   belongs_to :technology_type  
   belongs_to :study  

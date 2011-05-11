@@ -145,16 +145,6 @@ Factory.define(:sample) do |f|
   f.association :specimen
 end
 
-#Experiment
-Factory.define(:experiment) do |f|
-  f.sequence(:title){|n|"Experiment#{n}"}
-  f.date Date.today
-  f.sequence(:description) {|n|"This is experiment #{n}"}
-  f.association :sample
-  f.association :contributor,:factory => :user
-  f.association :project
-  f.association :institution
-end
 
 #Data File
 Factory.define(:data_file) do |f|

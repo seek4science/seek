@@ -240,8 +240,6 @@ module ImagesHelper
         "misc_icons/green_virus-64x64.png"
       when "sample_avatar"
         "misc_icons/jws_builder32x32.png"
-        when "experiment_avatar"
-        "misc_icons/flask2-64x64.png"
       when "specimen", "specimens"
         "misc_icons/green_virus-64x64.png"
 
