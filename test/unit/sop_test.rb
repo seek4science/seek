@@ -10,7 +10,11 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    assert_equal Sop.find(:all).sort_by { |s| s.updated_at.to_i * -1 }, Sop.find(:all)
+    last = 0
+    Sop.find(:all).each do |sop|
+      assert sop.updated_at.to_i >= last
+      last=sop.updated_at.to_i
+    end
   end
 
   def test_title_trimmed 
