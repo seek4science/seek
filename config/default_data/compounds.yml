@@ -1,0 +1,108 @@
+Acetate:
+  id: 1
+  name: Acetate
+
+Alanine:
+  id: 2
+  name: Alanine
+
+Arginine:
+  id: 3
+  name: Arginine
+
+Aspartic acid:
+  id: 4
+  name: Aspartic acid
+
+CO2:
+  id: 5
+  name: CO2
+
+Cysteine:
+  id: 6
+  name: Cysteine
+
+Formiate:
+  id: 7
+  name: Formiate
+
+Glucose:
+  id: 8
+  name: Glucose
+
+Glutamate:
+  id: 9
+  name: Glutamate
+
+Glycine:
+  id: 10
+  name: Glycine
+
+Histidine:
+  id: 11
+  name: Histidine
+
+Isoluecine:
+  id: 12
+  name: Isoluecine
+
+Lactate:
+  id: 13
+  name: Lactate
+
+Leucine:
+  id: 14
+  name: Leucine
+
+Lysine:
+  id: 15
+  name: Lysine
+
+Methionine:
+  id: 16
+  name: Methionine
+
+NH3:
+  id: 17
+  name: NH3
+
+O2:
+  id: 18
+  name: O2
+
+Ornithine:
+  id: 19
+  name: Ornithine
+
+Phenylalanine:
+  id: 20
+  name: Phenylalanine
+
+Proline:
+  id: 21
+  name: Proline
+
+Pyruvate:
+  id: 22
+  name: Pyruvate
+
+Serine:
+  id: 23
+  name: Serine
+
+Succinate:
+  id: 24
+  name: Succinate
+
+Threonine:
+  id: 25
+  name: Threonine
+
+Tyrosine:
+  id: 26
+  name: Tyrosine
+
+Valine:
+  id: 27
+  name: Valine
+

@@ -61,6 +61,17 @@ class ConfigTest < ActiveSupport::TestCase
   test "google_analytics_tracker_id" do
     assert_equal '000-000' ,Seek::Config.google_analytics_tracker_id
   end
+
+  test "piwik_analytics_enabled" do
+    assert_equal false ,Seek::Config.piwik_analytics_enabled
+  end
+  test "piwik_analytics_id_site" do
+    assert_equal 1 ,Seek::Config.piwik_analytics_id_site
+  end
+  test "piwik_analytics_url" do
+    assert_equal 'localhost/piwik/',Seek::Config.piwik_analytics_url
+  end
+
 #Project
   test "project_name" do
     assert_equal "Sysmo" ,Seek::Config.project_name
