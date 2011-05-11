@@ -6,6 +6,7 @@ running mouse:
   lab_internal_number: "Do221"
   project: sysmo_project
   institution: one
+  policy: policy_for_viewable_data_file
 
 running mouse2:
   donor_number: "running mouse No.2"
@@ -15,3 +16,4 @@ running mouse2:
   lab_internal_number: "Do251"
   project: sysmo_project
   institution: one
+  policy: policy_for_viewable_data_file

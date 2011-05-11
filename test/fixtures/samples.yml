@@ -1,8 +1,10 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 test_sample:
-  title: "test"
+  title: "test in fixture"
   specimen: running mouse
   lab_internal_number: "Do231"
   strains: yeast1,yeast2
-  donation_date: "May 05, 2011 12:00 AM"
+  donation_date: <%= Date.today%>
+  policy: policy_for_viewable_data_file
+  contributor: datafile_owner (User)
