@@ -84,6 +84,7 @@ Factory.define(:assay_base, :class => Assay) do |f|
   f.association :owner, :factory => :person
   f.association :study
   f.association :assay_type
+  f.association :sample
 end
 
 Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
