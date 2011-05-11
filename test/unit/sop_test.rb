@@ -11,7 +11,9 @@ class SopTest < ActiveSupport::TestCase
 
   test "sort by updated_at" do
     last = 0
-    Sop.find(:all).each do |sop|
+    sops = Sop.find(:all)
+    assert sops.count > 2
+    sops.each do |sop|
       assert sop.updated_at.to_i >= last
       last=sop.updated_at.to_i
     end
