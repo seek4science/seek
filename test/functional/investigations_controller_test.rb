@@ -89,8 +89,9 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test "no add study button for person that can edit" do
-    login_as(:aaron)
+    login_as(:owner_of_my_first_sop)
     inv = investigations(:metabolomics_investigation)
+    assert !inv.can_edit?,"Aaron should not be able to edit this investigation"
     get :show, :id=>inv
     assert_select "a",:text=>/Add a study/,:count=>0
   end
