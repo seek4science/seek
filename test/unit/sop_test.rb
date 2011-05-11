@@ -12,7 +12,7 @@ class SopTest < ActiveSupport::TestCase
   test "sort by updated_at" do
     last = 0
     sops = Sop.find(:all)
-    assert sops.count > 2
+    assert sops.count >= 3, "This test is pointless with less than 3 sops (even just 3 is pushing it)"
     sops.each do |sop|
       assert sop.updated_at.to_i >= last
       last=sop.updated_at.to_i
