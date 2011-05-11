@@ -4,6 +4,13 @@
     <% elsif @investigation.can_edit?-%>
       <li><%= image_tag_for_key('edit', edit_investigation_path, "Edit investigation", nil, 'Edit investigation') -%></li>
     <% end -%>
+
+    <% if @investigation.can_edit? -%>
+      <li>
+        <%= image_tag_for_key('new', new_study_path(:investigation_id=>@investigation), "Add a study", nil, "Add a study") -%>
+      </li>
+    <% end -%>
+  
     <%= delete_ISA_icon @investigation,current_user -%>
 </ul>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@investigation} %>

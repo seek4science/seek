@@ -12,8 +12,9 @@ class StudiesController < ApplicationController
   def new
     @study = Study.new
     investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
+    
     if investigation
-      if investigation.can_edit?(current_user)
+      if investigation.can_edit?
         @study.investigation = investigation
       else
         flash.now[:error] = "You do now have permission to associate the new study with the investigation '#{investigation.title}'."

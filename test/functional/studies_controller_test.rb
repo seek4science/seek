@@ -37,6 +37,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should get new with investigation predefined" do
     inv = investigations(:metabolomics_investigation)
+
+    assert inv.can_edit?,"model owner should be able to edit this investigation"
     get :new, :investigation_id=>inv
     assert_response :success
 
