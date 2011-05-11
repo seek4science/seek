@@ -3,6 +3,8 @@ class StudiedFactorsController < ApplicationController
   before_filter :find_data_file_auth
   before_filter :create_new_studied_factor, :only=>[:index]
 
+  include StudiedFactorsHelper
+
   def index
     respond_to do |format|
       format.html
@@ -14,6 +16,7 @@ class StudiedFactorsController < ApplicationController
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
+    @studied_factor.substance = find_or_create_substance
 
     render :update do |page|
       if @studied_factor.save
@@ -23,7 +26,6 @@ class StudiedFactorsController < ApplicationController
         page.alert(@studied_factor.errors.full_messages)
       end
     end
-
   end
 
   def destroy
@@ -68,6 +70,4 @@ class StudiedFactorsController < ApplicationController
     @studied_factor=StudiedFactor.new(:data_file=>@data_file)
   end
 
-
-  
 end

@@ -1,9 +1,6 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-second:
-  symbol: s
-  comment: second
 
-gram:
-  symbol: g
-  comment: gram
+compound_glucose:
+  name: Glucose
+

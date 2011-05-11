@@ -1,14 +1,16 @@
-
-<% remote_form_for :studied_factor,@studied_factor,
+<%= javascript_include_tag "sharing.js" -%>
+<% remote_form_for :studied_factor ,@studied_factor,
   :url=>data_file_studied_factors_path(:data_file_id=>@data_file,:id=>@studied_factor),
   :before=>"$('studied_factor_submit').disabled=true;",
   :loaded=>"$('studied_factor_submit').disabled=false;",
   :html=>{:method=>:post} do |f| -%>
 
-  <table class="conditions_or_factors">
+
+  <div class="conditions_or_factors" >
+  <table >
     <tr>
       <th>Time point</th>
-      <th>Measured item</th>
+      <th>Item</th>
       <th>Unit</th>
       <th>Start value</th>
       <th>End value</th>
@@ -18,9 +20,9 @@
 
       <td><%= f.text_field :time_point,:size=>4 %></td>
 
-      <td><%=  f.collection_select :measured_item_id, sorted_measured_items,:id,:title %></td>
+      <td><%=  f.collection_select :measured_item_id, sorted_measured_items(true),:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('studied_factor_measured_item_id')"} %></td>
 
-      <td><%=  f.collection_select :unit_id, Unit.find(:all),:id,:symbol %></td>
+      <td><%=  f.collection_select :unit_id, Unit.find(:all, :conditions => "factors_studied = true"),:id,:symbol %></td>
 
       <td><%= f.text_field :start_value,:size=>4 %></td>
 
@@ -34,5 +36,8 @@
     </tr>
 
   </table>
+
+    <%= render :partial=>"layouts/substances_autocomplete"%>
+  </div>
 
 <% end -%>

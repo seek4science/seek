@@ -29,8 +29,12 @@ module StudiesHelper
     return image_tag + "<p style='margin: 0; text-align: center;'>#{project_link}</p>"
   end
 
-  def sorted_measured_items
-    items=MeasuredItem.find(:all)    
+  def sorted_measured_items factors_studied = false
+    if factors_studied
+      items=MeasuredItem.find(:all, :conditions => "factors_studied = 1")
+    else
+      items=MeasuredItem.find(:all)
+    end
     items.sort{|a,b| a.title <=> b.title}
   end
 

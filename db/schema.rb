@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110315124941) do
+ActiveRecord::Schema.define(:version => 20110510133519) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -119,6 +119,12 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.text    "cached_concept_yaml"
     t.integer "conceptable_id"
     t.string  "conceptable_type"
+  end
+
+  create_table "compounds", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "content_blobs", :force => true do |t|
@@ -239,6 +245,8 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "sop_version"
+    t.integer  "substance_id"
+    t.string   "substance_type"
   end
 
   create_table "favourite_group_memberships", :force => true do |t|
@@ -355,6 +363,7 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "factors_studied", :default => true
   end
 
   create_table "model_formats", :force => true do |t|
@@ -681,6 +690,8 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.datetime "updated_at"
     t.float    "standard_deviation"
     t.integer  "data_file_version"
+    t.integer  "substance_id"
+    t.string   "substance_type"
   end
 
   create_table "studies", :force => true do |t|
@@ -695,6 +706,14 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.datetime "updated_at"
     t.string   "first_letter",          :limit => 1
     t.string   "uuid"
+  end
+
+  create_table "synonyms", :force => true do |t|
+    t.string   "name"
+    t.integer  "substance_id"
+    t.string   "substance_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "taggings", :force => true do |t|
@@ -760,6 +779,7 @@ ActiveRecord::Schema.define(:version => 20110315124941) do
     t.datetime "updated_at"
     t.string   "symbol"
     t.string   "comment"
+    t.boolean  "factors_studied", :default => true
   end
 
   create_table "users", :force => true do |t|

@@ -51,5 +51,4 @@ module TagsHelper
     end
     tags
   end
-
 end
