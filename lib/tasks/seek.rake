@@ -141,7 +141,7 @@ namespace :seek do
     new_root.children << modelling_assay_type
     new_root.save!
 
-    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation"]
+    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation", "protein interations"]
     new_modelling_types.each do |title|
       a=AssayType.new(:title=>title)
       a.save!
