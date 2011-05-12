@@ -224,6 +224,8 @@ class ApplicationController < ActionController::Base
       name = self.controller_name.singularize
       action = translate_action(action_name)
 
+      return if action.nil?
+
       object = name.camelize.constantize.find(params[:id])
 
       if object.can_perform? action

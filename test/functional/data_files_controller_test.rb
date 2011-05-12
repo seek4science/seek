@@ -624,7 +624,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal ["golf","soup"],df.tag_counts.collect(&:name).sort
 
   end
-  
+
+  test "correct response to unknown action" do
+    df=data_files(:picture)
+    assert_raises ActionController::UnknownAction do
+      get :sdkfjshdfkhsdf, :id=>df
+    end
+  end
+
   private
   
   def valid_data_file
