@@ -43,9 +43,16 @@
 
 <script type="text/javascript">
     var strains = new Array();
-    var strain_ids = new Array();
-    <%strain_ids = resource.strain_ids%>
-    <% params[:sample_strain_ids] = strain_ids%>
+    <% params[:sample_strain_ids] = resource.strain_ids%>
+
+
+    <%  resource.strains.each do |s| %>
+    <% strain = Strain.find  s.id %>
+    title = '<%=strain.title %>';
+    id = '<%= strain.id %>';
+    addStrain(title, id);
+    <%end%>
+
 
     <%if params[:sample_strain_ids]%>
         <% params[:sample_strain_ids].each do |s_id| %>
@@ -73,7 +80,7 @@
         toAdd = true;
 
         for (var i = 0; i < strains.length; i++)
-            if (strains[i][0] == strain_title && strains[i][2] == strain_id) {
+            if (strains[i][0] == strain_title && strains[i][1] == strain_id) {
                 toAdd = false;
                 break;
             }
