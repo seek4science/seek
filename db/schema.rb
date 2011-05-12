@@ -601,10 +601,6 @@ ActiveRecord::Schema.define(:version => 20110512081640) do
     t.string   "comments"
     t.string   "first_letter"
     t.integer  "policy_id"
-    t.text     "other_creators"
-    t.integer  "project_id"
-    t.integer  "contributor_id"
-    t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
