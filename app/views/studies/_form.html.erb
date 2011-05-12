@@ -36,10 +36,12 @@
       <%= f.label :project %><span class="required">*</span><br/>
       <%
       selected_project=@study.investigation ? @study.investigation.project.id : 0
+      projects = current_user.person.projects
+      projects = projects | [@study.investigation.project] if @study.investigation
     %>
       <%=
       select_tag :project_id,
-        options_for_select([["Select project ..",0]]|current_user.person.projects.collect{|p| [h(p.name),p.id]},selected_project),
+        options_for_select([["Select project ..",0]]|projects.collect{|p| [h(p.name),p.id]},selected_project),
         {:onchange=>remote_function(
           :url=>{:action=>"project_selected_ajax"},
           :with=>"'project_id='+this.value",

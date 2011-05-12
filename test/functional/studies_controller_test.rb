@@ -35,6 +35,59 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
+  test "should get new with investigation predefined with project added if not member" do
+    #this scenario arose whilst fixing the test "should get new with investigation predefined"
+    #when passing the investigation_id, if that is editable but current_user is not a member, then the project of that investigation
+    #should be added to the list
+    inv = investigations(:metabolomics_investigation)
+
+    assert inv.can_edit?,"model owner should be able to edit this investigation"
+    get :new, :investigation_id=>inv
+    assert_response :success
+
+    assert_select "select#project_id" do
+      assert_select "option[selected='selected'][value=?]",inv.project.id
+    end
+    assert_select "select#study_investigation_id" do
+      assert_select "option[selected='selected'][value=?]",inv.id
+    end
+  end
+
+  test "should get new with investigation predefined" do
+    login_as :model_owner
+    inv = investigations(:metabolomics_investigation)
+
+    assert inv.can_edit?,"model owner should be able to edit this investigation"
+    get :new, :investigation_id=>inv
+    assert_response :success
+
+    assert_select "select#project_id" do
+      assert_select "option[selected='selected'][value=?]",inv.project.id
+    end
+    assert_select "select#study_investigation_id" do
+      assert_select "option[selected='selected'][value=?]",inv.id
+    end
+  end
+
+  test "should not allow linking to an investigation from a project you are not a member of" do
+    login_as(:owner_of_my_first_sop)
+    inv = investigations(:metabolomics_investigation)
+    assert !inv.project.people.include?(people(:person_for_owner_of_my_first_sop)), "this person should not be a member of the investigations project"
+    assert !inv.can_edit?(users(:owner_of_my_first_sop))
+    get :new, :investigation_id=>inv
+    assert_response :success
+
+    assert_select "select#project_id" do
+      assert_select "option[selected='selected'][value=?]",0
+    end
+    assert_select "select#study_investigation_id" do
+      assert_select "option[selected='selected'][value=?]",0
+    end
+
+    assert_not_nil flash.now[:error]
+  end
+
+
   test "should get edit" do
     get :edit,:id=>studies(:metabolomics_study)
     assert_response :success

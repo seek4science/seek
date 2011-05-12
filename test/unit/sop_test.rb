@@ -10,7 +10,19 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    assert_equal Sop.find(:all).sort_by { |s| s.updated_at.to_i * -1 }, Sop.find(:all)
+    last = 9999999999999 #safe until the year 318857 !
+
+    Sop.record_timestamps = false
+    Factory(:sop,:title=>"8 day old SOP",:updated_at=>8.day.ago)
+    Factory(:sop,:title=>"20 day old SOP",:updated_at=>20.days.ago)
+    Sop.record_timestamps = true
+    
+    sops = Sop.find(:all)
+
+    sops.each do |sop|
+      assert sop.updated_at.to_i <= last
+      last=sop.updated_at.to_i
+    end
   end
 
   def test_title_trimmed 

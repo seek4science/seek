@@ -2,13 +2,10 @@
 <%# 1) "object" for which the avatar is displayed (object.name() method should be available for any supplied object); -%>
 <%# 2) "drag_id" - id for dragging-dropping avatar into "favourites" gadget; -%>
 
-<% if object.instance_of?(Person) -%>
-    
-<% end -%>
 
 <div class="contribution_section_box">
   <div>
-    <%= favouritable_icon(object, 60) -%>    
+    <%= favouritable_icon(object, 120) -%>
   </div>
   
   <% if object.instance_of?(Person) -%>
