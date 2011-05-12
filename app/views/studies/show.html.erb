@@ -5,13 +5,14 @@
       <li><%= image_tag_for_key('edit', edit_study_path, "Edit study", nil, 'Edit study') -%></li>
     <% end -%>
 
+    <% if @study.can_edit? -%>
+        <li>
+          <%= image_tag_for_key('new', new_assay_path(:study_id=>@study), "Add an assay", nil, 'Add an assay') -%>
+        </li>
+    <% end -%>
+
   <%= delete_ISA_icon @study,current_user -%>
-  
-  <% if @study.can_edit? -%>
-    <li>
-      <%= image_tag_for_key('new', new_assay_path(:study_id=>@study), "Create an Assay for this study", nil, 'Create an Assay for this study') -%>
-    </li>
-  <% end -%>
+
 </ul>
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@study} %>

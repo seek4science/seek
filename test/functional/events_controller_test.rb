@@ -21,6 +21,16 @@ class EventsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:events)
   end
 
+  test "index should not show contributor or project" do
+    e = Factory :event,
+                :contributor => Factory(:user, :person => Factory(:person ,:first_name => "Dont", :last_name => "Display Person")),
+                :project => Factory(:project, :title => "Dont Display Project"),
+                :policy => Factory(:public_policy)
+    get :index
+    assert !(/Dont Display Person/ =~ @response.body)
+    assert !(/Dont Display Project/ =~ @response.body)
+  end
+
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -36,8 +46,8 @@ class EventsControllerTest < ActionController::TestCase
 
   test "xml for projectless event" do
     id = Factory(:event, :policy => Factory(:public_policy)).id
-    get :show, :id => id, :format => :xml
-    assert_response :success
+    get :show, :id => id, :format => "xml"
+    perform_api_checks
   end
 
   test "should show event" do

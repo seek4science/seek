@@ -85,7 +85,21 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test "edit button in show for authorized user" do
     get :show, :id=>investigations(:metabolomics_investigation)
-    assert_select "a",:text=>/Edit investigation/,:count=>1
+    assert_select "a[href=?]",edit_investigation_path(investigations(:metabolomics_investigation)),:text=>/Edit investigation/,:count=>1
+  end
+
+  test "no add study button for person that can edit" do
+    login_as(:owner_of_my_first_sop)
+    inv = investigations(:metabolomics_investigation)
+    assert !inv.can_edit?,"Aaron should not be able to edit this investigation"
+    get :show, :id=>inv
+    assert_select "a",:text=>/Add a study/,:count=>0
+  end
+
+  test "add study button for person that can edit" do
+    inv = investigations(:metabolomics_investigation)
+    get :show, :id=>inv
+    assert_select "a[href=?]",new_study_path(:investigation_id=>inv),:text=>/Add a study/,:count=>1
   end
 
 

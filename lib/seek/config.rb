@@ -65,6 +65,7 @@ module Seek
       if self.piwik_analytics_enabled
           PiwikAnalytics::Config.id_site = self.piwik_analytics_id_site
           PiwikAnalytics::Config.url = self.piwik_analytics_url
+          PiwikAnalytics::Config.use_async = true
       end
     end
 
@@ -81,7 +82,7 @@ module Seek
     end
 
     def open_id_authentication_store_propagate
-      OpenIdAuthentication.store = self.open_id_authentication_store
+      OpenIdAuthentication.store = self.open_id_authentication_store.to_sym
     end
 
     def solr_enabled_propagate
