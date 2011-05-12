@@ -71,7 +71,7 @@
 </table>
 
 <p>
-    <%= f.label "Sample" %> <span class="required">*</span><br/>
+    <%= f.label "Sample" %> <br/>
     <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{},{"style" =>"width:90%"}) %>
 </p>
 <br style="clear:both"/>
