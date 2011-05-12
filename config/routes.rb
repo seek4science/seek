@@ -55,7 +55,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :sops, :member => { :download => :get, :new_version=>:post, :request_resource=>:post, :update_tags_ajax=>:post } do |sop|
+  map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
     sop.resources :experimental_conditions
   end
 

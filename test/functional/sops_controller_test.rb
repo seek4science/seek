@@ -636,6 +636,41 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test "do publish" do
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    assert sop.can_manage?,"The sop must be manageable for this test to succeed"
+    post :publish,:id=>sop
+    assert_redirected_to sop
+    assert_nil flash[:error]
+    assert_not_nil flash[:notice]
+  end
+
+  test "do not publish if not can_manage?" do
+    sop=sops(:my_first_sop)
+    assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
+    post :publish,:id=>sop
+    assert_redirected_to sop
+    assert_not_nil flash[:error]
+    assert_nil flash[:notice]
+  end
+
+  test "get preview_publish" do
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    assert sop.can_manage?,"The sop must be manageable for this test to succeed"
+    get :preview_publish, :id=>sop
+    assert_response :success
+  end
+
+  test "cannot get preview_publish when not manageable" do
+    sop=sops(:my_first_sop)
+    assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
+    get :preview_publish, :id=>sop
+    assert_redirected_to sop
+    assert flash[:error]
+  end
+
   private
 
   def valid_sop_with_url
