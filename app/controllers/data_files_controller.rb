@@ -8,6 +8,7 @@ class DataFilesController < ApplicationController
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
+  include Seek::Publishing
 
   #before_filter :login_required
   

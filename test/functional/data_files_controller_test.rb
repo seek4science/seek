@@ -632,6 +632,22 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test "get preview_publish" do
+    df=data_files(:picture)
+    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_response :success
+  end
+
+  test "cannot get preview_publish when not manageable" do
+    login_as(:quentin)
+    df = data_files(:picture)
+    assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_redirected_to data_file_path(df)
+    assert flash[:error]
+  end
+
   private
   
   def valid_data_file
