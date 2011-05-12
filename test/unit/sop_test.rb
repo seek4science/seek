@@ -11,16 +11,9 @@ class SopTest < ActiveSupport::TestCase
 
   test "sort by updated_at" do
     last = 9999999999999 #safe until the year 318857 !
-    #add a couple more sops with a 1s delay between to ensure some timestamp differences
-    sleep 1
-    Factory(:sop)
-    sleep 1
-    Factory(:sop,:title=>"Another SOP")
-    sops = Sop.find(:all)
 
-    sops.each do |sop|
+    Sop.find(:all).each do |sop|
       assert sop.updated_at.to_i <= last
-      puts sop.updated_at.to_i
       last=sop.updated_at.to_i
     end
   end
