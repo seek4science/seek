@@ -32,6 +32,7 @@ class SpecimensController < ApplicationController
           format.xml  { head :ok }
         else
           flash[:notice] = "Specimen metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+         format.html { redirect_to specimen_edit_path(@specimen)}
         end
       else
        # Policy.create_or_update_policy(@specimen, current_user, params)
@@ -56,6 +57,7 @@ class SpecimensController < ApplicationController
           format.xml  { head :ok }
         else
           flash[:notice] = "Specimen metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to specimen_edit_path(@specimen)}
         end
       else
         format.html { render :action => "edit" }
