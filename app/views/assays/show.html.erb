@@ -70,6 +70,16 @@
           <b>Organisms: </b>
           <%= assay_organisms_list @assay.assay_organisms %>
       </p>
+
+     <p id="specimen">
+       <b>Specimen: </b>
+       <%= link_to h(@assay.sample.specimen.title.capitalize), @assay.sample.specimen -%>
+     </p>
+
+     <p id="Sample">
+       <b>Sample: </b>
+       <%= link_to h(@assay.sample.title.capitalize), @assay.sample -%>
+     </p>
       <style type="text/css">
           div.data_model_relationship {
               border: 1px dotted black;
