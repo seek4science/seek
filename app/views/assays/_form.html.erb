@@ -24,7 +24,10 @@
     <%= f.label :description -%><br/>
     <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
   </p>
-
+  <p>
+    <%= f.label "Institution" %><br/>
+    <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:prompt => true}) %>
+  </p>
   <% if @assay.study.blank? or @assay.study.can_view? %>
       <p>
       <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
@@ -70,7 +73,7 @@
 <p>
     <%= f.label "Sample" %> <span class="required">*</span><br/>
     <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{},{"style" =>"width:90%"}) %>
-  </p>
+</p>
 <br style="clear:both"/>
 
 <p>
