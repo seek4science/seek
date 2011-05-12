@@ -447,11 +447,6 @@ ActiveRecord::Schema.define(:version => 20110512090820) do
     t.datetime "updated_at"
   end
 
-  create_table "notifiers", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
