@@ -27,9 +27,9 @@ class SampleTest < ActiveSupport::TestCase
     s.donation_date=nil
     assert !s.valid?
 
-    s.reload
-    s.strains=[]
-    assert !s.valid?
+    #s.reload
+    #s.strains=[]
+    #assert !s.valid?
 
 
 
