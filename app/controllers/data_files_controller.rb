@@ -8,13 +8,16 @@ class DataFilesController < ApplicationController
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
-  include Seek::Publishing
 
   #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_data_file, :only=>[:show,:download]
+
+  #has to come after the other filters
+  include Seek::Publishing
+
     
   def new_version
     if (handle_data nil)          

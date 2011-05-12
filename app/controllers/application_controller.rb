@@ -211,7 +211,7 @@ class ApplicationController < ActionController::Base
       when 'destroy', 'destroy_item'
         'delete'
 
-      when 'manage','preview_publish'
+      when 'manage','preview_publish','publish'
         'manage'
 
       else
