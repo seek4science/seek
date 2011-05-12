@@ -18,10 +18,19 @@ class SamplesController < ApplicationController
     @sample = Sample.new(params[:sample])
     @sample.contributor = current_user
     @sample.strain_ids = params[:sample_strain_ids]
+    #add policy to sample
+    policy_err_msg = Policy.create_or_update_policy(@sample, current_user, params)
     respond_to do |format|
       if @sample.save
 
-        format.html { redirect_to(@sample) }
+        if policy_err_msg.blank?
+          flash[:notice] = 'Sample was successfully created.'
+          format.html { redirect_to(@sample) }
+          format.xml  { head :ok }
+        else
+          flash[:notice] = "Sample metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+         format.html { redirect_to sample_edit_path(@sample)}
+        end
 
       else
         format.html { render :action => "new" }
@@ -33,12 +42,20 @@ class SamplesController < ApplicationController
   def update
 
       @sample.strain_ids = params[:sample_strain_ids]
+      #update policy to sample
+    policy_err_msg = Policy.create_or_update_policy(@sample, current_user, params)
 
       respond_to do |format|
 
       if @sample.update_attributes params[:sample]
-        flash[:notice] = 'Sample was successfully updated'
-        format.html { redirect_to @sample }
+         if policy_err_msg.blank?
+          flash[:notice] = 'Sample was successfully created.'
+          format.html { redirect_to(@sample) }
+          format.xml  { head :ok }
+        else
+          flash[:notice] = "Sample metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+         format.html { redirect_to sample_edit_path(@sample)}
+        end
       else
         format.html { render :action => "edit" }
       end
