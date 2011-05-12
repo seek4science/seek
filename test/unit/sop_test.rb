@@ -10,9 +10,10 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    last = 0
+    last = 9999999999999 #safe until the year 318857 !
+
     Sop.find(:all).each do |sop|
-      assert sop.updated_at.to_i >= last
+      assert sop.updated_at.to_i <= last
       last=sop.updated_at.to_i
     end
   end
