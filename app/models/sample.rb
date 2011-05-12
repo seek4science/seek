@@ -26,4 +26,8 @@ class Sample < ActiveRecord::Base
   def can_delete? user=User.current_user
     assays.empty? && mixin_super(user)
   end
+
+  def self.user_creatable?
+    true
+  end
 end

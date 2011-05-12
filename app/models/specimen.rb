@@ -39,4 +39,7 @@ class Specimen < ActiveRecord::Base
     samples.empty? && mixin_super(user)
   end
 
+  def self.user_creatable?
+    true
+  end
 end
