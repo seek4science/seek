@@ -87,8 +87,4 @@ module StudiedFactorsHelper
     end
     return new_substances, known_substances
   end
-
-  def is_concentration?
-
-  end
 end
