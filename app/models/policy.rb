@@ -70,7 +70,7 @@ class Policy < ActiveRecord::Base
     # this method will return an error message is something goes wrong (empty string in case of success)
     #FIXME: this method always returns an empty string, and therefore indicates success - can this be removed?
     error_msg = ""
-    
+
     # if no data about sharing is contained in params[], it should be some user (not the onwer!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     return "" unless params[:sharing]
@@ -103,13 +103,13 @@ class Policy < ActiveRecord::Base
        policy.use_whitelist = use_whitelist
        policy.use_blacklist = use_blacklist
        policy.save
+
     end
-    
-    
+
+
     # NOW PROCESS THE PERMISSIONS
     # policy of an asset; pemissions will be applied to it
     policy = resource.policy
-    
     # read the permission data from params[]
     unless params[:sharing][:permissions].blank?
       contributor_types = ActiveSupport::JSON.decode(params[:sharing][:permissions][:contributor_types])
@@ -138,8 +138,8 @@ class Policy < ActiveRecord::Base
     end
     # this is required to leave the association of "policy" with its permissions in the correct state; otherwise exception is thrown
     policy.reload if changes_made
-    
-    
+
+
     # update the remaining old permissions if the access type has changed for them
     policy.permissions.each do |p|
       unless p.access_type == new_permission_data["#{p.contributor_type}"][p.contributor_id]["access_type"].to_i
@@ -147,21 +147,24 @@ class Policy < ActiveRecord::Base
         p.save!
       end
     end
-    
-    
+
+
     # now add any remaining new memberships
     if contributor_types && contributor_types.length > 0
       contributor_types.each do |contributor_type|
         if new_permission_data.has_key?(contributor_type)
           new_permission_data["#{contributor_type}"].each do |p|
-            unless (found = Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}))
-              Permission.create(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"], :policy_id => policy.id)
+           permission =  Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0]})
+            unless (permission.try(:policy) == policy)
+              new_permission  = Permission.new(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"])
+              new_permission.policy = policy
+              new_permission.save!
             end
           end
         end
       end
     end
-    
+
     # --- Synchronisation is Finished ---
     
     # returns some message in case of errors (or empty string in case of success)
