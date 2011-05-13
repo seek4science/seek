@@ -7,8 +7,8 @@ class << obj
 attr_accessor :data_url,:local_copy
 end unless obj.nil?
 obj.local_copy=1 unless obj.nil?
-asset_name = upload_field.humanize.capitalize
-assert_name = "SOP" if asset_name=="Sop" -%>
+asset_name = text_for_resource upload_field
+-%>
 
 <div class="box_infotext">
     <p>
