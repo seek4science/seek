@@ -224,7 +224,7 @@ module AssetsHelper
     Authorization.authorize_collection("view",assets,current_user)
   end
 
-  def asset_buttons asset,version
+  def asset_buttons asset,version=nil
      human_name = text_for_resource asset
      render :partial=>"assets/asset_buttons",:locals=>{:asset=>asset,:version=>version,:human_name=>human_name}
   end
