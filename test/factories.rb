@@ -35,6 +35,10 @@
     f.after_create { |user| user.activate }
   end
 
+  Factory.define(:user_not_in_project,:parent => :activated_user) do |f|
+    f.association :person, :factory => :brand_new_person
+  end
+
   Factory.define(:user, :parent => :activated_user) do |f|
     f.association :person, :factory => :person_in_project
   end
