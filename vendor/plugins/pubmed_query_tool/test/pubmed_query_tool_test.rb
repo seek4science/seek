@@ -20,6 +20,10 @@ class PubmedQueryToolTest < ActiveSupport::TestCase
     assert_equal "10000", result.pmid
     assert_equal 2002, result.abstract.size
   end
+
+  test "fail" do
+    assert false
+  end
   
   #TODO: this
   test "can search" do
