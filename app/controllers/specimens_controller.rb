@@ -88,10 +88,10 @@ class SpecimensController < ApplicationController
     end
     ins||=[]
 
-    render :update do |page|
+    #render :update do |page|
 
-      page.replace_html "institution_collection", :partial=>"specimens/institutions_list", :locals=>{:ins=>ins, :project_id=>params[:project_id]}
-    end
+     # page.replace_html "institution_collection", :partial=>"specimens/institutions_list", :locals=>{:ins=>ins, :project_id=>params[:project_id]}
+    #end
 
   end
 
