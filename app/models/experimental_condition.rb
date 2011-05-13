@@ -9,6 +9,8 @@ class ExperimentalCondition < ActiveRecord::Base
   validates_presence_of :unit,:measured_item,:start_value,:sop
   validates_presence_of :substance, :if => Proc.new{|e| e.measured_item.title == 'concentration'}, :message => 'can not be blank or multiple'
 
+  acts_as_solr(:field => [], :include => [:measured_item, :substance]) if Seek::Config.solr_enabled
+
 
   def range_text
     #TODO: write test

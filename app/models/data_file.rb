@@ -35,7 +35,7 @@ class DataFile < ActiveRecord::Base
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
   acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
-  
+
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
   
   acts_as_uniquely_identifiable  
