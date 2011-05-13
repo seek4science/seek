@@ -1145,7 +1145,6 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
 
 function showOrHideSubstanceTextField(selectedItem){
     //check if the selected entry is concentration
-    "studied_factor_measured_item_id"
     selectedIndex = $(selectedItem).selectedIndex
     option_select = $(selectedItem).options[selectedIndex]
 
@@ -1156,7 +1155,6 @@ function showOrHideSubstanceTextField(selectedItem){
        $('facebook').hide()
     }
 }
-
 
 
 

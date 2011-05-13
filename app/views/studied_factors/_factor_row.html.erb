@@ -8,7 +8,7 @@
 
     <li id="measured_item">
       <%if  studied_factor.measured_item.title == 'concentration' and studied_factor.substance.try(:name)%>
-        <%= h studied_factor.measured_item.title + ' of ' + studied_factor.substance.name %>
+        <%= h studied_factor.substance.name + ' ' + studied_factor.measured_item.title  %>
       <%else%>
         <%= h studied_factor.measured_item.title %>
       <%end%>
@@ -21,9 +21,6 @@
     <li id="standard_deviation">
       <%= h studied_factor.standard_deviation %>
     </li>
-
-
-
     
     <% style="display:none;" unless show_delete %>
     <li id="delete" class="destroy_studied_factor" style="<%= style %>">

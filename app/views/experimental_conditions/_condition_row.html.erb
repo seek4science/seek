@@ -4,7 +4,7 @@
   <ul class="condition_or_factor_row">
     <li id="measured_item">
       <%if  exp_condition.measured_item.title == 'concentration' and exp_condition.substance.try(:name)%>
-        <%= h exp_condition.measured_item.title + ' of ' + exp_condition.substance.name %>
+        <%= h exp_condition.substance.name + ' ' + exp_condition.measured_item.title %>
       <%else%>
         <%= h exp_condition.measured_item.title %>
       <%end%>

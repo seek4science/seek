@@ -16,13 +16,17 @@ class ExperimentalConditionsController < ApplicationController
     @experimental_condition=ExperimentalCondition.new(params[:experimental_condition])
     @experimental_condition.sop=@sop
     @experimental_condition.sop_version = params[:version]
-    @experimental_condition.substance = find_or_create_substance
+    new_substances = params[:tag_autocompleter_unrecognized_items] || []
+    known_substance_ids_and_types = params[:tag_autocompleter_selected_ids] || []
+    @experimental_condition.substance = find_or_create_substance new_substances, known_substance_ids_and_types
     
     render :update do |page|
       if @experimental_condition.save
         page.insert_html :bottom,"experimental_conditions_rows",:partial=>"condition_row",:object=>@experimental_condition,:locals=>{:show_delete=>true}
         page.visual_effect :highlight,"experimental_conditions"
         #page.visual_effect :highlight,"experimental_condition_row_#{@experimental_condition.id}"
+        # clear the substance text field
+        page.call "autocompleters['tag_autocompleter'].deleteAllTokens"
       else
         page.alert(@experimental_condition.errors.full_messages)
       end

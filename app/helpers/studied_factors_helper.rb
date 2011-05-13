@@ -41,10 +41,8 @@ module StudiedFactorsHelper
      end
   end
 
-   def find_or_create_substance
-    new_substances = params[:tag_autocompleter_unrecognized_items] || []
+   def find_or_create_substance(new_substances, known_substance_ids_and_types)
     known_substances = []
-    known_substance_ids_and_types =params[:tag_autocompleter_selected_ids] || []
     known_substance_ids_and_types.each do |text|
       id, type = text.split(',')
       id = id.strip

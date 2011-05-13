@@ -2,6 +2,7 @@
   <%= "Factors studied for '#{link_to h(@data_file.title),data_file_path(@data_file, :version => @display_data_file.version)}' version #{@display_data_file.version}" %>
 </h1>
 <% if @data_file.can_edit? current_user -%>
+
   <div id="edit_on">
     <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Start editing",:alt=>"Start editing") do |page|
       page.visual_effect :appear,"add_factor"
@@ -14,7 +15,7 @@
     -%>
   </div>
 
-  <div id="edit_off" style="display:none;">
+  <div id="edit_off" style="display:none">
     <%= link_to_function image(("edit-off"),:style=>"margin-left:4em;",:title=>"Stop editing",:alt=>"Stop editing") do |page|
       page.visual_effect :fade,"add_factor"
       page["edit_on"].toggle
@@ -25,6 +26,7 @@
     end
     -%>
   </div>
+
 <% end -%>
 
 <center>
@@ -44,3 +46,4 @@
 
 
 </center>
+
