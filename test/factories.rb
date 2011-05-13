@@ -134,6 +134,14 @@
     f.association :contributor, :factory => :user
   end
 
+#Publication
+  Factory.define(:publication) do |f|
+    f.title "A Model"
+    f.pubmed_id 1
+    f.association :project
+    f.association :contributor, :factory => :user
+  end
+
 #Misc
   Factory.define(:group_membership) do |f|
     f.association :work_group
