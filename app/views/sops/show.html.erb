@@ -1,29 +1,6 @@
 <%= javascript_include_tag "resource" -%>
-<% truncate_length_for_boxes = 22 -%>
 
-<ul class="sectionIcons">
-  <% if @sop.can_manage? -%>
-      <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
-      <li><%= image_tag_for_key('manage', edit_sop_path(@sop), nil, nil, 'Manage SOP') -%></li>
-  <% elsif @sop.can_edit?-%>
-      <%# this is not owner, but current user can edit -%>
-      <li><%= image_tag_for_key('edit', edit_sop_path(@sop), nil, nil, 'Edit SOP') -%></li>
-  <% end -%>
-
-  <% if @sop.can_delete? -%>
-      <li><%= image_tag_for_key('destroy', sop_path(@sop), nil, { :confirm => 'This deletes the SOP and all metadata. Are you sure?', :method => :delete }, 'Delete SOP') -%></li>
-  <% end -%>
-
-  <% if @sop.can_download? -%>
-      <li><%= image_tag_for_key('download', download_sop_url(:version=>@display_sop.version), "Download SOP", nil, "Download SOP") -%></li>
-  <% else -%>
-      <li>
-      <li>
-        <%= render :partial=>"assets/request_resource", :locals=>{:resource=>@sop} %>
-      </li>
-      </li>
-  <% end -%>
-</ul>
+<%= asset_buttons @sop,@display_sop.version -%>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
 
