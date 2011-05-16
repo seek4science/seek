@@ -169,7 +169,7 @@ class SopsController < ApplicationController
           @assay.relate(@sop)
         end
         #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@sop.id)
+        assay_assets = @sop.assay_assets
         assay_assets.each do |assay_asset|
           flag = false
           assay_ids.each do |id|

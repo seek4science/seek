@@ -108,7 +108,7 @@
         selection_box.onchange();
     }
 
-<% assay_assets = AssayAsset.find_all_by_asset_id(resource.id) %>
+<% assay_assets = AssayAsset.find_all_by_asset_type_and_asset_id(resource.class.name,resource.id) %>
   <% if assay_assets%>
     <% assay_assets.each do |assay_asset|%>
       <% assay = Assay.find(assay_asset.assay_id) %>
