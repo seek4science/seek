@@ -15,7 +15,12 @@
     </li>
     
     <li id="values">
-      <%= "#{h studied_factor.range_text} #{studied_factor.unit.symbol}" %>
+      <!--don't show dimensionless unit-->
+      <% if studied_factor.unit.symbol == 'dimensionless' %>
+          <%= "#{h studied_factor.range_text}" %>
+      <% else %>
+        <%= "#{h studied_factor.range_text} #{studied_factor.unit.symbol}" %>
+      <% end %>
     </li>       
 
     <li id="standard_deviation">

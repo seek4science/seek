@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110516091100) do
+ActiveRecord::Schema.define(:version => 20110516170953) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -684,7 +684,7 @@ ActiveRecord::Schema.define(:version => 20110516091100) do
     t.float    "start_value"
     t.float    "end_value"
     t.integer  "unit_id"
-    t.integer  "time_point"
+    t.float    "time_point"
     t.integer  "data_file_id"
     t.datetime "created_at"
     t.datetime "updated_at"

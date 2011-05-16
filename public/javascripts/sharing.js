@@ -1149,10 +1149,10 @@ function showOrHideSubstanceTextField(selectedItem){
     option_select = $(selectedItem).options[selectedIndex]
 
     if (option_select.text == 'concentration'){
-        $('facebook').show()
+        $('tag_autocomplete_input').disabled = false
 
     }else{
-       $('facebook').hide()
+       $('tag_autocomplete_input').disabled = true
     }
 }
 

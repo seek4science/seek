@@ -19,7 +19,6 @@ class StudiedFactorsController < ApplicationController
     new_substances = params[:tag_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:tag_autocompleter_selected_ids] || []
     @studied_factor.substance = find_or_create_substance new_substances,known_substance_ids_and_types
-
     render :update do |page|
       if @studied_factor.save
         page.insert_html :bottom,"studied_factors_rows",:partial=>"factor_row",:object=>@studied_factor,:locals=>{:show_delete=>true}
