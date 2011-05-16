@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="Content-Language" content="en"/>
+  <title>Drop Menu 1 - Horizontal - Example 1 - MyGosuMenu</title>
+  <style type="text/css">
+      h1 {
+          font-size: 24px;
+      }
+
+      body {
+          font: 13px tahoma;
+          background: #ffffff;
+          margin: 1em 2em;
+          padding: 0em;
+      }
+  </style>
+
+</head>
+
+<%= javascript_include_tag 'dropMenu.js' %>
+<body>
+
+<table cellspacing="0" cellpadding="0" id="menu" class="dm">
+  <tr>
+    <td>
+      <a class="item1" href="javascript:void(0)">Yellow Pages</a>
+
+      <div class="section">
+        <%= tab_definition :controllers=>["people"] -%>
+
+        <!-- Projects tab -->
+        <%= tab_definition :controllers=>["projects"] -%>
+
+        <!-- Institutions tab -->
+        <%= tab_definition :controllers=>["institutions"] -%>
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+      <a class="item1" href="javascript:void(0)">I S A</a>
+      </div>
+
+        <div class="section">
+          <!-- Investigations tab -->
+          <%= tab_definition :controllers=>["investigations"] -%>
+
+          <!-- Studies tab -->
+          <%= tab_definition :controllers=>["studies"] -%>
+
+          <!-- Assays tab -->
+          <%= tab_definition :controllers=>["assays"] -%>
+
+          <!-- Samples tab -->
+          <%= tab_definition :controllers=>["samples"] -%>
+
+          <!-- Specimens tab -->
+          <%= tab_definition :controllers=>["specimens"] -%>
+        </div>
+
+    </td>
+    <td>
+      <div class="tab_gap_before">
+      <a class="item1" href="javascript:void(0)">Assets</a>
+      </div>
+
+        <div class="section">
+          <!-- Data tab -->
+          <%= tab_definition :controllers=>["data_files"], :title=>"Data" -%>
+
+          <!-- Models tab -->
+          <%= tab_definition :controllers=>["models"] -%>
+
+          <!-- SOPs tab -->
+          <%= tab_definition :controllers=>["sops"], :title=>"SOPs" -%>
+        </div>
+
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <% if logged_in? %>
+            <%= link_to "Forums", forums_path, {:class =>"item1"} %>
+        <% end %>
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <%= link_to "Events", events_path, {:class =>"item1"} if Seek::Config.events_enabled %>
+      </div>
+    </td>
+    <td>
+      <div class="tab_gap_before">
+        <%= link_to "Help", {:controller => "help_documents", :action=>"index"}, {:class =>"item1"} %>
+      </div>
+    </td>
+  </tr>
+</table>
+
+
+<script type="text/javascript">
+    var dm = new DropMenu1('menu');
+    dm.position.top = -1;
+    dm.init();
+</script>
+
+</body>
+</html>
