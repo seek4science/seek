@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110510133519) do
+ActiveRecord::Schema.define(:version => 20110516091100) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -780,6 +780,7 @@ ActiveRecord::Schema.define(:version => 20110510133519) do
     t.string   "symbol"
     t.string   "comment"
     t.boolean  "factors_studied", :default => true
+    t.integer  "order"
   end
 
   create_table "users", :force => true do |t|

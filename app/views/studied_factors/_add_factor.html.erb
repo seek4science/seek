@@ -22,7 +22,7 @@
 
       <td><%=  f.collection_select :measured_item_id, sorted_measured_items(true),:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('studied_factor_measured_item_id')"} %></td>
 
-      <td><%=  f.collection_select :unit_id, Unit.factors_studied_units,:id,:symbol %></td>
+      <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
 
       <td><%= f.text_field :start_value,:size=>4 %></td>
 
