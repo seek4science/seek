@@ -66,7 +66,7 @@ namespace :seek do
   
   desc 'upgrades between 0.6 and 0.7'
   task(:upgrade_live=>:environment) do
-    other_tasks=["assay_classes","update_assay_classes","strains","graft_new_assay_types","relationship_types"]
+    other_tasks=["assay_classes","update_assay_classes","strains","tissue_and_cell_types","graft_new_assay_types","relationship_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute
     end
@@ -309,7 +309,7 @@ namespace :seek do
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains"]
+    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains","tissue_and_cell_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute      
     end
@@ -367,6 +367,12 @@ namespace :seek do
     revert_fixtures_identify
     Strain.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "strains")
+  end
+
+  task(:tissue_and_cell_types=>:environment) do
+    revert_fixtures_identify
+    Strain.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "tissue_and_cell_types")
   end
   
   task(:culture_growth_types=>:environment) do
