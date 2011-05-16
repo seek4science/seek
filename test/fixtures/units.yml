@@ -3,7 +3,9 @@
 second:
   symbol: s
   comment: second
+  order: 1
 
 gram:
   symbol: g
   comment: gram
+  order: 2
