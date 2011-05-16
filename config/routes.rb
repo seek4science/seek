@@ -4,8 +4,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :strains
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_tags_ajax=>:post}
-  
-  map.resources :created_datas
 
   map.resources :assay_types, :collection=>{:manage=>:get}
 
