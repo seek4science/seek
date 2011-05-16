@@ -39,7 +39,7 @@ class HomeControllerTest < ActionController::TestCase
   test "SOP tab should be capitalized" do
     login_as(:quentin)
     get :index
-    assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+    assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
   end
 
   test "SOP upload option should be capitlized" do
