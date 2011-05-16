@@ -18,13 +18,6 @@ class SpecimenTest < ActiveSupport::TestCase
     specimen.contributor = nil
     assert !specimen.valid?
 
-    specimen.reload
-    specimen.organism = nil
-    assert !specimen.valid?
-
-    specimen.reload
-    specimen.strain = nil
-    assert !specimen.valid?
 
     specimen.reload
     specimen.project= nil

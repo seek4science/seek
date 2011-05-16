@@ -17,6 +17,7 @@ class SpecimensController < ApplicationController
 
   def create
     @specimen = Specimen.new(params[:specimen])
+    organisms     = params[:specimen_organism_ids] || []
     @specimen.contributor = current_user
     @specimen.project_id = params[:project_id]
 
@@ -26,6 +27,13 @@ class SpecimensController < ApplicationController
 
     respond_to do |format|
       if @specimen.save
+
+         organisms.each do |text|
+          o_id, strain, culture_growth_type_text=text.split(",")
+          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+          @specimen.associate_organism(o_id, strain, culture_growth)
+         end
+
         if policy_err_msg.blank?
           flash[:notice] = 'Specimen was successfully created.'
           format.html { redirect_to(@specimen) }
@@ -45,12 +53,20 @@ class SpecimensController < ApplicationController
 
     #update project
     @specimen.project_id = params[:project_id]
+    organisms     = params[:specimen_organism_ids] || []
     @specimen.contributor = current_user
     policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|
       if @specimen.update_attributes params[:specimen]
+
+        organisms.each do |text|
+          o_id, strain, culture_growth_type_text=text.split(",")
+          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+          @specimen.associate_organism(o_id, strain, culture_growth)
+         end
+
         if policy_err_msg.blank?
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }

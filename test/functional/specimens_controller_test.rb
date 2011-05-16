@@ -52,8 +52,6 @@ class SpecimensControllerTest < ActionController::TestCase
       post :create, :specimen => {:donor_number => "running mouse NO.1",
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
-                                  :organism => Factory(:organism),
-                                  :strain => Factory(:strain),
                                   :institution => Factory(:institution)},
            :project_id => Factory(:project).id
     end

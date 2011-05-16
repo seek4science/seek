@@ -1,8 +1,6 @@
 running mouse:
   donor_number: "running mouse No.1"
   contributor:  owner_of_my_first_sop (User)
-  organism: Saccharomyces_cerevisiae
-  strain: Saccharomyces_cerevisiae1
   lab_internal_number: "Do221"
   project: sysmo_project
   institution: one
@@ -11,8 +9,6 @@ running mouse:
 running mouse2:
   donor_number: "running mouse No.2"
   contributor:  owner_of_my_first_sop (User)
-  organism: Saccharomyces_cerevisiae
-  strain: Saccharomyces_cerevisiae1
   lab_internal_number: "Do251"
   project: sysmo_project
   institution: one
