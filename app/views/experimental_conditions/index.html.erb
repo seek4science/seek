@@ -1,35 +1,10 @@
 <h1>
   <%= "Experimental conditions for '#{link_to h(@sop.title),sop_path(@sop, :version => @display_sop.version)}' version #{@display_sop.version}" %>
 </h1>
-<% if @sop.can_edit? current_user -%>
-  <div id="edit_on">
-    <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Start editing",:alt=>"Start editing") do |page|
-      page.visual_effect :appear,"add_condition"
-      page["edit_on"].toggle
-      page["edit_off"].toggle
-      page.select('li.destroy_experimental_condition').each do |el|
-        el.toggle
-      end
-    end
-    -%>
-  </div>
-
-  <div id="edit_off" style="display:none;">
-    <%= link_to_function image(("edit-off"),:style=>"margin-left:4em;",:title=>"Stop editing",:alt=>"Stop editing") do |page|
-      page.visual_effect :fade,"add_condition"
-      page["edit_on"].toggle
-      page["edit_off"].toggle
-      page.select('li.destroy_experimental_condition').each do |el|
-        el.toggle
-      end
-    end
-    -%>
-  </div>
-<% end -%>
 
 <center>
 
-  <div id="add_condition" style="display:none;">
+  <div id="add_condition" style="display:block;">
     <%= render :partial=>"add_condition" %>
   </div>
 

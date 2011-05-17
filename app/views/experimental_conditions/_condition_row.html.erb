@@ -21,7 +21,7 @@
         
 
     <% if Authorization.is_authorized?("edit",exp_condition.sop,current_user) -%>
-    <% style="display:none;" unless show_delete %>
+    <% style="display:block;" unless show_delete %>
     <li class="destroy_experimental_condition" style="<%= style %>">
        <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete experimental condition"),
          :url => { :action => "destroy", :id => exp_condition.id,:sop_id=>exp_condition.sop.id },

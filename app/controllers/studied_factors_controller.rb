@@ -48,15 +48,13 @@ class StudiedFactorsController < ApplicationController
   def find_data_file_auth
     begin
       data_file = DataFile.find(params[:data_file_id])
-      the_action=action_name
-      the_action="edit" if the_action=="destroy" #we are not destroying the sop, just editing its exp conditions
-      if Authorization.is_authorized?(the_action, nil, data_file, current_user)
+      if data_file.can_edit? current_user
         @data_file = data_file
         @display_data_file = params[:version] ? @data_file.find_version(params[:version]) : @data_file.latest_version
       else
         respond_to do |format|
           flash[:error] = "You are not authorized to perform this action"
-          format.html { redirect_to sops_path }
+          format.html { redirect_to data_files_path }
         end
         return false
       end

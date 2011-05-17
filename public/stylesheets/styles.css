@@ -646,8 +646,11 @@ ul.users_details li p {
 
 div.conditions_or_factors {
     border: dotted #999999 1px;
-    position: center;
-    width: 55em;
+    float: left;
+    margin-left: 4em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    width: 50em;
 }
 
 ul.conditions_or_factors li {        
@@ -1480,11 +1483,16 @@ div.email_configuration{
     width: 500px
 }
 
-div.substance{
+div.substance_factors_studied{
     position:relative;
-    left: -155px;
-    top: 10px;
-    margin-bottom: 2em;
+    margin-left: -7em;
+    margin-bottom: 1em;
     width: 25em;
+}
 
+div.substance_experimental_condition{
+    position:relative;
+    margin-left: -16em;
+    margin-bottom: 1em;
+    width: 25em;
 }

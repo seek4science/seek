@@ -27,7 +27,7 @@
       <%= h studied_factor.standard_deviation %>
     </li>
     
-    <% style="display:none;" unless show_delete %>
+    <% style="display:block;" unless show_delete %>
     <li id="delete" class="destroy_studied_factor" style="<%= style %>">
        <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete factor studied"),
          :url => { :action => "destroy", :id => studied_factor.id,:data_file_id=>studied_factor.data_file.id },
