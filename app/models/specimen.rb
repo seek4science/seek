@@ -12,15 +12,15 @@ class Specimen < ActiveRecord::Base
 
   belongs_to :institution
   belongs_to :organism
+  belongs_to :culture_growth_type
   belongs_to :strain
-
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
 
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :donor_number,:contributor,:organism,:strain,:lab_internal_number,:project,:institution
+  validates_presence_of :donor_number,:contributor,:lab_internal_number,:project,:institution
 
   validates_uniqueness_of :donor_number
 
@@ -41,5 +41,25 @@ class Specimen < ActiveRecord::Base
 
   def self.user_creatable?
     true
+  end
+
+  #Associates and organism with the specimen
+  #organism may be either an ID or Organism instance
+  #strain_title should be the String for the strain
+  #culture_growth should be the culture growth instance
+  def associate_organism(organism,strain_title=nil,culture_growth_type=nil)
+    organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
+    self.organism_id = organism.id
+    strain=nil
+    if (strain_title && !strain_title.empty?)
+      strain=organism.strains.find_by_title(strain_title)
+      if strain.nil?
+        strain=Strain.new(:title=>strain_title,:organism_id=>organism.id)
+        strain.save!
+      end
+    end
+    self.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
+    self.strain=strain
+
   end
 end

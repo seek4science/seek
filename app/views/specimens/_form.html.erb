@@ -6,22 +6,14 @@
 
 <h2>Specimen Details</h2>
 
-<div style="text-align: center;">
-  <div style="width: 95%;">
+
+ <div style="width: 95%;">
     <p>
       <%= f.label :donor_number -%><span class="required">*</span><br/>
       <%= f.text_field :donor_number, :style => "width: 350px;" -%>
     </p>
 
-    <p>
-      <%= f.label "Choose an organism" %><span class="required">*</span><br/>
-      <%= collection_select(:specimen, :organism_id, Organism.all, :id, :title, {:prompt => true}) %>
-    </p>
-
-    <p>
-      <%= f.label "Choose a strain" %><span class="required">*</span><br/>
-      <%= collection_select(:specimen, :strain_id, Strain.all, :id, :title, {:prompt => true}) %>
-    </p>
+    <%= render :partial=>"specimens/select_organisms" -%>
 
     <p>
       <%= f.label :age -%><br/>
@@ -77,7 +69,7 @@
 
 
   </div>
-</div>
+
 
 
 

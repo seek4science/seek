@@ -21,18 +21,9 @@
         <%= text_or_not_specified(@specimen.donor_number) %>
       </p>
 
-      <p>
-        <label>Organism:</label>
-        <% if !@specimen.organism.nil? %>
-            <%= text_or_not_specified(@specimen.organism.title) %>
-        <% end %>
-      </p>
-
-      <p>
-        <label>Strain:</label>
-        <% if !@specimen.strain.nil? %>
-            <%= text_or_not_specified(@specimen.strain.title) %>
-        <% end %>
+      <p id="organism">
+          <label>Organism and strain: </label>
+         <%= text_or_not_specified(specimen_organism_title(@specimen)) %>
       </p>
 
       <p>

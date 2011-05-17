@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110516073535) do
+ActiveRecord::Schema.define(:version => 20110517081952) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -181,7 +181,7 @@ ActiveRecord::Schema.define(:version => 20110516073535) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version"
+    t.integer  "version",                        :default => 1
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -417,7 +417,7 @@ ActiveRecord::Schema.define(:version => 20110516073535) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version"
+    t.integer  "version",                                 :default => 1
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -691,8 +691,6 @@ ActiveRecord::Schema.define(:version => 20110516073535) do
 
   create_table "specimens", :force => true do |t|
     t.string   "donor_number"
-    t.integer  "organism_id"
-    t.integer  "strain_id"
     t.integer  "age"
     t.string   "treatment"
     t.string   "lab_internal_number"
@@ -707,6 +705,9 @@ ActiveRecord::Schema.define(:version => 20110516073535) do
     t.string   "contributor_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "organism_id"
+    t.integer  "culture_growth_type_id"
+    t.integer  "strain_id"
   end
 
   create_table "strains", :force => true do |t|

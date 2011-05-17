@@ -17,6 +17,12 @@ class SpecimensController < ApplicationController
 
   def create
     @specimen = Specimen.new(params[:specimen])
+
+    organism = params[:specimen_organism_id] || []
+    o_id, strain, culture_growth_type_text=organism.split(",")
+    culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+    @specimen.associate_organism(o_id, strain, culture_growth)
+
     @specimen.contributor = current_user
     @specimen.project_id = params[:project_id]
 
@@ -26,6 +32,9 @@ class SpecimensController < ApplicationController
 
     respond_to do |format|
       if @specimen.save
+
+
+
         if policy_err_msg.blank?
           flash[:notice] = 'Specimen was successfully created.'
           format.html { redirect_to(@specimen) }
@@ -45,6 +54,11 @@ class SpecimensController < ApplicationController
 
     #update project
     @specimen.project_id = params[:project_id]
+    organism = params[:specimen_organism_id] || []
+    o_id, strain, culture_growth_type_text=organism.split(",")
+    culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+    @specimen.associate_organism(o_id, strain, culture_growth)
+
     @specimen.contributor = current_user
     policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
     #update creators
