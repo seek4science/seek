@@ -27,16 +27,11 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :uuids
 
-  map.resources :expertise
-
-
   map.resources :institutions,
     :collection => { :request_all => :get } do |institution|
     # avatars / pictures 'owned by' institution
     institution.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
-
-  map.resources :groups
 
   map.resources :models, 
     :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_tags_ajax=>:post },
@@ -56,8 +51,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
     sop.resources :experimental_conditions
   end
-
-
 
   map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
                         :member => {:set_openid => :put}
