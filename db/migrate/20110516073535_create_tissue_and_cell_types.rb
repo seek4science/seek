@@ -1,4 +1,4 @@
-class AddTissuesAndCellTypes < ActiveRecord::Migration
+class CreateTissueAndCellTypes < ActiveRecord::Migration
   def self.up
     create_table :tissue_and_cell_types do |t|
       t.string :title
