@@ -54,7 +54,7 @@ module Acts #:nodoc:
 
         belongs_to :project
 
-        belongs_to :policy
+        belongs_to :policy, :autosave => true
 
         class_eval do
           extend Acts::Authorized::SingletonMethods

@@ -12,6 +12,8 @@ class ModelsController < ApplicationController
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
+
+  include Seek::Publishing
   
   @@model_builder = Seek::JWS::OneStop.new
   

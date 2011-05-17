@@ -1,34 +1,6 @@
 <%= javascript_include_tag "resource" -%>
 
-<ul class="sectionIcons">
-    <% if @model.can_manage? -%>
-    <li>
-        <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%>
-    </li>
-    <li>
-        <%= image_tag_for_key('manage', edit_model_path(@model), nil, nil, 'Manage Model') -%>
-    </li>    
-    <% elsif @model.can_edit? -%>
-    <%# this is not owner, but current user can edit -%>
-    <li>
-        <%= image_tag_for_key('edit', edit_model_path(@model), nil, nil, 'Edit Model') -%>
-    </li>
-    <% end -%>
-    <% if @model.can_delete?-%>
-    <li>
-        <%= image_tag_for_key('destroy', model_path(@model), nil, { :confirm => 'This deletes the Model and all metadata. Are you sure?', :method => :delete }, 'Delete Model') -%>
-    </li>
-    <% end -%>
-    <% if @model.can_download? -%>
-    <li>
-        <%= image_tag_for_key('download', download_model_path(@model,:version=>@display_model.version), "Download Model", nil, "Download Model") -%>
-    </li>
-    <% else -%>
-    <li>
-        <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@model} %>
-    </li>
-    <% end -%>
-</ul>
+<%= asset_buttons @model,@display_model.version -%>
 
 <% if Seek::Config.jws_enabled && jws_supported?(@display_model) -%>
 	<ul class="sectionIcons">

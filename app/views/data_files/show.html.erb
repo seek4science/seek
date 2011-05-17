@@ -1,30 +1,7 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
-<ul class="sectionIcons">
-  <% if @data_file.can_manage? -%>
-    <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>
-    <li><%= image_tag_for_key('manage', edit_data_file_path(@data_file), nil, nil, 'Manage Data file') -%></li>
-  <% elsif @data_file.can_edit? -%>
-    <%# this is not owner, but current user can edit -%>
-    <li><%= image_tag_for_key('edit', edit_data_file_path(@data_file), nil, nil, 'Edit Data file') -%></li>
-  <% end -%>
-
-  <% if @data_file.can_delete? -%>
-    <li><%= image_tag_for_key('destroy', data_file_path(@data_file), nil, { :confirm => 'This deletes the Data file and all metadata. Are you sure?', :method => :delete }, 'Delete Data file') -%></li>
-  <% end -%>
-
-  <% if @data_file.can_download? -%>
-    <li>
-      <%= image_tag_for_key('download', download_data_file_url(:version=>@display_data_file.version), "Download Data file", nil, "Download Data file") -%>
-    </li>
-  <% else -%>
-    <li>
-      <%= render :partial=>"assets/request_resource",:locals=>{:resource=>@data_file} %>
-    </li>
-  <% end -%>
-
-</ul>
+<%= asset_buttons @data_file,@display_data_file.version -%>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 

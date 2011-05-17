@@ -5,15 +5,22 @@ class HomeControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
-  def test_should_be_accesable_to_seek_even_if_not_logged_in
+  test "test should be accessible to seek even if not logged in" do
     get :index
     assert_response :success
   end
 
-  def test_title
+  test "test title" do
     login_as(:quentin)
     get :index
     assert_select "title",:text=>/The Sysmo SEEK.*/, :count=>1
+  end
+
+  test "correct response to unknown action" do
+    login_as(:quentin)
+    assert_raises ActionController::UnknownAction do
+      get :sdjgsdfjg
+    end
   end
 
   test "should get feedback form" do

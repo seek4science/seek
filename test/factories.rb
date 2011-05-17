@@ -35,6 +35,10 @@ Factory.define(:activated_user, :parent => :brand_new_user) do |f|
   f.after_create { |user| user.activate }
 end
 
+  Factory.define(:user_not_in_project,:parent => :activated_user) do |f|
+    f.association :person, :factory => :brand_new_person
+  end
+
   Factory.define(:user, :parent => :activated_user) do |f|
     f.association :person, :factory => :person_in_project
   end
@@ -158,6 +162,14 @@ Factory.define(:model) do |f|
   f.association :project
   f.association :contributor, :factory => :user
 end
+
+#Publication
+  Factory.define(:publication) do |f|
+    f.title "A Model"
+    f.pubmed_id 1
+    f.association :project
+    f.association :contributor, :factory => :user
+  end
 
 #Misc
 Factory.define(:group_membership) do |f|
