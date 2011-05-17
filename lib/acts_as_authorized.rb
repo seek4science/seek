@@ -118,10 +118,18 @@ module Acts #:nodoc:
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers
+        #FIXME: how to handle projects as contributors - return all people or just specific people (pals or other role)?
         people=[]
-        people << self.contributor.person unless self.contributor.nil?
+        unless self.contributor.nil?
+          people << self.contributor.person if self.contributor.kind_of?(User)
+          people << self.contributor if self.contributor.kind_of?(Person)
+        end
+
         self.policy.permissions.each do |perm|
-          people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
+          unless perm.contributor.nil? || perm.access_type!=Policy::MANAGING
+            people << (perm.contributor) if perm.contributor.kind_of?(Person)
+            people << (perm.contributor.person) if perm.contributor.kind_of?(User)
+          end
         end
         people.uniq
       end
