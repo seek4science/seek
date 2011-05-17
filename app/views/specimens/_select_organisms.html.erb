@@ -27,7 +27,7 @@
           :with=>"'organism_id='+this.value",
           :before=>"show_ajax_loader('existing_strains')")+
           ";check_show_add_organism();$('strain').clear();return(false);"} -%>
-        <%= select_tag :specimen_organism_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+        <%= select_tag :specimen_organism_id, options_from_collection_for_select([], :id, :title), {:style=>"display:none;"} -%>
       </div>
       <div id="extra_organism_details" style="display:none;">
         <div class="association_step">
@@ -49,52 +49,51 @@
 </div>
 
 <script type="text/javascript">
- var organisms = new Array();
-
+ var organism = new Array();
   function setStrainTextField(strain){
       $('strain').value = strain;
       new Effect.Highlight('strain');
   }
 
-  <% @specimen.organism_specimens.each do |o| -%>
-      organism_id = '<%= o.organism.id -%>';
-      organism_title = '<%= escape_javascript(o.organism.title) -%>';
-      strain = '<%= o.strain.nil? ? "" : o.strain.title -%>';
-      culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>'
-      addOrganism(organism_title, organism_id, strain, culture_growth);
-  <% end -%>
 
-  <% if params[:specimen_organism_ids] %>
-    <% params[:specimen_organism_ids].each do |text| -%>
+      organism_id = '<%= @specimen.organism.id unless @specimen.organism.nil? -%>';
+      organism_title = '<%= escape_javascript(@specimen.organism.title) unless @specimen.organism.nil?-%>';
+      strain = '<%= @specimen.strain.nil? ? "" :@specimen.strain.title unless @specimen.strain.nil?-%>';
+      culture_growth = '<%= @specimen.culture_growth_type.nil? ? "" : @specimen.culture_growth_type.title unless @specimen.culture_growth_type.nil?-%>'  ;
+       if((organism_title+strain+culture_growth)!=""){
+           addOrganism(organism_title, organism_id, strain, culture_growth);
+       }
+  <% if params[:specimen_organism_id] %>
+    <% text = params[:specimen_organism_id] -%>
       <%
       o_id,strain,culture_growth_type_text=text.split(",")
-      organism=Organism.find(o_id);
+      organism=Organism.find(o_id)
       %>
         organism_id = '<%= o_id -%>';
         organism_title = '<%= escape_javascript(organism.title) -%>';
         strain = '<%= strain -%>';
         culture_growth = '<%= culture_growth_type_text -%>';
         addOrganism(organism_title, organism_id,strain,culture_growth);
-    <% end -%>
   <% end -%>
+
+ function checkOrganismNotInList(title,id,strain,culture_growth) {
+       toAdd = true;
+     if(organism.length > 0) {
+           if(organism[0][0] == title && organism[0][1] == id && organism[0][2] && organism[0][3]) {
+                toAdd = false;
+            }
+     }
+      return toAdd;
+    }
   function addOrganism(title,id,strain,culture_growth) {
-      if (checkOrganismNotInList(title,id,strain,culture_growth)){
-          organisms.push([title,id,strain,culture_growth]);
+      if (checkOrganismNotInList(title,id,strain,culture_growth)) {
+      organism.push([title,id,strain,culture_growth]);
+
+      updateOrganisms();
       }
 
 }
 
- function checkOrganismNotInList(title,id,strain,culture_growth) {
-        toAdd = true;
-
-        for (var i = 0; i < organisms.length; i++)
-            if (organisms[i][0] == organism_title && organisms[i][1] == organism_id && organisms[i][2]==strain,organisms[i][3]==culture_growth) {
-                toAdd = false;
-                break;
-            }
-
-        return toAdd;
-    }
 
 function addSelectedOrganism() {
     selected_option_index=$("possible_organisms").selectedIndex;
@@ -107,27 +106,28 @@ function addSelectedOrganism() {
     selected_option=$('culture_growth').options[selected_option_index];
     culture_growth=selected_option.text
 
+    if(organism.length > 0) {
+        removeOrganism(0);
+    }
     addOrganism(title,id,strain,culture_growth);
-    updateOrganisms();
-
 }
 
 function removeOrganism(index) {
     // remove according to the index
-    organisms.splice(index, 1);
+    organism.splice(index, 1);
     // update the page
     updateOrganisms();
 }
 
 function updateOrganisms() {
     organism_text='<ul class="related_asset_list">';
+  if(organism.length >0) {
+    o = organism[0];
+    title=o[0];
+    id=o[1];
+    strain=o[2];
+    culture_growth=o[3];
 
-    for (var i=0;i<organisms.length;i++) {
-        organism=organisms[i];
-        title=organism[0];
-        id=organism[1];
-        strain=organism[2]
-        culture_growth=organism[3]
         titleText = '<span title="' + title + '">' + title.truncate(100);
         if (strain.length>0) {
             titleText += ":"+strain
@@ -138,27 +138,27 @@ function updateOrganisms() {
         titleText +=  '</span>';
         organism_text += '<li>' + titleText +
           '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
-          '[<a href=\"\" onclick=\"javascript:removeOrganism('+i+'); return(false);\">remove</a>]</small></li>';
-    }
+          '[<a href=\"\" onclick=\"javascript:removeOrganism('+0+'); return(false);\">remove</a>]</small></li>';
 
+  }
     organism_text += '</ul>';
 
     // update the page
-    if(organisms.length == 0) {
+    if(organism.length == 0) {
         $('organism_to_list').innerHTML = '<span class="none_text">No organisms</span>';
     }
     else {
         $('organism_to_list').innerHTML = organism_text;
     }
 
-    clearList('specimen_organism_ids');
+    clearList('specimen_organism_id');
 
-    select=$('specimen_organism_ids')
-    for (i=0;i<organisms.length;i++) {
-        organism=organisms[i];
-        id=organism[1];
-        strain=organism[2]
-        culture_growth=organism[3]
+    select=$('specimen_organism_id');
+     if(organism.length >0) {
+        or = organism[0];
+        id = or[1];
+        strain = or[2];
+        culture_growth = or[3];
         o=document.createElement('option');
         o.value=id;
         o.text=id;
@@ -170,7 +170,7 @@ function updateOrganisms() {
         catch (ex) {
             select.add(o,null);
         }
-    }
+     }
 }
     updateOrganisms();
 

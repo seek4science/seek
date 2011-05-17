@@ -11,8 +11,9 @@ class Specimen < ActiveRecord::Base
 
 
   belongs_to :institution
-  has_many :organism_specimens,:dependent => :destroy
-
+  belongs_to :organism
+  belongs_to :culture_growth_type
+  belongs_to :strain
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
@@ -48,9 +49,7 @@ class Specimen < ActiveRecord::Base
   #culture_growth should be the culture growth instance
   def associate_organism(organism,strain_title=nil,culture_growth_type=nil)
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
-    specimen_organism=OrganismSpecimen.new
-    specimen_organism.specimen = self
-    specimen_organism.organism = organism
+    self.organism_id = organism.id
     strain=nil
     if (strain_title && !strain_title.empty?)
       strain=organism.strains.find_by_title(strain_title)
@@ -59,8 +58,8 @@ class Specimen < ActiveRecord::Base
         strain.save!
       end
     end
-    specimen_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
-    specimen_organism.strain=strain
-    specimen_organism.save!
+    self.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
+    self.strain=strain
+
   end
 end

@@ -1,24 +1,31 @@
 module SpecimensHelper
 
-   def specimen_organism_list_item specimen_organism
-    result = link_to h(specimen_organism.organism.title),specimen_organism.organism
-    if specimen_organism.strain
-      result += ": #{specimen_organism.strain.title}"
+   def specimen_organism_list_item attribute,specimen,none_text="Not specified"
+    result = "<span class='none_text'>#{none_text}</span>"
+    unless specimen.nil?
+    result = link_to h(specimen.organism.try(:title)),specimen.organism
+    if specimen.strain
+      result += ": #{specimen.strain.try(:title)}"
     end
-    if specimen_organism.culture_growth_type
-      result += " (#{specimen_organism.culture_growth_type.title})"
+    if specimen.culture_growth_type
+      result += " (#{specimen.culture_growth_type.try(:title)})"
     end
-    return result
-   end
+    end
 
-  def specimen_organisms_list organism_specimens,none_text="Not specified"
-    result=""
-    result="<span class='none_text'>#{none_text}</span>" if organism_specimens.empty?
-    organism_specimens.each do |ao|
-      result += specimen_organism_list_item ao
-      result += ", " unless ao==organism_specimens.last
-    end
-    result
-  end
+    return "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{result}</p>"
+   end
+   def specimen_organism_title specimen
+     title = ""
+     unless specimen.nil?
+       title = specimen.organism.try(:title)
+       if specimen.strain
+         title += ": #{specimen.strain.try(:title)}"
+       end
+       if specimen.culture_growth_type
+         title += " (#{specimen.culture_growth_type.try(:title)})"
+       end
+     end
+     return title
+   end
 
 end

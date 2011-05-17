@@ -8,7 +8,7 @@
 <div class="list_item_right_column">
 
   <%= list_item_optional_attribute "Project", resource.project.try(:name), resource.project %>
-  <%= list_item_simple_list(resource.organism_specimens, "Organism") { |so| specimen_organism_list_item(so) } %>
+  <%= specimen_organism_list_item "Organism",resource%>
 
 </div>
 <div class="list_item_whole_width">

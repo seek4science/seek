@@ -22,8 +22,8 @@
       </p>
 
       <p id="organism">
-          <b>Organisms: </b>
-          <%= specimen_organisms_list @specimen.organism_specimens %>
+          <label>Organism and strain: </label>
+         <%= text_or_not_specified(specimen_organism_title(@specimen)) %>
       </p>
 
       <p>
