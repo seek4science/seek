@@ -3,7 +3,7 @@
   :url=>sop_experimental_conditions_path(:sop_id=>@sop,:id=>@experimental_condition),
   :before=>"$('experimental_condition_submit').disabled=true;",
   :loaded=>"$('experimental_condition_submit').disabled=false;",
-  :html=>{:method=>:post} do |f| -%>
+  :html=>{:method=>:post, :id => "add_condition_form"} do |f| -%>
 
   <div class="conditions_or_factors" >
       <table>

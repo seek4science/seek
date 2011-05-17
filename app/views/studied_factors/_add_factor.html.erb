@@ -3,7 +3,7 @@
   :url=>data_file_studied_factors_path(:data_file_id=>@data_file,:id=>@studied_factor),
   :before=>"$('studied_factor_submit').disabled=true;",
   :loaded=>"$('studied_factor_submit').disabled=false;",
-  :html=>{:method=>:post} do |f| -%>
+  :html=>{:method=>:post, :id => "add_factor_form"} do |f| -%>
 
 
   <div class="conditions_or_factors" >
@@ -31,7 +31,7 @@
       <td><%= f.text_field :standard_deviation,:size=>4 %></td>
 
       <td><%= f.submit "Add" %></td>
-      
+
       <%= hidden_field_tag "version", @display_data_file.version -%>
     </tr>
 

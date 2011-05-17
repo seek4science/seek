@@ -13,6 +13,10 @@ class StudiedFactorsController < ApplicationController
   end
 
   def create
+    #if the comma is used for the decimal, change it to point
+    params[:studied_factor].each_value do |value|
+      value[","] = "." if value.match(",")
+    end
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
@@ -23,8 +27,9 @@ class StudiedFactorsController < ApplicationController
       if @studied_factor.save
         page.insert_html :bottom,"studied_factors_rows",:partial=>"factor_row",:object=>@studied_factor,:locals=>{:show_delete=>true}
         page.visual_effect :highlight,"studied_factors"
-        # clear the substance text field
+        # clear the _add_factor form
         page.call "autocompleters['tag_autocompleter'].deleteAllTokens"
+        page[:add_factor_form].reset
       else
         page.alert(@studied_factor.errors.full_messages)
       end

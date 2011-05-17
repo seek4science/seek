@@ -12,7 +12,11 @@ class ExperimentalConditionsController < ApplicationController
     end
   end
 
-  def create    
+  def create
+    #if the comma is used for the decimal, change it to point
+    params[:experimental_condition].each_value do |value|
+      value[","] = "." if value.match(",")
+    end
     @experimental_condition=ExperimentalCondition.new(params[:experimental_condition])
     @experimental_condition.sop=@sop
     @experimental_condition.sop_version = params[:version]
@@ -24,19 +28,17 @@ class ExperimentalConditionsController < ApplicationController
       if @experimental_condition.save
         page.insert_html :bottom,"experimental_conditions_rows",:partial=>"condition_row",:object=>@experimental_condition,:locals=>{:show_delete=>true}
         page.visual_effect :highlight,"experimental_conditions"
-        #page.visual_effect :highlight,"experimental_condition_row_#{@experimental_condition.id}"
         # clear the substance text field
         page.call "autocompleters['tag_autocompleter'].deleteAllTokens"
+        page[:add_condition_form].reset
       else
         page.alert(@experimental_condition.errors.full_messages)
       end
     end
-    
   end
 
   def destroy
     @experimental_condition=ExperimentalCondition.find(params[:id])
-
     render :update do |page|
       if @experimental_condition.destroy
         page.visual_effect :fade,"experimental_condition_row_#{@experimental_condition.id}"
