@@ -5,7 +5,8 @@ require 'bundler'
 
 
 desc "task for cruise control"
-task :cruise do
+task :cruise, :run_secondary do |t, args|
+  args.with_defaults :run_secondary => true
   RAILS_ENV = ENV['RAILS_ENV'] = 'test'
   
   `bundle install`
@@ -24,6 +25,14 @@ task :cruise do
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:refresh_controlled_vocabs"].invoke
   Rake::Task["seek:default_tags"].invoke
-  Rake::Task["test"].invoke
-  
+  Rake::Task["test"].invoke args[:run_secondary]
+
+end
+
+#this will add functionality to the existing 'test' task, not overwrite it.
+task :test, :run_secondary do |t, args|
+  args.with_defaults :run_secondary => false
+  ActiveSupport::TestCase.class_eval do
+    @@run_secondary = args[:run_secondary]
+  end
 end

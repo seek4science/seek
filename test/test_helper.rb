@@ -60,4 +60,8 @@ class ActiveSupport::TestCase
       RubyProf::GraphHtmlPrinter.new(results).print(file)
     end
   end
+
+  def run_secondary_tests?
+    @@run_secondary ||= false
+  end
 end
