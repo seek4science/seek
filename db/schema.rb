@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110517081952) do
+ActiveRecord::Schema.define(:version => 20110518102319) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -181,7 +181,7 @@ ActiveRecord::Schema.define(:version => 20110517081952) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -417,7 +417,7 @@ ActiveRecord::Schema.define(:version => 20110517081952) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -604,9 +604,9 @@ ActiveRecord::Schema.define(:version => 20110517081952) do
     t.integer  "institution_id"
   end
 
-  create_table "samples_strains", :id => false, :force => true do |t|
+  create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
     t.integer "sample_id"
-    t.integer "strain_id"
+    t.integer "tissue_and_cell_type_id"
   end
 
   create_table "saved_searches", :force => true do |t|
@@ -775,7 +775,6 @@ ActiveRecord::Schema.define(:version => 20110517081952) do
 
   create_table "tissue_and_cell_types", :force => true do |t|
     t.string   "title"
-    t.integer  "organism_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
