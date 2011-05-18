@@ -50,10 +50,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference("Sample.count") do
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
-                                #:strain_ids =>[Factory(:strain).id, Factory(:strain).id],
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen)},
-      :sample_strain_ids => [Factory(:strain).id, Factory(:strain).id]
+                                :specimen => Factory(:specimen)}
     end
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
@@ -74,7 +72,7 @@ class SamplesControllerTest < ActionController::TestCase
   test "should update" do
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy))
     assert_not_equal "test", s.title
-    put "update", :id=>s, :sample =>{:title =>"test"},:sample_strain_ids => [Factory(:strain).id, Factory(:strain).id]
+    put "update", :id=>s, :sample =>{:title =>"test"}
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "test", s.title
