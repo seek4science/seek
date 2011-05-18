@@ -76,7 +76,7 @@ class Policy < ActiveRecord::Base
   end
 
   def self.create_or_update_default_policy(project, user, params)
-    project.default_policy = Project.private_policy unless project.default_policy
+    project.default_policy = Policy.private_policy unless project.default_policy
     project.default_policy.set_attributes_with_sharing(params[:sharing])
     project.save
     project.errors.full_messages.join('\n')
