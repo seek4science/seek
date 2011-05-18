@@ -33,11 +33,8 @@ class Sample < ActiveRecord::Base
   end
   def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
        if tissue_and_cell_type_id=="0"
-         p "§§§§§§§§§§§§§§§§ #{tissue_and_cell_type_id}"
           tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
-         p "%%%%%%%%%%%%%%% #{tissue_and_cell_type}"
        else
-         p "öööööööööööö"
         tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
        end
       self.tissue_and_cell_types << tissue_and_cell_type
