@@ -14,6 +14,13 @@ class DataFuseController < ApplicationController
 
   @@model_builder = Seek::JWS::OneStop.new
 
+  def graph_test
+    @csv_url = "http://jjj.mib.ac.uk/webMathematica/Examples/DataFuse/Plots/2011518155714416344original.csv"
+    respond_to do |format|
+      format.html 
+    end
+  end
+
   def data_file_csv
 
     element=params[:element]

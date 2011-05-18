@@ -31,11 +31,12 @@
         <%= link_to "View Results",url_for(:action=>"view_result_csv",:url=>result.csv_url) -%>
         </span>
       </p>
-      </p>
+      <p>
         <span class="graph">
-        <%= image_tag result.graph_url -%>
+            <%# image_tag result.graph_url -%>
+            <%= render :partial=>"google_graph",:locals=>{:csv_url=>result.csv_url} -%>
         </span>
-      <p/>
+      </p>
 
       <hr/>
 

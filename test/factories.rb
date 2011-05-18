@@ -17,6 +17,10 @@
     f.association :user, :factory => :activated_user
   end
 
+  Factory.define(:admin,:parent=>:person) do |f|
+    f.is_admin true
+  end
+
   Factory.define(:pal, :parent => :person) do |f|
     f.is_pal true
     f.after_create { |pal| pal.group_memberships.first.roles << Role.pal_role}
