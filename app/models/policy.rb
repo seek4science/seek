@@ -69,7 +69,8 @@ class Policy < ActiveRecord::Base
   end
 
   def self.create_or_update_policy  resource, user, params
-    resource.policy = (resource.policy || Policy.new).set_attributes_with_sharing(params[:sharing])
+    resource.policy_or_default
+    resource.policy.set_attributes_with_sharing(params[:sharing])
     resource.save
     resource.errors.full_messages.join('\n')
   end
@@ -138,7 +139,7 @@ class Policy < ActiveRecord::Base
     # if no data about sharing is contained in params[], it should be some user (not the onwer!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     return error_msg unless params[:sharing]
-    
+
     # this variable will hold current settings of the policy in case something
     # goes wrong and a revert would be needed at some point
     last_saved_policy = nil
