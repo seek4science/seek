@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :samples
 
   map.resources :events
-
+  map.resources :tissue_and_cell_types
   map.resources :strains
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_tags_ajax=>:post}
