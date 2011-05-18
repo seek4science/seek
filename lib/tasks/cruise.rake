@@ -6,7 +6,6 @@ require 'bundler'
 
 desc "task for cruise control"
 task :cruise, :run_secondary do |t, args|
-  args.with_defaults :run_secondary => true
   $run_secondary = args[:run_secondary]
   RAILS_ENV = ENV['RAILS_ENV'] = 'test'
   
