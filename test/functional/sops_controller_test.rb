@@ -6,6 +6,7 @@ class SopsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
 
   def setup
     login_as(:quentin)
@@ -681,12 +682,4 @@ class SopsControllerTest < ActionController::TestCase
     {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
   end
 
-  def valid_sharing
-    {
-        :use_whitelist =>"0",
-        :user_blacklist=>"0",
-        :sharing_scope =>Policy::ALL_REGISTERED_USERS,
-        :permissions   =>{:contributor_types=>ActiveSupport::JSON.encode("Person"), :values=>ActiveSupport::JSON.encode({})}
-    }
-  end
 end
