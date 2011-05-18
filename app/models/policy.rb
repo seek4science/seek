@@ -6,7 +6,9 @@ class Policy < ActiveRecord::Base
   
   has_many :permissions,
            :dependent => :destroy,
-           :order => "created_at ASC"
+           :order => "created_at ASC",
+           :autosave => true,
+           :after_add => proc {|policy, perm| perm.policy = policy}
   
   validates_presence_of :sharing_scope, :access_type
 
@@ -65,107 +67,68 @@ class Policy < ActiveRecord::Base
     policy.permissions.create :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
     return policy
   end
+
+  def self.create_or_update_policy  resource, user, params
+    resource.policy = (resource.policy || Policy.new).set_attributes_with_sharing(params[:sharing])
+    resource.save
+    resource.errors.full_messages.join('\n')
+  end
   
-  def self.create_or_update_policy(resource, user, params)
-    # this method will return an error message is something goes wrong (empty string in case of success)
-    #FIXME: this method always returns an empty string, and therefore indicates success - can this be removed?
-    error_msg = ""
-    
-    # if no data about sharing is contained in params[], it should be some user (not the onwer!)
+  def set_attributes_with_sharing sharing
+    # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
-    return "" unless params[:sharing]
+    returning self do |policy|
+      if sharing
     
-    # obtain parameters from params[] hash
-    sharing_scope = params[:sharing][:sharing_scope].to_i
-    access_type = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::NO_ACCESS : params[:sharing]["access_type_#{sharing_scope}"])
-    use_custom_sharing = ((sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : params[:sharing]["include_custom_sharing_#{sharing_scope}"]).to_i
-    use_whitelist = params[:sharing][:use_whitelist]
-    use_blacklist = params[:sharing][:use_blacklist]
-    
-    # PROCESS THE POLICY FIRST
-    unless resource.policy
-      #last_saved_policy = Policy._default(current_user, nil) # second parameter ensures that this policy is not applied anywhere
-      
-      
-      policy = Policy.new(:name => 'auto',                          
-                          :sharing_scope => sharing_scope,
-                          :access_type => access_type,
-                          :use_whitelist => use_whitelist,
-                          :use_blacklist => use_blacklist)
-      resource.policy = policy  # by doing this the new policy object is saved implicitly too
-      resource.save
-    else
-       policy = resource.policy
-       #last_saved_policy = policy.clone # clone required, not 'dup' (which still works through reference, so the values in both get changed anyway - which is not what's needed here)
-       
-       policy.sharing_scope = sharing_scope
-       policy.access_type = access_type
-       policy.use_whitelist = use_whitelist
-       policy.use_blacklist = use_blacklist
-       policy.save
-    end
-    
-    
-    # NOW PROCESS THE PERMISSIONS
-    # policy of an asset; pemissions will be applied to it
-    policy = resource.policy
-    
-    # read the permission data from params[]
-    unless params[:sharing][:permissions].blank?
-      contributor_types = ActiveSupport::JSON.decode(params[:sharing][:permissions][:contributor_types])
-      new_permission_data = ActiveSupport::JSON.decode(params[:sharing][:permissions][:values])
-    else
-      contributor_types = []
-      new_permission_data = {}
-    end
+        # obtain parameters from sharing hash
+        policy.sharing_scope = sharing[:sharing_scope]
+        policy.access_type = ((policy.sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::NO_ACCESS : sharing["access_type_#{sharing_scope}"])
+        use_custom_sharing = ((policy.sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : sharing["include_custom_sharing_#{sharing_scope}"]).to_i
+        policy.use_whitelist = sharing[:use_whitelist]
+        policy.use_blacklist = sharing[:use_blacklist]
 
-    # NB! if "use_custom_sharing" is not set after the policy data was processed - this means that there can be
-    # no more permissions: and any existing ones should be deleted; the line below ensures that the synchronisation
-    # mechanism will "think" that no permission selections were made and all old ones need to be removed
-    unless (use_custom_sharing == true || use_custom_sharing == Policy::TRUE_VALUE)
-      new_permission_data = {}
-    end
+    
+        # NOW PROCESS THE PERMISSIONS
+
+        # read the permission data from sharing
+        unless sharing[:permissions].blank?
+          contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types])
+          new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values])
+        else
+          contributor_types = []
+          new_permission_data = {}
+        end
+
+        # NB! if "use_custom_sharing" is not set after the policy data was processed - this means that there can be
+        # no more permissions: and any existing ones should be deleted; the line below ensures that the synchronisation
+        # mechanism will "think" that no permission selections were made and all old ones need to be removed
+        unless (use_custom_sharing == true || use_custom_sharing == Policy::TRUE_VALUE)
+          new_permission_data = {}
+        end
 
 
-    # --- Synchronise All Permissions for the Policy ---
-    # first delete any old memberships that are no longer valid
-    changes_made = false
-    policy.permissions.each do |p|
-      unless (new_permission_data["#{p.contributor_type}"] && new_permission_data["#{p.contributor_type}"][p.contributor_id])
-        p.destroy
-        changes_made = true
-      end
-    end
-    # this is required to leave the association of "policy" with its permissions in the correct state; otherwise exception is thrown
-    policy.reload if changes_made
+        # --- Synchronise All Permissions for the Policy ---
+        # first delete or update any old memberships
+        policy.permissions.each do |p|
+          if permission_access = (new_permission_data[p.contributor_type.to_s].try :delete, p.contributor_id)
+            p.access_type = permission_access
+          else
+            p.mark_for_destruction
+          end
+        end
     
     
-    # update the remaining old permissions if the access type has changed for them
-    policy.permissions.each do |p|
-      unless p.access_type == new_permission_data["#{p.contributor_type}"][p.contributor_id]["access_type"].to_i
-        p.access_type = new_permission_data["#{p.contributor_type}"][p.contributor_id]["access_type"].to_i
-        p.save!
-      end
-    end
-    
-    
-    # now add any remaining new memberships
-    if contributor_types && contributor_types.length > 0
-      contributor_types.each do |contributor_type|
-        if new_permission_data.has_key?(contributor_type)
-          new_permission_data["#{contributor_type}"].each do |p|
-            unless (found = Permission.find(:first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}))
-              Permission.create(:contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"], :policy_id => policy.id)
+        # now add any remaining new memberships
+        contributor_types.try :each do |contributor_type|
+          new_permission_data[contributor_type.to_s].try :each do |p|
+            if policy.new_record? or !Permission.find :first, :conditions => {:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id}
+              p = policy.permissions.build :contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"]
             end
           end
         end
+
       end
     end
-    
-    # --- Synchronisation is Finished ---
-    
-    # returns some message in case of errors (or empty string in case of success)
-    return error_msg
   end
   
   def self.create_or_update_default_policy(project, user, params)
