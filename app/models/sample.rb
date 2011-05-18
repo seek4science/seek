@@ -16,7 +16,8 @@ class Sample < ActiveRecord::Base
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date
 
-  has_and_belongs_to_many :strains
+
+  has_and_belongs_to_many :tissue_and_cell_types
 
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
@@ -29,5 +30,16 @@ class Sample < ActiveRecord::Base
 
   def self.user_creatable?
     true
+  end
+  def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
+       if tissue_and_cell_type_id=="0"
+         p "§§§§§§§§§§§§§§§§ #{tissue_and_cell_type_id}"
+          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
+         p "%%%%%%%%%%%%%%% #{tissue_and_cell_type}"
+       else
+         p "öööööööööööö"
+        tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+       end
+      self.tissue_and_cell_types << tissue_and_cell_type
   end
 end

@@ -38,10 +38,13 @@
     <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
   </p>
 
+  <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample}-%>
+
   <br style="clear:both"/>
   <p>
       <%= render :partial => "assets/sharing_form" -%>
   </p>
+
 
 </div>
 
