@@ -20,7 +20,7 @@
             width: 800,
             height: 540,
             title: '<%= graph_title -%>',
-            vAxis: {title:'<%= y_axis_title -%>',minValue:0},
+            vAxis: {title:'<%= y_axis_title -%>',minValue:0,baseline:0},
             hAxis: {title:'<%= x_axis_title -%>'}
         });
         google.visualization.events.addListener(chart, 'select', itemSelected);
