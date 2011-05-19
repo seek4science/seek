@@ -2,7 +2,10 @@
     graph_title ||= ""
     x_axis_title ||= "time(min)"
     y_axis_title ||= ""
+    width ||= "800"
+    height ||= "600"
     div_id="chart_#{UUIDTools::UUID.random_create.to_s}"
+    csv_data ||= open(csv_url).read
 
  -%>
 <!--Load the AJAX API-->
@@ -13,12 +16,12 @@
       var chart;
       function drawChart() {
         var data = new google.visualization.DataTable();
-        <%= csv_to_google_data csv_url -%>
+        <%= csv_to_google_data csv_data -%>
 
         chart = new google.visualization.LineChart(document.getElementById('<%= div_id -%>'));
         chart.draw(data, {curveType:'function',
-            width: 800,
-            height: 540,
+            width: <%= width -%>,
+            height: <%= height -%>,
             title: '<%= graph_title -%>',
             vAxis: {title:'<%= y_axis_title -%>',minValue:0,baseline:0},
             hAxis: {title:'<%= x_axis_title -%>'}

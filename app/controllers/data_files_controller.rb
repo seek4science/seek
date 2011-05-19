@@ -18,6 +18,13 @@ class DataFilesController < ApplicationController
   #has to come after the other filters
   include Seek::Publishing
 
+  def plot
+    sheet = params[:sheet] || 2
+    @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,true)
+    respond_to do |format|
+      format.html
+    end
+  end
     
   def new_version
     if (handle_data nil)          
@@ -258,7 +265,7 @@ end
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
         format.xml {render :xml=>spreadsheet_to_xml(open(@data_file.content_blob.filepath)) }
-        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet) }
+        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,true) }
       end
     else
       respond_to do |format|

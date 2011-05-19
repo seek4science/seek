@@ -1,9 +1,7 @@
 module DataFuseHelper
 
-  def csv_to_google_data csv_url
-    puts "csv url = #{csv_url}"
+  def csv_to_google_data csv
     res = ""
-    csv = open(csv_url).read
     rows = FasterCSV.parse(csv)
     rows.each_with_index do |row,i|
       if i==0
