@@ -54,19 +54,15 @@ class SpecimensController < ApplicationController
     @specimen.associate_organism(o_id, strain, culture_growth)
 
     @specimen.contributor = current_user
-    policy_err_msg = Policy.create_or_update_policy(@specimen, current_user, params)
+    @specimen.policy.set_attributes_with_sharing params[:sharing]
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|
       if @specimen.update_attributes params[:specimen]
-        if policy_err_msg.blank?
+
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }
           format.xml  { head :ok }
-        else
-          flash[:notice] = "Specimen metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to specimen_edit_path(@specimen)}
-        end
       else
         format.html { render :action => "edit" }
       end
