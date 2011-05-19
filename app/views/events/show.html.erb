@@ -1,15 +1,4 @@
-<ul class="sectionIcons">
-  <% if @event.can_manage? -%>
-    <li><%= image_tag_for_key('manage', edit_event_path(@event), nil, nil, 'Manage Event') -%></li>
-  <% elsif @event.can_edit?-%>
-  <%# this is not owner, but current user can edit -%>
-    <li><%= image_tag_for_key('edit', edit_event_path(@event), nil, nil, 'Edit Event') -%></li>
-  <% end -%>
-
-  <% if @event.can_delete? -%>
-    <li><%= image_tag_for_key('destroy', event_path(@event), nil, { :confirm => 'This deletes the Event listing. Are you sure?', :method => :delete }, 'Delete Event') -%></li>
-  <% end -%>
-</ul>
+<%= asset_buttons @event,nil,"This deletes the Event listing. Are you sure?'" -%>
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@event} %>
 

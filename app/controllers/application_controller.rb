@@ -211,7 +211,7 @@ class ApplicationController < ActionController::Base
       when 'destroy', 'destroy_item'
         'delete'
 
-      when 'manage'
+      when 'manage','preview_publish','publish'
         'manage'
 
       else
@@ -224,6 +224,8 @@ class ApplicationController < ActionController::Base
       name = self.controller_name.singularize
       action = translate_action(action_name)
 
+      return if action.nil?
+
       object = name.camelize.constantize.find(params[:id])
 
       if object.can_perform? action
@@ -235,7 +237,7 @@ class ApplicationController < ActionController::Base
           flash[:error] = "You may not #{action} #{name}:#{params[:id]}"
           format.html do
             case action
-              when 'manage'   then redirect_to eval("#{self.controller_name}_edit_path(object)")
+              when 'manage'   then redirect_to object
               when 'edit'     then redirect_to object
               when 'download' then redirect_to object
               else                 redirect_to eval "#{self.controller_name}_path"

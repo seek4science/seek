@@ -5,7 +5,8 @@ class ModelsControllerTest < ActionController::TestCase
   fixtures :all
   
   include AuthenticatedTestHelper
-  include RestTestCases  
+  include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     login_as(:model_owner)
@@ -616,21 +617,47 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
+  test "do publish" do
+    model=models(:teusink)
+    assert model.can_manage?,"The sop must be manageable for this test to succeed"
+    post :publish,:id=>model
+    assert_redirected_to model
+    assert_nil flash[:error]
+    assert_not_nil flash[:notice]
+  end
+
+  test "do not publish if not can_manage?" do
+    login_as(:quentin)
+    model=models(:teusink)
+    assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
+    post :publish,:id=>model
+    assert_redirected_to model
+    assert_not_nil flash[:error]
+    assert_nil flash[:notice]
+  end
+
+  test "get preview_publish" do
+    model=models(:teusink)
+    assert model.can_manage?,"The sop must be manageable for this test to succeed"
+    get :preview_publish, :id=>model
+    assert_response :success
+  end
+
+  test "cannot get preview_publish when not manageable" do
+    login_as(:quentin)
+    model=models(:teusink)
+    assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
+    get :preview_publish, :id=>model
+    assert_redirected_to model
+    assert flash[:error]
+  end
+
   def valid_model
     { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project=>projects(:sysmo_project)}
   end
 
   def valid_model_with_url
     { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
-  end
-
-  def valid_sharing
-    {
-      :use_whitelist=>"0",
-      :user_blacklist=>"0",
-      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
-      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
-    }
   end
   
 end

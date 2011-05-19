@@ -39,4 +39,15 @@ class AssetTest < ActiveSupport::TestCase
     assert result["DataFile"].include?(data_file)
   end
 
+  test "is publishable" do
+    assert Factory(:sop).is_publishable?
+    assert Factory(:model).is_publishable?
+    assert Factory(:data_file).is_publishable?
+    assert !Factory(:assay).is_publishable?
+    assert !Factory(:investigation).is_publishable?
+    assert !Factory(:study).is_publishable?
+    assert !Factory(:event).is_publishable?
+    assert !Factory(:publication).is_publishable?
+  end
+
 end

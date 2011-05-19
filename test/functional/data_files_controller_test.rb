@@ -7,6 +7,7 @@ class DataFilesControllerTest < ActionController::TestCase
   
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     login_as(:datafile_owner)
@@ -624,7 +625,49 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal ["golf","soup"],df.tag_counts.collect(&:name).sort
 
   end
-  
+
+  test "correct response to unknown action" do
+    df=data_files(:picture)
+    assert_raises ActionController::UnknownAction do
+      get :sdkfjshdfkhsdf, :id=>df
+    end
+  end
+
+  test "do publish" do
+    df=data_files(:picture)
+    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    post :publish,:id=>df
+    assert_redirected_to data_file_path(df)
+    assert_nil flash[:error]
+    assert_not_nil flash[:notice]
+  end
+
+  test "do not publish if not can_manage?" do
+    login_as(:quentin)
+    df=data_files(:picture)
+    assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
+    post :publish,:id=>df
+    assert_redirected_to data_file_path(df)
+    assert_not_nil flash[:error]
+    assert_nil flash[:notice]
+  end
+
+  test "get preview_publish" do
+    df=data_files(:picture)
+    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_response :success
+  end
+
+  test "cannot get preview_publish when not manageable" do
+    login_as(:quentin)
+    df = data_files(:picture)
+    assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_redirected_to data_file_path(df)
+    assert flash[:error]
+  end
+
   private
   
   def valid_data_file
@@ -637,15 +680,6 @@ class DataFilesControllerTest < ActionController::TestCase
   
   def valid_data_file_with_ftp_url
       { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
-  end
-  
-  def valid_sharing
-    {
-      :use_whitelist=>"0",
-      :user_blacklist=>"0",
-      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
-      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
-    }
   end
   
 end

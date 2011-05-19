@@ -42,7 +42,9 @@ class AssaysController < ApplicationController
     update_tags @assay
 
     @assay.owner=current_user.person
-    policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
+
+    @assay.policy_or_default
+    @assay.policy.set_attributes_with_sharing params[:sharing]
 
     respond_to do |format|
       if @assay.save
@@ -67,17 +69,9 @@ class AssaysController < ApplicationController
 
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
-
-
-
-        if policy_err_msg.blank?
-          flash[:notice] = 'Assay was successfully created.'
-          format.html { redirect_to(@assay) }
-          format.xml { render :xml => @assay, :status => :created, :location => @assay }
-        else
-          flash[:notice] = "Assay metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to assay_edit_path(@assay) }
-        end
+        flash[:notice] = 'Assay was successfully created.'
+        format.html { redirect_to(@assay) }
+        format.xml { render :xml => @assay, :status => :created, :location => @assay }
       else
         format.html { render :action => "new" }
         format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
@@ -99,7 +93,9 @@ class AssaysController < ApplicationController
     update_tags @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
-    policy_err_msg = Policy.create_or_update_policy(@assay, current_user, params)
+
+    @assay.policy_or_default
+    @assay.policy.set_attributes_with_sharing params[:sharing]
 
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
@@ -132,16 +128,9 @@ class AssaysController < ApplicationController
         @assay.updated_at=Time.now
         @assay.save!
 
-
-
-        if policy_err_msg.blank?
-          flash[:notice] = 'Assay was successfully updated.'
-          format.html { redirect_to(@assay) }
-          format.xml { head :ok }
-        else
-          flash[:notice] = "Assay metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to assay_edit_path(@assay) }
-        end
+        flash[:notice] = 'Assay was successfully updated.'
+        format.html { redirect_to(@assay) }
+        format.xml { head :ok }
       else
         format.html { render :action => "edit" }
         format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }

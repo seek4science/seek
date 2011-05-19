@@ -19,8 +19,8 @@ class SamplesController < ApplicationController
     @sample.contributor = current_user
 
     #add policy to sample
-    policy_err_msg = Policy.create_or_update_policy(@sample, current_user, params)
-
+    @sample.policy_or_default
+    @sample.policy.set_attributes_with_sharing params[:sharing]
     tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
 
     respond_to do |format|
@@ -28,18 +28,11 @@ class SamplesController < ApplicationController
 
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
-          p "### #{t_id}: #{t_title}"
           @sample.associate_tissue_and_cell_type(t_id, t_title)
         end
-        if policy_err_msg.blank?
           flash[:notice] = 'Sample was successfully created.'
           format.html { redirect_to(@sample) }
           format.xml  { head :ok }
-        else
-          flash[:notice] = "Sample metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-         format.html { redirect_to sample_edit_path(@sample)}
-        end
-
       else
         format.html { render :action => "new" }
       end
@@ -53,8 +46,7 @@ class SamplesController < ApplicationController
       tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
 
       #update policy to sample
-    policy_err_msg = Policy.create_or_update_policy(@sample, current_user, params)
-
+      @sample.policy.set_attributes_with_sharing params[:sharing]
       respond_to do |format|
 
       if @sample.update_attributes params[:sample]
@@ -64,14 +56,10 @@ class SamplesController < ApplicationController
           @sample.associate_tissue_and_cell_type(t_id, t_title)
         end
 
-        if policy_err_msg.blank?
           flash[:notice] = 'Sample was successfully created.'
           format.html { redirect_to(@sample) }
           format.xml { head :ok }
-        else
-          flash[:notice] = "Sample metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to sample_edit_path(@sample) }
-        end
+
       else
         format.html { render :action => "edit" }
       end

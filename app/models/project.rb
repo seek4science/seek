@@ -36,7 +36,8 @@ class Project < ActiveRecord::Base
   #  is to be used)
   belongs_to :default_policy, 
     :class_name => 'Policy',
-    :dependent => :destroy  
+    :dependent => :destroy,
+    :autosave => true
   
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
