@@ -104,7 +104,7 @@ function addSelectedOrganism() {
 
     selected_option_index=$('culture_growth').selectedIndex;
     selected_option=$('culture_growth').options[selected_option_index];
-    culture_growth=selected_option.text
+    culture_growth=selected_option.text;
 
     if(organism.length > 0) {
         removeOrganism(0);
@@ -145,7 +145,7 @@ function updateOrganisms() {
 
     // update the page
     if(organism.length == 0) {
-        $('organism_to_list').innerHTML = '<span class="none_text">No organisms</span>';
+        $('organism_to_list').innerHTML = '<span class="none_text">No organism</span>';
     }
     else {
         $('organism_to_list').innerHTML = organism_text;
