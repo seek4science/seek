@@ -9,7 +9,7 @@ class Study < ActiveRecord::Base
   acts_as_authorized
 
   def default_contributor
-    User.current_user.person
+    User.current_user.try :person
   end
 
   has_many :assays
