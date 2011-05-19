@@ -9,7 +9,7 @@ task :cruise, :run_secondary do |t, args|
   args.with_defaults :run_secondary => true
   run_secondary_signal = '/tmp/run_secondary'
   if args[:run_secondary]
-    File(run_secondary_signal) unless File.exists? run_secondary_signal
+    File.new(run_secondary_signal) unless File.exists? run_secondary_signal
   else
     File.delete(run_secondary_signal) if File.exists? run_secondary_signal
   end
