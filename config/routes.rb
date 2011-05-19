@@ -8,8 +8,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_tags_ajax=>:post}
 
-  map.resources :created_datas
-
   map.resources :assay_types, :collection=>{:manage=>:get}
 
   map.resources :organisms, :member=>{:visualise=>:get}
@@ -26,14 +24,11 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get, :data => :get, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors
   end
   
   map.resources :uuids
-
-  map.resources :expertise
-
 
   map.resources :institutions,
     :collection => { :request_all => :get } do |institution|
@@ -41,10 +36,8 @@ ActionController::Routing::Routes.draw do |map|
     institution.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :groups
-
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_tags_ajax=>:post },
+    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_tags_ajax=>:post },
     :collection=>{:build=>:get}
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
@@ -58,7 +51,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :sops, :member => { :download => :get, :new_version=>:post, :request_resource=>:post, :update_tags_ajax=>:post } do |sop|
+  map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
     sop.resources :experimental_conditions
   end
 
