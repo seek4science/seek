@@ -48,7 +48,7 @@
     </p>
      <p>
     <%= f.label "Institution" %><span class="required">*</span><br/>
-    <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:prompt => true}) %>
+    <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank => "Please Select"}) %>
   </p>
 
     <%= render :partial=>"specimens/select_organisms" -%>
