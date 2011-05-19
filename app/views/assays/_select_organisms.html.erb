@@ -50,7 +50,7 @@
                          {:style=>"width:90%",
                           :onchange=> "$('tissue_and_cell_type').clear();return(false);"} -%>
           <div id="existing_tissue_and_cell_types"></div>
-          <%= text_field_tag :tissue_and_cell_type%>
+          <%= text_field_tag :tissue_and_cell_type,nil,{:onfocus=>"$('possible_tissue_and_cell_types').selectedIndex = 0;"}%>
           <br/>
         </div>
 

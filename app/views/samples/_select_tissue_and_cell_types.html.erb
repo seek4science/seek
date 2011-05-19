@@ -40,7 +40,7 @@
 
           <br/>
           <div id="existing_tissue_and_cell_types"></div>
-          <%= text_field_tag :tissue_and_cell_type %>
+          <%= text_field_tag :tissue_and_cell_type ,nil,{:onfocus=>"$('possible_tissue_and_cell_types').selectedIndex = 0;"}%>
 
 
 
@@ -59,6 +59,7 @@
    function setTissueAndCellTypeTextField(title){
       $('tissue_and_cell_type').value = title;
       new Effect.Highlight('tissue_and_cell_type');
+
   }
 
    <%  resource.tissue_and_cell_types.each do |t| %>
