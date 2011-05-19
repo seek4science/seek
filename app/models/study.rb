@@ -2,15 +2,10 @@ require 'acts_as_authorized'
 class Study < ActiveRecord::Base  
   acts_as_isa
 
-  alias_attribute :contributor, :person_responsible
   belongs_to :investigation
   has_one :project, :through=>:investigation
 
   acts_as_authorized
-
-  def default_contributor
-    User.current_user.try :person
-  end
 
   has_many :assays
 
