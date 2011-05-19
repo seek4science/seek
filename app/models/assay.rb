@@ -2,24 +2,13 @@ require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
 
-  # The following is basically the same as acts_as_authorized,
-  # but instead of creating a project and contributor
-  # I use the existing project method and owner attribute.
-    alias_attribute :contributor, :owner
+  def project
+    investigation.nil? ? nil : investigation.project
+  end
 
-    def project_id
-      project.try :id
-    end
+  alias_attribute :contributor, :owner
 
-    after_initialize :policy_or_default_if_new
-
-    belongs_to :policy, :autosave => true
-
-    class_eval do
-      extend Acts::Authorized::SingletonMethods
-    end
-    include Acts::Authorized::InstanceMethods
-  #end of acts_as_authorized stuff
+  acts_as_authorized
 
   acts_as_taggable
 
@@ -73,10 +62,6 @@ class Assay < ActiveRecord::Base
     type=assay_type.nil? ? "No type" : assay_type.title
    
     "#{title} (#{type})"
-  end
-
-  def project
-    investigation.nil? ? nil : investigation.project
   end
 
   def can_delete? user=nil

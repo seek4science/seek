@@ -47,12 +47,13 @@ module Acts #:nodoc:
 
     module ClassMethods
       def acts_as_authorized
-        belongs_to :contributor, :polymorphic => true
+        belongs_to :contributor, :polymorphic => true  unless method_defined? :contributor
+
         does_not_require_can_edit :uuid, :first_letter
         #checks a policy exists, and if missing resorts to using a private policy
         after_initialize :policy_or_default_if_new
 
-        belongs_to :project
+        belongs_to :project  unless method_defined? :project
 
         belongs_to :policy, :autosave => true
 
