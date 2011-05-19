@@ -9,7 +9,7 @@ module Seek
       asset_type_name = @template.text_for_resource @asset
 
       respond_to do |format|
-        format.html { render :template=>"assets/preview_publish",:locals=>{:asset_type_name=>asset_type_name} }
+        format.html { render :template=>"assets/publish/preview",:locals=>{:asset_type_name=>asset_type_name} }
       end
     end
 

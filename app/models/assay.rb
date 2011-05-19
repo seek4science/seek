@@ -133,7 +133,11 @@ class Assay < ActiveRecord::Base
   end
   
   def assets
-    (data_file_masters + model_masters + sop_masters).collect {|a| a.latest_version} |  (data_files + models + sops)
+    asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)
+  end
+
+  def asset_masters
+    data_file_masters + model_masters + sop_masters
   end
   
   def related_publications
