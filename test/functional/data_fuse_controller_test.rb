@@ -5,7 +5,6 @@ class DataFuseControllerTest < ActionController::TestCase
 
   fixtures :all
 
-  # Replace this with your real tests.
   test "graph test" do
     login_as(Factory(:admin).user)
     get :graph_test
