@@ -6,7 +6,13 @@ require 'bundler'
 
 desc "task for cruise control"
 task :cruise, :run_secondary do |t, args|
-  $run_secondary = args[:run_secondary]
+  args.with_defaults :run_secondary => true
+  run_secondary_signal = '/tmp/run_secondary'
+  if args[:run_secondary]
+    File(run_secondary_signal) unless File.exists? run_secondary_signal
+  else
+    File.delete(run_secondary_signal) if File.exists? run_secondary_signal
+  end
   RAILS_ENV = ENV['RAILS_ENV'] = 'test'
   
   `bundle install`
@@ -25,6 +31,7 @@ task :cruise, :run_secondary do |t, args|
   Rake::Task["db:test:prepare"].invoke
   Rake::Task["seek:refresh_controlled_vocabs"].invoke
   Rake::Task["seek:default_tags"].invoke
-  Rake::Task["test"].invoke args[:run_secondary]
+  Rake::Task["test"].invoke
 
+  File.delete(run_secondary_signal) if File.exists? run_secondary_signal
 end
