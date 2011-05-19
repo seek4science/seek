@@ -21,6 +21,11 @@ module AssaysHelper
     if assay_organism.strain
       result += ": #{assay_organism.strain.title}"
     end
+
+    if assay_organism.tissue_and_cell_type
+      result += ": #{assay_organism.tissue_and_cell_type.title}"
+    end
+
     if assay_organism.culture_growth_type
       result += " (#{assay_organism.culture_growth_type.title})"
     end
@@ -31,7 +36,7 @@ module AssaysHelper
     result="<span class='none_text'>#{none_text}</span>" if assay_organisms.empty?
     assay_organisms.each do |ao|
       result += assay_organism_list_item ao
-      result += ", " unless ao==assay_organisms.last
+      result += ",<br/>" unless ao==assay_organisms.last
     end
     result
   end

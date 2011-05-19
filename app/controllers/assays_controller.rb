@@ -34,6 +34,11 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:assay_model_ids] || []
 
+    organisms.each do |text|
+          o_id =text.split(",").first
+      @assay.organisms << Organism.find(o_id)
+    end
+
     update_tags @assay
 
     @assay.owner=current_user.person
@@ -55,9 +60,9 @@ class AssaysController < ApplicationController
           @assay.relate(s) if s.can_view?
         end
         organisms.each do |text|
-          o_id, strain, culture_growth_type_text=text.split(",")
+          o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth)
+          @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
         end
 
         # update related publications
@@ -115,9 +120,9 @@ class AssaysController < ApplicationController
         (@assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
 
         organisms.each do |text|
-          o_id, strain, culture_growth_type_text=text.split(",")
+          o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth)
+          @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
         end
 
         # update related publications

@@ -362,8 +362,33 @@ function removeAssay(index) {
     updateAssays();
 }
 
-function addOrganism(title,id,strain,culture_growth) {
-    organisms.push([title,id,strain,culture_growth]);
+function checkOrganismNotInList(title,id,strain,culture_growth,t_id,t_title) {
+        toAdd = true;
+
+        for (var i = 0; i < organisms.length; i++){
+            if (organisms[i][0] == title
+                    && organisms[i][1] == id
+                    && organisms[i][2] == strain
+                    && organisms[i][3] == culture_growth
+                    && organisms[i][4] == t_id
+                    && organisms[i][5] == t_title) {
+
+                toAdd = false;
+                break;
+            }
+        }
+        if (!toAdd) {
+            alert("Organism already exists!");
+        }
+        return toAdd;
+    }
+
+function addOrganism(title,id,strain,culture_growth,t_id,t_title) {
+    if(checkOrganismNotInList(title,id,strain,culture_growth,t_id,t_title)){
+       organisms.push([title,id,strain,culture_growth,t_id,t_title]);
+       updateOrganisms();
+    }
+
 }
 
 function addSelectedOrganism() {
@@ -375,10 +400,29 @@ function addSelectedOrganism() {
 
     selected_option_index=$('culture_growth').selectedIndex;
     selected_option=$('culture_growth').options[selected_option_index];
-    culture_growth=selected_option.text    
-    
-    addOrganism(title,id,strain,culture_growth);
-    updateOrganisms();
+    culture_growth=selected_option.text;
+
+    selected_option_index = $("possible_tissue_and_cell_types").selectedIndex;
+    selected_option = $("possible_tissue_and_cell_types").options[selected_option_index];
+
+    t_id = selected_option.value;
+
+
+    if($('tissue_and_cell_type').value=="" && t_id != 0){
+        t_title = selected_option.text;
+        addOrganism(title,id,strain,culture_growth,t_id,t_title);
+
+    }
+    if($('tissue_and_cell_type').value!="" && t_id != 0) {
+        t_title = $('tissue_and_cell_type').value;
+        addOrganism(title,id,strain,culture_growth,0,t_title);
+    }
+
+    if(t_id == 0) {
+        t_title = $('tissue_and_cell_type').value;
+        addOrganism(title,id,strain,culture_growth,t_id,t_title);
+    }
+
     
 }
 
@@ -396,11 +440,17 @@ function updateOrganisms() {
         organism=organisms[i];
         title=organism[0];
         id=organism[1];
-        strain=organism[2]
-        culture_growth=organism[3]
+        strain=organism[2];
+        culture_growth=organism[3];
+        tissue_and_cell_type_id=organism[4];
+        tissue_and_cell_type_title = organism[5];
         titleText = '<span title="' + title + '">' + title.truncate(100);
+
         if (strain.length>0) {
             titleText += ":"+strain
+        }
+        if (tissue_and_cell_type_title.length>0) {
+            titleText += ":"+tissue_and_cell_type_title
         }
         if (culture_growth.length>0 && culture_growth!='Not specified') {
             titleText += " <span class='assay_item_sup_info'>("+culture_growth+")</span>";
@@ -427,13 +477,15 @@ function updateOrganisms() {
     for (i=0;i<organisms.length;i++) {
         organism=organisms[i];
         id=organism[1];
-        strain=organism[2]
-        culture_growth=organism[3]
+        strain=organism[2];
+        culture_growth=organism[3];
+        tissue_and_cell_type_id=organism[4];
+        tissue_and_cell_type_title = organism[5];
         o=document.createElement('option');
         o.value=id;
         o.text=id;
         o.selected=true;
-        o.value=id + "," + strain + "," + culture_growth;
+        o.value=id + "," + strain + "," + culture_growth+ "," + tissue_and_cell_type_id  + "," + tissue_and_cell_type_title;
         try {
             select.add(o); //for older IE version
         }

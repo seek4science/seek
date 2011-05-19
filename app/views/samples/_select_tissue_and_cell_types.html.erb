@@ -89,6 +89,9 @@
                 toAdd = false;
                 break;
             }
+        if (!toAdd) {
+            alert("Tissue or cell type already exists!");
+        }
         return toAdd;
     }
 
@@ -107,14 +110,17 @@
 
         id = selected_option.value;
 
-        if($('tissue_and_cell_type').value==""){
+
+        if($('tissue_and_cell_type').value==""&& id != 0 ){
             title = selected_option.text;
             addTissueAndCellType(title, id);
         }
-        else {
+        if ($('tissue_and_cell_type').value!=""){
             title = $('tissue_and_cell_type').value;
             addTissueAndCellType(title, id);
         }
+
+
 
 
 

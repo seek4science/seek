@@ -225,12 +225,12 @@ class AssayTest < ActiveSupport::TestCase
     end
 
     #with String ID
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assay.associate_organism(organism.id.to_s)
     end
 
     #with Organism object
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assay.associate_organism(organism)
     end
 
@@ -310,4 +310,7 @@ class AssayTest < ActiveSupport::TestCase
     )
 
   end
+
+
+
 end

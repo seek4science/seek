@@ -1,4 +1,5 @@
 <%
+ select_truncate_length=120
 @assay_text=@assay.is_modelling? ? "analysis" : "assay"
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
 %>
@@ -71,8 +72,8 @@
 </table>
 
 <p>
-    <%= f.label "Sample" %> <br/>
-    <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{:prompt =>true},{"style" =>"width:90%"}) %>
+  <%= f.label "Sample" %> <br/>
+  <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{:include_blank =>"Select Sample ..."},{:onchange=>"check_add_organism_form();return(false);",:style=>"width:90%"}) %>
 </p>
 <br style="clear:both"/>
 
@@ -84,8 +85,9 @@
   <%= render :partial=>"assets/select_tags" -%>
 </p>
 
+<div id="add_organism_form">
 <%= render :partial=>"assays/select_organisms" -%>
-
+</div>
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
 <%  if @assay.is_modelling? -%>
@@ -107,6 +109,10 @@
 </p>
 
 <script type="text/javascript">
+
+ <% if params[:sample_id] %>
+
+ <% end %>
   function showTitle(text){
     var elem = document.getElementById("full_study_title");
     elem.style.display = '';
@@ -155,5 +161,19 @@
       else 
         techTypeSelect.options[i].selected = false;
     }
+
   }
+
+  function check_add_organism_form() {
+      i = $('assay_sample_id').selectedIndex;
+      if (i == '0') {
+          Effect.Appear('add_organism_form');
+      }
+      else {
+          Effect.Fade('add_organism_form');
+      }
+
+
+  }
+
 </script>
