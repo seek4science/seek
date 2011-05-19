@@ -371,9 +371,10 @@ namespace :seek do
 
   task(:tissue_and_cell_types=>:environment) do
     revert_fixtures_identify
-    Strain.delete_all
+    TissueAndCellType.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "tissue_and_cell_types")
   end
+
   
   task(:culture_growth_types=>:environment) do
     revert_fixtures_identify
