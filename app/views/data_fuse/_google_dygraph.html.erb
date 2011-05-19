@@ -1,12 +1,6 @@
 <%
     chart_title ||= ""
     div_id="chart_#{UUIDTools::UUID.random_create.to_s}"
-    csv = open(csv_url).read.gsub(".,",".0,")
-    processed_csv=""
-    FasterCSV.parse(csv) do |row|
-        row_csv=row.join(",")
-        processed_csv << "\"#{row_csv}\n\"+"
-    end
 
 -%>
 <%= javascript_include_tag 'dygraph-combined.js' -%>
