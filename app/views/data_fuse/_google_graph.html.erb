@@ -10,11 +10,12 @@
     <script type="text/javascript">
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(drawChart);
+      var chart;
       function drawChart() {
         var data = new google.visualization.DataTable();
         <%= csv_to_google_data csv_url -%>
 
-        var chart = new google.visualization.LineChart(document.getElementById('<%= div_id -%>'));
+        chart = new google.visualization.LineChart(document.getElementById('<%= div_id -%>'));
         chart.draw(data, {curveType:'function',
             width: 800,
             height: 540,
@@ -22,6 +23,11 @@
             vAxis: {title:'<%= y_axis_title -%>',minValue:0},
             hAxis: {title:'<%= x_axis_title -%>'}
         });
+        google.visualization.events.addListener(chart, 'select', itemSelected);
+      }
+
+      function itemSelected(e) {
+          alert("something was selected");
       }
     </script>
 
