@@ -1,0 +1,24 @@
+<%
+    chart_title ||= ""
+    div_id="chart_#{UUIDTools::UUID.random_create.to_s}"
+    csv = open(csv_url).read.gsub(".,",".0,")
+    processed_csv=""
+    FasterCSV.parse(csv) do |row|
+        row_csv=row.join(",")
+        processed_csv << "\"#{row_csv}\n\"+"
+    end
+
+-%>
+<%= javascript_include_tag 'dygraph-combined.js' -%>
+<div style="width:800px;height:540px" id="<%= div_id -%>"></div>
+
+<script type="text/javascript">
+
+  g = new Dygraph(
+          document.getElementById("<%= div_id -%>"),
+          // CSV or path to a CSV file.
+          "/test.csv"
+
+          );
+
+</script>
