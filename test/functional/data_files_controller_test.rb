@@ -7,6 +7,7 @@ class DataFilesControllerTest < ActionController::TestCase
   
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     login_as(:datafile_owner)
@@ -679,15 +680,6 @@ class DataFilesControllerTest < ActionController::TestCase
   
   def valid_data_file_with_ftp_url
       { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
-  end
-  
-  def valid_sharing
-    {
-      :use_whitelist=>"0",
-      :user_blacklist=>"0",
-      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
-      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
-    }
   end
   
 end

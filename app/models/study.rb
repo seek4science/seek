@@ -8,7 +8,7 @@ class Study < ActiveRecord::Base
 
     before_save :policy_or_default
 
-    belongs_to :policy
+    belongs_to :policy, :autosave => true
 
     class_eval do
       extend Acts::Authorized::SingletonMethods

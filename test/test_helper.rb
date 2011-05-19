@@ -60,4 +60,8 @@ class ActiveSupport::TestCase
       RubyProf::GraphHtmlPrinter.new(results).print(file)
     end
   end
+
+  def run_secondary_tests?
+    @@run_secondary ||= File.exists? '/tmp/run_secondary'
+  end
 end
