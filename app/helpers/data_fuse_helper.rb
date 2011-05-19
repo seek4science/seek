@@ -4,20 +4,25 @@ module DataFuseHelper
     puts "csv url = #{csv_url}"
     res = ""
     csv = open(csv_url).read
-    row_count=0
     rows = FasterCSV.parse(csv)
-    rows.each do |row|
-      if row_count==0
+    rows.each_with_index do |row,i|
+      if i==0
+        type='string'
         row.each do |entry|
-           res << "data.addColumn('number','#{entry}');\n"
+           res << "data.addColumn('#{type}','#{entry}');\n"
+           type='number'
         end
-        #res << "data.addRows(#{rows.count});\n"
+        res << "data.addRows(#{rows.count-1});\n"
       else
-        row_values = row.join(", ").gsub(".,",",")
-        res << "data.addRow([#{row_values}]);\n"
+        row.each_with_index do |v,i2|
+          v = v+"0" if v.end_with?(".")
+          v = "'#{v}'" if i2==0
+          res << "data.setValue(#{i-1},#{i2},#{v});\n"
+        end
       end
-      row_count+=1
+
     end
+    puts res
     res
   end
 end
