@@ -69,7 +69,6 @@ class Policy < ActiveRecord::Base
   end
 
   def self.create_or_update_policy  resource, user, params
-    resource.policy_or_default
     resource.policy.set_attributes_with_sharing(params[:sharing])
     resource.save
     resource.errors.full_messages.join('\n')

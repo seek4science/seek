@@ -50,7 +50,7 @@ module Acts #:nodoc:
         belongs_to :contributor, :polymorphic => true
         does_not_require_can_edit :uuid, :first_letter
         #checks a policy exists, and if missing resorts to using a private policy
-        before_save :policy_or_default
+        after_initialize :policy_or_default_if_new
 
         belongs_to :project
 
@@ -102,9 +102,19 @@ module Acts #:nodoc:
         true
       end
 
+      def default_policy
+        Policy.default
+      end
+
       def policy_or_default
         if self.policy.nil?
-          self.policy = Policy.private_policy
+          self.policy = default_policy
+        end
+      end
+
+      def policy_or_default_if_new
+        if self.new_record?
+          policy_or_default
         end
       end
 

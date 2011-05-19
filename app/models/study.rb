@@ -6,7 +6,7 @@ class Study < ActiveRecord::Base
   # but instead of creating a project attribute, I use the existing one.
     alias_attribute :contributor, :person_responsible
 
-    before_save :policy_or_default
+    after_initialize :policy_or_default_if_new
 
     belongs_to :policy, :autosave => true
 

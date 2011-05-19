@@ -11,7 +11,7 @@ class Assay < ActiveRecord::Base
       project.try :id
     end
 
-    before_save :policy_or_default
+    after_initialize :policy_or_default_if_new
 
     belongs_to :policy, :autosave => true
 

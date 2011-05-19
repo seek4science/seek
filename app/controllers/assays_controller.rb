@@ -38,7 +38,6 @@ class AssaysController < ApplicationController
 
     @assay.owner=current_user.person
 
-    @assay.policy_or_default
     @assay.policy.set_attributes_with_sharing params[:sharing]
 
     respond_to do |format|
