@@ -7,8 +7,12 @@ class Assay < ActiveRecord::Base
   end
 
   alias_attribute :contributor, :owner
-
   acts_as_authorized
+
+  def default_contributor
+    User.current_user.try :person
+  end
+
 
   acts_as_taggable
 

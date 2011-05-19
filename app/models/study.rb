@@ -8,6 +8,10 @@ class Study < ActiveRecord::Base
 
   acts_as_authorized
 
+  def default_contributor
+    User.current_user.person
+  end
+
   has_many :assays
 
   belongs_to :person_responsible, :class_name => "Person"

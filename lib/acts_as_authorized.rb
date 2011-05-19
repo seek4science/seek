@@ -48,6 +48,7 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_authorized
         belongs_to :contributor, :polymorphic => true  unless method_defined? :contributor
+        after_initialize :contributor_or_default_if_new
 
         does_not_require_can_edit :uuid, :first_letter
         #checks a policy exists, and if missing resorts to using a private policy
@@ -116,6 +117,16 @@ module Acts #:nodoc:
       def policy_or_default_if_new
         if self.new_record?
           policy_or_default
+        end
+      end
+
+      def default_contributor
+        User.current_user
+      end
+
+      def contributor_or_default_if_new
+        if self.new_record? and contributor.nil?
+          self.contributor = default_contributor
         end
       end
 
