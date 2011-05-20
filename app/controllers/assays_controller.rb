@@ -38,7 +38,7 @@ class AssaysController < ApplicationController
 
     @assay.owner=current_user.person
 
-    @assay.policy = Policy.new.set_attributes_with_sharing params[:sharing]
+    @assay.policy.set_attributes_with_sharing params[:sharing]
 
     respond_to do |format|
       if @assay.save
@@ -88,7 +88,8 @@ class AssaysController < ApplicationController
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
 
-    (@assay.policy || Policy.new).set_attributes_with_sharing params[:sharing]
+    @assay.policy_or_default if params[:sharing]
+    @assay.policy.try :set_attributes_with_sharing, params[:sharing]
 
     respond_to do |format|
       if @assay.update_attributes(params[:assay])
