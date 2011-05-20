@@ -26,7 +26,7 @@
   </p>
   <p>
     <%= f.label "Institution" %><br/>
-    <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:prompt => true}) %>
+    <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."}) %>
   </p>
   <% if @assay.study.blank? or @assay.study.can_view? %>
       <p>
@@ -72,7 +72,7 @@
 
 <p>
     <%= f.label "Sample" %> <br/>
-    <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{:prompt =>true},{"style" =>"width:90%"}) %>
+    <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{:include_blank =>"Please Select ..."},{"style" =>"width:90%"}) %>
 </p>
 <br style="clear:both"/>
 
