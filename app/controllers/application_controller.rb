@@ -28,7 +28,9 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
   around_filter :with_current_user
   def with_current_user
-    User.with_current_user current_user { yield }
+    User.with_current_user current_user do
+      yield
+    end
   end
 
   before_filter :project_membership_required,:only=>[:create,:new]
