@@ -69,16 +69,9 @@ class Policy < ActiveRecord::Base
   end
 
   def self.create_or_update_policy  resource, user, params
-    resource.policy.set_attributes_with_sharing(params[:sharing])
+    resource.policy = (resource.policy || Policy.new).set_attributes_with_sharing(params[:sharing])
     resource.save
     resource.errors.full_messages.join('\n')
-  end
-
-  def self.create_or_update_default_policy(project, user, params)
-    project.default_policy = Policy.private_policy unless project.default_policy
-    project.default_policy.set_attributes_with_sharing(params[:sharing])
-    project.save
-    project.errors.full_messages.join('\n')
   end
   
   def set_attributes_with_sharing sharing
