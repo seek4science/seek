@@ -13,25 +13,20 @@ class StudiedFactorsController < ApplicationController
   end
 
   def create
-    #if the comma is used for the decimal, change it to point
-=begin
-    params[:studied_factor].each_value do |value|
-      value[","] = "." if value.match(",")
-    end
-=end
     @studied_factor=StudiedFactor.new(params[:studied_factor])
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
     @studied_factor.substance = find_or_create_substance new_substances,known_substance_ids_and_types
+
     render :update do |page|
       if @studied_factor.save
-        page.insert_html :bottom,"studied_factors_rows",:partial=>"factor_row",:object=>@studied_factor,:locals=>{:show_delete=>true}
-        page.visual_effect :highlight,"studied_factors"
+        page.insert_html :bottom,"condition_or_factor_rows",:partial=>"condition_or_factor_row",:object=>@studied_factor,:locals=>{:asset => 'data_file', :show_delete=>true}
+        page.visual_effect :highlight,"condition_or_factor_rows"
         # clear the _add_factor form
         page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
-        page[:add_factor_form].reset
+        page[:add_condition_or_factor_form].reset
       else
         page.alert(@studied_factor.errors.full_messages)
       end
@@ -42,8 +37,8 @@ class StudiedFactorsController < ApplicationController
     @studied_factor=StudiedFactor.find(params[:id])
     render :update do |page|
       if @studied_factor.destroy
-         page.visual_effect :fade, "studied_factor_row_#{@studied_factor.id}"
-         page.visual_effect :fade, "edit_factor_#{@studied_factor.id}_form"
+         page.visual_effect :fade, "condition_or_factor_row_#{@studied_factor.id}"
+         page.visual_effect :fade, "edit_condition_or_factor_#{@studied_factor.id}_form"
       else
         page.alert(@studied_factor.errors.full_messages)
       end
@@ -51,12 +46,6 @@ class StudiedFactorsController < ApplicationController
   end
 
   def update
-    #if the comma is used for the decimal, change it to point
-=begin
-    params[:studied_factor].each_value do |value|
-      value[","] = "." if value.match(",")
-    end
-=end
     @studied_factor = StudiedFactor.find(params[:id])
 
     new_substances = params["#{@studied_factor.id}_substance_autocompleter_unrecognized_items"] || []
@@ -68,11 +57,11 @@ class StudiedFactorsController < ApplicationController
 
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])
-        page.visual_effect :fade,"edit_factor_#{@studied_factor.id}_form"
-        page.replace_html "studied_factor_row_#{@studied_factor.id}", :partial => 'factor_row', :object => @studied_factor, :locals=>{:show_delete=>true}
+        page.visual_effect :fade,"edit_condition_or_factor_#{@studied_factor.id}_form"
+        page.replace_html "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
         #clear the _add_factor form
         page.call "autocompleters['#{@studied_factor.id}_substance_autocompleter'].deleteAllTokens"
-        page["edit_factor_#{@studied_factor.id}_form"].reset
+        page["edit_condition_or_factor_#{@studied_factor.id}_form"].reset
       else
         page.alert(@studied_factor.errors.full_messages)
       end

@@ -1483,9 +1483,8 @@ div.email_configuration{
     width: 500px
 }
 
-div.substance_factors_studied{
+div.substance_condition_factor{
     position:relative;
-    margin-left: -7em;
     margin-bottom: 1em;
     width: 25em;
 }

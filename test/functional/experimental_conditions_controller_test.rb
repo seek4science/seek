@@ -10,33 +10,18 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     login_as(:quentin)
   end
 
-=begin
-test "should not get edit option for downloadable only sop" do
-    sop=sops(:downloadable_sop)
-    sop.save
-    get :index, {:sop_id => sop.id, :version => sop.version}
-    assert_select 'img[title="Start editing"]',:count=>0
-    assert_select 'div[id="edit_on"]',:count=>0
-    assert_select 'div[id="edit_off"]',:count=>0
-  end
 
-  test "should get edit option for editable sop" do
+  test "can only go to the experimental condition if the user can edit the sop" do
     sop=sops(:editable_sop)
     sop.save
-    get :index, {:sop_id => sop.id, :version => sop.version}
-    assert_select 'img[title="Start editing"]',:count=>1
-    assert_select 'div[id="edit_on"]',:count=>1
-    assert_select 'div[id="edit_off"]',:count=>1
-  end
+    get :index,{:sop_id=>sop.id, :version => sop.version}
+    assert_response :success
 
-  test "should get edit option for owners downloadable sop" do
-    login_as(:owner_of_my_first_sop)
     sop=sops(:downloadable_sop)
     sop.save
-    get :index, {:sop_id => sop.id, :version => sop.version}
-    assert_select 'img[title="Start editing"]',:count=>1
-    assert_select 'div[id="edit_on"]',:count=>1
-    assert_select 'div[id="edit_off"]',:count=>1
+    get :index,{:sop_id=>sop.id, :version => sop.version}
+    assert_not_nil flash[:error]
+
   end
 
   test 'should create the experimental condition with the concentration of the compound' do
@@ -101,5 +86,77 @@ test "should not get edit option for downloadable only sop" do
     assert_equal ec.measured_item, mi
   end
 
-=end
+  test 'should update the experimental condition of concentration to time' do
+    ec = experimental_conditions(:experimental_condition_concentration_glucose)
+    assert_not_nil ec
+    assert_equal ec.measured_item, measured_items(:concentration)
+    assert_equal ec.substance, compounds(:compound_glucose)
+
+    mi = measured_items(:time)
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:measured_item_id => mi.id},  "#{ec.id}_substance_autocompleter_selected_ids" => nil
+    fs_updated = assigns(:experimental_condition)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, mi
+    assert_equal fs_updated.substance, nil
+  end
+
+  test 'should update the experimental condition of time to concentration' do
+    ec = experimental_conditions(:experimental_condition_time)
+    assert_not_nil ec
+    assert_equal ec.measured_item, measured_items(:time)
+    assert_equal ec.substance, nil
+
+    mi = measured_items(:concentration)
+    cp = compounds(:compound_glucose)
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:measured_item_id => mi.id},  "#{ec.id}_substance_autocompleter_selected_ids" => ["#{cp.id.to_s},Compound"]
+    fs_updated = assigns(:experimental_condition)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, mi
+    assert_equal fs_updated.substance, cp
+  end
+
+  test 'should update the experimental condition of time to pressure' do
+    ec = experimental_conditions(:experimental_condition_time)
+    assert_not_nil ec
+    assert_equal ec.measured_item, measured_items(:time)
+    assert_equal ec.substance, nil
+
+    mi = measured_items(:pressure)
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:measured_item_id => mi.id}
+    fs_updated = assigns(:experimental_condition)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, mi
+    assert_equal fs_updated.substance, nil
+  end
+
+  test 'should update the experimental condition of concentration of glucose to concentration of glycine' do
+    ec = experimental_conditions(:experimental_condition_concentration_glucose)
+    assert_not_nil ec
+    assert_equal ec.measured_item, measured_items(:concentration)
+    assert_equal ec.substance, compounds(:compound_glucose)
+
+    cp = compounds(:compound_glycine)
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {}, "#{ec.id}_substance_autocompleter_selected_ids" => ["#{cp.id.to_s},Compound"]
+    fs_updated = assigns(:experimental_condition)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, measured_items(:concentration)
+    assert_equal fs_updated.substance, cp
+  end
+
+  test 'should update start_value, end_value of the experimental condition' do
+    ec = experimental_conditions(:experimental_condition_time)
+    assert_not_nil ec
+
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:start_value => 10.02, :end_value => 50}
+    fs_updated = assigns(:experimental_condition)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.start_value, 10.02
+    assert_equal fs_updated.end_value, 50
+  end
+
 end

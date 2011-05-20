@@ -153,7 +153,6 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:time_point => 5.3, :start_value => 10.02, :end_value => 50, :standard_deviation => 0.6}
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
-    p fs.inspect
     assert fs_updated.valid?
     assert_equal fs_updated.time_point, 5.3
     assert_equal fs_updated.start_value, 10.02
