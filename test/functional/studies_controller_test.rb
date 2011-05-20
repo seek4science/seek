@@ -95,8 +95,8 @@ class StudiesControllerTest < ActionController::TestCase
   end  
   
   test "shouldn't show edit for unauthorized users" do
-    login_as(Factory(:user))
     s = Factory :study, :policy => Factory(:private_policy)
+    login_as(Factory(:user))
     get :edit, :id=>s
     assert_redirected_to study_path(s)
     assert flash[:error]
@@ -175,8 +175,8 @@ class StudiesControllerTest < ActionController::TestCase
 
 
   test "unauthorized user can't update" do
-    login_as(Factory(:user))
     s=Factory :study, :policy => Factory(:private_policy)
+    login_as(Factory(:user))
     Factory :permission, :contributor => User.current_user, :policy=> s.policy, :access_type => Policy::VISIBLE
 
     put :update, :id=>s.id,:study=>{:title=>"test"}
