@@ -20,7 +20,6 @@ module DataFuseHelper
       end
 
     end
-    puts res
     res
   end
 end
