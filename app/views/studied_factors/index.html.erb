@@ -12,8 +12,9 @@
     <%= render :partial=>"factor_row_headings" %>
 
     <div id="studied_factors_rows">
-      <%= render :partial=>"factor_row",:collection=>@display_data_file.studied_factors %>
+      <%= render :partial=>"factor_row",:collection=>@display_data_file.studied_factors, :locals=>{:show_delete=>true} %>
     </div>
   </ul>
+
 </center>
 

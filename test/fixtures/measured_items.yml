@@ -6,3 +6,6 @@ concentration:
 
 time:
   title: time
+
+pressure:
+  title: pressure

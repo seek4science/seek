@@ -1,3 +1,5 @@
+<% javascript_include_tag "sharing.js" -%>
+
 <% show_delete||=false %>
 <% studied_factor=factor_row -%>
 <li id="studied_factor_row_<%= studied_factor.id -%>" >
@@ -27,13 +29,38 @@
       <%= h studied_factor.standard_deviation %>
     </li>
     
-    <% style="display:block;" unless show_delete %>
-    <li id="delete" class="destroy_studied_factor" style="<%= style %>">
-       <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete factor studied"),
-         :url => { :action => "destroy", :id => studied_factor.id,:data_file_id=>studied_factor.data_file.id },
-         :confirm=>"Are you sure?",:method=>:delete
-       -%>
-    </li>
-    
-  </ul>
+    <% if show_delete %>
+        <li id="delete" class="destroy_studied_factor">
+           <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete factor studied"),
+             :url => { :action => "destroy", :id => studied_factor.id,:data_file_id=>studied_factor.data_file.id },
+             :confirm=>"Are you sure?",:method=>:delete
+           -%>
+        </li>
+
+        <li id="edit_on_<%= studied_factor.id -%>" >
+          <%= link_to_function image(("edit"),:title=>"Start editing",:alt=>"Start editing") do |page|
+             page.visual_effect :appear, "edit_factor_#{studied_factor.id}_form"
+             page["edit_on_#{studied_factor.id}"].toggle
+             page["edit_off_#{studied_factor.id}"].toggle
+
+            end
+          -%>
+        </li>
+
+        <li id="edit_off_<%= studied_factor.id -%>" style="display:none">
+          <%= link_to_function image(("edit-off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
+             page.visual_effect :fade, "edit_factor_#{studied_factor.id}_form"
+             page["edit_on_#{studied_factor.id}"].toggle
+             page["edit_off_#{studied_factor.id}"].toggle
+            end
+          -%>
+        </li>
+    <% end %>
+    </ul>
 </li>
+
+
+<% if show_delete %>
+    <%= render :partial => "studied_factors/edit_factor", :locals => {:studied_factor => studied_factor}-%>
+<% end %>
+

@@ -18,9 +18,9 @@
     </tr>
     <tr>
 
-      <td><%= f.text_field :time_point,:size=>4 %></td>
+      <td><%= f.text_field :time_point, :size=>4 %></td>
 
-      <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('studied_factor_measured_item_id')"} %></td>
+      <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_factor_form')"} %></td>
 
       <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
 
@@ -37,7 +37,7 @@
 
   </table>
   <div class="substance_factors_studied">
-    <%= render :partial=>"layouts/substances_autocomplete"%>
+    <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}%>
   </div>
   </div>
 

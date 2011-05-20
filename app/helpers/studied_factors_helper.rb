@@ -23,7 +23,19 @@ module StudiedFactorsHelper
         all_substances.push s
       end
       all_substances
-     end
+   end
+
+   def tagged_substances resource
+      tagged_substances = []
+      if !resource.nil? && !resource.substance.nil?
+        substance = resource.substance
+        s = Substance.new
+        s.id = substance.id.to_s + ",#{substance.class.name}"
+        s.name = substance.name
+        tagged_substances.push s
+      end
+      tagged_substances
+   end
 
   class Substance
      def id
