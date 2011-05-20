@@ -370,7 +370,6 @@ function checkOrganismNotInList(title,id,strain,culture_growth,t_id,t_title) {
                     && organisms[i][1] == id
                     && organisms[i][2] == strain
                     && organisms[i][3] == culture_growth
-                    && organisms[i][4] == t_id
                     && organisms[i][5] == t_title) {
 
                 toAdd = false;
@@ -396,7 +395,7 @@ function addSelectedOrganism() {
     selected_option=$("possible_organisms").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
-    strain=$('strain').value
+    strain=$('strain').value;
 
     selected_option_index=$('culture_growth').selectedIndex;
     selected_option=$('culture_growth').options[selected_option_index];
@@ -408,22 +407,23 @@ function addSelectedOrganism() {
     t_id = selected_option.value;
 
 
+
     if($('tissue_and_cell_type').value=="" && t_id != 0){
         t_title = selected_option.text;
         addOrganism(title,id,strain,culture_growth,t_id,t_title);
 
     }
-    if($('tissue_and_cell_type').value!="" && t_id != 0) {
+    if($('tissue_and_cell_type').value!="" && t_id == 0) {
         t_title = $('tissue_and_cell_type').value;
         addOrganism(title,id,strain,culture_growth,0,t_title);
     }
 
-    if(t_id == 0) {
-        t_title = $('tissue_and_cell_type').value;
+    if(t_id == 0 && $('tissue_and_cell_type').value=="") {
+        t_title = "";
         addOrganism(title,id,strain,culture_growth,t_id,t_title);
     }
 
-    
+
 }
 
 function removeOrganism(index) {
@@ -444,13 +444,13 @@ function updateOrganisms() {
         culture_growth=organism[3];
         tissue_and_cell_type_id=organism[4];
         tissue_and_cell_type_title = organism[5];
-        titleText = '<span title="' + title + '">' + title.truncate(100);
+        titleText = '<span title="' + title + '">' + ' <span class="assay_organism_info">'+ title.truncate(100);'</span>';
 
         if (strain.length>0) {
-            titleText += ":"+strain
+            titleText += ":"+ "<span class='assay_strain_info'> " + strain+ "</span>";
         }
         if (tissue_and_cell_type_title.length>0) {
-            titleText += ":"+tissue_and_cell_type_title
+            titleText += ":"+"<span class='assay_tissue_and_cell_type_info'> " + tissue_and_cell_type_title+ "</span>";
         }
         if (culture_growth.length>0 && culture_growth!='Not specified') {
             titleText += " <span class='assay_item_sup_info'>("+culture_growth+")</span>";

@@ -20,7 +20,7 @@
         <span class="none_text" id="organisms">Loading...</span>
       </div>
       <div class="association_step">
-        <b>Step 1</b> - Choose an organism<br/><br/>
+        <b>Step 1</b> - <span class="assay_organism_info">Choose an organism</span> <br/><br/>
         <%= select_tag :possible_organisms,
         options_for_select([["Select Organism ...", 0]]|all_organisms.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
          {:style=>"width:90%",
@@ -32,19 +32,19 @@
       </div>
       <div id="extra_organism_details" style="display:none;">
         <div class="association_step">
-          <b>Step 2</b> - Select method of cell culture (optional)<br/><br/>
+          <b>Step 2</b> - <span class="assay_item_sup_info"> Select method of cell culture (optional)</span><br/><br/>
           <%= select_tag :culture_growth,culture_growth_options -%>
           <br/>
         </div>
         <div class="association_step">
-          <b>Step 3</b> - Specify a strain (optional)<br/>
+          <b>Step 3</b> - <span class="assay_strain_info">  Specify a strain (optional)</span><br/>
           <div id="existing_strains"></div>
           <%= text_field_tag :strain %>
           <br/>
         </div>
 
         <div class="association_step">
-          <b>Step 4</b> - Select or specify a cell type or tissue (optional)<br/>
+          <b>Step 4</b> - <span class="assay_tissue_and_cell_type_info">  Select or specify a cell type or tissue (optional)</span> <br/>
           <%= select_tag :possible_tissue_and_cell_types,
                          options_for_select([["Select Tissue or Cell Type ...", 0]]|all_tissue_and_cell_types.collect { |o| [truncate(h(o.title), :length=>select_truncate_length), o.id] }),
                          {:style=>"width:90%",
@@ -72,9 +72,9 @@
       organism_id = '<%= o.organism.id -%>';
       organism_title = '<%= escape_javascript(o.organism.title) -%>';
       strain = '<%= o.strain.nil? ? "" : o.strain.title -%>';
-      culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>';
-      tissue_and_cell_type_id ='<%= o.tissue_and_cell_type.id%>';
-      tissue_and_cell_type_title ='<%= escape_javascript(o.tissue_and_cell_type.title) %>';
+      culture_growth = '<%= o.culture_growth_type.nil? ? "Not specified" : o.culture_growth_type.title -%>';
+      tissue_and_cell_type_id ='<%= o.tissue_and_cell_type.nil?? 0 : o.tissue_and_cell_type.id%>';
+      tissue_and_cell_type_title ='<%= o.tissue_and_cell_type.nil?? "": escape_javascript(o.tissue_and_cell_type.title) %>';
       addOrganism(organism_title, organism_id, strain, culture_growth,tissue_and_cell_type_id,tissue_and_cell_type_title);
   <% end -%>
   

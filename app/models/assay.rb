@@ -1,7 +1,7 @@
 require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
-
+  cattr_accessor :organism_count
   # The following is basically the same as acts_as_authorized,
   # but instead of creating a project and contributor
   # I use the existing project method and owner attribute.
@@ -62,8 +62,8 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  validates_presence_of :sample, :if => :organisms_are_missing?,:unless => :sample_is_missing?
-  validates_presence_of :organisms,:if => :sample_is_missing?,:unless => :organisms_are_missing?
+ # validates_presence_of :sample, :if => :organisms_are_missing?,:unless => :sample_is_missing?
+ # validates_presence_of :organisms,:if => :sample_is_missing?,:unless => :organisms_are_missing?
 
   has_many :relationships, 
     :class_name => 'Relationship',
@@ -118,6 +118,7 @@ class Assay < ActiveRecord::Base
   #strain_title should be the String for the strain
   #culture_growth should be the culture growth instance
   def associate_organism(organism,strain_title=nil,culture_growth_type=nil,tissue_and_cell_type_id="0",tissue_and_cell_type_title=nil)
+
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
     assay_organism=AssayOrganism.new
     assay_organism.assay = self
@@ -134,13 +135,15 @@ class Assay < ActiveRecord::Base
     assay_organism.strain=strain
 
     tissue_and_cell_type=nil
-    if ( tissue_and_cell_type_id=="0")
-        found = TissueAndCellType.find(:first,:conditions => {:title => tissue_and_cell_type_title})
-        unless found
-        tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title) if (!tissue_and_cell_type_title.nil? && tissue_and_cell_type_title!="")
-        end
-    else
-        tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+    if tissue_and_cell_type_title && !tissue_and_cell_type_title.empty?
+      if ( tissue_and_cell_type_id =="0" )
+          found = TissueAndCellType.find(:first,:conditions => {:title => tissue_and_cell_type_title})
+          unless found
+          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title) if (!tissue_and_cell_type_title.nil? && tissue_and_cell_type_title!="")
+          end
+      else
+          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+      end
     end
     assay_organism.tissue_and_cell_type = tissue_and_cell_type
 
@@ -152,6 +155,7 @@ class Assay < ActiveRecord::Base
     unless existing
     assay_organism.save!
     end
+   
   end
   
   def assets
@@ -176,12 +180,14 @@ class Assay < ActiveRecord::Base
   end
 
   def organisms_are_missing?
-    return organisms.nil? || organisms.empty?
+
+    return organism_count == 0
   end
 
 
   def validate
     errors.add_to_base "Please specify either sample or organisms for assay!" if sample_is_missing? and organisms_are_missing?
+
 
   end
 

@@ -4,9 +4,13 @@ class AssaysController < ApplicationController
   include IndexPager
   include Seek::TaggingCommon
 
+  before_filter :reset_organism_count
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
+  def reset_organism_count
+    Assay.organism_count = 0
+  end
   def new
     @assay=Assay.new
     study = Study.find(params[:study_id]) if params[:study_id]
@@ -34,10 +38,7 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:assay_model_ids] || []
 
-    organisms.each do |text|
-          o_id =text.split(",").first
-      @assay.organisms << Organism.find(o_id)
-    end
+    Assay.organism_count = organisms.length
 
     update_tags @assay
 
@@ -45,6 +46,7 @@ class AssaysController < ApplicationController
 
     @assay.policy_or_default
     @assay.policy.set_attributes_with_sharing params[:sharing]
+
 
     respond_to do |format|
       if @assay.save
@@ -63,6 +65,7 @@ class AssaysController < ApplicationController
         end
         organisms.each do |text|
           o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
+
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
         end
@@ -90,6 +93,9 @@ class AssaysController < ApplicationController
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
 
+
+    Assay.organism_count = organisms.length
+
     update_tags @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
@@ -114,6 +120,7 @@ class AssaysController < ApplicationController
         end
         #Destroy AssayAssets that aren't needed
         (@assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
+
 
         organisms.each do |text|
           o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")

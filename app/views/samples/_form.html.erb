@@ -16,7 +16,7 @@
 
   <p>
     <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
-    <%= collection_select(:sample, :specimen_id, Specimen.all, :id, :title) %>
+    <%= collection_select(:sample, :specimen_id, Specimen.all, :id, :title,{:include_blank =>"Please Select..."}) %>
   </p>
 
   <p>
