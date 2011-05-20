@@ -377,10 +377,10 @@ class DataFilesControllerTest < ActionController::TestCase
     csv=@response.body
     assert csv.include?(%!,,"fish","bottle","ggg,gg"!)
 
-    get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:sheet=>"2"
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:trim=>true,:sheet=>"2"
     assert_response :success
     csv=@response.body
-    assert csv.include?(%!,,"a",1.0,TRUE,,FALSE!)
+    assert csv.include?(%!"a",1.0,TRUE,,FALSE!)
   end
   
   test "should not expose non downloadable spreadsheet" do
