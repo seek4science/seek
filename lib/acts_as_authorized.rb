@@ -2,7 +2,7 @@ module Acts #:nodoc:
   module Authorized #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
-      mod.before_destroy :can_delete?
+      mod.before_destroy :delete_authorized?
       mod.before_update :changes_authorized?
     end
 
@@ -42,7 +42,11 @@ module Acts #:nodoc:
     end
 
     def changes_authorized?
-      (changes_requiring_can_edit.empty? || can_edit?) and (changes_requiring_can_manage.empty? || can_manage?)
+      $authorization_checks_disabled or changes_requiring_can_edit.empty? || can_edit? and changes_requiring_can_manage.empty? || can_manage?
+    end
+
+    def delete_authorized?
+      $authorization_checks_disabled or can_delete?
     end
 
     module ClassMethods
@@ -162,3 +166,39 @@ end
 ActiveRecord::Base.class_eval do
   include Acts::Authorized
 end
+
+module OnlyWritesVisible
+
+  def concat_with_ignore_invisible *args
+    args = flatten_deeper(args).select {|record| record.can_view?} unless $authorization_checks_disabled
+    concat_without_ignore_invisible *args
+  end
+
+  def delete_with_ignore_invisible *args
+    args = flatten_deeper(args).select {|record| record.can_view?} unless $authorization_checks_disabled
+    delete_without_ignore_invisible *args
+  end
+
+  def self.included base
+    base.class_eval do
+      alias_method_chain :concat, :ignore_invisible
+      alias_method :<<, :concat
+      alias_method :push, :concat
+
+      alias_method_chain :delete, :ignore_invisible
+    end
+  end
+end
+
+ActiveRecord::Associations::AssociationCollection.class_eval do
+  include OnlyWritesVisible
+end
+
+class Object
+  def disable_authorization_checks
+    saved = $authorization_checks_disabled
+    $authorization_checks_disabled = true
+    yield ensure $authorization_checks_disabled = saved
+  end
+end
+

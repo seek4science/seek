@@ -13,12 +13,11 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "event association" do
-    datafile = data_files(:picture)
-    assert datafile.events.empty?
-    event = events(:event_with_no_files)
+    User.current_user = Factory :user
+    datafile = Factory :data_file
+    event = Factory :event
     datafile.events << event
     assert datafile.valid?
-    User.current_user = datafile.contributor
     assert datafile.save
     assert_equal 1, datafile.events.count
   end
