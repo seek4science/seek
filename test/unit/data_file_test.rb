@@ -13,13 +13,14 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "event association" do
-    User.current_user = Factory :user
-    datafile = Factory :data_file
-    event = Factory :event
-    datafile.events << event
-    assert datafile.valid?
-    assert datafile.save
-    assert_equal 1, datafile.events.count
+    User.with_current_user Factory(:user) do
+      datafile = Factory :data_file
+      event = Factory :event
+      datafile.events << event
+      assert datafile.valid?
+      assert datafile.save
+      assert_equal 1, datafile.events.count
+    end
   end
 
   test "assay association" do
