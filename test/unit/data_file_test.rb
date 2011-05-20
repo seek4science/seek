@@ -134,7 +134,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'failing to delete due to can_delete does not create trash' do
-    df = Factory :data_file, :policy => Factory(:private_policy)
+    df = Factory :data_file, :policy => Factory(:private_policy), :contributor => Factory(:user)
     assert_no_difference("DataFile.count") do
       df.destroy
     end
