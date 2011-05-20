@@ -5,7 +5,8 @@ class ModelsControllerTest < ActionController::TestCase
   fixtures :all
   
   include AuthenticatedTestHelper
-  include RestTestCases  
+  include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     login_as(:model_owner)
@@ -657,15 +658,6 @@ class ModelsControllerTest < ActionController::TestCase
 
   def valid_model_with_url
     { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
-  end
-
-  def valid_sharing
-    {
-      :use_whitelist=>"0",
-      :user_blacklist=>"0",
-      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
-      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
-    }
   end
   
 end

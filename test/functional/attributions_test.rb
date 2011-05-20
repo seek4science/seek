@@ -8,6 +8,7 @@ class AttributionsTest < ActionController::TestCase
   
   
   include AuthenticatedTestHelper
+  include SharingFormTestHelper
   def setup
     login_as(:owner_of_my_first_sop)
   end
@@ -137,17 +138,5 @@ class AttributionsTest < ActionController::TestCase
                                                           :object_type => "Sop" } )
     assert (!new_attr.nil?), "new attribution should't be nil - nil means that it wasn't created"
   end
-  
-  
-  private
- 
-  def valid_sharing
-    {
-      :sharing_scope => Policy::ALL_REGISTERED_USERS,
-      :access_type => Policy::VISIBLE,
-      :use_whitelist => false,
-      :use_blacklist => false,
-      :permissions => { :contributor_types => ActiveSupport::JSON.encode([]), :values => ActiveSupport::JSON.encode({}) }
-    }
-  end
+
 end

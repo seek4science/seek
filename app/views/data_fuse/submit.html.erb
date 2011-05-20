@@ -5,7 +5,7 @@
   ul.data_fuse_results li{
       list-style-type:none;
   }
-  .data_fuse_results p.title {
+  .data_fuse_results h2.title {
       font-weight:bolder;
       text-decoration:underline;
   }
@@ -33,8 +33,9 @@
       </p>
       <p>
         <span class="graph">
-            <%# image_tag result.graph_url -%>
-            <%= render :partial=>"google_graph",:locals=>{:csv_url=>result.csv_url} -%>
+            <%= render :partial=>"google_graph",:locals=>{:csv_url=>result.csv_url,:graph_title=>"#{result.id}",:x_axis_title=>"time (min)",:y_axis_title=>"[metabolites] (mM)"} -%>
+            <br/>
+            <%= image_tag result.graph_url -%>
         </span>
       </p>
 
