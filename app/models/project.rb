@@ -42,7 +42,7 @@ class Project < ActiveRecord::Base
   after_initialize :default_default_policy_if_new
 
   def default_default_policy_if_new
-    self.default_policy = Policy.default_policy if new_record?
+    self.default_policy = Policy.default if new_record?
   end
 
   has_many :work_groups, :dependent=>:destroy
