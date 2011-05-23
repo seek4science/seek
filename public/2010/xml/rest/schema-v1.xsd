@@ -4,12 +4,14 @@
 	elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/">
 
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd" />
 	<xsd:import namespace="http://purl.org/dc/elements/1.1/"
 		schemaLocation="dc.xsd" />
 	<xsd:import namespace="http://purl.org/dc/terms/"
 		schemaLocation="dcterms.xsd" />
 	<xsd:import namespace="http://www.w3.org/1999/xlink"
 		schemaLocation="xlink.xsd" />
+
 
 	<xsd:complexType name="ResourceLink">
 		<xsd:attribute ref="xlink:href" use="required"></xsd:attribute>

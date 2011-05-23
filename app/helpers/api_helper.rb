@@ -9,7 +9,7 @@ module ApiHelper
   def xml_root_attributes
     { "xmlns" => "http://www.sysmo-db.org/2010/xml/rest",
       "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
-      "xsi:schemaLocation" => "http://www.sysmo-db.org/2010/xml/rest http://www.sysmo-db.org/2010/xml/rest/schema-v1.xsd",
+      "xsi:schemaLocation" => "http://www.sysmo-db.org/2010/xml/rest/schema-v1.xsd",
       "xmlns:xlink" => "http://www.w3.org/1999/xlink",
       "xmlns:dc" => "http://purl.org/dc/elements/1.1/",
       "xmlns:dcterms" => "http://purl.org/dc/terms/" }

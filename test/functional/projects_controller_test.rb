@@ -8,14 +8,14 @@ class ProjectsControllerTest < ActionController::TestCase
 
 	fixtures :all
 
-	def test_title
-		get :index
-		assert_select "title",:text=>/The Sysmo SEEK Projects.*/, :count=>1
-	end
-
 	def setup
 		login_as(:quentin)
 		@object=projects(:sysmo_project)
+  end
+
+  def test_title
+		get :index
+		assert_select "title",:text=>/The Sysmo SEEK Projects.*/, :count=>1
 	end
 
 	def test_should_get_index
