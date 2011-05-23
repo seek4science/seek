@@ -47,9 +47,12 @@ class Specimen < ActiveRecord::Base
   #organism may be either an ID or Organism instance
   #strain_title should be the String for the strain
   #culture_growth should be the culture growth instance
-  def associate_organism(organism,strain_title=nil,culture_growth_type=nil)
+  def associate_organism(organism=nil,strain_title=nil,culture_growth_type=nil)
+
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
-    self.organism = organism
+    if organism && !organism.empty?
+      self.organism = organism
+    end
     strain=nil
     if (strain_title && !strain_title.empty?)
       strain=organism.strains.find_by_title(strain_title)
