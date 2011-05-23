@@ -2,7 +2,7 @@
   <%= "Factors studied for '#{link_to h(@data_file.title),data_file_path(@data_file, :version => @display_data_file.version)}' version #{@display_data_file.version}" %>
 </h1>
 
-<center>
+<div align="center">
   <div id="add_condition_or_factor" style="display:block;">
     <%= render :partial=>"add_condition_or_factor", :locals => {:asset => 'data_file'} %>
   </div>
@@ -16,5 +16,5 @@
     </div>
   </ul>
 
-</center>
+</div>
 
