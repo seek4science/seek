@@ -177,9 +177,9 @@ module ApiHelper
           builder.tag! "version",core_xlink(v)
         end
       end
-    end    
+    end
     
-    policy_xml builder,object if current_user.person.is_admin? && object.respond_to?("policy")
+    policy_xml builder,object if try_block{current_user.person.is_admin?} && object.respond_to?("policy")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
     if object.respond_to?("project")
       if object.project
