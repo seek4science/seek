@@ -12,11 +12,10 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal policy.access_type,copy.access_type
     assert_equal policy.name,copy.name
     assert_not_equal policy.id,copy.id
-    
-    assert policy.use_custom_sharing
-    assert copy.use_custom_sharing
 
     assert policy.permissions.size>0,"needs to have custom permissions to make this test meaningful"
+    assert copy.permissions.size>0,"needs to have custom permissions to make this test meaningful"
+
     assert_equal policy.permissions.size,copy.permissions.size
 
     policy.permissions.each_with_index do |perm,i|
@@ -33,7 +32,6 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, pol.access_type
     assert_equal false,pol.use_whitelist
     assert_equal false,pol.use_blacklist
-    assert_equal false,pol.use_custom_sharing
     assert pol.permissions.empty?
   end
 
@@ -43,8 +41,21 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, pol.access_type
     assert_equal false,pol.use_whitelist
     assert_equal false,pol.use_blacklist
-    assert_equal false,pol.use_custom_sharing
     assert pol.permissions.empty?
+  end
+
+  test "policy access type presedence" do
+    assert Policy::NO_ACCESS < Policy::VISIBLE
+    assert Policy::VISIBLE < Policy::ACCESSIBLE
+    assert Policy::ACCESSIBLE < Policy::EDITING
+    assert Policy::EDITING < Policy::MANAGING
+  end
+
+  test "policy sharing scope presedence" do
+    assert Policy::PRIVATE < Policy::CUSTOM_PERMISSIONS_ONLY
+    assert Policy::CUSTOM_PERMISSIONS_ONLY < Policy::ALL_SYSMO_USERS
+    assert Policy::ALL_SYSMO_USERS < Policy::ALL_REGISTERED_USERS
+    assert Policy::ALL_REGISTERED_USERS < Policy::EVERYONE
   end
 
 end

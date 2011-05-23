@@ -8,8 +8,8 @@ class AssaysControllerTest < ActionController::TestCase
   include RestTestCases
 
   def setup
-    login_as(:aaron)
-    @object=assays(:metabolomics_assay)
+    login_as(:quentin)
+    @object=Factory(:assay, :policy => Factory(:public_policy))
   end
 
   test "modelling assay validates with schema" do
@@ -31,9 +31,12 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "shouldn't show unauthorized assays" do
+    login_as Factory(:user)
+    hidden = Factory(:assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
     get :index, :page=>"all",:format=>"xml"
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("show", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("view", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
+    assert !assigns(:assays).include?(hidden)
   end
 
   def test_title
@@ -42,6 +45,12 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "should show index" do
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:assays)
+  end
+
+  test "should show index in xml" do
     get :index
     assert_response :success
     assert_not_nil assigns(:assays)
@@ -61,8 +70,10 @@ class AssaysControllerTest < ActionController::TestCase
     assay.reload
     stored_sop = assay.assay_assets.detect{|aa| aa.asset_id=sop.id}.versioned_asset
     assert_equal sop.version, stored_sop.version
-    
+
+    login_as sop.contributor
     sop.save_as_new_version
+    login_as(:model_owner)
     
     put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
     
@@ -90,7 +101,7 @@ class AssaysControllerTest < ActionController::TestCase
 
 end
 
-  
+
 
   test "should update timestamp when associating datafile" do
     login_as(:model_owner)
@@ -131,6 +142,14 @@ end
 
     assert_select "p#assay_type",:text=>/Metabalomics/,:count=>1
     assert_select "p#technology_type",:text=>/Gas chromatography/,:count=>1
+  end
+
+  test "should not show tagging when not logged in" do
+    logout
+    public_assay = Factory(:assay, :policy => Factory(:public_policy))
+    get :show,:id=>public_assay
+    assert_response :success
+    assert_select "div#tags_box",:count=>0
   end
   
   test "should show svg item" do
@@ -208,7 +227,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not delete assay when not project pal" do
@@ -218,7 +237,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not edit assay when not project pal" do
@@ -226,7 +245,7 @@ end
     login_as(:datafile_owner)
     get :edit, :id => a
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to a
   end
   
   test "admin should not edit somebody elses assay" do
@@ -234,7 +253,7 @@ end
     login_as(:quentin)
     get :edit, :id => a
     assert flash[:error]
-    assert_redirected_to assay_path(a)
+    assert_redirected_to a
   end
 
   test "should not delete assay with data files" do
@@ -244,8 +263,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]    
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not delete assay with model" do
@@ -255,8 +273,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
   
   test "should not delete assay with publication" do
@@ -266,8 +283,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
 
   test "should not delete assay with sops" do
@@ -277,8 +293,7 @@ end
       delete :destroy, :id => a
     end
     assert flash[:error]
-    assert flash[:error].include?("You cannot delete an assay that has items")
-    assert_redirected_to assay_path(a)
+    assert_redirected_to assays_path
   end
 
   test "get new presents options for class" do
@@ -533,10 +548,10 @@ end
     assert assay.data_files.include?(data_files(:downloadable_data_file).find_version(1))
     assert assay.data_files.include?(data_files(:private_data_file).find_version(1))
 
-    assert Authorization.is_authorized?("show",nil,sops(:sop_with_fully_public_policy),user)
-    assert !Authorization.is_authorized?("show",nil,sops(:sop_with_private_policy_and_custom_sharing),user)
-    assert Authorization.is_authorized?("show",nil,data_files(:downloadable_data_file),user)
-    assert !Authorization.is_authorized?("show",nil,data_files(:private_data_file),user)
+    assert sops(:sop_with_fully_public_policy).can_view? user
+    assert !sops(:sop_with_private_policy_and_custom_sharing).can_view?(user)
+    assert data_files(:downloadable_data_file).can_view?(user)
+    assert !data_files(:private_data_file).can_view?(user)
   end
   
   test "filtering by study" do

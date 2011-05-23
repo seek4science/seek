@@ -2,10 +2,10 @@
 
 <% truncate_length_for_boxes = 22 -%>
 
-<% if mine?(@project) || @project.can_be_edited_by?(current_user) -%>
+<% if mine?(@project) || @project.try(:can_be_edited_by?, current_user) -%>
   <ul class="sectionIcons">
     <li><%= image_tag_for_key('edit', edit_project_path(@project), "Edit Project Details", nil, 'Edit Project Details')%></li>
-    <% if current_user.is_admin? -%>
+    <% if current_user.try :is_admin? -%>
       <li><%= image_tag_for_key "admin", admin_project_path(@project), "Administer", nil, "Project administration" -%></li>
       <li><%= image_tag_for_key "destroy", project_path(@project), "Delete Project", { :confirm => 'Are you sure?', :method => :delete }, "Delete Project" -%></li>
     <% end -%>

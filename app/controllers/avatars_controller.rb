@@ -1,5 +1,7 @@
 class AvatarsController < ApplicationController
-  
+
+  skip_before_filter :project_membership_required
+
   before_filter :login_required, :except => [ :show ]
   before_filter :check_owner_specified
   before_filter :find_avatars, :only => [ :index ]
@@ -225,7 +227,7 @@ class AvatarsController < ApplicationController
   def find_avatars
     # all avatars for current object are only shown to the owner of the object OR to any admin (if the object is not an admin themself);
     # also, show avatars to all members of a project/institution
-    if current_user.is_admin? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) ||
+    if User.admin_logged_in? || (@avatar_owner_instance.class.name == "Person" && @avatar_for_id.to_i == current_user.person.id.to_i) ||
      (["Project", "Institution"].include?(@avatar_for) && @avatar_owner_instance.people.include?(current_user))
       @avatars = Avatar.find(:all, :conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id })
     else

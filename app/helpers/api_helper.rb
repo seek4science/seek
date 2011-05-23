@@ -9,7 +9,7 @@ module ApiHelper
   def xml_root_attributes
     { "xmlns" => "http://www.sysmo-db.org/2010/xml/rest",
       "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
-      "xsi:schemaLocation" => "http://www.sysmo-db.org/2010/xml/rest/schema-v1.xsd",
+      "xsi:schemaLocation" => "http://www.sysmo-db.org/2010/xml/rest http://www.sysmo-db.org/2010/xml/rest/schema-v1.xsd",
       "xmlns:xlink" => "http://www.w3.org/1999/xlink",
       "xmlns:dc" => "http://purl.org/dc/elements/1.1/",
       "xmlns:dcterms" => "http://purl.org/dc/terms/" }
@@ -140,16 +140,12 @@ module ApiHelper
       organisms=object.organisms if object.respond_to?("organisms")
       organisms << object.organism if object.respond_to?("organism") && object.organism
       api_partial_collection builder,organisms
-    end if object.respond_to?("organism") || object.respond_to?("organisms")                
+    end if object.respond_to?("organism") || object.respond_to?("organisms")
         
     builder.tag! "creators" do      
-      api_partial_collection builder,object.creators
-    end if object.respond_to?("creators") 
-    
-#    builder.tag! "attributions" do      
-#      api_partial_collection builder,object.parent.attributions
-#    end if object.parent.respond_to?("attributions")  
-        
+      api_partial_collection builder,(object.creators || [])
+    end if object.respond_to?("creators")
+            
     unless Seek::Config.hide_details_enabled
       builder.tag! "email",object.email if object.respond_to?("email")
       builder.tag! "webpage",object.webpage if object.respond_to?("webpage")
@@ -185,7 +181,13 @@ module ApiHelper
     
     policy_xml builder,object if current_user.person.is_admin? && object.respond_to?("policy")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
-    api_partial builder,object.project if object.respond_to?("project")  
+    if object.respond_to?("project")
+      if object.project
+        api_partial builder,object.project
+      else
+        builder.tag! "project",{"xsi:nil"=>"true","xlink:href"=>"","resourceType"=>"Project"}
+      end      
+    end
     
     if object.respond_to?("avatar")
       builder.tag! "avatars" do
@@ -201,7 +203,6 @@ module ApiHelper
         dc_core_xml builder,policy
         builder.tag! "sharing_scope",policy.sharing_scope
         builder.tag! "access_type",policy.access_type
-        builder.tag! "use_custom_sharing",policy.use_custom_sharing ? policy.use_custom_sharing : false
         builder.tag! "use_blacklist",policy.use_blacklist ? policy.use_blacklist : false
         builder.tag! "use_whitelist",policy.use_whitelist ? policy.use_whitelist : false
         builder.tag! "permissions" do
@@ -272,7 +273,7 @@ module ApiHelper
   
   def api_partial builder,object, is_root=false
     parent_object =  object.class.name.include?("::Version") ? object.parent : object
-    path=api_partial_path_for_item(parent_object)    
+    path=api_partial_path_for_item(parent_object)
     classname=parent_object.class.name.underscore
     render :partial=>path,:locals=>{:parent_xml => builder,:is_root=>is_root,classname.to_sym=>object}
   end

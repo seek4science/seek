@@ -86,6 +86,7 @@ ActiveRecord::Schema.define(:version => 20110516170953) do
     t.string   "first_letter",       :limit => 1
     t.integer  "assay_class_id"
     t.string   "uuid"
+    t.integer  "policy_id"
   end
 
   create_table "assets", :force => true do |t|
@@ -355,8 +356,11 @@ ActiveRecord::Schema.define(:version => 20110516170953) do
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "first_letter", :limit => 1
+    t.string   "first_letter",     :limit => 1
     t.string   "uuid"
+    t.integer  "policy_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
   end
 
   create_table "measured_items", :force => true do |t|
@@ -453,7 +457,6 @@ ActiveRecord::Schema.define(:version => 20110516170953) do
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
-    t.string   "strain"
     t.string   "genotype"
     t.string   "phenotype"
     t.datetime "created_at"
@@ -497,9 +500,8 @@ ActiveRecord::Schema.define(:version => 20110516170953) do
 
   create_table "policies", :force => true do |t|
     t.string   "name"
-    t.integer  "sharing_scope",      :limit => 1
-    t.integer  "access_type",        :limit => 1
-    t.boolean  "use_custom_sharing"
+    t.integer  "sharing_scope", :limit => 1
+    t.integer  "access_type",   :limit => 1
     t.boolean  "use_whitelist"
     t.boolean  "use_blacklist"
     t.datetime "created_at"
@@ -706,6 +708,9 @@ ActiveRecord::Schema.define(:version => 20110516170953) do
     t.datetime "updated_at"
     t.string   "first_letter",          :limit => 1
     t.string   "uuid"
+    t.integer  "policy_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
   end
 
   create_table "synonyms", :force => true do |t|

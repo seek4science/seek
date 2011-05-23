@@ -55,19 +55,19 @@ class InvestigationTest < ActiveSupport::TestCase
 
   end
 
-  test "project member can delete with no study" do
-    investigation=investigations(:investigation_with_no_study)
-    assert investigation.can_delete?(users(:model_owner))
+  test "unauthorized users can't delete" do
+    investigation = Factory :investigation
+    assert !investigation.can_delete?(Factory(:user))
   end
 
-  test "project member cant delete with study" do
-    investigation=investigations(:metabolomics_investigation)
-    assert !investigation.can_delete?(users(:model_owner))
+  test 'authorized user can delete' do
+    investigation = Factory :investigation, :studies => [], :contributor => Factory(:user)
+    assert investigation.can_delete?(investigation.contributor)
   end
 
-  test "non project member cant delete even with no study" do
-    investigation=investigations(:investigation_with_no_study)
-    assert !investigation.can_delete?(users(:aaron))
+  test "authorized user cant delete with study" do
+    investigation = Factory :investigation, :studies => [Factory :study], :contributor => Factory(:user)
+    assert !investigation.can_delete?(investigation.contributor)
   end
   
   test "test uuid generated" do

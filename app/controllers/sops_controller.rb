@@ -4,11 +4,12 @@ class SopsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon  
   
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_sop, :only=>[:show,:download]
-  
+
+  include Seek::Publishing
   
   def new_version
     if (handle_data nil)      
@@ -75,7 +76,7 @@ class SopsController < ApplicationController
   def new
     @sop=Sop.new
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new SOPs. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -117,9 +118,10 @@ class SopsController < ApplicationController
             flash[:notice] = "SOP was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
           end
-          assay_ids.each do |id|
-              @assay = Assay.find(id)
-              @assay.relate(@sop)
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit?
+              assay.relate(@sop)
+            end
           end
         else
           format.html { 
@@ -164,21 +166,17 @@ class SopsController < ApplicationController
           format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
         end
         # Update new assay_asset
-        assay_ids.each do |id|
-          @assay = Assay.find(id)
-          @assay.relate(@sop)
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit?
+            assay.relate(@sop)
+          end
         end
+
         #Destroy AssayAssets that aren't needed
         assay_assets = @sop.assay_assets
         assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |id|
-            if assay_asset.assay_id.to_s == id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
+          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
           end
         end
       else
@@ -205,7 +203,7 @@ class SopsController < ApplicationController
     sop=Sop.find_by_id(params[:id])
     
     render :update do |page|
-      if sop && Authorization.is_authorized?("show", nil, sop, current_user)
+      if sop.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>sop}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

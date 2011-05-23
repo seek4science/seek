@@ -10,7 +10,7 @@ module ImagesHelper
   end
   
   def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false)
-    
+
     if (label == 'Destroy')
       label = 'Delete';
     end
@@ -236,6 +236,8 @@ module ImagesHelper
         "misc_icons/jws_builder24x24.png"
       when "event_avatar"
         "crystal_project/32x32/apps/vcalendar.png"
+      when "publish"
+       "crystal_project/22x22/actions/up.png"
     else
       return nil
     end

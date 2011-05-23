@@ -5,8 +5,6 @@ class ModelsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon
   
-  before_filter :login_required
-  
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
@@ -14,6 +12,8 @@ class ModelsController < ApplicationController
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
+
+  include Seek::Publishing
   
   @@model_builder = Seek::JWS::OneStop.new
   
@@ -372,7 +372,7 @@ class ModelsController < ApplicationController
   def new    
     @model=Model.new
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new Models. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -405,7 +405,7 @@ class ModelsController < ApplicationController
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
           # update related publications
-          Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+          Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
@@ -417,9 +417,10 @@ class ModelsController < ApplicationController
             flash[:notice] = "Model was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
             format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
           end
-          assay_ids.each do |id|
-              @assay = Assay.find(id)
-              @assay.relate(@model)
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit?
+              assay.relate(@model)
+            end
           end
         else
           format.html {
@@ -466,7 +467,7 @@ class ModelsController < ApplicationController
         Relationship.create_or_update_attributions(@model, params[:attributions])
         
         # update related publications
-        Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@model, params[:creators])
@@ -479,21 +480,16 @@ class ModelsController < ApplicationController
           format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
         end
         # Update new assay_asset
-        assay_ids.each do |id|
-          @assay = Assay.find(id)
-          @assay.relate(@model)
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit?
+            assay.relate(@model)
+          end
         end
         #Destroy AssayAssets that aren't needed
         assay_assets = @model.assay_assets
         assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |id|
-            if assay_asset.assay_id.to_s == id
-              flag = true
-            end
-          end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
+          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
           end
         end
       else
@@ -521,7 +517,7 @@ class ModelsController < ApplicationController
     model = Model.find_by_id(params[:id])
     
     render :update do |page|
-      if model && Authorization.is_authorized?("show", nil, model, current_user)
+      if model.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>model}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."
@@ -563,7 +559,7 @@ class ModelsController < ApplicationController
   def translate_action action
     action="download" if action == "simulate"
     action="edit" if ["submit_to_jws","builder"].include?(action)
-    action
+    super action
   end
   
   def jws_enabled

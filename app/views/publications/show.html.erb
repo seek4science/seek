@@ -4,11 +4,11 @@
   <% elsif !@publication.doi.nil? %>
     <li><%= image_tag_for_key('visit_pubmed', "http://dx.doi.org/#{@publication.doi}", nil, {:popup => true}, 'View Publication') -%></li>
   <% end -%>
-  <% if Authorization.is_authorized?("edit", nil, @publication, current_user) -%>
+  <% if @publication.can_edit? -%>
       <li><%= image_tag_for_key('manage', edit_publication_path(@publication), nil, nil, 'Manage Publication') -%></li>
   <% end -%>
 
-  <% if Authorization.is_authorized?("destroy", nil, @publication, current_user) -%>
+  <% if @publication.can_delete? -%>
       <li><%= image_tag_for_key('destroy', publication_path(@publication), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
   <% end -%>
 </ul>
@@ -81,9 +81,9 @@
   <div class="main_content_right_box_wider">
   	<%= render :partial => "assets/resource_original_uploader_box", :locals => { :resource => @publication, :title=>"Registered by" } -%>  
 	<%= render :partial => "assets/resource_authors_box", :locals => { :resource => @publication, :creators => @publication.creators, :truncate_to => 20, :title=>"Authors" } -%>
-    <div id="tags_box" class="contribution_section_box">
-        <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
-    </div>
+
+    <%= item_tags_and_tag_entry -%>
+
   </div>
   
   <div style="clear:both;padding-top:1em;">      

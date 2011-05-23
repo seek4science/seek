@@ -78,6 +78,14 @@ function setSharingElementVisibility(sharing_scope)
             $('cb_use_blacklist').disabled = true;
             setCustomSharingDivVisibility(PRIVATE);
             break;
+        case EVERYONE:
+            //$('include_custom_sharing_div_' + EVERYONE).hide();
+            //$('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
+            //$('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
+            $('cb_use_whitelist').disabled = true;
+            $('cb_use_blacklist').disabled = true;
+            //setCustomSharingDivVisibility(EVERYONE);
+            break;
         case ALL_REGISTERED_USERS:
             //$('include_custom_sharing_div_' + EVERYONE).hide();
             $('include_custom_sharing_div_' + ALL_REGISTERED_USERS).show();

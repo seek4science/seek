@@ -1,7 +1,5 @@
 class SearchController < ApplicationController
   
-  before_filter :login_required
-  
   def index
     
     @search_query = params[:search_query]
@@ -58,9 +56,9 @@ class SearchController < ApplicationController
 
   private  
 
-  #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
+  #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
   def select_authorised collection
-    collection.select {|el| Authorization.is_authorized?("show", nil, el, current_user)}
+    collection.select {|el| el.can_view?}
   end
 
   def search_in_factors_studied

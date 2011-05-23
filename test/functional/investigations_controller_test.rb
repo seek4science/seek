@@ -8,8 +8,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   include RestTestCases
   
   def setup
-    login_as(:model_owner)
-    @object=investigations(:metabolomics_investigation)
+    login_as(:quentin)
+    @object= Factory(:investigation, :policy => Factory(:public_policy))
   end
 
   def test_title
@@ -41,15 +41,21 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert assigns(:investigation)
   end
 
+  test "logged out user can't see new" do
+    logout
+    get :new
+    assert_redirected_to investigations_path
+  end
+
   test "should show edit" do
     get :edit, :id=>investigations(:metabolomics_investigation)
     assert_response :success
     assert assigns(:investigation)
   end
   
-  test "shouldn't show edit for non-project member" do
-    login_as(:owner_of_fully_public_policy)
-    i = investigations(:metabolomics_investigation)
+  test "shouldn't show edit for unauthorized user" do
+    i = Factory(:investigation, :policy => Factory(:private_policy))
+    login_as(Factory(:user))
     get :edit, :id=>i
     assert_redirected_to investigation_path(i)
     assert flash[:error]
@@ -64,20 +70,28 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_equal "test",assigns(:investigation).title
   end
 
-  test "no edit button in show for person not in project" do
-    login_as(:aaron)
-    get :show, :id=>investigations(:metabolomics_investigation)
+  test "should create" do
+    login_as(Factory :user)
+    put :create, :investigation=>Factory(:investigation, :project => User.current_user.person.projects.first).attributes
+    assert_response :success
+    assert assigns(:investigation)
+  end
+
+  test "no edit button in show for unauthorized user" do
+    login_as(Factory(:user))
+    get :show, :id=>Factory(:investigation, :policy => Factory(:private_policy))
     assert_select "a",:text=>/Edit investigation/,:count=>0
   end
 
-  test "edit button in show for person in project" do
+  test "edit button in show for authorized user" do
     get :show, :id=>investigations(:metabolomics_investigation)
     assert_select "a[href=?]",edit_investigation_path(investigations(:metabolomics_investigation)),:text=>/Edit investigation/,:count=>1
   end
 
   test "no add study button for person that can edit" do
-    login_as(:aaron)
+    login_as(:owner_of_my_first_sop)
     inv = investigations(:metabolomics_investigation)
+    assert !inv.can_edit?,"Aaron should not be able to edit this investigation"
     get :show, :id=>inv
     assert_select "a",:text=>/Add a study/,:count=>0
   end
@@ -89,37 +103,36 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
 
-  test "non project member can't edit investigation" do
-    login_as(:aaron)
-    i=investigations(:metabolomics_investigation)
+  test "unauthorized user can't edit investigation" do
+    i=Factory(:investigation, :policy => Factory(:private_policy))
+    login_as(Factory(:user))
     get :edit, :id=>i
     assert_redirected_to investigation_path(i)
     assert flash[:error]
   end
 
-  test "non project member can't update investigation" do
-    login_as(:aaron)
-    i=investigations(:metabolomics_investigation)
+  test "unauthorized users can't update investigation" do
+    i=Factory(:investigation, :policy => Factory(:private_policy))
+    login_as(Factory(:user))
     put :update, :id=>i.id,:investigation=>{:title=>"test"}
 
     assert_redirected_to investigation_path(i)
-    assert assigns(:investigation)
-    assert flash[:error]
-    assert_equal "Metabolomics Investigation",assigns(:investigation).title
   end
 
   test "should destroy investigation" do
+    i = Factory(:investigation, :contributor => User.current_user)
     assert_difference("Investigation.count",-1) do
-      delete :destroy, :id => investigations(:investigation_with_no_study).id
+      delete :destroy, :id => i.id
     end
     assert !flash[:error]
     assert_redirected_to investigations_path    
   end
 
-  test "non project member should not destroy investigation" do
-    login_as(:aaron)
+  test "unauthorized user should not destroy investigation" do
+    i = Factory(:investigation, :policy => Factory(:private_policy))
+    login_as(Factory(:user))
     assert_no_difference("Investigation.count") do
-      delete :destroy, :id => investigations(:investigation_with_no_study).id
+      delete :destroy, :id => i.id
     end
     assert flash[:error]
     assert_redirected_to investigations_path    
@@ -134,7 +147,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test "option to delete investigation without study" do    
-    get :show,:id=>investigations(:investigation_with_no_study).id
+    get :show,:id=>Factory(:investigation, :contributor => User.current_user).id
     assert_select "a",:text=>/Delete Investigation/,:count=>1
   end
 
@@ -143,12 +156,13 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Delete Investigation/,:count=>0
   end
 
-  test "no option to delete investigation for non project member" do
-    login_as(:aaron)
-    get :show,:id=>investigations(:investigation_with_no_study).id
+  test "no option to delete investigation when unauthorized" do
+    i = Factory :investigation, :policy => Factory(:private_policy)
+    login_as Factory(:user)
+    get :show,:id=>i.id
     assert_select "a",:text=>/Delete Investigation/,:count=>0
   end
-  
+
   def test_should_add_nofollow_to_links_in_show_page
     get :show, :id=> investigations(:investigation_with_links_in_description)    
     assert_select "div#description" do

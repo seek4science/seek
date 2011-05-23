@@ -1,6 +1,18 @@
-
+require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
+
+  def project
+    investigation.nil? ? nil : investigation.project
+  end
+
+  alias_attribute :contributor, :owner
+  acts_as_authorized
+
+  def default_contributor
+    User.current_user.try :person
+  end
+
 
   acts_as_taggable
 
@@ -56,16 +68,8 @@ class Assay < ActiveRecord::Base
     "#{title} (#{type})"
   end
 
-  def project
-    investigation.nil? ? nil : investigation.project
-  end
-
-  def can_edit? user
-    project.pals.include?(user.person) || user.person == owner
-  end
-
-  def can_delete? user
-    can_edit?(user) && assets.empty? && related_publications.empty?
+  def can_delete? user=nil
+    mixin_super(user) && assets.empty? && related_publications.empty?
   end
 
   #returns true if this is a modelling class of assay
@@ -80,7 +84,7 @@ class Assay < ActiveRecord::Base
   
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
-    assay_asset = assay_assets.select {|aa| aa.asset_id == asset.id}.first
+    assay_asset = assay_assets.select {|aa| aa.asset == asset}.first
 
     if assay_asset.nil?
       assay_asset = AssayAsset.new
@@ -118,11 +122,19 @@ class Assay < ActiveRecord::Base
   end
   
   def assets
-    (data_file_masters + model_masters + sop_masters).collect {|a| a.latest_version} |  (data_files + models + sops)
+    asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)
+  end
+
+  def asset_masters
+    data_file_masters + model_masters + sop_masters
   end
   
   def related_publications
     self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
+  end
+
+  def related_asset_ids asset_type
+    self.assay_assets.select {|a| a.asset_type == asset_type}.collect { |a| a.asset_id }
   end
 
   def avatar_key

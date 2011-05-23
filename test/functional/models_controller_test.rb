@@ -5,7 +5,8 @@ class ModelsControllerTest < ActionController::TestCase
   fixtures :all
   
   include AuthenticatedTestHelper
-  include RestTestCases  
+  include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     login_as(:model_owner)
@@ -89,13 +90,36 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash.now[:error]
   end
-  
+    test "associates assay" do
+    login_as(:model_owner) #can edit assay_can_edit_by_my_first_sop_owner
+    m = models(:teusink)
+    original_assay = assays(:assay_with_a_model)
+    asset_ids = original_assay.related_asset_ids 'Model'
+    assert asset_ids.include? m.id
+    new_assay=assays(:modelling_assay)
+    new_asset_ids = new_assay.related_asset_ids 'Model'
+    assert !new_asset_ids.include?(m.id)
+
+    put :update, :id => m, :model =>{}, :assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to model_path(m)
+    m.reload
+    original_assay.reload
+    new_assay.reload
+    assert !original_assay.related_asset_ids('Model').include?(m.id)
+    assert new_assay.related_asset_ids('Model').include?(m.id)
+    end
+
   test "should create model" do
+    login_as(:model_owner)
+    assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, :model => valid_model, :sharing=>valid_sharing
+      post :create, :model => valid_model, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
     end
     
     assert_redirected_to model_path(assigns(:model))
+    assay.reload
+    assert assay.related_asset_ids('Model').include? assigns(:model).id
   end
   
   def test_missing_sharing_should_default_to_private
@@ -114,7 +138,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal private_policy.access_type,model.policy.access_type
     assert_equal private_policy.use_whitelist,model.policy.use_whitelist
     assert_equal private_policy.use_blacklist,model.policy.use_blacklist
-    assert_equal false,model.policy.use_custom_sharing
     assert model.policy.permissions.empty?
     
     #check it doesn't create an error when retreiving the index
@@ -513,9 +536,39 @@ class ModelsControllerTest < ActionController::TestCase
     put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
     assert_redirected_to model_path(model)
     model.reload
-
     assert_equal "new title", model.title
     assert_equal Policy::NO_ACCESS, model.policy.access_type, "policy should have been updated"
+  end
+
+  test "owner should be able to choose policy 'share with everyone' when creating a model" do
+    model=valid_model
+    post :create, :model => model, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, :access_type_4=>Policy::VISIBLE}
+    assert_redirected_to model_path(assigns(:model))
+    assert_equal users(:model_owner),assigns(:model).contributor
+    assert assigns(:model)
+
+    model=assigns(:model)
+    assert_equal Policy::EVERYONE,model.policy.sharing_scope
+    assert_equal Policy::VISIBLE,model.policy.access_type
+    #check it doesn't create an error when retreiving the index
+    get :index
+    assert_response :success
+  end
+
+  test "owner should be able to choose policy 'share with everyone' when updating a model" do
+    login_as(:model_owner)
+    user = users(:model_owner)
+    model   = models(:model_with_links_in_description)
+    assert model.can_edit?(user), "model should be editable and manageable for this test"
+    assert model.can_manage?(user), "model should be editable and manageable for this test"
+    assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
+    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, :access_type_4=>Policy::VISIBLE}
+    assert_redirected_to model_path(model)
+    model.reload
+
+    assert_equal "new title", model.title
+    assert_equal Policy::EVERYONE, model.policy.sharing_scope, "policy should have been changed to everyone"
+    assert_equal Policy::VISIBLE, model.policy.access_type, "policy should have been updated to visible"
   end
 
   test "update with ajax only applied when viewable" do
@@ -564,21 +617,47 @@ class ModelsControllerTest < ActionController::TestCase
 
   end
 
+  test "do publish" do
+    model=models(:teusink)
+    assert model.can_manage?,"The sop must be manageable for this test to succeed"
+    post :publish,:id=>model
+    assert_redirected_to model
+    assert_nil flash[:error]
+    assert_not_nil flash[:notice]
+  end
+
+  test "do not publish if not can_manage?" do
+    login_as(:quentin)
+    model=models(:teusink)
+    assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
+    post :publish,:id=>model
+    assert_redirected_to model
+    assert_not_nil flash[:error]
+    assert_nil flash[:notice]
+  end
+
+  test "get preview_publish" do
+    model=models(:teusink)
+    assert model.can_manage?,"The sop must be manageable for this test to succeed"
+    get :preview_publish, :id=>model
+    assert_response :success
+  end
+
+  test "cannot get preview_publish when not manageable" do
+    login_as(:quentin)
+    model=models(:teusink)
+    assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
+    get :preview_publish, :id=>model
+    assert_redirected_to model
+    assert flash[:error]
+  end
+
   def valid_model
     { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project=>projects(:sysmo_project)}
   end
 
   def valid_model_with_url
     { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
-  end
-
-  def valid_sharing
-    {
-      :use_whitelist=>"0",
-      :user_blacklist=>"0",
-      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
-      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
-    }
   end
   
 end

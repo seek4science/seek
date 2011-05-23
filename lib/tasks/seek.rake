@@ -154,17 +154,17 @@ namespace :seek do
   desc 'removes any data this is not authorized to viewed by the first User'
   task(:remove_private_data=>:environment) do
     sops        =Sop.find(:all)
-    private_sops=sops.select { |s| !Authorization.is_authorized?("view", nil, s, User.first) }
+    private_sops=sops.select { |s| !s.can_view? User.first }
     puts "#{private_sops.size} private Sops being removed"
     private_sops.each { |s| s.destroy }
 
     models        =Model.find(:all)
-    private_models=models.select { |m| !Authorization.is_authorized?("view", nil, m, User.first) }
+    private_models=models.select { |m| ! m.can_view? User.first }
     puts "#{private_models.size} private Models being removed"
     private_models.each { |m| m.destroy }
 
     data        =DataFile.find(:all)
-    private_data=data.select { |d| !Authorization.is_authorized?("view", nil, d, User.first) }
+    private_data=data.select { |d| !d.can_view? User.first }
     puts "#{private_data.size} private Data files being removed"
     private_data.each { |d| d.destroy }
 
@@ -320,7 +320,7 @@ namespace :seek do
     count = 0
     Publication.all.each do |pub|
       if pub.asset.policy.nil?
-        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1)
         count            += 1
         pub.asset.save
       end

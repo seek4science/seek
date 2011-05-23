@@ -8,10 +8,10 @@ class StudiesControllerTest < ActionController::TestCase
   include RestTestCases
 
   def setup
-    login_as(:model_owner)
-    @object=studies(:metabolomics_study)
+    login_as(:quentin)
+    @object=Factory :study, :policy => Factory(:public_policy)
   end
-  
+
   test "should get index" do
     get :index
     assert_response :success
@@ -35,8 +35,29 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
-  test "should get new with investigation predefined" do
+  test "should get new with investigation predefined with project added if not member" do
+    #this scenario arose whilst fixing the test "should get new with investigation predefined"
+    #when passing the investigation_id, if that is editable but current_user is not a member, then the project of that investigation
+    #should be added to the list
     inv = investigations(:metabolomics_investigation)
+
+    assert inv.can_edit?,"model owner should be able to edit this investigation"
+    get :new, :investigation_id=>inv
+    assert_response :success
+
+    assert_select "select#project_id" do
+      assert_select "option[selected='selected'][value=?]",inv.project.id
+    end
+    assert_select "select#study_investigation_id" do
+      assert_select "option[selected='selected'][value=?]",inv.id
+    end
+  end
+
+  test "should get new with investigation predefined" do
+    login_as :model_owner
+    inv = investigations(:metabolomics_investigation)
+
+    assert inv.can_edit?,"model owner should be able to edit this investigation"
     get :new, :investigation_id=>inv
     assert_response :success
 
@@ -73,9 +94,9 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end  
   
-  test "shouldn't show edit for non-project member" do
-    login_as(:owner_of_fully_public_policy)
-    s = studies(:metabolomics_study)
+  test "shouldn't show edit for unauthorized users" do
+    s = Factory :study, :policy => Factory(:private_policy)
+    login_as(Factory(:user))
     get :edit, :id=>s
     assert_redirected_to study_path(s)
     assert flash[:error]
@@ -97,6 +118,21 @@ class StudiesControllerTest < ActionController::TestCase
     s=assigns(:study)
     assert_redirected_to study_path(s)
   end  
+
+  test "should update sharing permissions" do
+    login_as(Factory(:user))
+    s = Factory :study,:contributor => Factory(:person), :policy => Factory(:public_policy)
+    assert s.can_manage?(Factory(:user)),"This user should be able to manage this study"
+    
+    assert_equal Policy::MANAGING,s.policy.sharing_scope
+    assert_equal Policy::EVERYONE,s.policy.access_type
+
+    put :update,:id=>s,:study=>{:title=>"test"},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    s=assigns(:study)
+    assert_redirected_to study_path(s)
+    assert_equal Policy::PRIVATE,s.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS,s.policy.access_type
+  end
 
   test "should not create with assay already related to study" do
     assert_no_difference("Study.count") do
@@ -125,9 +161,10 @@ class StudiesControllerTest < ActionController::TestCase
     assert s.assays.include?(assays(:metabolomics_assay))
   end
 
-  test "no edit button in show for person not in project" do
-    login_as(:aaron)
-    get :show, :id=>studies(:metabolomics_study)
+  test "no edit button shown for people who can't edit the study" do
+    login_as Factory(:user)
+    study = Factory :study, :policy => Factory(:private_policy)
+    get :show, :id=>study
     assert_select "a",:text=>/Edit study/,:count=>0
   end
 
@@ -136,28 +173,23 @@ class StudiesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Edit study/,:count=>1
   end
 
-  test "study project member can't edit" do
-    login_as(:aaron)
-    s=studies(:metabolomics_study)
-    get :edit, :id=>s.id
-    assert_redirected_to study_path(s)
-    assert flash[:error]
-  end
 
-  test "study project member can't update" do
-    login_as(:aaron)
-    s=studies(:metabolomics_study)
+  test "unauthorized user can't update" do
+    s=Factory :study, :policy => Factory(:private_policy)
+    login_as(Factory(:user))
+    Factory :permission, :contributor => User.current_user, :policy=> s.policy, :access_type => Policy::VISIBLE
+
     put :update, :id=>s.id,:study=>{:title=>"test"}
 
     assert_redirected_to study_path(s)
-    assert assigns(:study)
     assert flash[:error]
-    assert_equal "A Metabolomics Study",assigns(:study).title
   end
 
-  test "study project member can delete if no assays" do
+  test "authorized user can delete if no assays" do
+    study = Factory(:study, :contributor => Factory(:person))
+    login_as study.contributor.user
     assert_difference('Study.count',-1) do
-      delete :destroy, :id => studies(:study_with_no_assays).id
+      delete :destroy, :id => study.id
     end    
     assert !flash[:error]
     assert_redirected_to studies_path
@@ -250,5 +282,7 @@ class StudiesControllerTest < ActionController::TestCase
     project=projects(:sysmo_project)
     get :index, :filter => {:project => project.id}
     assert_response :success
-  end  
+  end
+
+
 end

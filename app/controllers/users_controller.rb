@@ -1,9 +1,8 @@
 class UsersController < ApplicationController
-  
-  layout "logged_out", :except=>[:edit]
     
   before_filter :is_current_user_auth, :only=>[:edit, :update]  
   before_filter :is_user_admin_auth, :only => [:impersonate]
+  skip_before_filter :project_membership_required
   
   # render new.rhtml
   def new

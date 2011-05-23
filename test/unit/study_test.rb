@@ -25,21 +25,16 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal Study.find(:all).sort_by { |s| s.updated_at.to_i * -1 }, Study.find(:all)
   end
 
-  test "can_edit" do
-    study=studies(:metabolomics_study)
-    assert !study.can_edit?(users(:aaron))
-    assert study.can_edit?(users(:model_owner)) #model owner is a member of the sysmo-project
-  end
-
-  #only project members can delete a study, and a study must have no assays
+  #only authorized people can delete a study, and a study must have no assays
   test "can delete" do
-    study=studies(:study_with_no_assays)
-    assert !study.can_delete?(users(:aaron))
-    assert study.can_delete?(users(:model_owner)) #model owner is a member of the sysmo-project
+    project_member = Factory :person
+    study = Factory :study, :contributor => Factory(:person), :investigation => Factory(:investigation, :project => project_member.projects.first)
+    assert !study.can_delete?(Factory(:user))
+    assert !study.can_delete?(project_member.user)
+    assert study.can_delete?(study.contributor)
 
-    study=studies(:metabolomics_study)
-    assert !study.can_delete?(users(:aaron))
-    assert !study.can_delete?(users(:model_owner))
+    study=Factory :study, :contributor => Factory(:person), :assays => [Factory :assay]
+    assert !study.can_delete?(study.contributor)
   end
 
   test "sops through assays" do

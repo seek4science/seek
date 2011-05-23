@@ -1,12 +1,13 @@
-
+require 'acts_as_authorized'
 class Study < ActiveRecord::Base  
   acts_as_isa
 
   belongs_to :investigation
-  
-  has_many :assays
-  
   has_one :project, :through=>:investigation
+
+  acts_as_authorized
+
+  has_many :assays
 
   belongs_to :person_responsible, :class_name => "Person"
 
@@ -23,14 +24,10 @@ class Study < ActiveRecord::Base
   
   def sops
     assays.collect{|a| a.sops}.flatten.uniq
-  end 
-
-  def can_edit? user
-    user.person && user.person.projects.include?(project)
   end
 
-  def can_delete? user
-    assays.empty? && can_edit?(user)
+  def can_delete? user=nil
+    assays.empty? && mixin_super(user)
   end
 
 

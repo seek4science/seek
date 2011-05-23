@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :find_and_auth, :except =>  [ :index, :new, :create, :preview]
 
   before_filter :find_assets
@@ -26,7 +26,7 @@ class EventsController < ApplicationController
     @event = Event.new
     @new = true
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html {render "events/form"}
       else
         flash[:error] = "You are not authorized to create new Events. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -41,15 +41,13 @@ class EventsController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     data_file_ids.each do |text|
       a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
+      d = DataFile.find(a_id)
+      @event.data_files << d if d.can_view?
     end
     params.delete :data_file_ids
 
-    publication_ids = params[:related_publication_ids] || []
-    publication_ids.each do |id|
-      @event.publications << Publication.find(id)
-    end
-    params.delete :related_publication_ids
+    publication_ids = params.delete(:related_publication_ids) || []
+    @event.publications << Publication.find(publication_ids)
 
     respond_to do | format |
       if @event.save
@@ -79,16 +77,13 @@ class EventsController < ApplicationController
     @event.data_files = []
     data_file_ids.each do |text|
       a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
+      d = DataFile.find(a_id)
+      @event.data_files << d if d.can_view?
     end
     params.delete :data_file_ids
 
-    publication_ids = params[:related_publication_ids] || []
-    @event.publications = []
-    publication_ids.each do |id|
-      @event.publications << Publication.find(id)
-    end
-    params.delete :related_publication_ids
+    publication_ids = params.delete(:related_publication_ids) || []
+    @event.publications << Publication.find(publication_ids)
 
     respond_to do | format |
       if @event.update_attributes params[:event]
@@ -113,7 +108,7 @@ class EventsController < ApplicationController
     event=Event.find_by_id(params[:id])
 
     render :update do |page|
-      if event && Authorization.is_authorized?("show", nil, event, current_user)
+      if event.try :can_view?
         page.replace_html element,:partial=>"events/resource_list_item_preview",:locals=>{:resource=>event}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

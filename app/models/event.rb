@@ -1,9 +1,10 @@
 require 'acts_as_authorized'
 require 'grouped_pagination'
+require 'only_writes_unique'
 
 class Event < ActiveRecord::Base
-  has_and_belongs_to_many :data_files
-  has_and_belongs_to_many :publications
+  has_and_belongs_to_many :data_files, :unique => true
+  has_and_belongs_to_many :publications, :unique => true
 
   #TODO: refactor to something like 'sorted_by :start_date', which should create the default scope and the sort method. Maybe rename the sort method.
   default_scope :order => "#{self.table_name}.start_date DESC"

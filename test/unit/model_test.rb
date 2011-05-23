@@ -99,7 +99,6 @@ class ModelTest < ActiveSupport::TestCase
     assert_equal Policy::NO_ACCESS, model.policy.access_type
     assert_equal false,model.policy.use_whitelist
     assert_equal false,model.policy.use_blacklist
-    assert_equal false,model.policy.use_custom_sharing
     assert model.policy.permissions.empty?
   end
 
@@ -126,6 +125,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test "versions destroyed as dependent" do
     model=models(:teusink)
+    User.current_user = model.contributor
     assert_equal 2,model.versions.size,"There should be 2 versions of this Model"
     assert_difference("Model.count",-1) do
       assert_difference("Model::Version.count",-2) do
@@ -136,6 +136,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test "make sure content blob is preserved after deletion" do
     model = models(:teusink)
+    User.current_user = model.contributor
     assert_not_nil model.content_blob,"Must have an associated content blob for this test to work"
     cb=model.content_blob
     assert_difference("Model.count",-1) do
@@ -148,6 +149,7 @@ class ModelTest < ActiveSupport::TestCase
 
   test "is restorable after destroy" do
     model = models(:teusink)
+    User.current_user = model.contributor
     assert_difference("Model.count",-1) do
       model.destroy
     end
@@ -156,6 +158,15 @@ class ModelTest < ActiveSupport::TestCase
       Model.restore_trash!(model.id)
     end
     assert_not_nil Model.find_by_id(model.id)
+  end
+
+
+  test 'failing to delete due to can_delete does not create trash' do
+    model = Factory :model, :policy => Factory(:private_policy)
+    assert_no_difference("Model.count") do
+      model.destroy
+    end
+    assert_nil Model.restore_trash(model.id)
   end
   
   test "test uuid generated" do

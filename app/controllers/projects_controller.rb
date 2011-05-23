@@ -5,10 +5,11 @@ class ProjectsController < ApplicationController
   include IndexPager
   
   before_filter :find_assets, :only=>[:index]
-  before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update,:admin]
-  
+
+  skip_before_filter :project_membership_required
+
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
 
   def auto_complete_for_organism_name
@@ -101,19 +102,14 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new(params[:project])
 
+    @project.default_policy.set_attributes_with_sharing params[:sharing]
+
+
     respond_to do |format|
       if @project.save
-        
-        policy_err_msg = Policy.create_or_update_default_policy(@project, current_user, params)
-        
-        if policy_err_msg.blank?
-          flash[:notice] = 'Project was successfully created.'
-          format.html { redirect_to(@project) }
-          format.xml  { render :xml => @project, :status => :created, :location => @project }
-        else
-          flash[:notice] = "Project was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'projects', :id => @project, :action => "edit" }
-        end
+        flash[:notice] = 'Project was successfully created.'
+        format.html { redirect_to(@project) }
+        format.xml  { render :xml => @project, :status => :created, :location => @project }
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
@@ -130,20 +126,16 @@ class ProjectsController < ApplicationController
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
     avatar_id = params[:project].delete(:avatar_id).to_i
     @project.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
-    
+
+    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing] if params[:sharing]
+
     respond_to do |format|
       if @project.update_attributes(params[:project])
         
-        policy_err_msg = Policy.create_or_update_default_policy(@project, current_user, params)
-        
-        if policy_err_msg.blank?
-          flash[:notice] = 'Project was successfully updated.'
-          format.html { redirect_to(@project) }
-          format.xml  { head :ok }
-        else
-          flash[:notice] = "Project was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'projects', :id => @project, :action => "edit" }
-        end
+
+        flash[:notice] = 'Project was successfully updated.'
+        format.html { redirect_to(@project) }
+        format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
@@ -196,7 +188,7 @@ class ProjectsController < ApplicationController
 
   def editable_by_user
     @project = Project.find(params[:id])
-    unless current_user.is_admin? || @project.can_be_edited_by?(current_user)
+    unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end

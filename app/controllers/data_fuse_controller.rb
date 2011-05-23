@@ -10,9 +10,16 @@ class DataFuseController < ApplicationController
   include Seek::DataFuse
   
   before_filter :login_required
-  before_filter :is_user_admin_auth
+  #before_filter :is_user_admin_auth
 
   @@model_builder = Seek::JWS::OneStop.new
+
+  def graph_test
+    @csv_url = "http://jjj.mib.ac.uk/webMathematica/Examples/DataFuse/Plots/2011519124421594563original.csv"
+    respond_to do |format|
+      format.html 
+    end
+  end
 
   def data_file_csv
 
@@ -23,7 +30,7 @@ class DataFuseController < ApplicationController
     csv = spreadsheet_to_csv(open(data_file.content_blob.filepath),last_sheet,true)
 
     render :update do |page|
-      if data_file && Authorization.is_authorized?("download", nil, data_file, current_user)
+      if data_file.try :can_download?
         page.replace_html element, :partial=>"data_fuse/csv_view", :locals=>{:csv=>csv}
       else
         page.replace_html element, :text=>"Data File not found, or not authorized to examine"
@@ -51,7 +58,7 @@ class DataFuseController < ApplicationController
     params[:parameter_keys] ||= {}
 
     #FIXME: temporary way of making sure it isn't exploited to get at data. Should never get here if used through the UI
-    raise Exception.new("Unauthorized") unless Authorization.is_authorized?("download", nil, @model, current_user) && Authorization.is_authorized?("download", nil, @data_file, current_user)
+    raise Exception.new("Unauthorized") unless @model.can_download? && @data_file.can_download?
 
     @parameter_keys = params[:parameter_keys].keys
 
@@ -67,7 +74,7 @@ class DataFuseController < ApplicationController
     csv = spreadsheet_to_csv(open(data_file.content_blob.filepath),last_sheet_index,true)
 
     #FIXME: temporary way of making sure it isn't exploited to get at data. Should never get here if used through the UI
-    raise Exception.new("Unauthorized") unless Authorization.is_authorized?("download", nil, @model, current_user)
+    raise Exception.new("Unauthorized") unless @model.can_download?
 
     Seek::CSVHandler.resolve_model_parameter_keys parameter_keys,csv
     
@@ -109,7 +116,7 @@ class DataFuseController < ApplicationController
     ps=extract_model_parameters_and_values(model).keys
 
     render :update do |page|
-      if model && Authorization.is_authorized?("download", nil, model, current_user)
+      if model.try :can_download?
 
         page.replace_html element, :partial=>"data_fuse/parameter_keys", :locals=>{:keys=>ps}
       else

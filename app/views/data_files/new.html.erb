@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js","associate_events.js","associate_datafile_assays.js","attribution.js","resource.js" -%>
+<%= javascript_include_tag "sharing.js","associate_events.js","assays.js","attribution.js","resource.js" -%>
 
 <h1>New Data file</h1>
 <div class="show_basic">
@@ -30,7 +30,7 @@
             <% end -%>
         </p>
         <p>
-            <%= render :partial => "assays/associate_data_file_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
+            <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
         </p>
         <p>
             <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>

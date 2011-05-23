@@ -27,8 +27,8 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "authorization supported?" do
-    assert !Assay.authorization_supported?
-    assert !assays(:metabolomics_assay).authorization_supported?
+    assert Assay.authorization_supported?
+    assert assays(:metabolomics_assay).authorization_supported?
   end
 
   test "avatar_key" do
@@ -38,6 +38,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert !assay.is_modelling?
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.save!
@@ -57,6 +58,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_experimental" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert assay.is_experimental?
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.save!
@@ -125,10 +127,29 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "can delete?" do
-    assert assays(:assay_with_just_a_study).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_a_model).can_delete?(users(:model_owner))
+    user = User.current_user = Factory(:user)
+    assert Factory(:assay, :owner => user.person).can_delete?
+
+    assay = Factory(:assay, :owner => user.person)
+    assay.relate Factory(:data_file)
+    assert !assay.can_delete?
+
+    assay = Factory(:assay, :owner => user.person)
+    assay.relate Factory(:sop)
+    assert !assay.can_delete?
+
+    assay = Factory(:assay, :owner => user.person)
+    assay.relate Factory(:model)
+    assert !assay.can_delete?
+
+    pal = Factory :pal
+    #create an assay with project = to the project for which the pal is a pal
+    assay = Factory(:assay,
+                    :study => Factory(:study,
+                                      :investigation => Factory(:investigation,
+                                                                :project => (pal.projects.find {|p| p.pals.include? pal}))))
+    assert !assay.can_delete?(pal.user)
+    
     assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
   end
 
@@ -169,7 +190,8 @@ class AssayTest < ActiveSupport::TestCase
     assay.reload
     assert_equal 1,assay.assay_assets.size
     assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
-    
+
+    User.current_user = sop.contributor
     sop.save_as_new_version
     
     assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
@@ -194,6 +216,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "associate organism" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     organism=organisms(:yeast)
     #test with numeric ID
     assert_difference("AssayOrganism.count") do
@@ -224,6 +247,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "disassociating organisms removes AssayOrganism" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert_equal 2,assay.assay_organisms.count
     assert_difference("AssayOrganism.count",-2) do
       assay.assay_organisms.clear

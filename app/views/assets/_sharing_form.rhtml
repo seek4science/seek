@@ -14,7 +14,7 @@
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you can specify who can <b>see</b>, <b>download</b> and <b>edit</b> this #{@resource_type}.") -%>
+    <%= help_icon("Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") -%>
     Sharing
   </div>
 
@@ -22,17 +22,18 @@
 
     <div class="box_infotext">
       <p>
-        Here you can specify who can <b>view</b> the summary of, <b>get</b> access to the content of, and <b>edit</b> the <%= @resource_type -%>.
+        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type -%>.
         <%= link_to_function "More info " + expand_image, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3) -%>
       </p>
       <div id="more_sharing_info" class="box_simple" style="display: none;">        
           You may:
         <ul style="padding-left:1em;">
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
+          <li>Share with everyone</li>
 	      <li>Share with all other users, <em>including</em> those that are not a member of a <%= Seek::Config.project_name %> project.</li>
           <li>Share with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
           <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> By using custom sharing permissions you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
-        </ul>               
+        </ul>
       </div>
     </div>
 
@@ -50,6 +51,18 @@
 
 
     <p style="font-weight: bold; margin-top: 1em;">Or share it with..</p>
+
+    <!-- public -->
+    <p>
+      <label for="sharing_scope_<%= Policy::EVERYONE -%>">
+        <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
+               value="<%= Policy::EVERYONE -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::EVERYONE -%>);" />
+        - Everyone, for
+      </label>
+      <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
+        :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
+      <br/>
+    </p>
 
     <!-- all registered users -->
     <p>
@@ -189,7 +202,7 @@
                   <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
 
                   <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-                    <%= policy_selection_options [Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] -%>
+                    <%= policy_selection_options [Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING], @resource -%>
                   </select>
                 </div>
 
@@ -250,7 +263,7 @@
                     </div>
 
                     <select name="individual_people_access_type_select" id="individual_people_access_type_select" style="width: 344px; vertical-align: middle; margin-top: 0.3em;">
-                      <%= policy_selection_options -%>
+                      <%= policy_selection_options nil, @resource -%>
                     </select>
                   </td>
 
@@ -357,32 +370,33 @@
 
 
 <% @policy.permissions.each do |p| -%>
-  <% case p.contributor_type; when "FavouriteGroup", "Person", "Project", "Institution", "WorkGroup" -%>
-    <% unless p.contributor_type == "FavouriteGroup" && [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name) -%>
-        if('<%= p.contributor_type -%>' in permissions_for_set)
-        permissions_for_set['<%= p.contributor_type -%>']++;
-        else {
-          permissions_for_set['<%= p.contributor_type -%>'] = 0;
-          permission_settings['<%= p.contributor_type -%>'] = new Array();
-        }
-      <% allow_removal=true -%>
-      <% if p.contributor_type == "Person" -%>
-        <%
-        contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
-        allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
-        -%>
-      <% elsif p.contributor_type == "WorkGroup" -%>
-        <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
-      <% else -%>
-        <% contributor_name = p.contributor.name -%>
+  <% unless p.marked_for_destruction? %>
+      <% case p.contributor_type; when "FavouriteGroup", "Person", "Project", "Institution", "WorkGroup" -%>
+        <% unless p.contributor_type == "FavouriteGroup" && [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name) -%>
+            if('<%= p.contributor_type -%>' in permissions_for_set)
+            permissions_for_set['<%= p.contributor_type -%>']++;
+            else {
+              permissions_for_set['<%= p.contributor_type -%>'] = 0;
+              permission_settings['<%= p.contributor_type -%>'] = new Array();
+            }
+          <% allow_removal=true -%>
+          <% if p.contributor_type == "Person" -%>
+            <%
+            contributor_name = (p.contributor.first_name + " " + p.contributor.last_name)
+            allow_removal = !prevent_manager_removal(@resource,p) if p.access_type==Policy::MANAGING
+            -%>
+          <% elsif p.contributor_type == "WorkGroup" -%>
+            <% contributor_name = p.contributor.project.name + " @ " + p.contributor.institution.name -%>
+          <% else -%>
+            <% contributor_name = p.contributor.name -%>
+          <% end -%>
+            // add current values into the associative array of permissions:
+            // first index is the category of contributor type of the permission, the second - consecutive
+            // number of occurrences of permissions for such type of contributor
+            permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
+              ['<%= contributor_name -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
+        <% end -%>
       <% end -%>
-
-        // add current values into the associative array of permissions:
-        // first index is the category of contributor type of the permission, the second - consecutive
-        // number of occurrences of permissions for such type of contributor
-        permission_settings['<%= p.contributor_type -%>'][permissions_for_set['<%= p.contributor_type -%>']] =
-          ['<%= contributor_name -%>', <%= p.contributor_id -%>, <%= p.access_type -%>, <%= allow_removal -%> ];
-    <% end -%>
   <% end -%>
 <% end -%>
 

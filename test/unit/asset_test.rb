@@ -39,4 +39,45 @@ class AssetTest < ActiveSupport::TestCase
     assert result["DataFile"].include?(data_file)
   end
 
+  test "is publishable" do
+    assert Factory(:sop).is_publishable?
+    assert Factory(:model).is_publishable?
+    assert Factory(:data_file).is_publishable?
+    assert !Factory(:assay).is_publishable?
+    assert !Factory(:investigation).is_publishable?
+    assert !Factory(:study).is_publishable?
+    assert !Factory(:event).is_publishable?
+    assert !Factory(:publication).is_publishable?
+  end
+
+  test "managers" do
+    person=Factory(:person)
+    person2=Factory(:person,:first_name=>"fred",:last_name=>"bloggs")
+    user=Factory(:user)
+    sop=Factory(:sop,:contributor=>person)
+    assert_equal 1,sop.managers.count
+    assert sop.managers.include?(person)
+
+    df=Factory(:data_file,:contributor=>user)
+    assert_equal 1,df.managers.count
+    assert df.managers.include?(user.person)
+
+    policy=Factory(:private_policy)
+    policy.permissions << Factory(:permission, :contributor => user, :access_type => Policy::MANAGING, :policy => policy)
+    policy.permissions << Factory(:permission, :contributor => person, :access_type => Policy::EDITING, :policy => policy)
+    assay=Factory(:assay,:policy=>policy,:owner=>person2)
+    assert_equal 2,assay.managers.count
+    assert assay.managers.include?(user.person)
+    assert assay.managers.include?(person2)
+
+    #this is liable to change when Project contributors are handled
+    p1=Factory(:project)
+    p2=Factory(:project)
+    policy=Factory(:private_policy)
+    policy.permissions << Factory(:permission, :contributor => p1, :access_type => Policy::MANAGING, :policy => policy)
+    model=Factory(:model,:policy=>policy,:contributor=>p2)
+    assert model.managers.empty?
+  end
+
+
 end

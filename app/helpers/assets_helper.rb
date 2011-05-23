@@ -192,17 +192,17 @@ module AssetsHelper
     end
     
     #Authorize
-    ["Sop","Model","DataFile","Event"].each do |asset_type|
-      unless related[asset_type][:items].empty?
-        total_count = related[asset_type][:items].size
-        related[asset_type][:items] = Asset.classify_and_authorize_homogeneous_resources(related[asset_type][:items], true, current_user)
-        related[asset_type][:hidden_count] = total_count - related[asset_type][:items].size
+    related.each_value do |resource_hash|
+      resource_hash[:items].compact!
+      unless resource_hash[:items].empty?
+        total_count = resource_hash[:items].size
+        resource_hash[:items] = resource_hash[:items].select &:can_view?
+        resource_hash[:hidden_count] = total_count - resource_hash[:items].size
       end
     end    
     
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      related[key][:items] = related[key][:items].compact
       if limit && related[key][:items].size > limit && ["Project","Investigation","Study","Assay","Person"].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]        
@@ -213,26 +213,21 @@ module AssetsHelper
   end
   
   def filter_url(resource_type, context_resource)
-    filter_text = ""
-    case context_resource.class.name
-      when "Project"
-        filter_text = "(:filter => {:project => #{context_resource.id}},:page=>'all')"
-      when "Investigation"
-        filter_text = "(:filter => {:investigation => #{context_resource.id}},:page=>'all')"#
-      when "Study"
-        filter_text = "(:filter => {:study => #{context_resource.id}},:page=>'all')"
-      when "Assay"
-        filter_text = "(:filter => {:assay => #{context_resource.id}},:page=>'all')"
-      when "Person"
-        filter_text = "(:filter => {:person => #{context_resource.id}},:page=>'all')"
-    end
-    return eval("#{resource_type.underscore.pluralize}_path" + filter_text)
+    #For example, if context_resource is a project with an id of 1, filter text is "(:filter => {:project => 1}, :page=>'all')"
+    filter_text = "(:filter => {:#{context_resource.class.name.downcase} => #{context_resource.id}},:page=>'all')"
+    eval("#{resource_type.underscore.pluralize}_path" + filter_text)
   end
 
   #provides a list of assets, according to the class, that are authorized to 'show'
   def authorised_assets asset_class
     assets=asset_class.find(:all)
-    Authorization.authorize_collection("show",assets,current_user)
+    Authorization.authorize_collection("view",assets,current_user)
+  end
+
+  def asset_buttons asset,version=nil,delete_confirm_message=nil
+     human_name = text_for_resource asset
+     delete_confirm_message ||= "This deletes the #{human_name} and all metadata. Are you sure?"
+     render :partial=>"assets/asset_buttons",:locals=>{:asset=>asset,:version=>version,:human_name=>human_name,:delete_confirm_message=>delete_confirm_message}
   end
 
 end

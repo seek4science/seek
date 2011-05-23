@@ -36,6 +36,7 @@ public/help_images/*
 Gemfile.lock
 vendor/bundle/
 tmp/restart.txt
+tmp/*-graph.html
 
 
 syntax: regexp
