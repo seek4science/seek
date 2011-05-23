@@ -18,6 +18,8 @@ class AssetTest < ActiveSupport::TestCase
     model.contributor = nil
     model.save!
     assert_equal nil,model.contributor
+    model = Model.find(model.id)
+    assert_equal nil,model.contributor
   end
 
   test "classifying and authorizing resources" do
