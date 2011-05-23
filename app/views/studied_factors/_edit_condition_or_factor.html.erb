@@ -65,6 +65,6 @@
     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "#{object.id}_substance", :resource => object}%>
   </div>
   </div>
-  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor#{object.id}_form')"%>
+  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"%>
 
 <% end -%>

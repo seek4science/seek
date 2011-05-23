@@ -21,7 +21,7 @@
         <li>
           <%= image_tag_for_key('download', polymorphic_path(asset,:version=>version,:action=>:download), "Download #{human_name}", nil, "Download #{human_name}") -%>
         </li>
-      <% else -%>
+      <% elsif logged_in? -%>
         <li>
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
         </li>
