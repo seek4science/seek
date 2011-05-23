@@ -88,6 +88,7 @@
 <div id="add_organism_form">
 <%= render :partial=>"assays/select_organisms" -%>
 </div>
+
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
 <%  if @assay.is_modelling? -%>
@@ -168,9 +169,10 @@
       }
       else {
           Effect.Fade('add_organism_form');
+          clearList('assay_organism_ids');
       }
 
 
   }
-
+   check_add_organism_form();
 </script>
