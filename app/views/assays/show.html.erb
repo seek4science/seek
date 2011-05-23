@@ -74,12 +74,20 @@
 
      <p id="specimen">
        <b>Specimen: </b>
-       <%= text_or_not_specified @assay.sample.try(:specimen).try(:title) -%>
+       <% if !@assay.sample.nil? %>
+            <%= link_to @assay.sample.specimen.try(:title) , @assay.sample.specimen %>
+       <% else %>
+          <span class='none_text'>Not Specified</span>
+       <% end %>
      </p>
 
      <p id="Sample">
        <b>Sample: </b>
-       <%= text_or_not_specified @assay.sample.try(:title) -%>
+       <% if !@assay.sample.nil? %>
+       <%= link_to @assay.sample.try(:title),@assay.sample -%>
+        <% else %>
+          <span class='none_text'>Not Specified</span>
+       <% end %>
      </p>
 
       <style type="text/css">
