@@ -166,8 +166,11 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
+                    <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
 					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
 						maxOccurs="1"></xsd:element>
+                    <xsd:element name="submitter" type="Submitter"
+						minOccurs="1" maxOccurs="1"></xsd:element>
                     <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
 					<xsd:element name="project" type="ProjectItem"
 						maxOccurs="1" minOccurs="1"></xsd:element>
@@ -209,6 +212,7 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
+                    <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
 					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
 						maxOccurs="1" />
 				</xsd:sequence>
