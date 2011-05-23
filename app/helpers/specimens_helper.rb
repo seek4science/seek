@@ -3,7 +3,9 @@ module SpecimensHelper
    def specimen_organism_title specimen
      title = ""
      unless specimen.nil?
+       if specimen.organism
        title = specimen.organism.try(:title)
+       end
        if specimen.strain
          title += ": #{specimen.strain.try(:title)}"
        end

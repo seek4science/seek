@@ -49,7 +49,7 @@ class Specimen < ActiveRecord::Base
   #culture_growth should be the culture growth instance
   def associate_organism(organism,strain_title=nil,culture_growth_type=nil)
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
-    self.organism_id = organism
+    self.organism = organism
     strain=nil
     if (strain_title && !strain_title.empty?)
       strain=organism.strains.find_by_title(strain_title)
