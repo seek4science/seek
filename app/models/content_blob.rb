@@ -96,7 +96,7 @@ class ContentBlob < ActiveRecord::Base
     unless @tmp_io_object.nil?
       begin
         logger.info "Moving #{@tmp_io_object.path} to #{filepath}"
-        @tmp_io_object.flush
+        @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
         FileUtils.mv @tmp_io_object.path, filepath
         @tmp_io_object = nil
       rescue Exception => e
