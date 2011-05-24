@@ -689,6 +689,21 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Request file/,:count=>0
   end
 
+=begin
+  test "should create sharing permissions within your project and with all SysMO members" do
+    login_as(:quentin)
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_-1"=>Policy::VISIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT}
+      end
+    end
+    df=assigns(:data_file)
+    assert_redirected_to data_file_path(df)
+    assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    assert_equal Policy::VISIBLE, df.policy.access_type
+  end
+=end
+
   private
   
   def valid_data_file
