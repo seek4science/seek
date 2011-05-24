@@ -52,11 +52,10 @@ class SamplesController < ApplicationController
       if @sample.update_attributes params[:sample]
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
-          p "### #{t_id}: #{t_title}"
           @sample.associate_tissue_and_cell_type(t_id, t_title)
         end
 
-          flash[:notice] = 'Sample was successfully created.'
+          flash[:notice] = 'Sample was successfully updated.'
           format.html { redirect_to(@sample) }
           format.xml { head :ok }
 
