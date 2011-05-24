@@ -35,7 +35,7 @@ class Sample < ActiveRecord::Base
   end
   def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
        tissue_and_cell_type=nil
-    if tissue_and_cell_type_title && !tissue_and_cell_type_title.empty?
+    if tissue_and_cell_type_title.blank?
       if ( tissue_and_cell_type_id =="0" )
           found = TissueAndCellType.find(:first,:conditions => {:title => tissue_and_cell_type_title})
           unless found
@@ -44,19 +44,25 @@ class Sample < ActiveRecord::Base
       else
           tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
       end
-    end
-   if !tissue_and_cell_type.nil?
-     existing = false
-     self.tissue_and_cell_types.each do |t|
-       if t == tissue_and_cell_type
-         existing = true
-         break
+
+      if !tissue_and_cell_type.nil?
+       existing = false
+       self.tissue_and_cell_types.each do |t|
+         if t == tissue_and_cell_type
+           existing = true
+           break
+         end
        end
-     end
-     unless existing
-       self.tissue_and_cell_types << tissue_and_cell_type
-     end
-   end
+       unless existing
+         self.tissue_and_cell_types << tissue_and_cell_type
+       end
+      end
+
+      if tissue_and_cell_type_id.blank?
+          self.tissue_and_cell_types =nil
+      end
+    end
+
 
 
   end

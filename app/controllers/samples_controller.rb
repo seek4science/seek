@@ -50,10 +50,15 @@ class SamplesController < ApplicationController
       respond_to do |format|
 
       if @sample.update_attributes params[:sample]
-        tissue_and_cell_types.each do |t|
+        if tissue_and_cell_types.blank?
+          @sample.tissue_and_cell_types= tissue_and_cell_types
+        else
+           tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
         end
+        end
+
 
           flash[:notice] = 'Sample was successfully updated.'
           format.html { redirect_to(@sample) }
