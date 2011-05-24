@@ -45,7 +45,7 @@ class EventsController < ApplicationController
     publication_ids = params.delete(:related_publication_ids) || []
     @event.publications = Publication.find(publication_ids)
 
-    @event.policy.set_attributes_with_sharing params[:sharing]
+    @event.policy.set_attributes_with_sharing params[:sharing], @event.project
 
     respond_to do | format |
       if @event.save
@@ -71,13 +71,15 @@ class EventsController < ApplicationController
     publication_ids = params.delete(:related_publication_ids) || []
     @event.publications = Publication.find(publication_ids)
 
+    @event.attributes = params[:event]
+
     if params[:sharing]
       @event.policy_or_default
-      @event.policy.set_attributes_with_sharing params[:sharing]
+      @event.policy.set_attributes_with_sharing params[:sharing], @event.project
     end
 
     respond_to do | format |
-      if @event.update_attributes params[:event]
+      if @event.save
         flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
         format.html { redirect_to @event }
       else

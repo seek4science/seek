@@ -38,7 +38,7 @@ class AssaysController < ApplicationController
 
     @assay.owner=current_user.person
 
-    @assay.policy.set_attributes_with_sharing params[:sharing]
+    @assay.policy.set_attributes_with_sharing params[:sharing], @assay.project
 
     respond_to do |format|
       if @assay.save
@@ -87,12 +87,14 @@ class AssaysController < ApplicationController
     update_tags @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
-
-    @assay.policy_or_default if params[:sharing]
-    @assay.policy.try :set_attributes_with_sharing, params[:sharing]
+    @assay.attributes = params[:assay]
+    if params[:sharing]
+      @assay.policy_or_default
+      @assay.policy.set_attributes_with_sharing params[:sharing], @assay.project
+    end
 
     respond_to do |format|
-      if @assay.update_attributes(params[:assay])
+      if @assay.save
         data_file_ids.each do |text|
           a_id, r_type = text.split(",")
           d = DataFile.find(a_id)

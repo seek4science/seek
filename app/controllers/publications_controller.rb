@@ -54,10 +54,9 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(params[:publication])
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
-    
+
     result = get_data(@publication, @publication.pubmed_id, @publication.doi)
     assay_ids = params[:assay_ids] || []
-    @publication.contributor = current_user    
     respond_to do |format|
       if @publication.save
         result.authors.each do |author|

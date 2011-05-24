@@ -61,20 +61,14 @@ class Policy < ActiveRecord::Base
   end
 
   def self.new_for_upload_tool(resource, recipient)
-    policy = resource.create_policy(:name               => 'auto',
+    policy = resource.build_policy(:name               => 'auto',
                                     :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
                                     :access_type        => Policy::NO_ACCESS)
-    policy.permissions.create :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
+    policy.permissions.build :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
     return policy
   end
 
-  def self.create_or_update_policy  resource, user, params
-    resource.policy = (resource.policy || Policy.new).set_attributes_with_sharing(params[:sharing])
-    resource.save
-    resource.errors.full_messages.join('\n')
-  end
-
-  def set_attributes_with_sharing sharing
+  def set_attributes_with_sharing sharing, project
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     returning self do |policy|

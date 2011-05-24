@@ -122,7 +122,7 @@ class StudiesControllerTest < ActionController::TestCase
   test "should update sharing permissions" do
     login_as(Factory(:user))
     s = Factory :study,:contributor => Factory(:person), :policy => Factory(:public_policy)
-    assert s.can_manage?(Factory(:user)),"This user should be able to manage this study"
+    assert s.can_manage?(User.current_user),"This user should be able to manage this study"
     
     assert_equal Policy::MANAGING,s.policy.sharing_scope
     assert_equal Policy::EVERYONE,s.policy.access_type
