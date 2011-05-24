@@ -9,7 +9,7 @@ module RestTestCases
   SCHEMA_FILE_PATH = File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
 
   def run_rest_tests?
-    run_secondary_tests?
+    true
   end
   
   def test_index_xml
@@ -50,8 +50,7 @@ module RestTestCases
     begin
       document.validate_schema(schema)
     rescue LibXML::XML::Error => e
-      result = false      
-      display_xml xml
+      result = false            
       assert false,"Error validating against schema: #{e.message}"
     end
   

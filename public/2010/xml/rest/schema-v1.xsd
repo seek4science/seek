@@ -4,12 +4,14 @@
 	elementFormDefault="qualified" xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/">
 
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd" />
 	<xsd:import namespace="http://purl.org/dc/elements/1.1/"
 		schemaLocation="dc.xsd" />
 	<xsd:import namespace="http://purl.org/dc/terms/"
 		schemaLocation="dcterms.xsd" />
 	<xsd:import namespace="http://www.w3.org/1999/xlink"
 		schemaLocation="xlink.xsd" />
+
 
 	<xsd:complexType name="ResourceLink">
 		<xsd:attribute ref="xlink:href" use="required"></xsd:attribute>
@@ -164,8 +166,11 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
+                    <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
 					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
 						maxOccurs="1"></xsd:element>
+                    <xsd:element name="submitter" type="Submitter"
+						minOccurs="1" maxOccurs="1"></xsd:element>
                     <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
 					<xsd:element name="project" type="ProjectItem"
 						maxOccurs="1" minOccurs="1"></xsd:element>
@@ -207,6 +212,7 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
+                    <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
 					<xsd:element name="uuid" type="xsd:string" minOccurs="1"
 						maxOccurs="1" />
 				</xsd:sequence>
@@ -548,8 +554,11 @@
 		<xsd:complexContent>
 			<xsd:extension base="MinimalType">
 				<xsd:sequence>
+                  <xsd:element ref="dc:creator" maxOccurs="1" minOccurs="0"></xsd:element>
                                     <xsd:element name="uuid" type="xsd:string" minOccurs="1"
 						maxOccurs="1"></xsd:element>
+                        <xsd:element name="submitter" type="Submitter"
+						minOccurs="1" maxOccurs="1"></xsd:element>
                                     <xsd:element name="project" type="ProjectItem" minOccurs="1"
 						maxOccurs="1" nillable="true"></xsd:element>
                                     <xsd:element name="start_date" minOccurs="1"

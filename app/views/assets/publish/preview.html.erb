@@ -1,3 +1,36 @@
+<style>
+  ul.publishing_options {
+      padding-left: 1em;
+  }
+
+  ul.publishing_options li.type_and_title {
+      font-weight:bolder;
+  }
+
+  ul.publishing_options li.title {
+      font-weight:bolder;
+  }
+
+  ul.publishing_options li.secondary {
+      padding-left: 1em;
+  }
+
+  ul.publishing_options li.owned {
+      color: green;
+  }
+
+  ul.publishing_options li.protected {
+      color: orangered;
+  }
+
+<%
+
+studies = @asset.assays.collect(&:study).uniq
+investigations = studies.collect(&:investigation).uniq
+
+-%>
+
+</style>
 <div class="show_basic">
 
   <h1>Publishing the <%= asset_type_name -%> '<%= @asset.title -%>' and related items. </h1>
@@ -6,27 +39,48 @@
     Some text about what publishing is and what you need to do.
   </p>
 
-  <% form_tag :action=>:publish do -%>
+  <p>
+    You are about to publish the <%= "#{asset_type_name} '#{link_to @asset.title,@asset}'" -%>. <br/>
+    Below are the other entries in SEEK related to this item.
+  </p>
 
-      <ul class="publish_assays">
+  <% form_tag :action=>:publish do -%>
+      <%= hidden_field_tag "#{@asset.class.name}[#{@asset.id}]",1 -%>
+      <h2>Assays related to this <%= asset_type_name -%> and the other assets.</h2>
+      <ul class="publishing_options">
         <% if @asset.assays.empty? -%>
             <span class="none_text">There are no Assays related to this <%= asset_type_name -%>.</span>
         <% else -%>
 
             <% @asset.assays.each do |assay| -%>
 
-                <%= render :partial=>"assets/publish/options_for", :object=>assay, :locals=>{:html_classes=>"publish_assay"} -%>
-
-                <%= render :partial=>"assets/publish/options_for", :object=>assay.study, :locals=>{:html_classes=>"publish_study"} -%>
-
-                <%= render :partial=>"assets/publish/options_for", :object=>assay.study.investigation, :locals=>{:html_classes=>"publish_investigation"} -%>
-
-                <%= render :partial=>"assets/publish/options_for", :collection=>(assay.asset_masters - [@asset]), :locals=>{:html_classes=>"publish_assay_assets"} -%>
-
+                <%= render :partial=>"assets/publish/options_for", :object=>assay, :locals=>{:html_classes=>"publishing_options"} -%>
+                <div style="padding-left: 1em;">
+                <%= render :partial=>"assets/publish/options_for", :collection=>(assay.asset_masters - [@asset]), :locals=>{:html_classes=>"publishing_options"} -%>
+                </div>
             <% end -%>
 
         <% end -%>
+      </ul>
 
+      <h2>Studies related to this <%= asset_type_name -%></h2>
+      <ul>
+        <% if studies.empty? -%>
+            <span class="none_text">There are no Studies related to this <%= asset_type_name -%>.</span>
+        <% else -%>
+
+            <%= render :partial=>"assets/publish/options_for", :collection=>studies, :locals=>{:html_classes=>"publishing_options"} -%>
+        <% end -%>
+      </ul>
+      
+      <h2>Investigations related to this <%= asset_type_name -%></h2>
+      <ul>
+        <% if investigations.empty? -%>
+            <span class="none_text">There are no Investigations related to this <%= asset_type_name -%>.</span>
+        <% else -%>
+
+            <%= render :partial=>"assets/publish/options_for", :collection=>investigations, :locals=>{:html_classes=>"publishing_options"} -%>
+        <% end -%>
       </ul>
 
       <%= submit_tag "Submit",:disable_with=>"Submitting ..." -%>

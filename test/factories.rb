@@ -133,6 +133,7 @@
     f.title "A Data File"
     f.association :project
     f.association :contributor, :factory => :user
+    f.association :content_blob, :factory => :content_blob
   end
 
 #Model
@@ -176,4 +177,8 @@
     f.title "An Event"
     f.start_date Time.now
     f.end_date 1.days.from_now
+  end
+
+  Factory.define(:content_blob) do |f|
+    f.uuid UUIDTools::UUID.random_create.to_s
   end

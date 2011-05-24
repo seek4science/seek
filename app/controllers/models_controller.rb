@@ -391,16 +391,14 @@ class ModelsController < ApplicationController
   def create    
     if handle_data
       @model = Model.new(params[:model])
-      @model.contributor = current_user
       @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
+
+      @model.policy.set_attributes_with_sharing params[:sharing], @model.project
 
       update_tags @model
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
-          # the Model was saved successfully, now need to apply policy / permissions settings to it
-          policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
-          
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
@@ -410,13 +408,8 @@ class ModelsController < ApplicationController
           #Add creators
           AssetsCreator.add_or_update_creator_list(@model, params[:creators])
           
-          if policy_err_msg.blank?
-            flash[:notice] = 'Model was successfully uploaded and saved.'
-            format.html { redirect_to model_path(@model) }
-          else
-            flash[:notice] = "Model was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
-          end
+          flash[:notice] = 'Model was successfully uploaded and saved.'
+          format.html { redirect_to model_path(@model) }
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
               assay.relate(@model)
@@ -457,12 +450,17 @@ class ModelsController < ApplicationController
 
     update_tags @model
 
+    @model.attributes = params[:model]
+
+    if params[:sharing]
+      @model.policy_or_default
+      @model.policy.set_attributes_with_sharing params[:sharing], @model.project
+    end
+
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
-      if @model.update_attributes(params[:model])
-        # the Model was updated successfully, now need to apply updated policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@model, current_user, params)
-        
+      if @model.save
+
         # update attributions
         Relationship.create_or_update_attributions(@model, params[:attributions])
         
@@ -472,13 +470,8 @@ class ModelsController < ApplicationController
         #update creators
         AssetsCreator.add_or_update_creator_list(@model, params[:creators])
         
-        if policy_err_msg.blank?
-          flash[:notice] = 'Model metadata was successfully updated.'
-          format.html { redirect_to model_path(@model) }
-        else
-          flash[:notice] = "Model metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'models', :id => @model, :action => "edit" }
-        end
+        flash[:notice] = 'Model metadata was successfully updated.'
+        format.html { redirect_to model_path(@model) }
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?

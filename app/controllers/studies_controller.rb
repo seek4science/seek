@@ -51,18 +51,18 @@ class StudiesController < ApplicationController
   def update
     @study=Study.find(params[:id])
 
-    respond_to do |format|
-      if @study.update_attributes(params[:study])
-        policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
+    @study.attributes = params[:study]
 
-        if policy_err_msg.blank?
-          flash[:notice] = 'Study was successfully updated.'
-          format.html { redirect_to(@study) }
-          format.xml  { head :ok }
-        else
-          flash[:notice] = "Study metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to study_edit_path(@study) }
-        end
+    if params[:sharing]
+      @study.policy_or_default
+      @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+    end
+
+    respond_to do |format|
+      if @study.save
+        flash[:notice] = 'Study was successfully updated.'
+        format.html { redirect_to(@study) }
+        format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }
@@ -84,20 +84,13 @@ class StudiesController < ApplicationController
 
   def create
     @study = Study.new(params[:study])
-    @study.person_responsible = current_user.person unless @study.person_responsible
-    
+
+    @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+
     respond_to do |format|
       if @study.save
-
-        policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
-
-        if policy_err_msg.blank?
-          format.html { redirect_to(@study) }
-          format.xml { render :xml => @study, :status => :created, :location => @study }
-        else
-          flash[:notice] = "Study metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to study_edit_path(@study) }
-        end
+        format.html { redirect_to(@study) }
+        format.xml { render :xml => @study, :status => :created, :location => @study }
       else
         format.html {render :action=>"new"}
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }

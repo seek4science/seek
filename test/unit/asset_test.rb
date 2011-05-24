@@ -11,6 +11,17 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal [DataFile,Model,Publication,Sop,Assay,Investigation,Study,Event],creatables
   end
 
+  test "default contributor or nil" do
+    User.current_user = users(:owner_of_my_first_sop)
+    model = Model.new :title=>"A model",:project=>projects(:sysmo_project)
+    assert_equal users(:owner_of_my_first_sop),model.contributor
+    model.contributor = nil
+    model.save!
+    assert_equal nil,model.contributor
+    model = Model.find(model.id)
+    assert_equal nil,model.contributor
+  end
+
   test "classifying and authorizing resources" do
     resource_array = []
     sop=sops(:my_first_sop)

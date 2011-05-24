@@ -28,19 +28,12 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-    @investigation.contributor = current_user
+    @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
     respond_to do |format|
       if @investigation.save
-        policy_err_msg = Policy.create_or_update_policy(@investigation, current_user, params)
-
-        if policy_err_msg.blank?
-          flash[:notice] = 'The Investigation was successfully created.'
-          format.html { redirect_to(@investigation) }
-          format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
-        else
-          flash[:notice] = "Investigation metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to investigation_edit_path(@investigation) }
-        end
+        flash[:notice] = 'The Investigation was successfully created.'
+        format.html { redirect_to(@investigation) }
+        format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
       else
         format.html { render :action => "new" }
         format.xml { render :xml => @investigation.errors, :status => :unprocessable_entity }
@@ -68,17 +61,18 @@ class InvestigationsController < ApplicationController
   def update
     @investigation=Investigation.find(params[:id])
 
+    @investigation.attributes = params[:investigation]
+
+    if params[:sharing]
+      @investigation.policy_or_default
+      @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
+    end
+
     respond_to do |format|
-      if @investigation.update_attributes(params[:investigation])
-        policy_err_msg = Policy.create_or_update_policy(@investigation, current_user, params)
-        if policy_err_msg.blank?
-          flash[:notice] = 'Investigation was successfully updated.'
-          format.html { redirect_to(@investigation) }
-          format.xml  { head :ok }
-        else
-          flash[:notice] = "Investigation metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to investigation_edit_path(@investigation) }
-        end
+      if @investigation.save
+        flash[:notice] = 'Investigation was successfully updated.'
+        format.html { redirect_to(@investigation) }
+        format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @investigation.errors, :status => :unprocessable_entity }
