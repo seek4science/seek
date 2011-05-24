@@ -1,2 +1,16 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+experimental_condition_concentration_glucose:
+  measured_item: concentration
+  unit: gram
+  start_value: 1
+  end_value: 8
+  sop: editable_sop
+  substance: compound_glucose
+  substance_type: Compound
 
+experimental_condition_time:
+  measured_item: time
+  unit: second
+  start_value: 1
+  end_value: 8
+  sop: editable_sop

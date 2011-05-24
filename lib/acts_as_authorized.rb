@@ -129,7 +129,7 @@ module Acts #:nodoc:
       end
 
       def contributor_or_default_if_new
-        if self.new_record? and contributor.nil?
+        if self.new_record? && contributor.nil?
           self.contributor = default_contributor
         end
       end

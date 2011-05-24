@@ -9,7 +9,7 @@ module ApiHelper
   def xml_root_attributes
     { "xmlns" => "http://www.sysmo-db.org/2010/xml/rest",
       "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
-      "xsi:schemaLocation" => "http://www.sysmo-db.org/2010/xml/rest http://www.sysmo-db.org/2010/xml/rest/schema-v1.xsd",
+      "xsi:schemaLocation" => "http://www.sysmo-db.org/2010/xml/rest/schema-v1.xsd",
       "xmlns:xlink" => "http://www.w3.org/1999/xlink",
       "xmlns:dc" => "http://purl.org/dc/elements/1.1/",
       "xmlns:dcterms" => "http://purl.org/dc/terms/" }
@@ -177,9 +177,9 @@ module ApiHelper
           builder.tag! "version",core_xlink(v)
         end
       end
-    end    
+    end
     
-    policy_xml builder,object if current_user.person.is_admin? && object.respond_to?("policy")
+    policy_xml builder,object if try_block{current_user.person.is_admin?} && object.respond_to?("policy")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
     if object.respond_to?("project")
       if object.project
