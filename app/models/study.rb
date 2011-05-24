@@ -26,8 +26,8 @@ class Study < ActiveRecord::Base
     assays.collect{|a| a.sops}.flatten.uniq
   end
 
-  def can_delete? user=nil
-    assays.empty? && mixin_super(user)
+  def can_delete? *args
+    assays.empty? && mixin_super(*args)
   end
 
 end

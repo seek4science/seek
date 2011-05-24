@@ -677,6 +677,19 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test "cannot get the request file button when not loggin" do
+    login_as(:quentin)
+    df = data_files(:viewable_data_file)
+    assert df.is_downloadable?, "The datafile must not be downloadable for this test to succeed"
+
+    get :show, :id => df
+    assert_select "a",:text=>/Request file/,:count=>1
+
+    logout
+    get :show, id => df
+    assert_select "a",:text=>/Request file/,:count=>0
+  end
+
   private
   
   def valid_data_file

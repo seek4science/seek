@@ -29,6 +29,7 @@ class Policy < ActiveRecord::Base
   # is preserved
   
   # sharing_scope
+  SHARE_WITH_PROJECT = -1 #never should be stored in the database, used by form
   PRIVATE = 0
   CUSTOM_PERMISSIONS_ONLY = 1
   ALL_SYSMO_USERS = 2
@@ -61,20 +62,14 @@ class Policy < ActiveRecord::Base
   end
 
   def self.new_for_upload_tool(resource, recipient)
-    policy = resource.create_policy(:name               => 'auto',
+    policy = resource.build_policy(:name               => 'auto',
                                     :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
                                     :access_type        => Policy::NO_ACCESS)
-    policy.permissions.create :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
+    policy.permissions.build :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
     return policy
   end
 
-  def self.create_or_update_policy  resource, user, params
-    resource.policy = (resource.policy || Policy.new).set_attributes_with_sharing(params[:sharing])
-    resource.save
-    resource.errors.full_messages.join('\n')
-  end
-
-  def set_attributes_with_sharing sharing
+  def set_attributes_with_sharing sharing, project
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     returning self do |policy|
@@ -87,7 +82,6 @@ class Policy < ActiveRecord::Base
         policy.use_whitelist = sharing[:use_whitelist]
         policy.use_blacklist = sharing[:use_blacklist]
 
-    
         # NOW PROCESS THE PERMISSIONS
 
         # read the permission data from sharing
@@ -106,6 +100,13 @@ class Policy < ActiveRecord::Base
           new_permission_data = {}
         end
 
+        #if share with your project is chosen
+        if (sharing[:sharing_scope].to_i == Policy::SHARE_WITH_PROJECT)
+          policy.sharing_scope = Policy::ALL_SYSMO_USERS
+          policy.access_type = sharing["access_type_#{sharing_scope}"]
+          contributor_types = ["Project"]
+          new_permission_data = {"Project" => {project.id => {"access_type" => sharing[:your_proj_access_type]}}}
+        end
 
         # --- Synchronise All Permissions for the Policy ---
         # first delete or update any old memberships

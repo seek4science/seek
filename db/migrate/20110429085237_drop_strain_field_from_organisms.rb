@@ -4,6 +4,6 @@ class DropStrainFieldFromOrganisms < ActiveRecord::Migration
   end
 
   def self.down
-    add_column :organisms,:strain ,:varchar,:default=>null
+    add_column :organisms,:strain, :string
   end
 end

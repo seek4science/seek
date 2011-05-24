@@ -14,8 +14,8 @@ module Acts #:nodoc:
       false
     end
 
-    def can_perform? action, user=nil
-      user ? send("can_#{action}?", user) : send("can_#{action}?")
+    def can_perform? action, *args
+      send "can_#{action}?", *args
     end
 
     def publish!
@@ -150,10 +150,11 @@ module Acts #:nodoc:
       end
 
       AUTHORIZATION_ACTIONS.each do |action|
-        define_method "can_#{action}?" do |*args|
-          user = args[0] || User.current_user
-          new_record? or Authorization.is_authorized? action.to_s, nil, self, user
-        end
+        eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+            new_record? or Authorization.is_authorized? "#{action}", nil, self, user
+          end
+        END_EVAL
       end
 
       #returns a list of the people that can manage this file
