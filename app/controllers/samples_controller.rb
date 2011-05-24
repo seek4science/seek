@@ -52,6 +52,7 @@ class SamplesController < ApplicationController
       if @sample.update_attributes params[:sample]
         if tissue_and_cell_types.blank?
           @sample.tissue_and_cell_types= tissue_and_cell_types
+          @sample.save
         else
            tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
