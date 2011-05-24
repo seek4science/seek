@@ -19,6 +19,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
+
+  test "get XML when not logged in" do
+    logout
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    get :show,:id=>df,:format=>"xml"
+    perform_api_checks
+
+  end
   
   test "should show index" do
     get :index
