@@ -23,7 +23,7 @@
 
       <p id="organism">
           <label>Organism and strain: </label>
-         <%= text_or_not_specified(specimen_organism_title(@specimen)) %>
+         <%= specimen_organism_list @specimen.organism,@specimen.strain,@specimen.culture_growth_type %>
       </p>
 
       <p>

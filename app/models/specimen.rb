@@ -17,7 +17,7 @@ class Specimen < ActiveRecord::Base
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
-
+  alias_attribute :specimen_number, :donor_number
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :donor_number,:contributor,:lab_internal_number,:project,:institution
