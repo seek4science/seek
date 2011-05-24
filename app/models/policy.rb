@@ -87,7 +87,6 @@ class Policy < ActiveRecord::Base
         policy.use_whitelist = sharing[:use_whitelist]
         policy.use_blacklist = sharing[:use_blacklist]
 
-    
         # NOW PROCESS THE PERMISSIONS
 
         # read the permission data from sharing

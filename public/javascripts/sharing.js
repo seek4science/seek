@@ -1169,6 +1169,7 @@ function showOrHideSubstanceTextField(form_id){
     var selectedIndex = item.selectedIndex
     var option_select = item.options[selectedIndex]
 
+
     if (option_select.text == 'concentration'){
          substance_autocomplete.disabled = false
     }else{
@@ -1179,7 +1180,6 @@ function showOrHideSubstanceTextField(form_id){
         substance_autocomplete.disabled = true
     }
 }
-
 
 
 
