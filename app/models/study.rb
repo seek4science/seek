@@ -30,5 +30,4 @@ class Study < ActiveRecord::Base
     assays.empty? && mixin_super(user)
   end
 
-
 end

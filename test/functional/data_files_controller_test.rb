@@ -643,6 +643,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "do publish" do
     df=data_files(:picture)
+
     assert df.can_manage?,"The datafile must be manageable for this test to succeed"
     post :publish,:id=>df
     assert_redirected_to data_file_path(df)

@@ -18,6 +18,21 @@ module Acts #:nodoc:
       user ? send("can_#{action}?", user) : send("can_#{action}?")
     end
 
+    def publish!
+      if can_manage?
+        policy.access_type=Policy::ACCESSIBLE
+        policy.sharing_scope=Policy::EVERYONE
+        policy.save
+      else
+        false
+      end
+    end
+
+    def is_published?
+      #FIXME: a temporary work-around for the lack of ability to use can_download? as a non logged in user (passing nil defaults to User.current_user)
+      Authorization.is_authorized? "download",nil,self,nil
+    end
+
     AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
     AUTHORIZATION_ACTIONS.each do |action|
       define_method "can_#{action}?" do
