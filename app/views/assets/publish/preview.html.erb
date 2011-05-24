@@ -1,3 +1,22 @@
+<style>
+  ul.publishing_options {
+      padding-left: 1em;
+  }
+
+  ul.publishing_options li.type_and_title {
+      font-weight:bolder;
+  }
+
+  ul.publishing_options li.title {
+      font-weight:bolder;
+  }
+
+  ul.publishing_options li.secondary {
+      padding-left: 1em;
+  }
+
+
+</style>
 <div class="show_basic">
 
   <h1>Publishing the <%= asset_type_name -%> '<%= @asset.title -%>' and related items. </h1>
@@ -7,21 +26,23 @@
   </p>
 
   <% form_tag :action=>:publish do -%>
-
-      <ul class="publish_assays">
+      <h2>Assays related to this <%= asset_type_name -%></h2>
+      <ul class="publishing_options">
         <% if @asset.assays.empty? -%>
             <span class="none_text">There are no Assays related to this <%= asset_type_name -%>.</span>
         <% else -%>
 
             <% @asset.assays.each do |assay| -%>
 
-                <%= render :partial=>"assets/publish/options_for", :object=>assay, :locals=>{:html_classes=>"publish_assay"} -%>
+                <h3>Assay <%= assay.title -%></h3>
 
-                <%= render :partial=>"assets/publish/options_for", :object=>assay.study, :locals=>{:html_classes=>"publish_study"} -%>
+                <%= render :partial=>"assets/publish/options_for", :object=>assay, :locals=>{:html_classes=>"xxx publishing_options"} -%>
 
-                <%= render :partial=>"assets/publish/options_for", :object=>assay.study.investigation, :locals=>{:html_classes=>"publish_investigation"} -%>
+                <%= render :partial=>"assets/publish/options_for", :object=>assay.study, :locals=>{:html_classes=>"xxx publishing_options"} -%>
 
-                <%= render :partial=>"assets/publish/options_for", :collection=>(assay.asset_masters - [@asset]), :locals=>{:html_classes=>"publish_assay_assets"} -%>
+                <%= render :partial=>"assets/publish/options_for", :object=>assay.study.investigation, :locals=>{:html_classes=>"xxx publishing_options"} -%>
+
+                <%= render :partial=>"assets/publish/options_for", :collection=>(assay.asset_masters - [@asset]), :locals=>{:html_classes=>"xxx publishing_options"} -%>
 
             <% end -%>
 
