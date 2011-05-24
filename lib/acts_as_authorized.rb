@@ -14,8 +14,23 @@ module Acts #:nodoc:
       false
     end
 
-    def can_perform? action, user=nil
-      user ? send("can_#{action}?", user) : send("can_#{action}?")
+    def can_perform? action, *args
+      send "can_#{action}?", *args
+    end
+
+    def publish!
+      if can_manage?
+        policy.access_type=Policy::ACCESSIBLE
+        policy.sharing_scope=Policy::EVERYONE
+        policy.save
+      else
+        false
+      end
+    end
+
+    def is_published?
+      #FIXME: a temporary work-around for the lack of ability to use can_download? as a non logged in user (passing nil defaults to User.current_user)
+      Authorization.is_authorized? "download",nil,self,nil
     end
 
     AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
@@ -135,10 +150,11 @@ module Acts #:nodoc:
       end
 
       AUTHORIZATION_ACTIONS.each do |action|
-        define_method "can_#{action}?" do |*args|
-          user = args[0] || User.current_user
-          new_record? or Authorization.is_authorized? action.to_s, nil, self, user
-        end
+        eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+            new_record? or Authorization.is_authorized? "#{action}", nil, self, user
+          end
+        END_EVAL
       end
 
       #returns a list of the people that can manage this file

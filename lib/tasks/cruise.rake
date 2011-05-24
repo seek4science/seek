@@ -7,7 +7,7 @@ require 'bundler'
 desc "task for cruise control"
 task :cruise, :run_secondary do |t, args|
   args.with_defaults :run_secondary => true
-  run_secondary_signal = 'tmp/run_secondary'
+  run_secondary_signal = "#{RAILS_ROOT}/tmp/run_secondary_tests"
   if args[:run_secondary]
     File.new(run_secondary_signal, 'w') unless File.exists? run_secondary_signal
   else

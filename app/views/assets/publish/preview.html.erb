@@ -45,18 +45,16 @@ investigations = studies.collect(&:investigation).uniq
   </p>
 
   <% form_tag :action=>:publish do -%>
-      <%= hidden_field_tag "#{@asset.class.name}[#{@asset.id}]",1 -%>
-      <h2>Assays related to this <%= asset_type_name -%> and the other assets.</h2>
-      <ul class="publishing_options">
+      <%= hidden_field_tag publishing_item_param(@asset),1 -%>
+      <h2>Assays related to this <%= asset_type_name -%> and their assets.</h2>
+      <ul>
         <% if @asset.assays.empty? -%>
             <span class="none_text">There are no Assays related to this <%= asset_type_name -%>.</span>
         <% else -%>
-
             <% @asset.assays.each do |assay| -%>
-
                 <%= render :partial=>"assets/publish/options_for", :object=>assay, :locals=>{:html_classes=>"publishing_options"} -%>
-                <div style="padding-left: 1em;">
-                <%= render :partial=>"assets/publish/options_for", :collection=>(assay.asset_masters - [@asset]), :locals=>{:html_classes=>"publishing_options"} -%>
+                <div style="padding-left: 2em;">
+                    <%= render :partial=>"assets/publish/options_for", :collection=>(assay.asset_masters - [@asset]), :locals=>{:html_classes=>"publishing_options"} -%>
                 </div>
             <% end -%>
 
@@ -68,7 +66,6 @@ investigations = studies.collect(&:investigation).uniq
         <% if studies.empty? -%>
             <span class="none_text">There are no Studies related to this <%= asset_type_name -%>.</span>
         <% else -%>
-
             <%= render :partial=>"assets/publish/options_for", :collection=>studies, :locals=>{:html_classes=>"publishing_options"} -%>
         <% end -%>
       </ul>

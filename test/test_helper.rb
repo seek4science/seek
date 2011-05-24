@@ -75,6 +75,6 @@ class ActiveSupport::TestCase
   end
 
   def run_secondary_tests?
-    @@run_secondary ||= File.exists? '/tmp/run_secondary'
+    @@run_secondary ||= File.exists? "#{RAILS_ROOT}/tmp/run_secondary_tests"
   end
 end

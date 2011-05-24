@@ -50,6 +50,33 @@ class AssetTest < ActiveSupport::TestCase
     assert result["DataFile"].include?(data_file)
   end
 
+  test "is_published?" do
+    User.with_current_user Factory(:user) do
+      public_sop=Factory(:sop,:policy=>Factory(:public_policy,:access_type=>Policy::ACCESSIBLE))
+      private_model=Factory(:model,:policy=>Factory(:public_policy,:access_type=>Policy::VISIBLE))
+      public_datafile=Factory(:data_file,:policy=>Factory(:public_policy))
+      registered_only_assay=Factory(:assay,:policy=>Factory(:public_policy, :sharing_scope=>Policy::ALL_REGISTERED_USERS))
+
+      assert public_sop.is_published?
+      assert !private_model.is_published?
+      assert public_datafile.is_published?
+      assert !registered_only_assay.is_published?
+    end
+  end
+
+  test "publish" do
+    user = Factory(:user)
+    private_model=Factory(:model,:contributor=>user,:policy=>Factory(:public_policy,:access_type=>Policy::VISIBLE))
+    User.with_current_user user do
+      assert private_model.can_manage?,"Should be able to manage this model for the test to work"
+      assert private_model.publish!
+    end
+    private_model.reload
+    assert_equal Policy::ACCESSIBLE,private_model.policy.access_type
+    assert_equal Policy::EVERYONE,private_model.policy.sharing_scope
+
+  end
+
   test "is publishable" do
     assert Factory(:sop).is_publishable?
     assert Factory(:model).is_publishable?

@@ -9,7 +9,7 @@ module RestTestCases
   SCHEMA_FILE_PATH = File.join(RAILS_ROOT, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
 
   def run_rest_tests?
-    true
+    run_secondary_tests?
   end
   
   def test_index_xml
