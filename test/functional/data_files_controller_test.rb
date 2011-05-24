@@ -22,7 +22,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "get XML when not logged in" do
     logout
-    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
     get :show,:id=>df,:format=>"xml"
     perform_api_checks
 
