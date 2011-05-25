@@ -13,14 +13,14 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "event association" do
-    datafile = data_files(:picture)
-    assert datafile.events.empty?
-    event = events(:event_with_no_files)
-    datafile.events << event
-    assert datafile.valid?
-    User.current_user = datafile.contributor
-    assert datafile.save
-    assert_equal 1, datafile.events.count
+    User.with_current_user Factory(:user) do
+      datafile = Factory :data_file
+      event = Factory :event
+      datafile.events << event
+      assert datafile.valid?
+      assert datafile.save
+      assert_equal 1, datafile.events.count
+    end
   end
 
   test "assay association" do
@@ -135,7 +135,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'failing to delete due to can_delete does not create trash' do
-    df = Factory :data_file, :policy => Factory(:private_policy)
+    df = Factory :data_file, :policy => Factory(:private_policy), :contributor => Factory(:user)
     assert_no_difference("DataFile.count") do
       df.destroy
     end

@@ -2,7 +2,7 @@ module Acts #:nodoc:
   module Authorized #:nodoc:
     def self.included(mod)
       mod.extend(ClassMethods)
-      mod.before_destroy :can_delete?
+      mod.before_destroy :delete_authorized?
       mod.before_update :changes_authorized?
     end
 
@@ -14,8 +14,23 @@ module Acts #:nodoc:
       false
     end
 
-    def can_perform? action, user=nil
-      user ? send("can_#{action}?", user) : send("can_#{action}?")
+    def can_perform? action, *args
+      send "can_#{action}?", *args
+    end
+
+    def publish!
+      if can_manage?
+        policy.access_type=Policy::ACCESSIBLE
+        policy.sharing_scope=Policy::EVERYONE
+        policy.save
+      else
+        false
+      end
+    end
+
+    def is_published?
+      #FIXME: a temporary work-around for the lack of ability to use can_download? as a non logged in user (passing nil defaults to User.current_user)
+      Authorization.is_authorized? "download",nil,self,nil
     end
 
     AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
@@ -42,17 +57,23 @@ module Acts #:nodoc:
     end
 
     def changes_authorized?
-      (changes_requiring_can_edit.empty? || can_edit?) and (changes_requiring_can_manage.empty? || can_manage?)
+      $authorization_checks_disabled or changes_requiring_can_edit.empty? || can_edit? and changes_requiring_can_manage.empty? || can_manage?
+    end
+
+    def delete_authorized?
+      $authorization_checks_disabled or can_delete?
     end
 
     module ClassMethods
       def acts_as_authorized
-        belongs_to :contributor, :polymorphic => true
+        belongs_to :contributor, :polymorphic => true  unless method_defined? :contributor
+        after_initialize :contributor_or_default_if_new
+
         does_not_require_can_edit :uuid, :first_letter
         #checks a policy exists, and if missing resorts to using a private policy
-        before_save :policy_or_default
+        after_initialize :policy_or_default_if_new
 
-        belongs_to :project
+        belongs_to :project  unless method_defined? :project
 
         belongs_to :policy, :autosave => true
 
@@ -102,26 +123,55 @@ module Acts #:nodoc:
         true
       end
 
+      def default_policy
+        Policy.default
+      end
+
       def policy_or_default
         if self.policy.nil?
-          self.policy = Policy.private_policy
+          self.policy = default_policy
+        end
+      end
+
+      def policy_or_default_if_new
+        if self.new_record?
+          policy_or_default
+        end
+      end
+
+      def default_contributor
+        User.current_user
+      end
+
+      def contributor_or_default_if_new
+        if self.new_record? && contributor.nil?
+          self.contributor = default_contributor
         end
       end
 
       AUTHORIZATION_ACTIONS.each do |action|
-        define_method "can_#{action}?" do |*args|
-          user = args[0] || User.current_user
-          new_record? or Authorization.is_authorized? action.to_s, nil, self, user
-        end
+        eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+            new_record? or Authorization.is_authorized? "#{action}", nil, self, user
+          end
+        END_EVAL
       end
 
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers
+        #FIXME: how to handle projects as contributors - return all people or just specific people (pals or other role)?
         people=[]
-        people << self.contributor.person unless self.contributor.nil?
+        unless self.contributor.nil?
+          people << self.contributor.person if self.contributor.kind_of?(User)
+          people << self.contributor if self.contributor.kind_of?(Person)
+        end
+
         self.policy.permissions.each do |perm|
-          people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
+          unless perm.contributor.nil? || perm.access_type!=Policy::MANAGING
+            people << (perm.contributor) if perm.contributor.kind_of?(Person)
+            people << (perm.contributor.person) if perm.contributor.kind_of?(User)
+          end
         end
         people.uniq
       end
@@ -132,3 +182,39 @@ end
 ActiveRecord::Base.class_eval do
   include Acts::Authorized
 end
+
+module OnlyWritesVisible
+
+  def concat_with_ignore_invisible *args
+    args = flatten_deeper(args).select {|record| record.can_view?} unless $authorization_checks_disabled
+    concat_without_ignore_invisible *args
+  end
+
+  def delete_with_ignore_invisible *args
+    args = flatten_deeper(args).select {|record| record.can_view?} unless $authorization_checks_disabled
+    delete_without_ignore_invisible *args
+  end
+
+  def self.included base
+    base.class_eval do
+      alias_method_chain :concat, :ignore_invisible
+      alias_method :<<, :concat
+      alias_method :push, :concat
+
+      alias_method_chain :delete, :ignore_invisible
+    end
+  end
+end
+
+ActiveRecord::Associations::AssociationCollection.class_eval do
+  include OnlyWritesVisible
+end
+
+class Object
+  def disable_authorization_checks
+    saved = $authorization_checks_disabled
+    $authorization_checks_disabled = true
+    yield ensure $authorization_checks_disabled = saved
+  end
+end
+

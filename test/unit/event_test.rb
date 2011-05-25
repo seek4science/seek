@@ -32,9 +32,11 @@ class EventTest < ActiveSupport::TestCase
     assert event.data_files.empty?
     datafile = data_files(:picture)
     event.data_files << datafile
-    event.data_files << datafile
-    assert !event.valid?
-    assert !event.save
+    assert_no_difference 'event.data_files.count' do
+      event.data_files << datafile
+      event.save!
+      event.reload
+    end
   end
 
   test "end date after start date" do

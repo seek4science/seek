@@ -95,30 +95,22 @@ class SopsController < ApplicationController
 
     if handle_data            
       @sop = Sop.new(params[:sop])
-      @sop.contributor=current_user
       @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
+
+      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.project
 
       update_tags @sop
       assay_ids = params[:assay_ids] || []
-      # apply policy / permissions settings to sop
-      policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
-      #Add creators
-      AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
-
       respond_to do |format|
         if @sop.save
-
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           
-
-          if policy_err_msg.blank?
-            flash[:notice] = 'SOP was successfully uploaded and saved.'
-            format.html { redirect_to sop_path(@sop) }
-          else
-            flash[:notice] = "SOP was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
-          end
+          #Add creators
+          AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
+          
+          flash[:notice] = 'SOP was successfully uploaded and saved.'
+          format.html { redirect_to sop_path(@sop) }
           Assay.find(assay_ids).each do |assay|
             if assay.can_edit?
               assay.relate(@sop)
@@ -148,25 +140,24 @@ class SopsController < ApplicationController
 
     update_tags @sop
     assay_ids = params[:assay_ids] || []
-    # apply updated policy / permissions settings to sop
-    policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
-    #update authors
-    AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
+
+    @sop.attributes = params[:sop]
+
+    if params[:sharing]
+      @sop.policy_or_default
+      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.project
+    end
 
     respond_to do |format|
-      if @sop.update_attributes(params[:sop])
-
+      if @sop.save
         # update attributions
         Relationship.create_or_update_attributions(@sop, params[:attributions])
         
-
-        if policy_err_msg.blank?
-          flash[:notice] = 'SOP metadata was successfully updated.'
-          format.html { redirect_to sop_path(@sop) }
-        else
-          flash[:notice] = "SOP metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
-        end
+        #update authors
+        AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
+        
+        flash[:notice] = 'SOP metadata was successfully updated.'
+        format.html { redirect_to sop_path(@sop) }
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?

@@ -51,7 +51,6 @@ module TagsHelper
     end
     tags
   end
-
   #defines the tag box, with AJAX tag entry and removal
   def item_tags_and_tag_entry
     #only show the tag box if a user is logged in

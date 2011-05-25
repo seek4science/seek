@@ -7,6 +7,19 @@ require 'ruby-prof'
 require 'factory_girl'
 Factory.find_definitions #It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
+Factory.class_eval do
+  def self.create_with_privileged_mode *args
+    disable_authorization_checks {create_without_privileged_mode *args}
+  end
+
+  def self.build_with_privileged_mode *args
+    disable_authorization_checks {build_without_privileged_mode *args}
+  end
+
+  class_alias_method_chain :create, :privileged_mode
+  class_alias_method_chain :build, :privileged_mode
+end
+
 class ActiveSupport::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
@@ -62,6 +75,6 @@ class ActiveSupport::TestCase
   end
 
   def run_secondary_tests?
-    @@run_secondary ||= File.exists? '/tmp/run_secondary'
+    @@run_secondary ||= File.exists? "#{RAILS_ROOT}/tmp/run_secondary_tests"
   end
 end

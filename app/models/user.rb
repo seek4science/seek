@@ -179,6 +179,15 @@ class User < ActiveRecord::Base
     !person.nil? && person.can_edit_institutions?
   end
 
+  def self.with_current_user user
+    self.current_user = user
+    begin
+      yield
+    ensure
+      User.current_user = nil
+    end
+  end
+
   protected
   # before filter
   def encrypt_password

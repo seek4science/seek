@@ -50,8 +50,7 @@ module RestTestCases
     begin
       document.validate_schema(schema)
     rescue LibXML::XML::Error => e
-      result = false      
-      display_xml xml
+      result = false            
       assert false,"Error validating against schema: #{e.message}"
     end
   

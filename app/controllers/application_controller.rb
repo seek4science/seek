@@ -28,11 +28,8 @@ class ApplicationController < ActionController::Base
   include AuthenticatedSystem
   around_filter :with_current_user
   def with_current_user
-    User.current_user = current_user
-    begin
+    User.with_current_user current_user do
       yield
-    ensure
-      User.current_user = nil
     end
   end
 
@@ -200,7 +197,7 @@ class ApplicationController < ActionController::Base
           'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
         'view'
 
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',

@@ -13,8 +13,8 @@ class Investigation < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
 
-  def can_delete? user=User.current_user
-    studies.empty? && mixin_super(user)
+  def can_delete? *args
+    studies.empty? && mixin_super(*args)
   end
   
   def data_files
