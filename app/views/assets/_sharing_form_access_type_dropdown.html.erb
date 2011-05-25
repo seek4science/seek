@@ -4,5 +4,5 @@
 <%# 3) access_type - active access_type for the current policy -%>
 
 <select name="sharing[access_type_<%= access_type_selector_for_scope -%>]" id="access_type_select_<%= access_type_selector_for_scope -%>" style="width: 19em; vertical-align: middle; margin: 0.3em 0;">
-    <%= policy_selection_options [Policy::VISIBLE, Policy::ACCESSIBLE,Policy::EDITING], @resource %>
+    <%= policy_selection_options [Policy::VISIBLE, Policy::ACCESSIBLE,Policy::EDITING], @resource, (access_type_selector_for_scope == sharing_scope ? access_type : nil)%>
 </select>
