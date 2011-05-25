@@ -7,7 +7,7 @@ module SpecimensHelper
        title = specimen.organism.try(:title)
        end
        if specimen.strain
-         title += ": #{specimen.strain.try(:title)}"
+         title += " : #{specimen.strain.try(:title)}"
        end
        if specimen.culture_growth_type
          title += " (#{specimen.culture_growth_type.try(:title)})"
@@ -24,7 +24,7 @@ module SpecimensHelper
       result = link_to h(organism.title),organism,{:class => "assay_organism_info"}
 
       if strain
-        result += ": "
+        result += " : "
         result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
       end
 

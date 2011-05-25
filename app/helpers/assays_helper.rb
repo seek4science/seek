@@ -19,11 +19,13 @@ module AssaysHelper
   def assay_organism_list_item assay_organism
     result = link_to h(assay_organism.organism.title),assay_organism.organism
     if assay_organism.strain
-      result += ": #{assay_organism.strain.title}"
+       result += " : "
+       result += link_to h(assay_organism.strain.title),assay_organism.strain,{:class => "assay_strain_info"}
     end
 
     if assay_organism.tissue_and_cell_type
-      result += ": #{assay_organism.tissue_and_cell_type.title}"
+      result += " : "
+      result += link_to h(assay_organism.tissue_and_cell_type.title),assay_organism.tissue_and_cell_type,{:class => "assay_tissue_and_cell_type_info"}
     end
 
     if assay_organism.culture_growth_type
@@ -43,5 +45,32 @@ module AssaysHelper
 
   def authorised_assays
     Assay.all.select{|assay| assay.can_edit?(current_user)}
+  end
+
+  def assay_sample_organism_list organism,strain,sample,culture_growth_type, none_text="Not Specified"
+    result=""
+    result ="<span class='none_text'>#{none_text}</span>" if organism.nil?
+    if organism
+      result = link_to h(organism.title),organism,{:class => "assay_organism_info"}
+
+      if strain
+        result += " : "
+        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if sample
+        result += " : "
+        result += link_to h(sample.title),sample
+      end
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+    end
+    return result
+  end
+
+  def list_assay_sample_organism attribute,organism,strain,sample,culture_growth_type
+      "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{assay_sample_organism_list(organism,strain,sample,culture_growth_type)}</p>"
   end
 end

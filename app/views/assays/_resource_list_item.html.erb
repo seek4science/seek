@@ -25,7 +25,11 @@
 
   <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
 
+  <% if !resource.assay_organisms.blank? %>
   <%= list_item_simple_list(resource.assay_organisms, "Organism") { |ao| assay_organism_list_item(ao) } %>
+  <% else %>
+  <%= try_block{list_assay_sample_organism( "Organism",resource.sample.specimen.organism,resource.sample.specimen.strain,resource.sample,resource.sample.specimen.culture_growth_type) } %>
+  <% end %>
 
   <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
 
