@@ -22,7 +22,7 @@ class SamplesController < ApplicationController
     @sample.policy_or_default
     @sample.policy.set_attributes_with_sharing params[:sharing]
     tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
-
+    sops       = params[:sample_sop_ids] || []
     respond_to do |format|
       if @sample.save
 
@@ -30,9 +30,13 @@ class SamplesController < ApplicationController
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
         end
-          flash[:notice] = 'Sample was successfully created.'
-          format.html { redirect_to(@sample) }
-          format.xml  { head :ok }
+        sops.each do |s_id|
+          s = Sop.find(s_id)
+          @sample.associate_sop(s) if s.can_view?
+        end
+        flash[:notice] = 'Sample was successfully created.'
+        format.html { redirect_to(@sample) }
+        format.xml { head :ok }
       else
         format.html { render :action => "new" }
       end
@@ -44,7 +48,7 @@ class SamplesController < ApplicationController
 
 
       tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
-
+      sops       = params[:sample_sop_ids] || []
       #update policy to sample
       @sample.policy.set_attributes_with_sharing params[:sharing]
       respond_to do |format|
@@ -60,6 +64,15 @@ class SamplesController < ApplicationController
           end
         end
 
+        if sops.blank?
+          @sample.sample_sops= []
+          @sample.save
+        else
+          sops.each do |s_id|
+          s = Sop.find(s_id)
+          @sample.associate_sop(s) if s.can_view?
+        end
+        end
 
           flash[:notice] = 'Sample was successfully updated.'
           format.html { redirect_to(@sample) }
