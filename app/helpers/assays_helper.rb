@@ -33,12 +33,37 @@ module AssaysHelper
     end
     return result
   end
-  def assay_organisms_list assay_organisms,none_text="Not specified"
+  def show_assay_organisms_list assay_organisms,none_text="Not specified"
     result=""
     result="<span class='none_text'>#{none_text}</span>" if assay_organisms.empty?
+
     assay_organisms.each do |ao|
-      result += assay_organism_list_item ao
-      result += ",<br/>" unless ao==assay_organisms.last
+
+      organism = ao.organism
+      strain = ao.strain
+      tissue_and_cell_type = ao.tissue_and_cell_type
+      culture_growth_type = ao.culture_growth_type
+
+      if organism
+      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      end
+
+      if strain
+        result += " : "
+        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if tissue_and_cell_type
+        result += " : "
+        result += link_to h(tissue_and_cell_type.title),tissue_and_cell_type,{:class => "assay_tissue_and_cell_type_info"}
+
+      end
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+      result += ",<br/>" unless ao == assay_organisms.last
+
     end
     result
   end
@@ -47,11 +72,23 @@ module AssaysHelper
     Assay.all.select{|assay| assay.can_edit?(current_user)}
   end
 
-  def assay_sample_organism_list organism,strain,sample,culture_growth_type, none_text="Not Specified"
-    result=""
-    result ="<span class='none_text'>#{none_text}</span>" if organism.nil?
-    if organism
-      result = link_to h(organism.title),organism,{:class => "assay_organism_info"}
+
+  def list_assay_samples attribute,assay_samples, none_text="Not Specified"
+
+    result= "<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
+
+    result +="<span class='none_text'>#{none_text}</span>" if assay_samples.blank?
+
+    assay_samples.each do |as|
+
+      organism = as.specimen.organism
+      strain = as.specimen.strain
+      sample = as
+      culture_growth_type = as.specimen.culture_growth_type
+
+      if organism
+      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      end
 
       if strain
         result += " : "
@@ -60,17 +97,103 @@ module AssaysHelper
 
       if sample
         result += " : "
-        result += link_to h(sample.title),sample
+        #result += link_to h(sample.title),sample
+        sample.tissue_and_cell_types.each do |tt|
+          result += "[" if tt== sample.tissue_and_cell_types.first
+          result += link_to h(tt.title), tt
+          result += "|" unless tt == sample.tissue_and_cell_types.last
+          result += "]" if tt == sample.tissue_and_cell_types.last
+        end
+
+
       end
 
       if culture_growth_type
         result += " (#{culture_growth_type.title})"
       end
+      result += ",<br/>" unless as == assay_samples.last
+
     end
+
+    result += "</p>"
     return result
   end
 
-  def list_assay_sample_organism attribute,organism,strain,sample,culture_growth_type
-      "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{assay_sample_organism_list(organism,strain,sample,culture_growth_type)}</p>"
+  def list_assay_organisms attribute,assay_organisms,none_text="Not specified"
+    result="<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
+    result +="<span class='none_text'>#{none_text}</span>" if assay_organisms.empty?
+
+    organism=nil
+    strain = nil
+    culture_growth_type=nil
+
+    organisms =[]
+    strains =[]
+    culture_growth_types =[]
+    tissue_and_cell_types = []
+
+    group_count = 0
+
+     i = 0
+     j = 0
+    assay_organisms.each do |ao|
+
+       if organism == ao.organism and strain == ao.strain and culture_growth_type == ao.culture_growth_type
+            tissue_and_cell_types[group_count].push ao.tissue_and_cell_type
+         j +=1
+       else
+          organism = ao.organism
+          strain = ao.strain
+          tissue_and_cell_type = ao.tissue_and_cell_type
+          culture_growth_type = ao.culture_growth_type
+
+          organisms[group_count] = organism
+          strains[group_count] = strain
+          culture_growth_types[group_count] = culture_growth_type
+
+          group_count += 1
+          tissue_and_cell_types[group_count] =[]
+          tissue_and_cell_types[group_count].push(tissue_and_cell_type)
+       end
+      i +=1
+    end
+
+    for group_index in 1..group_count do
+
+        organism = organisms[group_index-1]
+        strain = strains[group_index-1]
+        culture_growth_type = culture_growth_types[group_index-1]
+
+        one_group_tissue_and_cell_types = tissue_and_cell_types[group_index]
+
+        if organism
+            result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+        end
+
+        if strain
+          result += " : "
+          result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+        end
+        if one_group_tissue_and_cell_types
+
+          one_group_tissue_and_cell_types.each do |tt|
+            if tt
+              result += "[" if tt== one_group_tissue_and_cell_types.first
+              result += link_to h(tt.title), tt
+              result += "|" unless tt == one_group_tissue_and_cell_types.last
+              result += "]" if tt == one_group_tissue_and_cell_types.last
+            end
+          end
+        end
+
+        if culture_growth_type
+          result += " (#{culture_growth_type.title})"
+        end
+        result += ",<br/>" unless group_index==group_count
+      end
+
+    result += "</p>"
+    return result
   end
+
 end

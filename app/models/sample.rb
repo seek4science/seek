@@ -4,7 +4,7 @@ require 'acts_as_authorized'
 class Sample < ActiveRecord::Base
   belongs_to :specimen
   belongs_to :institution
-  has_many :assays
+  has_and_belongs_to_many :assays
 
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
@@ -56,7 +56,7 @@ class Sample < ActiveRecord::Base
           tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
       end
 
-      if !tissue_and_cell_type.nil?
+      if tissue_and_cell_type
        existing = false
        self.tissue_and_cell_types.each do |t|
          if t == tissue_and_cell_type

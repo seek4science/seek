@@ -5,12 +5,17 @@ class AssaysController < ApplicationController
   include Seek::TaggingCommon
 
   before_filter :reset_organism_count
+  before_filter :reset_sample_count
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
   def reset_organism_count
     Assay.organism_count = 0
   end
+  def reset_sample_count
+    Assay.sample_count = 0
+  end
+
   def new
     @assay=Assay.new
     study = Study.find(params[:study_id]) if params[:study_id]
@@ -34,11 +39,13 @@ class AssaysController < ApplicationController
     @assay        = Assay.new(params[:assay])
 
     organisms     = params[:assay_organism_ids] || []
+    samples       = params[:assay_sample_ids] || []
     sop_ids       = params[:assay_sop_ids] || []
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:assay_model_ids] || []
 
     Assay.organism_count = organisms.length
+    Assay.sample_count= samples.length
 
     update_tags @assay
 
@@ -69,6 +76,9 @@ class AssaysController < ApplicationController
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
         end
+        samples.each do |s_id|
+          @assay.associate_sample(s_id)
+        end
 
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
@@ -89,12 +99,15 @@ class AssaysController < ApplicationController
     @assay.assay_organisms=[]
 
     organisms             = params[:assay_organism_ids] || []
+    samples               = params[:assay_sample_ids] || []
+
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
 
 
     Assay.organism_count = organisms.length
+    Assay.sample_count= samples.length
 
     update_tags @assay
 
@@ -128,6 +141,14 @@ class AssaysController < ApplicationController
           @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
         end
 
+        if samples.blank?
+          @assay.samples=[]
+          @assay.save!
+        else
+          samples.each do |s_id|
+            @assay.associate_sample(s_id)
+          end
+        end
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 

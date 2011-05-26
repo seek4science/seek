@@ -16,4 +16,18 @@ module SamplesHelper
     result
   end
 
+  def samples_link_list samples,sorted=true
+    #FIXME: make more generic and share with other model link list helper methods
+    samples=samples.select{|s| !s.nil?} #remove nil items
+    return "<span class='none_text'>Not Specified</span>" if samples.empty?
+
+    result=""
+    samples=samples.sort{|a,b| a.title<=>b.title} if sorted
+    samples.each do |sample|
+      result += link_to h(sample.title.capitalize),sample
+      result += " | " unless samples.last==sample
+    end
+    return result
+  end
+
 end

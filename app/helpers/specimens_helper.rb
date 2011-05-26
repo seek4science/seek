@@ -39,4 +39,19 @@ module SpecimensHelper
       "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{specimen_organism_list(organism,strain,culture_growth_type)}</p>"
   end
 
+
+  def specimens_link_list specimens,sorted=true
+    #FIXME: make more generic and share with other model link list helper methods
+    specimens=specimens.select{|s| !s.nil?} #remove nil items
+    return "<span class='none_text'>Not associated with any Specimens</span>" if specimens.empty?
+
+    result=""
+    specimens=specimens.sort{|a,b| a.title<=>b.title} if sorted
+    specimens.each do |specimen|
+      result += link_to h(specimen.title.capitalize),specimen
+      result += " | " unless specimens.last==specimen
+    end
+    return result
+  end
+
 end

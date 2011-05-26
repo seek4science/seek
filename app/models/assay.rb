@@ -2,6 +2,7 @@ require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
   cattr_accessor :organism_count
+  cattr_accessor :sample_count
   # The following is basically the same as acts_as_authorized,
   # but instead of creating a project and contributor
   # I use the existing project method and owner attribute.
@@ -23,7 +24,7 @@ class Assay < ActiveRecord::Base
 
   acts_as_taggable
   belongs_to :institution
-  belongs_to :sample
+  has_and_belongs_to_many :samples
   belongs_to :assay_type
   belongs_to :technology_type  
   belongs_to :study  
@@ -157,6 +158,26 @@ class Assay < ActiveRecord::Base
     end
    
   end
+
+  def associate_sample (sample_id)
+       sample = Sample.find(sample_id)
+    if sample
+      existing = false
+      self.samples.each do |s|
+        if s==sample
+          existing = true
+          break
+        end
+      end
+
+      unless existing
+         self.samples << sample
+      end
+
+    end
+
+
+  end
   
   def assets
     (data_file_masters + model_masters + sop_masters).collect {|a| a.latest_version} |  (data_files + models + sops)
@@ -176,7 +197,7 @@ class Assay < ActiveRecord::Base
   end
 
   def sample_is_missing?
-    return sample_id.nil?
+    return sample_count == 0
   end
 
   def organisms_are_missing?

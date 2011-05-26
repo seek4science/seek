@@ -1,0 +1,161 @@
+<%
+ select_truncate_length=120
+ samples_collection =  Sample.all.select{|s|s.can_view?}
+
+
+%>
+
+
+<div id="add_samples_form" class="fold">
+
+  <div class="foldTitle">
+    <%= help_icon("Here you can associate the assay with specific samples.") -%>
+    Samples
+  </div>
+
+  <div id="samples_fold_content" class="foldContent" style="display: block;">
+    <div class="yui-u first">
+      <p style="color: #666666;">
+        The following samples are involved in this <%= "#{@assay_text}" -%>:
+      </p>
+      <div id="sample_to_list" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text" id="samples">Loading...</span>
+      </div>
+      <div class="association_step">
+         <%= select_tag :possible_samples,
+             options_for_select([["Select Sample ...", 0]]|samples_collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
+             {:style=>"width:90%",
+              :onchange=>"check_show_organism_form();return(false);"} -%>
+        <%= select_tag :assay_sample_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+      </div>
+
+
+		<br/>
+        <%= link_to_function (image("new") + " Include in the #{@assay_text}"), "addSelectedSample(); return(false);", :id=>"add_sample_link", :class=>"block_link", :style => "width: 12em" %>
+
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var samples = new Array();
+
+   <%  @assay.samples.each do |t| %>
+    title = '<%=escape_javascript(t.title) %>';
+    id = '<%= t.id %>';
+    addSample(title, id);
+    <%end%>
+
+     <%if params[:assay_sample_ids]%>
+        <% params[:assay_sample_ids].each do |as_id| %>
+        <% sample = Sample.find_by_id(as_id)%>
+        title = '<%=escape_javascript(sample.title) %>';
+        id = '<%= as_id %>';
+        addSample(title, id);
+     <%end%>
+    <%end-%>
+
+
+    updateSamples();
+
+    function checkSampleNotInList(title,id) {
+        toAdd = true;
+
+        for (var i = 0; i < samples.length; i++)
+            if (samples[i][0] == title ) {
+                toAdd = false;
+                alert("Sample already exists!");
+                break;
+            }
+        return toAdd;
+    }
+
+    function addSample(title, id) {
+        if (checkSampleNotInList(title, id)) {
+            samples.push([title,id]);
+            updateSamples();
+        }
+
+
+    }
+
+    function addSelectedSample() {
+        selected_option_index = $("possible_samples").selectedIndex;
+        selected_option = $("possible_samples").options[selected_option_index];
+
+        id = selected_option.value;
+        title = selected_option.text;
+        if (id!='0'){
+          addSample(title,id);
+        }
+
+
+
+    }
+
+    function removeSample(index) {
+        // remove according to the index
+
+        samples.splice(index, 1);
+        $('possible_samples').selectedIndex = 0;
+
+        if (samples.length == 0){
+            Effect.Appear('add_organism_form');
+        }
+        // update the page
+        updateSamples();
+    }
+
+    function updateSamples() {
+        sample_text = '<ul class="related_asset_list">';
+
+        for (var i = 0; i < samples.length; i++) {
+            sample = samples[i];
+            title = sample[0];
+            id = sample[1];
+
+            titleText = '<span title="' + title + '">' + title.truncate(100);
+
+
+            titleText += '</span>';
+            sample_text += '<li>' + titleText +
+                    '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+                    '[<a href=\"\" onclick=\"javascript:removeSample(' + i + '); return(false);\">remove</a>]</small></li>';
+        }
+
+        sample_text += '</ul>';
+
+        // update the page
+        if (samples.length == 0) {
+            $('sample_to_list').innerHTML = '<span class="none_text">No samples</span>';
+        }
+        else {
+            $('sample_to_list').innerHTML = sample_text;
+        }
+
+
+        clearList('assay_sample_ids');
+
+        select = $('assay_sample_ids');
+        for (i = 0; i < samples.length; i++) {
+            sample = samples[i];
+            title = sample[0];
+            id = sample[1];
+
+            o = document.createElement('option');
+            o.value = id;
+            o.text = title;
+            o.selected = true;
+
+            try {
+                select.add(o); //for older IE version
+            }
+            catch (ex) {
+                select.add(o, null);
+            }
+        }
+
+    }
+
+
+</script>

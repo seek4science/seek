@@ -71,10 +71,11 @@
   </tr>
 </table>
 
-<p>
-  <%= f.label "Sample" %> <br/>
-  <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{:include_blank =>"Select Sample ..."},{:onchange=>"check_add_organism_form();return(false);",:style=>"width:90%"}) %>
-</p>
+
+
+ <%= render :partial=>"assays/select_samples",:locals=>{:f=>f} %>
+
+
 <br style="clear:both"/>
 
 <p>
@@ -111,6 +112,10 @@
 
 <script type="text/javascript">
 
+
+  function hide_organism_form(){
+      Effect.Fade('add_organism_form');
+  }
   function showTitle(text){
     var elem = document.getElementById("full_study_title");
     elem.style.display = '';
@@ -153,7 +158,7 @@
     }
     //Change TechnologyType form
     var techTypeSelect = $("assay_technology_type_id");
-    for (var i=0;i < techTypeSelect.options.length;i++) {
+    for ( i=0;i < techTypeSelect.options.length;i++) {
       if (techTypeSelect.options[i].value == technologyTypeRoot)
         techTypeSelect.options[i].selected = true;
       else 
@@ -162,9 +167,10 @@
 
   }
 
-  function check_add_organism_form() {
-      i = $('assay_sample_id').selectedIndex;
-      if (i == '0') {
+  function check_show_organism_form() {
+      i = $('assay_sample_ids').length;//$('possible_samples').selectedIndex;
+      id = $('possible_samples').selectedIndex;
+      if (i == 0 && id =='0') {
           Effect.Appear('add_organism_form');
       }
       else {
@@ -174,5 +180,20 @@
 
 
   }
-   check_add_organism_form();
+  function check_show_sample_form() {
+      i = $('assay_organism_ids').length;//$('possible_samples').selectedIndex;
+      id = $('possible_organisms').selectedIndex;
+      if (i == 0 && id =='0') {
+          Effect.Appear('add_samples_form');
+      }
+      else {
+          Effect.Fade('add_samples_form');
+          clearList('add_samples_form');
+      }
+
+
+  }
+  check_show_organism_form();
+  check_show_sample_form();
+
 </script>
