@@ -134,13 +134,10 @@ module AssaysHelper
 
     group_count = 0
 
-     i = 0
-     j = 0
     assay_organisms.each do |ao|
 
        if organism == ao.organism and strain == ao.strain and culture_growth_type == ao.culture_growth_type
             tissue_and_cell_types[group_count].push ao.tissue_and_cell_type
-         j +=1
        else
           organism = ao.organism
           strain = ao.strain
@@ -155,7 +152,6 @@ module AssaysHelper
           tissue_and_cell_types[group_count] =[]
           tissue_and_cell_types[group_count].push(tissue_and_cell_type)
        end
-      i +=1
     end
 
     for group_index in 1..group_count do
