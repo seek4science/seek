@@ -89,7 +89,7 @@
 #Assay
   Factory.define(:assay_base, :class => Assay) do |f|
     f.title "An Assay"
-    f.association :owner, :factory => :person
+    f.association :contributor, :factory => :person
     f.association :study
     f.association :assay_type
   end
