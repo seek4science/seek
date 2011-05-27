@@ -137,6 +137,7 @@ Factory.define(:specimen) do |f|
   f.association :contributor, :factory => :user
   f.association :project
   f.association :institution
+  f.association :organism
 end
 
 #Sample

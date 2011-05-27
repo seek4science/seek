@@ -20,7 +20,7 @@ class Specimen < ActiveRecord::Base
   alias_attribute :specimen_number, :donor_number
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :donor_number,:contributor,:lab_internal_number,:project,:institution
+  validates_presence_of :donor_number,:contributor,:lab_internal_number,:project,:institution,:organism
 
   validates_uniqueness_of :donor_number
 
