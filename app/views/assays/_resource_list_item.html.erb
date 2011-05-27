@@ -25,10 +25,11 @@
 
   <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
 
-  <%= list_assay_organisms("Organisms",resource.assay_organisms) %>
-
+  <% if !resource.assay_organisms.blank? %>
+  <%= list_assay_organisms("Samples",resource.assay_organisms) %>
+  <% else %>
   <%= list_assay_samples "Samples",resource.samples%>
-
+  <% end %>
 
   <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
 

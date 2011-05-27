@@ -174,7 +174,7 @@ module AssaysHelper
 
           one_group_tissue_and_cell_types.each do |tt|
             if tt
-              result += "[" if tt== one_group_tissue_and_cell_types.first
+              result += " [" if tt== one_group_tissue_and_cell_types.first
               result += link_to h(tt.title), tt
               result += "|" unless tt == one_group_tissue_and_cell_types.last
               result += "]" if tt == one_group_tissue_and_cell_types.last
