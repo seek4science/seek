@@ -115,7 +115,6 @@ class DataFilesController < ApplicationController
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @data_file.save
-          
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
           

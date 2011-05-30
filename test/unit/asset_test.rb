@@ -103,7 +103,7 @@ class AssetTest < ActiveSupport::TestCase
     policy=Factory(:private_policy)
     policy.permissions << Factory(:permission, :contributor => user, :access_type => Policy::MANAGING, :policy => policy)
     policy.permissions << Factory(:permission, :contributor => person, :access_type => Policy::EDITING, :policy => policy)
-    assay=Factory(:assay,:policy=>policy,:owner=>person2)
+    assay=Factory(:assay,:policy=>policy,:contributor=>person2)
     assert_equal 2,assay.managers.count
     assert assay.managers.include?(user.person)
     assert assay.managers.include?(person2)

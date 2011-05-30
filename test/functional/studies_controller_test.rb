@@ -127,9 +127,9 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal Policy::MANAGING,s.policy.sharing_scope
     assert_equal Policy::EVERYONE,s.policy.access_type
 
-    put :update,:id=>s,:study=>{:title=>"test"},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    put :update,:id=>s,:study=>{},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
     s=assigns(:study)
-    assert_redirected_to study_path(s)
+    assert_response :success
     assert_equal Policy::PRIVATE,s.policy.sharing_scope
     assert_equal Policy::NO_ACCESS,s.policy.access_type
   end
