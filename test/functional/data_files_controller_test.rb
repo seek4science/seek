@@ -690,20 +690,55 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Request file/,:count=>0
   end
 
-=begin
-  test "should create sharing permissions within your project and with all SysMO members" do
+  test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_-1"=>Policy::VISIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT}
+        post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_-1"=>Policy::VISIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT, :your_proj_access_type => Policy::ACCESSIBLE}
       end
     end
+
     df=assigns(:data_file)
     assert_redirected_to data_file_path(df)
     assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
     assert_equal Policy::VISIBLE, df.policy.access_type
+    assert_equal df.policy.permissions.count, 1
+
+    permission = df.policy.permissions.first
+    assert_equal permission.contributor_type, 'Project'
+    assert_equal permission.contributor_id, df.project_id
+    assert_equal permission.policy_id, df.policy_id
+    assert_equal permission.access_type, Policy::ACCESSIBLE
   end
-=end
+
+  test "should update sharing permissions 'with your project and with all SysMO members'" do
+    login_as(:datafile_owner)
+    df=data_files(:editable_data_file)
+    assert df.can_manage?
+    assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    assert_equal Policy::EDITING, df.policy.access_type
+    assert_equal df.policy.permissions.length, 1
+
+    permission = df.policy.permissions.first
+    assert_equal permission.contributor_type, 'FavouriteGroup'
+    assert_equal permission.policy_id, df.policy_id
+    assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
+
+    put :update, :id => df, :data_file => {}, :sharing => {"access_type_-1"=>Policy::ACCESSIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT, :your_proj_access_type => Policy::EDITING}
+
+    df.reload
+
+    assert_redirected_to data_file_path(df)
+    assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    assert_equal Policy::ACCESSIBLE, df.policy.access_type
+    assert_equal 1, df.policy.permissions.length
+
+    update_permission = df.policy.permissions.first
+    assert_equal update_permission.contributor_type, 'Project'
+    assert_equal update_permission.contributor_id, df.project_id
+    assert_equal update_permission.policy_id, df.policy_id
+    assert_equal update_permission.access_type, Policy::EDITING
+  end
 
   private
   
