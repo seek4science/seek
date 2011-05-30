@@ -19,11 +19,11 @@ function DropMenu1(id) {
         "hide": 300
     }
     /* Change the default position of sub-menu by Y pixels from top and X pixels from left
-     * Negative values are allowed */
+     * Negative values are allowed
     this.position = {
         "top": 0,
         "left": 0
-    }
+    } */
     /* Z-index property for .section */
     this.zIndex = {
         "visible": 1,
@@ -130,7 +130,7 @@ function DropMenu1(id) {
                     // position
                     var box1 = document.getElementById(id + "-" + (tree.length - 1));
                     var box2 = document.getElementById(nodes[i].id);
-                    if ("horizontal" == self.type) {
+                    /*if ("horizontal" == self.type) {
                         box2.style.top = box1.offsetTop + box1.offsetHeight + self.position.top + "px";
                         if (self.browser.ie5) {
                             box2.style.left = self.position.left + "px";
@@ -144,7 +144,7 @@ function DropMenu1(id) {
                         } else {
                             box2.style.left = box1.offsetLeft + box1.offsetWidth + self.position.left + "px";
                         }
-                    }
+                    } */
                     // sections, sectionsShowCnt, sectionsHideCnt
                     self.sections.push(nodes[i].id);
                     self.sectionsShowCnt.push(0);

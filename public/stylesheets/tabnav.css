@@ -6,6 +6,7 @@
 .dm .item1:hover,
 .dm .item1-active,
 .dm .item1-active:hover {
+
     padding: 3px 8px 4px 8px;
     border: 1px #003366;
     border-style: solid none solid none;
