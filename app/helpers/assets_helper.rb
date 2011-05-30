@@ -193,6 +193,7 @@ module AssetsHelper
         related["Institution"][:items] = [resource.institution]
         related["Person"][:items] = resource.creators
         related["Project"][:items] = [resource.project]
+        related["Sample"][:items] = resource.samples
 
       when "Sample"
         related["Specimen"][:items] = [resource.specimen]
