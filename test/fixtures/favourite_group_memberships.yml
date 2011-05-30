@@ -69,7 +69,7 @@ person_for_owner_of_my_first_sop_in_test_fav_group_for_owner_of_download_for_all
 person_for_owner_of_my_first_sop_in_best_fav_group_for_owner_of_editing_for_all_sysmo_users_policy:
   person: person_for_owner_of_my_first_sop
   favourite_group: best_fav_group_for_owner_of_editing_for_all_sysmo_users_policy
-  access_type: <%= Policy::NO_ACCESS %>
+  access_type: <%= Policy::VISIBLE %>
 
 
 person_for_owner_of_custom_permissions_only_policy_in_whitelist_for_owner_of_my_first_sop:

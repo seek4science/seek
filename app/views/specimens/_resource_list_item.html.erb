@@ -1,0 +1,16 @@
+<%= list_item_title resource %>
+
+<div class="list_item_left_column">
+  <%= list_item_optional_attribute "Contributor", resource.contributor.person.try(:name), resource.contributor.person %>
+  <%= list_item_simple_list resource.creators, "Creator(s)" -%>
+</div>
+
+<div class="list_item_right_column">
+
+  <%= list_item_optional_attribute "Project", resource.project.try(:name), resource.project %>
+  <%= list_item_organism "Organism",resource.organism,resource.strain,resource.culture_growth_type %>
+
+</div>
+<div class="list_item_whole_width">
+  <%= list_item_description resource.description %>
+</div>

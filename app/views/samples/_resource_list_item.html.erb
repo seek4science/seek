@@ -1,0 +1,19 @@
+<%= list_item_title resource %>
+
+<div class="list_item_left_column">
+  <%= list_item_optional_attribute "Contributor", resource.contributor.person.try(:name), resource.contributor.person %>
+
+  <%= list_item_optional_attribute "Specimen", resource.specimen.try(:title),resource.specimen %>
+
+
+</div>
+
+<div class="list_item_right_column">
+
+  <%= list_item_attribute "Date of donation", resource.donation_date.strftime("%d/%m/%y")%>
+  <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
+
+</div>
+<div class="list_item_whole_width">
+  <%= list_item_description resource.description %>
+</div>

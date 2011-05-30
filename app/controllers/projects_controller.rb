@@ -5,10 +5,11 @@ class ProjectsController < ApplicationController
   include IndexPager
   
   before_filter :find_assets, :only=>[:index]
-  before_filter :login_required
   before_filter :is_user_admin_auth, :except=>[:index, :show, :edit, :update, :request_institutions]
   before_filter :editable_by_user, :only=>[:edit,:update,:admin]
-  
+
+  skip_before_filter :project_membership_required
+
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
 
   def auto_complete_for_organism_name
@@ -196,7 +197,7 @@ class ProjectsController < ApplicationController
 
   def editable_by_user
     @project = Project.find(params[:id])
-    unless current_user.is_admin? || @project.can_be_edited_by?(current_user)
+    unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
       error("Insufficient privileges", "is invalid (insufficient_privileges)")
       return false
     end

@@ -5,7 +5,7 @@ module ResourceListItemHelper
   end
 
   def get_list_item_actions_partial resource
-    if resource.authorization_supported? && resource.is_downloadable_asset?
+    if try_block{resource.authorization_supported? && resource.is_downloadable_asset? }
       actions_partial = "assets/resource_actions_td"
     else
       actions_partial = nil
@@ -48,7 +48,7 @@ module ResourceListItemHelper
         icon  = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
 
         html << "<p style=\"float:left;width:95%;\">#{icon} #{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
-        html << list_item_visibility(resource.policy) if resource.authorization_supported? && Authorization.is_authorized?("manage", nil, resource, current_user)
+        html << list_item_visibility(resource.policy) if resource.authorization_supported? && resource.can_manage?
         html << "<br style=\"clear:both\"/>"
       else
         html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)}</p>"
@@ -79,8 +79,8 @@ module ResourceListItemHelper
   end
 
   def list_item_authorized_list items, attribute, sort=true, max_length=75, count_hidden_items=false
-    html  = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     items = Authorization.authorize_collection("view", items, current_user, count_hidden_items)
+    html  = "<p class=\"list_item_attribute\"><b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     if items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else

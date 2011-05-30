@@ -1,6 +1,6 @@
-<% if Authorization.is_authorized?("view",nil,@sop,current_user) -%>
+<% if @sop.can_view? -%>
 
-  <% if @sop.can_edit? current_user -%>
+  <% if @sop.can_edit? -%>
     <ul class="sectionIcons">
       <li><%= image_tag_for_key('edit', sop_experimental_conditions_path(@sop), nil, nil, 'Edit experimental conditions (latest version)') -%></li>
     </ul>

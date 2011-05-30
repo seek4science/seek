@@ -66,7 +66,7 @@ namespace :seek do
   
   desc 'upgrades between 0.6 and 0.7'
   task(:upgrade_live=>:environment) do
-    other_tasks=["assay_classes","update_assay_classes","strains","graft_new_assay_types","relationship_types"]
+    other_tasks=["assay_classes","update_assay_classes","strains","tissue_and_cell_types","graft_new_assay_types","relationship_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute
     end
@@ -309,7 +309,7 @@ namespace :seek do
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains"]
+    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains","tissue_and_cell_types"]
     other_tasks.each do |task|
       Rake::Task[ "seek:#{task}" ].execute      
     end
@@ -334,7 +334,7 @@ namespace :seek do
     new_root.children << modelling_assay_type
     new_root.save!
     
-    new_modelling_types = ["cell cycle","enzymology","gene expression","gene regulatory network","metabolic network","metabolism","signal transduction","translation"]
+    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation"]
     new_modelling_types.each do |title|
       a=AssayType.new(:title=>title)
       a.save!
@@ -347,17 +347,17 @@ namespace :seek do
   desc 'removes any data this is not authorized to viewed by the first User'
   task(:remove_private_data=>:environment) do
     sops=Sop.find(:all)
-    private_sops=sops.select{|s| !Authorization.is_authorized?("view",nil,s,User.first)}
+    private_sops=sops.select { |s| !Authorization.is_authorized?("view", nil, s, User.first) }
     puts "#{private_sops.size} private Sops being removed"
     private_sops.each{|s| s.destroy }
     
     models=Model.find(:all)
-    private_models=models.select{|m| !Authorization.is_authorized?("view",nil,m,User.first)}
+    private_models=models.select { |m| !Authorization.is_authorized?("view", nil, m, User.first) }
     puts "#{private_models.size} private Models being removed"
     private_models.each{|m| m.destroy }
     
     data=DataFile.find(:all)
-    private_data=data.select{|d| !Authorization.is_authorized?("view",nil,d,User.first)}
+    private_data=data.select { |d| !Authorization.is_authorized?("view", nil, d, User.first) }
     puts "#{private_data.size} private Data files being removed"
     private_data.each{|d| d.destroy }
     
@@ -368,6 +368,13 @@ namespace :seek do
     Strain.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "strains")
   end
+
+  task(:tissue_and_cell_types=>:environment) do
+    revert_fixtures_identify
+    TissueAndCellType.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "tissue_and_cell_types")
+  end
+
   
   task(:culture_growth_types=>:environment) do
     revert_fixtures_identify
@@ -507,7 +514,7 @@ namespace :seek do
     count = 0
     Publication.all.each do |pub|
       if pub.asset.policy.nil?
-        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1)
         count += 1
         pub.asset.save
       end

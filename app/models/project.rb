@@ -36,7 +36,8 @@ class Project < ActiveRecord::Base
   #  is to be used)
   belongs_to :default_policy, 
     :class_name => 'Policy',
-    :dependent => :destroy  
+    :dependent => :destroy,
+    :autosave => true
   
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
@@ -145,7 +146,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_be_edited_by?(subject)
-    return(subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
+    subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
   end
   
 end

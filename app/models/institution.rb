@@ -28,7 +28,7 @@ class Institution < ActiveRecord::Base
   end
 
    def can_be_edited_by?(subject)
-    return(subject.is_admin? ||
+    subject == nil ? false : (subject.is_admin? ||
           (self.people.include?(subject.person) && (subject.can_edit_institutions? || subject.is_project_manager?)))
   end
 

@@ -2,19 +2,25 @@ class StudiesController < ApplicationController
 
   include DotGenerator
   include IndexPager
-  
-  before_filter :login_required
-    
-  before_filter :find_studies,:only=>[:index]
-  before_filter :is_project_member,:only=>[:create,:new]
+
+  before_filter :find_assets, :only=>[:index]
+  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
-  before_filter :study_auth_project,:only=>[:edit,:update]
-  before_filter :delete_allowed,:only=>[:destroy]
   
 
   def new
     @study = Study.new
-    @study.assays << Assay.find(params[:assay_id]) if params[:assay_id]
+    investigation = nil
+    investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
+    
+    if investigation
+      if investigation.can_edit?
+        @study.investigation = investigation
+      else
+        flash.now[:error] = "You do now have permission to associate the new study with the investigation '#{investigation.title}'."
+      end
+    end
     
     respond_to do |format|
       format.html
@@ -44,12 +50,19 @@ class StudiesController < ApplicationController
   
   def update
     @study=Study.find(params[:id])
+    policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
 
     respond_to do |format|
       if @study.update_attributes(params[:study])
-        flash[:notice] = 'Study was successfully updated.'
-        format.html { redirect_to(@study) }
-        format.xml  { head :ok }
+
+        if policy_err_msg.blank?
+          flash[:notice] = 'Study was successfully updated.'
+          format.html { redirect_to(@study) }
+          format.xml  { head :ok }
+        else
+          flash[:notice] = "Study metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to study_edit_path(@study) }
+        end
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }
@@ -58,7 +71,7 @@ class StudiesController < ApplicationController
   end
 
   def show
-    @study=Study.find(params[:id])    
+    @study=Study.find(params[:id])
     respond_to do |format|
       format.html
       format.xml
@@ -67,15 +80,23 @@ class StudiesController < ApplicationController
       format.png { render :text=>to_png(@study.investigation,params[:deep]=='true',@study)}
     end
 
-  end  
+  end
 
   def create
-    @study = Study.new(params[:study])    
-    
+    @study = Study.new(params[:study])
+    @study.person_responsible = current_user.person unless @study.person_responsible
+    policy_err_msg = Policy.create_or_update_policy(@study, current_user, params)
+
     respond_to do |format|
       if @study.save
-        format.html { redirect_to(@study) }
-        format.xml { render :xml => @study, :status => :created, :location => @study }
+
+        if policy_err_msg.blank?
+          format.html { redirect_to(@study) }
+          format.xml { render :xml => @study, :status => :created, :location => @study }
+        else
+          flash[:notice] = "Study metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
+          format.html { redirect_to study_edit_path(@study) }
+        end
       else
         format.html {render :action=>"new"}
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }
@@ -127,28 +148,4 @@ class StudiesController < ApplicationController
       end
     end
   end
-
-  def study_auth_project
-    @study=Study.find(params[:id])
-    unless @study.can_edit?(current_user)
-      flash[:error] = "You cannot edit a Study for a project you are not a member."
-      redirect_to @study
-    end
-  end
-
-  def delete_allowed
-    @study=Study.find(params[:id])
-    unless @study.can_delete?(current_user)
-      respond_to do |format|
-        flash[:error] = "You cannot delete a Study related to a project or which you are not a member, or that has assays associated"
-        format.html { redirect_to studies_path }
-      end
-      return false
-    end
-  end
-  
-  def find_studies
-    @studies=apply_filters(Study.find(:all))    
-  end
-  
 end

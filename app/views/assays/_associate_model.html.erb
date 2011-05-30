@@ -88,7 +88,7 @@
   }
   
 <% @assay.model_masters.each do |s| -%>    
-  <% if Authorization.is_authorized?("show",nil,s,current_user) -%>
+  <% if s.can_view? -%>
       model_id = '<%= s.id -%>';
       model_title = '<%= escape_javascript(s.title) -%>';
       addModel(model_title, model_id);
@@ -98,7 +98,7 @@
 <% if params[:assay_model_ids] %>
   <% params[:assay_model_ids].each do |id| -%>
     <% model = Model.find(id) %>
-    <% if Authorization.is_authorized?("show",nil,model,current_user) -%>
+    <% if model.can_view?-%>
         model_id = '<%= model.id -%>';
         model_title = '<%= escape_javascript(model.title) -%>';
         addModel(model_title, model_id);

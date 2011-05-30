@@ -314,10 +314,15 @@ module ApplicationHelper
   end
   
   #Return whether or not to hide contact details from this user
-  #Current decided by HIDE_DETAILS flag in environment_local.rb
+  #Current decided by Seek::Config.hide_details_enabled in config.rb
   #Defaults to false
   def hide_contact_details?
-    Seek::Config.hide_details_enabled
+    #hide for non-login and non-project-member
+    if !logged_in? or !current_user.person.member?
+      return true
+    else
+      Seek::Config.hide_details_enabled
+    end
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
@@ -361,7 +366,7 @@ module ApplicationHelper
   end
 
   def can_manage_announcements?
-    return current_user.is_admin?
+    return admin_logged_in?
   end
 
   def show_or_hide_block visible=true
@@ -414,7 +419,7 @@ module ApplicationHelper
     @policy_type = policy_type
     @sharing_mode = policy.sharing_scope
     @access_mode = policy.access_type
-    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
+    @use_custom_sharing = !policy.permissions.empty?
     @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
     @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
 

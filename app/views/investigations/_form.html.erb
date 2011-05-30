@@ -1,23 +1,28 @@
+<%= javascript_include_tag "sharing.js" %>
 <%= f.error_messages -%>
 
-<center>
-  <div style="width: 90%;">
-    <p>
-      <%= f.label :title-%><span class="required">*</span><br/>
-      <%= f.text_area :title,:style => "width: 100%;", :rows=>2 -%>
-    </p>
 
-    <p>
-      <%= f.label :description -%><br/>
-      <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
-    </p>
+<div style="width: 90%;">
+  <p>
+    <%= f.label :title-%><span class="required">*</span><br/>
+    <%= f.text_area :title,:style => "width: 100%;", :rows=>2 -%>
+  </p>
 
-    <p>
-      <%= f.label :project -%><br/>
-      <%= f.collection_select :project_id,current_user.person.projects,:id,:name %>
-    </p>
-  </div>
-</center>
+  <p>
+    <%= f.label :description -%><br/>
+    <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
+  </p>
+
+  <p>
+    <%= f.label :project -%><br/>
+    <%= f.collection_select :project_id,current_user.person.projects,:id,:name %>
+  </p>
+
+  <p>
+    <%= render :partial=>"assets/sharing_form" if @investigation.can_manage? -%>
+  </p>
+</div>
+
 
 
 <p style="margin-top: 2em; text-align: center;" >

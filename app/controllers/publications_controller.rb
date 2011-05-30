@@ -6,7 +6,6 @@ class PublicationsController < ApplicationController
   
   require 'pubmed_query_tool'
   
-  before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :fetch_publication, :only => [:show, :edit, :update, :destroy]
   before_filter :associate_authors, :only => [:edit, :update]
@@ -70,19 +69,19 @@ class PublicationsController < ApplicationController
         end
 
         Assay.find(assay_ids).each do |assay|
-          Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?(current_user)
+          Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION) if assay.can_edit?
         end
 
         #Make a policy
-        policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
         @publication.policy = policy
         @publication.save
         #add managers (authors + contributor)
         @publication.creators.each do |author|
-          policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => 4)
+          policy.permissions << Permission.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
         end
         #Add contributor
-        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => 4)
+        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => policy, :access_type => Policy::MANAGING)
         
         flash[:notice] = 'Publication was successfully created.'
         format.html { redirect_to(edit_publication_url(@publication)) }
@@ -133,32 +132,32 @@ class PublicationsController < ApplicationController
 
         # Update relationship
         Assay.find(assay_ids).each do |assay|
-          if assay.can_edit?(current_user) && Relationship.find_all_by_object_id(@publication.id, :conditions => "subject_id = #{assay.id}").empty?
-            Relationship.create_or_update_attributions(assay,{"Publication", @publication.id}.to_json, Relationship::RELATED_TO_PUBLICATION)
+          if assay.can_edit?
+            Relationship.create_or_update_attributions(assay,[["Publication", @publication.id]], Relationship::RELATED_TO_PUBLICATION)
           end
         end
         #Destroy Assay relationship that aren't needed
         associate_relationships = Relationship.find(:all,:conditions=>["object_id = ? and subject_type = ?",@publication.id,"Assay"])
-        logger.info associate_relationships
         associate_relationships.each do |associate_relationship|
-          if associate_relationship.subject.can_edit?(current_user) && !assay_ids.include?(associate_relationship.subject_id.to_s)
-            Relationship.destroy(associate_relationship.id)
+          assay = associate_relationship.subject
+          if assay.can_edit? && !assay_ids.include?(assay.id.to_s)
+            associate_relationship.destroy
           end
         end
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
-          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
           @publication.save
         end
         
         #Update policy so current authors have manage permissions
         @publication.creators.each do |author|
           @publication.policy.permissions.clear
-          @publication.policy.permissions << Permission.create(:contributor => author, :policy => @publication.policy, :access_type => 4)
+          @publication.policy.permissions << Permission.create(:contributor => author, :policy => @publication.policy, :access_type => Policy::MANAGING)
         end      
         #Add contributor
-        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => 4)
+        @publication.policy.permissions << Permission.create(:contributor => @publication.contributor.person, :policy => @publication.policy, :access_type => Policy::MANAGING)
         
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
@@ -308,7 +307,7 @@ class PublicationsController < ApplicationController
     begin
       publication = Publication.find(params[:id])            
       
-      if Authorization.is_authorized?(action_name, nil, publication, current_user)
+      if publication.can_perform? translate_action(action_name)
         @publication = publication
       else
         respond_to do |format|

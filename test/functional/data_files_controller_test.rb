@@ -7,6 +7,7 @@ class DataFilesControllerTest < ActionController::TestCase
   
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
   
   def setup
     login_as(:datafile_owner)
@@ -24,7 +25,72 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:data_files)
   end
-  
+
+  test 'should show index for non-project member, non-login user' do
+    login_as(:registered_user_with_no_projects)
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+
+    logout
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+  end
+
+  test 'shouldnt show upload button for non-project member and non-login user' do
+    login_as(:registered_user_with_no_projects)
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+    assert_select "a",:text=>/Upload a datafile/,:count=>0
+
+    logout
+    get :index
+    assert_response :success
+    assert_not_nil assigns(:data_files)
+    assert_select "a",:text=>/Upload a datafile/,:count=>0
+  end
+
+  test 'non-project member and non-login user can edit datafile with public policy and editable' do
+    login_as(:registered_user_with_no_projects)
+    data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
+    get :show, :id => data_file
+    assert_response :success
+    put :update, :id => data_file, :data_file => {:title => 'new title'}
+    assert_equal 'new title', assigns(:data_file).title
+
+    logout
+    data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
+    get :show, :id => data_file
+    assert_response :success
+    put :update, :id => data_file, :data_file => {:title => 'new title'}
+    assert_equal 'new title', assigns(:data_file).title
+
+  end
+
+  test "associates assay" do
+    login_as(:model_owner) #can edit assay
+    d = data_files(:picture)
+    original_assay = assays(:metabolomics_assay)
+    asset_ids = original_assay.related_asset_ids 'DataFile'
+    assert asset_ids.include? d.id
+
+    new_assay=assays(:metabolomics_assay2)
+    new_asset_ids = new_assay.related_asset_ids 'DataFile'
+    assert !new_asset_ids.include?(d.id)
+
+    put :update, :id => d, :data_file =>{}, :assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to data_file_path(d)
+    d.reload
+    original_assay.reload
+    new_assay.reload
+
+    assert !original_assay.related_asset_ids('DataFile').include?(d.id)
+    assert new_assay.related_asset_ids('DataFile').include?(d.id)
+  end
+
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -188,9 +254,11 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should create data file" do
+    login_as(:datafile_owner) #can edit assay
+    assay=assays(:assay_can_edit_by_datafile_owner)
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file, :sharing=>valid_sharing
+        post :create, :data_file => valid_data_file, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -198,6 +266,8 @@ class DataFilesControllerTest < ActionController::TestCase
     
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.url.blank?
+    assay.reload
+    assert assay.related_asset_ids('DataFile').include? assigns(:data_file).id
   end
 
   test "should create data file for upload tool" do
@@ -236,7 +306,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal private_policy.access_type,df.policy.access_type
     assert_equal private_policy.use_whitelist,df.policy.use_whitelist
     assert_equal private_policy.use_blacklist,df.policy.use_blacklist
-    assert_equal false,df.policy.use_custom_sharing
     assert df.policy.permissions.empty?
     
     #check it doesn't create an error when retreiving the index
@@ -288,7 +357,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "shouldn't download" do
     login_as(:aaron)
     get :download, :id => data_files(:viewable_data_file)
-    assert_redirected_to data_files_path
+    assert_redirected_to data_file_path(data_files(:viewable_data_file))
     assert flash[:error]    
   end
   
@@ -317,8 +386,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not expose non downloadable spreadsheet" do
     login_as(:model_owner)
     get :data, :id => data_files(:viewable_data_file),:format=>"xml"    
-    assert_redirected_to data_files_path(:format=>"xml")
-    assert_not_nil flash[:error]         
+    assert_response 403
   end
   
   def test_should_not_expose_contents_for_picture
@@ -330,7 +398,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not expose spreadsheet contents if not authorized" do
     login_as(:aaron)
     get :data, :id => data_files(:viewable_data_file)
-    assert_redirected_to data_files_path
+    assert_redirected_to data_file_path(data_files(:viewable_data_file))
     assert flash[:error]    
   end
   
@@ -557,7 +625,49 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal ["golf","soup"],df.tag_counts.collect(&:name).sort
 
   end
-  
+
+  test "correct response to unknown action" do
+    df=data_files(:picture)
+    assert_raises ActionController::UnknownAction do
+      get :sdkfjshdfkhsdf, :id=>df
+    end
+  end
+
+  test "do publish" do
+    df=data_files(:picture)
+    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    post :publish,:id=>df
+    assert_redirected_to data_file_path(df)
+    assert_nil flash[:error]
+    assert_not_nil flash[:notice]
+  end
+
+  test "do not publish if not can_manage?" do
+    login_as(:quentin)
+    df=data_files(:picture)
+    assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
+    post :publish,:id=>df
+    assert_redirected_to data_file_path(df)
+    assert_not_nil flash[:error]
+    assert_nil flash[:notice]
+  end
+
+  test "get preview_publish" do
+    df=data_files(:picture)
+    assert df.can_manage?,"The datafile must be manageable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_response :success
+  end
+
+  test "cannot get preview_publish when not manageable" do
+    login_as(:quentin)
+    df = data_files(:picture)
+    assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
+    get :preview_publish, :id=>df
+    assert_redirected_to data_file_path(df)
+    assert flash[:error]
+  end
+
   private
   
   def valid_data_file
@@ -570,15 +680,6 @@ class DataFilesControllerTest < ActionController::TestCase
   
   def valid_data_file_with_ftp_url
       { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
-  end
-  
-  def valid_sharing
-    {
-      :use_whitelist=>"0",
-      :user_blacklist=>"0",
-      :sharing_scope=>Policy::ALL_REGISTERED_USERS,
-      :permissions=>{:contributor_types=>ActiveSupport::JSON.encode("Person"),:values=>ActiveSupport::JSON.encode({})}
-    }
   end
   
 end

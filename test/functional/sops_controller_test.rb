@@ -6,6 +6,7 @@ class SopsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
+  include SharingFormTestHelper
 
   def setup
     login_as(:quentin)
@@ -112,20 +113,47 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
   end
 
+  test "associates assay" do
+    login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
+    s = sops(:my_first_sop)
+    original_assay = assays(:assay_can_edit_by_my_first_sop_owner1)
+    asset_ids = original_assay.related_asset_ids 'Sop'
+    assert asset_ids.include? s.id
+
+    new_assay=assays(:assay_can_edit_by_my_first_sop_owner2)
+    new_asset_ids = new_assay.related_asset_ids 'Sop'
+    assert !new_asset_ids.include?(s.id)
+
+    put :update, :id => s.id, :sop =>{}, :assay_ids=>[new_assay.id.to_s]
+
+    assert_redirected_to sop_path(s)
+
+    s.reload
+    original_assay.reload
+    new_assay.reload
+
+    assert !original_assay.related_asset_ids('Sop').include?(s.id)
+    assert new_assay.related_asset_ids('Sop').include?(s.id)
+  end
+
   test "should create sop" do
+    login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
+    assay=assays(:assay_can_edit_by_my_first_sop_owner1)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => valid_sop, :sharing=>valid_sharing
+        post :create, :sop => valid_sop, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
       end
     end
 
     assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:quentin), assigns(:sop).contributor
+    assert_equal users(:owner_of_my_first_sop), assigns(:sop).contributor
 
     assert assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
     assert assigns(:sop).content_blob.file_exists?
     assert_equal "file_picture.png", assigns(:sop).original_filename
+    assay.reload
+    assert assay.related_asset_ids('Sop').include? assigns(:sop).id
   end
 
   def test_missing_sharing_should_default_to_private
@@ -144,7 +172,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal private_policy.access_type, sop.policy.access_type
     assert_equal private_policy.use_whitelist, sop.policy.use_whitelist
     assert_equal private_policy.use_blacklist, sop.policy.use_blacklist
-    assert_equal false, sop.policy.use_custom_sharing
     assert sop.policy.permissions.empty?
 
     #check it doesn't create an error when retreiving the index
@@ -309,7 +336,7 @@ class SopsControllerTest < ActionController::TestCase
       post :new_version, :id=>s, :data=>fixture_file_upload('files/file_picture.png'), :revision_comment=>"This is a new revision"
     end
 
-    assert_redirected_to sops_path
+    assert_redirected_to sop_path(s)
     assert_not_nil flash[:error]
 
     s=Sop.find(s.id)
@@ -610,6 +637,41 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test "do publish" do
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    assert sop.can_manage?,"The sop must be manageable for this test to succeed"
+    post :publish,:id=>sop
+    assert_redirected_to sop
+    assert_nil flash[:error]
+    assert_not_nil flash[:notice]
+  end
+
+  test "do not publish if not can_manage?" do
+    sop=sops(:my_first_sop)
+    assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
+    post :publish,:id=>sop
+    assert_redirected_to sop
+    assert_not_nil flash[:error]
+    assert_nil flash[:notice]
+  end
+
+  test "get preview_publish" do
+    login_as(:owner_of_my_first_sop)
+    sop=sops(:my_first_sop)
+    assert sop.can_manage?,"The sop must be manageable for this test to succeed"
+    get :preview_publish, :id=>sop
+    assert_response :success
+  end
+
+  test "cannot get preview_publish when not manageable" do
+    sop=sops(:my_first_sop)
+    assert !sop.can_manage?,"The sop must not be manageable for this test to succeed"
+    get :preview_publish, :id=>sop
+    assert_redirected_to sop
+    assert flash[:error]
+  end
+
   private
 
   def valid_sop_with_url
@@ -620,12 +682,4 @@ class SopsControllerTest < ActionController::TestCase
     {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
   end
 
-  def valid_sharing
-    {
-        :use_whitelist =>"0",
-        :user_blacklist=>"0",
-        :sharing_scope =>Policy::ALL_REGISTERED_USERS,
-        :permissions   =>{:contributor_types=>ActiveSupport::JSON.encode("Person"), :values=>ActiveSupport::JSON.encode({})}
-    }
-  end
 end

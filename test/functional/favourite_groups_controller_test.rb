@@ -15,7 +15,9 @@ class FavouriteGroupsControllerTest < ActionController::TestCase
     
     name=fav.name
 
-    post :create,:favourite_group_name=>name,:favourite_group_members=>{}.to_json,:format=>"json"
+    assert_no_difference("FavouriteGroup.count") do
+      post :create,:favourite_group_name=>name,:favourite_group_members=>{}.to_json,:format=>"json"
+    end
 
     json_response=ActiveSupport::JSON.decode(@response.body)
     assert_equal 422,json_response['status']

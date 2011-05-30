@@ -46,7 +46,7 @@ class Sop < ActiveRecord::Base
   def self.get_all_as_json(user)
     all_sops = Sop.find(:all, :order => "ID asc")
     sops_with_contributors = all_sops.collect{ |s|
-      Authorization.is_authorized?("show", nil, s, user) ?
+      s.can_view?(user) ?
         (contributor = s.contributor;
         { "id" => s.id,
           "title" => s.title,

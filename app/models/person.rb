@@ -126,6 +126,10 @@ class Person < ActiveRecord::Base
     return res
   end
 
+  def member?
+    !projects.empty?
+  end
+
   def locations
     # infer all person's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }
@@ -178,7 +182,7 @@ class Person < ActiveRecord::Base
   end
 
   def can_be_edited_by?(subject)
-    return((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
+    subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
   end
 
   private

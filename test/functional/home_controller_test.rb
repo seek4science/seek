@@ -5,16 +5,22 @@ class HomeControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
-  def test_redirected_to_login_if_not_logged_in
+  test "test should be accessible to seek even if not logged in" do
     get :index
-    assert_response :redirect
-    assert_redirected_to :controller => 'sessions', :action => 'new'
+    assert_response :success
   end
 
-  def test_title
+  test "test title" do
     login_as(:quentin)
     get :index
     assert_select "title",:text=>/The Sysmo SEEK.*/, :count=>1
+  end
+
+  test "correct response to unknown action" do
+    login_as(:quentin)
+    assert_raises ActionController::UnknownAction do
+      get :sdjgsdfjg
+    end
   end
 
   test "should get feedback form" do
@@ -40,7 +46,7 @@ class HomeControllerTest < ActionController::TestCase
   test "SOP tab should be capitalized" do
     login_as(:quentin)
     get :index
-    assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+    assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
   end
 
   test "SOP upload option should be capitlized" do
@@ -52,15 +58,36 @@ class HomeControllerTest < ActionController::TestCase
   end
 
   test "hidden items do not appear in recent items" do
-    model = models(:private_model)
-    model.title="An updated private model"
-    model.save! #to make sure it a recent item
+    model = Factory :model, :policy => Factory(:private_policy), :title => "A title"
 
+    login_as(:quentin)
     get :index
 
     #difficult to use assert_select, because of the way the tabbernav tabs are constructed with javascript onLoad
     assert !@response.body.include?(model.title)
   end
 
+  test 'root should route to sign_up when no user, otherwise to home' do
+    User.find(:all).each do |u|
+      u.delete
+    end
+    get :index
+    assert_redirected_to :controller => 'users', :action => 'new'
 
+    Factory(:user)
+    get :index
+    assert_response :success
+  end
+
+  test 'should hide the forum tab for unlogin user' do
+    logout
+    get :index, :controller => 'home'
+    assert_response :success
+    assert_select 'a',:text=>/Forum/,:count=>0
+
+    login_as(:quentin)
+    get :index
+    assert_response :success
+    assert_select 'a',:text=>/Forum/,:count=>1
+  end
 end

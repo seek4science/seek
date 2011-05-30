@@ -1,7 +1,5 @@
 class SearchController < ApplicationController
   
-  before_filter :login_required
-  
   def index
     
     @search_query = params[:search_query]
@@ -39,8 +37,12 @@ class SearchController < ApplicationController
       @results = Assay.multi_solr_search(downcase_query, :limit=>100, :models=>[Assay]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
    when ("publications")
       @results = Publication.multi_solr_search(downcase_query, :limit=>100, :models=>[Publication]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+   when ("specimens")
+      @results = Specimen.multi_solr_search(downcase_query, :limit=>100, :models=>[Specimen]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+   when ("samples")
+      @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
     else
-      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Study,DataFile,Assay,Investigation, Publication]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+      @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution,Sop,Model,Study,DataFile,Assay,Investigation, Publication, Specimen, Sample]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
     end
 
     @results = select_authorised @results    
@@ -54,9 +56,9 @@ class SearchController < ApplicationController
 
   private  
 
-  #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
+  #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
   def select_authorised collection
-    collection.select {|el| Authorization.is_authorized?("show", nil, el, current_user)}
+    collection.select {|el| el.can_view?}
   end
   
 end

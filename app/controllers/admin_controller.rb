@@ -38,6 +38,7 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
+    Seek::Config.public_seek_enabled= string_to_boolean params[:public_seek_enabled]
     Seek::Config.events_enabled= string_to_boolean params[:events_enabled]
     Seek::Config.jerm_enabled= string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled= string_to_boolean params[:email_enabled]
@@ -219,7 +220,7 @@ class AdminController < ApplicationController
       when "invalid"
         collection = {}
         type = "invalid_users"
-        pal_role=Role.find(:first,:conditions=>{:name=>"#{Seek::Config.dm_project_name} Pal"})
+        pal_role=Role.pal_role
         collection[:pal_mismatch] = Person.find(:all).select {|p| p.is_pal? != p.roles.include?(pal_role)}
         collection[:duplicates] = Person.duplicates
         collection[:no_person] = User.without_profile

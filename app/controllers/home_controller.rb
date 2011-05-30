@@ -1,9 +1,8 @@
 class HomeController < ApplicationController
   
-  before_filter :login_required  
-  
-  layout :select_layout
-  
+
+  before_filter :redirect_to_sign_up_when_no_user
+
   def index
     respond_to do |format|
       format.html # index.html.erb      
@@ -16,14 +15,6 @@ class HomeController < ApplicationController
     end
   end
   
-  def select_layout
-    if logged_in?
-      return 'main'
-    else
-      return 'logged_out'
-    end
-  end
-
   def feedback
     respond_to do |format|
       format.html
@@ -48,6 +39,12 @@ class HomeController < ApplicationController
       end
       flash[:notice]="Your feedback has been delivered. Thank You."
       redirect_to root_path
+    end
+  end
+
+  def redirect_to_sign_up_when_no_user
+    if User.count == 0
+      redirect_to :controller => 'users', :action => 'new'
     end
   end
 
