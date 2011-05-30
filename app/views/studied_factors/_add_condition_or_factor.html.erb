@@ -1,0 +1,68 @@
+<%= javascript_include_tag "sharing.js" -%>
+<%
+   entity=controller_name.singularize
+   object=eval("@"+entity)
+   display_asset = nil
+   path_to_object = nil
+   if asset == "data_file"
+      display_asset = @display_data_file
+      path_to_object = data_file_path(@data_file).concat("/#{controller_name}")
+   elsif asset == "sop"
+     display_asset = @sop
+     path_to_object = sop_path(@sop).concat("/#{controller_name}")
+   end
+%>
+
+<% remote_form_for entity, object,
+  :url=> path_to_object,
+  :before=>"$('#{entity}_submit').disabled=true;",
+  :loaded=>"$('#{entity}_submit').disabled=false;",
+  :html=>{:method=>:post, :id => "add_condition_or_factor_form"} do |f| -%>
+
+
+  <div class="conditions_or_factors" >
+  <h4> Add new entry </h4>
+  <table >
+    <tr>
+      <% if entity == "studied_factor" %>
+        <th>Time point</th>
+      <% end %>
+      <th>Item</th>
+      <th>Unit</th>
+      <th>Start value</th>
+      <th>End value</th>
+      <% if entity == "studied_factor" %>
+        <th>SD</th>
+      <% end %>
+    </tr>
+    <tr>
+
+      <% if entity == "studied_factor" %>
+        <td><%= f.text_field :time_point, :size=>4 %></td>
+        <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
+        <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
+      <% elsif entity == "experimental_condition" %>
+        <td><%=  f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
+        <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
+      <% end %>
+
+      <td><%= f.text_field :start_value,:size=>4 %></td>
+
+      <td><%= f.text_field :end_value,:size=>4 %></td>
+
+      <% if entity == "studied_factor" %>
+        <td><%= f.text_field :standard_deviation,:size=>4 %></td>
+      <% end %>
+
+      <td><%= f.submit "Add" %></td>
+
+      <%= hidden_field_tag "version", display_asset.version -%>
+    </tr>
+
+  </table>
+  <div class="substance_condition_factor">
+    <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}%>
+  </div>
+  </div>
+
+<% end -%>

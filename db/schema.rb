@@ -129,6 +129,12 @@ ActiveRecord::Schema.define(:version => 20110525154213) do
     t.string  "conceptable_type"
   end
 
+  create_table "compounds", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "content_blobs", :force => true do |t|
     t.binary "data_old", :limit => 2147483647
     t.string "md5sum"
@@ -247,6 +253,8 @@ ActiveRecord::Schema.define(:version => 20110525154213) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "sop_version"
+    t.integer  "substance_id"
+    t.string   "substance_type"
   end
 
   create_table "favourite_group_memberships", :force => true do |t|
@@ -366,6 +374,7 @@ ActiveRecord::Schema.define(:version => 20110525154213) do
     t.string   "title"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "factors_studied", :default => true
   end
 
   create_table "model_formats", :force => true do |t|
@@ -733,12 +742,14 @@ ActiveRecord::Schema.define(:version => 20110525154213) do
     t.float    "start_value"
     t.float    "end_value"
     t.integer  "unit_id"
-    t.integer  "time_point"
+    t.float    "time_point"
     t.integer  "data_file_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.float    "standard_deviation"
     t.integer  "data_file_version"
+    t.integer  "substance_id"
+    t.string   "substance_type"
   end
 
   create_table "studies", :force => true do |t|
@@ -754,6 +765,16 @@ ActiveRecord::Schema.define(:version => 20110525154213) do
     t.string   "first_letter",          :limit => 1
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+  end
+
+  create_table "synonyms", :force => true do |t|
+    t.string   "name"
+    t.integer  "substance_id"
+    t.string   "substance_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "taggings", :force => true do |t|
@@ -825,6 +846,8 @@ ActiveRecord::Schema.define(:version => 20110525154213) do
     t.datetime "updated_at"
     t.string   "symbol"
     t.string   "comment"
+    t.boolean  "factors_studied", :default => true
+    t.integer  "order"
   end
 
   create_table "users", :force => true do |t|

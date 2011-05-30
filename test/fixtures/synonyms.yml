@@ -1,0 +1,6 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+glucose_synonym:
+  name: glk
+  substance: compound_glucose
+  substance_type: Compound

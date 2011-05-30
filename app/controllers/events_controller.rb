@@ -37,33 +37,20 @@ class EventsController < ApplicationController
 
   def create
     @event = Event.new params[:event]
-    @event.contributor=current_user
-    data_file_ids = params[:data_file_ids] || []
-    data_file_ids.each do |text|
-      a_id, r_type = text.split(",")
-      d = DataFile.find(a_id)
-      @event.data_files << d if d.can_view? and !@event.data_files.include?d
-    end
-    params.delete :data_file_ids
 
-    publication_ids = params[:related_publication_ids] || []
-    publication_ids.each do |id|
-      p = Publication.find(id)
-      @event.publications << p if !@event.publications.include?p
-    end
-    params.delete :related_publication_ids
-    policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
+    data_file_ids = params.delete(:data_file_ids) || []
+    data_file_ids.collect! {|text| id, rel = text.split(','); id}
+    @event.data_files = DataFile.find(data_file_ids)
+
+    publication_ids = params.delete(:related_publication_ids) || []
+    @event.publications = Publication.find(publication_ids)
+
+    @event.policy.set_attributes_with_sharing params[:sharing], @event.project
 
     respond_to do | format |
       if @event.save
-
-        if policy_err_msg.blank?
-          flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
-          format.html { redirect_to @event }
-        else
-          flash[:notice] = "Event was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to event_edit_path(@event)}
-        end
+        flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
+        format.html { redirect_to @event }
       else
         @new = true
         format.html {render "events/form"}
@@ -77,34 +64,24 @@ class EventsController < ApplicationController
   end
 
   def update
-    data_file_ids = params[:data_file_ids] || []
-    @event.data_files = []
-    data_file_ids.each do |text|
-      a_id, r_type = text.split(",")
-      d = DataFile.find(a_id)
-      @event.data_files << d if d.can_view? and !@event.data_files.include?d
-    end
-    params.delete :data_file_ids
+    data_file_ids = params.delete(:data_file_ids) || []
+    data_file_ids.collect! {|text| id, rel = text.split(','); id}
+    @event.data_files = DataFile.find(data_file_ids)
 
-    publication_ids = params[:related_publication_ids] || []
-    @event.publications = []
-    publication_ids.each do |id|
-      p = Publication.find(id)
-      @event.publications << p if !@event.publications.include?p
+    publication_ids = params.delete(:related_publication_ids) || []
+    @event.publications = Publication.find(publication_ids)
+
+    @event.attributes = params[:event]
+
+    if params[:sharing]
+      @event.policy_or_default
+      @event.policy.set_attributes_with_sharing params[:sharing], @event.project
     end
-    params.delete :related_publication_ids
-    policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
 
     respond_to do | format |
-      if @event.update_attributes params[:event]
-
-        if policy_err_msg.blank?
-          flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
-          format.html { redirect_to @event }
-        else
-          flash[:notice] = "Event metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to event_edit_path(@event)}
-        end
+      if @event.save
+        flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
+        format.html { redirect_to @event }
       else
         @new = false
         format.html {render "events/form"}

@@ -22,11 +22,9 @@ class SpecimensController < ApplicationController
     o_id =organism.split(",").first
     @specimen.organism= Organism.find o_id if o_id.kind_of?(Numeric) || o_id.kind_of?(String)
 
-    @specimen.contributor = current_user
     @specimen.project_id = params[:project_id]
 
-    @specimen.policy_or_default
-    @specimen.policy.set_attributes_with_sharing params[:sharing]
+    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
@@ -54,6 +52,9 @@ class SpecimensController < ApplicationController
     organism = params[:specimen_organism_id] || []
     o_id =organism.split(",").first
 
+    @specimen.attributes = params[:specimen]
+
+    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
     if o_id.kind_of?(Numeric) || o_id.kind_of?(String)
     @specimen.organism  = Organism.find o_id
     else
@@ -61,12 +62,10 @@ class SpecimensController < ApplicationController
        @specimen.strain = nil
        @specimen.culture_growth_type =nil
     end
-    @specimen.contributor = current_user
-    @specimen.policy.set_attributes_with_sharing params[:sharing]
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|
-      if @specimen.update_attributes params[:specimen]
+      if @specimen.save
            o_id, strain, culture_growth_type_text=organism.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @specimen.associate_organism(o_id, strain, culture_growth)

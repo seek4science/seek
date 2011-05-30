@@ -16,11 +16,9 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(params[:sample])
-    @sample.contributor = current_user
 
     #add policy to sample
-    @sample.policy_or_default
-    @sample.policy.set_attributes_with_sharing params[:sharing]
+    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.project
     tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
     sops       = params[:sample_sop_ids] || []
     respond_to do |format|
@@ -49,11 +47,14 @@ class SamplesController < ApplicationController
 
       tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
       sops       = params[:sample_sop_ids] || []
+
+      @sample.attributes = params[:sample]
+
       #update policy to sample
-      @sample.policy.set_attributes_with_sharing params[:sharing]
+      @sample.policy.set_attributes_with_sharing params[:sharing], @sample.project
       respond_to do |format|
 
-      if @sample.update_attributes params[:sample]
+      if @sample.save
         if tissue_and_cell_types.blank?
           @sample.tissue_and_cell_types= tissue_and_cell_types
           @sample.save

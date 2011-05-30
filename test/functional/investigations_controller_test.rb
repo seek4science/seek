@@ -104,16 +104,16 @@ class InvestigationsControllerTest < ActionController::TestCase
 
 
   test "unauthorized user can't edit investigation" do
-    login_as(Factory(:user))
     i=Factory(:investigation, :policy => Factory(:private_policy))
+    login_as(Factory(:user))
     get :edit, :id=>i
     assert_redirected_to investigation_path(i)
     assert flash[:error]
   end
 
   test "unauthorized users can't update investigation" do
-    login_as(Factory(:user))
     i=Factory(:investigation, :policy => Factory(:private_policy))
+    login_as(Factory(:user))
     put :update, :id=>i.id,:investigation=>{:title=>"test"}
 
     assert_redirected_to investigation_path(i)
@@ -129,8 +129,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test "unauthorized user should not destroy investigation" do
-    login_as(Factory(:user))
     i = Factory(:investigation, :policy => Factory(:private_policy))
+    login_as(Factory(:user))
     assert_no_difference("Investigation.count") do
       delete :destroy, :id => i.id
     end
@@ -158,6 +158,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test "no option to delete investigation when unauthorized" do
     i = Factory :investigation, :policy => Factory(:private_policy)
+    login_as Factory(:user)
     get :show,:id=>i.id
     assert_select "a",:text=>/Delete Investigation/,:count=>0
   end

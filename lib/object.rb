@@ -40,3 +40,11 @@ class Object
 
 end
 
+Module.module_eval do
+  def class_alias_method_chain name, feature
+    singleton_class.instance_eval do
+      alias_method_chain name, feature
+    end
+  end
+end
+

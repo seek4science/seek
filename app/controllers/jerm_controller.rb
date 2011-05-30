@@ -26,7 +26,7 @@ class JermController < ApplicationController
       format.html
     end
   end
-  
+
   def download
     if params[:id]
       asset = Asset.find(params[:id])

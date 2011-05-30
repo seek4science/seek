@@ -454,6 +454,12 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_classes")
   end
   
+   task(:compounds=>:environment) do
+    revert_fixtures_identify
+    Compound.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "compounds")
+  end
+
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
   task :xmi => :environment do
     require 'lib/uml_dumper.rb'

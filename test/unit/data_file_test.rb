@@ -13,33 +13,35 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "event association" do
-    datafile = data_files(:picture)
-    assert datafile.events.empty?
-    event = events(:event_with_no_files)
-    datafile.events << event
-    assert datafile.valid?
-    User.current_user = datafile.contributor
-    assert datafile.save
-    assert_equal 1, datafile.events.count
+    User.with_current_user Factory(:user) do
+      datafile = Factory :data_file, :contributor => User.current_user
+      event = Factory :event, :contributor => User.current_user
+      datafile.events << event
+      assert datafile.valid?
+      assert datafile.save
+      assert_equal 1, datafile.events.count
+    end
   end
 
   test "assay association" do
-    datafile = data_files(:picture)
-    assay = assays(:modelling_assay_with_data_and_relationship)
-    relationship = relationship_types(:validation_data)
-    assay_asset = assay_assets(:metabolomics_assay_asset1)
-    assert_not_equal assay_asset.asset, datafile
-    assert_not_equal assay_asset.assay, assay
-    assay_asset.asset = datafile
-    assay_asset.assay = assay
-    assay_asset.relationship_type = relationship
-    assay_asset.save!
-    assay_asset.reload
+    User.with_current_user Factory(:user) do
+      datafile = data_files(:picture)
+      assay = assays(:modelling_assay_with_data_and_relationship)
+      relationship = relationship_types(:validation_data)
+      assay_asset = assay_assets(:metabolomics_assay_asset1)
+      assert_not_equal assay_asset.asset, datafile
+      assert_not_equal assay_asset.assay, assay
+      assay_asset.asset = datafile
+      assay_asset.assay = assay
+      assay_asset.relationship_type = relationship
+      assay_asset.save!
+      assay_asset.reload
 
-    assert assay_asset.valid?
-    assert_equal assay_asset.asset, datafile
-    assert_equal assay_asset.assay, assay
-    assert_equal assay_asset.relationship_type, relationship
+      assert assay_asset.valid?
+      assert_equal assay_asset.asset, datafile
+      assert_equal assay_asset.assay, assay
+      assert_equal assay_asset.relationship_type, relationship
+    end
   end
 
   test "sort by updated_at" do
@@ -135,11 +137,13 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'failing to delete due to can_delete does not create trash' do
-    df = Factory :data_file, :policy => Factory(:private_policy)
-    assert_no_difference("DataFile.count") do
-      df.destroy
+    df = Factory :data_file, :policy => Factory(:private_policy), :contributor => Factory(:user)
+    User.with_current_user Factory(:user) do
+      assert_no_difference("DataFile.count") do
+        df.destroy
+      end
+      assert_nil DataFile.restore_trash(df.id)
     end
-    assert_nil DataFile.restore_trash(df.id)
   end
   
   test "test uuid generated" do

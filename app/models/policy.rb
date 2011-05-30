@@ -29,6 +29,7 @@ class Policy < ActiveRecord::Base
   # is preserved
   
   # sharing_scope
+  SHARE_WITH_PROJECT = -1 #never should be stored in the database, used by form
   PRIVATE = 0
   CUSTOM_PERMISSIONS_ONLY = 1
   ALL_SYSMO_USERS = 2
@@ -61,28 +62,14 @@ class Policy < ActiveRecord::Base
   end
 
   def self.new_for_upload_tool(resource, recipient)
-    policy = resource.create_policy(:name               => 'auto',
+    policy = resource.build_policy(:name               => 'auto',
                                     :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
                                     :access_type        => Policy::NO_ACCESS)
-    policy.permissions.create :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
+    policy.permissions.build :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
     return policy
   end
 
-  def self.create_or_update_policy  resource, user, params
-    resource.policy_or_default
-    resource.policy.set_attributes_with_sharing(params[:sharing])
-    resource.save
-    resource.errors.full_messages.join('\n')
-  end
-
-  def self.create_or_update_default_policy(project, user, params)
-    project.default_policy = Policy.private_policy unless project.default_policy
-    project.default_policy.set_attributes_with_sharing(params[:sharing])
-    project.save
-    project.errors.full_messages.join('\n')
-  end
-  
-  def set_attributes_with_sharing sharing
+  def set_attributes_with_sharing sharing, project
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     returning self do |policy|
@@ -95,7 +82,6 @@ class Policy < ActiveRecord::Base
         policy.use_whitelist = sharing[:use_whitelist]
         policy.use_blacklist = sharing[:use_blacklist]
 
-    
         # NOW PROCESS THE PERMISSIONS
 
         # read the permission data from sharing
@@ -114,18 +100,24 @@ class Policy < ActiveRecord::Base
           new_permission_data = {}
         end
 
+        #if share with your project is chosen
+        if (sharing[:sharing_scope].to_i == Policy::SHARE_WITH_PROJECT)
+          policy.sharing_scope = Policy::ALL_SYSMO_USERS
+          policy.access_type = sharing["access_type_#{sharing[:sharing_scope]}"]
+          contributor_types = ["Project"]
+          new_permission_data = {"Project" => {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}}}
+        end
 
         # --- Synchronise All Permissions for the Policy ---
         # first delete or update any old memberships
         policy.permissions.each do |p|
           if permission_access = (new_permission_data[p.contributor_type.to_s].try :delete, p.contributor_id)
-            p.access_type = permission_access
+            p.access_type = permission_access["access_type"]
           else
             p.mark_for_destruction
           end
         end
-    
-    
+
         # now add any remaining new memberships
         contributor_types.try :each do |contributor_type|
           new_permission_data[contributor_type.to_s].try :each do |p|

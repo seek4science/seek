@@ -3,10 +3,18 @@ require 'test_helper'
 class AssayAssetTest < ActiveSupport::TestCase
   fixtures :all
 
+  def setup
+    User.current_user = Factory :user
+  end
+
+  def teardown
+    User.current_user = nil
+  end
+
   test "create explicit version" do
-    sop = sops(:my_first_sop)
+    sop = Factory :sop, :contributor => User.current_user
     sop.save_as_new_version
-    assay = assays(:metabolomics_assay)
+    assay = Factory :assay, :contributor => User.current_user.person
 
     version_number = sop.version
 
@@ -27,9 +35,9 @@ class AssayAssetTest < ActiveSupport::TestCase
   end   
   
   test "versioned asset" do
-    sop = sops(:my_first_sop)
+    sop = Factory :sop, :contributor => User.current_user
     sop.save_as_new_version
-    assay = assays(:metabolomics_assay)
+    assay = Factory :assay, :contributor => User.current_user.person
     
     a = AssayAsset.new
     a.asset = sop.latest_version

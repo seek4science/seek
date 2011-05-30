@@ -38,7 +38,13 @@ class Project < ActiveRecord::Base
     :class_name => 'Policy',
     :dependent => :destroy,
     :autosave => true
-  
+
+  after_initialize :default_default_policy_if_new
+
+  def default_default_policy_if_new
+    self.default_policy = Policy.default if new_record?
+  end
+
   has_many :work_groups, :dependent=>:destroy
   has_many :institutions, :through=>:work_groups
   

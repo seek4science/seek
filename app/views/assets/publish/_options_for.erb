@@ -1,0 +1,21 @@
+<%
+item = options_for
+checkbox_title = item.can_manage? ? "Publish" : "Notify owner"
+checkbox_class = item.can_manage? ? "owned" : "protected"
+checkbox_class = "none_text" if item.is_published?
+-%>
+<li>
+    <ul class="<%= html_classes -%>">
+        <li class="type_and_title"><%= text_for_resource item -%>:&nbsp;<%= link_to item.title,item,:target=>"_blank" -%></li>
+        <li class="secondary">Owners <%= item.managers.empty? ? "<span class='none_text'>None</span>" : item.managers.collect{|m| link_to(m.title,m)}.join(", ")  -%></li>
+        <li class="secondary <%= checkbox_class -%>">
+          <% if item.is_published? -%>
+            This item is already published.
+          <% else -%>
+            <%= checkbox_title -%>&nbsp;<%= check_box_tag publishing_item_param(item),1,true -%>
+          <% end -%>
+
+        </li>
+    </ul>
+</li>
+<li style="clear:both;">&nbsp;</li>

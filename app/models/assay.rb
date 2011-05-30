@@ -3,24 +3,17 @@ class Assay < ActiveRecord::Base
   acts_as_isa
   cattr_accessor :organism_count
   cattr_accessor :sample_count
-  # The following is basically the same as acts_as_authorized,
-  # but instead of creating a project and contributor
-  # I use the existing project method and owner attribute.
-    alias_attribute :contributor, :owner
+  def project
+    investigation.nil? ? nil : investigation.project
+  end
 
-    def project_id
-      project.try :id
-    end
+  alias_attribute :contributor, :owner
+  acts_as_authorized
 
-    before_save :policy_or_default
+  def default_contributor
+    User.current_user.try :person
+  end
 
-    belongs_to :policy, :autosave => true
-
-    class_eval do
-      extend Acts::Authorized::SingletonMethods
-    end
-    include Acts::Authorized::InstanceMethods
-  #end of acts_as_authorized stuff
 
   acts_as_taggable
   belongs_to :institution
@@ -79,12 +72,8 @@ class Assay < ActiveRecord::Base
     "#{title} (#{type})"
   end
 
-  def project
-    investigation.nil? ? nil : investigation.project
-  end
-
-  def can_delete? user=nil
-    mixin_super(user) && assets.empty? && related_publications.empty?
+  def can_delete? *args
+    mixin_super(*args) && assets.empty? && related_publications.empty?
   end
 
   #returns true if this is a modelling class of assay
@@ -182,7 +171,11 @@ class Assay < ActiveRecord::Base
   end
   
   def assets
-    (data_file_masters + model_masters + sop_masters).collect {|a| a.latest_version} |  (data_files + models + sops)
+    asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)
+  end
+
+  def asset_masters
+    data_file_masters + model_masters + sop_masters
   end
   
   def related_publications

@@ -36,8 +36,8 @@ class Sample < ActiveRecord::Base
   acts_as_authorized
 
 
-  def can_delete? user=User.current_user
-    assays.empty? && mixin_super(user)
+  def can_delete? *args
+    assays.empty? && mixin_super(*args)
   end
 
   def self.user_creatable?

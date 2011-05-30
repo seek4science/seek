@@ -10,22 +10,153 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     login_as(:quentin)
   end
 
-  test "cannot edit factors studied for downloadable data file" do
-    df=data_files(:downloadable_data_file)
-    df.save
-    get :index,{:data_file_id=>df.id, :version => df.version}
-    assert_select 'img[title="Start editing"]',:count=>0
-    assert_select 'div[id="edit_on"]',:count=>0
-    assert_select 'div[id="edit_off"]',:count=>0
-  end
-
-  test "can edit factors studied for editable data file" do
+  test "can only go to factors studied if the user can edit the data file" do
     df=data_files(:editable_data_file)
     df.save
     get :index,{:data_file_id=>df.id, :version => df.version}
-    assert_select 'img[title="Start editing"]',:count=>1
-    assert_select 'div[id="edit_on"]',:count=>1
-    assert_select 'div[id="edit_off"]',:count=>1
+    assert_response :success
+
+    df=data_files(:downloadable_data_file)
+    df.save
+    get :index,{:data_file_id=>df.id, :version => df.version}
+    assert_not_nil flash[:error]
+
   end
 
+  test 'should create the factor studied with the concentration of the compound' do
+    df=data_files(:editable_data_file)
+    mi = measured_items(:concentration)
+    cp = compounds(:compound_glucose)
+    unit = units(:gram)
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_unrecognized_items => ["iron"]
+    fs = assigns(:studied_factor)
+    assert_not_nil fs
+    assert fs.valid?
+    assert_equal fs.measured_item, mi
+  end
+
+  test "should create factor studied with the none concentration item and no substance" do
+    data_file=data_files(:editable_data_file)
+    mi = measured_items(:time)
+    unit = units(:gram)
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    post :create, :studied_factor => fs, :data_file_id => data_file.id, :version => data_file.version
+    fs = assigns(:studied_factor)
+    assert_not_nil fs
+    assert fs.valid?
+    assert_equal fs.measured_item, mi
+  end
+
+  test 'should not create the factor studied with the concentration of no substance' do
+    df=data_files(:editable_data_file)
+    mi = measured_items(:concentration)
+    unit = units(:gram)
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_unrecognized_items => nil
+    fs = assigns(:studied_factor)
+    assert_not_nil fs
+    assert !fs.valid?
+  end
+
+  test "should create the factor studied with the concentration of the compound chosen from autocomplete" do
+    df=data_files(:editable_data_file)
+    mi = measured_items(:concentration)
+    cp = compounds(:compound_glucose)
+    unit = units(:gram)
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_selected_ids => ["#{cp.id.to_s},Compound"]
+    fs = assigns(:studied_factor)
+    assert_not_nil fs
+    assert fs.valid?
+    assert_equal fs.measured_item, mi
+  end
+
+  test "should create the factor studied with the concentration of the compound's synonym" do
+    df=data_files(:editable_data_file)
+    mi = measured_items(:concentration)
+    syn = synonyms(:glucose_synonym)
+    unit = units(:gram)
+    fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_selected_ids => ["#{syn.id.to_s},Synonym"]
+    fs = assigns(:studied_factor)
+    assert_not_nil fs
+    assert fs.valid?
+    assert_equal fs.measured_item, mi
+  end
+
+  test 'should update the factor studied of concentration to time' do
+    fs = studied_factors(:studied_factor_concentration_glucose)
+    assert_not_nil fs
+    assert_equal fs.measured_item, measured_items(:concentration)
+    assert_equal fs.substance, compounds(:compound_glucose)
+
+    mi = measured_items(:time)
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:measured_item_id => mi.id},  "#{fs.id}_substance_autocompleter_selected_ids" => nil
+    fs_updated = assigns(:studied_factor)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, mi
+    assert_equal fs_updated.substance, nil
+  end
+
+  test 'should update the factor studied of time to concentration' do
+    fs = studied_factors(:studied_factor_time)
+    assert_not_nil fs
+    assert_equal fs.measured_item, measured_items(:time)
+    assert_equal fs.substance, nil
+
+    mi = measured_items(:concentration)
+    cp = compounds(:compound_glucose)
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:measured_item_id => mi.id},  "#{fs.id}_substance_autocompleter_selected_ids" => ["#{cp.id.to_s},Compound"]
+    fs_updated = assigns(:studied_factor)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, mi
+    assert_equal fs_updated.substance, cp
+  end
+
+  test 'should update the factor studied of time to pressure' do
+    fs = studied_factors(:studied_factor_time)
+    assert_not_nil fs
+    assert_equal fs.measured_item, measured_items(:time)
+    assert_equal fs.substance, nil
+
+    mi = measured_items(:pressure)
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:measured_item_id => mi.id}
+    fs_updated = assigns(:studied_factor)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, mi
+    assert_equal fs_updated.substance, nil
+  end
+
+  test 'should update the factor studied of concentration of glucose to concentration of glycine' do
+    fs = studied_factors(:studied_factor_concentration_glucose)
+    assert_not_nil fs
+    assert_equal fs.measured_item, measured_items(:concentration)
+    assert_equal fs.substance, compounds(:compound_glucose)
+
+    cp = compounds(:compound_glycine)
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {}, "#{fs.id}_substance_autocompleter_selected_ids" => ["#{cp.id.to_s},Compound"]
+    fs_updated = assigns(:studied_factor)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.measured_item, measured_items(:concentration)
+    assert_equal fs_updated.substance, cp
+  end
+
+  test 'should update timepoint, start_value, end_value, standard_deviation of the factor studied' do
+    fs = studied_factors(:studied_factor_time)
+    assert_not_nil fs
+
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:time_point => 5.3, :start_value => 10.02, :end_value => 50, :standard_deviation => 0.6}
+    fs_updated = assigns(:studied_factor)
+    assert_not_nil fs_updated
+    assert fs_updated.valid?
+    assert_equal fs_updated.time_point, 5.3
+    assert_equal fs_updated.start_value, 10.02
+    assert_equal fs_updated.end_value, 50
+    assert_equal fs_updated.standard_deviation, 0.6
+  end
 end
