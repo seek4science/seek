@@ -1,144 +1,191 @@
 dimensionless:
   symbol: dimensionless
   comment: dimensionless
+  order: 36
 
 seconds:
   symbol: s
   comment: time
+  order: 21
 
 minutes:
   symbol: min
   comment: time
+  order: 22
 
 hour:
   symbol: h
   comment: time
+  order: 23
 
 hour-1:
   symbol: h-1
   comment: rate
+  factors_studied: false
+  order: 24
 
 min-1:
   symbol: min-1
   comment: rate
+  factors_studied: false
+  order: 25
 
 sec-1:
   symbol: sec-1
   comment: rate
+  factors_studied: false
+  order: 26
 
 litre:
   symbol: L
   comment: litre
+  order: 1
 
 millilitre:
   symbol: mL
   comment: millilitre
+  order: 2
 
 microlitre:
   symbol: µL
   comment: microlitre
+  order: 3
 
 bar:
   symbol: bar
   comment: headspace pressure
+  order: 32
 
 rpm:
   symbol: rpm
   comment: revolutions per minute
+  order: 33
 
 L/min:
   symbol: L/min
   comment: flow rate
+  order: 27
 
 mL/min:
   symbol: mL/min
   comment: flow rate
+  order: 28
 
 metre:
   symbol: m
   comment: metre
+  factors_studied: false
+  order: 29
 
 gram:
   symbol: g
   comment: gram
+  order: 4
 
 miligram:
   symbol: mg
   comment: milligram
+  order: 5
 
 microgram:
   symbol: µg
   comment: microgram
+  order: 6
 
 mpicogram:
   symbol: pg
   comment: mpicogram
+  order: 7
 
 celcius:
   symbol: °C
   comment: Celcius
+  order: 31
 
 mol:
   symbol: mol
   comment: amount of substance
+  order: 8
 
 M:
   symbol: M
   comment: concentration per litre of corresponding comparment
+  order: 9
 
 mM:
   symbol: mM
   comment: concentration per litre of corresponding comparment
+  order: 10
 
 muM:
   symbol: µM
   comment: concentration per litre of corresponding comparment
+  order: 11
 
 pM:
   symbol: pM
   comment: concentration per litre of corresponding comparment
+  order: 12
 
 grams_per_litre:
   symbol: g/L
   comment: concentration per litre of corresponding comparment
+  order: 13
 
 g/g_DW:
   symbol: g/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
+  order: 14
 
 mg/g_DW:
   symbol: mg/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
+  order: 15
 
 muMol-g_DW:
   symbol: muMol/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
+  order: 16
 
 mmol/g_DW:
   symbol: mmol/g_DW
   comment: specific concentration per gram of dry weigh biomass
+  factors_studied: false
+  order: 17
 
 µmol/L_CV:
   symbol: µmol/L_CV
   comment: specific concentration per litre of cytoplasmic volume
+  factors_studied: false
+  order: 18
 
 mmol/L_CV:
   symbol: mmol/L_CV
   comment: specific concentration per litre of cytoplasmic volume
+  factors_studied: false
+  order: 19
 
 µmol/(g_DW*min):
   symbol: µmol/(g_DW*min)
   comment: specific rate per gram of dry weigh biomass
+  factors_studied: false
+  order: 20
 
 µm:
   symbol: µm
   comment: micrometer
+  order: 30
 
 a.u.:
   symbol: a.u.
   comment: arbitrary units
+  order: 35
 
 percent:
   symbol: %
   comment: percentage
+  order: 34
 

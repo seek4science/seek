@@ -7,6 +7,7 @@ function addListTag(name,tag_id) {
         'value': index
     });
     autocompleter.addContactToList(item);
+
 }
 
 //Add the last tag entered onto the list when the element becomes unfocused.
@@ -21,3 +22,5 @@ function addLastTag(autocompleter_id){
     }
     return false;
   }
+
+

@@ -18,6 +18,13 @@ class DataFilesController < ApplicationController
   #has to come after the other filters
   include Seek::Publishing
 
+  def plot
+    sheet = params[:sheet] || 2
+    @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,true)
+    respond_to do |format|
+      format.html
+    end
+  end
     
   def new_version
     if (handle_data nil)          
@@ -76,7 +83,6 @@ class DataFilesController < ApplicationController
 
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.contributor  = current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
@@ -99,39 +105,28 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      event_ids = params[:event_ids] || []
-      event_ids = event_ids.select do |id|
-         Event.find(id).can_view?
-      end
-      @data_file.event_ids = event_ids
-      @data_file.contributor=current_user
+      @data_file.event_ids = params[:event_ids] || []
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
       update_tags @data_file
 
+      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+
       assay_ids = params[:assay_ids] || []
-      #apply policy / permissions settings
-      policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-      #Add creators
-      AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
       respond_to do |format|
         if @data_file.save
-
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
           
           # update related publications
           Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
+          #Add creators
+          AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
 
-          
-          if policy_err_msg.blank?
-            flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-            format.html { redirect_to data_file_path(@data_file) }
-          else
-            flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
-          end
+          flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+          format.html { redirect_to data_file_path(@data_file) }
+
 
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
@@ -184,20 +179,18 @@ class DataFilesController < ApplicationController
 
     update_tags @data_file
     assay_ids = params[:assay_ids] || []
-    # updated policy / permissions settings
-    policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-    #update creators
-    AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-
     respond_to do |format|
       data_file_params = params[:data_file]
-      event_ids = params[:event_ids] || []
-      event_ids = event_ids.select do |id|
-         Event.find(id).can_view?
-      end
-      data_file_params[:event_ids] = event_ids
+      data_file_params[:event_ids] = params[:event_ids] || []
 
-      if @data_file.update_attributes(data_file_params)
+      @data_file.attributes = data_file_params
+
+      if params[:sharing]
+        @data_file.policy_or_default
+        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+      end
+
+      if @data_file.save
 
         # update attributions
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
@@ -206,14 +199,12 @@ class DataFilesController < ApplicationController
         Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
         
+        #update creators
+        AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
 
-        if policy_err_msg.blank?
-          flash[:notice] = 'Data file metadata was successfully updated.'
-          format.html { redirect_to data_file_path(@data_file) }
-        else
-          flash[:notice] = "Data file metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
-        end
+        flash[:notice] = 'Data file metadata was successfully updated.'
+        format.html { redirect_to data_file_path(@data_file) }
+
 
         # Update new assay_asset
         a_ids = []
@@ -255,12 +246,14 @@ end
   def data
     @data_file =  DataFile.find(params[:id])
     sheet = params[:sheet] || 1
+    trim = params[:trim]
+    trim ||= false
     if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
 
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
         format.xml {render :xml=>spreadsheet_to_xml(open(@data_file.content_blob.filepath)) }
-        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet) }
+        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,trim) }
       end
     else
       respond_to do |format|

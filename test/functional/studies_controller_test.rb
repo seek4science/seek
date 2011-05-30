@@ -95,8 +95,8 @@ class StudiesControllerTest < ActionController::TestCase
   end  
   
   test "shouldn't show edit for unauthorized users" do
-    login_as(Factory(:user))
     s = Factory :study, :policy => Factory(:private_policy)
+    login_as(Factory(:user))
     get :edit, :id=>s
     assert_redirected_to study_path(s)
     assert flash[:error]
@@ -122,14 +122,14 @@ class StudiesControllerTest < ActionController::TestCase
   test "should update sharing permissions" do
     login_as(Factory(:user))
     s = Factory :study, :contributor => User.current_user.person,:policy => Factory(:public_policy)
-    assert s.can_manage?(Factory(:user)),"This user should be able to manage this study"
+    assert s.can_manage?(User.current_user),"This user should be able to manage this study"
     
     assert_equal Policy::MANAGING,s.policy.sharing_scope
     assert_equal Policy::EVERYONE,s.policy.access_type
 
-    put :update,:id=>s,:study=>{:title=>"test"},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    put :update,:id=>s,:study=>{},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
     s=assigns(:study)
-    assert_redirected_to study_path(s)
+    assert_response :success
     assert_equal Policy::PRIVATE,s.policy.sharing_scope
     assert_equal Policy::NO_ACCESS,s.policy.access_type
   end
@@ -175,8 +175,8 @@ class StudiesControllerTest < ActionController::TestCase
 
 
   test "unauthorized user can't update" do
-    login_as(Factory(:user))
     s=Factory :study, :policy => Factory(:private_policy)
+    login_as(Factory(:user))
     Factory :permission, :contributor => User.current_user, :policy=> s.policy, :access_type => Policy::VISIBLE
 
     put :update, :id=>s.id,:study=>{:title=>"test"}

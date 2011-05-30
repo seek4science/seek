@@ -1,0 +1,23 @@
+<li>
+  <ul class="condition_or_factor_row heading">
+    <% if asset == 'data_file' %>
+      <li id="time_point">
+        Time point
+      </li>
+    <% end %>
+
+    <li id="measured_item">
+      Item
+    </li>
+    <li id="values">
+      Value(s)
+    </li>
+
+    <% if asset == 'data_file' %>
+      <li id="standard_deviation">
+        SD
+      </li>
+    <% end %>
+
+  </ul>
+</li>

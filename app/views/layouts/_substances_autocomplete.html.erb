@@ -1,0 +1,21 @@
+<%
+   resource ||= nil
+%>
+
+<div id="facebook" class="clearfix" style="display:block;">
+If concentration is chosen, please enter the substance:
+  <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
+    <span class="tokenizer_stretcher">^_^</span>
+    <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
+    <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
+      <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" disabled=true onBlur="addLastTag('<%= name -%>_autocompleter');"/>
+    </div>
+  </div>
+  <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
+    <div class="typeahead_message"></div>
+  </div>
+</div>
+
+<%= render :partial=>"tagging/autocompleter_javascript", :locals=>{:name=> name, :all_tags =>all_substances ,:item_tags=>tagged_substances(resource)} %>
+
+
