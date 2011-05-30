@@ -1,27 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta http-equiv="Content-Language" content="en"/>
-  <title>Drop Menu 1 - Horizontal - Example 1 - MyGosuMenu</title>
-  <style type="text/css">
-      h1 {
-          font-size: 24px;
-      }
 
-      body {
-          font: 13px tahoma;
-          background: #ffffff;
-          margin: 1em 2em;
-          padding: 0em;
-      }
-  </style>
-
-</head>
 
 <%= javascript_include_tag 'dropMenu.js' %>
-<body>
 
+
+<div>
 <table cellspacing="0" cellpadding="0" id="menu" class="dm">
   <tr>
     <td>
@@ -99,13 +81,10 @@
     </td>
   </tr>
 </table>
-
+</div>
 
 <script type="text/javascript">
     var dm = new DropMenu1('menu');
-    dm.position.top = -1;
     dm.init();
 </script>
 
-</body>
-</html>
