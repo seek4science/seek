@@ -180,11 +180,12 @@ class User < ActiveRecord::Base
   end
 
   def self.with_current_user user
+    previous = self.current_user
     self.current_user = user
     begin
       yield
     ensure
-      User.current_user = nil
+      User.current_user = previous
     end
   end
 
