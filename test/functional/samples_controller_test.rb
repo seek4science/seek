@@ -130,7 +130,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "should not destroy sample related to an existing assay" do
-    a = Factory :assay
+    a = Factory :experimental_assay
     s = Factory :sample
     s.assays = [a]
     assert_no_difference("Sample.count") do

@@ -52,7 +52,7 @@ class AssayTest < ActiveSupport::TestCase
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
-      :sample => samples(:test_sample))
+      :samples => [samples(:test_sample)])
     assay.save!
     assert_equal "test",assay.title
   end
@@ -116,9 +116,10 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.owner=people(:person_for_model_owner)
 
-    #an modelling assay can be valid without a technology type
+    #an modelling assay can be valid without a technology type,but require sample or organism
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.technology_type=nil
+    assay.samples = [Factory(:sample)]
     assert assay.valid?
     
   end
@@ -306,7 +307,7 @@ class AssayTest < ActiveSupport::TestCase
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
-      :sample => samples(:test_sample)
+      :samples => [samples(:test_sample)]
     )
 
   end

@@ -63,7 +63,7 @@
       <% unless @assay.is_modelling? -%>
       <p id="technology_type">
           <b>Technology type: </b>
-          <%= link_to h(@assay.technology_type.title.capitalize), @assay.technology_type -%>
+          <%= link_to h(try_block{@assay.technology_type.title.capitalize}), @assay.technology_type -%>
       </p>
       <% end -%>
       <p id="organism">

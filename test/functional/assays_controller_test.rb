@@ -9,7 +9,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-    @object=Factory(:assay, :policy => Factory(:public_policy))
+    @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
   end
 
   test "modelling assay validates with schema" do
@@ -32,7 +32,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "shouldn't show unauthorized assays" do
     login_as Factory(:user)
-    hidden = Factory(:assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
+    hidden = Factory(:experimental_assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
     get :index, :page=>"all",:format=>"xml"
     assert_response :success
     assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("view", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
@@ -146,7 +146,7 @@ end
 
   test "should not show tagging when not logged in" do
     logout
-    public_assay = Factory(:assay, :policy => Factory(:public_policy))
+    public_assay = Factory(:experimental_assay, :policy => Factory(:public_policy))
     get :show,:id=>public_assay
     assert_response :success
     assert_select "div#tags_box",:count=>0
@@ -198,20 +198,53 @@ end
     assert_equal s,assigns(:assay).study
   end
 
-  test "should create" do
+  test "should create experimental assay without sample" do
+
     assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",
         :technology_type_id=>technology_types(:gas_chromatography).id,
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class=>assay_classes(:experimental_assay_class),
-        :sample => samples(:test_sample)}
+        :owner => Factory(:person)}
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
     #assert_equal organisms(:yeast),a.organism
   end
+   test "should not create modelling assay without sample or organisms" do
 
+      assert_no_difference("Assay.count") do
+      post :create,:assay=>{:title=>"test",
+        :technology_type_id=>technology_types(:gas_chromatography).id,
+        :assay_type_id=>assay_types(:metabolomics).id,
+        :study_id=>studies(:metabolomics_study).id,
+        :assay_class=>assay_classes(:modelling_assay_class),
+        :owner => Factory(:person)}
+      end
+
+      assert_difference("Assay.count") do
+        post :create,:assay=>{:title=>"test",
+          :technology_type_id=>technology_types(:gas_chromatography).id,
+          :assay_type_id=>assay_types(:metabolomics).id,
+          :study_id=>studies(:metabolomics_study).id,
+          :assay_class=>assay_classes(:modelling_assay_class),
+          :owner => Factory(:person)},
+          :assay_sample_ids =>[Factory(:sample).id,Factory(:sample).id]
+      end
+
+      assert_difference("Assay.count") do
+      post :create,:assay=>{:title=>"test",
+        :technology_type_id=>technology_types(:gas_chromatography).id,
+        :assay_type_id=>assay_types(:metabolomics).id,
+        :study_id=>studies(:metabolomics_study).id,
+        :assay_class=>assay_classes(:modelling_assay_class),
+        :owner => Factory(:person)},
+        :assay_organism_ids => [Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,Factory(:tissue_and_cell_type).id,Factory(:tissue_and_cell_type).title].to_s
+    end
+    a=assigns(:assay)
+    assert_redirected_to assay_path(a)
+  end
   test "should delete assay with study" do
     login_as(:model_owner)
     assert_difference('Assay.count',-1) do
@@ -328,6 +361,7 @@ end
     login_as(:model_owner)
     get :new,:class=>"experimental"
     assert_response :success
+     @response.body
     assert_select "select#possible_data_files" do
       assert_select "option",:text=>/Sysmo Data File/,:count=>1      
       assert_select "option",:text=>/Myexperiment Data File/,:count=>0
@@ -494,7 +528,7 @@ end
     assert_select "script",:text=>/relationship_type = '#{rel.title}'/,:count=>1
     assert_select "script",:text=>/addDataFile/,:count=>1
     assert_select "script",:text=>/addSop/,:count=>1
-    assert_select "script",:text=>/addModel/,:count=>1    
+    assert_select "script",:text=>/addModel/,:count=>1
   end
 
   test "associated assets aren't lost on failed validation on update" do

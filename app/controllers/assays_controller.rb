@@ -47,6 +47,8 @@ class AssaysController < ApplicationController
     Assay.organism_count = organisms.length
     Assay.sample_count= samples.length
 
+
+
     update_tags @assay
 
     @assay.owner=current_user.person
@@ -70,6 +72,7 @@ class AssaysController < ApplicationController
           s = Sop.find(a_id)
           @assay.relate(s) if s.can_view?
         end
+
         organisms.each do |text|
           o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
 
@@ -109,6 +112,7 @@ class AssaysController < ApplicationController
     Assay.organism_count = organisms.length
     Assay.sample_count= samples.length
 
+
     update_tags @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
@@ -134,7 +138,6 @@ class AssaysController < ApplicationController
         #Destroy AssayAssets that aren't needed
         (@assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
 
-
         organisms.each do |text|
           o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
@@ -143,12 +146,14 @@ class AssaysController < ApplicationController
 
         if samples.blank?
           @assay.samples=[]
-          @assay.save!
+          #@assay.save!
         else
           samples.each do |s_id|
             @assay.associate_sample(s_id)
           end
         end
+
+
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 

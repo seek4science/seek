@@ -88,8 +88,10 @@ Factory.define(:assay_base, :class => Assay) do |f|
   f.association :owner, :factory => :person
   f.association :study
   f.association :assay_type
-  f.association :sample
+  f.samples {[Factory :sample]}
 end
+#Technology Type
+Factory.define(:technology_type){}
 
 Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
   f.title 'Modelling Assay'
@@ -129,6 +131,17 @@ end
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
 end
+
+#Culture growth type
+Factory.define(:culture_growth_type) do |f|
+  f.title "a culture_growth_type"
+end
+
+#Tissue and cell type
+Factory.define(:tissue_and_cell_type) do |f|
+  f.title "a tissue and cell type"
+end
+
 
 #Specimen
 Factory.define(:specimen) do |f|

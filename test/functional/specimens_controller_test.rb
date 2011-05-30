@@ -52,8 +52,9 @@ class SpecimensControllerTest < ActionController::TestCase
       post :create, :specimen => {:donor_number => "running mouse NO.1",
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
-                                  :institution => Factory(:institution)},
-           :project_id => Factory(:project).id
+                                  :institution => Factory(:institution),
+                                  :organism => Factory(:organism)},
+           :project_id => Factory(:project)
     end
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
@@ -77,7 +78,7 @@ class SpecimensControllerTest < ActionController::TestCase
     creator1= Factory(:person,:last_name =>"test1")
     creator2 = Factory(:person,:last_name =>"test2")
     assert_not_equal "test", specimen.donor_number
-    put "update", :id=>specimen.id, :specimen =>{:donor_number =>"test",:project_id => Factory(:project).id},
+    put "update", :id=>specimen.id, :specimen =>{:donor_number =>"test",:project_id => Factory(:project).id,:organism =>Factory(:organism)},
         :creators => [[creator1.name,creator1.id],[creator2.name,creator2.id]].to_json
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)

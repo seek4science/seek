@@ -57,7 +57,7 @@ class Assay < ActiveRecord::Base
   has_one :investigation,:through=>:study    
 
   has_many :assets,:through=>:assay_assets
-
+  after_validation :clear_on_failure
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
@@ -147,15 +147,17 @@ class Assay < ActiveRecord::Base
       end
     end
     assay_organism.tissue_and_cell_type = tissue_and_cell_type
-
-    existing = AssayOrganism.find(:first,:conditions => {:organism_id=> organism,
+    if self.save
+      existing = AssayOrganism.find(:first,:conditions => {:organism_id=> organism,
                                                           :assay_id => self,
                                                           :strain_id => strain,
                                                           :culture_growth_type_id => culture_growth_type,
                                                           :tissue_and_cell_type_id => tissue_and_cell_type})
-    unless existing
-    assay_organism.save!
+      unless existing
+      assay_organism.save!
+      end
     end
+
    
   end
 
@@ -196,20 +198,32 @@ class Assay < ActiveRecord::Base
     "assay_#{type}_avatar"
   end
 
-  def sample_is_missing?
+  def samples_are_missing?
     return sample_count == 0
+    #return samples.blank?
   end
 
   def organisms_are_missing?
 
     return organism_count == 0
+    #return  assay_organisms.blank?
   end
 
 
   def validate
-    errors.add_to_base "Please specify either sample or organisms for assay!" if sample_is_missing? and organisms_are_missing?
+
+    errors.add_to_base "Please specify either sample or organisms for assay!" if is_modelling? and samples_are_missing? and organisms_are_missing?
+
 
 
   end
 
+  def clear_on_failure
+
+      unless errors.blank?
+            self.samples =[]
+            self.organisms=[]
+            self.assay_organisms=[]
+      end
+  end
 end

@@ -66,15 +66,14 @@
     <% root_id = @assay.is_modelling? ? AssayType.modelling_assay_type_id : AssayType.experimental_assay_type_id %>
     <td style="width:50%"><%= ontology_select_tag f,AssayType,root_id,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
     <% unless @assay.is_modelling? -%>
-      <td style="width:50%"><%= ontology_select_tag f,TechnologyType,nil,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} %></td>
+      <td style="width:50%"><%= try_block{ontology_select_tag f,TechnologyType,nil,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} } %></td>
     <% end -%>
   </tr>
 </table>
 
 
-
+<br style="clear:both"/>
  <%= render :partial=>"assays/select_samples",:locals=>{:f=>f} %>
-
 
 <br style="clear:both"/>
 
@@ -86,9 +85,11 @@
   <%= render :partial=>"assets/select_tags" -%>
 </p>
 
+
 <div id="add_organism_form">
-<%= render :partial=>"assays/select_organisms" -%>
+<%= render :partial=>"assays/select_organisms" if @assay.is_modelling?-%>
 </div>
+
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
@@ -168,32 +169,53 @@
   }
 
   function check_show_organism_form() {
-      i = $('assay_sample_ids').length;//$('possible_samples').selectedIndex;
+     if ( $('assay_sample_ids')){
+          i = $('assay_sample_ids').length;
+      }else{
+          i=0;
+      }
       id = $('possible_samples').selectedIndex;
       if (i == 0 && id =='0') {
           Effect.Appear('add_organism_form');
       }
       else {
           Effect.Fade('add_organism_form');
+         if ( $('assay_organism_ids')){
           clearList('assay_organism_ids');
+         }
+
       }
 
 
   }
   function check_show_sample_form() {
-      i = $('assay_organism_ids').length;//$('possible_samples').selectedIndex;
+
+      if ( $('assay_organism_ids')){
+          i = $('assay_organism_ids').length;
+      }else{
+          i=0;
+      }
+
       id = $('possible_organisms').selectedIndex;
       if (i == 0 && id =='0') {
           Effect.Appear('add_samples_form');
       }
       else {
           Effect.Fade('add_samples_form');
-          clearList('add_samples_form');
+           if ( $('assay_sample_ids')){
+          clearList('assay_sample_ids');
+         }
       }
 
 
   }
-  check_show_organism_form();
-  check_show_sample_form();
+
+  if(<%= @assay.is_modelling?%>){
+     check_show_organism_form();
+        check_show_sample_form();
+  }
+
+
+
 
 </script>

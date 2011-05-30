@@ -19,9 +19,8 @@ class SpecimensController < ApplicationController
     @specimen = Specimen.new(params[:specimen])
 
     organism = params[:specimen_organism_id] || []
-    o_id, strain, culture_growth_type_text=organism.split(",")
-    culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-    @specimen.associate_organism(o_id, strain, culture_growth)
+    o_id =organism.split(",").first
+    @specimen.organism= Organism.find o_id if o_id.kind_of?(Numeric) || o_id.kind_of?(String)
 
     @specimen.contributor = current_user
     @specimen.project_id = params[:project_id]
@@ -33,6 +32,10 @@ class SpecimensController < ApplicationController
 
     respond_to do |format|
       if @specimen.save
+
+        o_id, strain, culture_growth_type_text=organism.split(",")
+        culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+        @specimen.associate_organism(o_id, strain, culture_growth)
 
         flash[:notice] = 'Specimen was successfully created.'
         format.html { redirect_to(@specimen) }
@@ -49,16 +52,24 @@ class SpecimensController < ApplicationController
     #update project
     @specimen.project_id = params[:project_id]
     organism = params[:specimen_organism_id] || []
-    o_id, strain, culture_growth_type_text=organism.split(",")
-    culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-    @specimen.associate_organism(o_id, strain, culture_growth)
+    o_id =organism.split(",").first
 
+    if o_id.kind_of?(Numeric) || o_id.kind_of?(String)
+    @specimen.organism  = Organism.find o_id
+    else
+       @specimen.organism  = nil
+       @specimen.strain = nil
+       @specimen.culture_growth_type =nil
+    end
     @specimen.contributor = current_user
     @specimen.policy.set_attributes_with_sharing params[:sharing]
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|
       if @specimen.update_attributes params[:specimen]
+           o_id, strain, culture_growth_type_text=organism.split(",")
+          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+          @specimen.associate_organism(o_id, strain, culture_growth)
 
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }
