@@ -23,11 +23,9 @@ class SpecimensController < ApplicationController
     culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
     @specimen.associate_organism(o_id, strain, culture_growth)
 
-    @specimen.contributor = current_user
     @specimen.project_id = params[:project_id]
 
-    @specimen.policy_or_default
-    @specimen.policy.set_attributes_with_sharing params[:sharing]
+    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
 
@@ -53,12 +51,13 @@ class SpecimensController < ApplicationController
     culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
     @specimen.associate_organism(o_id, strain, culture_growth)
 
-    @specimen.contributor = current_user
-    @specimen.policy.set_attributes_with_sharing params[:sharing]
+    @specimen.attributes = params[:specimen]
+
+    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|
-      if @specimen.update_attributes params[:specimen]
+      if @specimen.save
 
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }

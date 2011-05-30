@@ -7,7 +7,7 @@ class SamplesControllerTest < ActionController::TestCase
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    login_as Factory(:user,:person => Factory(:person,:is_admin=> false))#:owner_of_fully_public_policy
+    login_as Factory(:user,:person => Factory(:person,:is_admin=> false))
     @object = Factory(:sample,:contributor => User.current_user,
             :title=> "test1",
             :policy => policies(:policy_for_viewable_data_file))
@@ -50,9 +50,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference("Sample.count") do
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
-                                #:strain_ids =>[Factory(:strain).id, Factory(:strain).id],
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen)},
+                                :specimen => Factory(:specimen, :contributor => User.current_user)},
       :sample_strain_ids => [Factory(:strain).id, Factory(:strain).id]
     end
     s = assigns(:sample)
@@ -92,15 +91,13 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :redirect
   end
   test "unauthorized user cannot edit sample" do
-    login_as Factory(:user,:person => Factory(:brand_new_person))
-    s = Factory :sample, :policy => Factory(:private_policy)
+    s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
     get :edit, :id =>s.id
     assert_redirected_to sample_path(s)
     assert flash[:error]
   end
   test "unauthorized user cannot update sample" do
-    login_as Factory(:user,:person => Factory(:brand_new_person))
-    s = Factory :sample, :policy => Factory(:private_policy)
+    s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
 
     put :update, :id=> s.id, :sample =>{:title =>"test"}
     assert_redirected_to sample_path(s)
@@ -108,8 +105,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "unauthorized user cannot delete sample" do
-    login_as Factory(:user,:person => Factory(:brand_new_person))
-    s = Factory :sample, :policy => Factory(:private_policy)
+    s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id
     end
@@ -123,7 +119,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference("Sample.count", -1, "A sample should be deleted") do
       delete :destroy, :id => s.id
     end
-    s = Factory :sample
+    s = Factory :sample, :contributor => Factory(:user)
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id
     end
@@ -132,9 +128,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "should not destroy sample related to an existing assay" do
-    a = Factory :assay
-    s = Factory :sample
-    s.assays = [a]
+    s = Factory :sample, :assays => [Factory :assay], :contributor => Factory(:user)
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id
     end
