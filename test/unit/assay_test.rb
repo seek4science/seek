@@ -126,7 +126,7 @@ class AssayTest < ActiveSupport::TestCase
     assay.technology_type=nil
     assay.samples = []
     assert !assay.valid?
-    
+    end
   end
 
   test "associated publication" do
