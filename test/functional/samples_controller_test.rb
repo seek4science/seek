@@ -51,9 +51,8 @@ class SamplesControllerTest < ActionController::TestCase
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen, :contributor => User.current_user)},
-                                :project=>Factory(:project),
-                                :policy => Factory(:private_policy)}
+                                :specimen => Factory(:specimen, :contributor => User.current_user)
+                                }
 
     end
     s = assigns(:sample)
