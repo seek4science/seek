@@ -17,17 +17,17 @@ class SamplesController < ApplicationController
   def create
     @sample = Sample.new(params[:sample])
     @sample.contributor = current_user
-    @sample.strain_ids = params[:sample_strain_ids]
+    @sample.strain_ids = params[:sample_strain_ids]||[]
     #add policy to sample
     @sample.policy_or_default
-    @sample.policy.set_attributes_with_sharing params[:sharing]
+    @sample.policy.set_attributes_with_sharing params[:sharing],@sample.project
     respond_to do |format|
       if @sample.save
-
           flash[:notice] = 'Sample was successfully created.'
           format.html { redirect_to(@sample) }
           format.xml  { head :ok }
       else
+
         format.html { render :action => "new" }
       end
     end
@@ -38,7 +38,7 @@ class SamplesController < ApplicationController
 
       @sample.strain_ids = params[:sample_strain_ids]
       #update policy to sample
-      @sample.policy.set_attributes_with_sharing params[:sharing]
+      @sample.policy.set_attributes_with_sharing params[:sharing],@sample.project
       respond_to do |format|
 
       if @sample.update_attributes params[:sample]

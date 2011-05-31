@@ -50,10 +50,11 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference("Sample.count") do
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
-                                #:strain_ids =>[Factory(:strain).id, Factory(:strain).id],
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen)},
-      :sample_strain_ids => [Factory(:strain).id, Factory(:strain).id]
+                                :specimen => Factory(:specimen),
+                                :project=>Factory(:project),
+                                :policy => Factory(:private_policy)}
+
     end
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
