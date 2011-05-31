@@ -19,7 +19,7 @@ class SamplesController < ApplicationController
     @sample.contributor = current_user
     @sample.strain_ids = params[:sample_strain_ids]||[]
     #add policy to sample
-    @sample.policy_or_default
+    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.project
     @sample.policy.set_attributes_with_sharing params[:sharing],@sample.project
     respond_to do |format|
       if @sample.save
@@ -37,11 +37,14 @@ class SamplesController < ApplicationController
   def update
 
       @sample.strain_ids = params[:sample_strain_ids]
+
+      @sample.attributes = params[:sample]
+
       #update policy to sample
       @sample.policy.set_attributes_with_sharing params[:sharing],@sample.project
       respond_to do |format|
 
-      if @sample.update_attributes params[:sample]
+      if @sample.save
 
           flash[:notice] = 'Sample was successfully created.'
           format.html { redirect_to(@sample) }
