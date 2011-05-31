@@ -121,17 +121,34 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should update sharing permissions" do
     login_as(Factory(:user))
-    s = Factory :study,:contributor => Factory(:person), :policy => Factory(:public_policy)
+    s = Factory :study,:contributor => User.current_user.person, :policy => Factory(:public_policy)
     assert s.can_manage?(User.current_user),"This user should be able to manage this study"
     
     assert_equal Policy::MANAGING,s.policy.sharing_scope
     assert_equal Policy::EVERYONE,s.policy.access_type
 
-    put :update,:id=>s,:study=>{:title=>"test"},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    put :update,:id=>s,:study=>{},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
     s=assigns(:study)
-    assert_redirected_to study_path(s)
+    assert_response :redirect
+    s.reload
     assert_equal Policy::PRIVATE,s.policy.sharing_scope
     assert_equal Policy::NO_ACCESS,s.policy.access_type
+  end
+
+  test "should not update sharing permissions to remove your own manage rights" do
+    login_as(Factory(:user))
+    s = Factory :study,:contributor => Factory(:person), :policy => Factory(:public_policy)
+    assert s.can_manage?(User.current_user),"This user should be able to manage this study"
+
+    assert_equal Policy::MANAGING, s.policy.sharing_scope
+    assert_equal Policy::EVERYONE, s.policy.access_type
+
+    put :update,:id=>s,:study=>{},:sharing=>{:access_type_0=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    s=assigns(:study)
+    assert_response :success
+    s.reload
+    assert_equal Policy::MANAGING, s.policy.sharing_scope
+    assert_equal Policy::EVERYONE, s.policy.access_type
   end
 
   test "should not create with assay already related to study" do

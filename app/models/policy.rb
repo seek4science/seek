@@ -103,22 +103,21 @@ class Policy < ActiveRecord::Base
         #if share with your project is chosen
         if (sharing[:sharing_scope].to_i == Policy::SHARE_WITH_PROJECT)
           policy.sharing_scope = Policy::ALL_SYSMO_USERS
-          policy.access_type = sharing["access_type_#{sharing_scope}"]
+          policy.access_type = sharing["access_type_#{sharing[:sharing_scope]}"]
           contributor_types = ["Project"]
-          new_permission_data = {"Project" => {project.id => {"access_type" => sharing[:your_proj_access_type]}}}
+          new_permission_data = {"Project" => {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}}}
         end
 
         # --- Synchronise All Permissions for the Policy ---
         # first delete or update any old memberships
         policy.permissions.each do |p|
           if permission_access = (new_permission_data[p.contributor_type.to_s].try :delete, p.contributor_id)
-            p.access_type = permission_access
+            p.access_type = permission_access["access_type"]
           else
             p.mark_for_destruction
           end
         end
-    
-    
+
         # now add any remaining new memberships
         contributor_types.try :each do |contributor_type|
           new_permission_data[contributor_type.to_s].try :each do |p|
