@@ -621,7 +621,7 @@ class ModelsControllerTest < ActionController::TestCase
     model=models(:teusink)
     assert model.can_manage?,"The sop must be manageable for this test to succeed"
     post :publish,:id=>model
-    assert_redirected_to model
+    assert_response :success
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end

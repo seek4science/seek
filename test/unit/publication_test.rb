@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'pubmed_query'
 
 class PublicationTest < ActiveSupport::TestCase
   
@@ -28,6 +29,20 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal assay_asset.asset, publication
     assert_equal assay_asset.assay, assay
 
+  end
+
+  test "publication date from pubmed" do
+    query = PubmedQuery.new("seek","sowen@cs.man.ac.uk")
+    result = query.fetch(21533085)
+    assert_equal Date.parse("20 April 2011"),result.date_published
+
+    sleep 0.5 #the sleeps are to keep in accordance to the pubmed service requirements
+    result = query.fetch(1)
+    assert_equal Date.parse("1 June 1975"),result.date_published
+
+    sleep 0.5 #the sleeps are to keep in accordance to the pubmed service requirements
+    result = query.fetch(20533085)
+    assert_equal Date.parse("9 June 2010"),result.date_published
   end
 
   test "model and datafile association" do

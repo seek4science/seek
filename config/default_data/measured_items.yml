@@ -1,36 +1,47 @@
 concentration:
   title: concentration
+  factors_studied: true
 
 pressure:
   title: pressure
+  factors_studied: true
 
 PH:
   title: acidity/PH
+  factors_studied: true
 
 specific concentration:
   title: specific concentration
+  factors_studied: false
 
 stiring rate:
   title: stiring rate
+  factors_studied: true
 
 temperature:
   title: temperature
+  factors_studied: true
 
 time:
   title: time
+  factors_studied: true
 
 glucose pulse:
   title: glucose pulse
+  factors_studied: false
 
 dilution rate:
   title: dilution rate
+  factors_studied: true
 
 gas flow rate:
   title: gas flow rate
+  factors_studied: true
 
 dry biomass concentration:
   title: dry biomass concentration
+  factors_studied: false
 
 optical density 600 nm:
   title: optical density 600 nm
-
+  factors_studied: false

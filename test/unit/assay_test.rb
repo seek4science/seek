@@ -46,15 +46,13 @@ class AssayTest < ActiveSupport::TestCase
   end
   
   test "title_trimmed" do
-    assay=Assay.new(:title=>" test",
-      :assay_type=>assay_types(:metabolomics),
-      :technology_type=>technology_types(:gas_chromatography),
-      :study => studies(:metabolomics_study),
-      :owner => people(:person_for_model_owner),
-      :assay_class => assay_classes(:experimental_assay_class),
-      :samples => [samples(:test_sample)])
-    assay.save!
-    assert_equal "test",assay.title
+    User.with_current_user Factory(:user) do
+      assay=Factory :assay,
+                    :contributor => User.current_user.person,
+                    :title => " test"
+      assay.save!
+      assert_equal "test",assay.title
+    end
   end
 
   test "is_experimental" do
@@ -80,47 +78,48 @@ class AssayTest < ActiveSupport::TestCase
   
 
   test "validation" do
-    assay=new_valid_assay
-    
-    assert assay.valid?
+    User.with_current_user Factory(:user) do
+      assay=new_valid_assay
 
-    assay.title=""
-    assert !assay.valid?
+      assert assay.valid?
 
-    assay.title=nil
-    assert !assay.valid?
+      assay.title=""
+      assert !assay.valid?
 
-    assay.title=assays(:metabolomics_assay).title
-    assert assay.valid? #can have duplicate titles
+      assay.title=nil
+      assert !assay.valid?
 
-    assay.title="test"
-    assay.assay_type=nil
-    assert !assay.valid?
+      assay.title=assays(:metabolomics_assay).title
+      assert assay.valid? #can have duplicate titles
 
-    assay.assay_type=assay_types(:metabolomics)
+      assay.title="test"
+      assay.assay_type=nil
+      assert !assay.valid?
 
-    assert assay.valid?
+      assay.assay_type=assay_types(:metabolomics)
 
-    assay.study=nil
-    assert !assay.valid?
-    assay.study=studies(:metabolomics_study)
+      assert assay.valid?
 
-    assay.technology_type=nil
-    assert !assay.valid?
+      assay.study=nil
+      assert !assay.valid?
+      assay.study=studies(:metabolomics_study)
 
-    assay.technology_type=technology_types(:gas_chromatography)
-    assert assay.valid?
+      assay.technology_type=nil
+      assert !assay.valid?
 
-    assay.owner=nil
-    assert !assay.valid?
+      assay.technology_type=technology_types(:gas_chromatography)
+      assert assay.valid?
 
-    assay.owner=people(:person_for_model_owner)
+      assay.owner=nil
+      assert !assay.valid?
 
-    #an modelling assay can be valid without a technology type,but require sample or organism
-    assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.technology_type=nil
-    assay.samples = [Factory(:sample)]
-    assert assay.valid?
+      assay.owner=people(:person_for_model_owner)
+
+      #an modelling assay can be valid without a technology type,but require sample or organism
+      assay.assay_class=assay_classes(:modelling_assay_class)
+      assay.technology_type=nil
+      assay.samples = [Factory(:sample)]
+      assert assay.valid?
 
     #an experimental assay can be invalid without a sample
     assay.assay_class=assay_classes(:experimental_assay_class)
@@ -136,18 +135,18 @@ class AssayTest < ActiveSupport::TestCase
 
   test "can delete?" do
     user = User.current_user = Factory(:user)
-    assert Factory(:assay, :owner => user.person).can_delete?
+    assert Factory(:assay, :contributor => user.person).can_delete?
 
-    assay = Factory(:assay, :owner => user.person)
-    assay.relate Factory(:data_file)
+    assay = Factory(:assay, :contributor => user.person)
+    assay.relate Factory(:data_file, :contributor => user)
     assert !assay.can_delete?
 
-    assay = Factory(:assay, :owner => user.person)
-    assay.relate Factory(:sop)
+    assay = Factory(:assay, :contributor => user.person)
+    assay.relate Factory(:sop, :contributor => user)
     assert !assay.can_delete?
 
-    assay = Factory(:assay, :owner => user.person)
-    assay.relate Factory(:model)
+    assay = Factory(:assay, :contributor => user.person)
+    assay.relate Factory(:model, :contributor => user)
     assert !assay.can_delete?
 
     pal = Factory :pal
@@ -181,37 +180,40 @@ class AssayTest < ActiveSupport::TestCase
   
   test "can relate data files" do
     assay = assays(:metabolomics_assay)
-    assert_difference("Assay.find_by_id(assay.id).data_files.count") do
-      assay.relate(data_files(:viewable_data_file), relationship_types(:test_data))
+    User.with_current_user assay.contributor.user do
+      assert_difference("Assay.find_by_id(assay.id).data_files.count") do
+        assay.relate(data_files(:viewable_data_file), relationship_types(:test_data))
+      end
     end
   end
   
   test "relate new version of sop" do
-    assay=new_valid_assay
-    assay.save!
-    sop=sops(:sop_with_all_sysmo_users_policy)
-    assert_difference("Assay.find_by_id(assay.id).sops.count",1) do
-      assert_difference("AssayAsset.count",1) do
-        assay.relate(sop)
+    User.with_current_user Factory(:user) do
+      assay=Factory :assay, :contributor => User.current_user.person
+      assay.save!
+      sop=sops(:sop_with_all_sysmo_users_policy)
+      assert_difference("Assay.find_by_id(assay.id).sops.count", 1) do
+        assert_difference("AssayAsset.count", 1) do
+          assay.relate(sop)
+        end
       end
-    end
-    assay.reload
-    assert_equal 1,assay.assay_assets.size
-    assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
+      assay.reload
+      assert_equal 1, assay.assay_assets.size
+      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
 
-    User.current_user = sop.contributor
-    sop.save_as_new_version
-    
-    assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
-      assert_no_difference("AssayAsset.count") do
-        assay.relate(sop)
+      User.current_user = sop.contributor
+      sop.save_as_new_version
+
+      assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
+        assert_no_difference("AssayAsset.count") do
+          assay.relate(sop)
+        end
       end
+
+      assay.reload
+      assert_equal 1, assay.assay_assets.size
+      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
     end
-    
-    assay.reload
-    assert_equal 1,assay.assay_assets.size
-    assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
-    
   end
 
   test "organisms association" do

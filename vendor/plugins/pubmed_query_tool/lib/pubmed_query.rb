@@ -141,7 +141,7 @@ class PubmedQuery
         end
       end
       
-      params[:pubmed_pub_date] = parse_date(article.find_first('.//PubMedPubDate'))
+      params[:pubmed_pub_date] = find_publication_date article
       
       journal = article.find_first('.//Journal/ISOAbbreviation')
       params[:journal] = journal.nil? ? nil : journal.content
@@ -155,6 +155,18 @@ class PubmedQuery
   end
   
   private
+
+  def find_publication_date article
+    status=["epublish","ppublish","aheadofprint","entrez,","pubmed","medline"]
+    node=nil
+    status.each do |s|
+      node = article.find_first(".//PubMedPubDate[@PubStatus='#{s}']")
+      break if node
+    end
+    #worse case is to use the first date - this is highly unlikey as everthing should have a pubmed or entrez date
+    node = article.find_first(".//PubMedPubDate") unless node
+    parse_date(node)
+  end
   
   def query(url)
     doc = nil

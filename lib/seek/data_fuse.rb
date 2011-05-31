@@ -11,7 +11,7 @@ module Seek
     end
 
     def data_fuse_url
-      "#{Seek::JWSModelBuilder::SIMULATE_URL}"
+      "#{Seek::JWS::SIMULATE_URL}"
     end
 
     def submit_parameter_values_to_jws_online model,matching_keys,parameter_values_csv

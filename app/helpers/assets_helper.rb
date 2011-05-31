@@ -13,6 +13,10 @@ module AssetsHelper
     end
   end
 
+  def publishing_item_param item
+    "publish[#{item.class.name}][#{item.id}]"
+  end
+
   def text_for_resource resource_or_text
     text=resource_or_text.is_a?(String) ? resource_or_text : resource_or_text.class.name
     text = text.underscore.humanize
@@ -49,7 +53,6 @@ module AssetsHelper
     icon = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource))) unless image.nil?
     icon
   end
-
 
   def get_original_model_name(model)
     class_name = model.class.name

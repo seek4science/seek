@@ -1,0 +1,18 @@
+<%
+    chart_title ||= ""
+    div_id="chart_#{UUIDTools::UUID.random_create.to_s}"
+
+-%>
+<%= javascript_include_tag 'dygraph-combined.js' -%>
+<div style="width:800px;height:540px" id="<%= div_id -%>"></div>
+
+<script type="text/javascript">
+
+  g = new Dygraph(
+          document.getElementById("<%= div_id -%>"),
+          // CSV or path to a CSV file.
+          "/test.csv"
+
+          );
+
+</script>

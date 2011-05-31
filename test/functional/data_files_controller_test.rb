@@ -19,6 +19,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "title",:text=>/The Sysmo SEEK Data.*/, :count=>1
   end
+
+  test "get XML when not logged in" do
+    logout
+    df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+    get :show,:id=>df,:format=>"xml"
+    perform_api_checks
+
+  end
   
   test "should show index" do
     get :index
@@ -377,10 +385,10 @@ class DataFilesControllerTest < ActionController::TestCase
     csv=@response.body
     assert csv.include?(%!,,"fish","bottle","ggg,gg"!)
 
-    get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:sheet=>"2"
+    get :data, :id => data_files(:downloadable_data_file),:format=>"csv",:trim=>true,:sheet=>"2"
     assert_response :success
     csv=@response.body
-    assert csv.include?(%!,,"a",1.0,TRUE,,FALSE!)
+    assert csv.include?(%!"a",1.0,TRUE,,FALSE!)
   end
   
   test "should not expose non downloadable spreadsheet" do
@@ -635,9 +643,10 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "do publish" do
     df=data_files(:picture)
+
     assert df.can_manage?,"The datafile must be manageable for this test to succeed"
     post :publish,:id=>df
-    assert_redirected_to data_file_path(df)
+    assert_response :success
     assert_nil flash[:error]
     assert_not_nil flash[:notice]
   end
@@ -667,6 +676,34 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(df)
     assert flash[:error]
   end
+
+  test "cannot get the request file button when not loggin" do
+    login_as(:quentin)
+    df = data_files(:viewable_data_file)
+    assert df.is_downloadable?, "The datafile must not be downloadable for this test to succeed"
+
+    get :show, :id => df
+    assert_select "a",:text=>/Request file/,:count=>1
+
+    logout
+    get :show, id => df
+    assert_select "a",:text=>/Request file/,:count=>0
+  end
+
+=begin
+  test "should create sharing permissions within your project and with all SysMO members" do
+    login_as(:quentin)
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_-1"=>Policy::VISIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT}
+      end
+    end
+    df=assigns(:data_file)
+    assert_redirected_to data_file_path(df)
+    assert_equal Policy::ALL_SYSMO_USERS, df.policy.sharing_scope
+    assert_equal Policy::VISIBLE, df.policy.access_type
+  end
+=end
 
   private
   

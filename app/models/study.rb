@@ -2,25 +2,12 @@ require 'acts_as_authorized'
 class Study < ActiveRecord::Base  
   acts_as_isa
 
-  # The following is basically the same as acts_as_authorized,
-  # but instead of creating a project attribute, I use the existing one.
-    alias_attribute :contributor, :person_responsible
-
-    before_save :policy_or_default
-
-    belongs_to :policy, :autosave => true
-
-    class_eval do
-      extend Acts::Authorized::SingletonMethods
-    end
-    include Acts::Authorized::InstanceMethods
-  #end of acts_as_authorized stuff
-
   belongs_to :investigation
-  
-  has_many :assays
-  
   has_one :project, :through=>:investigation
+
+  acts_as_authorized
+
+  has_many :assays
 
   belongs_to :person_responsible, :class_name => "Person"
 
@@ -39,9 +26,8 @@ class Study < ActiveRecord::Base
     assays.collect{|a| a.sops}.flatten.uniq
   end
 
-  def can_delete? user=nil
-    assays.empty? && mixin_super(user)
+  def can_delete? *args
+    assays.empty? && mixin_super(*args)
   end
-
 
 end
