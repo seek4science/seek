@@ -8,6 +8,7 @@ EVERYONE = null;
 ALL_REGISTERED_USERS = null;
 ALL_SYSMO_USERS = null;
 CUSTOM_PERMISSIONS_ONLY = null;
+SHARE_WITH_PROJECT = null;
 // --
 DETERMINED_BY_GROUP = null;
 NO_ACCESS = null;
@@ -54,6 +55,7 @@ function init_sharing() {
     ALL_REGISTERED_USERS = parseInt($('const_all_registered_users').value);
     ALL_SYSMO_USERS = parseInt($('const_all_sysmo_users').value);
     CUSTOM_PERMISSIONS_ONLY = parseInt($('const_custom_permissions_only').value);
+    SHARE_WITH_PROJECT = parseInt($('const_your_project').value)
 	
     DETERMINED_BY_GROUP = parseInt($('const_determined_by_group').value);
     NO_ACCESS = parseInt($('const_no_access').value);
@@ -80,11 +82,19 @@ function setSharingElementVisibility(sharing_scope)
             break;
         case EVERYONE:
             //$('include_custom_sharing_div_' + EVERYONE).hide();
-            //$('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
-            //$('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
+            $('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
+            $('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
             $('cb_use_whitelist').disabled = true;
             $('cb_use_blacklist').disabled = true;
-            //setCustomSharingDivVisibility(EVERYONE);
+            setCustomSharingDivVisibility(EVERYONE);
+            break;
+        case SHARE_WITH_PROJECT:
+            //$('include_custom_sharing_div_' + EVERYONE).hide();
+            $('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
+            $('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
+            $('cb_use_whitelist').disabled = true;
+            $('cb_use_blacklist').disabled = true;
+            setCustomSharingDivVisibility(SHARE_WITH_PROJECT);
             break;
         case ALL_REGISTERED_USERS:
             //$('include_custom_sharing_div_' + EVERYONE).hide();
@@ -118,7 +128,7 @@ function setSharingElementVisibility(sharing_scope)
 
 function setCustomSharingDivVisibility(sharing_scope)
 {
-    if ((sharing_scope >= ALL_SYSMO_USERS && sharing_scope <= EVERYONE && $('include_custom_sharing_'+sharing_scope).checked)
+    if ((sharing_scope >= ALL_SYSMO_USERS && sharing_scope < EVERYONE && $('include_custom_sharing_'+sharing_scope).checked)
         || sharing_scope == CUSTOM_PERMISSIONS_ONLY)
         {
         $('specific_sharing').show();
