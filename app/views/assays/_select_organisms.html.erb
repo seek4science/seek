@@ -72,7 +72,7 @@
       organism_id = '<%= o.organism.id -%>';
       organism_title = '<%= escape_javascript(o.organism.title) -%>';
       strain = '<%= o.strain.nil? ? "" : o.strain.title -%>';
-      culture_growth = '<%= o.culture_growth_type.nil? ? "Not specified" : o.culture_growth_type.title -%>';
+      culture_growth = '<%= o.culture_growth_type.nil? ? "" : o.culture_growth_type.title -%>';
       tissue_and_cell_type_id ='<%= o.tissue_and_cell_type.nil?? 0 : o.tissue_and_cell_type.id%>';
       tissue_and_cell_type_title ='<%= o.tissue_and_cell_type.nil?? "": escape_javascript(o.tissue_and_cell_type.title) %>';
       addOrganism(organism_title, organism_id, strain, culture_growth,tissue_and_cell_type_id,tissue_and_cell_type_title);

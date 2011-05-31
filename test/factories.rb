@@ -88,7 +88,7 @@ Factory.define(:assay_base, :class => Assay) do |f|
   f.association :owner, :factory => :person
   f.association :study
   f.association :assay_type
-  f.samples {[Factory :sample]}
+
 end
 #Technology Type
 Factory.define(:technology_type){}
@@ -105,11 +105,18 @@ end
 
 Factory.define(:modelling_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :modelling_assay_class
+  f.samples {[Factory :sample]}
+
 end
 
+Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
+  f.after_create{|ma|Factory(:organism,:assay=>ma)}
+
+end
 Factory.define(:experimental_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :experimental_assay_class
   f.association :technology_type
+  f.samples {[Factory :sample]}
 end
 
 Factory.define(:assay, :parent => :modelling_assay) {}

@@ -29,7 +29,6 @@
         <%= select_tag :assay_sample_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
 
-
 		<br/>
         <%= link_to_function (image("new") + " Include in the #{@assay_text}"), "addSelectedSample(); return(false);", :id=>"add_sample_link", :class=>"block_link", :style => "width: 12em" %>
 
@@ -46,14 +45,7 @@
     addSample(title, id);
     <%end%>
 
-     <%if params[:assay_sample_ids]%>
-        <% params[:assay_sample_ids].each do |as_id| %>
-        <% sample = Sample.find_by_id(as_id)%>
-        title = '<%=escape_javascript(sample.title) %>';
-        id = '<%= as_id %>';
-        addSample(title, id);
-     <%end%>
-    <%end-%>
+
 
 
     updateSamples();

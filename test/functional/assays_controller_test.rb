@@ -9,7 +9,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-    @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
+    @object=Factory(:experimental_assay,:policy => Factory(:public_policy))
   end
 
   test "modelling assay validates with schema" do
@@ -32,7 +32,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "shouldn't show unauthorized assays" do
     login_as Factory(:user)
-    hidden = Factory(:experimental_assay, :policy => Factory(:private_policy)) #ensure at least one hidden assay exists
+    hidden = Factory(:experimental_assay,:policy => Factory(:private_policy)) #ensure at least one hidden assay exists
     get :index, :page=>"all",:format=>"xml"
     assert_response :success
     assert_equal assigns(:assays).sort_by(&:id), Authorization.authorize_collection("view", assigns(:assays), users(:aaron)).sort_by(&:id), "assays haven't been authorized"
@@ -60,10 +60,10 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay=assays(:metabolomics_assay)
     timestamp=assay.updated_at
-    
+
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)   
-    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
+    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{},:assay_sample_ids=>[Factory(:sample).id]
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     
@@ -75,7 +75,7 @@ class AssaysControllerTest < ActionController::TestCase
     sop.save_as_new_version
     login_as(:model_owner)
     
-    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
+    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{},:assay_sample_ids=>[Factory(:sample).id]
     
     assay.reload
     stored_sop = assay.assay_assets.detect{|aa| aa.asset_id=sop.id}.versioned_asset
@@ -92,7 +92,7 @@ class AssaysControllerTest < ActionController::TestCase
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{}
+    put :update, :id=>assay,:assay_sop_ids=>[sop.id],:assay=>{},:assay_sample_ids=>[Factory(:sample).id]
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
@@ -111,7 +111,7 @@ end
     df = data_files(:downloadable_data_file)
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
-    put :update, :id=>assay,:data_file_ids=>["#{df.id},Test data"],:assay=>{}
+    put :update, :id=>assay,:data_file_ids=>["#{df.id},Test data"],:assay=>{},:assay_sample_ids=>[Factory(:sample).id]
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
@@ -127,7 +127,7 @@ end
     model = models(:teusink)
     assert !assay.models.include?(model.latest_version)
     sleep(1)
-    put :update, :id=>assay,:assay_model_ids=>[model.id],:assay=>{}
+    put :update, :id=>assay,:assay_model_ids=>[model.id],:assay=>{},:assay_sample_ids=>[Factory(:sample).id]
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
@@ -191,14 +191,23 @@ end
     login_as(:model_owner)
     a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
-    put :update,:id=>a,:assay=>{:study=>s}
+    put :update,:id=>a,:assay=>{:study=>s},:assay_sample_ids=>[Factory(:sample).id]
     assert_redirected_to assay_path(a)
     assert assigns(:assay)
     assert_not_nil assigns(:assay).study
     assert_equal s,assigns(:assay).study
   end
 
-  test "should create experimental assay without sample" do
+  test "should not create experimental assay without sample" do
+
+    assert_no_difference("Assay.count") do
+      post :create,:assay=>{:title=>"test",
+        :technology_type_id=>technology_types(:gas_chromatography).id,
+        :assay_type_id=>assay_types(:metabolomics).id,
+        :study_id=>studies(:metabolomics_study).id,
+        :assay_class=>assay_classes(:experimental_assay_class),
+        :owner => Factory(:person)}
+    end
 
     assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",
@@ -206,7 +215,9 @@ end
         :assay_type_id=>assay_types(:metabolomics).id,
         :study_id=>studies(:metabolomics_study).id,
         :assay_class=>assay_classes(:experimental_assay_class),
-        :owner => Factory(:person)}
+        :owner => Factory(:person)},
+        :assay_sample_ids=>[Factory(:sample).id]
+
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
@@ -223,14 +234,16 @@ end
         :owner => Factory(:person)}
       end
 
+
+
       assert_difference("Assay.count") do
         post :create,:assay=>{:title=>"test",
           :technology_type_id=>technology_types(:gas_chromatography).id,
           :assay_type_id=>assay_types(:metabolomics).id,
           :study_id=>studies(:metabolomics_study).id,
           :assay_class=>assay_classes(:modelling_assay_class),
-          :owner => Factory(:person)},
-          :assay_sample_ids =>[Factory(:sample).id,Factory(:sample).id]
+          :owner => Factory(:person)} ,
+          :assay_sample_ids =>  [Factory(:sample).id,Factory(:sample).id]
       end
 
       assert_difference("Assay.count") do
