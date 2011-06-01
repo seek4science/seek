@@ -2,7 +2,6 @@ require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
   cattr_accessor :organism_count
-  cattr_accessor :sample_count
   def project
     investigation.nil? ? nil : investigation.project
   end
@@ -56,8 +55,6 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
- # validates_presence_of :sample, :if => :organisms_are_missing?,:unless => :sample_is_missing?
- # validates_presence_of :organisms,:if => :sample_is_missing?,:unless => :organisms_are_missing?
 
   has_many :relationships, 
     :class_name => 'Relationship',
@@ -149,26 +146,6 @@ class Assay < ActiveRecord::Base
 
    
   end
-
-  def associate_sample (sample_id)
-       sample = Sample.find(sample_id)
-    if sample
-      existing = false
-      self.samples.each do |s|
-        if s==sample
-          existing = true
-          break
-        end
-      end
-
-      unless existing
-         self.samples << sample
-      end
-
-    end
-
-
-  end
   
   def assets
     asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)
@@ -192,12 +169,10 @@ class Assay < ActiveRecord::Base
   end
 
   def samples_are_missing?
-    return sample_count == 0
-    #return samples.blank?
+    samples.blank?
   end
 
   def organisms_are_missing?
-
     return organism_count == 0
     #return  assay_organisms.blank?
   end
@@ -209,14 +184,5 @@ class Assay < ActiveRecord::Base
 
 
 
-  end
-
-  def clear_on_failure
-
-      unless errors.blank?
-            self.samples =[]
-            self.organisms=[]
-            self.assay_organisms=[]
-      end
   end
 end

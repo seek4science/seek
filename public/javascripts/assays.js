@@ -430,9 +430,6 @@ function removeOrganism(index) {
     // remove according to the index
     organisms.splice(index, 1);
 
-    if (organisms.length == 0){
-        Effect.Appear('add_sample_form');
-    }
     // update the page
     updateOrganisms();
 }
