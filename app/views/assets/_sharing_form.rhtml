@@ -31,8 +31,6 @@
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
           <li>Share with the all visitors (including anonymous visitors with no login)</li>
           <li>Share within your project and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
-	      <li>Share with all other users, <em>including</em> those that are not a member of a <%= Seek::Config.project_name %> project.</li>
-          <li>Share with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
           <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> By using custom sharing permissions you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
         </ul>
       </div>
@@ -44,13 +42,11 @@
         <!-- private -->
         <p><label for="sharing_scope_<%= Policy::PRIVATE -%>">
             <input type="hidden" name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
-            <input type="hidden" name="sharing[include_custom_sharing_<%= Policy::PRIVATE -%>]" value="0">
-
             <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
-                                                                                  value="<%= Policy::PRIVATE -%>" type="radio" onclick="javascript:setSharingElementVisibility(<%= Policy::PRIVATE -%>);" />
+                                                                                  value="<%= Policy::PRIVATE -%>" type="radio" />
             - Keep this <%= @resource_type -%> private.
-          </label></p>
-
+          </label>
+        </p>
 
         <p style="font-weight: bold; margin-top: 0.5em;">Or share it with..</p>
 
@@ -58,7 +54,7 @@
         <p>
           <label for="sharing_scope_<%= Policy::EVERYONE -%>">
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::EVERYONE -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::EVERYONE -%>);" />
+                   value="<%= Policy::EVERYONE -%>" />
             - All visitors (including anonymous visitors with no login), for
           </label>
           <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
@@ -69,74 +65,39 @@
         <!-- within your project -->
         <p>
           <label>
-            <input type="radio" <%= 'checked="checked"' if share_with_your_project?(@policy, @resource) -%> id="sharing_scope_<%= Policy::SHARE_WITH_PROJECT -%>" name="sharing[sharing_scope]" value="<%= Policy::SHARE_WITH_PROJECT -%>"
-            onclick="javascript:setSharingElementVisibility(<%= Policy::SHARE_WITH_PROJECT -%>);"/>
+            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
             - Your project, for
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
-                 <%= policy_selection_options [Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING], @resource, try_block{@policy.permissions.first.access_type} -%>
+                 <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING], @resource, your_project_access_type(@policy, @resource)) -%>
              </select>
              and all SysMO users, for
-             <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::SHARE_WITH_PROJECT,
-               :sharing_scope => Policy::SHARE_WITH_PROJECT, :access_type => @access_mode } -%>
+             <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
+               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode } -%>
              <br/>
         </p>
     </div>
 
     <br/>
-    <%= link_to_function "Advanced sharing " + expand_image, visual_effect(:toggle_blind, "advanced sharing", :duration => 0.3), :class => 'advanced_sharing_link' -%>
+    <%= link_to_function "Advanced sharing " + expand_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'block;' : 'none;'), :id =>'advanced_sharing_expand_image' do |page|
+        page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
+        page["advanced_sharing_expand_image"].toggle
+        page["advanced_sharing_collapse_image"].toggle
+        end
+    -%>
+    <%= link_to_function "Advanced sharing " + collapse_image, :class => 'advanced_sharing_link', :style => "display:" + (@policy.permissions.empty? ? 'none;' : 'block;'), :id =>'advanced_sharing_collapse_image'do |page|
+        page.visual_effect :toggle_blind, "advanced sharing", :duration => 0.5
+        page["advanced_sharing_expand_image"].toggle
+        page["advanced_sharing_collapse_image"].toggle
+        end
+    -%>
     <br/>
     <br/>
 
-    <div id="advanced sharing" class='sharing_box_form' style="display: none;">
+    <div id="advanced sharing" class='sharing_box_form' style="display:<%= @policy.permissions.empty? ? 'none;' : 'block;'-%>">
         <p style="font-weight: bold;">Define more fine-grained sharing</p>
-        <!-- all registered users -->
-        <p>
-          <label for="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>">
-            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_REGISTERED_USERS -%> id="sharing_scope_<%= Policy::ALL_REGISTERED_USERS -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::ALL_REGISTERED_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_REGISTERED_USERS -%>);" />
-            - All users, including those that are not members of <%= Seek::Config.project_name %> projects, for
-          </label>
-          <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_REGISTERED_USERS,
-            :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
 
-          <br/>
-          <%= render :partial => "assets/sharing_form_custom_permissions_checkbox", :locals => { :custom_sharing_cb_for_scope => Policy::ALL_REGISTERED_USERS,
-            :sharing_scope => @sharing_mode, :use_custom_sharing => @use_custom_sharing } -%>
-        </p>
-
-
-        <!-- all SysMO users -->
-        <p>
-          <label for="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>">
-            <input type="radio" <%= 'checked="checked"' if ((@sharing_mode == Policy::ALL_SYSMO_USERS) && (!share_with_your_project?(@policy, @resource))) -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::ALL_SYSMO_USERS -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::ALL_SYSMO_USERS -%>);" />
-            - All registered users that are members of a <%= Seek::Config.project_name %> project for
-          </label>
-          <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
-            :sharing_scope => @sharing_mode, :access_type => share_with_your_project?(@policy, @resource) ? Policy::VISIBLE : @access_mode } -%>
-
-          <br/>
-          <%= render :partial => "assets/sharing_form_custom_permissions_checkbox", :locals => { :custom_sharing_cb_for_scope => Policy::ALL_SYSMO_USERS,
-            :sharing_scope => @sharing_mode, :use_custom_sharing => share_with_your_project?(@policy, @resource) ? false : @use_custom_sharing } -%>
-        </p>
-
-
-        <!-- custom permissions-->
-        <p>
-          <label for="sharing_scope_<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>">
-            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::CUSTOM_PERMISSIONS_ONLY -%> id="sharing_scope_<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>" onclick="javascript:setSharingElementVisibility(<%= Policy::CUSTOM_PERMISSIONS_ONLY -%>);" />
-            - Use custom sharing permissions only
-          </label>
-        </p>
-
-
-        <div id="specific_sharing" class='box_simple' style="display: <%= ((@use_custom_sharing || @sharing_mode == Policy::CUSTOM_PERMISSIONS_ONLY) && !share_with_your_project?(@policy, @resource)) ? "block" : "none" -%>; margin-top: 1em;">
-          <p style="font-weight: bold;">
-            Custom sharing permissions
-          </p>
-
+        <div id="specific_sharing" class='box_simple' style="display:block; margin-top: 1em;">
           <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
             <p style="color: #666666;">
               So far you have selected to share this <%= @resource_type -%> with:
@@ -150,7 +111,6 @@
               Select from the options below and click "Add" to apply
               your choices and add collaborators to your current selection:
             </p>
-
 
             <!-- favourite groups -->
             <div class="fold" style="width: 70%; margin: 0.6em 0;">
@@ -325,13 +285,12 @@
         </div>
         <br/>
 
-        <%= "<div style='display:none;'>" unless @enable_black_white_listing %>
           <p style="font-weight: bold">Also include people in my..</p>
 
           <!-- whitelist / blacklist -->
           <p>
             <label for="cb_use_whitelist">
-              <input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_whitelist]" id="cb_use_whitelist" <%= "checked='checked'" if @use_whitelist -%> />
+              <input style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_whitelist]" id="cb_use_whitelist" <%= "checked='checked'" if @use_whitelist -%> />
               - "white list", who always get full access
             </label>
             <% white_lst = current_user.get_whitelist -%>
@@ -350,7 +309,7 @@
           </p>
           <p>
             <label for="cb_use_blacklist">
-              <input <%= "disabled" if @sharing_mode == Policy::PRIVATE -%> style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_blacklist]" id="cb_use_blacklist" <%= "checked='checked'" if @use_blacklist -%> />
+              <input style="margin-right: 0.3em;" value="1" type="checkbox" name="sharing[use_blacklist]" id="cb_use_blacklist" <%= "checked='checked'" if @use_blacklist -%> />
               - "black list", who have no access at all
             </label>
             <% black_lst = current_user.get_blacklist -%>
@@ -379,7 +338,6 @@
             </div>
           </div>
 
-        <%= "</div>" unless @enable_black_white_listing %>
 
   </div>
   </div>

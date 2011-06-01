@@ -694,7 +694,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:quentin)
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_-1"=>Policy::VISIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT, :your_proj_access_type => Policy::ACCESSIBLE}
+        post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
       end
     end
 
@@ -724,7 +724,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
 
-    put :update, :id => df, :data_file => {}, :sharing => {"access_type_-1"=>Policy::ACCESSIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT, :your_proj_access_type => Policy::EDITING}
+    put :update, :id => df, :data_file => {}, :sharing => {"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::ACCESSIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::EDITING}
 
     df.reload
 

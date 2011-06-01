@@ -29,7 +29,6 @@ class Policy < ActiveRecord::Base
   # is preserved
   
   # sharing_scope
-  SHARE_WITH_PROJECT = -1 #never should be stored in the database, used by form
   PRIVATE = 0
   CUSTOM_PERMISSIONS_ONLY = 1
   ALL_SYSMO_USERS = 2
@@ -74,11 +73,10 @@ class Policy < ActiveRecord::Base
     # who is editing the asset - no need to do anything with policy / permissions: return success
     returning self do |policy|
       if sharing
-    
+
         # obtain parameters from sharing hash
         policy.sharing_scope = sharing[:sharing_scope]
-        policy.access_type = ((policy.sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::NO_ACCESS : sharing["access_type_#{sharing_scope}"])
-        use_custom_sharing = ((policy.sharing_scope == Policy::CUSTOM_PERMISSIONS_ONLY) ? Policy::TRUE_VALUE : sharing["include_custom_sharing_#{sharing_scope}"]).to_i
+        policy.access_type = sharing["access_type_#{sharing_scope}"]
         policy.use_whitelist = sharing[:use_whitelist]
         policy.use_blacklist = sharing[:use_blacklist]
 
@@ -93,19 +91,16 @@ class Policy < ActiveRecord::Base
           new_permission_data = {}
         end
 
-        # NB! if "use_custom_sharing" is not set after the policy data was processed - this means that there can be
-        # no more permissions: and any existing ones should be deleted; the line below ensures that the synchronisation
-        # mechanism will "think" that no permission selections were made and all old ones need to be removed
-        unless (use_custom_sharing == true || use_custom_sharing == Policy::TRUE_VALUE)
-          new_permission_data = {}
-        end
-
         #if share with your project is chosen
-        if (sharing[:sharing_scope].to_i == Policy::SHARE_WITH_PROJECT)
-          policy.sharing_scope = Policy::ALL_SYSMO_USERS
-          policy.access_type = sharing["access_type_#{sharing[:sharing_scope]}"]
-          contributor_types = ["Project"]
-          new_permission_data = {"Project" => {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}}}
+        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS)
+          #add Project to contributor_type
+          contributor_types << "Project" if !contributor_types.include? "Project"
+          #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
+          if !new_permission_data.has_key?('Project')
+            new_permission_data["Project"] = {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}}
+          else
+            new_permission_data["Project"][project.id] = {"access_type" => sharing[:your_proj_access_type].to_i}
+          end
         end
 
         # --- Synchronise All Permissions for the Policy ---

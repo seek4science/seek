@@ -9,17 +9,14 @@ module PolicyHelper
     options
   end
 
-  #check if the sharing scope is ALL_SYSMO_USERS and permission is your project
-  def share_with_your_project? policy = nil, resource = nil
-    unless policy.nil? or policy.permissions.empty? or resource.nil?
-      if (policy.sharing_scope == Policy::ALL_SYSMO_USERS) && (policy.permissions.length == 1) &&
-      (policy.permissions.first.contributor_type == 'Project') && (policy.permissions.first.contributor_id == resource.project.id)
-        true
-      else
-        false
+  # return access_type of your project if this permission is available in the policy
+  def your_project_access_type policy = nil, resource = nil
+    unless policy.nil? or policy.permissions.empty? or resource.nil? or !(policy.sharing_scope == Policy::ALL_SYSMO_USERS)
+      policy.permissions.each do |permission|
+        if (permission.contributor_type == 'Project') && (permission.contributor_id == (resource.class.name=="Project" ? resource.id : resource.project.id))
+          return permission.access_type
+        end
       end
-    else
-      false
     end
   end
 end
