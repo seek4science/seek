@@ -28,7 +28,7 @@ class Sample < ActiveRecord::Base
 
   has_many :sops, :class_name => "Sop::Version", :finder_sql => self.sop_sql()
   has_many :sample_sops
-  has_many :sop_masters,:through => :sample_sops
+  has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   acts_as_solr(:fields=>[:description,:title,:lab_internal_number],:include=>[:specimen,:assays]) if Seek::Config.solr_enabled
@@ -72,7 +72,6 @@ class Sample < ActiveRecord::Base
   end
 
   def associate_sop sop
-
     sample_sop = sample_sops.select{|ss|ss.sop==sop}.first
 
     if sample_sop.nil?

@@ -61,6 +61,8 @@
             :other_creators=>@specimen.other_creators,
     } -%>
 
+    <%= render :partial=>"samples/associate_sop",:locals=>{:f=>f,:resource=>@specimen} -%>
+
     <p>
       <%= f.label :description -%><br/>
       <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>

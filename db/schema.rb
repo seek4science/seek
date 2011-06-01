@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110525154213) do
+ActiveRecord::Schema.define(:version => 20110531134351) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -667,6 +667,12 @@ ActiveRecord::Schema.define(:version => 20110525154213) do
     t.boolean  "email_notification",            :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "sop_specimens", :force => true do |t|
+    t.integer "specimen_id"
+    t.integer "sop_id"
+    t.integer "sop_version"
   end
 
   create_table "sop_versions", :force => true do |t|

@@ -11,6 +11,9 @@
   <div class="foldTitle">
     <%= help_icon("Here you can associate the assay with specific samples.") -%>
     Samples
+    <% unless @assay.is_modelling? %>
+    <span class="required">*</span>
+    <% end %>
   </div>
 
   <div id="samples_fold_content" class="foldContent" style="display: block;">
