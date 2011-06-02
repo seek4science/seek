@@ -78,6 +78,7 @@ function create_panel_cookies_by_id(id){
 }
 
 function read_panel_cookies(){
+    alert("fred");
     read_panel_cookies_from_id('name_panel');
     read_panel_cookies_from_id('reactions_panel');
     read_panel_cookies_from_id('equations_panel');
@@ -97,6 +98,7 @@ function read_panel_cookies(){
         rc2.SetCurrentWidth2(cookieToArray('rc2')[0]);
         rc2.SetCurrentHeight(cookieToArray('rc2')[1]);
     };
+
 }
 
 function read_panel_cookies_from_id(id){
