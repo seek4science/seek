@@ -88,10 +88,13 @@ function toggleChevronIcon(content)
 function createCookie(name,days) {
 	if (days) {
 		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
+		date.setTime(date.getTime()+(days*86400000));
 		var expires = "; expires="+date.toGMTString();
 //		var value = document.getElementById("name_panel").style.display;
-		var value = document.getElementById(name).style.display;		
+		var value = document.getElementById(name).style.display;
+        if (value == null || value.blank()) {
+            value = "block"
+        }
 	}
 	else var expires = "";
 	document.cookie = name+"="+value+expires+"; path=/";
@@ -100,7 +103,7 @@ function createCookie(name,days) {
 function createCookie2(name,days,nameString) {
 	if (days) {
 		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
+		date.setTime(date.getTime()+(days*86400000));
 		var expires = "; expires="+date.toGMTString();
 //		var value = document.getElementById("name_panel").style.display;
 		var value = new Array(name.GetCurrentWidth(),name.GetCurrentHeight());	
@@ -113,7 +116,7 @@ function createCookie2(name,days,nameString) {
 function createCookie3(name,days,nameString) {
 	if (days) {
 		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
+		date.setTime(date.getTime()+(days*86400000));
 		var expires = "; expires="+date.toGMTString();
 //		var value = document.getElementById("name_panel").style.display;
 		var value = name.value;	
@@ -125,7 +128,7 @@ function createCookie3(name,days,nameString) {
 function createCookie4(name,days,nameString) {
 	if (days) {
 		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
+		date.setTime(date.getTime()+(days*86400000));
 		var expires = "; expires="+date.toGMTString();
 //		var value = document.getElementById("name_panel").style.display;
 		var value = name.y;	
@@ -137,7 +140,7 @@ function createCookie4(name,days,nameString) {
 function createCookie5(name,name2,days,nameString) {
 	if (days) {
 		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
+		date.setTime(date.getTime()+(days*86400000));
 		var expires = "; expires="+date.toGMTString();
 //		var value = document.getElementById("name_panel").style.display;
 		if (readCookie('rc')=='undefined' || readCookie('rc')==null) {var value = new Array(name2.GetCurrentWidth(),name2.GetCurrentHeight());} else {var value = new Array(rc.GetCurrentWidth(),rc.GetCurrentHeight());}; 
@@ -151,7 +154,7 @@ function createCookie5(name,name2,days,nameString) {
 function createCookie6(name,name2,days,nameString) {
 	if (days) {
 		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
+		date.setTime(date.getTime()+(days*86400000));
 		var expires = "; expires="+date.toGMTString();
 //		var value = document.getElementById("name_panel").style.display;
 		if (readCookie('rc2')=='undefined' || readCookie('rc2')==null) {var value = new Array(name2.GetCurrentWidth(),name2.GetCurrentHeight());} else {var value = new Array(rc2.GetCurrentWidth(),rc2.GetCurrentHeight());}; 
