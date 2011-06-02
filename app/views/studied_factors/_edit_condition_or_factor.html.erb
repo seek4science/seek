@@ -21,48 +21,48 @@
 
 
   <div class="conditions_or_factors" >
-  <h4> Edit this entry </h4>
-  <table >
-    <tr>
-      <% if entity == "studied_factor" %>
-        <th>Time point</th>
-      <% end %>
-      <th>Item</th>
-      <th>Unit</th>
-      <th>Start value</th>
-      <th>End value</th>
-      <th>SD</th>
-    </tr>
-    <tr>
+      <h4> Edit this entry </h4>
+      <table >
+        <tr>
+          <% if entity == "studied_factor" %>
+            <th>Time point</th>
+          <% end %>
+          <th>Item</th>
+          <th>Unit</th>
+          <th>Start value</th>
+          <th>End value</th>
+          <th>SD</th>
+        </tr>
+        <tr>
 
-      <% if entity == "studied_factor" %>
-        <td><%= f.text_field :time_point, :size=>4 %></td>
-        <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"} %></td>
-        <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
-      <% elsif entity == "experimental_condition" %>
-        <td><%=  f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"} %></td>
-        <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
-      <% end %>
+          <% if entity == "studied_factor" %>
+            <td><%= f.text_field :time_point, :size=>4 %></td>
+            <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"} %></td>
+            <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol -%></td>
+          <% elsif entity == "experimental_condition" -%>
+            <td><%=  f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"} %></td>
+            <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol -%></td>
+          <% end %>
 
-      <td><%= f.text_field :start_value,:size=>4 %></td>
+          <td><%= f.text_field :start_value,:size=>4 %></td>
 
-      <td><%= f.text_field :end_value,:size=>4 %></td>
+          <td><%= f.text_field :end_value,:size=>4 %></td>
 
-      <% if entity == "studied_factor" %>
-        <td><%= f.text_field :standard_deviation,:size=>4 %></td>
-      <% end %>
+          <% if entity == "studied_factor" %>
+            <td><%= f.text_field :standard_deviation,:size=>4 %></td>
+          <% end %>
 
-      <td><%= f.submit "Add" %></td>
+          <td><%= f.submit "Add" %></td>
 
-      <%= hidden_field_tag "version", display_asset.version -%>
-    </tr>
+          <%= hidden_field_tag "version", display_asset.version -%>
+        </tr>
 
 
-  </table>
-  <div class="substance_condition_factor">
-    <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "#{object.id}_substance", :resource => object}%>
+      </table>
+      <div class="substance_condition_factor">
+        <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "#{object.id}_substance", :resource => object} -%>
+      </div>
   </div>
-  </div>
-  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor#{object.id}_form')"%>
+  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor#{object.id}_form')" -%>
 
 <% end -%>
