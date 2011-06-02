@@ -40,6 +40,8 @@ function create_panel_cookies() {
     create_panel_cookies_by_id('parameters_panel');
     create_panel_cookies_by_id('functions_panel');
     create_panel_cookies_by_id('events_panel');
+    create_panel_cookies_by_id('annotated_reactions_panel');
+    create_panel_cookies_by_id('annotated_species_panel');
     
 //    if ($('plotGraphPanel').value == "on") {
 //        createCookie5(rc, rtreaction, 1, 'rc');
@@ -84,6 +86,8 @@ function read_panel_cookies(){
     read_panel_cookies_from_id('parameters_panel');
     read_panel_cookies_from_id('functions_panel');
     read_panel_cookies_from_id('events_panel');
+    read_panel_cookies_from_id('annotated_reactions_panel');
+    read_panel_cookies_from_id('annotated_species_panel');
     
     if ($('plotGraphPanel').value == "on") {
 //        rc.SetCurrentWidth2(cookieToArray('rc')[0]);
