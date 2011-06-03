@@ -55,7 +55,6 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
- # validates_presence_of :organisms,:if => :sample_is_missing?,:unless => :organisms_are_missing?
   validates_presence_of :samples,:unless => :is_modelling?
   has_many :relationships, 
     :class_name => 'Relationship',
@@ -146,6 +145,7 @@ class Assay < ActiveRecord::Base
     end
 
   end
+  
 
 
 
@@ -177,7 +177,6 @@ class Assay < ActiveRecord::Base
   end
 
   def organisms_are_missing?
-
     return assay_organisms.blank?
   end
 
@@ -188,6 +187,4 @@ class Assay < ActiveRecord::Base
 
 
   end
-
-
 end

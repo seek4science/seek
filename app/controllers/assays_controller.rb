@@ -33,13 +33,10 @@ class AssaysController < ApplicationController
     @assay        = Assay.new(params[:assay])
 
     organisms     = params[:assay_organism_ids] || []
-    samples       = params[:assay_sample_ids] || []
     sop_ids       = params[:assay_sop_ids] || []
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:assay_model_ids] || []
 
-
-    @assay.sample_ids = samples
 
     organism_ids= organisms.collect{|o|o.split(",").first}.to_a
     @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
@@ -95,15 +92,13 @@ class AssaysController < ApplicationController
     @assay.assay_organisms=[]
 
     organisms             = params[:assay_organism_ids]||[]
-    samples               = params[:assay_sample_ids] ||[]
 
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
 
 
-    @assay.sample_ids = samples
-
+    Assay.organism_count = organisms.length
 
     organism_ids= organisms.collect{|o|o.split(",").first}.to_a
     @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
@@ -143,8 +138,6 @@ class AssaysController < ApplicationController
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
         end
-
-
 
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
