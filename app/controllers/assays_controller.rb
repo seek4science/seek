@@ -98,8 +98,6 @@ class AssaysController < ApplicationController
     model_ids             = params[:assay_model_ids] || []
 
 
-    Assay.organism_count = organisms.length
-
     organism_ids= organisms.collect{|o|o.split(",").first}.to_a
     @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
     @assay.assay_organisms.each do |ao|
