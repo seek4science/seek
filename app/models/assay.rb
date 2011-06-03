@@ -1,7 +1,7 @@
 require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
-  cattr_accessor :organism_count
+
   def project
     investigation.nil? ? nil : investigation.project
   end
@@ -22,9 +22,10 @@ class Assay < ActiveRecord::Base
   belongs_to :study  
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
-  has_many :assay_organisms, :dependent=>:destroy
+  has_many :assay_organisms, :dependent=>:destroy,:autosave => true
   has_many :organisms, :through=>:assay_organisms
   has_many :strains, :through=>:assay_organisms
+#  has_many :tissue_and_cell_types,:through => :assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
   
@@ -49,13 +50,12 @@ class Assay < ActiveRecord::Base
   has_one :investigation,:through=>:study    
 
   has_many :assets,:through=>:assay_assets
-
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-
+  validates_presence_of :samples,:unless => :is_modelling?
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
@@ -133,19 +133,23 @@ class Assay < ActiveRecord::Base
       end
     end
     assay_organism.tissue_and_cell_type = tissue_and_cell_type
-    if self.save
-      existing = AssayOrganism.find(:first,:conditions => {:organism_id=> organism,
-                                                          :assay_id => self,
-                                                          :strain_id => strain,
-                                                          :culture_growth_type_id => culture_growth_type,
-                                                          :tissue_and_cell_type_id => tissue_and_cell_type})
-      unless existing
-      assay_organism.save!
-      end
+
+
+    existing = AssayOrganism.find(:first,:conditions => {:organism_id=> organism,
+                                                        :assay_id => self,
+                                                        :strain_id => strain,
+                                                        :culture_growth_type_id => culture_growth_type,
+                                                        :tissue_and_cell_type_id => tissue_and_cell_type})
+    unless existing
+    assay_organism.save!
     end
 
-   
   end
+  
+
+
+
+
   
   def assets
     asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)
@@ -169,19 +173,17 @@ class Assay < ActiveRecord::Base
   end
 
   def samples_are_missing?
-    samples.blank?
+    return samples.blank?
   end
 
   def organisms_are_missing?
-    return organism_count == 0
-    #return  assay_organisms.blank?
+    return assay_organisms.blank?
   end
 
 
   def validate
 
     errors.add_to_base "Please specify either sample or organisms for assay!" if is_modelling? and samples_are_missing? and organisms_are_missing?
-
 
 
   end

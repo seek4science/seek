@@ -12,6 +12,9 @@
 %>
 
 
+    <% unless @assay.is_modelling? %>
+    <span class="required">*</span>
+    <% end %>
     <div class="yui-u first">
       <p style="color: #666666;">
         The following <%= collection_name %> are involved in this <%= resource_type_text -%>:
@@ -25,7 +28,6 @@
              {:style=>"width:90%"} -%>
         <%= select_tag name, options_from_collection_for_select(collection, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
-
 
 		<br/>
         <%= link_to_function (image("new") + " Include in the #{resource_type_text}"), "addSelectedSample(); return(false);", :id=>"add_sample_link", :class=>"block_link", :style => "width: 12em" %>

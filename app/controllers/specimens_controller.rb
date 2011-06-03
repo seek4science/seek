@@ -22,6 +22,9 @@ class SpecimensController < ApplicationController
     o_id =organism.split(",").first
     @specimen.organism= Organism.find o_id if o_id.kind_of?(Numeric) || o_id.kind_of?(String)
 
+    sop_ids = params[:specimen_sop_ids]||[]
+    @specimen.sop_ids = sop_ids
+
     @specimen.project_id = params[:project_id]
 
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
@@ -35,6 +38,10 @@ class SpecimensController < ApplicationController
         culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
         @specimen.associate_organism(o_id, strain, culture_growth)
 
+        sop_ids.each do |sop_id|
+          sop= Sop.find sop_id
+          SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
+        end
         flash[:notice] = 'Specimen was successfully created.'
         format.html { redirect_to(@specimen) }
         format.xml  { head :ok }
@@ -51,6 +58,9 @@ class SpecimensController < ApplicationController
     @specimen.project_id = params[:project_id]
     organism = params[:specimen_organism_id] || []
     o_id =organism.split(",").first
+
+    sop_ids = params[:specimen_sop_ids]||[]
+   # @specimen.sop_ids = sop_ids
 
     @specimen.attributes = params[:specimen]
 
@@ -69,6 +79,15 @@ class SpecimensController < ApplicationController
            o_id, strain, culture_growth_type_text=organism.split(",")
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @specimen.associate_organism(o_id, strain, culture_growth)
+
+          sop_ids.each do |sop_id|
+            sop= Sop.find sop_id
+            existing = @specimen.sop_masters.select{|ss|ss.sop == sop}
+            if existing.blank?
+               SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
+            end
+
+          end
 
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }

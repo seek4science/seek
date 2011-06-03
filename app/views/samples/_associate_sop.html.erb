@@ -1,7 +1,11 @@
+<% resource_text = resource.class.name.downcase
+   resource_sop_ids_string ="#{resource_text} Sop Ids".parameterize.underscore.to_s
+   resource_sop_ids_symbol = "#{resource_text} Sop Ids".parameterize.underscore.to_sym
+%>
 <div class="fold">
 
   <div class="foldTitle">
-    <%= help_icon("Here you associate SOPs in SEEK to this sample.") -%>
+    <%= help_icon("Here you associate SOPs in SEEK to this #{resource_text}.") -%>
     Associate SOPs
   </div>
 
@@ -15,7 +19,7 @@
       -%>
 
       <p style="color: #666666;">
-        The following SOPs are involved in this sample:
+        The following SOPs are involved in this <%= resource_text %>:
       </p>
   
       <div id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
@@ -32,13 +36,13 @@
                        )+";check_show_add_sop();return(false);"
                        } -%>
         
-        <%= select_tag :sample_sop_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+        <%= select_tag resource_sop_ids_symbol, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
         <br/>
       
         <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Include SOPs from other projects?
       </div>
 	  <br/>
-      <%= link_to_function (image("new") + " Include in the sample"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link", :style => "width: 11em" %>
+      <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link", :style => "width: 11em" %>
     </div>
     <div id="sop_preview" class="yui-u preview_box"  style="float:right">
       <div style="text-align: center;">SOP preview</div>
@@ -89,7 +93,7 @@
         selection_box.onchange();
     }  
   
-    <% @sample.sample_sops.each do |ss| -%>
+    <% resource.sop_masters.each do |ss| -%>
       <% if ss.sop.can_view? -%>
         sop_id = '<%= ss.sop.id -%>';
         sop_title = '<%= escape_javascript(ss.sop.title) -%>';
@@ -97,8 +101,8 @@
       <% end -%>
     <% end -%>
 
-    <% if params[:sample_sop_ids] %>
-      <% params[:sample_sop_ids].each do |id| -%>
+    <% if params[resource_sop_ids_symbol] %>
+      <% params[resource_sop_ids_symbol].each do |id| -%>
         <% sop = Sop.find(id) %>
           <% if sop.can_view?-%>
         sop_id = '<%= sop.id -%>';
@@ -167,9 +171,9 @@ function updateSops() {
     else {
         $('sop_to_list').innerHTML = sop_text;
     }
-    clearList('sample_sop_ids');
+    clearList(<%=resource_sop_ids_string%>);
 
-    select=$('sample_sop_ids');
+    select=$(<%=resource_sop_ids_string%>);
      for (i=0;i<sops_assets.length;i++) {
         sop=sops_assets[i];
         title=sop[0];

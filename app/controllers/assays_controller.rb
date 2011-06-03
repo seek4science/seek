@@ -4,8 +4,11 @@ class AssaysController < ApplicationController
   include IndexPager
   include Seek::TaggingCommon
 
+
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+
+
 
   def new
     @assay=Assay.new
@@ -34,14 +37,18 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:assay_model_ids] || []
 
-    Assay.organism_count = organisms.length
+
+    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
+    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
+    @assay.assay_organisms.each do |ao|
+      ao.mark_for_destruction
+    end
 
     update_tags @assay
 
     @assay.owner=current_user.person
 
     @assay.policy.set_attributes_with_sharing params[:sharing], @assay.project
-
 
     respond_to do |format|
       if @assay.save
@@ -59,12 +66,11 @@ class AssaysController < ApplicationController
           @assay.relate(s) if s.can_view?
         end
 
-        organisms.each do |text|
-          o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
-
-          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
-        end
+    organisms.each do |text|
+      o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
+      culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+      @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
+    end
 
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
@@ -72,6 +78,7 @@ class AssaysController < ApplicationController
         format.html { redirect_to(@assay) }
         format.xml { render :xml => @assay, :status => :created, :location => @assay }
       else
+
         format.html { render :action => "new" }
         format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
       end
@@ -84,14 +91,18 @@ class AssaysController < ApplicationController
     #DOES resolve differences for assets now
     @assay.assay_organisms=[]
 
-    organisms             = params[:assay_organism_ids] || []
+    organisms             = params[:assay_organism_ids]||[]
 
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
 
 
-    Assay.organism_count = organisms.length
+    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
+    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
+    @assay.assay_organisms.each do |ao|
+      ao.mark_for_destruction
+    end
 
     update_tags @assay
 

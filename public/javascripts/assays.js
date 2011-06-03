@@ -399,7 +399,12 @@ function addSelectedOrganism() {
 
     selected_option_index=$('culture_growth').selectedIndex;
     selected_option=$('culture_growth').options[selected_option_index];
-    culture_growth=selected_option.text;
+    if (selected_option_index==0) {
+      culture_growth="";
+    }else{
+        culture_growth=selected_option.text;
+    }
+
 
     selected_option_index = $("possible_tissue_and_cell_types").selectedIndex;
     selected_option = $("possible_tissue_and_cell_types").options[selected_option_index];

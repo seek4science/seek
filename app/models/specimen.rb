@@ -23,8 +23,16 @@ class Specimen < ActiveRecord::Base
   validates_presence_of :donor_number,:contributor,:lab_internal_number,:project,:institution,:organism
 
   validates_uniqueness_of :donor_number
+  def self.sop_sql()
+  'SELECT sop_versions.* FROM sop_versions ' +
+  'INNER JOIN sop_specimens ' +
+  'ON sop_specimens.sop_id = sop_versions.sop_id ' +
+  'WHERE (sop_specimens.sop_version = sop_versions.version ' +
+  'AND sop_specimens.specimen_id = #{self.id})'
+  end
 
-
+  has_many :sops,:class_name => "Sop::Version",:finder_sql => self.sop_sql()
+  has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
   acts_as_solr(:fields=>[:description,:donor_number,:lab_internal_number],:include=>[:culture_growth_type,:organism,:strain]) if Seek::Config.solr_enabled
