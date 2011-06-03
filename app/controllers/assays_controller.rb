@@ -61,7 +61,7 @@ class AssaysController < ApplicationController
           @assay.relate(d, RelationshipType.find_by_title(r_type)) if d.can_view?
         end
         model_ids.each do |a_id|
-          m = tudtuModel.find(a_id)
+          m = Model.find(a_id)
           @assay.relate(m) if m.can_view?
         end
         sop_ids.each do |a_id|
