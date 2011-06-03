@@ -1,8 +1,6 @@
 <%
  select_truncate_length=120
- samples_collection =  Sample.all.select{|s|s.can_view?}
-
-
+ samples_collection =  Sample.all.select &:can_view?
 %>
 
 
@@ -24,9 +22,8 @@
       <div class="association_step">
          <%= select_tag :possible_samples,
              options_for_select([["Select Sample ...", 0]]|samples_collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
-             {:style=>"width:90%",
-              :onchange=>"check_show_organism_form();return(false);"} -%>
-        <%= select_tag :assay_sample_ids, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+             {:style=>"width:90%"} -%>
+        <%= select_tag 'assay[sample_ids]', options_from_collection_for_select(samples_collection, :id, :title, @assay.samples.map(&:id)), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
 
 		<br/>
@@ -37,24 +34,17 @@
 </div>
 
 <script type="text/javascript">
-  var samples = new Array();
 
-   <%  @assay.samples.each do |t| %>
-    title = '<%=escape_javascript(t.title) %>';
-    id = '<%= t.id %>';
-    addSample(title, id);
-    <%end%>
+    Event.observe(window, 'load',function () {
+        updateSamples();
+    });
 
-
-
-
-    updateSamples();
-
-    function checkSampleNotInList(title,id) {
-        toAdd = true;
+    function checkSampleNotInList(id) {
+        var samples = $F('assay_sample_ids');
+        var toAdd = true;
 
         for (var i = 0; i < samples.length; i++)
-            if (samples[i][0] == title ) {
+            if (samples[i] == id ) {
                 toAdd = false;
                 alert("Sample already exists!");
                 break;
@@ -62,49 +52,37 @@
         return toAdd;
     }
 
-    function addSample(title, id) {
-        if (checkSampleNotInList(title, id)) {
-            samples.push([title,id]);
+    function addSample(id) {
+        if (checkSampleNotInList(id)) {
+            $('assay_sample_ids').setValue($F('assay_sample_ids').push(id));
             updateSamples();
         }
-
-
     }
 
     function addSelectedSample() {
-        selected_option_index = $("possible_samples").selectedIndex;
-        selected_option = $("possible_samples").options[selected_option_index];
-
-        id = selected_option.value;
-        title = selected_option.text;
-        if (id!='0'){
-          addSample(title,id);
-        }
-
-
-
+        addSample($F("possible_samples"));
     }
 
-    function removeSample(index) {
-        // remove according to the index
-
-        samples.splice(index, 1);
-        $('possible_samples').selectedIndex = 0;
-
-        if (samples.length == 0){
-            Effect.Appear('add_organism_form');
-        }
-        // update the page
+    function removeSample(id) {
+        $('assay_sample_ids').setValue($F('assay_sample_ids').reject(function(val){
+            return id == val;
+        }));
         updateSamples();
     }
 
+    function optionToListItem(option) {
+        var title_span = '<span title="' + option.text + '">' + option.text.truncate(100) + '</span>';
+        var remove_link = '[<a href="" onclick="javascript:removeSample(' + option.value + '); return(false);">remove</a>]';
+        return '<li>&nbsp;&nbsp;&nbsp;'+ title_span +'<small style="vertical-align: middle;">' + remove_link + '</small>';
+    }
+
     function updateSamples() {
+        samples = $F('assay_sample_ids');
         sample_text = '<ul class="related_asset_list">';
 
         for (var i = 0; i < samples.length; i++) {
-            sample = samples[i];
-            title = sample[0];
-            id = sample[1];
+            id = samples[i];
+            title = $$('#assay_sample_ids option[value='+ id +']')[0].text;
 
             titleText = '<span title="' + title + '">' + title.truncate(100);
 
@@ -112,7 +90,7 @@
             titleText += '</span>';
             sample_text += '<li>' + titleText +
                     '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
-                    '[<a href="" onclick="javascript:removeSample(' + i + '); return(false);">remove</a>]</small></li>';
+                    '[<a href="" onclick="javascript:removeSample(' + id + '); return(false);">remove</a>]</small></li>';
         }
 
         sample_text += '</ul>';
@@ -124,30 +102,5 @@
         else {
             $('sample_to_list').innerHTML = sample_text;
         }
-
-
-        clearList('assay_sample_ids');
-
-        select = $('assay_sample_ids');
-        for (i = 0; i < samples.length; i++) {
-            sample = samples[i];
-            title = sample[0];
-            id = sample[1];
-
-            o = document.createElement('option');
-            o.value = id;
-            o.text = title;
-            o.selected = true;
-
-            try {
-                select.add(o); //for older IE version
-            }
-            catch (ex) {
-                select.add(o, null);
-            }
-        }
-
     }
-
-
 </script>
