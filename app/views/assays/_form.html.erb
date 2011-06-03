@@ -55,6 +55,23 @@
 
 <%= f.hidden_field :assay_class_id -%>
 
+<table class="padded_table">
+  <tr>
+    <td><%= f.label "#{@assay_type_text.capitalize}: " %></td>
+    <% unless @assay.is_modelling? -%>
+      <td><%= f.label "Technology type: " %></td>
+    <% end -%>
+  </tr>
+  <tr>
+    <% root_id = @assay.is_modelling? ? AssayType.modelling_assay_type_id : AssayType.experimental_assay_type_id %>
+    <td style="width:50%"><%= ontology_select_tag f,AssayType,root_id,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
+    <% unless @assay.is_modelling? -%>
+      <td style="width:50%"><%= try_block{ontology_select_tag f,TechnologyType,nil,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} } %></td>
+    <% end -%>
+  </tr>
+</table>
+
+
 <br style="clear:both"/>
  <%= render :partial=>"assays/select_samples",:locals=>{:f=>f} %>
 
