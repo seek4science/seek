@@ -73,7 +73,7 @@
 
 
 <br style="clear:both"/>
- <%= render :partial=>"assays/select_samples",:locals=>{:f=>f} %>
+ <%= render :partial=>"assays/select_samples",:layout => "assets/folding_box",:locals=>{:f=>f, :fold_id => 'add_samples_form', :fold_title => (help_icon("Here you can associate the assay with specific samples.") + 'Samples')} -%>
 
 <br style="clear:both"/>
 
@@ -185,7 +185,7 @@
       }
   }
 
-  if (<%= @assay.is_modelling?%>) {
+  <%if @assay.is_modelling?%>
       Event.observe(window, 'load', function() {
           //rewrites updateSamples to check and display/hide the organism form
           var update_samples_without_check_organism_form = this['updateSamples'];
@@ -203,7 +203,7 @@
           updateSamples();
           updateOrganisms();
       });
-  }
+  <% end %>
 
 
 

@@ -1,38 +1,36 @@
 <%
  select_truncate_length=120
- samples_collection =  Sample.all.select &:can_view?
+ collection =  Sample.all.select &:can_view?
+ value_method ||= :id
+ text_method ||= :title
+ selected ||= @assay.samples.map &:id
+ resource_type_text ||= @assay_text
+ collection_name ||= 'samples'
+ name ||= 'assay[sample_ids]'
+ possible_collection_id = "possible_#{collection_name}"
+ collection_id = sanitize_to_id name
 %>
 
 
-<div id="add_samples_form" class="fold">
-
-  <div class="foldTitle">
-    <%= help_icon("Here you can associate the assay with specific samples.") -%>
-    Samples
-  </div>
-
-  <div id="samples_fold_content" class="foldContent" style="display: block;">
     <div class="yui-u first">
       <p style="color: #666666;">
-        The following samples are involved in this <%= "#{@assay_text}" -%>:
+        The following <%= collection_name %> are involved in this <%= resource_type_text -%>:
       </p>
       <div id="sample_to_list" class="box_editing_inner" style="line-height: 1.5;">
         <span class="none_text" id="samples">Loading...</span>
       </div>
       <div class="association_step">
-         <%= select_tag :possible_samples,
-             options_for_select([["Select Sample ...", 0]]|samples_collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
+         <%= select_tag possible_collection_id,
+             options_for_select([["Select #{collection_name.capitalize.singularize} ...", 0]]|collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
              {:style=>"width:90%"} -%>
-        <%= select_tag 'assay[sample_ids]', options_from_collection_for_select(samples_collection, :id, :title, @assay.samples.map(&:id)), {:multiple=>true, :style=>"display:none;"} -%>
+        <%= select_tag name, options_from_collection_for_select(collection, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
 
 
 		<br/>
-        <%= link_to_function (image("new") + " Include in the #{@assay_text}"), "addSelectedSample(); return(false);", :id=>"add_sample_link", :class=>"block_link", :style => "width: 12em" %>
+        <%= link_to_function (image("new") + " Include in the #{resource_type_text}"), "addSelectedSample(); return(false);", :id=>"add_sample_link", :class=>"block_link", :style => "width: 12em" %>
 
     </div>
-  </div>
-</div>
 
 <script type="text/javascript">
 
@@ -41,21 +39,16 @@
     });
 
     function checkSampleNotInList(id) {
-        var samples = $F('assay_sample_ids');
-        var toAdd = true;
-
-        for (var i = 0; i < samples.length; i++)
-            if (samples[i] == id ) {
-                toAdd = false;
-                alert("Sample already exists!");
-                break;
-            }
+        var toAdd = $F('assay_sample_ids').indexOf(id) == -1;
+        if(!toAdd){
+            alert('<%= collection_name.capitalize.singularize %> already exists!');
+        }
         return toAdd;
     }
 
     function addSample(id) {
         if (checkSampleNotInList(id)) {
-            $('assay_sample_ids').setValue($F('assay_sample_ids').push(id));
+            $('<%= collection_id %>').setValue($F('<%= collection_id %>').concat(id));
             updateSamples();
         }
     }
@@ -65,9 +58,9 @@
     }
 
     function removeSample(id) {
-        $('assay_sample_ids').setValue($F('assay_sample_ids').reject(function(val){
-            return id == val;
-        }));
+        var selected = $F('<%= collection_id %>').slice();
+        selected.splice(selected.indexOf(id.toString()),1);
+        $(<%= collection_id %>).setValue(selected);
         updateSamples();
     }
 
@@ -78,27 +71,27 @@
     }
 
     function updateSamples() {
-        samples = $F('assay_sample_ids');
-        sample_text = '<ul class="related_asset_list">';
+        var samples = $F(('<%= collection_id %>'));
+        var sample_text = '<ul class="related_asset_list">';
 
         for (var i = 0; i < samples.length; i++) {
-            id = samples[i];
-            title = $$('#assay_sample_ids option[value='+ id +']')[0].text;
+            var value = samples[i];
+            var text = $$('#<%= collection_id %> option[value='+ value +']')[0].text;
 
-            titleText = '<span title="' + title + '">' + title.truncate(100);
+            var titleText = '<span title="' + text + '">' + text.truncate(100);
 
 
             titleText += '</span>';
             sample_text += '<li>' + titleText +
                     '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
-                    '[<a href="" onclick="javascript:removeSample(' + id + '); return(false);">remove</a>]</small></li>';
+                    '[<a href="" onclick="javascript:removeSample(' + value + '); return(false);">remove</a>]</small></li>';
         }
 
         sample_text += '</ul>';
 
         // update the page
         if (samples.length == 0) {
-            $('sample_to_list').innerHTML = '<span class="none_text">No samples</span>';
+            $('sample_to_list').innerHTML = '<span class="none_text">No <%= collection_name %></span>';
         }
         else {
             $('sample_to_list').innerHTML = sample_text;
