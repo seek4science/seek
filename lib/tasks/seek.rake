@@ -216,6 +216,8 @@ namespace :seek do
     revert_fixtures_identify
     Organism.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "organisms")
+    BioportalConcept.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "bioportal_concepts")
   end
 
   task(:technology_types=>:environment) do
