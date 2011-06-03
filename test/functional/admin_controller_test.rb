@@ -72,14 +72,7 @@ class AdminControllerTest < ActionController::TestCase
     post :update_others, :pubmed_api_email => 'quentin@example.com', :crossref_api_email => 'quentin@example.com', :tag_threshold => '1', :max_visible_tags => '0'
     assert_not_nil flash[:error]
   end
-#
-#  test "show graphs" do
-#
-#    login_as(:quentin)
-#    get :graphs
-#    assert_response :success
-#
-#  end
+
 
   test "editing tags visible to admin" do
     login_as(:quentin)
@@ -87,6 +80,12 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
 
     get :edit_tag, :id=>tags(:fishing)
+    assert_response :success
+  end
+
+  test "get edit tag for owned tag" do
+    login_as(:quentin)
+    get :edit_tag, :id=>tags(:cricket)
     assert_response :success
   end
 

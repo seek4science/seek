@@ -50,7 +50,7 @@
   <% for tagging in @tag.taggings do -%>
       <% unless tagging.taggable.nil? -%>
           <li>
-            <%= link_to "#{tagging.taggable.name} ( #{tagging.taggable_type} )", tagging.taggable -%>
+            <%= link_to "#{tagging.taggable.title} ( #{tagging.taggable_type} )", tagging.taggable -%>
             context = <%= tagging.context -%>
 
 
