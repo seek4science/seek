@@ -78,7 +78,7 @@ class SpecimensControllerTest < ActionController::TestCase
     creator1= Factory(:person,:last_name =>"test1")
     creator2 = Factory(:person,:last_name =>"test2")
     assert_not_equal "test", specimen.donor_number
-    put "update", :id=>specimen.id, :specimen_organism_id =>Factory(:organism).id, :specimen =>{:donor_number =>"test",:project_id => Factory(:project).id},
+    put "update", :id=>specimen.id, :specimen =>{:donor_number =>"test",:project_id => Factory(:project).id},
         :creators => [[creator1.name,creator1.id],[creator2.name,creator2.id]].to_json
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
