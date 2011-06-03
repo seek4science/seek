@@ -49,7 +49,7 @@ class Assay < ActiveRecord::Base
   has_one :investigation,:through=>:study    
 
   has_many :assets,:through=>:assay_assets
-  after_validation :clear_on_failure
+
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
