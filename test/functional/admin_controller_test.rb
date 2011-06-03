@@ -120,7 +120,7 @@ class AdminControllerTest < ActionController::TestCase
     post :edit_tag, :id=>tag, :tags_autocompleter_selected_ids=>[tag.id]
     assert_redirected_to :action=>:tags
 
-    tag=ActsAsTaggableOn::Tag.find_by_name("cricket")
+    tag.reload
     assert_equal "cricket",tag.name
     assert_equal tagger,tag.taggings.first.tagger
     assert_equal taggable,tag.taggings.first.taggable
