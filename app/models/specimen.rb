@@ -53,25 +53,5 @@ class Specimen < ActiveRecord::Base
     true
   end
 
-  #Associates and organism with the specimen
-  #organism may be either an ID or Organism instance
-  #strain_title should be the String for the strain
-  #culture_growth should be the culture growth instance
-  def associate_organism(organism_id,strain_title=nil,culture_growth_type=nil)
 
-    organism=nil
-    organism = Organism.find(organism_id) if organism_id.kind_of?(Numeric) || organism_id.kind_of?(String)
-
-    strain=nil
-    if (strain_title && !strain_title.empty? && organism)
-      strain=organism.strains.find_by_title(strain_title)
-      if strain.nil?
-        strain=Strain.new(:title=>strain_title,:organism_id=>organism.id)
-        strain.save!
-      end
-    end
-    self.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
-    self.strain=strain
-    self.organism = organism
-  end
 end
