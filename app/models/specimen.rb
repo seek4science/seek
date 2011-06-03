@@ -31,7 +31,7 @@ class Specimen < ActiveRecord::Base
   'AND sop_specimens.specimen_id = #{self.id})'
   end
 
-  has_many :sops,:class_name => "Sop::Version", :finder_sql => self.sop_sql()
+  has_many :sops,:class_name => "Sop::Version",:finder_sql => self.sop_sql()
   has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 

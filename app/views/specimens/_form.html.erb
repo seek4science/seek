@@ -13,11 +13,7 @@
       <%= f.text_field :donor_number, :style => "width: 350px;" -%>
     </p>
 
-    <p>
-      <%= f.label :age -%><br/>
-      <%= f.text_field :age, :style => "width: 150px;" -%> weeks
 
-    </p>
 
     <p>
       <%= f.label :treatment -%><br/>
@@ -51,7 +47,7 @@
     <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank => "Please Select"}) %>
   </p>
 
-    <%= render :partial=>"specimens/select_organisms" -%>
+    <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f}-%>
 
     <%= render :partial=>"assets/asset_form_bottom", :locals=> {
             :resource_type => "Specimen",

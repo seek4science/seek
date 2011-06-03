@@ -40,7 +40,7 @@ class SpecimensController < ApplicationController
 
         sop_ids.each do |sop_id|
           sop= Sop.find sop_id
-          SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen)
+          SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
         end
         flash[:notice] = 'Specimen was successfully created.'
         format.html { redirect_to(@specimen) }
@@ -60,7 +60,7 @@ class SpecimensController < ApplicationController
     o_id =organism.split(",").first
 
     sop_ids = params[:specimen_sop_ids]||[]
-    @specimen.sop_ids = sop_ids
+   # @specimen.sop_ids = sop_ids
 
     @specimen.attributes = params[:specimen]
 
@@ -82,7 +82,7 @@ class SpecimensController < ApplicationController
 
           sop_ids.each do |sop_id|
             sop= Sop.find sop_id
-            existing = SopSpecimen.all.select{|ss|ss.specimen_id==@specimen.id and ss.sop_id == sop_id and  ss.sop_version==sop.version}
+            existing = @specimen.sop_masters.select{|ss|ss.sop == sop}
             if existing.blank?
                SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
             end
