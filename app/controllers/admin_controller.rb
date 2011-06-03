@@ -144,28 +144,28 @@ class AdminController < ApplicationController
   def edit_tag
     if request.post?
       @tag=ActsAsTaggableOn::Tag.find(params[:id])
+      replacement_tags = []
+
+      params[:tags_autocompleter_selected_ids].each do |selected_id|
+          replacement_tags << ActsAsTaggableOn::Tag.find(selected_id)
+      end unless params[:tags_autocompleter_selected_ids].nil?
+      params[:tags_autocompleter_unrecognized_items].select{|t| !t.blank?}.each do |item|
+          tag = ActsAsTaggableOn::Tag.find_by_name(item)
+          tag = ActsAsTaggableOn::Tag.create :name=>item if tag.nil?
+          replacement_tags << tag
+      end unless params[:tags_autocompleter_unrecognized_items].nil?
+      
       @tag.taggings.select{|t| !t.taggable.nil?}.each do |tagging|
-        context_sym=tagging.context.to_sym
+        context=tagging.context
         taggable=tagging.taggable
-        current_tags=taggable.tag_list_on(context_sym).select{|tag| tag!=@tag.name}
-        new_tag_list=current_tags.join(", ")
-
-        replacement_tags=", "
-        params[:tags_autocompleter_selected_ids].each do |selected_id|
-          tag=ActsAsTaggableOn::Tag.find(selected_id)
-          replacement_tags << tag.name << ","
-        end unless params[:tags_autocompleter_selected_ids].nil?
-        params[:tags_autocompleter_unrecognized_items].each do |item|
-          replacement_tags << item << ","
-        end unless params[:tags_autocompleter_unrecognized_items].nil?
-
-        new_tag_list=new_tag_list << replacement_tags
-
-        method_sym="#{tagging.context.singularize}_list=".to_sym
-
-        taggable.send method_sym, new_tag_list
-
-        taggable.save
+        tagger=tagging.tagger
+        tagging.destroy unless replacement_tags.include?(@tag)
+        replacement_tags.each do |tag|
+          if ActsAsTaggableOn::Tagging.find(:all,:conditions=>{:context=>context,:tag_id=>tag.id}).select{|t| t.tagger==tagger && t.taggable==taggable}.empty?
+            new_tagging = ActsAsTaggableOn::Tagging.new :taggable=>taggable,:tagger=>tagger, :tag_id=>tag.id, :context=>context
+            new_tagging.save!
+          end          
+        end
 
       end
 

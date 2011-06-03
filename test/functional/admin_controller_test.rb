@@ -89,20 +89,55 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "edit owned asset tag" do
+    login_as(:quentin)
+    tag=tags(:cricket)
+    tagger=users(:pal_user)
+    taggable=models(:francos_model)
+    assert_equal 1,ActsAsTaggableOn::Tag.find(:all,:conditions=>{:name=>"cricket"}).count, "There should only be 1 tag named cricket"
+    assert_equal 1,tag.taggings.count
+    assert_equal "cricket",tag.name
+    assert_equal tagger,tag.taggings.first.tagger
+    assert_equal taggable,tag.taggings.first.taggable
+
+    golf_tag_id=tags(:golf).id
+    post :edit_tag, :id=>tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>["microbiology", "spanish"]
+    assert_redirected_to :action=>:tags
+    
+    new_tag_names = ["golf","microbiology","spanish"]
+    taggable.reload
+    tagger.reload
+    assert_nil ActsAsTaggableOn::Tag.find_by_name("cricket")
+    puts "list: #{taggable.tag_list}"
+
+  end
+
+  test "edit owned tag to itself" do
+    login_as(:quentin)
+    tag=tags(:cricket)
+    tagger=users(:pal_user)
+    taggable=models(:francos_model)
+    post :edit_tag, :id=>tag, :tags_autocompleter_selected_ids=>[tag.id]
+    assert_redirected_to :action=>:tags
+
+    tag=ActsAsTaggableOn::Tag.find_by_name("cricket")
+    assert_equal "cricket",tag.name
+    assert_equal tagger,tag.taggings.first.tagger
+    assert_equal taggable,tag.taggings.first.taggable
+  end
+
   test "editing tags blocked for non admin" do
     login_as(:aaron)
     get :tags
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-
     get :edit_tag, :id=>tags(:fishing)
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-
     fishing_tag=tags(:fishing)
-    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_unrecognized_items=>"microbiology, spanish"
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_unrecognized_items=>["microbiology", "spanish"]
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
@@ -130,7 +165,7 @@ class AdminControllerTest < ActionController::TestCase
     sleep(2) #for timestamp test
 
     golf_tag_id=tags(:golf).id
-    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>"microbiology, spanish"
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>["microbiology","spanish"]
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -150,6 +185,8 @@ class AdminControllerTest < ActionController::TestCase
       assert expected_expertise.include?(expertise_tag)
     end
 
+    assert_nil ActsAsTaggableOn::Tag.find_by_name("fishing")
+
   end
 
   test "edit tag includes orginal" do
@@ -166,7 +203,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_not_nil fishing_tag
 
     golf_tag_id=tags(:golf).id
-    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>"fishing, spanish"
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>["fishing","spanish"]
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -205,7 +242,7 @@ class AdminControllerTest < ActionController::TestCase
 
     assert_nil ActsAsTaggableOn::Tag.find_by_name("sparrow") #check tag doesn't already exist
 
-    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[], :tags_autocompleter_unrecognized_items=>"sparrow"
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[], :tags_autocompleter_unrecognized_items=>["sparrow"]
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -238,7 +275,7 @@ class AdminControllerTest < ActionController::TestCase
     fishing_tag=ActsAsTaggableOn::Tag.find(:first, :conditions=>{:name=>"fishing"})
     assert_not_nil fishing_tag
 
-    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[], :tags_autocompleter_unrecognized_items=>""
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[], :tags_autocompleter_unrecognized_items=>[""]
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
@@ -272,7 +309,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_not_nil fishing_tag
 
     golf_tag_id=tags(:golf).id
-    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>""
+    post :edit_tag, :id=>fishing_tag, :tags_autocompleter_selected_ids=>[golf_tag_id], :tags_autocompleter_unrecognized_items=>[""]
     assert_redirected_to :action=>:tags
     assert_nil flash[:error]
 
