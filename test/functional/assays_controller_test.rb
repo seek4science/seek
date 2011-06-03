@@ -589,7 +589,7 @@ end
     a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
          :study_id=>studies(:metabolomics_study).id, :assay_class=>assay_classes(:experimental_assay_class)}
     assert_difference('Assay.count') do
-      post :create, :assay => a, :sharing=>{"access_type_-1"=>Policy::VISIBLE,:sharing_scope=>Policy::SHARE_WITH_PROJECT, :your_proj_access_type => Policy::ACCESSIBLE}
+      post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
     end
 
     assay=assigns(:assay)
@@ -614,7 +614,7 @@ end
     assert_equal Policy::NO_ACCESS, assay.policy.access_type
     assert assay.policy.permissions.empty?
 
-    put :update, :id => assay, :assay => {}, :sharing => {"access_type_-1"=>Policy::ACCESSIBLE,:sharing_scope => Policy::SHARE_WITH_PROJECT, :your_proj_access_type => Policy::EDITING}
+    put :update, :id => assay, :assay => {}, :sharing => {"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::ACCESSIBLE,:sharing_scope => Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::EDITING}
 
     assay.reload
     assert_redirected_to assay_path(assay)

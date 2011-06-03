@@ -8,7 +8,7 @@
     <div class="yui-gf">
         <div class="yui-u first builder_actions" style="width:19%;">
           <h6>Store annotations</h6>
-          <input type="Button" id="submit_annotations_button" value="Store" onclick="submit_annotations();">
+          <input type="Button" id="submit_annotations_button" value="Store" onclick="create_annotator_panel_cookies();submit_annotations();">
           <div style="padding-bottom:1em;"></div>
         </div>
         <div class="yui-u" style="width: 80%; height: 100%; margin-left: 0.1em;">
@@ -50,4 +50,5 @@
     display_search_results('<%= prefix -%>','<%= @search_results.selected_symbol -%>','<%= @search_results.search_term -%>',triplets);
 
 <% end -%>
+   read_annotator_panel_cookies();
 </script>

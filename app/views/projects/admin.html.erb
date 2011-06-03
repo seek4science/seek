@@ -1,3 +1,4 @@
+<%= javascript_include_tag 'sharing.js'%>
 <h1>Administer Project: <%= link_to h(@project.name), project_path(@project) -%></h1>
 
 <div class="show_basic">
@@ -11,7 +12,7 @@
 
     <%= render :partial=>"jerm_details",:locals=>{:f=>f} %>
     <br/>
-    <%= render :partial=>"default_policy_form",:locals=>{:f=>f} %>
+    <%= render :partial=>"assets/sharing_form"%>
 
     <h2 style="margin-top: 2em;">Participating Institutions</h2>
 

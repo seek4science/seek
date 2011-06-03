@@ -3,11 +3,7 @@
 
 
 // global declarations
-PRIVATE = null;
-EVERYONE = null;
-ALL_REGISTERED_USERS = null;
-ALL_SYSMO_USERS = null;
-CUSTOM_PERMISSIONS_ONLY = null;
+
 // --
 DETERMINED_BY_GROUP = null;
 NO_ACCESS = null;
@@ -49,12 +45,6 @@ var currentFavouriteGroupSettings = {};
 
 
 function init_sharing() {
-    PRIVATE = parseInt($('const_private').value);
-    EVERYONE = parseInt($('const_everyone').value);
-    ALL_REGISTERED_USERS = parseInt($('const_all_registered_users').value);
-    ALL_SYSMO_USERS = parseInt($('const_all_sysmo_users').value);
-    CUSTOM_PERMISSIONS_ONLY = parseInt($('const_custom_permissions_only').value);
-	
     DETERMINED_BY_GROUP = parseInt($('const_determined_by_group').value);
     NO_ACCESS = parseInt($('const_no_access').value);
     VIEWING = parseInt($('const_viewing').value);
@@ -65,193 +55,6 @@ function init_sharing() {
     replaceFavouriteGroupRedboxActionURL();
 }
 	
-
-function setSharingElementVisibility(sharing_scope)
-{
-    switch(sharing_scope)
-    {
-        case PRIVATE:
-            //$('include_custom_sharing_div_' + EVERYONE).hide();
-            $('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
-            $('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
-            $('cb_use_whitelist').disabled = true;
-            $('cb_use_blacklist').disabled = true;
-            setCustomSharingDivVisibility(PRIVATE);
-            break;
-        case EVERYONE:
-            //$('include_custom_sharing_div_' + EVERYONE).hide();
-            //$('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
-            //$('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
-            $('cb_use_whitelist').disabled = true;
-            $('cb_use_blacklist').disabled = true;
-            //setCustomSharingDivVisibility(EVERYONE);
-            break;
-        case ALL_REGISTERED_USERS:
-            //$('include_custom_sharing_div_' + EVERYONE).hide();
-            $('include_custom_sharing_div_' + ALL_REGISTERED_USERS).show();
-            $('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
-            $('cb_use_whitelist').disabled = false;
-            $('cb_use_blacklist').disabled = false;
-            setCustomSharingDivVisibility(ALL_REGISTERED_USERS);
-            break;
-        case ALL_SYSMO_USERS:
-            //$('include_custom_sharing_div_' + EVERYONE).hide();
-            $('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
-            $('include_custom_sharing_div_' + ALL_SYSMO_USERS).show();
-            $('cb_use_whitelist').disabled = false;
-            $('cb_use_blacklist').disabled = false;
-            setCustomSharingDivVisibility(ALL_SYSMO_USERS);
-            break;
-        case CUSTOM_PERMISSIONS_ONLY:
-            //$('include_custom_sharing_div_' + EVERYONE).hide();
-            $('include_custom_sharing_div_' + ALL_REGISTERED_USERS).hide();
-            $('include_custom_sharing_div_' + ALL_SYSMO_USERS).hide();
-            $('cb_use_whitelist').disabled = false;
-            $('cb_use_blacklist').disabled = false;
-            setCustomSharingDivVisibility(CUSTOM_PERMISSIONS_ONLY);
-            break;
-        default:
-		  
-    }
-}
-
-
-function setCustomSharingDivVisibility(sharing_scope)
-{
-    if ((sharing_scope >= ALL_SYSMO_USERS && sharing_scope <= EVERYONE && $('include_custom_sharing_'+sharing_scope).checked)
-        || sharing_scope == CUSTOM_PERMISSIONS_ONLY)
-        {
-        $('specific_sharing').show();
-    }
-    else
-    {
-        $('specific_sharing').hide();
-    }
-}
-
-
-function loadDefaultProjectPolicy(project_id) {
-    $('policy_loading_spinner').style.display = "inline";
-  
-    request = new Ajax.Request(GET_POLICY_DEFAULTS_LINK,
-    {
-        method: 'get',
-        parameters: {
-            policy_type: 'default',
-            entity_type: 'Project',
-            entity_id: project_id
-        },
-        onSuccess: function(transport){
-            $('policy_loading_spinner').style.display = "none";
-                                 
-            // "true" parameter to evalJSON() activates sanitization of input
-            var data = transport.responseText.evalJSON(true);
-                                 
-            if (data.status == 200) {
-                msg = data.found_exact_match ? 'Default policy found and loaded' : 'Couldn\'t find default policy for this Project,\nsystem defaults loaded instead.'
-                alert(msg);
-                                   
-                receivedPolicySettings = data;
-                                   
-                parsePolicyJSONData(data);
-                updateSharingSettings();
-            }
-            else {
-                error_status = data.status;
-                error_message = data.error
-                alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
-            }
-        },
-        onFailure: function(transport){
-            $('policy_loading_spinner').style.display = "none";
-            alert('Something went wrong, please try again...');
-        }
-    });
-
-}
-
-
-function parsePolicyJSONData(data) {
-    // re-initialize data structures in case this is run more than one time
-    policy_settings = new Object();
-    permissions_for_set = {};
-    permission_settings = new Array();
-  
-    policy_settings = data.policy
-  
-    for(var i = 0; i < data.permission_count; i++)
-    {
-        // permission IDs are present - if required
-        // example: perm_id = data.permissions[i][0];
-    
-        // process all permissions and categorize by contributor types
-        perm_settings = data.permissions[i][1];
-
-        switch(perm_settings.contributor_type) {
-            case "FavouriteGroup":
-                // the only thing to check here is that the current FavouriteGroup is a whitelist/blacklist
-                // (skip this group if it is; process identically to other contributor types otherwise)
-                if(perm_settings.whitelist_or_blacklist)
-                    continue;
-          
-            case "Person":
-            case "WorkGroup":
-            case "Project":
-            case "Institution":
-                addContributor(perm_settings.contributor_type, perm_settings.contributor_name, perm_settings.contributor_id, perm_settings.access_type);
-                break;
-            default:
-        // do nothing for unknown permission types
-        }
-    }
-}
-
-
-function updateSharingSettings() {
-    // ************** STANDARD SETTINGS ***************
-    // reset previous settings
-    //$('include_custom_sharing_' + EVERYONE).checked = false;
-    $('include_custom_sharing_' + ALL_REGISTERED_USERS).checked = false;
-    $('include_custom_sharing_' + ALL_SYSMO_USERS).checked = false;
-  
-    //$('access_type_select_' + EVERYONE).selectedIndex = 0;
-    $('access_type_select_' + ALL_REGISTERED_USERS).selectedIndex = 0;
-    $('access_type_select_' + ALL_SYSMO_USERS).selectedIndex = 0;
-  
-  
-    // set all main policy settings..
-    // ..sharing scope
-    $('sharing_scope_' + policy_settings.sharing_scope).checked = true;
-  
-    // ..access_type and usage of custom permissions
-    if(policy_settings.sharing_scope >= ALL_SYSMO_USERS && policy_settings.sharing_scope <= EVERYONE) {
-        access_type_select = $('access_type_select_' + policy_settings.sharing_scope)
-        for(var i = 0; i < access_type_select.options.length; i++)
-            if(access_type_select.options[i].value == policy_settings.access_type) {
-                access_type_select.selectedIndex = i;
-                break;
-            }
-    
-        if(policy_settings.use_custom_sharing)
-            $('include_custom_sharing_' + policy_settings.sharing_scope).checked = true;
-    }
-  
-    // ..whitelist / blacklist settings
-    $('cb_use_whitelist').checked = policy_settings.use_whitelist;
-    $('cb_use_blacklist').checked = policy_settings.use_blacklist;
-  
-  
-    // make sure that correct DIVs on the page are visible (same mechanism as if the
-    // selections were made on the page, rather than from JavaScript)
-    setSharingElementVisibility(policy_settings.sharing_scope);
-  
-  
-    // ************** CUSTOM PERMISSIONS ***************
-    // build custom permissions list and set relevant other options
-    updateCustomSharingSettings();
-}
-
-
 function updateCustomSharingSettings() {
     // iterate through all categories of contributors in existing permissions
     // and build the "shared with" list
@@ -1153,31 +956,31 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
 
 function showOrHideSubstanceTextField(form_id){
     //check if the selected entry is concentration
-    var elements =  $(form_id).getElements()
-    var item
-    var substance_autocomplete
+    var elements =  $(form_id).getElements();
+    var item;
+    var substance_autocomplete;
     for (var i=0;i<elements.length;i++)
     {
-      var id = elements[i].id
+      var id = elements[i].id;
       if (id.match('measured_item_id'))
-        item = elements[i]
+        item = elements[i];
       if (id.match('autocomplete_input'))
-        substance_autocomplete = elements[i]
+        substance_autocomplete = elements[i];
     }
 
     //check if the selected item is concentration
-    var selectedIndex = item.selectedIndex
-    var option_select = item.options[selectedIndex]
+    var selectedIndex = item.selectedIndex;
+    var option_select = item.options[selectedIndex];
 
 
     if (option_select.text == 'concentration'){
-         substance_autocomplete.disabled = false
+         substance_autocomplete.disabled = false;
     }else{
         //clear all the substances when disable
-        var autocompleter_id = substance_autocomplete.id.replace('autocomplete_input', '')
-        autocompleter_id = autocompleter_id.concat('autocompleter')
-        autocompleters[autocompleter_id].deleteAllTokens()
-        substance_autocomplete.disabled = true
+        var autocompleter_id = substance_autocomplete.id.replace('autocomplete_input', '');
+        autocompleter_id = autocompleter_id.concat('autocompleter');
+        autocompleters[autocompleter_id].deleteAllTokens();
+        substance_autocomplete.disabled = true;
     }
 }
 

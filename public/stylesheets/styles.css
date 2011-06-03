@@ -1495,3 +1495,12 @@ div.substance_experimental_condition{
     margin-bottom: 1em;
     width: 25em;
 }
+
+a.advanced_sharing_link{
+   float:right;
+}
+
+.sharing_box_form {
+	background-color: #EEEEEE;
+	padding: 0.8em 0.8em;
+}
