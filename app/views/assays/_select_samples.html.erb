@@ -5,98 +5,72 @@
  text_method ||= :title
  selected ||= @assay.samples.map &:id
  resource_type_text ||= @assay_text
- collection_name ||= 'samples'
+ association_name ||= 'samples'
  name ||= 'assay[sample_ids]'
- possible_collection_id = "possible_#{collection_name}"
+ possible_collection_id = "possible_#{association_name}"
  collection_id = sanitize_to_id name
 %>
 
 
-    <% unless @assay.is_modelling? %>
-    <span class="required">*</span>
-    <% end %>
     <div class="yui-u first">
       <p style="color: #666666;">
-        The following <%= collection_name %> are involved in this <%= resource_type_text -%>:
+        The following <%= association_name %> are involved in this <%= resource_type_text -%>:
       </p>
-      <div id="sample_to_list" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="samples">Loading...</span>
+      <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text" id="<%= association_name %>">Loading...</span>
       </div>
       <div class="association_step">
          <%= select_tag possible_collection_id,
-             options_for_select([["Select #{collection_name.capitalize.singularize} ...", 0]]|collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
+             options_for_select([["Select #{association_name.capitalize.singularize} ...", 0]]|collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
              {:style=>"width:90%"} -%>
         <%= select_tag name, options_from_collection_for_select(collection, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
 
 		<br/>
-        <%= link_to_function (image("new") + " Include in the #{resource_type_text}"), "addSelectedSample(); return(false);", :id=>"add_sample_link", :class=>"block_link", :style => "width: 12em" %>
+        <%= link_to_function (image("new") + " Include in the #{resource_type_text}"), "addSelectedToFancy('#{collection_id}', $F(#{possible_collection_id})); return(false);", :id=>"add_#{association_name.singularize}_link", :class=>"block_link", :style => "width: 12em" %>
 
     </div>
 
 <script type="text/javascript">
 
     Event.observe(window, 'load',function () {
-        updateSamples();
+        updateFancyMultiselect('<%= collection_id %>');
     });
 
-    function checkSampleNotInList(id) {
-        var toAdd = $F('assay_sample_ids').indexOf(id) == -1;
-        if(!toAdd){
-            alert('<%= collection_name.capitalize.singularize %> already exists!');
-        }
-        return toAdd;
-    }
-
-    function addSample(id) {
-        if (checkSampleNotInList(id)) {
-            $('<%= collection_id %>').setValue($F('<%= collection_id %>').concat(id));
-            updateSamples();
+    function addSelectedToFancy(multiselect, value) {
+        if (!$F(multiselect).include(value)) {
+            $(multiselect).setValue($F(multiselect).concat(value));
+            updateFancyMultiselect(multiselect);
+        } else {
+            alert('Item already exists!');
         }
     }
 
-    function addSelectedSample() {
-        addSample($F("possible_samples"));
+    function removeFromFancy(multiselect, value) {
+        $(multiselect).setValue($F(multiselect).without(value));
+        updateFancyMultiselect(multiselect);
     }
 
-    function removeSample(id) {
-        var selected = $F('<%= collection_id %>').slice();
-        selected.splice(selected.indexOf(id.toString()),1);
-        $(<%= collection_id %>).setValue(selected);
-        updateSamples();
-    }
-
-    function optionToListItem(option) {
+    function toFancyListItem(option, multiselect) {
         var title_span = '<span title="' + option.text + '">' + option.text.truncate(100) + '</span>';
-        var remove_link = '[<a href="" onclick="javascript:removeSample(' + option.value + '); return(false);">remove</a>]';
-        return '<li>&nbsp;&nbsp;&nbsp;'+ title_span +'<small style="vertical-align: middle;">' + remove_link + '</small>';
+        var remove_link = '<a href="" onclick="javascript:removeFromFancy(';
+        remove_link += "'" + $(multiselect).id + "','";
+        remove_link += option.value + "'";
+        remove_link += '); return(false);">remove</a>';
+        return '<li>&nbsp;&nbsp;&nbsp;'+ title_span +'<small style="vertical-align: middle;">[' + remove_link + ']</small>';
     }
 
-    function updateSamples() {
-        var samples = $F(('<%= collection_id %>'));
-        var sample_text = '<ul class="related_asset_list">';
-
-        for (var i = 0; i < samples.length; i++) {
-            var value = samples[i];
-            var text = $$('#<%= collection_id %> option[value='+ value +']')[0].text;
-
-            var titleText = '<span title="' + text + '">' + text.truncate(100);
-
-
-            titleText += '</span>';
-            sample_text += '<li>' + titleText +
-                    '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
-                    '[<a href="" onclick="javascript:removeSample(' + value + '); return(false);">remove</a>]</small></li>';
+    function updateFancyMultiselect(multiselect) {
+        multiselect = $(multiselect);
+        var display_area = $(multiselect.id + '_display_area');
+        var selected_options = multiselect.childElements().select(function(c){return c.selected});
+        if(selected_options.length > 0) {
+            display_area.innerHTML =  selected_options.inject('<ul class="related_asset_list">', function(display_text, option){
+                return display_text + toFancyListItem(option, multiselect);
+            }) + '</ul>'
+        } else {
+            display_area.innerHTML = '<span class="none_text">No Items</span>';
         }
-
-        sample_text += '</ul>';
-
-        // update the page
-        if (samples.length == 0) {
-            $('sample_to_list').innerHTML = '<span class="none_text">No <%= collection_name %></span>';
-        }
-        else {
-            $('sample_to_list').innerHTML = sample_text;
-        }
+        multiselect.fire('change');
     }
 </script>
