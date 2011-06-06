@@ -3,6 +3,7 @@ require 'acts_as_authorized'
 
 class Specimen < ActiveRecord::Base
 
+  before_save  :clear_garbage
 
   has_many :samples
 
@@ -51,6 +52,38 @@ class Specimen < ActiveRecord::Base
 
   def self.user_creatable?
     true
+  end
+
+  def clear_garbage
+    if culture_growth_type.title=="in vivo"
+      self.medium=nil
+      self.culture_format=nil
+      self.temperature=nil
+      self.ph=nil
+      self.confluency=nil
+      self.passage=nil
+      self.viability=nil
+      self.purity=nil
+    end
+    if culture_growth_type.title=="cultured cell line"||culture_growth_type.title=="primary cell culture"
+      self.sex=nil
+      self.born=nil
+      self.age=nil
+    end
+
+  end
+
+  def strain_title
+    self.strain.try(:title)
+  end
+
+  def strain_title= title
+    existing = Strain.all.select{|s|s.title==title}.first
+    if existing.blank?
+      self.strain = Strain.create(:title=>title)
+    else
+      self.strain= existing
+    end
   end
 
 

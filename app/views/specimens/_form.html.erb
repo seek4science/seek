@@ -33,12 +33,12 @@
       %>
       <%=
           select_tag :project_id,
-                     options_for_select([["Select project ..", 0]]|Project.all.collect { |p| [h(p.name), p.id] }, selected_project)
+                     options_for_select([["Select project ..", 0]]|Project.all.collect { |p| [h(p.name), p.id] }, selected_project),{:style=>"width:90%"}
       %>
     </p>
      <p>
     <%= f.label "Institution" %><span class="required">*</span><br/>
-    <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank => "Please Select"}) %>
+    <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank => "Please Select"},{:style=>"width:90%"}) %>
   </p>
 
     <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f}-%>

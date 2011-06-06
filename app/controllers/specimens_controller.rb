@@ -7,6 +7,7 @@ class SpecimensController < ApplicationController
 
   include IndexPager
 
+
   def new
     @specimen = Specimen.new
     respond_to do |format|
@@ -96,20 +97,7 @@ class SpecimensController < ApplicationController
   end
 
 
-  def project_selected_ajax
 
-    if params[:project_id] && params[:project_id]!="0"
-      ins=Project.find(params[:project_id]).institutions
-
-    end
-    ins||=[]
-
-    #render :update do |page|
-
-     # page.replace_html "institution_collection", :partial=>"specimens/institutions_list", :locals=>{:ins=>ins, :project_id=>params[:project_id]}
-    #end
-
-  end
 
 
 end

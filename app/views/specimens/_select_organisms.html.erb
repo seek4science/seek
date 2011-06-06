@@ -34,7 +34,7 @@
           <%= select_tag "specimen[culture_growth_type_id]",culture_growth_options ,{:onchange=>"check_show_which_fields();"}-%>
           <br/>
          <div id="fields_for_cultured_cell_line_and_primary_cell_culture" style="display:none;">
-           <table border="1" cellpadding="10" >
+           <table id="table1" border="1" cellpadding="10" >
                <tr>
                 <td> <%= f.label :medium -%></td>
                 <td> <%= f.text_field :medium  %></td>
@@ -72,7 +72,7 @@
 
          <div id="fields_for_vivo" style="display:none;">
            <br/>
-           <table border="1" >
+           <table id="table2" border="1" >
            <tr>
              <td style="text-align:left;"><%= f.label :sex -%></td>
              <td style="text-align:left;"><%= f.select :sex,options_for_select({"female"=>true,"male"=>false},@specimen.sex),:include_blank=>"Not Specified"%> </td>
@@ -96,7 +96,7 @@
         <div class="association_step">
           <b>Step 3</b> - Specify a strain (optional)<br/>
           <div id="existing_strains"></div>
-          <%= f.text_field :strain_id %>
+          <%= f.text_field :strain_title %>
           <br/>
         </div>
       </div>
@@ -122,6 +122,20 @@
         Effect.Appear('extra_organism_details');
       }
     }
+    function clearTable1(){
+        var table1_elements = new Array();
+        table1_elements = ["specimen_medium","specimen_culture_format","specimen_temperature","specimen_ph","specimen_confluency","specimen_passage","specimen_viability","specimen_purity"];
+        for(var i=0; i<table1_elements.length;i++)
+        {
+           document.getElementById(table1_elements[i]).value="";
+        }
+
+    }
+    function clearTable2() {
+       $('specimen_sex').selectedIndex = 0;
+       document.getElementById("specimen_age").value="";
+       document.getElementById("specimen_born").value="";
+     }
 
     function check_show_which_fields(){
         if($F('specimen_culture_growth_type_id')){
@@ -135,14 +149,23 @@
         if (title=="cultured cell line" || title=="primary cell culture"){
             div1.style.display = 'block';
             div2.style.display='none';
+            //clearTable2();
+
+
         }
         else if(title=="in vivo"){
             div2.style.display = 'block';
             div1.style.display='none';
+            //clearTable1();
+
+
+
 
         }else{
            div1.style.display = 'none';
            div2.style.display='none';
+          // clearTable1();
+          // clearTable2();
 
         }
        }
