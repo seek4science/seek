@@ -55,7 +55,7 @@ class Specimen < ActiveRecord::Base
   end
 
   def clear_garbage
-    if culture_growth_type.title=="in vivo"
+    if culture_growth_type.try(:title)=="in vivo"
       self.medium=nil
       self.culture_format=nil
       self.temperature=nil
@@ -65,7 +65,7 @@ class Specimen < ActiveRecord::Base
       self.viability=nil
       self.purity=nil
     end
-    if culture_growth_type.title=="cultured cell line"||culture_growth_type.title=="primary cell culture"
+    if culture_growth_type.try(:title)=="cultured cell line"||culture_growth_type.try(:title)=="primary cell culture"
       self.sex=nil
       self.born=nil
       self.age=nil
