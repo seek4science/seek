@@ -190,7 +190,7 @@
 
   <%if @assay.is_modelling?%>
       Event.observe(window, 'load', function() {
-          Event.observe('assay_sample_ids', 'change', function(){
+          Event.observe('assay_sample_ids', 'fancySelect:update', function(){
             check_show_organism_form();
           });
 
@@ -200,7 +200,7 @@
               check_show_sample_form();
           };
 
-          $('assay_sample_ids').fire('change');
+          $('assay_sample_ids').fire('fancySelect:update');
           updateOrganisms();
       });
   <% end %>
