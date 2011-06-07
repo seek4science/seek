@@ -112,6 +112,10 @@ ActionController::Routing::Routes.draw do |map|
   # review members of workgroup (also of a project / institution) popup
   map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }  
   
+  #create new specimen based existing one
+  map.new_specimen_based_on_existing_one '/specimens/new_specimen_based_on_existing_one/:id',:controller=>'specimens',:action=>'new_specimen_based_on_existing_one', :conditions => { :method => :post }
+
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
