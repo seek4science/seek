@@ -12,7 +12,7 @@
   <% end %>
 
   <% if logged_in? and current_user.person.member? %>
-      <li><%= image_tag_for_key('new', new_specimen_based_on_existing_one_path(@specimen.id), nil, nil, 'New specimen based on this one') %></li>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"specimens",:id=>@specimen.id), nil, nil, 'New specimen based on this one') %></li>
   <% end %>
 </ul>
 

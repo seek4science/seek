@@ -7,18 +7,13 @@ class SpecimensController < ApplicationController
 
   include IndexPager
 
-  def new_specimen_based_on_existing_one
-    existing_specimen =  Specimen.find(params[:id])
-    @specimen = new_resource_based_on_existing_one existing_specimen
-
-    @specimen.policy = Policy.find @specimen.policy_id
-    #@specimen.policy.permission_ids = existing_specimen.policy.permission_ids
-    @specimen.sop_masters = existing_specimen.try(:sop_masters)
-    @specimen.creators = existing_specimen.try(:creators)
-
-    respond_to do |format|
-      format.html { render :action=>"new"}
-    end
+  def new_object_based_on_existing_one
+    @existing_specimen =  Specimen.find(params[:id])
+    @specimen = @existing_specimen.clone_with_associations
+    render :action=>"new"
+#    respond_to do |format|
+#      format.html { render :action=>"new"}
+#    end
   end
 
   def new
@@ -42,7 +37,6 @@ class SpecimensController < ApplicationController
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-
     respond_to do |format|
       if @specimen.save
         sop_ids.each do |sop_id|

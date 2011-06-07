@@ -349,18 +349,6 @@ class ApplicationController < ActionController::Base
     }
   end
 
-  def new_resource_based_on_existing_one object
-     name = self.controller_name.singularize
 
-     new_attributes= object.attributes
-
-     new_attributes.delete_if{|k,v| k=="id"}
-
-     new_object = name.camelize.constantize.new
-     new_object.attributes = new_attributes
-
-    return new_object
-
-  end
 
 end
