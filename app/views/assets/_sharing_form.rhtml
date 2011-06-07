@@ -31,7 +31,7 @@
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
           <li>Share with the all visitors (including anonymous visitors with no login)</li>
           <li>Share within your project and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
-          <li>Define more fine-grained sharing, by selecting <em>Custom sharing permissions</em>.<br/> By using custom sharing permissions you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
+          <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
         </ul>
       </div>
     </div>
@@ -97,7 +97,7 @@
     <div id="advanced sharing" class='sharing_box_form' style="display:<%= @policy.permissions.empty? ? 'none;' : 'block;'-%>">
         <p style="font-weight: bold;">Define more fine-grained sharing</p>
 
-        <div id="specific_sharing" class='box_simple' style="display:block; margin-top: 1em;">
+        <div id="specific_sharing" style="display:block; margin-top: 1em;">
           <div class="box_editing" style="padding-left: 1em; font-size: 93%;">
             <p style="color: #666666;">
               So far you have selected to share this <%= @resource_type -%> with:

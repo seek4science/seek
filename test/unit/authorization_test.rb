@@ -658,7 +658,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert res, "test user should have been allowed to 'download' the SOP - because of group permission: shared with test user's institution"
   end
 
-
   def test_downloadable_data_file
     data_file=data_files(:downloadable_data_file)
     res=Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
