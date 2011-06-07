@@ -7,6 +7,9 @@
   <% if @sample.can_delete? %>
       <li><%= image_tag_for_key "destroy", sample_path(@sample), "Delete Sample", {:confirm => 'Are you sure?', :method => :delete}, "Delete Sample" -%></li>
   <% end %>
+  <% if logged_in? and current_user.person.member? %>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"samples",:id=>@sample.id), nil, nil, 'New sample based on this one') %></li>
+  <% end %>
 </ul>
 
 <%= render :partial => "layouts/item_title", :locals=>{:item=>@sample} %>
