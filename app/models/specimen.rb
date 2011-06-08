@@ -9,7 +9,7 @@ class Specimen < ActiveRecord::Base
 
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
-  accepts_nested_attributes_for :creators
+#  accepts_nested_attributes_for :creators
 
   belongs_to :institution
   belongs_to :organism
