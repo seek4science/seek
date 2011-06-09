@@ -30,9 +30,7 @@ class Policy < ActiveRecord::Base
   
   # sharing_scope
   PRIVATE = 0
-  CUSTOM_PERMISSIONS_ONLY = 1
   ALL_SYSMO_USERS = 2
-  ALL_REGISTERED_USERS = 3
   EVERYONE = 4
   
   # access_type
@@ -62,7 +60,7 @@ class Policy < ActiveRecord::Base
 
   def self.new_for_upload_tool(resource, recipient)
     policy = resource.build_policy(:name               => 'auto',
-                                    :sharing_scope      => Policy::CUSTOM_PERMISSIONS_ONLY,
+                                    :sharing_scope      => Policy::PRIVATE,
                                     :access_type        => Policy::NO_ACCESS)
     policy.permissions.build :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
     return policy

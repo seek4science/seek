@@ -52,10 +52,8 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test "policy sharing scope presedence" do
-    assert Policy::PRIVATE < Policy::CUSTOM_PERMISSIONS_ONLY
-    assert Policy::CUSTOM_PERMISSIONS_ONLY < Policy::ALL_SYSMO_USERS
-    assert Policy::ALL_SYSMO_USERS < Policy::ALL_REGISTERED_USERS
-    assert Policy::ALL_REGISTERED_USERS < Policy::EVERYONE
+    assert Policy::PRIVATE < Policy::ALL_SYSMO_USERS
+    assert Policy::ALL_SYSMO_USERS < Policy::EVERYONE
   end
 
 end
