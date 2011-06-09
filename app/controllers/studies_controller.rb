@@ -13,7 +13,7 @@ class StudiesController < ApplicationController
     @existing_study =  Study.find(params[:id])
     @study = @existing_study.clone_with_associations
 
-    unless @study.investigation.can_view?
+    unless @study.investigation.can_edit?
        @study.investigation = nil
       flash[:notice] = 'The investigation of the existing study cannot be viewed, please specify your own investigation!'
     end
