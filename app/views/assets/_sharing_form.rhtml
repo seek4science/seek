@@ -206,7 +206,7 @@
                             <%= link_to "Add immediately", "", :onclick => "javascript: addProjectInstitution(); return(false);", :style => "font-weight: bold; padding: 0;" -%>
                           </li>
                           <li style="list-style-type: disc; padding: 0;">
-                            <div id="work_group_parent_span"><%= workgroup_member_review_popup_link() -%></div>
+                            <div id="work_group_parent_span"><%= workgroup_member_review_popup_link(@resource_type) -%></div>
                           </li>
                         </ul>
                       </div>
