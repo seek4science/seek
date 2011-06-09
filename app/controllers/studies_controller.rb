@@ -15,10 +15,11 @@ class StudiesController < ApplicationController
 
     unless @study.investigation.can_edit?
        @study.investigation = nil
-      flash[:notice] = 'The investigation of the existing study cannot be viewed, please specify your own investigation!'
+      flash.now[:notice] = 'The investigation of the existing study cannot be viewed, please specify your own investigation!'
     end
 
-    render :action=>"new"
+    render :action => "new"
+
   end
 
   def new
