@@ -387,6 +387,27 @@ module ApplicationHelper
     count
   end
 
+
+  def fancy_multiselect object, association, options = {}
+    reflection = object.class.reflect_on_association(association)
+    access_required = reflection.options.delete(:required_access).try(:to_sym) || :can_view?
+    object_type_text = options.delete(:object_type_text) || object.class.name.humanize
+    locals = {
+        :fold_id => "add_#{association}_form",
+        :fold_title => (help_icon("Here you can associate the #{object_type_text} with specific #{association}.") + "#{association.to_s.capitalize}"),
+        :intro => "The following #{association} are involved in this #{object_type_text}:",
+        :button_text => "Include in the #{object_type_text}",
+        :default_choice_text => "Select #{association.to_s.capitalize} ...",
+        :name => object.class.name.downcase,
+        :method => reflection.association_foreign_key.pluralize,
+        :possibilities => reflection.klass.all.select(&access_required),
+        :text_method => :title,
+        :value_method => :id,
+        :selected => @assay.samples.map(&:id)}
+    locals.update options
+    render :partial => 'assets/fancy_multiselect', :layout => "assets/folding_box", :locals => locals
+  end
+
   def set_parameters_for_sharing_form
     object = eval "@#{controller_name.singularize}"
     policy = nil
@@ -435,5 +456,10 @@ module ApplicationHelper
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
-  
 end
+class SeekFormBuilder< ActionView::Helpers::FormBuilder
+  def fancy_multiselect association, options = {}
+    @template.fancy_multiselect object, association, options
+  end
+end
+ActionView::Base.default_form_builder = SeekFormBuilder
