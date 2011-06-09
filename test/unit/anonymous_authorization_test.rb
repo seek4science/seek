@@ -22,9 +22,9 @@ class AnonymousAuthorizationTest < ActiveSupport::TestCase
   end
 
   test "anonymous cannot view access or edit non public sop" do
-    sop=sops(:sop_with_all_registered_users_policy)
+    sop=sops(:sop_with_download_for_all_sysmo_users_policy)
 
-    assert_equal Policy::ALL_REGISTERED_USERS,sop.policy.sharing_scope
+    assert_equal Policy::ALL_SYSMO_USERS,sop.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE,sop.policy.access_type
 
     assert !Authorization.is_authorized?("view",nil,sop,nil)

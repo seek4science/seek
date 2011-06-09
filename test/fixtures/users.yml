@@ -96,9 +96,9 @@ owner_of_fully_public_policy:
 
 
 
-owner_of_download_for_all_registered_users_policy:
-  person: person_for_owner_of_download_for_all_registered_users_policy
-  login: owner_of_download_for_all_registered_users_policy_login
+owner_of_download_for_all_sysmo_users_policy:
+  person: person_for_owner_of_download_for_all_sysmo_users_policy
+  login: owner_of_download_for_all_sysmo_users_policy_login
   email: all_registered_policy_owner@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
@@ -118,10 +118,10 @@ owner_of_editing_for_all_sysmo_users_policy:
 
 
 
-owner_of_custom_permissions_only_policy:
-  person: person_for_owner_of_custom_permissions_only_policy
-  login: owner_of_custom_permissions_only_policy_login
-  email: owner_of_custom_permissions_only_policy@example.com
+owner_of_private_policy_using_custom_sharing:
+  person: person_for_owner_of_private_policy_using_custom_sharing
+  login: owner_of_private_policy_using_custom_sharing_login
+  email: owner_of_private_policy_using_custom_sharing@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>
@@ -206,10 +206,10 @@ sysmo_user_both_in_blacklist_and_whitelist:
 
 
 
-random_registered_user_who_wants_to_access_different_things:
-  person: person_for_random_registered_user_who_wants_to_access_different_things
-  login: random_registered_user_who_wants_to_access_different_things_login
-  email: random_registered_user_who_wants_to_access_different_things@example.com
+sysmo_user_who_wants_to_access_different_things:
+  person: person_for_sysmo_user_who_wants_to_access_different_things
+  login: sysmo_user_who_wants_to_access_different_things_login
+  email: sysmo_user_who_wants_to_access_different_things@example.com
   salt: 7e3041ebc2fc05a40c60028e2c4901a81035d3cd
   crypted_password: 00742970dc9e6319f8019fd54864d3ea740f04b1 # test
   created_at: <%= 1.days.ago.to_s :db %>

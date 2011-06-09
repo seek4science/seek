@@ -45,9 +45,9 @@ private_sop:
   project: sysmo_project # not linked to any project for now
   policy: private_policy
 
-sop_with_all_registered_users_policy:
-  contributor: owner_of_download_for_all_registered_users_policy (User)
-  title: "SOP with all registered users policy"
+sop_with_download_for_all_sysmo_users_policy:
+  contributor: owner_of_download_for_all_sysmo_users_policy (User)
+  title: "SOP with download_for_all_sysmo_users_policy"
   description: "This is a SOP attached to asset with a policy for all registered users."
   original_filename: "little_file.txt"
   content_type: "text/plain"
@@ -57,7 +57,7 @@ sop_with_all_registered_users_policy:
   last_used_at: <%= 1.days.ago.to_s :db %>
   version: 1
   project: other_project # not linked to any project for now
-  policy: download_for_all_registered_users_policy
+  policy: download_for_all_sysmo_users_policy
 
 sop_with_all_sysmo_users_policy:
   contributor: owner_of_editing_for_all_sysmo_users_policy (User)
@@ -74,7 +74,7 @@ sop_with_all_sysmo_users_policy:
   policy: editing_for_all_sysmo_users_policy
 
 sop_with_custom_permissions_policy:
-  contributor: owner_of_custom_permissions_only_policy (User)
+  contributor: owner_of_private_policy_using_custom_sharing (User)
   title: "SOP with custom permissions only policy"
   description: "This is a SOP attached to asset with a policy for custom permissions only."
   original_filename: "little_file.txt"
@@ -85,7 +85,7 @@ sop_with_custom_permissions_policy:
   last_used_at: <%= 1.days.ago.to_s :db %>
   version: 1
   project: other_project #not linked to any project for now
-  policy: custom_permissions_only_policy
+  policy: private_policy_using_custom_sharing
 
 sop_with_complex_permissions:
   contributor: owner_of_my_first_sop (User)

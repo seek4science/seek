@@ -5,7 +5,7 @@ class PolicyTest < ActiveSupport::TestCase
   fixtures :all
 
   test "deep clone" do
-    policy = policies(:download_for_all_registered_users_policy)
+    policy = policies(:download_for_all_sysmo_users_policy)
 
     copy = policy.deep_copy    
     assert_equal policy.sharing_scope,copy.sharing_scope
