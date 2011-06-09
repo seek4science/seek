@@ -120,8 +120,6 @@ class AssaysController < ApplicationController
       @assay.policy_or_default
       @assay.policy.set_attributes_with_sharing params[:sharing], @assay.project
     end
-    p @assay.can_edit?
-
 
     respond_to do |format|
       if @assay.save
@@ -158,7 +156,6 @@ class AssaysController < ApplicationController
         format.html { redirect_to(@assay) }
         format.xml { head :ok }
       else
-        p @assay.errors
 
         format.html { render :action => "edit" }
         format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
