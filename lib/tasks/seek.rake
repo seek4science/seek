@@ -37,72 +37,12 @@ namespace :seek do
         create_tag item, "tools", "Person"
       end
     end
-  end
-
-  task(:associate_people_with_notification_info=>:environment) do
-    Person.find(:all).each do |p|
-      p.check_for_notifiee_info
-      puts "Saved NotifieeInfo for #{p.name} - UUID = "+p.notifiee_info.unique_key
-    end
-  end
-
-  desc 'upgrades between 0.7 and 0.8'
-  task(:upgrade_live2=>:environment) do
-    other_tasks=["associate_people_with_notification_info", "load_help_docs", "update_blobs"]
-    other_tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
-  end
-
-  desc 'upgrades between 0.6 and 0.7'
-  task(:upgrade_live=>:environment) do
-    other_tasks=["assay_classes", "update_assay_classes", "strains", "graft_new_assay_types", "relationship_types"]
-    other_tasks.each do |task|
-      Rake::Task["seek:#{task}"].execute
-    end
-  end
+  end    
 
   desc 're-extracts bioportal information about all organisms, overriding the cached details'
   task(:refresh_organism_concepts=>:environment) do
     Organism.all.each do |o|
       o.concept({:refresh=>true})
-    end
-  end
-
-  task(:rebuild_project_organisms=>:environment) do
-    organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
-    puts "found #{organism_taggings.size} organism taggings"
-    organism_taggings.each do |tagging|
-      if tagging.taggable_type == "Project"
-        tag     =tagging.tag
-        project =tagging.taggable
-        organism=Organism.find(:first, :conditions=>["title=?", tag.name])
-        if organism.nil?
-          puts "unable to find organism #{tag.name} required for project #{project.title}"
-        else
-          puts "adding #{organism.title} to #{project.title} "
-          class << project
-            def record_timestamps
-              false
-            end
-          end
-          project.organisms << organism unless project.organisms.include?(organism)
-          project.save!
-        end
-      else
-        puts "Tagging with id #{tagging.id} is not for Project"
-      end
-    end
-  end
-
-  task(:update_blobs=>:environment) do
-    ContentBlob.all.each do |blob|
-      class << blob
-        def record_timestamps
-          false
-        end
-      end
-      blob.save!
     end
   end
 
@@ -116,39 +56,10 @@ namespace :seek do
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "update_first_letters", "assay_classes", "relationship_types", "strains"]
+    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
     other_tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
-  end
-
-  desc 'adds the new modelling assay types and creates a new root'
-  task(:graft_new_assay_types=>:environment) do
-    experimental      =AssayType.find(628957644)
-
-    experimental.title="experimental assay type"
-    flux              =AssayType.new(:title=>"fluxomics")
-    flux.save!
-    experimental.children << flux
-    experimental.save!
-
-    modelling_assay_type=AssayType.new(:title=>"modelling analysis type")
-    modelling_assay_type.save!
-
-    new_root      =AssayType.new
-    new_root.title="assay types"
-    new_root.children << experimental
-    new_root.children << modelling_assay_type
-    new_root.save!
-
-    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation", "protein interations"]
-    new_modelling_types.each do |title|
-      a=AssayType.new(:title=>title)
-      a.save!
-      modelling_assay_type.children << a
-    end
-    modelling_assay_type.save!
-
   end
 
   desc 'removes any data this is not authorized to viewed by the first User'
@@ -216,6 +127,8 @@ namespace :seek do
     revert_fixtures_identify
     Organism.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "organisms")
+    BioportalConcept.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "bioportal_concepts")
   end
 
   task(:technology_types=>:environment) do
@@ -269,35 +182,6 @@ namespace :seek do
     puts "Done. Schema XMI created as doc/data_models/schema.xmi."
   end
 
-  task :update_first_letters => :environment do
-    (Person.find(:all)|Project.find(:all)|Institution.find(:all)|Model.find(:all)|DataFile.find(:all)|Sop.find(:all)|Assay.find(:all)|Study.find(:all)|Investigation.find(:all)).each do |p|
-      #suppress the timestamps being recorded.
-      class << p
-        def record_timestamps
-          false
-        end
-      end
-      p.save #forces the first letter to be updated
-      puts "Updated for #{p.class.name} : #{p.id}"
-    end
-  end
-
-  #a 1 shot task to update the creators field for Asset retrospectively for contributors
-  task :update_creators => :environment do
-    Asset.find(:all).each do |asset|
-      if (asset.creators.empty? && !asset.contributor.nil?)
-        class << asset
-          def record_timestamps
-            false
-          end
-        end
-        asset.creators << asset.contributor.person
-        asset.save!
-        puts "Added creator for Asset: #{asset.id}"
-      end
-    end
-  end
-
   #Task to add default assay_class (1 - Experimental Assay) to those without one
   task :update_assay_classes => :environment do
     default_assay_class = AssayClass.find(1)
@@ -334,23 +218,6 @@ namespace :seek do
       pub.asset.policy.permissions << Permission.create(:contributor => pub.contributor.person, :policy => pub.asset.policy, :access_type => 4)
     end
     puts "Done - #{count} policies for publications added."
-  end
-
-  task :content_stats => :environment do
-
-    stats=ContentStats.generate
-
-    stats.each do |project_stat|
-      puts "Project: #{project_stat.project.title}"
-      puts "\t SOPs: #{project_stat.sops.count} (#{project_stat.sops_size/1048576} Mb / #{project_stat.sops_size/1024} Kb), of which I can see #{project_stat.visible_sops.count}"
-      puts "\t Models: #{project_stat.models.count} (#{project_stat.models_size/1048576} Mb / #{project_stat.models_size/1024} Kb), of which I can see #{project_stat.visible_models.count}"
-      puts "\t Data: #{project_stat.data_files.count} (#{project_stat.data_files_size/1048576} Mb / #{project_stat.data_files_size/1024} Kb), of which I can see #{project_stat.visible_data_files.count}"
-      puts "\t Publications: #{project_stat.publications.count}"
-      puts "\t People: #{project_stat.people.count}, of which have registered: #{project_stat.registered_people.count}"
-      puts "\t Assays: #{project_stat.assays.count}"
-      puts "\t Studies: #{project_stat.studies.count}"
-      puts "\n --------------- \n\n"
-    end
   end
 
   desc "Dumps help documents and attachments/images"
@@ -476,72 +343,6 @@ namespace :seek do
         end
       end
       puts "#{count} UUIDs generated for #{c.name}" unless count < 1
-    end
-  end
-
-  desc "Record state of pre-asset removal db to file for comparison"
-  task :record_old_asset_state => :environment do
-    File.open("asset_old.txt", "w") do |file|
-      classes = [DataFile, Model, Sop, Publication]
-
-      file.write("Asset + AssetsCreator changes ====================\n")
-      file.write("AssetsCreator count: #{AssetsCreator.count}\n")
-      classes.each do |c|
-        file.write("#{c.name} count: #{c.count}\n")
-        c.all.each do |resource|
-          file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
-          file.write("  Policy #{resource.asset.policy_id}")
-          file.write("  Project ID: #{resource.asset.project_id}\n")
-          resource.asset.creators.each do |p|
-            file.write("  Person #{p.id} - #{p.name}\n")
-          end
-        end
-      end
-
-
-      file.write("AssayAsset changes ====================\n")
-      file.write("Assay count: #{Assay.count}\n")
-      file.write("AssayAsset count: #{AssayAsset.count}\n")
-      Assay.all.each do |assay|
-        file.write("Assay ##{assay.id} - #{assay.title}\n")
-        assay.assay_assets.each do |aa|
-          res = aa.asset.resource.find_version(aa.version)
-          file.write("  AssayAsset #{aa.id} - #{res.class.name} #{res.id} (#{res.version})\n")
-        end
-      end
-    end
-  end
-
-  desc "Record state of post-asset removal db to file for comparison"
-  task :record_new_asset_state => :environment do
-    File.open("asset_new.txt", "w") do |file|
-      classes = [DataFile, Model, Sop, Publication]
-
-      file.write("Asset + AssetsCreator changes ====================\n")
-      file.write("AssetsCreator count: #{AssetsCreator.count}\n")
-      classes.each do |c|
-        file.write("#{c.name} count: #{c.count}\n")
-        c.all.each do |resource|
-          file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
-          file.write("  Policy #{resource.policy_id}")
-          file.write("  Project ID: #{resource.project_id}\n")
-          resource.creators.each do |p|
-            file.write("  Person #{p.id} - #{p.name}\n")
-          end
-        end
-      end
-
-
-      file.write("AssayAsset changes ====================\n")
-      file.write("Assay count: #{Assay.count}\n")
-      file.write("AssayAsset count: #{AssayAsset.count}\n")
-      Assay.all.each do |assay|
-        file.write("Assay ##{assay.id} - #{assay.title}\n")
-        assay.assay_assets.each do |aa|
-          res = aa.asset.find_version(aa.version)
-          file.write("  AssayAsset #{aa.id} - #{res.class.name} #{res.id} (#{res.version})\n")
-        end
-      end
     end
   end
 
