@@ -8,6 +8,10 @@ class SamplesController < ApplicationController
   def new_object_based_on_existing_one
     @existing_sample =  Sample.find(params[:id])
     @sample = @existing_sample.clone_with_associations
+    unless @sample.specimen.can_view?
+      @sample.specimen = nil
+      flash.now[:notice] = "The specimen of existing sample cannot be viewed, please specify your own specimen"
+    end
     render :action=>"new"
 
   end
