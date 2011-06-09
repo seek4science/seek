@@ -9,7 +9,7 @@ class Specimen < ActiveRecord::Base
 
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
-
+#  accepts_nested_attributes_for :creators
 
   belongs_to :institution
   belongs_to :organism
@@ -84,6 +84,15 @@ class Specimen < ActiveRecord::Base
     else
       self.strain= existing
     end
+  end
+
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = Policy.find self.policy_id
+    new_object.policy.permission_ids = self.policy.permission_ids
+    new_object.sop_masters = self.try(:sop_masters)
+    new_object.creators = self.try(:creators)
+    return new_object
   end
 
 

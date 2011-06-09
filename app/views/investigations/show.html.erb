@@ -12,6 +12,10 @@
     <% end -%>
   
     <%= delete_ISA_icon @investigation,current_user -%>
+   <% if logged_in? and current_user.person.member? %>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"investigations",:id=>@investigation.id), nil, nil, 'New investigation based on this one') %></li>
+    <% end %>
+
 </ul>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@investigation} %>
 <div class="show_basic">

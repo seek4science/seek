@@ -7,6 +7,14 @@ class SpecimensController < ApplicationController
 
   include IndexPager
 
+  def new_object_based_on_existing_one
+    @existing_specimen =  Specimen.find(params[:id])
+    @specimen = @existing_specimen.clone_with_associations
+    render :action=>"new"
+#    respond_to do |format|
+#      format.html { render :action=>"new"}
+#    end
+  end
 
   def new
     @specimen = Specimen.new
@@ -29,10 +37,8 @@ class SpecimensController < ApplicationController
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-
     respond_to do |format|
       if @specimen.save
-
         sop_ids.each do |sop_id|
           sop= Sop.find sop_id
           SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)

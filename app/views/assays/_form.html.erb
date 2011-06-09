@@ -29,27 +29,32 @@
     <%= f.label "Institution" %><br/>
     <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."}) %>
   </p>
-  <% if @assay.study.blank? or @assay.study.can_view? %>
-      <p>
-      <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
-      <%= f.label :study-%><span class="required">*</span><br/>
-      <%  investigations = Investigation.all.select &:can_edit? -%>
-      <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
-      <% investigations.each do |i| %>
-         <% studies = i.studies.select &:can_edit? %>
-        <% unless studies.empty?%>
-          <% options << "<optgroup label=\"#{truncate(i.title, :length => 64)}\">\n" %>
-          <% studies.each do |s| %>
-            <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
-          <% end %>
-          <% options << "</optgroup>" %>
+
+  <p>
+
+  <div id="study_selection">
+    <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
+
+    <%= f.label :study -%>
+    <span class="required">*</span><br/>
+    <% investigations = Investigation.all.select &:can_edit? -%>
+    <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>" : "" %>
+    <% investigations.each do |i| %>
+        <% studies = i.studies.select &:can_edit? %>
+        <% unless studies.empty? %>
+            <% options << "<optgroup label=\"#{truncate(i.title, :length => 64)}\">\n" %>
+            <% studies.each do |s| %>
+                <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" style=\"z-index:0;\" onMouseOver=\"showTitle(\'#{s.title}\')\">#{truncate(s.title, :length => 64)}</option>\n" %>
+            <% end %>
+            <% options << "</optgroup>" %>
         <% end %>
-      <% end %>
-      <select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()" style="width:100%">
-        <%= options %>
-      </select>
-    </p>
-  <%end%>
+    <% end %>
+    <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
+      <%= options %>
+    </select>
+  </div>
+  </p>
+
 
 </div>
 
@@ -187,6 +192,14 @@
           Effect.Appear('add_samples_form');
       }
   }
+  function check_show_study_selection(){
+      if (!<%=@assay.study.blank?%> || !<%=@assay.study.try(:can_view?)%> ){
+
+          document.getElementById('study_selection').style.display = "none";
+
+      }
+  }
+
 
   <%if @assay.is_modelling?%>
       Event.observe(window, 'load', function() {
@@ -204,5 +217,5 @@
           updateOrganisms();
       });
   <% end %>
-
+    check_show_study_selection();
 </script>

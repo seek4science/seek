@@ -30,4 +30,12 @@ class Study < ActiveRecord::Base
     assays.empty? && mixin_super(*args)
   end
 
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = Policy.find self.policy_id
+    new_object.policy.permission_ids = self.policy.permission_ids
+
+    return new_object
+  end
+
 end

@@ -686,7 +686,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Request file/,:count=>1
 
     logout
-    get :show, id => df
+    get :show, :id => df
     assert_select "a",:text=>/Request file/,:count=>0
   end
 

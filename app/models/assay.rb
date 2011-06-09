@@ -185,6 +185,20 @@ class Assay < ActiveRecord::Base
 
     errors.add_to_base "Please specify either sample or organisms for assay!" if is_modelling? and samples_are_missing? and organisms_are_missing?
 
+  end
 
+
+
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = Policy.find self.policy_id
+    new_object.policy.permission_ids = self.policy.permission_ids
+    new_object.sop_masters = self.try(:sop_masters)
+
+    new_object.model_masters = self.try(:model_masters)
+    new_object.sample_ids = self.try(:sample_ids)
+    new_object.assay_organisms = self.try(:assay_organisms)
+
+    return new_object
   end
 end

@@ -24,4 +24,13 @@ class Investigation < ActiveRecord::Base
   def sops
     assays.collect{|assay| assay.sops}.flatten.uniq
   end
+
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = Policy.find self.policy_id
+    new_object.policy.permission_ids = self.policy.permission_ids
+
+    return new_object
+  end
+
 end

@@ -5,6 +5,13 @@ class SamplesController < ApplicationController
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
 
 
+  def new_object_based_on_existing_one
+    @existing_sample =  Sample.find(params[:id])
+    @sample = @existing_sample.clone_with_associations
+    render :action=>"new"
+
+  end
+
   def new
     @sample = Sample.new
     respond_to do |format|

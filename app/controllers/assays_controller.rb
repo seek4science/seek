@@ -9,6 +9,14 @@ class AssaysController < ApplicationController
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
 
+   def new_object_based_on_existing_one
+    @existing_assay =  Assay.find(params[:id])
+    @assay = @existing_assay.clone_with_associations
+    params[:data_file_ids]=@existing_assay.data_files.collect{|d|"#{d.id},None"}
+    params[:related_publication_ids]= @existing_assay.related_publications.collect{|p| "#{p.id},None"}
+
+    render :action=>"new"
+   end
 
   def new
     @assay=Assay.new
@@ -148,6 +156,7 @@ class AssaysController < ApplicationController
         format.html { redirect_to(@assay) }
         format.xml { head :ok }
       else
+
         format.html { render :action => "edit" }
         format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
       end
