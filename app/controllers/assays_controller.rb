@@ -15,6 +15,10 @@ class AssaysController < ApplicationController
     params[:data_file_ids]=@existing_assay.data_files.collect{|d|"#{d.id},None"}
     params[:related_publication_ids]= @existing_assay.related_publications.collect{|p| "#{p.id},None"}
 
+    unless @assay.study.can_edit?
+      @assay.study = nil
+      flash.now[:notice] = "The study of existing assay cannot be viewed,please specify your own study"
+    end
     render :action=>"new"
    end
 

@@ -31,13 +31,10 @@
   </p>
 
   <p>
-
-  <div id="study_selection">
     <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
-
     <%= f.label :study -%>
     <span class="required">*</span><br/>
-    <% investigations = Investigation.all.select &:can_edit? -%>
+    <% investigations = Investigation.all.select &:can_view? -%>
     <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>" : "" %>
     <% investigations.each do |i| %>
         <% studies = i.studies.select &:can_edit? %>
@@ -52,7 +49,6 @@
     <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
       <%= options %>
     </select>
-  </div>
   </p>
 
 
@@ -192,14 +188,6 @@
           Effect.Appear('add_samples_form');
       }
   }
-  function check_show_study_selection(){
-      if (!<%=@assay.study.blank?%> || !<%=@assay.study.try(:can_view?)%> ){
-
-          document.getElementById('study_selection').style.display = "none";
-
-      }
-  }
-
 
   <%if @assay.is_modelling?%>
       Event.observe(window, 'load', function() {
@@ -217,5 +205,5 @@
           updateOrganisms();
       });
   <% end %>
-    check_show_study_selection();
+
 </script>
