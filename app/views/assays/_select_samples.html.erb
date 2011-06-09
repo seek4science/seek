@@ -1,39 +1,13 @@
-<%
- select_truncate_length=120
- collection =  Sample.all.select &:can_view?
- value_method ||= :id
- text_method ||= :title
- selected ||= @assay.samples.map &:id
- resource_type_text ||= @assay_text
- association_name ||= 'samples'
- name ||= 'assay[sample_ids]'
- possible_collection_id = "possible_#{association_name}"
- collection_id = sanitize_to_id name
+<%=
+ render :partial => 'assets/fancy_multiselect', :layout => "assets/folding_box",
+        :locals => {
+                :fold_id => 'add_samples_form',
+                :fold_title => (help_icon("Here you can associate the assay with specific samples.") + 'Samples'),
+                :intro => "The following samples are involved in this #{@assay_text}:",
+                :button_text => "Include in the #{@assay_text}",
+                :default_choice_text => "Select Sample ...",
+                :name => :assay,
+                :method => :sample_ids,
+                :possibilities => Sample.all.select(&:can_view?),
+                :selected => @assay.samples.map(&:id)}
 %>
-
-<%= javascript_include_tag "fancy_multiselect.js"  %>
-
-    <div class="yui-u first">
-      <p style="color: #666666;">
-        The following <%= association_name %> are involved in this <%= resource_type_text -%>:
-      </p>
-      <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="<%= association_name %>">Loading...</span>
-      </div>
-      <div class="association_step">
-         <%= select_tag possible_collection_id,
-             options_for_select([["Select #{association_name.capitalize.singularize} ...", 0]]|collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
-             {:style=>"width:90%"} -%>
-        <%= select_tag name, options_from_collection_for_select(collection, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
-      </div>
-
-		<br/>
-        <%= link_to_function (image("new") + " Include in the #{resource_type_text}"), "addSelectedToFancy('#{collection_id}', $F(#{possible_collection_id})); return(false);", :id=>"add_#{association_name.singularize}_link", :class=>"block_link", :style => "width: 12em" %>
-
-    </div>
-
-<script type="text/javascript">
-    Event.observe(window, 'load',function () {
-        updateFancyMultiselect('<%= collection_id %>');
-    });
-</script>
