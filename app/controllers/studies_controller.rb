@@ -12,6 +12,12 @@ class StudiesController < ApplicationController
   def new_object_based_on_existing_one
     @existing_study =  Study.find(params[:id])
     @study = @existing_study.clone_with_associations
+
+    unless @study.investigation.can_view?
+       @study.investigation = nil
+      flash[:notice] = 'The investigation of the existing study cannot be viewed, please specify your own investigation!'
+    end
+
     render :action=>"new"
   end
 
