@@ -47,7 +47,7 @@ class Specimen < ActiveRecord::Base
   end
 
   def can_delete? user=User.current_user
-    samples.empty? && mixin_super(user)
+    samples.empty? && super
   end
 
   def self.user_creatable?

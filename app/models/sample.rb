@@ -37,7 +37,7 @@ class Sample < ActiveRecord::Base
 
 
   def can_delete? *args
-    assays.empty? && mixin_super(*args)
+    assays.empty? && super
   end
 
   def self.user_creatable?
