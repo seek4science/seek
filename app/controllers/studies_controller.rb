@@ -9,6 +9,12 @@ class StudiesController < ApplicationController
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
   
 
+  def new_object_based_on_existing_one
+    @existing_study =  Study.find(params[:id])
+    @study = @existing_study.clone_with_associations
+    render :action=>"new"
+  end
+
   def new
     @study = Study.new
     investigation = nil
