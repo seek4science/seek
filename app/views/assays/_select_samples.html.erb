@@ -1,78 +1,13 @@
-<%
- select_truncate_length=120
- collection =  Sample.all.select &:can_view?
- value_method ||= :id
- text_method ||= :title
- selected ||= @assay.samples.map &:id
- resource_type_text ||= @assay_text
- association_name ||= 'samples'
- name ||= 'assay[sample_ids]'
- possible_collection_id = "possible_#{association_name}"
- collection_id = sanitize_to_id name
+<%=
+ render :partial => 'assets/fancy_multiselect', :layout => "assets/folding_box",
+        :locals => {
+                :fold_id => 'add_samples_form',
+                :fold_title => (help_icon("Here you can associate the assay with specific samples.") + 'Samples'),
+                :intro => "The following samples are involved in this #{@assay_text}:",
+                :button_text => "Include in the #{@assay_text}",
+                :default_choice_text => "Select Sample ...",
+                :name => :assay,
+                :method => :sample_ids,
+                :possibilities => Sample.all.select(&:can_view?),
+                :selected => @assay.samples.map(&:id)}
 %>
-
-
-    <div class="yui-u first">
-      <p style="color: #666666;">
-        The following <%= association_name %> are involved in this <%= resource_type_text -%>:
-      </p>
-      <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
-        <span class="none_text" id="<%= association_name %>">Loading...</span>
-      </div>
-      <div class="association_step">
-         <%= select_tag possible_collection_id,
-             options_for_select([["Select #{association_name.capitalize.singularize} ...", 0]]|collection.collect{|o| [truncate(h(o.title), :length=>select_truncate_length), o.id]}),
-             {:style=>"width:90%"} -%>
-        <%= select_tag name, options_from_collection_for_select(collection, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
-      </div>
-
-		<br/>
-        <%= link_to_function (image("new") + " Include in the #{resource_type_text}"), "addSelectedToFancy('#{collection_id}', $F(#{possible_collection_id})); return(false);", :id=>"add_#{association_name.singularize}_link", :class=>"block_link", :style => "width: 12em" %>
-
-    </div>
-
-<script type="text/javascript">
-
-    Event.observe(window, 'load',function () {
-        updateFancyMultiselect('<%= collection_id %>');
-    });
-
-    function addSelectedToFancy(multiselect, value) {
-        if (!$F(multiselect).include(value)) {
-            $(multiselect).setValue($F(multiselect).concat(value));
-            updateFancyMultiselect(multiselect);
-        } else {
-            alert('Item already exists!');
-        }
-    }
-
-    function removeFromFancy(multiselect, value) {
-        $(multiselect).setValue($F(multiselect).without(value));
-        updateFancyMultiselect(multiselect);
-    }
-
-    function insertFancyListItem(multiselect, displaylist, option) {
-        var title_span = '<span title="' + option.text + '">' + option.text.truncate(100) + '</span>';
-        var remove_link = '<a href="" onclick="javascript:removeFromFancy(';
-        remove_link += "'" + $(multiselect).id + "','";
-        remove_link += option.value + "'";
-        remove_link += '); return(false);">remove</a>';
-        displaylist.insert('<li>&nbsp;&nbsp;&nbsp;'+ title_span +'<small style="vertical-align: middle;">[' + remove_link + ']</small></li>');
-    }
-
-    function updateFancyMultiselect(multiselect) {
-        multiselect = $(multiselect);
-        var display_area = $(multiselect.id + '_display_area');
-        var selected_options = multiselect.childElements().select(function(c){return c.selected});
-        if(selected_options.length > 0) {
-            display_area.innerHTML = '<ul class="related_asset_list"></ul>'
-            var list = display_area.select('ul')[0];
-            selected_options.each(function(opt){
-                insertFancyListItem(multiselect, list, opt);
-            });
-        } else {
-            display_area.innerHTML = '<span class="none_text">No Items</span>';
-        }
-        multiselect.fire('fancySelect:update');
-    }
-</script>

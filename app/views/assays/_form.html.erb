@@ -77,7 +77,7 @@
  <% unless @assay.is_modelling?  %>
      <span class="required">*</span>
  <% end %>
- <%= render :partial=>"assays/select_samples",:layout => "assets/folding_box",:locals=>{:f=>f, :fold_id => 'add_samples_form', :fold_title => (help_icon("Here you can associate the assay with specific samples.") + 'Samples')} -%>
+ <%= render :partial=>"assays/select_samples" -%>
 
 <br style="clear:both"/>
 
