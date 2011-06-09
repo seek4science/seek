@@ -17,8 +17,28 @@ class AssaysController < ApplicationController
 
     unless @assay.study.can_edit?
       @assay.study = nil
-      flash.now[:notice] = "The study of existing assay cannot be viewed,please specify your own study"
+      flash.now[:notice] = "The study of the existing assay cannot be viewed, please specify your own study! <br/>"
     end
+
+    @existing_assay.data_file_masters.each do |d|
+      if !d.can_view?
+       flash.now[:notice] << "Some or all data files of the existing assay cannot be viewed, please specify your own! <br/>"
+        break
+      end
+    end
+    @existing_assay.sop_masters.each do |s|
+       if !s.can_view?
+       flash.now[:notice] << "Some or all sops of the existing assay cannot be viewed, please specify your own! <br/>"
+        break
+      end
+    end
+    @existing_assay.model_masters.each do |m|
+       if !m.can_view?
+       flash.now[:notice] << "Some or all models of the existing assay cannot be viewed, please specify your own! <br/>"
+        break
+      end
+    end
+
     render :action=>"new"
    end
 

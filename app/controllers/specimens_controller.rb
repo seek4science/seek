@@ -10,10 +10,16 @@ class SpecimensController < ApplicationController
   def new_object_based_on_existing_one
     @existing_specimen =  Specimen.find(params[:id])
     @specimen = @existing_specimen.clone_with_associations
+
+     @existing_specimen.sop_masters.each do |s|
+       if !s.sop.can_view?
+       flash.now[:notice] = "Some or all sops of the existing specimen cannot be viewed, please specify your own!"
+        break
+      end
+     end
+
     render :action=>"new"
-#    respond_to do |format|
-#      format.html { render :action=>"new"}
-#    end
+
   end
 
   def new
