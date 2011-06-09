@@ -70,7 +70,7 @@ class Assay < ActiveRecord::Base
   end
 
   def can_delete? *args
-    mixin_super(*args) && assets.empty? && related_publications.empty?
+    super && assets.empty? && related_publications.empty?
   end
 
   #returns true if this is a modelling class of assay
