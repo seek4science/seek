@@ -27,7 +27,7 @@
   </p>
   <p>
     <%= f.label "Institution" %><br/>
-    <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ...",:style=>"width:90%"}) %>
+    <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
   </p>
 
   <p>
