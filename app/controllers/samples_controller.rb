@@ -34,7 +34,6 @@ class SamplesController < ApplicationController
     sops       = params[:sample_sop_ids] || []
     respond_to do |format|
       if @sample.save
-
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
@@ -47,6 +46,7 @@ class SamplesController < ApplicationController
         format.html { redirect_to(@sample) }
         format.xml { head :ok }
       else
+
         format.html { render :action => "new" }
       end
     end
