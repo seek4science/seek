@@ -173,6 +173,43 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "compounds")
   end
 
+  #Update the sharing_scope in the policies table, because of removing CUSTOM_PERMISSIONS_ONLY and ALL_REGISTERED_USERS scopes
+  task(:update_sharing_scope=>:environment) do
+    # sharing_scope
+    private_scope = 0
+    custom_permissions_only_scope = 1
+    all_sysmo_users_scope = 2
+    all_registered_users_scope = 3
+
+    #update  ALL_REGISTERED_USERS to ALL_SYSMO_USERS
+    policies = Policy.find(:all, :conditions => ["sharing_scope = ?", all_registered_users_scope])
+    unless policies.nil?
+      count = 0
+      policies.each do |policy|
+        policy.sharing_scope = all_sysmo_users_scope
+        policy.save
+        count += 1
+      end
+      puts "Done - #{count} policies with ALL_REGISTERED_USERS scope changed to ALL_SYSMO_USERS scope."
+    else
+      puts "Couldn't find any policies with ALL_REGISTERED_USERS scope"
+    end
+
+    #update  CUSTOM_PERMISSIONS_ONLY to PRIVATE
+    policies = Policy.find(:all, :conditions => ["sharing_scope = ?", custom_permissions_only_scope])
+    unless policies.nil?
+      count = 0
+      policies.each do |policy|
+        policy.sharing_scope = private_scope
+        policy.save
+        count += 1
+      end
+      puts "Done - #{count} policies with CUSTOM_PERMISSIONS_ONLY scope changed to PRIVATE scope."
+    else
+      puts "Couldn't find any policies with CUSTOM_PERMISSIONS_ONLY scope"
+    end
+  end
+
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
   task :xmi => :environment do
     require 'lib/uml_dumper.rb'
