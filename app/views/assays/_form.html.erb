@@ -77,7 +77,7 @@
  <% unless @assay.is_modelling?  %>
      <span class="required">*</span>
  <% end %>
- <%= fancy_multiselect @assay, :samples, :object_type_text => @assay_text -%>
+ <%= f.fancy_multiselect :samples, :object_type_text => @assay_text -%>
 
 <br style="clear:both"/>
 
