@@ -193,7 +193,7 @@
       }
   }
   function check_show_study_selection(){
-      if (!<%=@assay.study.blank?%> || !<%=@assay.study.can_view?%> ){
+      if (!<%=@assay.study.blank?%> || !<%=@assay.study.try(:can_view?)%> ){
 
           document.getElementById('study_selection').style.display = "none";
 
