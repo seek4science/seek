@@ -87,8 +87,7 @@ class Sample < ActiveRecord::Base
 
   def clone_with_associations
     new_object= self.clone
-    new_object.policy = Policy.find self.policy_id
-    new_object.policy.permission_ids = self.policy.permission_ids
+    new_object.policy = self.policy.deep_copy
     new_object.sop_masters = self.try(:sop_masters)
     new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
     return new_object
