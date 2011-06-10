@@ -48,10 +48,47 @@ namespace :seek do
 
   desc 'seeds the database with the controlled vocabularies'
   task(:seed=>:environment) do
-    tasks=["refresh_controlled_vocabs", "default_tags", "graft_new_assay_types", "load_help_docs"]
+    tasks=["seed_sqlite","load_help_docs"]
     tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
+  end
+
+  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678)'
+  task(:seed_sqlite=>:environment) do
+    tasks=["refresh_controlled_vocabs", "default_tags", "graft_new_assay_types"]
+    tasks.each do |task|
+      Rake::Task["seek:#{task}"].execute
+    end
+  end
+
+  desc 'adds the new modelling assay types and creates a new root'
+  task(:graft_new_assay_types=>:environment) do
+    experimental      =AssayType.find(628957644)
+
+    experimental.title="experimental assay type"
+    flux              =AssayType.new(:title=>"fluxomics")
+    flux.save!
+    experimental.children << flux
+    experimental.save!
+
+    modelling_assay_type=AssayType.new(:title=>"modelling analysis type")
+    modelling_assay_type.save!
+
+    new_root      =AssayType.new
+    new_root.title="assay types"
+    new_root.children << experimental
+    new_root.children << modelling_assay_type
+    new_root.save!
+
+    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation", "protein interations"]
+    new_modelling_types.each do |title|
+      a=AssayType.new(:title=>title)
+      a.save!
+      modelling_assay_type.children << a
+    end
+    modelling_assay_type.save!
+
   end
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
