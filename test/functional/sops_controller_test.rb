@@ -452,7 +452,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?(user), "sop should be editable but not manageable for this test"
     assert !sop.can_manage?(user), "sop should be editable but not manageable for this test"
     assert_equal Policy::EDITING, sop.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
+    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS}
     assert_redirected_to sop_path(sop)
     sop.reload
 
@@ -469,7 +469,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?(user), "sop should be editable and manageable for this test"
     assert sop.can_manage?(user), "sop should be editable and manageable for this test"
     assert_equal Policy::EDITING, sop.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
+    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS}
     assert_redirected_to sop_path(sop)
     sop.reload
 

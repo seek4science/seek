@@ -258,7 +258,8 @@ class ProjectsControllerTest < ActionController::TestCase
 		sharing[:permissions] = {}
 		sharing[:permissions][:contributor_types] = ActiveSupport::JSON.encode(["Person"])
 		sharing[:permissions][:values] = ActiveSupport::JSON.encode({"Person"=>{(person.id)=>{"access_type"=>0}}})
-		sharing[:sharing_scope] = 1
+		sharing[:sharing_scope] = Policy::EVERYONE
+    sharing["access_type_#{sharing[:sharing_scope]}"] = Policy::VISIBLE
 		put :update, :id => project.id, :project => valid_project, :sharing => sharing
 
 		project = Project.find(project.id)

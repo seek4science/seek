@@ -29,8 +29,7 @@ task :cruise, :run_secondary do |t, args|
   Rake::Task["db:create:all"].invoke
   Rake::Task["db:test:load"].invoke
   Rake::Task["db:test:prepare"].invoke
-  Rake::Task["seek:refresh_controlled_vocabs"].invoke
-  Rake::Task["seek:default_tags"].invoke
+  Rake::Task["seek:seed"].invoke
   Rake::Task["test"].invoke
 
   File.delete(run_secondary_signal) if File.exists? run_secondary_signal

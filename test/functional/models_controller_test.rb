@@ -517,7 +517,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), "sop should be editable but not manageable for this test"
     assert !model.can_manage?(user), "sop should be editable but not manageable for this test"
     assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
+    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS}
     assert_redirected_to model_path(model)
     model.reload
 
@@ -533,7 +533,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), "sop should be editable and manageable for this test"
     assert model.can_manage?(user), "sop should be editable and manageable for this test"
     assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, :access_type_2=>Policy::NO_ACCESS}
+    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS}
     assert_redirected_to model_path(model)
     model.reload
     assert_equal "new title", model.title
@@ -542,7 +542,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
     model=valid_model
-    post :create, :model => model, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, :access_type_4=>Policy::VISIBLE}
+    post :create, :model => model, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
     assert assigns(:model)
@@ -562,7 +562,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), "model should be editable and manageable for this test"
     assert model.can_manage?(user), "model should be editable and manageable for this test"
     assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, :access_type_4=>Policy::VISIBLE}
+    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
     assert_redirected_to model_path(model)
     model.reload
 

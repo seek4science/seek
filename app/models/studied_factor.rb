@@ -8,7 +8,7 @@ class StudiedFactor < ActiveRecord::Base
   belongs_to :substance, :polymorphic => true
 
   validates_presence_of :unit,:measured_item,:start_value,:data_file
-  validates_presence_of :substance, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => 'can not be blank or multiple'
+  validates_presence_of :substance, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => "can't be blank or contain multiple entries"
   acts_as_solr(:field => [], :include => [:measured_item, :substance]) if Seek::Config.solr_enabled
 
   def range_text

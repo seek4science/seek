@@ -5,7 +5,7 @@ class PolicyTest < ActiveSupport::TestCase
   fixtures :all
 
   test "deep clone" do
-    policy = policies(:download_for_all_registered_users_policy)
+    policy = policies(:download_for_all_sysmo_users_policy)
 
     copy = policy.deep_copy    
     assert_equal policy.sharing_scope,copy.sharing_scope
@@ -52,10 +52,8 @@ class PolicyTest < ActiveSupport::TestCase
   end
 
   test "policy sharing scope presedence" do
-    assert Policy::PRIVATE < Policy::CUSTOM_PERMISSIONS_ONLY
-    assert Policy::CUSTOM_PERMISSIONS_ONLY < Policy::ALL_SYSMO_USERS
-    assert Policy::ALL_SYSMO_USERS < Policy::ALL_REGISTERED_USERS
-    assert Policy::ALL_REGISTERED_USERS < Policy::EVERYONE
+    assert Policy::PRIVATE < Policy::ALL_SYSMO_USERS
+    assert Policy::ALL_SYSMO_USERS < Policy::EVERYONE
   end
 
 end

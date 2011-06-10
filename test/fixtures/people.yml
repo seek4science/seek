@@ -102,9 +102,9 @@ person_for_owner_of_fully_public_policy:
   last_name: "FullyPublicPolicy"
 
 
-person_for_owner_of_download_for_all_registered_users_policy:
+person_for_owner_of_download_for_all_sysmo_users_policy:
   first_name: "OwnerOf"
-  last_name: "DownloadForAllRegisteredUsersPolicy"
+  last_name: "DownloadForAllSysmoUsersPolicy"
 
 
 person_for_owner_of_editing_for_all_sysmo_users_policy:
@@ -112,9 +112,9 @@ person_for_owner_of_editing_for_all_sysmo_users_policy:
   last_name: "EditingForAllSysMOUsersPolicy"
 
 
-person_for_owner_of_custom_permissions_only_policy:
+person_for_owner_of_private_policy_using_custom_sharing:
   first_name: "OwnerOf"
-  last_name: "CustomPermissionsOnlyPolicy"
+  last_name: "PrivatePolicyUsingCustomSharing"
 
 
 random_userless_person:
@@ -154,7 +154,7 @@ person_for_sysmo_user_both_in_blacklist_and_whitelist:
   last_name: "InWhitelistAndBlacklist"
 
 
-person_for_random_registered_user_who_wants_to_access_different_things:
+person_for_sysmo_user_who_wants_to_access_different_things:
   first_name: "Registered-User"
   last_name: "WantsToAccessManyThingsAndHasSomePermissions"
 

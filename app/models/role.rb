@@ -10,4 +10,8 @@ class Role < ActiveRecord::Base
     end
   end
 
+  def to_s
+    title
+  end
+
 end

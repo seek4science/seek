@@ -24,7 +24,6 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     unit = units(:second)
     sop = sops(:editable_sop)
     ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
-    p ec
     assert ec.save, "should create experimental condition  of the none concentration item and no substance"
   end
 

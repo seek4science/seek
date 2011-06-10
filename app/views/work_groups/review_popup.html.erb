@@ -1,3 +1,7 @@
+<%
+   #this is use for correct display the access_type dropdown list, which depending on the type of resource
+   resource = try_block{params[:resource_type].constantize.send 'new'}
+%>
 <div id="redbox_contents_div" class="redbox_contents" style="width:500px;">
 	<div class="head">
 		<%= link_to_close_redbox image_tag("close.gif"), :style => "float:right; margin-left:0.5em; vertical-align:middle;" -%>
@@ -25,10 +29,7 @@
 						  	<td id="work_group_member_person_<%= p.id -%>" style="text-align: left;"><%= "#{p.first_name} #{p.last_name}" -%></td>
 								<td>
 									<select id="work_group_access_rights_select_person_<%= p.id -%>" style="width: 220px; vertical-align: middle;">
-									  <option value="<%= Policy::NO_ACCESS -%>" <%= "selected" if @access_type == Policy::NO_ACCESS -%> ><%= Policy.get_access_type_wording(Policy::NO_ACCESS) -%></option>
-										<option value="<%= Policy::VISIBLE -%>" <%= "selected" if @access_type == Policy::VISIBLE -%> ><%= Policy.get_access_type_wording(Policy::VISIBLE) -%></option>
-									  <option value="<%= Policy::ACCESSIBLE -%>" <%= "selected" if @access_type == Policy::ACCESSIBLE -%> ><%= Policy.get_access_type_wording(Policy::ACCESSIBLE) -%></option>
-									  <option value="<%= Policy::EDITING -%>" <%= "selected" if @access_type == Policy::EDITING -%> ><%= Policy.get_access_type_wording(Policy::EDITING) -%></option>
+									  <%= policy_selection_options([Policy::NO_ACCESS, Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING, Policy::MANAGING], resource, @access_type)-%>
 									</select>
 								</td>
 						  </tr>
