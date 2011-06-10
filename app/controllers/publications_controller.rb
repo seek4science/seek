@@ -183,6 +183,9 @@ class PublicationsController < ApplicationController
   
   def fetch_preview
     begin
+      #trim the PubMed or Doi Id
+      params[:key] = params[:key].strip()
+
       @publication = Publication.new(params[:publication])
       @publication.project_id = params[:project_id]
       key = params[:key]
