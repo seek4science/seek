@@ -24,7 +24,7 @@
       <%= text_field_tag("key") %>            
     </p>    
 	<p>
-		<%= submit_tag 'Fetch',:id=>"fetch_button" %>
+		<%= submit_tag 'Fetch',{:id=>"fetch_button", :onclick => "trimDoiOrPubMedId()"} %>
 	</p>
 
   <% end %>
@@ -33,3 +33,10 @@
   <%= image_tag "ajax-loader-large.gif", :id => 'spinner', :style => 'display:none;' -%>
   <div id="publication_preview_container" style="display:none;"></div>
 </div>
+
+<script type="text/javascript">
+  function trimDoiOrPubMedId(){
+      //String.trim() is not supported in IE8, so using regular expression instead.
+      $('key').value = $('key').value.replace(/(^\s*)|(\s*$)/g, "");
+  }
+</script>
