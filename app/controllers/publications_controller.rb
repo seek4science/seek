@@ -98,16 +98,18 @@ class PublicationsController < ApplicationController
     valid = true
     to_add = []
     to_remove = []
-    params[:author].keys.sort.each do |author_id|
-      author_assoc = params[:author][author_id]
-      unless author_assoc.blank?
-        to_remove << PublicationAuthor.find_by_id(author_id)
-        p = Person.find(author_assoc)
-        if @publication.creators.include?(p)
-          @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
-          valid = false
-        else
-          to_add << p
+    unless params[:author].blank?
+      params[:author].keys.sort.each do |author_id|
+        author_assoc = params[:author][author_id]
+        unless author_assoc.blank?
+          to_remove << PublicationAuthor.find_by_id(author_id)
+          p = Person.find(author_assoc)
+          if @publication.creators.include?(p)
+            @publication.errors.add_to_base("Multiple authors cannot be associated with the same SEEK person.")
+            valid = false
+          else
+            to_add << p
+          end
         end
       end
     end
