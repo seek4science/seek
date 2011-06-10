@@ -633,5 +633,49 @@ end
       assert_select "a",:text=>a2.title,:count=>0
     end
   end
-  
+
+  test "should create sharing permissions 'with your project and with all SysMO members'" do
+    login_as(:quentin)
+    a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
+         :study_id=>studies(:metabolomics_study).id, :assay_class=>assay_classes(:experimental_assay_class)}
+    assert_difference('Assay.count') do
+      post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+    end
+
+    assay=assigns(:assay)
+    assert_redirected_to assay_path(assay)
+    assert_equal Policy::ALL_SYSMO_USERS, assay.policy.sharing_scope
+    assert_equal Policy::VISIBLE, assay.policy.access_type
+    assert_equal assay.policy.permissions.count, 1
+
+    permission = assay.policy.permissions.first
+    assert_equal permission.contributor_type, 'Project'
+    assert_equal permission.contributor_id, assay.project.id
+    assert_equal permission.policy_id, assay.policy_id
+    assert_equal permission.access_type, Policy::ACCESSIBLE
+  end
+
+  test "should update sharing permissions 'with your project and with all SysMO members'" do
+    login_as Factory(:user)
+    assay= Factory(:assay, :policy => Factory(:private_policy), :contributor => User.current_user.person)
+
+    assert assay.can_manage?
+    assert_equal Policy::PRIVATE, assay.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, assay.policy.access_type
+    assert assay.policy.permissions.empty?
+
+    put :update, :id => assay, :assay => {}, :sharing => {"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::ACCESSIBLE,:sharing_scope => Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::EDITING}
+
+    assay.reload
+    assert_redirected_to assay_path(assay)
+    assert_equal Policy::ALL_SYSMO_USERS, assay.policy.sharing_scope
+    assert_equal Policy::ACCESSIBLE, assay.policy.access_type
+    assert_equal 1, assay.policy.permissions.length
+
+    update_permission = assay.policy.permissions.first
+    assert_equal update_permission.contributor_type, 'Project'
+    assert_equal update_permission.contributor_id, assay.project.id
+    assert_equal update_permission.policy_id, assay.policy_id
+    assert_equal update_permission.access_type, Policy::EDITING
+  end
 end

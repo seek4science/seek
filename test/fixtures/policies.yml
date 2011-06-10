@@ -18,9 +18,9 @@ private_policy:
   created_at: <%= 2.days.ago.to_s :db %>
   updated_at: <%= 2.days.ago.to_s :db %>
 
-custom_permissions_only_policy:  
+private_policy_using_custom_sharing:
   name: "auto"
-  sharing_scope: <%= Policy::CUSTOM_PERMISSIONS_ONLY %>
+  sharing_scope: <%= Policy::PRIVATE %>
   access_type: <%= Policy::NO_ACCESS %>
   use_whitelist: true
   use_blacklist: true
@@ -56,9 +56,9 @@ sysmo_member_edit:
   updated_at: <%= 2.days.ago.to_s :db %>
 
 
-download_for_all_registered_users_policy:  
+download_for_all_sysmo_users_policy:
   name: "auto"
-  sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
+  sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
   access_type: <%= Policy::ACCESSIBLE %>
   use_whitelist: false
   use_blacklist: false
@@ -105,7 +105,7 @@ policy_with_complex_permissions:
 
 private_policy_with_custom_sharing:  
   name: "auto"
-  sharing_scope: <%= Policy::CUSTOM_PERMISSIONS_ONLY %>
+  sharing_scope: <%= Policy::PRIVATE %>
   access_type: <%= Policy::NO_ACCESS %>
   use_whitelist: false
   use_blacklist: false
@@ -115,7 +115,7 @@ private_policy_with_custom_sharing:
 
 public_download_with_no_custom_sharing:  
   name: "auto"
-  sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
+  sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
   access_type: <%= Policy::ACCESSIBLE %>
   use_whitelist: false
   use_blacklist: false
@@ -125,7 +125,7 @@ public_download_with_no_custom_sharing:
 
 whitelist_blacklist_and_custom_sharing:  
   name: "auto"
-  sharing_scope: <%= Policy::ALL_REGISTERED_USERS %>
+  sharing_scope: <%= Policy::ALL_SYSMO_USERS %>
   access_type: <%= Policy::VISIBLE %>
   use_whitelist: true
   use_blacklist: true

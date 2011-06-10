@@ -1,3 +1,5 @@
+require 'fastercsv'
+
 module DataFuseHelper
 
   def csv_to_google_data csv

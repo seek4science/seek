@@ -55,7 +55,7 @@ class AssetTest < ActiveSupport::TestCase
       public_sop=Factory(:sop,:policy=>Factory(:public_policy,:access_type=>Policy::ACCESSIBLE))
       private_model=Factory(:model,:policy=>Factory(:public_policy,:access_type=>Policy::VISIBLE))
       public_datafile=Factory(:data_file,:policy=>Factory(:public_policy))
-      registered_only_assay=Factory(:assay,:policy=>Factory(:public_policy, :sharing_scope=>Policy::ALL_REGISTERED_USERS))
+      registered_only_assay=Factory(:assay,:policy=>Factory(:public_policy, :sharing_scope=>Policy::ALL_SYSMO_USERS))
 
       assert public_sop.is_published?
       assert !private_model.is_published?

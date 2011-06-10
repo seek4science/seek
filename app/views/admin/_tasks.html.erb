@@ -16,6 +16,8 @@
   <ul>
     <li><%= link_to "Manage assay types", url_for(:action=>"manage", :controller=>"assay_types") %></li>
     <li><%= link_to "Manage technology types", url_for(:action=>"manage", :controller=>"technology_types") %></li>
+
+    <li><%= link_to "Manage tags", url_for(:action=>"tags", :controller=>"admin") %></li>
   </ul>
   <% if Seek::Config.jerm_enabled -%>
       <h3>JERM</h3>

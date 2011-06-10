@@ -128,7 +128,6 @@ class FavouriteGroupsController < ApplicationController
       users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
     end
     
-    
     respond_to do |format|
       format.json {
         unless already_exists
@@ -139,7 +138,7 @@ class FavouriteGroupsController < ApplicationController
       }
     end
   end
-  
+
   
   def destroy
     # these parameters will be needed for the client-side processing

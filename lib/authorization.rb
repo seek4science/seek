@@ -45,7 +45,7 @@ module Authorization
         # (4 = can manage, 0 = can manage... if contributor) ???
       else
         if user.person && user.person.projects.empty?
-          scope = Policy::ALL_REGISTERED_USERS
+          scope = Policy::EVERYONE
         else
           scope = Policy::ALL_SYSMO_USERS
         end

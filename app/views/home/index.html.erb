@@ -6,10 +6,20 @@
     </p>
   <% end -%>
 
-  <%= render :partial=>"home_intro" -%>
+  <% if logged_in? -%>
+
+    <%= render :partial=>"home_intro" -%>
 
   <%= render :partial=>"recent_project_changes" -%>
 
   <%= render :partial=>"recent_all_changes" -%>
+
+  <% else -%>
+
+  <%= render :partial=>"alternative_home" -%>
+
+  <% end -%>
+
+
 
 </div>

@@ -103,6 +103,20 @@ class JwsTest < ActionController::TestCase
       assert_equal "text/xml", m.content_type
     end
 
+    test "show eqs graph" do
+      m=models(:jws_model)
+      post :submit_to_jws,simple_model_params("plotKineticsPanel"=>"on",:id=>m)
+      assert_response :success
+      assert_select "iframe.reContent",:count=>1
+    end
+
+    test "show schema" do
+      m=models(:jws_model)
+      post :submit_to_jws,simple_model_params("plotGraphPanel"=>"on",:id=>m)
+      assert_response :success
+      assert_select "object[type='image/svg+xml']",:count=>1
+    end
+
     test "simulate model" do
       m=models(:teusink)
       m.content_blob.dump_data_to_file
@@ -147,7 +161,6 @@ class JwsTest < ActionController::TestCase
       assert_select "input#modelname[value=?]","model1"
       assert_select "input#TOD[value=?]","some terms"
     end
-
 
   else
     test "jws disabled" do
