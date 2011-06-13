@@ -24,6 +24,8 @@ module PublicationsHelper
   def publication_type_text type
     if type==DoiRecord::PUBLICATION_TYPES[:conference]
       "Conference"
+    elsif type == DoiRecord::PUBLICATION_TYPES[:book_chapter]
+      "Book"
     else
       "Journal"
     end
