@@ -20,11 +20,14 @@ class Specimen < ActiveRecord::Base
   alias_attribute :title, :donor_number
   alias_attribute :specimen_number, :donor_number
 
+  HUMANIZED_COLUMNS = {:donor_number => "Specimen number"}
+
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :donor_number,:message => "Specimen number can not be blank"
+  validates_presence_of :donor_number
+
   validates_presence_of :contributor,:lab_internal_number,:project,:institution,:organism
 
-  validates_uniqueness_of :donor_number,:message => "Specimen number has already been taken"
+  validates_uniqueness_of :donor_number
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
   'INNER JOIN sop_specimens ' +
@@ -95,5 +98,9 @@ class Specimen < ActiveRecord::Base
     return new_object
   end
 
+
+  def self.human_attribute_name(attribute)
+    HUMANIZED_COLUMNS[attribute.to_sym] || super
+  end
 
 end
