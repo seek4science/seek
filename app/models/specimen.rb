@@ -21,9 +21,10 @@ class Specimen < ActiveRecord::Base
   alias_attribute :specimen_number, :donor_number
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :donor_number,:contributor,:lab_internal_number,:project,:institution,:organism
+  validates_presence_of :donor_number,:message => "Specimen number can not be blank"
+  validates_presence_of :contributor,:lab_internal_number,:project,:institution,:organism
 
-  validates_uniqueness_of :donor_number
+  validates_uniqueness_of :donor_number,:message => "Specimen number has already been taken"
   def self.sop_sql()
   'SELECT sop_versions.* FROM sop_versions ' +
   'INNER JOIN sop_specimens ' +
