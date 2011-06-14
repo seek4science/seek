@@ -71,7 +71,7 @@
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING], @resource, your_project_access_type(@policy, @resource)) -%>
              </select>
-             and all SysMO users, for
+             and all <%= Seek::Config.project_name %> users, for
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode } -%>
              <br/>
