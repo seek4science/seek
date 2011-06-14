@@ -18,6 +18,12 @@
     } -%>
 
     <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Required to interact with BioPortal - for example when creating new Organisms through the NCBI Taxonomy. Please register with http://bioportal.bioontology.org to get an API key.",
+            :name=>"BioPortal API key",
+            :field=>text_field_tag(:bioportal_api_key, Seek::Config.bioportal_api_key, :title => 'BioPortal API Key, available from http://bioportal.bioontology.org')
+    } -%>
+
+    <%= render :partial=>'setting_li',:locals=>{
             :description=>"This base URL for this SEEK installation. This is required for the REST API",
             :name=>"Site base URL",
             :field=>text_field_tag(:site_base_host, Seek::Config.site_base_host, :title => 'this is needed for the xlinks in the REST API')

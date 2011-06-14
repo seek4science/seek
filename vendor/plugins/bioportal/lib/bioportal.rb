@@ -13,7 +13,7 @@ module BioPortal
         cattr_accessor :bioportal_base_rest_url, :bioportal_api_key
 
         self.bioportal_base_rest_url=options[:base_url]
-        self.bioportal_api_key=options[:api_key]
+        self.bioportal_api_key=options[:apikey]
         
 
         extend BioPortal::Acts::SingletonMethods
@@ -29,7 +29,7 @@ module BioPortal
      
       def concept options={}
 
-        options[:api_key] ||= self.bioportal_api_key unless self.bioportal_api_key.nil?
+        options[:apikey] ||= self.bioportal_api_key unless self.bioportal_api_key.nil?
 
         return nil if self.bioportal_concept.nil?
         begin
@@ -40,7 +40,7 @@ module BioPortal
       end
 
       def ontology options={}
-        options[:api_key] ||= self.bioportal_api_key unless self.bioportal_api_key.nil?
+        options[:apikey] ||= self.bioportal_api_key unless self.bioportal_api_key.nil?
 
         return nil if self.bioportal_concept.nil?
         return self.bioportal_concept.get_ontology options
@@ -109,10 +109,6 @@ module BioPortal
       concept_url=concept_url[0..-2]
       
       full_concept_path=bioportal_base_rest_url+concept_url
-
-      puts "========================================================================================"
-      puts full_concept_path
-      puts "========================================================================================"
 
       parser = XML::Parser.io(open(full_concept_path))
       doc = parser.parse
