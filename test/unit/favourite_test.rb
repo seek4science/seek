@@ -6,12 +6,12 @@ class FavouriteTest < ActiveSupport::TestCase
   test "remove redundant" do
     fav=favourites(:data_file_fav)
     res = fav.resource
-
     assert_difference("Favourite.count",-1) do
+      User.current_user = res.contributor
       res.destroy
     end
 
-    o=organisms(:yeast)
+    o=Factory(:organism)
     fav=Favourite.new(:resource=>o,:user=>users(:quentin))
     fav.save!
 

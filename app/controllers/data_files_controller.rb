@@ -9,11 +9,22 @@ class DataFilesController < ApplicationController
   include DotGenerator  
   include Seek::AssetsCommon
 
-  before_filter :login_required
+  #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_data_file, :only=>[:show,:download]
+
+  #has to come after the other filters
+  include Seek::Publishing
+
+  def plot
+    sheet = params[:sheet] || 2
+    @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,true)
+    respond_to do |format|
+      format.html
+    end
+  end
     
   def new_version
     if (handle_data nil)          
@@ -57,7 +68,7 @@ class DataFilesController < ApplicationController
   def new
     @data_file = DataFile.new
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new Data files. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -67,28 +78,24 @@ class DataFilesController < ApplicationController
   end
 
   def upload_for_tool
-    t1 = Time.now
+
     if handle_data
-      t2 = Time.now
 
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.contributor  = current_user
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
       Policy.new_for_upload_tool(@data_file, params[:recipient_id])
+
       if @data_file.save
-        time = Time.now
-        logger.info "TIME: total for upload tool #{time - t1}"
-        logger.info "TIME: after handle_data #{time - t2}"
         @data_file.creators = [current_user.person]
-        flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+
+        #send email to the file uploader and receiver
+        Mailer.deliver_file_uploaded(current_user,Person.find(params[:recipient_id]),@data_file,base_host)
+
+        flash.now[:notice] ="Data file was successfully uploaded and saved." if flash.now[:notice].nil?
         render :text => flash.now[:notice]
       else
-        time = Time.now
-        logger.info "TIME: total for upload tool #{time - t1}"
-        logger.info "TIME: after handle_data #{time - t2}"
         errors = (@data_file.errors.map { |e| e.join(" ") }.join("\n"))
-        logger.debug errors
         render :text => errors, :status => 500
       end
     end
@@ -98,39 +105,35 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.event_ids = params[:event_ids] || [] 
-      @data_file.contributor=current_user
+      @data_file.event_ids = params[:event_ids] || []
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
       update_tags @data_file
 
+      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @data_file.save
-          # the Data file was saved successfully, now need to apply policy / permissions settings to it
-          policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-          
           # update attributions
           Relationship.create_or_update_attributions(@data_file, params[:attributions])
           
           # update related publications
-          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+          Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-          
-          if policy_err_msg.blank?
-            flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
-            format.html { redirect_to data_file_path(@data_file) }
-          else
-            flash[:notice] = "Data file was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
-          end
+
+          flash.now[:notice] = 'Data file was successfully uploaded and saved.' if flash.now[:notice].nil?
+          format.html { redirect_to data_file_path(@data_file) }
+
 
           assay_ids.each do |text|
             a_id, r_type = text.split(",")
             @assay = Assay.find(a_id)
-            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+            if @assay.can_edit?
+              @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
+            end
           end
         else
           format.html {
@@ -178,47 +181,47 @@ class DataFilesController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       data_file_params = params[:data_file]
-      data_file_params[:event_ids] = params[:event_ids]
-      if @data_file.update_attributes(data_file_params)
-        # the Data file was updated successfully, now need to apply updated policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@data_file, current_user, params)
-        
+      data_file_params[:event_ids] = params[:event_ids] || []
+
+      @data_file.attributes = data_file_params
+
+      if params[:sharing]
+        @data_file.policy_or_default
+        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+      end
+
+      if @data_file.save
+
         # update attributions
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
         
         # update related publications        
-        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}.to_json, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
         
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@data_file, params[:creators])
-        
-        if policy_err_msg.blank?
-          flash[:notice] = 'Data file metadata was successfully updated.'
-          format.html { redirect_to data_file_path(@data_file) }
-        else
-          flash[:notice] = "Data file metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'data_files', :id => @data_file, :action => "edit" }
-        end
+
+        flash[:notice] = 'Data file metadata was successfully updated.'
+        format.html { redirect_to data_file_path(@data_file) }
+
 
         # Update new assay_asset
+        a_ids = []
         assay_ids.each do |text|
           a_id, r_type = text.split(",")
+          a_ids.push(a_id)
           @assay = Assay.find(a_id)
-          @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
-        end
-        #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@data_file.id)
-        assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |text|
-            a_id, r_type = text.split(",")
-            if assay_asset.assay_id.to_s == a_id
-              flag = true
-            end
+          if @assay.can_edit?
+            @assay.relate(@data_file, RelationshipType.find_by_title(r_type))
           end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
+        end
+
+        #Destroy AssayAssets that aren't needed
+        assay_assets = @data_file.assay_assets
+        assay_assets.each do |assay_asset|
+          if assay_asset.assay.can_edit? and !a_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
           end
         end
       else
@@ -243,12 +246,14 @@ end
   def data
     @data_file =  DataFile.find(params[:id])
     sheet = params[:sheet] || 1
+    trim = params[:trim]
+    trim ||= false
     if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
 
       respond_to do |format|
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
         format.xml {render :xml=>spreadsheet_to_xml(open(@data_file.content_blob.filepath)) }
-        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet) }
+        format.csv {render :text=>spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,trim) }
       end
     else
       respond_to do |format|
@@ -263,7 +268,7 @@ end
     data_file=DataFile.find_by_id(params[:id])
     
     render :update do |page|
-      if data_file && Authorization.is_authorized?("show", nil, data_file, current_user)
+      if data_file.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>data_file}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."
@@ -292,7 +297,7 @@ end
 
   def translate_action action
     action="download" if action=="data"
-    action
+    super action
   end
 
 end

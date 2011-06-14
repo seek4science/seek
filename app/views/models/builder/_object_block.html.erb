@@ -24,16 +24,7 @@
         <%= link_to "Download schema",url,:target=>"_blank" -%>
         <br/>
     <% else -%>
-        <!--[if !IE]>-->
-                <object data="<%= data_url -%>" id="<%= object_element_id -%>" class="reContent">
-        <!--<![endif]-->
-        <!--[if lt IE 9]>
-                <object src="<%= data_url -%>" id="<%= object_element_id -%>" class="reContent">
-        <![endif]-->
-        <!--[if gte IE 9]>
-                <object data="<%= data_url -%>" id="<%= object_element_id -%>" class="reContent">
-        <![endif]-->
-        </object>
+        <iframe src="<%= data_url -%>" id="<%= object_element_id -%>" class="reContent"></iframe>
         <script type="text/javascript">
             var <%= javascript_var -%> = new ResizeableContainer('<%= object_element_id -%>');
             container = <%= javascript_var -%>;

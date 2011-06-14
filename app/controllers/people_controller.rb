@@ -1,12 +1,14 @@
 class PeopleController < ApplicationController
   
-  before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]  
+  #before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
   before_filter :profile_is_not_another_admin_except_me, :only=>[:edit,:update]
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
-  before_filter :auth_params,:only=>[:update,:create]  
+  before_filter :auth_params,:only=>[:update,:create]
+
+  skip_before_filter :project_membership_required
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
   
@@ -68,7 +70,7 @@ class PeopleController < ApplicationController
     @person = Person.new
 
     respond_to do |format|
-      format.html { render :action=>"new",:layout=>"logged_out" }
+      format.html { render :action=>"new" }
       format.xml  { render :xml => @person }
     end
   end
@@ -123,7 +125,7 @@ class PeopleController < ApplicationController
     @userless_projects.sort!{|a,b|a.name<=>b.name}
     @person = Person.new(params[:openid_details]) #Add some default values gathered from OpenID, if provided.
 
-    render :action=>"select",:layout=>"logged_out"
+    render :action=>"select"
   end
 
   # POST /people
@@ -160,19 +162,13 @@ class PeopleController < ApplicationController
           logout_user
           format.html {redirect_to :controller=>"users",:action=>"activation_required"}
         else
-          if registration && !current_user.is_admin?
-            logout_user
-            flash[:notice]="Profile successfully created. You can log in when an administrator has assigned you to a project."
-            format.html { redirect_to :controller => "sessions", :action=>"new"}
-          else
-            flash[:notice] = 'Person was successfully created.'
-            format.html { redirect_to(@person) }
-            format.xml  { render :xml => @person, :status => :created, :location => @person }
-          end
+          flash[:notice] = 'Person was successfully created.'
+          format.html { redirect_to(@person) }
+          format.xml  { render :xml => @person, :status => :created, :location => @person }
         end
         
       else        
-        format.html { render :action => redirect_action,:layout=>"logged_out" }
+        format.html { render :action => redirect_action }
         format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
       end
     end
@@ -305,7 +301,7 @@ class PeopleController < ApplicationController
   
   def profile_belongs_to_current_or_is_admin
     @person=Person.find(params[:id])
-    unless @person == current_user.person || current_user.is_admin? || current_user.person.is_project_manager?
+    unless @person == current_user.person || User.admin_logged_in? || current_user.person.is_project_manager?
       error("Not the current person", "is invalid (not owner)")
       return false
     end
@@ -320,7 +316,7 @@ class PeopleController < ApplicationController
   end
 
   def is_user_admin_or_personless
-    unless current_user.is_admin? || current_user.person.nil?
+    unless User.admin_logged_in? || current_user.person.nil?
       error("You do not have permission to create new people","Is invalid (not admin)")
       return false
     end
@@ -337,10 +333,10 @@ class PeopleController < ApplicationController
   def auth_params
     # make sure to update people/_form if this changes
     #                   param                 => allowed access?
-    restricted_params={:is_pal                => current_user.is_admin?,
-                       :is_admin              => current_user.is_admin?,
-                       :can_edit_projects     => (current_user.is_admin? or current_user.is_project_manager?),
-                       :can_edit_institutions => (current_user.is_admin? or current_user.is_project_manager?)}
+    restricted_params={:is_pal                => User.admin_logged_in?,
+                       :is_admin              => User.admin_logged_in?,
+                       :can_edit_projects     => (User.admin_logged_in? or current_user.is_project_manager?),
+                       :can_edit_institutions => (User.admin_logged_in? or current_user.is_project_manager?)}
     restricted_params.each do |param, allowed|
       params[:person].delete(param) if params[:person] and not allowed
     end

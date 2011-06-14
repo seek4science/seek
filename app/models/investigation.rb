@@ -1,8 +1,8 @@
 
 class Investigation < ActiveRecord::Base    
   acts_as_isa
+  acts_as_authorized
 
-  belongs_to :project
   has_many :studies  
 
 
@@ -13,12 +13,8 @@ class Investigation < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:title]) if Seek::Config.solr_enabled
 
-  def can_edit? user
-    user.person.projects.include?(project)
-  end
-
-  def can_delete? user
-    studies.empty? && can_edit?(user)
+  def can_delete? *args
+    studies.empty? && super
   end
   
   def data_files
@@ -29,5 +25,11 @@ class Investigation < ActiveRecord::Base
     assays.collect{|assay| assay.sops}.flatten.uniq
   end
 
-  
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = self.policy.deep_copy
+
+    return new_object
+  end
+
 end

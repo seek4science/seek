@@ -1,0 +1,40 @@
+<%
+ possibilities ||= []
+ selected ||= nil
+ intro ||= ""
+ default_choice_text ||= "Select Item ..."
+ button_text ||= "Include"
+ value_method ||= :id
+ text_method ||= :title
+
+ default_choice = [default_choice_text, 0]
+ collection_id = "#{name}_#{method}"
+ possibilities_collection_id = "possible_#{collection_id}"
+%>
+
+<%= javascript_include_tag "fancy_multiselect.js"  %>
+
+    <div class="yui-u first">
+      <p style="color: #666666;">
+        <%= intro %>
+      </p>
+      <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text">Loading...</span>
+      </div>
+      <div class="association_step">
+         <%= select_tag possibilities_collection_id,
+             options_for_select([default_choice]|possibilities.collect{|o| [truncate(h(o.title), :length=>120), o.id]}),
+             {:style=>"width:90%"} -%>
+        <%= select name, method, options_from_collection_for_select(possibilities, value_method, text_method, selected),{}, {:multiple=>true, :style=>"display:none;"} -%>
+      </div>
+
+		<br/>
+        <%= link_to_function "#{image('new')} #{button_text}", "addSelectedToFancy('#{collection_id}', $F(#{possibilities_collection_id})); return(false);", :id=>"add_to_#{collection_id}_link", :class=>"block_link", :style => "width: 12em" %>
+
+    </div>
+
+<script type="text/javascript">
+    Event.observe(window, 'load',function () {
+        updateFancyMultiselect('<%= collection_id %>');
+    });
+</script>

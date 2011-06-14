@@ -2,6 +2,18 @@ var annotations = new Array();
   var cached_annotations = new Array();
   var search_results = new Array();
 
+  function create_annotator_panel_cookies() {
+    create_panel_cookies_by_id('species_panel');
+    create_panel_cookies_by_id('reactions_panel');
+    create_panel_cookies_by_id('attribution_annotations_panel');
+  }
+
+  function read_annotator_panel_cookies() {
+    read_panel_cookies_from_id('species_panel');
+    read_panel_cookies_from_id('reactions_panel');
+    read_panel_cookies_from_id('attribution_annotations_panel');
+  }
+
   function submit_annotations() {
       update_annotation_field("annotationsSpecies","species",annotations);
       update_annotation_field("annotationsReactions","reactions",annotations);
@@ -70,6 +82,7 @@ var annotations = new Array();
       button=$(prefix+"_search_button");
       button.disabled = true;
       button.value = "Searching ...";
+      create_annotator_panel_cookies();
       submit_annotations();
   }
 

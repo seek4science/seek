@@ -43,6 +43,26 @@ class User < ActiveRecord::Base
   
   acts_as_uniquely_identifiable
 
+  cattr_accessor :current_user
+
+  def self.admin_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_admin?
+  end
+
+  #a person can be logged in but not fully registered during
+  #the registration process whilst selecting or creating a profile
+  def self.logged_in_and_registered?
+    self.logged_in? && self.current_user.person
+  end
+
+  def self.logged_in?
+    self.current_user
+  end
+
+  def self.pal_logged_in?
+    self.logged_in_and_registered? && self.current_user.person.is_pal?
+  end
+
   # Activates the user in the database.
   def activate
     @activated = true
@@ -142,7 +162,7 @@ class User < ActiveRecord::Base
   def using_openid?
     !openid.nil?
   end
-  #TODO: may no longer be required after refactoring    
+        
   def is_admin?
     !person.nil? && person.is_admin?
   end
@@ -157,6 +177,16 @@ class User < ActiveRecord::Base
   
   def can_edit_institutions?
     !person.nil? && person.can_edit_institutions?
+  end
+
+  def self.with_current_user user
+    previous = self.current_user
+    self.current_user = user
+    begin
+      yield
+    ensure
+      User.current_user = previous
+    end
   end
 
   protected
@@ -176,3 +206,4 @@ class User < ActiveRecord::Base
   end
     
 end
+

@@ -16,8 +16,8 @@ class PoliciesController < ApplicationController
       supported = true
       
       # check that current user (the one sending AJAX request to get data from this handler)
-      # is a member of the project (or an institution / workgroup), for which they try to get the default policy
-      authorized = Authorization.is_member?(current_user.person.id, entity_type, entity_id)
+      # is a member of the project for which they try to get the default policy
+      authorized = current_user.person.projects.include? Project.find(entity_id)
     else
       supported = false
     end

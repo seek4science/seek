@@ -41,7 +41,13 @@ class EventsControllerTest < ActionController::TestCase
 
   test "should create hidden event by default" do
     post :create, :event => valid_event
-    assert !Authorization.is_authorized?("view", nil, assigns(:event), users(:aaron)) #must be a user other than the one you are logged in as
+    assert !assigns(:event).can_view?(users(:aaron)) #must be a user other than the one you are logged in as
+  end
+
+  test "xml for projectless event" do
+    id = Factory(:event, :policy => Factory(:public_policy)).id
+    get :show, :id => id, :format => "xml"
+    perform_api_checks
   end
 
   test "should show event" do
@@ -105,5 +111,23 @@ class EventsControllerTest < ActionController::TestCase
     after = assigns :event
     assert_not_equal before.title, after.title
     assert_equal after.title, valid_event[:title]
+  end
+
+  test "should not add invisible data_file" do
+    e = Factory :event, :contributor => User.current_user
+    df = Factory :data_file, :contributor => Factory(:user), :policy => Factory(:private_policy)
+    put :update, :id => e.id, :data_file_ids => ["#{df.id}"], :event => {}
+
+    assert_redirected_to e
+    assert_equal 0, e.data_files.count
+  end
+
+  test "should not lose invisible data_files when updating" do
+    e = Factory :event, :contributor => User.current_user,
+                :data_files => [Factory(:data_file, :contributor => Factory(:user), :policy => Factory(:private_policy))]
+    put :update, :id => e.id, :data_file_ids => []
+
+    assert_redirected_to e
+    assert_equal 1, e.data_files.count
   end
 end

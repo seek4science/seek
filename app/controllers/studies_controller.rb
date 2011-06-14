@@ -2,19 +2,38 @@ class StudiesController < ApplicationController
 
   include DotGenerator
   include IndexPager
-  
-  before_filter :login_required
-    
-  before_filter :find_studies,:only=>[:index]
-  before_filter :is_project_member,:only=>[:create,:new]
+
+  before_filter :find_assets, :only=>[:index]
+  before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
+
   before_filter :check_assays_are_not_already_associated_with_another_study,:only=>[:create,:update]
-  before_filter :study_auth_project,:only=>[:edit,:update]
-  before_filter :delete_allowed,:only=>[:destroy]
   
+
+  def new_object_based_on_existing_one
+    @existing_study =  Study.find(params[:id])
+    @study = @existing_study.clone_with_associations
+
+    unless @study.investigation.can_edit?
+       @study.investigation = nil
+      flash.now[:notice] = 'The investigation of the existing study cannot be viewed, please specify your own investigation!'
+    end
+
+    render :action => "new"
+
+  end
 
   def new
     @study = Study.new
-    @study.assays << Assay.find(params[:assay_id]) if params[:assay_id]
+    investigation = nil
+    investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
+    
+    if investigation
+      if investigation.can_edit?
+        @study.investigation = investigation
+      else
+        flash.now[:error] = "You do now have permission to associate the new study with the investigation '#{investigation.title}'."
+      end
+    end
     
     respond_to do |format|
       format.html
@@ -45,8 +64,15 @@ class StudiesController < ApplicationController
   def update
     @study=Study.find(params[:id])
 
+    @study.attributes = params[:study]
+
+    if params[:sharing]
+      @study.policy_or_default
+      @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+    end
+
     respond_to do |format|
-      if @study.update_attributes(params[:study])
+      if @study.save
         flash[:notice] = 'Study was successfully updated.'
         format.html { redirect_to(@study) }
         format.xml  { head :ok }
@@ -58,7 +84,7 @@ class StudiesController < ApplicationController
   end
 
   def show
-    @study=Study.find(params[:id])    
+    @study=Study.find(params[:id])
     respond_to do |format|
       format.html
       format.xml
@@ -67,11 +93,13 @@ class StudiesController < ApplicationController
       format.png { render :text=>to_png(@study.investigation,params[:deep]=='true',@study)}
     end
 
-  end  
+  end
 
   def create
-    @study = Study.new(params[:study])    
-    
+    @study = Study.new(params[:study])
+
+    @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+
     respond_to do |format|
       if @study.save
         format.html { redirect_to(@study) }
@@ -127,28 +155,4 @@ class StudiesController < ApplicationController
       end
     end
   end
-
-  def study_auth_project
-    @study=Study.find(params[:id])
-    unless @study.can_edit?(current_user)
-      flash[:error] = "You cannot edit a Study for a project you are not a member."
-      redirect_to @study
-    end
-  end
-
-  def delete_allowed
-    @study=Study.find(params[:id])
-    unless @study.can_delete?(current_user)
-      respond_to do |format|
-        flash[:error] = "You cannot delete a Study related to a project or which you are not a member, or that has assays associated"
-        format.html { redirect_to studies_path }
-      end
-      return false
-    end
-  end
-  
-  def find_studies
-    @studies=apply_filters(Study.find(:all))    
-  end
-  
 end

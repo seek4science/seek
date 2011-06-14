@@ -32,7 +32,7 @@ downloadable_data_file:
   last_used_at: 2009-04-03 11:09:18
   version: 1
   project: other_project # not linked to any project for now
-  policy: download_for_all_registered_users_policy
+  policy: download_for_all_sysmo_users_policy
   
 url_based_data_file:
   contributor: datafile_owner (User)
@@ -44,7 +44,7 @@ url_based_data_file:
   last_used_at: 2009-04-03 11:09:18
   version: 1
   project: other_project # not linked to any project for now
-  policy: download_for_all_registered_users_policy
+  policy: download_for_all_sysmo_users_policy
   
 url_no_host_data_file:
   contributor: datafile_owner (User)
@@ -56,7 +56,7 @@ url_no_host_data_file:
   last_used_at: 2009-04-03 11:09:18
   version: 1
   project: other_project # not linked to any project for now
-  policy: download_for_all_registered_users_policy
+  policy: download_for_all_sysmo_users_policy
   
 url_not_found_data_file:
   contributor: datafile_owner (User)
@@ -68,7 +68,7 @@ url_not_found_data_file:
   last_used_at: 2009-04-03 11:09:18
   version: 1
   project: other_project # not linked to any project for now
-  policy: download_for_all_registered_users_policy      
+  policy: download_for_all_sysmo_users_policy
 
 editable_data_file:
   contributor: datafile_owner (User)
@@ -128,7 +128,7 @@ data_file_with_no_contributor:
   version: 1
   project: sysmo_project
   policy: sysmo_member_edit
-  
+
 viewable_data_file:
   contributor: datafile_owner (User)
   title: Can Only Be Viewed
@@ -140,3 +140,4 @@ viewable_data_file:
   version: 1
   project: sysmo_project
   policy: policy_for_viewable_data_file
+

@@ -27,8 +27,8 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "authorization supported?" do
-    assert !Assay.authorization_supported?
-    assert !assays(:metabolomics_assay).authorization_supported?
+    assert Assay.authorization_supported?
+    assert assays(:metabolomics_assay).authorization_supported?
   end
 
   test "avatar_key" do
@@ -38,6 +38,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "is_modelling" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert !assay.is_modelling?
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.save!
@@ -45,18 +46,18 @@ class AssayTest < ActiveSupport::TestCase
   end
   
   test "title_trimmed" do
-    assay=Assay.new(:title=>" test",
-      :assay_type=>assay_types(:metabolomics),
-      :technology_type=>technology_types(:gas_chromatography),
-      :study => studies(:metabolomics_study),
-      :owner => people(:person_for_model_owner),
-      :assay_class => assay_classes(:experimental_assay_class))
-    assay.save!
-    assert_equal "test",assay.title
+    User.with_current_user Factory(:user) do
+      assay=Factory :assay,
+                    :contributor => User.current_user.person,
+                    :title => " test"
+      assay.save!
+      assert_equal "test",assay.title
+    end
   end
 
   test "is_experimental" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert assay.is_experimental?
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.save!
@@ -77,47 +78,55 @@ class AssayTest < ActiveSupport::TestCase
   
 
   test "validation" do
-    assay=new_valid_assay
-    
-    assert assay.valid?
+    User.with_current_user Factory(:user) do
+      assay=new_valid_assay
 
-    assay.title=""
-    assert !assay.valid?
+      assert assay.valid?
 
-    assay.title=nil
-    assert !assay.valid?
+      assay.title=""
+      assert !assay.valid?
 
-    assay.title=assays(:metabolomics_assay).title
-    assert assay.valid? #can have duplicate titles
+      assay.title=nil
+      assert !assay.valid?
 
-    assay.title="test"
-    assay.assay_type=nil
-    assert !assay.valid?
+      assay.title=assays(:metabolomics_assay).title
+      assert assay.valid? #can have duplicate titles
 
-    assay.assay_type=assay_types(:metabolomics)
+      assay.title="test"
+      assay.assay_type=nil
+      assert !assay.valid?
 
-    assert assay.valid?
+      assay.assay_type=assay_types(:metabolomics)
 
-    assay.study=nil
-    assert !assay.valid?
-    assay.study=studies(:metabolomics_study)
+      assert assay.valid?
 
+      assay.study=nil
+      assert !assay.valid?
+      assay.study=studies(:metabolomics_study)
+
+      assay.technology_type=nil
+      assert !assay.valid?
+
+      assay.technology_type=technology_types(:gas_chromatography)
+      assert assay.valid?
+
+      assay.owner=nil
+      assert !assay.valid?
+
+      assay.owner=people(:person_for_model_owner)
+
+      #an modelling assay can be valid without a technology type,but require sample or organism
+      assay.assay_class=assay_classes(:modelling_assay_class)
+      assay.technology_type=nil
+      assay.samples = [Factory(:sample)]
+      assert assay.valid?
+
+    #an experimental assay can be invalid without a sample
+    assay.assay_class=assay_classes(:experimental_assay_class)
     assay.technology_type=nil
+    assay.samples = []
     assert !assay.valid?
-
-    assay.technology_type=technology_types(:gas_chromatography)
-    assert assay.valid?
-
-    assay.owner=nil
-    assert !assay.valid?
-
-    assay.owner=people(:person_for_model_owner)
-
-    #an modelling assay can be valid without a technology type
-    assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.technology_type=nil
-    assert assay.valid?
-    
+    end
   end
 
   test "associated publication" do
@@ -125,10 +134,29 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "can delete?" do
-    assert assays(:assay_with_just_a_study).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_no_study_but_has_some_files).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_no_study_but_has_some_sops).can_delete?(users(:model_owner))
-    assert !assays(:assay_with_a_model).can_delete?(users(:model_owner))
+    user = User.current_user = Factory(:user)
+    assert Factory(:assay, :contributor => user.person).can_delete?
+
+    assay = Factory(:assay, :contributor => user.person)
+    assay.relate Factory(:data_file, :contributor => user)
+    assert !assay.can_delete?
+
+    assay = Factory(:assay, :contributor => user.person)
+    assay.relate Factory(:sop, :contributor => user)
+    assert !assay.can_delete?
+
+    assay = Factory(:assay, :contributor => user.person)
+    assay.relate Factory(:model, :contributor => user)
+    assert !assay.can_delete?
+
+    pal = Factory :pal
+    #create an assay with project = to the project for which the pal is a pal
+    assay = Factory(:assay,
+                    :study => Factory(:study,
+                                      :investigation => Factory(:investigation,
+                                                                :project => (pal.projects.find {|p| p.pals.include? pal}))))
+    assert !assay.can_delete?(pal.user)
+    
     assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
   end
 
@@ -152,36 +180,40 @@ class AssayTest < ActiveSupport::TestCase
   
   test "can relate data files" do
     assay = assays(:metabolomics_assay)
-    assert_difference("Assay.find_by_id(assay.id).data_files.count") do
-      assay.relate(data_files(:viewable_data_file), relationship_types(:test_data))
+    User.with_current_user assay.contributor.user do
+      assert_difference("Assay.find_by_id(assay.id).data_files.count") do
+        assay.relate(data_files(:viewable_data_file), relationship_types(:test_data))
+      end
     end
   end
   
   test "relate new version of sop" do
-    assay=new_valid_assay
-    assay.save!
-    sop=sops(:sop_with_all_sysmo_users_policy)
-    assert_difference("Assay.find_by_id(assay.id).sops.count",1) do
-      assert_difference("AssayAsset.count",1) do
-        assay.relate(sop)
+    User.with_current_user Factory(:user) do
+      assay=Factory :assay, :contributor => User.current_user.person
+      assay.save!
+      sop=sops(:sop_with_all_sysmo_users_policy)
+      assert_difference("Assay.find_by_id(assay.id).sops.count", 1) do
+        assert_difference("AssayAsset.count", 1) do
+          assay.relate(sop)
+        end
       end
-    end
-    assay.reload
-    assert_equal 1,assay.assay_assets.size
-    assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
-    
-    sop.save_as_new_version
-    
-    assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
-      assert_no_difference("AssayAsset.count") do
-        assay.relate(sop)
+      assay.reload
+      assert_equal 1, assay.assay_assets.size
+      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
+
+      User.current_user = sop.contributor
+      sop.save_as_new_version
+
+      assert_no_difference("Assay.find_by_id(assay.id).sops.count") do
+        assert_no_difference("AssayAsset.count") do
+          assay.relate(sop)
+        end
       end
+
+      assay.reload
+      assert_equal 1, assay.assay_assets.size
+      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
     end
-    
-    assay.reload
-    assert_equal 1,assay.assay_assets.size
-    assert_equal sop.version,assay.assay_assets.first.versioned_asset.version
-    
   end
 
   test "organisms association" do
@@ -194,6 +226,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "associate organism" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     organism=organisms(:yeast)
     #test with numeric ID
     assert_difference("AssayOrganism.count") do
@@ -201,12 +234,12 @@ class AssayTest < ActiveSupport::TestCase
     end
 
     #with String ID
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assay.associate_organism(organism.id.to_s)
     end
 
     #with Organism object
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assay.associate_organism(organism)
     end
 
@@ -224,6 +257,7 @@ class AssayTest < ActiveSupport::TestCase
 
   test "disassociating organisms removes AssayOrganism" do
     assay=assays(:metabolomics_assay)
+    User.current_user = assay.contributor
     assert_equal 2,assay.assay_organisms.count
     assert_difference("AssayOrganism.count",-2) do
       assay.assay_organisms.clear
@@ -244,7 +278,7 @@ class AssayTest < ActiveSupport::TestCase
       end
     end
 
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assert_no_difference("Strain.count") do
         assay.associate_organism(organism,"FFFF")
       end
@@ -280,6 +314,12 @@ class AssayTest < ActiveSupport::TestCase
       :technology_type=>technology_types(:gas_chromatography),
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
-      :assay_class => assay_classes(:experimental_assay_class))
+      :assay_class => assay_classes(:experimental_assay_class),
+      :samples => [Factory :sample]
+    )
+
   end
+
+
+
 end

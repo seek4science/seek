@@ -1,0 +1,130 @@
+<% truncate_length_for_boxes = 22 -%>
+
+<ul class="sectionIcons">
+  <% if @specimen.can_edit? %>
+      <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit Specimen", nil, 'Edit Specimen') %></li>
+
+
+
+  <% end %>
+  <% if @specimen.can_delete? %>
+      <li><%= image_tag_for_key "destroy", specimen_path(@specimen), "Delete Specimen", {:confirm => 'Are you sure?', :method => :delete}, "Delete Specimen" -%></li>
+  <% end %>
+
+  <% if logged_in? and current_user.person.member? %>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"specimens",:id=>@specimen.id), nil, nil, 'New specimen based on this one') %></li>
+  <% end %>
+</ul>
+
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@specimen} %>
+
+<div class="show_basic">
+
+  <div class="main_content_left_box">
+
+    <div class="box_about_actor">
+      <p>
+        <label>Specimen number:</label>
+        <%= text_or_not_specified(@specimen.donor_number) %>
+      </p>
+
+      <p id="organism">
+          <label>Organism and strain: </label>
+         <%= specimen_organism_list @specimen.organism,@specimen.strain,@specimen.culture_growth_type %>
+         <table border="1" cellpadding="10" >
+              <tr>
+                <th>Medium</th>
+                <th>Culture Format</th>
+                <th>Temperature</th>
+                <th>PH</th>
+                <th>Confluency</th>
+                <th>Passage</th>
+                <th>Viability</th>
+                <th>Purity</th>
+              </tr>
+           <tr>
+             <td><%=text_or_not_specified(@specimen.medium) %></td>
+             <td><%=text_or_not_specified(@specimen.culture_format) %></td>
+             <td><%=text_or_not_specified(@specimen.temperature) %></td>
+             <td><%=text_or_not_specified(@specimen.ph) %></td>
+             <td><%=text_or_not_specified(@specimen.confluency) %></td>
+             <td><%=text_or_not_specified(@specimen.passage) %></td>
+             <td><%=text_or_not_specified(@specimen.viability) %></td>
+             <td><%=text_or_not_specified(@specimen.purity) %></td>
+           </tr>
+
+         </table>
+
+      </p>
+
+      <p>
+        <label>Age:</label>
+        <%= text_or_not_specified(@specimen.age_in_weeks) %>
+      </p>
+      <p>
+        <label>Sex:</label>
+         <% if @specimen.sex==true%>
+         <%= text_or_not_specified("female") %>
+         <% end %>
+
+         <% if @specimen.sex==false%>
+         <%= text_or_not_specified("male") %>
+         <% end %>
+
+         <% if @specimen.sex.nil? %>
+         <%= text_or_not_specified nil %>
+         <% end %>
+      </p>
+      <p>
+        <label>Birthday:</label>
+         <% if @specimen.born.nil? %>
+            <%= text_or_not_specified nil %>
+        <% else %>
+
+            <% if @specimen.try(:born).hour == 0 and @specimen.try(:born).min == 0 and @specimen.try(:born).sec == 0 then %>
+                <%= h @specimen.try(:born).strftime('%d/%m/%Y') %>
+            <% else %>
+                <%= h @specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
+            <% end %>
+
+        <% end %>
+      </p>
+
+      <p>
+        <label>Treatment:</label>
+        <%= text_or_not_specified(@specimen.treatment) %>
+      </p>
+
+      <p>
+        <label>Lab internal No.:</label>
+        <%= text_or_not_specified(@specimen.lab_internal_number) %>
+      </p>
+      <p>
+        <label>Institution:</label>
+        <%= text_or_not_specified(@specimen.institution.name) %>
+      </p>
+
+
+    </div>
+  </div>
+  <!--  <div class="main_content_right_box">
+    <#%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
+  </div>-->
+  <div style="clear:both;">
+    <p style="margin-top: 1em;">
+      <b>About the specimen:</b>
+
+    <div id="description" class="box_standout">
+      <%= text_or_not_specified(@specimen.comments, :description=>true, :auto_link=>true) %>
+    </div>
+    </p>
+
+  </div>
+
+
+  <div style="clear:both">
+
+    <%= render :partial=>"layouts/items_related_to", :object => @specimen %>
+  </div>
+
+</div>

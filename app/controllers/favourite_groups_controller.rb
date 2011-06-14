@@ -8,7 +8,8 @@ class FavouriteGroupsController < ApplicationController
   before_filter :set_no_layout, :only => [ :new, :edit ]
   
   protect_from_forgery :except => [:create, :update, :destroy]
-  
+
+  skip_before_filter :project_membership_required
   
   def new
     @f_group = FavouriteGroup.new
@@ -127,7 +128,6 @@ class FavouriteGroupsController < ApplicationController
       users_favourite_groups = FavouriteGroup.get_all_without_blacklists_and_whitelists(current_user.id)
     end
     
-    
     respond_to do |format|
       format.json {
         unless already_exists
@@ -138,7 +138,7 @@ class FavouriteGroupsController < ApplicationController
       }
     end
   end
-  
+
   
   def destroy
     # these parameters will be needed for the client-side processing

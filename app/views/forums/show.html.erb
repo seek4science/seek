@@ -93,8 +93,8 @@
       </tr>
     <% end %>
   </table>
-
   <%= will_paginate @topics %>
+
 
   <% if logged_in? %>
     <p><%= link_to 'New topic'[:new_topic], new_forum_topic_path(@forum), :class => "utility" %></p>

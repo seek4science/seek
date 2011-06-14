@@ -17,6 +17,7 @@ gem "rmagick","2.12.2"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
+gem 'factory_girl'
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
@@ -24,4 +25,6 @@ end
 
 group :test do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
+  gem "timocratic-test_benchmark"
+  gem "ruby-prof"
 end

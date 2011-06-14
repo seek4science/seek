@@ -1,46 +1,20 @@
 <h1>
   <%= "Factors studied for '#{link_to h(@data_file.title),data_file_path(@data_file, :version => @display_data_file.version)}' version #{@display_data_file.version}" %>
 </h1>
-<% if @data_file.can_edit? current_user -%>
-  <div id="edit_on">
-    <%= link_to_function image(("edit"),:style=>"margin-left:4em;",:title=>"Start editing",:alt=>"Start editing") do |page|
-      page.visual_effect :appear,"add_factor"
-      page["edit_on"].toggle
-      page["edit_off"].toggle
-      page.select('li.destroy_studied_factor').each do |el|
-        el.toggle
-      end
-    end
-    -%>
+
+<div align="center">
+  <div id="add_condition_or_factor" style="display:block;">
+    <%= render :partial=>"add_condition_or_factor", :locals => {:asset => 'data_file'} %>
   </div>
 
-  <div id="edit_off" style="display:none;">
-    <%= link_to_function image(("edit-off"),:style=>"margin-left:4em;",:title=>"Stop editing",:alt=>"Stop editing") do |page|
-      page.visual_effect :fade,"add_factor"
-      page["edit_on"].toggle
-      page["edit_off"].toggle
-      page.select('li.destroy_studied_factor').each do |el|
-        el.toggle
-      end
-    end
-    -%>
-  </div>
-<% end -%>
+  <ul id="conditions_or_factors" class="conditions_or_factors">
 
-<center>
+    <%= render :partial=>"condition_or_factor_row_headings", :locals=>{:asset => 'data_file', :show_delete=>true} %>
 
-  <div id="add_factor" style="display:none;">
-    <%= render :partial=>"add_factor" %>
-  </div>
-
-  <ul id="studied_factors" class="conditions_or_factors">
-
-    <%= render :partial=>"factor_row_headings" %>
-
-    <div id="studied_factors_rows">
-      <%= render :partial=>"factor_row",:collection=>@display_data_file.studied_factors %>
+    <div id="condition_or_factor_rows">
+      <%= render :partial=>"condition_or_factor_row",:collection=>@display_data_file.studied_factors, :locals=>{:asset => 'data_file', :show_delete=>true} %>
     </div>
   </ul>
 
+</div>
 
-</center>

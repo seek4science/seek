@@ -644,13 +644,17 @@ ul.users_details li p {
 
 }
 
-table.conditions_or_factors {
+div.conditions_or_factors {
     border: dotted #999999 1px;
-    margin-top: 1em;
+    float: left;
+    margin-left: 4em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    width: 50em;
 }
 
 ul.conditions_or_factors li {        
-    list-style-type:none;    
+    list-style-type:none;
 }
 
 ul.condition_or_factor_row {
@@ -1143,6 +1147,15 @@ div#existing_strains {
 .assay_item_sup_info {
     color: #1465FF;
 }
+.assay_organism_info {
+    color: #000099;
+}
+.assay_strain_info {
+    color: #f93fec;
+}
+.assay_tissue_and_cell_type_info {
+    color: #dd283c;
+}
 
 .system_message {
     border-color: red;
@@ -1477,4 +1490,26 @@ div.email_configuration{
     border: 1px solid #999;
     margin: 3px 0;
     width: 500px
+}
+
+div.substance_condition_factor{
+    position:relative;
+    margin-bottom: 1em;
+    width: 25em;
+}
+
+div.substance_experimental_condition{
+    position:relative;
+    margin-left: -16em;
+    margin-bottom: 1em;
+    width: 25em;
+}
+
+a.advanced_sharing_link{
+   float:right;
+}
+
+.sharing_box_form {
+	background-color: #EEEEEE;
+	padding: 0.8em 0.8em;
 }

@@ -1,0 +1,58 @@
+<%= javascript_include_tag 'calendar_date_select/calendar_date_select' %>
+<%= stylesheet_link_tag 'calendar_date_select/default' %>
+<%= javascript_include_tag "sharing.js" -%>
+
+<%= f.error_messages %>
+
+
+<h2>Sample Details</h2>
+
+<div style="width: 85%;">
+
+  <p>
+    <%= f.label "Sample name:" -%><span class="required">*</span><br/>
+    <%= f.text_field :title, :style => "width: 350px;" -%>
+  </p>
+
+  <p>
+    <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
+    <%= collection_select(:sample, :specimen_id, Specimen.all.select{|s|s.can_view?} , :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:90%"}) %>
+  </p>
+
+  <p>
+    <%= f.label :explantation -%><br/>
+    <%= f.text_field :explantation, :style => "width: 350px;" -%>
+  </p>
+
+  <p>
+    <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
+    <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+  </p>
+  <p>
+    <%= f.label :donation_date -%><span class="required">*</span><br/>
+    <%= f.calendar_date_select :donation_date, :time => "mixed" -%>
+  </p>
+
+  <p>
+    <%= f.label :description -%><br/>
+    <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+  </p>
+
+  <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample}-%>
+
+  <br style="clear:both"/>
+  <p>
+      <%= render :partial => "assets/sharing_form" -%>
+  </p>
+
+
+</div>
+
+ <%= render :partial=>"samples/associate_sop",:locals=>{:f=>f,:resource=>@sample} -%>
+
+
+
+<p style="margin-top: 2em; text-align: center;">
+  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (@sample.id ? sample_path(@sample.id) : samples_path) -%>
+</p>

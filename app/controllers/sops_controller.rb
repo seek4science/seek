@@ -4,11 +4,12 @@ class SopsController < ApplicationController
   include DotGenerator
   include Seek::AssetsCommon  
   
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_tags_ajax]
   before_filter :find_display_sop, :only=>[:show,:download]
-  
+
+  include Seek::Publishing
   
   def new_version
     if (handle_data nil)      
@@ -75,7 +76,7 @@ class SopsController < ApplicationController
   def new
     @sop=Sop.new
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html # new.html.erb
       else
         flash[:error] = "You are not authorized to upload new SOPs. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -94,32 +95,26 @@ class SopsController < ApplicationController
 
     if handle_data            
       @sop = Sop.new(params[:sop])
-      @sop.contributor=current_user
       @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
+
+      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.project
 
       update_tags @sop
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @sop.save
-          # the SOP was saved successfully, now need to apply policy / permissions settings to it
-          policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
-          
           # update attributions
           Relationship.create_or_update_attributions(@sop, params[:attributions])
           
           #Add creators
           AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
           
-          if policy_err_msg.blank?
-            flash[:notice] = 'SOP was successfully uploaded and saved.'
-            format.html { redirect_to sop_path(@sop) }
-          else
-            flash[:notice] = "SOP was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-            format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
-          end
-          assay_ids.each do |id|
-              @assay = Assay.find(id)
-              @assay.relate(@sop)
+          flash[:notice] = 'SOP was successfully uploaded and saved.'
+          format.html { redirect_to sop_path(@sop) }
+          Assay.find(assay_ids).each do |assay|
+            if assay.can_edit?
+              assay.relate(@sop)
+            end
           end
         else
           format.html { 
@@ -145,40 +140,36 @@ class SopsController < ApplicationController
 
     update_tags @sop
     assay_ids = params[:assay_ids] || []
+
+    @sop.attributes = params[:sop]
+
+    if params[:sharing]
+      @sop.policy_or_default
+      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.project
+    end
+
     respond_to do |format|
-      if @sop.update_attributes(params[:sop])
-        # the SOP was updated successfully, now need to apply updated policy / permissions settings to it
-        policy_err_msg = Policy.create_or_update_policy(@sop, current_user, params)
-        
+      if @sop.save
         # update attributions
         Relationship.create_or_update_attributions(@sop, params[:attributions])
         
         #update authors
         AssetsCreator.add_or_update_creator_list(@sop, params[:creators])
         
-        if policy_err_msg.blank?
-          flash[:notice] = 'SOP metadata was successfully updated.'
-          format.html { redirect_to sop_path(@sop) }
-        else
-          flash[:notice] = "SOP metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to :controller => 'sops', :id => @sop, :action => "edit" }
-        end
+        flash[:notice] = 'SOP metadata was successfully updated.'
+        format.html { redirect_to sop_path(@sop) }
         # Update new assay_asset
-        assay_ids.each do |id|
-          @assay = Assay.find(id)
-          @assay.relate(@sop)
-        end
-        #Destroy AssayAssets that aren't needed
-        assay_assets = AssayAsset.find_all_by_asset_id(@sop.id)
-        assay_assets.each do |assay_asset|
-          flag = false
-          assay_ids.each do |id|
-            if assay_asset.assay_id.to_s == id
-              flag = true
-            end
+        Assay.find(assay_ids).each do |assay|
+          if assay.can_edit?
+            assay.relate(@sop)
           end
-          if flag == false
-             AssayAsset.destroy(assay_asset.id)
+        end
+
+        #Destroy AssayAssets that aren't needed
+        assay_assets = @sop.assay_assets
+        assay_assets.each do |assay_asset|
+          if assay_asset.assay.can_edit? and !assay_ids.include?(assay_asset.assay_id.to_s)
+            AssayAsset.destroy(assay_asset.id)
           end
         end
       else
@@ -205,7 +196,7 @@ class SopsController < ApplicationController
     sop=Sop.find_by_id(params[:id])
     
     render :update do |page|
-      if sop && Authorization.is_authorized?("show", nil, sop, current_user)
+      if sop.try :can_view?
         page.replace_html element,:partial=>"assets/resource_preview",:locals=>{:resource=>sop}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

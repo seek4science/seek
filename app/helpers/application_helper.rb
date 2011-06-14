@@ -264,10 +264,11 @@ module ApplicationHelper
     html
   end
 
-  def favourite_group_popup_link_action_new
-    return link_to_remote_redbox("Create new favourite group", 
+  def favourite_group_popup_link_action_new resource_type=nil
+    return link_to_remote_redbox("Create new favourite group",
       { :url => new_favourite_group_url,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+        :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],
         :id => "create_new_f_group_redbox",
         :onclick => "javascript: currentFavouriteGroupSettings = {};" }#,
@@ -276,10 +277,11 @@ module ApplicationHelper
     )
   end
   
-  def favourite_group_popup_link_action_edit
-    return link_to_remote_redbox("Edit selected favourite group", 
+  def favourite_group_popup_link_action_edit resource_type=nil
+    return link_to_remote_redbox("Edit selected favourite group",
       { :url => edit_favourite_group_url,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+        :with => "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
       { #:style => options[:style],
         :id => "edit_existing_f_group_redbox",
         :onclick => "javascript: currentFavouriteGroupSettings = {};" } #,
@@ -288,10 +290,11 @@ module ApplicationHelper
     )
   end
   
-  def workgroup_member_review_popup_link
+  def workgroup_member_review_popup_link resource_type=nil
     return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>", 
       { :url => review_work_group_url("type", "id", "access_type"),
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+        :with => "'resource_type=' + '#{resource_type}'" },
       { #:style => options[:style],
         :id => "review_work_group_redbox" } #,
       #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
@@ -314,10 +317,15 @@ module ApplicationHelper
   end
   
   #Return whether or not to hide contact details from this user
-  #Current decided by HIDE_DETAILS flag in environment_local.rb
+  #Current decided by Seek::Config.hide_details_enabled in config.rb
   #Defaults to false
   def hide_contact_details?
-    Seek::Config.hide_details_enabled
+    #hide for non-login and non-project-member
+    if !logged_in? or !current_user.person.member?
+      return true
+    else
+      Seek::Config.hide_details_enabled
+    end
   end
 
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
@@ -361,7 +369,7 @@ module ApplicationHelper
   end
 
   def can_manage_announcements?
-    return current_user.is_admin?
+    return admin_logged_in?
   end
 
   def show_or_hide_block visible=true
@@ -380,6 +388,27 @@ module ApplicationHelper
       count = ActivityLog.count(:conditions => {:action => actions, :activity_loggable_type => object.class.name, :activity_loggable_id => object.id})
     end
     count
+  end
+
+
+  def fancy_multiselect object, association, options = {}
+    reflection = object.class.reflect_on_association(association)
+    access_required = reflection.options.delete(:required_access).try(:to_sym) || :can_view?
+    object_type_text = options.delete(:object_type_text) || object.class.name.humanize
+    locals = {
+        :fold_id => "add_#{association}_form",
+        :fold_title => (help_icon("Here you can associate the #{object_type_text} with specific #{association}.") + "#{association.to_s.capitalize}"),
+        :intro => "The following #{association} are involved in this #{object_type_text}:",
+        :button_text => "Include in the #{object_type_text}",
+        :default_choice_text => "Select #{association.to_s.capitalize} ...",
+        :name => object.class.name.downcase,
+        :method => reflection.association_foreign_key.pluralize,
+        :possibilities => reflection.klass.all.select(&access_required),
+        :text_method => :title,
+        :value_method => :id,
+        :selected => @assay.samples.map(&:id)}
+    locals.update options
+    render :partial => 'assets/fancy_multiselect', :layout => "assets/folding_box", :locals => locals
   end
 
   def set_parameters_for_sharing_form
@@ -414,7 +443,7 @@ module ApplicationHelper
     @policy_type = policy_type
     @sharing_mode = policy.sharing_scope
     @access_mode = policy.access_type
-    @use_custom_sharing = (policy.use_custom_sharing == true || policy.use_custom_sharing == 1)
+    @use_custom_sharing = !policy.permissions.empty?
     @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
     @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
 
@@ -430,5 +459,10 @@ module ApplicationHelper
 
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
-  
 end
+class SeekFormBuilder< ActionView::Helpers::FormBuilder
+  def fancy_multiselect association, options = {}
+    @template.fancy_multiselect object, association, options
+  end
+end
+ActionView::Base.default_form_builder = SeekFormBuilder

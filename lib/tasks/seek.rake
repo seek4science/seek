@@ -47,29 +47,6 @@ namespace :seek do
         end
       end
     end        
-  end  
-  
-  task(:associate_people_with_notification_info=>:environment) do
-    Person.find(:all).each do |p|
-      p.check_for_notifiee_info      
-      puts "Saved NotifieeInfo for #{p.name} - UUID = "+p.notifiee_info.unique_key
-    end
-  end
-  
-  desc 'upgrades between 0.7 and 0.8'
-  task(:upgrade_live2=>:environment) do
-    other_tasks=["associate_people_with_notification_info","load_help_docs","update_blobs"]
-    other_tasks.each do |task|
-      Rake::Task[ "seek:#{task}" ].execute
-    end
-  end
-  
-  desc 'upgrades between 0.6 and 0.7'
-  task(:upgrade_live=>:environment) do
-    other_tasks=["assay_classes","update_assay_classes","strains","graft_new_assay_types","relationship_types"]
-    other_tasks.each do |task|
-      Rake::Task[ "seek:#{task}" ].execute
-    end
   end
   
   desc 're-extracts bioportal information about all organisms, overriding the cached details'
@@ -78,44 +55,7 @@ namespace :seek do
       o.concept({:refresh=>true})
     end
   end
-  
-  task(:rebuild_project_organisms=>:environment) do
-    organism_taggings=Tagging.find(:all, :conditions=>['context=? and taggable_id > 0', 'organisms'])
-    puts "found #{organism_taggings.size} organism taggings"
-    organism_taggings.each do |tagging|
-      if tagging.taggable_type == "Project"
-        tag=tagging.tag
-        project=tagging.taggable
-        organism=Organism.find(:first, :conditions=>["title=?", tag.name])
-        if organism.nil?
-          puts "unable to find organism #{tag.name} required for project #{project.title}"
-        else
-          puts "adding #{organism.title} to #{project.title} "
-          class << project
-            def record_timestamps
-              false
-            end
-          end
-          project.organisms << organism unless project.organisms.include?(organism)
-          project.save!
-        end
-      else
-        puts "Tagging with id #{tagging.id} is not for Project"
-      end
-    end
-  end
-    
-  task(:update_blobs=>:environment) do
-    ContentBlob.all.each do |blob|
-      class << blob
-        def record_timestamps
-          false
-        end
-      end
-      blob.save!
-    end    
-  end
-  
+
   desc 'seeds the database with the controlled vocabularies'
   task(:seed=>:environment) do
     tasks=["refresh_controlled_vocabs","default_tags","graft_new_assay_types","load_help_docs"]
@@ -123,198 +63,7 @@ namespace :seek do
       Rake::Task[ "seek:#{task}" ].execute     
     end
   end
-  
-  desc 'creates an initial institution set '
-  task(:create_institutions=>:environment) do
-    revert_fixtures_identify
-    #Institution.delete_all
-    print "BEFORE\n"
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "institutions")  				  
-    print "AFTER\n"
-  end
 
-  desc 'creates an initial projects set '
-  task(:create_projects=>:environment) do
-    revert_fixtures_identify
-	# was Institutions.delete_all is this wanted??
-    Projects.delete_all  
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "projects")  				  
-  end
-
-  desc 'creates an initial users and people set '
-  task(:create_users_and_people=>:environment) do
-    #Users.delete_all
-    #People.delete_all
-
-    count = 0;
-
-    CSV.open(File.join(RAILS_ROOT,
-    "config/default_data/users_and_people.csv"), 'r', ',').each do |row|
-
-
-    	 count = count + 1;
-	 
-	 next if(count == 1);
-
-         email,first_name,last_name,phone,skype_name,web_page,institution,projects = row
-
-	 
-
-	 
-	 #print "#{first_name} #{last_name}\n"
-
-	 #print "#{first_name.downcase[0..0]}#{first_name.downcase[-1..-1]}#{last_name.tr('äöüß','aous').downcase}"
-
-	 login = "#{first_name.downcase[0..0]}#{first_name.downcase[-1..-1]}#{last_name.downcase}"
-
-	p = Person.find_or_create_by_email( :email => email,
-	    				    :first_name => first_name,
-					    :last_name => last_name,
-					    :phone => phone,
-					    :skype_name => skype_name,
-					    :web_page => web_page);  
-
-	p.email=email;
-
-	saved = p.save(true);
-	
-	print "Saving #{email} #{web_page} -> #{p}: #{saved}\n";
-
-	person_id = p.id;
-
-	puts p.to_yaml
-
-	print "Person ID for #{first_name} #{last_name}: #{person_id} / Login #{login}\n";
-
-	unless(saved)
-		p.errors.each_full { |msg| puts "ERROR: #{msg}" }
-	end;
-
-	u = p.user;
-
-
-	fullInstitution = Institution.find_by_name(institution);
-	print "found institution _#{fullInstitution}_ for name _#{institution}_\n";
-	if(!fullInstitution.nil?)
-	 projectsList = projects.split(/;/);
-	 projectsList.each do |currentProject|
-		 print "Current project: #{currentProject}\n";
-		 # looking for the stuff before the colon in the project name
-		 # NOTE THAT THIS ACTUALLY RELIES ON THE PROJECT NAME FORMAT
-	 	 fullProject = Project.find (:all, :conditions=> ["name like ?", "#{currentProject.upcase}:%"]);
-		 print "found full project #{fullProject[-1].name}\n";
-		 print "querying for institution_id=#{fullInstitution.id} AND project_id=#{fullProject[-1].id}"
-		workgroups = WorkGroup.find(:all,:conditions=>["institution_id=? AND project_id=?",fullInstitution.id,fullProject[-1].id]);
-
-		w = workgroups[-1]
-		if(w.nil?)
-			w=WorkGroup.new(:institution => fullInstitution,
-					:project=>fullProject[-1]);
-			w.save(true);
-		end;
-		print "Found workgroup #{w}\n";
-		if(!w.nil?)
-			## need to specify the work group
-
-			memberships= GroupMembership.find(:all,:conditions=>["person_id=? and work_group_id=?",p.id,w.id]);
-
-			if(memberships.empty?)#save only if there is not already a membership record
-				g = GroupMembership.new(:person=>p,
-							:work_group=>w);	
-				if(g.save(true))
-					print "saved successfully #{g}\n";
-				else
-					print "failed to save #{g}\n";
-				end
-			end
-		end
-	 end
-	
-	if(u.nil?)
-			u = User.new(:email=>email,
-				     :login=>login ,
-				     :password=>"dummypass",
-				     :password_confirmation=>"dummypass"
-				     );
-			
-			saved = u.save(true)			   
-			u.activate()
-			print "Saving #{u}: #{saved}\n";
-			p.user = u;
-			p.save(true);
-			u.save(true);
-			print "creating new user #{u.login} #{u}\n"
-
-	end
-
-        if(u.save(true))
-
-		print u.login
-
-		u = User.find_by_login(login);
-
-		if(!u.nil?)
-			user_id = u.id;
-			print "User ID for #{first_name} #{last_name}: #{user_id}\n";
-		else
-			print "Could not find user with ID #{login}\n"
-		end
-	else
-		print "Could not save #{u}\n";
-		u.errors.each_full { |msg| puts "ERROR: #{msg}" };
-		exit;
-	end
-    end
-  end
-  end
-
-  desc 'Builds users matching people '
-  task(:generate_users_for_people=>:environment) do
-
-    Person.all.each do |person|
-
-	 login = "#{person.first_name.downcase[0..0]}#{person.first_name.downcase[-1..-1]}#{person.last_name.downcase}".gsub(" ","")
-
-
-		password = Digest::MD5.hexdigest("#{rand(20000000)}")
-
-    	       print "#{person.id} #{person.user} #{login} _#{password}_\n"
-
-	u = person.user;
-
-	if(u.nil?)
-
-		p "building user!"
-
-			u = User.new(:email=>person.email,
-				     :login=>login ,
-				     :password=>password,
-				     :password_confirmation=>password
-				     );
-			
-			saved = u.save(true)			   
-			u.activate()
-			print "Saving #{u}: #{saved}\n";
-			person.user = u;
-			person.save(true);
-			u.save(true);
-			print "creating new user #{u.login} #{u}\n"
-
-	end
-
-
-    end
-  end
-
-
-  desc 'refreshes, or creates, the standard initial controlled vocublaries'
-  task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types","model_types","model_formats","assay_types","disciplines","organisms","technology_types","recommended_model_environments","measured_items","units","roles","update_first_letters","assay_classes","relationship_types","strains"]
-    other_tasks.each do |task|
-      Rake::Task[ "seek:#{task}" ].execute      
-    end
-  end
-  
   desc 'adds the new modelling assay types and creates a new root'
   task(:graft_new_assay_types=>:environment) do
     experimental=AssayType.find(628957644)
@@ -334,7 +83,7 @@ namespace :seek do
     new_root.children << modelling_assay_type
     new_root.save!
     
-    new_modelling_types = ["cell cycle","enzymology","gene expression","gene regulatory network","metabolic network","metabolism","signal transduction","translation"]
+    new_modelling_types = ["cell cycle", "enzymology", "gene expression", "gene regulatory network", "metabolic network", "metabolism", "signal transduction", "translation"]
     new_modelling_types.each do |title|
       a=AssayType.new(:title=>title)
       a.save!
@@ -344,20 +93,28 @@ namespace :seek do
     
   end
   
+  desc 'refreshes, or creates, the standard initial controlled vocublaries'
+  task(:refresh_controlled_vocabs=>:environment) do
+    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
+    other_tasks.each do |task|
+      Rake::Task["seek:#{task}"].execute
+    end
+  end
+
   desc 'removes any data this is not authorized to viewed by the first User'
   task(:remove_private_data=>:environment) do
-    sops=Sop.find(:all)
-    private_sops=sops.select{|s| !Authorization.is_authorized?("view",nil,s,User.first)}
+    sops        =Sop.find(:all)
+    private_sops=sops.select { |s| !s.can_view? User.first }
     puts "#{private_sops.size} private Sops being removed"
-    private_sops.each{|s| s.destroy }
-    
-    models=Model.find(:all)
-    private_models=models.select{|m| !Authorization.is_authorized?("view",nil,m,User.first)}
+    private_sops.each { |s| s.destroy }
+
+    models        =Model.find(:all)
+    private_models=models.select { |m| ! m.can_view? User.first }
     puts "#{private_models.size} private Models being removed"
-    private_models.each{|m| m.destroy }
-    
-    data=DataFile.find(:all)
-    private_data=data.select{|d| !Authorization.is_authorized?("view",nil,d,User.first)}
+    private_models.each { |m| m.destroy }
+
+    data        =DataFile.find(:all)
+    private_data=data.select { |d| !d.can_view? User.first }
     puts "#{private_data.size} private Data files being removed"
     private_data.each{|d| d.destroy }
     
@@ -368,6 +125,13 @@ namespace :seek do
     Strain.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "strains")
   end
+
+  task(:tissue_and_cell_types=>:environment) do
+    revert_fixtures_identify
+    TissueAndCellType.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "tissue_and_cell_types")
+  end
+
   
   task(:culture_growth_types=>:environment) do
     revert_fixtures_identify
@@ -409,6 +173,8 @@ namespace :seek do
     revert_fixtures_identify
     Organism.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "organisms")
+    BioportalConcept.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "bioportal_concepts")
   end
   
   task(:technology_types=>:environment) do
@@ -447,6 +213,49 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data" ), "assay_classes")
   end
   
+   task(:compounds=>:environment) do
+    revert_fixtures_identify
+    Compound.delete_all
+    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "compounds")
+  end
+
+  #Update the sharing_scope in the policies table, because of removing CUSTOM_PERMISSIONS_ONLY and ALL_REGISTERED_USERS scopes
+  task(:update_sharing_scope=>:environment) do
+    # sharing_scope
+    private_scope = 0
+    custom_permissions_only_scope = 1
+    all_sysmo_users_scope = 2
+    all_registered_users_scope = 3
+  
+    #update  ALL_REGISTERED_USERS to ALL_SYSMO_USERS
+    policies = Policy.find(:all, :conditions => ["sharing_scope = ?", all_registered_users_scope])
+    unless policies.nil?
+      count = 0
+      policies.each do |policy|
+        policy.sharing_scope = all_sysmo_users_scope
+        policy.save
+        count += 1
+      end
+      puts "Done - #{count} policies with ALL_REGISTERED_USERS scope changed to ALL_SYSMO_USERS scope."
+    else
+      puts "Couldn't find any policies with ALL_REGISTERED_USERS scope"
+    end
+  
+    #update  CUSTOM_PERMISSIONS_ONLY to PRIVATE
+    policies = Policy.find(:all, :conditions => ["sharing_scope = ?", custom_permissions_only_scope])
+    unless policies.nil?
+      count = 0
+      policies.each do |policy|
+        policy.sharing_scope = private_scope
+        policy.save
+        count += 1
+      end
+      puts "Done - #{count} policies with CUSTOM_PERMISSIONS_ONLY scope changed to PRIVATE scope."
+    else
+      puts "Couldn't find any policies with CUSTOM_PERMISSIONS_ONLY scope"
+    end
+  end
+
   desc "Generate an XMI db/schema.xml file describing the current DB as seen by AR. Produces XMI 1.1 for UML 1.3 Rose Extended, viewable e.g. by StarUML"
   task :xmi => :environment do
     require 'lib/uml_dumper.rb'
@@ -454,35 +263,6 @@ namespace :seek do
       ActiveRecord::UmlDumper.dump(ActiveRecord::Base.connection, file)
     end
     puts "Done. Schema XMI created as doc/data_models/schema.xmi."
-  end
-  
-  task :update_first_letters => :environment do
-   (Person.find(:all)|Project.find(:all)|Institution.find(:all)|Model.find(:all)|DataFile.find(:all)|Sop.find(:all)|Assay.find(:all)|Study.find(:all)|Investigation.find(:all)).each do |p|
-      #suppress the timestamps being recorded.
-      class << p
-        def record_timestamps
-          false
-        end
-      end
-      p.save #forces the first letter to be updated
-      puts "Updated for #{p.class.name} : #{p.id}"
-    end
-  end
-  
-  #a 1 shot task to update the creators field for Asset retrospectively for contributors
-  task :update_creators => :environment do
-    Asset.find(:all).each do |asset|      
-      if (asset.creators.empty? && !asset.contributor.nil?)
-        class << asset
-          def record_timestamps
-            false
-          end
-        end
-        asset.creators << asset.contributor.person
-        asset.save!
-        puts "Added creator for Asset: #{asset.id}"
-      end
-    end
   end
   
   #Task to add default assay_class (1 - Experimental Assay) to those without one
@@ -507,7 +287,7 @@ namespace :seek do
     count = 0
     Publication.all.each do |pub|
       if pub.asset.policy.nil?
-        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1, :use_custom_sharing => true)
+        pub.asset.policy = Policy.create(:name => "publication_policy", :sharing_scope => 3, :access_type => 1)
         count += 1
         pub.asset.save
       end
@@ -521,23 +301,6 @@ namespace :seek do
       pub.asset.policy.permissions << Permission.create(:contributor => pub.contributor.person, :policy => pub.asset.policy, :access_type => 4)
     end
     puts "Done - #{count} policies for publications added."
-  end
-  
-  task :content_stats => :environment do
-    
-    stats=ContentStats.generate
-    
-    stats.each do |project_stat|
-      puts "Project: #{project_stat.project.title}"
-      puts "\t SOPs: #{project_stat.sops.count} (#{project_stat.sops_size/1048576} Mb / #{project_stat.sops_size/1024} Kb), of which I can see #{project_stat.visible_sops.count}"
-      puts "\t Models: #{project_stat.models.count} (#{project_stat.models_size/1048576} Mb / #{project_stat.models_size/1024} Kb), of which I can see #{project_stat.visible_models.count}"
-      puts "\t Data: #{project_stat.data_files.count} (#{project_stat.data_files_size/1048576} Mb / #{project_stat.data_files_size/1024} Kb), of which I can see #{project_stat.visible_data_files.count}"
-      puts "\t Publications: #{project_stat.publications.count}"
-      puts "\t People: #{project_stat.people.count}, of which have registered: #{project_stat.registered_people.count}"
-      puts "\t Assays: #{project_stat.assays.count}"
-      puts "\t Studies: #{project_stat.studies.count}"
-      puts "\n --------------- \n\n"
-    end
   end
   
   desc "Dumps help documents and attachments/images"
@@ -603,6 +366,34 @@ namespace :seek do
     File.open("config/default_data/help/help_documents.yml", 'w') {|f| f.write template.result(binding)}
   end
 
+  desc "The newer acts-as-taggable-on plugin is case insensitve. Older tags are case sensitive, leading to some odd behaviour. This task resolves the old tags"
+  task :resolve_duplicate_tags=>:environment do
+    tags=ActsAsTaggableOn::Tag.find :all
+    skip_tags = []
+    tags.each do |tag|
+      unless skip_tags.include? tag
+        matching = tags.select{|t| t.name.downcase.strip == tag.name.downcase.strip && t.id != tag.id}
+        unless matching.empty?
+          matching.each do |m|
+            puts "#{m.name}(#{m.id}) - #{tag.name}(#{tag.id})"
+            m.taggings.each do |tagging|
+              unless tag.taggings.detect{|t| t.context==tagging.context && t.taggable==tagging.taggable}
+                puts "Updating tagging #{tagging.id} to point to #{tag.name}:#{tag.id}"
+                tagging.tag = tag
+                tagging.save!
+              else
+                puts "Deleting duplicate tagging #{tagging.id}"
+                tagging.delete
+              end
+            end
+            m.delete
+            skip_tags << m  
+          end
+        end
+      end
+    end
+  end
+
   desc "Overwrite footer layouts with generic, rebranded alternatives"
   task :rebrand_layouts do
     dir = 'config/rebrand/'
@@ -638,72 +429,6 @@ namespace :seek do
     end
   end
   
-  desc "Record state of pre-asset removal db to file for comparison"
-  task :record_old_asset_state => :environment do
-    File.open("asset_old.txt", "w") do |file|
-      classes = [DataFile, Model, Sop, Publication]
-      
-      file.write("Asset + AssetsCreator changes ====================\n")
-      file.write("AssetsCreator count: #{AssetsCreator.count}\n")
-      classes.each do |c|
-        file.write("#{c.name} count: #{c.count}\n")
-        c.all.each do |resource|        
-          file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
-          file.write("  Policy #{resource.asset.policy_id}")
-          file.write("  Project ID: #{resource.asset.project_id}\n")
-          resource.asset.creators.each do |p|
-            file.write("  Person #{p.id} - #{p.name}\n")
-          end
-        end
-      end
-      
-      
-      file.write("AssayAsset changes ====================\n")
-      file.write("Assay count: #{Assay.count}\n")
-      file.write("AssayAsset count: #{AssayAsset.count}\n")
-      Assay.all.each do |assay|
-        file.write("Assay ##{assay.id} - #{assay.title}\n")
-        assay.assay_assets.each do |aa|
-          res = aa.asset.resource.find_version(aa.version)
-          file.write("  AssayAsset #{aa.id} - #{res.class.name} #{res.id} (#{res.version})\n")
-        end
-      end      
-    end
-  end 
-  
-  desc "Record state of post-asset removal db to file for comparison"
-  task :record_new_asset_state => :environment do
-    File.open("asset_new.txt", "w") do |file|
-      classes = [DataFile, Model, Sop, Publication]
-      
-      file.write("Asset + AssetsCreator changes ====================\n")
-      file.write("AssetsCreator count: #{AssetsCreator.count}\n")
-      classes.each do |c|
-        file.write("#{c.name} count: #{c.count}\n")
-        c.all.each do |resource|        
-          file.write("#{resource.class.name} #{resource.id} - #{resource.title}\n")
-          file.write("  Policy #{resource.policy_id}")
-          file.write("  Project ID: #{resource.project_id}\n")
-          resource.creators.each do |p|
-            file.write("  Person #{p.id} - #{p.name}\n")
-          end
-        end
-      end
-      
-      
-      file.write("AssayAsset changes ====================\n")
-      file.write("Assay count: #{Assay.count}\n")
-      file.write("AssayAsset count: #{AssayAsset.count}\n")
-      Assay.all.each do |assay|
-        file.write("Assay ##{assay.id} - #{assay.title}\n")
-        assay.assay_assets.each do |aa|
-          res = aa.asset.find_version(aa.version)
-          file.write("  AssayAsset #{aa.id} - #{res.class.name} #{res.id} (#{res.version})\n")
-        end
-      end      
-    end
-  end 
-  
   private
   
   #returns true if the tag is over 30 chars long, or contains colons, semicolons, comma's or forward slash
@@ -717,5 +442,17 @@ namespace :seek do
       label.to_s.hash.abs
     end
   end
-  
+
+  def create_tag name, context, taggable_type
+    tag=ActsAsTaggableOn::Tag.find :first, :conditions=>{:name=>name}
+    if tag.nil?
+      tag=ActsAsTaggableOn::Tag.new(:name=>name)
+      tag.save!
+    end
+    if tag.taggings.detect { |tagging| tagging.context==context && tagging.taggable_type==taggable_type }.nil?
+      tagging=ActsAsTaggableOn::Tagging.new(:tag_id=>tag.id, :context=>context, :taggable_type=>taggable_type)
+      tagging.save!
+    end
+  end
+
 end

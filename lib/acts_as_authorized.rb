@@ -1,97 +1,68 @@
 module Acts #:nodoc:
   module Authorized #:nodoc:
-    def self.included(mod)
-      mod.extend(ClassMethods)
+    def self.included(ar)
+      ar.const_get(:Base).class_eval { include BaseExtensions }
+      ar.module_eval { include AuthorizationEnforcement }
     end
 
-    def authorization_supported?
-      self.class.authorization_supported?
-    end
+    AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
 
-    module ClassMethods
-      def acts_as_authorized
-        belongs_to :contributor, :polymorphic => true
+    module BaseExtensions
+      def self.included base
+        base.extend ClassMethods
+      end
 
-        #checks a policy exists, and if missing resorts to using a private policy
-        before_save :policy_or_default
-
-        belongs_to :project
-
-        belongs_to :policy
-
-        class_eval do
-          extend Acts::Authorized::SingletonMethods
+      #Sets up the basic interface for authorization hooks. All AR instances get these methods, and by default they return true.
+      AUTHORIZATION_ACTIONS.each do |action|
+        define_method "can_#{action}?" do
+          true
         end
-        include Acts::Authorized::InstanceMethods
 
+        def can_perform? action, *args
+          send "can_#{action}?", *args
+        end
       end
 
       def authorization_supported?
-        include?(Acts::Authorized::InstanceMethods)
+        self.class.authorization_supported?
       end
-
-    end
-
-    module SingletonMethods
-    end
-
-    module InstanceMethods
-      # this method will take attributions' association and return a collection of resources,
-      # to which the current resource is attributed
 
       def contributor_credited?
-        true
+        false
       end
 
-      def policy_or_default
-        if self.policy.nil?
-          self.policy = Policy.private_policy
+      def publish!
+        if can_manage?
+          policy.access_type=Policy::ACCESSIBLE
+          policy.sharing_scope=Policy::EVERYONE
+          policy.save
+        else
+          false
         end
       end
 
-      def can_edit? user
-        Authorization.is_authorized? "edit", nil, self, user
+      def is_published?
+        #FIXME: a temporary work-around for the lack of ability to use can_download? as a non logged in user (passing nil defaults to User.current_user)
+        can_download? nil
       end
 
-      def can_view? user
-        Authorization.is_authorized? "show", nil, self, user
-      end
-
-      def can_download? user
-        Authorization.is_authorized? "download", nil, self, user
-      end
-
-      def can_delete? user
-        Authorization.is_authorized? "destroy", nil, self, user
-      end
-
-      def can_manage? user
-        Authorization.is_authorized? "manage", nil, self, user
-      end
-
-      #returns a list of the people that can manage this file
-      #which will be the contributor, and those that have manage permissions
-      def managers
-        people=[]
-        people << self.contributor.person unless self.contributor.nil?
-        self.policy.permissions.each do |perm|
-          people << (perm.contributor) if perm.contributor.kind_of?(Person) && perm.access_type==Policy::MANAGING
+      module ClassMethods
+        def acts_as_authorized
+          include Acts::Authorized::PolicyBasedAuthorization
         end
-        people.uniq
+
+        def authorization_supported?
+          include?(Acts::Authorized::PolicyBasedAuthorization)
+        end
       end
-
-      # def asset; return self; end
-      # def resource; return self; end
-
     end
   end
 end
 
+require 'authorization_enforcement'
+require 'policy_based_authorization'
 
-ActiveRecord::Base.class_eval do
+ActiveRecord.module_eval do
   include Acts::Authorized
-  def contributor_credited?
-    false
-  end
 end
 

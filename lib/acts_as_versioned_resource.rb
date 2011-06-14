@@ -22,7 +22,7 @@ module Acts #:nodoc:
 
         belongs_to :project
 
-        belongs_to :policy
+        belongs_to :policy, :autosave => true
 
         class_eval do
           extend Acts::VersionedResource::SingletonMethods
@@ -43,20 +43,20 @@ module Acts #:nodoc:
         self.parent.attributions.collect { |a| a.object }
       end
 
-      def can_edit? user
-        self.parent.can_edit?(user)
+      def can_edit? *args
+        self.parent.can_edit? *args
       end
 
-      def can_view? user
-        self.parent.can_view?(user)
+      def can_view? *args
+        self.parent.can_view? *args
       end
 
-      def can_download? user
-        self.parent.can_download?(user)
+      def can_download? *args
+        self.parent.can_download? *args
       end
 
-      def can_delete? user
-        self.parent.can_delete?(user)
+      def can_delete? *args
+        self.parent.can_delete? *args
       end
 
       #assumes all versioned resources are also taggable

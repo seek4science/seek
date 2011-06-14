@@ -7,7 +7,7 @@ class Asset < ActiveRecord::Base
       if should_perform_filtering_if_not_authorized
         # if asset is not authorized for viewing by this user, just skip it
         # (it's much faster to supply 'asset' instance instead of related resource)
-        next unless Authorization.is_authorized?("show", nil, asset, user_to_authorize)
+        next unless asset.can_view? user_to_authorize
       end
       
       results[asset.class.name] = [] unless results[asset.class.name]
@@ -25,7 +25,7 @@ class Asset < ActiveRecord::Base
       if should_perform_filtering_if_not_authorized
         # if asset is not authorized for viewing by this user, just skip it
         # (it's much faster to supply 'asset' instance instead of related resource)
-        next unless Authorization.is_authorized?("show", nil, r, user_to_authorize)
+        next unless r.can_view? user_to_authorize
       end
       
       # Fix version class names to be the class name of the versioned object
@@ -47,7 +47,7 @@ class Asset < ActiveRecord::Base
     
     resource_array.each do |r|
       if should_perform_filtering_if_not_authorized
-        next unless Authorization.is_authorized?("show", nil, r, user_to_authorize)
+        next unless r.can_view? user_to_authorize
       end
       
       results << r

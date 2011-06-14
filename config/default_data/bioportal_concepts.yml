@@ -1,0 +1,71 @@
+Bacillus_subtilis_Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:1423"
+  conceptable: Bacillus_subtilis(Organism)
+
+Clostridium acetobutylicum Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:1488"
+  conceptable: Clostridium acetobutylicum(Organism)
+
+Escherichia coli Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:562"
+  conceptable: Escherichia coli(Organism)
+
+Enterococcus faecalis Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:1351"
+  conceptable: Enterococcus faecalis(Organism)
+
+Streptococcus pyogenes Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:1314"
+  conceptable: Streptococcus pyogenes(Organism)
+
+Pseudomonas putida Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:303"
+  conceptable: Pseudomonas putida(Organism)
+
+Pseudomonas fluorescens Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:294"
+  conceptable: Pseudomonas fluorescens(Organism)
+
+Saccharomyces cerevisiae Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:4932"
+  conceptable: Saccharomyces cerevisiae(Organism)
+
+Streptomyces coelicolor Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:1902"
+  conceptable: Streptomyces coelicolor(Organism)
+
+Sulfolobus solfataricus Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:2287"
+  conceptable: Sulfolobus solfataricus(Organism)
+
+Trypanosoma brucei Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:5691"
+  conceptable: Trypanosoma brucei(Organism)
+
+Lactobacillus plantarum Concept:
+  ontology_id: 1132
+  ontology_version_id: 38802
+  concept_uri: "NCBITaxon:1590"
+  conceptable: Lactobacillus plantarum(Organism)

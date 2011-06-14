@@ -1,17 +1,31 @@
-
+require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
 
-  acts_as_taggable
+  def project
+    investigation.nil? ? nil : investigation.project
+  end
 
+  alias_attribute :contributor, :owner
+  acts_as_authorized
+
+  def default_contributor
+    User.current_user.try :person
+  end
+
+
+  acts_as_taggable
+  belongs_to :institution
+  has_and_belongs_to_many :samples
   belongs_to :assay_type
   belongs_to :technology_type  
   belongs_to :study  
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
-  has_many :assay_organisms, :dependent=>:destroy
+  has_many :assay_organisms, :dependent=>:destroy,:autosave => true
   has_many :organisms, :through=>:assay_organisms
   has_many :strains, :through=>:assay_organisms
+#  has_many :tissue_and_cell_types,:through => :assay_organisms
 
   has_many :assay_assets, :dependent => :destroy
   
@@ -36,13 +50,12 @@ class Assay < ActiveRecord::Base
   has_one :investigation,:through=>:study    
 
   has_many :assets,:through=>:assay_assets
-
   validates_presence_of :assay_type
   validates_presence_of :technology_type, :unless=>:is_modelling?
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-           
+  validates_presence_of :samples,:unless => :is_modelling?
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
@@ -56,16 +69,8 @@ class Assay < ActiveRecord::Base
     "#{title} (#{type})"
   end
 
-  def project
-    investigation.nil? ? nil : investigation.project
-  end
-
-  def can_edit? user
-    project.pals.include?(user.person) || user.person == owner
-  end
-
-  def can_delete? user
-    can_edit?(user) && assets.empty? && related_publications.empty?
+  def can_delete? *args
+    super && assets.empty? && related_publications.empty?
   end
 
   #returns true if this is a modelling class of assay
@@ -80,7 +85,7 @@ class Assay < ActiveRecord::Base
   
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
-    assay_asset = assay_assets.select {|aa| aa.asset_id == asset.id}.first
+    assay_asset = assay_assets.select {|aa| aa.asset == asset}.first
 
     if assay_asset.nil?
       assay_asset = AssayAsset.new
@@ -99,7 +104,8 @@ class Assay < ActiveRecord::Base
   #organism may be either an ID or Organism instance
   #strain_title should be the String for the strain
   #culture_growth should be the culture growth instance
-  def associate_organism(organism,strain_title=nil,culture_growth_type=nil)
+  def associate_organism(organism,strain_title=nil,culture_growth_type=nil,tissue_and_cell_type_id="0",tissue_and_cell_type_title=nil)
+
     organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
     assay_organism=AssayOrganism.new
     assay_organism.assay = self
@@ -114,19 +120,86 @@ class Assay < ActiveRecord::Base
     end
     assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
     assay_organism.strain=strain
+
+    tissue_and_cell_type=nil
+    if tissue_and_cell_type_title && !tissue_and_cell_type_title.empty?
+      if ( tissue_and_cell_type_id =="0" )
+          found = TissueAndCellType.find(:first,:conditions => {:title => tissue_and_cell_type_title})
+          unless found
+          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title) if (!tissue_and_cell_type_title.nil? && tissue_and_cell_type_title!="")
+          end
+      else
+          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
+      end
+    end
+    assay_organism.tissue_and_cell_type = tissue_and_cell_type
+
+
+    existing = AssayOrganism.find(:first,:conditions => {:organism_id=> organism,
+                                                        :assay_id => self,
+                                                        :strain_id => strain,
+                                                        :culture_growth_type_id => culture_growth_type,
+                                                        :tissue_and_cell_type_id => tissue_and_cell_type})
+    unless existing
     assay_organism.save!
+    end
+
   end
   
+
+
+
+
+  
   def assets
-    (data_file_masters + model_masters + sop_masters).collect {|a| a.latest_version} |  (data_files + models + sops)
+    asset_masters.collect {|a| a.latest_version} |  (data_files + models + sops)
+  end
+
+  def asset_masters
+    data_file_masters + model_masters + sop_masters
   end
   
   def related_publications
     self.relationships.select {|a| a.object_type == "Publication"}.collect { |a| a.object }
   end
 
+  def related_asset_ids asset_type
+    self.assay_assets.select {|a| a.asset_type == asset_type}.collect { |a| a.asset_id }
+  end
+
   def avatar_key
     type = is_modelling? ? "modelling" : "experimental"
     "assay_#{type}_avatar"
+  end
+
+  def samples_are_missing?
+    return samples.blank?
+  end
+
+  def organisms_are_missing?
+    return assay_organisms.blank?
+  end
+
+
+  def validate
+
+    errors.add_to_base "Please specify either sample or organisms for assay!" if is_modelling? and samples_are_missing? and organisms_are_missing?
+
+  end
+
+
+
+  def clone_with_associations
+    new_object= self.clone
+    #new_object.policy = Policy.find self.policy_id
+    #new_object.policy.permission_ids = self.policy.permission_ids
+    new_object.policy = self.policy.deep_copy
+    new_object.sop_masters = self.try(:sop_masters)
+
+    new_object.model_masters = self.try(:model_masters)
+    new_object.sample_ids = self.try(:sample_ids)
+    new_object.assay_organisms = self.try(:assay_organisms)
+
+    return new_object
   end
 end

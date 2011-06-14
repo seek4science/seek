@@ -42,7 +42,7 @@ class Person < ActiveRecord::Base
   has_many :created_sops, :through => :assets_creators, :source => :asset, :source_type => "Sop"
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
 
-  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :description ]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :roles ],:include=>[:disciplines]) if Seek::Config.solr_enabled
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
@@ -126,6 +126,10 @@ class Person < ActiveRecord::Base
     return res
   end
 
+  def member?
+    !projects.empty?
+  end
+
   def locations
     # infer all person's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }
@@ -156,8 +160,10 @@ class Person < ActiveRecord::Base
     group_memberships.each do |gm|
       roles = roles | gm.roles
     end
-    return roles
+    roles
   end
+
+
 
   def update_first_letter
     no_last_name=last_name.nil? || last_name.strip.blank?
@@ -178,7 +184,7 @@ class Person < ActiveRecord::Base
   end
 
   def can_be_edited_by?(subject)
-    return((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
+    subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
   end
 
   private

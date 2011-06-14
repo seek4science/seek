@@ -25,8 +25,6 @@ class Model < ActiveRecord::Base
   
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name,:tag_counts]) if Seek::Config.solr_enabled
 
-  has_many :created_datas
-
   acts_as_uniquely_identifiable
   
   explicit_versioning(:version_column => "version") do
@@ -52,7 +50,7 @@ class Model < ActiveRecord::Base
     all_models = Model.find(:all, :order => "ID asc")
 
     models_with_contributors = all_models.collect{ |m|
-      Authorization.is_authorized?("show", nil, m, user) ?
+      m.can_view?(user) ?
         (contributor = m.contributor;
         { "id" => m.id,
           "title" => m.title,

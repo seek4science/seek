@@ -1,0 +1,208 @@
+<% resource_text = resource.class.name.downcase
+   resource_sop_ids_string ="#{resource_text} Sop Ids".parameterize.underscore.to_s
+   resource_sop_ids_symbol = "#{resource_text} Sop Ids".parameterize.underscore.to_sym
+%>
+<div class="fold">
+
+  <div class="foldTitle">
+    <%= help_icon("Here you associate SOPs in SEEK to this #{resource_text}.") -%>
+    Associate SOPs
+  </div>
+
+  <div id="associate_model_fold_content" class="foldContent" style="display: block;">
+    <div class="yui-u first" style="width:66%; float:left">
+      <%
+        select_truncate_length=120
+        all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}   
+        project_sops=all_sops.select{|s| current_user.person.projects.include?(s.project )}
+        sop_collection= project_sops.collect{|s| [truncate(h(s.title), :length=>select_truncate_length), s.id]}
+      -%>
+
+      <p style="color: #666666;">
+        The following SOPs are involved in this <%= resource_text %>:
+      </p>
+  
+      <div id="sop_to_list" class="box_editing_inner" style="line-height: 1.5;">
+        <span class="none_text" id="sops">Loading...</span>
+      </div>
+      
+      <div class="association_step">  
+        <%= select_tag :possible_sops,
+                       options_for_select([["Select SOP ...", 0]]|sop_collection),
+                       {:style=>"width:90%",:onchange=>remote_function(
+                               :url=>{:action=>"preview", :controller=>"sops",:element=>"sop_preview"},
+                               :with=>"'id='+this.value",
+                               :before=>"show_ajax_loader('sop_preview')"
+                       )+";check_show_add_sop();return(false);"
+                       } -%>
+        
+        <%= select_tag resource_sop_ids_symbol, options_from_collection_for_select([], :id, :title), {:multiple=>true, :style=>"display:none;"} -%>
+        <br/>
+      
+        <%= check_box_tag :include_other_project_sops, nil, false, {:onchange=>"toggle_sop_list();",:style=>"margin-top:0.5em;"} -%> Include SOPs from other projects?
+      </div>
+	  <br/>
+      <%= link_to_function (image("new") + " Include in the #{resource_text}"), "addSelectedSop(); return(false);", :id=>"add_sop_link", :class=>"block_link", :style => "width: 11em" %>
+    </div>
+    <div id="sop_preview" class="yui-u preview_box"  style="float:right">
+      <div style="text-align: center;">SOP preview</div>
+    </div>
+ 
+    <br style="clear:both"/>
+  
+  </div>
+</div>
+
+<script type="text/javascript">
+  var sops_assets=new Array();
+
+    function toggle_sop_list() {
+        var checked = $('include_other_project_sops').checked;
+        var option;
+        var selection_box = $('possible_sops');
+
+        selection_box.options.length=0;        
+
+        if (checked) {
+        <% ([["Select SOP ...",0]]|all_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(sop_details[0]) -%>';
+            option.value = '<%= sop_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+        else {
+           <% ([["Select SOP ...",0]]|project_sops.collect{|s| [truncate(h(s.title),:length=>select_truncate_length),s.id]}).each do |sop_details| -%>
+            option = document.createElement("OPTION");
+            option.text = '<%= escape_javascript(sop_details[0]) -%>';
+            option.value = '<%= sop_details[1] -%>';
+            try {
+                selection_box.add(option); //for older IE version
+            }
+            catch (ex) {
+                selection_box.add(option, null);
+            }
+        <% end -%>
+        }
+
+        selection_box.onchange();
+    }  
+  
+    <% resource.sop_masters.each do |ss| -%>
+      <% if ss.sop.can_view? -%>
+        sop_id = '<%= ss.sop.id -%>';
+        sop_title = '<%= escape_javascript(ss.sop.title) -%>';
+        addSop(sop_title, sop_id);
+      <% end -%>
+    <% end -%>
+
+    <% if params[resource_sop_ids_symbol] %>
+      <% params[resource_sop_ids_symbol].each do |id| -%>
+        <% sop = Sop.find(id) %>
+          <% if sop.can_view?-%>
+        sop_id = '<%= sop.id -%>';
+        sop_title = '<%= escape_javascript(sop.title) -%>';
+        addSop(sop_title, sop_id);
+          <% end -%>
+      <% end -%>
+    <% end -%>
+
+  function addSop(title,id) {
+    if(checkSoPNotInList(title,id)) {
+       sops_assets.push([title,id]);
+        updateSops();
+    }
+
+}
+function checkSoPNotInList(title, id) {
+    toAdd = true;
+
+    for (var i = 0; i < sops_assets.length; i++)
+        if (sops_assets[i][0] == title && sops_assets[i][1] == id ) {
+            toAdd = false;
+            alert('The following Sop had already been added:\n\n' +
+            title);
+            break;
+        }
+    return(toAdd);
+}
+function addSelectedSop() {
+
+    selected_option_index=$("possible_sops").selectedIndex;
+    selected_option=$("possible_sops").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
+
+    addSop(title,id);
+}
+
+function removeSop(index) {
+    sops_assets.splice(index, 1);
+    // update the page
+    updateSops();
+}
+
+function updateSops() {
+    sop_text='<ul class="related_asset_list">';
+
+
+    for (var i=0;i<sops_assets.length;i++) {
+        sop=sops_assets[i];
+        title=sop[0];
+        id=sop[1];
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        sop_text += '<li>' + titleText +
+          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '[<a href=\"\" onclick=\"javascript:removeSop('+i+'); return(false);\">remove</a>]</small></li>';
+
+    }
+
+    sop_text += '</ul>';
+
+    // update the page
+    if(sops_assets.length == 0) {
+        $('sop_to_list').innerHTML = '<span class="none_text">No sops</span>';
+    }
+    else {
+        $('sop_to_list').innerHTML = sop_text;
+    }
+    clearList(<%=resource_sop_ids_string%>);
+
+    select=$(<%=resource_sop_ids_string%>);
+     for (i=0;i<sops_assets.length;i++) {
+        sop=sops_assets[i];
+        title=sop[0];
+        id=sop[1];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=title;
+        o.selected=true;
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+    }
+}
+    updateSops();
+
+
+    function check_show_add_sop() {
+        i = $('possible_sops').selectedIndex;
+        selected_id = $('possible_sops').options[i].value;
+        if (selected_id == '0') {
+            $('add_sop_link').hide();
+        }
+        else {
+            $('add_sop_link').show();
+        }
+    }
+
+    check_show_add_sop();
+</script>

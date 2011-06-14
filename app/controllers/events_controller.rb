@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_filter :login_required
+  #before_filter :login_required
   before_filter :find_and_auth, :except =>  [ :index, :new, :create, :preview]
 
   before_filter :find_assets
@@ -26,7 +26,7 @@ class EventsController < ApplicationController
     @event = Event.new
     @new = true
     respond_to do |format|
-      if Authorization.is_member?(current_user.person_id, nil, nil)
+      if current_user.person.member?
         format.html {render "events/form"}
       else
         flash[:error] = "You are not authorized to create new Events. Only members of known projects, institutions or work groups are allowed to create new content."
@@ -37,31 +37,20 @@ class EventsController < ApplicationController
 
   def create
     @event = Event.new params[:event]
-    @event.contributor=current_user
-    data_file_ids = params[:data_file_ids] || []
-    data_file_ids.each do |text|
-      a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
-    end
-    params.delete :data_file_ids
 
-    publication_ids = params[:related_publication_ids] || []
-    publication_ids.each do |id|
-      @event.publications << Publication.find(id)
-    end
-    params.delete :related_publication_ids
+    data_file_ids = params.delete(:data_file_ids) || []
+    data_file_ids.collect! {|text| id, rel = text.split(','); id}
+    @event.data_files = DataFile.find(data_file_ids)
+
+    publication_ids = params.delete(:related_publication_ids) || []
+    @event.publications = Publication.find(publication_ids)
+
+    @event.policy.set_attributes_with_sharing params[:sharing], @event.project
 
     respond_to do | format |
       if @event.save
-        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
-
-        if policy_err_msg.blank?
-          flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
-          format.html { redirect_to @event }
-        else
-          flash[:notice] = "Event was successfully created. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to event_edit_path(@event)}
-        end
+        flash.now[:notice] = 'Event was successfully saved.' if flash.now[:notice].nil?
+        format.html { redirect_to @event }
       else
         @new = true
         format.html {render "events/form"}
@@ -75,32 +64,24 @@ class EventsController < ApplicationController
   end
 
   def update
-    data_file_ids = params[:data_file_ids] || []
-    @event.data_files = []
-    data_file_ids.each do |text|
-      a_id, r_type = text.split(",")
-      @event.data_files << DataFile.find(a_id)
-    end
-    params.delete :data_file_ids
+    data_file_ids = params.delete(:data_file_ids) || []
+    data_file_ids.collect! {|text| id, rel = text.split(','); id}
+    @event.data_files = DataFile.find(data_file_ids)
 
-    publication_ids = params[:related_publication_ids] || []
-    @event.publications = []
-    publication_ids.each do |id|
-      @event.publications << Publication.find(id)
+    publication_ids = params.delete(:related_publication_ids) || []
+    @event.publications = Publication.find(publication_ids)
+
+    @event.attributes = params[:event]
+
+    if params[:sharing]
+      @event.policy_or_default
+      @event.policy.set_attributes_with_sharing params[:sharing], @event.project
     end
-    params.delete :related_publication_ids
 
     respond_to do | format |
-      if @event.update_attributes params[:event]
-        policy_err_msg = Policy.create_or_update_policy(@event, current_user, params)
- 
-        if policy_err_msg.blank?
-          flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
-          format.html { redirect_to @event }
-        else
-          flash[:notice] = "Event metadata was successfully updated. However some problems occurred, please see these below.</br></br><span style='color: red;'>" + policy_err_msg + "</span>"
-          format.html { redirect_to event_edit_path(@event)}
-        end
+      if @event.save
+        flash.now[:notice] = 'Event was updated successfully.' if flash.now[:notice].nil?
+        format.html { redirect_to @event }
       else
         @new = false
         format.html {render "events/form"}
@@ -113,7 +94,7 @@ class EventsController < ApplicationController
     event=Event.find_by_id(params[:id])
 
     render :update do |page|
-      if event && Authorization.is_authorized?("show", nil, event, current_user)
+      if event.try :can_view?
         page.replace_html element,:partial=>"events/resource_list_item_preview",:locals=>{:resource=>event}
       else
         page.replace_html element,:text=>"Nothing is selected to preview."

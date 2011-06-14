@@ -77,4 +77,8 @@ assay_with_a_model:
   assay: assay_with_a_model
   version: 1
     
-    
+assay_can_edit_by_my_first_sop_owner1_asset:
+  asset: my_first_sop (Sop)
+  assay: assay_can_edit_by_my_first_sop_owner1
+  version: 1
+

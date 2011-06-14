@@ -3,7 +3,7 @@
     <%= help_icon("Non-SEEK members who helped with the creation of this file.") -%>
     Other Creators
     <a name="authors"></a>
-    <% if Authorization.is_authorized?("edit", nil, resource, current_user) %>
+    <% if resource.can_edit? %>
       <p style="text-align:center; margin: 0; padding: 0;"><small>[ <%= link_to "edit", edit_polymorphic_path(resource) %> ]</small></p>
     <% end %>
   </p>

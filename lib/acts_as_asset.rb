@@ -21,7 +21,7 @@ module Acts #:nodoc:
     end
 
     def is_downloadable_asset?
-      is_asset? && respond_to?(:content_blob)
+      is_asset? && is_downloadable?
     end
 
     module ClassMethods

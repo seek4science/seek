@@ -24,15 +24,15 @@ person_for_test_user_only_in_whitelist_whitelist_for_owner_of_my_first_sop:
   access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
 
 
-person_for_test_user_only_in_whitelist_whitelist_for_owner_of_custom_permissions_only_policy:
+person_for_test_user_only_in_whitelist_whitelist_for_owner_of_private_policy_using_custom_sharing:
   person: person_for_test_user_only_in_whitelist
-  favourite_group: whitelist_for_owner_of_custom_permissions_only_policy
+  favourite_group: whitelist_for_owner_of_private_policy_using_custom_sharing
   access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
 
 
-person_for_test_user_only_in_blacklist_blacklist_for_owner_of_custom_permissions_only_policy:
+person_for_test_user_only_in_blacklist_blacklist_for_owner_of_private_policy_using_custom_sharing:
   person: person_for_test_user_only_in_blacklist
-  favourite_group: blacklist_for_owner_of_custom_permissions_only_policy
+  favourite_group: blacklist_for_owner_of_private_policy_using_custom_sharing
   access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>
 
 
@@ -54,26 +54,26 @@ person_for_sysmo_user_in_blacklist_in_blacklist_for_owner_of_editing_for_all_sys
   access_type: <%= FavouriteGroup::BLACKLIST_ACCESS_TYPE %>
 
 
-person_for_random_registered_user_who_wants_to_access_different_things_in_test_fav_group_for_owner_of_download_for_all_registered_users_policy:
-  person: person_for_random_registered_user_who_wants_to_access_different_things
-  favourite_group: test_fav_group_for_owner_of_download_for_all_registered_users_policy
+person_for_sysmo_user_who_wants_to_access_different_things_in_test_fav_group_for_owner_of_download_for_all_sysmo_users_policy:
+  person: person_for_sysmo_user_who_wants_to_access_different_things
+  favourite_group: test_fav_group_for_owner_of_download_for_all_sysmo_users_policy
   access_type: <%= Policy::EDITING %>
 
 
-person_for_owner_of_my_first_sop_in_test_fav_group_for_owner_of_download_for_all_registered_users_policy:
+person_for_owner_of_my_first_sop_in_test_fav_group_for_owner_of_download_for_all_sysmo_users_policy:
   person: person_for_owner_of_my_first_sop
-  favourite_group: test_fav_group_for_owner_of_download_for_all_registered_users_policy
+  favourite_group: test_fav_group_for_owner_of_download_for_all_sysmo_users_policy
   access_type: <%= Policy::EDITING %>
 
 
 person_for_owner_of_my_first_sop_in_best_fav_group_for_owner_of_editing_for_all_sysmo_users_policy:
   person: person_for_owner_of_my_first_sop
   favourite_group: best_fav_group_for_owner_of_editing_for_all_sysmo_users_policy
-  access_type: <%= Policy::NO_ACCESS %>
+  access_type: <%= Policy::VISIBLE %>
 
 
-person_for_owner_of_custom_permissions_only_policy_in_whitelist_for_owner_of_my_first_sop:
-  person: person_for_owner_of_custom_permissions_only_policy
+person_for_owner_of_private_policy_using_custom_sharing_in_whitelist_for_owner_of_my_first_sop:
+  person: person_for_owner_of_private_policy_using_custom_sharing
   favourite_group: whitelist_for_owner_of_my_first_sop
   access_type: <%= FavouriteGroup::WHITELIST_ACCESS_TYPE %>
 

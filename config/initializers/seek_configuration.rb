@@ -4,6 +4,7 @@
 require 'seek/config'
 
 #Features enabled
+Seek::Config.default :public_seek_enabled,false
 Seek::Config.default :sycamore_enabled,false
 Seek::Config.default :events_enabled,false
 Seek::Config.default :jerm_enabled,true
@@ -43,7 +44,7 @@ Seek::Config.default :copyright_addendum_enabled,false
 Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
 # Pagination
-Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
+Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
 Seek::Config.default :limit_latest,7
 
 # Others
