@@ -22,19 +22,19 @@ class AssaysController < ApplicationController
 
     @existing_assay.data_file_masters.each do |d|
       if !d.can_view?
-       flash.now[:notice] << "Some or all data files of the existing assay cannot be viewed, please specify your own! <br/>"
+       flash.now[:notice] << "Some or all data files of the existing assay cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
     @existing_assay.sop_masters.each do |s|
        if !s.can_view?
-       flash.now[:notice] << "Some or all sops of the existing assay cannot be viewed, please specify your own! <br/>"
+       flash.now[:notice] << "Some or all sops of the existing assay cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
     @existing_assay.model_masters.each do |m|
        if !m.can_view?
-       flash.now[:notice] << "Some or all models of the existing assay cannot be viewed, please specify your own! <br/>"
+       flash.now[:notice] << "Some or all models of the existing assay cannot be viewed, you may specify your own! <br/>"
         break
       end
     end
