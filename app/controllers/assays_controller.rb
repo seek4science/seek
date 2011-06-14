@@ -70,11 +70,17 @@ class AssaysController < ApplicationController
     model_ids     = params[:assay_model_ids] || []
 
 
-    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
-    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
-    @assay.assay_organisms.each do |ao|
-      ao.mark_for_destruction
+#    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
+#    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
+#    @assay.assay_organisms.each do |ao|
+#      ao.mark_for_destruction
+#    end
+     organisms.each do |text|
+      o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
+      culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+      @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title,true)
     end
+
 
     update_tags @assay
 
@@ -98,11 +104,12 @@ class AssaysController < ApplicationController
           @assay.relate(s) if s.can_view?
         end
 
-    organisms.each do |text|
-      o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
-      culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-      @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
-    end
+#    organisms.each do |text|
+#      o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
+#      culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+#      @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
+#    end
+
 
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
@@ -129,11 +136,16 @@ class AssaysController < ApplicationController
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
 
-
-    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
-    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
-    @assay.assay_organisms.each do |ao|
-      ao.mark_for_destruction
+    @assay.assay_organisms = []
+#    organism_ids= organisms.collect{|o|o.split(",").first}.to_a
+#    @assay.assay_organisms=organism_ids.collect{|o_id|AssayOrganism.new(:organism_id=>o_id,:assay_id=>@assay)}
+#    @assay.assay_organisms.each do |ao|
+#      ao.mark_for_destruction
+#    end
+    organisms.each do |text|
+          o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
+          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+          @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
     end
 
     update_tags @assay
@@ -162,12 +174,6 @@ class AssaysController < ApplicationController
         end
         #Destroy AssayAssets that aren't needed
         (@assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
-
-        organisms.each do |text|
-          o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
-          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
-        end
 
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
