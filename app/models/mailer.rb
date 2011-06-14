@@ -61,7 +61,7 @@ class Mailer < ActionMailer::Base
   def contact_admin_new_user_no_profile(details,user,base_host)
     
     subject    "#{Seek::Config.application_name} member signed up"
-    recipients admin_emails
+    recipients (admin_emails + Person.all.select(&:is_project_manager?).map(&:email_with_name))
     from       Seek::Config.noreply_sender
     reply_to   user.person.email_with_name
     sent_on    Time.now
