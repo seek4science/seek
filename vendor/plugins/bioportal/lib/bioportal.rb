@@ -10,12 +10,10 @@ module BioPortal
         
         has_one :bioportal_concept,:as=>:conceptable,:dependent=>:destroy
         before_save :save_changed_concept
-        cattr_accessor :bioportal_base_rest_url, :bioportal_email
+        cattr_accessor :bioportal_base_rest_url, :bioportal_api_key
 
-
-        #FIXME: should be a class variable, not a global variable
         self.bioportal_base_rest_url=options[:base_url]
-        self.bioportal_email=options[:email]
+        self.bioportal_api_key=options[:apikey]
         
 
         extend BioPortal::Acts::SingletonMethods
@@ -31,7 +29,7 @@ module BioPortal
      
       def concept options={}
 
-        options[:email] ||= self.bioportal_email unless self.bioportal_email.nil?
+        options[:apikey] ||= self.bioportal_api_key unless self.bioportal_api_key.nil?
 
         return nil if self.bioportal_concept.nil?
         begin
@@ -42,7 +40,7 @@ module BioPortal
       end
 
       def ontology options={}
-        options[:email] ||= self.bioportal_email unless self.bioportal_email.nil?
+        options[:apikey] ||= self.bioportal_api_key unless self.bioportal_api_key.nil?
 
         return nil if self.bioportal_concept.nil?
         return self.bioportal_concept.get_ontology options
@@ -110,8 +108,8 @@ module BioPortal
       options.keys.each{|key| concept_url += "#{key.to_s}=#{URI.encode(options[key].to_s)}&"}
       concept_url=concept_url[0..-2]
       
-      full_concept_path=bioportal_base_rest_url+concept_url      
-      
+      full_concept_path=bioportal_base_rest_url+concept_url
+
       parser = XML::Parser.io(open(full_concept_path))
       doc = parser.parse
       
@@ -121,7 +119,7 @@ module BioPortal
         return results
       end
 
-      return process_concepts_xml(doc).merge({:ontology_version_id=>ontology_version_id})
+      process_concepts_xml(doc).merge({:ontology_version_id=>ontology_version_id})
     end
 
     def get_ontology_details ontology_version_id,options={}

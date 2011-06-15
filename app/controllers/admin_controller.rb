@@ -119,12 +119,14 @@ class AdminController < ApplicationController
 
   def update_others
     update_flag = true
-    Seek::Config.site_base_host= params[:site_base_host]
+    Seek::Config.site_base_host = params[:site_base_host]
     #check valid email
-    Seek::Config.pubmed_api_email= params[:pubmed_api_email] if params[:pubmed_api_email] == '' || (check_valid_email params[:pubmed_api_email], "pubmed api email")
-    Seek::Config.crossref_api_email= params[:crossref_api_email] if params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")
-    Seek::Config.tag_threshold= params[:tag_threshold] if only_integer params[:tag_threshold], "tag threshold"
-    Seek::Config.max_visible_tags= params[:max_visible_tags] if only_positive_integer params[:max_visible_tags], "maximum visible tags"
+    Seek::Config.pubmed_api_email = params[:pubmed_api_email] if params[:pubmed_api_email] == '' || (check_valid_email params[:pubmed_api_email], "pubmed api email")
+    Seek::Config.crossref_api_email = params[:crossref_api_email] if params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")
+
+    Seek::Config.bioportal_api_key = params[:bioportal_api_key]
+    Seek::Config.tag_threshold = params[:tag_threshold] if only_integer params[:tag_threshold], "tag threshold"
+    Seek::Config.max_visible_tags = params[:max_visible_tags] if only_positive_integer params[:max_visible_tags], "maximum visible tags"
     update_flag = (params[:pubmed_api_email] == '' ||(check_valid_email params[:pubmed_api_email], "pubmed api email")) && (params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")) && (only_integer params[:tag_threshold], "tag threshold") && (only_positive_integer params[:max_visible_tags], "maximum visible tags")
     update_redirect_to update_flag,'others'
   end
