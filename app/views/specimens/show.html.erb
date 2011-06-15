@@ -31,6 +31,7 @@
       <p id="organism">
           <label>Organism and strain: </label>
          <%= specimen_organism_list @specimen.organism,@specimen.strain,@specimen.culture_growth_type %>
+      <% if @specimen.culture_growth_type.try(:title)=="cultured cell line" || @specimen.culture_growth_type.try(:title)=="primary cell culture"%>
          <table border="1" cellpadding="10" >
               <tr>
                 <th>Medium</th>
@@ -54,42 +55,43 @@
            </tr>
 
          </table>
-
+      <% end %>
       </p>
 
-      <p>
-        <label>Age:</label>
-        <%= text_or_not_specified(@specimen.age_in_weeks) %>
-      </p>
-      <p>
-        <label>Sex:</label>
-         <% if @specimen.sex==true%>
-         <%= text_or_not_specified("female") %>
-         <% end %>
+       <% if @specimen.culture_growth_type.try(:title)=="in vivo"%>
+          <p>
+            <label>Age:</label>
+            <%= text_or_not_specified(@specimen.age_in_weeks) %>
+          </p>
+          <p>
+            <label>Sex:</label>
+             <% if @specimen.sex==true%>
+             <%= text_or_not_specified("female") %>
+             <% end %>
 
-         <% if @specimen.sex==false%>
-         <%= text_or_not_specified("male") %>
-         <% end %>
+             <% if @specimen.sex==false%>
+             <%= text_or_not_specified("male") %>
+             <% end %>
 
-         <% if @specimen.sex.nil? %>
-         <%= text_or_not_specified nil %>
-         <% end %>
-      </p>
-      <p>
-        <label>Birthday:</label>
-         <% if @specimen.born.nil? %>
-            <%= text_or_not_specified nil %>
-        <% else %>
-
-            <% if @specimen.try(:born).hour == 0 and @specimen.try(:born).min == 0 and @specimen.try(:born).sec == 0 then %>
-                <%= h @specimen.try(:born).strftime('%d/%m/%Y') %>
+             <% if @specimen.sex.nil? %>
+             <%= text_or_not_specified nil %>
+             <% end %>
+          </p>
+          <p>
+            <label>Birthday:</label>
+             <% if @specimen.born.nil? %>
+                <%= text_or_not_specified nil %>
             <% else %>
-                <%= h @specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
+
+                <% if @specimen.try(:born).hour == 0 and @specimen.try(:born).min == 0 and @specimen.try(:born).sec == 0 then %>
+                    <%= h @specimen.try(:born).strftime('%d/%m/%Y') %>
+                <% else %>
+                    <%= h @specimen.try(:born).strftime('%d/%m/%Y @ %H:%M:%S') %>
+                <% end %>
+
             <% end %>
-
-        <% end %>
-      </p>
-
+          </p>
+      <% end %>
       <p>
         <label>Treatment:</label>
         <%= text_or_not_specified(@specimen.treatment) %>
