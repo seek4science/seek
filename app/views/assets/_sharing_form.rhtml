@@ -44,25 +44,13 @@
             <input type="hidden" name="sharing[access_type_<%= Policy::PRIVATE -%>]" value="<%= Policy::NO_ACCESS -%>">
             <input <%= 'checked="checked"' if @sharing_mode == Policy::PRIVATE %> id="sharing_scope_<%= Policy::PRIVATE -%>" name="sharing[sharing_scope]"
                                                                                   value="<%= Policy::PRIVATE -%>" type="radio" />
-            - Keep this <%= @resource_type -%> private.
+            - Keep this <%= @resource_type -%> private (only visible to you)
           </label>
         </p>
 
         <p style="font-weight: bold; margin-top: 0.5em;">Or share it with..</p>
 
-        <!-- public -->
-        <p>
-          <label for="sharing_scope_<%= Policy::EVERYONE -%>">
-            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
-                   value="<%= Policy::EVERYONE -%>" />
-            - All visitors (including anonymous visitors with no login), for
-          </label>
-          <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
-            :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
-          <br/>
-        </p>
-
-        <!-- within your project -->
+        <!-- within your project ... and with all sysmo project members ...-->
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
@@ -75,6 +63,17 @@
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
                :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode } -%>
              <br/>
+        </p>
+        <!-- public -->
+        <p>
+          <label for="sharing_scope_<%= Policy::EVERYONE -%>">
+            <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::EVERYONE -%> id="sharing_scope_<%= Policy::EVERYONE -%>" name="sharing[sharing_scope]"
+                   value="<%= Policy::EVERYONE -%>" />
+            - All visitors (including anonymous visitors with no login), for
+          </label>
+          <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::EVERYONE,
+            :sharing_scope => @sharing_mode, :access_type => @access_mode } -%>
+          <br/>
         </p>
     </div>
 

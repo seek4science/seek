@@ -49,8 +49,8 @@ module Seek
     
     def yearly_users
       distinct_culprits_since 1.year.ago
-    end 
-    
+    end
+
     private  
     
     def create_attributes
@@ -68,6 +68,6 @@ module Seek
     def distinct_culprits_since time=500.years.ago
       ActivityLog.count(:all,:select=>"distinct culprit_id",:conditions=>["created_at > ?",time])
     end
-    
+
   end
 end
