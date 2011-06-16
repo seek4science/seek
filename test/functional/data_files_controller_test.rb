@@ -339,7 +339,9 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, :id => data_files(:picture)
     assert_response :success
     assert_select "h1",:text=>/Editing Data file/
+    assert_select "label",:text=>/Keep this Data file private/
   end
+
   
   test "publications included in form for datafile" do
     

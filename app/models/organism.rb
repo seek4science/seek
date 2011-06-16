@@ -2,7 +2,7 @@ class Organism < ActiveRecord::Base
 
   acts_as_favouritable
 
-  linked_to_bioportal :email=>"stuart.owen@manchester.ac.uk"
+  linked_to_bioportal :apikey=>Seek::Config.bioportal_api_key
   
   has_many :assay_organisms
   has_many :models

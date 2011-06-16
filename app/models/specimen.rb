@@ -42,6 +42,8 @@ class Specimen < ActiveRecord::Base
 
   acts_as_solr(:fields=>[:description,:donor_number,:lab_internal_number],:include=>[:culture_growth_type,:organism,:strain]) if Seek::Config.solr_enabled
 
+  acts_as_solr(:fields=>[:description,:donor_number,:lab_internal_number],:include=>[:institution,:culture_growth_type,:organism,:strain]) if Seek::Config.solr_enabled
+
   acts_as_authorized
 
   def age_in_weeks

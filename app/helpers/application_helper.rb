@@ -427,7 +427,7 @@ module ApplicationHelper
     @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
 
     # ..other
-    @resource_type = object.class.name
+    @resource_type = text_for_resource object
     @favourite_groups = current_user.favourite_groups
     @resource = object
 

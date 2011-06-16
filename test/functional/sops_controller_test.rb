@@ -223,7 +223,12 @@ class SopsControllerTest < ActionController::TestCase
     get :edit, :id => sops(:my_first_sop)
     assert_response :success
     assert_select "h1", :text=>/Editing SOP/
+
+    #this is to check the SOP is all upper case in the sharing form
+    assert_select "label",:text=>/Keep this SOP private/
   end
+
+  
 
   test "publications excluded in form for sops" do
     login_as(:owner_of_my_first_sop)

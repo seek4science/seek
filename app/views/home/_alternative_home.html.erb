@@ -1,10 +1,10 @@
 <style>
   div.home_panel {
       background-color: #EEE;
-      border: 1px solid black;
       #padding-left: 0.5em;
       #padding-right: 0.5em;
-      min-height: 20em;
+      height: 20em;
+      overflow-y:auto;
 
   }
 
@@ -16,7 +16,6 @@
 
   div.top_home_panel {
       background-color: #EEE;
-      border: 1px solid black;
       width: 95%;
       margin-left:auto;
       margin-right: auto;
@@ -32,13 +31,11 @@
       color: white;
       font-weight:bolder;
       text-align: center;
-      border-bottom: 1px solid #333;
       min-height:.2em;
       text-align:center;
       padding-top: 0.25em;
       padding-bottom: 0.25em;
   }
-
   .atom {
       float:left;
       margin-left:0.25em;
@@ -63,9 +60,31 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
      <div class="heading">Recently viewed</div>
+    <div>
+        <% viewed_items = recently_viewed_items(1.year.ago, 10) %>
+        <ul>
+        <% viewed_items.each do |viewed_item|%>
+            <%path = eval("#{viewed_item.class.name.underscore}_path(#{viewed_item.id})" )%>
+            <li>
+            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path -%>
+            </li>
+        <%end%>
+        </ul>
+     </div>
   </div>
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
+    <div>
+        <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
+        <ul>
+        <%downloaded_items.each do |downloaded_item|%>
+            <%path = eval("#{downloaded_item.class.name.underscore}_path(#{downloaded_item.id})" )%>
+            <li>
+            <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path -%>
+            </li>
+        <%end%>
+        </ul>
+     </div>
   </div>
 
 </div>
