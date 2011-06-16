@@ -72,7 +72,7 @@ class Sample < ActiveRecord::Base
   end
 
   def associate_sop sop
-    sample_sop = sample_sops.select{|ss|ss.sop==sop}.first
+    sample_sop = sample_sops.detect{|ss|ss.sop==sop}
 
     if sample_sop.nil?
       sample_sop = SampleSop.new
