@@ -85,7 +85,7 @@ class Assay < ActiveRecord::Base
   
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
-    assay_asset = assay_assets.select {|aa| aa.asset == asset}.first
+    assay_asset = assay_assets.detect {|aa| aa.asset == asset}
 
     if assay_asset.nil?
       assay_asset = AssayAsset.new
@@ -191,8 +191,6 @@ class Assay < ActiveRecord::Base
 
   def clone_with_associations
     new_object= self.clone
-    #new_object.policy = Policy.find self.policy_id
-    #new_object.policy.permission_ids = self.policy.permission_ids
     new_object.policy = self.policy.deep_copy
     new_object.sop_masters = self.try(:sop_masters)
 
