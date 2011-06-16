@@ -69,17 +69,19 @@
           <%= link_to h(try_block{@assay.technology_type.title.capitalize}), @assay.technology_type -%>
       </p>
       <% end -%>
+
+     <% if !@assay.assay_organisms.blank? and @assay.samples.blank?%>
       <p id="organism">
+
           <b>Organisms: </b>
-          <% unless @assay.assay_organisms.blank? %>
+
           <%= show_assay_organisms_list @assay.assay_organisms %>
-          <% else if !@assay.samples.blank?%>
-           <%= show_specimen_organisms_list @assay.samples.collect{|s|s.specimen} %>
-               <% end %>
-          <% end %>
+
+
       </p>
+    <% end %>
 
-
+     <% if @assay.assay_organisms.blank? and !@assay.samples.blank?%>
      <p id="specimens">
        <b>Specimens: </b>
        <% specimens = [] %>
@@ -100,6 +102,8 @@
        <b>Samples: </b>
        <%= samples_link_list @assay.samples%>
      </p>
+     <% end %>
+
 
       <style type="text/css">
           div.data_model_relationship {

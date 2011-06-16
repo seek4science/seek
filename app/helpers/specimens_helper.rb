@@ -49,7 +49,21 @@ module SpecimensHelper
     specimens=specimens.sort{|a,b| a.title<=>b.title} if sorted
     specimens.each do |specimen|
       result += link_to h(specimen.title.capitalize),specimen
-      result += " | " unless specimens.last==specimen
+      result += " ["
+      result += link_to h(specimen.organism.title),specimen.organism,{:class => "assay_organism_info"}
+
+      if specimen.strain
+        result += " : "
+        result += link_to h(specimen.strain.title),specimen.strain,{:class => "assay_strain_info"}
+      end
+
+      if specimen.culture_growth_type
+        result += " (#{specimen.culture_growth_type.title})"
+      end
+
+      result += "]"
+
+      result += " ,<br/> " unless specimens.last==specimen
     end
     return result
   end

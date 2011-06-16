@@ -116,6 +116,7 @@ module AssaysHelper
       sample = as
       culture_growth_type = as.specimen.culture_growth_type
 
+
       if organism
       result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
       end

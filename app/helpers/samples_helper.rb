@@ -35,17 +35,18 @@ module SamplesHelper
       sample = as
       culture_growth_type = as.specimen.culture_growth_type
 
+      result += link_to h(sample.title.capitalize),sample
       if organism
-      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      #result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
       end
 
       if strain
-        result += " : "
-        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+       # result += " : "
+      #  result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
       end
 
       if sample
-        result += " : "
+      #  result += " : "
         #result += link_to h(sample.title),sample
         sample.tissue_and_cell_types.each do |tt|
           result += "[" if tt== sample.tissue_and_cell_types.first
@@ -58,7 +59,7 @@ module SamplesHelper
       end
 
       if culture_growth_type
-        result += " (#{culture_growth_type.title})"
+      #  result += " (#{culture_growth_type.title})"
       end
       result += ",<br/>" unless as == samples.last
 
