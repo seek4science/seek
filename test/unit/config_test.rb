@@ -76,6 +76,26 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'localhost/piwik/',Seek::Config.piwik_analytics_url
   end
 
+  test "project_news_enabled" do
+    assert_equal false ,Seek::Config.project_news_enabled
+  end
+  test "project_news_feed_urls" do
+    assert_equal '',Seek::Config.project_news_feed_urls
+  end
+  test "project_news_number_of_feed_entry" do
+    assert_equal '',Seek::Config.project_news_number_of_feed_entry
+  end
+
+  test "community_news_enabled" do
+    assert_equal false ,Seek::Config.community_news_enabled
+  end
+  test "community_news_feed_urls" do
+    assert_equal '',Seek::Config.community_news_feed_urls
+  end
+  test "community_news_number_of_feed_entry" do
+    assert_equal '',Seek::Config.community_news_number_of_feed_entry
+  end
+
 #Project
   test "project_name" do
     assert_equal "Sysmo" ,Seek::Config.project_name
