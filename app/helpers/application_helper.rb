@@ -445,9 +445,11 @@ module ApplicationHelper
   end
 
   def require_js file
-    @@required_js ||= []
-    unless @@required_js.include? file
-      @@required_js << file
+    #TODO: Needs testing, not sure what the 'lifecycle' for instance variables in a helper is.
+    #Needs to last as long as the page is being rendered and no longer. The intent is to include the js only if it hasn't already been included.
+    @required_js ||= []
+    unless @required_js.include? file
+      @required_js << file
       javascript_include_tag file
     end
   end
