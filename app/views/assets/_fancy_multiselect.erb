@@ -29,7 +29,7 @@
       </div>
 
 		<br/>
-        <%= link_to_function "#{image('new')} #{button_text}", "addSelectedToFancy('#{collection_id}', $F(#{possibilities_collection_id})); return(false);", :id=>"add_to_#{collection_id}_link", :class=>"block_link", :style => "width: 12em" %>
+        <%= link_to_function "#{image('new')} #{button_text}", "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}')); return(false);", :id=>"add_to_#{collection_id}_link", :class=>"block_link", :style => "width: 12em" %>
 
     </div>
 
