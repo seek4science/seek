@@ -142,7 +142,12 @@ class ApplicationController < ActionController::Base
 
     case Seek::Config.type_managers
       when "admins"
-        return true
+        if User.admin_logged_in?
+          return true
+        else
+          error("Admin rights required to manage types", "...")
+          return false
+        end
 
       when "pals"
       if User.admin_logged_in? || User.pal_logged_in?
