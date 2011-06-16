@@ -209,6 +209,7 @@ duplicate_2:
 person_for_project_manager:
   first_name: "Project"
   last_name: "Manager"
+  email: "manager@email.com"
   is_admin: false
   can_edit_projects: false
   can_edit_institutions: false

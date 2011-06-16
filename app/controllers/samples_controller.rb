@@ -16,7 +16,7 @@ class SamplesController < ApplicationController
 
     @existing_sample.sop_masters.each do |s|
        if !s.sop.can_view?
-       flash.now[:notice] << "Some or all sops of the existing sample cannot be viewed, please specify your own! <br/>"
+       flash.now[:notice] << "Some or all sops of the existing sample cannot be viewed, you may specify your own! <br/>"
         break
       end
     end

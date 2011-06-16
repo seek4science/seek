@@ -78,21 +78,7 @@
       addOrganism(organism_title, organism_id, strain, culture_growth,tissue_and_cell_type_id,tissue_and_cell_type_title);
   <% end -%>
   
-  <% if params[:assay_organism_ids] %>
-    <% params[:assay_organism_ids].each do |text| -%>
-      <% 
-      o_id,strain,culture_growth_type_text,t_id,t_title=text.split(",")
-      organism=Organism.find(o_id)
-      %>
-        organism_id = '<%= o_id -%>';
-        organism_title = '<%= escape_javascript(organism.title) -%>';
-        strain = '<%= strain -%>';
-        culture_growth = '<%= culture_growth_type_text -%>';
-        tissue_and_cell_type_id ='<%= t_id%>';
-        tissue_and_cell_type_title ='<%= escape_javascript(t_title) %>';
-        addOrganism(organism_title, organism_id,strain,culture_growth,tissue_and_cell_type_id,tissue_and_cell_type_title);
-    <% end -%>
-  <% end -%>
+
   
     updateOrganisms();
   

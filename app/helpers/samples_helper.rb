@@ -16,17 +16,54 @@ module SamplesHelper
     result
   end
 
-  def samples_link_list samples,sorted=true
+  def samples_link_list samples
     #FIXME: make more generic and share with other model link list helper methods
     samples=samples.select{|s| !s.nil?} #remove nil items
     return "<span class='none_text'>Not Specified</span>" if samples.empty?
 
     result=""
-    samples=samples.sort{|a,b| a.title<=>b.title} if sorted
-    samples.each do |sample|
-      result += link_to h(sample.title.capitalize),sample
-      result += " | " unless samples.last==sample
-    end
+#    samples=samples.sort{|a,b| a.title<=>b.title} if sorted
+#    samples.each do |sample|
+#      result += link_to h(sample.title.capitalize),sample
+#      result += " | " unless samples.last==sample
+#    end
+
+     samples.each do |as|
+
+      organism = as.specimen.organism
+      strain = as.specimen.strain
+      sample = as
+      culture_growth_type = as.specimen.culture_growth_type
+
+      if organism
+      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      end
+
+      if strain
+        result += " : "
+        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if sample
+        result += " : "
+        #result += link_to h(sample.title),sample
+        sample.tissue_and_cell_types.each do |tt|
+          result += "[" if tt== sample.tissue_and_cell_types.first
+          result += link_to h(tt.title), tt
+          result += "|" unless tt == sample.tissue_and_cell_types.last
+          result += "]" if tt == sample.tissue_and_cell_types.last
+        end
+
+
+      end
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+      result += ",<br/>" unless as == samples.last
+
+     end
+
     return result
   end
 

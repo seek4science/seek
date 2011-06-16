@@ -22,7 +22,7 @@ class Assay < ActiveRecord::Base
   belongs_to :study  
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
-  has_many :assay_organisms, :dependent=>:destroy,:autosave => true
+  has_many :assay_organisms, :dependent=>:destroy
   has_many :organisms, :through=>:assay_organisms
   has_many :strains, :through=>:assay_organisms
 #  has_many :tissue_and_cell_types,:through => :assay_organisms
@@ -134,14 +134,9 @@ class Assay < ActiveRecord::Base
     end
     assay_organism.tissue_and_cell_type = tissue_and_cell_type
 
-
-    existing = AssayOrganism.find(:first,:conditions => {:organism_id=> organism,
-                                                        :assay_id => self,
-                                                        :strain_id => strain,
-                                                        :culture_growth_type_id => culture_growth_type,
-                                                        :tissue_and_cell_type_id => tissue_and_cell_type})
-    unless existing
-    assay_organism.save!
+    existing = AssayOrganism.all.select{|ao|ao.organism==organism and ao.assay == self and ao.strain==strain and ao.culture_growth_type==culture_growth_type and ao.tissue_and_cell_type==tissue_and_cell_type}
+    if existing.blank?
+    self.assay_organisms << assay_organism
     end
 
   end
