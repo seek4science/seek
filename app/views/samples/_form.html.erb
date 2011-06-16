@@ -7,7 +7,7 @@
 
 <h2>Sample Details</h2>
 
-<div style="width: 85%;">
+<div>
 
   <p>
     <%= f.label "Sample name:" -%><span class="required">*</span><br/>
@@ -45,11 +45,8 @@
       <%= render :partial => "assets/sharing_form" -%>
   </p>
 
-
+  <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :selected => (params[:sample_sop_ids].map(&:to_i) || []) | @sample.sample_sops.map(&:sop_id) %>
 </div>
-
- <%= render :partial=>"samples/associate_sop",:locals=>{:f=>f,:resource=>@sample} -%>
-
 
 
 <p style="margin-top: 2em; text-align: center;">

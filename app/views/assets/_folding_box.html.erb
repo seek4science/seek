@@ -1,4 +1,5 @@
-<% hidden ||= false %>
+<% hidden ||= false
+   contents ||= nil %>
 <div id="<%= fold_id %>" class="fold">
 
   <div class="foldTitle">
@@ -6,6 +7,6 @@
   </div>
 
   <div id="<%= fold_id %>_fold_content" class="foldContent" <%=hidden ? 'style="display: none;"': 'style="display: block;"'%>>
-      <%= yield %>
+      <%= contents || yield %>
   </div>
  </div>
