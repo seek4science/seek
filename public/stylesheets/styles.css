@@ -119,9 +119,9 @@ min-width:
 }
 
 .box_editing_inner2 {
-	background-color: #EEEEEE;
+	background-color: #eee;
 	padding: 0.5em 0.8em;
-	border: 1px dotted #999999;
+	border: 1px dotted #999;
 }
 
 
@@ -142,7 +142,7 @@ table.list_item {
     background-color: #F0F0F0;
     margin-top: 6px;
     padding: 1em;
-    border: #999999 solid 1px;
+    border: #999 solid 1px;
     border-collapse: collapse;
     font-size: 93%;
     min-height: 90px;
@@ -153,7 +153,7 @@ table.list_item tr.odd_row {
 }
 
 table.list_item tr.even_row {
-    background-color: #EEEEEE;
+    background-color: #eee;
 }
 
 table.list_item tr td.actions {
@@ -162,14 +162,14 @@ table.list_item tr td.actions {
 
 table.list_item tr td.actions a {
     display: block;
-    border-bottom: 0px solid #999999;
+    border-bottom: 0px solid #999;
     margin-bottom: 0.3em;
     font-size: 85%;
     font-weight: normal;
 }
 
 table.list_item .desc {
-    border: 1px dotted #999999;
+    border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.4em 0.6em;
     background-color: #FFFFCC;
@@ -179,7 +179,7 @@ table.list_item .desc {
 }
 
 table.list_item .standout {
-    border: 1px dotted #999999;
+    border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.5em 0.6em;
     background-color: #FFFFCC;
@@ -187,7 +187,7 @@ table.list_item .standout {
     line-height: 1;
     font-size: 93%;
     font-weight: bold;
-    color: #333333;
+    color: #333;
 }
 
 
@@ -271,7 +271,7 @@ span.disabled_icon {
     *padding: 0.2em 0.5em;
     line-height: 1.0;
     text-decoration: none;
-    border: 1px solid #BBBBBB;
+    border: 1px solid #bbb;
     background-color: #FEF6FF;
     color: #000099;
 }
@@ -358,7 +358,7 @@ span.disabled_icon {
 	background-repeat: repeat-x;
 	background-color: #FFFFCC;
     padding: 0.5em 0 1em 0;
-	border: 1px dotted #999999;
+	border: 1px dotted #999;
 	text-align: center;
 	margin-bottom: 0.6em;
 }
@@ -396,7 +396,7 @@ span.disabled_icon {
 	margin: 0.5em 0;
 	*margin: 0;
 	height: 1px;
-	border-bottom: 1px dotted #999999;
+	border-bottom: 1px dotted #999;
 }
 
 .contribution_section_box .heading {
@@ -425,9 +425,9 @@ span.disabled_icon {
 .contribution_section_box .foldTitle {
 	background-image: none;
 	background-color: #EEF6FF;
-	color: #333333;
-	border: 1px solid #BBBBBB;
-	border-bottom: 2px solid #CCCCCC;
+	color: #333;
+	border: 1px solid #bbb;
+	border-bottom: 2px solid #ccc;
 }
 
 .contribution_section_box .foldText {
@@ -438,7 +438,7 @@ span.disabled_icon {
 .contribution_section_box .foldContent {
 	padding: 0.2em;
 	background-color: #F5F5F5;
-	border: 1px solid #BBBBBB;
+	border: 1px solid #bbb;
 	border-top: 1px solid transparent;
 }
 
@@ -493,7 +493,7 @@ span.disabled_icon {
 .note_text_disabled {
     font-size: 93%;
     font-weight: bold;
-    color: #666666;
+    color: #666;
 }
 
 
@@ -645,7 +645,7 @@ ul.users_details li p {
 }
 
 div.conditions_or_factors {
-    border: dotted #999999 1px;
+    border: dotted #999 1px;
     float: left;
     margin-left: 4em;
     margin-top: 2em;
@@ -665,7 +665,7 @@ ul.condition_or_factor_row li {
     float:left;
     padding: 0 1em 0.25em 1em;
     text-align:left;
-    border-bottom: dotted #999999 1px;
+    border-bottom: dotted #999 1px;
     min-height: 2em;
 }
 
@@ -855,8 +855,8 @@ img.badge {
 
 a.asset img.avatar {
     padding :5px;
-    border:1px solid #CCCCCC;
-    background-color: #FFFFFF;
+    border:1px solid #ccc;
+    background-color: #fff;
     min-width :3em;
     min-height: 3em;
 }
@@ -866,7 +866,7 @@ div.list_item {
     background-color: #F0F0F0;
     margin-top: 6px;
     padding: 1em;
-    border: #999999 solid 1px;
+    border: #999 solid 1px;
     border-collapse: collapse;
     min-height: 90px;
     float: left;
@@ -891,7 +891,7 @@ div.list_item_actions {
 }
 
 div.list_item_desc {
-    border: 1px dotted #999999;
+    border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.4em 0.6em;
     background-color: #FFFFCC;
@@ -950,9 +950,9 @@ div.hidden_list_item {
     background-color: #F0F0F0;
     margin-top: 6px;
     padding: 1em;
-    border: #999999 solid 1px;
+    border: #999 solid 1px;
     border-collapse: collapse;
-    color: #999999;
+    color: #999;
     float:left;
 }
 
@@ -963,8 +963,8 @@ ul.related_asset_list li{
 }
 
 .contribution_title {
-    border-top: solid #BBBBBB 1px;
-    border-bottom: solid #BBBBBB 1px;
+    border-top: solid #bbb 1px;
+    border-bottom: solid #bbb 1px;
     padding-top: 0.5em;
     background-color: #F0F0F0;
     margin-left: 1em;
@@ -979,8 +979,8 @@ ul.related_asset_list li{
     margin-right: 0.5em;
     margin-top: -0.2em;
     padding:3px 5px 0px 3px;
-    border:1px solid #CCCCCC;
-    background-color: #FFFFFF;
+    border:1px solid #ccc;
+    background-color: #fff;
     
 	min-width :2.3em;
     min-height: 2.3em;
@@ -996,7 +996,7 @@ ul.related_asset_list li{
 }
 
 .contribution_aftertitle {
-	color: #666666; 
+	color: #666;
 	font-size: 85%; 
 	text-align: center; 	
 	margin-bottom: 0.6em;
@@ -1022,8 +1022,8 @@ p.select_assay_class {
     font-size: larger;
     font-weight: bold;    
     height: 3em;
-    background-color: #DDDDDD;
-    border: solid 1px #999999;
+    background-color: #ddd;
+    border: solid 1px #999;
     margin-bottom: 1em;
     width: 70%;
     margin-right: auto;
@@ -1041,8 +1041,8 @@ div.avatar_list_popup {
     margin-left:6em;
     z-index:1;
     padding:7px;
-    background-color:#EEEEEE;
-    border:1px solid #999999;
+    background-color:#eee;
+    border:1px solid #999;
     position:absolute;
     max-width:420px;
     text-align:center;
@@ -1055,13 +1055,13 @@ ul.horiz_list_items li {
 /* Begin Footer styles */
 
 #ft {	
-    border: 2px solid #999999;
+    border: 2px solid #999;
     border-width: 1px 0 1px 0;
-    color: #333333;
+    color: #333;
     background-image: url('/images/footer-bg.png');
     background-position: top;
     background-repeat: repeat-x;
-    background-color: #EEEEEE;		
+    background-color: #eee;
 	bottom:0px;
 }
 
@@ -1073,7 +1073,7 @@ ul.horiz_list_items li {
 
 #ft table {
     width: 100%;
-    border-top: 1px solid #999999;
+    border-top: 1px solid #999;
     border-spacing: 0;
     margin: 0;		
 }
@@ -1094,7 +1094,7 @@ ul.horiz_list_items li {
 
 #ft td.middle {
     width: auto;    
-    border-left: 1px solid #999999;
+    border-left: 1px solid #999;
     text-align: center;		
 }
 	
@@ -1111,7 +1111,7 @@ ul.horiz_list_items li {
 #ft td.right {
     width: 110px;
     text-align: center;
-    border-left: 1px solid #999999;
+    border-left: 1px solid #999;
 }
 
 #ft td.right p {
@@ -1171,8 +1171,8 @@ ul.bulleted_list li {
 
 /* HELP DOCUMENT STYLES */
 div.help_document {
-  border-bottom: 1px dotted #999999;
-  border-top: 1px dotted #999999;
+  border-bottom: 1px dotted #999;
+  border-top: 1px dotted #999;
   margin: 1em 0;
   padding: 1em 0;
 }
@@ -1195,7 +1195,7 @@ div.help_document h1, div.help_document h2, div.help_document h3, div.help_docum
   border: none;
   padding: 0;
   margin: 0.5em 0;
-  color: #000000;
+  color: black;
   text-align: left;
   background: none;
   line-height: normal;
@@ -1232,14 +1232,14 @@ div.help_document h6 {
 }
 
 div.help_upload_box form {
-  border-top: 1px dotted #CCCCCC;
+  border-top: 1px dotted #ccc;
   margin-top: 5px;
 }
 
 div.help_upload_box div.image_thumbnail {
   display: inline-block;
   padding: 2px;
-  border: 1px solid #999999;
+  border: 1px solid #999;
   text-align: center;
   margin-bottom: 3px;
 }
@@ -1272,7 +1272,7 @@ div.collapsable_div_header {
   background-image: url('/images/header-bg.png');
   background-position: top;
   background-repeat: repeat-x;
-  background-color: #EEEEEE;
+  background-color: #eee;
   padding: 0.5em 0.6em;  
   font-size: 100%;
   display: block;
@@ -1298,7 +1298,7 @@ ul.attachments_list {
 ul.attachments_list li {
   list-style: none;
   background-color:#EEF;
-  border: 1px solid #999999;
+  border: 1px solid #999;
   padding: 3px;
   margin: 2px;
 }
@@ -1429,14 +1429,14 @@ a.block_link img {
 div.preview_box {
   width: 17em;
   max-height: 25em;
-  background-color: #EEEEEE;
+  background-color: #eee;
   display: inline-block;
   padding: 1em 1em 1em 1em;
-  border: 1px solid #999999;
+  border: 1px solid #999;
 }
 
 .pale_text {
-	color: #666666;
+	color: #666;
 }
 
 div.asset_form {
@@ -1501,6 +1501,6 @@ a.advanced_sharing_link{
 }
 
 .sharing_box_form {
-	background-color: #EEEEEE;
+	background-color: #eee;
 	padding: 0.8em 0.8em;
 }

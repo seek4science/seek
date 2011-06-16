@@ -53,11 +53,11 @@
             - Your project, for
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
-                 <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING], @resource, your_project_access_type(@policy, @resource)) -%>
+                 <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource)) -%>
              </select>
              and all <%= Seek::Config.project_name %> users, for
              <%= render :partial => "assets/sharing_form_access_type_dropdown", :locals => { :access_type_selector_for_scope => Policy::ALL_SYSMO_USERS,
-               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode } -%>
+               :sharing_scope => Policy::ALL_SYSMO_USERS, :access_type => @access_mode, :access_type_options=>[Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING] } -%>
              <br/>
         </p>
         <!-- public -->
@@ -183,7 +183,7 @@
                       <span class="note_text" style="line-height: 1.5;">Step 3:</span> Choose access rights, review and submit
 
                       <select name="proj_access_type_select" id="proj_access_type_select" onchange="javascript: replaceReviewWorkGroupURL();" style="width: 100%; vertical-align: middle; margin: 0.3em 0;">
-                        <%= policy_selection_options [Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING], @resource -%>
+                        <%= policy_selection_options [Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource -%>
                       </select>
                     </div>
 

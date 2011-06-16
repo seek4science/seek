@@ -195,29 +195,28 @@ adds the resource as a new asset within the registry returns a report:
 66:               <span class="ruby-keyword kw">return</span> {<span class="ruby-identifier">:response=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:fail</span>,<span class="ruby-identifier">:message=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">MESSAGES</span>[<span class="ruby-identifier">:unknown_auth</span>],<span class="ruby-identifier">:author=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">author</span>,<span class="ruby-identifier">:response_code=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">RESPONSE_CODES</span>[<span class="ruby-identifier">:unknown_auth</span>]}                                        
 67:             <span class="ruby-keyword kw">end</span>
 68:             
-69:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">policy</span>.<span class="ruby-identifier">use_custom_sharing</span> = <span class="ruby-keyword kw">true</span>
-70:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">policy</span>.<span class="ruby-identifier">save!</span>
-71:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">creators</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">author</span>
-72:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">project</span>=<span class="ruby-identifier">project</span>
-73:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">save!</span>
-74:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">reload</span>
-75:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">cache_remote_content_blob</span>
-76:             
-77:             <span class="ruby-identifier">p</span>=<span class="ruby-constant">Permission</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:contributor=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">author</span>,<span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">MANAGING</span>,<span class="ruby-identifier">:policy_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">policy</span>.<span class="ruby-identifier">id</span>)
-78:             <span class="ruby-identifier">p</span>.<span class="ruby-identifier">save!</span>
-79:             <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">warning</span>
-80:               <span class="ruby-identifier">response</span>={<span class="ruby-identifier">:response=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:warning</span>,<span class="ruby-identifier">:message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">warning</span>,<span class="ruby-identifier">:author=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">author</span>,<span class="ruby-identifier">:seek_model=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">resource_model</span>,<span class="ruby-identifier">:response_code=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">warning_code</span>}
-81:             <span class="ruby-keyword kw">else</span>
-82:               <span class="ruby-identifier">response</span>={<span class="ruby-identifier">:response=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:success</span>,<span class="ruby-identifier">:message=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">MESSAGES</span>[<span class="ruby-identifier">:success</span>],<span class="ruby-identifier">:author=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">author</span>,<span class="ruby-identifier">:seek_model=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">resource_model</span>,<span class="ruby-identifier">:response_code=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">RESPONSE_CODES</span>[<span class="ruby-identifier">:success</span>]}
-83:             <span class="ruby-keyword kw">end</span>            
-84:           <span class="ruby-keyword kw">end</span>
-85:           
-86:         <span class="ruby-keyword kw">end</span>
-87:       <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">exception</span>
-88:         <span class="ruby-identifier">response</span>={<span class="ruby-identifier">:response=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:fail</span>,<span class="ruby-identifier">:message=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">&quot;Something went wrong&quot;</span>,<span class="ruby-identifier">:exception=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">exception</span>}
-89:       <span class="ruby-keyword kw">end</span>
-90:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">response</span>
-91:     <span class="ruby-keyword kw">end</span>
+69:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">policy</span>.<span class="ruby-identifier">save!</span>
+70:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">creators</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">author</span>
+71:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">project</span>=<span class="ruby-identifier">project</span>
+72:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">save!</span>
+73:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">reload</span>
+74:             <span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">cache_remote_content_blob</span>
+75:             
+76:             <span class="ruby-identifier">p</span>=<span class="ruby-constant">Permission</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:contributor=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">author</span>,<span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">MANAGING</span>,<span class="ruby-identifier">:policy_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">resource_model</span>.<span class="ruby-identifier">policy</span>.<span class="ruby-identifier">id</span>)
+77:             <span class="ruby-identifier">p</span>.<span class="ruby-identifier">save!</span>
+78:             <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">warning</span>
+79:               <span class="ruby-identifier">response</span>={<span class="ruby-identifier">:response=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:warning</span>,<span class="ruby-identifier">:message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">warning</span>,<span class="ruby-identifier">:author=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">author</span>,<span class="ruby-identifier">:seek_model=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">resource_model</span>,<span class="ruby-identifier">:response_code=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">warning_code</span>}
+80:             <span class="ruby-keyword kw">else</span>
+81:               <span class="ruby-identifier">response</span>={<span class="ruby-identifier">:response=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:success</span>,<span class="ruby-identifier">:message=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">MESSAGES</span>[<span class="ruby-identifier">:success</span>],<span class="ruby-identifier">:author=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">author</span>,<span class="ruby-identifier">:seek_model=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">resource_model</span>,<span class="ruby-identifier">:response_code=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">RESPONSE_CODES</span>[<span class="ruby-identifier">:success</span>]}
+82:             <span class="ruby-keyword kw">end</span>            
+83:           <span class="ruby-keyword kw">end</span>
+84:           
+85:         <span class="ruby-keyword kw">end</span>
+86:       <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">exception</span>
+87:         <span class="ruby-identifier">response</span>={<span class="ruby-identifier">:response=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">:fail</span>,<span class="ruby-identifier">:message=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">&quot;Something went wrong&quot;</span>,<span class="ruby-identifier">:exception=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">exception</span>}
+88:       <span class="ruby-keyword kw">end</span>
+89:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">response</span>
+90:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -237,11 +236,11 @@ adds the resource as a new asset within the registry returns a report:
             onclick="toggleCode('M000006-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000006-source">
 <pre>
-     <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 121</span>
-121:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_policy</span> <span class="ruby-identifier">author</span>,<span class="ruby-identifier">project</span>
-122:       <span class="ruby-comment cmt">#FIXME: IS THIS USED?</span>
-123:       <span class="ruby-keyword kw">nil</span>      
-124:     <span class="ruby-keyword kw">end</span>
+     <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 118</span>
+118:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_policy</span> <span class="ruby-identifier">author</span>,<span class="ruby-identifier">project</span>
+119:       <span class="ruby-comment cmt">#FIXME: IS THIS USED?</span>
+120:       <span class="ruby-keyword kw">nil</span>      
+121:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -284,12 +283,12 @@ adds the resource as a new asset within the registry returns a report:
             onclick="toggleCode('M000005-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000005-source">
 <pre>
-     <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 115</span>
-115:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">generated_title</span> <span class="ruby-identifier">resource</span>,<span class="ruby-identifier">author</span>
-116:       <span class="ruby-identifier">type</span>=<span class="ruby-identifier">resource</span>.<span class="ruby-identifier">type</span>.<span class="ruby-identifier">capitalize</span>
-117:       <span class="ruby-identifier">type</span>=<span class="ruby-value str">&quot;SOP&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">downcase</span><span class="ruby-operator">==</span><span class="ruby-value str">&quot;sop&quot;</span>
-118:       <span class="ruby-node">&quot;#{author.name}'s #{type} #{Time.now.strftime('(%d %b %Y)')}&quot;</span>
-119:     <span class="ruby-keyword kw">end</span>
+     <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 112</span>
+112:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">generated_title</span> <span class="ruby-identifier">resource</span>,<span class="ruby-identifier">author</span>
+113:       <span class="ruby-identifier">type</span>=<span class="ruby-identifier">resource</span>.<span class="ruby-identifier">type</span>.<span class="ruby-identifier">capitalize</span>
+114:       <span class="ruby-identifier">type</span>=<span class="ruby-value str">&quot;SOP&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">downcase</span><span class="ruby-operator">==</span><span class="ruby-value str">&quot;sop&quot;</span>
+115:       <span class="ruby-node">&quot;#{author.name}'s #{type} #{Time.now.strftime('(%d %b %Y)')}&quot;</span>
+116:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -309,19 +308,18 @@ adds the resource as a new asset within the registry returns a report:
             onclick="toggleCode('M000004-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000004-source">
 <pre>
-     <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 102</span>
-102:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">project_policy</span> <span class="ruby-identifier">project</span>
-103:       <span class="ruby-identifier">policy</span>=<span class="ruby-constant">Policy</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'auto'</span>,
-104:                 <span class="ruby-identifier">:sharing_scope=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ALL_SYSMO_USERS</span>,
-105:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">VISIBLE</span>,
-106:                 <span class="ruby-identifier">:use_custom_sharing=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>,
-107:                 <span class="ruby-identifier">:use_whitelist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>,
-108:                 <span class="ruby-identifier">:use_blacklist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>) 
-109:       <span class="ruby-identifier">policy</span>.<span class="ruby-identifier">save!</span>
-110:       <span class="ruby-identifier">p</span>=<span class="ruby-constant">Permission</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:contributor=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">project</span>,<span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ACCESSIBLE</span>,<span class="ruby-identifier">:policy_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">policy</span>.<span class="ruby-identifier">id</span>)
-111:       <span class="ruby-identifier">p</span>.<span class="ruby-identifier">save!</span>
-112:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">policy</span>
-113:     <span class="ruby-keyword kw">end</span>
+     <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 100</span>
+100:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">project_policy</span> <span class="ruby-identifier">project</span>
+101:       <span class="ruby-identifier">policy</span>=<span class="ruby-constant">Policy</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'auto'</span>,
+102:                 <span class="ruby-identifier">:sharing_scope=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ALL_SYSMO_USERS</span>,
+103:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">VISIBLE</span>,
+104:                 <span class="ruby-identifier">:use_whitelist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>,
+105:                 <span class="ruby-identifier">:use_blacklist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>) 
+106:       <span class="ruby-identifier">policy</span>.<span class="ruby-identifier">save!</span>
+107:       <span class="ruby-identifier">p</span>=<span class="ruby-constant">Permission</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:contributor=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">project</span>,<span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ACCESSIBLE</span>,<span class="ruby-identifier">:policy_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">policy</span>.<span class="ruby-identifier">id</span>)
+108:       <span class="ruby-identifier">p</span>.<span class="ruby-identifier">save!</span>
+109:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">policy</span>
+110:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -341,15 +339,14 @@ adds the resource as a new asset within the registry returns a report:
             onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000003-source">
 <pre>
-     <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 93</span>
- 93:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sysmo_policy</span>
- 94:       <span class="ruby-constant">Policy</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'auto'</span>,
- 95:                 <span class="ruby-identifier">:sharing_scope=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ALL_SYSMO_USERS</span>,
- 96:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ACCESSIBLE</span>,
- 97:                 <span class="ruby-identifier">:use_custom_sharing=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>,
- 98:                 <span class="ruby-identifier">:use_whitelist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>,
- 99:                 <span class="ruby-identifier">:use_blacklist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>)      
-100:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/jerm/embedded_populator.rb, line 92</span>
+92:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sysmo_policy</span>
+93:       <span class="ruby-constant">Policy</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'auto'</span>,
+94:                 <span class="ruby-identifier">:sharing_scope=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ALL_SYSMO_USERS</span>,
+95:                 <span class="ruby-identifier">:access_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Policy</span><span class="ruby-operator">::</span><span class="ruby-constant">ACCESSIBLE</span>,
+96:                 <span class="ruby-identifier">:use_whitelist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>,
+97:                 <span class="ruby-identifier">:use_blacklist=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>)      
+98:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
