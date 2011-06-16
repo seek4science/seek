@@ -10,7 +10,7 @@ class DataFuseController < ApplicationController
   include Seek::DataFuse
   
   before_filter :login_required
-  #before_filter :is_user_admin_auth
+  before_filter :is_user_admin_auth
 
   @@model_builder = Seek::JWS::OneStop.new
 
