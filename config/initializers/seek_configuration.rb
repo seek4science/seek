@@ -49,7 +49,7 @@ Seek::Config.default :limit_latest,7
 
 # Others
 Seek::Config.default :type_managers_enabled,true
-Seek::Config.default :type_managers,'admins'
+Seek::Config.default :type_managers,'users'
 Seek::Config.default :tag_threshold,1
 Seek::Config.default :max_visible_tags,20
 Seek::Config.default :pubmed_api_email,nil
