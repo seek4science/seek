@@ -71,7 +71,12 @@
       <% end -%>
       <p id="organism">
           <b>Organisms: </b>
+          <% unless @assay.assay_organisms.blank? %>
           <%= show_assay_organisms_list @assay.assay_organisms %>
+          <% else if !@assay.samples.blank?%>
+           <%= show_specimen_organisms_list @assay.samples.collect{|s|s.specimen} %>
+               <% end %>
+          <% end %>
       </p>
 
 
@@ -94,6 +99,8 @@
      <p id="Samples">
        <b>Samples: </b>
        <%= samples_link_list @assay.samples%>
+
+       <%= list_assay_samples "Samples",@assay.samples%>
      </p>
 
       <style type="text/css">
