@@ -1,7 +1,7 @@
 class DoiRecord
   attr_accessor :authors, :title, :abstract, :journal, :doi, :xml, :date_published,:publication_type  
 
-  PUBLICATION_TYPES = {:journal=>1,:conference=>2}
+  PUBLICATION_TYPES = {:journal=>1,:conference=>2,:book_chapter=>3}
 
 
   def initialize(attributes={})

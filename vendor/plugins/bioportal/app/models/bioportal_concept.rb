@@ -10,19 +10,18 @@ class BioportalConcept < ActiveRecord::Base
     
     refresh=options.delete(:refresh)
     
+    concept=nil
     concept = YAML::load(cached_concept_yaml) unless (refresh || cached_concept_yaml.nil?)
     unless concept      
       concept = super(self.ontology_version_id,self.concept_uri,options)      
       update_attribute(:cached_concept_yaml, concept.to_yaml)
     end
       
-    return concept
+    concept
   end
 
   def get_ontology options={}
-    ontology = get_ontology_details self.ontology_version_id,options
-
-    return ontology
+    get_ontology_details self.ontology_version_id,options
   end
 
   #the base url is defined by the associated class - this overrides the method in the RestAPI mixin
