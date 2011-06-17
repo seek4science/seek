@@ -85,7 +85,7 @@ class SamplesController < ApplicationController
         end
 
         if sops.blank?
-          @sample.sample_sops= []
+          @sample.sop_masters= []
           @sample.save
         else
           sops.each do |s_id|
