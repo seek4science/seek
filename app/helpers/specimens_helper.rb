@@ -100,7 +100,7 @@ module SpecimensHelper
 
       result += link_to h(specimen.title.capitalize),specimen
       result += " ["
-      result += link_to h(specimen.organism.title),specimen.organism,{:class => "assay_organism_info"}
+      result += link_to h(specimen.organism.try(:title)),specimen.organism,{:class => "assay_organism_info"}
 
       if specimen.strain
         result += " : "
