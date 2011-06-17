@@ -196,4 +196,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal Seek::Config.smtp_settings('password'), 'abcd'
     assert_equal ActionMailer::Base.smtp_settings[:password], 'abcd'
   end
+
+  test "home_description" do
+    assert_equal "Some (configurable) information about the project and what we do goes here.", Seek::Config.home_description
+    Seek::Config.home_description = "A new description"
+    assert_equal "A new description", Seek::Config.home_description
+  end
+  
 end
