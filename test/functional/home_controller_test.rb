@@ -102,5 +102,21 @@ class HomeControllerTest < ActionController::TestCase
 
   end
 
+  test "should turn on/off project news and community news" do
+    #turn on
+    Seek::Config.project_news_enabled=true
+    Seek::Config.community_news_enabled=true
+
+    get :index
+    assert_response :success
+
+    assert_select "div.heading", :text=>/Community News/, :count=>1
+    assert_select "div.heading", :text=>"#{Seek::Config.project_name} News", :count=>1
+    #turn off
+  end
+
+  test "should display the 'Recent changes in your project and across SysMo' only for SysMO project members" do
+
+  end
   
 end

@@ -48,8 +48,8 @@
 </div>
 
 <div class="yui-g home_panel_pair">
-  <div class="yui-u first home_panel">
-     <div class="heading">SysMO News<span class="atom"><%= image("atom_feed") -%></span></div>
+  <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
+     <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
      <ul>
      <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
         number_of_feed_entry_array = Seek::Config.project_news_number_of_feed_entry.split(',')
