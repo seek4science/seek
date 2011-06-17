@@ -59,7 +59,7 @@ GEM
     ruby-ole (1.2.11.1)
     ruby-openid (2.1.8)
     ruby-prof (0.9.2)
-    simple-spreadsheet-extractor (0.5.0)
+    simple-spreadsheet-extractor (0.6.1)
       POpen4 (= 0.1.4)
       open4 (= 1.0.1)
     spreadsheet (0.6.4.1)
@@ -88,7 +88,7 @@ DEPENDENCIES
   rubaidh-google_analytics (~> 1.1.4)
   ruby-openid
   ruby-prof
-  simple-spreadsheet-extractor (= 0.5.0)
+  simple-spreadsheet-extractor (= 0.6.1)
   spreadsheet (= 0.6.4.1)
   sqlite3-ruby (= 1.2.5)
   timocratic-test_benchmark
