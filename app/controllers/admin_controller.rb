@@ -74,6 +74,8 @@ class AdminController < ApplicationController
     Seek::Config.community_news_feed_urls= params[:community_news_feed_urls]
     Seek::Config.community_news_number_of_feed_entry= params[:community_news_number_of_feed_entry]
 
+    Seek::Config.home_description = params[:home_description]
+
     Seek::Config.set_smtp_settings 'port', params[:port] if only_integer params[:port], 'port'
     update_redirect_to (only_integer params[:port], "port"),'features_enabled'
   end
