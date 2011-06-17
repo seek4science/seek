@@ -6,15 +6,18 @@
  button_text ||= "Include"
  value_method ||= :id
  text_method ||= :title
+ html_options ||= ''
+ collection_id ||= name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
 
  default_choice = [default_choice_text, 0]
- collection_id = "#{name}_#{method}"
  possibilities_collection_id = "possible_#{collection_id}"
+ possibilities_options ||= {}
+ possibilities_options.reverse_merge! :style=>"width:90%"
 %>
 
-<%= javascript_include_tag "fancy_multiselect.js"  %>
+<%= require_js "fancy_multiselect.js"  %>
 
-    <div class="yui-u first">
+    <div class="yui-u first" <%= html_options %>>
       <p style="color: #666666;">
         <%= intro %>
       </p>
@@ -23,18 +26,17 @@
       </div>
       <div class="association_step">
          <%= select_tag possibilities_collection_id,
-             options_for_select([default_choice]|possibilities.collect{|o| [truncate(h(o.title), :length=>120), o.id]}),
-             {:style=>"width:90%"} -%>
-        <%= select name, method, options_from_collection_for_select(possibilities, value_method, text_method, selected),{}, {:multiple=>true, :style=>"display:none;"} -%>
+             options_for_select([default_choice]|possibilities.collect{|o| [truncate(h(o.send(text_method)), :length=>120), o.send(value_method)]}),
+             possibilities_options -%>
+        <%= select_tag name, options_from_collection_for_select(possibilities, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
 
 		<br/>
-        <%= link_to_function "#{image('new')} #{button_text}", "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}')); return(false);", :id=>"add_to_#{collection_id}_link", :class=>"block_link", :style => "width: 12em" %>
+        <%= link_to_function "#{image('new')} #{button_text}", "addSelectedToFancy('#{collection_id}', $F('#{possibilities_collection_id}'))", :id=>"add_to_#{collection_id}_link", :class=>"block_link", :style => "width: 12em" %>
 
+      <script type="text/javascript">
+          Event.observe(window, 'load', function () {
+              updateFancyMultiselect('<%= collection_id %>');
+          });
+      </script>
     </div>
-
-<script type="text/javascript">
-    Event.observe(window, 'load',function () {
-        updateFancyMultiselect('<%= collection_id %>');
-    });
-</script>

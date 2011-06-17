@@ -25,6 +25,7 @@ Seek::Config.default :google_analytics_tracker_id, '000-000'
 Seek::Config.default :piwik_analytics_enabled, false
 Seek::Config.default :piwik_analytics_id_site, 1
 Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
+Seek::Config.default :bioportal_api_key,''
 
 
 
@@ -49,7 +50,7 @@ Seek::Config.default :limit_latest,7
 
 # Others
 Seek::Config.default :type_managers_enabled,true
-Seek::Config.default :type_managers,'admins'
+Seek::Config.default :type_managers,'users'
 Seek::Config.default :tag_threshold,1
 Seek::Config.default :max_visible_tags,20
 Seek::Config.default :pubmed_api_email,nil

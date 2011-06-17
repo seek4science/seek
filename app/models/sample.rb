@@ -31,7 +31,7 @@ class Sample < ActiveRecord::Base
   has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  acts_as_solr(:fields=>[:description,:title,:lab_internal_number],:include=>[:specimen,:assays]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:lab_internal_number],:include=>[:institution,:specimen,:assays]) if Seek::Config.solr_enabled
 
   acts_as_authorized
 
@@ -72,7 +72,7 @@ class Sample < ActiveRecord::Base
   end
 
   def associate_sop sop
-    sample_sop = sample_sops.select{|ss|ss.sop==sop}.first
+    sample_sop = sample_sops.detect{|ss|ss.sop==sop}
 
     if sample_sop.nil?
       sample_sop = SampleSop.new

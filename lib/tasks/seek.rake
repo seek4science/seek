@@ -58,9 +58,17 @@ namespace :seek do
 
   desc 'seeds the database with the controlled vocabularies'
   task(:seed=>:environment) do
-    tasks=["refresh_controlled_vocabs","default_tags","graft_new_assay_types","load_help_docs"]
+    tasks=["seed_sqlite","load_help_docs"]
     tasks.each do |task|
-      Rake::Task[ "seek:#{task}" ].execute     
+      Rake::Task["seek:#{task}"].execute
+    end
+  end
+
+  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678)'
+  task(:seed_sqlite=>:environment) do
+    tasks=["refresh_controlled_vocabs", "default_tags", "graft_new_assay_types"]
+    tasks.each do |task|
+      Rake::Task["seek:#{task}"].execute
     end
   end
 
