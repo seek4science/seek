@@ -28,6 +28,11 @@
          <%= select_tag possibilities_collection_id,
              options_for_select([default_choice]|possibilities.collect{|o| [truncate(h(o.send(text_method)), :length=>120), o.send(value_method)]}),
              possibilities_options -%>
+        <%# This ensures that the parameter is always sent, even when nothing is selected.
+        It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
+        value of the parameter will be ["","1","2","3"]. This is compatible with the rails
+        association association_ids= methods, which reject 'blank' values automatically.%>
+        <%= hidden_field_tag "#{name}[]", "" %>
         <%= select_tag name, options_from_collection_for_select(possibilities, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
       </div>
 
