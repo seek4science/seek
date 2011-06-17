@@ -92,13 +92,14 @@ class HomeControllerTest < ActionController::TestCase
   end
 
   test "should display home description" do
-    Seek::Config.home_description="Blah blah blah"
+    Seek::Config.home_description="Blah blah blah - http://www.google.com"
     logout
 
     get :index
     assert_response :success
 
     assert_select "div.top_home_panel", :text=>/Blah blah blah/, :count=>1
+    assert_select "div.top_home_panel a[href=?]", "http://www.google.com", :count=>1
 
   end
 

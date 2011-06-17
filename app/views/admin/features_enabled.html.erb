@@ -100,6 +100,12 @@
       <span class="setting_description">Number of news you want to retrieve from each feed url. If multiple feed urls are set, multiple numbers have to be given, separated by a comma, follow the order of the feed url</span>
     </li>
 
+    <%= render :partial=>'setting_li',:locals=>{
+            :description=>"Sets the description text on the front page",
+            :name=>"Home page description",
+            :field=>text_area_tag(:home_description,Seek::Config.home_description,:size=>"90x8")
+    } -%>
+
     <li>
       <%= render :partial => 'admin/email'  %>
     </li>
