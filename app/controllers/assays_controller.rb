@@ -128,8 +128,6 @@ class AssaysController < ApplicationController
 
     #FIXME: would be better to resolve the differences, rather than keep clearing and reading the assets and organisms
     #DOES resolve differences for assets now
-    @assay.assay_organisms=[]
-
     organisms             = params[:assay_organism_ids]||[]
 
     sop_ids               = params[:assay_sop_ids] || []
