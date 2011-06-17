@@ -51,7 +51,7 @@
             :other_creators=>@specimen.other_creators,
     } -%>
 
-    <%= render :partial=>"samples/associate_sop",:locals=>{:f=>f,:resource=>@specimen} -%>
+    <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids', :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id)%>
 
     <p>
       <%= f.label :description -%><br/>

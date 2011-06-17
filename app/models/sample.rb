@@ -27,7 +27,6 @@ class Sample < ActiveRecord::Base
   end
 
   has_many :sops, :class_name => "Sop::Version", :finder_sql => self.sop_sql()
-  has_many :sample_sops
   has_many :sop_masters,:class_name => "SampleSop"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 

@@ -45,7 +45,7 @@
       <%= render :partial => "assets/sharing_form" -%>
   </p>
 
-  <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :selected => (params[:sample_sop_ids].map(&:to_i) || []) | @sample.sample_sops.map(&:sop_id) %>
+  <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
 </div>
 
 
