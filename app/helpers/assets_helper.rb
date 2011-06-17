@@ -19,9 +19,7 @@ module AssetsHelper
 
   def text_for_resource resource_or_text
     text=resource_or_text.is_a?(String) ? resource_or_text : resource_or_text.class.name
-    text = text.underscore.humanize
-    text = text.upcase if text.downcase=="sop"
-    text
+    text.underscore.humanize
   end
 
   def resource_version_selection versioned_resource,displayed_resource_version
