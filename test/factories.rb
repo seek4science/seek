@@ -79,6 +79,11 @@
     f.access_type Policy::MANAGING
   end
 
+  Factory.define(:all_sysmo_viewable_policy,:parent=>:policy) do |f|
+    f.sharing_scope Policy::ALL_SYSMO_USERS
+    f.access_type Policy::VISIBLE
+  end
+
 #Permission
   Factory.define(:permission, :class => Permission) do |f|
     f.association :contributor, :factory => :person
