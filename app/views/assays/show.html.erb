@@ -72,12 +72,8 @@
 
      <% if !@assay.assay_organisms.blank? and @assay.samples.blank?%>
       <p id="organism">
-
-          <b>Organisms: </b>
-
+        <b>Organisms:</b>
           <%= show_assay_organisms_list @assay.assay_organisms %>
-
-
       </p>
     <% end %>
 
@@ -120,6 +116,76 @@
           
           div.data_model_relationship span {
               color: #1465FF;
+          }
+
+          div.specimens table {
+              border-collapse: collapse;
+              border: 1px ;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+          }
+
+          div.specimens table.wide {
+              width: 100%;
+          }
+
+          div.specimens table tr th {
+              color: #151b23;
+              padding: 3px 10px;
+              border: 1px solid #222;
+          }
+          div.specimens table th.tdborder {
+             border: 1px solid #ddd;
+         }
+          div.specimens table tr td {
+              padding: 7px;
+              border: 1px solid #aaa;
+          }
+
+          div.specimens table tr td.specimen{
+              background: #99CCFF;
+          }
+          div.samples table {
+              border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+          }
+
+          div.samples table.wide {
+              width: 100%;
+          }
+
+          div.samples table tr th {
+              padding: 3px 10px;
+              border: 1px solid #222;
+          }
+         div.samples table.noborder td {
+             border: 0;
+         }
+          div.samples table tr td {
+              padding: 7px;
+              border: 1px solid #aaa;
+
+          }
+
+          div.assay_organisms table {
+              border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+          }
+
+          div.assay_organisms table.wide {
+              width: 100%;
+          }
+
+          div.assay_organisms table tr th {
+              padding: 3px 10px;
+              border: 1px solid #222;
+          }
+         div.assay_organisms table.noborder td {
+             border: 0;
+         }
+          div.assay_organisms table tr td {
+              padding: 7px;
+              border: 1px solid #aaa;
+
           }
           
       </style>

@@ -40,6 +40,51 @@ module SpecimensHelper
   end
 
 
+
+#  def table_specimens_link_list specimens,sorted=true
+#    #FIXME: make more generic and share with other model link list helper methods
+#    specimens=specimens.select{|s| !s.nil?} #remove nil items
+#    return "<span class='none_text'>Not associated with any Specimens</span>" if specimens.empty?
+#
+#    result=""
+#    unless specimens.blank?
+#      result += "<div id='specimens' class='specimens'><table border='1' cellpadding='10' >"
+#
+#      specimens=specimens.sort{|a,b| a.title<=>b.title} if sorted
+#
+#      result +=" <tr>
+#              <th>Specimen</th>
+#              <th colspan='3'>Organism | Strain | Culture growth type</th></tr>"
+#
+#      specimens.each do |specimen|
+#
+#        result +="<tr>"
+#        result +="<td>"
+#        result += link_to h(specimen.title.capitalize),specimen
+#        result +="</td>"
+#
+#        result +="<td>"
+#        result += link_to h(specimen.organism.title),specimen.organism,{:class => "assay_organism_info"}
+#        result += "</td>"
+#
+#        result +="<td>"
+#        if specimen.strain
+#          result += link_to h(specimen.strain.title),specimen.strain,{:class => "assay_strain_info"}
+#        end
+#        result += "</td>"
+#        result +="<td>"
+#        if specimen.culture_growth_type
+#          result += "#{specimen.culture_growth_type.title}"
+#        end
+#        result += "</td>"
+#        result += "<tr>"
+#      end
+#      result += "</table></div>"
+#    end
+#    return result
+#  end
+
+
   def specimens_link_list specimens,sorted=true
     #FIXME: make more generic and share with other model link list helper methods
     specimens=specimens.select{|s| !s.nil?} #remove nil items
@@ -47,7 +92,12 @@ module SpecimensHelper
 
     result=""
     specimens=specimens.sort{|a,b| a.title<=>b.title} if sorted
+
+    result += "<table cellpadding='10'>"
+
     specimens.each do |specimen|
+      result += "<tr><td style='text-align:left;'>"
+
       result += link_to h(specimen.title.capitalize),specimen
       result += " ["
       result += link_to h(specimen.organism.title),specimen.organism,{:class => "assay_organism_info"}
@@ -63,9 +113,11 @@ module SpecimensHelper
 
       result += "]"
 
-      result += " ,<br/> " unless specimens.last==specimen
+      result += "</td></tr>"
     end
+    result += "</table>"
     return result
   end
+
 
 end
