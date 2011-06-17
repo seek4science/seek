@@ -79,9 +79,8 @@ module HomeHelper
     items.take(number_of_item)
   end
 
-  # get feeds from multiple sites
+  # get multiple feeds from multiple sites
   def get_feeds feed_urls=nil
-      # fetching multiple feeds
     unless feed_urls.blank?
       #trim the url element
       feed_urls=feed_urls.each{|feed_url| feed_url.strip! }
@@ -90,6 +89,7 @@ module HomeHelper
     end
   end
 
+  #display entries of a single feed. Nuber of entries displayed are set in number_of_entries variable
   def display_single_feed feed=nil, number_of_entries=3
       html=''
       # atom format use entries while rss format use items

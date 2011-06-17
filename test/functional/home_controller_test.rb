@@ -101,5 +101,6 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "div.top_home_panel", :text=>/Blah blah blah/, :count=>1
 
   end
+
   
 end
