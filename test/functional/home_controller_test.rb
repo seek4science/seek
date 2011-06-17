@@ -81,7 +81,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test 'should hide the forum tab for unlogin user' do
     logout
-    get :index, :controller => 'home'
+    get :index
     assert_response :success
     assert_select 'a',:text=>/Forum/,:count=>0
 
@@ -90,4 +90,16 @@ class HomeControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a',:text=>/Forum/,:count=>1
   end
+
+  test "should display home description" do
+    Seek::Config.home_description="Blah blah blah"
+    logout
+
+    get :index
+    assert_response :success
+
+    assert_select "div.top_home_panel", :text=>/Blah blah blah/, :count=>1
+
+  end
+  
 end
