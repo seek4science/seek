@@ -35,8 +35,9 @@ module FancyMultiselectHelper
     def fancy_multiselect object, association, options = {}
       options[:possibilities_options] = {} unless options[:possibilities_options]
       onchange = options[:possibilities_options][:onchange] || ''
-      possibilities_id = "possible_#{options[:collection_id]}"
-      button_id = "add_to_#{options[:collection_id]}_link"
+      collection_id = options[:name].to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
+      possibilities_id = "possible_#{collection_id}"
+      button_id = "add_to_#{collection_id}_link"
       hide_add_link_when_default_is_selected_js = "($F('#{possibilities_id}') == 0) ? $('#{button_id}').hide() : $('#{button_id}').show();"
       onchange += hide_add_link_when_default_is_selected_js
       options[:possibilities_options][:onchange] = onchange
@@ -60,7 +61,6 @@ module FancyMultiselectHelper
                              :text_method => :title
 
       options[:selected] = object.send(association).map(&options[:value_method]) unless options[:selected]
-      options[:collection_id] = options[:name].to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_") unless options[:collection_id]
 
       super object, association, options
     end
