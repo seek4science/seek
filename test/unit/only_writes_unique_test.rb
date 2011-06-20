@@ -1,6 +1,6 @@
 require 'test_helper'
-#Authorization tests that are specific to public access
-class AnonymousAuthorizationTest < ActiveSupport::TestCase
+
+class OnlyWritesOnceTest < ActiveSupport::TestCase
   def setup
     User.current_user = Factory :user
     @item = Factory :event
