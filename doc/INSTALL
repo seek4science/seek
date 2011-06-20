@@ -30,11 +30,14 @@ as follows:
 
 (if you need more information, see https://help.ubuntu.com/community/Repositories/Ubuntu#Adding+Canonical+Partner+Repositories).
 
+If you needed to add partner repositories, and its a good idea anyway, you should do an apt-get update
+
+  sudo apt-get update
 
 If using Ubuntu or Debian, the following commands should install most the packages you need:
-
+ 
   sudo apt-get install wget mercurial ruby rdoc ri libopenssl-ruby ruby-dev mysql-server libssl-dev build-essential openssh-server 
-  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3
+  sudo apt-get install libmysqlclient16-dev libmagick++-dev libxml++2.6-dev sun-java6-jdk graphviz libsqlite3-dev sqlite3 libxslt-dev libxml2-dev
 
 if you are intending to develop SEEK you will probably also want to use:
 

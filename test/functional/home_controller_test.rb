@@ -81,7 +81,7 @@ class HomeControllerTest < ActionController::TestCase
 
   test 'should hide the forum tab for unlogin user' do
     logout
-    get :index, :controller => 'home'
+    get :index
     assert_response :success
     assert_select 'a',:text=>/Forum/,:count=>0
 
@@ -90,4 +90,34 @@ class HomeControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a',:text=>/Forum/,:count=>1
   end
+
+  test "should display home description" do
+    Seek::Config.home_description="Blah blah blah - http://www.google.com"
+    logout
+
+    get :index
+    assert_response :success
+
+    assert_select "div.top_home_panel", :text=>/Blah blah blah/, :count=>1
+    assert_select "div.top_home_panel a[href=?]", "http://www.google.com", :count=>1
+
+  end
+
+  test "should turn on/off project news and community news" do
+    #turn on
+    Seek::Config.project_news_enabled=true
+    Seek::Config.community_news_enabled=true
+
+    get :index
+    assert_response :success
+
+    assert_select "div.heading", :text=>/Community News/, :count=>1
+    assert_select "div.heading", :text=>"#{Seek::Config.project_name} News", :count=>1
+    #turn off
+  end
+
+  test "should display the 'Recent changes in your project and across SysMo' only for SysMO project members" do
+
+  end
+  
 end

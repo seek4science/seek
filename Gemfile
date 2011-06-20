@@ -12,12 +12,14 @@ gem 'fastercsv', "1.5.1"
 gem 'libxml-ruby',"1.1.3",:require=>"libxml"
 gem 'uuidtools',"2.1.1"
 gem "RedCloth","~>4.2.3"
-gem 'simple-spreadsheet-extractor',"0.5.0"
+gem 'simple-spreadsheet-extractor',"0.6.1"
 gem "rmagick","2.12.2"
 gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl'
+gem 'pauldix-feedzirra'
+
 
 group :development do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"

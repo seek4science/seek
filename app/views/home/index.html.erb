@@ -6,20 +6,12 @@
     </p>
   <% end -%>
 
-  <% if logged_in? -%>
-
-    <%= render :partial=>"home_intro" -%>
-
-  <%= render :partial=>"recent_project_changes" -%>
-
-  <%= render :partial=>"recent_all_changes" -%>
-
-  <% else -%>
-
   <%= render :partial=>"alternative_home" -%>
 
+  <% if logged_in? and try_block{current_user.person.member?} -%>
+    <h2 style="float:left; margin:1.5em 1.5em 2em">
+    <%= link_to "Recent changes in your project and across #{Seek::Config.project_name}", :controller => 'home', :action => 'recent_changes' -%>
+    </h2>
   <% end -%>
-
-
 
 </div>

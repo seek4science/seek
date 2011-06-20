@@ -1,3 +1,5 @@
+require 'feedzirra'
+
 module HomeHelper
 
   RECENT_SIZE=5
@@ -65,6 +67,7 @@ module HomeHelper
     end
     items.take(number_of_item)
   end
+
   def recently_viewed_items time=1.month.ago, number_of_item=10
     activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "count(*) DESC", :conditions => ["action = ? AND updated_at > ?", 'show', time])
     #take out only Asset and Publication log
@@ -74,6 +77,42 @@ module HomeHelper
       items.push activity_log.activity_loggable if !activity_log.activity_loggable.nil?
     end
     items.take(number_of_item)
+  end
+
+  # get multiple feeds from multiple sites
+  def get_feeds feed_urls=nil
+    unless feed_urls.blank?
+      #trim the url element
+      feed_urls=feed_urls.each{|feed_url| feed_url.strip! }
+      feeds = Feedzirra::Feed.fetch_and_parse(feed_urls)
+      feeds
+    end
+  end
+
+  #display entries of a single feed. Nuber of entries displayed are set in number_of_entries variable
+  def display_single_feed feed=nil, number_of_entries=3
+      html=''
+      # atom format use entries while rss format use items
+      entries = try_block{feed.entries} || try_block{feed.items}
+      unless !entries
+        entries.take(number_of_entries).each do |entry|
+          #get the link of the entry
+          entry_link = (check_entry_link(try_block{entry.url})) || (check_entry_link(try_block{entry.links.first})) || (check_entry_link(try_block{entry.link})) || (check_entry_link(try_block{entry.id})) || ''
+          entry_title = try_block{entry.title} || ''
+          unless entry_title.blank?
+            html << "<li>"
+            html << link_to("#{entry_title}", "#{entry_link}")
+            html << "</li>"
+          end
+        end
+      end
+      html
+  end
+
+  private
+  def check_entry_link entry_link=nil
+    return nil if entry_link.nil? || !entry_link.to_s.start_with?('http://')
+    entry_link.to_s
   end
 
 end

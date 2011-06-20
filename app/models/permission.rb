@@ -9,7 +9,7 @@ class Permission < ActiveRecord::Base
   # TODO implement duplicate check in :before_create
 
   def controls_access_for? person
-    contributor == person or try_block {contributor.people.include? person}
+    contributor == person || try_block {contributor.people.include? person}
   end
 
   #precedence of permission types. Highest precedence is listed first
@@ -18,7 +18,7 @@ class Permission < ActiveRecord::Base
   #takes a list of permissions, and gives you the effective permission
   def self.choose_for person, list
     return nil if list.empty?
-    p = list.inject do |p, p2|
+    list.inject do |p, p2|
       permissions = [p, p2]
       unless p.contributor_type == p2.contributor_type
         #return highest precedence
