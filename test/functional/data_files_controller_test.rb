@@ -679,9 +679,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
-  test "cannot get the request file button when not loggin" do
-    login_as(:aaron)
-    df = data_files(:viewable_data_file)
+  test "request file button visibility when logged in and out" do
+    df = Factory :data_file,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
 
     assert !df.can_download?, "The datafile must not be downloadable for this test to succeed"
 
@@ -690,7 +689,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "span.icon > a",:text=>/Request file/,:count=>1
 
     logout
-    
     get :show, :id => df
     assert_response :success
     assert_select "span.icon > a",:text=>/Request file/,:count=>0
