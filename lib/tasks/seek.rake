@@ -420,6 +420,20 @@ namespace :seek do
     end
   end
 
+
+  desc "Lists all publicly available assets"
+  task :list_public_assets => :environment do
+    [Investigation, Study, Assay, DataFile, Model, Sop, Publication].each do |assets|
+      #  :logout
+      assets.all.each do |asset|
+        if asset.can_view?
+          puts "#{asset.title} - #{asset.id}"
+        end
+      end
+    end
+  end
+
+
   private
 
   #returns true if the tag is over 30 chars long, or contains colons, semicolons, comma's or forward slash
