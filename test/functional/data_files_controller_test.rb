@@ -680,16 +680,20 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "cannot get the request file button when not loggin" do
-    login_as(:quentin)
+    login_as(:aaron)
     df = data_files(:viewable_data_file)
-    assert df.is_downloadable?, "The datafile must not be downloadable for this test to succeed"
+
+    assert !df.can_download?, "The datafile must not be downloadable for this test to succeed"
 
     get :show, :id => df
-    assert_select "a",:text=>/Request file/,:count=>1
+    assert_response :success
+    assert_select "span.icon > a",:text=>/Request file/,:count=>1
 
     logout
-    get :show, id => df
-    assert_select "a",:text=>/Request file/,:count=>0
+    
+    get :show, :id => df
+    assert_response :success
+    assert_select "span.icon > a",:text=>/Request file/,:count=>0
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
