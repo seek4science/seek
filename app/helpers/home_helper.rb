@@ -9,7 +9,7 @@ module HomeHelper
     people=Person.find(:all,:order=>'updated_at DESC')
     selected_people=[]
 
-    people.each do |p|      
+    people.each do |p|
       selected_people << p if !(projects & p.projects).empty?
       break if selected_people.size>=RECENT_SIZE
     end
@@ -57,7 +57,7 @@ module HomeHelper
     item_hash
   end
 
-  def recently_downloaded_items time=1.month.ago, number_of_item=10
+  def recently_downloaded_items time=1.month.ago, number_of_item=50
     activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "count(*) DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
     items = []
     activity_logs.each do |activity_log|
@@ -71,7 +71,7 @@ module HomeHelper
     activity_logs = activity_logs.select{|activity_log| ['DataFile', 'Model', 'Sop', 'Publication'].include?(activity_log.activity_loggable_type)}
     items = []
     activity_logs.each do |activity_log|
-      items.push activity_log.activity_loggable if !activity_log.activity_loggable.nil?
+      items.push activity_log.activity_loggable if (activity_log.can_view?) #((!activity_log.activity_loggable.nil?) #&& (activity_log.can_view?))
     end
     items.take(number_of_item)
   end
