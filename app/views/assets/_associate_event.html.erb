@@ -1,12 +1,11 @@
 <% project_events = Event.all.select(&:can_view?).sort_by(&:title).select {|e| e.project == resource.project} %>
-<% content = capture do %>
+
+<% fancy_multiselect resource, :events, :name => :event_ids do %>
     <br/>
 
     <%= check_box_tag :include_other_project_events, nil, false, {:onchange=>"toggle_event_list();",:style=>"margin-top:0.5em;"} -%> Include Events from other projects?
     <%= select_tag :alternative_event_ids, options_for_select([["Select events ...",0]]|project_events.collect{|o| [truncate(h(o.title), :length=>120), o.id]}), {:style => 'display:none;'} %>
 <% end %>
-
-<%= fancy_multiselect resource, :events, :name => :event_ids, :association_step_content => content %>
 
 <script type="text/javascript">
     function toggle_event_list() {
