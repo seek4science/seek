@@ -65,7 +65,6 @@
         <ul>
         <% viewed_items.each do |viewed_item|%>
             <%path = eval("#{viewed_item.class.name.underscore}_path(#{viewed_item.id})" )%>
-             <%= viewed_items.count %>
             <li>
             <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path -%>
             </li>
