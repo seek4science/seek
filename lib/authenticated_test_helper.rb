@@ -10,7 +10,7 @@ module AuthenticatedTestHelper
     #forces ApplicationController.@current_user=false
     class << @controller
       def force_logout
-        @current_user=false
+        @current_user=nil
       end
     end
     @controller.force_logout
@@ -18,7 +18,6 @@ module AuthenticatedTestHelper
 
     @request.session[:user_id] = nil
     User.current_user = nil
-
   end
 
   def authorize_as(user)
