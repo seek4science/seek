@@ -35,7 +35,7 @@ class SpecimensController < ApplicationController
 
 
 
-    sop_ids = params[:specimen_sop_ids]||[]
+    sop_ids = params[:specimen_sop_ids].reject(&:blank?)||[]
     @specimen.sop_ids = sop_ids
 
     @specimen.project_id = params[:project_id]
@@ -65,7 +65,7 @@ class SpecimensController < ApplicationController
     @specimen.project_id = params[:project_id]
 
 
-    sop_ids = params[:specimen_sop_ids]||[]
+    sop_ids = params[:specimen_sop_ids].reject(&:blank?)||[]
    # @specimen.sop_ids = sop_ids
 
     @specimen.attributes = params[:specimen]
