@@ -1,7 +1,7 @@
 source :gemcutter
 source 'http://gems.github.com'
 
-gem "rails", "2.3.8"
+gem "rails", "2.3.12"
 
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
 gem 'spreadsheet',"0.6.4.1"
@@ -19,6 +19,7 @@ gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl'
 gem 'pauldix-feedzirra'
+gem 'rdoc'
 
 
 group :development do
