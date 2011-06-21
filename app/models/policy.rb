@@ -69,7 +69,7 @@ class Policy < ActiveRecord::Base
   def set_attributes_with_sharing sharing, project
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
-    returning self do |policy|
+    self.tap do |policy|
       if sharing
 
         # obtain parameters from sharing hash
