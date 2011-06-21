@@ -1,8 +1,11 @@
 <div>
   <ul class="tabnav">
 
+    <!-- Homepage tab -->
+    <%= tab_definition :controllers=>["home"] -%>
+
     <!-- People tab -->
-    <%= tab_definition :controllers=>["people"] -%>
+    <%= tab_definition :controllers=>["people"], :gap_before=>true -%>
 
     <!-- Projects tab -->
     <%= tab_definition :controllers=>["projects"] -%>

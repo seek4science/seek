@@ -1,7 +1,7 @@
 class HomeController < ApplicationController
   
 
-  before_filter :redirect_to_sign_up_when_no_user
+#  before_filter :redirect_to_sign_up_when_no_user
 
   def index
     respond_to do |format|
