@@ -1,10 +1,10 @@
 require 'rubygems'
 require 'rake'
-require 'rake/rdoctask'
+require 'rdoc/task'
 
 namespace :doc do
   desc "Generate documentation for key areas of the SEEK API"
-  Rake::RDocTask.new("seek") { |rdoc|
+  RDoc::Task.new("seek") { |rdoc|
     rdoc.rdoc_dir = 'doc/seek'
     rdoc.template = ENV['template'] if ENV['template']
     rdoc.title    = ENV['title'] || "Sysmo-SEEK Technical and API Documentation"
