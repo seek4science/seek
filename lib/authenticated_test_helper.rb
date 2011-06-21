@@ -1,5 +1,6 @@
 module AuthenticatedTestHelper
   # Sets the current user in the session from the user fixtures.
+
   def login_as(user)
     user = users(user) unless user.class == User
     @request.session[:user_id] = user.try(:id)
@@ -14,10 +15,10 @@ module AuthenticatedTestHelper
       end
     end
     @controller.force_logout
-    
 
     @request.session[:user_id] = nil
     User.current_user = nil
+
   end
 
   def authorize_as(user)

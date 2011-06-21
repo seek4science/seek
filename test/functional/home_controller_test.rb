@@ -4,6 +4,7 @@ class HomeControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include HomeHelper
 
   test "test should be accessible to seek even if not logged in" do
     get :index
@@ -113,11 +114,72 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select "div.heading", :text=>/Community News/, :count=>1
     assert_select "div.heading", :text=>"#{Seek::Config.project_name} News", :count=>1
+
     #turn off
+    Seek::Config.project_news_enabled=false
+    Seek::Config.community_news_enabled=false
+
+
+    get :index
+    assert_response :success
+
+    assert_select "div[class='yui-u first home_panel'][style='display:none']", :count => 1
+    assert_select "div[class='yui-u home_panel'][style='display:none']", :count => 1
   end
 
-  test "should display the 'Recent changes in your project and across SysMo' only for SysMO project members" do
+  test "should display the link 'Recent changes in your project and across SysMo' only for SysMO project members" do
+    login_as(:aaron)
+    get :index
+    assert_response :success
 
+    assert_select "h2",:text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 1
+
+    logout
+    get :index
+    assert_response :success
+
+    assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
+
+    login_as(:registered_user_with_no_projects)
+    get :index
+    assert_response :success
+
+    assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
+  end
+
+  test "should show the content of 4 boxes" do
+    #project news
+    Seek::Config.project_news_enabled=true
+    Seek::Config.project_news_feed_urls = "http://sbml.org/index.php?title=News&action=feed"
+    Seek::Config.project_news_number_of_feed_entry = "5"
+
+    #community news
+    Seek::Config.community_news_enabled=true
+    Seek::Config.community_news_feed_urls = "http://www2.warwick.ac.uk/sitebuilder2/api/rss/news.rss?page=/fac/sci/systemsbiology/publications/&rss=true, http://feeds.bbci.co.uk/news/uk/rss.xml"
+    Seek::Config.community_news_number_of_feed_entry = "4,3"
+
+    #recently viewed
+    recently_viewed_items =  recently_viewed_items(1.year.ago, 10)
+    #recently downloaded
+    recently_downloaded_items =  recently_downloaded_items(1.year.ago, 10)
+
+    login_as(:aaron)
+    get :index
+    assert_response :success
+
+    assert_select 'div.project_news ul>li', 5
+    assert_select 'div.community_news ul>li', 7
+    assert_select 'div.recently_viewed ul>li', recently_viewed_items.count
+    assert_select 'div.recently_downloaded ul>li', recently_downloaded_items.count
+
+    logout
+    get :index
+    assert_response :success
+
+    assert_select 'div.project_news ul>li', 5
+    assert_select 'div.community_news ul>li', 7
+    assert_select 'div.recently_viewed ul>li', recently_viewed_items.count
+    assert_select 'div.recently_downloaded ul>li', recently_downloaded_items.count
   end
   
 end

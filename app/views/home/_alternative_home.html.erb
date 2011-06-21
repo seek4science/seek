@@ -48,43 +48,47 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
      <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <ul>
-     <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
-        number_of_feed_entry_array = Seek::Config.project_news_number_of_feed_entry.split(',')
-        number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-        count = 0
-     %>
-     <% unless !try_block{feeds.values} %>
-         <% feeds.values.each do |value|   %>
-            <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-            <%count +=1 %>
+     <div class="project_news">
+        <ul>
+         <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
+            number_of_feed_entry_array = Seek::Config.project_news_number_of_feed_entry.split(',')
+            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
+            count = 0
+         %>
+         <% unless !try_block{feeds.values} %>
+             <% feeds.values.each do |value|   %>
+                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
+                <%count +=1 %>
+             <% end %>
          <% end %>
-     <% end %>
-     </ul>
+         </ul>
+     </div>
   </div>
 
   <div class="yui-u home_panel" style="display:<%= Seek::Config.community_news_enabled ? 'block' : 'none' -%>">
      <div class="heading">Community News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <ul>
-     <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
-        number_of_feed_entry_array = Seek::Config.community_news_number_of_feed_entry.split(',')
-        number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-        count = 0
-     %>
-     <% unless !try_block{feeds.values} %>
-         <% feeds.values.each do |value|   %>
-            <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-            <%count +=1 %>
+     <div class="community_news">
+         <ul>
+         <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
+            number_of_feed_entry_array = Seek::Config.community_news_number_of_feed_entry.split(',')
+            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
+            count = 0
+         %>
+         <% unless !try_block{feeds.values} %>
+             <% feeds.values.each do |value|   %>
+                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
+                <%count +=1 %>
+             <% end %>
          <% end %>
-     <% end %>
-     </ul>
+         </ul>
+     </div>
   </div>
 </div>
 <br/>
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
      <div class="heading">Recently viewed</div>
-    <div>
+    <div class="recently_viewed">
         <% viewed_items = recently_viewed_items(1.year.ago, 10) %>
         <ul>
         <% viewed_items.each do |viewed_item|%>
@@ -98,7 +102,7 @@
   </div>
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
-    <div>
+    <div class="recently_downloaded">
         <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
         <ul>
         <% downloaded_items.each do |downloaded_item|%>
