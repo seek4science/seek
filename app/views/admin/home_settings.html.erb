@@ -1,0 +1,48 @@
+<%= stylesheet_link_tag "settings" -%>
+
+<h1>Homepage setting</h1>
+<div class="show_basic">
+<% form_tag :action=>"update_home_settings" do -%>
+  <br/>
+  <ul class='settings'>
+    <%= render :partial=>'setting_li', :locals=>{
+            :description=>"Display the project news in the homepage",
+            :name=>"Project news enabled",
+            :field=>check_box_tag(:project_news_enabled, 1, Seek::Config.project_news_enabled, :onchange=>toggle_appear_javascript('project_news_block'))
+    } -%>
+
+    <li id="project_news_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.project_news_enabled -%>">
+      Feed urls: <%= text_field_tag(:project_news_feed_urls, Seek::Config.project_news_feed_urls, :size => 81) %>
+      <span class="setting_description">The feed urls of the sites you want to get the feeds for your project news box. The format of the feeds can be rss or atom. The multiple urls are separated by a comma.</span>
+      Number of news from each
+      feed: <%= text_field_tag(:project_news_number_of_feed_entry, Seek::Config.project_news_number_of_feed_entry) %>
+      <span class="setting_description">Number of news you want to retrieve from each feed url. If multiple feed urls are set, multiple numbers have to be given, separated by a comma, follow the order of the feed url</span>
+    </li>
+
+    <%= render :partial=>'setting_li', :locals=>{
+            :description=>"Display the community news in the homepage",
+            :name=>"Community news enabled",
+            :field=>check_box_tag(:community_news_enabled, 1, Seek::Config.community_news_enabled, :onchange=>toggle_appear_javascript('community_news_block'))
+    } -%>
+
+    <li id="community_news_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.community_news_enabled -%>">
+      Feed urls: <%= text_field_tag(:community_news_feed_urls, Seek::Config.community_news_feed_urls, :size => 81) %>
+      <span class="setting_description">The feed urls of the sites you want to get the feeds for your community news box. The format of the feeds can be rss or atom. The multiple urls are separated by a comma.</span>
+      Number of news from each
+      feed: <%= text_field_tag(:community_news_number_of_feed_entry, Seek::Config.community_news_number_of_feed_entry) %>
+      <span class="setting_description">Number of news you want to retrieve from each feed url. If multiple feed urls are set, multiple numbers have to be given, separated by a comma, follow the order of the feed url</span>
+    </li>
+
+    <%= render :partial=>'setting_li', :locals=>{
+            :description=>"Sets the description text on the front page",
+            :name=>"Home page description",
+            :field=>text_area_tag(:home_description, Seek::Config.home_description, :size=>"90x8")
+    } -%>
+
+    <br/>
+    <li><%= submit_tag "Update",:disable_with=>"Updating ..." %></li>
+
+  </ul>
+
+<% end %>
+</div>
