@@ -36,6 +36,9 @@ class PublishingTest < ActionController::TestCase
   test "get preview_publish" do
     df=data_with_isa
     assay=df.assays.first
+    study=assay.study
+    investigation=study.investigation
+    
     other_df=assay.data_file_masters.reject{|d|d==df}.first
     assert_not_nil assay,"There should be an assay associated"
     assert df.can_manage?,"The datafile must be manageable for this test to succeed"
@@ -57,6 +60,20 @@ class PublishingTest < ActionController::TestCase
     end
     assert_select "li.secondary",:text=>/Notify owner/ do
       assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_DataFile_#{other_df.id}"
+    end
+
+    assert_select "li.type_and_title",:text=>/Study/,:count=>1 do
+      assert_select "a[href=?]",study_path(study),:text=>/#{study.title}/
+    end
+    assert_select "li.secondary",:text=>/Publish/ do
+      assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_Study_#{study.id}"
+    end
+
+    assert_select "li.type_and_title",:text=>/Investigation/,:count=>1 do
+      assert_select "a[href=?]",investigation_path(investigation),:text=>/#{investigation.title}/
+    end
+    assert_select "li.secondary",:text=>/Publish/ do
+      assert_select "input[checked='checked'][type='checkbox'][id=?]","publish_Investigation_#{investigation.id}"
     end
 
   end
