@@ -1,6 +1,6 @@
 <% project_events = Event.all.select(&:can_view?).sort_by(&:title).select {|e| e.project == resource.project} %>
 
-<% fancy_multiselect resource, :events, :name => :event_ids do %>
+<% fancy_multiselect resource, :events do %>
     <br/>
 
     <%= check_box_tag :include_other_project_events, nil, false, {:onchange=>"swapSelectListContents('possible_event_ids','alternative_event_ids');",:style=>"margin-top:0.5em;"} -%> Include Events from other projects?
