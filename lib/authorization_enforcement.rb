@@ -85,7 +85,7 @@ module Acts
                 return true
               end
               unless !send(reflection.name) or send(reflection.name).can_perform? options[:required_access]
-                errors.add reflection.primary_key_name.to_s, "must be a #{reflection.name.humanize} you can #{options[:required_access].to_s}"
+                errors.add reflection.primary_key_name.to_s, "must be a #{reflection.name.to_s.humanize} you can #{options[:required_access].to_s}"
                 return true
               end
               #TODO: need to check can_perform?(options[:required_access]) for the old value of the association as well.
