@@ -94,7 +94,7 @@ class Assay < ActiveRecord::Base
     assay_asset.asset = asset
     assay_asset.version = asset.version
     assay_asset.relationship_type = r_type unless r_type.nil?
-    assay_asset.save! if assay_asset.changed?
+    assay_asset.save if assay_asset.changed?
     
     return assay_asset
   end
