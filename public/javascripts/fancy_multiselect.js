@@ -36,3 +36,9 @@
         }
         multiselect.fire('fancySelect:update');
     }
+
+    function swapSelectListContents(target, alternative) {
+        var old = $(target).innerHTML;
+        $(target).innerHTML = $(alternative).innerHTML;
+        $(alternative).innerHTML = old;
+    }

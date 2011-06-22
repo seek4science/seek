@@ -89,6 +89,18 @@ module FancyMultiselectHelper
     end
   end
 
+  module AssociationContentFromBlock
+    def fancy_multiselect object, association, options = {}
+      if block_given?
+        options[:association_step_content] = '' unless options[:association_step_content]
+        options[:association_step_content] = options[:association_step_content] + capture {yield}
+        concat super(object, association, options)
+      else
+        super(object, association, options)
+      end
+    end
+  end
+
   #commenting some of these out should be ok. The only one relied on by others is SetDefaults (and Base, of course).
   #Changing the order may break things. These are executed starting with the last one, and ending with Base.
   include Base
@@ -97,4 +109,5 @@ module FancyMultiselectHelper
   include SetDefaults
   include SetDefaultsWithReflection
   include FoldingBox
+  include AssociationContentFromBlock
 end
