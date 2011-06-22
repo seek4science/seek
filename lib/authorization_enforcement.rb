@@ -30,12 +30,26 @@ module Acts
           base.before_save :changes_authorized?
           base.class_inheritable_array :attributes_not_requiring_can_edit
           base.class_inheritable_array :attributes_requiring_can_manage
+          base.class_eval {alias_method_chain :save!, :authorization_exception}
+        end
+
+        def save_with_authorization_exception! *args
+          if changes_authorized?
+            disable_authorization_checks {save_without_authorization_exception!}
+          else
+            raise "Authorization failed: #{errors.full_messages}"
+          end
         end
 
         # Implements rule 1 above. Used instead of using can_delete? directly,
         # so that authorization enforcement can be disabled
         def delete_authorized?
-          $authorization_checks_disabled or can_delete?
+          if $authorization_checks_disabled or can_delete?
+            true
+          else
+            errors.add_to_base "Deleting #{self.class.name.underscore.humanize}-#{id} is not permitted"
+            false
+          end
         end
 
         def changes_authorized?
@@ -50,8 +64,14 @@ module Acts
         def unauthorized_change_to_attributes?
           #changed includes the foreign keys of belongs_to associations. Since those are implemented by a different method, I filter them out here.
           changed_attrs = changed - self.class.reflect_on_all_associations(:belongs_to).map(&:primary_key_name).map(&:to_s)
-          return true unless (changed_attrs - (attributes_not_requiring_can_edit || []).map(&:to_s)).empty? || can_edit?
-          return true unless (changed_attrs & (attributes_requiring_can_manage || []).map(&:to_s)).empty? || can_manage?
+          unless (changed_attrs - (attributes_not_requiring_can_edit || []).map(&:to_s)).empty? || can_edit?
+            errors.add_to_base "You are not permitted to edit #{self.class.name.underscore.humanize}-#{id}"
+            return true
+          end
+          unless (changed_attrs & (attributes_requiring_can_manage || []).map(&:to_s)).empty? || can_manage?
+            errors.add_to_base "You are not permitted to manage #{self.class.name.underscore.humanize}-#{id}"
+            return true
+          end
           false
         end
 
@@ -60,8 +80,14 @@ module Acts
           self.class.reflect_on_all_associations(:belongs_to).each do |reflection|
             options = reflection.options.reverse_merge :required_access => :view, :required_access_to_owner => :edit
             if changed.include? reflection.primary_key_name.to_s
-              return true unless can_perform? options[:required_access_to_owner]
-              return true unless !send(reflection.name) or send(reflection.name).can_perform? options[:required_access]
+              unless can_perform? options[:required_access_to_owner]
+                errors.add_to_base "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
+                return true
+              end
+              unless !send(reflection.name) or send(reflection.name).can_perform? options[:required_access]
+                errors.add reflection.primary_key_name.to_s, "must be a #{reflection.name.to_s.humanize} you can #{options[:required_access].to_s}"
+                return true
+              end
               #TODO: need to check can_perform?(options[:required_access]) for the old value of the association as well.
               #Tricky because of polymorphic belongs_to associations. You can get the old values of the id/type from the changes method.
               #changes[reflection.primary_key_name].first, and changes["#{reflection.name}_type"].first
@@ -77,7 +103,10 @@ module Acts
             if targets = association_instance_get(reflection.name)
               targets = [targets] unless reflection.collection?
               if targets.detect { |record| record.changed_for_autosave? }
-                return true if !can_perform?(options[:required_access_to_owner])
+                if !can_perform?(options[:required_access_to_owner])
+                  errors.add_to_base "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
+                  return true
+                end
               end
             end
           end
