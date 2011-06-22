@@ -73,11 +73,11 @@ class AdminController < ApplicationController
   def update_home_settings
     Seek::Config.project_news_enabled= string_to_boolean params[:project_news_enabled]
     Seek::Config.project_news_feed_urls= params[:project_news_feed_urls]
-    Seek::Config.project_news_number_of_feed_entry= params[:project_news_number_of_feed_entry]
+    Seek::Config.project_news_number_of_entries= params[:project_news_number_of_entries] if only_integer params[:tag_threshold], "number of project news"
 
     Seek::Config.community_news_enabled= string_to_boolean params[:community_news_enabled]
     Seek::Config.community_news_feed_urls= params[:community_news_feed_urls]
-    Seek::Config.community_news_number_of_feed_entry= params[:community_news_number_of_feed_entry]
+    Seek::Config.community_news_number_of_entries= params[:community_news_number_of_entries] if only_integer params[:tag_threshold], "number of community news"
 
     Seek::Config.home_description = params[:home_description]
     update_redirect_to true,'home_settings'

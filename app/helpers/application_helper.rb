@@ -123,8 +123,8 @@ module ApplicationHelper
     return res
   end
   
-  def tooltip_title_attrib(text, delay=200)
-    return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
+  def tooltip_title_attrib(text, css_header='boxoverTooltipHeader', css_body='boxoverTooltipBody', delay=200)
+    return "header=[] body=[#{text}] cssheader=[#{css_header}] cssbody=[#{css_body}] delay=[#{delay}]"
   end
     
   

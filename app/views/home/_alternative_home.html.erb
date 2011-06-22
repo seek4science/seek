@@ -69,14 +69,11 @@
      <div class="project_news">
         <ul>
          <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
-            number_of_feed_entry_array = Seek::Config.project_news_number_of_feed_entry.split(',')
-            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-            count = 0
+            entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
          %>
-         <% unless !try_block{feeds.values} %>
-             <% feeds.values.each do |value|   %>
-                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-                <%count +=1 %>
+         <% unless !entries %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>
@@ -88,14 +85,11 @@
      <div class="community_news">
          <ul>
          <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
-            number_of_feed_entry_array = Seek::Config.community_news_number_of_feed_entry.split(',')
-            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-            count = 0
+           entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.community_news_number_of_entries)
          %>
-         <% unless !try_block{feeds.values} %>
-             <% feeds.values.each do |value|   %>
-                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-                <%count +=1 %>
+         <% unless !entries %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>

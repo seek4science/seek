@@ -28,10 +28,10 @@ Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
 Seek::Config.default :bioportal_api_key,''
 Seek::Config.default :project_news_enabled,false
 Seek::Config.default :project_news_feed_urls,''
-Seek::Config.default :project_news_number_of_feed_entry,''
+Seek::Config.default :project_news_number_of_entries,10
 Seek::Config.default :community_news_enabled,false
 Seek::Config.default :community_news_feed_urls,''
-Seek::Config.default :community_news_number_of_feed_entry,''
+Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 
 
