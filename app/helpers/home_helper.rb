@@ -99,9 +99,15 @@ module HomeHelper
           #get the link of the entry
           entry_link = (check_entry_link(try_block{entry.url})) || (check_entry_link(try_block{entry.links.first})) || (check_entry_link(try_block{entry.link})) || (check_entry_link(try_block{entry.id})) || ''
           entry_title = try_block{entry.title} || ''
-          unless entry_title.blank?
+          entry_date = try_block{entry.published} || try_block{entry.last_modified}
+          unless entry_title.blank? or entry_link.blank?
             html << "<li>"
-            html << link_to("#{entry_title}", "#{entry_link}")
+            html << link_to("#{entry_title}", "#{entry_link}", {:title => "header=[] body=[#{try_block{entry.summary}}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"})
+            html << "<div style='font-size:10px;font-style:italic;color:gray'>"
+            html << try_block{feed.title}
+            html << ' '
+            html << get_day_month_year(entry_date)
+            html << "</div>"
             html << "</li>"
           end
         end
@@ -113,6 +119,18 @@ module HomeHelper
   def check_entry_link entry_link=nil
     return nil if entry_link.nil? || !entry_link.to_s.start_with?('http://')
     entry_link.to_s
+  end
+
+  #get date in the format of day-month-year
+  def get_day_month_year date
+    return '' if date.nil?
+    new_date = ''
+    new_date << try_block{date.day.to_s}
+    new_date << '-' if !new_date.blank?
+    new_date << try_block{date.month.to_s}
+    new_date << '-' if !try_block{date.month.to_s}.blank?
+    new_date << try_block{date.year.to_s}
+    new_date
   end
 
 end
