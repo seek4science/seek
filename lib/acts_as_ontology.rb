@@ -9,8 +9,8 @@ module Stu
 
       module ClassMethods
         def acts_as_ontology
-          has_and_belongs_to_many :children, :class_name=>self.class_name,:join_table=>"#{self.class_name.pluralize.underscore}_edges",:foreign_key=>"parent_id",:association_foreign_key=>"child_id"
-          has_and_belongs_to_many :parents, :class_name=>self.class_name,:join_table=>"#{self.class_name.pluralize.underscore}_edges",:foreign_key=>"child_id",:association_foreign_key=>"parent_id"
+          has_and_belongs_to_many :children, :class_name=>self.name,:join_table=>"#{self.name.pluralize.underscore}_edges",:foreign_key=>"parent_id",:association_foreign_key=>"child_id"
+          has_and_belongs_to_many :parents, :class_name=>self.name,:join_table=>"#{self.name.pluralize.underscore}_edges",:foreign_key=>"child_id",:association_foreign_key=>"parent_id"
 
           extend Stu::Acts::Ontology::SingletonMethods
           include Stu::Acts::Ontology::InstanceMethods

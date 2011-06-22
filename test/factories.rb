@@ -91,6 +91,16 @@
     f.access_type Policy::NO_ACCESS
   end
 
+#Assay and Technology types
+
+  Factory.define(:technology_type, :class=>TechnologyType) do |f|
+    f.sequence(:title) {|n| "A TechnologyType#{n}"}
+  end
+
+  Factory.define(:assay_type) do |f|
+    f.sequence(:title) {|n| "An AssayType#{n}"}
+  end
+
 #Assay
   Factory.define(:assay_base, :class => Assay) do |f|
     f.title "An Assay"
@@ -168,10 +178,6 @@
   Factory.define(:work_group) do |f|
     f.association :project
     f.association :institution
-  end
-
-  Factory.define(:assay_type) do |f|
-    f.sequence(:title) {|n| "An AssayType#{n}"}
   end
 
   Factory.define(:organism) do |f|
