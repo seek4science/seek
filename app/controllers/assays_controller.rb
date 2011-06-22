@@ -38,7 +38,7 @@ class AssaysController < ApplicationController
 
     @assay.owner=current_user.person
 
-    @assay.policy.set_attributes_with_sharing params[:sharing], @assay.project
+    @assay.policy.set_attributes_with_sharing params[:sharing], @assay.study.investigation.project
 
     respond_to do |format|
       if @assay.save

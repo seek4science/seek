@@ -39,6 +39,24 @@
       margin-left:0.25em;
       padding-bottom: 0.5em;
   }
+  .hoverTooltipHeader {
+        display: none;
+        border: 0;
+        height: 0;
+    }
+
+  .hoverTooltipBody {
+        border: solid 1px #d3d3d3;
+        color: #000000;
+        background-color: #e0ffff;
+        font-size: 93%;
+        font-weight: normal;
+        padding: 0.2em 0.6em;
+        max-width: 500px;
+        text-align: left;
+        line-height: 1.4em;
+    }
+
 </style>
 <h1><%= Seek::Config.application_name -%></h1>
 <div class="top_home_panel">
@@ -94,7 +112,8 @@
         <% viewed_items.each do |viewed_item|%>
             <%path = eval("#{viewed_item.class.name.underscore}_path(#{viewed_item.id})" )%>
             <li>
-            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path -%>
+            <% description = try_block{viewed_item.description} || try_block{viewed_item.abstract} %>
+            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
             </li>
         <%end%>
         </ul>
@@ -108,7 +127,8 @@
         <% downloaded_items.each do |downloaded_item|%>
             <%path = eval("#{downloaded_item.class.name.underscore}_path(#{downloaded_item.id})" )%>
             <li>
-            <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path -%>
+              <% description = try_block{downloaded_item.description} || try_block{downloaded_item.abstract} %>
+              <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
             </li>
         <% end %>
         </ul>
