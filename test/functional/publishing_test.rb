@@ -14,7 +14,7 @@ class PublishingTest < ActionController::TestCase
   end
   
   test "do publish" do
-    df=data_files(:picture)
+    df=data_file_for_publishing
 
     assert df.can_manage?,"The datafile must be manageable for this test to succeed"
     post :publish,:id=>df
@@ -25,7 +25,7 @@ class PublishingTest < ActionController::TestCase
 
   test "do not publish if not can_manage?" do
     login_as(:quentin)
-    df=data_files(:picture)
+    df=data_file_for_publishing
     assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
     post :publish,:id=>df
     assert_redirected_to data_file_path(df)
@@ -34,7 +34,7 @@ class PublishingTest < ActionController::TestCase
   end
 
   test "get preview_publish" do
-    df=data_files(:picture)
+    df=data_file_for_publishing
     assert df.can_manage?,"The datafile must be manageable for this test to succeed"
     get :preview_publish, :id=>df
     assert_response :success
@@ -42,11 +42,22 @@ class PublishingTest < ActionController::TestCase
 
   test "cannot get preview_publish when not manageable" do
     login_as(:quentin)
-    df = data_files(:picture)
+    df=data_file_for_publishing
     assert !df.can_manage?,"The datafile must not be manageable for this test to succeed"
     get :preview_publish, :id=>df
     assert_redirected_to data_file_path(df)
     assert flash[:error]
+  end
+
+  private
+
+  def data_file_for_publishing
+    owner = users(:datafile_owner)
+    other_user = users(:quentin)
+    assay = Factory :experimental_assay
+    data_file = Factory :data_file, :contributor=>owner, :project=>owner.person.projects.first
+
+    data_file
   end
   
 end
