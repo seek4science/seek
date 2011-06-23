@@ -118,7 +118,7 @@ module HomeHelper
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c')}</p>")
           unless entry_title.blank? or entry_link.blank?
             html << "<li>"
-            html << link_to("#{entry_title}", "#{entry_link}", {:title => tooltip})
+            html << link_to("#{entry_title}", "#{entry_link}", :title => tooltip, :target=>"_blank")
             html << "<div class='feedinfo none_text'>"
             html << feed_title
             html << " - #{time_ago_in_words(entry_date)} ago"
