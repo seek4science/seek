@@ -11,6 +11,6 @@ if Rails.env.test?
     Settings.defaults[:jws_enabled] = true
     Settings.defaults[:events_enabled] = true
 
-    Settings.default[:email_enabled] = true
+    Settings.defaults[:email_enabled] = true
   end
 end
