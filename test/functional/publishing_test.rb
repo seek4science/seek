@@ -78,6 +78,93 @@ class PublishingTest < ActionController::TestCase
 
   end
 
+  test "do publish all" do
+    df=data_with_isa
+    assays=df.assays
+    params={:publish=>{}}
+    non_owned_assets=[]
+    assays.each do |a|
+      assert !a.is_published?,"This assay should not be public for the test to work"
+      assert !a.study.is_published?,"This assays study should not be public for the test to work"
+      assert !a.study.investigation.is_published?,"This assays investigation should not be public for the test to work"
+
+      params[:publish]["Assay"]||={}
+      params[:publish]["Assay"][a.id.to_s]="1"
+      params[:publish]["Study"]||={}
+      params[:publish]["Study"][a.study.id.to_s]="1"
+      params[:publish]["Investigation"]||={}
+      params[:publish]["Investigation"][a.study.investigation.id.to_s]="1"
+
+      a.assets.collect{|a| a.parent}.each do |asset|
+        assert !asset.is_published?,"This assays assets should not be public for the test to work"
+        params[:publish][asset.class.name]||={}
+        params[:publish][asset.class.name][asset.id.to_s]="1"
+        non_owned_assets << asset unless asset.can_manage?
+      end
+    end
+
+    assert !non_owned_assets.empty?, "There should be non manageable assets included in this test"
+
+    post :publish,params.merge(:id=>df)
+
+    assert_emails 1
+
+    assert_response :success
+
+    df.reload
+
+    assert df.is_published?, "Datafile should now be published"
+    df.assays.each do |assay|
+      assert assay.is_published?
+      assert assay.study.is_published?
+      assert assay.study.investigation.is_published?
+    end
+    non_owned_assets.each {|a| assert !a.is_published?, "Non manageable assets should not have been published"}
+
+  end
+
+  test "do publish some" do
+    df=data_with_isa
+    assays=df.assays
+    params={:publish=>{}}
+    non_owned_assets=[]
+    assays.each do |a|
+      assert !a.is_published?,"This assay should not be public for the test to work"
+      assert !a.study.is_published?,"This assays study should not be public for the test to work"
+      assert !a.study.investigation.is_published?,"This assays investigation should not be public for the test to work"
+
+      params[:publish]["Assay"]||={}
+      params[:publish]["Study"]||={}
+      params[:publish]["Study"][a.study.id.to_s]="1"
+      params[:publish]["Investigation"]||={}
+
+      a.assets.collect{|a| a.parent}.each do |asset|
+        assert !asset.is_published?,"This assays assets should not be public for the test to work"
+        params[:publish][asset.class.name]||={}
+        params[:publish][asset.class.name][asset.id.to_s]="1" if asset.can_manage?
+        non_owned_assets << asset unless asset.can_manage?
+      end
+    end
+
+    assert !non_owned_assets.empty?, "There should be non manageable assets included in this test"
+
+    post :publish,params.merge(:id=>df)
+    assert_response :success
+
+    assert_emails 0
+
+    df.reload
+
+    assert df.is_published?, "Datafile should now be published"
+    df.assays.each do |assay|
+      assert !assay.is_published?, "The assay was not requested to be published"
+      assert assay.study.is_published?
+      assert !assay.study.investigation.is_published?, "The investigation was not requested to be published"
+    end
+    non_owned_assets.each {|a| assert !a.is_published?, "Non manageable assets should not have been published"}
+
+  end
+
   test "cannot get preview_publish when not manageable" do
     login_as(:quentin)
     df=data_file_for_publishing
@@ -100,6 +187,7 @@ class PublishingTest < ActionController::TestCase
     other_persons_data_file = Factory :data_file, :contributor=>other_user, :project=>other_user.person.projects.first,:policy=>Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
     assay.relate(df)
     assay.relate(other_persons_data_file)
+    assert !other_persons_data_file.can_manage?
     df
   end
   

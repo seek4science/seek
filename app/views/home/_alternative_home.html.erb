@@ -1,63 +1,5 @@
-<style>
-  div.home_panel {
-      background-color: #EEE;
-      border: 1px solid #d3d3d3;
-      height: 20em;
-      overflow-y:auto;
-      float: left;
-  }
+<%= stylesheet_link_tag "homepage" -%>
 
-  div.home_panel_pair {
-      width: 95%;
-      margin-left:auto;
-      margin-right: auto;
-  }
-
-  div.top_home_panel {
-      background-color: #EEE;
-      border: 1px solid #d3d3d3;
-      width: 95%;
-      margin-left:auto;
-      margin-right: auto;
-      margin-bottom: 1em;
-      min-height: 6em;
-      padding-left: 0.25em;
-  }
-
-  div.home_panel .heading {
-      background-color: #55F;
-      color: white;
-      font-weight:bolder;
-      text-align: center;
-      min-height:.2em;
-      text-align:center;
-      padding-top: 0.25em;
-      padding-bottom: 0.25em;
-  }
-  .atom {
-      float:left;
-      margin-left:0.25em;
-      padding-bottom: 0.5em;
-  }
-  .hoverTooltipHeader {
-        display: none;
-        border: 0;
-        height: 0;
-    }
-
-  .hoverTooltipBody {
-        border: solid 1px #d3d3d3;
-        color: #000000;
-        background-color: #e0ffff;
-        font-size: 93%;
-        font-weight: normal;
-        padding: 0.2em 0.6em;
-        max-width: 500px;
-        text-align: left;
-        line-height: 1.4em;
-    }
-
-</style>
 <h1><%= Seek::Config.application_name -%></h1>
 <div class="top_home_panel">
   <%= simple_format(auto_link(Seek::Config.home_description)) -%>
@@ -66,17 +8,14 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
      <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="project_news">
+     <div id="project_news" class="homepanel_list">
         <ul>
          <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
-            number_of_feed_entry_array = Seek::Config.project_news_number_of_feed_entry.split(',')
-            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-            count = 0
+            entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
          %>
-         <% unless !try_block{feeds.values} %>
-             <% feeds.values.each do |value|   %>
-                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-                <%count +=1 %>
+         <% unless !entries %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>
@@ -85,17 +24,14 @@
 
   <div class="yui-u home_panel" style="display:<%= Seek::Config.community_news_enabled ? 'block' : 'none' -%>">
      <div class="heading">Community News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="community_news">
+     <div id="community_news" class="homepanel_list">
          <ul>
          <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
-            number_of_feed_entry_array = Seek::Config.community_news_number_of_feed_entry.split(',')
-            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-            count = 0
+           entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.community_news_number_of_entries)
          %>
-         <% unless !try_block{feeds.values} %>
-             <% feeds.values.each do |value|   %>
-                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-                <%count +=1 %>
+         <% unless !entries %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>
@@ -106,14 +42,17 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
      <div class="heading">Recently viewed</div>
-    <div class="recently_viewed">
+    <div id="recently_viewed" class="homepanel_list">
         <% viewed_items = recently_viewed_items(1.year.ago, 10) %>
         <ul>
         <% viewed_items.each do |viewed_item|%>
             <%path = eval("#{viewed_item.class.name.underscore}_path(#{viewed_item.id})" )%>
             <li>
-            <% description = try_block{viewed_item.description} || try_block{viewed_item.abstract} %>
-            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
+            <%
+                description = try_block{viewed_item.description} || try_block{viewed_item.abstract}
+                tooltip=tooltip_title_attrib(description)
+            %>
+            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path, {:title => tooltip} -%>
             </li>
         <%end%>
         </ul>
@@ -121,14 +60,17 @@
   </div>
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
-    <div class="recently_downloaded">
+    <div id="recently_downloaded" class="homepanel_list">
         <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
         <ul>
         <% downloaded_items.each do |downloaded_item|%>
             <%path = eval("#{downloaded_item.class.name.underscore}_path(#{downloaded_item.id})" )%>
             <li>
-              <% description = try_block{downloaded_item.description} || try_block{downloaded_item.abstract} %>
-              <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
+              <%
+                 description = try_block{downloaded_item.description} || try_block{downloaded_item.abstract}
+                 tooltip=tooltip_title_attrib(description)
+              %>
+              <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path, {:title => tooltip } -%>
             </li>
         <% end %>
         </ul>

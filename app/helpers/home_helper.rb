@@ -89,48 +89,50 @@ module HomeHelper
     end
   end
 
-  #display entries of a single feed. Nuber of entries displayed are set in number_of_entries variable
-  def display_single_feed feed=nil, number_of_entries=3
+  #
+  def filter_feeds_entries_with_chronological_order feeds, number_of_entries=10
+    filtered_entries = []
+    unless try_block{feeds.values}.nil?
+      feeds.values.each do |value|
+         # atom format use entries while rss format use items
+         entries = try_block{value.entries} || try_block{value.items}
+         #concat the source of the entry in the entry title, used later on to display
+         unless !entries
+           entries.each{|entry| entry.title<< "***#{value.title}" if entry.title}
+         end
+         filtered_entries |= entries.take(number_of_entries) if entries
+      end
+    end
+    filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified || 10.year.ago}) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
+  end
+
+  
+  def display_single_entry entry
       html=''
-      # atom format use entries while rss format use items
-      entries = try_block{feed.entries} || try_block{feed.items}
-      unless !entries
-        entries.take(number_of_entries).each do |entry|
+      unless entry.nil?
           #get the link of the entry
           entry_link = (check_entry_link(try_block{entry.url})) || (check_entry_link(try_block{entry.links.first})) || (check_entry_link(try_block{entry.link})) || (check_entry_link(try_block{entry.id})) || ''
-          entry_title = try_block{entry.title} || ''
-          entry_date = try_block{entry.published} || try_block{entry.last_modified}
+          entry_title, feed_title = (try_block{entry.title} || '').split('***')
+          entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
+          entry_summary = truncate(strip_tags(entry.summary),:length=>500)
+          tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
           unless entry_title.blank? or entry_link.blank?
-            html << "<li>"
-            html << link_to("#{entry_title}", "#{entry_link}", {:title => "header=[] body=[#{try_block{entry.summary}}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"})
-            html << "<div style='font-size:10px;font-style:italic;color:gray'>"
-            html << try_block{feed.title}
-            html << ' '
-            html << get_day_month_year(entry_date)
+            html << "<li class='homepanel_item'>"
+            html << link_to("#{entry_title}", "#{entry_link}", :title => tooltip, :target=>"_blank")
+            html << "<div class='feedinfo none_text'>"
+            html << feed_title
+            html << " - #{time_ago_in_words(entry_date)} ago" unless entry_date.nil?
             html << "</div>"
             html << "</li>"
           end
-        end
       end
       html
   end
 
   private
   def check_entry_link entry_link=nil
-    return nil if entry_link.nil? || !entry_link.to_s.start_with?('http://')
+    return nil if entry_link.nil? || !entry_link.to_s.start_with?('http')
     entry_link.to_s
-  end
-
-  #get date in the format of day-month-year
-  def get_day_month_year date
-    return '' if date.nil?
-    new_date = ''
-    new_date << try_block{date.day.to_s}
-    new_date << '-' if !new_date.blank?
-    new_date << try_block{date.month.to_s}
-    new_date << '-' if !try_block{date.month.to_s}.blank?
-    new_date << try_block{date.year.to_s}
-    new_date
   end
 
 end

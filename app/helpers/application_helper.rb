@@ -122,12 +122,11 @@ module ApplicationHelper
     end
     return res
   end
-  
+
   def tooltip_title_attrib(text, delay=200)
     return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
   end
-    
-  
+      
   # text in "caption" will be used to display the item next to the image_tag_for_key;
   # if "caption" is nil, item.name will be used by default
   def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil)

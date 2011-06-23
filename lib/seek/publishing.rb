@@ -21,6 +21,10 @@ module Seek
 
       @problematic_items = @published_items.select{|item| !item.publish!}
 
+      if Seek::Config.email_enabled
+        deliver_publishing_notifications @notified_items
+      end
+
       @published_items = @published_items - @problematic_items
 
       respond_to do |format|
@@ -35,6 +39,20 @@ module Seek
     end
 
     private
+
+    def deliver_publishing_notifications items_for_notification
+      owners_items={}
+      items_for_notification.each do |item|
+        item.managers.each do |person|
+          owners_items[person]||=[]
+          owners_items[person] << item
+        end
+      end
+
+      owners_items.keys.each do |owner|
+        Mailer.deliver_request_publishing User.current_user.person,owner,owners_items[owner],base_host
+      end
+    end
 
     #returns an enumeration of assets, or ISA elements, for publishing based upon the parameters passed
 

@@ -41,6 +41,22 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test "request file button visibility when logged in and out" do
+
+    sop = Factory :sop,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+
+    assert !sop.can_download?, "The SOP must not be downloadable for this test to succeed"
+
+    get :show, :id => sop
+    assert_response :success
+    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>1
+
+    logout
+    get :show, :id => sop
+    assert_response :success
+    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>0
+  end
+
   test "fail gracefullly when trying to access a missing sop" do
     get :show,:id=>99999
     assert_redirected_to sops_path
