@@ -151,12 +151,12 @@ class HomeControllerTest < ActionController::TestCase
     #project news
     Seek::Config.project_news_enabled=true
     Seek::Config.project_news_feed_urls = "http://sbml.org/index.php?title=News&action=feed"
-    Seek::Config.project_news_number_of_feed_entry = "5"
+    Seek::Config.project_news_number_of_entries = "5"
 
     #community news
     Seek::Config.community_news_enabled=true
     Seek::Config.community_news_feed_urls = "http://www2.warwick.ac.uk/sitebuilder2/api/rss/news.rss?page=/fac/sci/systemsbiology/publications/&rss=true, http://feeds.bbci.co.uk/news/uk/rss.xml"
-    Seek::Config.community_news_number_of_feed_entry = "4,3"
+    Seek::Config.community_news_number_of_entries = "7"
 
     #recently viewed
     recently_viewed_items =  recently_viewed_items(1.year.ago, 10)
@@ -167,19 +167,19 @@ class HomeControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div.project_news ul>li', 5
-    assert_select 'div.community_news ul>li', 7
-    assert_select 'div.recently_viewed ul>li', recently_viewed_items.count
-    assert_select 'div.recently_downloaded ul>li', recently_downloaded_items.count
+    assert_select 'div#project_news ul>li', 5
+    assert_select 'div#community_news ul>li', 7
+    assert_select 'div#recently_viewed ul>li', recently_viewed_items.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_items.count
 
     logout
     get :index
     assert_response :success
 
-    assert_select 'div.project_news ul>li', 5
-    assert_select 'div.community_news ul>li', 7
-    assert_select 'div.recently_viewed ul>li', recently_viewed_items.count
-    assert_select 'div.recently_downloaded ul>li', recently_downloaded_items.count
+    assert_select 'div#project_news ul>li', 5
+    assert_select 'div#community_news ul>li', 7
+    assert_select 'div#recently_viewed ul>li', recently_viewed_items.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_items.count
   end
   
 end

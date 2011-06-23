@@ -8,7 +8,7 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
      <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="homepanel_list">
+     <div id="project_news" class="homepanel_list">
         <ul>
          <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
             entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
@@ -24,7 +24,7 @@
 
   <div class="yui-u home_panel" style="display:<%= Seek::Config.community_news_enabled ? 'block' : 'none' -%>">
      <div class="heading">Community News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="homepanel_list">
+     <div id="community_news" class="homepanel_list">
          <ul>
          <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
            entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.community_news_number_of_entries)
@@ -42,7 +42,7 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
      <div class="heading">Recently viewed</div>
-    <div class="homepanel_list">
+    <div id="recently_viewed" class="homepanel_list">
         <% viewed_items = recently_viewed_items(1.year.ago, 10) %>
         <ul>
         <% viewed_items.each do |viewed_item|%>
@@ -60,7 +60,7 @@
   </div>
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
-    <div class="homepanel_list">
+    <div id="recently_downloaded" class="homepanel_list">
         <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
         <ul>
         <% downloaded_items.each do |downloaded_item|%>

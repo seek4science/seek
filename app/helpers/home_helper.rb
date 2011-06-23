@@ -115,13 +115,13 @@ module HomeHelper
           entry_title, feed_title = (try_block{entry.title} || '').split('***')
           entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
           entry_summary = truncate(strip_tags(entry.summary),:length=>500)
-          tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c')}</p>")
+          tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
           unless entry_title.blank? or entry_link.blank?
             html << "<li class='homepanel_item'>"
             html << link_to("#{entry_title}", "#{entry_link}", :title => tooltip, :target=>"_blank")
             html << "<div class='feedinfo none_text'>"
             html << feed_title
-            html << " - #{time_ago_in_words(entry_date)} ago"
+            html << " - #{time_ago_in_words(entry_date)} ago" unless entry_date.nil?
             html << "</div>"
             html << "</li>"
           end
