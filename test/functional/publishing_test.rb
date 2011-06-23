@@ -106,6 +106,9 @@ class PublishingTest < ActionController::TestCase
     assert !non_owned_assets.empty?, "There should be non manageable assets included in this test"
 
     post :publish,params.merge(:id=>df)
+
+    assert_emails 1
+
     assert_response :success
 
     df.reload
@@ -138,7 +141,7 @@ class PublishingTest < ActionController::TestCase
       a.assets.collect{|a| a.parent}.each do |asset|
         assert !asset.is_published?,"This assays assets should not be public for the test to work"
         params[:publish][asset.class.name]||={}
-        params[:publish][asset.class.name][asset.id.to_s]="1"
+        params[:publish][asset.class.name][asset.id.to_s]="1" if asset.can_manage?
         non_owned_assets << asset unless asset.can_manage?
       end
     end
@@ -147,6 +150,8 @@ class PublishingTest < ActionController::TestCase
 
     post :publish,params.merge(:id=>df)
     assert_response :success
+
+    assert_emails 0
 
     df.reload
 
