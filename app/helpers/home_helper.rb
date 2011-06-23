@@ -92,7 +92,7 @@ module HomeHelper
   #
   def filter_feeds_entries_with_chronological_order feeds, number_of_entries=10
     filtered_entries = []
-    unless !try_block{feeds.values}
+    unless try_block{feeds.values}.nil?
       feeds.values.each do |value|
          # atom format use entries while rss format use items
          entries = try_block{value.entries} || try_block{value.items}
@@ -104,24 +104,24 @@ module HomeHelper
       end
     end
     filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified || 10.year.ago}) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
-
   end
 
-
+  
   def display_single_entry entry
       html=''
-      unless !entry
+      unless entry.nil?
           #get the link of the entry
           entry_link = (check_entry_link(try_block{entry.url})) || (check_entry_link(try_block{entry.links.first})) || (check_entry_link(try_block{entry.link})) || (check_entry_link(try_block{entry.id})) || ''
           entry_title, feed_title = (try_block{entry.title} || '').split('***')
           entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
+          entry_summary = truncate(strip_tags(entry.summary),:length=>500)
+          tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c')}</p>")
           unless entry_title.blank? or entry_link.blank?
             html << "<li>"
-            html << link_to("#{entry_title}", "#{entry_link}", {:title => tooltip_title_attrib(entry.summary, 'hoverTooltipHeader', 'hoverTooltipBody')})
-            html << "<div style='font-size:10px;font-style:italic;color:gray'>"
+            html << link_to("#{entry_title}", "#{entry_link}", {:title => tooltip})
+            html << "<div class='feedinfo none_text'>"
             html << feed_title
-            html << ' '
-            html << get_day_month_year(entry_date)
+            html << " - #{time_ago_in_words(entry_date)} ago"
             html << "</div>"
             html << "</li>"
           end
@@ -133,18 +133,6 @@ module HomeHelper
   def check_entry_link entry_link=nil
     return nil if entry_link.nil? || !entry_link.to_s.start_with?('http')
     entry_link.to_s
-  end
-
-  #get date in the format of day-month-year
-  def get_day_month_year date
-    return '' if date.nil?
-    new_date = ''
-    new_date << try_block{date.day.to_s}
-    new_date << '-' if !new_date.blank?
-    new_date << try_block{date.month.to_s}
-    new_date << '-' if !try_block{date.month.to_s}.blank?
-    new_date << try_block{date.year.to_s}
-    new_date
   end
 
 end
