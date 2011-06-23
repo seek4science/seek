@@ -48,8 +48,11 @@
         <% viewed_items.each do |viewed_item|%>
             <%path = eval("#{viewed_item.class.name.underscore}_path(#{viewed_item.id})" )%>
             <li>
-            <% description = try_block{viewed_item.description} || try_block{viewed_item.abstract} %>
-            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
+            <%
+                description = try_block{viewed_item.description} || try_block{viewed_item.abstract}
+                tooltip=tooltip_title_attrib(description)
+            %>
+            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path, {:title => tooltip} -%>
             </li>
         <%end%>
         </ul>
@@ -63,8 +66,11 @@
         <% downloaded_items.each do |downloaded_item|%>
             <%path = eval("#{downloaded_item.class.name.underscore}_path(#{downloaded_item.id})" )%>
             <li>
-              <% description = try_block{downloaded_item.description} || try_block{downloaded_item.abstract} %>
-              <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
+              <%
+                 description = try_block{downloaded_item.description} || try_block{downloaded_item.abstract}
+                 tooltip=tooltip_title_attrib(description)
+              %>
+              <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path, {:title => tooltip } -%>
             </li>
         <% end %>
         </ul>
