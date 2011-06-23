@@ -117,7 +117,7 @@ module HomeHelper
           entry_summary = truncate(strip_tags(entry.summary),:length=>500)
           tooltip=tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c')}</p>")
           unless entry_title.blank? or entry_link.blank?
-            html << "<li>"
+            html << "<li class='homepanel_item'>"
             html << link_to("#{entry_title}", "#{entry_link}", :title => tooltip, :target=>"_blank")
             html << "<div class='feedinfo none_text'>"
             html << feed_title

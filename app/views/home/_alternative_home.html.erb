@@ -1,17 +1,4 @@
 <style>
-  div.home_panel {
-      background-color: #EEE;
-      border: 1px solid #d3d3d3;
-      height: 20em;
-      overflow-y:auto;
-      float: left;
-  }
-
-  div.home_panel_pair {
-      width: 95%;
-      margin-left:auto;
-      margin-right: auto;
-  }
 
   div.top_home_panel {
       background-color: #EEE;
@@ -24,14 +11,44 @@
       padding-left: 0.25em;
   }
 
+  div.home_panel {
+      background-color: #EEE;
+      border: 1px solid #d3d3d3;
+      height: 25em;
+      float: left;
+      overflow-y: auto;
+  }
+
+  div.home_panel_pair {
+      width: 95%;
+      margin-left:auto;
+      margin-right: auto;
+  }
+
+  div.home_panel .homepanel_list {
+      padding-bottom: 1em;
+  }
+
+  div.home_panel .homepanel_list ul {
+      margin-left: 0.5em;
+      margin-right: 0.5em;
+  }
+
+  div.home_panel .homepanel_item {
+      border-bottom: 1px solid #DDD;
+      list-style: none;
+      width: 100%;
+      padding-left: 0px;
+  }
+
   div.home_panel .heading {
       background-color: #3D71CA;
       color: white;
       font-weight:bolder;
       text-align: center;
-      min-height:.2em;
+      min-height:1.25em;
       text-align:center;
-      padding-top: 0.25em;
+      padding-top: 0.4em;
       padding-bottom: 0.25em;
   }
   
@@ -46,6 +63,7 @@
   }
 
 </style>
+
 <h1><%= Seek::Config.application_name -%></h1>
 <div class="top_home_panel">
   <%= simple_format(auto_link(Seek::Config.home_description)) -%>
@@ -54,7 +72,7 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
      <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="project_news">
+     <div class="homepanel_list">
         <ul>
          <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
             entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
@@ -70,7 +88,7 @@
 
   <div class="yui-u home_panel" style="display:<%= Seek::Config.community_news_enabled ? 'block' : 'none' -%>">
      <div class="heading">Community News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="community_news">
+     <div class="homepanel_list">
          <ul>
          <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
            entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.community_news_number_of_entries)
@@ -88,7 +106,7 @@
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
      <div class="heading">Recently viewed</div>
-    <div class="recently_viewed">
+    <div class="homepanel_list">
         <% viewed_items = recently_viewed_items(1.year.ago, 10) %>
         <ul>
         <% viewed_items.each do |viewed_item|%>
@@ -103,7 +121,7 @@
   </div>
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
-    <div class="recently_downloaded">
+    <div class="homepanel_list">
         <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
         <ul>
         <% downloaded_items.each do |downloaded_item|%>
