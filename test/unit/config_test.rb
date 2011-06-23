@@ -15,8 +15,11 @@ class ConfigTest < ActiveSupport::TestCase
   test "solr enabled" do
     assert_equal false ,Seek::Config.solr_enabled
   end
+
+
   test "email_enabled" do
-    assert_equal false ,Seek::Config.email_enabled
+    #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
+    assert_equal true ,Seek::Config.email_enabled
   end
 
   test "smtp_settings port" do
