@@ -22,13 +22,13 @@ class Mailer < ActionMailer::Base
 
   def request_publishing(publisher,owner,resources,base_host)
 
-    subject "#{Seek::Config.application_name} - request for making items public"
+    subject "A #{Seek::Config.application_name} member requests you make some items public"
     recipients owner.email_with_name
     from       Seek::Config.noreply_sender
     reply_to   publisher.email_with_name
     sent_on Time.now
 
-    body :host=>base_host,:publisher=>publisher,:resources=>resources
+    body :host=>base_host,:owner=>owner, :publisher=>publisher,:resources=>resources
   end
 
   def request_resource(user,resource,details,base_host)
