@@ -41,7 +41,6 @@ module Seek
     private
 
     def deliver_publishing_notifications items_for_notification
-      puts "**** DELIVEERING"
       owners_items={}
       items_for_notification.each do |item|
         item.managers.each do |person|
