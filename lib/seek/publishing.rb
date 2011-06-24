@@ -21,7 +21,7 @@ module Seek
 
       @problematic_items = @published_items.select{|item| !item.publish!}
 
-      if Seek::Config.email_enabled
+      if Seek::Config.email_enabled && !@notified_items.empty?
         deliver_publishing_notifications @notified_items
       end
 

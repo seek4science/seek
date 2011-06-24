@@ -145,7 +145,7 @@
 
 #Data File
   Factory.define(:data_file) do |f|
-    f.title "A Data File"
+    f.sequence(:title) {|n| "A Data File_#{n}"}
     f.association :project
     f.association :contributor, :factory => :user
     f.association :content_blob, :factory => :content_blob
