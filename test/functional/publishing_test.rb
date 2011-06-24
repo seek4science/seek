@@ -105,9 +105,9 @@ class PublishingTest < ActionController::TestCase
 
     assert !non_owned_assets.empty?, "There should be non manageable assets included in this test"
 
-    post :publish,params.merge(:id=>df)
-
-    #assert_emails 1
+    assert_emails 1 do
+      post :publish,params.merge(:id=>df)
+    end
 
     assert_response :success
 
@@ -125,13 +125,16 @@ class PublishingTest < ActionController::TestCase
 
   test "do publish some" do
     df=data_with_isa
+    
     assays=df.assays
+
     params={:publish=>{}}
     non_owned_assets=[]
     assays.each do |a|
       assert !a.is_published?,"This assay should not be public for the test to work"
       assert !a.study.is_published?,"This assays study should not be public for the test to work"
       assert !a.study.investigation.is_published?,"This assays investigation should not be public for the test to work"
+
 
       params[:publish]["Assay"]||={}
       params[:publish]["Study"]||={}
@@ -148,10 +151,11 @@ class PublishingTest < ActionController::TestCase
 
     assert !non_owned_assets.empty?, "There should be non manageable assets included in this test"
 
-    post :publish,params.merge(:id=>df)
+    assert_emails 0 do
+      post :publish,params.merge(:id=>df)
+    end
+    
     assert_response :success
-
-    #assert_emails 0
 
     df.reload
 
