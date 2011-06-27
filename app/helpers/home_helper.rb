@@ -1,8 +1,9 @@
-require 'feedzirra'
+require 'atom'
 
 module HomeHelper
 
   RECENT_SIZE=5
+
 
   def recent_project_changes_hash
 
@@ -80,25 +81,29 @@ module HomeHelper
   end
 
   # get multiple feeds from multiple sites
-  def get_feeds feed_urls=nil
-    unless feed_urls.blank?
+  def get_feed feed_url=nil
+    unless feed_url.blank?
       #trim the url element
-      feed_urls=feed_urls.each{|feed_url| feed_url.strip! }
-      feeds = Feedzirra::Feed.fetch_and_parse(feed_urls)
-      feeds
+      feed_url.strip!
+      begin
+        feed = Atom::Feed.load_feed(URI.parse(feed_url))
+      rescue
+        feed = nil
+      end
+      feed
     end
   end
 
   #
+
   def filter_feeds_entries_with_chronological_order feeds, number_of_entries=10
     filtered_entries = []
-    unless try_block{feeds.values}.nil?
-      feeds.values.each do |value|
-         # atom format use entries while rss format use items
-         entries = try_block{value.entries} || try_block{value.items}
+    unless feeds.blank?
+      feeds.each do |feed|
+         entries = try_block{feed.entries}
          #concat the source of the entry in the entry title, used later on to display
-         unless !entries
-           entries.each{|entry| entry.title<< "***#{value.title}" if entry.title}
+         unless entries.blank?
+           entries.each{|entry| entry.title<< "***#{feed.title}" if entry.title}
          end
          filtered_entries |= entries.take(number_of_entries) if entries
       end
@@ -109,9 +114,10 @@ module HomeHelper
   
   def display_single_entry entry
       html=''
-      unless entry.nil?
+      unless entry.blank?
           #get the link of the entry
-          entry_link = (check_entry_link(try_block{entry.url})) || (check_entry_link(try_block{entry.links.first})) || (check_entry_link(try_block{entry.link})) || (check_entry_link(try_block{entry.id})) || ''
+          entry_links = try_block{entry.links}
+          entry_link = try_block{entry_links.alternate.href}
           entry_title, feed_title = (try_block{entry.title} || '').split('***')
           entry_date = try_block{entry.updated} || try_block{entry.published} || try_block{entry.last_modified}
           entry_summary = truncate(strip_tags(entry.summary),:length=>500)
@@ -127,12 +133,6 @@ module HomeHelper
           end
       end
       html
-  end
-
-  private
-  def check_entry_link entry_link=nil
-    return nil if entry_link.nil? || !entry_link.to_s.start_with?('http')
-    entry_link.to_s
   end
 
 end

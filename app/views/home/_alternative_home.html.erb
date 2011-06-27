@@ -10,10 +10,13 @@
      <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
      <div id="project_news" class="homepanel_list">
         <ul>
-         <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
-            entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
+         <% feeds = []
+            Seek::Config.project_news_feed_urls.split(',').each do |url|
+                feeds.push get_feed(url) if !get_feed(url).blank?
+            end
+           entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
          %>
-         <% unless !entries %>
+         <% unless entries.blank? %>
              <% entries.each do |entry|   %>
                 <%= display_single_entry(entry) -%>
              <% end %>
@@ -26,10 +29,13 @@
      <div class="heading">Community News<span class="atom"><%= image("atom_feed") -%></span></div>
      <div id="community_news" class="homepanel_list">
          <ul>
-         <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
+         <% feeds = []
+            Seek::Config.community_news_feed_urls.split(',').each do |url|
+                feeds.push get_feed(url) if !get_feed(url).blank?
+            end
            entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.community_news_number_of_entries)
          %>
-         <% unless !entries %>
+         <% unless entries.blank? %>
              <% entries.each do |entry|   %>
                 <%= display_single_entry(entry) -%>
              <% end %>

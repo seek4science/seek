@@ -150,12 +150,12 @@ class HomeControllerTest < ActionController::TestCase
   test "should show the content of 4 boxes" do
     #project news
     Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = "http://sbml.org/index.php?title=News&action=feed"
+    Seek::Config.project_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F02837181562898136579%2Fbundle%2Fsystembiology, http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
     Seek::Config.project_news_number_of_entries = "5"
 
     #community news
     Seek::Config.community_news_enabled=true
-    Seek::Config.community_news_feed_urls = "http://www2.warwick.ac.uk/sitebuilder2/api/rss/news.rss?page=/fac/sci/systemsbiology/publications/&rss=true, http://feeds.bbci.co.uk/news/uk/rss.xml"
+    Seek::Config.community_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
     Seek::Config.community_news_number_of_entries = "7"
 
     #recently viewed
