@@ -24,7 +24,6 @@ class SopTest < ActiveSupport::TestCase
       last=sop.updated_at.to_i
     end
   end
-]
 
   def test_title_trimmed 
     sop=Sop.new(:title=>" test sop",:project=>projects(:sysmo_project))
