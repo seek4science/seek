@@ -90,8 +90,6 @@ module HomeHelper
     end
   end
 
-  #
-
   def filter_feeds_entries_with_chronological_order feeds, number_of_entries=10
     filtered_entries = []
     unless feeds.blank?
@@ -104,7 +102,7 @@ module HomeHelper
          filtered_entries |= entries.take(number_of_entries) if entries
       end
     end
-    filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified || 10.year.ago}) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
+    filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified} || 10.year.ago) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
   end
 
   
