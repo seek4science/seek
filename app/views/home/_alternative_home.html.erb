@@ -52,7 +52,6 @@
         <% uploaded_items = recently_uploaded_items(1.year.ago, 10) %>
         <ul>
         <% uploaded_items.each do |uploaded_item|%>
-
             <%= display_single_item(uploaded_item, 'uploaded', uploaded_item.created_at) -%>
         <%end%>
 
@@ -64,8 +63,11 @@
     <div id="recently_downloaded" class="homepanel_list">
         <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
         <ul>
-        <% downloaded_items.each do |downloaded_item|%>
-           <%= display_single_item(downloaded_item, 'downloaded', downloaded_item.last_used_at) -%>
+        <% downloaded_items.each do |downloaded_item|
+           activity_logs = downloaded_item.activity_logs.select{|a| a.action == 'download'}
+           lasted_download_time = activity_logs.sort{|a,b| b.created_at <=> a.created_at}.first.created_at
+        %>
+           <%= display_single_item(downloaded_item, 'downloaded', lasted_download_time) -%>
         <% end %>
         </ul>
      </div>
