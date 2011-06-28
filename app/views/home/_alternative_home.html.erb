@@ -47,20 +47,15 @@
 <br/>
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
-     <div class="heading">Recently viewed</div>
-    <div id="recently_viewed" class="homepanel_list">
-        <% viewed_items = recently_viewed_items(1.year.ago, 10) %>
+     <div class="heading">Recently uploaded</div>
+    <div id="recently_uploaded" class="homepanel_list">
+        <% uploaded_items = recently_uploaded_items(1.year.ago, 10) %>
         <ul>
-        <% viewed_items.each do |viewed_item|%>
-            <%path = eval("#{viewed_item.class.name.underscore}_path(#{viewed_item.id})" )%>
-            <li>
-            <%
-                description = try_block{viewed_item.description} || try_block{viewed_item.abstract}
-                tooltip=tooltip_title_attrib(description)
-            %>
-            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path, {:title => tooltip} -%>
-            </li>
+        <% uploaded_items.each do |uploaded_item|%>
+
+            <%= display_single_item(uploaded_item, 'uploaded', uploaded_item.created_at) -%>
         <%end%>
+
         </ul>
      </div>
   </div>
@@ -70,14 +65,7 @@
         <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
         <ul>
         <% downloaded_items.each do |downloaded_item|%>
-            <%path = eval("#{downloaded_item.class.name.underscore}_path(#{downloaded_item.id})" )%>
-            <li>
-              <%
-                 description = try_block{downloaded_item.description} || try_block{downloaded_item.abstract}
-                 tooltip=tooltip_title_attrib(description)
-              %>
-              <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path, {:title => tooltip } -%>
-            </li>
+           <%= display_single_item(downloaded_item, 'downloaded', downloaded_item.last_used_at) -%>
         <% end %>
         </ul>
      </div>

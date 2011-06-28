@@ -61,21 +61,21 @@ module HomeHelper
   end
 
   def recently_downloaded_items time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "count(*) DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
+    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "updated_at DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
     items = []
     activity_logs.each do |activity_log|
-      items.push activity_log.activity_loggable if !activity_log.activity_loggable.nil?
+      items.push activity_log.activity_loggable if (!activity_log.activity_loggable.nil? and activity_log.activity_loggable.can_view?)
     end
     items.take(number_of_item)
   end
 
-  def recently_viewed_items time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "count(*) DESC", :conditions => ["action = ? AND updated_at > ?", 'show', time])
+  def recently_uploaded_items time=1.month.ago, number_of_item=10
+    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'create', time])
     #take out only Asset and Publication log
     activity_logs = activity_logs.select{|activity_log| ['DataFile', 'Model', 'Sop', 'Publication'].include?(activity_log.activity_loggable_type)}
     items = []
     activity_logs.each do |activity_log|
-      items.push activity_log.activity_loggable if !activity_log.activity_loggable.nil?
+      items.push activity_log.activity_loggable if (!activity_log.activity_loggable.nil? and activity_log.activity_loggable.can_view?)
     end
     items.take(number_of_item)
   end
@@ -131,6 +131,22 @@ module HomeHelper
             html << "</div>"
             html << "</li>"
           end
+      end
+      html
+  end
+
+  def display_single_item item, action, at_time
+      html=''
+      unless item.blank?
+        path = eval("#{item.class.name.underscore}_path(#{item.id})" )
+        description = try_block{item.description} || try_block{item.abstract}
+        tooltip=tooltip_title_attrib("<p>#{description}</p><p class='feedinfo none_text'>#{at_time}</p>")
+        html << "<li class='homepanel_item'>"
+        html << link_to("#{item.title}", path, :title => tooltip, :target=>"_blank")
+        html << "<div class='feedinfo none_text'>"
+        html << "#{item.class.name.underscore.humanize} - #{action} #{time_ago_in_words(at_time)} ago"
+        html << "</div>"
+        html << "</li>"
       end
       html
   end
