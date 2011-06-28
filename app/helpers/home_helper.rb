@@ -90,8 +90,6 @@ module HomeHelper
     end
   end
 
-  #
-
   def filter_feeds_entries_with_chronological_order feeds, number_of_entries=10
     filtered_entries = []
     unless feeds.blank?
