@@ -147,7 +147,7 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
   end
 
-  test "should show the content of 4 boxes" do
+  test "should show the content of project news and community news with the configurable number of entries" do
     #project news
     Seek::Config.project_news_enabled=true
     Seek::Config.project_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F02837181562898136579%2Fbundle%2Fsystembiology, http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
@@ -158,19 +158,12 @@ class HomeControllerTest < ActionController::TestCase
     Seek::Config.community_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
     Seek::Config.community_news_number_of_entries = "7"
 
-    #recently viewed
-    recently_viewed_items =  recently_viewed_items(1.year.ago, 10)
-    #recently downloaded
-    recently_downloaded_items =  recently_downloaded_items(1.year.ago, 10)
-
     login_as(:aaron)
     get :index
     assert_response :success
 
     assert_select 'div#project_news ul>li', 5
     assert_select 'div#community_news ul>li', 7
-    assert_select 'div#recently_viewed ul>li', recently_viewed_items.count
-    assert_select 'div#recently_downloaded ul>li', recently_downloaded_items.count
 
     logout
     get :index
@@ -178,8 +171,45 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select 'div#project_news ul>li', 5
     assert_select 'div#community_news ul>li', 7
-    assert_select 'div#recently_viewed ul>li', recently_viewed_items.count
-    assert_select 'div#recently_downloaded ul>li', recently_downloaded_items.count
+  end
+
+  test 'should show recently uploaded and downloaded items with the filter can_view?' do
+    login_as(:aaron)
+    #recently added
+    recently_uploaded_item_logs =  recently_uploaded_item_logs(1.year.ago, 10)
+    recently_uploaded_item_logs.each do |uploaded_item_log|
+      assert uploaded_item_log.activity_loggable.can_view?
+    end
+    #recently downloaded
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    recently_downloaded_item_logs.each do |downloaded_item_log|
+      assert downloaded_item_log.activity_loggable.can_view?
+    end
+
+    get :index
+    assert_response :success
+
+    assert_select 'div#recently_uploaded ul>li', recently_uploaded_item_logs.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
+
+    logout
+    #recently added
+    recently_uploaded_item_logs =  recently_uploaded_item_logs(1.year.ago, 10)
+    recently_uploaded_item_logs.each do |uploaded_item_log|
+      assert uploaded_item_log.activity_loggable.can_view?
+    end
+    #recently downloaded
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    recently_downloaded_item_logs.each do |downloaded_item_log|
+      assert downloaded_item_log.activity_loggable.can_view?
+    end
+
+    get :index
+    assert_response :success
+
+    assert_select 'div#recently_uploaded ul>li', recently_uploaded_item_logs.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
+
   end
   
 end

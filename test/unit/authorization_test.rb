@@ -22,10 +22,32 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !res, "test person should have not been identified as being in the whitelist of test user"
   end
 
-  
-  
+  def test_auth_on_asset_version
+    user1 = Factory :user
+    user2 = Factory :user
+    sop = Factory :sop, :contributor=>user1, :policy=>Factory(:private_policy)
+    sop.policy.permissions << Factory(:permission, :policy=>sop.policy,:contributor=>user2.person,:access_type=>Policy::VISIBLE)
+    assert_equal 1,sop.versions.count
+    sop_v=sop.versions.first
+
+    assert_equal sop,sop_v.parent
+
+    assert sop.can_manage?(user1)
+    assert !sop.can_manage?(user2)
+    assert sop.can_view?(user2)
+    assert !sop.can_view?(nil)
+    assert !sop.can_download?(user2)
+    assert !sop.can_edit?(user2)
+
+    assert sop_v.can_manage?(user1)
+    assert !sop_v.can_manage?(user2)
+    assert sop_v.can_view?(user2)
+    assert !sop_v.can_view?(nil)
+    assert !sop_v.can_download?(user2)
+    assert !sop_v.can_edit?(user2)
+  end
+
   # testing: is_person_in_blacklist?(person_id, blacklist_owner_user_id)
-  
   def test_is_person_in_blacklist__should_yield_true
     res = Authorization.is_person_in_blacklist?(people(:person_for_owner_of_my_first_sop), users(:owner_of_a_sop_with_complex_permissions))
     
