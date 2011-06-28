@@ -193,3 +193,8 @@
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
   end
+
+  Factory.define(:activity_log) do |f|
+    f.action "create"
+    f.association :activity_loggable, :factory => :data_file
+  end

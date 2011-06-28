@@ -193,7 +193,7 @@ class HomeControllerTest < ActionController::TestCase
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
 
     logout
-    #recently added
+    #recently uploaded
     recently_uploaded_item_logs =  recently_uploaded_item_logs(1.year.ago, 10)
     recently_uploaded_item_logs.each do |uploaded_item_log|
       assert uploaded_item_log.activity_loggable.can_view?
@@ -209,7 +209,6 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select 'div#recently_uploaded ul>li', recently_uploaded_item_logs.count
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
-
   end
   
 end

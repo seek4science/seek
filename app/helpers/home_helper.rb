@@ -61,7 +61,7 @@ module HomeHelper
   end
 
   def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "updated_at DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
+    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
     #filter by can_view?
     activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
     activity_logs.take(number_of_item)
