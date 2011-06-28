@@ -60,24 +60,20 @@ module HomeHelper
     item_hash
   end
 
-  def recently_downloaded_items time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "updated_at DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
-    items = []
-    activity_logs.each do |activity_log|
-      items.push activity_log.activity_loggable if (!activity_log.activity_loggable.nil? and activity_log.activity_loggable.can_view?)
-    end
-    items.take(number_of_item)
+  def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
+    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "updated_at DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
+    #filter by can_view?
+    activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
+    activity_logs.take(number_of_item)
   end
 
-  def recently_uploaded_items time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'create', time])
+  def recently_uploaded_item_logs time=1.month.ago, number_of_item=10
+    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'create', time])
+    #filter by can_view?
+    activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
     #take out only Asset and Publication log
     activity_logs = activity_logs.select{|activity_log| ['DataFile', 'Model', 'Sop', 'Publication'].include?(activity_log.activity_loggable_type)}
-    items = []
-    activity_logs.each do |activity_log|
-      items.push activity_log.activity_loggable if (!activity_log.activity_loggable.nil? and activity_log.activity_loggable.can_view?)
-    end
-    items.take(number_of_item)
+    activity_logs.take(number_of_item)
   end
 
   # get multiple feeds from multiple sites
