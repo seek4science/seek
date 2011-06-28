@@ -171,46 +171,44 @@ class HomeControllerTest < ActionController::TestCase
 
     assert_select 'div#project_news ul>li', 5
     assert_select 'div#community_news ul>li', 7
-    assert_select 'div#recently_uploaded ul>li', recently_uploaded_items.count
-    assert_select 'div#recently_downloaded ul>li', recently_downloaded_items.count
   end
 
   test 'should show recently uploaded and downloaded items with the filter can_view?' do
     login_as(:aaron)
     #recently added
-    recently_uploaded_items =  recently_uploaded_items(1.year.ago, 10)
-    recently_uploaded_items.each do |uploaded_item|
-      assert uploaded_item.can_view?
+    recently_uploaded_item_logs =  recently_uploaded_item_logs(1.year.ago, 10)
+    recently_uploaded_item_logs.each do |uploaded_item_log|
+      assert uploaded_item_log.activity_loggable.can_view?
     end
     #recently downloaded
-    recently_downloaded_items =  recently_downloaded_items(1.year.ago, 10)
-    recently_downloaded_items.each do |downloaded_item|
-      assert downloaded_item.can_view?
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    recently_downloaded_item_logs.each do |downloaded_item_log|
+      assert downloaded_item_log.activity_loggable.can_view?
     end
 
     get :index
     assert_response :success
 
-    assert_select 'div#recently_uploaded ul>li', recently_uploaded_items.count
-    assert_select 'div#recently_downloaded ul>li', recently_downloaded_items.count
+    assert_select 'div#recently_uploaded ul>li', recently_uploaded_item_logs.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
 
     logout
     #recently added
-    recently_uploaded_items =  recently_uploaded_items(1.year.ago, 10)
-    recently_uploaded_items.each do |uploaded_item|
-      assert uploaded_item.can_view?
+    recently_uploaded_item_logs =  recently_uploaded_item_logs(1.year.ago, 10)
+    recently_uploaded_item_logs.each do |uploaded_item_log|
+      assert uploaded_item_log.activity_loggable.can_view?
     end
     #recently downloaded
-    recently_downloaded_items =  recently_downloaded_items(1.year.ago, 10)
-    recently_downloaded_items.each do |downloaded_item|
-      assert downloaded_item.can_view?
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    recently_downloaded_item_logs.each do |downloaded_item_log|
+      assert downloaded_item_log.activity_loggable.can_view?
     end
 
     get :index
     assert_response :success
 
-    assert_select 'div#recently_uploaded ul>li', recently_uploaded_items.count
-    assert_select 'div#recently_downloaded ul>li', recently_downloaded_items.count
+    assert_select 'div#recently_uploaded ul>li', recently_uploaded_item_logs.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
 
   end
   

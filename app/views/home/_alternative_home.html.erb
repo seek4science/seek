@@ -49,11 +49,11 @@
   <div class="yui-u first home_panel">
      <div class="heading">Recently uploaded</div>
     <div id="recently_uploaded" class="homepanel_list">
-        <% uploaded_items = recently_uploaded_items(1.year.ago, 10) %>
+        <% uploaded_item_logs = recently_uploaded_item_logs(1.year.ago, 8) %>
         <ul>
-        <% uploaded_items.each do |uploaded_item|%>
-
-            <%= display_single_item(uploaded_item, 'uploaded', uploaded_item.created_at) -%>
+        <% uploaded_item_logs.each do |uploaded_item_log|
+            uploaded_item = uploaded_item_log.activity_loggable %>
+            <%= display_single_item(uploaded_item, 'uploaded', uploaded_item_log.created_at) -%>
         <%end%>
 
         </ul>
@@ -62,10 +62,12 @@
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
     <div id="recently_downloaded" class="homepanel_list">
-        <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
+        <% downloaded_item_logs = recently_downloaded_item_logs(1.year.ago, 8) %>
         <ul>
-        <% downloaded_items.each do |downloaded_item|%>
-           <%= display_single_item(downloaded_item, 'downloaded', downloaded_item.last_used_at) -%>
+        <% downloaded_item_logs.each do |downloaded_item_log|
+           downloaded_item = downloaded_item_log.activity_loggable
+        %>
+           <%= display_single_item(downloaded_item, 'downloaded', downloaded_item_log.created_at) -%>
         <% end %>
         </ul>
      </div>
