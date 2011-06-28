@@ -121,18 +121,14 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should correctly handle 404 url" do
     mock_http
     df={:title=>"Test",:data_url=>"http://mocked404.com"}
+    assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
           post :create, :data_file => df, :sharing=>valid_sharing
         end
       end
     end
-
-    assert_no_difference('DataFile.count') do
-      assert_no_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
-      end
-    end
+      
     assert_not_nil flash.now[:error]
   end
   
@@ -164,12 +160,13 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should create data file with http_url" do
     mock_http
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => valid_data_file_with_http_url, :sharing=>valid_sharing
-        end
+    
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => valid_data_file_with_http_url, :sharing=>valid_sharing
       end
     end
+      
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
@@ -255,13 +252,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create and redirect on download for 401 url" do
     mock_http
     df = {:title=>"401",:data_url=>"http://mocked401.com",:project=>projects(:sysmo_project)}
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => df, :sharing=>valid_sharing
-        end
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, :data_file => df, :sharing=>valid_sharing
       end
     end
-
+      
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         post :create, :data_file => df, :sharing=>valid_sharing
@@ -327,10 +323,10 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should create data file for upload tool" do
     assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :upload_for_tool, :data_file => valid_data_file, :recipient_id => people(:quentin_person).id
-        end
+      assert_difference('ContentBlob.count') do
+        post :upload_for_tool, :data_file => valid_data_file, :recipient_id => people(:quentin_person).id
       end
+    end
 
     assert_response :success
     df = assigns(:data_file)
@@ -419,10 +415,9 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should download from url" do
     mock_http
+    assert_difference('ActivityLog.count') do
       get :download, :id => data_files(:url_based_data_file)
     end
-
-    get :download, :id => data_files(:url_based_data_file)
     assert_response :success
   end
   
