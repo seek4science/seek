@@ -18,8 +18,8 @@ gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl'
-gem 'pauldix-feedzirra'
-gem 'rdoc'
+gem 'ratom'
+
 
 
 group :development do
