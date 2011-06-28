@@ -49,7 +49,7 @@
   <div class="yui-u first home_panel">
      <div class="heading">Recently uploaded</div>
     <div id="recently_uploaded" class="homepanel_list">
-        <% uploaded_items = recently_uploaded_items(1.year.ago, 10) %>
+        <% uploaded_items = recently_uploaded_items(1.year.ago, 8) %>
         <ul>
         <% uploaded_items.each do |uploaded_item|%>
             <%= display_single_item(uploaded_item, 'uploaded', uploaded_item.created_at) -%>
@@ -61,7 +61,7 @@
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
     <div id="recently_downloaded" class="homepanel_list">
-        <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
+        <% downloaded_items = recently_downloaded_items(1.year.ago, 8) %>
         <ul>
         <% downloaded_items.each do |downloaded_item|
            activity_logs = downloaded_item.activity_logs.select{|a| a.action == 'download'}
