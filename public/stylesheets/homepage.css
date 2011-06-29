@@ -25,6 +25,7 @@ div.home_panel_pair {
 div.home_panel .homepanel_list {
     padding-bottom: 0.5em;
     height: 22.6em;
+    margin-left: 0.5em;
     overflow-y: auto;
 }
 
