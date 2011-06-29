@@ -25,10 +25,13 @@ module Acts #:nodoc:
     end
 
     module ClassMethods
+
       def acts_as_asset
         acts_as_authorized
         acts_as_favouritable
         default_scope :order => "#{self.table_name}.updated_at DESC"
+
+
 
         validates_presence_of :title
         validates_presence_of :project
@@ -59,12 +62,15 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
-
+        include SendImmediateSubscription
       end
 
       def is_asset?
         include?(Acts::Asset::InstanceMethods)
       end
+
+
+
     end
 
     module SingletonMethods

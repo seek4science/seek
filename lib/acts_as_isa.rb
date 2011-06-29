@@ -34,6 +34,7 @@ module Acts #:nodoc:
           extend Acts::Isa::SingletonMethods
         end
         include Acts::Isa::InstanceMethods
+        include SendImmediateSubscription
 
       end
 

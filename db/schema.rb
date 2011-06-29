@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110602160032) do
+ActiveRecord::Schema.define(:version => 20110629110200) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -753,6 +753,14 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
   add_index "sops", ["project_id"], :name => "index_sops_on_project_id"
 
+  create_table "specific_subscriptions", :force => true do |t|
+    t.integer  "person_id"
+    t.string   "subscribable_type"
+    t.integer  "subscribable_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "specimens", :force => true do |t|
     t.string   "donor_number"
     t.integer  "age"
@@ -823,6 +831,14 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+  end
+
+  create_table "subscriptions", :force => true do |t|
+    t.integer "person_id"
+    t.integer "project_id"
+    t.string  "subscribed_resource_types"
+    t.integer "subscription_type",         :limit => 1, :default => 0
+    t.date    "next_sent"
   end
 
   create_table "synonyms", :force => true do |t|

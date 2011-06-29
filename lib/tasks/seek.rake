@@ -463,4 +463,78 @@ namespace :seek do
     end
   end
 
+
+  desc "Send sub_mailer to users"
+  task :send_subscription => :environment do
+    Subscription.all.reject{|s|s.subscription_type == 0}.each do |s|
+      case s.subscription_type
+        #never
+        when 0
+          p  "no subscription"
+         #immediately
+        when 1
+          p "subscription for immediate changes"
+        # daily
+        when 2
+          if s.next_sent <= Date.today
+            SubMailer.deliver_send_subscription s
+            s.next_sent = Date.today + 1
+            p "daily sent!"
+          else
+            p "daily sent later!"
+          end
+
+        #weekly
+        when 3
+          if s.next_sent <= Date.today
+            SubMailer.deliver_send_subscription s
+            s.next_sent = Date.today + 7
+            p "weekly sent!"
+          else
+            p "weekly sent later!"
+          end
+
+        #monthly
+        when 4
+          if s.next_sent <= Date.today
+            SubMailer.deliver_send_subscription s
+            s.next_sent = Date.today >> 1
+            p "monthly sent!"
+          else
+            p "monthly sent later!"
+          end
+        else
+
+      end
+    end
+
+  end
+
+
+  task :set_default_subscription => :environment do
+      Person.all.each do |person|
+        person.projects.each do |p|
+        Subscription.create(:person=>person,
+                            :project=>p,
+                            :subscription_type=>Subscription::NEVER)
+
+        end
+
+        other_projects = Project.all - person.projects
+        other_projects.each do |op|
+          person.subscriptions.build(:project_id=>op.id,
+                                      :subscribe_data_file=>false,
+                                      :subscribe_sop=>false,
+                                      :subscribe_model => false,
+                                      :subscribe_presentation=>false,
+                                      :subscribe_event=>false,
+                                      :subscribe_investigation=>false,
+                                      :subscribe_study=>false,
+                                      :subscribe_assay=>false,
+                                      :subscribe_specimen=>false,
+                                      :subscribe_sample=>false,
+                                      :subscription_type=>Subscription::NEVER)
+        end
+      end
+  end
 end

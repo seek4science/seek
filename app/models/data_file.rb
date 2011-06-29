@@ -16,6 +16,7 @@ class DataFile < ActiveRecord::Base
   else
     def events
       []
+
     end
 
     def event_ids

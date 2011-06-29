@@ -7,7 +7,6 @@ class PeopleController < ApplicationController
   before_filter :is_user_admin_auth, :only=>[:destroy]
   before_filter :is_user_admin_or_personless, :only=>[:new]
   before_filter :auth_params,:only=>[:update,:create]
-
   skip_before_filter :project_membership_required
 
   cache_sweeper :people_sweeper,:only=>[:update,:create,:destroy]
@@ -68,6 +67,7 @@ class PeopleController < ApplicationController
   # GET /people/new.xml
   def new    
     @person = Person.new
+    setup_subscription
 
     respond_to do |format|
       format.html { render :action=>"new" }
@@ -78,7 +78,8 @@ class PeopleController < ApplicationController
   # GET /people/1/edit
   def edit
     @person = Person.find(params[:id])
-    
+    setup_subscription
+
     possible_unsaved_data = "unsaved_#{@person.class.name}_#{@person.id}".to_sym
     if session[possible_unsaved_data]
       # if user was redirected to this 'edit' page from avatar upload page - use session
@@ -178,7 +179,15 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
-    
+
+    subscriptions_attributes = params[:person][:subscriptions_attributes]
+    subscriptions_attributes.each{|k,v|
+     v[:subscribed_resource_types]= v[:subscribed_resource_types].reject(&:blank?)
+
+    }
+
+    params[:person][:subscriptions_attributes]= subscriptions_attributes.collect{|k,v|v}
+
     @person.disciplines.clear if params[:discipline_ids].nil?
 
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
@@ -197,7 +206,9 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-         
+
+        subscriptions_setting params[:person][:subscriptions_attributes]
+
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -341,5 +352,24 @@ class PeopleController < ApplicationController
       params[:person].delete(param) if params[:person] and not allowed
     end
   end
+
+  def setup_subscription
+      if @person.subscriptions.blank?
+        @person.projects.each do |p|
+          @person.subscriptions.build(:project_id=>p.id,
+                                      :subscribed_resource_types=>["DataFile","Sop","Model","Presentation","Event","Investigation","Study","Assay","Specimen","Sample"])
+        end
+        other_projects = Project.all - @person.projects
+        other_projects.each do |op|
+          @person.subscriptions.build(:project_id=>op.id,
+          :subscribed_resource_types=>[])
+        end
+        p "******************"
+        @person.subscriptions.each do |s|
+          p s.project.name
+         end
+      end
+  end
+
 
 end

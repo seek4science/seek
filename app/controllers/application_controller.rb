@@ -261,53 +261,59 @@ class ApplicationController < ActionController::Base
   filter_parameter_logging :password
 
   def log_event
-    c = self.controller_name.downcase
-    a = self.action_name.downcase
+    User.with_current_user current_user do
+      c = self.controller_name.downcase
+      a = self.action_name.downcase
 
-    object = eval("@"+c.singularize)
+      object = eval("@"+c.singularize)
 
-    object=current_user if c=="sessions" #logging in and out is a special case    
+      object=current_user if c=="sessions" #logging in and out is a special case
 
-    #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
-    return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+      #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
+      return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-    case c
-      when "sessions"
-      if ["create","destroy"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :controller_name=>c,
-                   :activity_loggable => object)
-      end
-      when "investigations","studies","assays"
-      if ["show","create","update","destroy"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :referenced => object.project,
-                   :controller_name=>c,
-                   :activity_loggable => object)
-      end
-      when "data_files","models","sops","publications","events"
-      if ["show","create","update","destroy","download"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :referenced => object.project,
-                   :controller_name=>c,
-                   :activity_loggable => object)
-      end
-      when "people"
-      if ["show","create","update","destroy"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :controller_name=>c,
-                   :activity_loggable => object)
-      end
-      when "search"
-      if a=="index"
-        ActivityLog.create(:action => "index",
-                   :culprit => current_user,
-                   :controller_name=>c,
-                   :data => {:search_query=>object,:result_count=>@results.count})
+      case c
+        when "sessions"
+        if ["create","destroy"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :controller_name=>c,
+                     :activity_loggable => object)
+        end
+        when "investigations","studies","assays","specimens","samples"
+        if ["show","create","update","destroy"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :referenced => object.project,
+                     :controller_name=>c,
+                     :activity_loggable => object,
+                      :data=> object.title)
+
+        end
+        when "data_files","models","sops","publications","presentations","events"
+        if ["show","create","update","destroy","download"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :referenced => object.project,
+                     :controller_name=>c,
+                     :activity_loggable => object,
+                      :data=> object.title)
+        end
+        when "people"
+        if ["show","create","update","destroy"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :controller_name=>c,
+                     :activity_loggable => object,
+                      :data=> object.title)
+        end
+        when "search"
+        if a=="index"
+          ActivityLog.create(:action => "index",
+                     :culprit => current_user,
+                     :controller_name=>c,
+                     :data => {:search_query=>object,:result_count=>@results.count})
+        end
       end
     end
   end
@@ -349,7 +355,6 @@ class ApplicationController < ActionController::Base
         :current_logged_in_user=>current_user
     }
   end
-
 
 
 end

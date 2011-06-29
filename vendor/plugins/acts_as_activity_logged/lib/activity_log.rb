@@ -5,7 +5,10 @@ class ActivityLog < ActiveRecord::Base
   
   serialize :data
 
+  after_save :send_notification
+
   alias the_culprit culprit
+
   def culprit(options="nil")
     options.to_sym == :value ? 
       ((defined? l_klass.models[:culprit] && defined? l_klass.models[:culprit][:method]) ?
@@ -55,6 +58,12 @@ class ActivityLog < ActiveRecord::Base
     self.find(:all, :conditions => conditions, :limit => limit, :order => order)
   end
 
+  def send_notification
+    p "@@@@@@@@@@@@@@@@@qq"
+    p  activity_loggable_type
+    p action
+    activity_loggable.send_immediate_subscription(id) if activity_loggable.respond_to? :send_immediate_subscription and action!="show"
+  end
 private
   def self.build_sql_conditional_for(options={})
     conditions = []
@@ -76,4 +85,5 @@ private
   def c_klass
     Object.const_get(self.culprit_type.to_s)
   end
+
 end

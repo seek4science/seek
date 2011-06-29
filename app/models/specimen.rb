@@ -1,12 +1,13 @@
 require 'grouped_pagination'
 require 'acts_as_authorized'
-
+require 'send_immediate_subscription'
 class Specimen < ActiveRecord::Base
+   include SendImmediateSubscription
 
   before_save  :clear_garbage
 
   has_many :samples
-
+  has_many :activity_logs, :as => :activity_loggable
   has_many :assets_creators, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
   has_many :creators, :class_name => "Person", :through => :assets_creators, :order=>'assets_creators.id'
 #  accepts_nested_attributes_for :creators
@@ -44,6 +45,8 @@ class Specimen < ActiveRecord::Base
 
 
   acts_as_authorized
+
+
 
   def age_in_weeks
     if !age.nil?

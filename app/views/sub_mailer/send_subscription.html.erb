@@ -1,0 +1,204 @@
+<head>
+<style type="text/css">
+
+          div.new_resources table {
+              border-collapse: collapse;
+              border: 1px ;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;
+          }
+
+          div.new_resources table.wide {
+              width: 100%;
+          }
+
+
+          div.new_resources table tr th {
+              color: #31d9cf;
+              padding: 3px 10px;
+              border: 1px solid #222;
+          }
+          div.new_resources table th.tdborder {
+             border: 1px solid #ddd;
+         }
+          div.new_resources table tr td {
+              padding: 7px;
+              border: 1px solid #aaa;
+          }
+
+
+        div.updated_resources table {
+              border-collapse: collapse;
+              border: 1px ;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+          }
+        div.updated_resources table.wide {
+              width: 100%;
+          }
+
+          div.updated_resources table tr th {
+              color: #1a4af6;
+              padding: 3px 10px;
+              border: 1px solid #222;
+          }
+          div.updated_resources table th.tdborder {
+             border: 1px solid #ddd;
+         }
+          div.updated_resources table tr td {
+              padding: 7px;
+              border: 1px solid #aaa;
+          }
+
+
+
+
+
+        div.deleted_resources table {
+              border-collapse: collapse;
+              border: 1px ;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+          }
+        div.deleted_resources table.wide {
+              width: 100%;
+          }
+
+          div.deleted_resources table tr th {
+              color: #df1a34;
+              padding: 3px 10px;
+              border: 1px solid #222;
+          }
+          div.deleted_resources table th.tdborder {
+             border: 1px solid #ddd;
+         }
+          div.deleted_resources table tr td {
+              padding: 7px;
+              border: 1px solid #aaa;
+          }
+
+        .none_text {
+        font-style: italic;
+        color: #666666;
+            }
+
+</style>
+</head>
+
+
+<% @new_req ||=false
+   @update_req ||=false
+   @delete_req ||=false
+%>
+<% if @new_req %>
+    <label style="color:#f0342a;"><b>New resources</b></label>
+
+   <% activity_logs = ActivityLog.all.select { |al| al.action=="create" and al.referenced==@project}
+       unless activity_logs.blank? || (activity_logs.collect(&:activity_loggable_type) & @resources).blank?%>
+       <div id="new_resources" class="new_resources" >
+       <table border="1px" cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Resource Type</th>
+        <th align="left">Name</th>
+        <th align="left">Person</th>
+        <th align="left">Created Date</th>
+      </tr>
+      <% @resources.each do |resource|
+            activity_logs.select { |al| al.activity_loggable_type==resource }.each do |act|
+             %>
+
+              <tr>
+                <td><%= resource %></td>
+                <td><%= act.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : act.data%></td>
+                <td><%= link_to h(act.culprit.person.name), "mailto:#{act.culprit.person.email_with_name}" %>
+                </td>
+                <td> <%= act.created_at %></td>
+              </tr>
+          <% end %>
+
+      <% end %>
+           </table></div>
+   <% else %>
+        <br/>
+        <span style="font-style:italic;color:#666666"> Nothing </span>
+        <br/>
+   <% end %>
+
+<% end %>
+
+<br style="clear:both"/>
+
+<% if @update_req %>
+    <label style="color:#eb6423"><b>Updated resources</b></label>
+     <% activity_logs = ActivityLog.all.select { |al| al.action=="update" and al.referenced==@project}
+       unless activity_logs.blank? || (activity_logs.collect(&:activity_loggable_type) & @resources).blank? %>
+    <div id="updated_resources" class="updated_resources">
+    <table border="1px" cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Resource</th>
+        <th align="left">Name</th>
+        <th align="left">Person</th>
+        <th align="left">Updated Date</th>
+      </tr>
+      <% @resources.each do |resource|
+            activity_logs.select { |al| al.activity_loggable_type==resource }.each do |act| %>
+
+              <tr>
+                <td><%= resource %></td>
+                <td><%= act.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : act.data%></td>
+                <td> <%= link_to h(act.culprit.person.name), "mailto:#{act.culprit.person.email_with_name}" %></td>
+                <td> <%= act.created_at %></td>
+              </tr>
+          <% end %>
+
+      <% end %>
+        </table></div>
+    <% else %>
+        <br/>
+    <span style="font-style:italic;color:#666666"> Nothing </span>
+        <br/>
+    <% end %>
+<% end %>
+
+<br style="clear:both"/>
+
+
+
+<% if @delete_req %>
+    <label style="color:#929191"><b>Deleted resources</b></label>
+     <% activity_logs = ActivityLog.all.select { |al| al.action=="destroy" and al.referenced==@project}
+       unless activity_logs.blank? || (activity_logs.collect(&:activity_loggable_type) & @resources).blank?%>
+        <div id="deleted_resources" class="deleted_resources">
+        <table  border="1px" cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Resource</th>
+        <th align="left">Name</th>
+        <th align="left">Person</th>
+        <th align="left">Deleted Date</th>
+      </tr>
+      <% @resources.each do |resource|
+          activity_logs.select { |al| al.activity_loggable_type==resource}.each do |act| %>
+
+              <tr>
+                <td><%= resource %></td>
+                <td><%= act.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : act.data%></td>
+                <td> <%= link_to h(act.culprit.person.name), "mailto:#{act.culprit.person.email_with_name}" %></td>
+                <td> <%= act.created_at %></td>
+              </tr>
+          <% end %>
+      <% end %>
+      </table></div>
+
+    <% else %>
+       <br/>
+        <span style="font-style:italic;color:#666666"> Nothing </span>
+       <br/>
+    <% end %>
+<% end %>

@@ -51,6 +51,14 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
+  has_many :subscriptions
+  accepts_nested_attributes_for :subscriptions,:allow_destroy=>true
+  attr_accessible :subscriptions
+  attr_accessible :subscriptions_attributes
+  attr_accessible :subscribed_resource_types
+
+  has_many :specific_subscriptions
+
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
@@ -186,6 +194,34 @@ class Person < ActiveRecord::Base
   def can_be_edited_by?(subject)
     subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
   end
+
+  def subscriptions_setting  subscriptions_attributes
+       subscriptions_attributes.reject{|s|s["subscribed_resource_types"].blank?}.each do |st|
+          subscription = self.subscriptions.detect{|s|s.project_id==st["project_id"].to_i}
+          if subscription
+            subscription.subscribed_resource_types = st["subscribed_resource_types"]
+            subscription.subscription_type = st["subscription_type"]
+            case subscription.subscription_type
+              when 1
+                 subscription.subscribed_resource_types.each do |srt|
+                     eval(srt).find(:all).each do |object|
+                       object.current_user_subscribed= true
+                     end
+                 end
+              when 2
+                subscription.next_sent=Date.today + 1
+              when 3
+                subscription.next_sent=Date.today + 7
+              when 4
+                subscription.next_sent=Date.today >> 1
+              else
+            end
+            subscription.save!
+
+          end
+       end
+  end
+
 
   private
 
