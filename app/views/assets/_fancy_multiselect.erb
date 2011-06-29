@@ -7,9 +7,10 @@
  value_method ||= :id
  text_method ||= :title
  html_options ||= ''
- collection_id ||= name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
+ association_step_content ||= nil
 
  default_choice = [default_choice_text, 0]
+ collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
  possibilities_collection_id = "possible_#{collection_id}"
  possibilities_options ||= {}
  possibilities_options.reverse_merge! :style=>"width:90%"
@@ -34,6 +35,7 @@
         association association_ids= methods, which reject 'blank' values automatically.%>
         <%= hidden_field_tag "#{name}[]", "" %>
         <%= select_tag name, options_from_collection_for_select(possibilities, value_method, text_method, selected), {:multiple=>true, :style=>"display:none;"} -%>
+        <%= association_step_content -%>
       </div>
 
 		<br/>
