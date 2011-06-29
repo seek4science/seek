@@ -231,7 +231,7 @@ module Seek
         if asset.content_blob.file_exists?
           send_file asset.content_blob.filepath, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'
         else
-          send_data asset.content_blob.data, :filename => asset.original_filename, :content_type => asset.content_type, :disposition => 'attachment'  
+          redirect_on_error asset,"Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
         end      
       else
         begin
@@ -245,23 +245,23 @@ module Seek
             end
           end
         rescue Seek::DownloadException=>de
-          flash[:error]="There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
-          if (asset.class.name.include?("::Version"))
-            redirect_to asset.parent,:version=>asset.version
-          else
-            redirect_to asset
-          end
+          redirect_on_error asset,"There was an error accessing the remote resource, and a local copy was not available. Please try again later when the remote resource may be available again."
         rescue Jerm::JermException=>de
-          flash[:error]=de.message
-          if (asset.class.name.include?("::Version"))
-            redirect_to asset.parent,:version=>asset.version
-          else
-            redirect_to asset
-          end
+          redirect_on_error asset,de.message
         end
 
       end
     end
+
+    def redirect_on_error asset,msg=nil
+      flash[:error]=msg if !msg.nil?
+      if (asset.class.name.include?("::Version"))
+        redirect_to asset.parent,:version=>asset.version
+      else
+        redirect_to asset
+      end
+    end
+    
   end
 
 end

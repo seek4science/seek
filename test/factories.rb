@@ -192,6 +192,7 @@
 
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
+    f.sequence(:data) {|n| "data [#{n}]" }
   end
 
   Factory.define(:activity_log) do |f|
