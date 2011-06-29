@@ -47,13 +47,13 @@
 <br/>
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
-     <div class="heading">Recently uploaded</div>
-    <div id="recently_uploaded" class="homepanel_list">
-        <% uploaded_item_logs = recently_uploaded_item_logs(1.year.ago, 8) %>
+     <div class="heading">Recently added</div>
+    <div id="recently_added" class="homepanel_list">
+        <% added_item_logs = recently_added_item_logs(1.year.ago, 8) %>
         <ul>
-        <% uploaded_item_logs.each do |uploaded_item_log|
-            uploaded_item = uploaded_item_log.activity_loggable %>
-            <%= display_single_item(uploaded_item, 'uploaded', uploaded_item_log.created_at) -%>
+        <% added_item_logs.each do |added_item_log|
+            uploaded_item = added_item_log.activity_loggable %>
+            <%= display_single_item(uploaded_item, 'uploaded', added_item_log.created_at) -%>
         <%end%>
 
         </ul>

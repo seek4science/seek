@@ -67,12 +67,12 @@ module HomeHelper
     activity_logs.take(number_of_item)
   end
 
-  def recently_uploaded_item_logs time=1.month.ago, number_of_item=10
+  def recently_added_item_logs time=1.month.ago, number_of_item=10
     activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'create', time])
     #filter by can_view?
     activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
     #take out only Asset and Publication log
-    activity_logs = activity_logs.select{|activity_log| ['DataFile', 'Model', 'Sop', 'Publication'].include?(activity_log.activity_loggable_type)}
+    activity_logs = activity_logs.select{|activity_log| ['DataFile', 'Model', 'Sop', 'Publication', 'Investigation', 'Study', 'Assay'].include?(activity_log.activity_loggable_type)}
     activity_logs.take(number_of_item)
   end
 
@@ -131,16 +131,23 @@ module HomeHelper
 
   def display_single_item item, action, at_time
       html=''
-      unless item.blank?
-        path = eval("#{item.class.name.underscore}_path(#{item.id})" )
-        description = try_block{item.description} || try_block{item.abstract}
-        tooltip=tooltip_title_attrib("<p>#{description}</p><p class='feedinfo none_text'>#{at_time}</p>")
-        html << "<li class='homepanel_item'>"
-        html << link_to("#{item.title}", path, :title => tooltip, :target=>"_blank")
-        html << "<div class='feedinfo none_text'>"
-        html << "#{item.class.name.underscore.humanize} - #{action} #{time_ago_in_words(at_time)} ago"
-        html << "</div>"
-        html << "</li>"
+       unless item.blank?
+          image_key = item.class.name.underscore
+          image_key = 'assay_modelling_avatar' if try_block{item.is_modelling?}
+          image = image_tag(icon_filename_for_key(image_key), :style => "width: 15px; height: 15px; vertical-align: middle")
+          icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset")
+
+          path = eval("#{item.class.name.underscore}_path(#{item.id})" )
+          description = try_block{item.description} || try_block{item.abstract}
+          tooltip = nil
+          tooltip=tooltip_title_attrib("<p>#{description}</p><p class='feedinfo none_text'>#{at_time}</p>") unless description.blank?
+          html << "<li class='homepanel_item'>"
+          html << "#{icon} "
+          html << link_to("#{item.title}", path, :title => tooltip, :target=>"_blank")
+          html << "<div class='feedinfo none_text'>"
+          html << "<span style='margin-left:2em'>#{item.class.name.underscore.humanize} - #{action} #{time_ago_in_words(at_time)} ago<span>"
+          html << "</div>"
+          html << "</li>"
       end
       html
   end

@@ -194,11 +194,11 @@ module ImagesHelper
       "file_icons/small/png.png"
       when "txt_file"
       "file_icons/small/txt.png"
-      when "investigation_avatar"
+      when "investigation_avatar", 'investigation', 'investigations'
       "crystal_project/64x64/apps/mydocuments.png"
       when "study_avatar"
       "crystal_project/64x64/apps/package_editors.png"
-      when "assay_avatar","assay_experimental_avatar"
+      when "assay_avatar","assay_experimental_avatar", 'assay'
       "misc_icons/flask3-64x64.png"
       when "assay_modelling_avatar"
       "crystal_project/64x64/filesystems/desktop.png"
@@ -214,7 +214,7 @@ module ImagesHelper
       "institution_64x64.png"
       when "organism_avatar"
       "misc_icons/green_virus-64x64.png"
-      when "publication_avatar"
+      when "publication_avatar", "publication", "publications"
      "crystal_project/64x64/mimetypes/wordprocessing.png"
       when "saved_search_avatar","saved_search"
       "crystal_project/32x32/actions/find.png"

@@ -14,7 +14,6 @@ div.home_panel {
     border: 1px solid #d3d3d3;
     height: 25em;
     float: left;
-    overflow-y: auto;
 }
 
 div.home_panel_pair {
@@ -25,6 +24,8 @@ div.home_panel_pair {
 
 div.home_panel .homepanel_list {
     padding-bottom: 0.5em;
+    height: 22.6em;
+    overflow-y: auto;
 }
 
 div.home_panel .homepanel_list ul {
