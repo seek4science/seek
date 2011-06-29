@@ -712,6 +712,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal update_permission.access_type, Policy::EDITING
   end
 
+  test "report error when file unavailable for download" do
+    df = Factory :data_file, :policy=>Factory(:public_policy)
+    df.content_blob.dump_data_to_file
+    assert df.content_blob.file_exists?
+    FileUtils.rm df.content_blob.filepath
+    assert !df.content_blob.file_exists?
+
+    get :download,:id=>df
+    assert_redirected_to df
+    assert flash[:error].match(/Unable to find a copy of the file for download/)
+  end
+
   private
   
   def valid_data_file
