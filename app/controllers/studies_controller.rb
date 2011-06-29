@@ -56,6 +56,7 @@ class StudiesController < ApplicationController
     if params[:sharing]
       @study.policy_or_default
       @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+
     end
 
     respond_to do |format|
