@@ -7,7 +7,7 @@ class ContentBlob < ActiveRecord::Base
   
   DATA_STORAGE_PATH = "filestore/content_blobs/"
   
-  #the actual data value stored in memeory. If this could be large, then using :tmp_io_object is preferred
+  #the actual data value stored in memory. If this could be large, then using :tmp_io_object is preferred
   attr_writer :data
   
   #this is used as an alternative to passing the data contents directly (in memory).
