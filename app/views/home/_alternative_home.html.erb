@@ -53,7 +53,7 @@
         <ul>
         <% added_item_logs.each do |added_item_log|
             uploaded_item = added_item_log.activity_loggable %>
-            <%= display_single_item(uploaded_item, 'uploaded', added_item_log.created_at) -%>
+            <%= display_single_item(uploaded_item, 'added', added_item_log.created_at) -%>
         <%end%>
 
         </ul>

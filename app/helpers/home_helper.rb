@@ -105,7 +105,7 @@ module HomeHelper
     filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified} || 10.year.ago) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
   end
 
-  
+
   def display_single_entry entry
       html=''
       unless entry.blank?
@@ -129,13 +129,14 @@ module HomeHelper
       html
   end
 
+
   def display_single_item item, action, at_time
       html=''
        unless item.blank?
           image_key = item.class.name.underscore
           image_key = 'assay_modelling_avatar' if try_block{item.is_modelling?}
           image = image_tag(icon_filename_for_key(image_key), :style => "width: 15px; height: 15px; vertical-align: middle")
-          icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset")
+          icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title => tooltip_title_attrib(item.class.name.underscore.humanize))
 
           path = eval("#{item.class.name.underscore}_path(#{item.id})" )
           description = try_block{item.description} || try_block{item.abstract}
