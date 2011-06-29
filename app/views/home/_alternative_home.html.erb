@@ -10,11 +10,8 @@
      <div class="heading"><%= Seek::Config.project_name%> News</div>
      <div id="project_news" class="homepanel_list">
         <ul>
-         <% feeds = []
-            Seek::Config.project_news_feed_urls.split(',').each do |url|
-                feeds.push get_feed(url) if !get_feed(url).blank?
-            end
-           entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
+         <%
+           entries = Seek::FeedReader.fetch_entries_for :project_news
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
@@ -29,11 +26,8 @@
      <div class="heading">Community News</div>
      <div id="community_news" class="homepanel_list">
          <ul>
-         <% feeds = []
-            Seek::Config.community_news_feed_urls.split(',').each do |url|
-                feeds.push get_feed(url) if !get_feed(url).blank?
-            end
-           entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.community_news_number_of_entries)
+         <%
+           entries = Seek::FeedReader.fetch_entries_for :community_news
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
