@@ -15,7 +15,11 @@
     <% if @notified_items.empty? -%><li class="none_text">No items</li><% end -%>
     <% @notified_items.each do |item| -%>
         <li style="font-weight:bolder;"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>
-        <li style="padding-left:2em;">Notification has been sent to: <%= item.managers.collect{|m| link_to(m.title,m)}.join(", ") -%></li>
+        <% if Seek::Config.email_enabled %>
+            <li style="padding-left:2em;">Notification has been sent to: <%= item.managers.collect{|m| link_to(m.title,m)}.join(", ") -%></li>
+        <% else %>
+            <li style="padding-left:2em;">Notification can't be sent to: <%= item.managers.collect{|m| link_to(m.title,m)}.join(", ") -%>, because email is disabled</li>
+        <% end %>
     <% end -%>
   </ul>
   <h2>Items that were not published due to an unforseen problem</h2>
