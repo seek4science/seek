@@ -48,12 +48,12 @@ module Seek
         #trim the url element
         feed_url.strip!
         begin
-          io = select_feed_source feed_url
-          feed = Atom::Feed.load_feed(io)
+          src = select_feed_source feed_url
+          feed = Atom::Feed.load_feed(src)
+          cache_feed(feed_url,feed.to_xml) unless src.is_a?(File)
         rescue
           feed = nil
         end
-        cache_feed(feed_url,feed.to_xml)
         feed
       end
     end

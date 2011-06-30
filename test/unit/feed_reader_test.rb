@@ -35,6 +35,12 @@ class FeedReaderTest < ActiveSupport::TestCase
     Seek::FeedReader.fetch_entries_for :project_news
 
     assert File.exists?(path)
+
+    #check it doesn't overwrite each time
+    time = File.mtime(path)
+    sleep(2)
+    Seek::FeedReader.fetch_entries_for :project_news
+    assert_equal time,File.mtime(path)
   end
 
   test "clear cache" do
