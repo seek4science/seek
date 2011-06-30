@@ -8,11 +8,6 @@
 %>
 <li id="condition_or_factor_row_<%= object.id -%>" >
   <ul class="condition_or_factor_row">
-    <% if asset == 'data_file' %>
-      <li id="time_point">
-        <%= h object.time_point %>
-      </li>
-    <% end %>
 
     <li id="measured_item">
       <%if  object.measured_item.title == 'concentration' and object.substance.try(:name)%>
