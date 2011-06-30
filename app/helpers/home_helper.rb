@@ -140,8 +140,7 @@ module HomeHelper
 
           path = eval("#{item.class.name.underscore}_path(#{item.id})" )
           description = try_block{item.description} || try_block{item.abstract}
-          tooltip = nil
-          tooltip=tooltip_title_attrib("<p>#{description}</p><p class='feedinfo none_text'>#{at_time}</p>") unless description.blank?
+          tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{at_time}</p>")
           html << "<li class='homepanel_item'>"
           html << "#{icon} "
           html << link_to("#{item.title}", path, :title => tooltip, :target=>"_blank")
