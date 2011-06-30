@@ -47,8 +47,8 @@ module Seek
       unless feed_url.blank?
         #trim the url element
         feed_url.strip!
-        io = select_feed_source feed_url
         begin
+          io = select_feed_source feed_url
           feed = Atom::Feed.load_feed(io)
         rescue
           feed = nil
