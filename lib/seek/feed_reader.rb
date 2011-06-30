@@ -14,20 +14,68 @@ module Seek
       filter_feeds_entries_with_chronological_order(feeds, n)
       
     end
+
+    def self.cache_path(url)
+      File.join(cache_dir,CGI::escape(url))
+    end
+
+    def self.cache_dir
+      if Rails.env=="test"
+        dir = File.join(Dir.tmpdir,"seek-cache","atom-feeds")
+      else
+        dir = File.join(Rails.root,"tmp","cache","atom-feeds")
+      end
+      FileUtils.mkdir_p dir if !File.exists?(dir)
+      dir
+    end
+
+    def self.cache_timeout
+      2.minutes.ago
+    end
   
     private
 
-    def self.get_feed feed_url=nil
+    def self.get_feed feed_url
+
       unless feed_url.blank?
         #trim the url element
         feed_url.strip!
+        io = select_feed_source feed_url
         begin
-          feed = Atom::Feed.load_feed(URI.parse(feed_url))
+          feed = Atom::Feed.load_feed(io)
         rescue
           feed = nil
         end
+        cache_feed(feed_url,feed.to_xml)
         feed
       end
+    end
+
+    # Selects either an IO object the a cached version of the feed, or a URI object
+    # This is determined by whether upon whether the cached copy is more than #cached_timeout old (currently defaults to 2 minutes)
+    # The cache is never used when running in DEVELOPMENT environment
+    def self.select_feed_source feed_url
+      source = URI.parse(feed_url)
+      unless Rails.env=="development"
+        source = check_cache(feed_url) || source
+      end
+      source
+    end
+
+    def self.check_cache url
+      path=cache_path(url)
+      if File.exists?(path) && File.mtime(path) > cache_timeout
+        open(path)
+      else
+        nil
+      end
+    end
+
+    def self.cache_feed url,xml
+      path=cache_path(url)
+      f=open(path,"w+")
+      f.write(xml)
+      f.close
     end
 
     def self.filter_feeds_entries_with_chronological_order feeds, number_of_entries=10
