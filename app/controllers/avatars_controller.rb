@@ -20,7 +20,7 @@ class AvatarsController < ApplicationController
   # POST /people/1/avatars
   # POST /people
   def create
-    unless (params[:avatar][:image_file]).blank?
+    unless params[:avatar].blank? || params[:avatar][:image_file].blank?
       file_specified = true
       
       # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
