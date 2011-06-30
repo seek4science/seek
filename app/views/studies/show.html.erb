@@ -44,10 +44,10 @@
     <div>
       <p>
         <label>Person responsible:</label>
-        <% if @study.person_responsible -%>
+        <% if @study.person_responsible.try :can_view? -%>
           <%= link_to h(@study.person_responsible.name),@study.person_responsible %>
         <% else -%>
-          <span class="none_text">Not specified</span>
+          <span class="none_text">Not available</span>
         <% end -%>
       </p>
     </div>

@@ -32,12 +32,14 @@
           </label>
           <%= @assay.assay_class.title -%>
       </p>
-      <p class="id">
-          <label>
-              Owner: 
-          </label>
-          <%= link_to h(@assay.owner.name),@assay.owner -%>
-      </p>
+      <% if @assay.owner.can_view? %>
+          <p class="id">
+              <label>
+                  Owner:
+              </label>
+              <%= link_to h(@assay.owner.name),@assay.owner -%>
+          </p>
+      <% end %>
       <p>
           <b>Description:</b>
           <div id="description" class="box_standout">
