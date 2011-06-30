@@ -18,7 +18,6 @@ class FeedReaderTest < ActiveSupport::TestCase
   end
   
   test "fetch atom entries" do
-
     Seek::Config.project_news_feed_urls="#{ATOM_FEED}, #{ATOM_FEED2}"
     Seek::Config.project_news_number_of_entries = 5
     entries = Seek::FeedReader.fetch_entries_for :project_news
@@ -38,4 +37,17 @@ class FeedReaderTest < ActiveSupport::TestCase
     assert File.exists?(path)
   end
 
+  test "clear cache" do
+    dir = File.join(Dir.tmpdir,"seek-cache","atom-feeds")
+
+    FileUtils.mkdir_p dir unless File.exists?(dir)
+
+    #stick a file in there to make sure it handles directory with files in
+    f=open(File.join(dir,"test-file"),"w+")
+    f.write("some info")
+    f.close
+    
+    Seek::FeedReader.clear_cache
+    assert !File.exists?(dir)
+  end
 end

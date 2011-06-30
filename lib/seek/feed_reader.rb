@@ -1,7 +1,7 @@
 module Seek
   class FeedReader
 
-    #Fetches the feed entires - aggregated and ordered, for a particular category
+    #Fetches the feed entries - aggregated and ordered, for a particular category
     #the category may be either :project_news or :community_news
     def self.fetch_entries_for category
       raise ArgumentError.new("Invalid category - should be either :project_news or :community_news") unless [:project_news,:community_news].include? category
@@ -15,10 +15,12 @@ module Seek
       
     end
 
+    #the cache file for a given feed url
     def self.cache_path(url)
       File.join(cache_dir,CGI::escape(url))
     end
 
+    #the directory used to contain the cached files
     def self.cache_dir
       if Rails.env=="test"
         dir = File.join(Dir.tmpdir,"seek-cache","atom-feeds")
@@ -27,6 +29,11 @@ module Seek
       end
       FileUtils.mkdir_p dir if !File.exists?(dir)
       dir
+    end
+
+    #deletes the cache directory, along with any files in it
+    def self.clear_cache
+      FileUtils.rm_rf cache_dir
     end
 
     def self.cache_timeout
