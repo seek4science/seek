@@ -464,77 +464,133 @@ namespace :seek do
   end
 
 
-  desc "Send sub_mailer to users"
-  task :send_subscription => :environment do
-    Subscription.all.reject{|s|s.subscription_type == 0}.each do |s|
-      case s.subscription_type
-        #never
-        when 0
-          p  "no subscription"
-         #immediately
-        when 1
-          p "subscription for immediate changes"
-        # daily
-        when 2
-          if s.next_sent <= Date.today
-            SubMailer.deliver_send_subscription s
-            s.next_sent = Date.today + 1
-            p "daily sent!"
-          else
-            p "daily sent later!"
-          end
+#  desc "Send sub_mailer to users"
+#  task :send_subscription => :environment do
+#    Subscription.all.reject{|s|s.subscription_type == 0}.each do |s|
+#      case s.subscription_type
+#        #never
+#        when 0
+#          p  "no subscription"
+#         #immediately
+#        when 1
+#          p "subscription for immediate changes"
+#        # daily
+#        when 2
+#          if s.next_sent <= Date.today
+#            SubMailer.deliver_send_subscription s
+#            s.next_sent = Date.today + 1
+#            p "daily sent!"
+#          else
+#            p "daily sent later!"
+#          end
+#
+#        #weekly
+#        when 3
+#          if s.next_sent <= Date.today
+#            SubMailer.deliver_send_subscription s
+#            s.next_sent = Date.today + 7
+#            p "weekly sent!"
+#          else
+#            p "weekly sent later!"
+#          end
+#
+#        #monthly
+#        when 4
+#          if s.next_sent <= Date.today
+#            SubMailer.deliver_send_subscription s
+#            s.next_sent = Date.today >> 1
+#            p "monthly sent!"
+#          else
+#            p "monthly sent later!"
+#          end
+#        else
+#
+#      end
+#    end
+#
+#    Person.all.each do |person|
+#      activity_logs =[]
+#      person.specific_subscriptions.each do|ss|
+#          activity_logs << ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==ss.subscribable}
+#      end
+#
+#    end
+#    SpecificSubscription.all.reject{|ss| ss.subscription_type==0}.each do |ss|
+#      activity_logs = ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==ss.subscribable}
+#       case ss.subscription_type
+#        #never
+#        when 0
+#          p  "no specific subscription"
+#         #immediately
+#        when 1
+#          p "specific subscription for immediate changes"
+#        # daily
+#        when 2
+#          if ss.next_sent <= Date.today
+#            SubMailer.deliver_send_specific_subscription activity_logs
+#            ss.next_sent = Date.today + 1
+#            p " specific subscription daily sent!"
+#          else
+#            p "specific subscription daily sent later!"
+#          end
+#
+#        #weekly
+#        when 3
+#          if ss.next_sent <= Date.today
+#            SubMailer.deliver_send_specific_subscription activity_logs
+#            ss.next_sent = Date.today + 7
+#            p "specific subscription weekly sent!"
+#          else
+#            p "specific subscription weekly sent later!"
+#          end
+#
+#        #monthly
+#        when 4
+#          if ss.next_sent <= Date.today
+#            SubMailer.deliver_send_specific_subscription activity_logs
+#            ss.next_sent = Date.today >> 1
+#            p "specific subscription monthly sent!"
+#          else
+#            p "specific subscription monthly sent later!"
+#          end
+#        else
+#
+#      end
+#    end
+#  end
 
-        #weekly
-        when 3
-          if s.next_sent <= Date.today
-            SubMailer.deliver_send_subscription s
-            s.next_sent = Date.today + 7
-            p "weekly sent!"
-          else
-            p "weekly sent later!"
-          end
-
-        #monthly
-        when 4
-          if s.next_sent <= Date.today
-            SubMailer.deliver_send_subscription s
-            s.next_sent = Date.today >> 1
-            p "monthly sent!"
-          else
-            p "monthly sent later!"
-          end
-        else
-
+  desc "Send mail daily to users"
+  task :send_daily_subscription => :environment do
+    Person.all.each do |person|
+       activity_logs =[]
+      person.specific_subscriptions.select{|ss|ss.subscription_type==Subscription::DAILY}.each do |sub|
+         activity_logs << ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==sub.subscribable}
       end
+      SubMailer.deliver_send_digest_subscription person,activity_logs,"daily"
     end
 
   end
 
-
-  task :set_default_subscription => :environment do
-      Person.all.each do |person|
-        person.projects.each do |p|
-        Subscription.create(:person=>person,
-                            :project=>p,
-                            :subscription_type=>Subscription::NEVER)
-
-        end
-
-        other_projects = Project.all - person.projects
-        other_projects.each do |op|
-          person.subscriptions.build(:project_id=>op.id,
-                                      :subscribe_data_file=>false,
-                                      :subscribe_sop=>false,
-                                      :subscribe_model => false,
-                                      :subscribe_presentation=>false,
-                                      :subscribe_event=>false,
-                                      :subscribe_investigation=>false,
-                                      :subscribe_study=>false,
-                                      :subscribe_assay=>false,
-                                      :subscribe_specimen=>false,
-                                      :subscribe_sample=>false,
-                                      :subscription_type=>Subscription::NEVER)
-        end
+  desc "Send mail weekly to users"
+  task :send_weekly_subscription => :environment do
+     Person.all.each do |person|
+       activity_logs =[]
+      person.specific_subscriptions.select{|ss|ss.subscription_type==Subscription::WEEKLY}.each do |sub|
+         activity_logs << ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==sub.subscribable}
       end
+      SubMailer.deliver_send_digest_subscription person,activity_logs,"weekly"
+    end
   end
+
+  desc "Send mail monthly to users"
+  task :send_monthly_subscription => :environment do
+     Person.all.each do |person|
+       activity_logs =[]
+      person.specific_subscriptions.select{|ss|ss.subscription_type==Subscription::MONTHLY}.each do |sub|
+         activity_logs << ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==sub.subscribable}
+      end
+      SubMailer.deliver_send_digest_subscription person,activity_logs,"monthly"
+    end
+  end
+
 end

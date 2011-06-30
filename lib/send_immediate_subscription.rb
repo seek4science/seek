@@ -9,10 +9,18 @@ module SendImmediateSubscription
 
   def current_user_subscribed= subscribed
       if subscribed
-        SpecificSubscription.create!(:person_id=>User.current_user.person.id,:subscribable=>self)  unless current_users_subscription
+        SpecificSubscription.create!(:person_id=>User.current_user.person.id,:project_id=>self.try(:project_id),:subscribable=>self)  unless current_users_subscription
       else
         current_users_subscription.try(:destroy)
       end
+  end
+
+  def subscription_type
+      current_users_subscription.subscription_type
+  end
+
+  def subscription_type=   type
+      current_users_subscription.subscription_type = type
   end
 
   def send_immediate_subscription activity_log_id
@@ -23,10 +31,10 @@ module SendImmediateSubscription
 
      activity_log = ActivityLog.find activity_log_id
 
-     if  self.current_user_subscribed
-      SubMailer.deliver_send_specific_subscription activity_log
+     if  self.current_user_subscribed and self.subscription_type==Subscription::IMMEDIATELY
+      SubMailer.deliver_send_immediate_subscription activity_log
      else
-       p "resource is not subscribed!!"
+       p "resource is not subscribed for immediate changes!!"
      end
   end
 

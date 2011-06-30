@@ -1,0 +1,23 @@
+<% resource_type = resource.class.to_s.downcase %>
+
+<div class="fold">
+  <div class="foldTitle">
+    <%= help_icon("Here you can customize your subscription for this #{resource_type}.") -%>
+    Subscriptions
+  </div>
+  <div class="foldContent">
+
+
+    <%= f.check_box :current_user_subscribed, {:style=>"align:middle"} %> Subscribe this <%= resource_type %>
+    <br/><br/>
+
+    <p> Would you like to receive emails:
+      <%= f.radio_button :subscription_type, Subscription::IMMEDIATELY %> Immediately
+      <%= f.radio_button :subscription_type, Subscription::DAILY %> Daily
+      <%= f.radio_button :subscription_type, Subscription::WEEKLY %> Weekly
+      <%= f.radio_button :subscription_type, Subscription::MONTHLY %> Monthly <br/>
+    </p>
+
+
+  </div>
+</div>

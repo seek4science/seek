@@ -5,7 +5,7 @@ class SpecificSubscription < ActiveRecord::Base
 
   validates_presence_of :person
   validates_presence_of :subscribable
-
+  #validates_presence_of :project project might be nil for some resource
 
 
 end

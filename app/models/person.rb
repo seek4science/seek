@@ -201,21 +201,28 @@ class Person < ActiveRecord::Base
           if subscription
             subscription.subscribed_resource_types = st["subscribed_resource_types"]
             subscription.subscription_type = st["subscription_type"]
-            case subscription.subscription_type
-              when 1
-                 subscription.subscribed_resource_types.each do |srt|
-                     eval(srt).find(:all).each do |object|
-                       object.current_user_subscribed= true
-                     end
-                 end
-              when 2
-                subscription.next_sent=Date.today + 1
-              when 3
-                subscription.next_sent=Date.today + 7
-              when 4
-                subscription.next_sent=Date.today >> 1
-              else
+            subscription.subscribed_resource_types.each do |srt|
+               eval(srt).find(:all).each do |object|
+                 object.current_user_subscribed= true
+                 object.subscription_type= subscription.subscription_type
+               end
             end
+
+#            case subscription.subscription_type
+#              when 1
+#                 subscription.subscribed_resource_types.each do |srt|
+#                     eval(srt).find(:all).each do |object|
+#                       object.current_user_subscribed= true
+#                     end
+#                 end
+#              when 2
+#                subscription.next_sent=Date.today + 1
+#              when 3
+#                subscription.next_sent=Date.today + 7
+#              when 4
+#                subscription.next_sent=Date.today >> 1
+#              else
+#            end
             subscription.save!
 
           end
