@@ -2,7 +2,7 @@ module SendImmediateSubscription
 
   def self.included klass
     klass.class_eval do
-      has_many :specific_subscriptions,:as=>:subscribable,:dependent=>:destroy,:autosave => true
+      has_many :specific_subscriptions, :as => :subscribable, :dependent => :destroy, :autosave => true
     end
   end
 
@@ -35,7 +35,7 @@ module SendImmediateSubscription
   end
 
   def send_immediate_subscription activity_log
-    if self.current_user_subscribed and self.subscription_type==Subscription::IMMEDIATE
+    if self.current_user_subscribed and self.subscription_type==Subscription::IMMEDIATELY
       SubMailer.deliver_send_immediate_subscription activity_log
     else
       p "resource is not subscribed for immediate changes!!"

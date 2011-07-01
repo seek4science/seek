@@ -7,7 +7,7 @@ class SpecificSubscription < ActiveRecord::Base
   validates_presence_of :person
   validates_presence_of :subscribable
 
-  [:daily, :monthly, :weekly, :immediate].each do |sym|
+  [:daily, :monthly, :weekly, :immediately].each do |sym|
     define_method "#{sym}?" do
       subscription_type == Subscription.const_get(sym.to_s.upcase)
     end

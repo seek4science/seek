@@ -9,7 +9,7 @@ class Subscription < ActiveRecord::Base
 
   # three subscription type
   NEVER = 0
-  IMMEDIATE = 1
+  IMMEDIATELY = 1
   DAILY = 2
   WEEKLY = 3
   MONTHLY = 4
