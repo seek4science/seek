@@ -1,6 +1,6 @@
 module SendImmediateSubscription
 
-  def self.include klass
+  def self.included klass
     klass.class_eval do
       #after_create :set_subscribable_id_for_new_object
       has_many :specific_subscriptions,:as=>:subscribable,:dependent=>:destroy
