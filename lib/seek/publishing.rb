@@ -28,7 +28,7 @@ module Seek
       @published_items = @published_items - @problematic_items
 
       respond_to do |format|
-        flash[:notice]="Publishing complete"
+        flash.now[:notice]="Publishing complete"
         format.html { render :template=>"assets/publish/published" }
       end
     end
