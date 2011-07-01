@@ -229,6 +229,9 @@ class Person < ActiveRecord::Base
        end
   end
 
+  def can_view? user = User.current_user
+    not user.nil?
+  end
 
   def can_edit? user = User.current_user
     new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
