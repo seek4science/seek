@@ -53,9 +53,6 @@ class Person < ActiveRecord::Base
 
   has_many :subscriptions
   accepts_nested_attributes_for :subscriptions,:allow_destroy=>true
-  attr_accessible :subscriptions
-  attr_accessible :subscriptions_attributes
-  attr_accessible :subscribed_resource_types
 
   has_many :specific_subscriptions
 
@@ -207,24 +204,7 @@ class Person < ActiveRecord::Base
                  object.subscription_type= subscription.subscription_type
                end
             end
-
-#            case subscription.subscription_type
-#              when 1
-#                 subscription.subscribed_resource_types.each do |srt|
-#                     eval(srt).find(:all).each do |object|
-#                       object.current_user_subscribed= true
-#                     end
-#                 end
-#              when 2
-#                subscription.next_sent=Date.today + 1
-#              when 3
-#                subscription.next_sent=Date.today + 7
-#              when 4
-#                subscription.next_sent=Date.today >> 1
-#              else
-#            end
             subscription.save!
-
           end
        end
   end
