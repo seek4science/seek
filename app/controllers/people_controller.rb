@@ -151,9 +151,20 @@ class PeopleController < ApplicationController
 
       redirect_action="select"
     end       
-    
+
+    subscriptions_attributes = params[:person][:subscriptions_attributes]
+    subscriptions_attributes.each{|k,v|
+     v[:subscribed_resource_types]= v[:subscribed_resource_types].reject(&:blank?)
+
+    }
+
+    params[:person][:subscriptions_attributes]= subscriptions_attributes.collect{|k,v|v}
+
     respond_to do |format|
       if @person.save && current_user.save
+
+         @person.subscriptions_setting params[:person][:subscriptions_attributes]
+
         if (!current_user.active?)
           if_sysmo_member||=false
           Mailer.deliver_contact_admin_new_user_no_profile(member_details,current_user,base_host) if is_sysmo_member
@@ -204,7 +215,7 @@ class PeopleController < ApplicationController
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
 
-        subscriptions_setting params[:person][:subscriptions_attributes]
+        @person.subscriptions_setting params[:person][:subscriptions_attributes]
 
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }

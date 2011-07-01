@@ -1,120 +1,114 @@
 
 <%
-  new_resource_logs = @activity_logs.select{|log|log.action=="create"}
-  updated_resource_logs = @activity_logs.select{|log|log.action=="update"}
-  deleted_resource_logs = @activity_logs.select{|log|log.action=="destroy"}
+  new_resource_logs =  @activity_logs.select{|log| log.action=="create"}
+  updated_resource_logs = @activity_logs.select{|log| log.action=="update"}
+  deleted_resource_logs = @activity_logs.select{|log| log.action=="destroy"}
 %>
-<% if @new_req %>
-    <label style="color:#f0342a;"><b>New resources</b></label>
 
-   <% activity_logs = ActivityLog.all.select { |al| al.action=="create" and al.referenced==@project}
-       unless activity_logs.blank? || (activity_logs.collect(&:activity_loggable_type) & @resources).blank?%>
+
+    <label style="color:#f0342a;"><b>New resources</b></label>
+ <% unless new_resource_logs.blank? %>
        <div id="new_resources" class="new_resources" >
        <table border="1px" cellpadding="5" style="border-collapse: collapse;
               font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
               width: 100%;">
 
       <tr>
+        <th align="left">Project Name</th>
         <th align="left">Resource Type</th>
-        <th align="left">Name</th>
+        <th align="left">Resource Name</th>
         <th align="left">Person</th>
         <th align="left">Created Date</th>
       </tr>
-      <% @resources.each do |resource|
-            activity_logs.select { |al| al.activity_loggable_type==resource }.each do |act|
-             %>
+      <% new_resource_logs.each do |log| %>
 
               <tr>
-                <td><%= resource %></td>
-                <td><%= act.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : act.data%></td>
-                <td><%= link_to h(act.culprit.person.name), "mailto:#{act.culprit.person.email_with_name}" %>
+                <td><%= log.referenced.nil?? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= log.activity_loggable_type %></td>
+                <td><%= log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : log.data%></td>
+                <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %>
                 </td>
-                <td> <%= act.created_at %></td>
+                <td> <%= log.activity_loggable.try(:created_at) || log.created_at %></td>
               </tr>
-          <% end %>
 
       <% end %>
            </table></div>
-   <% else %>
+ <% else %>
         <br/>
         <span style="font-style:italic;color:#666666"> Nothing </span>
         <br/>
-   <% end %>
-
 <% end %>
 
 <br style="clear:both"/>
 
-<% if @update_req %>
-    <label style="color:#eb6423"><b>Updated resources</b></label>
-     <% activity_logs = ActivityLog.all.select { |al| al.action=="update" and al.referenced==@project}
-       unless activity_logs.blank? || (activity_logs.collect(&:activity_loggable_type) & @resources).blank? %>
-    <div id="updated_resources" class="updated_resources">
-    <table border="1px" cellpadding="5" style="border-collapse: collapse;
+
+    <label style="color:#f0342a;"><b>Updated resources</b></label>
+ <% unless updated_resource_logs.blank? %>
+       <div id="updated_resources" class="updated_resources" >
+       <table border="1px" cellpadding="5" style="border-collapse: collapse;
               font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
               width: 100%;">
 
       <tr>
-        <th align="left">Resource</th>
-        <th align="left">Name</th>
+        <th align="left">Project Name</th>
+        <th align="left">Resource Type</th>
+        <th align="left">Resource Name</th>
         <th align="left">Person</th>
         <th align="left">Updated Date</th>
       </tr>
-      <% @resources.each do |resource|
-            activity_logs.select { |al| al.activity_loggable_type==resource }.each do |act| %>
+      <% updated_resource_logs.each do |log| %>
 
               <tr>
-                <td><%= resource %></td>
-                <td><%= act.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : act.data%></td>
-                <td> <%= link_to h(act.culprit.person.name), "mailto:#{act.culprit.person.email_with_name}" %></td>
-                <td> <%= act.created_at %></td>
+                <td><%= log.referenced.nil?? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= log.activity_loggable_type %></td>
+                <td><%= log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : log.data%></td>
+                <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %>
+                </td>
+                <td> <%= log.created_at %></td>
               </tr>
-          <% end %>
 
       <% end %>
-        </table></div>
-    <% else %>
+           </table></div>
+ <% else %>
         <br/>
-    <span style="font-style:italic;color:#666666"> Nothing </span>
+        <span style="font-style:italic;color:#666666"> Nothing </span>
         <br/>
-    <% end %>
 <% end %>
 
 <br style="clear:both"/>
 
 
 
-<% if @delete_req %>
-    <label style="color:#929191"><b>Deleted resources</b></label>
-     <% activity_logs = ActivityLog.all.select { |al| al.action=="destroy" and al.referenced==@project}
-       unless activity_logs.blank? || (activity_logs.collect(&:activity_loggable_type) & @resources).blank?%>
-        <div id="deleted_resources" class="deleted_resources">
-        <table  border="1px" cellpadding="5" style="border-collapse: collapse;
+
+    <label style="color:#f0342a;"><b>Deleted resources</b></label>
+ <% unless deleted_resource_logs.blank? %>
+       <div id="deleted_resource" class="deleted_resource" >
+       <table border="1px" cellpadding="5" style="border-collapse: collapse;
               font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
               width: 100%;">
 
       <tr>
-        <th align="left">Resource</th>
-        <th align="left">Name</th>
+        <th align="left">Project Name</th>
+        <th align="left">Resource Type</th>
+        <th align="left">Resource Name</th>
         <th align="left">Person</th>
         <th align="left">Deleted Date</th>
       </tr>
-      <% @resources.each do |resource|
-          activity_logs.select { |al| al.activity_loggable_type==resource}.each do |act| %>
+      <% deleted_resource_logs.each do |log| %>
 
               <tr>
-                <td><%= resource %></td>
-                <td><%= act.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : act.data%></td>
-                <td> <%= link_to h(act.culprit.person.name), "mailto:#{act.culprit.person.email_with_name}" %></td>
-                <td> <%= act.created_at %></td>
+                <td><%= log.referenced.nil?? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= log.activity_loggable_type %></td>
+                <td><%= log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : log.data%></td>
+                <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %>
+                </td>
+                <td> <%= log.created_at %></td>
               </tr>
-          <% end %>
-      <% end %>
-      </table></div>
 
-    <% else %>
-       <br/>
+      <% end %>
+           </table></div>
+ <% else %>
+        <br/>
         <span style="font-style:italic;color:#666666"> Nothing </span>
-       <br/>
-    <% end %>
+        <br/>
 <% end %>

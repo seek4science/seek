@@ -1,4 +1,6 @@
-<% resource_type = resource.class.to_s.downcase %>
+<% resource_type = resource.class.to_s.downcase
+check_box_name = "#{resource_type}[current_user_subscribed]"
+radio_button_name = "#{resource_type}[subscription_type]"%>
 
 <div class="fold">
   <div class="foldTitle">
@@ -7,15 +9,15 @@
   </div>
   <div class="foldContent">
 
-
-    <%= f.check_box :current_user_subscribed, {:style=>"align:middle"} %> Subscribe this <%= resource_type %>
+    <%= check_box resource_type,:current_user_subscribed,{},true,false%> Subscribe this <%= resource_type %>
     <br/><br/>
 
     <p> Would you like to receive emails:
-      <%= f.radio_button :subscription_type, Subscription::IMMEDIATELY %> Immediately
-      <%= f.radio_button :subscription_type, Subscription::DAILY %> Daily
-      <%= f.radio_button :subscription_type, Subscription::WEEKLY %> Weekly
-      <%= f.radio_button :subscription_type, Subscription::MONTHLY %> Monthly <br/>
+      <%= radio_button_tag radio_button_name, Subscription::IMMEDIATELY,(resource.subscription_type==Subscription::IMMEDIATELY) %> Immediately
+      <%= radio_button_tag radio_button_name, Subscription::DAILY,(resource.subscription_type==Subscription::DAILY) %> Daily
+      <%= radio_button_tag radio_button_name, Subscription::WEEKLY,(resource.subscription_type==Subscription::WEEKLY) %> Weekly
+      <%= radio_button_tag radio_button_name, Subscription::MONTHLY ,(resource.subscription_type==Subscription::MONTHLY)%> Monthly <br/>
+
     </p>
 
 

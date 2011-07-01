@@ -5,7 +5,7 @@ class AddSubscriptionTypeAndProjectIdToSpecificSubscriptions < ActiveRecord::Mig
   end
 
   def self.down
-    remove_column :specific_subscriptions,:subscribable_type
+    remove_column :specific_subscriptions,:subscription_type
     remove_column :specific_subscriptions,:project_id
   end
 end

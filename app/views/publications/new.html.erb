@@ -22,7 +22,8 @@
     <p>
       <%= select_tag("protocol", options_for_select([["PubMed ID","pubmed"],["DOI","doi"]])) %>
       <%= text_field_tag("key") %>            
-    </p>    
+    </p>
+    <%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@publication} %>
 	<p>
 		<%= submit_tag 'Fetch',:id=>"fetch_button" %>
 	</p>

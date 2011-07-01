@@ -111,7 +111,8 @@
 
 <%= render :partial => "assets/publication_relation_form", :locals => { :resource_type => "Assay",
                                                                         :related_publications => @assay.related_publications} -%>
-                                                                        
+<%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@assay} %>
+
 <p style="margin-top: 2em; text-align: center;" >
   <%
      button_text=action==:edit ? "Update" : "Create"

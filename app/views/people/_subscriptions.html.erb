@@ -25,7 +25,6 @@
 
     <br/>
     <% f.fields_for :subscriptions do |sub_form| %>
-        <% subscriptions << sub_form.object %>
         <div id="subscription<%=sub_form.object.project_id%>" style="display:none;" >
             <fieldset>
               <legend> Project: <%= sub_form.object.project.name %></legend>

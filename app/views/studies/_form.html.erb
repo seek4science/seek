@@ -69,7 +69,7 @@
   <p>
     <%= render :partial=>"assets/sharing_form" if @study.can_manage? -%>
   </p>
-
+  <%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@study} %>
 </div>
 
 

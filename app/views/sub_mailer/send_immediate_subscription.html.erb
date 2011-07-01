@@ -27,7 +27,7 @@
 
               <tr>
                 <td><%= @activity_log.activity_loggable_type %></td>
-                <td><%= @activity_log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : activity_log.data%></td>
+                <td><%= @activity_log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : @activity_log.data%></td>
                 <td> <%= link_to h(@activity_log.culprit.person.name), "mailto:#{@activity_log.culprit.person.email_with_name}" %></td>
                 <td> <%= @activity_log.created_at %></td>
               </tr>

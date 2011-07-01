@@ -1,3 +1,4 @@
+require 'acts_as_authorized'
 class SpecificSubscription < ActiveRecord::Base
   belongs_to :person
   belongs_to :project
