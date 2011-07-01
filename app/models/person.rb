@@ -229,6 +229,24 @@ class Person < ActiveRecord::Base
        end
   end
 
+  def can_view? user = User.current_user
+    not user.nil?
+  end
+
+  def can_edit? user = User.current_user
+    new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
+  end
+
+  does_not_require_can_edit :is_admin
+  requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
+
+  def can_manage? user = User.current_user
+    user.is_admin?
+  end
+
+  def can_destroy? user = User.current_user
+    can_manage? user
+  end
 
   private
 

@@ -111,7 +111,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_non_admin_cant_edit_someone_else
     login_as(:fred)
     get :edit, :id=> people(:aaron_person)
-    assert_redirected_to root_path
+    assert_redirected_to people(:aaron_person)
   end
 
   def test_project_manager_can_edit_others
