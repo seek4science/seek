@@ -8,5 +8,10 @@ class SpecificSubscription < ActiveRecord::Base
   validates_presence_of :subscribable
   #validates_presence_of :project project might be nil for some resource
 
+  [:daily, :monthly, :weekly, :immediate].each do |sym|
+    define_method "#{sym}?" do
+      subscription_type == Subscription.const_get(sym.to_s.upcase)
+    end
+  end
 
 end
