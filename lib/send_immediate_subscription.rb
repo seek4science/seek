@@ -34,9 +34,7 @@ module SendImmediateSubscription
     end
   end
 
-  def send_immediate_subscription activity_log_id
-    activity_log = ActivityLog.find activity_log_id
-
+  def send_immediate_subscription activity_log
     if self.current_user_subscribed and self.subscription_type==Subscription::IMMEDIATE
       SubMailer.deliver_send_immediate_subscription activity_log
     else
