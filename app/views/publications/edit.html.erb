@@ -77,6 +77,7 @@
       <p>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @publication, :show_relationships => false} -%>
       </p>
+     <%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@publication} %>
     <p style="text-align: center;">
       <%= submit_tag 'Update',:disable_with=>"Updating..." %>
     </p>

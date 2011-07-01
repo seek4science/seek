@@ -4,23 +4,30 @@ module SendImmediateSubscription
   end
 
   def current_user_subscribed
-      current_users_subscription
+      !current_users_subscription.nil?
+
   end
 
   def current_user_subscribed= subscribed
       if subscribed
-        SpecificSubscription.create!(:person_id=>User.current_user.person.id,:project_id=>self.try(:project_id),:subscribable=>self)  unless current_users_subscription
+       new_sub = nil
+       new_sub = SpecificSubscription.create!(:person_id=>User.current_user.person.id,:project_id=>self.try(:project_id),:subscribable=>self) if current_users_subscription.nil?
+       User.current_user.person.specific_subscriptions << new_sub if
+       User.current_user.person.specific_subscriptions.compact!
       else
         current_users_subscription.try(:destroy)
       end
   end
 
   def subscription_type
-      current_users_subscription.subscription_type
+      current_users_subscription.try(:subscription_type)
   end
 
   def subscription_type=   type
-      current_users_subscription.subscription_type = type
+     unless  current_users_subscription.nil?
+     current_users_subscription.subscription_type = type
+     current_users_subscription.save!
+     end
   end
 
   def send_immediate_subscription activity_log_id
