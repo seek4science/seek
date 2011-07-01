@@ -1,6 +1,6 @@
 <% resource_type = resource.class.to_s.downcase
-check_box_name = "#{resource.class.to_s}[current_user_subscribed]"
-radio_button_name = "#{resource.class.to_s}[subscription_type]"%>
+check_box_name = "#{resource_type}[current_user_subscribed]"
+radio_button_name = "#{resource_type}[subscription_type]"%>
 
 <div class="fold">
   <div class="foldTitle">
@@ -9,8 +9,7 @@ radio_button_name = "#{resource.class.to_s}[subscription_type]"%>
   </div>
   <div class="foldContent">
 
-
-    <%= check_box_tag check_box_name,resource.current_user_subscribed,resource.current_user_subscribed==true, {:style=>"align:middle"}%> Subscribe this <%= resource_type %>
+    <%= check_box resource_type,:current_user_subscribed,{},true,false%> Subscribe this <%= resource_type %>
     <br/><br/>
 
     <p> Would you like to receive emails:

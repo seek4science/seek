@@ -1,5 +1,25 @@
 module SendImmediateSubscription
+
+  def self.include klass
+    klass.class_eval do
+      #after_create :set_subscribable_id_for_new_object
+      has_many :specific_subscriptions,:dependent=>:destroy
+    end
+
+  end
+
+
+  def set_subscribable_id_for_new_object
+      sub = User.current_user.person.specific_subscriptions.detect{|ss|ss.subscribable_type==self.class.to_s and ss.subscribable_id.nil?}
+      unless sub.nil?
+        sub.subscribable_id = self.id
+        sub.save!
+      end
+
+  end
   def current_users_subscription
+
+
       User.current_user.person.specific_subscriptions.detect{|ss|ss.subscribable==self}
   end
 
@@ -11,8 +31,8 @@ module SendImmediateSubscription
   def current_user_subscribed= subscribed
       if subscribed
        new_sub = nil
-       new_sub = SpecificSubscription.create!(:person_id=>User.current_user.person.id,:project_id=>self.try(:project_id),:subscribable=>self) if current_users_subscription.nil?
-       User.current_user.person.specific_subscriptions << new_sub if
+       new_sub = SpecificSubscription.new(:person_id=>User.current_user.person.id,:project_id=>self.try(:project).try(:id),:subscribable=>self) if current_users_subscription.nil?
+       User.current_user.person.specific_subscriptions << new_sub
        User.current_user.person.specific_subscriptions.compact!
       else
         current_users_subscription.try(:destroy)
@@ -24,9 +44,10 @@ module SendImmediateSubscription
   end
 
   def subscription_type=   type
+
      unless  current_users_subscription.nil?
      current_users_subscription.subscription_type = type
-     current_users_subscription.save!
+     #current_users_subscription.save!
      end
   end
 
@@ -35,6 +56,7 @@ module SendImmediateSubscription
      p "##############"
      p model
 
+     set_subscribable_id_for_new_object
 
      activity_log = ActivityLog.find activity_log_id
 
