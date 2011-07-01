@@ -187,6 +187,21 @@ class Person < ActiveRecord::Base
     subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
   end
 
+  def can_edit? user = User.current_user
+    new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
+  end
+
+  does_not_require_can_edit :is_admin
+  requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
+
+  def can_manage? user = User.current_user
+    user.is_admin?
+  end
+
+  def can_destroy? user = User.current_user
+    can_manage? user
+  end
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
