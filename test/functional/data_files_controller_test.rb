@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'libxml'
+require 'webmock/test_unit'
 
 class DataFilesControllerTest < ActionController::TestCase
   
@@ -113,7 +114,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle 404 url" do
-    df={:title=>"Test",:data_url=>"http:/www.sysmo-db.org/nothing-there.png"}    
+    mock_http
+    df={:title=>"Test",:data_url=>"http://mocked404.com"}
     assert_no_difference('DataFile.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :data_file => df, :sharing=>valid_sharing
@@ -143,6 +145,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should create data file with http_url" do
+    mock_http
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         post :create, :data_file => valid_data_file_with_http_url, :sharing=>valid_sharing
@@ -153,7 +156,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert assigns(:data_file).content_blob.data_io_object.nil?
     assert !assigns(:data_file).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
+    assert_equal "a-piccy.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
   end
   
@@ -188,6 +191,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should create data file and store with url and store flag" do
+    mock_http
     datafile_details = valid_data_file_with_http_url
     datafile_details[:local_copy]="1"
     
@@ -202,11 +206,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !assigns(:data_file).content_blob.url.blank?
     assert !assigns(:data_file).content_blob.data_io_object.read.nil?
     assert assigns(:data_file).content_blob.file_exists?
-    assert_equal "sysmo-db-logo-grad2.png", assigns(:data_file).original_filename
+    assert_equal "a-piccy.png", assigns(:data_file).original_filename
     assert_equal "image/png", assigns(:data_file).content_type
   end  
   
   test "should gracefully handle when downloading a unknown host url" do
+    WebMock.allow_net_connect!
     df=data_files(:url_no_host_data_file)
     get :download,:id=>df
     assert_redirected_to data_file_path(df,:version=>df.version)
@@ -214,6 +219,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should gracefully handle when downloading a url resulting in 404" do
+    mock_http
     df=data_files(:url_not_found_data_file)
     get :download,:id=>df
     assert_redirected_to data_file_path(df,:version=>df.version)
@@ -222,7 +228,8 @@ class DataFilesControllerTest < ActionController::TestCase
   
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 401 url" do
-    df = {:title=>"401",:data_url=>"http://www.myexperiment.org/workflow.xml?id=82",:project=>projects(:sysmo_project)}
+    mock_http
+    df = {:title=>"401",:data_url=>"http://mocked401.com",:project=>projects(:sysmo_project)}
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         post :create, :data_file => df, :sharing=>valid_sharing
@@ -238,14 +245,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "",assigns(:data_file).content_type
     
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://www.myexperiment.org/workflow.xml?id=82"
+    assert_redirected_to "http://mocked401.com"
   end
   
   
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 302 url" do
-    
-    df = {:title=>"302",:data_url=>"http://demo.sysmo-db.org/models/1/download",:project=>projects(:sysmo_project)}
+    mock_http
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:project=>projects(:sysmo_project)}
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         post :create, :data_file => df, :sharing=>valid_sharing
@@ -261,7 +268,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "",assigns(:data_file).content_type
     
     get :download, :id => assigns(:data_file)
-    assert_redirected_to "http://demo.sysmo-db.org/models/1/download"
+    assert_redirected_to "http://mocked302.com"
   end
   
   test "should create data file" do
@@ -363,6 +370,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should download from url" do
+    mock_http
     get :download, :id => data_files(:url_based_data_file)
     assert_response :success
   end
@@ -663,6 +671,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
+    mock_http
     login_as(:quentin)
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
@@ -725,13 +734,23 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   private
+
+  def mock_http
+    file="#{Rails.root}/test/fixtures/files/file_picture.png"
+    stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new(file), :status => 200, :headers=>{'Content-Type' => 'image/png'})
+    stub_request(:head, "http://mockedlocation.com/a-piccy.png")
+
+    stub_request(:any, "http://mocked302.com").to_return(:status=>302)
+    stub_request(:any, "http://mocked401.com").to_return(:status=>401)
+    stub_request(:any, "http://mocked404.com").to_return(:status=>404)
+  end
   
   def valid_data_file
     { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
   end
   
   def valid_data_file_with_http_url
-    { :title=>"Test HTTP",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
+    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:project=>projects(:sysmo_project)}
   end
   
   def valid_data_file_with_ftp_url
