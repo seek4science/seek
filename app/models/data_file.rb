@@ -37,18 +37,10 @@ class DataFile < ActiveRecord::Base
   acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
-<<<<<<< local
-
-  acts_as_uniquely_identifiable
-
-=======
   
   has_many :spreadsheet_annotations
-  
-  grouped_pagination 
-  
-  acts_as_uniquely_identifiable  
->>>>>>> other
+
+  acts_as_uniquely_identifiable
 
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource

@@ -53,7 +53,7 @@ class SearchController < ApplicationController
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."
     else
       flash.now[:notice]="#{@results.size} #{@results.size==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content."
-    end<<<<<<< local
+    end
     
   end
 
