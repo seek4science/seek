@@ -1,5 +1,6 @@
 require 'test_helper'
 
+
 class ModelTest < ActiveSupport::TestCase
   fixtures :all    
 
@@ -72,6 +73,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "cache_remote_content" do
+    WebMock.allow_net_connect!
     project = projects(:sysmo_project)
     
     model=Model.new(:title=>"test model for caching remote")

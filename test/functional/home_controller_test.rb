@@ -6,6 +6,10 @@ class HomeControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include HomeHelper
 
+  def setup
+    WebMock.allow_net_connect!
+  end
+
   test "test should be accessible to seek even if not logged in" do
     get :index
     assert_response :success

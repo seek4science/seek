@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'webmock/test_unit'
 
 class RemoteDownloaderTest < ActiveSupport::TestCase  
 

@@ -32,6 +32,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "publication date from pubmed" do
+    WebMock.allow_net_connect!
     query = PubmedQuery.new("seek","sowen@cs.man.ac.uk")
     result = query.fetch(21533085)
     assert_equal Date.parse("20 April 2011"),result.date_published
@@ -46,6 +47,7 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "book chapter doi" do
+    WebMock.allow_net_connect!
     query=DoiQuery.new("sowen@cs.man.ac.uk")
     result = query.fetch("10.1007/978-3-642-16239-8_8")
     assert_equal 3,result.publication_type
