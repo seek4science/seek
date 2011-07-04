@@ -61,19 +61,37 @@ module HomeHelper
   end
 
   def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
+    activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'download', time])
+    selected_activity_logs = []
+    selected_items = []
+    count = 0
+    activity_logs.each do |activity_log|
+       item = activity_log.activity_loggable
+       if !item.nil? and item.can_view? and !selected_items.include? item
+         selected_items.push item
+         selected_activity_logs.push activity_log
+         count += 1
+       end
+       break if count == number_of_item
+    end
     #filter by can_view?
-    activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
-    activity_logs.take(number_of_item)
+    selected_activity_logs
   end
 
   def recently_added_item_logs time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'create', time])
-    #filter by can_view?
-    activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
-    #take out only Asset and Publication log
-    activity_logs = activity_logs.select{|activity_log| ['DataFile', 'Model', 'Sop', 'Publication', 'Investigation', 'Study', 'Assay'].include?(activity_log.activity_loggable_type)}
-    activity_logs.take(number_of_item)
+    item_types = ['DataFile', 'Model', 'Sop', 'Publication', 'Investigation', 'Study', 'Assay']
+    activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
+    selected_activity_logs = []
+    count = 0
+    activity_logs.each do |activity_log|
+       item = activity_log.activity_loggable
+       if !item.nil? and item.can_view? and item_types.include?(activity_log.activity_loggable_type)
+         selected_activity_logs.push activity_log
+         count += 1
+       end
+       break if count == number_of_item
+    end
+    selected_activity_logs
   end
 
   # get multiple feeds from multiple sites

@@ -1,3 +1,4 @@
+
 require 'test_helper'
 require 'libxml'
 
@@ -63,7 +64,10 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'non-project member and non-login user can edit datafile with public policy and editable' do
     login_as(:registered_user_with_no_projects)
     data_file = Factory(:data_file, :policy => Factory(:public_policy, :access_type => Policy::EDITING))
-    get :show, :id => data_file
+    assert_difference('ActivityLog.count') do
+      get :show, :id => data_file
+    end
+
     assert_response :success
     put :update, :id => data_file, :data_file => {:title => 'new title'}
     assert_equal 'new title', assigns(:data_file).title
@@ -87,8 +91,9 @@ class DataFilesControllerTest < ActionController::TestCase
     new_assay=assays(:metabolomics_assay2)
     new_asset_ids = new_assay.related_asset_ids 'DataFile'
     assert !new_asset_ids.include?(d.id)
-
-    put :update, :id => d, :data_file =>{}, :assay_ids=>[new_assay.id.to_s]
+    assert_difference('ActivityLog.count') do
+      put :update, :id => d, :data_file =>{}, :assay_ids=>[new_assay.id.to_s]
+    end
 
     assert_redirected_to data_file_path(d)
     d.reload
@@ -114,38 +119,49 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should correctly handle 404 url" do
     df={:title=>"Test",:data_url=>"http:/www.sysmo-db.org/nothing-there.png"}    
-    assert_no_difference('DataFile.count') do
-      assert_no_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
       end
     end
+
     assert_not_nil flash.now[:error]
   end
   
   test "should correctly handle bad data url" do
     df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:project=>projects(:sysmo_project)}
-    assert_no_difference('DataFile.count') do
-      assert_no_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
       end
     end
+
     assert_not_nil flash.now[:error]
   end
   
   test "should not create invalid datafile" do
     df={:title=>"Test"}
-    assert_no_difference('DataFile.count') do
-      assert_no_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
       end
     end
+
     assert_not_nil flash.now[:error]
   end
   
   test "should create data file with http_url" do
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file_with_http_url, :sharing=>valid_sharing
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => valid_data_file_with_http_url, :sharing=>valid_sharing
+        end
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -160,10 +176,11 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create data file with ftp_url" do
     #FIXME FTP call needs mocking out
     return puts("Skipping test DataFileControllerTest 'should create data file with ftp_url'")
-
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file_with_ftp_url, :sharing=>valid_sharing
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => valid_data_file_with_ftp_url, :sharing=>valid_sharing
+        end
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -179,24 +196,29 @@ class DataFilesControllerTest < ActionController::TestCase
     file_url="file://"+file_path
     uri=URI.parse(file_url)    
    
-    assert_no_difference('DataFile.count') do
-      assert_no_difference('ContentBlob.count') do
-        post :create, :data_file => { :title=>"Test",:data_url=>uri.to_s}, :sharing=>valid_sharing
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        assert_no_difference('ContentBlob.count') do
+          post :create, :data_file => { :title=>"Test",:data_url=>uri.to_s}, :sharing=>valid_sharing
+        end
       end
     end
+
     assert_not_nil flash[:error]    
   end
   
   test "should create data file and store with url and store flag" do
     datafile_details = valid_data_file_with_http_url
     datafile_details[:local_copy]="1"
-    
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => datafile_details, :sharing=>valid_sharing
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => datafile_details, :sharing=>valid_sharing
+        end
       end
     end
-    
+
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
@@ -223,11 +245,14 @@ class DataFilesControllerTest < ActionController::TestCase
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 401 url" do
     df = {:title=>"401",:data_url=>"http://www.myexperiment.org/workflow.xml?id=82",:project=>projects(:sysmo_project)}
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
       end
     end
+
     
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
@@ -246,12 +271,14 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create and redirect on download for 302 url" do
     
     df = {:title=>"302",:data_url=>"http://demo.sysmo-db.org/models/1/download",:project=>projects(:sysmo_project)}
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
       end
     end
-    
+
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner),assigns(:data_file).contributor
     assert !assigns(:data_file).content_blob.url.blank?
@@ -267,9 +294,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create data file" do
     login_as(:datafile_owner) #can edit assay
     assay=assays(:assay_can_edit_by_datafile_owner)
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => valid_data_file, :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+        end
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -283,10 +313,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should create data file for upload tool" do
     assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :upload_for_tool, :data_file => valid_data_file, :recipient_id => people(:quentin_person).id
+        assert_difference('ContentBlob.count') do
+          post :upload_for_tool, :data_file => valid_data_file, :recipient_id => people(:quentin_person).id
+        end
       end
-    end
+
     assert_response :success
     df = assigns(:data_file)
     df.reload
@@ -302,9 +333,11 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def test_missing_sharing_should_default_to_private
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => valid_data_file
+        end
       end
     end
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -326,7 +359,10 @@ class DataFilesControllerTest < ActionController::TestCase
   
   test "should show data file" do
     d = data_files(:picture)
-    get :show, :id => d
+    assert_difference('ActivityLog.count') do
+      get :show, :id => d
+    end
+
     assert_response :success
   end
 
@@ -334,7 +370,10 @@ class DataFilesControllerTest < ActionController::TestCase
     d = data_files(:picture)
     d.title="\"Title with quote"
     d.save!
-    get :show, :id => d
+    assert_difference('ActivityLog.count') do
+      get :show, :id => d
+    end
+
     assert_response :success
   end
   
@@ -358,12 +397,17 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should download" do
-    get :download, :id => data_files(:viewable_data_file)
+    assert_difference('ActivityLog.count') do
+      get :download, :id => data_files(:viewable_data_file)
+    end
     assert_response :success
   end
   
   test "should download from url" do
-    get :download, :id => data_files(:url_based_data_file)
+    assert_difference('ActivityLog.count') do
+      get :download, :id => data_files(:url_based_data_file)
+    end
+
     assert_response :success
   end
   
@@ -415,11 +459,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]    
   end
   
-  def test_should_allow_factors_studies_edited_for_downloadable_file
+  def test_should_not_allow_factors_studies_edited_for_downloadable_file
     login_as(:aaron)
     d = data_files(:downloadable_data_file)
     d.save
-    get :show, :id=>d
+    assert_difference('ActivityLog.count') do
+      get :show, :id=>d
+    end
+    assert_response :success
     assert_select "a",:text=>/Edit factors studied/,:count=>0
   end
   
@@ -427,7 +474,10 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:aaron)
     d=data_files(:editable_data_file)
     d.save
-    get :show, :id=>d
+    assert_difference('ActivityLog.count') do
+      get :show, :id=>d
+    end
+
     assert_select "a",:text=>/Edit factors studied/,:count=>1
   end
   
@@ -435,12 +485,18 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:datafile_owner)
     d=data_files(:downloadable_data_file)
     d.save
-    get :show, :id=>d
+    assert_difference('ActivityLog.count') do
+      get :show, :id=>d
+    end
+
     assert_select "a",:text=>/Edit factors studied/,:count=>1
   end
   
   test "should update data file" do
-    put :update, :id => data_files(:picture).id, :data_file => { }
+    assert_difference('ActivityLog.count') do
+      put :update, :id => data_files(:picture).id, :data_file => { }
+    end
+
     assert_redirected_to data_file_path(assigns(:data_file))
   end
   
@@ -460,11 +516,14 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should destroy DataFile" do
-    assert_difference('DataFile.count', -1) do
-      assert_no_difference("ContentBlob.count") do
-        delete :destroy, :id => data_files(:editable_data_file).id
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count', -1) do
+        assert_no_difference("ContentBlob.count") do
+          delete :destroy, :id => data_files(:editable_data_file).id
+        end
       end
-    end    
+    end
+
     assert_redirected_to data_files_path
   end
   
@@ -517,7 +576,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = DataFile.find(df.id)
     assert df.attributions.collect{|a| a.object}.include?(jerm_file),"The datafile should have had the jerm file added as an attribution"
     get :show,:id=>df
-    assert :success
+    assert_response :success
   end
   
   test "filtering by assay" do
@@ -586,7 +645,10 @@ class DataFilesControllerTest < ActionController::TestCase
      assert df.can_edit?(user), "data file should be editable and manageable for this test"
      assert df.can_manage?(user), "data file should be editable and manageable for this test"
      assert_equal Policy::EDITING,df.policy.access_type,"data file should have an initial policy with access type for editing"
-     put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS,"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS }
+     assert_difference('ActivityLog.count') do
+      put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS,"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS }
+     end
+
      assert_redirected_to data_file_path(df)
      df.reload
 
@@ -664,11 +726,14 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => valid_data_file_with_http_url, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+        end
       end
     end
+
 
     df=assigns(:data_file)
     assert_redirected_to data_file_path(df)
@@ -695,9 +760,9 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.contributor_type, 'FavouriteGroup'
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
-
-    put :update, :id => df, :data_file => {}, :sharing => {"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::ACCESSIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::EDITING}
-
+    assert_difference('ActivityLog.count') do
+      put :update, :id => df, :data_file => {}, :sharing => {"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::ACCESSIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::EDITING}
+    end
     df.reload
 
     assert_redirected_to data_file_path(df)
@@ -718,8 +783,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.content_blob.file_exists?
     FileUtils.rm df.content_blob.filepath
     assert !df.content_blob.file_exists?
-
     get :download,:id=>df
+
     assert_redirected_to df
     assert flash[:error].match(/Unable to find a copy of the file for download/)
   end
