@@ -9,6 +9,7 @@ class SopsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
+    WebMock.allow_net_connect!
     login_as(:quentin)
     @object=sops(:downloadable_sop)
   end

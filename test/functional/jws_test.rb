@@ -8,6 +8,7 @@ class JwsTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
+    WebMock.allow_net_connect!
     login_as(:model_owner)
   end
 
