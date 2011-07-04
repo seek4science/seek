@@ -5,6 +5,7 @@ class DataFilesController < ApplicationController
   
   include IndexPager
   include SysMODB::SpreadsheetExtractor
+  include SpreadsheetViewer 
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
@@ -286,6 +287,35 @@ end
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end  
+  
+  def explore
+    @data_file =  DataFile.find(params[:id])
+    if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
+      
+      #CACHING HACK TO AVOID SEGFAULT!! - DELETE THIS
+      xml = nil
+      filename = "spreadsheet_xml_" + @data_file.id.to_s
+      if File.exist?(filename)
+        puts "FILE EXISTS - READING FROM DISK"
+        xml = File.open(filename, "r") {|f| f.read}
+      else
+        xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath)) #Original code
+        File.open(filename, "w") {|f| f.write(xml)} 
+      end
+      #END OF HACK
+
+      @spreadsheet = parse_spreadsheet_xml(xml)
+      @spreadsheet.annotations = @data_file.spreadsheet_annotations
+      respond_to do |format|
+        format.html { render :layout=>"minimal" }
+      end
+    else
+     respond_to do |format|
+        flash[:error] = "Unable to view contents of this data file"
+        format.html { redirect_to @data_file,:format=>"html" }
+      end
+    end
+  end 
   
   protected    
   

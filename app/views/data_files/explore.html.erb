@@ -1,0 +1,34 @@
+<%= stylesheet_link_tag('finn_spreadsheet') %>
+<%= javascript_include_tag 'jquery-1.4.3.js', 'finn_spreadsheet.js' %>
+
+<ul class="sectionIcons">
+  <li>
+    <%= image_tag_for_key('arrow_left', data_file_path(@data_file), 'Return to Data file', nil, 'Return to Data file') -%>
+  </li>
+</ul>
+
+<h1>Exploring Data File</h1>
+
+<div class="show_basic">
+  <div id="spreadsheet_errors"></div>
+  <input size="10" id="selection_data"></input>
+  <input size="60" id="cell_info" readonly="readonly"></input>
+  <div class="spreadsheet_controls">
+    <%= link_to image('spreadsheet_annotation_add') + " Add Annotation", "#", :onclick =>"$j('div#annotation_overview').hide(); $j('div#annotation_form').toggle();return false;",
+          :title => "Add new annotation", :class => "spreadsheet_button" %>
+    <%= link_to image('spreadsheet') + " List Annotations", "#", :onclick =>"$j('div#annotation_form').hide(); $j('div#annotation_overview').toggle();return false;", 
+          :title => "Add new annotation", :class => "spreadsheet_button" %>
+  </div>
+
+  
+  <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
+  
+  <div class="spreadsheet_viewer">
+    <%= render :partial => "annotations/annotation_form" %>
+    <div id="annotations">
+      <%= render :partial => "annotations/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
+    </div>
+    <%= generate_spreadsheet_html(@spreadsheet) %>
+
+  </div>
+</div>

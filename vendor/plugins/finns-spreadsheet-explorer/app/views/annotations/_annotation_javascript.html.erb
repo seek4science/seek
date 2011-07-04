@@ -1,0 +1,18 @@
+<script type="text/javascript">
+  $j(function () {
+    $j("td.annotated_cell").removeClass("annotated_cell")
+  <% annotations.each do |a| %>
+    $j("table.sheet:eq(<%= a.sheet -%>) tr").slice(<%= a.start_row-%>,<%= a.end_row+1-%>).each(
+      function() {
+        $j(this).children("td.cell").slice(<%= a.start_column-1-%>,<%= a.end_column-%>).addClass("annotated_cell")
+          .click(function (e) {show_annotation(<%=a.id-%>,
+                                               $j(this).position().left + $j(this).outerWidth(),
+                                               $j(this).position().top);});
+      }
+    );
+  <% end %>
+  });
+  
+  //FIXME: Hacky
+  callJS();
+</script>

@@ -1,0 +1,20 @@
+<div id="annotation_container" style="display:none">
+  <div id="annotation_drag"></div>
+  <%= render :partial => "annotations/annotation_javascript", :locals => {:annotations => annotations} %>
+  <%= render :partial => "annotations/annotation", :collection=>annotations %>
+</div>
+<div id="annotation_overview" style="display:none">
+  <div class="spreadsheet_box_title">
+    <div style="float: left">Listing Annotations</div>
+    <div style="float: right"><a href="#" onclick="$j('#annotation_overview').hide(); return false;">Close</a></div>
+    <br style="clear:both"/>
+  </div>
+  <table>
+    <% annotations.reverse.group_by(&:source).each do |source, annotation_subset| %>    
+      <tr class="source_header" id="annotation_from_<%= source.class.name + source.id.to_s -%>">
+        <td colspan="3">Annotations from <%= link_to source.person.name, source.person -%></td>        
+      </tr>
+      <%= render :partial => "annotations/annotation_stub", :collection=>annotation_subset, :as => :annotation %>
+    <% end %>
+  </table>
+</div>

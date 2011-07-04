@@ -1,0 +1,8 @@
+<div class="spreadsheet_errors">
+  <h1><%= errors.length > 1 ? "Errors" : "An error"-%> occurred whilst <%= verb -%> your annotation</h1>
+  <ul>
+    <% errors.each_full do |e| %>
+      <li><%= e%></li>
+    <% end %>
+  </ul>
+</div>

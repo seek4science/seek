@@ -238,6 +238,16 @@ module ImagesHelper
         "crystal_project/32x32/apps/vcalendar.png"
       when "publish"
        "crystal_project/22x22/actions/up.png"
+      when "spreadsheet"
+      "famfamfam_silk/table.png"
+      when "spreadsheet_annotation"
+      "famfamfam_silk/tag_blue.png"
+      when "spreadsheet_annotation_edit"
+      "famfamfam_silk/tag_blue_edit.png"
+      when "spreadsheet_annotation_add"
+      "famfamfam_silk/tag_blue_add.png"
+      when "spreadsheet_annotation_destroy"
+      "famfamfam_silk/tag_blue_delete.png"
     else
       return nil
     end

@@ -712,6 +712,21 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
   add_index "sops", ["project_id"], :name => "index_sops_on_project_id"
 
+  create_table "spreadsheet_annotations", :force => true do |t|
+    t.integer  "data_file_id"
+    t.integer  "sheet"
+    t.integer  "start_row"
+    t.integer  "start_column"
+    t.integer  "end_row"
+    t.integer  "end_column"
+    t.integer  "source_id"
+    t.string   "annotation_type"
+    t.text     "content"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "source_type"
+  end
+
   create_table "strains", :force => true do |t|
     t.string   "title"
     t.integer  "organism_id"
