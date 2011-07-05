@@ -1,7 +1,7 @@
 <% if object.subscribed? %>
        <%= link_to "Unsubscribe", object.current_users_subscription, :method => :delete %>
 <% else
-       form_for Subscription.new(:subscribable => object, :person => current_user.person) do |f| %>
+       form_for Subscription.new(:subscribable => object, :person => current_user.person), :html => {:style => 'display:inline;'} do |f| %>
         <%= f.hidden_field :subscribable_id  -%>
         <%= f.hidden_field :subscribable_type  -%>
         <%= f.hidden_field :person_id  -%>
