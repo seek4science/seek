@@ -9,7 +9,7 @@ class ProjectSubscription < ActiveRecord::Base
 
   after_initialize :default_frequency
   def default_frequency
-    frequency = 'weekly' unless self.frequency
+    frequency = 'weekly' if self.frequency.blank?
   end
 
   #store the 'unsubscribed types' instead of the subscribed ones,
