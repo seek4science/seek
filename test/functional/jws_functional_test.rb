@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class JwsTest < ActionController::TestCase
+class JwsFunctionalTest < ActionController::TestCase
   tests ModelsController
 
   fixtures :all

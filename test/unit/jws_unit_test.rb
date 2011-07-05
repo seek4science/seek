@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class JwsTest < ActiveSupport::TestCase
+class JwsUnitTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
