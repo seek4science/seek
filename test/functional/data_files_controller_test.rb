@@ -252,15 +252,11 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create and redirect on download for 401 url" do
     mock_http
     df = {:title=>"401",:data_url=>"http://mocked401.com",:project=>projects(:sysmo_project)}
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
-      end
-    end
-      
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        post :create, :data_file => df, :sharing=>valid_sharing
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, :data_file => df, :sharing=>valid_sharing
+        end
       end
     end
     
@@ -559,7 +555,10 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def test_should_add_nofollow_to_links_in_show_page
-    get :show, :id=> data_files(:data_file_with_links_in_description)    
+    assert_difference('ActivityLog.count') do
+      get :show, :id=> data_files(:data_file_with_links_in_description)
+    end
+
     assert_select "div#description" do
       assert_select "a[rel=nofollow]"
     end
@@ -570,7 +569,10 @@ class DataFilesControllerTest < ActionController::TestCase
   def test_update_should_not_overwrite_contributor
     login_as(:pal_user) #this user is a member of sysmo, and can edit this data file
     df=data_files(:data_file_with_no_contributor)
-    put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
+    assert_difference('ActivityLog.count') do
+      put :update, :id => df, :data_file => {:title=>"blah blah blah blah"}
+    end
+
     updated_df=assigns(:data_file)
     assert_redirected_to data_file_path(updated_df)
     assert_equal "blah blah blah blah",updated_df.title,"Title should have been updated"
@@ -585,7 +587,10 @@ class DataFilesControllerTest < ActionController::TestCase
     r.save!
     df = DataFile.find(df.id)
     assert df.attributions.collect{|a| a.object}.include?(jerm_file),"The datafile should have had the jerm file added as an attribution"
-    get :show,:id=>df
+    assert_difference('ActivityLog.count') do
+      get :show,:id=>df
+    end
+
     assert_response :success
     assert :success
   end
@@ -634,7 +639,10 @@ class DataFilesControllerTest < ActionController::TestCase
      assert df.can_edit?(user), "data file should be editable but not manageable for this test"
      assert !df.can_manage?(user), "data file should be editable but not manageable for this test"
      assert_equal Policy::EDITING,df.policy.access_type,"data file should have an initial policy with access type for editing"
-     put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS }
+     assert_difference('ActivityLog.count') do
+      put :update, :id => df, :data_file => {:title=>"new title" },:sharing=>{:use_whitelist=>"0",:user_blacklist=>"0",:sharing_scope =>Policy::ALL_SYSMO_USERS, "access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::NO_ACCESS }
+     end
+
      assert_redirected_to data_file_path(df)
      df.reload
 
@@ -724,8 +732,10 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :data_file,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
 
     assert !df.can_download?, "The datafile must not be downloadable for this test to succeed"
+    assert_difference('ActivityLog.count') do
+      get :show, :id => df
+    end
 
-    get :show, :id => df
     assert_response :success
     assert_select "#request_resource_button > a",:text=>/Request Data file/,:count=>1
 

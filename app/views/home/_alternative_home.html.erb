@@ -1,4 +1,6 @@
 <%= stylesheet_link_tag "homepage" -%>
+<%= javascript_include_tag "prototype" -%>
+
 
 <h1><%= Seek::Config.application_name -%></h1>
 <div class="top_home_panel">
@@ -27,7 +29,7 @@
      <div id="community_news" class="homepanel_list">
          <ul>
          <%
-           entries = Seek::FeedReader.fetch_entries_for :community_news
+            entries = Seek::FeedReader.fetch_entries_for :community_news
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
