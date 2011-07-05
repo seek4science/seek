@@ -2,6 +2,8 @@ require 'grouped_pagination'
 require 'acts_as_authorized'
 
 class Sample < ActiveRecord::Base
+  include Subscribable
+
   belongs_to :specimen
   belongs_to :institution
   has_and_belongs_to_many :assays

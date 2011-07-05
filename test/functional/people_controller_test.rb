@@ -102,6 +102,19 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, :id => people(:quentin_person)
     assert_response :success
   end
+
+  test 'anonymous user cannot view people' do
+    logout
+    get :show, :id => people(:quentin_person)
+    assert_present flash[:error]
+  end
+
+  test 'anonymous user doesnt see people in index' do
+    Factory :person, :first_name => 'Invisible', :last_name => ''
+    logout
+    get :index
+    assert_select 'a', :text => /Invisible/, :count => 0
+  end
   
   def test_should_get_edit
     get :edit, :id => people(:quentin_person)
@@ -111,7 +124,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_non_admin_cant_edit_someone_else
     login_as(:fred)
     get :edit, :id=> people(:aaron_person)
-    assert_redirected_to root_path
+    assert_redirected_to people(:aaron_person)
   end
 
   def test_project_manager_can_edit_others

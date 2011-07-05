@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110602160032) do
+ActiveRecord::Schema.define(:version => 20110704082948) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -557,6 +557,13 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
   add_index "posts", ["topic_id", "created_at"], :name => "index_posts_on_topic_id"
   add_index "posts", ["user_id", "created_at"], :name => "index_posts_on_user_id"
 
+  create_table "project_subscriptions", :force => true do |t|
+    t.integer "person_id"
+    t.integer "project_id"
+    t.string  "unsubscribed_types"
+    t.string  "frequency"
+  end
+
   create_table "projects", :force => true do |t|
     t.string   "name"
     t.string   "web_page"
@@ -823,6 +830,15 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+  end
+
+  create_table "subscriptions", :force => true do |t|
+    t.integer  "person_id"
+    t.integer  "subscribable_id"
+    t.string   "subscribable_type"
+    t.string   "subscription_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "synonyms", :force => true do |t|

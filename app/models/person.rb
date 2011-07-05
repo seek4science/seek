@@ -51,6 +51,27 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
+  has_many :project_subscriptions
+  accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
+
+  has_many :subscriptions
+  before_create :set_default_subscriptions
+
+  def set_default_subscriptions
+    projects.each do |proj|
+      set_default_subscription_to proj
+    end
+  end
+
+  def set_default_subscription_to proj
+    project_subscriptions.build :project => proj, :unsubscribed_types => []
+    ProjectSubscription.subscribable_types.each do |type_name|
+      type_name.constantize.all.select{|item| item.project == proj}.each do |item|
+        subscriptions.build :subscribable => item unless subscriptions.detect {|ss| ss.subscribable == item and ss.project == proj}
+      end
+    end
+  end
+
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
 
@@ -185,6 +206,42 @@ class Person < ActiveRecord::Base
 
   def can_be_edited_by?(subject)
     subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
+  end
+
+  def subscriptions_setting  subscriptions_attributes
+       subscriptions_attributes.reject{|s|s["subscribed_resource_types"].blank?}.each do |st|
+          subscription = self.subscriptions.detect{|s|s.project_id==st["project_id"].to_i}
+          if subscription
+            subscription.subscribed_resource_types = st["subscribed_resource_types"]
+            subscription.subscription_type = st["subscription_type"]
+            subscription.subscribed_resource_types.each do |srt|
+               eval(srt).find(:all).select(&:can_edit?).each do |object|
+                 object.current_user_subscribed= true
+                 object.subscription_type= subscription.subscription_type
+               end
+            end
+            subscription.save!
+          end
+       end
+  end
+
+  def can_view? user = User.current_user
+    not user.nil?
+  end
+
+  def can_edit? user = User.current_user
+    new_record? or user && (user.is_admin? || user.is_project_manager? || user == self.user)
+  end
+
+  does_not_require_can_edit :is_admin
+  requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
+
+  def can_manage? user = User.current_user
+    user.is_admin?
+  end
+
+  def can_destroy? user = User.current_user
+    can_manage? user
   end
 
   private

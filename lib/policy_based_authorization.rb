@@ -7,9 +7,6 @@ module Acts
           belongs_to :contributor, :polymorphic => true unless method_defined? :contributor
           after_initialize :contributor_or_default_if_new
 
-          #wrapped in try_block in case the AuthorizationEnforcement module has not been included into ActiveRecord.
-          try_block { does_not_require_can_edit :uuid, :first_letter }
-
           #checks a policy exists, and if missing resorts to using a private policy
           after_initialize :policy_or_default_if_new
 

@@ -463,4 +463,42 @@ namespace :seek do
     end
   end
 
+
+  desc "Send mail daily to users"
+  task :send_daily_subscription => :environment do
+    Person.all.each do |person|
+       activity_logs =[]
+       daily_subs = person.specific_subscriptions.select &:daily?
+       daily_subs.each do |sub|
+         activity_logs.concat ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==sub.subscribable and log.created_at.to_date == Date.yesterday}
+       end
+      SubMailer.deliver_send_digest_subscription person,activity_logs,"daily" unless daily_subs.blank?
+    end
+
+  end
+
+  desc "Send mail weekly to users"
+  task :send_weekly_subscription => :environment do
+     Person.all.each do |person|
+       activity_logs =[]
+       weekly_subs = person.specific_subscriptions.select &:weekly?
+       weekly_subs.each do |sub|
+         activity_logs.concat ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==sub.subscribable and log.created_at.to_date < Date.today and log.created_at.to_date >= 7.days.ago.to_date}
+      end
+      SubMailer.deliver_send_digest_subscription person,activity_logs,"weekly" unless  weekly_subs.blank?
+    end
+  end
+
+  desc "Send mail monthly to users"
+  task :send_monthly_subscription => :environment do
+     Person.all.each do |person|
+       activity_logs =[]
+       monthly_subs =  person.specific_subscriptions.select &:monthly?
+       monthly_subs.each do |sub|
+         activity_logs.concat ActivityLog.all.select{|log|log.action !="show" and log.activity_loggable==sub.subscribable and log.created_at.to_date < Date.today and log.created_at.to_date >= 1.month.ago.to_date}
+      end
+      SubMailer.deliver_send_digest_subscription person,activity_logs,"monthly" unless monthly_subs.blank?
+    end
+  end
+
 end

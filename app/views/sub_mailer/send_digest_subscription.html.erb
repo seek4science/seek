@@ -1,0 +1,114 @@
+
+<%
+  new_resource_logs =  @activity_logs.select{|log| log.action=="create"}
+  updated_resource_logs = @activity_logs.select{|log| log.action=="update"}
+  deleted_resource_logs = @activity_logs.select{|log| log.action=="destroy"}
+%>
+
+
+    <label style="color:#f0342a;"><b>New resources</b></label>
+ <% unless new_resource_logs.blank? %>
+       <div id="new_resources" class="new_resources" >
+       <table border="1px" cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Project Name</th>
+        <th align="left">Resource Type</th>
+        <th align="left">Resource Name</th>
+        <th align="left">Person</th>
+        <th align="left">Created Date</th>
+      </tr>
+      <% new_resource_logs.each do |log| %>
+
+              <tr>
+                <td><%= log.referenced.nil?? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= log.activity_loggable_type %></td>
+                <td><%= log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : log.data%></td>
+                <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %>
+                </td>
+                <td> <%= log.activity_loggable.try(:created_at) || log.created_at %></td>
+              </tr>
+
+      <% end %>
+           </table></div>
+ <% else %>
+        <br/>
+        <span style="font-style:italic;color:#666666"> Nothing </span>
+        <br/>
+<% end %>
+
+<br style="clear:both"/>
+
+
+    <label style="color:#f0342a;"><b>Updated resources</b></label>
+ <% unless updated_resource_logs.blank? %>
+       <div id="updated_resources" class="updated_resources" >
+       <table border="1px" cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Project Name</th>
+        <th align="left">Resource Type</th>
+        <th align="left">Resource Name</th>
+        <th align="left">Person</th>
+        <th align="left">Updated Date</th>
+      </tr>
+      <% updated_resource_logs.each do |log| %>
+
+              <tr>
+                <td><%= log.referenced.nil?? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= log.activity_loggable_type %></td>
+                <td><%= log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : log.data%></td>
+                <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %>
+                </td>
+                <td> <%= log.created_at %></td>
+              </tr>
+
+      <% end %>
+           </table></div>
+ <% else %>
+        <br/>
+        <span style="font-style:italic;color:#666666"> Nothing </span>
+        <br/>
+<% end %>
+
+<br style="clear:both"/>
+
+
+
+
+    <label style="color:#f0342a;"><b>Deleted resources</b></label>
+ <% unless deleted_resource_logs.blank? %>
+       <div id="deleted_resource" class="deleted_resource" >
+       <table border="1px" cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Project Name</th>
+        <th align="left">Resource Type</th>
+        <th align="left">Resource Name</th>
+        <th align="left">Person</th>
+        <th align="left">Deleted Date</th>
+      </tr>
+      <% deleted_resource_logs.each do |log| %>
+
+              <tr>
+                <td><%= log.referenced.nil?? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= log.activity_loggable_type %></td>
+                <td><%= log.data.nil?? "<span style='font-style:italic;color:#666666'>Not Logged</span>" : log.data%></td>
+                <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %>
+                </td>
+                <td> <%= log.created_at %></td>
+              </tr>
+
+      <% end %>
+           </table></div>
+ <% else %>
+        <br/>
+        <span style="font-style:italic;color:#666666"> Nothing </span>
+        <br/>
+<% end %>
