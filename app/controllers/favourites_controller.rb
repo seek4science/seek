@@ -12,7 +12,7 @@ class FavouritesController < ApplicationController
       end
     else
       split_id=params[:id].split("_")
-      resource = eval(split_id[1]).find_by_id(split_id[2].to_i)
+      resource = split_id[1].constantize.find_by_id(split_id[2].to_i)
     end
     
     f=Favourite.new
