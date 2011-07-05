@@ -292,7 +292,7 @@ end
     @data_file =  DataFile.find(params[:id])
     if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
       
-      #CACHING HACK TO AVOID SEGFAULT!! - DELETE THIS
+      #TODO: CACHING HACK TO AVOID SEGFAULT!! - DELETE THIS
       xml = nil
       filename = "spreadsheet_xml_" + @data_file.id.to_s
       if File.exist?(filename)

@@ -4,12 +4,8 @@ module SpreadsheetHelper
     html = ""
             
     #List of tabs
-    first_sheet = true
-    sheet_index = 0
-    workbook.sheets.each do |sheet|
-      html << "<a index=\"#{sheet_index}\" class=\"sheet_tab #{"selected_tab" if first_sheet}\" href=\"#\">#{sheet.name}</a>"
-      first_sheet = false
-      sheet_index += 1
+    workbook.sheets.each_with_index do |sheet, sheet_index|
+      html << "<a index=\"#{sheet_index}\" class=\"sheet_tab #{"selected_tab" if workbook.sheets.first == sheet}\" href=\"#\">#{sheet.name}</a>"
     end
 
     html << "<div class=\"spreadsheet_container\" onselectstart=\"return false;\" >"
