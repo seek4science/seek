@@ -46,7 +46,7 @@ $j(document).ready(function ($) {
       activeSheet.scrollTop(0).scrollLeft(0);
       
       //Set table active
-      activeSheet.find("table").addClass('active_sheet');
+      activeSheet.children("table").addClass('active_sheet');
 
       //Deselect any cells
       $("table.active_sheet td.selected_cell").removeClass("selected_cell");

@@ -1,3 +1,16 @@
+#
+#
+#
+#
+#
+#
+#NO LONGER USED - LEFT FOR REFERENCE
+#
+#
+#
+#
+#
+
 module SpreadsheetHelper
   
   def generate_spreadsheet_html(workbook)
@@ -9,7 +22,7 @@ module SpreadsheetHelper
     end
 
     html << "<div class=\"spreadsheet_container\" onselectstart=\"return false;\" >"
-    
+
     first_sheet = true
     workbook.sheets.each do |sheet|
       max_col = sheet.last_col
@@ -21,7 +34,7 @@ module SpreadsheetHelper
       sheet_html << "\t<tr>"
       sheet_html << "\t\t<th class=\"col_heading\" style=\"width:3em\"></th>"
       sheet.columns.each do |col|
-        sheet_html << "\t\t<th #{col.width.nil? ? "" : "style =\"width:"+(col.width.to_f/31).to_s+"px\""} class=\"col_heading\">#{to_alpha(col.index)}</th>"
+        sheet_html << "\t\t<th #{"style =\"width:"+(col.width.to_f/31).to_s+"px\"" unless col.width.nil?} class=\"col_heading\">#{to_alpha(col.index)}</th>"
       end
       sheet_html << "\t</tr>"
       
@@ -50,6 +63,7 @@ module SpreadsheetHelper
         row_html << "\t</tr>"
         sheet_html << row_html
       end
+#====================UP TO HERE    
       
       #End sheet
       sheet_html << "</table>"
@@ -60,19 +74,5 @@ module SpreadsheetHelper
     html << "</div>"
     html << ""
     return html
-  end
-  
-  private
-  
-  def to_alpha(col)
-    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)    
-    result = ""
-    col = col-1
-    while (col > -1) do
-      letter = (col % 26)
-      result = alphabet[letter] + result
-      col = (col / 26) - 1
-    end
-    result
-  end
+  end  
 end  
