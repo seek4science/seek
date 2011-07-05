@@ -18,7 +18,6 @@ Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk"
 Seek::Config.default :exception_notification_enabled,false
 Seek::Config.default :exception_notification_recipients,""
 Seek::Config.default :hide_details_enabled,false
-Seek::Config.default :activity_log_enabled,true
 Seek::Config.default :activation_required_enabled,false
 Seek::Config.default :google_analytics_enabled, false
 Seek::Config.default :google_analytics_tracker_id, '000-000'
