@@ -51,10 +51,26 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
-  has_many :subscriptions
-  accepts_nested_attributes_for :subscriptions,:allow_destroy=>true
+  has_many :project_subscriptions
+  accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
-  has_many :specific_subscriptions
+  has_many :subscriptions
+  before_create :set_default_subscriptions
+
+  def set_default_subscriptions
+    projects.each do |proj|
+      set_default_subscription_to proj
+    end
+  end
+
+  def set_default_subscription_to proj
+    project_subscriptions.build :project => proj, :unsubscribed_types => []
+    ProjectSubscription.subscribable_types.each do |type_name|
+      type_name.constantize.all.select{|item| item.project == proj}.each do |item|
+        subscriptions.build :subscribable => item unless subscriptions.detect {|ss| ss.subscribable == item and ss.project == proj}
+      end
+    end
+  end
 
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"

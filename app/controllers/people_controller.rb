@@ -1,6 +1,5 @@
 class PeopleController < ApplicationController
   
-  #before_filter :login_required,:except=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
   before_filter :current_user_exists,:only=>[:select,:userless_project_selected_ajax,:create,:new]
   before_filter :profile_belongs_to_current_or_is_admin, :only=>[:edit, :update]
@@ -30,11 +29,7 @@ class PeopleController < ApplicationController
     elsif @tools=params[:tools]
       @people=Person.tagged_with(@tools, :on=>:tools)
     elsif (params[:discipline_id])
-      @discipline=Discipline.find(params[:discipline_id])
-      #FIXME: strips out the disciplines that don't match
-      @people=Person.find(:all,:include=>:disciplines,:conditions=>["disciplines.id=?",@discipline.id])
-      #need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
-      @people.each(&:reload)
+      @people=Person.find(:all,:include=>:disciplines).select{|p| p.discipline_id == params[:discipline_id]}
     elsif (params[:role_id])
       @role=Role.find(params[:role_id])
       @people=Person.find(:all,:include=>[:group_memberships])
@@ -68,8 +63,6 @@ class PeopleController < ApplicationController
   # GET /people/new.xml
   def new    
     @person = Person.new
-    setup_subscription
-
     respond_to do |format|
       format.html { render :action=>"new" }
       format.xml  { render :xml => @person }
@@ -78,7 +71,6 @@ class PeopleController < ApplicationController
 
   # GET /people/1/edit
   def edit
-    setup_subscription
     possible_unsaved_data = "unsaved_#{@person.class.name}_#{@person.id}".to_sym
     if session[possible_unsaved_data]
       # if user was redirected to this 'edit' page from avatar upload page - use session
@@ -150,21 +142,10 @@ class PeopleController < ApplicationController
       end
 
       redirect_action="select"
-    end       
-
-    subscriptions_attributes = params[:person][:subscriptions_attributes]
-    subscriptions_attributes.each{|k,v|
-     v[:subscribed_resource_types]= v[:subscribed_resource_types].reject(&:blank?)
-
-    }
-
-    params[:person][:subscriptions_attributes]= subscriptions_attributes.collect{|k,v|v}
+    end
 
     respond_to do |format|
       if @person.save && current_user.save
-
-         @person.subscriptions_setting params[:person][:subscriptions_attributes]
-
         if (!current_user.active?)
           if_sysmo_member||=false
           Mailer.deliver_contact_admin_new_user_no_profile(member_details,current_user,base_host) if is_sysmo_member
@@ -188,14 +169,6 @@ class PeopleController < ApplicationController
   # PUT /people/1
   # PUT /people/1.xml
   def update
-    subscriptions_attributes = params[:person][:subscriptions_attributes]
-    subscriptions_attributes.each{|k,v|
-     v[:subscribed_resource_types]= v[:subscribed_resource_types].reject(&:blank?)
-
-    }
-
-    params[:person][:subscriptions_attributes]= subscriptions_attributes.collect{|k,v|v}
-
     @person.disciplines.clear if params[:discipline_ids].nil?
 
     # extra check required to see if any avatar was actually selected (or it remains to be the default one)
@@ -214,9 +187,6 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.update_attributes(params[:person]) && set_group_membership_role_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-
-        @person.subscriptions_setting params[:person][:subscriptions_attributes]
-
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -359,24 +329,4 @@ class PeopleController < ApplicationController
       params[:person].delete(param) if params[:person] and not allowed
     end
   end
-
-  def setup_subscription
-      if @person.subscriptions.blank?
-        @person.projects.each do |p|
-          @person.subscriptions.build(:project_id=>p.id,
-                                      :subscribed_resource_types=>["DataFile","Sop","Model","Presentation","Event","Investigation","Study","Assay","Specimen","Sample"])
-        end
-        other_projects = Project.all - @person.projects
-        other_projects.each do |op|
-          @person.subscriptions.build(:project_id=>op.id,
-          :subscribed_resource_types=>[])
-        end
-        p "******************"
-        @person.subscriptions.each do |s|
-          p s.project.name
-         end
-      end
-  end
-
-
 end

@@ -13,10 +13,10 @@ radio_button_name = "#{resource_type}[subscription_type]"%>
     <br/><br/>
 
     <p> Would you like to receive emails:
-      <%= radio_button_tag radio_button_name, Subscription::IMMEDIATELY,(resource.subscription_type==Subscription::IMMEDIATELY) %> Immediately
-      <%= radio_button_tag radio_button_name, Subscription::DAILY,(resource.subscription_type==Subscription::DAILY) %> Daily
-      <%= radio_button_tag radio_button_name, Subscription::WEEKLY,(resource.subscription_type==Subscription::WEEKLY) %> Weekly
-      <%= radio_button_tag radio_button_name, Subscription::MONTHLY ,(resource.subscription_type==Subscription::MONTHLY)%> Monthly <br/>
+      <%= radio_button_tag radio_button_name, ProjectSubscription::IMMEDIATELY,(resource.subscription_type==ProjectSubscription::IMMEDIATELY) %> Immediately
+      <%= radio_button_tag radio_button_name, ProjectSubscription::DAILY,(resource.subscription_type==ProjectSubscription::DAILY) %> Daily
+      <%= radio_button_tag radio_button_name, ProjectSubscription::WEEKLY,(resource.subscription_type==ProjectSubscription::WEEKLY) %> Weekly
+      <%= radio_button_tag radio_button_name, ProjectSubscription::MONTHLY ,(resource.subscription_type==ProjectSubscription::MONTHLY)%> Monthly <br/>
 
     </p>
 

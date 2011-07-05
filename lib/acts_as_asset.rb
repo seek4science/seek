@@ -62,7 +62,7 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
-        include SendImmediateSubscription
+        include Subscribable
       end
 
       def is_asset?

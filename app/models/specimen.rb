@@ -1,8 +1,8 @@
 require 'grouped_pagination'
 require 'acts_as_authorized'
-require 'send_immediate_subscription'
+require 'subscribable'
 class Specimen < ActiveRecord::Base
-   include SendImmediateSubscription
+   include Subscribable
 
   before_save  :clear_garbage
 

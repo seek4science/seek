@@ -2,7 +2,7 @@ require 'grouped_pagination'
 require 'acts_as_authorized'
 
 class Sample < ActiveRecord::Base
-  include SendImmediateSubscription
+  include Subscribable
 
   belongs_to :specimen
   belongs_to :institution

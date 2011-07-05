@@ -114,7 +114,6 @@ class PeopleControllerTest < ActionController::TestCase
     logout
     get :index
     assert_select 'a', :text => /Invisible/, :count => 0
-
   end
   
   def test_should_get_edit

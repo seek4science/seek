@@ -1,104 +1,64 @@
 <%
    select_truncate_length=120
-   other_projects = Project.all - @person.projects
-   subscriptions = []
-   @person.subscriptions.collect(&:subscribed_resource_types)
-  count = 0
+   projects = Project.all.sort_by { |p| @person.projects.include?(p) ? 1 : 0}
 %>
-<div class="fold" >
+<div class="fold">
   <div class="foldTitle">
-    <%= help_icon("Here you can customize your sub_mailer. By default, you subscribe all in your project.") -%>
+    <%= help_icon("Here you can customize your project subscriptions. By default, you subscribe to your projects.") -%>
     Subscriptions
   </div>
   <div class="foldContent">
-     <label><b>Your Projects:</b></label> <br/>
-      <%= select_tag :person_projects_subscriptions,
-                         options_for_select([["Select Project ...", 0]]|@person.projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length),p.id] }),
-                         {:style=>"width:90%",
-                          :onchange=>"show_person_project_subscription();return(false);"} -%>
-
-    <br/><label><b>Other Projects:</b></label><br/>
-    <%= select_tag :other_projects_subscriptions,
-                         options_for_select([["Select Project ...", 0]]|other_projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length),p.id] }),
-                         {:style=>"width:90%",
-                          :onchange=> "show_other_project_subscription();return(false);"} -%>
+    <label><b>Projects:</b></label> <br/>
+    <%= select_tag :select_project_subscription,
+                   options_for_select([["Select Project ...", 0]]|projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length), p.id] }),
+                   {:style=>"width:90%",
+                    :onchange=>"show_project_subscription();return(false);"} -%>
 
     <br/>
-    <% f.fields_for :subscriptions do |sub_form| %>
-        <div id="subscription<%=sub_form.object.project_id%>" style="display:none;" >
-            <fieldset>
-              <legend> Project: <%= sub_form.object.project.name %></legend>
-              <%=sub_form.hidden_field  :project_id%>
-              <br/> <br/>
-                <label><b>Assets:</b></label>
 
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},'Sop',nil%> SOPs
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},'DataFile',nil%> DataFiles
+    <% project_subscriptions_with_unsubscribed = projects.map do |proj|
+        @person.project_subscriptions.detect { |ps| ps.project == proj } || ProjectSubscription.new(:project => proj, :person => @person).tap(&:mark_for_destruction)
+    end %>
+    <% f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
+        <div id="subscription<%= sub_form.object.project_id %>" style="display:none;">
+          <fieldset>
+            <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
+            <legend> Project: <%= sub_form.object.project.name %></legend>
+            <%= sub_form.hidden_field :project_id %>
+            <br/>
 
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},"Model",'' %> Models
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},"Presentation",'' %> Presentations
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},"Event","" %> Events <br/> <br/>
-               <label><b>ISA:</b></label>
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},"Investigation",'' %> Investigations
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},"Study",''%> Studies
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"} ,"Assay",''%> Assays<br/> <br/>
-                <label><b>Specimen:</b></label>
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},"Sample",''%> Samples
-                <%= sub_form.check_box "subscribed_resource_types",{:name=>"person[subscriptions_attributes][#{count}][subscribed_resource_types][]"},"Specimen" ,''%> Specimens <br/> <br/><br/>
-
-
-
-              <p> Would you like to receive emails:
-            <%= sub_form.radio_button :subscription_type,Subscription::IMMEDIATELY %> Immediately
-            <%= sub_form.radio_button :subscription_type,Subscription::DAILY %> Daily
-            <%= sub_form.radio_button :subscription_type,Subscription::WEEKLY %> Weekly
-            <%= sub_form.radio_button :subscription_type,Subscription::MONTHLY %> Monthly <br/> </p>
-            </fieldset>
+            <p> Would you like to receive emails:
+              <% Subscription::FREQUENCIES.each do |freq| %>
+                  <%= sub_form.radio_button :frequency, freq %> <%= "#{freq.capitalize}" %>
+              <% end %>
+              <br/>
+              Unsubscribe: <%= sub_form.check_box :_destroy %>
+            </p>
+          </fieldset>
         </div>
-        <% count +=1 %>
-   <% end %>
-   </div>
+    <% end %>
+  </div>
 </div>
 
- <script type="text/javascript">
+<script type="text/javascript">
 
-   var  old_person_project_subscription_id = "subscription";
-   var  new_person_project_subscription_id = "subscription";
+    var project_subscription = "subscription";
 
-   var  old_other_project_subscription_id = "subscription_other";
-   var  new_other_project_subscription_id = "subscription_other";
+    function swap_subscription(old_div_id, new_div_id) {
+        var old_div = $(old_div_id);
+        if (old_div && old_div.style.display == "block") {
+            old_div.style.display = "none";
+        }
+        var new_div = $(new_div_id);
+        if (new_div && new_div.style.display == "none") {
+            new_div.style.display = "block";
+        }
+    }
 
+    function show_project_subscription() {
+        var new_project_subscription = "subscription" + $F('select_project_subscription');
+        swap_subscription(project_subscription, new_project_subscription);
+        project_subscription = new_project_subscription;
+    }
 
-    function show_subscription(old_div_id,new_div_id){
-
-       var old_div = document.getElementById(old_div_id);
-
-       if(old_div && old_div.style.display=="block") {
-           old_div.style.display="none";
-       }
-
-
-       var new_div = document.getElementById(new_div_id);
-       if(new_div && new_div.style.display=="none") {
-           new_div.style.display="block";
-       }
-
-     }
-
-     function show_person_project_subscription(){
-         new_person_project_subscription_id = "subscription" + $F('person_projects_subscriptions');
-         show_subscription(old_person_project_subscription_id,new_person_project_subscription_id);
-         old_person_project_subscription_id = new_person_project_subscription_id;
-     }
-
-     function show_other_project_subscription(){
-
-         new_other_project_subscription_id = "subscription" + $F('other_projects_subscriptions');
-
-         show_subscription(old_other_project_subscription_id,new_other_project_subscription_id);
-
-         old_other_project_subscription_id = new_other_project_subscription_id;
-     }
-
-
- </script>
+</script>
