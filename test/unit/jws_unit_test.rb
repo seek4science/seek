@@ -83,7 +83,6 @@ class JwsUnitTest < ActiveSupport::TestCase
   end
   
   test "jws online response handled when errors present" do
-    WebMock.allow_net_connect!
     model=models(:invalid_sbml_xml)
     params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content model.versions.first
     assert !error_keys.empty?
