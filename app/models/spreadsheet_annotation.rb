@@ -5,7 +5,7 @@ class SpreadsheetAnnotation < ActiveRecord::Base
   belongs_to :source,
              :polymorphic => true
              
-  acts_as_solr(:fields => [ :content ]) if SOLR_ENABLED
+  acts_as_solr(:fields => [ :content ]) if Seek::Config.solr_enabled
              
   validates_presence_of :content
   #validates_presence_of :annotation_type
