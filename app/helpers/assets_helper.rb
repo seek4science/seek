@@ -2,8 +2,8 @@ module AssetsHelper
 
   def request_request_label resource
     icon_filename=icon_filename_for_key("message")
-    resource_type=resource.class.name.humanize
-    return '<span class="icon">' + image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}</span>";
+    resource_type=text_for_resource(resource)
+    '<span class="icon">' + image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}</span>";
   end
 
   #returns all the classes for models that return true for is_asset?

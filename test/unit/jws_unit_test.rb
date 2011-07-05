@@ -1,9 +1,10 @@
 require 'test_helper'
 
-class JwsTest < ActiveSupport::TestCase
+class JwsUnitTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
+    WebMock.allow_net_connect!
     @builder = Seek::JWS::OneStop.new
   end
   
@@ -82,6 +83,7 @@ class JwsTest < ActiveSupport::TestCase
   end
   
   test "jws online response handled when errors present" do
+    WebMock.allow_net_connect!
     model=models(:invalid_sbml_xml)
     params_hash,attributions,saved_file,objects_hash,error_keys = @builder.builder_content model.versions.first
     assert !error_keys.empty?

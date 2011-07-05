@@ -125,6 +125,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to "/"
   end
 
+
   protected
     def auth_token(token)
       CGI::Cookie.new('name' => 'auth_token', 'value' => token)

@@ -25,6 +25,8 @@ module Acts #:nodoc:
                  :as        => :owner,
                  :dependent => :destroy
 
+        has_many :activity_logs, :as => :activity_loggable
+
         validates_associated :avatars
 
         belongs_to :avatar

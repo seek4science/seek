@@ -6,6 +6,10 @@ class HomeControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include HomeHelper
 
+  def setup
+    WebMock.allow_net_connect!
+  end
+
   test "test should be accessible to seek even if not logged in" do
     get :index
     assert_response :success
@@ -147,39 +151,68 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
   end
 
-  test "should show the content of 4 boxes" do
+  test "should show the content of project news and community news with the configurable number of entries" do
     #project news
     Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = "http://sbml.org/index.php?title=News&action=feed"
-    Seek::Config.project_news_number_of_feed_entry = "5"
+    Seek::Config.project_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F02837181562898136579%2Fbundle%2Fsystembiology, http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
+    Seek::Config.project_news_number_of_entries = "5"
 
     #community news
     Seek::Config.community_news_enabled=true
-    Seek::Config.community_news_feed_urls = "http://www2.warwick.ac.uk/sitebuilder2/api/rss/news.rss?page=/fac/sci/systemsbiology/publications/&rss=true, http://feeds.bbci.co.uk/news/uk/rss.xml"
-    Seek::Config.community_news_number_of_feed_entry = "4,3"
-
-    #recently viewed
-    recently_viewed_items =  recently_viewed_items(1.year.ago, 10)
-    #recently downloaded
-    recently_downloaded_items =  recently_downloaded_items(1.year.ago, 10)
+    Seek::Config.community_news_feed_urls = "http://www.google.com/reader/public/atom/user%2F03588343170344705149%2Fbundle%2FSBML"
+    Seek::Config.community_news_number_of_entries = "7"
 
     login_as(:aaron)
     get :index
     assert_response :success
 
-    assert_select 'div.project_news ul>li', 5
-    assert_select 'div.community_news ul>li', 7
-    assert_select 'div.recently_viewed ul>li', recently_viewed_items.count
-    assert_select 'div.recently_downloaded ul>li', recently_downloaded_items.count
+    assert_select 'div#project_news ul>li', 5
+    assert_select 'div#community_news ul>li', 7
 
     logout
     get :index
     assert_response :success
 
-    assert_select 'div.project_news ul>li', 5
-    assert_select 'div.community_news ul>li', 7
-    assert_select 'div.recently_viewed ul>li', recently_viewed_items.count
-    assert_select 'div.recently_downloaded ul>li', recently_downloaded_items.count
+    assert_select 'div#project_news ul>li', 5
+    assert_select 'div#community_news ul>li', 7
+  end
+
+  test 'should show recently added and downloaded items with the filter can_view?' do
+    login_as(:aaron)
+    #recently added
+    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
+    recently_added_item_logs.each do |added_item_log|
+      assert added_item_log.activity_loggable.can_view?
+    end
+    #recently downloaded
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    recently_downloaded_item_logs.each do |downloaded_item_log|
+      assert downloaded_item_log.activity_loggable.can_view?
+    end
+
+    get :index
+    assert_response :success
+
+    assert_select 'div#recently_added ul>li', recently_added_item_logs.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
+
+    logout
+    #recently uploaded
+    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
+    recently_added_item_logs.each do |added_item_log|
+      assert added_item_log.activity_loggable.can_view?
+    end
+    #recently downloaded
+    recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
+    recently_downloaded_item_logs.each do |downloaded_item_log|
+      assert downloaded_item_log.activity_loggable.can_view?
+    end
+
+    get :index
+    assert_response :success
+
+    assert_select 'div#recently_added ul>li', recently_added_item_logs.count
+    assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
   end
   
 end

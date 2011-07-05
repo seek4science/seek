@@ -1,63 +1,7 @@
-<style>
-  div.home_panel {
-      background-color: #EEE;
-      border: 1px solid #d3d3d3;
-      height: 20em;
-      overflow-y:auto;
-      float: left;
-  }
+<%= stylesheet_link_tag "homepage" -%>
+<%= javascript_include_tag "prototype" -%>
 
-  div.home_panel_pair {
-      width: 95%;
-      margin-left:auto;
-      margin-right: auto;
-  }
 
-  div.top_home_panel {
-      background-color: #EEE;
-      border: 1px solid #d3d3d3;
-      width: 95%;
-      margin-left:auto;
-      margin-right: auto;
-      margin-bottom: 1em;
-      min-height: 6em;
-      padding-left: 0.25em;
-  }
-
-  div.home_panel .heading {
-      background-color: #55F;
-      color: white;
-      font-weight:bolder;
-      text-align: center;
-      min-height:.2em;
-      text-align:center;
-      padding-top: 0.25em;
-      padding-bottom: 0.25em;
-  }
-  .atom {
-      float:left;
-      margin-left:0.25em;
-      padding-bottom: 0.5em;
-  }
-  .hoverTooltipHeader {
-        display: none;
-        border: 0;
-        height: 0;
-    }
-
-  .hoverTooltipBody {
-        border: solid 1px #d3d3d3;
-        color: #000000;
-        background-color: #e0ffff;
-        font-size: 93%;
-        font-weight: normal;
-        padding: 0.2em 0.6em;
-        max-width: 500px;
-        text-align: left;
-        line-height: 1.4em;
-    }
-
-</style>
 <h1><%= Seek::Config.application_name -%></h1>
 <div class="top_home_panel">
   <%= simple_format(auto_link(Seek::Config.home_description)) -%>
@@ -65,18 +9,15 @@
 
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
-     <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="project_news">
+     <div class="heading"><%= Seek::Config.project_name%> News</div>
+     <div id="project_news" class="homepanel_list">
         <ul>
-         <% feeds = get_feeds(Seek::Config.project_news_feed_urls.split(','))
-            number_of_feed_entry_array = Seek::Config.project_news_number_of_feed_entry.split(',')
-            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-            count = 0
+         <%
+           entries = Seek::FeedReader.fetch_entries_for :project_news
          %>
-         <% unless !try_block{feeds.values} %>
-             <% feeds.values.each do |value|   %>
-                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-                <%count +=1 %>
+         <% unless entries.blank? %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>
@@ -84,18 +25,15 @@
   </div>
 
   <div class="yui-u home_panel" style="display:<%= Seek::Config.community_news_enabled ? 'block' : 'none' -%>">
-     <div class="heading">Community News<span class="atom"><%= image("atom_feed") -%></span></div>
-     <div class="community_news">
+     <div class="heading">Community News</div>
+     <div id="community_news" class="homepanel_list">
          <ul>
-         <% feeds = get_feeds(Seek::Config.community_news_feed_urls.split(','))
-            number_of_feed_entry_array = Seek::Config.community_news_number_of_feed_entry.split(',')
-            number_of_feed_entry_array = number_of_feed_entry_array.collect!{|number_of_feed_entry| number_of_feed_entry.strip.to_i}
-            count = 0
+         <%
+            entries = Seek::FeedReader.fetch_entries_for :community_news
          %>
-         <% unless !try_block{feeds.values} %>
-             <% feeds.values.each do |value|   %>
-                <%= display_single_feed(value, (number_of_feed_entry_array[count].nil? ? 0 : number_of_feed_entry_array[count])) -%>
-                <%count +=1 %>
+         <% unless entries.blank? %>
+             <% entries.each do |entry|   %>
+                <%= display_single_entry(entry) -%>
              <% end %>
          <% end %>
          </ul>
@@ -105,31 +43,27 @@
 <br/>
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
-     <div class="heading">Recently viewed</div>
-    <div class="recently_viewed">
-        <% viewed_items = recently_viewed_items(1.year.ago, 10) %>
+     <div class="heading">Recently added</div>
+    <div id="recently_added" class="homepanel_list">
+        <% added_item_logs = recently_added_item_logs(1.year.ago, 8) %>
         <ul>
-        <% viewed_items.each do |viewed_item|%>
-            <%path = eval("#{viewed_item.class.name.underscore}_path(#{viewed_item.id})" )%>
-            <li>
-            <% description = try_block{viewed_item.description} || try_block{viewed_item.abstract} %>
-            <%=link_to "#{viewed_item.title} (#{viewed_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
-            </li>
+        <% added_item_logs.each do |added_item_log|
+            uploaded_item = added_item_log.activity_loggable %>
+            <%= display_single_item(uploaded_item, 'added', added_item_log.created_at) -%>
         <%end%>
+
         </ul>
      </div>
   </div>
   <div class="yui-u home_panel">
     <div class="heading">Recently downloaded</div>
-    <div class="recently_downloaded">
-        <% downloaded_items = recently_downloaded_items(1.year.ago, 10) %>
+    <div id="recently_downloaded" class="homepanel_list">
+        <% downloaded_item_logs = recently_downloaded_item_logs(1.year.ago, 8) %>
         <ul>
-        <% downloaded_items.each do |downloaded_item|%>
-            <%path = eval("#{downloaded_item.class.name.underscore}_path(#{downloaded_item.id})" )%>
-            <li>
-              <% description = try_block{downloaded_item.description} || try_block{downloaded_item.abstract} %>
-              <%=link_to "#{downloaded_item.title} (#{downloaded_item.class.name.underscore.humanize})", path, {:title => "header=[] body=[#{description}] cssheader=[hoverTooltipHeader] cssbody=[hoverTooltipBody] delay=[200]"} -%>
-            </li>
+        <% downloaded_item_logs.each do |downloaded_item_log|
+           downloaded_item = downloaded_item_log.activity_loggable
+        %>
+           <%= display_single_item(downloaded_item, 'downloaded', downloaded_item_log.created_at) -%>
         <% end %>
         </ul>
      </div>

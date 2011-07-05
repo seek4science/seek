@@ -46,7 +46,7 @@ spreadsheet_blob:
   uuid: <%= init_blob('small-test-spreadsheet.xls') %>
   
 url_content_blob:
-  url: http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png  
+  url: http://mockedlocation.com/a-piccy.png
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
   
 url_no_host_content_blob:
@@ -54,7 +54,7 @@ url_no_host_content_blob:
   uuid: <%= UUIDTools::UUID.random_create.to_s %>
   
 url_not_found_content_blob:
-  url: http://www.sysmo-db.org/notthere.png  
+  url: http://mocked404.com
   uuid: <%= UUIDTools::UUID.random_create.to_s %>  
   
 non_sbml_xml_blob:  

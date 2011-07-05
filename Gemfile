@@ -18,7 +18,8 @@ gem "mysql"
 gem 'rest-client',">=1.6.1"
 gem 'calendar_date_select'
 gem 'factory_girl'
-gem 'pauldix-feedzirra'
+gem 'ratom'
+
 
 
 group :development do
@@ -29,4 +30,5 @@ group :test do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
   gem "timocratic-test_benchmark"
   gem "ruby-prof"
+  gem "webmock"
 end

@@ -145,7 +145,7 @@
 
 #Data File
   Factory.define(:data_file) do |f|
-    f.title "A Data File"
+    f.sequence(:title) {|n| "A Data File_#{n}"}
     f.association :project
     f.association :contributor, :factory => :user
     f.association :content_blob, :factory => :content_blob
@@ -192,4 +192,10 @@
 
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
+    f.sequence(:data) {|n| "data [#{n}]" }
+  end
+
+  Factory.define(:activity_log) do |f|
+    f.action "create"
+    f.association :activity_loggable, :factory => :data_file
   end
