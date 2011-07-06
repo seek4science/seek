@@ -42,13 +42,10 @@ GEM
     rubaidh-google_analytics (1.1.4)
       actionpack
       activesupport
-    ruby-ole (1.2.11.1)
     ruby-openid (2.1.8)
     simple-spreadsheet-extractor (0.5.0)
       POpen4 (= 0.1.4)
       open4 (= 1.0.1)
-    spreadsheet (0.6.4.1)
-      ruby-ole
     sqlite3-ruby (1.2.5)
     uuidtools (2.1.1)
 
@@ -69,6 +66,5 @@ DEPENDENCIES
   rubaidh-google_analytics (~> 1.1.4)
   ruby-openid
   simple-spreadsheet-extractor (= 0.5.0)
-  spreadsheet (= 0.6.4.1)
   sqlite3-ruby (= 1.2.5)
   uuidtools (= 2.1.1)
