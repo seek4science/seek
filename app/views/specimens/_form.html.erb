@@ -52,7 +52,6 @@
     } -%>
 
     <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids', :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id)%>
-    <%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@specimen} %>
     <p>
       <%= f.label :description -%><br/>
       <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>

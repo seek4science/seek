@@ -46,7 +46,6 @@
   </p>
 
   <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
-  <%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@sample} %>
 </div>
 
 
