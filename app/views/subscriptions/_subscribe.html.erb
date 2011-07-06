@@ -1,14 +1,13 @@
 <% if current_user and object.subscribable? and object.class != Publication%>
     <li>
       <% if object.subscribed? %>
-          <%= link_to "Unsubscribe", object.current_users_subscription, :method => :delete -%>
+          <%= image_tag_for_key 'unsubscribe', object.current_users_subscription, nil, {:method => :delete} -%>
       <% else
-
              form_for Subscription.new(:subscribable => object, :person => current_user.person), :html => {:style => 'display:inline;'} do |f| %>
               <%= f.hidden_field :subscribable_id -%>
               <%= f.hidden_field :subscribable_type -%>
               <%= f.hidden_field :person_id -%>
-              <%= link_to_function "Subscribe", "$(this).up('form').submit()" %>
+              <%= image_tag_for_key "subscribe", "$(this).up('form').submit()" %>
           <% end
          end
           %>
