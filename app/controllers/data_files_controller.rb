@@ -292,19 +292,27 @@ end
     @data_file =  DataFile.find(params[:id])
     if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
       
-      #TODO: CACHING HACK TO AVOID SEGFAULT!! - DELETE THIS
-      xml = nil
-      filename = "spreadsheet_xml_" + @data_file.id.to_s
-      if File.exist?(filename)
-        puts "FILE EXISTS - READING FROM DISK"
-        xml = File.open(filename, "r") {|f| f.read}
-      else
-        xml = spreadsheet_to_xml(open(@data_file.content_blob.filepath)) #Original code
-        File.open(filename, "w") {|f| f.write(xml)} 
+      #Get the spreadsheet object
+      spreadsheet = @data_file.spreadsheet
+      update_metadata = false
+      
+      #If it doesn't exist, or it's out of date, re-create it
+      if spreadsheet.nil? || spreadsheet.created_at < @data_file.updated_at
+        spreadsheet = Spreadsheet.create(:data_file => @data_file)
+        spreadsheet.content_blob = ContentBlob.create(:data => spreadsheet_to_xml(open(@data_file.content_blob.filepath)))
+        update_metadata = true
       end
-      #END OF HACK
-
-      @spreadsheet = parse_spreadsheet_xml(xml)
+            
+      @spreadsheet = parse_spreadsheet_xml(open(spreadsheet.content_blob.filepath).read)
+      
+      #Update the metadata from the parsed spreadsheet model
+      # setting the number of sheets, and the row/column bounds of those sheets
+      if update_metadata
+        spreadsheet.update_metadata(@spreadsheet)
+      end
+      
+      spreadsheet.save
+      
       @spreadsheet.annotations = @data_file.spreadsheet_annotations
       respond_to do |format|
         format.html { render :layout=>"minimal" }

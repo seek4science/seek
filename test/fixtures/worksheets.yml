@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  spreadsheet_id: 1
+  last_row: 1
+  last_column: 1
+
+two:
+  spreadsheet_id: 1
+  last_row: 1
+  last_column: 1
