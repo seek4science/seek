@@ -1,6 +1,6 @@
-<tr onclick="show_annotation_stub(<%= annotation.id.to_s + ", " + annotation.sheet.to_s + ", '" + annotation.cell_coverage + "'" -%>); return false;" class="annotation_stub" id="annotation_from_<%= annotation.source.class.name + annotation.source.id.to_s -%>">
+<tr onclick="show_annotation_stub(<%= annotation.id.to_s + ", " + annotation.sheet.to_s + ", '" + annotation.cell_range + "'" -%>); return false;" class="annotation_stub" id="annotation_from_<%= annotation.source.class.name + annotation.source.id.to_s -%>">
   <td>
-    <span class="sheet_location">Sheet<%= annotation.sheet + 1-%>.</span><span class="cell_coverage"><%= annotation.cell_coverage -%></span>
+    <span class="sheet_location">Sheet<%= annotation.sheet + 1-%>.</span><span class="cell_coverage"><%= annotation.cell_range -%></span>
   </td>
   <td><%= h truncate(annotation.content, :length => 40, :omission => "...") -%></td>
   <td><%= time_ago_in_words(annotation.created_at) %> ago</td>

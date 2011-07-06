@@ -1,55 +1,58 @@
 class SpreadsheetAnnotation < ActiveRecord::Base
   
+  include SpreadsheetUtil
+  
   belongs_to :data_file
   
   belongs_to :source,
              :polymorphic => true
              
   acts_as_solr(:fields => [ :content ]) if Seek::Config.solr_enabled
-             
+  
+  #DONT HAVE ANY UPPER AND LOWER BOUNDS FOR CELLS - CAN CREATE ANNOTATIONS OUT OF RANGE
+               
   validates_presence_of :content
   #validates_presence_of :annotation_type
   validates_presence_of :source
   validates_presence_of :data_file
-  validate :valid_cell_range #FIXME: NEED TO MAKE THIS BETTER, TOO MUCH VALIDATION DONE IN CONTROLLER
+  validate :valid_cell_range
   validates_numericality_of :sheet, :allow_nil => false, :only_integer => true, :greater_than_or_equal_to => 0
+    
+  attr_accessor :cell_range
   
-  def cell_coverage
-    return SpreadsheetAnnotation.to_alpha(start_column)+start_row.to_s + 
-      ((end_column == start_column && end_row == start_row) ? "" : ":" + SpreadsheetAnnotation.to_alpha(end_column)+end_row.to_s)    
+  #Turns an Excel-style cell range (A1:B3) into two pairs of co-ordinates ((1,1),(2,3))
+  def cell_range= range
+    start_cell, end_cell = range.split(":")
+    unless start_cell.nil? || start_cell.match(/[a-zA-Z]+[1-9][0-9]*/).nil?
+      start_cell = start_cell.upcase
+      self.start_column, self.start_row = from_alpha(start_cell.sub(/[0-9]+/,"")), start_cell.sub(/[A-Z]+/,"").to_i
+      self.end_column, self.end_row = nil, nil
+      if end_cell.nil?
+        self.end_column = self.start_column
+        self.end_row = self.start_row
+      else
+        end_cell = end_cell.upcase
+        unless end_cell.match(/[a-zA-Z]+[1-9][0-9]*/).nil?
+          self.end_column, self.end_row = from_alpha(end_cell.sub(/[0-9]+/,"")), end_cell.sub(/[A-Z]+/,"").to_i
+        end  
+      end
+    end        
+  end
+  
+  def cell_range
+    return to_alpha(start_column)+start_row.to_s + 
+      ((end_column == start_column && end_row == start_row) ? "" : ":" + to_alpha(end_column)+end_row.to_s)    
   end
   
 private
-
-  def self.to_alpha(col)
-    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)    
-    result = ""
-    col = col-1
-    while (col > -1) do
-      letter = (col % 26)
-      result = alphabet[letter] + result
-      col = (col / 26) - 1
-    end
-    result
-  end
   
-  def self.from_alpha(col)
-    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(//)    
-    result = 0
-    col = col.split(//)
-    (0..col.length-1).reverse_each do |x|
-      result += ((alphabet.index(col[x])+1) * (26 ** ((col.length - 1) - x)))
-    end
-    result
-  end
-  
+  #If an invalid cell range was entered, one or more of the cell range co-ordinates will
+  # be set to nil after cell_range= is called.
   def valid_cell_range
-    [self.start_row, self.start_column, self.end_row, self.end_column].each do |attr|
-      if !(attr.kind_of?(Fixnum)) || attr < 0 || attr.nil?
-        errors.add_to_base("Invalid cell range")
-        break
-      end
-    end     
+    if start_row.nil? || start_column.nil? || end_row.nil? || end_column.nil?
+      errors.add_to_base("Invalid cell range")
+      return false
+    end
   end
   
 end

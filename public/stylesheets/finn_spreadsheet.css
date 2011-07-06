@@ -247,13 +247,16 @@ div.spreadsheet_errors
 {
   margin: 0.5em;
   padding: 0.5em;
-  border: 3px solid red;
+  border: 2px solid red;
+  background-color: #FFDDDD;
 }
 
 div.spreadsheet_errors h1
 {
   color: #FF0000;
   text-align: left;
+  line-height: 1;
+  font-size: 125%;
 }
 
 div.spreadsheet_errors ul li
@@ -267,6 +270,6 @@ div.spreadsheet_errors ul li
   background-color: #DDD;
   margin: 2px 0;
   border: 2px outset #999;
-  text-align: middle;
+  text-align: center;
   z-index: 10;
 }
