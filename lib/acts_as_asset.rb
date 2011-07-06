@@ -62,7 +62,7 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
-        include Subscribable
+        include Subscribable unless self == Publication
       end
 
       def is_asset?
