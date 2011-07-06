@@ -3,6 +3,7 @@ module Subscribable
     klass.class_eval do
       has_many :subscriptions, :as => :subscribable, :dependent => :destroy, :autosave => true
       before_create :set_default_subscriptions
+      extend ClassMethods
     end
   end
 
@@ -32,10 +33,14 @@ module Subscribable
 
   def send_immediate_subscriptions activity_log
     subscriptions.each do |subscription|
-      if subscription.immediately? and activity_log.action != 'show'
+      if subscription.immediately? and subscribers_are_notified_of? activity_log.action
         SubMailer.deliver_send_immediate_subscription subscription.person, activity_log
       end
     end
+  end
+
+  def subscribers_are_notified_of? action
+    self.class.subscribers_are_notified_of? action
   end
 
   def set_default_subscriptions
@@ -43,6 +48,12 @@ module Subscribable
       if subscription = person.subscriptions.detect {|s| s.project = self.project}
         subscriptions.build :person => person, :project => self.project unless subscription.unsubscribed_resource_types.includes? self.class.name
       end
+    end
+  end
+
+  module ClassMethods
+    def subscribers_are_notified_of? action
+      action != 'show' and action != 'download'
     end
   end
 end
