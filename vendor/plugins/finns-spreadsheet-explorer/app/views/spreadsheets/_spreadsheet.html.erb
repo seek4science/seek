@@ -12,8 +12,8 @@
       <!--- Column headings --->
       <tr>
         <th class="col_heading" style="width:3em"></th>
-        <% sheet.columns.each do |col| %>
-          <th style="<%= (("width:" + (col.width.to_f/31).to_s) + "px") unless col.width.nil? -%>" class="col_heading"><%= to_alpha(col.index) -%></th>
+        <% sheet.columns.each do |col| -%>
+        <th style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" class="col_heading"><%= to_alpha(col.index) -%></th>
         <% end -%>
       </tr>      
       
@@ -26,9 +26,7 @@
           <% 1.upto(sheet.last_col) do |c| %>
             <% if sheet[r] && sheet[r][c] -%>
               <% cell = sheet[r][c] -%>
-              <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= cell.formula || "" -%>" class="cell <%= cell.style || ""-%>">
-                <%= cell.value -%>
-              </td>
+              <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= cell.formula || "" -%>" class="cell <%= cell.style || ""-%>"><%= cell.value -%></td>
             <% else -%>
               <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell"></td>
             <% end -%>  
