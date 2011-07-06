@@ -1,4 +1,4 @@
-<% if current_user and object.subscribable?%>
+<% if current_user and object.subscribable? and object.class != Publication%>
     <li>
       <% if object.subscribed? %>
           <%= link_to "Unsubscribe", object.current_users_subscription, :method => :delete -%>

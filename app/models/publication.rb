@@ -83,6 +83,10 @@ class Publication < ActiveRecord::Base
   def related_assays
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
+
+  def self.subscribers_are_notified_of? action
+    action == 'create'
+  end
   
   private
   
