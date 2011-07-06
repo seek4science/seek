@@ -21,7 +21,6 @@
   <p>
     <%= render :partial=>"assets/sharing_form" if @investigation.can_manage? -%>
   </p>
-  <%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@investigation} %>
 </div>
 
 

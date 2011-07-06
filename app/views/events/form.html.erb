@@ -71,7 +71,6 @@
               <%= render :partial => "assets/sharing_form" -%>
             </p>
         <% end %>
-        <%= render :partial=>"assets/specific_subscription",:locals => {:resource=>@event} %>
       </div>
       <p>
         <%= f.submit(@new ? "Create" : "Update", :disable_with=>(@new ? "Creating..." :"Updating...")) %>
