@@ -46,7 +46,7 @@ module Subscribable
   def set_default_subscriptions
     Person.all.each do |person|
       if project_subscription = person.project_subscriptions.detect {|s| s.project == self.project}
-        subscriptions.build :person => person unless project_subscription.unsubscribed_resource_types.includes? self.class.name
+        subscriptions.build :person => person unless project_subscription.unsubscribed_types.include? self.class.name
       end
     end
   end
