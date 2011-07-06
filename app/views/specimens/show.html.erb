@@ -1,7 +1,7 @@
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
-  <%= render :partial => "subscriptions/subscribe", :object => @sample %>
+  <%= render :partial => "subscriptions/subscribe", :object => @specimen %>
   <% if @specimen.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit Specimen", nil, 'Edit Specimen') %></li>
   <% end %>
