@@ -11,7 +11,7 @@ Seek::Config.default :jerm_enabled,true
 Seek::Config.default :test_enabled, false  #FIXME: whats this used for??
 Seek::Config.default :email_enabled,false
 Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
-Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
+Seek::Config.default :noreply_sender, 'seek1@virtual-liver.de'
 Seek::Config.default :solr_enabled,false
 Seek::Config.default :jws_enabled, true
 Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk"
