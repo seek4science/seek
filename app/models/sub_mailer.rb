@@ -7,6 +7,7 @@ class SubMailer < ActionMailer::Base
     from Seek::Config.noreply_sender
     sent_on Time.now
     content_type "text/html"
+    template "send_digest_subscription"
     body :activity_logs=> activity_logs
   end
 
