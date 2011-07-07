@@ -153,15 +153,15 @@ module HomeHelper
        unless item.blank?
           image_key = item.class.name.underscore
           image_key = 'assay_modelling_avatar' if try_block{item.is_modelling?}
-          image = image_tag(icon_filename_for_key(image_key), :style => "width: 15px; height: 15px; vertical-align: middle")
+          image = image_tag(icon_filename_for_key(image_key), :class => "home_asset_icon")
           icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title => tooltip_title_attrib(item.class.name.underscore.humanize))
 
-          path = eval("#{item.class.name.underscore}_path(#{item.id})" )
+          path = url_for(item)
           description = try_block{item.description} || try_block{item.abstract}
           tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{at_time}</p>")
           html << "<li class='homepanel_item'>"
           html << "#{icon} "
-          html << link_to("#{item.title}", path, :title => tooltip, :target=>"_blank")
+          html << link_to("#{item.title}", path, :title => tooltip)
           html << "<div class='feedinfo none_text'>"
           html << "<span style='margin-left:2em'>#{item.class.name.underscore.humanize} - #{action} #{time_ago_in_words(at_time)} ago<span>"
           html << "</div>"

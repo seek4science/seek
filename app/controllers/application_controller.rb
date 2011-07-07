@@ -21,9 +21,7 @@ class ApplicationController < ActionController::Base
 
   exception_data :additional_exception_notifier_data
 
-  if Seek::Config.activity_log_enabled
-    after_filter :log_event
-  end
+  after_filter :log_event
 
   include AuthenticatedSystem
   around_filter :with_current_user

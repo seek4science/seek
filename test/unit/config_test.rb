@@ -56,9 +56,7 @@ class ConfigTest < ActiveSupport::TestCase
   test "hide_details_enabled" do
     assert_equal false ,Seek::Config.hide_details_enabled
   end
-  test "activity_log_enabled" do
-    assert_equal true ,Seek::Config.activity_log_enabled
-  end
+  
   test "activation_required_enabled" do
     assert_equal false ,Seek::Config.activation_required_enabled
   end

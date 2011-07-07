@@ -65,9 +65,9 @@ The following commands should install rubygems for you on a Ubuntu/Debian system
 
 Our source code is stored within the {Sysmo-DB Google Code Repository}[http://code.google.com/p/sysmo-db/], using Mercurial[http://mercurial.selenic.com/] as the version control system. 
 
-For a stable version, you should check out according to a stable tag. Our current tag is v0.11.1, so to retrieve this version you should use:
+For a stable version, you should check out according to a stable tag. Our current tag is v0.11.2, so to retrieve this version you should use:
 
-  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.11.1 seek
+  hg clone https://sysmo-db.googlecode.com/hg/ -r v0.11.2 seek
   
 Bundler[http://gembundler.com/] is used to manage gems, so to install the required gems you first need to install the bundler gem:
 
