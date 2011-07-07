@@ -1,6 +1,6 @@
 <%
    select_truncate_length=120
-   projects = p.projects + Project.all.reject { |p| @person.projects.include?(p)}
+   projects = @person.projects + Project.all.reject { |p| @person.projects.include?(p)}
 %>
 <div class="fold">
   <div class="foldTitle">
