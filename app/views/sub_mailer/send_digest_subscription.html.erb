@@ -1,4 +1,4 @@
-<% activity_logs.group_by(&:action).each do |action, logs| %>
+<% @activity_logs.group_by(&:action).each do |action, logs| %>
     <label style="color:#f0342a;"><b><%= action.capitalize%></b></label>
     <div id="new_resources" class="new_resources" >
        <table border="1px" cellpadding="5" style="border-collapse: collapse;
