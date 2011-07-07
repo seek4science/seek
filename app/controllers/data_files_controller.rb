@@ -303,6 +303,7 @@ end
         update_metadata = true
       end
             
+      #Generate Ruby spreadsheet model from XML
       @spreadsheet = parse_spreadsheet_xml(open(spreadsheet.content_blob.filepath).read)
       
       #Update the metadata from the parsed spreadsheet model
