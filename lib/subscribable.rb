@@ -31,9 +31,9 @@ module Subscribable
     current_users_subscription.try(:destroy)
   end
 
-  def send_immediate_subscription activity_log
+  def send_immediate_subscriptions activity_log
     subscriptions.each do |subscription|
-      if subscription.immediately? and subscribers_are_notified_of? activity_log.action
+      if !subscription.person.email.match('Lihua.An') and subscription.immediately? and subscribers_are_notified_of? activity_log.action and can_view?(subscription.person.user)
         SubMailer.deliver_send_immediate_subscription subscription.person, activity_log
       end
     end
@@ -53,7 +53,7 @@ module Subscribable
 
   module ClassMethods
     def subscribers_are_notified_of? action
-      action != 'show' and action != 'download'
+      action != 'show' and action != 'download' and action != 'destroy'
     end
   end
 end
