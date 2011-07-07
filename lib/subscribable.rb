@@ -31,7 +31,7 @@ module Subscribable
     current_users_subscription.try(:destroy)
   end
 
-  def send_immediate_subscriptions activity_log
+  def send_immediate_subscription activity_log
     subscriptions.each do |subscription|
       if subscription.immediately? and subscribers_are_notified_of? activity_log.action
         SubMailer.deliver_send_immediate_subscription subscription.person, activity_log
