@@ -15,6 +15,7 @@ require 'seek/acts_as_uniquely_identifiable'
 require 'acts_as_favouritable'
 require 'acts_as_asset'
 require 'send_subscriptions_when_activity_logged'
+require 'modporter_extensions'
 
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
