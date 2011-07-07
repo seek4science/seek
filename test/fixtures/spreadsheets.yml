@@ -3,13 +3,6 @@
 one:
   data_file_id: 1
   content_blob_id: 1
-  sheets: 1
-  last_row: 1
-  last_column: 1
-
 two:
   data_file_id: 1
   content_blob_id: 1
-  sheets: 1
-  last_row: 1
-  last_column: 1
