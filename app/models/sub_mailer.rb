@@ -2,7 +2,7 @@ class SubMailer < ActionMailer::Base
 
 
   def send_digest_subscription person, activity_logs
-    subject "#{person.user.name}: SEEK subscription report"
+    subject "#{person.user.login}: SEEK subscription report"
     recipients person.email_with_name
     from Seek::Config.noreply_sender
     sent_on Time.now
