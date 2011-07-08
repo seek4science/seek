@@ -50,7 +50,7 @@
         <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
-      <td><%= f.submit "Add" %></td>
+      <td><%= f.submit "Add" -%></td>
 
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
@@ -60,5 +60,5 @@
     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}%>
   </div>
   </div>
-
 <% end -%>
+

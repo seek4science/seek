@@ -71,7 +71,6 @@ class SearchController < ApplicationController
         @results.push(fs.data_file) if !@results.include? fs.data_file
       end
     end
-
   end
 
   def search_in_experimental_condition
@@ -82,7 +81,6 @@ class SearchController < ApplicationController
         @results.push(ec.sop) if !@results.include? ec.sop
       end
     end
-
   end
 end
 

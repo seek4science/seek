@@ -64,7 +64,7 @@ function init_sharing() {
 	
     replaceFavouriteGroupRedboxActionURL();
 }
-	
+
 
 function setSharingElementVisibility(sharing_scope)
 {
@@ -1171,6 +1171,8 @@ function showOrHideSubstanceTextField(form_id){
         substance_autocomplete.disabled = true;
     }
 }
+
+
 
 
 
