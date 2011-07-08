@@ -73,7 +73,9 @@ Rails::Initializer.run do |config|
 
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
-
+  config.after_initialize do
+    config.action_mailer.default_url_options = { :host => Seek::Config.site_base_host.gsub(/https?:\//, '') }
+  end
 end
 
 
