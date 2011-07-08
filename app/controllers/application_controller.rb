@@ -291,6 +291,8 @@ class ApplicationController < ActionController::Base
 
         end
         when "data_files","models","sops","publications","presentations","events"
+          a = "create" if a == "upload_for_tool"
+          a = "update" if a == "new_version"
         if ["show","create","update","destroy","download"].include?(a)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
