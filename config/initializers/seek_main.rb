@@ -25,3 +25,5 @@ ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation
 PORTER_SECRET = "" unless defined? PORTER_SECRET
 
 Seek::Config.propagate_all
+
+config.action_mailer.default_url_options = { :host => Seek::Config.site_base_host.gsub(/https?:\//, '') }

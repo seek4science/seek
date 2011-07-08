@@ -45,10 +45,6 @@ module Seek
   # Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
 
-    def site_base_host_propagate
-      config.action_mailer.default_url_options = { :host => self.site_base_host.gsub(/https?:\//, '') }
-    end
-
     def smtp_propagate
       smtp_hash = self.smtp
       password =  self.smtp_settings 'password'
