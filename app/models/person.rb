@@ -66,7 +66,10 @@ class Person < ActiveRecord::Base
   def set_default_subscription_to proj
     project_subscriptions.build :project => proj, :unsubscribed_types => []
     ProjectSubscription.subscribable_types.each do |type_name|
-      type_name.constantize.all.select{|item| item.project == proj}.each do |item|
+      klass = type_name.constantize
+      klass.reflect_on_association(:project) ? items = klass.scoped(:include => :project) : items = klass.scoped({})
+      items.scoped(:include => :subscriptions)
+      items.select{|item| item.project == proj}.each do |item|
         subscriptions.build :subscribable => item unless subscriptions.detect {|ss| ss.subscribable == item and ss.project == proj}
       end
     end
@@ -136,15 +139,11 @@ class Person < ActiveRecord::Base
   end
 
   def institutions
-    res=[]
-    work_groups.collect {|wg| res << wg.institution unless res.include?(wg.institution) }
-    return res
+    work_groups.scoped(:include => :institution).collect {|wg| wg.institution }.uniq
   end
 
   def projects
-    res=[]
-    work_groups.collect {|wg| res << wg.project unless res.include?(wg.project) }
-    return res
+    work_groups.scoped(:include => :project).collect {|wg| wg.project }.uniq
   end
 
   def member?
