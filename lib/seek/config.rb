@@ -46,7 +46,7 @@ module Seek
   module Propagators
 
     def site_base_host_propagate
-      ActionMailer::Base.default_url_options = { :host => self.site_base_host.gsub(/https?:\//, '') }
+      ActionMailer::Base.default_url_options = { :host => self.site_base_host.gsub(/https?:\/\//, '') }
     end
 
     def smtp_propagate
