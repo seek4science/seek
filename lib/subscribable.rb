@@ -24,7 +24,7 @@ module Subscribable
   end
 
   def subscribe
-    subscriptions.build :person => User.current_user.person, :project => project unless subscribed?
+    subscriptions.build :person => User.current_user.person unless subscribed?
   end
 
   def unsubscribe
