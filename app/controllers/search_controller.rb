@@ -66,16 +66,23 @@ class SearchController < ApplicationController
   def search_in_factors_studied
     downcase_query = @search_query.downcase
     factors_studies = StudiedFactor.multi_solr_search(downcase_query, :limit=>100, :models=>[StudiedFactor]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
-    factors_studies.each do |fs|
-      @results.push(fs.data_file) if !@results.include? fs.data_file
+    unless factors_studies.blank?
+      factors_studies.each do |fs|
+        @results.push(fs.data_file) if !@results.include? fs.data_file
+      end
     end
+
   end
 
   def search_in_experimental_condition
     downcase_query = @search_query.downcase
     experimental_conditions = ExperimentalCondition.multi_solr_search(downcase_query, :limit=>100, :models=>[ExperimentalCondition]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+    unless experimental_conditions.blank?
       experimental_conditions.each do |ec|
         @results.push(ec.sop) if !@results.include? ec.sop
+      end
     end
+
   end
 end
+
