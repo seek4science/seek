@@ -17,7 +17,7 @@
               <tr>
                 <td><%= log.referenced.nil? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
                 <td><%= log.activity_loggable_type.humanize %></td>
-                <td><%= log.activity_loggable ? link_to(log.activity_loggable.title, log.activity_loggable, :only_path => false) : log.data%></td>
+                <td><%= log.activity_loggable ? link_to(log.activity_loggable.title, {:id => log.activity_loggable, :only_path => false}) : log.data%></td>
                 <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %></td>
                 <td> <%= log.created_at %></td>
               </tr>
