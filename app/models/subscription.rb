@@ -3,11 +3,6 @@ class Subscription < ActiveRecord::Base
   belongs_to :person
   belongs_to :subscribable, :polymorphic => true
 
-  has_one :project, :through => :subscribable
-
-  #you usually want to know what frequency the subscription is, and the project is needed to fetch it.
-  default_scope :include => :project
-
   validates_presence_of :person
   validates_presence_of :subscribable
 
@@ -26,6 +21,6 @@ class Subscription < ActiveRecord::Base
   end
 
   def frequency
-   ProjectSubscription.find_by_person_id_and_project_id(person_id, project_id).try(:frequency) || generic_frequency
+   ProjectSubscription.find_by_person_id_and_project_id(person_id, subscribable.project_id).try(:frequency) || generic_frequency
   end
 end
