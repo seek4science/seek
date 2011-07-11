@@ -159,4 +159,23 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal fs_updated.end_value, 50
   end
 
+
+  test "should not create experimental condition which has fields containing the comma in the decimal number" do
+    sop = sops(:editable_sop)
+    mi = measured_items(:time)
+    unit = units(:gram)
+    ec = {:measured_item_id => mi.id, :start_value => "1,5" , :end_value => 10, :unit => unit}
+    post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
+    ec = assigns(:experimental_condition)
+    assert_nil ec
+  end
+
+  test 'should not update experimental condition which has fields containing the comma in the decimal number' do
+    ec = experimental_conditions(:experimental_condition_time)
+    assert_not_nil ec
+
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:start_value => "10,02", :end_value => 50}
+    ec_updated = assigns(:experimental_condition)
+    assert_nil ec_updated
+  end
 end

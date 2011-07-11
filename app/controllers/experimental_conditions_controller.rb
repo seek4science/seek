@@ -2,6 +2,7 @@ class ExperimentalConditionsController < ApplicationController
   before_filter :login_required
   before_filter :find_and_auth_sop  
   before_filter :create_new_condition, :only=>[:index]
+  before_filter :no_comma_for_decimal, :only=>[:create, :update]
 
   include StudiedFactorsHelper
 
