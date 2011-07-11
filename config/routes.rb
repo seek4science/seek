@@ -1,4 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :specimens
+  map.resources :samples
+
   map.resources :events
 
   map.resources :strains
@@ -12,11 +15,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :technology_types, :collection=>{:manage=>:get}
 
   map.resources :measured_items
-  
+
   map.resources :investigations
 
   map.resources :studies
-  
+
   map.resources :assays,:member=>{:update_tags_ajax=>:post}
 
   map.resources :saved_searches
@@ -51,6 +54,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
     sop.resources :experimental_conditions
   end
+
+
 
   map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
                         :member => {:set_openid => :put}

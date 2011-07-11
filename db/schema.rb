@@ -1,4 +1,4 @@
-# This file is auto-generated from the current state of the database. Instead of editing this file,
+# This file is auto-generated from the current state of the database. Instead of editing this file, 
 # please use the migrations feature of Active Record to incrementally modify your database, and
 # then regenerate this schema definition.
 #
@@ -93,6 +93,8 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
     t.integer  "assay_class_id"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "sample_id"
+    t.integer  "institution_id"
   end
 
   create_table "assets", :force => true do |t|
@@ -625,6 +627,28 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
     t.datetime "updated_at"
   end
 
+  create_table "samples", :force => true do |t|
+    t.string   "title"
+    t.integer  "specimen_id"
+    t.string   "lab_internal_number"
+    t.datetime "donation_date"
+    t.string   "explantation"
+    t.string   "comments"
+    t.string   "first_letter"
+    t.integer  "policy_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.integer  "project_id"
+    t.integer  "institution_id"
+  end
+
+  create_table "samples_strains", :id => false, :force => true do |t|
+    t.integer "sample_id"
+    t.integer "strain_id"
+  end
+
   create_table "saved_searches", :force => true do |t|
     t.integer  "user_id"
     t.text     "search_query"
@@ -711,6 +735,27 @@ ActiveRecord::Schema.define(:version => 20110602160032) do
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
   add_index "sops", ["project_id"], :name => "index_sops_on_project_id"
+
+  create_table "specimens", :force => true do |t|
+    t.string   "donor_number"
+    t.integer  "age"
+    t.string   "treatment"
+    t.string   "lab_internal_number"
+    t.integer  "person_id"
+    t.integer  "institution_id"
+    t.string   "comments"
+    t.string   "first_letter"
+    t.integer  "policy_id"
+    t.text     "other_creators"
+    t.integer  "project_id"
+    t.integer  "contributor_id"
+    t.string   "contributor_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "organism_id"
+    t.integer  "culture_growth_type_id"
+    t.integer  "strain_id"
+  end
 
   create_table "strains", :force => true do |t|
     t.string   "title"

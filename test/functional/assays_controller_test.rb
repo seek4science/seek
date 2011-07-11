@@ -231,15 +231,15 @@ end
 
   test "should create" do
     assert_difference('ActivityLog.count') do
-      assert_difference("Assay.count") do
-        post :create,:assay=>{:title=>"test",
-          :technology_type_id=>technology_types(:gas_chromatography).id,
-          :assay_type_id=>assay_types(:metabolomics).id,
-          :study_id=>studies(:metabolomics_study).id,
-          :assay_class=>assay_classes(:experimental_assay_class)}
-      end
+    assert_difference("Assay.count") do
+      post :create,:assay=>{:title=>"test",
+        :technology_type_id=>technology_types(:gas_chromatography).id,
+        :assay_type_id=>assay_types(:metabolomics).id,
+        :study_id=>studies(:metabolomics_study).id,
+        :assay_class=>assay_classes(:experimental_assay_class),
+        :sample => samples(:test_sample)}
     end
-
+    end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
     #assert_equal organisms(:yeast),a.organism

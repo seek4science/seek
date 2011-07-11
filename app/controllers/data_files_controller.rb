@@ -105,7 +105,6 @@ class DataFilesController < ApplicationController
     if handle_data
       
       @data_file = DataFile.new params[:data_file]
-      @data_file.event_ids = params[:event_ids] || []
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
       update_tags @data_file
@@ -180,10 +179,7 @@ class DataFilesController < ApplicationController
     update_tags @data_file
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
-      data_file_params = params[:data_file]
-      data_file_params[:event_ids] = params[:event_ids] || []
-
-      @data_file.attributes = data_file_params
+      @data_file.attributes = params[:data_file]
 
       if params[:sharing]
         @data_file.policy_or_default
