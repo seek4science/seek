@@ -1,4 +1,6 @@
 class SpreadsheetAnnotation < ActiveRecord::Base
+
+  unloadable
   
   include SpreadsheetUtil
   

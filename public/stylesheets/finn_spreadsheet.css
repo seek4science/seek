@@ -29,6 +29,7 @@ td.cell {
   background: #FFF;
   border: 1px solid #CCC;
   border-width: 0px 1px 1px 0px;
+  text-align: left;
 }
 
 td.selected_cell {
