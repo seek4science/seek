@@ -163,7 +163,7 @@ module HomeHelper
           html << "#{icon} "
           html << link_to("#{item.title}", path, :title => tooltip)
           html << "<div class='feedinfo none_text'>"
-          html << "<span style='margin-left:2em'>#{item.class.name.underscore.humanize} - #{action} #{time_ago_in_words(at_time)} ago<span>"
+          html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago<span>"
           html << "</div>"
           html << "</li>"
       end
