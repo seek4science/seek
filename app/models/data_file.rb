@@ -6,6 +6,8 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
+  include SpreadsheetUtil
+
   acts_as_asset
   acts_as_trashable
 
@@ -38,12 +40,13 @@ class DataFile < ActiveRecord::Base
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
   
-  has_one :spreadsheet, :dependent => :destroy
   has_many :spreadsheet_annotations, :dependent => :destroy
 
   acts_as_uniquely_identifiable
 
   explicit_versioning(:version_column => "version") do
+
+    include SpreadsheetUtil
     acts_as_versioned_resource
     
     belongs_to :content_blob
@@ -80,11 +83,6 @@ class DataFile < ActiveRecord::Base
     return datafiles_with_contributors.to_json
   end
 
-  def self.spreadsheets
-    
-  end
-  
-
   def relationship_type(assay)
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting
     assay_assets.find_by_assay_id(assay.id).relationship_type  
@@ -98,5 +96,4 @@ class DataFile < ActiveRecord::Base
   def self.user_creatable?
     true
   end
-  
 end

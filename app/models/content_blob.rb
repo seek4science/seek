@@ -22,6 +22,8 @@ class ContentBlob < ActiveRecord::Base
   before_save :dump_data_to_file
   
   before_save :calculate_md5
+
+  has_many :worksheets, :dependent => :destroy
   
   def md5sum
     if super.nil?

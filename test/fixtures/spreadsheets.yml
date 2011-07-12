@@ -1,8 +1,0 @@
-# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-
-one:
-  data_file_id: 1
-  content_blob_id: 1
-two:
-  data_file_id: 1
-  content_blob_id: 1

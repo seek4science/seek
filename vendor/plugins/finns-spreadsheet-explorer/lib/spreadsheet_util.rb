@@ -1,17 +1,49 @@
-%w{ models controllers helpers }.each do |dir|
-  path = File.join(File.dirname(__FILE__), 'app', dir)
-  $LOAD_PATH << path
-  ActiveSupport::Dependencies.load_paths << path
-  ActiveSupport::Dependencies.load_once_paths.delete(path)
-end
-
 #Methods concerning the parsing of spreadsheets
 
+require 'simple-spreadsheet-extractor'
 require 'libxml'
 
 module SpreadsheetUtil
   
   include SpreadsheetRepresentation
+  include SysMODB::SpreadsheetExtractor
+
+  def is_spreadsheet?
+    self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    self.content_type == "application/vnd.ms-excel"
+  end
+
+  #Return the data file's spreadsheet
+  #If it doesn't exist yet, it gets created
+  def spreadsheet
+    if is_spreadsheet?
+      workbook = parse_spreadsheet_xml(spreadsheet_xml)
+      if content_blob.worksheets.empty?
+        workbook.sheets.each do |sheet|
+          content_blob.worksheets << Worksheet.create(:last_row => sheet.last_row, :last_column => sheet.last_col)
+        end
+        content_blob.save
+      end
+      return workbook
+    else
+      return nil
+    end
+  end
+
+  #Return the data file's spreadsheet XML
+  #If it doesn't exist yet, it gets created
+  def spreadsheet_xml
+    if is_spreadsheet?
+       if File.exists?(cached_spreadsheet_path)
+         return File.open(cached_spreadsheet_path, "r") {|f| f.read}
+       else
+         content_blob.worksheets.clear #Expire all worksheets
+         return cache_spreadsheet
+       end
+    else
+      return nil
+    end
+  end
   
   #Take in a string containing spreadsheet xml and returns
   # a Workbook object
@@ -87,6 +119,30 @@ module SpreadsheetUtil
       result += (c.ord - 64) * (26 ** (col.length - (i+1)))
     end
     result
+  end
+
+  private
+  #the cache file for a given feed url
+  def cached_spreadsheet_path
+    File.join(cached_spreadsheet_dir,"spreadsheet_blob_#{self.content_blob_id.to_s}.xml")
+  end
+
+  #the directory used to contain the cached spreadsheets
+  def cached_spreadsheet_dir
+    if Rails.env=="test"
+      dir = File.join(Dir.tmpdir,"seek-cache","spreadsheet-xml")
+    else
+      dir = File.join(Rails.root,"tmp","cache","spreadsheet-xml")
+    end
+    FileUtils.mkdir_p dir if !File.exists?(dir)
+    dir
+  end
+
+  #Cache the data file's spreadsheet XML, and returns it
+  def cache_spreadsheet
+    xml = spreadsheet_to_xml(open(content_blob.filepath))
+    File.open(cached_spreadsheet_path, "w") {|f| f.write(xml)}
+    return xml
   end
   
 end

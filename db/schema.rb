@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110706144240) do
+ActiveRecord::Schema.define(:version => 20110712102514) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -727,13 +727,6 @@ ActiveRecord::Schema.define(:version => 20110706144240) do
     t.string   "source_type"
   end
 
-  create_table "spreadsheets", :force => true do |t|
-    t.integer  "data_file_id"
-    t.integer  "content_blob_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "strains", :force => true do |t|
     t.string   "title"
     t.integer  "organism_id"
@@ -883,7 +876,7 @@ ActiveRecord::Schema.define(:version => 20110706144240) do
   add_index "work_groups", ["project_id"], :name => "index_work_groups_on_project_id"
 
   create_table "worksheets", :force => true do |t|
-    t.integer "spreadsheet_id"
+    t.integer "content_blob_id"
     t.integer "last_row"
     t.integer "last_column"
   end

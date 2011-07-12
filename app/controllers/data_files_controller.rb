@@ -14,7 +14,7 @@ class DataFilesController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
-  before_filter :find_display_data_file, :only=>[:show,:download]
+  before_filter :find_display_data_file, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
   include Seek::Publishing
@@ -183,7 +183,6 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       data_file_params = params[:data_file]
       data_file_params[:event_ids] = params[:event_ids] || []
-
       @data_file.attributes = data_file_params
 
       if params[:sharing]
@@ -289,31 +288,11 @@ end
   end  
   
   def explore
-    @data_file =  DataFile.find(params[:id])
-    if ["xls","xlsx"].include?(mime_extension(@data_file.content_type))
-      
-      #Get the spreadsheet object
-      spreadsheet = @data_file.spreadsheet
-      update_metadata = false
-      
-      #If it doesn't exist, or it's out of date, re-create it
-      if spreadsheet.nil? || spreadsheet.created_at < @data_file.updated_at
-        spreadsheet = Spreadsheet.create(:data_file => @data_file)
-        spreadsheet.content_blob = ContentBlob.create(:data => spreadsheet_to_xml(open(@data_file.content_blob.filepath)))
-        update_metadata = true
-      end
-            
+    if @data_file.is_spreadsheet?
       #Generate Ruby spreadsheet model from XML
-      @spreadsheet = parse_spreadsheet_xml(open(spreadsheet.content_blob.filepath).read)
-      
-      #Update the metadata from the parsed spreadsheet model
-      # setting the number of sheets, and the row/column bounds of those sheets
-      if update_metadata
-        spreadsheet.update_metadata(@spreadsheet)
-      end
-      
-      spreadsheet.save
-      
+      @spreadsheet = @data_file.spreadsheet
+
+      #FIXME: Annotations need to be specific to version
       @spreadsheet.annotations = @data_file.spreadsheet_annotations
       respond_to do |format|
         format.html { render :layout=>"minimal" }

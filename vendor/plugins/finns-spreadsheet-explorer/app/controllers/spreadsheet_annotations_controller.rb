@@ -1,7 +1,7 @@
 class SpreadsheetAnnotationsController < ApplicationController
 
   unloadable
-  
+
   before_filter :login_required
   
   def create

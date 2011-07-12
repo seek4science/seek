@@ -4,14 +4,6 @@
 
 <%= asset_buttons @data_file,@display_data_file.version -%>
 
-	<%# TODO: FIX THIS %>
-	<h1>FINN YOU NEED TO FIX THIS</h1>
-
-  <% if Authorization.is_authorized?("download", nil, @data_file, current_user) -%>
-    <li>
-      <%= image_tag_for_key('spreadsheet', explore_data_file_url, "Explore Data file", nil, "Explore Data file") -%>
-    </li>
-  <% end -%>
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
 
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@data_file} %>
