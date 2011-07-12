@@ -53,6 +53,15 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assays)
   end
 
+  test "should show draggable icon in index" do
+    get :index
+    assert_response :success
+    assays = assigns(:assays)
+    first_assay = assays.first
+    assert_not_nil first_assay
+    assert_select "a[id*=?]",/drag_Assay_#{first_assay.id}/
+  end
+
   test "should show index in xml" do
     get :index
     assert_response :success
