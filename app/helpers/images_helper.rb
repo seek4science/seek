@@ -213,7 +213,7 @@ module ImagesHelper
       when "institution_avatar"
       "institution_64x64.png"
       when "organism_avatar"
-      "misc_icons/green_virus-64x64.png"
+      "misc_icons/cell3.png"
       when "publication_avatar", "publication", "publications"
      "crystal_project/64x64/mimetypes/wordprocessing.png"
       when "saved_search_avatar","saved_search"
