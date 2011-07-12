@@ -61,6 +61,8 @@ ActionController::Routing::Routes.draw do |map|
                         :member => {:set_openid => :put}
 
   map.resource :session, :collection=>{:auto_openid=>:get,:show=>:get,:index=>:get},:member=>{:show=>:get}
+
+  map.resource :favourites, :member=>{:delete=>:delete},:collection=>{:add=>:post}
   
   #help pages
   map.resources :help_documents, :as => :help do |h|

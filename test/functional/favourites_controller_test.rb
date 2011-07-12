@@ -18,14 +18,30 @@ class FavouritesControllerTest < ActionController::TestCase
     fav=Favourite.find_by_resource_type_and_resource_id("Project",project.id)
     assert_nil fav
     
-    xml_http_request(:put, :add, {:id=>id})
+    xml_http_request(:post, :add, {:id=>id})
     
     assert_response :created
     
     fav=Favourite.find_by_resource_type_and_resource_id("Project",project.id)
     assert_not_nil fav
     
-  end  
+  end
+
+  def test_add_with_get_fails
+    project = projects(:one)
+    id = model_to_drag_id(project)
+
+    fav=Favourite.find_by_resource_type_and_resource_id("Project",project.id)
+    assert_nil fav
+
+    xml_http_request(:get, :add, {:id=>id})
+
+    assert_response :unprocessable_entity
+
+    fav=Favourite.find_by_resource_type_and_resource_id("Project",project.id)
+    assert_nil fav
+
+  end
   
   def test_add_duplicate
     project = projects(:two)    
@@ -35,7 +51,7 @@ class FavouritesControllerTest < ActionController::TestCase
     fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
     assert_not_nil fav, "The project with id 2 should already exist for quentin"
     
-    xml_http_request(:put, :add, {:id=>id})
+    xml_http_request(:post, :add, {:id=>id})
     
     assert_response :unprocessable_entity
     
@@ -45,7 +61,7 @@ class FavouritesControllerTest < ActionController::TestCase
 
     assert_difference("Favourite.count",1) do
       assert_difference("SavedSearch.count",1) do
-        xml_http_request(:put,:add,{:id=>"drag_search",:search_query=>"fred bloggs",:search_type=>"All"})
+        xml_http_request(:post,:add,{:id=>"drag_search",:search_query=>"fred bloggs",:search_type=>"All"})
       end
     end
     assert_response :success
@@ -61,7 +77,7 @@ class FavouritesControllerTest < ActionController::TestCase
     login_as(:pal_user)
     assert_no_difference("Favourite.count") do
       assert_no_difference("SavedSearch.count") do
-        xml_http_request(:put,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"All"})
+        xml_http_request(:post,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"All"})
       end
     end
     assert_response :unprocessable_entity
@@ -71,7 +87,7 @@ class FavouritesControllerTest < ActionController::TestCase
     login_as(:pal_user)
     assert_difference("Favourite.count",1) do
       assert_difference("SavedSearch.count",1) do
-        xml_http_request(:put,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"Assays"})
+        xml_http_request(:post,:add,{:id=>"drag_search",:search_query=>"cheese",:search_type=>"Assays"})
       end
     end
     assert_response :success
@@ -104,13 +120,40 @@ class FavouritesControllerTest < ActionController::TestCase
     fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
     assert_nil fav, "#{id} should have been destroyed"
   end
+
+  def test_delete_with_get_fails
+    project = projects(:two)
+    id="fav_#{favourites(:project_fav).id}"
+    xml_http_request(:get, :delete, {:id=>id})
+    assert_response :unprocessable_entity
+    fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
+    assert_not_nil fav, "#{id} should have been destroyed"
+  end
+
+  def test_delete_with_post_fails
+    project = projects(:two)
+    id="fav_#{favourites(:project_fav).id}"
+    xml_http_request(:post, :delete, {:id=>id})
+    assert_response :unprocessable_entity
+    fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
+    assert_not_nil fav, "#{id} should have been destroyed"
+  end
+
+  def test_delete_with_put_fails
+    project = projects(:two)
+    id="fav_#{favourites(:project_fav).id}"
+    xml_http_request(:put, :delete, {:id=>id})
+    assert_response :unprocessable_entity
+    fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
+    assert_not_nil fav, "#{id} should have been destroyed"
+  end
   
   def test_shouldnt_add_invalid_resource
     id="drag_DataFile_-1_25251251"
     fav=Favourite.find_by_resource_type_and_resource_id("DataFile",-1)
     assert_nil fav
     
-    xml_http_request(:put, :add, {:id=>id})
+    xml_http_request(:post, :add, {:id=>id})
     
     assert_response :unprocessable_entity
     
