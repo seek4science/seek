@@ -245,6 +245,12 @@ module ImagesHelper
         "misc_icons/jws_builder24x24.png"
       when "event_avatar"
         "crystal_project/32x32/apps/vcalendar.png"
+      when "specimen_avatar"
+        "misc_icons/green_virus-64x64.png"
+      when "sample_avatar"
+        "misc_icons/jws_builder32x32.png"
+      when "specimen", "specimens"
+        "misc_icons/green_virus-64x64.png"
       when "publish"
        "crystal_project/22x22/actions/up.png"
     else
