@@ -33,6 +33,15 @@ module ImagesHelper
     
     return '<span class="icon">' + inner + '</span>';
   end
+
+  def resource_avatar resource,html_options={}
+
+    if resource.avatar_key
+          image_tag(icon_filename_for_key(resource.avatar_key), html_options)
+    elsif resource.use_mime_type_for_avatar?
+          image_tag(file_type_icon_url(resource), html_options)
+    end
+  end
   
   def icon_filename_for_key(key)
     case (key.to_s)
@@ -270,8 +279,6 @@ module ImagesHelper
       return ''
     end
   end
-  
-  
   
   # A generic key to produce avatars for entities of all kinds.
   #
