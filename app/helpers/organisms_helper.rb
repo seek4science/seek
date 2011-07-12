@@ -6,6 +6,10 @@ module OrganismsHelper
     if model_or_tag.instance_of?(Organism)
       link_to h(model_or_tag.title.capitalize),model_or_tag
     end
+
+
+
+
   end
   
   def organisms_link_list organisms

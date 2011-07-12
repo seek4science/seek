@@ -32,12 +32,14 @@
           </label>
           <%= @assay.assay_class.title -%>
       </p>
-      <p class="id">
-          <label>
-              Owner: 
-          </label>
-          <%= link_to h(@assay.owner.name),@assay.owner -%>
-      </p>
+      <% if @assay.owner.can_view? %>
+          <p class="id">
+              <label>
+                  Owner:
+              </label>
+              <%= link_to h(@assay.owner.name),@assay.owner -%>
+          </p>
+      <% end %>
       <p>
           <b>Description:</b>
           <div id="description" class="box_standout">
@@ -70,6 +72,18 @@
           <b>Organisms: </b>
           <%= assay_organisms_list @assay.assay_organisms %>
       </p>
+
+
+     <p id="specimen">
+       <b>Specimen: </b>
+       <%= text_or_not_specified @assay.sample.try(:specimen).try(:title) -%>
+     </p>
+
+     <p id="Sample">
+       <b>Sample: </b>
+       <%= text_or_not_specified @assay.sample.try(:title) -%>
+     </p>
+
       <style type="text/css">
           div.data_model_relationship {
               border: 1px dotted black;

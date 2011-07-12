@@ -306,6 +306,9 @@ class AssayTest < ActiveSupport::TestCase
       :technology_type=>technology_types(:gas_chromatography),
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
-      :assay_class => assay_classes(:experimental_assay_class))
+      :assay_class => assay_classes(:experimental_assay_class),
+      :sample => samples(:test_sample)
+    )
+
   end
 end

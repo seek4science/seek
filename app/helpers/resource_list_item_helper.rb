@@ -100,6 +100,11 @@ module ResourceListItemHelper
     return "<p class=\"list_item_attribute\"><b>#{attribute}</b>: #{value}</p>"
   end
 
+  def list_item_authorized_attribute attribute, object, url='undefined', method = :title
+    url = object if url == 'undefined'
+    list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, "Not available"
+  end
+
   def list_item_optional_attribute attribute, value, url=nil, missing_value_text="Not specified"
     if value.blank?
       value = "<span class='none_text'>#{missing_value_text}</span>"
@@ -128,12 +133,8 @@ module ResourceListItemHelper
   end
 
   def list_item_contributor resource
-    if resource.contributor.nil?
-      value = jerm_harvester_name
-    else
-      value = link_to resource.contributor.person.name, resource.contributor.person
-    end
-    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{value}</p>"
+    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{jerm_harvester_name}</p>" if resource.contributor.nil?
+    list_item_authorized_attribute 'Uploader', resource.contributor.person
   end
 
   def list_item_expandable_text attribute, text, length=200
