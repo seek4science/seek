@@ -2,6 +2,7 @@ class StudiedFactorsController < ApplicationController
   before_filter :login_required
   before_filter :find_data_file_auth
   before_filter :create_new_studied_factor, :only=>[:index]
+  before_filter :no_comma_for_decimal, :only=>[:create, :update]
 
   include StudiedFactorsHelper
 
@@ -27,6 +28,7 @@ class StudiedFactorsController < ApplicationController
         # clear the _add_factor form
         page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
         page[:add_condition_or_factor_form].reset
+        page[:substance_autocomplete_input].disable = true
       else
         page.alert(@studied_factor.errors.full_messages)
       end
@@ -59,9 +61,6 @@ class StudiedFactorsController < ApplicationController
       if  @studied_factor.update_attributes(params[:studied_factor])
         page.visual_effect :fade,"edit_condition_or_factor_#{@studied_factor.id}_form"
         page.replace_html "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
-        #clear the _add_factor form
-        page.call "autocompleters['#{@studied_factor.id}_substance_autocompleter'].deleteAllTokens"
-        page["edit_condition_or_factor_#{@studied_factor.id}_form"].reset
       else
         page.alert(@studied_factor.errors.full_messages)
       end

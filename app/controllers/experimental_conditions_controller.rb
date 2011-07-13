@@ -2,8 +2,7 @@ class ExperimentalConditionsController < ApplicationController
   before_filter :login_required
   before_filter :find_and_auth_sop  
   before_filter :create_new_condition, :only=>[:index]
-
-  include StudiedFactorsHelper
+  before_filter :no_comma_for_decimal, :only=>[:create, :update]
 
   def index
     respond_to do |format|
@@ -27,6 +26,7 @@ class ExperimentalConditionsController < ApplicationController
         # clear the _add_factor form
         page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
         page[:add_condition_or_factor_form].reset
+        page[:substance_autocomplete_input].disable = true
       else
         page.alert(@experimental_condition.errors.full_messages)
       end
