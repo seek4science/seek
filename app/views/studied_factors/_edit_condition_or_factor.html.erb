@@ -50,7 +50,12 @@
         <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
-      <td><%= f.submit "Update" %></td>
+      <td><%= f.submit "Update" %> or <%= link_to_function "Cancel" do |page|
+          page.visual_effect :fade, "edit_condition_or_factor_#{object.id}_form"
+          page["edit_on_#{object.id}"].toggle
+          page["edit_off_#{object.id}"].toggle
+          end
+      -%></td>
 
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
@@ -61,6 +66,5 @@
     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "#{object.id}_substance", :resource => object}%>
   </div>
   </div>
-  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"%>
-
+  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"-%>
 <% end -%>
