@@ -27,7 +27,7 @@ class Study < ActiveRecord::Base
   end
 
   def can_delete? *args
-    assays.empty? && mixin_super(*args)
+    assays.empty? && super
   end
 
 end

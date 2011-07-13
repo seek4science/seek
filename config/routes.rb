@@ -1,4 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :specimens
+  map.resources :samples
+
   map.resources :events
 
   map.resources :strains
@@ -12,11 +15,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :technology_types, :collection=>{:manage=>:get}
 
   map.resources :measured_items
-  
+
   map.resources :investigations
 
   map.resources :studies
-  
+
   map.resources :assays,:member=>{:update_tags_ajax=>:post}
 
   map.resources :saved_searches
@@ -52,10 +55,14 @@ ActionController::Routing::Routes.draw do |map|
     sop.resources :experimental_conditions
   end
 
+
+
   map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
                         :member => {:set_openid => :put}
 
   map.resource :session, :collection=>{:auto_openid=>:get,:show=>:get,:index=>:get},:member=>{:show=>:get}
+
+  map.resource :favourites, :member=>{:delete=>:delete},:collection=>{:add=>:post}
   
   #help pages
   map.resources :help_documents, :as => :help do |h|

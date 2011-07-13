@@ -126,7 +126,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       publication_params = params[:publication]||{}
-      publication_params[:event_ids] = params[:event_ids]||[]
       if valid && @publication.update_attributes(publication_params)
         to_add.each {|a| @publication.creators << a}
         to_remove.each {|a| a.destroy}

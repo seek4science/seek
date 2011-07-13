@@ -1,4 +1,4 @@
-<%= list_item_title resource, :include_avatar=>false %>
+<%= list_item_title resource %>
 
 <div class="list_item_left_column">
   <%= list_item_attribute "ID", resource.id %>
@@ -8,7 +8,7 @@
 
 <div class="list_item_right_column">
   <%= list_item_attribute "Project", resource.project.title, resource.project %>
-  <%= list_item_optional_attribute "Person responsible", resource.person_responsible.try(:name), resource.person_responsible, "Not specified" %>
+  <%= list_item_authorized_attribute "Person responsible", resource.person_responsible %>
 </div>
 
 <div class="list_item_whole_width">

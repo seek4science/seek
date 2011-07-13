@@ -8,7 +8,7 @@ class AssetTest < ActiveSupport::TestCase
     EVENTS_ENABLED=true
     creatables = user_creatable_classes
     assert !creatables.empty?
-    assert_equal [DataFile,Model,Publication,Sop,Assay,Investigation,Study,Event],creatables
+    assert_equal [DataFile,Model,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],creatables
   end
 
   test "default contributor or nil" do

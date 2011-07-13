@@ -1,0 +1,76 @@
+.dm {
+    font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+
+}
+.dm .item1,
+.dm .item1:hover,
+.dm .item1-active,
+.dm .item1-active:hover {
+
+    padding: 3px 8px 4px 8px;
+    border: 1px #003366;
+    border-style: solid none solid none;
+    text-decoration: none;
+    display: block;
+    position: relative;
+    width: 8em;
+    font-weight: bold;
+
+}
+.dm .item1 {
+    background: #3173ff;
+    color: #ffffff;
+}
+.dm .item1:hover,
+.dm .item1-active,
+.dm .item1-active:hover {
+    background: #47bee4;
+    color: #ffffff;
+}
+.dm .section {
+    border: 1px #003366;
+    border-style: solid solid solid solid;
+    position: absolute;
+    visibility: hidden;
+    z-index: -1;
+    white-space: nowrap;
+
+    text-align: left;
+    font-weight: bolder;
+    font-size: 95%;
+    margin: 0;
+}
+.section li,
+.section li:hover{
+     padding: 3px 8px 4px 8px;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap;
+    color: #ffffff;
+}
+
+.section li {
+    background: #47bee4;
+    color: #ffffff;
+
+}
+.section li :hover {
+    color: #ffffff;
+}
+.section li a {
+	color: #ffffff;
+	text-decoration: none;
+}
+.section li a:hover {
+    color: #000099;
+}
+
+.tab_gap_before {
+    margin-left: 1em;
+}
+
+
+.dm .left, .dm .left:hover { border-style: solid none solid solid; }
+.dm .right, .dm .right:hover { border-style: solid solid solid none; }
+
+* html .dm td { position: relative; } /* ie 5.0 fix */

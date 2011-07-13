@@ -5,6 +5,7 @@ contributor = resource.contributor
 contributor = contributor.person if contributor.respond_to? :person
 creators << contributor if resource.contributor_credited? and contributor
 creators = creators.uniq
+creators = creators.select &:can_view?
 %>
 
 <div style="text-align: center">

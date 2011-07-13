@@ -1,0 +1,22 @@
+<% if logged_in? and current_user.person.member? %>
+    <ul class="sectionIcons">
+      <li><%= image_tag_for_key "new", new_specimen_path, "New Specimen", nil, "New specimen" %></li>
+    </ul>
+<% end %>
+
+<% if @specimens.public_methods.include?("page_totals") %>
+    <!-- only do the page links if the collection supports it -->
+    <%= render :partial => "layouts/paginate_alphabetical", :locals => {:pages => @specimens.pages, :page_totals=>@specimens.page_totals, :current_page=>@specimens.page} -%>
+<% end %>
+
+
+<div class="list_items_container">
+  <%= render :partial=>"layouts/resource_list_item", :collection=>@specimens, :locals => {:avatar_partial => "layouts/avatars"} %>
+</div>
+
+
+<% if @specimens.page == "latest" && Specimen.find(:all).length > Seek::Config.limit_latest %>
+    <%= render :partial => "layouts/paginate_see_all" %>
+<% end %>
+
+
