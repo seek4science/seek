@@ -61,7 +61,12 @@ class SearchController < ApplicationController
       when ("samples")
         @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       else
-        @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+        sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication,Sample,Specimen]
+        unless Seek::Config.is_virtualliver
+          sources.delete(Sample)
+          sources.delete(Specimen)
+        end
+        @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>sources).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
         search_in_factors_studied
         search_in_experimental_condition
     end
