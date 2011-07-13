@@ -16,6 +16,13 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal false ,Seek::Config.solr_enabled
   end
 
+  test "is_virtualliver" do
+    original_value = Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver = true
+    assert Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver = original_value
+  end
+
 
   test "email_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
