@@ -13,6 +13,12 @@ module ApplicationHelper
         c.respond_to?("user_creatable?") && c.user_creatable?
       end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
       classes.delete(Event) unless Seek::Config.events_enabled
+      
+      unless Seek::Config.is_virtualliver
+        classes.delete(Sample)
+        classes.delete(Specimen)
+      end
+
       classes
     end    
   end
