@@ -29,7 +29,7 @@ class StudiedFactorsController < ApplicationController
         # clear the _add_factor form
         page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
         page[:add_condition_or_factor_form].reset
-        page[:substance_autocomplete_input].disable = true
+        page[:substance_autocomplete_input].disabled = true
       else
         page.alert(@studied_factor.errors.full_messages)
       end
