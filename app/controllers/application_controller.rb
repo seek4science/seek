@@ -178,6 +178,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #used to suppress elements that are for virtualliver only or are still currently being worked on
+  def virtualliver_only
+    if !Seek::Config.is_virtualliver
+      error("This feature is is not yet currently available","invalid route")
+      return false
+    end
+  end
 
   def check_allowed_to_manage_types
     unless Seek::Config.type_managers_enabled
