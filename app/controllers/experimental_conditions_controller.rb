@@ -2,8 +2,7 @@ class ExperimentalConditionsController < ApplicationController
   before_filter :login_required
   before_filter :find_and_auth_sop  
   before_filter :create_new_condition, :only=>[:index]
-
-  include StudiedFactorsHelper
+  before_filter :no_comma_for_decimal, :only=>[:create, :update]
 
   def index
     respond_to do |format|
@@ -27,6 +26,7 @@ class ExperimentalConditionsController < ApplicationController
         # clear the _add_factor form
         page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
         page[:add_condition_or_factor_form].reset
+        page[:substance_autocomplete_input].disabled = true
       else
         page.alert(@experimental_condition.errors.full_messages)
       end
@@ -59,9 +59,6 @@ class ExperimentalConditionsController < ApplicationController
         if  @experimental_condition.update_attributes(params[:experimental_condition])
           page.visual_effect :fade,"edit_condition_or_factor_#{@experimental_condition.id}_form"
           page.replace_html "condition_or_factor_row_#{@experimental_condition.id}", :partial => 'studied_factors/condition_or_factor_row', :object => @experimental_condition, :locals=>{:asset => 'sop', :show_delete=>true}
-          #clear the _add_factor form
-          page.call "autocompleters['#{@experimental_condition.id}_substance_autocompleter'].deleteAllTokens"
-          page["edit_condition_or_factor_#{@experimental_condition.id}_form"].reset
         else
           page.alert(@experimental_condition.errors.full_messages)
         end

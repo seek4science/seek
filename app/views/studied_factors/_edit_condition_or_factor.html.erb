@@ -24,9 +24,6 @@
   <h4> Edit this entry </h4>
   <table >
     <tr>
-      <% if entity == "studied_factor" %>
-        <th>Time point</th>
-      <% end %>
       <th>Item</th>
       <th>Unit</th>
       <th>Start value</th>
@@ -38,7 +35,6 @@
     <tr>
 
       <% if entity == "studied_factor" %>
-        <td><%= f.text_field :time_point, :size=>4 %></td>
         <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% elsif entity == "experimental_condition" %>
@@ -54,7 +50,12 @@
         <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
-      <td><%= f.submit "Update" %></td>
+      <td><%= f.submit "Update" %> or <%= link_to_function "Cancel" do |page|
+          page.visual_effect :fade, "edit_condition_or_factor_#{object.id}_form"
+          page["edit_on_#{object.id}"].toggle
+          page["edit_off_#{object.id}"].toggle
+          end
+      -%></td>
 
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
@@ -65,6 +66,5 @@
     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "#{object.id}_substance", :resource => object}%>
   </div>
   </div>
-  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"%>
-
+  <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"-%>
 <% end -%>

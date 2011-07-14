@@ -80,6 +80,11 @@ class AdminController < ApplicationController
     Seek::Config.community_news_number_of_entries= params[:community_news_number_of_entries] if only_integer params[:tag_threshold], "number of community news"
 
     Seek::Config.home_description = params[:home_description]
+    begin
+      Seek::FeedReader.clear_cache
+    rescue e
+      logger.error "Error whilst attempting to clear feed cache #{e.message}"
+    end
     update_redirect_to true,'home_settings'
   end
 

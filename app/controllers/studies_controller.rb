@@ -56,6 +56,7 @@ class StudiesController < ApplicationController
     if params[:sharing]
       @study.policy_or_default
       @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+
     end
 
     respond_to do |format|
@@ -71,7 +72,7 @@ class StudiesController < ApplicationController
   end
 
   def show
-    @study=Study.find(params[:id])    
+    @study=Study.find(params[:id])
     respond_to do |format|
       format.html
       format.xml
@@ -80,7 +81,7 @@ class StudiesController < ApplicationController
       format.png { render :text=>to_png(@study.investigation,params[:deep]=='true',@study)}
     end
 
-  end  
+  end
 
   def create
     @study = Study.new(params[:study])

@@ -24,9 +24,6 @@
   <h4> Add new entry </h4>
   <table >
     <tr>
-      <% if entity == "studied_factor" %>
-        <th>Time point</th>
-      <% end %>
       <th>Item</th>
       <th>Unit</th>
       <th>Start value</th>
@@ -38,7 +35,6 @@
     <tr>
 
       <% if entity == "studied_factor" %>
-        <td><%= f.text_field :time_point, :size=>4 %></td>
         <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% elsif entity == "experimental_condition" %>
@@ -54,7 +50,7 @@
         <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
-      <td><%= f.submit "Add" %></td>
+      <td><%= f.submit "Add" -%></td>
 
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
@@ -64,5 +60,5 @@
     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}%>
   </div>
   </div>
-
 <% end -%>
+

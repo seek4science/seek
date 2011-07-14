@@ -6,6 +6,10 @@ class HomeControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include HomeHelper
 
+  def setup
+    WebMock.allow_net_connect!
+  end
+
   test "test should be accessible to seek even if not logged in" do
     get :index
     assert_response :success
@@ -47,7 +51,7 @@ class HomeControllerTest < ActionController::TestCase
   test "SOP tab should be capitalized" do
     login_as(:quentin)
     get :index
-    assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+    assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
   end
 
   test "SOP upload option should be capitlized" do
@@ -173,12 +177,12 @@ class HomeControllerTest < ActionController::TestCase
     assert_select 'div#community_news ul>li', 7
   end
 
-  test 'should show recently uploaded and downloaded items with the filter can_view?' do
+  test 'should show recently added and downloaded items with the filter can_view?' do
     login_as(:aaron)
     #recently added
-    recently_uploaded_item_logs =  recently_uploaded_item_logs(1.year.ago, 10)
-    recently_uploaded_item_logs.each do |uploaded_item_log|
-      assert uploaded_item_log.activity_loggable.can_view?
+    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
+    recently_added_item_logs.each do |added_item_log|
+      assert added_item_log.activity_loggable.can_view?
     end
     #recently downloaded
     recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
@@ -189,14 +193,14 @@ class HomeControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#recently_uploaded ul>li', recently_uploaded_item_logs.count
+    assert_select 'div#recently_added ul>li', recently_added_item_logs.count
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
 
     logout
-    #recently added
-    recently_uploaded_item_logs =  recently_uploaded_item_logs(1.year.ago, 10)
-    recently_uploaded_item_logs.each do |uploaded_item_log|
-      assert uploaded_item_log.activity_loggable.can_view?
+    #recently uploaded
+    recently_added_item_logs =  recently_added_item_logs(1.year.ago, 10)
+    recently_added_item_logs.each do |added_item_log|
+      assert added_item_log.activity_loggable.can_view?
     end
     #recently downloaded
     recently_downloaded_item_logs =  recently_downloaded_item_logs(1.year.ago, 10)
@@ -207,9 +211,8 @@ class HomeControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#recently_uploaded ul>li', recently_uploaded_item_logs.count
+    assert_select 'div#recently_added ul>li', recently_added_item_logs.count
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
-
   end
   
 end

@@ -21,9 +21,7 @@ class ApplicationController < ActionController::Base
 
   exception_data :additional_exception_notifier_data
 
-  if Seek::Config.activity_log_enabled
-    after_filter :log_event
-  end
+  after_filter :log_event
 
   include AuthenticatedSystem
   around_filter :with_current_user
@@ -110,6 +108,53 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
+  def find_or_create_substance(new_substances, known_substance_ids_and_types)
+    known_substances = []
+    known_substance_ids_and_types.each do |text|
+      id, type = text.split(',')
+      id = id.strip
+      type = type.strip.capitalize.constantize
+      known_substances.push(type.find(id)) if type.find(id)
+    end
+    new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
+    #no substance
+    if (new_substances.size + known_substances.size) == 0
+      nil
+    #one substance
+    elsif (new_substances.size + known_substances.size) == 1
+      if !known_substances.empty?
+        known_substances.first
+      else
+        c = Compound.new(:name => new_substances.first)
+          if  c.save
+            c
+          else
+            nil
+          end
+      end
+    #FIXME: update code when mixture table is created
+    else
+      nil
+    end
+  end
+
+  def no_comma_for_decimal
+    check_string = ''
+    if self.controller_name.downcase == 'studied_factors'
+      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
+    elsif self.controller_name.downcase == 'experimental_conditions'
+      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
+    end
+
+    if check_string.match(',')
+         render :update do |page|
+           page.alert('Please use point instead of comma for decimal number')
+         end
+      return false
+    else
+      return true
+    end
+  end
   private
 
   def project_membership_required
@@ -351,4 +396,18 @@ class ApplicationController < ActionController::Base
     }
   end
 
+  #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
+  #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
+  def check_if_new_substances_are_known new_substances, known_substances
+    fixed_new_substances = []
+    new_substances.each do |new_substance|
+      substance=Compound.find_by_name(new_substance.strip) || Synonym.find_by_name(new_substance.strip)
+      if substance.nil?
+        fixed_new_substances << new_substance
+      else
+        known_substances << substance unless known_substances.include?(substance)
+      end
+    end
+    return new_substances, known_substances
+  end
 end

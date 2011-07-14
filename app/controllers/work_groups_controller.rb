@@ -114,7 +114,7 @@ class WorkGroupsController < ApplicationController
     access_type = white_list(params[:access_type]).to_i
     
     begin
-      group_instance = eval("#{group_type}.find(#{group_id})")
+      group_instance = group_type.constantize.find group_id
       @error_text = nil
       @group_instance = group_instance
       case @group_instance.class.name

@@ -7,14 +7,11 @@
 
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel" style="display:<%= Seek::Config.project_news_enabled ? 'block' : 'none' -%>">
-     <div class="heading"><%= Seek::Config.project_name%> News<span class="atom"><%= image("atom_feed") -%></span></div>
+     <div class="heading"><%= Seek::Config.project_name%> News</div>
      <div id="project_news" class="homepanel_list">
         <ul>
-         <% feeds = []
-            Seek::Config.project_news_feed_urls.split(',').each do |url|
-                feeds.push get_feed(url) if !get_feed(url).blank?
-            end
-           entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.project_news_number_of_entries)
+         <%
+           entries = Seek::FeedReader.fetch_entries_for :project_news
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
@@ -26,14 +23,11 @@
   </div>
 
   <div class="yui-u home_panel" style="display:<%= Seek::Config.community_news_enabled ? 'block' : 'none' -%>">
-     <div class="heading">Community News<span class="atom"><%= image("atom_feed") -%></span></div>
+     <div class="heading">Community News</div>
      <div id="community_news" class="homepanel_list">
          <ul>
-         <% feeds = []
-            Seek::Config.community_news_feed_urls.split(',').each do |url|
-                feeds.push get_feed(url) if !get_feed(url).blank?
-            end
-           entries = filter_feeds_entries_with_chronological_order(feeds, Seek::Config.community_news_number_of_entries)
+         <%
+            entries = Seek::FeedReader.fetch_entries_for :community_news
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
@@ -44,16 +38,18 @@
      </div>
   </div>
 </div>
+
 <br/>
+
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
-     <div class="heading">Recently uploaded</div>
-    <div id="recently_uploaded" class="homepanel_list">
-        <% uploaded_item_logs = recently_uploaded_item_logs(1.year.ago, 8) %>
+     <div class="heading">Recently added</div>
+    <div id="recently_added" class="homepanel_list">
+        <% added_item_logs = recently_added_item_logs(1.year.ago, 8) %>
         <ul>
-        <% uploaded_item_logs.each do |uploaded_item_log|
-            uploaded_item = uploaded_item_log.activity_loggable %>
-            <%= display_single_item(uploaded_item, 'uploaded', uploaded_item_log.created_at) -%>
+        <% added_item_logs.each do |added_item_log|
+            uploaded_item = added_item_log.activity_loggable %>
+            <%= display_single_item(uploaded_item, 'added', added_item_log.created_at) -%>
         <%end%>
 
         </ul>

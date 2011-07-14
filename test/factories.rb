@@ -102,46 +102,71 @@
   end
 
 #Assay
-  Factory.define(:assay_base, :class => Assay) do |f|
-    f.title "An Assay"
+Factory.define(:assay_base, :class => Assay) do |f|
+  f.title "An Assay"
     f.association :contributor, :factory => :person
-    f.association :study
-    f.association :assay_type
-  end
+  f.association :study
+  f.association :assay_type
+  f.association :sample
+end
 
-  Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
-    f.title 'Modelling Assay'
-    f.key 'MODEL'
-  end
+Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
+  f.title 'Modelling Assay'
+  f.key 'MODEL'
+end
 
-  Factory.define(:experimental_assay_class, :class => AssayClass) do |f|
-    f.title 'Experimental Assay'
-    f.key 'EXP'
-  end
+Factory.define(:experimental_assay_class, :class => AssayClass) do |f|
+  f.title 'Experimental Assay'
+  f.key 'EXP'
+end
 
-  Factory.define(:modelling_assay, :parent => :assay_base) do |f|
-    f.association :assay_class, :factory => :modelling_assay_class
-  end
+Factory.define(:modelling_assay, :parent => :assay_base) do |f|
+  f.association :assay_class, :factory => :modelling_assay_class
+end
 
-  Factory.define(:experimental_assay, :parent => :assay_base) do |f|
-    f.association :assay_class, :factory => :experimental_assay_class
-    f.association :technology_type
-  end
+Factory.define(:experimental_assay, :parent => :assay_base) do |f|
+  f.association :assay_class, :factory => :experimental_assay_class
+  f.association :technology_type
+end
 
   Factory.define(:assay, :parent => :modelling_assay) {}
 
 #Study
-  Factory.define(:study) do |f|
-    f.sequence(:title) {|n| "Study#{n}" }
-    f.association :investigation
-    f.association :person_responsible, :factory => :person
-  end
+Factory.define(:study) do |f|
+  f.sequence(:title) { |n| "Study#{n}" }
+  f.association :investigation
+  f.association :contributor, :factory => :person
+end
 
 #Investigation
-  Factory.define(:investigation) do |f|
-    f.association :project
-    f.sequence(:title) {|n| "Investigation#{n}"}
-  end
+Factory.define(:investigation) do |f|
+  f.association :project
+  f.sequence(:title) { |n| "Investigation#{n}" }
+end
+
+#Strain
+Factory.define(:strain) do |f|
+  f.sequence(:title) { |n| "Strain#{n}" }
+end
+
+#Specimen
+Factory.define(:specimen) do |f|
+  f.sequence(:donor_number) { |n| "Specimen#{n}" }
+  f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+  f.association :contributor, :factory => :user
+  f.association :project
+  f.association :institution
+end
+
+#Sample
+Factory.define(:sample) do |f|
+  f.sequence(:title) { |n| "Sample#{n}" }
+  f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
+  f.donation_date Date.today
+  f.strains { [Factory :strain] }
+  f.association :specimen
+end
+
 
 #Data File
   Factory.define(:data_file) do |f|
@@ -192,4 +217,10 @@
 
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
+    f.sequence(:data) {|n| "data [#{n}]" }
+  end
+
+  Factory.define(:activity_log) do |f|
+    f.action "create"
+    f.association :activity_loggable, :factory => :data_file
   end

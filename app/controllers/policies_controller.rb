@@ -25,7 +25,7 @@ class PoliciesController < ApplicationController
     # only fetch all the policy/permissions settings if authorized to do so & only for request types that are supported
     if supported && authorized
       begin
-        entity = eval("#{entity_type}.find(#{entity_id})")
+        entity = entity_type.constantize.find entity_id
         found_entity = true
         policy = nil
         

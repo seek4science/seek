@@ -2,6 +2,7 @@
 
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
+  include FancyMultiselectHelper
 
 
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
@@ -12,6 +13,12 @@ module ApplicationHelper
         c.respond_to?("user_creatable?") && c.user_creatable?
       end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
       classes.delete(Event) unless Seek::Config.events_enabled
+      
+      unless Seek::Config.is_virtualliver
+        classes.delete(Sample)
+        classes.delete(Specimen)
+      end
+
       classes
     end    
   end
@@ -435,7 +442,31 @@ module ApplicationHelper
     @enable_black_white_listing = @resource.nil? || (@resource.respond_to?(:contributor) and !@resource.contributor.nil?)
   end
 
+  def folding_box id, title, options = nil
+    render :partial => 'assets/folding_box', :locals =>
+        {:fold_id => id,
+         :fold_title => title,
+         :contents => options[:contents],
+         :hidden => options[:hidden]}
+  end
+
+  def require_js file
+    #TODO: Needs testing, not sure what the 'lifecycle' for instance variables in a helper is.
+    #Needs to last as long as the page is being rendered and no longer. The intent is to include the js only if it hasn't already been included.
+    @required_js ||= []
+    unless @required_js.include? file
+      @required_js << file
+      javascript_include_tag file
+    end
+  end
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
-  
 end
+
+class ApplicationFormBuilder< ActionView::Helpers::FormBuilder
+  def fancy_multiselect association, options = {}
+    @template.fancy_multiselect object, association, options
+  end
+end
+
+ActionView::Base.default_form_builder = ApplicationFormBuilder

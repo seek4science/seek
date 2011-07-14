@@ -14,7 +14,6 @@ div.home_panel {
     border: 1px solid #d3d3d3;
     height: 25em;
     float: left;
-    overflow-y: auto;
 }
 
 div.home_panel_pair {
@@ -25,6 +24,9 @@ div.home_panel_pair {
 
 div.home_panel .homepanel_list {
     padding-bottom: 0.5em;
+    height: 22.6em;
+    margin-left: 0.5em;
+    overflow-y: auto;
 }
 
 div.home_panel .homepanel_list ul {
@@ -58,4 +60,11 @@ div.home_panel .heading {
 
 .feedinfo {
     font-size: smaller;
+}
+
+div.home_panel img.home_asset_icon {
+    width: 1.6em;
+    height: 1.6em;
+    vertical-align: middle;
+    padding-right: 0.5em;
 }

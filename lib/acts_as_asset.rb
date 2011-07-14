@@ -27,6 +27,7 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_asset
         acts_as_authorized
+        does_not_require_can_edit :last_used_at
         acts_as_favouritable
         default_scope :order => "#{self.table_name}.updated_at DESC"
 

@@ -644,60 +644,12 @@ ul.users_details li p {
 
 }
 
-div.conditions_or_factors {
-    border: dotted #999 1px;
-    float: left;
-    margin-left: 4em;
-    margin-top: 2em;
-    margin-bottom: 2em;
-    width: 50em;
-}
-
-ul.conditions_or_factors li {        
-    list-style-type:none;
-}
-
-ul.condition_or_factor_row {
-    clear:both;
-}
-
-ul.condition_or_factor_row li {
-    float:left;
-    padding: 0 1em 0.25em 1em;
-    text-align:left;
-    border-bottom: dotted #999 1px;
-    min-height: 2em;
-}
-
-ul.condition_or_factor_row li#measured_item {
-    width:15em;
-}
-
-ul.condition_or_factor_row li#values {
-    width:15em;
-}
-
-ul.condition_or_factor_row li#time_point {
-    width:5em;
-}
-
-ul.condition_or_factor_row li#standard_deviation {
-    width:5em;
-}
-
-ul.condition_or_factor_row li#delete {
-    width:1em;
-}
-
 ul.heading li {
     font-weight:bolder;
     min-height: 4em;
 }
 
-.show_basic div#studied_factors {
-    max-height:30em;
-    overflow:auto;
-}
+
 
 div.ontology_nav {
     padding-left: 3em;
@@ -958,7 +910,7 @@ div.hidden_list_item {
 
 ul.related_asset_list li{
     white-space: normal;
-    list-style-type: disc;
+    list-style-type: none;
     list-style-position: inside;
 }
 
@@ -1483,8 +1435,20 @@ div.email_configuration{
     width: 500px
 }
 
+
+
+a.advanced_sharing_link{
+   float:right;
+}
+
+.sharing_box_form {
+	background-color: #eee;
+	padding: 0.8em 0.8em;
+}
+
+/*Factors studied, experimental condition, substances*/
 div.substance_condition_factor{
-    position:relative;
+    margin-bottom: 1em;
     margin-bottom: 1em;
     width: 25em;
 }
@@ -1496,11 +1460,87 @@ div.substance_experimental_condition{
     width: 25em;
 }
 
-a.advanced_sharing_link{
-   float:right;
+table.substance_info {
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: outset;
+	border-color: #DDD;
+	border-collapse: separate;
+	background-color: white;
+    margin-top: 0.5em;
+
+
+}
+table.substance_info th {
+	border-width: 1px;
+	padding: 1px;
+	border-style: inset;
+	border-color: #DDD;
+	background-color: white;
+}
+table.substance_info td {
+	border-width: 1px;
+	padding: 1px;
+	border-style: inset;
+	border-color: #DDD;
+	background-color: white;
+}
+input.search_substance_info {
+    font-weight:bold;
+}
+div.add_substance_concentration {
+   border-top: 1px dashed #DDD;
+   margin-top: 0.5em;
+   margin-bottom: 1em;
 }
 
-.sharing_box_form {
-	background-color: #eee;
-	padding: 0.8em 0.8em;
+ul.conditions_or_factors li {
+    list-style-type:none;
+}
+
+ul.condition_or_factor_row {
+    clear:both;
+}
+
+ul.condition_or_factor_row li {
+    float:left;
+    padding: 0 1em 0.25em 1em;
+    text-align:left;
+    border-bottom: dotted #999 1px;
+    min-height: 2em;
+}
+
+ul.condition_or_factor_row li#measured_item {
+    width:15em;
+}
+
+ul.condition_or_factor_row li#values {
+    width:15em;
+}
+
+ul.condition_or_factor_row li#time_point {
+    width:5em;
+}
+
+ul.condition_or_factor_row li#standard_deviation {
+    width:5em;
+}
+
+ul.condition_or_factor_row li#delete {
+    width:1em;
+}
+
+.show_basic div#studied_factors {
+    max-height:30em;
+    overflow:auto;
+}
+
+div.conditions_or_factors {
+    border: 1px solid #DDD;
+    float: left;
+    margin-left: 2em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+    width: 50em;
+    padding: 0 1em 0.5em 1em;
 }

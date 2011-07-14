@@ -170,7 +170,7 @@ module Acts
           def remove_unauthorized_changes args
             unless $authorization_checks_disabled
               options = @reflection.options.reverse_merge :required_access => :view, :required_access_to_owner => :edit
-              args = [] if options[:required_access_to_parent] && !@owner.can_perform?(options[:required_access_to_owner])
+              args = [] if options[:required_access_to_owner] && !@owner.can_perform?(options[:required_access_to_owner])
               args = flatten_deeper(args).select { |record| record.can_perform? options[:required_access] } if options[:required_access]
             end
             args

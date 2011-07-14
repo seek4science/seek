@@ -61,19 +61,37 @@ module HomeHelper
   end
 
   def recently_downloaded_item_logs time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "updated_at DESC", :conditions => ["action = ? AND updated_at > ?", 'download', time])
+    activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'download', time])
+    selected_activity_logs = []
+    selected_items = []
+    count = 0
+    activity_logs.each do |activity_log|
+       item = activity_log.activity_loggable
+       if !item.nil? and item.can_view? and !selected_items.include? item
+         selected_items.push item
+         selected_activity_logs.push activity_log
+         count += 1
+       end
+       break if count == number_of_item
+    end
     #filter by can_view?
-    activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
-    activity_logs.take(number_of_item)
+    selected_activity_logs
   end
 
-  def recently_uploaded_item_logs time=1.month.ago, number_of_item=10
-    activity_logs = ActivityLog.find(:all,:group => "activity_loggable_type, activity_loggable_id", :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ?", 'create', time])
-    #filter by can_view?
-    activity_logs = activity_logs.select{|a| (!a.activity_loggable.nil? and a.activity_loggable.can_view?)}
-    #take out only Asset and Publication log
-    activity_logs = activity_logs.select{|activity_log| ['DataFile', 'Model', 'Sop', 'Publication'].include?(activity_log.activity_loggable_type)}
-    activity_logs.take(number_of_item)
+  def recently_added_item_logs time=1.month.ago, number_of_item=10
+    item_types = ['DataFile', 'Model', 'Sop', 'Publication', 'Investigation', 'Study', 'Assay']
+    activity_logs = ActivityLog.find(:all, :include => "activity_loggable", :order => "created_at DESC", :conditions => ["action = ? AND created_at > ? AND activity_loggable_type in (?)", 'create', time, item_types])
+    selected_activity_logs = []
+    count = 0
+    activity_logs.each do |activity_log|
+       item = activity_log.activity_loggable
+       if !item.nil? and item.can_view? and item_types.include?(activity_log.activity_loggable_type)
+         selected_activity_logs.push activity_log
+         count += 1
+       end
+       break if count == number_of_item
+    end
+    selected_activity_logs
   end
 
   # get multiple feeds from multiple sites
@@ -105,7 +123,7 @@ module HomeHelper
     filtered_entries.sort {|a,b| (try_block{b.updated} || try_block{b.published} || try_block{b.last_modified} || 10.year.ago) <=> (try_block{a.updated} || try_block{a.published} || try_block{a.last_modified} || 10.year.ago)}.take(number_of_entries)
   end
 
-  
+
   def display_single_entry entry
       html=''
       unless entry.blank?
@@ -129,18 +147,26 @@ module HomeHelper
       html
   end
 
+
   def display_single_item item, action, at_time
       html=''
-      unless item.blank?
-        path = eval("#{item.class.name.underscore}_path(#{item.id})" )
-        description = try_block{item.description} || try_block{item.abstract}
-        tooltip=tooltip_title_attrib("<p>#{description}</p><p class='feedinfo none_text'>#{at_time}</p>")
-        html << "<li class='homepanel_item'>"
-        html << link_to("#{item.title}", path, :title => tooltip, :target=>"_blank")
-        html << "<div class='feedinfo none_text'>"
-        html << "#{item.class.name.underscore.humanize} - #{action} #{time_ago_in_words(at_time)} ago"
-        html << "</div>"
-        html << "</li>"
+       unless item.blank?
+         image=resource_avatar(item,:class=>"home_asset_icon")
+#          image_key = item.class.name.underscore
+#          image_key = 'assay_modelling_avatar' if try_block{item.is_modelling?}
+#          image = image_tag(icon_filename_for_key(image_key), :class => "home_asset_icon")
+          icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title => tooltip_title_attrib(text_for_resource(item)))
+
+          path = url_for(item)
+          description = try_block{item.description} || try_block{item.abstract}
+          tooltip=tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{at_time}</p>")
+          html << "<li class='homepanel_item'>"
+          html << "#{icon} "
+          html << link_to("#{item.title}", path, :title => tooltip)
+          html << "<div class='feedinfo none_text'>"
+          html << "<span>#{text_for_resource(item)} - #{action} #{time_ago_in_words(at_time)} ago<span>"
+          html << "</div>"
+          html << "</li>"
       end
       html
   end

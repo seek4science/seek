@@ -159,4 +159,23 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs_updated.end_value, 50
     assert_equal fs_updated.standard_deviation, 0.6
   end
+
+  test "should not create factor studied which has fields containing the comma in the decimal number" do
+    data_file=data_files(:editable_data_file)
+    mi = measured_items(:time)
+    unit = units(:gram)
+    fs = {:measured_item_id => mi.id, :start_value => "1,5" , :end_value => 10, :unit => unit}
+    post :create, :studied_factor => fs, :data_file_id => data_file.id, :version => data_file.version
+    fs = assigns(:studied_factor)
+    assert_nil fs
+  end
+
+  test 'should not update factor studied which has fields containing the comma in the decimal number' do
+    fs = studied_factors(:studied_factor_time)
+    assert_not_nil fs
+
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:start_value => "10,02", :end_value => 50, :standard_deviation => 0.6}
+    fs_updated = assigns(:studied_factor)
+    assert_nil fs_updated
+  end
 end
