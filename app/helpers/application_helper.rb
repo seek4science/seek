@@ -454,6 +454,30 @@ module ApplicationHelper
       javascript_include_tag file
     end
   end
+  def can_manage_types?
+    unless Seek::Config.type_managers_enabled
+      return false
+    end
+
+    case Seek::Config.type_managers
+      when "admins"
+      if User.admin_logged_in?
+        return true
+      else
+        return false
+      end
+      when "pals"
+      if User.admin_logged_in? || User.pal_logged_in?
+        return true
+      else
+        return false
+      end
+      when "users"
+      return true
+      when "none"
+      return false
+    end
+  end
   private  
   PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
 end
