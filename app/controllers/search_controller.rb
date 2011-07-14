@@ -8,8 +8,10 @@ class SearchController < ApplicationController
       @results = []
     end
 
+    #strip out nils, which can occur if the index is out of sync
+    @results = @results.select{|r| !r.nil?}
 
-    @results = select_authorised @results    
+    @results = select_authorised @results
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."
     else
