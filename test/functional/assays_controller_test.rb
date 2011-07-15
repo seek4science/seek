@@ -376,7 +376,6 @@ end
     login_as(:model_owner)
     get :new,:class=>"experimental"
     assert_response :success
-     @response.body
     assert_select "select#possible_data_files" do
       assert_select "option",:text=>/Sysmo Data File/,:count=>1      
       assert_select "option",:text=>/Myexperiment Data File/,:count=>0
@@ -637,7 +636,7 @@ end
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
     a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
-         :study_id=>studies(:metabolomics_study).id, :assay_class=>assay_classes(:experimental_assay_class)}
+         :study_id=>studies(:metabolomics_study).id, :assay_class=>assay_classes(:experimental_assay_class),:sample_ids=>[Factory(:sample).id]}
     assert_difference('Assay.count') do
       post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_SYSMO_USERS}"=>Policy::VISIBLE,:sharing_scope=>Policy::ALL_SYSMO_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
     end
