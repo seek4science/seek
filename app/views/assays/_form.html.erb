@@ -59,12 +59,16 @@
 <table class="padded_table">
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
-      <%= link_to h("new assay type?"),new_assay_type_path %>
+      <% if User.current_user.can_manage_types? %>
+          <%= link_to h("new assay type?"), new_assay_type_path %>
+      <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
-      <td><%= f.label "Technology type: " %>
-        <%= link_to h("new technology type?"),new_technology_type_path %>
-      </td>
+        <td><%= f.label "Technology type: " %>
+          <% if User.current_user.can_manage_types? %>
+              <%= link_to h("new technology type?"), new_technology_type_path %>
+          <% end %>
+        </td>
     <% end -%>
   </tr>
   <tr>

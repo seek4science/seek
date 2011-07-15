@@ -44,7 +44,10 @@ function addNewInvestigation(new_investigation) {
 }
 
 function addSop(title,id) {
+     if(checkNotInList(id,sops_assets)) {
     sops_assets.push([title,id]);
+     }
+
 }
 
 function addSelectedSop() {
@@ -115,7 +118,9 @@ function updateSops() {
 
 //Data files
 function addDataFile(title,id,relationshipType) {
+    if(checkNotInList(id,data_files_assets)) {
     data_files_assets.push([title,id,relationshipType]);
+    }
 }
 
 function addSelectedDataFile() {
@@ -193,7 +198,9 @@ function updateDataFiles() {
 
 //Models
 function addModel(title,id) {
+    if(checkNotInList(id,models_assets)) {
     models_assets.push([title,id]);
+    }
 }
 
 function addSelectedModel() {

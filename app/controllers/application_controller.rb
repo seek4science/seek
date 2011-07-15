@@ -140,27 +140,22 @@ class ApplicationController < ActionController::Base
       return false
     end
 
-    case Seek::Config.type_managers
-      when "admins"
-        if User.admin_logged_in?
-          return true
-        else
+    if User.current_user.can_manage_types?
+      return true
+    else
+      case Seek::Config.type_managers
+        when "admins"
           error("Admin rights required to manage types", "...")
           return false
-        end
 
-      when "pals"
-      if User.admin_logged_in? || User.pal_logged_in?
-        return true
-      else
-        error("Admin or PAL rights required to manage types", "...")
-        return false
+        when "pals"
+          error("Admin or PAL rights required to manage types", "...")
+          return false
+
+        when "none"
+          error("Type management disabled", "...")
+          return false
       end
-      when "users"
-      return true
-      when "none"
-      error("Type management disabled", "...")
-      return false
     end
   end
 
