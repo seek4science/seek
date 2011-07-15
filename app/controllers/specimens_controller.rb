@@ -7,6 +7,21 @@ class SpecimensController < ApplicationController
 
   include IndexPager
 
+  def new_object_based_on_existing_one
+    @existing_specimen =  Specimen.find(params[:id])
+    @specimen = @existing_specimen.clone_with_associations
+
+     @existing_specimen.sop_masters.each do |s|
+       if !s.sop.can_view?
+       flash.now[:notice] = "Some or all sops of the existing specimen cannot be viewed, you may specify your own!"
+        break
+      end
+     end
+
+    render :action=>"new"
+
+  end
+
   def new
     @specimen = Specimen.new
     respond_to do |format|
@@ -18,20 +33,22 @@ class SpecimensController < ApplicationController
   def create
     @specimen = Specimen.new(params[:specimen])
 
-    organism = params[:specimen_organism_id] || []
-    o_id, strain, culture_growth_type_text=organism.split(",")
-    culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-    @specimen.associate_organism(o_id, strain, culture_growth)
+
+
+    sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
+    @specimen.sop_ids = sop_ids
 
     @specimen.project_id = params[:project_id]
 
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
-
     respond_to do |format|
       if @specimen.save
-
+        sop_ids.each do |sop_id|
+          sop= Sop.find sop_id
+          SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
+        end
         flash[:notice] = 'Specimen was successfully created.'
         format.html { redirect_to(@specimen) }
         format.xml  { head :ok }
@@ -46,18 +63,27 @@ class SpecimensController < ApplicationController
 
     #update project
     @specimen.project_id = params[:project_id]
-    organism = params[:specimen_organism_id] || []
-    o_id, strain, culture_growth_type_text=organism.split(",")
-    culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-    @specimen.associate_organism(o_id, strain, culture_growth)
+
+
+    sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) ||[]
+   # @specimen.sop_ids = sop_ids
 
     @specimen.attributes = params[:specimen]
 
     @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
+
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
      respond_to do |format|
       if @specimen.save
+          sop_ids.each do |sop_id|
+            sop= Sop.find sop_id
+            existing = @specimen.sop_masters.select{|ss|ss.sop == sop}
+            if existing.blank?
+               SopSpecimen.create!(:sop_id => sop_id,:sop_version=> sop.version,:specimen_id=>@specimen.id)
+            end
+
+          end
 
           flash[:notice] = 'Specimen was successfully updated.'
           format.html { redirect_to(@specimen) }
@@ -83,20 +109,7 @@ class SpecimensController < ApplicationController
   end
 
 
-  def project_selected_ajax
 
-    if params[:project_id] && params[:project_id]!="0"
-      ins=Project.find(params[:project_id]).institutions
-
-    end
-    ins||=[]
-
-    #render :update do |page|
-
-     # page.replace_html "institution_collection", :partial=>"specimens/institutions_list", :locals=>{:ins=>ins, :project_id=>params[:project_id]}
-    #end
-
-  end
 
 
 end

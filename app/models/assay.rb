@@ -16,7 +16,7 @@ class Assay < ActiveRecord::Base
 
   acts_as_taggable
   belongs_to :institution
-  belongs_to :sample
+  has_and_belongs_to_many :samples
   belongs_to :assay_type
   belongs_to :technology_type  
   belongs_to :study  
@@ -55,7 +55,7 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-           
+  validates_presence_of :samples,:unless => :is_modelling?
   has_many :relationships, 
     :class_name => 'Relationship',
     :as => :subject,
@@ -85,7 +85,7 @@ class Assay < ActiveRecord::Base
   
   #Create or update relationship of this assay to an asset, with a specific relationship type and version  
   def relate(asset, r_type=nil)
-    assay_asset = assay_assets.select {|aa| aa.asset == asset}.first
+    assay_asset = assay_assets.detect {|aa| aa.asset == asset}
 
     if assay_asset.nil?
       assay_asset = AssayAsset.new
@@ -119,7 +119,14 @@ class Assay < ActiveRecord::Base
     end
     assay_organism.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
     assay_organism.strain=strain
-    assay_organism.save!
+
+   
+
+    existing = AssayOrganism.all.select{|ao|ao.organism==organism and ao.assay == self and ao.strain==strain and ao.culture_growth_type==culture_growth_type}
+    if existing.blank?
+    self.assay_organisms << assay_organism
+    end
+
   end
   
   def assets
@@ -141,5 +148,34 @@ class Assay < ActiveRecord::Base
   def avatar_key
     type = is_modelling? ? "modelling" : "experimental"
     "assay_#{type}_avatar"
+  end
+
+  def samples_are_missing?
+    return samples.blank?
+  end
+
+  def organisms_are_missing?
+    return assay_organisms.blank?
+  end
+
+
+  def validate
+
+    errors.add_to_base "Please specify either sample or organisms for assay!" if is_modelling? and samples_are_missing? and organisms_are_missing?
+
+  end
+
+
+
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = self.policy.deep_copy
+    new_object.sop_masters = self.try(:sop_masters)
+
+    new_object.model_masters = self.try(:model_masters)
+    new_object.sample_ids = self.try(:sample_ids)
+    new_object.assay_organisms = self.try(:assay_organisms)
+
+    return new_object
   end
 end

@@ -24,7 +24,9 @@ module ImagesHelper
     inner = "#{img_tag} #{label}" unless label == nil
 
     if (url)
-      if (remote)
+      if (remote==:function)
+        inner = link_to_function inner, url, url_options
+      elsif (remote)
         inner = link_to_remote(inner, url, url_options);
       else
         inner = link_to(inner, url, url_options)
@@ -242,7 +244,10 @@ module ImagesHelper
         "misc_icons/jws_builder32x32.png"
       when "specimen", "specimens"
         "misc_icons/green_virus-64x64.png"
-
+      when 'unsubscribe'
+        "famfamfam_silk/email_delete.png"
+      when 'subscribe'
+        "famfamfam_silk/email_add.png"
       else
         return nil
     end

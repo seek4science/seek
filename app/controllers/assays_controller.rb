@@ -7,6 +7,40 @@ class AssaysController < ApplicationController
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
 
+
+   def new_object_based_on_existing_one
+    @existing_assay =  Assay.find(params[:id])
+    @assay = @existing_assay.clone_with_associations
+    params[:data_file_ids]=@existing_assay.data_file_masters.collect{|d|"#{d.id},None"}
+    params[:related_publication_ids]= @existing_assay.related_publications.collect{|p| "#{p.id},None"}
+
+    unless @assay.study.can_edit?
+      @assay.study = nil
+      flash.now[:notice] = "The study of the existing assay cannot be viewed, please specify your own study! <br/>"
+    end
+
+    @existing_assay.data_file_masters.each do |d|
+      if !d.can_view?
+       flash.now[:notice] << "Some or all data files of the existing assay cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
+    @existing_assay.sop_masters.each do |s|
+       if !s.can_view?
+       flash.now[:notice] << "Some or all sops of the existing assay cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
+    @existing_assay.model_masters.each do |m|
+       if !m.can_view?
+       flash.now[:notice] << "Some or all models of the existing assay cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
+
+    render :action=>"new"
+   end
+
   def new
     @assay=Assay.new
     study = Study.find(params[:study_id]) if params[:study_id]
@@ -33,6 +67,14 @@ class AssaysController < ApplicationController
     sop_ids       = params[:assay_sop_ids] || []
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:assay_model_ids] || []
+
+
+     organisms.each do |text|
+      o_id, strain, culture_growth_type_text=text.split(",")
+      culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+      @assay.associate_organism(o_id, strain, culture_growth)
+    end
+
 
     update_tags @assay
 
@@ -77,13 +119,18 @@ class AssaysController < ApplicationController
 
     #FIXME: would be better to resolve the differences, rather than keep clearing and reading the assets and organisms
     #DOES resolve differences for assets now
-    @assay.assay_organisms=[]
+    organisms             = params[:assay_organism_ids]||[]
 
-    organisms             = params[:assay_organism_ids] || []
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
 
+    @assay.assay_organisms = []
+    organisms.each do |text|
+          o_id, strain, culture_growth_type_text=text.split(",")
+          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
+          @assay.associate_organism(o_id, strain, culture_growth)
+        end
     update_tags @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
@@ -110,12 +157,6 @@ class AssaysController < ApplicationController
         end
         #Destroy AssayAssets that aren't needed
         (@assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
-
-        organisms.each do |text|
-          o_id, strain, culture_growth_type_text=text.split(",")
-          culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-          @assay.associate_organism(o_id, strain, culture_growth)
-        end
 
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?

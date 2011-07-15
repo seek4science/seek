@@ -52,8 +52,9 @@ class SpecimensControllerTest < ActionController::TestCase
       post :create, :specimen => {:donor_number => "running mouse NO.1",
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
-                                  :institution => Factory(:institution)},
-           :project_id => Factory(:project).id
+                                  :institution => Factory(:institution),
+                                  :organism => Factory(:organism)},
+           :project_id => Factory(:project)
     end
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)

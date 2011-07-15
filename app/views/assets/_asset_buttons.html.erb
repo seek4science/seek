@@ -1,4 +1,5 @@
 <ul class="sectionIcons">
+  <%= render :partial => "subscriptions/subscribe", :object => asset -%>
   <% if asset.can_manage? -%>
     <% if asset.is_downloadable? -%>
         <li><%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%></li>

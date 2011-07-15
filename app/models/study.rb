@@ -30,4 +30,11 @@ class Study < ActiveRecord::Base
     assays.empty? && super
   end
 
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = self.policy.deep_copy
+
+    return new_object
+  end
+
 end

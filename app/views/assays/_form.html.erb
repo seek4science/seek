@@ -1,4 +1,5 @@
 <%
+ select_truncate_length=120
 @assay_text=@assay.is_modelling? ? "analysis" : "assay"
 @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "assay type"
 %>
@@ -26,13 +27,14 @@
   </p>
   <p>
     <%= f.label "Institution" %><br/>
-    <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."}) %>
+    <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
   </p>
-  <% if @assay.study.blank? or @assay.study.can_view? %>
+
       <p>
       <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
-      <%= f.label :study-%><span class="required">*</span><br/>
-      <%  investigations = Investigation.all.select &:can_edit? -%>
+    <%= f.label :study -%>
+    <span class="required">*</span><br/>
+    <% investigations = Investigation.all.select &:can_view? -%>
       <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
       <% investigations.each do |i| %>
          <% studies = i.studies.select &:can_edit? %>
@@ -44,11 +46,11 @@
           <% options << "</optgroup>" %>
         <% end %>
       <% end %>
-      <select id="study_id" name="assay[study_id]"  onMouseOut="hideTitle()" style="width:100%">
+    <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
         <%= options %>
       </select>
     </p>
-  <%end%>
+
 
 </div>
 
@@ -56,24 +58,41 @@
 
 <table class="padded_table">
   <tr>
-    <td><%= f.label "#{@assay_type_text.capitalize}: " %></td>
+    <td><%= f.label "#{@assay_type_text.capitalize}: " %>
+    <% if User.current_user.can_manage_types? %>
+      <%= link_to h("new assay type?"),new_assay_type_path %>
+    <% end %>
+    </td>
     <% unless @assay.is_modelling? -%>
-      <td><%= f.label "Technology type: " %></td>
+      <td><%= f.label "Technology type: " %>
+
+       <% if User.current_user.can_manage_types? %>
+        <%= link_to h("new technology type?"),new_technology_type_path %>
+       <% end %>
+
+      </td>
     <% end -%>
   </tr>
   <tr>
     <% root_id = @assay.is_modelling? ? AssayType.modelling_assay_type_id : AssayType.experimental_assay_type_id %>
     <td style="width:50%"><%= ontology_select_tag f,AssayType,root_id,"assay_type_id",(@assay.assay_type.nil? ? nil : @assay.assay_type.id),{:style=>"width:100%"} %></td>
     <% unless @assay.is_modelling? -%>
-      <td style="width:50%"><%= ontology_select_tag f,TechnologyType,nil,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} %></td>
+      <td style="width:50%"><%= try_block{ontology_select_tag f,TechnologyType,nil,"technology_type_id",(@assay.technology_type.nil? ? nil : @assay.technology_type.id),{:style=>"width:100%"} } %></td>
     <% end -%>
   </tr>
 </table>
 
-<p>
-    <%= f.label "Sample" %> <br/>
-    <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{:include_blank =>"Please Select ..."},{"style" =>"width:90%"}) %>
-</p>
+
+<br style="clear:both"/>
+ <% unless @assay.is_modelling?  %>
+     <span class="required">*</span>
+ <% end %>
+ <%= f.fancy_multiselect :samples, :object_type_text => @assay_text -%>
+
+<div id="add_organism_form">
+<%= render :partial=>"assays/select_organisms" if @assay.is_modelling?-%>
+</div>
+
 <br style="clear:both"/>
 
 <p>
@@ -84,7 +103,9 @@
   <%= render :partial=>"assets/select_tags" -%>
 </p>
 
-<%= render :partial=>"assays/select_organisms" -%>
+
+
+
 
 <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f} -%>
 
@@ -107,6 +128,11 @@
 </p>
 
 <script type="text/javascript">
+
+
+  function hide_organism_form(){
+      Effect.Fade('add_organism_form');
+  }
   function showTitle(text){
     var elem = document.getElementById("full_study_title");
     elem.style.display = '';
@@ -149,11 +175,47 @@
     }
     //Change TechnologyType form
     var techTypeSelect = $("assay_technology_type_id");
-    for (var i=0;i < techTypeSelect.options.length;i++) {
+    for ( i=0;i < techTypeSelect.options.length;i++) {
       if (techTypeSelect.options[i].value == technologyTypeRoot)
         techTypeSelect.options[i].selected = true;
       else 
         techTypeSelect.options[i].selected = false;
     }
+
   }
+
+  function check_show_organism_form() {
+      if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
+          Effect.Fade('add_organism_form');
+      }
+      else {
+          Effect.Appear('add_organism_form');
+      }
+  }
+
+  function check_show_sample_form() {
+      if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
+          Effect.Fade('add_samples_form');
+      } else {
+          Effect.Appear('add_samples_form');
+      }
+  }
+
+  <%if @assay.is_modelling?%>
+      Event.observe(window, 'load', function() {
+          Event.observe('assay_sample_ids', 'fancySelect:update', function(){
+            check_show_organism_form();
+          });
+
+          var update_organisms_without_check_sample_form = this['updateOrganisms'];
+          this['updateOrganisms'] = function() {
+              update_organisms_without_check_sample_form();
+              check_show_sample_form();
+          };
+
+          $('assay_sample_ids').fire('fancySelect:update');
+          updateOrganisms();
+      });
+  <% end %>
+
 </script>

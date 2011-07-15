@@ -78,9 +78,11 @@ class AssayTest < ActiveSupport::TestCase
   
 
   test "validation" do
+    User.with_current_user Factory(:user) do
     assay=new_valid_assay
     
     assert assay.valid?
+
 
     assay.title=""
     assert !assay.valid?
@@ -114,11 +116,18 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.owner=people(:person_for_model_owner)
 
-    #an modelling assay can be valid without a technology type
+      #an modelling assay can be valid without a technology type,but require sample or organism
     assay.assay_class=assay_classes(:modelling_assay_class)
     assay.technology_type=nil
+      assay.samples = [Factory(:sample)]
     assert assay.valid?
     
+    #an experimental assay can be invalid without a sample
+    assay.assay_class=assay_classes(:experimental_assay_class)
+    assay.technology_type=nil
+    assay.samples = []
+    assert !assay.valid?
+    end
   end
 
   test "associated publication" do
@@ -226,12 +235,12 @@ class AssayTest < ActiveSupport::TestCase
     end
 
     #with String ID
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assay.associate_organism(organism.id.to_s)
     end
 
     #with Organism object
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assay.associate_organism(organism)
     end
 
@@ -270,7 +279,7 @@ class AssayTest < ActiveSupport::TestCase
       end
     end
 
-    assert_difference("AssayOrganism.count") do
+    assert_no_difference("AssayOrganism.count") do
       assert_no_difference("Strain.count") do
         assay.associate_organism(organism,"FFFF")
       end
@@ -307,7 +316,7 @@ class AssayTest < ActiveSupport::TestCase
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
-      :sample => samples(:test_sample)
+      :samples => [Factory :sample]
     )
 
   end

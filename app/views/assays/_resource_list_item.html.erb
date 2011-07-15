@@ -9,7 +9,7 @@
 
   <%= list_item_attribute "#{@assay_text} type", resource.assay_type.title.capitalize, resource.assay_type %>
   <% unless resource.is_modelling? -%>
-      <%= list_item_attribute "Technology type", resource.technology_type.title.capitalize, resource.technology_type %>
+      <%= list_item_attribute "Technology type", try_block{resource.technology_type.title.capitalize}, resource.technology_type %>
   <% end -%>
 
   <%= list_item_optional_attribute "Investigation", resource.investigation.try(:title), resource.investigation if resource.investigation.can_view?%>
@@ -25,7 +25,11 @@
 
   <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project %>
 
-  <%= list_item_simple_list(resource.assay_organisms, "Organism") { |ao| assay_organism_list_item(ao) } %>
+  <% if !resource.assay_organisms.blank? %>
+  <%= list_assay_organisms("Samples",resource.assay_organisms) %>
+  <% else %>
+  <%= list_assay_samples "Samples",resource.samples%>
+  <% end %>
 
   <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
 

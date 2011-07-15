@@ -1,0 +1,38 @@
+
+
+  <% case @activity_log.action
+     when "create"
+     color = "color:#f0342a"
+     when "update"
+     color = "color:#eb6423"
+     when "destroy"
+     color = "color:#929191"
+     else
+      color = "color:#ffffff"
+ end
+ %>
+    <label style= "<%= color %>;font-size:medium;"><b><%= @activity_log.action.capitalize%> resource</b></label>
+
+
+    <table cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Resource</th>
+        <th align="left">Name</th>
+        <th align="left">Person</th>
+        <th align="left"><%= @activity_log.action.capitalize%> Date</th>
+      </tr>
+
+              <tr>
+                <td><%= @activity_log.activity_loggable_type.humanize %></td>
+                <td><%= @activity_log.activity_loggable ? link_to(@activity_log.activity_loggable.name, @activity_log.activity_loggable) : @activity_log.data %></td>
+                <td> <%= link_to h(@activity_log.culprit.person.name), "mailto:#{@activity_log.culprit.person.email_with_name}"%></td>
+                <td> <%= @activity_log.created_at %></td>
+              </tr>
+
+
+        </table>
+
+

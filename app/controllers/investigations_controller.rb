@@ -7,6 +7,12 @@ class InvestigationsController < ApplicationController
   before_filter :make_investigation_and_auth,:only=>[:create]
   before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
 
+  def new_object_based_on_existing_one
+    @existing_investigation =  Investigation.find(params[:id])
+    @investigation = @existing_investigation.clone_with_associations
+    render :action=>"new"
+  end
+
   def destroy    
     @investigation.destroy
 

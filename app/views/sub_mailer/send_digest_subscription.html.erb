@@ -1,0 +1,30 @@
+<% @activity_logs.group_by(&:action).each do |action, logs| %>
+    <label style="color:#f0342a;"><b><%= action.capitalize%></b></label>
+    <div id="new_resources" class="new_resources" >
+       <table border="1px" cellpadding="5" style="border-collapse: collapse;
+              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+              width: 100%;">
+
+      <tr>
+        <th align="left">Project Name</th>
+        <th align="left">Resource Type</th>
+        <th align="left">Resource Name</th>
+        <th align="left">Person</th>
+        <th align="left"><%= action.capitalize%> Date</th>
+      </tr>
+      <% logs.each do |log| %>
+
+              <tr>
+                <td><%= log.referenced.nil? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : log.referenced.name %></td>
+                <td><%= log.activity_loggable_type.humanize %></td>
+                <td><%= try_block{link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable))} || log.activity_loggable.title%></td>
+                <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %></td>
+                <td> <%= log.created_at %></td>
+              </tr>
+
+      <% end %>
+           </table></div>
+    <br style="clear:both"/>
+<% end %>
+
+

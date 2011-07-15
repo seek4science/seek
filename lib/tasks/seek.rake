@@ -446,4 +446,42 @@ namespace :seek do
     end
   end
 
+
+  desc "Send mail daily to users"
+  task :send_daily_subscription => :environment do
+    Person.all.each do |person|
+       activity_logs =[]
+       daily_subs = person.subscriptions.select &:daily?
+       daily_subs.each do |sub|
+         activity_logs.concat ActivityLog.all.select{|log|log.activity_loggable.try(:can_view?, person.user) and try_block{log.activity_loggable_type.constantize.subscribable?} and log.activity_loggable_type.constantize.subscribers_are_notified_of?(log.action) and log.activity_loggable_id==sub.subscribable_id and log.activity_loggable_type == sub.subscribable_type and log.created_at.to_date == Date.yesterday}
+       end
+      SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?
+    end
+
+  end
+
+  desc "Send mail weekly to users"
+  task :send_weekly_subscription => :environment do
+     Person.all.each do |person|
+       activity_logs =[]
+       weekly_subs = person.subscriptions.select &:weekly?
+       weekly_subs.each do |sub|
+         activity_logs.concat ActivityLog.all.select{|log|log.activity_loggable.try(:can_view?, person.user) and try_block{log.activity_loggable_type.constantize.subscribable?} and log.activity_loggable_type.constantize.subscribers_are_notified_of?(log.action) and log.activity_loggable_id==sub.subscribable_id and log.activity_loggable_type == sub.subscribable_type and log.created_at.to_date >= 7.days.ago.to_date}
+      end
+      SubMailer.deliver_send_digest_subscription person, activity_logs unless  activity_logs.blank?
+    end
+  end
+
+  desc "Send mail monthly to users"
+  task :send_monthly_subscription => :environment do
+     Person.all.each do |person|
+       activity_logs =[]
+       monthly_subs =  person.subscriptions.select &:monthly?
+       monthly_subs.each do |sub|
+         activity_logs.concat ActivityLog.all.select{|log|log.activity_loggable.try(:can_view?, person.user) and try_block{log.activity_loggable_type.constantize.subscribable?} and log.activity_loggable_type.constantize.subscribers_are_notified_of?(log.action) and log.activity_loggable_id==sub.subscribable_id and log.activity_loggable_type == sub.subscribable_type and log.created_at.to_date >= 1.month.ago.to_date}
+      end
+      SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?
+    end
+  end
+
 end

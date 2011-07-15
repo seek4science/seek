@@ -92,8 +92,10 @@ Factory.define(:assay_base, :class => Assay) do |f|
     f.association :contributor, :factory => :person
   f.association :study
   f.association :assay_type
-  f.association :sample
+
 end
+#Technology Type
+Factory.define(:technology_type){}
 
 Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
   f.title 'Modelling Assay'
@@ -107,11 +109,18 @@ end
 
 Factory.define(:modelling_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :modelling_assay_class
+  f.samples {[Factory :sample]}
+
 end
 
+Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
+  f.after_create{|ma|Factory(:organism,:assay=>ma)}
+
+end
 Factory.define(:experimental_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :experimental_assay_class
   f.association :technology_type
+  f.samples {[Factory :sample]}
 end
 
 Factory.define(:assay, :parent => :modelling_assay) {}
@@ -134,6 +143,11 @@ Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
 end
 
+#Culture growth type
+Factory.define(:culture_growth_type) do |f|
+  f.title "a culture_growth_type"
+end
+
 #Specimen
 Factory.define(:specimen) do |f|
   f.sequence(:donor_number) { |n| "Specimen#{n}" }
@@ -141,6 +155,7 @@ Factory.define(:specimen) do |f|
   f.association :contributor, :factory => :user
   f.association :project
   f.association :institution
+  f.association :organism
 end
 
 #Sample
@@ -148,7 +163,6 @@ Factory.define(:sample) do |f|
   f.sequence(:title) { |n| "Sample#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.donation_date Date.today
-  f.strains { [Factory :strain] }
   f.association :specimen
 end
 

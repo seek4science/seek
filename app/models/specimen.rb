@@ -1,8 +1,10 @@
 require 'grouped_pagination'
 require 'acts_as_authorized'
-
+require 'subscribable'
 class Specimen < ActiveRecord::Base
+   include Subscribable
 
+  before_save  :clear_garbage
 
   has_many :samples
 
@@ -17,19 +19,34 @@ class Specimen < ActiveRecord::Base
 
   alias_attribute :description, :comments
   alias_attribute :title, :donor_number
+  alias_attribute :specimen_number, :donor_number
 
+  HUMANIZED_COLUMNS = {:donor_number => "Specimen number"}
 
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
-  validates_presence_of :donor_number,:contributor,:lab_internal_number,:project,:institution
+  validates_presence_of :donor_number
+
+  validates_presence_of :contributor,:lab_internal_number,:project,:institution,:organism
 
   validates_uniqueness_of :donor_number
+  def self.sop_sql()
+  'SELECT sop_versions.* FROM sop_versions ' +
+  'INNER JOIN sop_specimens ' +
+  'ON sop_specimens.sop_id = sop_versions.sop_id ' +
+  'WHERE (sop_specimens.sop_version = sop_versions.version ' +
+  'AND sop_specimens.specimen_id = #{self.id})'
+  end
 
-
+  has_many :sops,:class_name => "Sop::Version",:finder_sql => self.sop_sql()
+  has_many :sop_masters,:class_name => "SopSpecimen"
   grouped_pagination :pages=>("A".."Z").to_a, :default_page => Seek::Config.default_page(self.name.underscore.pluralize)
 
-  acts_as_solr(:fields=>[:description,:donor_number,:lab_internal_number],:include=>[:institution,:culture_growth_type,:organism,:strain]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:donor_number,:lab_internal_number],:include=>[:culture_growth_type,:organism,:strain]) if Seek::Config.solr_enabled
+
 
   acts_as_authorized
+
+
 
   def age_in_weeks
     if !age.nil?
@@ -45,23 +62,49 @@ class Specimen < ActiveRecord::Base
     true
   end
 
-  #Associates and organism with the specimen
-  #organism may be either an ID or Organism instance
-  #strain_title should be the String for the strain
-  #culture_growth should be the culture growth instance
-  def associate_organism(organism,strain_title=nil,culture_growth_type=nil)
-    organism = Organism.find(organism) if organism.kind_of?(Numeric) || organism.kind_of?(String)
-    self.organism_id = organism
-    strain=nil
-    if (strain_title && !strain_title.empty?)
-      strain=organism.strains.find_by_title(strain_title)
-      if strain.nil?
-        strain=Strain.new(:title=>strain_title,:organism_id=>organism.id)
-        strain.save!
-      end
+  def clear_garbage
+    if culture_growth_type.try(:title)=="in vivo"
+      self.medium=nil
+      self.culture_format=nil
+      self.temperature=nil
+      self.ph=nil
+      self.confluency=nil
+      self.passage=nil
+      self.viability=nil
+      self.purity=nil
     end
-    self.culture_growth_type = culture_growth_type unless culture_growth_type.nil?
-    self.strain=strain
+    if culture_growth_type.try(:title)=="cultured cell line"||culture_growth_type.try(:title)=="primary cell culture"
+      self.sex=nil
+      self.born=nil
+      self.age=nil
+    end
 
   end
+
+  def strain_title
+    self.strain.try(:title)
+  end
+
+  def strain_title= title
+    existing = Strain.all.select{|s|s.title==title}.first
+    if existing.blank?
+      self.strain = Strain.create(:title=>title)
+    else
+      self.strain= existing
+    end
+  end
+
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = self.policy.deep_copy
+    new_object.sop_masters = self.try(:sop_masters)
+    new_object.creators = self.try(:creators)
+    return new_object
+  end
+
+
+  def self.human_attribute_name(attribute)
+    HUMANIZED_COLUMNS[attribute.to_sym] || super
+  end
+
 end

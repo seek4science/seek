@@ -1,11 +1,15 @@
 <% truncate_length_for_boxes = 22 -%>
 
 <ul class="sectionIcons">
+  <%= render :partial => "subscriptions/subscribe", :object => @sample %>
   <% if @sample.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_sample_path(@sample), "Edit Sample", nil, 'Edit Sample') %></li>
   <% end %>
   <% if @sample.can_delete? %>
       <li><%= image_tag_for_key "destroy", sample_path(@sample), "Delete Sample", {:confirm => 'Are you sure?', :method => :delete}, "Delete Sample" -%></li>
+  <% end %>
+  <% if logged_in? and current_user.person.member? %>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"samples",:id=>@sample.id), nil, nil, 'New sample based on this one') %></li>
   <% end %>
 </ul>
 
@@ -20,11 +24,6 @@
       <p>
         <label>Specimen:</label>
         <%= text_or_not_specified(@sample.specimen.title) %>
-      </p>
-
-      <p>
-        <label>Strains:</label>
-        <%= sample_strains_list @sample.strains -%>
       </p>
 
       <p>

@@ -454,8 +454,11 @@ module ApplicationHelper
       javascript_include_tag file
     end
   end
+
+
+
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

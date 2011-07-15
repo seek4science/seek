@@ -140,26 +140,22 @@ class ApplicationController < ActionController::Base
       return false
     end
 
-    case Seek::Config.type_managers
-      when "admins"
-      if User.admin_logged_in?
-        return true
-      else
-        error("Admin rights required to manage types", "...")
-        return false
-      end
-      when "pals"
-      if User.admin_logged_in? || User.pal_logged_in?
-        return true
-      else
-        error("Admin or PAL rights required to manage types", "...")
-        return false
-      end
-      when "users"
+    if User.current_user.can_manage_types?
       return true
-      when "none"
-      error("Type management disabled", "...")
-      return false
+    else
+      case Seek::Config.type_managers
+        when "admins"
+          error("Admin rights required to manage types", "...")
+          return false
+
+        when "pals"
+          error("Admin or PAL rights required to manage types", "...")
+          return false
+
+        when "none"
+          error("Type management disabled", "...")
+          return false
+      end
     end
   end
 
@@ -260,6 +256,7 @@ class ApplicationController < ActionController::Base
   filter_parameter_logging :password
 
   def log_event
+    User.with_current_user current_user do
     c = self.controller_name.downcase
     a = self.action_name.downcase
 
@@ -278,28 +275,34 @@ class ApplicationController < ActionController::Base
                    :controller_name=>c,
                    :activity_loggable => object)
       end
-      when "investigations","studies","assays"
+        when "investigations","studies","assays","specimens","samples"
       if ["show","create","update","destroy"].include?(a)
         ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :referenced => object.project,
                    :controller_name=>c,
-                   :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
+
       end
-      when "data_files","models","sops","publications","events"
+        when "data_files","models","sops","publications","presentations","events"
+          a = "create" if a == "upload_for_tool"
+          a = "update" if a == "new_version"
       if ["show","create","update","destroy","download"].include?(a)
         ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :referenced => object.project,
                    :controller_name=>c,
-                   :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
       end
       when "people"
       if ["show","create","update","destroy"].include?(a)
         ActivityLog.create(:action => a,
                    :culprit => current_user,
                    :controller_name=>c,
-                   :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
       end
       when "search"
       if a=="index"
@@ -309,6 +312,7 @@ class ApplicationController < ActionController::Base
                    :data => {:search_query=>object,:result_count=>@results.count})
       end
     end
+  end
   end
 
   def permitted_filters

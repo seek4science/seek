@@ -1,0 +1,64 @@
+<%
+   select_truncate_length=120
+   projects = @person.projects + Project.all.reject { |p| @person.projects.include?(p)}
+%>
+<div class="fold">
+  <div class="foldTitle">
+    <%= help_icon("Here you can customize your project subscriptions. By default, you subscribe to your projects.") -%>
+    Subscriptions
+  </div>
+  <div class="foldContent">
+    <label><b>Projects:</b></label> <br/>
+    <%= select_tag :select_project_subscription,
+                   options_for_select([["Select Project ...", 0]]|projects.collect { |p| [truncate(h(p.title), :length=>select_truncate_length), p.id] }),
+                   {:style=>"width:90%",
+                    :onchange=>"show_project_subscription();return(false);"} -%>
+
+    <br/>
+
+    <% project_subscriptions_with_unsubscribed = projects.map do |proj|
+        @person.project_subscriptions.detect { |ps| ps.project == proj } || ProjectSubscription.new(:project => proj, :person => @person).tap(&:mark_for_destruction)
+    end %>
+    <% f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
+        <div id="subscription<%= sub_form.object.project_id %>" style="display:none;">
+          <fieldset>
+            <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
+            <legend> Project: <%= sub_form.object.project.name %></legend>
+            <%= sub_form.hidden_field :project_id %>
+            <br/>
+
+            <p> Would you like to receive emails:
+              <% Subscription::FREQUENCIES.each do |freq| %>
+                  <%= sub_form.radio_button :frequency, freq %> <%= "#{freq.capitalize}" %>
+              <% end %>
+              <br/>
+              Unsubscribe: <%= sub_form.check_box :_destroy %>
+            </p>
+          </fieldset>
+        </div>
+    <% end %>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+    var project_subscription = "subscription";
+
+    function swap_subscription(old_div_id, new_div_id) {
+        var old_div = $(old_div_id);
+        if (old_div && old_div.style.display == "block") {
+            old_div.style.display = "none";
+        }
+        var new_div = $(new_div_id);
+        if (new_div && new_div.style.display == "none") {
+            new_div.style.display = "block";
+        }
+    }
+
+    function show_project_subscription() {
+        var new_project_subscription = "subscription" + $F('select_project_subscription');
+        swap_subscription(project_subscription, new_project_subscription);
+        project_subscription = new_project_subscription;
+    }
+
+</script>

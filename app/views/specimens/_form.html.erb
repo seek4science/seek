@@ -9,15 +9,11 @@
 
  <div style="width: 95%;">
     <p>
-      <%= f.label :donor_number -%><span class="required">*</span><br/>
+      <%= f.label :specimen_number -%><span class="required">*</span><br/>
       <%= f.text_field :donor_number, :style => "width: 350px;" -%>
     </p>
 
-    <p>
-      <%= f.label :age -%><br/>
-      <%= f.text_field :age, :style => "width: 150px;" -%> weeks
 
-    </p>
 
     <p>
       <%= f.label :treatment -%><br/>
@@ -37,21 +33,15 @@
       %>
       <%=
           select_tag :project_id,
-                     options_for_select([["Select project ..", 0]]|current_user.person.projects.collect { |p| [h(p.name), p.id] }, selected_project),
-                     {:onchange=>remote_function(
-                             :url=>{:action=>"project_selected_ajax"},
-                             :with=>"'project_id='+this.value"
-                     ), :style=>"width:82%"
-
-                     }
+                     options_for_select([["Select project ..", 0]]|Project.all.collect { |p| [h(p.name), p.id] }, selected_project),{:style=>"width:90%"}
       %>
     </p>
      <p>
     <%= f.label "Institution" %><span class="required">*</span><br/>
-    <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."}) %>
+    <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank => "Please Select"},{:style=>"width:90%"}) %>
   </p>
 
-    <%= render :partial=>"specimens/select_organisms" -%>
+    <%= render :partial=>"specimens/select_organisms" ,:locals=>{:f=>f}-%>
 
     <%= render :partial=>"assets/asset_form_bottom", :locals=> {
             :resource_type => "Specimen",
@@ -61,6 +51,7 @@
             :other_creators=>@specimen.other_creators,
     } -%>
 
+    <%= fancy_multiselect @specimen, :sops, :name => 'specimen_sop_ids', :selected => (params[:specimen_sop_ids] || []).map(&:to_i) | @specimen.sop_masters.map(&:sop_id)%>
     <p>
       <%= f.label :description -%><br/>
       <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>

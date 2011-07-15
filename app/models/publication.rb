@@ -84,6 +84,10 @@ class Publication < ActiveRecord::Base
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
   
+  def self.subscribers_are_notified_of? action
+    action == 'create'
+  end
+  
   private
   
   def check_identifier_present
