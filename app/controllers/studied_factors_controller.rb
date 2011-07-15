@@ -36,6 +36,17 @@ class StudiedFactorsController < ApplicationController
     end
   end
 
+  def create_from_existing
+    studied_factor_ids = []
+    #retrieve the selected FSes
+    params.each do |key, value|
+       if key.match('checkbox_')
+         studied_factor_ids.push value.to_i
+       end
+    end
+    #create the new FSes based on the selected FSes
+  end
+
   def destroy
     @studied_factor=StudiedFactor.find(params[:id])
     render :update do |page|
