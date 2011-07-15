@@ -449,37 +449,26 @@ namespace :seek do
 
   desc "Send mail daily to users"
   task :send_daily_subscription => :environment do
-    Person.all.each do |person|
-       activity_logs =[]
-       daily_subs = person.subscriptions.select &:daily?
-       daily_subs.each do |sub|
-         activity_logs.concat ActivityLog.all.select{|log|log.activity_loggable.try(:can_view?, person.user) and try_block{log.activity_loggable_type.constantize.subscribable?} and log.activity_loggable_type.constantize.subscribers_are_notified_of?(log.action) and log.activity_loggable_id==sub.subscribable_id and log.activity_loggable_type == sub.subscribable_type and log.created_at.to_date == Date.yesterday}
-       end
-      SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?
-    end
-
+    send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at=?', Date.yesterday]), 'daily'
   end
 
   desc "Send mail weekly to users"
   task :send_weekly_subscription => :environment do
-     Person.all.each do |person|
-       activity_logs =[]
-       weekly_subs = person.subscriptions.select &:weekly?
-       weekly_subs.each do |sub|
-         activity_logs.concat ActivityLog.all.select{|log|log.activity_loggable.try(:can_view?, person.user) and try_block{log.activity_loggable_type.constantize.subscribable?} and log.activity_loggable_type.constantize.subscribers_are_notified_of?(log.action) and log.activity_loggable_id==sub.subscribable_id and log.activity_loggable_type == sub.subscribable_type and log.created_at.to_date >= 7.days.ago.to_date}
-      end
-      SubMailer.deliver_send_digest_subscription person, activity_logs unless  activity_logs.blank?
-    end
+    send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 7.days.ago]), 'weekly'
   end
 
   desc "Send mail monthly to users"
   task :send_monthly_subscription => :environment do
-     Person.all.each do |person|
-       activity_logs =[]
-       monthly_subs =  person.subscriptions.select &:monthly?
-       monthly_subs.each do |sub|
-         activity_logs.concat ActivityLog.all.select{|log|log.activity_loggable.try(:can_view?, person.user) and try_block{log.activity_loggable_type.constantize.subscribable?} and log.activity_loggable_type.constantize.subscribers_are_notified_of?(log.action) and log.activity_loggable_id==sub.subscribable_id and log.activity_loggable_type == sub.subscribable_type and log.created_at.to_date >= 1.month.ago.to_date}
-      end
+     send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 30.days.ago]), 'monthly'
+  end
+
+  private
+
+  def send_subscription_mails logs, frequency
+    Person.scoped(:include => :subscriptions).select{|p|p.receive_notifications?}.each do |person|
+      activity_logs = person.subscriptions.scoped(:include => :subscribable).select{|s|s.frequency == frequency}.collect do |sub|
+         logs.select{|log|log.activity_loggable.try(:can_view?, person.user) and log.activity_loggable.subscribable? and log.activity_loggable.subscribers_are_notified_of?(log.action) and log.activity_loggable == sub.subscribable}
+      end.flatten(1)
       SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?
     end
   end
