@@ -34,7 +34,7 @@ module Subscribable
   def send_immediate_subscriptions activity_log
     if subscribers_are_notified_of? activity_log.action
       subscriptions.each do |subscription|
-        if !subscription.person.email.match('Lihua.An') and subscription.immediately? and can_view?(subscription.person.user)
+        if subscription.person.receive_notifications? and subscription.immediately? and can_view?(subscription.person.user)
           SubMailer.deliver_send_immediate_subscription subscription.person, activity_log
         end
       end
