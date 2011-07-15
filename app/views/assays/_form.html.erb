@@ -69,6 +69,8 @@
               <%= link_to h("new technology type?"), new_technology_type_path %>
           <% end %>
         </td>
+
+      </td>
     <% end -%>
   </tr>
   <tr>
@@ -179,6 +181,23 @@
         techTypeSelect.options[i].selected = false;
     }
 
+  }
+
+  function check_show_organism_form() {
+      if ($F('assay_sample_ids') && $F('assay_sample_ids').length > 0) {
+          Effect.Fade('add_organism_form');
+      }
+      else {
+          Effect.Appear('add_organism_form');
+      }
+  }
+
+  function check_show_sample_form() {
+      if ($F('assay_organism_ids') && $F('assay_organism_ids').length > 0) {
+          Effect.Fade('add_samples_form');
+      } else {
+          Effect.Appear('add_samples_form');
+      }
   }
 
   function check_show_organism_form() {
