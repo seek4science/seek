@@ -62,7 +62,7 @@ class SamplesController < ApplicationController
 
 
   def update
-
+      sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
 
       tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
       sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []

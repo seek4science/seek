@@ -15,47 +15,7 @@ module SamplesHelper
     end
     result
   end
-# do not remove
-#  def table_samples_link_list samples
-#    #FIXME: make more generic and share with other model link list helper methods
-#    samples=samples.select{|s| !s.nil?} #remove nil items
-#    return "<span class='none_text'>Not Specified</span>" if samples.empty?
-#
-#    result=""
-#
-#     unless samples.blank?
-#       result += "<div id='samples' class='samples'><table border='1' cellpadding='10' RULES=COLS FRAME=BOX>"
-#
-#      samples = samples.sort_by{|ss|ss.tissue_and_cell_types.count}
-#      colspan_counts= samples.collect{|s|s.tissue_and_cell_types.count}
-#      result +=" <tr>
-#              <th>Sample</th>
-#              <th>Tissue and cell types</th>
-#            </tr> "
-#
-#       count = 0
-#       samples.each do |sample|
-#        result += "<tr>"
-#        result += "<td ROWSPAN='#{colspan_counts[count]}'>"
-#        result += link_to h(sample.title.capitalize),sample
-#        result += "</td>"
-#
-#        if sample
-#          sample.tissue_and_cell_types.each do |tt|
-#            result += "<td>"
-#            result += link_to h(tt.title), tt
-#            result += "</td>"
-#            result += "</tr>" unless tt==sample.tissue_and_cell_types.first and sample.tissue_and_cell_types.count==1
-#            result += "<tr>" unless tt==sample.tissue_and_cell_types.last  and sample.tissue_and_cell_types.count==1
-#          end
-#        end
-#        result += "</tr>"
-#         count += 1
-#       end
-#     result += "</table></div>"
-#     end
-#    return result
-#  end
+
 
   def samples_link_list samples
     #FIXME: make more generic and share with other model link list helper methods

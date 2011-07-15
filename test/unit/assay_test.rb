@@ -83,6 +83,7 @@ class AssayTest < ActiveSupport::TestCase
 
       assert assay.valid?
 
+
       assay.title=""
       assert !assay.valid?
 

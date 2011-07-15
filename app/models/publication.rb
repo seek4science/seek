@@ -88,6 +88,10 @@ class Publication < ActiveRecord::Base
     action == 'create'
   end
   
+  def self.subscribers_are_notified_of? action
+    action == 'create'
+  end
+  
   private
   
   def check_identifier_present

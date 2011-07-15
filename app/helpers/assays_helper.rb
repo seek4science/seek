@@ -33,56 +33,7 @@ module AssaysHelper
     end
     return result
   end
-#  def table_show_assay_organisms_list assay_organisms,none_text="Not specified"
-#    result=""
-#    result="<span class='none_text'>#{none_text}</span>" if assay_organisms.empty?
-#    unless assay_organisms.blank?
-#      result += "<div id='assay_organisms' class='assay_organisms'><table border='1' cellpadding='10' >"
-#
-#      result +=" <tr>
-#                <th>Organism</th>
-#                <th>Strain</th>
-#                <th>Tissue and cell type</th>
-#                <th>Culture growth type</th>
-#              </tr> "
-#      assay_organisms.each do |ao|
-#
-#        organism = ao.organism
-#        strain = ao.try(:strain)
-#        tissue_and_cell_type = try_block{ao.tissue_and_cell_type}
-#        culture_growth_type = ao.try(:culture_growth_type)
-#
-#        result += "<tr>"
-#        result += "<td>"
-#        if organism
-#        result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
-#        end
-#        result += "</td>"
-#        result += "<td>"
-#        if strain
-#          #result += " : "
-#          result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
-#        end
-#        result += "</td>"
-#        result += "<td>"
-#        if tissue_and_cell_type
-#          #result += " : "
-#          result += link_to h(tissue_and_cell_type.title),tissue_and_cell_type,{:class => "assay_tissue_and_cell_type_info"}
-#
-#        end
-#        result += "</td>"
-#        result += "<td>"
-#        if culture_growth_type
-#          result += "#{culture_growth_type.title}"
-#        end
-#        result += "</td>"
-#        result += "</tr>"
-#        #result += ",<br/>" unless ao == assay_organisms.last
-#      end
-#      result +="</table></div>"
-#    end
-#    result
-#  end
+
 
   def show_assay_organisms_list assay_organisms,none_text="Not specified"
       result=""
@@ -114,10 +65,9 @@ module AssaysHelper
           result += " (#{culture_growth_type.title})"
         end
         result += ",<br/>" unless ao == assay_organisms.last
-
       end
-      result
-    end
+     return result
+   end
 
   def show_specimen_organisms_list specimens,none_text="Not specified"
     result=""

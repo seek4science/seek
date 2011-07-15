@@ -61,9 +61,11 @@ function addSelectedSop() {
         updateSops();
     }
     else {
-        alert('The following Sop had already been added:\n\n' +
-            title);
+    alert('The following Sop had already been added:\n\n' +
+        title);
     }
+
+
 }
 
 function removeSop(index) {
@@ -119,7 +121,7 @@ function updateSops() {
 //Data files
 function addDataFile(title,id,relationshipType) {
     if(checkNotInList(id,data_files_assets)) {
-    data_files_assets.push([title,id,relationshipType]);
+        data_files_assets.push([title,id,relationshipType]);
     }
 }
 

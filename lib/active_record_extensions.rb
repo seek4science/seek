@@ -39,6 +39,7 @@ module ActiveRecordExtensions
       end
 
       class_alias_method_chain :accepts_nested_attributes_for, :allow_destroy_bugfix
+
     end
   end
 
