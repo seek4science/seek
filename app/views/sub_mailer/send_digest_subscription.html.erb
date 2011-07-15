@@ -21,7 +21,7 @@
                 <td><%= try_block{link_to(log.activity_loggable.title, send("#{log.activity_loggable.class.name.underscore}_url", log.activity_loggable))} || log.activity_loggable.title%></td>
                 <td><%= link_to h(log.culprit.person.name), "mailto:#{log.culprit.person.email_with_name}" %></td>
                 <td> <%= log.created_at %></td>
-                <td> <%= link_to "Unsubscribe", {:method => :delete, :only_path => false, :controller => :subscription, :action => :destroy, :id => Subscription.find_by_subscribable_id_and_subscribable_type_and_person_id(log.activity_loggable_id, log.activity_loggable_type, @person.id)} %></td>
+                <td> <%= link_to "Unsubscribe", { :only_path => false, :controller => :subscription, :action => :destroy, :id => Subscription.find_by_subscribable_id_and_subscribable_type_and_person_id(log.activity_loggable_id, log.activity_loggable_type, @person.id)}, {:method => :delete} %></td>
               </tr>
 
       <% end %>
