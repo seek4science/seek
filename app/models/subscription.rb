@@ -23,6 +23,6 @@ class Subscription < ActiveRecord::Base
   end
 
   def frequency
-   ProjectSubscription.find_by_person_id_and_project_id(person_id, subscribable.project_id).try(:frequency) || generic_frequency
+   ProjectSubscription.find_by_person_id_and_project_id(person_id, subscribable.project.id).try(:frequency) || generic_frequency
   end
 end
