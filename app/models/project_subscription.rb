@@ -43,4 +43,19 @@ class ProjectSubscription < ActiveRecord::Base
       frequency == s_type
     end
   end
+
+  after_create :subscribe_to_all_in_project
+
+  def subscribe_to_all_in_project
+    all_in_project.each(&:subscribe).each {|i| i.save if i.changed?}
+  end
+
+  def unsubscribe_to_all_in_project
+    all_in_project.each(&:unsubscribe).each {|i| i.save if i.changed?}
+  end
+
+  private
+  def all_in_project
+    subscribable_types.map(&:constantize).collect {|klass| if klass.reflect_on_association(:project) then klass.scoped(:include => :project) else klass.find.all end}.flatten.select {|item| item.project == project}
+  end
 end
