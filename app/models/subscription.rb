@@ -17,7 +17,7 @@ class Subscription < ActiveRecord::Base
 
   #TODO: add a way for the user to set a frequency for projects they don't subscribe to.
   def generic_frequency
-    ProjectSubscription.find_all_by_person_id(person_id).map(&:frequency).fold('weekly') {|slowest, current|  FREQUENCIES.index(current) > FREQUENCIES.index(slowest) ? current : slowest}
+    ProjectSubscription.find_all_by_person_id(person_id).map(&:frequency).inject('weekly') {|slowest, current|  FREQUENCIES.index(current) > FREQUENCIES.index(slowest) ? current : slowest}
   end
 
   def frequency
