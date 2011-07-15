@@ -8,7 +8,7 @@ SubMailer < ActionMailer::Base
     from Seek::Config.noreply_sender
     sent_on Time.now
     content_type "text/html"
-    body :activity_logs=> activity_logs
+    body :activity_logs=> activity_logs, :person => person
   end
 
   def send_immediate_subscription person, activity_log
