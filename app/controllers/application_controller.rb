@@ -312,7 +312,6 @@ class ApplicationController < ActionController::Base
                      :data => {:search_query=>object,:result_count=>@results.count})
         end
       end
-  end
     end
   end
 
