@@ -3,8 +3,6 @@ class Subscription < ActiveRecord::Base
   belongs_to :person, :required_access => false
   belongs_to :subscribable, :required_access => false, :polymorphic => true
 
-  default_scope :include => [:person, :subscribable]
-
   validates_presence_of :person
   validates_presence_of :subscribable
 
