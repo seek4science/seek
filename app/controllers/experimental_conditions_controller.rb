@@ -33,6 +33,37 @@ class ExperimentalConditionsController < ApplicationController
     end
   end
 
+  def create_from_existing
+    experimental_condition_ids = []
+    new_experimental_conditions = []
+    #retrieve the selected FSes
+    params.each do |key, value|
+       if key.match('checkbox_')
+         experimental_condition_ids.push value.to_i
+       end
+    end
+    #create the new FSes based on the selected FSes
+    experimental_condition_ids.each do |id|
+      experimental_condition = ExperimentalCondition.find(id)
+      new_experimental_condition = ExperimentalCondition.new(:measured_item_id => experimental_condition.measured_item_id, :unit_id => experimental_condition.unit_id, :start_value => experimental_condition.start_value,
+                                             :end_value => experimental_condition.end_value, :substance_type => experimental_condition.substance_type, :substance_id => experimental_condition.substance_id)
+      new_experimental_condition.sop=@sop
+      new_experimental_condition.sop_version = params[:version]
+      if new_experimental_condition.save
+        new_experimental_conditions.push new_experimental_condition
+      else
+        flash.now[:error] = "can not create experimental condition: item: #{try_block{new_experimental_condition.substance.name}} #{new_experimental_condition.measured_item.title}, values: #{new_experimental_condition.start_value}-#{new_experimental_condition.end_value}#{new_experimental_condition.unit.title}"
+      end
+    end
+    #
+    render :update do |page|
+      new_experimental_conditions.each do  |ec|
+         page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>ec,:locals=>{:asset => 'sop', :show_delete=>true}
+      end
+      page.visual_effect :highlight,"condition_or_factor_rows"
+    end
+  end
+
   def destroy
     @experimental_condition=ExperimentalCondition.find(params[:id])
     render :update do |page|

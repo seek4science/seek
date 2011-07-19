@@ -52,10 +52,8 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
-    sop.resources :experimental_conditions
+    sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
   end
-
-
 
   map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
                         :member => {:set_openid => :put}

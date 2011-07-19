@@ -1526,6 +1526,7 @@ ul.measured_items li{
     padding: 0 1em 0.25em 1em;
     text-align:left;
     min-height: 2em;
+    list-style-type:none;
 }
 
 ul.condition_or_factor_row li#measured_item {
@@ -1566,11 +1567,15 @@ div.conditions_or_factors {
 ul.available_conditions_or_factors {
     float: left;
     margin-left: 0em;
-    margin-top: 1em;
+    margin-top: 0em;
     margin-bottom: 2em;
     padding: 0 1em 0.5em 1em;
+    clear: both;
 }
 
+ul.available_conditions_or_factors li {
+    list-style-type:none;
+}
 .border_top {
     border-top: 1px solid #DDD;
     width: 20em;

@@ -62,7 +62,6 @@ class StudiedFactorsController < ApplicationController
       end
       page.visual_effect :highlight,"condition_or_factor_rows"
     end
-
   end
 
   def destroy
