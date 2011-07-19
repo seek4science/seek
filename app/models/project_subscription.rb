@@ -47,11 +47,11 @@ class ProjectSubscription < ActiveRecord::Base
   after_create :subscribe_to_all_in_project
 
   def subscribe_to_all_in_project
-    all_in_project.each(&:subscribe).each {|i| disable_authorization_checks {i.save!} if i.changed_for_autosave?}
+    all_in_project.each(&:subscribe).each {|i| disable_authorization_checks {i.save(false)} if i.changed_for_autosave?}
   end
 
   def unsubscribe_to_all_in_project
-    all_in_project.each(&:unsubscribe).each {|i| disable_authorization_checks {i.save!} if i.changed_for_autosave?}
+    all_in_project.each(&:unsubscribe).each {|i| disable_authorization_checks {i.save(false)} if i.changed_for_autosave?}
   end
 
   private
