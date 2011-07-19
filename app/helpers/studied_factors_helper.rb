@@ -55,11 +55,9 @@ module StudiedFactorsHelper
 
   def uniq_fs_or_ec fs_or_ec_array=[]
     result = []
-    #uniq_fs_or_ec_field_array =  fs_or_ec_array.collect{|fs_or_ec| [fs_or_ec.measured_item.title, fs_or_ec.start_value, fs_or_ec.end_value, fs_or_ec.unit.title, fs_or_ec.standard_deviation, fs_or_ec.substance_id, fs_or_ec.substance_type]}
-    #uniq_fs_or_ec_field_array.uniq!
     uniq_fs_or_ec_field_array = []
     fs_or_ec_array.each do |fs_or_ec|
-      compare_field = [fs_or_ec.measured_item.title, fs_or_ec.start_value, fs_or_ec.end_value, fs_or_ec.unit.title, fs_or_ec.standard_deviation, fs_or_ec.substance_id, fs_or_ec.substance_type]
+      compare_field = [fs_or_ec.measured_item_id, fs_or_ec.start_value, fs_or_ec.end_value, fs_or_ec.unit_id, fs_or_ec.standard_deviation, fs_or_ec.substance_id, fs_or_ec.substance_type]
       if !uniq_fs_or_ec_field_array.include?compare_field
         uniq_fs_or_ec_field_array.push compare_field
         result.push fs_or_ec

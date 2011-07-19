@@ -1498,13 +1498,14 @@ ul.conditions_or_factors li {
     list-style-type:none;
 }
 
-ul.condition_or_factor_row {
-    clear:both;
+ul.conditions_or_factors {
+    float: left;
+    margin-left: 4em;
+    margin-top: 2em;
 }
 
-ul.condition_or_factor_row heading{
-    float: left;
-    margin-left: 2em;
+ul.condition_or_factor_row {
+    clear:both;
 }
 
 ul.condition_or_factor_row li {
@@ -1515,17 +1516,18 @@ ul.condition_or_factor_row li {
     min-height: 2em;
 }
 
-ul.data_files_or_sops {
+ul.measured_items {
     clear:both;
     margin-top: 1em;
 }
 
-ul.data_files_or_sops li{
+ul.measured_items li{
     float:left;
     padding: 0 1em 0.25em 1em;
     text-align:left;
     min-height: 2em;
 }
+
 ul.condition_or_factor_row li#measured_item {
     width:15em;
 }
@@ -1556,21 +1558,25 @@ div.conditions_or_factors {
     float: left;
     margin-left: 2em;
     margin-top: 2em;
-    margin-bottom: 2em;
-    width: 50em;
+    margin-bottom: 1em;
+    width: 48em;
     padding: 0 1em 0.5em 1em;
 }
 
-div.available_conditions_or_factors {
+ul.available_conditions_or_factors {
     float: left;
-    margin-left: 1em;
+    margin-left: 0em;
     margin-top: 1em;
     margin-bottom: 2em;
     padding: 0 1em 0.5em 1em;
 }
 
-div.border_top {
+.border_top {
     border-top: 1px solid #DDD;
     width: 20em;
     padding: 0.5em 1em 0.5em 1em;
+}
+
+.space_for_alignment {
+  width: 1em;
 }

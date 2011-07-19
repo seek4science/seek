@@ -4,14 +4,17 @@
    object=eval("@"+entity)
    display_asset = nil
    path_to_object = nil
+   path_to_create_from_existing = nil
    if asset == "data_file"
       asset_object = @data_file
       display_asset = @display_data_file
       path_to_object = data_file_path(@data_file).concat("/#{controller_name}")
+      path_to_create_from_existing = create_from_existing_data_file_studied_factors_url
    elsif asset == "sop"
      asset_object = @sop
      display_asset = @display_sop
      path_to_object = sop_path(@sop).concat("/#{controller_name}")
+     path_to_create_from_existing = create_from_existing_sop_experimental_conditions_url
    end
 %>
 
@@ -79,32 +82,38 @@
  </div>
 <% end -%>
 
- <% form_tag :action=>"create_from_existing" do -%>
-    <div class="conditions_or_factors" >
-      <% fses_or_ecs = fses_or_ecs_of_project asset_object.class.name, controller_name, asset_object.project_id
-         unless fses_or_ecs.blank? %>
+<% form_remote_tag :url => path_to_create_from_existing do -%>
+   <% fses_or_ecs = fses_or_ecs_of_project asset_object.class.name, controller_name, asset_object.project_id
+      unless fses_or_ecs.blank? %>
+         <div class="conditions_or_factors" >
             <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Or select from:</h4>
             <% grouped_fses_or_ecs = fses_or_ecs.group_by{|fs_or_ec| fs_or_ec.measured_item.title}
+               grouped_fses_or_ecs = Hash[grouped_fses_or_ecs.sort]
                grouped_fses_or_ecs.each do |measured_item, fses_or_ecs|
                 fses_or_ecs = uniq_fs_or_ec fses_or_ecs
                 fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.substance.name.downcase}.to_s + b.measured_item.title)} %>
-                <ul class="data_files_or_sops">
+                <ul class="measured_items">
                   <li>
-                     <input type=checkbox id='checkbox_<%= measured_item-%>' onchange="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear')">
+                     <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear')">
                   </li>
-                  <li> <%= measured_item -%> </li>
+                  <li><%= measured_item -%></li>
                 </ul>
-                <div id = 'conditions_or_factors_of_item_<%= measured_item -%>' class='available_conditions_or_factors' style="display: none">
-                  <%= render :partial=>"condition_or_factor_row_headings", :locals=>{:asset => asset, :show_delete=>false} %>
+                <ul id = 'conditions_or_factors_of_item_<%= measured_item -%>' class='available_conditions_or_factors' style="display: none;">
+                  <%= render :partial=>"condition_or_factor_row_headings", :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
                   <%= render :partial=>"condition_or_factor_row",:collection=>fses_or_ecs, :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
-                </div>
+                </ul>
             <% end -%>
             <%= hidden_field_tag "#{asset}_id", asset_object.id -%>
+            <%= hidden_field_tag "version", display_asset.version  -%>
             <div class='border_top'>
-               <%= submit_tag "Add", :style => "width:50px;font-weight:bold;" %>
+               <%= submit_tag "Add", :style => "width:50px;font-weight:bold" %>
             </div>
-         <% end -%>
-    </div>
+         </div>
+      <% end -%>
 <% end -%>
+
+
+
+
 
 
