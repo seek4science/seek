@@ -13,14 +13,18 @@ module SpreadsheetUtil
     self.content_type == "application/vnd.ms-excel"
   end
 
+  def spreadsheet_annotations
+    content_blob.worksheets.collect {|w| w.cell_ranges.collect {|c| c.annotations}}.flatten
+  end
+
   #Return the data file's spreadsheet
   #If it doesn't exist yet, it gets created
   def spreadsheet
     if is_spreadsheet?
       workbook = parse_spreadsheet_xml(spreadsheet_xml)
       if content_blob.worksheets.empty?
-        workbook.sheets.each do |sheet|
-          content_blob.worksheets << Worksheet.create(:last_row => sheet.last_row, :last_column => sheet.last_col)
+        workbook.sheets.each_with_index do |sheet, sheet_number|
+          content_blob.worksheets << Worksheet.create(:sheet_number => sheet_number, :last_row => sheet.last_row, :last_column => sheet.last_col)
         end
         content_blob.save
       end

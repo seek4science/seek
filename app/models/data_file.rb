@@ -39,8 +39,6 @@ class DataFile < ActiveRecord::Base
   acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
-  
-  has_many :spreadsheet_annotations, :dependent => :destroy
 
   acts_as_uniquely_identifiable
 
