@@ -45,7 +45,7 @@ td.annotated_cell {
   border: 1px dotted #4477FF;
   background-image: url('../images/famfamfam_silk/tag_blue.png');
   background-repeat:no-repeat;
-  background-position: 5px 1px;
+  background-position: right;
 }
 
 div.sheet {

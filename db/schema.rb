@@ -187,6 +187,7 @@ ActiveRecord::Schema.define(:version => 20110715134328) do
   end
 
   create_table "cell_ranges", :force => true do |t|
+    t.integer  "cell_range_id"
     t.integer  "worksheet_id"
     t.integer  "start_row"
     t.integer  "start_column"
