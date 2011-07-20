@@ -131,7 +131,8 @@ class Person < ActiveRecord::Base
   end
 
   def projects
-    work_groups.scoped(:include => :project).collect {|wg| wg.project }.uniq
+    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
   end
 
   def member?
