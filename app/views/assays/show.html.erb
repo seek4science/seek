@@ -73,16 +73,17 @@
           <%= assay_organisms_list @assay.assay_organisms %>
       </p>
 
+    <% if Seek::Config.is_virtualliver -%>
+         <p id="specimen">
+           <b>Specimen: </b>
+           <%= text_or_not_specified @assay.sample.try(:specimen).try(:title) -%>
+         </p>
 
-     <p id="specimen">
-       <b>Specimen: </b>
-       <%= text_or_not_specified @assay.sample.try(:specimen).try(:title) -%>
-     </p>
-
-     <p id="Sample">
-       <b>Sample: </b>
-       <%= text_or_not_specified @assay.sample.try(:title) -%>
-     </p>
+         <p id="Sample">
+           <b>Sample: </b>
+           <%= text_or_not_specified @assay.sample.try(:title) -%>
+         </p>
+     <% end -%>
 
       <style type="text/css">
           div.data_model_relationship {

@@ -11,6 +11,12 @@ class SpecimensControllerTest < ActionController::TestCase
     @object = Factory(:specimen, :contributor => User.current_user,
             :donor_number => "test1",
             :policy => policies(:policy_for_viewable_data_file))
+    @is_vl=Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver=true
+  end
+  
+  def teardown
+    Seek::Config.is_virtualliver = @is_vl
   end
 
   test "index xml validates with schema" do

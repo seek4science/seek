@@ -69,11 +69,12 @@
     <% end -%>
   </tr>
 </table>
-
+<% if Seek::Config.is_virtualliver -%>
 <p>
     <%= f.label "Sample" %> <br/>
     <%= collection_select(:assay, :sample_id, Sample.all, :id, :title,{:include_blank =>"Please Select ..."},{"style" =>"width:90%"}) %>
 </p>
+<% end -%>
 <br style="clear:both"/>
 
 <p>
