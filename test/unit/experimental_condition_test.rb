@@ -5,37 +5,45 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
   include StudiedFactorsHelper
 
   test 'should create experimental condition with the concentration of the compound' do
-    measured_item = measured_items(:concentration)
-    unit = units(:gram)
-    compound = compounds(:compound_glucose)
-    sop = sops(:editable_sop)
-    ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => compound)
-    assert ec.save, "should create the new experimental condition with the concentration of the compound "
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:concentration)
+      unit = units(:gram)
+      compound = compounds(:compound_glucose)
+      sop = sops(:editable_sop)
+      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => compound)
+      assert ec.save, "should create the new experimental condition with the concentration of the compound "
+    end
   end
 
   test 'should not create experimental condition with the concentration of no substance' do
-    measured_item = measured_items(:concentration)
-    unit = units(:gram)
-    sop = sops(:editable_sop)
-    ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
-    assert !ec.save, "shouldn't create experimental condition with concentration of no substance"
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:concentration)
+      unit = units(:gram)
+      sop = sops(:editable_sop)
+      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
+      assert !ec.save, "shouldn't create experimental condition with concentration of no substance"
+    end
   end
 
   test 'should create experimental condition with the none concentration item and no substance' do
-    measured_item = measured_items(:time)
-    unit = units(:second)
-    sop = sops(:editable_sop)
-    ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
-    assert ec.save, "should create experimental condition  of the none concentration item and no substance"
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:time)
+      unit = units(:second)
+      sop = sops(:editable_sop)
+      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
+      assert ec.save, "should create experimental condition  of the none concentration item and no substance"
+    end
   end
 
   test "should create experimental condition with the concentration of the compound's synonym" do
-    measured_item = measured_items(:concentration)
-    unit = units(:gram)
-    synonym = synonyms(:glucose_synonym)
-    sop = sops(:editable_sop)
-    ec= ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => synonym)
-    assert ec.save, "should create the new experimental condition with the concentration of the compound's synonym "
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:concentration)
+      unit = units(:gram)
+      synonym = synonyms(:glucose_synonym)
+      sop = sops(:editable_sop)
+      ec= ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => synonym)
+      assert ec.save, "should create the new experimental condition with the concentration of the compound's synonym "
+    end
   end
 
   test 'should list the existing ECes of the project the sop belongs to, filtured by can_view' do

@@ -5,37 +5,45 @@ class StudiedFactorTest < ActiveSupport::TestCase
   include StudiedFactorsHelper
 
   test 'should create FS with the concentration of the compound' do
-    measured_item = measured_items(:concentration)
-    unit = units(:gram)
-    compound = compounds(:compound_glucose)
-    data_file = data_files(:editable_data_file)
-    fs = StudiedFactor.new(:data_file => data_file, :data_file_version => data_file.latest_version, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => compound)
-    assert fs.save, "should create the new factor studied with the concentration of the compound "
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:concentration)
+      unit = units(:gram)
+      compound = compounds(:compound_glucose)
+      data_file = data_files(:editable_data_file)
+      fs = StudiedFactor.new(:data_file => data_file, :data_file_version => data_file.latest_version, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => compound)
+      assert fs.save, "should create the new factor studied with the concentration of the compound "
+    end
   end
 
   test 'should not create FS with the concentration of no substance' do
-    measured_item = measured_items(:concentration)
-    unit = units(:gram)
-    data_file = data_files(:editable_data_file)
-    fs = StudiedFactor.new(:data_file => data_file, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
-    assert !fs.save, "shouldn't create factor studied with concentration of no substance"
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:concentration)
+      unit = units(:gram)
+      data_file = data_files(:editable_data_file)
+      fs = StudiedFactor.new(:data_file => data_file, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
+      assert !fs.save, "shouldn't create factor studied with concentration of no substance"
+    end
   end
 
   test 'should create FS with the none concentration item and no substance' do
-    measured_item = measured_items(:time)
-    unit = units(:second)
-    data_file = data_files(:editable_data_file)
-    fs = StudiedFactor.new(:data_file => data_file, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
-    assert fs.save, "should create factor studied  of the none concentration item and no substance"
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:time)
+      unit = units(:second)
+      data_file = data_files(:editable_data_file)
+      fs = StudiedFactor.new(:data_file => data_file, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
+      assert fs.save, "should create factor studied  of the none concentration item and no substance"
+    end
   end
 
   test "should create FS with the concentration of the compound's synonym" do
-    measured_item = measured_items(:concentration)
-    unit = units(:gram)
-    synonym = synonyms(:glucose_synonym)
-    data_file = data_files(:editable_data_file)
-    fs = StudiedFactor.new(:data_file => data_file, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => synonym)
-    assert fs.save, "should create the new factor studied with the concentration of the compound's synonym "
+    User.with_current_user  users(:aaron) do
+      measured_item = measured_items(:concentration)
+      unit = units(:gram)
+      synonym = synonyms(:glucose_synonym)
+      data_file = data_files(:editable_data_file)
+      fs = StudiedFactor.new(:data_file => data_file, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => synonym)
+      assert fs.save, "should create the new factor studied with the concentration of the compound's synonym "
+    end
   end
 
   test 'should list the existing FSes of the project the datafile belongs to, filtured by can_view' do
