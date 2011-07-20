@@ -289,19 +289,19 @@ end
   end  
   
   def explore
-    if @data_file.is_spreadsheet?
+    if @display_data_file.is_spreadsheet?
       #Generate Ruby spreadsheet model from XML
-      @spreadsheet = @data_file.spreadsheet
+      @spreadsheet = @display_data_file.spreadsheet
 
       #FIXME: Annotations need to be specific to version
-      @spreadsheet.annotations = @data_file.spreadsheet_annotations
+      @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
       respond_to do |format|
         format.html { render :layout=>"minimal" }
       end
     else
      respond_to do |format|
         flash[:error] = "Unable to view contents of this data file"
-        format.html { redirect_to @data_file,:format=>"html" }
+        format.html { redirect_to @display_data_file,:format=>"html" }
       end
     end
   end 

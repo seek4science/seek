@@ -16,8 +16,10 @@
   <input size="60" id="cell_info" readonly="readonly"></input>
   
   <div class="spreadsheet_controls">
+    <% if logged_in? %>
     <%= link_to image('spreadsheet_annotation_add') + " Add Annotation", "#", :onclick =>"$j('div#annotation_overview').hide(); $j('div#annotation_form').toggle();return false;",
           :title => "Add new annotation", :class => "spreadsheet_button" %>
+    <% end %>
     <%= link_to image('spreadsheet') + " List Annotations", "#", :onclick =>"$j('div#annotation_form').hide(); $j('div#annotation_overview').toggle();return false;", 
           :title => "Add new annotation", :class => "spreadsheet_button" %>
   </div>
