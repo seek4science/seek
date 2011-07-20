@@ -59,7 +59,7 @@ class Person < ActiveRecord::Base
 
   def set_default_subscriptions
     projects.each do |proj|
-      project_subscriptions.build :project => proj, :unsubscribed_types => []
+      project_subscriptions.build :project => proj
     end
   end
 
