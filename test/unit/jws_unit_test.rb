@@ -1,9 +1,10 @@
 require 'test_helper'
 
-class JwsTest < ActiveSupport::TestCase
+class JwsUnitTest < ActiveSupport::TestCase
   fixtures :all
 
   def setup
+    WebMock.allow_net_connect!
     @builder = Seek::JWS::OneStop.new
   end
   

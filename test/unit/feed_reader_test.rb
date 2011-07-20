@@ -1,6 +1,5 @@
 require 'test_helper'
 
-
 class FeedReaderTest < ActiveSupport::TestCase
 
   ATOM_FEED = "http://feeds.feedburner.com/co/luEY"
@@ -8,6 +7,7 @@ class FeedReaderTest < ActiveSupport::TestCase
   ATOM_FEED3 = "http://feeds.feedburner.com/co/aVFK"
 
   def setup
+    WebMock.allow_net_connect!
     @old_project_news = Seek::Config.project_news_feed_urls
     @old_project_num_entries = Seek::Config.project_news_number_of_entries
   end

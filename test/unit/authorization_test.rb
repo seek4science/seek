@@ -713,7 +713,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   def test_anyone_can_do_anything_for_policy_free_items
-    item = Factory :person
+    item = Factory :project
     User.current_user = Factory :user
     actions.each {|a| assert item.can_perform? a}
     assert item.can_edit?

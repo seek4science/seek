@@ -33,6 +33,15 @@ module ImagesHelper
     
     return '<span class="icon">' + inner + '</span>';
   end
+
+  def resource_avatar resource,html_options={}
+
+    if resource.avatar_key
+          image_tag(icon_filename_for_key(resource.avatar_key), html_options)
+    elsif resource.use_mime_type_for_avatar?
+          image_tag(file_type_icon_url(resource), html_options)
+    end
+  end
   
   def icon_filename_for_key(key)
     case (key.to_s)
@@ -213,7 +222,7 @@ module ImagesHelper
       when "institution_avatar"
       "institution_64x64.png"
       when "organism_avatar"
-      "misc_icons/green_virus-64x64.png"
+      "misc_icons/cell3.png"
       when "publication_avatar", "publication", "publications"
      "crystal_project/64x64/mimetypes/wordprocessing.png"
       when "saved_search_avatar","saved_search"
@@ -236,6 +245,12 @@ module ImagesHelper
         "misc_icons/jws_builder24x24.png"
       when "event_avatar"
         "crystal_project/32x32/apps/vcalendar.png"
+      when "specimen_avatar"
+        "misc_icons/green_virus-64x64.png"
+      when "sample_avatar"
+        "misc_icons/jws_builder32x32.png"
+      when "specimen", "specimens"
+        "misc_icons/green_virus-64x64.png"
       when "publish"
        "crystal_project/22x22/actions/up.png"
       when "spreadsheet"
@@ -280,8 +295,6 @@ module ImagesHelper
       return ''
     end
   end
-  
-  
   
   # A generic key to produce avatars for entities of all kinds.
   #

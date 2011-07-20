@@ -1,46 +1,53 @@
 <div>
   <ul class="tabnav">
 
-    <!-- People tab -->
-    <%= tab_definition :controllers=>["people"] -%>
+        <!-- People tab -->
+        <%= tab_definition :controllers=>["people"] -%>
 
-    <!-- Projects tab -->
-    <%= tab_definition :controllers=>["projects"] -%>
+        <!-- Projects tab -->
+        <%= tab_definition :controllers=>["projects"] -%>
 
-    <!-- Institutions tab -->
-    <%= tab_definition :controllers=>["institutions"] -%>
+        <!-- Institutions tab -->
+        <%= tab_definition :controllers=>["institutions"] -%>
 
-    <!-- Investigations tab -->
-    <%= tab_definition :controllers=>["investigations"], :gap_before=>true -%>
+        <!-- Investigations tab -->
+        <%= tab_definition :controllers=>["investigations"], :gap_before=>true -%>
 
-    <!-- Studies tab -->
-    <%= tab_definition :controllers=>["studies"] -%>
+        <!-- Studies tab -->
+        <%= tab_definition :controllers=>["studies"] -%>
 
-    <!-- Assays tab -->
-    <%= tab_definition :controllers=>["assays"] -%>
+        <!-- Assays tab -->
+        <%= tab_definition :controllers=>["assays"] -%>
 
-    <!-- Data tab -->
-    <%= tab_definition :controllers=>["data_files"],:title=>"Data", :gap_before=>true -%>
 
-    <!-- Models tab -->
-    <%= tab_definition :controllers=>["models"] -%>
+         <!-- Samples tab -->
+        <%# tab_definition :controllers=>["samples"] -%>
 
-    <!-- SOPs tab -->
-    <%= tab_definition :controllers=>["sops"],:title=>"SOPs" -%>
+        <!-- Specimens tab -->
+        <%# tab_definition :controllers=>["specimens"] -%>
 
-    <!-- Publications tab -->
-    <%= tab_definition :controllers=>["publications"] -%>
+        <!-- Data tab -->
+        <%= tab_definition :controllers=>["data_files"], :title=>"Data", :gap_before=>true -%>
 
-    <!-- Forums tab -->
-    <!-- Be hiden for unlogin user -->
-    <% if logged_in? %>
-        <%= tab_definition :controllers=>["forums","topics"], :gap_before=>true -%>
-    <% end %>
+        <!-- Models tab -->
+        <%= tab_definition :controllers=>["models"] -%>
 
-    <!-- Events tab -->
-    <%= tab_definition :controllers=>["events"], :gap_before=>true if Seek::Config.events_enabled -%>
+        <!-- SOPs tab -->
+        <%= tab_definition :controllers=>["sops"], :title=>"SOPs" -%>
 
-    <!-- Help tab -->
-    <%= tab_definition :controllers=>["help_documents"],:title=>"Help",:gap_before=>true -%>
-  </ul>
-</div>
+        <!-- Publications tab -->
+        <%= tab_definition :controllers=>["publications"] -%>
+
+        <!-- Forums tab -->
+        <!-- Be hidden for unlogin user -->
+        <% if logged_in? %>
+            <%= tab_definition :controllers=>["forums", "topics"], :gap_before=>true -%>
+        <% end %>
+
+        <!-- Events tab -->
+        <%= tab_definition :controllers=>["events"], :gap_before=>true if Seek::Config.events_enabled -%>
+
+        <!-- Help tab -->
+        <%= tab_definition :controllers=>["help_documents"], :title=>"Help", :gap_before=>true -%>
+      </ul>
+    </div>

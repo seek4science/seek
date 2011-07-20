@@ -1,0 +1,71 @@
+<% truncate_length_for_boxes = 22 -%>
+
+<ul class="sectionIcons">
+  <% if @specimen.can_edit? %>
+      <li><%= image_tag_for_key('edit', edit_specimen_path(@specimen), "Edit Specimen", nil, 'Edit Specimen') %></li>
+  <% end %>
+  <% if @specimen.can_delete? %>
+      <li><%= image_tag_for_key "destroy", specimen_path(@specimen), "Delete Specimen", {:confirm => 'Are you sure?', :method => :delete}, "Delete Specimen" -%></li>
+  <% end %>
+</ul>
+
+<%= render :partial => "layouts/item_title", :locals=>{:item=>@specimen} %>
+
+<div class="show_basic">
+
+  <div class="main_content_left_box">
+
+    <div class="box_about_actor">
+      <p>
+        <label>Donor:</label>
+        <%= text_or_not_specified(@specimen.donor_number) %>
+      </p>
+
+      <p id="organism">
+          <label>Organism and strain: </label>
+         <%= text_or_not_specified(specimen_organism_title(@specimen)) %>
+      </p>
+
+      <p>
+        <label>Age:</label>
+        <%= text_or_not_specified(@specimen.age_in_weeks) %>
+      </p>
+
+      <p>
+        <label>Treatment:</label>
+        <%= text_or_not_specified(@specimen.treatment) %>
+      </p>
+
+      <p>
+        <label>Lab internal No.:</label>
+        <%= text_or_not_specified(@specimen.lab_internal_number) %>
+      </p>
+      <p>
+        <label>Institution:</label>
+        <%= text_or_not_specified(@specimen.institution.name) %>
+      </p>
+
+
+    </div>
+  </div>
+  <!--  <div class="main_content_right_box">
+    <#%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
+  </div>-->
+  <div style="clear:both;">
+    <p style="margin-top: 1em;">
+      <b>About the specimen:</b>
+
+    <div id="description" class="box_standout">
+      <%= text_or_not_specified(@specimen.comments, :description=>true, :auto_link=>true) %>
+    </div>
+    </p>
+
+  </div>
+
+
+  <div style="clear:both">
+
+    <%= render :partial=>"layouts/items_related_to", :object => @specimen %>
+  </div>
+
+</div>

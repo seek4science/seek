@@ -27,7 +27,7 @@
      <div id="community_news" class="homepanel_list">
          <ul>
          <%
-           entries = Seek::FeedReader.fetch_entries_for :community_news
+            entries = Seek::FeedReader.fetch_entries_for :community_news
          %>
          <% unless entries.blank? %>
              <% entries.each do |entry|   %>
@@ -38,7 +38,9 @@
      </div>
   </div>
 </div>
+
 <br/>
+
 <div class="yui-g home_panel_pair">
   <div class="yui-u first home_panel">
      <div class="heading">Recently added</div>

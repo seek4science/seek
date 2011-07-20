@@ -4,12 +4,17 @@
    object=eval("@"+entity)
    display_asset = nil
    path_to_object = nil
+   path_to_create_from_existing = nil
    if asset == "data_file"
+      asset_object = @data_file
       display_asset = @display_data_file
       path_to_object = data_file_path(@data_file).concat("/#{controller_name}")
+      path_to_create_from_existing = create_from_existing_data_file_studied_factors_url
    elsif asset == "sop"
-     display_asset = @sop
+     asset_object = @sop
+     display_asset = @display_sop
      path_to_object = sop_path(@sop).concat("/#{controller_name}")
+     path_to_create_from_existing = create_from_existing_sop_experimental_conditions_url
    end
 %>
 
@@ -21,7 +26,7 @@
 
 
   <div class="conditions_or_factors" >
-  <h4> Add new entry </h4>
+  <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Add new entry manually </h4>
   <table >
     <tr>
       <th>Item</th>
@@ -32,8 +37,8 @@
         <th>SD</th>
       <% end %>
     </tr>
-    <tr>
 
+    <tr>
       <% if entity == "studied_factor" %>
         <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
@@ -50,15 +55,66 @@
         <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
-      <td><%= f.submit "Add" %></td>
-
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
-
   </table>
-  <div class="substance_condition_factor">
-    <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}%>
-  </div>
+
+  <div id="add_substance_concentration" class="add_substance_concentration" style="display: none;">
+      <div class="substance_condition_factor">
+         <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}-%>
+      </div>
+
+      <input type="button" class= "search_substance_info" value="Search in Sabio-RK" onclick="testAjax()"/>
+      <table class="substance_info">
+        <tr>
+          <th>Substance name</th>
+          <th>Sabiork ID</th>
+          <th>Chebi ID</th>
+          <th>Kegg ID</th>
+          <th>Synonyms</th>
+        </tr>
+      </table>
   </div>
 
+  <div class='border_top'>
+    <%= f.submit "Add", :style => "width:50px;font-weight:bold;" -%>
+  </div>
+ </div>
 <% end -%>
+
+<% form_remote_tag :url => path_to_create_from_existing do -%>
+   <% fses_or_ecs = fses_or_ecs_of_project asset_object.class.name, controller_name, asset_object.project_id
+      unless fses_or_ecs.blank? %>
+         <div class="conditions_or_factors" >
+            <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Or select from:</h4>
+            <% grouped_fses_or_ecs = fses_or_ecs.group_by{|fs_or_ec| fs_or_ec.measured_item.title}
+               grouped_fses_or_ecs = Hash[grouped_fses_or_ecs.sort]
+               grouped_fses_or_ecs.each do |measured_item, fses_or_ecs|
+                fses_or_ecs = uniq_fs_or_ec fses_or_ecs
+                fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.substance.name.downcase}.to_s + b.measured_item.title)} %>
+                <ul class="measured_items">
+                  <li>
+                     <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear')">
+                  </li>
+                  <li><%= measured_item -%></li>
+                </ul>
+                <ul id = 'conditions_or_factors_of_item_<%= measured_item -%>' class='existing_conditions_or_factors' style="display: none;">
+                  <%= render :partial=>"studied_factors/condition_or_factor_row_headings", :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
+                  <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>fses_or_ecs, :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
+                </ul>
+            <% end -%>
+            <%= hidden_field_tag "#{asset}_id", asset_object.id -%>
+            <%= hidden_field_tag "version", display_asset.version  -%>
+            <div class='border_top'>
+               <%= submit_tag "Add", :style => "width:50px;font-weight:bold" %>
+            </div>
+         </div>
+      <% end -%>
+<% end -%>
+
+
+
+
+
+
+

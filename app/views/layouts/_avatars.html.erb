@@ -1,1 +1,1 @@
-<%= resource.respond_to?(:owner) ? favouritable_icon(resource.owner, 60) : favouritable_icon(resource, 60) -%>
+<%= try_block {resource.owner.can_view?} ? favouritable_icon(resource.owner, 60) : favouritable_icon(resource, 60) -%>

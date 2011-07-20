@@ -909,17 +909,29 @@ function showOrHideSubstanceTextField(form_id){
     var selectedIndex = item.selectedIndex;
     var option_select = item.options[selectedIndex];
 
-
     if (option_select.text == 'concentration'){
          substance_autocomplete.disabled = false;
+        Effect.Appear('add_substance_concentration', { duration: 5 });
+
     }else{
         //clear all the substances when disable
         var autocompleter_id = substance_autocomplete.id.replace('autocomplete_input', '');
         autocompleter_id = autocompleter_id.concat('autocompleter');
         autocompleters[autocompleter_id].deleteAllTokens();
         substance_autocomplete.disabled = true;
+        Effect.Fade('add_substance_concentration', { duration: 2 });
     }
 }
 
+function testAjax(){
+new Ajax.Request('http://hitssv506.h-its.org/sabioRestWebServices/suggestions/compounds?searchCompounds=water', {
+  method: 'GET',
+  onSuccess: function(transport) {
+    alert('sucess')
+    alert(transport.responseText)
 
+  },
+  onFailure: function(){ alert('Something went wrong...') }
+});
+}
 

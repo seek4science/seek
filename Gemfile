@@ -4,7 +4,6 @@ source 'http://gems.github.com'
 gem "rails", "2.3.8"
 
 gem 'rubaidh-google_analytics', "~>1.1.4",:require => 'rubaidh/google_analytics'
-gem 'spreadsheet',"0.6.4.1"
 gem 'hpricot',"~>0.8.2"
 gem 'ruby-openid'
 gem 'rack-openid',"1.1.0"
@@ -30,4 +29,5 @@ group :test do
   gem "sqlite3-ruby","1.2.5",:require=>"sqlite3"
   gem "timocratic-test_benchmark"
   gem "ruby-prof"
+  gem "webmock"
 end

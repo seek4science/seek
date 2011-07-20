@@ -6,6 +6,10 @@ class HomeControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include HomeHelper
 
+  def setup
+    WebMock.allow_net_connect!
+  end
+
   test "test should be accessible to seek even if not logged in" do
     get :index
     assert_response :success
@@ -47,10 +51,15 @@ class HomeControllerTest < ActionController::TestCase
   test "SOP tab should be capitalized" do
     login_as(:quentin)
     get :index
-    assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+    if Seek::Config.is_virtualliver
+      assert_select "div.section>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+    else
+      assert_select "ul.tabnav>li>a[href=?]","/sops",:text=>"SOPs",:count=>1
+    end
+
   end
 
-  test "SOP upload option should be capitlized" do
+  test "SOP upload option should be capitalized" do
     login_as(:quentin)
     get :index
     assert_select "select#new_resource_type",:count=>1 do

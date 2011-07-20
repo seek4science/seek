@@ -53,48 +53,28 @@ module StudiedFactorsHelper
      end
   end
 
-   def find_or_create_substance(new_substances, known_substance_ids_and_types)
-    known_substances = []
-    known_substance_ids_and_types.each do |text|
-      id, type = text.split(',')
-      id = id.strip
-      type = type.strip.capitalize.constantize
-      known_substances.push(type.find(id)) if type.find(id)
-    end
-    new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
-    #no substance
-    if (new_substances.size + known_substances.size) == 0
-      nil
-    #one substance
-    elsif (new_substances.size + known_substances.size) == 1
-      if !known_substances.empty?
-        known_substances.first
-      else
-        c = Compound.new(:name => new_substances.first)
-          if  c.save
-            c
-          else
-            nil
-          end
+  def uniq_fs_or_ec fs_or_ec_array=[]
+    result = []
+    uniq_fs_or_ec_field_array = []
+    fs_or_ec_array.each do |fs_or_ec|
+      compare_field = [fs_or_ec.measured_item_id, fs_or_ec.start_value, fs_or_ec.end_value, fs_or_ec.unit_id, try_block{fs_or_ec.standard_deviation}, fs_or_ec.substance_id, fs_or_ec.substance_type]
+      if !uniq_fs_or_ec_field_array.include?compare_field
+        uniq_fs_or_ec_field_array.push compare_field
+        result.push fs_or_ec
       end
-    #FIXME: update code when mixture table is created
-    else
-      nil
     end
+    result
   end
 
-  #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
-  #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
-  def check_if_new_substances_are_known new_substances, known_substances
-    fixed_new_substances = []
-    new_substances.each do |new_substance|
-      substance=Compound.find_by_name(new_substance.strip) || Synonym.find_by_name(new_substance.strip)
-      if substance.nil?
-        fixed_new_substances << new_substance
-      else
-        known_substances << substance unless known_substances.include?(substance)
-      end
+  def fses_or_ecs_of_project asset, fs_or_ec, project_id
+    asset_class = asset.constantize
+    fs_or_ec_array= []
+    #FIXME: add :include in the query
+    asset_items = asset_class.find(:all, :conditions => ["project_id = ?", project_id])
+    asset_items.each do |item|
+      fs_or_ec_array |= item.send fs_or_ec if item.can_view?
     end
-    return new_substances, known_substances
+    fs_or_ec_array
   end
+
 end
