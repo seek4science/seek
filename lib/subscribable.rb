@@ -11,8 +11,8 @@ module Subscribable
     subscriptions.detect { |ss| ss.person == User.current_user.person }
   end
 
-  def subscribed?
-    !current_users_subscription.nil?
+  def subscribed? person=User.current_user.person
+    !subscriptions.detect{|sub| sub.person == person}.nil?
   end
 
   def subscribed= subscribed
@@ -23,12 +23,12 @@ module Subscribable
     end
   end
 
-  def subscribe
-    subscriptions.build :person => User.current_user.person unless subscribed?
+  def subscribe person=User.current_user.person
+    subscriptions.build :person => person unless subscribed?(person)
   end
 
-  def unsubscribe
-    current_users_subscription.try(:destroy)
+  def unsubscribe person=User.current_user.person
+    subscriptions.detect{|sub| sub.person == person}.try(:destroy)
   end
 
   def send_immediate_subscriptions activity_log
