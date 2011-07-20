@@ -1,4 +1,3 @@
-<% javascript_include_tag "sharing.js" -%>
 
 <%
    show_delete||=false
@@ -62,8 +61,6 @@
     <% end %>
     </ul>
 </li>
-
-
 
 <% if show_delete %>
     <%= render :partial => "studied_factors/edit_condition_or_factor", :locals => {:asset => asset, :object => object}-%>

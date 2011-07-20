@@ -1,4 +1,4 @@
-<%= javascript_include_tag "sharing.js" -%>
+
 <%
    asset ||= nil
    object ||= nil
@@ -59,9 +59,8 @@
 
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
-
-
   </table>
+
   <div class="substance_condition_factor">
     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "#{object.id}_substance", :resource => object}%>
   </div>
