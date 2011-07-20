@@ -1,18 +1,28 @@
 <script type="text/javascript">
-  $j(function () {
-    $j("td.annotated_cell").removeClass("annotated_cell")
-  <% annotations.each do |a| %>
-    $j("table.sheet:eq(<%= a.sheet -%>) tr").slice(<%= a.start_row-%>,<%= a.end_row+1-%>).each(
-      function() {
-        $j(this).children("td.cell").slice(<%= a.start_column-1-%>,<%= a.end_column-%>).addClass("annotated_cell")
-          .click(function (e) {show_annotation(<%=a.id-%>,
-                                               $j(this).position().left + $j(this).outerWidth(),
-                                               $j(this).position().top);});
-      }
-    );
+
+annotation_sources = [];
+
+<% annotations.reverse.group_by(&:source).each do |source, annotation_subset| %>
+  //FIXME: Not generic
+  var as = new annotation_source(<%= source.id -%>, '<%= source.class.name -%>', '<%= source.person.name -%>', '<%= polymorphic_path(source.person) -%>');
+  annotation_sources.push(as);
+  <% annotation_subset.each do |a| %>
+    as.annotations.push(new annotation(<%= a.id -%>, <%= a.sheet -%>, '<%= a.cell_range -%>', '<%= a.content -%>', '<%= time_ago_in_words(a.created_at) %> ago'));
   <% end %>
-  });
-  
-  //FIXME: Hacky
-  callJS();
+<% end %>
+
+$j(document).ready(function () {
+  var oldAnnotatedCells = $j("td.annotated_cell").removeClass("annotated_cell");
+
+  bindAnnotations();
+
+  //Flash the annotations that were added/deleted
+  var newAnnotatedCells = $j("td.annotated_cell");
+  if(newAnnotatedCells != oldAnnotatedCells) {
+    oldAnnotatedCells.not(newAnnotatedCells).unbind("click").effect("highlight", {color: "#FF0000"}, 600)
+    newAnnotatedCells.not(oldAnnotatedCells).effect("highlight", {color: "#00FF00"}, 600);
+  }
+});
+
+
 </script>

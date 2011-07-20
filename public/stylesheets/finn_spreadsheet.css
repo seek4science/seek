@@ -1,8 +1,13 @@
 table.sheet {
-  border: 1px solid #CCC;
   background-color: #69F;
   table-layout: fixed;
   width: 1px;
+}
+
+table.sheet tr{
+  height: 15pt;
+  padding:  0px;
+  margin:  0px;
 }
 
 table.sheet tr td {
@@ -12,17 +17,12 @@ table.sheet tr td {
 }
 
 th.col_heading, td.row_heading {
-  border: 1px outset #FFF;
+  border: 1px solid #000;
   background: #DDD;
   text-align: center;
   width: 2em;
-  padding: 2px 5px;
-}
-
-th.selected_heading, td.selected_heading{
-  border: 1px outset #69F;
-  background: #69F;
-  text-align: center;
+  padding: 2px 0px;
+  border-width: 0px 1px 1px 0px;
 }
 
 td.cell {
@@ -49,8 +49,9 @@ td.annotated_cell {
 }
 
 div.sheet {
-  overflow: scroll;
-  height: 600px;
+  overflow: auto;
+  height: 500px;
+  width: 1052px;
   margin: 0px;
 }
 
@@ -79,6 +80,8 @@ div.spreadsheet_container
 {
   border: 1px solid black;
   padding: 0px;
+  width: 1091px;
+  overflow:  hidden;
 }
 
 div.annotation
@@ -91,6 +94,7 @@ div.annotation
   width:20em;
   z-index: 1;
   margin-bottom: 0.5em;
+  display: none;
 }
 
 div.annotation_content
@@ -130,7 +134,7 @@ div.annotation_footer img
 
 div.spreadsheet_layout {
   width: 70%;
-  min-width: 800px;
+  min-width: 1092px;
   margin-left: auto;
   margin-right: auto;
   padding: 1em;
@@ -274,3 +278,98 @@ div.spreadsheet_errors ul li
   text-align: center;
   z-index: 10;
 }
+
+div.col_heading
+{
+  background-color: #ddd;
+}
+
+table.spreadsheet_layout_table
+{
+
+}
+
+td.layout_segment
+{
+  padding:  0px;
+  margin:  0px;
+  vertical-align: top;
+}
+
+div.col_heading, div.row_heading
+{
+  background: #DDD;
+  text-align: center;
+  vertical-align: middle;
+  width: 3em;
+  padding: 0;
+  margin: 0;
+  height: 15pt;
+}
+
+div.col_heading
+{
+  display: block;
+  /* Because having whitespace between inline-blocks puts a space between them */
+  float:left;
+}
+
+div.row_heading
+{
+  border:  none;
+  padding:  0px;
+}
+
+div.corner_heading
+{
+  position: absolute;
+  border-right:  1px solid black;
+  margin-right: -1px;
+  border-bottom: 1px solid black;
+  margin-bottom: -1px;
+  width: 3em;
+  height: 15pt
+
+}
+
+div.odd_heading
+{
+ background: #BBB;
+}
+
+div.row_headings, div.col_headings
+{
+  overflow:  hidden;
+}
+
+div.row_headings
+{
+  height: 500px;
+  width:3em;
+  border-right:  1px solid black;
+}
+
+div.col_headings
+{
+  height: 15pt;
+  width: 1091px;
+  margin-left: 3em;
+  border-bottom:  1px solid black;
+}
+
+div.sheet_container
+{
+  width:1105px;
+  height: 520px;
+  background-color: #DDD;
+  overflow:  hidden;
+}
+
+div.selected_heading {
+  background-color: #69F;
+}
+
+div.odd_heading.selected_heading {
+  background-color: #47D;
+}
+

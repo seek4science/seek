@@ -26,7 +26,7 @@
           <%= render :partial=>"assets/request_resource",:locals=>{:resource=>asset} %>
         </li>
       <% end -%>
-      <% if asset.class.name == "DataFile" && asset.is_spreadsheet? %>
+      <% if asset.can_download? && asset.class.name == "DataFile" && asset.is_spreadsheet? %>
         <li>
           <%= image_tag_for_key('spreadsheet', polymorphic_path(asset,:version=>version,:action=>:explore), "Explore #{human_name}", nil, "Explore #{human_name}") -%>
         </li>

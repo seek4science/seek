@@ -86,7 +86,9 @@ module SpreadsheetUtil
           end
           r.find(".//cell").each do |c|
             col_index = c["column"].to_i
-            cell = Cell.new(c.content, row_index, col_index, c["formula"], c["style"])
+            content = c.content
+            content = content.to_f if c["type"] == "numeric"
+            cell = Cell.new(content, row_index, col_index, c["formula"], c["style"])
             row.cells[col_index] = cell
           end
         end

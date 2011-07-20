@@ -2,7 +2,7 @@
   <% styles.each_key do |style_name| %> 
     td.<%= style_name -%> {
     <% styles[style_name].attributes.each_key do |a| %>
-      <%= a + ": " + styles[style_name][a] + ";" %>
+      <%= a + ": " + styles[style_name][a] + ";" unless a.include?("border")%>
     <% end %>
     }
   <% end %>

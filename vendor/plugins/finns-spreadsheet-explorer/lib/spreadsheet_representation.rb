@@ -122,6 +122,14 @@ module SpreadsheetRepresentation
       @formula = f
       @style = s unless s.blank?
     end
+
+    def pretty_value
+      if @value.class == Float
+        return @value.round(3)
+      else
+        return @value
+      end
+    end
   end
 
 end

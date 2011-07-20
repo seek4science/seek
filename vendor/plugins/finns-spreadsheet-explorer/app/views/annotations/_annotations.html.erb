@@ -10,11 +10,6 @@
     <br style="clear:both"/>
   </div>
   <table>
-    <% annotations.reverse.group_by(&:source).each do |source, annotation_subset| %>    
-      <tr class="source_header" id="annotation_from_<%= source.class.name + source.id.to_s -%>">
-        <td colspan="3">Annotations from <%= link_to source.person.name, source.person -%></td>        
-      </tr>
-      <%= render :partial => "annotations/annotation_stub", :collection=>annotation_subset, :as => :annotation %>
-    <% end %>
+    <colgroup><col/><col/><col/></colgroup>
   </table>
 </div>

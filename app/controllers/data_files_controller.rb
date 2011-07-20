@@ -183,6 +183,7 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       data_file_params = params[:data_file]
       data_file_params[:event_ids] = params[:event_ids] || []
+
       @data_file.attributes = data_file_params
 
       if params[:sharing]

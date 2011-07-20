@@ -1,49 +1,67 @@
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
-  <a index="<%= sheet_index -%>" class="sheet_tab <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= sheet.name -%></a>
+  <% unless sheet.rows.empty? %>
+    <a index="<%= sheet_index -%>" class="sheet_tab <%= "selected_tab" if workbook.sheets.first == sheet -%>" href="#"><%= sheet.name -%></a>
+  <% end %>
 <% end %>
 
 <div class="spreadsheet_container" onselectstart="return false;">
-  
-<!--- Sheets --->
-<% workbook.sheets.each do |sheet| -%>
-  <div style="display:none" class="sheet" id="<%= ("spreadsheet_" + sheet.name.sub(" ", "_").to_s) -%>">
-    <table class="sheet" cellspacing="1">
-      
-      <!--- Column headings --->
-      <tr>
-        <th class="col_heading" style="width:3em"></th>
-        <% sheet.columns.each do |col| -%>
-        <th style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" class="col_heading"><%= to_alpha(col.index) -%></th>
-        <% end -%>
-      </tr>      
-      
-      <!--- Rows --->
-      <% 1.upto(sheet.last_row) do |r| -%>
-        <tr <%= (sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%>>
-          <!--- Row heading --->
-          <td class="row_heading"><%= r -%></td>          
-          <!--- Cells --->
-          <% 1.upto(sheet.last_col) do |c| %>
-            <% if sheet[r] && sheet[r][c] -%>
-              <% cell = sheet[r][c] -%>
-              <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= cell.formula || "" -%>" class="cell <%= cell.style || ""-%>"><%= cell.value -%></td>
-            <% else -%>
-              <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell"></td>
-            <% end -%>  
-          <% end -%>          
-        </tr>
-      <% end -%>
-      
-    </table>
-  </div>
-<% end -%>
+  <!--- Sheets --->
+  <% workbook.sheets.each do |sheet| -%>
+    <% unless sheet.rows.empty? %>
+      <div style="display:none" class="sheet_container" id="<%= ("spreadsheet_" + sheet.name.sub(" ", "_").to_s) -%>">
+        <div class="corner_heading" >&nbsp;</div>
+        <div class="col_headings" style="background:  none">
+          <div style="min-width:1000000px">
+            <% sheet.columns.each_with_index do |col,c| -%>
+              <div style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" class="col_heading <%= "odd_heading" if c % 2 == 0  -%>"><%= to_alpha(col.index) -%></div>
+            <% end -%>
+            <br style=" clear:both"/>
+          </div>
+        </div>
 
+        <div>
+          <div class="row_headings" style="float:left; background:  none;">
+            <% 1.upto(sheet.last_row) do |r| -%>
+              <div <%= (sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%> class="row_heading <%= "odd_heading" if r % 2 == 1 -%>"><%= r -%></div>
+            <% end -%>
+            <div class="row_heading">&nbsp;</div>
+          </div>
+          <div style="float: left" class="sheet" id="<%= ("spreadsheet_" + sheet.name.sub(" ", "_").to_s) -%>">
+            <table class="sheet" cellspacing="0" cellpadding="0">
+              <!--- Columns --->
+              <colgroup>
+                <% sheet.columns.each do |col| -%>
+                  <col style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" width="<%= (((col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>">
+                <% end -%>
+              </colgroup>
+
+              <!--- Rows --->
+              <% 1.upto(sheet.last_row) do |r| -%>
+                <% height =(sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%>
+                <tr <%= height -%>>
+                  <!--- Cells --->
+                  <% 1.upto(sheet.last_col) do |c| %>
+                    <% if sheet[r] && sheet[r][c] -%>
+                      <% cell = sheet[r][c] -%>
+                      <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= ("=" + cell.formula unless cell.formula.nil?) || "" -%>" class="cell <%= cell.style || ""-%>"><%= cell.value -%></td>
+                    <% else -%>
+                      <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell"></td>
+                    <% end -%>
+                  <% end -%>
+                </tr>
+              <% end -%>
+
+            </table>
+          </div>
+          <br style="clear:both"/>
+        </div>
+      </div>
+    <% end -%>
+  <% end -%>
 </div>
 
 <script type = "text/javascript">
   //"activate" the first worksheet
-  var activeSheet = $j("div.sheet").first();
-  activeSheet.show().addClass('active_sheet');
-  activeSheet.children("table").addClass('active_sheet');
+  activateSheet(0);
 </script>
       
