@@ -45,7 +45,7 @@ $j(document).ready(function ($) {
 
   //To disable text-selection
   //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
-  $.fn.disableSelection = function() {
+  $.fn.disableSelect = function() {
     $(this).attr('unselectable', 'on')
         .css('-moz-user-select', 'none')
         .each(function() {
@@ -195,6 +195,25 @@ $j(document).ready(function ($) {
     $(elem + ' div.annotation_edit_text').toggle();
     $(elem + ' #annotation_controls').toggle();
   };
+
+  //Resize column/rows
+  $( "div.col_heading" )
+      .resizable({
+        handles: 'e',
+        stop: function (){
+          $("table.active_sheet col:eq("+$(this).index()+")").width($(this).width());
+        }
+      })
+  ;
+
+  $( "div.row_heading" )
+      .resizable({
+        handles: 's',
+        stop: function (){
+          $("table.active_sheet tr:eq("+$(this).index()+")").height($(this).height());
+        }
+      })
+  ;
 });
 
 
