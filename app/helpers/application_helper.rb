@@ -1,5 +1,5 @@
 # Methods added to this helper will be available to all templates in the application.
-
+require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'helpers', 'application_helper')
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
 

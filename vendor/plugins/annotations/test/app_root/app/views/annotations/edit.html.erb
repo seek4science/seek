@@ -1,0 +1,12 @@
+<h1>Editing annotation</h1>
+
+<% form_for(@annotation) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @annotation %> |
+<%= link_to 'Back', annotations_path %>

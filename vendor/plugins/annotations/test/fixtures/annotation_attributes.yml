@@ -1,0 +1,49 @@
+aa_tag:
+  id: 1
+  name: Tag
+  identifier: "http://www.example.org/attribute#Tag"
+  
+aa_summary:
+  id: 2
+  name: Summary
+  identifier: "http://www.example.org/attribute#Summary"
+
+aa_length:
+  id: 3
+  name: length
+  identifier: "http://www.example.org/attribute#Length"
+  
+aa_title:
+  id: 4
+  name: Title
+  identifier: "http://www.example.org/attribute#Title"
+  
+aa_complexity:
+  id: 5
+  name: complexity
+  identifier: "http://www.example.org/attribute#complexity"
+  
+aa_endingtype:
+  id: 6
+  name: endingType
+  identifier: "http://www.example.org/attribute#endingType"
+  
+aa_note:
+  id: 7
+  name: Note
+  identifier: "http://www.example.org/attribute#Note"
+  
+aa_author:
+  id: 8
+  name: Author
+  identifier: "http://www.example.org/attribute#Author"
+  
+aa_rating:
+  id: 9
+  name: rating
+  identifier: "http://www.example.org/attribute#rating"
+  
+aa_contextualtag:
+  id: 10
+  name: Contextual Tag
+  identifier: "http://www.example.org/attribute#ContextualTag"
