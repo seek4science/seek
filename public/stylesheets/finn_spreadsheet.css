@@ -323,13 +323,8 @@ div.row_heading
 div.corner_heading
 {
   position: absolute;
-  border-right:  1px solid black;
-  margin-right: -1px;
-  border-bottom: 1px solid black;
-  margin-bottom: -1px;
   width: 3em;
   height: 15pt
-
 }
 
 div.odd_heading
