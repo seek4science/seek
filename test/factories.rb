@@ -224,3 +224,39 @@ end
     f.action "create"
     f.association :activity_loggable, :factory => :data_file
   end
+
+  #Factor studied
+  Factory.define(:studied_factor) do |f|
+    f.start_value 1
+    f.end_value 10
+    f.standard_deviation 2
+    f.data_file_version 1
+    f.association :measured_item, :factory => :measured_item
+    f.association :unit, :factory => :unit
+    f.association :substance, :factory => :compound
+    f.association :data_file, :factory => :data_file
+  end
+
+  Factory.define(:measured_item) do |f|
+    f.title 'concentration'
+  end
+
+  Factory.define(:unit) do |f|
+    f.symbol 'g'
+    f.sequence(:order) {|n| n}
+  end
+
+  Factory.define(:compound) do |f|
+    f.sequence(:name) {|n| "glucose #{n}"}
+  end
+
+ #Experimental condition
+  Factory.define(:experimental_condition) do |f|
+    f.start_value 1
+    f.end_value 10
+    f.sop_version 1
+    f.association :measured_item, :factory => :measured_item
+    f.association :unit, :factory => :unit
+    f.association :substance, :factory => :compound
+    f.association :sop, :factory => :sop
+  end

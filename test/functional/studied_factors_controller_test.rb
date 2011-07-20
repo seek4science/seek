@@ -178,4 +178,21 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     fs_updated = assigns(:studied_factor)
     assert_nil fs_updated
   end
+
+  test 'should create FSes from the existing FSes' do
+    fs_array = []
+    user = Factory(:user)
+    login_as(user)
+    d = Factory(:data_file, :contributor => user)
+    assert_equal d.studied_factors.count, 0
+    #create bunch of FSes which are different
+    i=0
+    while i < 3  do
+      fs_array.push Factory(:studied_factor, :start_value => i)
+      i +=1
+    end
+    post :create_from_existing, :data_file_id => d.id, :version => d.latest_version, "checkbox_#{fs_array.first.id}" => fs_array.first.id, "checkbox_#{fs_array[1].id}" => fs_array[1].id, "checkbox_#{fs_array[2].id}" => fs_array[2].id
+    d.reload
+    assert_equal d.studied_factors.count, 3
+  end
 end

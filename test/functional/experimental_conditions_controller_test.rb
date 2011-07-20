@@ -178,4 +178,21 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     ec_updated = assigns(:experimental_condition)
     assert_nil ec_updated
   end
+
+  test 'should create ECs from the existing ECs' do
+    ec_array = []
+    user = Factory(:user)
+    login_as(user)
+    sop = Factory(:sop, :contributor => user)
+    assert_equal sop.experimental_conditions.count, 0
+    #create bunch of FSes which are different
+    i=0
+    while i < 3  do
+      ec_array.push Factory(:experimental_condition, :start_value => i)
+      i +=1
+    end
+    post :create_from_existing, :sop_id => sop.id, :version => sop.latest_version, "checkbox_#{ec_array.first.id}" => ec_array.first.id, "checkbox_#{ec_array[1].id}" => ec_array[1].id, "checkbox_#{ec_array[2].id}" => ec_array[2].id
+    sop.reload
+    assert_equal sop.experimental_conditions.count, 3
+  end
 end

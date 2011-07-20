@@ -98,7 +98,7 @@
                   </li>
                   <li><%= measured_item -%></li>
                 </ul>
-                <ul id = 'conditions_or_factors_of_item_<%= measured_item -%>' class='available_conditions_or_factors' style="display: none;">
+                <ul id = 'conditions_or_factors_of_item_<%= measured_item -%>' class='existing_conditions_or_factors' style="display: none;">
                   <%= render :partial=>"studied_factors/condition_or_factor_row_headings", :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
                   <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>fses_or_ecs, :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
                 </ul>

@@ -1564,7 +1564,7 @@ div.conditions_or_factors {
     padding: 0 1em 0.5em 1em;
 }
 
-ul.available_conditions_or_factors {
+ul.existing_conditions_or_factors {
     float: left;
     margin-left: 0em;
     margin-top: 0em;
@@ -1573,7 +1573,7 @@ ul.available_conditions_or_factors {
     clear: both;
 }
 
-ul.available_conditions_or_factors li {
+ul.existing_conditions_or_factors li {
     list-style-type:none;
 }
 .border_top {

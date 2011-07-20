@@ -49,16 +49,16 @@ class StudiedFactorsController < ApplicationController
                                              :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation, :substance_type => studied_factor.substance_type, :substance_id => studied_factor.substance_id)
       new_studied_factor.data_file=@data_file
       new_studied_factor.data_file_version = params[:version]
-      if new_studied_factor.save
-        new_studied_factors.push new_studied_factor
-      else
-        flash.now[:error] = "can not create factor studied: item: #{try_block{new_studied_factor.substance.name}} #{new_studied_factor.measured_item.title}, values: #{new_studied_factor.start_value}-#{new_studied_factor.end_value}#{new_studied_factor.unit.title}, SD: #{new_studied_factor.standard_deviation}"
-      end
+      new_studied_factors.push new_studied_factor
     end
     #
     render :update do |page|
       new_studied_factors.each do  |sf|
-         page.insert_html :bottom,"condition_or_factor_rows",:partial=>"condition_or_factor_row",:object=>sf,:locals=>{:asset => 'data_file', :show_delete=>true}
+        if sf.save
+          page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>sf,:locals=>{:asset => 'data_file', :show_delete=>true}
+        else
+          page.alert("can not create factor studied: item: #{try_block{sf.substance.name}} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}")
+        end
       end
       page.visual_effect :highlight,"condition_or_factor_rows"
     end

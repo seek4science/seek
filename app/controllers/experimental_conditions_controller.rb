@@ -49,18 +49,18 @@ class ExperimentalConditionsController < ApplicationController
                                              :end_value => experimental_condition.end_value, :substance_type => experimental_condition.substance_type, :substance_id => experimental_condition.substance_id)
       new_experimental_condition.sop=@sop
       new_experimental_condition.sop_version = params[:version]
-      if new_experimental_condition.save
-        new_experimental_conditions.push new_experimental_condition
-      else
-        flash.now[:error] = "can not create experimental condition: item: #{try_block{new_experimental_condition.substance.name}} #{new_experimental_condition.measured_item.title}, values: #{new_experimental_condition.start_value}-#{new_experimental_condition.end_value}#{new_experimental_condition.unit.title}"
-      end
+      new_experimental_conditions.push new_experimental_condition
     end
     #
     render :update do |page|
-      new_experimental_conditions.each do  |ec|
-         page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>ec,:locals=>{:asset => 'sop', :show_delete=>true}
-      end
-      page.visual_effect :highlight,"condition_or_factor_rows"
+        new_experimental_conditions.each do  |ec|
+          if ec.save
+            page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>ec,:locals=>{:asset => 'sop', :show_delete=>true}
+          else
+            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, values: #{ec.start_value}-#{ec.end_value}#{ec.unit.title}, SD: #{ec.standard_deviation}")
+          end
+        end
+        page.visual_effect :highlight,"condition_or_factor_rows"
     end
   end
 
