@@ -188,14 +188,6 @@ $j(document).ready(function ($) {
       })
   ;
 
-  function toggle_annotation_form(annotation_id) {
-    var elem = 'div#annotation_' + annotation_id
-
-    $(elem + ' div.annotation_text').toggle();
-    $(elem + ' div.annotation_edit_text').toggle();
-    $(elem + ' #annotation_controls').toggle();
-  };
-
   //Resize column/rows
   $( "div.col_heading" )
       .resizable({
@@ -316,6 +308,18 @@ function bindAnnotation(ann) {
           );
   });
 }
+
+
+
+function toggle_annotation_form(annotation_id) {
+  var elem = 'div#annotation_' + annotation_id
+
+  $j(elem + ' div.annotation_text').toggle();
+  $j(elem + ' div.annotation_edit_text').toggle();
+  $j(elem + ' #annotation_controls').toggle();
+};
+
+
 
 //To display the annotations
 function show_annotation(id,x,y) {
