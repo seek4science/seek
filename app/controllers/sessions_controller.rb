@@ -78,7 +78,7 @@ class SessionsController < ApplicationController
   
   def successful_login
     self.current_user = @user    
-    if params[:remember_me] == "1"
+    if params[:remember_me] == "on"
       @user.remember_me unless @user.remember_token?
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
     end
