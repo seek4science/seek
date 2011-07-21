@@ -1,14 +1,18 @@
-<% javascript_include_tag "sharing.js" -%>
-
 <%
    show_delete||=false
+   show_checkbox||=false
    asset ||= nil
    object = condition_or_factor_row
    asset_object = object.send asset
 %>
 <li id="condition_or_factor_row_<%= object.id -%>" >
   <ul class="condition_or_factor_row">
+    <% if show_checkbox %>
+        <li>
+          <%= check_box_tag("checkbox_#{object.id}", object.id, false)-%>
+        </li>
 
+    <% end %>
     <li id="measured_item">
       <%if  object.measured_item.title == 'concentration' and object.substance.try(:name)%>
         <%= h object.substance.name + ' ' + object.measured_item.title  %>
@@ -19,11 +23,8 @@
     
     <li id="values">
       <!--don't show dimensionless unit-->
-      <% if object.unit.symbol == 'dimensionless' %>
-          <%= "#{h object.range_text}" %>
-      <% else %>
-        <%= "#{h object.range_text} #{object.unit.symbol}" %>
-      <% end %>
+      <%= object.unit.symbol == 'dimensionless' ? "#{h object.range_text}" : "#{h object.range_text} #{object.unit.symbol}" %>
+
     </li>       
     <% if asset == 'data_file' %>
       <li id="standard_deviation">
@@ -59,8 +60,6 @@
     <% end %>
     </ul>
 </li>
-
-
 
 <% if show_delete %>
     <%= render :partial => "studied_factors/edit_condition_or_factor", :locals => {:asset => asset, :object => object}-%>

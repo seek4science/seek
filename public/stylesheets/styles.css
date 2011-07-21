@@ -1498,6 +1498,12 @@ ul.conditions_or_factors li {
     list-style-type:none;
 }
 
+ul.conditions_or_factors {
+    float: left;
+    margin-left: 4em;
+    margin-top: 2em;
+}
+
 ul.condition_or_factor_row {
     clear:both;
 }
@@ -1508,6 +1514,19 @@ ul.condition_or_factor_row li {
     text-align:left;
     border-bottom: dotted #999 1px;
     min-height: 2em;
+}
+
+ul.measured_items {
+    clear:both;
+    margin-top: 1em;
+}
+
+ul.measured_items li{
+    float:left;
+    padding: 0 1em 0.25em 1em;
+    text-align:left;
+    min-height: 2em;
+    list-style-type:none;
 }
 
 ul.condition_or_factor_row li#measured_item {
@@ -1540,7 +1559,29 @@ div.conditions_or_factors {
     float: left;
     margin-left: 2em;
     margin-top: 2em;
-    margin-bottom: 2em;
-    width: 50em;
+    margin-bottom: 1em;
+    width: 48em;
     padding: 0 1em 0.5em 1em;
+}
+
+ul.existing_conditions_or_factors {
+    float: left;
+    margin-left: 0em;
+    margin-top: 0em;
+    margin-bottom: 2em;
+    padding: 0 1em 0.5em 1em;
+    clear: both;
+}
+
+ul.existing_conditions_or_factors li {
+    list-style-type:none;
+}
+.border_top {
+    border-top: 1px solid #DDD;
+    width: 20em;
+    padding: 0.5em 1em 0.5em 1em;
+}
+
+.space_for_alignment {
+  width: 1em;
 }

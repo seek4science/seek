@@ -4,9 +4,6 @@ class StudiedFactorsController < ApplicationController
   before_filter :create_new_studied_factor, :only=>[:index]
   before_filter :no_comma_for_decimal, :only=>[:create, :update]
 
-
-  include StudiedFactorsHelper
-
   def index
     respond_to do |format|
       format.html
@@ -33,6 +30,37 @@ class StudiedFactorsController < ApplicationController
       else
         page.alert(@studied_factor.errors.full_messages)
       end
+    end
+  end
+
+  def create_from_existing
+    studied_factor_ids = []
+    new_studied_factors = []
+    #retrieve the selected FSes
+    params.each do |key, value|
+       if key.match('checkbox_')
+         studied_factor_ids.push value.to_i
+       end
+    end
+    #create the new FSes based on the selected FSes
+    studied_factor_ids.each do |id|
+      studied_factor = StudiedFactor.find(id)
+      new_studied_factor = StudiedFactor.new(:measured_item_id => studied_factor.measured_item_id, :unit_id => studied_factor.unit_id, :start_value => studied_factor.start_value,
+                                             :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation, :substance_type => studied_factor.substance_type, :substance_id => studied_factor.substance_id)
+      new_studied_factor.data_file=@data_file
+      new_studied_factor.data_file_version = params[:version]
+      new_studied_factors.push new_studied_factor
+    end
+    #
+    render :update do |page|
+      new_studied_factors.each do  |sf|
+        if sf.save
+          page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>sf,:locals=>{:asset => 'data_file', :show_delete=>true}
+        else
+          page.alert("can not create factor studied: item: #{try_block{sf.substance.name}} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}")
+        end
+      end
+      page.visual_effect :highlight,"condition_or_factor_rows"
     end
   end
 

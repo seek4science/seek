@@ -1,6 +1,6 @@
 class OrganismsController < ApplicationController
   
-  before_filter :login_required,:except=>[:show,:index]
+  before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]
   before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise,:destroy]
   layout "main",:except=>:visualise

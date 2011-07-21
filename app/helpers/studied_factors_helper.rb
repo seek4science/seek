@@ -53,23 +53,28 @@ module StudiedFactorsHelper
      end
   end
 
-
-
-  def no_comma_for_decimal
-    check_string = ''
-    if self.controller_name.downcase == 'studied_factors'
-      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
-    elsif self.controller_name.downcase == 'experimental_conditions'
-      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
+  def uniq_fs_or_ec fs_or_ec_array=[]
+    result = []
+    uniq_fs_or_ec_field_array = []
+    fs_or_ec_array.each do |fs_or_ec|
+      compare_field = [fs_or_ec.measured_item_id, fs_or_ec.start_value, fs_or_ec.end_value, fs_or_ec.unit_id, try_block{fs_or_ec.standard_deviation}, fs_or_ec.substance_id, fs_or_ec.substance_type]
+      if !uniq_fs_or_ec_field_array.include?compare_field
+        uniq_fs_or_ec_field_array.push compare_field
+        result.push fs_or_ec
+      end
     end
-
-    if check_string.match(',')
-         render :update do |page|
-           page.alert('Please use point instead of comma for decimal number')
-         end
-      return false
-    else
-      return true
-    end
+    result
   end
+
+  def fses_or_ecs_of_project asset, fs_or_ec, project_id
+    asset_class = asset.constantize
+    fs_or_ec_array= []
+    #FIXME: add :include in the query
+    asset_items = asset_class.find(:all, :conditions => ["project_id = ?", project_id])
+    asset_items.each do |item|
+      fs_or_ec_array |= item.send fs_or_ec if item.can_view?
+    end
+    fs_or_ec_array
+  end
+
 end

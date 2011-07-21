@@ -23,6 +23,10 @@ module ApplicationHelper
     end    
   end
 
+  def tabbar
+    Seek::Config.is_virtualliver ? render(:partial=>"layouts/tabnav_dropdown") : render(:partial=>"layouts/tabnav")
+  end
+
   #joins the list with seperator and the last item with an 'and'
   def join_with_and list, seperator=", "
     return list.first if list.count==1
