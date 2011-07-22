@@ -24,6 +24,10 @@ class ContentBlob < ActiveRecord::Base
   before_save :calculate_md5
 
   has_many :worksheets, :dependent => :destroy
+
+  def spreadsheet_annotations
+    worksheets.collect {|w| w.cell_ranges.collect {|c| c.annotations}}.flatten
+  end
   
   def md5sum
     if super.nil?

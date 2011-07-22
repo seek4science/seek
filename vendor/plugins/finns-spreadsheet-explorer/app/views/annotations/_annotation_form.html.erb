@@ -12,7 +12,7 @@
                    :complete => "Element.hide('spinner');Element.hide('annotation_form');", :html => {:id => "annotation_form"}) do %>
     
     <%= hidden_field_tag :annotation_id %>                
-    <%= hidden_field_tag :annotation_data_file_id, @data_file.id %>    
+    <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob_id %>
     <%= hidden_field_tag :annotation_sheet_id, "0" %>
     
     <p>
