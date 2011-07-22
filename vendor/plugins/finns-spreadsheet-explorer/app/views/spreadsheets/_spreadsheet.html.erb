@@ -9,9 +9,10 @@
   <% workbook.sheets.each do |sheet| -%>
     <% unless sheet.rows.empty? %>
       <div style="display:none" class="sheet_container" id="<%= ("spreadsheet_" + sheet.name.sub(" ", "_").to_s) -%>">
-        <div class="corner_heading" >&nbsp;</div>
+        <div class="corner_heading">&nbsp;</div>
         <div class="col_headings <%= "odd_heading" if sheet.last_col % 2 == 0 -%>">
           <div style="min-width:1000000px">
+            <div class="col_heading_spacer">&nbsp;</div>
             <% sheet.columns.each_with_index do |col,c| -%>
               <div style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" class="col_heading <%= "odd_heading" if c % 2 == 0  -%>"><%= to_alpha(col.index) -%></div>
             <% end -%>

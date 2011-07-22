@@ -191,7 +191,7 @@ $j(document).ready(function ($) {
       .resizable({
         handles: 'e',
         stop: function (){
-          $("table.active_sheet col:eq("+$(this).index()+")").width($(this).width());
+          $("table.active_sheet col:eq("+($(this).index()-1)+")").width($(this).width());
         }
       })
   ;

@@ -279,11 +279,6 @@ div.spreadsheet_errors ul li
   z-index: 10;
 }
 
-div.col_heading
-{
-  background-color: #ddd;
-}
-
 table.spreadsheet_layout_table
 {
 
@@ -307,11 +302,10 @@ div.col_headings
 {
   height: 15pt;
   width: 1091px;
-  margin-left: 3em;
   border-bottom:  1px solid black;
 }
 
-div.col_heading, div.row_heading
+div.col_heading, div.row_heading, div.col_heading_spacer
 {
   background: #DDD;
   text-align: center;
@@ -322,7 +316,7 @@ div.col_heading, div.row_heading
   height: 15pt;
 }
 
-div.col_heading
+div.col_heading, div.col_heading_spacer
 {
   display: block;
   /* Because having whitespace between inline-blocks puts a space between them */
@@ -337,9 +331,14 @@ div.row_heading
 
 div.corner_heading
 {
-  position: absolute;
   width: 3em;
-  height: 15pt
+  height: 15pt;
+  display: block;
+  float:left;
+  border-right: 1px solid black;
+  z-index:10;
+  background-color: #DDD;
+  position: absolute;
 }
 
 div.odd_heading
