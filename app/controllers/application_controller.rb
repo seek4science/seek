@@ -415,6 +415,6 @@ class ApplicationController < ActionController::Base
         known_substances << substance unless known_substances.include?(substance)
       end
     end
-    return new_substances, known_substances
+    return fixed_new_substances, known_substances
   end
 end

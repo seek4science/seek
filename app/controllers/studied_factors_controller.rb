@@ -89,7 +89,8 @@ class StudiedFactorsController < ApplicationController
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])
         page.visual_effect :fade,"edit_condition_or_factor_#{@studied_factor.id}_form"
-        page.replace_html "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
+        page.call "autocompleters['#{@studied_factor.id}_substance_autocompleter'].deleteAllTokens"
+        page.replace "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
       else
         page.alert(@studied_factor.errors.full_messages)
       end
