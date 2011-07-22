@@ -92,7 +92,7 @@ div.annotation
   position: relative;
   display:none;
   width:20em;
-  z-index: 1;
+  z-index: 10;
   margin-bottom: 0.5em;
   display: none;
 }
@@ -176,7 +176,7 @@ div#annotation_form
   margin: 0.5em;
   background-color: #FFFFFF;
   position: absolute;
-  z-index: 2;
+  z-index: 20;
 }
 
 div#annotation_overview
@@ -186,7 +186,7 @@ div#annotation_overview
   margin: 0.5em;
   background-color: #FFFFFF;
   position: absolute;
-  z-index: 2;  
+  z-index: 20;
 }
 
 div#annotation_overview table td
@@ -336,7 +336,7 @@ div.corner_heading
   display: block;
   float:left;
   border-right: 1px solid black;
-  z-index:10;
+  z-index:5;
   background-color: #DDD;
   position: absolute;
 }
