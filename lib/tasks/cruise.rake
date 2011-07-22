@@ -14,10 +14,7 @@ task :cruise, :run_secondary do |t, args|
     File.delete(run_secondary_signal) if File.exists? run_secondary_signal
   end
   RAILS_ENV = ENV['RAILS_ENV'] = 'test'
-  
-  `bundle install`
-  Bundler.setup(:default, :test)
-  
+
   FileUtils.copy(Dir.pwd+"/config/database.cc.yml", Dir.pwd+"/config/database.yml")      
   
   begin
