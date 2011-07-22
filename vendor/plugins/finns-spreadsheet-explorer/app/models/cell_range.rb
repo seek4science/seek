@@ -1,5 +1,7 @@
 class CellRange < ActiveRecord::Base
 
+  unloadable
+
   include SpreadsheetUtil
 
   acts_as_annotatable

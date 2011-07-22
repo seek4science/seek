@@ -12,6 +12,7 @@ function annotation(id, sheet_number, cell_range, content, date_created) {
   this.cellRange = cell_range;
   this.content = content;
   this.dateCreated = date_created;
+
   var cell_coords = explodeCellRange(cell_range);
   this.startCol = cell_coords[0];
   this.startRow = cell_coords[1];
@@ -37,11 +38,7 @@ $j(document).ready(function ($) {
       startRow,
       startCol,
       endRow,
-      endCol,
-      minRow,
-      minCol,
-      maxRow,
-      maxCol;;
+      endCol;
 
   //To disable text-selection
   //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
@@ -96,7 +93,7 @@ $j(document).ready(function ($) {
       })
   ;
 
-  //Scrolling
+  //Auto scrolling when selection box is dragged to the edge of the view
   $("div.sheet")
       .mousemove(function (e) {
         if(isMouseDown)
@@ -180,6 +177,7 @@ $j(document).ready(function ($) {
       })
   ;
 
+  //Select cells that are typed in
   $('input#selection_data')
       .keyup(function(e) {
         if(e.keyCode == 13) {
