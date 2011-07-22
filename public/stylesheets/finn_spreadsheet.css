@@ -296,6 +296,21 @@ td.layout_segment
   vertical-align: top;
 }
 
+div.row_headings
+{
+  height: 500px;
+  width:3em;
+  border-right:  1px solid black;
+}
+
+div.col_headings
+{
+  height: 15pt;
+  width: 1091px;
+  margin-left: 3em;
+  border-bottom:  1px solid black;
+}
+
 div.col_heading, div.row_heading
 {
   background: #DDD;
@@ -337,20 +352,6 @@ div.row_headings, div.col_headings
   overflow:  hidden;
 }
 
-div.row_headings
-{
-  height: 500px;
-  width:3em;
-  border-right:  1px solid black;
-}
-
-div.col_headings
-{
-  height: 15pt;
-  width: 1091px;
-  margin-left: 3em;
-  border-bottom:  1px solid black;
-}
 
 div.sheet_container
 {
