@@ -6,33 +6,35 @@ class SpreadsheetAnnotationsController < ApplicationController
 
   def create
     data_file = DataFile.find(params[:annotation_data_file_id])
-    worksheet = data_file.content_blob.worksheets.select {|w| w.sheet_number == params[:annotation_sheet_id].to_i}.first
+    worksheet = data_file.content_blob.worksheets.select { |w| w.sheet_number == params[:annotation_sheet_id].to_i }.first
 
-    cell = CellRange.new( :worksheet => worksheet,
-                         :cell_range => params[:annotation_cell_coverage])
+    if data_file.can_download?
 
-    if (cell.save)
-      new_annotation = Annotation.new(:source => current_user,
-                                     :annotatable => cell,
-                                     :attribute_name => "annotation",
-                                     :value => params[:annotation_content])
+      cell = CellRange.new(:worksheet => worksheet,
+                           :cell_range => params[:annotation_cell_coverage])
 
-      if(new_annotation.save)
+      if (cell.save)
+        new_annotation = Annotation.new(:source => current_user,
+                                        :annotatable => cell,
+                                        :attribute_name => "annotation",
+                                        :value => params[:annotation_content])
 
-        respond_to do |format|
-          format.html { render :partial => "annotations/annotations", :locals=>{ :annotations => data_file.spreadsheet_annotations} }
+        if (new_annotation.save)
+
+          respond_to do |format|
+            format.html { render :partial => "annotations/annotations", :locals=>{:annotations => data_file.spreadsheet_annotations} }
+          end
+        else
+          respond_to do |format|
+            format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{:verb => "adding", :errors => new_annotation.errors} }
+          end
         end
       else
         respond_to do |format|
-          format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => new_annotation.errors} }
+          format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{:verb => "adding", :errors => cell.errors} }
         end
       end
-    else
-      respond_to do |format|
-        format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => cell.errors} }
-      end
     end
-
   end
 
   def update

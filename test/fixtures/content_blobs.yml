@@ -44,6 +44,9 @@ picture_blob:
   
 spreadsheet_blob:  
   uuid: <%= init_blob('small-test-spreadsheet.xls') %>
+
+private_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
   
 url_content_blob:
   url: http://mockedlocation.com/a-piccy.png

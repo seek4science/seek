@@ -33,7 +33,19 @@ downloadable_data_file:
   version: 1
   project: other_project # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
-  
+
+non_downloadable_data_file:
+  contributor: datafile_owner (User)
+  title: Download Only
+  description: A spreadsheet
+  original_filename: spreadsheet.xls
+  content_blob: private_spreadsheet_blob
+  content_type: application/vnd.excel
+  last_used_at: 2009-04-03 11:09:18
+  version: 1
+  project: other_project # not linked to any project for now
+  policy: private_policy
+
 url_based_data_file:
   contributor: datafile_owner (User)
   title: Data file from URL
