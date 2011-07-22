@@ -1,3 +1,5 @@
+var autocompleters = new Array();
+
 function showOrHideSubstanceTextField(form_id){
     var elements =  $(form_id).getElements();
     var item;

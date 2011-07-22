@@ -1,4 +1,4 @@
-<%= javascript_include_tag "tagging.js", 'studied_factor.js' -%>
+<%= javascript_include_tag 'studied_factor.js' -%>
 
 <div class="show_basic">
     <h1>
@@ -23,6 +23,6 @@
           <%= render :partial=>"condition_or_factor_row",:collection=>@display_data_file.studied_factors, :locals=>{:asset => 'data_file', :show_delete=>true} %>
         </div>
       </ul>
-     </center>
+    </center>
 </div>
 

@@ -82,7 +82,7 @@
 <% end -%>
 
 <% form_remote_tag :url => path_to_create_from_existing do -%>
-   <% fses_or_ecs = fses_or_ecs_of_project asset_object.class.name, controller_name, asset_object.project_id
+   <% fses_or_ecs = fses_or_ecs_of_project asset_object, controller_name
       unless fses_or_ecs.blank? %>
          <div class="conditions_or_factors" >
             <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Or select from:</h4>
@@ -105,7 +105,7 @@
             <%= hidden_field_tag "#{asset}_id", asset_object.id -%>
             <%= hidden_field_tag "version", display_asset.version  -%>
             <div class='border_top' style="float:right;margin-right: 13em; clear: both">
-               <%= submit_tag "Add", :style => "width:50px;font-weight:bold" %>
+               <%= submit_tag "Add", :style => "width:50px;font-weight:bold", :id => 'add_from_existing' %>
             </div>
          </div>
       <% end -%>
