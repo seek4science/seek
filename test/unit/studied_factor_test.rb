@@ -67,7 +67,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
 
     User.with_current_user  user do
         assert data_file.can_edit?
-        fses = fses_or_ecs_of_project 'DataFile', 'studied_factors', data_file.project_id
+        fses = fses_or_ecs_of_project data_file, 'studied_factors'
         assert_equal fses.count, 10
         fses.each do |fs|
           assert fs.data_file.can_view?
