@@ -107,3 +107,37 @@ function validateDataFileFields(is_new_file) {
     $('data_file_submit_btn').form.submit();
     return(true);
 }
+
+function validatePresentationFields(is_new_file) {
+    // only make this test if that's a new DataFile
+    if(is_new_file) {
+        if($('presentation_data').value.length == 0 && $('presentation_data_url').value.length == 0) {
+            alert("Please specify the file to upload, or provide a URL");
+            $('presentation_data').focus();
+            return(false);
+        }
+    }
+
+    // other tests are applicable to both editing and creating new Model
+    if($('presentation_title').value.length == 0) {
+        alert("Please specify the title for the presentation!");
+        $('presentation_title').focus();
+        return(false);
+    }
+
+    // check if no tokens remain in the attributions autocompleter
+    // (only do this if the fold with attributions is expanded)
+    if($('attributions_fold_content').style.display == "block" &&
+        autocompleters[attributions_autocompleter_id].getRecognizedSelectedIDs() != "")
+        {
+        alert('You didn\'t press "Add" link to add items in the attributions autocomplete field.');
+        $('attributions_autocomplete_input').focus();
+        return(false);
+    }
+
+    // filename and title set - can submit
+    $('presentation_submit_btn').disabled = true;
+    $('presentation_submit_btn').value = (is_new_file ? "Uploading and Saving..." : "Updating...");
+    $('presentation_submit_btn').form.submit();
+    return(true);
+}

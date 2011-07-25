@@ -1,0 +1,133 @@
+
+
+<%= javascript_include_tag "resource" -%>
+
+
+<%= asset_buttons @presentation,@display_presentation.version -%>
+
+
+<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
+
+<%= render :partial => "layouts/item_title",:locals=>{:item=>@presentation} %>
+
+<%= render :partial => "layouts/usage_info", :locals => { :resource => @presentation } -%>
+
+
+<div class="show_basic">
+
+
+  <div class="main_content_left_box_narrower">
+
+    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
+
+    <div class="box_about_actor">
+      <p>
+        <b>Title:</b>
+        <span class="title"><%= h @display_presentation.title -%></span>
+      </p>
+
+
+      <p>
+        <b>File name:</b>
+        <%= h @display_presentation.original_filename -%>
+
+        <%= link_to h("View Online?"),"",:id=>"asset_view_link",:onclick=>"javascript:view_presentation();return false;",:style => 'text-decoration:underline;' %>
+      </p>
+      <div id="div_for_viewerPlaceHolder" style="width:600px;height:480px;display:none">
+          <a id="viewerPlaceHolder" style="width:595px;height:480px;display:block"></a>
+      </div>
+      <p>
+        <b>Format:</b>
+        <%= h mime_nice_name(@display_presentation.content_type) -%>
+      </p>
+
+      <br/>
+
+      <p>
+        <b>Description:</b>
+        <% unless @display_presentation.description.blank? -%>
+          <div class="box_standout" id="description">
+            <%= simple_format(auto_link(white_list(@display_presentation.description),:all,:rel=>'nofollow')) -%>
+          </div>
+      <% else -%>
+          <p class="none_text">
+            No description
+          </p>
+      <% end -%>
+      </p>
+
+    </div>
+  </div>
+
+  <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @presentation } %>
+
+  <div style="clear:both;padding-top:1em;">
+    <p>
+        <%= embedded_isa_svg(@presentation, true, @presentation) -%>
+    </p>
+
+
+    <br/>
+
+    <%# get, classify and authorize all assets for this project -%>
+    <%= render :partial=>"layouts/items_related_to",:object => @presentation %>
+
+  </div>
+
+</div>
+
+<script type="text/javascript">
+  var fp = null;
+
+  function toggle_asset_view_link_title(){
+      var viewer = document.getElementById("div_for_viewerPlaceHolder");
+
+      switch($("asset_view_link").innerHTML){
+          case "View Online?":
+            $("asset_view_link").innerHTML ="Close View?" ;
+            viewer.style.display = "block";
+            break;
+          case "Close View?":
+            $("asset_view_link").innerHTML ="View Online?";
+            viewer.style.display = "none";
+            break;
+          default:
+          break;
+      }
+
+  }
+  function view_presentation() {
+      if (fp == null) {
+          fp = new FlexPaperViewer(
+                  '/swf/FlexPaperViewer',
+                  'viewerPlaceHolder', { config : {
+              SwfFile : '/swf/presentations/<%= @presentation.title %>.swf',
+              Scale : 0.6,
+              ZoomTransition : 'easeOut',
+              ZoomTime : 0.5,
+              ZoomInterval : 0.2,
+              FitPageOnLoad : true,
+              FitWidthOnLoad : false,
+              PrintEnabled : true,
+              FullScreenAsMaxWindow : false,
+              ProgressiveLoading : false,
+              MinZoomSize : 0.2,
+              MaxZoomSize : 5,
+              SearchMatchAll : false,
+              InitViewMode : 'Portrait',
+
+              ViewModeToolsVisible : true,
+              ZoomToolsVisible : true,
+              NavToolsVisible : true,
+              CursorToolsVisible : true,
+              SearchToolsVisible : true,
+
+              localeChain: 'en_US'
+          }});
+      }
+
+
+      toggle_asset_view_link_title();
+
+  }
+  </script>

@@ -1,0 +1,37 @@
+<%= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" -%>
+<h1>New Presentation</h1>
+<div class="show_basic">
+    <% form_tag({:action => :create}, :multipart => true) do -%>
+    <div class="asset_form">
+        <%= error_messages_for :presentation -%>
+        <%= render :partial=>"assets/upload_box" -%>
+        <p style="margin-top: 1.5em;">
+            <b>Title</b>
+            <span class="required">*</span>
+            <br/>
+            <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
+            <%= text_area_tag "presentation[title]", presentation_title_value, :style => "width: 100%;", :rows=>2 -%>
+        </p>
+        <p style="margin-top: 0.5em;">
+            <b>Description</b>
+            <br/>
+            <% presentation_description_value = (params[:presentation].blank? || params[:presentation][:description].blank?) ? nil : params[:presentation][:description] -%>
+            <%= text_area_tag "presentation[description]", presentation_description_value, :style => "width: 100%;", :rows => 10 -%>
+        </p>
+        <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Presentation",
+        :project_hash => current_user.generate_own_project_id_name_hash } -%>
+
+		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Presentation"} -%>
+        <p>
+            <% if Seek::Config.events_enabled -%>
+                <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>
+            <% end -%>
+        </p>
+
+		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @presentation, :show_relationships => false} -%>
+        <p>
+            <%= submit_tag "Upload and Save", :id => "presentation_submit_btn", :onclick => "javascript: validatePresentationFields(true); return(false);" -%> or <%= link_to 'Cancel', presentations_path -%>
+        </p>
+		</div>
+     <% end -%>
+</div>

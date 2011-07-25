@@ -248,6 +248,8 @@ module ImagesHelper
         "famfamfam_silk/email_delete.png"
       when 'subscribe'
         "famfamfam_silk/email_add.png"
+      when 'presentation_avatar'
+        "misc_icons/presentations.png"
       else
         return nil
     end

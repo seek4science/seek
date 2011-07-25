@@ -1,0 +1,17 @@
+<% if logged_in? and current_user.person.member?%>
+    <ul class="sectionIcons">
+        <li><%= image_tag_for_key "new", new_presentation_path, "Upload a Presentation", nil, "Upload a Presentation" %></li>
+
+    </ul>
+<% end %>
+
+<% if @presentations.public_methods.include?("page_totals") %>
+  <!-- only do the page links if the collection supports it -->
+  <%= render :partial => "layouts/paginate_alphabetical", :locals => { :pages => @presentations.pages, :page_totals=>@presentations.page_totals,:current_page=>@presentations.page } -%>
+<% end %>
+
+<%= render :partial => "assets/resource_list", :locals => { :collection => @presentations, :authorization_for_showing_already_done=>true } %>
+
+<% if @presentations.page == "latest" && Presentation.find(:all).length > Seek::Config.limit_latest%>
+    <%= render :partial => "layouts/paginate_see_all"%>
+<% end %>
