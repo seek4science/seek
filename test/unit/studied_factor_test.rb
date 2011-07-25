@@ -106,8 +106,8 @@ class StudiedFactorTest < ActiveSupport::TestCase
       compound1 = Compound.new(:name => 'water')
       compound2 = Compound.new(:name => 'glucose')
       fs = StudiedFactor.new(:data_file => data_files(:editable_data_file), :data_file_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10, :standard_deviation => 1)
-      fs_link1 = StudiedFactorLink.new(:substance => compound1, :fs => fs)
-      fs_link2 = StudiedFactorLink.new(:substance => compound2, :fs => fs)
+      fs_link1 = StudiedFactorLink.new(:substance => compound1, :studied_factor => fs)
+      fs_link2 = StudiedFactorLink.new(:substance => compound2, :studied_factor => fs)
       assert fs.save!
       assert compound1.save!
       assert compound2.save!

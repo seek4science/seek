@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110721091613) do
+ActiveRecord::Schema.define(:version => 20110725155156) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -254,6 +254,14 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.integer "event_id"
   end
 
+  create_table "experimental_condition_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "experimental_condition_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "experimental_conditions", :force => true do |t|
     t.integer  "measured_item_id"
     t.float    "start_value"
@@ -382,6 +390,22 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+  end
+
+  create_table "mapping_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "mapping_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "mappings", :force => true do |t|
+    t.integer  "sabiork_id"
+    t.integer  "chebi_id"
+    t.integer  "kegg_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "measured_items", :force => true do |t|
@@ -770,6 +794,14 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
   create_table "strains", :force => true do |t|
     t.string   "title"
     t.integer  "organism_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "studied_factor_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "studied_factor_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

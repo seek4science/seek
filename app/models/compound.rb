@@ -1,6 +1,6 @@
 class Compound < ActiveRecord::Base
-  has_many :studied_factors, :as => :substance
-  has_many :experimental_conditions,:as => :substance
+  has_many :studied_factor_links, :as => :substance
+  has_many :experimental_condition_links,:as => :substance
   has_many :synonyms, :as => :substance
   has_many :mapping_links, :as => :substance
 

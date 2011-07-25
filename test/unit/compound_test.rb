@@ -33,7 +33,7 @@ class CompoundTest < ActiveSupport::TestCase
     assert compound.synonyms.count, 2
   end
 
-  test 'should create the compound has_many studied_factors, through studied_factor_links table ' do
+  test 'should create the association compound has_many studied_factors, through studied_factor_links table ' do
     User.with_current_user  users(:aaron) do
       compound = Compound.new(:name => 'glucose')
       fs1 = StudiedFactor.new(:data_file => data_files(:editable_data_file), :data_file_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10, :standard_deviation => 1)
@@ -53,7 +53,7 @@ class CompoundTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should create the compound has_many experimental_conditions, through experimental_condition_links table ' do
+  test 'should create the association compound has_many experimental_conditions, through experimental_condition_links table ' do
     User.with_current_user  users(:aaron) do
       compound = Compound.new(:name => 'glucose')
       ec1 = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10)

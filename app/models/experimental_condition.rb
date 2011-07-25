@@ -4,7 +4,7 @@ class ExperimentalCondition < ActiveRecord::Base
   belongs_to :sop  
   belongs_to :measured_item
   belongs_to :unit
-  has_many :studied_factor_links
+  has_many :experimental_condition_links
 
   validates_presence_of :unit,:measured_item,:start_value,:sop
 

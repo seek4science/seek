@@ -46,7 +46,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should list the existing ECes of the project the sop belongs to, filtured by can_view' do
+  test 'should list the existing ECes of the project the sop belongs to, filtered by can_view' do
     user = Factory(:user)
     sop = Factory(:sop, :contributor => user)
     #create bunch of sops and ECs which belong to the same project and the sops can be viewed
@@ -106,8 +106,8 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       compound1 = Compound.new(:name => 'water')
       compound2 = Compound.new(:name => 'glucose')
       ec = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10)
-      ec_link1 = ExperimentalConditionLink.new(:substance => compound1, :ec => ec)
-      ec_link2 = ExperimentalCondition.new(:substance => compound2, :ec => ec)
+      ec_link1 = ExperimentalConditionLink.new(:substance => compound1, :experimental_condition => ec)
+      ec_link2 = ExperimentalConditionLink.new(:substance => compound2, :experimental_condition => ec)
       assert ec.save!
       assert compound1.save!
       assert compound2.save!
