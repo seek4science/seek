@@ -67,7 +67,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
 
     User.with_current_user  user do
         assert sop.can_edit?
-        ecs = fses_or_ecs_of_project 'Sop', 'experimental_conditions', sop.project_id
+        ecs = fses_or_ecs_of_project sop, 'experimental_conditions'
         assert_equal ecs.count, 10
         ecs.each do |ec|
           assert ec.sop.can_view?
