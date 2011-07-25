@@ -227,3 +227,24 @@ end
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
   end
+
+  Factory.define(:project_subscription) do |f|
+    f.association :person
+    f.association :project
+  end
+
+  Factory.define(:subscription) do |f|
+    f.association :person
+    f.association :subscribable
+  end
+
+  Factory.define(:subscribable, :parent => :data_file){}
+
+  Factory.define(:activity_log) do |f|
+    f.association :activity_loggable, :factory => :subscribable
+    f.association :culprit, :factory => :user
+  end
+
+  Factory.define(:notifiee_info) do |f|
+    f.association :notifiee, :factory => :person
+  end
