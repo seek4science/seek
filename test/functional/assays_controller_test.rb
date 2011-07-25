@@ -751,7 +751,7 @@ end
 
     permission = assay.policy.permissions.first
     assert_equal permission.contributor_type, 'Project'
-    assert_equal permission.contributor_id, assay.project.id
+    assert_equal permission.contributor_id, assay.study.investigation.project.id
     assert_equal permission.policy_id, assay.policy_id
     assert_equal permission.access_type, Policy::ACCESSIBLE
   end
