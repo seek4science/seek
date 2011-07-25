@@ -1,4 +1,3 @@
-<% if logged_in? -%>
 <% item_hash=recent_changes_hash -%>
 <h2>New or recently changed items across <%= Seek::Config.project_name %></h2>
 
@@ -8,4 +7,3 @@
     :tabs_id=>"recent_changed_tabber",
     :authorization_already_done => true } -%>
 </div>
-<% end %>

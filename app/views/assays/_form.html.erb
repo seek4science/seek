@@ -29,7 +29,7 @@
     <%= f.label "Institution" %><br/>
     <%= collection_select(:assay, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."},{:style=>"width:90%"}) %>
   </p>
-
+  <% if @assay.study.blank? or @assay.study.can_view? %>
       <p>
       <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
     <%= f.label :study -%>
@@ -50,7 +50,7 @@
         <%= options %>
       </select>
     </p>
-
+  <%end%>
 
 </div>
 
@@ -81,16 +81,16 @@
     <% end -%>
   </tr>
 </table>
-
+<% if Seek::Config.is_virtualliver -%>
 
 <br style="clear:both"/>
  <% unless @assay.is_modelling?  %>
      <span class="required">*</span>
  <% end %>
  <%= f.fancy_multiselect :samples, :object_type_text => @assay_text -%>
-
+<% end %>
 <div id="add_organism_form">
-<%= render :partial=>"assays/select_organisms" if @assay.is_modelling?-%>
+<%= render :partial=>"assays/select_organisms" if !Seek::Config.is_virtualliver || @assay.is_modelling?-%>
 </div>
 
 <br style="clear:both"/>

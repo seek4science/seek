@@ -2,8 +2,7 @@ class StudiedFactorsController < ApplicationController
   before_filter :login_required
   before_filter :find_data_file_auth
   before_filter :create_new_studied_factor, :only=>[:index]
-
-  include StudiedFactorsHelper
+  before_filter :no_comma_for_decimal, :only=>[:create, :update]
 
   def index
     respond_to do |format|
@@ -27,9 +26,41 @@ class StudiedFactorsController < ApplicationController
         # clear the _add_factor form
         page.call "autocompleters['substance_autocompleter'].deleteAllTokens"
         page[:add_condition_or_factor_form].reset
+        page[:substance_autocomplete_input].disabled = true
       else
         page.alert(@studied_factor.errors.full_messages)
       end
+    end
+  end
+
+  def create_from_existing
+    studied_factor_ids = []
+    new_studied_factors = []
+    #retrieve the selected FSes
+    params.each do |key, value|
+       if key.match('checkbox_')
+         studied_factor_ids.push value.to_i
+       end
+    end
+    #create the new FSes based on the selected FSes
+    studied_factor_ids.each do |id|
+      studied_factor = StudiedFactor.find(id)
+      new_studied_factor = StudiedFactor.new(:measured_item_id => studied_factor.measured_item_id, :unit_id => studied_factor.unit_id, :start_value => studied_factor.start_value,
+                                             :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation, :substance_type => studied_factor.substance_type, :substance_id => studied_factor.substance_id)
+      new_studied_factor.data_file=@data_file
+      new_studied_factor.data_file_version = params[:version]
+      new_studied_factors.push new_studied_factor
+    end
+    #
+    render :update do |page|
+      new_studied_factors.each do  |sf|
+        if sf.save
+          page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>sf,:locals=>{:asset => 'data_file', :show_delete=>true}
+        else
+          page.alert("can not create factor studied: item: #{try_block{sf.substance.name}} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}")
+        end
+      end
+      page.visual_effect :highlight,"condition_or_factor_rows"
     end
   end
 
@@ -58,10 +89,8 @@ class StudiedFactorsController < ApplicationController
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])
         page.visual_effect :fade,"edit_condition_or_factor_#{@studied_factor.id}_form"
-        page.replace_html "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
-        #clear the _add_factor form
         page.call "autocompleters['#{@studied_factor.id}_substance_autocompleter'].deleteAllTokens"
-        page["edit_condition_or_factor_#{@studied_factor.id}_form"].reset
+        page.replace "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
       else
         page.alert(@studied_factor.errors.full_messages)
       end

@@ -54,17 +54,17 @@ Rails::Initializer.run do |config|
 
   # Your secret key for verifying cookie session data integrity.
   # If you change this key, all old sessions will become invalid!
-  # Make sure the secret is at least 30 characters and all random, 
+  # Make sure the secret is at least 30 characters and all random,
   # no regular words or you'll be exposed to dictionary attacks.
-  config.action_controller.session = {
-    :key => '_seek-hub_session',
-    :secret      => '1576ebcfe0d1c7477397d8fb6a7a4354ad24936cc12fd5d6ab6956ab0fc24fc7aa35da1cccc605a5abafc299ba8749694fc156dc84aa32bdf357c66537361f77'
-  }
+#  config.action_controller.session = {
+#    :key => '_seek-hub_session',
+#    :secret      => "579f8d2b8c37c18d473811946c642d7d"
+#  }
 
   # Use the database for sessions instead of the cookie-based default,
   # which shouldn't be used to store highly confidential information
   # (create the session table with "rake db:sessions:create")
-  # config.action_controller.session_store = :active_record_store
+  config.action_controller.session_store = :active_record_store
 
   # Use SQL instead of Active Record's schema dumper when creating the test database.
   # This is necessary if your schema can't be completely dumped by the schema dumper,

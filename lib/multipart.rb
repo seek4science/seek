@@ -83,8 +83,8 @@ class MultipartStream
     total
   end
   
-  def read ( how_much )
-    
+  def read ( how_much = nil )
+    how_much ||= size
     if @part_no >= @parts.size
       return nil;
     end

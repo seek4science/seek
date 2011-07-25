@@ -93,7 +93,7 @@ namespace :seek do
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
+    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains","compounds"]
     other_tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
@@ -419,6 +419,20 @@ namespace :seek do
       puts "#{count} UUIDs generated for #{c.name}" unless count < 1
     end
   end
+
+
+  desc "Lists all publicly available assets"
+  task :list_public_assets => :environment do
+    [Investigation, Study, Assay, DataFile, Model, Sop, Publication].each do |assets|
+      #  :logout
+      assets.all.each do |asset|
+        if asset.can_view?
+          puts "#{asset.title} - #{asset.id}"
+        end
+      end
+    end
+  end
+
 
   private
 

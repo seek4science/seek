@@ -17,6 +17,15 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:studies)
   end
+
+  test "should show draggable icon in index" do
+    get :index
+    assert_response :success
+    studies = assigns(:studies)
+    first_study = studies.first
+    assert_not_nil first_study
+    assert_select "a[id*=?]",/drag_Study_#{first_study.id}/
+  end
   
   def test_title
     get :index

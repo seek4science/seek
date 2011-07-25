@@ -119,9 +119,9 @@ min-width:
 }
 
 .box_editing_inner2 {
-	background-color: #EEEEEE;
+	background-color: #eee;
 	padding: 0.5em 0.8em;
-	border: 1px dotted #999999;
+	border: 1px dotted #999;
 }
 
 
@@ -142,7 +142,7 @@ table.list_item {
     background-color: #F0F0F0;
     margin-top: 6px;
     padding: 1em;
-    border: #999999 solid 1px;
+    border: #999 solid 1px;
     border-collapse: collapse;
     font-size: 93%;
     min-height: 90px;
@@ -153,7 +153,7 @@ table.list_item tr.odd_row {
 }
 
 table.list_item tr.even_row {
-    background-color: #EEEEEE;
+    background-color: #eee;
 }
 
 table.list_item tr td.actions {
@@ -162,14 +162,14 @@ table.list_item tr td.actions {
 
 table.list_item tr td.actions a {
     display: block;
-    border-bottom: 0px solid #999999;
+    border-bottom: 0px solid #999;
     margin-bottom: 0.3em;
     font-size: 85%;
     font-weight: normal;
 }
 
 table.list_item .desc {
-    border: 1px dotted #999999;
+    border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.4em 0.6em;
     background-color: #FFFFCC;
@@ -179,7 +179,7 @@ table.list_item .desc {
 }
 
 table.list_item .standout {
-    border: 1px dotted #999999;
+    border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.5em 0.6em;
     background-color: #FFFFCC;
@@ -187,7 +187,7 @@ table.list_item .standout {
     line-height: 1;
     font-size: 93%;
     font-weight: bold;
-    color: #333333;
+    color: #333;
 }
 
 
@@ -271,7 +271,7 @@ span.disabled_icon {
     *padding: 0.2em 0.5em;
     line-height: 1.0;
     text-decoration: none;
-    border: 1px solid #BBBBBB;
+    border: 1px solid #bbb;
     background-color: #FEF6FF;
     color: #000099;
 }
@@ -358,7 +358,7 @@ span.disabled_icon {
 	background-repeat: repeat-x;
 	background-color: #FFFFCC;
     padding: 0.5em 0 1em 0;
-	border: 1px dotted #999999;
+	border: 1px dotted #999;
 	text-align: center;
 	margin-bottom: 0.6em;
 }
@@ -396,7 +396,7 @@ span.disabled_icon {
 	margin: 0.5em 0;
 	*margin: 0;
 	height: 1px;
-	border-bottom: 1px dotted #999999;
+	border-bottom: 1px dotted #999;
 }
 
 .contribution_section_box .heading {
@@ -425,9 +425,9 @@ span.disabled_icon {
 .contribution_section_box .foldTitle {
 	background-image: none;
 	background-color: #EEF6FF;
-	color: #333333;
-	border: 1px solid #BBBBBB;
-	border-bottom: 2px solid #CCCCCC;
+	color: #333;
+	border: 1px solid #bbb;
+	border-bottom: 2px solid #ccc;
 }
 
 .contribution_section_box .foldText {
@@ -438,7 +438,7 @@ span.disabled_icon {
 .contribution_section_box .foldContent {
 	padding: 0.2em;
 	background-color: #F5F5F5;
-	border: 1px solid #BBBBBB;
+	border: 1px solid #bbb;
 	border-top: 1px solid transparent;
 }
 
@@ -493,7 +493,7 @@ span.disabled_icon {
 .note_text_disabled {
     font-size: 93%;
     font-weight: bold;
-    color: #666666;
+    color: #666;
 }
 
 
@@ -644,60 +644,12 @@ ul.users_details li p {
 
 }
 
-div.conditions_or_factors {
-    border: dotted #999999 1px;
-    float: left;
-    margin-left: 4em;
-    margin-top: 2em;
-    margin-bottom: 2em;
-    width: 50em;
-}
-
-ul.conditions_or_factors li {        
-    list-style-type:none;
-}
-
-ul.condition_or_factor_row {
-    clear:both;
-}
-
-ul.condition_or_factor_row li {
-    float:left;
-    padding: 0 1em 0.25em 1em;
-    text-align:left;
-    border-bottom: dotted #999999 1px;
-    min-height: 2em;
-}
-
-ul.condition_or_factor_row li#measured_item {
-    width:15em;
-}
-
-ul.condition_or_factor_row li#values {
-    width:15em;
-}
-
-ul.condition_or_factor_row li#time_point {
-    width:5em;
-}
-
-ul.condition_or_factor_row li#standard_deviation {
-    width:5em;
-}
-
-ul.condition_or_factor_row li#delete {
-    width:1em;
-}
-
 ul.heading li {
     font-weight:bolder;
     min-height: 4em;
 }
 
-.show_basic div#studied_factors {
-    max-height:30em;
-    overflow:auto;
-}
+
 
 div.ontology_nav {
     padding-left: 3em;
@@ -855,8 +807,8 @@ img.badge {
 
 a.asset img.avatar {
     padding :5px;
-    border:1px solid #CCCCCC;
-    background-color: #FFFFFF;
+    border:1px solid #ccc;
+    background-color: #fff;
     min-width :3em;
     min-height: 3em;
 }
@@ -866,7 +818,7 @@ div.list_item {
     background-color: #F0F0F0;
     margin-top: 6px;
     padding: 1em;
-    border: #999999 solid 1px;
+    border: #999 solid 1px;
     border-collapse: collapse;
     min-height: 90px;
     float: left;
@@ -891,7 +843,7 @@ div.list_item_actions {
 }
 
 div.list_item_desc {
-    border: 1px dotted #999999;
+    border: 1px dotted #999;
     margin: 0.2em 0;
     padding: 0.4em 0.6em;
     background-color: #FFFFCC;
@@ -950,21 +902,21 @@ div.hidden_list_item {
     background-color: #F0F0F0;
     margin-top: 6px;
     padding: 1em;
-    border: #999999 solid 1px;
+    border: #999 solid 1px;
     border-collapse: collapse;
-    color: #999999;
+    color: #999;
     float:left;
 }
 
 ul.related_asset_list li{
     white-space: normal;
-    list-style-type: disc;
+    list-style-type: none;
     list-style-position: inside;
 }
 
 .contribution_title {
-    border-top: solid #BBBBBB 1px;
-    border-bottom: solid #BBBBBB 1px;
+    border-top: solid #bbb 1px;
+    border-bottom: solid #bbb 1px;
     padding-top: 0.5em;
     background-color: #F0F0F0;
     margin-left: 1em;
@@ -979,8 +931,8 @@ ul.related_asset_list li{
     margin-right: 0.5em;
     margin-top: -0.2em;
     padding:3px 5px 0px 3px;
-    border:1px solid #CCCCCC;
-    background-color: #FFFFFF;
+    border:1px solid #ccc;
+    background-color: #fff;
     
 	min-width :2.3em;
     min-height: 2.3em;
@@ -996,7 +948,7 @@ ul.related_asset_list li{
 }
 
 .contribution_aftertitle {
-	color: #666666; 
+	color: #666;
 	font-size: 85%; 
 	text-align: center; 	
 	margin-bottom: 0.6em;
@@ -1022,8 +974,8 @@ p.select_assay_class {
     font-size: larger;
     font-weight: bold;    
     height: 3em;
-    background-color: #DDDDDD;
-    border: solid 1px #999999;
+    background-color: #ddd;
+    border: solid 1px #999;
     margin-bottom: 1em;
     width: 70%;
     margin-right: auto;
@@ -1041,8 +993,8 @@ div.avatar_list_popup {
     margin-left:6em;
     z-index:1;
     padding:7px;
-    background-color:#EEEEEE;
-    border:1px solid #999999;
+    background-color:#eee;
+    border:1px solid #999;
     position:absolute;
     max-width:420px;
     text-align:center;
@@ -1055,13 +1007,13 @@ ul.horiz_list_items li {
 /* Begin Footer styles */
 
 #ft {	
-    border: 2px solid #999999;
+    border: 2px solid #999;
     border-width: 1px 0 1px 0;
-    color: #333333;
+    color: #333;
     background-image: url('/images/footer-bg.png');
     background-position: top;
     background-repeat: repeat-x;
-    background-color: #EEEEEE;		
+    background-color: #eee;
 	bottom:0px;
 }
 
@@ -1073,7 +1025,7 @@ ul.horiz_list_items li {
 
 #ft table {
     width: 100%;
-    border-top: 1px solid #999999;
+    border-top: 1px solid #999;
     border-spacing: 0;
     margin: 0;		
 }
@@ -1094,7 +1046,7 @@ ul.horiz_list_items li {
 
 #ft td.middle {
     width: auto;    
-    border-left: 1px solid #999999;
+    border-left: 1px solid #999;
     text-align: center;		
 }
 	
@@ -1111,7 +1063,7 @@ ul.horiz_list_items li {
 #ft td.right {
     width: 110px;
     text-align: center;
-    border-left: 1px solid #999999;
+    border-left: 1px solid #999;
 }
 
 #ft td.right p {
@@ -1177,8 +1129,8 @@ ul.bulleted_list li {
 
 /* HELP DOCUMENT STYLES */
 div.help_document {
-  border-bottom: 1px dotted #999999;
-  border-top: 1px dotted #999999;
+  border-bottom: 1px dotted #999;
+  border-top: 1px dotted #999;
   margin: 1em 0;
   padding: 1em 0;
 }
@@ -1201,7 +1153,7 @@ div.help_document h1, div.help_document h2, div.help_document h3, div.help_docum
   border: none;
   padding: 0;
   margin: 0.5em 0;
-  color: #000000;
+  color: black;
   text-align: left;
   background: none;
   line-height: normal;
@@ -1238,14 +1190,14 @@ div.help_document h6 {
 }
 
 div.help_upload_box form {
-  border-top: 1px dotted #CCCCCC;
+  border-top: 1px dotted #ccc;
   margin-top: 5px;
 }
 
 div.help_upload_box div.image_thumbnail {
   display: inline-block;
   padding: 2px;
-  border: 1px solid #999999;
+  border: 1px solid #999;
   text-align: center;
   margin-bottom: 3px;
 }
@@ -1278,7 +1230,7 @@ div.collapsable_div_header {
   background-image: url('/images/header-bg.png');
   background-position: top;
   background-repeat: repeat-x;
-  background-color: #EEEEEE;
+  background-color: #eee;
   padding: 0.5em 0.6em;  
   font-size: 100%;
   display: block;
@@ -1304,7 +1256,7 @@ ul.attachments_list {
 ul.attachments_list li {
   list-style: none;
   background-color:#EEF;
-  border: 1px solid #999999;
+  border: 1px solid #999;
   padding: 3px;
   margin: 2px;
 }
@@ -1435,14 +1387,14 @@ a.block_link img {
 div.preview_box {
   width: 17em;
   max-height: 25em;
-  background-color: #EEEEEE;
+  background-color: #eee;
   display: inline-block;
   padding: 1em 1em 1em 1em;
-  border: 1px solid #999999;
+  border: 1px solid #999;
 }
 
 .pale_text {
-	color: #666666;
+	color: #666;
 }
 
 div.asset_form {
@@ -1489,8 +1441,20 @@ div.email_configuration{
     width: 500px
 }
 
+
+
+a.advanced_sharing_link{
+   float:right;
+}
+
+.sharing_box_form {
+	background-color: #eee;
+	padding: 0.8em 0.8em;
+}
+
+/*Factors studied, experimental condition, substances*/
 div.substance_condition_factor{
-    position:relative;
+    margin-bottom: 1em;
     margin-bottom: 1em;
     width: 25em;
 }
@@ -1502,11 +1466,128 @@ div.substance_experimental_condition{
     width: 25em;
 }
 
-a.advanced_sharing_link{
-   float:right;
+table.substance_info {
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: outset;
+	border-color: #DDD;
+	border-collapse: separate;
+	background-color: white;
+    margin-top: 0.5em;
+
+
+}
+table.substance_info th {
+	border-width: 1px;
+	padding: 1px;
+	border-style: inset;
+	border-color: #DDD;
+	background-color: white;
+}
+table.substance_info td {
+	border-width: 1px;
+	padding: 1px;
+	border-style: inset;
+	border-color: #DDD;
+	background-color: white;
+}
+input.search_substance_info {
+    font-weight:bold;
+}
+div.add_substance_concentration {
+   border-top: 1px dashed #DDD;
+   margin-top: 0.5em;
+   margin-bottom: 1em;
 }
 
-.sharing_box_form {
-	background-color: #EEEEEE;
-	padding: 0.8em 0.8em;
+ul.conditions_or_factors li {
+    list-style-type:none;
+}
+
+ul.conditions_or_factors {
+    float: left;
+    margin-left: 4em;
+    margin-top: 2em;
+}
+
+ul.condition_or_factor_row {
+    clear:both;
+}
+
+ul.condition_or_factor_row li {
+    float:left;
+    padding: 0 1em 0.25em 1em;
+    text-align:left;
+    border-bottom: dotted #999 1px;
+    min-height: 2em;
+}
+
+ul.measured_items {
+    clear:both;
+    margin-top: 1em;
+}
+
+ul.measured_items li{
+    float:left;
+    padding: 0 1em 0.25em 1em;
+    text-align:left;
+    min-height: 2em;
+    list-style-type:none;
+}
+
+ul.condition_or_factor_row li#measured_item {
+    width:15em;
+}
+
+ul.condition_or_factor_row li#values {
+    width:15em;
+}
+
+ul.condition_or_factor_row li#time_point {
+    width:5em;
+}
+
+ul.condition_or_factor_row li#standard_deviation {
+    width:5em;
+}
+
+ul.condition_or_factor_row li#delete {
+    width:1em;
+}
+
+.show_basic div#studied_factors {
+    max-height:30em;
+    overflow:auto;
+}
+
+div.conditions_or_factors {
+    border: 1px solid #DDD;
+    float: left;
+    margin-left: 2em;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    width: 48em;
+    padding: 0 1em 0.5em 1em;
+}
+
+ul.existing_conditions_or_factors {
+    float: left;
+    margin-left: 0em;
+    margin-top: 0em;
+    margin-bottom: 2em;
+    padding: 0 1em 0.5em 1em;
+    clear: both;
+}
+
+ul.existing_conditions_or_factors li {
+    list-style-type:none;
+}
+.border_top {
+    border-top: 1px solid #DDD;
+    width: 20em;
+    padding: 0.5em 1em 0.5em 1em;
+}
+
+.space_for_alignment {
+  width: 1em;
 }

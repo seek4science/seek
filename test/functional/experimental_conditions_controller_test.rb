@@ -159,4 +159,40 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal fs_updated.end_value, 50
   end
 
+
+  test "should not create experimental condition which has fields containing the comma in the decimal number" do
+    sop = sops(:editable_sop)
+    mi = measured_items(:time)
+    unit = units(:gram)
+    ec = {:measured_item_id => mi.id, :start_value => "1,5" , :end_value => 10, :unit => unit}
+    post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
+    ec = assigns(:experimental_condition)
+    assert_nil ec
+  end
+
+  test 'should not update experimental condition which has fields containing the comma in the decimal number' do
+    ec = experimental_conditions(:experimental_condition_time)
+    assert_not_nil ec
+
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:start_value => "10,02", :end_value => 50}
+    ec_updated = assigns(:experimental_condition)
+    assert_nil ec_updated
+  end
+
+  test 'should create ECs from the existing ECs' do
+    ec_array = []
+    user = Factory(:user)
+    login_as(user)
+    sop = Factory(:sop, :contributor => user)
+    assert_equal sop.experimental_conditions.count, 0
+    #create bunch of FSes which are different
+    i=0
+    while i < 3  do
+      ec_array.push Factory(:experimental_condition, :start_value => i)
+      i +=1
+    end
+    post :create_from_existing, :sop_id => sop.id, :version => sop.latest_version, "checkbox_#{ec_array.first.id}" => ec_array.first.id, "checkbox_#{ec_array[1].id}" => ec_array[1].id, "checkbox_#{ec_array[2].id}" => ec_array[2].id
+    sop.reload
+    assert_equal sop.experimental_conditions.count, 3
+  end
 end

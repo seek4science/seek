@@ -1,5 +1,5 @@
 <%
-resource_type=resource.class.name.humanize
+resource_type = text_for_resource(resource)
 %>
 
 
@@ -27,6 +27,6 @@ resource_type=resource.class.name.humanize
 
 <% else -%>
   <%=  help_icon("You do not have permission to download this #{resource_type}, but if you are interested you can request permission from the owner.") %>
-  <%= image_tag_for_key('sop',"javascript:alert('Unable to send emails')","Request file",nil,"Request file") -%>
+  <%= image_tag_for_key('sop',"javascript:alert('Unable to send emails')","Request #{resource_type}",nil,"Request #{resource_type}") -%>
 
 <% end -%>

@@ -1,0 +1,70 @@
+div.top_home_panel {
+    background-color: #EEE;
+    border: 1px solid #d3d3d3;
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1em;
+    min-height: 6em;
+    padding-left: 0.25em;
+}
+
+div.home_panel {
+    background-color: #EEE;
+    border: 1px solid #d3d3d3;
+    height: 25em;
+    float: left;
+}
+
+div.home_panel_pair {
+    width: 95%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.home_panel .homepanel_list {
+    padding-bottom: 0.5em;
+    height: 22.6em;
+    margin-left: 0.5em;
+    overflow-y: auto;
+}
+
+div.home_panel .homepanel_list ul {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+div.home_panel .homepanel_item {
+    border-bottom: 1px solid #DDD;
+    list-style: none;
+    width: 100%;
+    padding-left: 0px;
+}
+
+div.home_panel .heading {
+    background-color: #3D71CA;
+    color: white;
+    font-weight: bolder;
+    text-align: center;
+    min-height: 1.25em;
+    text-align: center;
+    padding-top: 0.4em;
+    padding-bottom: 0.25em;
+}
+
+.atom {
+    float: left;
+    margin-left: 0.25em;
+    padding-bottom: 0.5em;
+}
+
+.feedinfo {
+    font-size: smaller;
+}
+
+div.home_panel img.home_asset_icon {
+    width: 1.6em;
+    height: 1.6em;
+    vertical-align: middle;
+    padding-right: 0.5em;
+}
