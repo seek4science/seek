@@ -3,6 +3,7 @@ class SamplesController < ApplicationController
   include IndexPager
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
+  before_filter :virtualliver_only
 
 
   def new_object_based_on_existing_one

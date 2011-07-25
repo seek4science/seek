@@ -23,6 +23,15 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:investigations)
   end
 
+  test "should show draggable icon in index" do
+    get :index
+    assert_response :success
+    investigations = assigns(:investigations)
+    first_investigations = investigations.first
+    assert_not_nil first_investigations
+    assert_select "a[id*=?]",/drag_Investigation_#{first_investigations.id}/
+  end
+
   test "should show item" do
     get :show, :id=>investigations(:metabolomics_investigation)
     assert_response :success

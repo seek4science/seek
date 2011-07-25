@@ -29,7 +29,7 @@ module Seek
     #Updates all tags as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
     #New tags are assigned to the owner, which defaults to the current user.
     def update_tags entity, owner=current_user
-
+      return if owner.nil?
       existing_tags = entity.tag_counts
       owner_tags = entity.owner_tags_on(owner, :tags)
 

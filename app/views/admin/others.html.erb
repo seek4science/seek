@@ -40,7 +40,6 @@
             :name=>"Maximum visible tags",
             :field=>text_field_tag(:max_visible_tags, Seek::Config.max_visible_tags, :title => 'maximum number of tags appeared in the tag cloud', :onkeypress => "javascript: return onlyNumbers(event);")
     } -%>
-
     <li>
         <%= submit_tag "Update",:disable_with=>"Updating..." -%>
     </li>

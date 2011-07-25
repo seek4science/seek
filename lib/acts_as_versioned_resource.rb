@@ -43,20 +43,12 @@ module Acts #:nodoc:
         self.parent.attributions.collect { |a| a.object }
       end
 
-      def can_edit? *args
-        self.parent.can_edit? *args
-      end
-
-      def can_view? *args
-        self.parent.can_view? *args
-      end
-
-      def can_download? *args
-        self.parent.can_download? *args
-      end
-
-      def can_delete? *args
-        self.parent.can_delete? *args
+      Acts::Authorized::AUTHORIZATION_ACTIONS.each do |action|
+        eval <<-END_EVAL
+          def can_#{action}? user = User.current_user
+            self.parent.can_perform? '#{action}', user
+          end
+        END_EVAL
       end
 
       #assumes all versioned resources are also taggable

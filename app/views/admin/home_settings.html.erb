@@ -1,0 +1,48 @@
+<%= stylesheet_link_tag "settings" -%>
+
+<h1>Homepage setting</h1>
+<div class="show_basic">
+<% form_tag :action=>"update_home_settings" do -%>
+  <br/>
+  <ul class='settings'>
+    <%= render :partial=>'setting_li', :locals=>{
+            :description=>"Display the project news in the homepage",
+            :name=>"Project news enabled",
+            :field=>check_box_tag(:project_news_enabled, 1, Seek::Config.project_news_enabled, :onchange=>toggle_appear_javascript('project_news_block'))
+    } -%>
+
+    <li id="project_news_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.project_news_enabled -%>">
+      Feed urls: <%= text_field_tag(:project_news_feed_urls, Seek::Config.project_news_feed_urls, :size => 81) %>
+      <span class="setting_description">The feed urls of the sites you want to get the feeds for your project news box. The multiple urls are separated by a comma. The format of the feeds is atom. You can convert an rss feed to atom feed by using google reader</span>
+      Number of news: <%= text_field_tag(:project_news_number_of_entries, Seek::Config.project_news_number_of_entries, :onkeypress => "javascript: return onlyNumbers(event);") %>
+      <span class="setting_description">Number of news you want to display in the project news box. The news will be taken by the chronological order</span>
+    </li>
+
+    <%= render :partial=>'setting_li', :locals=>{
+            :description=>"Display the community news in the homepage",
+            :name=>"Community news enabled",
+            :field=>check_box_tag(:community_news_enabled, 1, Seek::Config.community_news_enabled, :onchange=>toggle_appear_javascript('community_news_block'))
+    } -%>
+
+    <li id="community_news_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.community_news_enabled -%>">
+      Feed urls: <%= text_field_tag(:community_news_feed_urls, Seek::Config.community_news_feed_urls, :size => 81) %>
+      <span class="setting_description">The feed urls of the sites you want to get the feeds for your community news box. The multiple urls are separated by a comma. The format of the feeds is atom. You can convert an rss feed to atom feed by using google reader</span>
+      Number of news: <%= text_field_tag(:community_news_number_of_entries, Seek::Config.community_news_number_of_entries, :onkeypress => "javascript: return onlyNumbers(event);") %>
+      <span class="setting_description">Number of news you want to display in the project news box. The news will be taken by the chronological order</span>
+    </li>
+
+    <%= render :partial=>'setting_li', :locals=>{
+            :description=>"Sets the description text on the front page",
+            :name=>"Home page description",
+            :field=>text_area_tag(:home_description, Seek::Config.home_description, :size=>"90x8")
+    } -%>
+
+    <br/>
+    <li><%= submit_tag "Update",:disable_with=>"Updating ..." %></li>
+
+  </ul>
+
+<% end %>
+</div>
+
+

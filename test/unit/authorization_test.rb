@@ -8,7 +8,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   # ************************************************************************
   
   # testing: is_person_in_whitelist?(person_id, whitelist_owner_user_id)
-  
+
+
   def test_is_person_in_whitelist__should_yield_true
     res = Authorization.is_person_in_whitelist?(people(:person_for_owner_of_fully_public_policy), users(:owner_of_a_sop_with_complex_permissions))
     
@@ -21,10 +22,32 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !res, "test person should have not been identified as being in the whitelist of test user"
   end
 
-  
-  
+  def test_auth_on_asset_version
+    user1 = Factory :user
+    user2 = Factory :user
+    sop = Factory :sop, :contributor=>user1, :policy=>Factory(:private_policy)
+    sop.policy.permissions << Factory(:permission, :policy=>sop.policy,:contributor=>user2.person,:access_type=>Policy::VISIBLE)
+    assert_equal 1,sop.versions.count
+    sop_v=sop.versions.first
+
+    assert_equal sop,sop_v.parent
+
+    assert sop.can_manage?(user1)
+    assert !sop.can_manage?(user2)
+    assert sop.can_view?(user2)
+    assert !sop.can_view?(nil)
+    assert !sop.can_download?(user2)
+    assert !sop.can_edit?(user2)
+
+    assert sop_v.can_manage?(user1)
+    assert !sop_v.can_manage?(user2)
+    assert sop_v.can_view?(user2)
+    assert !sop_v.can_view?(nil)
+    assert !sop_v.can_download?(user2)
+    assert !sop_v.can_edit?(user2)
+  end
+
   # testing: is_person_in_blacklist?(person_id, blacklist_owner_user_id)
-  
   def test_is_person_in_blacklist__should_yield_true
     res = Authorization.is_person_in_blacklist?(people(:person_for_owner_of_my_first_sop), users(:owner_of_a_sop_with_complex_permissions))
     
@@ -722,6 +745,31 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !item.can_manage?
   end
 
+  def test_permission_has_precendence_over_policy
+    person = Factory :person
+    assert_equal 1,person.projects.count,"Should only be in 1 project"
+    project = person.projects.first
+    user=person.user
+    item = Factory :sop, :policy=>Factory(:all_sysmo_viewable_policy)
+    User.with_current_user user do
+      assert item.can_view?
+    end
+    item.policy.permissions << Factory(:permission, :contributor => project, :access_type => Policy::NO_ACCESS, :policy => item.policy)
+                
+    User.with_current_user user do
+      assert !item.can_view?
+    end
+
+    item = Factory :sop, :policy=>Factory(:private_policy)
+    User.with_current_user user do
+      assert !item.can_view?
+    end
+    item.policy.permissions << Factory(:permission, :contributor => project, :access_type => Policy::VISIBLE, :policy => item.policy)
+    User.with_current_user user do
+      assert item.can_view?
+    end
+  end
+
   def test_permissions
     User.current_user = Factory :user
     access_levels = {Policy::MANAGING => actions, 
@@ -741,6 +789,7 @@ class AuthorizationTest < ActiveSupport::TestCase
       assert_equal item.can_manage?, allowed.include?(:manage)
     end
   end
+
 
   private 
 
