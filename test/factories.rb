@@ -189,6 +189,14 @@ end
     f.association :project
     f.association :contributor, :factory => :user
   end
+#Presentation
+Factory.define(:presentation) do |f|
+  f.title "A Presentation"
+  f.association :project
+ # f.data_url "http://www.virtual-liver.de/images/logo.png"
+  f.association :contributor,:factory=>:user
+  f.association :content_blob, :factory => :content_blob
+end
 
 #Misc
 Factory.define(:group_membership) do |f|
@@ -218,6 +226,9 @@ end
     f.end_date 1.days.from_now
   end
 
+#Content_blob
+#either url or data should be provided for assets
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
+    f.url "http://www.virtual-liver.de/images/logo.png"
   end
