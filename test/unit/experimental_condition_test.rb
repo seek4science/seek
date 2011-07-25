@@ -100,4 +100,22 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     uniq_fs_array = uniq_fs_or_ec ec_array
     assert_equal uniq_fs_array.count, i+1
   end
+
+  test "should create the association has_many compounds , through experimental_condition_links table" do
+    User.with_current_user  users(:aaron) do
+      compound1 = Compound.new(:name => 'water')
+      compound2 = Compound.new(:name => 'glucose')
+      ec = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10)
+      ec_link1 = ExperimentalConditionLink.new(:substance => compound1, :ec => ec)
+      ec_link2 = ExperimentalCondition.new(:substance => compound2, :ec => ec)
+      assert ec.save!
+      assert compound1.save!
+      assert compound2.save!
+      assert ec_link1.save!
+      assert ec_link2.save!
+      assert_equal ec.experimental_condition_links.count, 2
+      assert_equal ec.experimental_condition_links.first.substance, compound1
+      assert_equal ec.experimental_condition_links[1].substance, compound2
+    end
+  end
 end

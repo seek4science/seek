@@ -101,4 +101,22 @@ class StudiedFactorTest < ActiveSupport::TestCase
     assert_equal uniq_fs_array.count, i+1
   end
 
+  test "should create the association has_many compounds , through studied_factor_links table" do
+    User.with_current_user  users(:aaron) do
+      compound1 = Compound.new(:name => 'water')
+      compound2 = Compound.new(:name => 'glucose')
+      fs = StudiedFactor.new(:data_file => data_files(:editable_data_file), :data_file_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10, :standard_deviation => 1)
+      fs_link1 = StudiedFactorLink.new(:substance => compound1, :fs => fs)
+      fs_link2 = StudiedFactorLink.new(:substance => compound2, :fs => fs)
+      assert fs.save!
+      assert compound1.save!
+      assert compound2.save!
+      assert fs_link1.save!
+      assert fs_link2.save!
+      assert_equal fs.studied_factor_links.count, 2
+      assert_equal fs.studied_factor_links.first.substance, compound1
+      assert_equal fs.studied_factor_links[1].substance, compound2
+    end
+  end
+
 end
