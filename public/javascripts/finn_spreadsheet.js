@@ -195,7 +195,6 @@ $j(document).ready(function ($) {
         }
       })
   ;
-
   $( "div.row_heading" )
       .resizable({
         handles: 's',
@@ -281,7 +280,7 @@ function bindAnnotations() {
     }
   }
   //Make the annotations draggable
-  $j('#annotation_container').draggable({handle: '#annotation_drag'});
+  $j('#annotation_container').draggable({handle: '#annotation_drag', zIndex: 10});
 }
 
 function createAnnotationStub(ann)
