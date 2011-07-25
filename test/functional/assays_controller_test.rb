@@ -10,6 +10,11 @@ class AssaysControllerTest < ActionController::TestCase
   def setup
     login_as(:quentin)
     @object=Factory(:assay, :policy => Factory(:public_policy))
+    #Seek::Config.is_virtualliver=true
+  end
+  
+  def teardown
+    #Seek::Config.is_virtualliver=false
   end
 
   test "modelling assay validates with schema" do
@@ -51,6 +56,15 @@ class AssaysControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:assays)
+  end
+
+  test "should show draggable icon in index" do
+    get :index
+    assert_response :success
+    assays = assigns(:assays)
+    first_assay = assays.first
+    assert_not_nil first_assay
+    assert_select "a[id*=?]",/drag_Assay_#{first_assay.id}/
   end
 
   test "should show index in xml" do
@@ -231,15 +245,15 @@ end
 
   test "should create" do
     assert_difference('ActivityLog.count') do
-      assert_difference("Assay.count") do
-        post :create,:assay=>{:title=>"test",
-          :technology_type_id=>technology_types(:gas_chromatography).id,
-          :assay_type_id=>assay_types(:metabolomics).id,
-          :study_id=>studies(:metabolomics_study).id,
-          :assay_class=>assay_classes(:experimental_assay_class)}
-      end
+    assert_difference("Assay.count") do
+      post :create,:assay=>{:title=>"test",
+        :technology_type_id=>technology_types(:gas_chromatography).id,
+        :assay_type_id=>assay_types(:metabolomics).id,
+        :study_id=>studies(:metabolomics_study).id,
+        :assay_class=>assay_classes(:experimental_assay_class),
+        :sample => samples(:test_sample)}
     end
-
+    end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
     #assert_equal organisms(:yeast),a.organism

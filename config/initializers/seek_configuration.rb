@@ -49,8 +49,10 @@ Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
 Seek::Config.default :copyright_addendum_enabled,false
 Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
+Seek::Config.default :is_virtualliver, false
+
 # Pagination
-Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
+Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}
 Seek::Config.default :limit_latest,7
 
 # Others

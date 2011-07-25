@@ -8,8 +8,10 @@ class SearchController < ApplicationController
       @results = []
     end
 
+    #strip out nils, which can occur if the index is out of sync
+    @results = @results.select{|r| !r.nil?}
 
-    @results = select_authorised @results    
+    @results = select_authorised @results
     if @results.empty?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'."
     else
@@ -56,8 +58,17 @@ class SearchController < ApplicationController
         @results = Assay.multi_solr_search(downcase_query, :limit=>100, :models=>[Assay]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       when ("publications")
         @results = Publication.multi_solr_search(downcase_query, :limit=>100, :models=>[Publication]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+      when ("specimens")
+        @results = Specimen.multi_solr_search(downcase_query, :limit=>100, :models=>[Specimen]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+      when ("samples")
+        @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       else
-        @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>[Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+        sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication,Sample,Specimen]
+        unless Seek::Config.is_virtualliver
+          sources.delete(Sample)
+          sources.delete(Specimen)
+        end
+        @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>sources).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
         search_in_factors_studied
         search_in_experimental_condition
     end
@@ -73,16 +84,20 @@ class SearchController < ApplicationController
   def search_in_factors_studied
     downcase_query = @search_query.downcase
     factors_studies = StudiedFactor.multi_solr_search(downcase_query, :limit=>100, :models=>[StudiedFactor]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
-    factors_studies.each do |fs|
-      @results.push(fs.data_file) if !@results.include? fs.data_file
+    unless factors_studies.blank?
+      factors_studies.each do |fs|
+        @results.push(fs.data_file) if !@results.include? fs.data_file
+      end
     end
   end
 
   def search_in_experimental_condition
     downcase_query = @search_query.downcase
     experimental_conditions = ExperimentalCondition.multi_solr_search(downcase_query, :limit=>100, :models=>[ExperimentalCondition]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+    unless experimental_conditions.blank?
       experimental_conditions.each do |ec|
-        @results.push(ec.sop) if !@results.include? ec.sop
+          @results.push(ec.sop) if !@results.include? ec.sop
+      end
     end
   end
 end

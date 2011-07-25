@@ -5,10 +5,10 @@ class AssetTest < ActiveSupport::TestCase
   include ApplicationHelper
 
   test "creatable classes order" do
-    EVENTS_ENABLED=true
-    creatables = user_creatable_classes
-    assert !creatables.empty?
-    assert_equal [DataFile,Model,Publication,Sop,Assay,Investigation,Study,Event],creatables
+    oldval = Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver = true
+    assert_equal [DataFile,Model,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],user_creatable_classes
+    Seek::Config.is_virtualliver = oldval
   end
 
   test "default contributor or nil" do

@@ -22,7 +22,7 @@ module ProjectsHelper
     if project.pals.empty?
       "<span class='none_text'>No Pals for this project</span>";
     else
-      project.pals.collect{|p| link_to(h(p.name),p)}.join(", ")
+      project.pals.select(&:can_view?).collect{|p| link_to(h(p.name),p)}.join(", ")
     end
   end
 end

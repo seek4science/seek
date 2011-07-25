@@ -131,6 +131,13 @@ class OrganismsControllerTest < ActionController::TestCase
       delete :destroy, :id => o
     end    
   end
+
+  test "visualise available when logged out" do
+    logout
+    o=organisms(:human)
+    get :visualise, :id=>o
+    assert_response :success
+  end
   
   test "cannot delete associated organism" do
     login_as(:aaron)

@@ -212,6 +212,9 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     @events=Event.paginate
     assert_equal @events.page, Seek::Config.default_pages[:events]
 
+    @specimens=Specimen.paginate
+    assert_equal @specimens.page, Seek::Config.default_pages[:specimens]
+
   end
 
 end

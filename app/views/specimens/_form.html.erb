@@ -1,0 +1,78 @@
+<%= javascript_include_tag "sharing.js" -%>
+
+<%= f.error_messages %>
+
+
+
+<h2>Specimen Details</h2>
+
+
+ <div style="width: 95%;">
+    <p>
+      <%= f.label :donor_number -%><span class="required">*</span><br/>
+      <%= f.text_field :donor_number, :style => "width: 350px;" -%>
+    </p>
+
+    <p>
+      <%= f.label :age -%><br/>
+      <%= f.text_field :age, :style => "width: 150px;" -%> weeks
+
+    </p>
+
+    <p>
+      <%= f.label :treatment -%><br/>
+      <%= f.text_field :treatment, :style => "width: 350px;" -%>
+    </p>
+
+    <p>
+      <%= f.label :lab_internal_number -%><span class="required">*</span><br/>
+      <%= f.text_field :lab_internal_number, :style => "width: 350px;" -%>
+    </p>
+
+
+    <p>
+      <%= f.label :project %><span class="required">*</span><br/>
+      <%
+         selected_project=@specimen.project.try(:id)
+      %>
+      <%=
+          select_tag :project_id,
+                     options_for_select([["Select project ..", 0]]|current_user.person.projects.collect { |p| [h(p.name), p.id] }, selected_project),
+                     {:onchange=>remote_function(
+                             :url=>{:action=>"project_selected_ajax"},
+                             :with=>"'project_id='+this.value"
+                     ), :style=>"width:82%"
+
+                     }
+      %>
+    </p>
+     <p>
+    <%= f.label "Institution" %><span class="required">*</span><br/>
+    <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank =>"Please Select ..."}) %>
+  </p>
+
+    <%= render :partial=>"specimens/select_organisms" -%>
+
+    <%= render :partial=>"assets/asset_form_bottom", :locals=> {
+            :resource_type => "Specimen",
+            :attribution_enable => false,
+            :show_publications => false,
+            :existing_creators=>@specimen.creators,
+            :other_creators=>@specimen.other_creators,
+    } -%>
+
+    <p>
+      <%= f.label :description -%><br/>
+      <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
+    </p>
+
+
+  </div>
+
+
+
+
+<p style="margin-top: 2em; text-align: center;">
+  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  or <%= link_to 'Cancel', (@specimen.id ? specimen_path(@specimen.id) : specimens_path) -%>
+</p>

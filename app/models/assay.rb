@@ -15,7 +15,8 @@ class Assay < ActiveRecord::Base
 
 
   acts_as_taggable
-
+  belongs_to :institution
+  belongs_to :sample
   belongs_to :assay_type
   belongs_to :technology_type  
   belongs_to :study  
@@ -69,7 +70,7 @@ class Assay < ActiveRecord::Base
   end
 
   def can_delete? *args
-    mixin_super(*args) && assets.empty? && related_publications.empty?
+    super && assets.empty? && related_publications.empty?
   end
 
   #returns true if this is a modelling class of assay

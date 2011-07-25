@@ -151,10 +151,11 @@ module HomeHelper
   def display_single_item item, action, at_time
       html=''
        unless item.blank?
-          image_key = item.class.name.underscore
-          image_key = 'assay_modelling_avatar' if try_block{item.is_modelling?}
-          image = image_tag(icon_filename_for_key(image_key), :class => "home_asset_icon")
-          icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title => tooltip_title_attrib(item.class.name.underscore.humanize))
+         image=resource_avatar(item,:class=>"home_asset_icon")
+#          image_key = item.class.name.underscore
+#          image_key = 'assay_modelling_avatar' if try_block{item.is_modelling?}
+#          image = image_tag(icon_filename_for_key(image_key), :class => "home_asset_icon")
+          icon  = link_to_draggable(image, show_resource_path(item), :id=>model_to_drag_id(item), :class=> "asset", :title => tooltip_title_attrib(text_for_resource(item)))
 
           path = url_for(item)
           description = try_block{item.description} || try_block{item.abstract}
@@ -171,3 +172,5 @@ module HomeHelper
   end
 
 end
+
+

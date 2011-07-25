@@ -101,7 +101,8 @@
     creator_id = <%= c.id -%>;
     creator_email = '<%= c.email -%>';
 
-    creator_settings.push([creator_name, creator_email, creator_id]);
+    //creator_settings.push([creator_name, creator_email, creator_id]);
+    addCreator(creator_name,creator_email,creator_id);
 <% end -%>
 
   // ..and update the page to make existing creators visible
