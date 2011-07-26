@@ -192,4 +192,28 @@ class DataFileTest < ActiveSupport::TestCase
     assert !df.update_attributes(:title => "Updated Title")
     assert_equal unupdated_title, df.reload.title
   end
+
+  test "convert to presentation" do
+    user = Factory :user
+    data_file = Factory :data_file,:contributor=>user
+    presentation = Factory.build :presentation,:contributor=>user
+    data_file_converted = data_file.convert_to_presentation
+
+    assert_equal "Presentation", data_file_converted.class.name
+    assert_equal presentation.attributes.keys, data_file_converted.attributes.keys
+    assert data_file_converted.valid?
+
+    data_file_converted.save!
+    data_file_converted.reload
+
+    assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
+    assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
+    assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
+    assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
+    assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
+
+    assert_equal data_file.event_ids, data_file_converted.event_ids
+    assert_equal data_file.creators, data_file_converted.creators
+
+  end
 end

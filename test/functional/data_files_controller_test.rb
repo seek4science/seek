@@ -742,6 +742,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal update_permission.access_type, Policy::EDITING
   end
 
+
+  test "can move to presentations" do
+    data_file = Factory :data_file,:contributor=>User.current_user
+    assert_difference("DataFile.count", -1) do
+      assert_difference("Presentation.count") do
+        post :convert_to_presentation, :id=>data_file
+      end
+    end
+  end
+
   private
   
   def valid_data_file

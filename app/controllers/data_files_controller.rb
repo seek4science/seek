@@ -12,11 +12,37 @@ class DataFilesController < ApplicationController
   #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax,:convert_to_presentation]
   before_filter :find_display_data_file, :only=>[:show,:download]
 
   #has to come after the other filters
   include Seek::Publishing
+
+  def convert_to_presentation
+    @data_file = DataFile.find params[:id]
+    @presentation = @data_file.convert_to_presentation
+
+    respond_to do |format|
+      if @presentation.save
+
+        # update attributions
+        Relationship.create_or_update_attributions(@presentation, @data_file.attributions.collect { |a| [a.class.name, a.id] })
+
+        # update related publications
+        Relationship.create_or_update_attributions(@presentation, @data_file.related_publications.collect { |p| ["Publication", p.id.to_json] }, Relationship::RELATED_TO_PUBLICATION) unless @data_file.related_publications.blank?
+
+        @data_file.destroy
+
+        flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
+        format.html { redirect_to presentation_path(@presentation) }
+      else
+        flash.now[:error] = "Data File failed to convert to Presentation!!"
+        format.html {
+          redirect_to data_data_file_path @data_file
+        }
+      end
+    end
+  end
 
   def plot
     sheet = params[:sheet] || 2

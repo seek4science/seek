@@ -29,4 +29,9 @@
       <% end -%>
   <% end -%>
 
+  <% if asset.respond_to? :convert_to_presentation %>
+     <li>
+       <%= image_tag_for_key "arrow_right", {:action => :convert_to_presentation,:id=>asset.id}, nil, {:title => "click it to move this data file to presentations",:confirm => "Are you sure? This action is irreversible!"}, 'Move'%>
+    </li>
+  <% end %>
 </ul>
