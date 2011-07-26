@@ -5,7 +5,7 @@ class StudiedFactor < ActiveRecord::Base
   belongs_to :measured_item
   belongs_to :unit
   belongs_to :data_file
-  has_many :studied_factor_links, :before_add => proc {|sf,sfl| sfl.studied_factor = sf}
+  has_many :studied_factor_links, :before_add => proc {|sf,sfl| sfl.studied_factor = sf}, :dependent => :destroy
 
   validates_presence_of :unit,:measured_item,:start_value,:data_file
   validates_presence_of :studied_factor_links, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => "can't be a nil"

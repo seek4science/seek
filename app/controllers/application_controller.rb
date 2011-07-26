@@ -108,7 +108,8 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  def find_or_create_substance(new_substances, known_substance_ids_and_types)
+  def find_or_new_substances(new_substances, known_substance_ids_and_types, mappings)
+    result = []
     known_substances = []
     known_substance_ids_and_types.each do |text|
       id, type = text.split(',')
@@ -117,24 +118,20 @@ class ApplicationController < ActionController::Base
       known_substances.push(type.find(id)) if type.find(id)
     end
     new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
-    #no substance
-    if (new_substances.size + known_substances.size) == 0
-      nil
-    #one substance
-    elsif (new_substances.size + known_substances.size) == 1
-      if !known_substances.empty?
-        known_substances.first
-      else
-        c = Compound.new(:name => new_substances.first)
-          if  c.save
-            c
-          else
-            nil
-          end
+    result |= known_substances
+
+    unless new_substances.blank?
+      new_substances.each do |new_substance|
+         c = Compound.new(:name => new_substance)
+         m_links = []
+         mappings["#{new_substance}"].each do |mapping|
+           #FIXME: need to check mapping with the existing records to know if the new record is needed to create.
+           m = Mapping.new(:sabiork_id => mapping[:sabiork_id], :chebi_id => mapping[:chebi_id], :kegg_id => mapping[:kegg_id])
+           m_links.push MappingLink.new(:substance => c, :mapping => m)
+         end
+         c.mapping_links = m_links
+         result.push c
       end
-    #FIXME: update code when mixture table is created
-    else
-      nil
     end
   end
 

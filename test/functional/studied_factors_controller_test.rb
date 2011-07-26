@@ -216,4 +216,16 @@ class StudiedFactorsControllerTest < ActionController::TestCase
       assert_equal fs.substances, fs_array.first.substances
     end
   end
+
+  test "should destroy FS" do
+    fs = studied_factors(:studied_factor_concentration_glucose)
+    assert_not_nil fs
+    assert_equal fs.measured_item, measured_items(:concentration)
+    assert_equal fs.substances.first, compounds(:compound_glucose)
+
+    delete :destroy, :id => fs.id
+    fs_updated = assigns(:studied_factor)
+    assert_nil fs_updated
+    assert fs.substances.blank?
+  end
 end

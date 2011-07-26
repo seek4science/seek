@@ -9,11 +9,13 @@ class CompoundTest < ActiveSupport::TestCase
 
   test "should create the association compound has_many mappings, through mapping_links table" do
     compound = Compound.new(:name => 'water')
+
     mapping1 = Mapping.new(:sabiork_id => 1, :chebi_id => 'CHEBI:1000', :kegg_id => 'C2000')
     mapping2 = Mapping.new(:sabiork_id => 1, :chebi_id => 'CHEBI:1000', :kegg_id => 'C2001')
     mapping_link1 = MappingLink.new(:substance => compound, :mapping => mapping1)
     mapping_link2 = MappingLink.new(:substance => compound, :mapping => mapping2)
     compound.mapping_links = [mapping_link1, mapping_link2]
+
     assert compound.save!
     assert_equal compound.mapping_links.count, 2
     assert_equal compound.mapping_links.first.mapping, mapping1

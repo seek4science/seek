@@ -17,7 +17,11 @@ class StudiedFactorsController < ApplicationController
     @studied_factor.data_file_version = params[:version]
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
-    @studied_factor.substance = find_or_create_substance new_substances,known_substance_ids_and_types
+    mappings = params[:mappings]
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types, mappings
+    substances.each do |substance|
+      @studied_factor.studied_factor_links.build(:substance => substance )
+    end
 
     render :update do |page|
       if @studied_factor.save
@@ -49,6 +53,9 @@ class StudiedFactorsController < ApplicationController
                                              :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation, :substance_type => studied_factor.substance_type, :substance_id => studied_factor.substance_id)
       new_studied_factor.data_file=@data_file
       new_studied_factor.data_file_version = params[:version]
+      studied_factor.studied_factor_links.each do |sfl|
+         new_studied_factor.studied_factor_links.build(:substance => sfl.substance)
+      end
       new_studied_factors.push new_studied_factor
     end
     #
@@ -81,10 +88,14 @@ class StudiedFactorsController < ApplicationController
 
     new_substances = params["#{@studied_factor.id}_substance_autocompleter_unrecognized_items"] || []
     known_substance_ids_and_types = params["#{@studied_factor.id}_substance_autocompleter_selected_ids"] || []
-    substance = find_or_create_substance new_substances,known_substance_ids_and_types
+    mappings = params[:mappings]
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types, mappings
 
-    params[:studied_factor][:substance_id] = substance.try :id
-    params[:studied_factor][:substance_type] = substance.class.name == nil.class.name ? nil : substance.class.name
+    studied_factor_links = []
+    substances.each do |substance|
+      studied_factor_links.push StudiedFactorLink.new(:substance => substance)
+    end
+    @studied_factor.studied_factor_links = studied_factor_links
 
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])
