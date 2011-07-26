@@ -1,11 +1,9 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
-one:
-  substance_type: MyString
-  substance_id: 1
-  studied_factor_id: 1
+studied_factor_concentration_glucose_link:
+  substance: compound_glucose
+  studied_factor: studied_factor_concentration_glucose
 
-two:
-  substance_type: MyString
-  substance_id: 1
-  studied_factor_id: 1
+studied_factor_concentration_glucose_link:
+  substance: compound_glycine
+  studied_factor: studied_factor_concentration_glucose
