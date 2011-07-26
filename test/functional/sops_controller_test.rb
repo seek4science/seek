@@ -9,6 +9,7 @@ class SopsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
+    WebMock.allow_net_connect!
     login_as(:quentin)
     @object=sops(:downloadable_sop)
   end
@@ -39,6 +40,22 @@ class SopsControllerTest < ActionController::TestCase
     md5sum2=content_blob_node.find_first("//ns:md5sum", "ns:http://www.sysmo-db.org/2010/xml/rest").content
     assert_not_equal md5sum, md5sum2
 
+  end
+
+  test "request file button visibility when logged in and out" do
+
+    sop = Factory :sop,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+
+    assert !sop.can_download?, "The SOP must not be downloadable for this test to succeed"
+
+    get :show, :id => sop
+    assert_response :success
+    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>1
+
+    logout
+    get :show, :id => sop
+    assert_response :success
+    assert_select "#request_resource_button > a",:text=>/Request SOP/,:count=>0
   end
 
   test "fail gracefullly when trying to access a missing sop" do

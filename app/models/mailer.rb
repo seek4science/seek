@@ -1,5 +1,4 @@
 class Mailer < ActionMailer::Base
-  helper UsersHelper  
 
   def feedback user,topic,details,send_anonymously,base_host
     subject "#{Seek::Config.application_name} Feedback provided - #{topic}"
@@ -19,8 +18,17 @@ class Mailer < ActionMailer::Base
     sent_on Time.now
 
     body :host=>base_host,:uploader=>uploader.person, :receiver => receiver,:data_file => file
+  end
 
+  def request_publishing(publisher,owner,resources,base_host)
 
+    subject "A #{Seek::Config.application_name} member requests you make some items public"
+    recipients owner.email_with_name
+    from       Seek::Config.noreply_sender
+    reply_to   publisher.email_with_name
+    sent_on Time.now
+
+    body :host=>base_host,:owner=>owner, :publisher=>publisher,:resources=>resources
   end
 
   def request_resource(user,resource,details,base_host)

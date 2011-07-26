@@ -2,8 +2,8 @@ module AssetsHelper
 
   def request_request_label resource
     icon_filename=icon_filename_for_key("message")
-    resource_type=resource.class.name.humanize
-    return '<span class="icon">' + image_tag(icon_filename, :alt=>"Request", :title=>"Request") + " Request #{resource_type}</span>";
+    resource_type=text_for_resource(resource)
+    '<span class="icon">' + image_tag(icon_filename,:alt=>"Request",:title=>"Request") + " Request #{resource_type}</span>";
   end
 
   #returns all the classes for models that return true for is_asset?
@@ -212,7 +212,7 @@ module AssetsHelper
 
       else
     end
-
+    
     #Authorize
     related.each_value do |resource_hash|
       resource_hash[:items].compact!
@@ -221,8 +221,8 @@ module AssetsHelper
         resource_hash[:items] = resource_hash[:items].select &:can_view?
         resource_hash[:hidden_count] = total_count - resource_hash[:items].size
       end
-    end
-
+    end    
+    
     #Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
       if limit && related[key][:items].size > limit && ["Project", "Investigation", "Study", "Assay", "Person", "Specimen", "Sample"].include?(resource.class.name)

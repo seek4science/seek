@@ -13,8 +13,18 @@ module ApplicationHelper
         c.respond_to?("user_creatable?") && c.user_creatable?
       end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
       classes.delete(Event) unless Seek::Config.events_enabled
+      
+      unless Seek::Config.is_virtualliver
+        classes.delete(Sample)
+        classes.delete(Specimen)
+      end
+
       classes
     end    
+  end
+
+  def tabbar
+    Seek::Config.is_virtualliver ? render(:partial=>"layouts/tabnav_dropdown") : render(:partial=>"layouts/tabnav")
   end
 
   #joins the list with seperator and the last item with an 'and'
@@ -123,12 +133,11 @@ module ApplicationHelper
     end
     return res
   end
-  
+
   def tooltip_title_attrib(text, delay=200)
     return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
   end
-    
-  
+      
   # text in "caption" will be used to display the item next to the image_tag_for_key;
   # if "caption" is nil, item.name will be used by default
   def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil)

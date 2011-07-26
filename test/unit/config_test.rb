@@ -15,8 +15,18 @@ class ConfigTest < ActiveSupport::TestCase
   test "solr enabled" do
     assert_equal false ,Seek::Config.solr_enabled
   end
+
+  test "is_virtualliver" do
+    original_value = Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver = true
+    assert Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver = original_value
+  end
+
+
   test "email_enabled" do
-    assert_equal false ,Seek::Config.email_enabled
+    #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
+    assert_equal true ,Seek::Config.email_enabled
   end
 
   test "smtp_settings port" do
@@ -53,9 +63,7 @@ class ConfigTest < ActiveSupport::TestCase
   test "hide_details_enabled" do
     assert_equal false ,Seek::Config.hide_details_enabled
   end
-  test "activity_log_enabled" do
-    assert_equal true ,Seek::Config.activity_log_enabled
-  end
+  
   test "activation_required_enabled" do
     assert_equal false ,Seek::Config.activation_required_enabled
   end
@@ -74,6 +82,27 @@ class ConfigTest < ActiveSupport::TestCase
   end
   test "piwik_analytics_url" do
     assert_equal 'localhost/piwik/',Seek::Config.piwik_analytics_url
+  end
+
+  #homepage settings
+  test "project_news_enabled" do
+    assert_equal false ,Seek::Config.project_news_enabled
+  end
+  test "project_news_feed_urls" do
+    assert_equal '',Seek::Config.project_news_feed_urls
+  end
+  test "project_news_number_of_feed_entry" do
+    assert_equal 10,Seek::Config.project_news_number_of_entries
+  end
+
+  test "community_news_enabled" do
+    assert_equal false ,Seek::Config.community_news_enabled
+  end
+  test "community_news_feed_urls" do
+    assert_equal '',Seek::Config.community_news_feed_urls
+  end
+  test "community_news_number_of_feed_entry" do
+    assert_equal 10,Seek::Config.community_news_number_of_entries
   end
 
 #Project
@@ -176,4 +205,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal Seek::Config.smtp_settings('password'), 'abcd'
     assert_equal ActionMailer::Base.smtp_settings[:password], 'abcd'
   end
+
+  test "home_description" do
+    assert_equal "Some (configurable) information about the project and what we do goes here.", Seek::Config.home_description
+    Seek::Config.home_description = "A new description"
+    assert_equal "A new description", Seek::Config.home_description
+  end
+  
 end

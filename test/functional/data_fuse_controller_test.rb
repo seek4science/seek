@@ -5,9 +5,5 @@ class DataFuseControllerTest < ActionController::TestCase
 
   fixtures :all
 
-  test "graph test" do
-    login_as(Factory(:admin).user)
-    get :graph_test
-    assert_response :success
-  end
+  
 end

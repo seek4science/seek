@@ -1,0 +1,10 @@
+<% if SiteAnnouncement.headline_announcement -%>
+<p class="box_standout headline_announcement">
+  <%= site_annoucements_headline %>
+</p>
+<% end -%>
+
+<%= render :partial=>"recent_project_changes" -%>
+
+<%= render :partial=>"recent_all_changes" -%>
+

@@ -2,9 +2,7 @@ require 'white_list_helper'
 
 class CountriesController < ApplicationController
   include WhiteListHelper
-  
-  before_filter :login_required
-  
+
   # GET /countries/:country_name
   def show
     @country = white_list(params[:country_name])

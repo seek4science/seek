@@ -35,7 +35,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :saved_searches
 
   map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
-    data_file.resources :studied_factors
+    data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
   end
   
   map.resources :uuids
@@ -62,15 +62,15 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
-    sop.resources :experimental_conditions
+    sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
   end
-
-
 
   map.resources :users, :collection=>{:impersonate => :post, :activation_required=>:get,:forgot_password=>[:get,:post],:reset_password=>:get},
                         :member => {:set_openid => :put}
 
   map.resource :session, :collection=>{:auto_openid=>:get,:show=>:get,:index=>:get},:member=>{:show=>:get}
+
+  map.resource :favourites, :member=>{:delete=>:delete},:collection=>{:add=>:post}
   
   #help pages
   map.resources :help_documents, :as => :help do |h|

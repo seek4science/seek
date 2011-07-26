@@ -1,7 +1,7 @@
 <%
 @assay_word=@assay.is_modelling? ? "Analysis" : "Assay" %>
 <ul class="sectionIcons">
-    <%= render :partial => "subscriptions/subscribe", :object => @assay %>
+    <%= render :partial => "subscriptions/subscribe", :locals => {:object => @assay }%>
     <% if @assay.can_manage? -%>
       <li><%= image_tag_for_key('manage', edit_assay_path, nil, nil, "Manage #{@assay_word}") -%></li>
     <% elsif @assay.can_edit?-%>
@@ -73,14 +73,14 @@
       </p>
       <% end -%>
 
-     <% if !@assay.assay_organisms.blank? and @assay.samples.blank?%>
+     <% if Seek::Config.is_virtualliver or !@assay.assay_organisms.blank? && @assay.samples.blank?%>
       <p id="organism">
           <b>Organisms: </b>
           <%= show_assay_organisms_list @assay.assay_organisms %>
       </p>
     <% end %>
 
-     <% if @assay.assay_organisms.blank? and !@assay.samples.blank?%>
+     <% if Seek::Config.is_virtualliver and @assay.assay_organisms.blank? and !@assay.samples.blank?%>
      <p id="specimens">
        <b>Specimens: </b>
        <% specimens = [] %>
@@ -95,13 +95,13 @@
        <% else %>
           <span class='none_text'>Not Specified</span>
        <% end %>
-     </p>
+         </p>
 
      <p id="Samples">
        <b>Samples: </b>
        <%= samples_link_list @assay.samples%>
-     </p>
-     <% end %>
+         </p>
+     <% end -%>
 
 
       <style type="text/css">

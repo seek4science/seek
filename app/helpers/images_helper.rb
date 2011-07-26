@@ -2,27 +2,27 @@
 # and open the template in the editor.
 
 module ImagesHelper
-
+  
   def info_icon_with_tooltip(info_text, delay=200)
     return image("info",
-                 :title => tooltip_title_attrib(info_text, delay),
-                 :style => "vertical-align:middle;")
+      :title => tooltip_title_attrib(info_text, delay),
+      :style => "vertical-align:middle;")
   end
-
+  
   def image_tag_for_key(key, url=nil, alt=nil, url_options={}, label=key.humanize, remote=false)
 
     if (label == 'Destroy')
       label = 'Delete';
     end
-
+    
     return nil unless (filename = icon_filename_for_key(key.downcase))
-
-    image_options = alt ? {:alt => alt} : {:alt => key.humanize}
+    
+    image_options = alt ? { :alt => alt } : { :alt => key.humanize }
     img_tag = image_tag(filename, image_options)
-
+    
     inner = img_tag;
     inner = "#{img_tag} #{label}" unless label == nil
-
+    
     if (url)
       if (remote==:function)
         inner = link_to_function inner, url, url_options
@@ -32,208 +32,217 @@ module ImagesHelper
         inner = link_to(inner, url, url_options)
       end
     end
-
+    
     return '<span class="icon">' + inner + '</span>';
   end
 
+  def resource_avatar resource,html_options={}
+
+    if resource.avatar_key
+          image_tag(icon_filename_for_key(resource.avatar_key), html_options)
+    elsif resource.use_mime_type_for_avatar?
+          image_tag(file_type_icon_url(resource), html_options)
+    end
+  end
+  
   def icon_filename_for_key(key)
     case (key.to_s)
       when "refresh"
-        "famfamfam_silk/arrow_refresh_small.png"
+      "famfamfam_silk/arrow_refresh_small.png"
       when "arrow_up"
-        "famfamfam_silk/arrow_up.png"
+      "famfamfam_silk/arrow_up.png"
       when "arrow_down"
-        "famfamfam_silk/arrow_down.png"
+      "famfamfam_silk/arrow_down.png"
       when "arrow_right", "next"
-        "famfamfam_silk/arrow_right.png"
+      "famfamfam_silk/arrow_right.png"
       when "arrow_left", "back"
-        "famfamfam_silk/arrow_left.png"
+      "famfamfam_silk/arrow_left.png"
       when "bioportal_logo"
-        "logos/bioportal_logo.png"
-      when "new", "add"
-        "famfamfam_silk/add.png"
+      "logos/bioportal_logo.png"
+      when "new","add"
+      "famfamfam_silk/add.png"
       when "multi_add"
-        "famfamfam_silk/table_add.png"
+      "famfamfam_silk/table_add.png"
       when "download"
-        "redmond_studio/arrow-down_16.png"
+      "redmond_studio/arrow-down_16.png"
       when "show"
-        "famfamfam_silk/zoom.png"
+      "famfamfam_silk/zoom.png"
       when "edit"
-        "famfamfam_silk/page_white_edit.png"
+      "famfamfam_silk/page_white_edit.png"
       when "edit-off"
-        "stop_edit.png"
+      "stop_edit.png"
       when "manage"
-        "famfamfam_silk/wrench.png"
+      "famfamfam_silk/wrench.png"
       when "destroy"
-        "famfamfam_silk/cross.png"
+      "famfamfam_silk/cross.png"
       when "tag"
-        "famfamfam_silk/tag_blue.png"
+      "famfamfam_silk/tag_blue.png"
       when "favourite"
-        "famfamfam_silk/star.png"
+      "famfamfam_silk/star.png"
       when "comment"
-        "famfamfam_silk/comment.png"
+      "famfamfam_silk/comment.png"
       when "comments"
-        "famfamfam_silk/comments.png"
+      "famfamfam_silk/comments.png"
       when "info"
-        "famfamfam_silk/information.png"
+      "famfamfam_silk/information.png"
       when "help"
-        "famfamfam_silk/help.png"
+      "famfamfam_silk/help.png"
       when "confirm"
-        "famfamfam_silk/accept.png"
+      "famfamfam_silk/accept.png"
       when "reject"
-        "famfamfam_silk/cancel.png"
+      "famfamfam_silk/cancel.png"
       when "user", "person"
-        "famfamfam_silk/user.png"
+      "famfamfam_silk/user.png"
       when "user-invite"
-        "famfamfam_silk/user_add.png"
+      "famfamfam_silk/user_add.png"
       when "avatar"
-        "famfamfam_silk/picture.png"
+      "famfamfam_silk/picture.png"
       when "avatars"
-        "famfamfam_silk/photos.png"
+      "famfamfam_silk/photos.png"
       when "save"
-        "famfamfam_silk/save.png"
+      "famfamfam_silk/save.png"
       when "message"
-        "famfamfam_silk/email.png"
+      "famfamfam_silk/email.png"
       when "message_read"
-        "famfamfam_silk/email_open.png"
+      "famfamfam_silk/email_open.png"
       when "reply"
-        "famfamfam_silk/email_go.png"
+      "famfamfam_silk/email_go.png"
       when "message_delete"
-        "famfamfam_silk/email_delete.png"
+      "famfamfam_silk/email_delete.png"
       when "messages_outbox"
-        "famfamfam_silk/email_go.png"
+      "famfamfam_silk/email_go.png"
       when "file"
-        "redmond_studio/documents_16.png"
+      "redmond_studio/documents_16.png"
       when "logout"
-        "famfamfam_silk/door_out.png"
+      "famfamfam_silk/door_out.png"
       when "login"
-        "famfamfam_silk/door_in.png"
+      "famfamfam_silk/door_in.png"
       when "picture"
-        "famfamfam_silk/picture.png"
+      "famfamfam_silk/picture.png"
       when "pictures"
-        "famfamfam_silk/photos.png"
+      "famfamfam_silk/photos.png"
       when "profile"
-        "famfamfam_silk/user_suit.png"
+      "famfamfam_silk/user_suit.png"
       when "history"
-        "famfamfam_silk/time.png"
+      "famfamfam_silk/time.png"
       when "news"
-        "famfamfam_silk/newspaper.png"
+      "famfamfam_silk/newspaper.png"
       when "view-all"
-        "famfamfam_silk/table_go.png"
+      "famfamfam_silk/table_go.png"
       when "announcement"
-        "famfamfam_silk/transmit.png"
+      "famfamfam_silk/transmit.png"
       when "denied"
-        "famfamfam_silk/exclamation.png"
+      "famfamfam_silk/exclamation.png"
       when "institution"
-        "famfamfam_silk/house.png"
+      "famfamfam_silk/house.png"
       when "project"
-        "famfamfam_silk/report.png"
+      "famfamfam_silk/report.png"
       when "tick"
-        "crystal_project/22x22/apps/clean.png"
+      "crystal_project/22x22/apps/clean.png"    
       when "lock"
-        "famfamfam_silk/lock.png"
+      "famfamfam_silk/lock.png"
       when "open"
-        "famfamfam_silk/lock_open.png"
+      "famfamfam_silk/lock_open.png"
       when "no_user"
-        "famfamfam_silk/link_break.png"
+      "famfamfam_silk/link_break.png"
       when "sop"
-        "famfamfam_silk/page.png"
+      "famfamfam_silk/page.png"
       when "sops"
-        "famfamfam_silk/page_copy.png"
+      "famfamfam_silk/page_copy.png"
       when "model"
-        "crystal_project/32x32/apps/kformula.png"
+      "crystal_project/32x32/apps/kformula.png"
       when "models"
-        "crystal_project/64x64/apps/kformula.png"
-      when "data_file", "data_files"
-        "famfamfam_silk/database.png"
+      "crystal_project/64x64/apps/kformula.png"
+      when "data_file","data_files"
+      "famfamfam_silk/database.png"
       when "study"
-        "famfamfam_silk/page.png"
+      "famfamfam_silk/page.png"
       when "test"
-        "crystal_project/16x16/actions/run.png"
+      "crystal_project/16x16/actions/run.png"
       when "execute"
-        "famfamfam_silk/lightning.png"
-      when "warning", "warn"
-        "crystal_project/22x22/apps/alert.png"
+      "famfamfam_silk/lightning.png"
+      when "warning","warn"
+      "crystal_project/22x22/apps/alert.png"
       when "skipped"
-        "crystal_project/22x22/actions/undo.png"
+      "crystal_project/22x22/actions/undo.png"
       when "error"
-        "famfamfam_silk/exclamation.png"
+      "famfamfam_silk/exclamation.png"
       when "feedback"
-        "famfamfam_silk/email.png"
+      "famfamfam_silk/email.png"
       when "spinner"
-        "ajax-loader.gif"
+      "ajax-loader.gif"
       when "large-spinner"
-        "ajax-loader-large.gif"
+      "ajax-loader-large.gif"
       when "current"
-        "famfamfam_silk/bullet_green.png"
+      "famfamfam_silk/bullet_green.png"
       when "collapse"
-        "folds/fold.png"
+      "folds/fold.png"
       when "expand"
-        "folds/unfold.png"
+      "folds/unfold.png"
       when "pal"
-        "famfamfam_silk/rosette.png"
+      "famfamfam_silk/rosette.png"
       when "admin"
-        "famfamfam_silk/shield.png"
+      "famfamfam_silk/shield.png"
       when "pdf_file"
-        "file_icons/small/pdf.png"
+      "file_icons/small/pdf.png"
       when "xls_file"
-        "file_icons/small/xls.png"
+      "file_icons/small/xls.png"
       when "doc_file"
-        "file_icons/small/doc.png"
+      "file_icons/small/doc.png"
       when "misc_file"
-        "file_icons/small/genericBlue.png"
+      "file_icons/small/genericBlue.png"
       when "ppt_file"
-        "file_icons/small/ppt.png"
+      "file_icons/small/ppt.png"
       when "xml_file"
-        "file_icons/small/xml.png"
+      "file_icons/small/xml.png"
       when "zip_file"
-        "file_icons/small/zip.png"
+      "file_icons/small/zip.png"
       when "jpg_file"
-        "file_icons/small/jpg.png"
+      "file_icons/small/jpg.png"
       when "gif_file"
-        "file_icons/small/gif.png"
+      "file_icons/small/gif.png"
       when "png_file"
-        "file_icons/small/png.png"
+      "file_icons/small/png.png"
       when "txt_file"
-        "file_icons/small/txt.png"
-      when "investigation_avatar"
-        "crystal_project/64x64/apps/mydocuments.png"
+      "file_icons/small/txt.png"
+      when "investigation_avatar", 'investigation', 'investigations'
+      "crystal_project/64x64/apps/mydocuments.png"
       when "study_avatar"
-        "crystal_project/64x64/apps/package_editors.png"
-      when "assay_avatar", "assay_experimental_avatar"
-        "misc_icons/flask3-64x64.png"
+      "crystal_project/64x64/apps/package_editors.png"
+      when "assay_avatar","assay_experimental_avatar", 'assay'
+      "misc_icons/flask3-64x64.png"
       when "assay_modelling_avatar"
-        "crystal_project/64x64/filesystems/desktop.png"
+      "crystal_project/64x64/filesystems/desktop.png"
       when "model_avatar"
-        "crystal_project/64x64/apps/kformula.png"
+      "crystal_project/64x64/apps/kformula.png"
       when "person_avatar"
-        "avatar.png"
+      "avatar.png"
       when "jerm_logo"
-        "jerm_logo.png"
+      "jerm_logo.png"
       when "project_avatar"
-        "project_64x64.png"
+      "project_64x64.png"
       when "institution_avatar"
-        "institution_64x64.png"
+      "institution_64x64.png"
       when "organism_avatar"
-        "misc_icons/green_virus-64x64.png"
-      when "publication_avatar"
+      "misc_icons/cell3.png"
+      when "publication_avatar", "publication", "publications"
      "crystal_project/64x64/mimetypes/wordprocessing.png"
       when "saved_search_avatar","saved_search"
       "crystal_project/32x32/actions/find.png"
       when "visit_pubmed"
-        "famfamfam_silk/page_white_go.png"
+      "famfamfam_silk/page_white_go.png"
       when "markup"
-        "famfamfam_silk/page_white_text.png"
+      "famfamfam_silk/page_white_text.png"
       when "atom_feed"
-        "misc_icons/feed_icon.png"
+      "misc_icons/feed_icon.png"
       when "impersonate"
-        "famfamfam_silk/group_go.png"
+      "famfamfam_silk/group_go.png"
       when "world"
-        "famfamfam_silk/world.png"
+      "famfamfam_silk/world.png"
       when "file_large"
-        "crystal_project/32x32/apps/klaptop.png"
+      "crystal_project/32x32/apps/klaptop.png"
       when "internet_large"
-        "crystal_project/32x32/devices/Globe2.png"
+      "crystal_project/32x32/devices/Globe2.png"
       when "jws_builder"
         "misc_icons/jws_builder24x24.png"
       when "event_avatar"
@@ -244,26 +253,28 @@ module ImagesHelper
         "misc_icons/jws_builder32x32.png"
       when "specimen", "specimens"
         "misc_icons/green_virus-64x64.png"
+      when "publish"
+       "crystal_project/22x22/actions/up.png"
       when 'unsubscribe'
         "famfamfam_silk/email_delete.png"
       when 'subscribe'
         "famfamfam_silk/email_add.png"
       when 'presentation_avatar'
         "misc_icons/presentations.png"
-      else
-        return nil
+    else
+      return nil
     end
   end
-
+  
   def help_icon(text, delay=200, extra_style="")
-    image_tag icon_filename_for_key("info"), :alt=>"help", :title=>tooltip_title_attrib(text, delay), :style => "vertical-align: middle;#{extra_style}"
+    image_tag icon_filename_for_key("info"), :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}"
   end
-
+  
   def flag_icon(country, text=country, margin_right='0.3em')
     return '' if country.nil? or country.empty?
-
+    
     code = ''
-
+    
     if country.downcase == "great britain"
       code = "gb"
     elsif ["england", "wales", "scotland"].include?(country.downcase)
@@ -273,17 +284,16 @@ module ImagesHelper
     else
       code = country if CountryCodes.valid_code?(country)
     end
-
+    
     unless code.nil? or code.empty?
       return image_tag("famfamfam_flags/#{code.downcase}.png",
-                       :title => "header=[] body=[<b>Location: </b>#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[200]",
-                       :style => "vertical-align:middle; margin-right: #{margin_right};")
+        :title => "header=[] body=[<b>Location: </b>#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[200]",
+        :style => "vertical-align:middle; margin-right: #{margin_right};")
     else
       return ''
     end
   end
-
-
+  
   # A generic key to produce avatars for entities of all kinds.
   #
   # Parameters:
@@ -301,29 +311,29 @@ module ImagesHelper
     else
       alternative = (alt.nil? ? h(title) : alt)
     end
-
+    
     case object.class.name.downcase
       when "person", "institution", "project"
-        if object.avatar_selected?
-          img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
-        else
-          img = default_avatar(object.class.name, size, alternative)
-        end
+      if object.avatar_selected?
+        img = image_tag avatar_url(object, object.avatar_id, size), :alt=> alternative, :class => 'framed'
+      else
+        img = default_avatar(object.class.name, size, alternative)
+      end
       when "datafile", "sop"
-        img = image_tag file_type_icon_url(object),
-                        :alt => alt,
-                        :class=> "avatar framed"
-      when "model", "investigation", "study", "publication"
-        img = image "#{object.class.name.downcase}_avatar",
-                    {:alt => alt,
-                     :class=>"avatar framed"}
+      img = image_tag file_type_icon_url(object),
+        :alt => alt,
+        :class=> "avatar framed"
+      when "model","investigation","study","publication"
+      img = image "#{object.class.name.downcase}_avatar",
+      {:alt => alt,
+        :class=>"avatar framed"}
       when "assay"
-        type=object.is_modelling? ? "modelling" : "experimental"
-        img = image "#{object.class.name.downcase}_#{type}_avatar",
-                    {:alt => alt,
-                     :class=>"avatar framed"}
+      type=object.is_modelling? ? "modelling" : "experimental"
+      img = image "#{object.class.name.downcase}_#{type}_avatar",
+      {:alt => alt,
+        :class=>"avatar framed"}
     end
-
+    
     # if the image of the avatar needs to be linked not to the url of the object, return only the image tag
     if return_image_tag_only
       return img
@@ -331,32 +341,32 @@ module ImagesHelper
       unless url
         url = eval("#{object.class.name.downcase}_url(#{object.id})")
       end
-
+      
       return link_to(img, url, :title => tooltip_title_attrib(tooltip_text))
     end
   end
-
+  
   def avatar_url(avatar_for_instance, avatar_id, size=nil)
     basic_url = eval("#{avatar_for_instance.class.name.downcase}_avatar_path(#{avatar_for_instance.id}, #{avatar_id})")
-
+    
     if size
       basic_url += "?size=#{size}"
       basic_url += "x#{size}" if size.kind_of?(Numeric)
     end
-
+    
     return basic_url
   end
-
+  
   def default_avatar(object_class_name, size=200, alt="Anonymous", onclick_options="")
     avatar_filename=icon_filename_for_key("#{object_class_name.downcase}_avatar")
-
+    
     image_tag avatar_filename,
-              :alt => alt,
-              :size => "#{size}x#{size}",
-              :class => 'framed',
-              :onclick => onclick_options
+      :alt => alt,
+      :size => "#{size}x#{size}",
+      :class => 'framed',
+      :onclick => onclick_options
   end
-
+  
   def file_type_icon(item)
     url = file_type_icon_url(item)
     image_tag url, :class => "icon"
@@ -369,17 +379,17 @@ module ImagesHelper
   def file_type_icon_url(item)
     mime_icon_url item.content_type
   end
-
+  
   def expand_image(margin_left="0.3em")
     image_tag icon_filename_for_key("expand"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
   end
-
+  
   def collapse_image(margin_left="0.3em")
     image_tag icon_filename_for_key("collapse"), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
   end
-
-  def image key, options={}
-    image_tag(icon_filename_for_key(key), options)
+  
+  def image key,options={}
+    image_tag(icon_filename_for_key(key),options)
   end
-
+  
 end

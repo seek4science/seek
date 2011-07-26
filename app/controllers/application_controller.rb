@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   ActiveRecord::RecordNotFound => "404",
   ::ActionController::UnknownController => "406",
   ::ActionController::UnknownAction => "406",
-  ::ActionController::RoutingError => "404",
+  ::ActionController::RoutingError => "404",  
   ::ActionView::MissingTemplate => "406",
   ::ActionView::TemplateError => "500"
   }
@@ -21,9 +21,7 @@ class ApplicationController < ActionController::Base
 
   exception_data :additional_exception_notifier_data
 
-  if Seek::Config.activity_log_enabled
-    after_filter :log_event
-  end
+  after_filter :log_event
 
   include AuthenticatedSystem
   around_filter :with_current_user
@@ -110,6 +108,53 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
+  def find_or_create_substance(new_substances, known_substance_ids_and_types)
+    known_substances = []
+    known_substance_ids_and_types.each do |text|
+      id, type = text.split(',')
+      id = id.strip
+      type = type.strip.capitalize.constantize
+      known_substances.push(type.find(id)) if type.find(id)
+    end
+    new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
+    #no substance
+    if (new_substances.size + known_substances.size) == 0
+      nil
+    #one substance
+    elsif (new_substances.size + known_substances.size) == 1
+      if !known_substances.empty?
+        known_substances.first
+      else
+        c = Compound.new(:name => new_substances.first)
+          if  c.save
+            c
+          else
+            nil
+          end
+      end
+    #FIXME: update code when mixture table is created
+    else
+      nil
+    end
+  end
+
+  def no_comma_for_decimal
+    check_string = ''
+    if self.controller_name.downcase == 'studied_factors'
+      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
+    elsif self.controller_name.downcase == 'experimental_conditions'
+      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
+    end
+
+    if check_string.match(',')
+         render :update do |page|
+           page.alert('Please use point instead of comma for decimal number')
+         end
+      return false
+    else
+      return true
+    end
+  end
   private
 
   def project_membership_required
@@ -133,6 +178,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #used to suppress elements that are for virtualliver only or are still currently being worked on
+  def virtualliver_only
+    if !Seek::Config.is_virtualliver
+      error("This feature is is not yet currently available","invalid route")
+      return false
+    end
+  end
 
   def check_allowed_to_manage_types
     unless Seek::Config.type_managers_enabled
@@ -257,62 +309,62 @@ class ApplicationController < ActionController::Base
 
   def log_event
     User.with_current_user current_user do
-    c = self.controller_name.downcase
-    a = self.action_name.downcase
+      c = self.controller_name.downcase
+      a = self.action_name.downcase
 
-    object = eval("@"+c.singularize)
+      object = eval("@"+c.singularize)
 
-    object=current_user if c=="sessions" #logging in and out is a special case    
+      object=current_user if c=="sessions" #logging in and out is a special case
 
-    #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
-    return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
+      #don't log if the object is not valid or has not been saved, as this will a validation error on update or create
+      return if object.nil? || (object.respond_to?("new_record?") && object.new_record?) || (object.respond_to?("errors") && !object.errors.empty?)
 
-    case c
-      when "sessions"
-      if ["create","destroy"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :controller_name=>c,
-                   :activity_loggable => object)
-      end
+      case c
+        when "sessions"
+        if ["create","destroy"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :controller_name=>c,
+                     :activity_loggable => object)
+        end
         when "investigations","studies","assays","specimens","samples"
-      if ["show","create","update","destroy"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :referenced => object.project,
-                   :controller_name=>c,
+        if ["show","create","update","destroy"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :referenced => object.project,
+                     :controller_name=>c,
                      :activity_loggable => object,
                       :data=> object.title)
 
-      end
+        end
         when "data_files","models","sops","publications","presentations","events"
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
-      if ["show","create","update","destroy","download"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :referenced => object.project,
-                   :controller_name=>c,
+        if ["show","create","update","destroy","download"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :referenced => object.project,
+                     :controller_name=>c,
                      :activity_loggable => object,
                       :data=> object.title)
-      end
-      when "people"
-      if ["show","create","update","destroy"].include?(a)
-        ActivityLog.create(:action => a,
-                   :culprit => current_user,
-                   :controller_name=>c,
+        end
+        when "people"
+        if ["show","create","update","destroy"].include?(a)
+          ActivityLog.create(:action => a,
+                     :culprit => current_user,
+                     :controller_name=>c,
                      :activity_loggable => object,
                       :data=> object.title)
-      end
-      when "search"
-      if a=="index"
-        ActivityLog.create(:action => "index",
-                   :culprit => current_user,
-                   :controller_name=>c,
-                   :data => {:search_query=>object,:result_count=>@results.count})
+        end
+        when "search"
+        if a=="index"
+          ActivityLog.create(:action => "index",
+                     :culprit => current_user,
+                     :controller_name=>c,
+                     :data => {:search_query=>object,:result_count=>@results.count})
+        end
       end
     end
-  end
   end
 
   def permitted_filters
@@ -353,4 +405,18 @@ class ApplicationController < ActionController::Base
     }
   end
 
+  #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
+  #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
+  def check_if_new_substances_are_known new_substances, known_substances
+    fixed_new_substances = []
+    new_substances.each do |new_substance|
+      substance=Compound.find_by_name(new_substance.strip) || Synonym.find_by_name(new_substance.strip)
+      if substance.nil?
+        fixed_new_substances << new_substance
+      else
+        known_substances << substance unless known_substances.include?(substance)
+      end
+    end
+    return fixed_new_substances, known_substances
+  end
 end

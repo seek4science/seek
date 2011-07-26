@@ -13,7 +13,7 @@ module PolicyHelper
   def your_project_access_type policy = nil, resource = nil
     unless policy.nil? or policy.permissions.empty? or resource.nil? or !(policy.sharing_scope == Policy::ALL_SYSMO_USERS)
       policy.permissions.each do |permission|
-        if (permission.contributor_type == 'Project') && (permission.contributor_id == (resource.class.name=="Project" ? resource.id : resource.project.id))
+        if (permission.contributor_type == 'Project') && (permission.contributor_id == (resource.class.name=="Project" ? resource.id : resource.project.try(:id)))
           return permission.access_type
         end
       end

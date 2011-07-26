@@ -32,7 +32,7 @@
                   <%= sub_form.radio_button :frequency, freq %> <%= "#{freq.capitalize}" %>
               <% end %>
               <br/>
-              Unsubscribe: <%= sub_form.check_box :_destroy %>
+              Subscribe: <%= sub_form.check_box :_destroy, {:checked => !sub_form.object.marked_for_destruction?}, 0, 1 %>
             </p>
           </fieldset>
         </div>

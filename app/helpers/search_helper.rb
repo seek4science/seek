@@ -1,7 +1,10 @@
 module SearchHelper
   
   def search_type_options
-    ["All","People","Institutions","Projects","Sops","Studies","Assays","Samples","Specimens","Investigations","Models","Data files", "Publications"]
+    types = ["All","People","Institutions","Projects","Sops","Studies","Assays","Samples","Specimens","Investigations","Models","Data files", "Publications"]
+    types.delete("Samples") unless Seek::Config.is_virtualliver
+    types.delete("Specimens") unless Seek::Config.is_virtualliver
+    types
   end
     
   def saved_search_image_tag saved_search

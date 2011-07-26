@@ -159,4 +159,40 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs_updated.end_value, 50
     assert_equal fs_updated.standard_deviation, 0.6
   end
+
+  test "should not create factor studied which has fields containing the comma in the decimal number" do
+    data_file=data_files(:editable_data_file)
+    mi = measured_items(:time)
+    unit = units(:gram)
+    fs = {:measured_item_id => mi.id, :start_value => "1,5" , :end_value => 10, :unit => unit}
+    post :create, :studied_factor => fs, :data_file_id => data_file.id, :version => data_file.version
+    fs = assigns(:studied_factor)
+    assert_nil fs
+  end
+
+  test 'should not update factor studied which has fields containing the comma in the decimal number' do
+    fs = studied_factors(:studied_factor_time)
+    assert_not_nil fs
+
+    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:start_value => "10,02", :end_value => 50, :standard_deviation => 0.6}
+    fs_updated = assigns(:studied_factor)
+    assert_nil fs_updated
+  end
+
+  test 'should create FSes from the existing FSes' do
+    fs_array = []
+    user = Factory(:user)
+    login_as(user)
+    d = Factory(:data_file, :contributor => user)
+    assert_equal d.studied_factors.count, 0
+    #create bunch of FSes which are different
+    i=0
+    while i < 3  do
+      fs_array.push Factory(:studied_factor, :start_value => i)
+      i +=1
+    end
+    post :create_from_existing, :data_file_id => d.id, :version => d.latest_version, "checkbox_#{fs_array.first.id}" => fs_array.first.id, "checkbox_#{fs_array[1].id}" => fs_array[1].id, "checkbox_#{fs_array[2].id}" => fs_array[2].id
+    d.reload
+    assert_equal d.studied_factors.count, 3
+  end
 end

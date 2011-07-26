@@ -1,6 +1,6 @@
 class OrganismsController < ApplicationController
   
-  before_filter :login_required,:except=>[:show,:index]
+  before_filter :login_required,:except=>[:show,:index,:visualise]
   before_filter :is_user_admin_auth,:only=>[:edit,:update,:new,:create,:destroy]
   before_filter :find_organism,:only=>[:show,:edit,:more_ajax,:visualise,:destroy]
   layout "main",:except=>:visualise
@@ -52,7 +52,7 @@ class OrganismsController < ApplicationController
     pagenum=params[:pagenum]
     pagenum||=1
     search_term=params[:search_term]
-    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>50,:pagenum=>pagenum,:ontologyids=>"1132"}
+    results,pages = search search_term,{:isexactmatch=>0,:pagesize=>50,:pagenum=>pagenum,:ontologyids=>"1132",:apikey=>Seek::Config.bioportal_api_key}
     render :update do |page|
       if results
         page.replace_html 'search_results',:partial=>"search_results",:object=>results,:locals=>{:pages=>pages,:pagenum=>pagenum,:search_term=>search_term}

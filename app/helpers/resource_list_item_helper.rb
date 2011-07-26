@@ -37,13 +37,7 @@ module ResourceListItemHelper
       html << "<p>#{link_to title, (url.nil? ? show_resource_path(resource) : url)} #{admin_icon(resource) + " " + pal_icon(resource)}</p>"
     else
       if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
-        image=nil
-
-        if resource.avatar_key
-          image = image_tag(icon_filename_for_key(resource.avatar_key), :style => "width: 24px; height: 24px; vertical-align: middle")
-        elsif resource.use_mime_type_for_avatar?
-          image = image_tag(file_type_icon_url(resource), :style => "width: 24px; height: 24px; vertical-align: middle")
-        end
+        image=resource_avatar resource,:style=>"width: 24px; height: 24px; vertical-align: middle"
 
         icon  = link_to_draggable(image, show_resource_path(resource), :id=>model_to_drag_id(resource), :class=> "asset", :title=>tooltip_title_attrib(get_object_title(resource)))
 

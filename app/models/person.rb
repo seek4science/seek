@@ -59,19 +59,7 @@ class Person < ActiveRecord::Base
 
   def set_default_subscriptions
     projects.each do |proj|
-      set_default_subscription_to proj
-    end
-  end
-
-  def set_default_subscription_to proj
-    project_subscriptions.build :project => proj, :unsubscribed_types => []
-    ProjectSubscription.subscribable_types.each do |type_name|
-      klass = type_name.constantize
-      klass.reflect_on_association(:project) ? items = klass.scoped(:include => :project) : items = klass.scoped({})
-      items.scoped(:include => :subscriptions)
-      items.select{|item| item.project == proj}.each do |item|
-        subscriptions.build :subscribable => item unless subscriptions.detect {|ss| ss.subscribable == item and ss.project == proj}
-      end
+      project_subscriptions.build :project => proj
     end
   end
 
@@ -143,7 +131,8 @@ class Person < ActiveRecord::Base
   end
 
   def projects
-    work_groups.scoped(:include => :project).collect {|wg| wg.project }.uniq
+    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
   end
 
   def member?

@@ -66,12 +66,12 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   def test_should_remember_me
-    post :create, :login => 'quentin', :password => 'test', :remember_me => "1"
+    post :create, :login => 'quentin', :password => 'test', :remember_me => "on"
     assert_not_nil @response.cookies["auth_token"]
   end
 
   def test_should_not_remember_me
-    post :create, :login => 'quentin', :password => 'test', :remember_me => "0"
+    post :create, :login => 'quentin', :password => 'test', :remember_me => "off"
     assert_nil @response.cookies["auth_token"]
   end
 
@@ -124,6 +124,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert !session[:user_id]
     assert_redirected_to "/"
   end
+
 
   protected
     def auth_token(token)

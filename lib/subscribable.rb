@@ -1,7 +1,7 @@
 module Subscribable
   def self.included klass
     klass.class_eval do
-      has_many :subscriptions, :as => :subscribable, :dependent => :destroy, :autosave => true
+      has_many :subscriptions, :required_access_to_owner => false, :as => :subscribable, :dependent => :destroy, :autosave => true, :before_add => proc {|item, sub| sub.subscribable = item}
       before_create :set_default_subscriptions
       extend ClassMethods
     end
@@ -11,8 +11,8 @@ module Subscribable
     subscriptions.detect { |ss| ss.person == User.current_user.person }
   end
 
-  def subscribed?
-    !current_users_subscription.nil?
+  def subscribed? person=User.current_user.person
+    !subscriptions.detect{|sub| sub.person == person}.nil?
   end
 
   def subscribed= subscribed
@@ -23,18 +23,18 @@ module Subscribable
     end
   end
 
-  def subscribe
-    subscriptions.build :person => User.current_user.person unless subscribed?
+  def subscribe person=User.current_user.person
+    subscriptions.build :person => person unless subscribed?(person)
   end
 
-  def unsubscribe
-    current_users_subscription.try(:destroy)
+  def unsubscribe person=User.current_user.person
+    subscriptions.detect{|sub| sub.person == person}.try(:destroy)
   end
 
   def send_immediate_subscriptions activity_log
     if subscribers_are_notified_of? activity_log.action
       subscriptions.each do |subscription|
-        if !subscription.person.email.match('Lihua.An') and subscription.immediately? and can_view?(subscription.person.user)
+        if subscription.person.receive_notifications? and subscription.immediately? and can_view?(subscription.person.user)
           SubMailer.deliver_send_immediate_subscription subscription.person, activity_log
         end
       end

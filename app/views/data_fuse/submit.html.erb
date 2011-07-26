@@ -34,8 +34,7 @@
       <p>
         <span class="graph">
             <%= render :partial=>"google_graph",:locals=>{:csv_url=>result.csv_url,:graph_title=>"#{result.id}",:x_axis_title=>"time (min)",:y_axis_title=>"[metabolites] (mM)"} -%>
-            <br/>
-            <%= image_tag result.graph_url -%>
+            <%# (old jws graph) image_tag result.graph_url -%>
         </span>
       </p>
 
