@@ -118,21 +118,21 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_not_nil ContentBlob.find_by_id(content_blob_id)
   end
 
-#  test "can subscribe" do
-#     presentation = Factory :presentation,:contributor=>User.current_user
-#
-#     presentation.contributor.person.set_default_subscriptions
-#
-#     presentation.save!
-#
-#     presentation.reload
-#
-#     subscriptions = []
-#
-#    subscriptions = Subscription.find(:all,:conditions => ["subscribable_id=?",presentation.id])
-#    assert  !subscriptions.empty?
-#
-#  end
+  test "can subscribe" do
+     presentation = Factory :presentation,:contributor=>User.current_user
+
+     presentation.contributor.person.set_default_subscriptions
+
+     presentation.save!
+
+     presentation.reload
+
+     subscriptions = []
+
+    subscriptions = Subscription.find(:all,:conditions => ["subscribable_id=?",presentation.id])
+    assert  !subscriptions.empty?
+
+  end
 
 
 end
