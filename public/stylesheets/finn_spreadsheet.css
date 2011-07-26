@@ -187,6 +187,7 @@ div#annotation_overview
   background-color: #FFFFFF;
   position: absolute;
   z-index: 20;
+  min-width: 18em;
 }
 
 div#annotation_overview table td

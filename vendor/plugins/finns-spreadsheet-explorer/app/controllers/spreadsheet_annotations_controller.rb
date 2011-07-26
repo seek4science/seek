@@ -14,12 +14,12 @@ class SpreadsheetAnnotationsController < ApplicationController
     if (cell.save)
       new_annotation = Annotation.new(:source => current_user,
                                      :annotatable => cell,
-                                     :attribute_name => "annotation",
+                                     :attribute_name => params[:annotation_attribute_name],
                                      :value => params[:annotation_content])
 
       if(new_annotation.save)
         respond_to do |format|
-          format.html { render :partial => "annotations/annotations", :locals=>{ :annotations => content_blob.spreadsheet_annotations }}
+          format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => content_blob.spreadsheet_annotations }}
         end
       else
         respond_to do |format|
@@ -36,15 +36,15 @@ class SpreadsheetAnnotationsController < ApplicationController
 
   def update
     annotation = Annotation.find(params[:id])
-    annotations = annotation.annotatable.worksheet.content_blob.spreadsheet_annotations
+    content_blob = annotation.annotatable.worksheet.content_blob
 
     if annotation.update_attributes(:value => params[:annotation_content])
       respond_to do |format|
-        format.html { render :partial => "annotations/annotations", :locals=>{ :annotations => annotations} }
+        format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => content_blob.spreadsheet_annotations} }
       end
     else
       respond_to do |format|
-        format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "editting", :errors => annotation.errors} }
+        format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "editing", :errors => annotation.errors} }
       end
     end
   end
@@ -56,7 +56,7 @@ class SpreadsheetAnnotationsController < ApplicationController
 
     if annotation.destroy && cell_range_to_destroy.destroy
       respond_to do |format|
-        format.html { render :partial => "annotations/annotations", :locals=>{ :annotations => content_blob.spreadsheet_annotations} }
+        format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => content_blob.spreadsheet_annotations} }
       end
     else
       respond_to do |format|

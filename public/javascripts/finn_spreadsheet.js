@@ -6,8 +6,9 @@ function annotation_source(id, type, name, url) {
   this.annotations = [];
 }
 
-function annotation(id, sheet_number, cell_range, content, date_created) {
+function annotation(id, type, sheet_number, cell_range, content, date_created) {
   this.id = id;
+  this.type = type;
   this.sheetNumber = sheet_number;
   this.cellRange = cell_range;
   this.content = content;
@@ -19,8 +20,6 @@ function annotation(id, sheet_number, cell_range, content, date_created) {
   this.endCol = cell_coords[2];
   this.endRow = cell_coords[3];
 }
-
-var annotation_sources;
 
 var $j = jQuery.noConflict(); //To prevent conflicts with prototype
 
@@ -257,7 +256,7 @@ function explodeCellRange(range) {
 // Links them to their respective sheet/cell/cellranges
 // Is called after every AJAX call to rebind the set of annotations that may have
 // changed, and to re-enhance DOM elements that have been reloaded
-function bindAnnotations() {
+function bindAnnotations(annotation_sources) {
   var annotationIndexTable = $j("div#annotation_overview table");
   for(var s = 0; s < annotation_sources.size(); s++)
   {
@@ -279,10 +278,16 @@ function bindAnnotations() {
       bindAnnotation(ann);
     }
   }
+  //Text displayed in annotation index if no annotations present
+  if(annotation_sources < 1)
+  {
+    annotationIndexTable.append($j("<tr></tr>").append($j("<td colspan=\"3\">No annotations found</td>")));
+  }
   //Make the annotations draggable
   $j('#annotation_container').draggable({handle: '#annotation_drag', zIndex: 10});
 }
 
+//Small annotation summary that jumps to said annotation when clicked
 function createAnnotationStub(ann)
 {
   var stub = $j("<tr></tr>").addClass("annotation_stub")

@@ -30,7 +30,7 @@
     <%= render :partial => "annotations/annotation_form" %>
     
     <div id="annotations">
-      <%= render :partial => "annotations/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
+      <%= render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
     </div>
     
     <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => @spreadsheet }%>
