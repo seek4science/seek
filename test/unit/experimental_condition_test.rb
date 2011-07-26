@@ -4,23 +4,12 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
   fixtures :all
   include StudiedFactorsHelper
 
-  test 'should create experimental condition with the concentration of the compound' do
-    User.with_current_user  users(:aaron) do
-      measured_item = measured_items(:concentration)
-      unit = units(:gram)
-      compound = compounds(:compound_glucose)
-      sop = sops(:editable_sop)
-      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => compound)
-      assert ec.save, "should create the new experimental condition with the concentration of the compound "
-    end
-  end
-
   test 'should not create experimental condition with the concentration of no substance' do
     User.with_current_user  users(:aaron) do
       measured_item = measured_items(:concentration)
       unit = units(:gram)
       sop = sops(:editable_sop)
-      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
+      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit)
       assert !ec.save, "shouldn't create experimental condition with concentration of no substance"
     end
   end
@@ -30,7 +19,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       measured_item = measured_items(:time)
       unit = units(:second)
       sop = sops(:editable_sop)
-      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => nil)
+      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit)
       assert ec.save, "should create experimental condition  of the none concentration item and no substance"
     end
   end
@@ -41,7 +30,9 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       unit = units(:gram)
       synonym = synonyms(:glucose_synonym)
       sop = sops(:editable_sop)
-      ec= ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit, :substance => synonym)
+      ec= ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit)
+      ec_link = ExperimentalConditionLink.new(:substance => synonym)
+      ec.experimental_condition_links = [ec_link]
       assert ec.save, "should create the new experimental condition with the concentration of the compound's synonym "
     end
   end
@@ -93,7 +84,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     unit = Factory(:unit)
     j=0
     while j < number_of_the_same_ecs  do
-      ec_array.push Factory(:experimental_condition, :substance => compound, :measured_item => measured_item, :unit => unit)
+      ec_array.push Factory(:experimental_condition, :measured_item => measured_item, :unit => unit)
       j +=1
     end
     assert_equal ec_array.count, i+j
@@ -101,18 +92,15 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     assert_equal uniq_fs_array.count, i+1
   end
 
-  test "should create the association has_many compounds , through experimental_condition_links table" do
+  test "should create experimental condition and the association has_many compounds , through experimental_condition_links table" do
     User.with_current_user  users(:aaron) do
       compound1 = Compound.new(:name => 'water')
       compound2 = Compound.new(:name => 'glucose')
       ec = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10)
-      ec_link1 = ExperimentalConditionLink.new(:substance => compound1, :experimental_condition => ec)
-      ec_link2 = ExperimentalConditionLink.new(:substance => compound2, :experimental_condition => ec)
+      ec_link1 = ExperimentalConditionLink.new(:substance => compound1)
+      ec_link2 = ExperimentalConditionLink.new(:substance => compound2)
+      ec.experimental_condition_links = [ec_link1, ec_link2]
       assert ec.save!
-      assert compound1.save!
-      assert compound2.save!
-      assert ec_link1.save!
-      assert ec_link2.save!
       assert_equal ec.experimental_condition_links.count, 2
       assert_equal ec.experimental_condition_links.first.substance, compound1
       assert_equal ec.experimental_condition_links[1].substance, compound2

@@ -13,11 +13,8 @@ class CompoundTest < ActiveSupport::TestCase
     mapping2 = Mapping.new(:sabiork_id => 1, :chebi_id => 'CHEBI:1000', :kegg_id => 'C2001')
     mapping_link1 = MappingLink.new(:substance => compound, :mapping => mapping1)
     mapping_link2 = MappingLink.new(:substance => compound, :mapping => mapping2)
-    assert mapping1.save!
-    assert mapping2.save!
+    compound.mapping_links = [mapping_link1, mapping_link2]
     assert compound.save!
-    assert mapping_link1.save!
-    assert mapping_link2.save!
     assert_equal compound.mapping_links.count, 2
     assert_equal compound.mapping_links.first.mapping, mapping1
     assert_equal compound.mapping_links[1].mapping, mapping2
@@ -42,11 +39,9 @@ class CompoundTest < ActiveSupport::TestCase
       studied_factor_link1 = StudiedFactorLink.new(:substance => compound, :studied_factor => fs1)
       studied_factor_link2 = StudiedFactorLink.new(:substance => compound, :studied_factor => fs2)
 
-      assert fs1.save!
-      assert fs2.save!
+      compound.studied_factor_links = [studied_factor_link1, studied_factor_link2]
+
       assert compound.save!
-      assert studied_factor_link1.save!
-      assert studied_factor_link2.save!
       assert_equal compound.studied_factor_links.count, 2
       assert_equal compound.studied_factor_links.first.studied_factor, fs1
       assert_equal compound.studied_factor_links[1].studied_factor, fs2
@@ -62,11 +57,8 @@ class CompoundTest < ActiveSupport::TestCase
       experimental_condition_link1 = ExperimentalConditionLink.new(:substance => compound, :experimental_condition => ec1)
       experimental_condition_link2 = ExperimentalConditionLink.new(:substance => compound, :experimental_condition => ec2)
 
-      assert ec1.save!
-      assert ec2.save!
+      compound.experimental_condition_links = [experimental_condition_link1, experimental_condition_link2]
       assert compound.save!
-      assert experimental_condition_link1.save!
-      assert experimental_condition_link2.save!
       assert_equal compound.experimental_condition_links.count, 2
       assert_equal compound.experimental_condition_links.first.experimental_condition, ec1
       assert_equal compound.experimental_condition_links[1].experimental_condition, ec2

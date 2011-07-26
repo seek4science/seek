@@ -3,7 +3,7 @@ require 'test_helper'
 class StudiedFactorLinkTest < ActiveSupport::TestCase
   fixtures :all
 
-  test "should create a studied_factor link" do
+  test "should create a studied_factor_link" do
     studied_factor_link = StudiedFactorLink.new(:substance => compounds(:compound_glucose), :studied_factor => studied_factors(:studied_factor_concentration_glucose))
     assert studied_factor_link.save!
   end
