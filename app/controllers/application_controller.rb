@@ -163,7 +163,7 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+          try_block {redirect_to eval("#{controller_name.camel_case}Controller.new").respond_to?("index")} or redirect_to root_url
         end
         format.json { render :json => {:status => 401, :error_message => flash[:error] } }
       end
