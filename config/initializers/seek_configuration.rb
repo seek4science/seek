@@ -33,6 +33,7 @@ Seek::Config.default :community_news_feed_urls,''
 Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 
+Seek::Config.default :presentations_enabled,true
 
 # Branding
 Seek::Config.default :project_name,'SysMO'
@@ -49,7 +50,7 @@ Seek::Config.default :header_image,'sysmo-db-logo_smaller.png'
 Seek::Config.default :copyright_addendum_enabled,false
 Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
 
-Seek::Config.default :is_virtualliver, false
+Seek::Config.default :is_virtualliver, true
 
 # Pagination
 Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest'}

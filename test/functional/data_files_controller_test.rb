@@ -799,6 +799,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal update_permission.access_type, Policy::EDITING
   end
 
+
+  test "can move to presentations" do
+    data_file = Factory :data_file,:contributor=>User.current_user
+    assert_difference("DataFile.count", -1) do
+      assert_difference("Presentation.count") do
+        post :convert_to_presentation, :id=>data_file
+      end
+    end
+  end
+
   test "report error when file unavailable for download" do
     df = Factory :data_file, :policy=>Factory(:public_policy)
     df.content_blob.dump_data_to_file

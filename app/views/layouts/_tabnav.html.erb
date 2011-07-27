@@ -38,6 +38,9 @@
         <!-- Publications tab -->
         <%= tab_definition :controllers=>["publications"] -%>
 
+        <!-- Presentations tab -->
+        <%= tab_definition :controllers=>["presentations"] if Seek::Config.presentations_enabled-%>
+
         <!-- Forums tab -->
         <!-- Be hidden for unlogin user -->
         <% if logged_in? %>
