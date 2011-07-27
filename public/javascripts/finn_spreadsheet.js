@@ -186,7 +186,7 @@ $j(document).ready(function ($) {
   ;
 
   //Resizable column/row headings
-  //also making them clickable to select all cells in that row/column
+  //also makes them clickable to select all cells in that row/column
   $( "div.col_heading" )
       .resizable({
         handles: 'e',
