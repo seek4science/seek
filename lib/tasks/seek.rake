@@ -217,7 +217,21 @@ namespace :seek do
     custom_permissions_only_scope = 1
     all_sysmo_users_scope = 2
     all_registered_users_scope = 3
+    every_one = 4
 
+    #First, need to update the sharing_scope of publication_policy from 3 to 4
+    policies = Policy.find(:all, :conditions => ["name = ? AND sharing_scope = ?", 'publication_policy', all_registered_users_scope])
+    unless policies.nil?
+      count = 0
+      policies.each do |policy|
+        policy.sharing_scope = every_one
+        policy.save
+        count += 1
+      end
+      puts "Done - #{count} publication_policies changed scope from ALL_REGISTERED_USERS to EVERYONE."
+    else
+      puts "Couldn't find any policies with ALL_REGISTERED_USERS scope and publication_policy"
+    end
     #update  ALL_REGISTERED_USERS to ALL_SYSMO_USERS
     policies = Policy.find(:all, :conditions => ["sharing_scope = ?", all_registered_users_scope])
     unless policies.nil?
