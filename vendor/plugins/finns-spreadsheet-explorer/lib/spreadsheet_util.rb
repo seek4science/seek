@@ -10,7 +10,10 @@ module SpreadsheetUtil
 
   def is_spreadsheet?
     self.content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
-    self.content_type == "application/vnd.ms-excel"
+    self.content_type == "application/vnd.ms-excel" ||
+    self.content_type == "application/vnd.excel" ||
+    self.content_type == "application/excel" ||
+    self.content_type == "application/x-msexcel"
   end
 
   def spreadsheet_annotations
@@ -81,10 +84,10 @@ module SpreadsheetUtil
             max_col = col_index
           end
         end
-        s.find(".//row").each do |r|
+        s.find("./rows/row").each do |r|
           row_index = r["index"].to_i
           row = Row.new(row_index, r["height"])
-          sheet.rows[row_index] = row
+          sheet.rows << row
           if max_row < row_index
             max_row = row_index
           end
@@ -93,7 +96,7 @@ module SpreadsheetUtil
             content = c.content
             content = content.to_f if c["type"] == "numeric"
             cell = Cell.new(content, row_index, col_index, c["formula"], c["style"])
-            row.cells[col_index] = cell
+            row.cells << cell
           end
         end
         sheet.last_row = max_row
@@ -127,11 +130,12 @@ module SpreadsheetUtil
     result
   end
 
-  private
   #the cache file for a given feed url
   def cached_spreadsheet_path
     File.join(cached_spreadsheet_dir,"spreadsheet_blob_#{Rails.env}_#{content_blob_id.to_s}.xml")
   end
+
+  private
 
   #the directory used to contain the cached spreadsheets
   def cached_spreadsheet_dir
