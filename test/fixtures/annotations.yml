@@ -1,0 +1,17 @@
+annotation_1:
+  source: users(:datafile_owner)
+  annotatable: cell_range_1
+  attribute: annotation (String)
+  value: "annotation #1"
+
+annotation_2:
+  source: users(:datafile_owner)
+  annotatable: cell_range_2
+  attribute: annotation (String)
+  value: "annotation #2"
+
+annotation_3:
+  source: users(:datafile_owner)
+  annotatable: cell_range_3
+  attribute: annotation (String)
+  value: "annotation #3"

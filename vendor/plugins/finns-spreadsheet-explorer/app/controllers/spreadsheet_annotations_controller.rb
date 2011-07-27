@@ -10,7 +10,7 @@ class SpreadsheetAnnotationsController < ApplicationController
     worksheet = content_blob.worksheets.select {|w| w.sheet_number == params[:annotation_sheet_id].to_i}.first
 
 
-    if data_file.can_download?
+    #if content_blob.can_download?
 
       cell = CellRange.new(:worksheet => worksheet,
                            :cell_range => params[:annotation_cell_coverage])
@@ -32,7 +32,10 @@ class SpreadsheetAnnotationsController < ApplicationController
           end
         end
       end
-    end
+    #end
+
+  end
+
 
   def update
     annotation = Annotation.find(params[:id])

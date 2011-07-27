@@ -1,0 +1,35 @@
+worksheet_1:
+  content_blob: content_blobs(:spreadsheet_blob)
+  last_row:    10
+  last_column: 10
+
+
+worksheet_2:
+  content_blob: content_blobs(:spreadsheet_blob)
+  last_row: 20
+  last_column: 20
+
+
+private_worksheet:
+  content_blob: content_blobs(:private_spreadsheet_blob)
+  last_row: 20
+  last_column: 20
+
+
+
+worksheet_fail_rows:
+  content_blob: content_blobs(:spreadsheet_blob)
+  last_row: 0
+  last_column: 2
+
+
+worksheet_fail_columns:
+  content_blob: content_blobs(:spreadsheet_blob)
+  last_row: 2
+  last_column: -1
+
+
+worksheet_fail_both:
+  content_blob: content_blobs(:spreadsheet_blob)
+  last_row: -1
+  last_column: 0
