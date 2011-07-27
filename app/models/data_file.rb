@@ -17,7 +17,8 @@ class DataFile < ActiveRecord::Base
       presentation.policy = self.policy.deep_copy
       presentation.event_ids = self.event_ids
       presentation.creators = self.creators
-
+      presentation.orig_data_file_id= self.id
+      presentation.subscribed = self.subscribed?
       presentation
   end
 

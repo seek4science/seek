@@ -7,7 +7,7 @@
 <% elsif resource.can_edit? -%>
   <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
 <% end -%>
-<% if resource.respond_to? :convert_to_presentation %>
+<% if (resource.can_delete? or current_user.admin?) and resource.respond_to? :convert_to_presentation %>
      <%= image_tag_for_key "arrow_right", {:action => :convert_to_presentation,:id=>resource.id}, nil, {:title => "click it to move this data file to presentations",:confirm => "Are you sure? This action is irreversible!"}, 'Move'%>
 <% end %>
 <!---

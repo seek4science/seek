@@ -22,8 +22,41 @@ class DataFilesController < ApplicationController
     @data_file = DataFile.find params[:id]
     @presentation = @data_file.convert_to_presentation
 
+    class << @presentation
+
+      def clone_versioned_data_file_model versioned_presentation, versioned_data_file
+          versioned_presentation.attributes.keys.each do |key|
+            versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"
+          end
+      end
+
+      def set_new_version
+         self.version = DataFile.find(self.orig_data_file_id).version
+      end
+      def save_version_on_create
+         df_versions = DataFile::Version.find(:all,:conditions=>["data_file_id =?",self.orig_data_file_id])
+         df_versions.each do |df_version|
+            rev = Presentation::Version.new
+            self.clone_versioned_data_file_model(rev,df_version)
+            rev.presentation_id = self.id
+            saved = rev.save
+            if saved
+              # Now update timestamp columns on main model.
+              # Note: main model doesnt get saved yet.
+              update_timestamps(rev, self)
+            end
+         end
+      end
+    end
+
+   saved = nil
+   if current_user.admin? or @data_file.can_delete?
+       saved = disable_authorization_checks { @presentation.save }
+   end
+
     respond_to do |format|
-      if @presentation.save
+
+      if saved
 
         # update attributions
         Relationship.create_or_update_attributions(@presentation, @data_file.attributions.collect { |a| [a.class.name, a.id] })
@@ -31,7 +64,9 @@ class DataFilesController < ApplicationController
         # update related publications
         Relationship.create_or_update_attributions(@presentation, @data_file.related_publications.collect { |p| ["Publication", p.id.to_json] }, Relationship::RELATED_TO_PUBLICATION) unless @data_file.related_publications.blank?
 
-        @data_file.destroy
+        if current_user.admin? or @data_file.can_delete?
+          disable_authorization_checks {@data_file.destroy }
+        end
 
         flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
         format.html { redirect_to presentation_path(@presentation) }
