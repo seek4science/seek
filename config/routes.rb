@@ -28,7 +28,7 @@ ActionController::Routing::Routes.draw do |map|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
   end
   
-  map.resources :spreadsheet_annotations
+  map.resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
   
   map.resources :uuids
 

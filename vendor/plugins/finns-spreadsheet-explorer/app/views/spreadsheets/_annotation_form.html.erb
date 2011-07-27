@@ -1,4 +1,4 @@
-<div id="annotation_form" style="display:none">
+<div id="annotation_form" class="spreadsheet_popup" style="display:none">
   <div class="spreadsheet_box_title">
     <div style="float: left">New Annotation</div>
     <div style="float: right"><a href="#" onclick="$j('#annotation_form').hide(); return false;">Close</a></div>
@@ -11,7 +11,6 @@
                    :loading => "Element.show('spinner');",
                    :complete => "Element.hide('spinner');Element.hide('annotation_form');", :html => {:id => "annotation_form"}) do %>
     
-    <%= hidden_field_tag :annotation_id %>                
     <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob_id %>
     <%= hidden_field_tag :annotation_sheet_id, "0" %>
     
@@ -19,11 +18,14 @@
       Cell Range:<br/>
       <%= text_field_tag :annotation_cell_coverage %>
     </p>
-    
+
+    <%#The stuff here can potentially be abstracted out into a partial when dealing with different annotation types%>
     <p>
       Content:<br/>
       <%= text_area_tag :annotation_content %>
+      <%= hidden_field_tag :annotation_attribute_name, "annotation" %>
     </p>
+    <%# --- %>
                        
     <%= submit_tag 'Add Annotation',:id=>"fetch_button" %>
   <% end %>

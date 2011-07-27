@@ -167,10 +167,9 @@ span.cell_coverage, span.sheet_location
 {
 }
 
-
-div#annotation_form
+div.spreadsheet_popup
 {
-  width: 18em;
+  min-width: 18em;
   border: 1px solid #CCC;
   padding: 0.5em;
   margin: 0.5em;
@@ -179,14 +178,13 @@ div#annotation_form
   z-index: 20;
 }
 
+
+div#annotation_form
+{
+}
+
 div#annotation_overview
 {
-  border: 1px solid #CCC;
-  padding: 0.5em;
-  margin: 0.5em;
-  background-color: #FFFFFF;
-  position: absolute;
-  z-index: 20;
 }
 
 div#annotation_overview table td
@@ -215,6 +213,11 @@ div#annotation_overview table tr.annotation_stub:hover
 div.spreadsheet_controls
 {
   margin: 0.5em;
+}
+
+a.requires_selection
+{
+  display: none;
 }
 
 a.spreadsheet_button

@@ -49,7 +49,7 @@ module SpreadsheetUtil
     end
   end
   
-  #Take in a string containing spreadsheet xml and returns
+  #Takes in a string containing the xml representation of a spreadsheet and returns
   # a Workbook object
   def parse_spreadsheet_xml(spreadsheet_xml)
     workbook = Workbook.new
@@ -130,7 +130,7 @@ module SpreadsheetUtil
   private
   #the cache file for a given feed url
   def cached_spreadsheet_path
-    File.join(cached_spreadsheet_dir,"spreadsheet_blob_#{self.content_blob_id.to_s}.xml")
+    File.join(cached_spreadsheet_dir,"spreadsheet_blob_#{Rails.env}_#{content_blob_id.to_s}.xml")
   end
 
   #the directory used to contain the cached spreadsheets

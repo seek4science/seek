@@ -263,6 +263,8 @@ module ImagesHelper
       "famfamfam_silk/tag_blue_add.png"
       when "spreadsheet_annotation_destroy"
       "famfamfam_silk/tag_blue_delete.png"
+      when "spreadsheet_export"
+      "famfamfam_silk/table_go.png"
     else
       return nil
     end

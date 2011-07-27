@@ -6,8 +6,9 @@ function annotation_source(id, type, name, url) {
   this.annotations = [];
 }
 
-function annotation(id, sheet_number, cell_range, content, date_created) {
+function annotation(id, type, sheet_number, cell_range, content, date_created) {
   this.id = id;
+  this.type = type;
   this.sheetNumber = sheet_number;
   this.cellRange = cell_range;
   this.content = content;
@@ -19,8 +20,6 @@ function annotation(id, sheet_number, cell_range, content, date_created) {
   this.endCol = cell_coords[2];
   this.endRow = cell_coords[3];
 }
-
-var annotation_sources;
 
 var $j = jQuery.noConflict(); //To prevent conflicts with prototype
 
@@ -186,7 +185,8 @@ $j(document).ready(function ($) {
       })
   ;
 
-  //Resize column/rows
+  //Resizable column/row headings
+  //also makes them clickable to select all cells in that row/column
   $( "div.col_heading" )
       .resizable({
         handles: 'e',
@@ -194,14 +194,23 @@ $j(document).ready(function ($) {
           $("table.active_sheet col:eq("+($(this).index()-1)+")").width($(this).width());
         }
       })
+      .mousedown(function(){
+        var col = $(this).index();
+        var last_row = $(this).parent().parent().parent().find("div.row_heading").size();
+        select_cells(col,1,col,last_row);
+      })
   ;
-
   $( "div.row_heading" )
       .resizable({
         handles: 's',
         stop: function (){
           $("table.active_sheet tr:eq("+$(this).index()+")").height($(this).height());
         }
+      })
+      .mousedown(function(){
+        var row = $(this).index() + 1;
+        var last_col = $(this).parent().parent().parent().find("div.col_heading").size();
+        select_cells(1,row,last_col,row);
       })
   ;
 });
@@ -258,7 +267,7 @@ function explodeCellRange(range) {
 // Links them to their respective sheet/cell/cellranges
 // Is called after every AJAX call to rebind the set of annotations that may have
 // changed, and to re-enhance DOM elements that have been reloaded
-function bindAnnotations() {
+function bindAnnotations(annotation_sources) {
   var annotationIndexTable = $j("div#annotation_overview table");
   for(var s = 0; s < annotation_sources.size(); s++)
   {
@@ -280,10 +289,16 @@ function bindAnnotations() {
       bindAnnotation(ann);
     }
   }
+  //Text displayed in annotation index if no annotations present
+  if(annotation_sources < 1)
+  {
+    annotationIndexTable.append($j("<tr></tr>").append($j("<td colspan=\"3\">No annotations found</td>")));
+  }
   //Make the annotations draggable
-  $j('#annotation_container').draggable({handle: '#annotation_drag'});
+  $j('#annotation_container').draggable({handle: '#annotation_drag', zIndex: 10});
 }
 
+//Small annotation summary that jumps to said annotation when clicked
 function createAnnotationStub(ann)
 {
   var stub = $j("<tr></tr>").addClass("annotation_stub")
@@ -405,6 +420,9 @@ function select_cells(startCol, startRow, endCol, endRow) {
 
   //Update cell coverage in annotation form
   $j('input#annotation_cell_coverage').attr("value",selection);
+
+  //Show selection-dependent controls
+  $j('.requires_selection').show();
 }
 
 function activateSheet(sheet, sheetTab) {
@@ -427,6 +445,8 @@ function activateSheet(sheet, sheetTab) {
   //Hide sheets
   $j('div.sheet_container').hide();
 
+  //Hide selection-dependent buttons
+  $j('.requires_selection').hide();
 
   //Select the tab
   sheetTab.addClass('selected_tab');
@@ -465,4 +485,25 @@ function activateSheet(sheet, sheetTab) {
       endRow = 0,
       endCol = 0;
   return false;
+}
+
+function copy_cells()
+{
+
+  var cells = $j('td.selected_cell');
+  var columns = $j('.col_heading.selected_heading').size();
+  var text = "";
+
+  for(var i = 0; i < cells.size(); i += columns)
+  {
+    for(var j = 0; j < columns; j += 1)
+    {
+      text += (cells.eq(i + j).html() + "\t");
+    }
+    text += "\n";
+  }
+
+  $j("textarea#export_data").val(text);
+  $j("div.spreadsheet_popup").hide();
+  $j("div#export_form").show();
 }
