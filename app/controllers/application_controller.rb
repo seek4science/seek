@@ -295,7 +295,11 @@ class ApplicationController < ActionController::Base
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
-        flash[:error] = "Couldn't find the #{name.humanize} or you are not authorized to view it"
+        if eval("@#{name}").nil?
+          flash[:error] = "Couldn't find the #{name.humanize}"
+        else
+          flash[:error] = "you are not authorized to view #{name.humanize}"
+        end
         format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false
