@@ -14,20 +14,23 @@
   
   <input size="10" id="selection_data"></input>
   <input size="60" id="cell_info" readonly="readonly"></input>
-  
+
   <div class="spreadsheet_controls">
+    <%= link_to image('spreadsheet') + " List Annotations", "#", :onclick =>"$j('div.spreadsheet_popup').hide(); $j('div#annotation_overview').show();return false;",
+          :title => "Add new annotation", :class => "spreadsheet_button" %>
     <% if logged_in? %>
-    <%= link_to image('spreadsheet_annotation_add') + " Add Annotation", "#", :onclick =>"$j('div#annotation_overview').hide(); $j('div#annotation_form').toggle();return false;",
-          :title => "Add new annotation", :class => "spreadsheet_button" %>
+    <%= link_to image('spreadsheet_annotation_add') + " Add Annotation", "#", :onclick =>"$j('div.spreadsheet_popup').hide(); $j('div#annotation_form').show();return false;",
+          :title => "Add new annotation", :class => "spreadsheet_button requires_selection" %>
     <% end %>
-    <%= link_to image('spreadsheet') + " List Annotations", "#", :onclick =>"$j('div#annotation_form').hide(); $j('div#annotation_overview').toggle();return false;", 
-          :title => "Add new annotation", :class => "spreadsheet_button" %>
+    <%= link_to image('spreadsheet_export') + " Export Selection", "#", :onclick =>"copy_cells(); return false;",
+          :title => "Export selected cells into an external application", :class => "spreadsheet_button requires_selection" %>
   </div>
   
   <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @spreadsheet.styles} %>
   
   <div class="spreadsheet_viewer">
-    <%= render :partial => "annotations/annotation_form" %>
+    <%= render :partial => "spreadsheets/annotation_form" %>
+    <%= render :partial => "spreadsheets/export" %>
     
     <div id="annotations">
       <%= render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @spreadsheet.annotations } %>
