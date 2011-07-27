@@ -5,7 +5,9 @@ class PresentationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
+    WebMock.allow_net_connect!
     login_as Factory(:user)
+    User.current_user.person.set_default_subscriptions
   end
 
   test "index" do
@@ -15,8 +17,11 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can create with valid url" do
-    presentation_attrs = Factory.build(:presentation).attributes #.symbolize_keys(turn string key to symbol)
-    presentation_attrs[:data_url] = "http://www.virtual-liver.de/images/logo.png"
+    presentation =   Factory.build(:presentation)
+    presentation_attrs = presentation.attributes #.symbolize_keys(turn string key to symbol)
+
+    url ="http://www.virtual-liver.de/images/logo.png"
+    presentation_attrs[:data_url] = url
 
     assert_difference "Presentation.count" do
       post :create,:presentation => presentation_attrs
@@ -60,8 +65,9 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test "can upload new version with valid url" do
     presentation = Factory :presentation,:contributor=>User.current_user
-    assert_equal "http://www.virtual-liver.de/images/logo.png",presentation.content_blob.url
+   # assert_equal "http://www.virtual-liver.de/images/logo.png",presentation.content_blob.url
     new_data_url = "http://www.virtual-liver.de/images/liver-illustration.png"
+
     assert_difference "presentation.version" do
        post :new_version,:id => presentation,:presentation=>{:data_url=>new_data_url}
        presentation.reload
@@ -88,6 +94,8 @@ class PresentationsControllerTest < ActionController::TestCase
   test "cannot upload file with invalid url" do
     presentation_attrs = Factory.build(:presentation, :contributor=>User.current_user).attributes #.symbolize_keys(turn string key to symbol)
     presentation_attrs[:data_url] = "http://www.blah.de/images/logo.png"
+    #
+    #register_url  "http://www.blah.de/images/logo.png"
 
     assert_no_difference "Presentation.count" do
      post :create, :presentation=>presentation_attrs
@@ -97,7 +105,6 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test "cannot upload new version with invalid url" do
     presentation = Factory :presentation,:contributor=>User.current_user
-    assert_equal "http://www.virtual-liver.de/images/logo.png",presentation.content_blob.url
     new_data_url = "http://www.blah.de/images/liver-illustration.png"
     assert_no_difference "presentation.version" do
        post :new_version,:id => presentation,:presentation=>{:data_url=>new_data_url}
@@ -119,19 +126,11 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can subscribe" do
-     presentation = Factory :presentation,:contributor=>User.current_user
-
-     presentation.contributor.person.set_default_subscriptions
-
-     presentation.save!
-
-     presentation.reload
-
-     subscriptions = []
-
-    subscriptions = Subscription.find(:all,:conditions => ["subscribable_id=?",presentation.id])
-    assert  !subscriptions.empty?
-
+     presentation = Factory :presentation,:project=>Factory(:project),:contributor=>User.current_user
+     assert_difference "presentation.subscriptions.count" do
+        presentation.subscribed = true
+        presentation.save
+     end
   end
 
 
