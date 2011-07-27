@@ -17,8 +17,7 @@ class StudiedFactorsController < ApplicationController
     @studied_factor.data_file_version = params[:version]
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
-    mappings = params[:mappings]
-    substances = find_or_new_substances new_substances,known_substance_ids_and_types, mappings
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types
     substances.each do |substance|
       @studied_factor.studied_factor_links.build(:substance => substance )
     end
@@ -88,9 +87,14 @@ class StudiedFactorsController < ApplicationController
 
     new_substances = params["#{@studied_factor.id}_substance_autocompleter_unrecognized_items"] || []
     known_substance_ids_and_types = params["#{@studied_factor.id}_substance_autocompleter_selected_ids"] || []
-    mappings = params[:mappings]
-    substances = find_or_new_substances new_substances,known_substance_ids_and_types, mappings
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types
 
+    #delete the old studied_factor_links
+    @studied_factor.studied_factor_links.each do |sfl|
+      sfl.destroy
+    end
+
+    #create the new studied_factor_links
     studied_factor_links = []
     substances.each do |substance|
       studied_factor_links.push StudiedFactorLink.new(:substance => substance)

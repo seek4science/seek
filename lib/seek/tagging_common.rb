@@ -104,7 +104,7 @@ module Seek
           known_tags << tag unless known_tags.include?(tag)
         end
       end
-      return new_tags, known_tags
+      return fixed_new_tags, known_tags
     end
 
 

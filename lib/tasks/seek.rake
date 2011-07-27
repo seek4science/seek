@@ -232,6 +232,7 @@ namespace :seek do
     else
       puts "Couldn't find any policies with ALL_REGISTERED_USERS scope and publication_policy"
     end
+
     #update  ALL_REGISTERED_USERS to ALL_SYSMO_USERS
     policies = Policy.find(:all, :conditions => ["sharing_scope = ?", all_registered_users_scope])
     unless policies.nil?

@@ -28,27 +28,28 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     unit = units(:gram)
     fs = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
-    substance_name = 'iron'
-    sabiork_id = "100"
-    chebi_id = 'CHEBI:57904'
-    kegg_id = 'C05235'
-    synonyms = ['iron_a', 'iron_b']
+    compound_name = 'iron'
+    compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(compound_name)
 
-    post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_unrecognized_items => [substance_name],
-         :sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id, :synonyms => synonyms
+    post :create, :studied_factor => fs, :data_file_id => df.id, :version => df.version, :substance_autocompleter_unrecognized_items => [compound_name]
 
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
     assert_equal fs.measured_item, mi
-    substance = fs.substances.first
-    assert_equal substance.name, substance_name
-    assert_equal substance.mappings.first.sabiork_id, sabiork_id
-    assert_equal substance.mappings.first.chebi_id, chebi_id
-    assert_equal substance.mappings.first.kegg_id, kegg_id
-    assert_equal substance.synonyms.count, 2
-    assert_equal substance.synonyms.first.name, synonyms.first
-    assert_equal substance.synonyms[1].name, synonyms[1]
+    substance = fs.studied_factor_links.first.substance
+    assert_equal substance.name, compound_annotation['recommended_name']
+    mappings = substance.mapping_links.each{|ml| ml.mapping}
+    kegg_ids = []
+    mappings.each do |m|
+      assert_equal m.sabiork_id, compound_annotation['sabiork_id']
+      assert_equal m.chebi_id, compound_annotation['chebi_id']
+      kegg_ids.push m.kegg_id
+    end
+    assert_equal kegg_ids, compound_annotation['kegg_ids']
+
+    synonyms = substance.synonyms.each{|s| s.name}
+    assert_equal synonyms, compound_annotation['synonyms']
   end
 
   test "should create factor studied with the none concentration item and no substance" do
@@ -85,7 +86,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_not_nil fs
     assert fs.valid?
     assert_equal fs.measured_item, mi
-    assert_equal fs.substances.first, cp
+    assert_equal fs.studied_factor_links.first.substance, cp
   end
 
   test "should create the factor studied with the concentration of the compound's synonym" do
@@ -99,14 +100,14 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_not_nil fs
     assert fs.valid?
     assert_equal fs.measured_item, mi
-    assert_equal fs.substances.first, syn
+    assert_equal fs.studied_factor_links.first.substance, syn
   end
 
   test 'should update the factor studied of concentration to time' do
     fs = studied_factors(:studied_factor_concentration_glucose)
     assert_not_nil fs
     assert_equal fs.measured_item, measured_items(:concentration)
-    assert_equal fs.substances.first, compounds(:compound_glucose)
+    assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
     mi = measured_items(:time)
     put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:measured_item_id => mi.id}
@@ -114,14 +115,14 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_not_nil fs_updated
     assert fs_updated.valid?
     assert_equal fs_updated.measured_item, mi
-    assert fs_updated.substances.blank?
+    assert fs_updated.studied_factor_links.blank?
   end
 
   test 'should update the factor studied of time to concentration' do
     fs = studied_factors(:studied_factor_time)
     assert_not_nil fs
     assert_equal fs.measured_item, measured_items(:time)
-    assert fs.substances.blank?
+    assert fs.studied_factor_links.blank?
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
@@ -130,14 +131,14 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_not_nil fs_updated
     assert fs_updated.valid?
     assert_equal fs_updated.measured_item, mi
-    assert_equal fs_updated.substances.first, cp
+    assert_equal fs_updated.studied_factor_links.first.substance, cp
   end
 
   test 'should update the factor studied of time to pressure' do
     fs = studied_factors(:studied_factor_time)
     assert_not_nil fs
     assert_equal fs.measured_item, measured_items(:time)
-    assert fs.substances.blank?
+    assert fs.studied_factor_links.blank?
 
     mi = measured_items(:pressure)
     put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {:measured_item_id => mi.id}
@@ -145,14 +146,14 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_not_nil fs_updated
     assert fs_updated.valid?
     assert_equal fs_updated.measured_item, mi
-    assert fs_updated.substances.blank?
+    assert fs_updated.studied_factor_links.blank?
   end
 
   test 'should update the factor studied of concentration of glucose to concentration of glycine' do
     fs = studied_factors(:studied_factor_concentration_glucose)
     assert_not_nil fs
     assert_equal fs.measured_item, measured_items(:concentration)
-    assert_equal fs.substances.first, compounds(:compound_glucose)
+    assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
     put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {}, "#{fs.id}_substance_autocompleter_selected_ids" => ["#{cp.id.to_s},Compound"]
@@ -160,8 +161,8 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_not_nil fs_updated
     assert fs_updated.valid?
     assert_equal fs_updated.measured_item, measured_items(:concentration)
-    assert_equal fs_updated.substances.count, 1
-    assert_equal fs_updated.substances.first, cp
+    assert_equal fs_updated.studied_factor_links.count, 1
+    assert_equal fs_updated.studied_factor_links.first.substance, cp
   end
 
   test 'should update start_value, end_value, standard_deviation of the factor studied' do
@@ -208,24 +209,36 @@ class StudiedFactorsControllerTest < ActionController::TestCase
       fs_array.push Factory(:studied_factor, :start_value => i)
       i +=1
     end
+
     post :create_from_existing, :data_file_id => d.id, :version => d.latest_version, "checkbox_#{fs_array.first.id}" => fs_array.first.id, "checkbox_#{fs_array[1].id}" => fs_array[1].id, "checkbox_#{fs_array[2].id}" => fs_array[2].id
+
     d.reload
     assert_equal d.studied_factors.count, 3
+    #test substances
+    substances_of_new_fses = []
     d.studied_factors.each do |fs|
       assert_not_nil fs.studied_factor_links
-      assert_equal fs.substances, fs_array.first.substances
+      substances_of_new_fses.push fs.studied_factor_links.first.substance
     end
+    substances_of_existing_fses = []
+    fs_array.each do |fs|
+      substances_of_existing_fses.push fs.studied_factor_links.first.substance
+    end
+    assert_equal substances_of_existing_fses, substances_of_new_fses
   end
 
   test "should destroy FS" do
     fs = studied_factors(:studied_factor_concentration_glucose)
     assert_not_nil fs
     assert_equal fs.measured_item, measured_items(:concentration)
-    assert_equal fs.substances.first, compounds(:compound_glucose)
+    assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
-    delete :destroy, :id => fs.id
-    fs_updated = assigns(:studied_factor)
-    assert_nil fs_updated
-    assert fs.substances.blank?
+    delete :destroy, :id => fs.id, :data_file_id => data_files(:editable_data_file).id
+
+    assert_nil StudiedFactor.find_by_id(fs.id)
+    fs.studied_factor_links.each do |sfl|
+      assert_nil StudiedFactorLink.find_by_id(sfl.id)
+    end
+
   end
 end

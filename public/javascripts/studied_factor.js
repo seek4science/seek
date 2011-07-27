@@ -33,6 +33,13 @@ function showOrHideSubstanceTextField(form_id){
     }
 }
 
+function searchSubstanceInformation(){
+    var known_substances = document.getElementsByName("substance_autocompleter_selected_ids[]")
+    var unrecognized_substances = document.getElementsByName("substance_autocompleter_unrecognized_items[]")
+    //take the info from internal for the known_substances
+
+    //web service to retrieve the info for the unrecognized_substances
+}
 function testAjax(){
     new Ajax.Request('http://hitssv506.h-its.org/sabioRestWebServices/suggestions/compounds?searchCompounds=water', {
       method: 'GET',

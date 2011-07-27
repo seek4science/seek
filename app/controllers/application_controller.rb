@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  def find_or_new_substances(new_substances, known_substance_ids_and_types, mappings)
+  def find_or_new_substances(new_substances, known_substance_ids_and_types)
     result = []
     known_substances = []
     known_substance_ids_and_types.each do |text|
@@ -120,19 +120,55 @@ class ApplicationController < ActionController::Base
     new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
     result |= known_substances
 
-    unless new_substances.blank?
-      new_substances.each do |new_substance|
-         c = Compound.new(:name => new_substance)
-         m_links = []
-         mappings["#{new_substance}"].each do |mapping|
-           #FIXME: need to check mapping with the existing records to know if the new record is needed to create.
-           m = Mapping.new(:sabiork_id => mapping[:sabiork_id], :chebi_id => mapping[:chebi_id], :kegg_id => mapping[:kegg_id])
-           m_links.push MappingLink.new(:substance => c, :mapping => m)
+    new_substances.each do |new_substance|
+       #call the webservice to retrieve the substance annotation from sabiork
+       #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_id, kegg_ids
+       compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(new_substance)
+       #compound_annotation = {'recommended_name' => 'H2O', 'synonyms' => ['Water'], 'sabiork_id' => 40, 'chebi_id' => "CHEBI:15377", 'kegg_ids' => ["C00001"]}
+       unless compound_annotation.blank?
+         #retrieve or create compound with the recommended_name
+         recommended_name = compound_annotation["recommended_name"]
+         c = Compound.find_by_name(recommended_name) ? Compound.find_by_name(recommended_name) : Compound.new(:name => recommended_name)
+
+         #create synonyms and the relations with compound
+         synonyms = compound_annotation["synonyms"]
+         synonym_objects = []
+         synonyms.each do |s|
+            synonym_objects.push Synonym.new(:name => s, :substance => c)
          end
-         c.mapping_links = m_links
+         #destroy the old synonyms if the recommended_compound exists
+         if !c.new_record?
+           c.synonyms.each do |s|
+             s.destroy
+           end
+         end
+         c.synonyms=synonym_objects
+
+         #create the mappings and mapping_links
+         sabiork_id = compound_annotation["sabiork_id"]
+         chebi_id = compound_annotation["chebi_id"]
+         kegg_ids = compound_annotation["kegg_ids"]
+         mapping_links = []
+         kegg_ids.each do |kegg_id|
+           mapping = Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id)
+           mapping_links.push MappingLink.new(:substance => c, :mapping => mapping)
+         end
+         #destroy the old mapping and mapping_links if the recommended_compound exists
+         if !c.new_record?
+           try_block{c.mapping_links.first.mapping.destroy}
+           c.mapping_links.each do |ml|
+             ml.destroy
+           end
+         end
+         c.mapping_links = mapping_links
          result.push c
-      end
+       else
+         #if the webservice doesn't return any value: create compound with the name new_substance
+         c = Compound.new(:name => new_substance)
+         result.push c
+       end
     end
+    result
   end
 
   def no_comma_for_decimal

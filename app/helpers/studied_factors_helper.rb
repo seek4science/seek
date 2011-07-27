@@ -27,12 +27,15 @@ module StudiedFactorsHelper
 
    def tagged_substances resource
       tagged_substances = []
-      if !resource.nil? && !resource.substance.nil?
-        substance = resource.substance
-        s = Substance.new
-        s.id = substance.id.to_s + ",#{substance.class.name}"
-        s.name = substance.name
-        tagged_substances.push s
+      link_table_name = (resource.class.name == 'StudiedFactor') ? 'studied_factor_links' : 'experimental_condition_links'
+      if !resource.nil?
+        (resource.send link_table_name).each do |ltn|
+          substance = ltn.substance
+          s = Substance.new
+          s.id = substance.id.to_s + ",#{substance.class.name}"
+          s.name = substance.name
+          tagged_substances.push s
+        end
       end
       tagged_substances
    end
@@ -79,3 +82,7 @@ module StudiedFactorsHelper
   end
 
 end
+
+
+
+

@@ -14,8 +14,13 @@
 
     <% end %>
     <li id="measured_item">
-      <%if  object.measured_item.title == 'concentration' and object.substance.try(:name)%>
-        <%= h object.substance.name + ' ' + object.measured_item.title  %>
+      <%if  object.measured_item.title == 'concentration' %>
+        <% substance = ''
+           object.studied_factor_links.each do |sfl|
+             substance.concat(sfl.substance.name + '/')
+           end
+        %>
+        <%= h substance + ' ' + object.measured_item.title  %>
       <%else%>
         <%= h object.measured_item.title %>
       <%end%>
