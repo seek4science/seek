@@ -708,7 +708,10 @@ ActiveRecord::Schema.define(:version => 20110721101026) do
   end
 
   create_table "samples_tissue_and_cell_types", :id => false, :force => true do |t|
+    t.integer "sample_id"
     t.integer "tissue_and_cell_type_id"
+  end
+
   create_table "saved_searches", :force => true do |t|
     t.integer  "user_id"
     t.text     "search_query"
@@ -882,15 +885,6 @@ ActiveRecord::Schema.define(:version => 20110721101026) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
-  end
-
-  create_table "subscriptions", :force => true do |t|
-    t.integer  "person_id"
-    t.integer  "subscribable_id"
-    t.string   "subscribable_type"
-    t.string   "subscription_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "subscriptions", :force => true do |t|
