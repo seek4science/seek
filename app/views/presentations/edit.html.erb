@@ -46,7 +46,7 @@
                 <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>
             <% end -%>
         </p>
-		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @presentation, :show_relationships => false} -%>
+
         <% end -%>
         <p>
             <%= f.submit "Update", :id => "presentation_submit_btn", :onclick => "javascript: validatePresentationFields(false);  return(false);" -%> or <%= link_to "Cancel", edit_presentation_path -%>

@@ -28,7 +28,7 @@
             <% end -%>
         </p>
 
-		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @presentation, :show_relationships => false} -%>
+
         <p>
             <%= submit_tag "Upload and Save", :id => "presentation_submit_btn", :onclick => "javascript: validatePresentationFields(true); return(false);" -%> or <%= link_to 'Cancel', presentations_path -%>
         </p>
