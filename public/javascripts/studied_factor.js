@@ -19,8 +19,6 @@ function showOrHideSubstanceTextField(form_id){
 
     if (option_select.text == 'concentration'){
         substance_autocomplete.disabled = false;
-        if (form_id == 'add_condition_or_factor_form')
-         Effect.Appear('add_substance_concentration',{ duration: 2});
 
     }else{
         //clear all the substances when disable
@@ -28,26 +26,5 @@ function showOrHideSubstanceTextField(form_id){
         autocompleter_id = autocompleter_id.concat('autocompleter');
         autocompleters[autocompleter_id].deleteAllTokens();
         substance_autocomplete.disabled = true;
-        if (form_id == 'add_condition_or_factor_form')
-          Effect.Fade('add_substance_concentration', { duration: 1 });
     }
-}
-
-function searchSubstanceInformation(){
-    var known_substances = document.getElementsByName("substance_autocompleter_selected_ids[]")
-    var unrecognized_substances = document.getElementsByName("substance_autocompleter_unrecognized_items[]")
-    //take the info from internal for the known_substances
-
-    //web service to retrieve the info for the unrecognized_substances
-}
-function testAjax(){
-    new Ajax.Request('http://hitssv506.h-its.org/sabioRestWebServices/suggestions/compounds?searchCompounds=water', {
-      method: 'GET',
-      onSuccess: function(transport) {
-        alert('sucess')
-        alert(transport.responseText)
-
-      },
-      onFailure: function(){ alert('Something went wrong...') }
-    });
 }

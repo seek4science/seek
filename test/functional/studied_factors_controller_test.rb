@@ -39,7 +39,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.measured_item, mi
     substance = fs.studied_factor_links.first.substance
     assert_equal substance.name, compound_annotation['recommended_name']
-    mappings = substance.mapping_links.each{|ml| ml.mapping}
+    mappings = substance.mapping_links.collect{|ml| ml.mapping}
     kegg_ids = []
     mappings.each do |m|
       assert_equal m.sabiork_id, compound_annotation['sabiork_id']
@@ -48,7 +48,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     end
     assert_equal kegg_ids, compound_annotation['kegg_ids']
 
-    synonyms = substance.synonyms.each{|s| s.name}
+    synonyms = substance.synonyms.collect{|s| s.name}
     assert_equal synonyms, compound_annotation['synonyms']
   end
 
