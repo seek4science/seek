@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110725155156) do
+ActiveRecord::Schema.define(:version => 20110727154707) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -271,8 +271,6 @@ ActiveRecord::Schema.define(:version => 20110725155156) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "sop_version"
-    t.integer  "substance_id"
-    t.string   "substance_type"
   end
 
   add_index "experimental_conditions", ["sop_id"], :name => "index_experimental_conditions_on_sop_id"
@@ -402,8 +400,8 @@ ActiveRecord::Schema.define(:version => 20110725155156) do
 
   create_table "mappings", :force => true do |t|
     t.integer  "sabiork_id"
-    t.integer  "chebi_id"
-    t.integer  "kegg_id"
+    t.string   "chebi_id"
+    t.string   "kegg_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -817,8 +815,6 @@ ActiveRecord::Schema.define(:version => 20110725155156) do
     t.datetime "updated_at"
     t.float    "standard_deviation"
     t.integer  "data_file_version"
-    t.integer  "substance_id"
-    t.string   "substance_type"
   end
 
   add_index "studied_factors", ["data_file_id"], :name => "index_studied_factors_on_data_file_id"
