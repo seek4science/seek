@@ -279,7 +279,8 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
-          flash[:error] = "You may not #{action} #{name}:#{params[:id]}"
+          flash[:error] = "You may not #{action} #{name}:#{params[:id]}! "
+          flash[:error] << "please login first" if User.current_user.nil?
           format.html do
             case action
               when 'manage'   then redirect_to object
