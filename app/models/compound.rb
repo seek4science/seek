@@ -7,4 +7,6 @@ class Compound < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name
 
+  acts_as_solr(:fields => [:name], :include => [{:synonyms => {:fields => [:name]}}]) if Seek::Config.solr_enabled
+
 end

@@ -65,7 +65,7 @@ class ExperimentalConditionsController < ApplicationController
           if ec.save
             page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>ec,:locals=>{:asset => 'sop', :show_delete=>true}
           else
-            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, values: #{ec.start_value}-#{ec.end_value}#{ec.unit.title}, SD: #{ec.standard_deviation}")
+            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, values: #{ec.start_value}-#{ec.end_value}#{ec.unit.title}")
           end
         end
         page.visual_effect :highlight,"condition_or_factor_rows"

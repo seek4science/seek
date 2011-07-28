@@ -9,7 +9,7 @@ class StudiedFactor < ActiveRecord::Base
 
   validates_presence_of :unit,:measured_item,:start_value,:data_file
   validates_presence_of :studied_factor_links, :if => Proc.new{|fs| fs.measured_item.title == 'concentration'}, :message => "can't be a nil"
-  acts_as_solr(:field => [], :include => [:measured_item, :substance]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields => [], :include => [{:measured_item => {:fields => [:title]}}]) if Seek::Config.solr_enabled
 
   def range_text
     #TODO: write test

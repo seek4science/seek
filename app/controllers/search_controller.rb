@@ -45,6 +45,8 @@ class SearchController < ApplicationController
       when ("sops")
         @results = Sop.multi_solr_search(downcase_query, :limit=>100, :models=>[Sop]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
         search_in_experimental_condition
+        search_in_compounds 'sop'
+        search_in_mappings 'sop'
       when ("studies")
         @results = Study.multi_solr_search(downcase_query, :limit=>100, :models=>[Study]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       when ("models")
@@ -52,6 +54,8 @@ class SearchController < ApplicationController
       when ("data files")
         @results = DataFile.multi_solr_search(downcase_query, :limit=>100, :models=>[DataFile]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
         search_in_factors_studied
+        search_in_compounds 'data_file'
+        search_in_mappings 'data_file'
       when ("investigations")
         @results = Investigation.multi_solr_search(downcase_query, :limit=>100, :models=>[Investigation]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       when ("assays")
@@ -71,6 +75,8 @@ class SearchController < ApplicationController
         @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>sources).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
         search_in_factors_studied
         search_in_experimental_condition
+        search_in_compounds
+        search_in_mappings
     end
   end
 
@@ -100,4 +106,64 @@ class SearchController < ApplicationController
       end
     end
   end
+
+  def search_in_compounds return_item=nil
+    downcase_query = @search_query.downcase
+    compounds = Compound.multi_solr_search(downcase_query, :limit=>100, :models=>[Compound]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+    data_files = []
+    sops = []
+    #retrieve the items associated with the compound
+    unless compounds.blank?
+        compounds.each do |c|
+           c.studied_factor_links.each do |sfl|
+             data_files.push sfl.studied_factor.data_file if try_block{sfl.studied_factor.data_file}
+           end
+           c.experimental_condition_links.each do |ecl|
+             sops.push ecl.experimental_condition.sop if try_block{ecl.experimental_condition.sop}
+           end
+        end
+    end
+
+    if return_item == 'data_file'
+      #| unions 2 arrays and removes duplicates
+      @results |= data_files
+    elsif return_item == 'sop'
+      @results |= sops
+    else
+      @results |= data_files
+      @results |= sops
+    end
+  end
+
+  def search_in_mappings return_item=nil
+    downcase_query = @search_query.downcase
+    mappings = Mapping.multi_solr_search(downcase_query, :limit=>100, :models=>[Mapping]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+    data_files = []
+    sops = []
+    #retrieve the items associated with the mapping fields
+    unless mappings.blank?
+      mappings.each do |mapping|
+        mapping.mapping_links.each do |ml|
+          ml.substance.studied_factor_links.each do |sfl|
+            data_files.push sfl.studied_factor.data_file if try_block{sfl.studied_factor.data_file}
+          end
+          ml.substance.experimental_condition_links.each do |ecl|
+            sops.push ecl.experimental_condition.sop if try_block{ecl.experimental_condition.sop}
+          end
+        end
+      end
+    end
+
+    if return_item == 'data_file'
+      @results |= data_files
+    elsif return_item == 'sop'
+      @results |= sops
+    else
+      @results |= data_files
+      @results |= sops
+    end
+  end
 end
+
+
+
