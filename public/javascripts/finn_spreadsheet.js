@@ -295,7 +295,7 @@ function bindAnnotations(annotation_sources) {
     annotationIndexTable.append($j("<tr></tr>").append($j("<td colspan=\"3\">No annotations found</td>")));
   }
   //Make the annotations draggable
-  $j('#annotation_container').draggable({handle: '#annotation_drag', zIndex: 10});
+  $j('#annotation_container').draggable({handle: '#annotation_drag', zIndex: 100000000000000});
 }
 
 //Small annotation summary that jumps to said annotation when clicked

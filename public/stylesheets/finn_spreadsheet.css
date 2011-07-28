@@ -161,6 +161,7 @@ div#annotation_controls
 div#annotation_container
 {
   position: absolute;
+  z-index: 10;
 }
 
 span.cell_coverage, span.sheet_location
@@ -371,3 +372,10 @@ div.odd_heading.selected_heading {
   background-color: #47D;
 }
 
+.ui-resizable-handle {
+  z-index:auto !important;
+}
+
+.ui-resizable {
+  z-index:5 !important;
+}
