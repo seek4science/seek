@@ -75,6 +75,11 @@ module SpreadsheetRepresentation
     def very_hidden?
       @hidden == 2
     end
+
+    #Rows with content
+    def actual_rows
+      @rows.select {|r| !r.nil?}
+    end
   end
   
   class Column
@@ -105,6 +110,11 @@ module SpreadsheetRepresentation
     
     def [] x
       @cells[x]
+    end
+
+    #Cells with content (present in XML - can still be blank with styles)
+    def actual_cells
+      @cells.select {|c| !c.nil?}
     end
   end
   

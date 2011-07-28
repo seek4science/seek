@@ -76,7 +76,7 @@ module SpreadsheetUtil
         #Load into memory
         max_row = 0
         max_col = 0
-        s.find(".//columns/column").each do |c|
+        s.find("./columns/column").each do |c|
           col_index = c["index"].to_i
           col = Column.new(col_index, c["width"])
           sheet.columns << col          
@@ -87,16 +87,16 @@ module SpreadsheetUtil
         s.find("./rows/row").each do |r|
           row_index = r["index"].to_i
           row = Row.new(row_index, r["height"])
-          sheet.rows << row
+          sheet.rows[row_index] = row
           if max_row < row_index
             max_row = row_index
           end
-          r.find(".//cell").each do |c|
+          r.find("./cell").each do |c|
             col_index = c["column"].to_i
             content = c.content
             content = content.to_f if c["type"] == "numeric"
             cell = Cell.new(content, row_index, col_index, c["formula"], c["style"])
-            row.cells << cell
+            row.cells[col_index] = cell
           end
         end
         sheet.last_row = max_row

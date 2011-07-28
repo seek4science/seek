@@ -23,13 +23,13 @@ class SpreadsheetTest < ActiveSupport::TestCase
 
     assert_equal 6, spreadsheet.sheets.first.columns.size
 
-    assert_equal 3, spreadsheet.sheets.first.rows.size
+    assert_equal 3, spreadsheet.sheets.first.actual_rows.size
 
-    assert_equal 1, spreadsheet.sheets[1].rows.size
+    assert_equal 1, spreadsheet.sheets[1].actual_rows.size
 
-    assert_equal 4, spreadsheet.sheets[1].rows.first.cells.size
+    assert_equal 4, spreadsheet.sheets[1].actual_rows.first.actual_cells.size
 
-    assert_equal "a", spreadsheet[2][0][1].value
+    assert_equal "a", spreadsheet.sheets[2].actual_rows[0].actual_cells[1].value
 
     assert File.exists?(datafile.cached_spreadsheet_path)
   end
