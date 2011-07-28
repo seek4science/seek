@@ -280,6 +280,7 @@ div.spreadsheet_errors ul li
   margin: 2px 0;
   border: 1px solid #555;
   text-align: right;
+  padding: 1px;
   z-index: 10;
 }
 
@@ -373,5 +374,5 @@ div.odd_heading.selected_heading {
 }
 
 .ui-resizable-handle {
-  z-index:auto !important;
+  z-index:5 !important;
 }

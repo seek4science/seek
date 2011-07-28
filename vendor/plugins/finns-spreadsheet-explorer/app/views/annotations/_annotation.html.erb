@@ -34,7 +34,7 @@
         <%= link_to(image('spreadsheet_annotation_edit', :title => "Edit Annotation"), '#', :onclick => "toggle_annotation_form('" + annotation.id.to_s + "'); return false;") -%>     
         <%= image_tag "ajax-loader.gif", :id => "spinner"+annotation.id.to_s, :class => 'spinner', :style => 'display:none;' -%> 
       <% end -%>    
-      <span class="cell_coverage" onclick="select_range(this.innerHTML);return false;"><%= annotation.annotatable.cell_range -%></span>
+      <span class="cell_coverage"><a href="#" onclick="select_range(this.innerHTML);return false;"><%= annotation.annotatable.cell_range -%></a></span>
     </div>
     <br style="clear:both"/>
     <div id="annotation_controls" style="display:none">

@@ -189,6 +189,7 @@ $j(document).ready(function ($) {
   //also makes them clickable to select all cells in that row/column
   $( "div.col_heading" )
       .resizable({
+        minWidth: 20,
         handles: 'e',
         stop: function (){
           $("table.active_sheet col:eq("+($(this).index()-1)+")").width($(this).width());
@@ -202,6 +203,7 @@ $j(document).ready(function ($) {
   ;
   $( "div.row_heading" )
       .resizable({
+        minHeight: 15,
         handles: 's',
         stop: function (){
           var height = $(this).height();
