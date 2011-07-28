@@ -1,4 +1,6 @@
 class StudiedFactorsController < ApplicationController
+  include Seek::FactorStudied
+
   before_filter :login_required
   before_filter :find_data_file_auth
   before_filter :create_new_studied_factor, :only=>[:index]

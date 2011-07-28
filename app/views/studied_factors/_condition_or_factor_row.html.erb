@@ -19,6 +19,7 @@
            object.studied_factor_links.each do |sfl|
              substance.concat(sfl.substance.name + '/')
            end
+           substance.chop!
         %>
         <%= h substance + ' ' + object.measured_item.title  %>
       <%else%>

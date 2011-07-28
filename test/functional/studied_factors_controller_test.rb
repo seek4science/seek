@@ -242,3 +242,6 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
   end
 end
+
+
+
