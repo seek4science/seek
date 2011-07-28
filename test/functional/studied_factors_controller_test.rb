@@ -224,7 +224,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     fs_array.each do |fs|
       substances_of_existing_fses.push fs.studied_factor_links.first.substance
     end
-    assert_equal substances_of_existing_fses, substances_of_new_fses
+    assert_equal substances_of_existing_fses.sort{|a,b| a.id <=> b.id}, substances_of_new_fses.sort{|a,b| a.id <=> b.id}
   end
 
   test "should destroy FS" do

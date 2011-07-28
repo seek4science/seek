@@ -1,4 +1,6 @@
 class ExperimentalConditionsController < ApplicationController
+  include Seek::FactorStudied
+
   before_filter :login_required
   before_filter :find_and_auth_sop  
   before_filter :create_new_condition, :only=>[:index]
@@ -17,7 +19,10 @@ class ExperimentalConditionsController < ApplicationController
     @experimental_condition.sop_version = params[:version]
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
-    @experimental_condition.substance = find_or_create_substance new_substances, known_substance_ids_and_types
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types
+    substances.each do |substance|
+      @experimental_condition.experimental_condition_links.build(:substance => substance )
+    end
     
     render :update do |page|
       if @experimental_condition.save
@@ -46,9 +51,12 @@ class ExperimentalConditionsController < ApplicationController
     experimental_condition_ids.each do |id|
       experimental_condition = ExperimentalCondition.find(id)
       new_experimental_condition = ExperimentalCondition.new(:measured_item_id => experimental_condition.measured_item_id, :unit_id => experimental_condition.unit_id, :start_value => experimental_condition.start_value,
-                                             :end_value => experimental_condition.end_value, :substance_type => experimental_condition.substance_type, :substance_id => experimental_condition.substance_id)
+                                             :end_value => experimental_condition.end_value)
       new_experimental_condition.sop=@sop
       new_experimental_condition.sop_version = params[:version]
+      experimental_condition.experimental_condition_links.each do |ecl|
+         new_experimental_condition.experimental_condition_links.build(:substance => ecl.substance)
+      end
       new_experimental_conditions.push new_experimental_condition
     end
     #
@@ -81,10 +89,19 @@ class ExperimentalConditionsController < ApplicationController
 
       new_substances = params["#{@experimental_condition.id}_substance_autocompleter_unrecognized_items"] || []
       known_substance_ids_and_types = params["#{@experimental_condition.id}_substance_autocompleter_selected_ids"] || []
-      substance = find_or_create_substance new_substances,known_substance_ids_and_types
+      substances = find_or_new_substances new_substances,known_substance_ids_and_types
 
-      params[:experimental_condition][:substance_id] = substance.try :id
-      params[:experimental_condition][:substance_type] = substance.class.name == nil.class.name ? nil : substance.class.name
+      #delete the old experimental_condition_links
+      @experimental_condition.experimental_condition_links.each do |ecl|
+        ecl.destroy
+      end
+
+      #create the new experimental_condition_links
+      experimental_condition_links = []
+      substances.each do |substance|
+        experimental_condition_links.push ExperimentalConditionLink.new(:substance => substance)
+      end
+      @experimental_condition.experimental_condition_links = experimental_condition_links
 
       render :update do |page|
         if  @experimental_condition.update_attributes(params[:experimental_condition])

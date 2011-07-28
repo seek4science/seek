@@ -51,7 +51,7 @@ class StudiedFactorsController < ApplicationController
     studied_factor_ids.each do |id|
       studied_factor = StudiedFactor.find(id)
       new_studied_factor = StudiedFactor.new(:measured_item_id => studied_factor.measured_item_id, :unit_id => studied_factor.unit_id, :start_value => studied_factor.start_value,
-                                             :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation, :substance_type => studied_factor.substance_type, :substance_id => studied_factor.substance_id)
+                                             :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation)
       new_studied_factor.data_file=@data_file
       new_studied_factor.data_file_version = params[:version]
       studied_factor.studied_factor_links.each do |sfl|

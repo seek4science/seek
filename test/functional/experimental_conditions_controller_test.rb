@@ -27,14 +27,30 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
   test 'should create the experimental condition with the concentration of the compound' do
     sop=sops(:editable_sop)
     mi = measured_items(:concentration)
-    cp = compounds(:compound_glucose)
     unit = units(:gram)
     ec = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
-    post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_unrecognized_items => ["iron"]
+    compound_name = 'iron'
+    compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(compound_name)
+
+    post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_unrecognized_items => [compound_name]
+
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
     assert_equal ec.measured_item, mi
+    substance = ec.experimental_condition_links.first.substance
+    assert_equal substance.name, compound_annotation['recommended_name']
+    mappings = substance.mapping_links.collect{|ml| ml.mapping}
+    kegg_ids = []
+    mappings.each do |m|
+      assert_equal m.sabiork_id, compound_annotation['sabiork_id']
+      assert_equal m.chebi_id, compound_annotation['chebi_id']
+      kegg_ids.push m.kegg_id
+    end
+    assert_equal kegg_ids, compound_annotation['kegg_ids']
+
+    synonyms = substance.synonyms.collect{|s| s.name}
+    assert_equal synonyms, compound_annotation['synonyms']
   end
 
   test 'should not create the experimental condition with the concentration of no substance' do
@@ -42,7 +58,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     unit = units(:gram)
     ec = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
-    post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_unrecognized_items => nil
+    post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert !ec.valid?
@@ -71,6 +87,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_not_nil ec
     assert ec.valid?
     assert_equal ec.measured_item, mi
+    assert_equal ec.experimental_condition_links.first.substance, cp
   end
 
   test "should create the experimental condition with the concentration of the compound's synonym" do
@@ -84,67 +101,69 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_not_nil ec
     assert ec.valid?
     assert_equal ec.measured_item, mi
+    assert_equal ec.experimental_condition_links.first.substance, syn
   end
 
   test 'should update the experimental condition of concentration to time' do
     ec = experimental_conditions(:experimental_condition_concentration_glucose)
     assert_not_nil ec
     assert_equal ec.measured_item, measured_items(:concentration)
-    assert_equal ec.substance, compounds(:compound_glucose)
+    assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
     mi = measured_items(:time)
-    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:measured_item_id => mi.id},  "#{ec.id}_substance_autocompleter_selected_ids" => nil
-    fs_updated = assigns(:experimental_condition)
-    assert_not_nil fs_updated
-    assert fs_updated.valid?
-    assert_equal fs_updated.measured_item, mi
-    assert_equal fs_updated.substance, nil
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:measured_item_id => mi.id}
+    ec_updated = assigns(:experimental_condition)
+    assert_not_nil ec_updated
+    assert ec_updated.valid?
+    assert_equal ec_updated.measured_item, mi
+    assert ec_updated.experimental_condition_links.blank?
   end
 
   test 'should update the experimental condition of time to concentration' do
     ec = experimental_conditions(:experimental_condition_time)
     assert_not_nil ec
     assert_equal ec.measured_item, measured_items(:time)
-    assert_equal ec.substance, nil
+    assert ec.experimental_condition_links.blank?
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
     put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:measured_item_id => mi.id},  "#{ec.id}_substance_autocompleter_selected_ids" => ["#{cp.id.to_s},Compound"]
-    fs_updated = assigns(:experimental_condition)
-    assert_not_nil fs_updated
-    assert fs_updated.valid?
-    assert_equal fs_updated.measured_item, mi
-    assert_equal fs_updated.substance, cp
+    ec_updated = assigns(:experimental_condition)
+    assert_not_nil ec_updated
+    assert ec_updated.valid?
+    assert_equal ec_updated.measured_item, mi
+    assert_equal ec_updated.experimental_condition_links.first.substance, cp
   end
 
   test 'should update the experimental condition of time to pressure' do
     ec = experimental_conditions(:experimental_condition_time)
     assert_not_nil ec
     assert_equal ec.measured_item, measured_items(:time)
-    assert_equal ec.substance, nil
+    assert ec.experimental_condition_links.blank?
 
     mi = measured_items(:pressure)
     put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:measured_item_id => mi.id}
-    fs_updated = assigns(:experimental_condition)
-    assert_not_nil fs_updated
-    assert fs_updated.valid?
-    assert_equal fs_updated.measured_item, mi
-    assert_equal fs_updated.substance, nil
+    ec_updated = assigns(:experimental_condition)
+    assert_not_nil ec_updated
+    assert ec_updated.valid?
+    assert_equal ec_updated.measured_item, mi
+    assert ec_updated.experimental_condition_links.blank?
   end
 
   test 'should update the experimental condition of concentration of glucose to concentration of glycine' do
     ec = experimental_conditions(:experimental_condition_concentration_glucose)
     assert_not_nil ec
     assert_equal ec.measured_item, measured_items(:concentration)
-    assert_equal ec.substance, compounds(:compound_glucose)
+    assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
     put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {}, "#{ec.id}_substance_autocompleter_selected_ids" => ["#{cp.id.to_s},Compound"]
-    fs_updated = assigns(:experimental_condition)
-    assert_not_nil fs_updated
-    assert fs_updated.valid?
-    assert_equal fs_updated.measured_item, measured_items(:concentration)
-    assert_equal fs_updated.substance, cp
+    ec_updated = assigns(:experimental_condition)
+    assert_not_nil ec_updated
+    assert ec_updated.valid?
+    assert_equal ec_updated.measured_item, measured_items(:concentration)
+    assert_equal ec_updated.experimental_condition_links.count, 1
+    assert_equal ec_updated.experimental_condition_links.first.substance, cp
   end
 
   test 'should update start_value, end_value of the experimental condition' do
@@ -185,14 +204,41 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     login_as(user)
     sop = Factory(:sop, :contributor => user)
     assert_equal sop.experimental_conditions.count, 0
-    #create bunch of FSes which are different
+    #create bunch of ECes which are different
     i=0
     while i < 3  do
       ec_array.push Factory(:experimental_condition, :start_value => i)
       i +=1
     end
+
     post :create_from_existing, :sop_id => sop.id, :version => sop.latest_version, "checkbox_#{ec_array.first.id}" => ec_array.first.id, "checkbox_#{ec_array[1].id}" => ec_array[1].id, "checkbox_#{ec_array[2].id}" => ec_array[2].id
+
     sop.reload
     assert_equal sop.experimental_conditions.count, 3
+    #test substances
+    substances_of_new_fses = []
+    sop.experimental_conditions.each do |ec|
+      assert_not_nil ec.experimental_condition_links
+      substances_of_new_fses.push ec.experimental_condition_links.first.substance
+    end
+    substances_of_existing_fses = []
+    ec_array.each do |ec|
+      substances_of_existing_fses.push ec.experimental_condition_links.first.substance
+    end
+    assert_equal substances_of_existing_fses.sort{|a,b| a.id <=> b.id}, substances_of_new_fses.sort{|a,b| a.id <=> b.id}
+  end
+
+  test "should destroy EC" do
+    ec = experimental_conditions(:experimental_condition_concentration_glucose)
+    assert_not_nil ec
+    assert_equal ec.measured_item, measured_items(:concentration)
+    assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
+
+    delete :destroy, :id => ec.id, :sop_id => sops(:editable_sop).id
+
+    assert_nil ExperimentalCondition.find_by_id(ec.id)
+    ec.experimental_condition_links.each do |ecl|
+      assert_nil ExperimentalConditionLink.find_by_id(ecl.id)
+    end
   end
 end

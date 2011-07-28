@@ -16,8 +16,9 @@
     <li id="measured_item">
       <%if  object.measured_item.title == 'concentration' %>
         <% substance = ''
-           object.studied_factor_links.each do |sfl|
-             substance.concat(sfl.substance.name + '/')
+           link_table_name = "#{object.class.name.underscore}_links"
+           object.send(link_table_name).each do |ltn|
+             substance.concat(ltn.substance.name + '/')
            end
            substance.chop!
         %>
