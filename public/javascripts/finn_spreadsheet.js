@@ -204,7 +204,8 @@ $j(document).ready(function ($) {
       .resizable({
         handles: 's',
         stop: function (){
-          $("table.active_sheet tr:eq("+$(this).index()+")").height($(this).height());
+          var height = $(this).height();
+          $("table.active_sheet tr:eq("+$(this).index()+")").height(height).css('line-height', height-2 + "px");
         }
       })
       .mousedown(function(){
@@ -377,11 +378,25 @@ function select_range(range) {
   $j('div.active_sheet').scrollLeft(cell.position().left + $j('div.active_sheet').scrollLeft() - 500);
 }
 
+function deselect_cells() {
+  //Deselect any cells and headings
+  $j(".selected_cell").removeClass("selected_cell");
+  $j(".selected_heading").removeClass("selected_heading");
+  //Clear selection box
+  $j('#selection_data').val("");
+  //Clear cell info box
+  $j('#cell_info').val("");
+  //Hide selection-dependent buttons
+  $j('.requires_selection').hide();
+}
+
+
+//Select cells in a specified area
 function select_cells(startCol, startRow, endCol, endRow) {
-  minRow = startRow;
-  minCol = startCol;
-  maxRow = endRow;
-  maxCol = endCol;
+  var minRow = startRow;
+  var minCol = startCol;
+  var maxRow = endRow;
+  var maxCol = endCol;
 
   //To ensure minRow/minCol is always less than maxRow/maxCol
   // no matter which direction the box is dragged
@@ -394,9 +409,7 @@ function select_cells(startCol, startRow, endCol, endRow) {
     maxCol = startCol;
   }
 
-  //Clear currently selected cells
-  $j(".selected_cell").removeClass("selected_cell");
-  $j(".selected_heading").removeClass("selected_heading");
+  deselect_cells();
 
   //"Select" dragged cells
   $j("table.active_sheet tr").slice(minRow-1,maxRow).each(function() {
@@ -445,9 +458,6 @@ function activateSheet(sheet, sheetTab) {
   //Hide sheets
   $j('div.sheet_container').hide();
 
-  //Hide selection-dependent buttons
-  $j('.requires_selection').hide();
-
   //Select the tab
   sheetTab.addClass('selected_tab');
 
@@ -465,15 +475,7 @@ function activateSheet(sheet, sheetTab) {
   //Set table active
   activeSheet.children("table.sheet").addClass('active_sheet');
 
-  //Deselect any cells and headings
-  $j(".selected_cell").removeClass("selected_cell");
-  $j(".selected_heading").removeClass("selected_heading");
-
-  //Clear selection box
-  $j('#selection_data').val("");
-
-  //Clear cell info box
-  $j('#cell_info').val("");
+  deselect_cells();
 
   //Record current sheet in annotation form
   $j('input#annotation_sheet_id').attr("value",sheetTab.attr("index"));

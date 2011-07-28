@@ -6,6 +6,7 @@ table.sheet {
 
 table.sheet tr{
   height: 15pt;
+  line-height: 11pt;
   padding:  0px;
   margin:  0px;
 }
@@ -13,7 +14,7 @@ table.sheet tr{
 table.sheet tr td {
   overflow: hidden;
   white-space: nowrap;
-  padding: 2px 5px;
+  padding: 0px 5px;
 }
 
 th.col_heading, td.row_heading {
@@ -223,7 +224,7 @@ a.requires_selection
 
 a.spreadsheet_button
 {
-  border: 1px outset #444;
+  border: 1px outset #DDD;
   background-color: #EEE;
   padding: 0.2em 0.5em;  
   display: inline-block;
@@ -275,11 +276,10 @@ div.spreadsheet_errors ul li
 
 #annotation_drag
 {
-  height: 8px;
   background-color: #DDD;
   margin: 2px 0;
-  border: 2px outset #999;
-  text-align: center;
+  border: 1px solid #555;
+  text-align: right;
   z-index: 10;
 }
 
@@ -374,8 +374,4 @@ div.odd_heading.selected_heading {
 
 .ui-resizable-handle {
   z-index:auto !important;
-}
-
-.ui-resizable {
-  z-index:5 !important;
 }

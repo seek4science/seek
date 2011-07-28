@@ -10,7 +10,7 @@ class SpreadsheetAnnotationsController < ApplicationController
     worksheet = content_blob.worksheets.select {|w| w.sheet_number == params[:annotation_sheet_id].to_i}.first
 
 
-    #if content_blob.can_download?
+    if content_blob.can_download?
 
       cell = CellRange.new(:worksheet => worksheet,
                            :cell_range => params[:annotation_cell_coverage])
@@ -22,16 +22,17 @@ class SpreadsheetAnnotationsController < ApplicationController
                                         :value => params[:annotation_content])
 
 
-      if(new_annotation.save)
-        respond_to do |format|
-          format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => content_blob.spreadsheet_annotations }}
-        end
-      else
-        respond_to do |format|
-          format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => new_annotation.errors} }
+        if(new_annotation.save)
+          respond_to do |format|
+            format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => content_blob.spreadsheet_annotations }}
+          end
+        else
+          respond_to do |format|
+            format.html { render :partial => "spreadsheets/spreadsheet_errors", :status => 500, :locals=>{ :verb => "adding", :errors => new_annotation.errors} }
+          end
         end
       end
-    #end
+    end
 
   end
 
