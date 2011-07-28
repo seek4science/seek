@@ -386,7 +386,6 @@ function deselect_cells() {
   $j(".selected_heading").removeClass("selected_heading");
   //Clear selection box
   $j('#selection_data').val("");
-  //Clear cell info box
   $j('#cell_info').val("");
   //Hide selection-dependent buttons
   $j('.requires_selection').hide();
@@ -411,7 +410,9 @@ function select_cells(startCol, startRow, endCol, endRow) {
     maxCol = startCol;
   }
 
-  deselect_cells();
+  //Deselect any cells and headings
+  $j(".selected_cell").removeClass("selected_cell");
+  $j(".selected_heading").removeClass("selected_heading");
 
   //"Select" dragged cells
   $j("table.active_sheet tr").slice(minRow-1,maxRow).each(function() {

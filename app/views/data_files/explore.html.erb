@@ -24,7 +24,7 @@
     <% end %>
     <%= link_to image('spreadsheet_export') + " Export Data", "#", :onclick =>"copy_cells(); return false;",
           :title => "Export selected cells into an external application", :class => "spreadsheet_button requires_selection" %>
-    <%= link_to image('destroy') + " Clear Selection", "#", :onclick =>"deselect_cells(); return false;",
+    <%= link_to image('destroy') + " Clear Selection", "#", :onclick =>"deselect_cells();$j('#cell_info').val(''); return false;",
           :title => "Cancel the current selection", :class => "spreadsheet_button requires_selection" %>
   </div>
   
