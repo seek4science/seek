@@ -67,4 +67,7 @@ invalid_sbml_xml_blob:
   uuid: <%= init_blob('invalid_sbml_xml.xml') %>    
   
 non_jws_dat_blob:  
-  uuid: <%= init_blob('non_jws_dat.dat') %>    
+  uuid: <%= init_blob('non_jws_dat.dat') %>
+
+unique_spreadsheet_blob:
+  uuid: <%= init_blob('small-test-spreadsheet.xls') %>
