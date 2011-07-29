@@ -20,6 +20,14 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
+
+    #Check values were properly set
+    a = assigns(:annotation)
+    assert_equal 1, a.annotatable.start_column
+    assert_equal 1, a.annotatable.start_row
+    assert_equal 2, a.annotatable.end_column
+    assert_equal 2, a.annotatable.end_row
+    assert_equal "Annotation!", a.value.text
   end
 
   test "can't create new annotation on inaccessible spreadsheet" do
@@ -43,7 +51,10 @@ class SpreadsheetAnnotationsControllerTest < ActionController::TestCase
 
     assert_response :success
 
+    #Check content was updated, but other attributes weren't'
     assert_equal "Updated", assigns(:annotation).value.text
+    assert_equal annotations(:annotation_1).annotatable.cell_range, assigns(:annotation).annotatable.cell_range
+    assert_equal annotations(:annotation_1).source, assigns(:annotation).source
   end
 
   test "can't update others' annotations" do
