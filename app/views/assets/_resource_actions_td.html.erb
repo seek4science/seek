@@ -8,7 +8,7 @@
   <%= image_tag_for_key "edit", edit_resource_path(resource), nil, nil, "Edit" -%>
 <% end -%>
 <% if (resource.can_delete? or current_user.try(:admin?)) and resource.respond_to? :convert_to_presentation %>
-     <%= image_tag_for_key "arrow_right", {:action => :convert_to_presentation,:id=>resource.id}, nil, {:title => "click it to move this data file to presentations",:confirm => "Are you sure? This action is irreversible!"}, 'Move'%>
+     <%= image_tag_for_key "arrow_right", {:action => :convert_to_presentation,:id=>resource.id}, nil, {:title => "click it to convert this data file to presentations",:confirm => "Are you sure? The conversion is irreversible!"}, 'Convert'%>
 <% end %>
 <!---
 <%= link_to_remote image_tag_for_key("favourite"), :url=>{:controller => "favourites", :action => "add", :id => model_to_drag_id(resource)},
