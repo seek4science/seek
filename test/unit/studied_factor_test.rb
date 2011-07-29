@@ -84,7 +84,10 @@ class StudiedFactorTest < ActiveSupport::TestCase
     unit = Factory(:unit)
     j=0
     while j < number_of_the_same_fses  do
-      fs_array.push Factory(:studied_factor, :measured_item => measured_item, :unit => unit)
+      studied_factor_link = Factory(:studied_factor_link, :substance => compound)
+      fs = Factory(:studied_factor, :measured_item => measured_item, :unit => unit)
+      fs.studied_factor_links = [studied_factor_link]
+      fs_array.push fs
       j +=1
     end
     assert_equal fs_array.count, i+j

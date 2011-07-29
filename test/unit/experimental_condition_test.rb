@@ -67,7 +67,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should list the unique EC , based on the set (measured_item, unit, start_value, end_value, substance)' do
+  test 'should list the unique EC , based on the set (measured_item, unit, start_value, end_value, substances)' do
     ec_array = []
     s = Factory(:sop)
     #create bunch of FSes which are different
@@ -84,12 +84,16 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     unit = Factory(:unit)
     j=0
     while j < number_of_the_same_ecs  do
-      ec_array.push Factory(:experimental_condition, :measured_item => measured_item, :unit => unit)
+      experimental_condition_link = Factory(:experimental_condition_link, :substance => compound)
+      ec = Factory(:experimental_condition, :measured_item => measured_item, :unit => unit)
+      ec.experimental_condition_links = [experimental_condition_link]
+      ec.save
+      ec_array.push ec
       j +=1
     end
     assert_equal ec_array.count, i+j
-    uniq_fs_array = uniq_fs_or_ec ec_array
-    assert_equal uniq_fs_array.count, i+1
+    uniq_ec_array = uniq_fs_or_ec ec_array
+    assert_equal uniq_ec_array.count, i+1
   end
 
   test "should create experimental condition and the association has_many compounds , through experimental_condition_links table" do
@@ -107,3 +111,4 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     end
   end
 end
+
