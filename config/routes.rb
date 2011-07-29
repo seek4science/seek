@@ -108,6 +108,10 @@ ActionController::Routing::Routes.draw do |map|
   map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get
   map.send_feedback '/home/send_feedback',:controller=>'home',:action=>'send_feedback',:method=>:post
 
+  #link to youtube
+  map.seek_intro_demo 'home/seek_intro_demo',:controller=>'home',:action=>'seek_intro_demo',:method=>:get
+
+
   # favourite groups
   map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }
   map.create_favourite_group '/favourite_groups/create', :controller => 'favourite_groups', :action => 'create', :conditions => { :method => :post }
