@@ -9,7 +9,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       measured_item = measured_items(:concentration)
       unit = units(:gram)
       sop = sops(:editable_sop)
-      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit)
+      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :unit => unit)
       assert !ec.save, "shouldn't create experimental condition with concentration of no substance"
     end
   end
@@ -19,7 +19,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       measured_item = measured_items(:time)
       unit = units(:second)
       sop = sops(:editable_sop)
-      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit)
+      ec = ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :unit => unit)
       assert ec.save, "should create experimental condition  of the none concentration item and no substance"
     end
   end
@@ -30,7 +30,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       unit = units(:gram)
       synonym = synonyms(:glucose_synonym)
       sop = sops(:editable_sop)
-      ec= ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :end_value => 10, :unit => unit)
+      ec= ExperimentalCondition.new(:sop => sop, :measured_item => measured_item, :start_value => 1, :unit => unit)
       ec_link = ExperimentalConditionLink.new(:substance => synonym)
       ec.experimental_condition_links = [ec_link]
       assert ec.save, "should create the new experimental condition with the concentration of the compound's synonym "
@@ -67,7 +67,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should list the unique EC , based on the set (measured_item, unit, start_value, end_value, substances)' do
+  test 'should list the unique EC , based on the set (measured_item, unit, value, substances)' do
     ec_array = []
     s = Factory(:sop)
     #create bunch of FSes which are different
@@ -78,7 +78,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       ec_array.push Factory(:experimental_condition, :sop => s, :start_value => i)
       i +=1
     end
-    #create bunch of FSes which are the same based on the set (measured_item, unit, start_value, end_value, substance)
+    #create bunch of ECes which are the same based on the set (measured_item, unit, value, substances)
     compound = Factory(:compound, :name => 'glucose')
     measured_item = Factory(:measured_item)
     unit = Factory(:unit)
@@ -100,7 +100,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
     User.with_current_user  users(:aaron) do
       compound1 = Compound.new(:name => 'water')
       compound2 = Compound.new(:name => 'glucose')
-      ec = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10)
+      ec = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1)
       ec_link1 = ExperimentalConditionLink.new(:substance => compound1)
       ec_link2 = ExperimentalConditionLink.new(:substance => compound2)
       ec.experimental_condition_links = [ec_link1, ec_link2]

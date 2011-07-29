@@ -16,4 +16,10 @@ class StudiedFactor < ActiveRecord::Base
     return start_value unless (end_value && end_value!=0)
     return "#{start_value} to #{end_value}"
   end
+
+  HUMANIZED_COLLUMNS = {:studied_factor_links => "Substance"}
+
+  def self.human_attribute_name(attribute)
+    HUMANIZED_COLLUMNS[attribute.to_sym] || super
+  end
 end

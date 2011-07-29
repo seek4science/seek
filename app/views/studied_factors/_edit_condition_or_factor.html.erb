@@ -43,10 +43,9 @@
 
       <td><%= f.text_field :start_value,:size=>4 %></td>
 
-      <td><%= f.text_field :end_value,:size=>4 %></td>
-
       <% if entity == "studied_factor" %>
-        <td><%= f.text_field :standard_deviation,:size=>4 %></td>
+          <td><%= f.text_field :end_value,:size=>4 %></td>
+          <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
       <td><%= f.submit "Update", :id => "update_#{object.id}" %> or <%= link_to_function "Cancel" do |page|

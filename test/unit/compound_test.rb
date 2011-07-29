@@ -53,8 +53,8 @@ class CompoundTest < ActiveSupport::TestCase
   test 'should create the association compound has_many experimental_conditions, through experimental_condition_links table ' do
     User.with_current_user  users(:aaron) do
       compound = Compound.new(:name => 'glucose')
-      ec1 = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 10)
-      ec2 = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1, :end_value => 5)
+      ec1 = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1)
+      ec2 = ExperimentalCondition.new(:sop => sops(:editable_sop), :sop_version => 1, :measured_item => measured_items(:concentration), :unit => units(:gram), :start_value => 1)
 
       experimental_condition_link1 = ExperimentalConditionLink.new(:substance => compound, :experimental_condition => ec1)
       experimental_condition_link2 = ExperimentalConditionLink.new(:substance => compound, :experimental_condition => ec2)

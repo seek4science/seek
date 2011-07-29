@@ -258,7 +258,6 @@ end
   #Experimental condition
   Factory.define(:experimental_condition) do |f|
     f.start_value 1
-    f.end_value 10
     f.sop_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit

@@ -3,5 +3,5 @@ class ExperimentalConditionLink < ActiveRecord::Base
   belongs_to :experimental_condition
 
   validates_presence_of :experimental_condition
-  validates_presence_of :substance, :message => "can't be blank"
+  validates_presence_of :substance
 end

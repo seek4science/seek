@@ -28,7 +28,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop=sops(:editable_sop)
     mi = measured_items(:concentration)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
     compound_name = 'iron'
     compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(compound_name)
 
@@ -57,7 +57,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop=sops(:editable_sop)
     mi = measured_items(:concentration)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -68,7 +68,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop=sops(:editable_sop)
     mi = measured_items(:time)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -81,7 +81,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_selected_ids => ["#{cp.id.to_s},Compound"]
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -95,7 +95,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     mi = measured_items(:concentration)
     syn = synonyms(:glucose_synonym)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => 1, :end_value => 10, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_selected_ids => ["#{syn.id.to_s},Synonym"]
     ec = assigns(:experimental_condition)
     assert_not_nil ec
@@ -166,16 +166,15 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec_updated.experimental_condition_links.first.substance, cp
   end
 
-  test 'should update start_value, end_value of the experimental condition' do
+  test 'should update value of the experimental condition' do
     ec = experimental_conditions(:experimental_condition_time)
     assert_not_nil ec
 
-    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:start_value => 10.02, :end_value => 50}
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:start_value => 10.02}
     fs_updated = assigns(:experimental_condition)
     assert_not_nil fs_updated
     assert fs_updated.valid?
     assert_equal fs_updated.start_value, 10.02
-    assert_equal fs_updated.end_value, 50
   end
 
 
@@ -183,7 +182,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop = sops(:editable_sop)
     mi = measured_items(:time)
     unit = units(:gram)
-    ec = {:measured_item_id => mi.id, :start_value => "1,5" , :end_value => 10, :unit => unit}
+    ec = {:measured_item_id => mi.id, :start_value => "1,5" , :unit => unit}
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version
     ec = assigns(:experimental_condition)
     assert_nil ec
@@ -193,7 +192,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     ec = experimental_conditions(:experimental_condition_time)
     assert_not_nil ec
 
-    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:start_value => "10,02", :end_value => 50}
+    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {:start_value => "10,02"}
     ec_updated = assigns(:experimental_condition)
     assert_nil ec_updated
   end

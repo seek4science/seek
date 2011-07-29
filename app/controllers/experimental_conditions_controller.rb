@@ -50,8 +50,7 @@ class ExperimentalConditionsController < ApplicationController
     #create the new FSes based on the selected FSes
     experimental_condition_ids.each do |id|
       experimental_condition = ExperimentalCondition.find(id)
-      new_experimental_condition = ExperimentalCondition.new(:measured_item_id => experimental_condition.measured_item_id, :unit_id => experimental_condition.unit_id, :start_value => experimental_condition.start_value,
-                                             :end_value => experimental_condition.end_value)
+      new_experimental_condition = ExperimentalCondition.new(:measured_item_id => experimental_condition.measured_item_id, :unit_id => experimental_condition.unit_id, :start_value => experimental_condition.start_value)
       new_experimental_condition.sop=@sop
       new_experimental_condition.sop_version = params[:version]
       experimental_condition.experimental_condition_links.each do |ecl|
@@ -65,7 +64,7 @@ class ExperimentalConditionsController < ApplicationController
           if ec.save
             page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>ec,:locals=>{:asset => 'sop', :show_delete=>true}
           else
-            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, values: #{ec.start_value}-#{ec.end_value}#{ec.unit.title}")
+            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.title}")
           end
         end
         page.visual_effect :highlight,"condition_or_factor_rows"

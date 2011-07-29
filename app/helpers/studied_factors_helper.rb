@@ -63,7 +63,7 @@ module StudiedFactorsHelper
     fs_or_ec_array.each do |fs_or_ec|
       substances = fs_or_ec.send(link_table_name).collect{|ltn| ltn.substance}
       substances = substances.sort{|a,b| a.id <=> b.id}
-      compare_field = [fs_or_ec.measured_item_id, fs_or_ec.start_value, fs_or_ec.end_value, fs_or_ec.unit_id, try_block{fs_or_ec.standard_deviation}, substances]
+      compare_field = [fs_or_ec.measured_item_id, fs_or_ec.start_value, try_block{fs_or_ec.end_value}, fs_or_ec.unit_id, try_block{fs_or_ec.standard_deviation}, substances]
       if !uniq_fs_or_ec_field_array.include?compare_field
         uniq_fs_or_ec_field_array.push compare_field
         result.push fs_or_ec
