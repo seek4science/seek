@@ -2,6 +2,7 @@
 
 <%= error_messages_for :study %>
 
+<%= f.hidden_field :create_from_asset %>
 
 <div style="margin-right: 0.4em;">
     <p style="margin-top: 1.5em;">
@@ -49,7 +50,8 @@
     </p>
 
     <p>
-      <%= f.label :investigation %><span class="required">*</span><br/>
+      <%= f.label :investigation %><span class="required">*</span>
+      <%=link_to h("New Investigation?"),new_investigation_path,:popup => true%><br/>
       <div id="investigation_collection">
         <% investigations = @study.investigation ? @study.investigation.project.investigations : [] -%>
         <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>investigations} -%>

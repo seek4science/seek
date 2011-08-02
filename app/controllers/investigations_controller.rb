@@ -23,7 +23,8 @@ class InvestigationsController < ApplicationController
   end
 
   def show
-    @investigation=Investigation.find(params[:id])        
+    @investigation=Investigation.find(params[:id])
+    @investigation.create_from_asset = params[:create_from_asset]
     respond_to do |format|
       format.html
       format.xml
@@ -38,7 +39,10 @@ class InvestigationsController < ApplicationController
     respond_to do |format|
       if @investigation.save
         flash[:notice] = 'The Investigation was successfully created.'
-        format.html { redirect_to(@investigation) }
+        if @investigation.create_from_asset=="true"
+           flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
+        end
+        format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
         format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
       else
         format.html { render :action => "new" }
@@ -49,7 +53,7 @@ class InvestigationsController < ApplicationController
 
   def new
     @investigation=Investigation.new
-
+    @investigation.create_from_asset = params[:create_from_asset]
     respond_to do |format|
       format.html
       format.xml { render :xml=>@investigation}

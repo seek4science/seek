@@ -1,21 +1,40 @@
-<div class="contribution_title">
-  <h1><%=  @assay.is_modelling? ? "Modelling analysis creation" : "Assay creation" -%></h1>
-</div>
+<% investigations = Investigation.all.select &:can_view?
+   studies=[]
+   investigations.each do |i|
+       studies << i.studies.select(&:can_view?)
+   end
+-%>
+<% if investigations.blank? %>
+    <ul class="sectionIcons">
+        <%= image_tag_for_key('arrow_right', new_investigation_path(:create_from_asset=>@assay.create_from_asset), "New investigation", {:style=>"font-size:larger"}, "New investigation") -%>
+    </ul>
+<% else %>
+    <% if studies.flatten.blank? %>
+        <ul class="sectionIcons">
+            <%= image_tag_for_key('arrow_right', new_study_path(:create_from_asset=>@assay.create_from_asset), "New study", {:style=>"font-size:larger"}, "New study") -%>
+        </ul>
+    <% else %>
+        <div class="contribution_title">
+          <h1><%=  @assay.is_modelling? ? "Modelling analysis creation" : "Assay creation" -%></h1>
+        </div>
 
-<% unless @assay.assay_class %>
-  <div class="assay_selection">
+        <% unless @assay.assay_class %>
+          <div class="assay_selection">
 
-    <span>Please select the class of assay you wish to create</span>
-    <br/><br/><br/>
-    <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An experimental assay</p>",new_assay_path(:class=>:experimental,:study_id=>params[:study_id]) %>
+            <span>Please select the class of assay you wish to create</span>
+            <br/><br/><br/>
+            <%= link_to "<p class='select_assay_class'>#{image("assay_experimental_avatar",:size=>"32x32")}An experimental assay</p>",new_assay_path(:class=>:experimental,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
 
-    <%= link_to "<p class='select_assay_class'>#{image("assay_modelling_avatar",:size=>"32x32")}A modelling analysis</p>",new_assay_path(:class=>:modelling,:study_id=>params[:study_id]) %>
+            <%= link_to "<p class='select_assay_class'>#{image("assay_modelling_avatar",:size=>"32x32")}A modelling analysis</p>",new_assay_path(:class=>:modelling,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset) %>
 
-  </div>
-<% else %>  
-  <div class="show_basic">
-    <% form_for @assay do |f| %>
-      <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+          </div>
+        <% else %>
+
+          <div class="show_basic">
+            <% form_for @assay do |f| %>
+              <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+            <% end -%>
+          </div>
+          <% end %>
     <% end -%>
-  </div>
-<% end -%>
+<% end %>
