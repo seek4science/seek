@@ -16,7 +16,7 @@
   <% if asset.can_delete? -%>
     <li><%= image_tag_for_key('destroy', polymorphic_path(asset), nil, { :confirm => delete_confirm_message, :method => :delete }, "Delete #{human_name}") -%></li>
   <% end -%>
-  <br/>
+  <br/><br/>
   <% if asset.is_downloadable? -%>
       <% if asset.can_download? -%>
         <li>
