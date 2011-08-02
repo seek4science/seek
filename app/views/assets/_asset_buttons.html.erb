@@ -16,7 +16,7 @@
   <% if asset.can_delete? -%>
     <li><%= image_tag_for_key('destroy', polymorphic_path(asset), nil, { :confirm => delete_confirm_message, :method => :delete }, "Delete #{human_name}") -%></li>
   <% end -%>
-
+  <br/><br/>
   <% if asset.is_downloadable? -%>
       <% if asset.can_download? -%>
         <li>
@@ -31,7 +31,7 @@
 
   <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :convert_to_presentation %>
      <li>
-       <%= image_tag_for_key "arrow_right", {:action => :convert_to_presentation,:id=>asset.id}, nil, {:title => "click it to move this data file to presentations",:confirm => "Are you sure? This action is irreversible!"}, 'Move'%>
+       <%= image_tag_for_key "arrow_right", {:action => :convert_to_presentation,:id=>asset.id}, nil, {:title => "click it to convert this data file to presentations",:confirm => "Are you sure? The conversion is irreversible!"}, 'Convert to presentation'%>
     </li>
   <% end %>
 </ul>
