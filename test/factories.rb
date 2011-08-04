@@ -205,7 +205,7 @@ end
 #Presentation
 Factory.define(:presentation) do |f|
   f.title "A Presentation"
-  f.association :project
+  f.projects {[Factory.build :project]}
  # f.data_url "http://www.virtual-liver.de/images/logo.png"
   f.association :contributor,:factory=>:user
   f.association :content_blob, :factory => :content_blob
