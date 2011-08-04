@@ -19,14 +19,17 @@ class Project < ActiveRecord::Base
   validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
   validates_format_of :wiki_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
 
-  has_many :investigations
-  has_many :studies, :through=>:investigations  
+  has_and_belongs_to_many :investigations
 
-  has_many :data_files
-  has_many :models
-  has_many :sops
-  has_many :publications
-  has_many :events
+  has_and_belongs_to_many :data_files
+  has_and_belongs_to_many :models
+  has_and_belongs_to_many :sops
+  has_and_belongs_to_many :publications
+  has_and_belongs_to_many :events
+
+  def studies
+    investigations.collect(&:studies).flatten.uniq
+  end
     
   # a default policy belonging to the project; this is set by a project PAL
   # if the project gets deleted, the default policy needs to be destroyed too
@@ -154,5 +157,5 @@ class Project < ActiveRecord::Base
   def can_be_edited_by?(subject)
     subject == nil ? false : (subject.is_admin? || (self.people.include?(subject.person) && (subject.can_edit_projects? || subject.is_project_manager?)))
   end
-  
+
 end
