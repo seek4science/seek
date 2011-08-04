@@ -131,7 +131,7 @@ class DataFileTest < ActiveSupport::TestCase
     end
     assert_nil DataFile.find_by_id(df.id)
     assert_difference("DataFile.count",1) do
-      DataFile.restore_trash!(df.id)
+      disable_authorization_checks {DataFile.restore_trash!(df.id)}
     end
     assert_not_nil DataFile.find_by_id(df.id)
   end

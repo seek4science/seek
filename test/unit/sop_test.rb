@@ -182,7 +182,7 @@ class SopTest < ActiveSupport::TestCase
     end
     assert_nil Sop.find_by_id(sop.id)
     assert_difference("Sop.count",1) do
-      Sop.restore_trash!(sop.id)
+      disable_authorization_checks {Sop.restore_trash!(sop.id)}
     end
     assert_not_nil Sop.find_by_id(sop.id)
   end

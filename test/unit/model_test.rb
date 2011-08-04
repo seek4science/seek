@@ -75,7 +75,7 @@ class ModelTest < ActiveSupport::TestCase
   test "cache_remote_content" do
     WebMock.allow_net_connect!
     project = projects(:sysmo_project)
-    
+
     model=Model.new(:title=>"test model for caching remote")
     model.policy = Policy.private_policy
     model.content_blob = ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png")
@@ -157,7 +157,7 @@ class ModelTest < ActiveSupport::TestCase
     end
     assert_nil Model.find_by_id(model.id)
     assert_difference("Model.count",1) do
-      Model.restore_trash!(model.id)
+      disable_authorization_checks {Model.restore_trash!(model.id)}
     end
     assert_not_nil Model.find_by_id(model.id)
   end
