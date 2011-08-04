@@ -2,7 +2,7 @@ require 'test_helper'
 
 
 class ChangeProjectToProjectsTest < ActionController::IntegrationTest
-  ASSETS_WITH_MULTIPLE_PROJECTS = %w[data_files events investigations models publications sops samples specimens]
+  ASSETS_WITH_MULTIPLE_PROJECTS = %w[data_files events investigations models publications sops samples specimens presentations]
 
   def setup
     User.current_user = Factory(:user, :login => 'test')
