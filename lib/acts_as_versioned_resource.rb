@@ -8,7 +8,7 @@
 # * See license.txt for details.
 # ********************************************************************************
 
-
+require 'project_compat'
 module Acts #:nodoc:
   module VersionedResource #:nodoc:
     def self.included(mod)
@@ -20,7 +20,7 @@ module Acts #:nodoc:
 
         belongs_to :contributor, :polymorphic => true
 
-        belongs_to :project
+        include ProjectCompat
 
         belongs_to :policy, :autosave => true
 

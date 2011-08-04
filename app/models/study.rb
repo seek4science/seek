@@ -3,7 +3,10 @@ class Study < ActiveRecord::Base
   acts_as_isa
 
   belongs_to :investigation
-  has_one :project, :through=>:investigation
+
+  def project
+    investigation.try :project
+  end
 
   acts_as_authorized
 

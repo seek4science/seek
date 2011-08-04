@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110721091613) do
+ActiveRecord::Schema.define(:version => 20110726101845) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -181,13 +181,16 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], :name => "index_data_file_versions_on_contributor_id_and_contributor_type"
   add_index "data_file_versions", ["data_file_id"], :name => "index_data_file_versions_on_data_file_id"
-  add_index "data_file_versions", ["project_id"], :name => "index_data_file_versions_on_project_id"
+
+  create_table "data_file_versions_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "version_id"
+  end
 
   create_table "data_files", :force => true do |t|
     t.string   "contributor_type"
@@ -205,16 +208,19 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], :name => "index_data_files_on_contributor_id_and_contributor_type"
-  add_index "data_files", ["project_id"], :name => "index_data_files_on_project_id"
 
   create_table "data_files_events", :id => false, :force => true do |t|
     t.integer "data_file_id"
     t.integer "event_id"
+  end
+
+  create_table "data_files_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "data_file_id"
   end
 
   create_table "db_files", :force => true do |t|
@@ -243,7 +249,6 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "url"
     t.text     "description"
     t.string   "title"
-    t.integer  "project_id"
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.datetime "created_at"
@@ -251,6 +256,11 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "contributor_type"
     t.string   "first_letter",     :limit => 1
     t.string   "uuid"
+  end
+
+  create_table "events_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "event_id"
   end
 
   create_table "events_publications", :id => false, :force => true do |t|
@@ -378,7 +388,6 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
   create_table "investigations", :force => true do |t|
     t.string   "title"
     t.text     "description"
-    t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "first_letter",     :limit => 1
@@ -386,6 +395,11 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+  end
+
+  create_table "investigations_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "investigation_id"
   end
 
   create_table "measured_items", :force => true do |t|
@@ -429,13 +443,16 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
   add_index "model_versions", ["model_id"], :name => "index_model_versions_on_model_id"
-  add_index "model_versions", ["project_id"], :name => "index_model_versions_on_project_id"
+
+  create_table "model_versions_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "version_id"
+  end
 
   create_table "models", :force => true do |t|
     t.string   "contributor_type"
@@ -457,12 +474,15 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"
-  add_index "models", ["project_id"], :name => "index_models_on_project_id"
+
+  create_table "models_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "model_id"
+  end
 
   create_table "moderatorships", :force => true do |t|
     t.integer "forum_id"
@@ -579,6 +599,31 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "uuid"
   end
 
+  create_table "projects_publications", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "publication_id"
+  end
+
+  create_table "projects_samples", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "sample_id"
+  end
+
+  create_table "projects_sop_versions", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "version_id"
+  end
+
+  create_table "projects_sops", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "sop_id"
+  end
+
+  create_table "projects_specimens", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "specimen_id"
+  end
+
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"
@@ -601,13 +646,11 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.datetime "last_used_at"
     t.string   "doi"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
     t.integer  "publication_type",              :default => 1
   end
 
   add_index "publications", ["contributor_id", "contributor_type"], :name => "index_publications_on_contributor_id_and_contributor_type"
-  add_index "publications", ["project_id"], :name => "index_publications_on_project_id"
 
   create_table "recommended_model_environments", :force => true do |t|
     t.string   "title"
@@ -657,7 +700,6 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.datetime "updated_at"
     t.integer  "contributor_id"
     t.string   "contributor_type"
-    t.integer  "project_id"
     t.integer  "institution_id"
   end
 
@@ -734,12 +776,10 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
   end
 
   add_index "sop_versions", ["contributor_id", "contributor_type"], :name => "index_sop_versions_on_contributor_id_and_contributor_type"
-  add_index "sop_versions", ["project_id"], :name => "index_sop_versions_on_project_id"
   add_index "sop_versions", ["sop_id"], :name => "index_sop_versions_on_sop_id"
 
   create_table "sops", :force => true do |t|
@@ -757,12 +797,10 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
   end
 
   add_index "sops", ["contributor_id", "contributor_type"], :name => "index_sops_on_contributor_id_and_contributor_type"
-  add_index "sops", ["project_id"], :name => "index_sops_on_project_id"
 
   create_table "specimens", :force => true do |t|
     t.string   "donor_number"
@@ -775,7 +813,6 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.string   "first_letter"
     t.integer  "policy_id"
     t.text     "other_creators"
-    t.integer  "project_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
     t.datetime "created_at"
