@@ -103,7 +103,7 @@ module AssetsHelper
     name = resource.class.name.split("::")[0]
 
     related = {"Person" => {}, "Project" => {}, "Institution" => {}, "Investigation" => {},
-               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {}, "Event" => {}}
+               "Study" => {}, "Assay" => {}, "Specimen" =>{}, "Sample" => {}, "DataFile" => {}, "Model" => {}, "Sop" => {}, "Publication" => {},"Presentation" => {}, "Event" => {}}
 
     related.each_key do |key|
       related[key][:items] = []
@@ -182,6 +182,12 @@ module AssetsHelper
         related["Model"][:items] = resource.related_models
         related["Assay"][:items] = resource.related_assays
         related["Event"][:items] = resource.events
+      when "Presentation"
+        related["Person"][:items] = resource.creators
+        related["Project"][:items] = [resource.project]
+        related["Publication"][:items] = resource.related_publications
+        related["Event"][:items] = resource.events
+
       when "Event"
         {#"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
          "Project" => resource.projects,

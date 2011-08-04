@@ -1,0 +1,19 @@
+<script type="text/javascript">
+  /* Popup window for creating new assay will be closed after submitting, and return to its parent window --the new asset(data_file,sop,model,..) window.
+  At the same time, the assays list for selection is updated and the new created assay is selected for adding to the asset.
+  Current user can go on creating new asset with new created assay and the old data in the form as well.
+  */
+    var text,value,assay_list_id;
+    text = "<%= @assay.title %>";
+    value = "<%= @assay.id %>";
+    if (!window.opener) {
+        alert("New assay was created but its parent window was closed.");
+        window.close();
+    }
+    assay_list_id = window.opener.document.getElementById("possible_assays");
+    assay_list_id.appendChild(new Option(text, value));
+    assay_list_id.selectedIndex = assay_list_id.options.length - 1;
+    assay_list_id.onchange();
+    alert("New assay was created! You can add it now.");
+    window.close();
+</script>

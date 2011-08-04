@@ -20,6 +20,7 @@ class PublicationTest < ActiveSupport::TestCase
   test "assay association" do
     publication = publications(:pubmed_2)
     assay = assays(:modelling_assay_with_data_and_relationship)
+    User.current_user = assay.contributor.user
     assay_asset = assay_assets(:metabolomics_assay_asset1)
     assert_not_equal assay_asset.asset, publication
     assert_not_equal assay_asset.assay, assay

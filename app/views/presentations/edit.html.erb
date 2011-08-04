@@ -1,0 +1,56 @@
+<%= javascript_include_tag "sharing.js", "assays.js","attribution.js","resource.js" %>
+
+
+<% current_user_authorized_to_manage = @presentation.can_manage? -%>
+<ul class="sectionIcons">
+    <li>
+        <%= image_tag_for_key('arrow_left', edit_presentation_path, "Return to Presentation", nil, "Return to Presentation") -%>
+    </li>
+</ul>
+<h1>Editing Presentation: <%= link_to(h(@presentation.title), edit_presentation_path) -%></h1>
+<div class="show_basic">
+    <% form_for(@presentation) do |f| %>
+    <div class="asset_form">
+        <%= f.error_messages %>
+        <p>
+            <b>Title:</b>
+            <br/>
+            <%= f.text_area :title, :style=>"width: 100%", :rows=>2 -%>
+        </p>
+        <p>
+            <b>Description:</b>
+            <br/>
+            <%= f.text_area :description, :style => "width: 100%;", :rows => 10 -%>
+        </p>
+
+        <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+        <% if current_user_authorized_to_manage -%>
+        <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Presentation",  # this is only for presentation, not for any processing
+        :selected_project_id => @presentation.project_id,
+        :project_hash => current_user.generate_own_project_id_name_hash,
+        :disable_project_select => true } -%>
+        <% end -%>
+        <%# only the owner should be able to change sharing permissions -%>
+        <% if current_user_authorized_to_manage -%>
+
+		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
+					:resource_type => "Presentation",
+					:existing_attributions=>Authorization.authorize_collection("view", @presentation.attributions_objects, current_user),
+					:existing_creators=>@presentation.creators,
+					:other_creators=>@presentation.other_creators,
+					:related_publications=>@presentation.related_publications
+				}
+    	-%>
+        <p>
+            <% if Seek::Config.events_enabled -%>
+                <%= render :partial => "assets/associate_event", :locals=>{:resource => @presentation} -%>
+            <% end -%>
+        </p>
+
+        <% end -%>
+        <p>
+            <%= f.submit "Update", :id => "presentation_submit_btn", :onclick => "javascript: validatePresentationFields(false);  return(false);" -%> or <%= link_to "Cancel", edit_presentation_path -%>
+        </p>
+		</div>
+        <% end %>
+</div>

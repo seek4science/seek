@@ -114,6 +114,17 @@ module Acts #:nodoc:
         end
       end
 
+      def project_assays
+        all_assays=Assay.all.select{|assay| assay.can_edit?(User.current_user)}.sort_by &:title
+        all_assays = all_assays.select do |assay|
+          assay.is_modelling?
+        end if self.is_a? Model
+
+        project_assays = all_assays.select { |df| User.current_user.person.projects.include?(df.project) }
+
+        project_assays
+      end
+
       # def asset; return self; end
       # def resource; return self; end
 

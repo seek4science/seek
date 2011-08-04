@@ -24,6 +24,7 @@ class StudiesController < ApplicationController
 
   def new
     @study = Study.new
+    @study.create_from_asset = params[:create_from_asset]
     investigation = nil
     investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
     
@@ -34,8 +35,11 @@ class StudiesController < ApplicationController
         flash.now[:error] = "You do now have permission to associate the new study with the investigation '#{investigation.title}'."
       end
     end
-    
+    investigations = Investigation.all.select &:can_view?
     respond_to do |format|
+      if investigations.blank?
+       flash.now[:notice] = "No investigation available, you have to create a new one before creating your study!"
+      end
       format.html
     end
   end
@@ -86,6 +90,7 @@ class StudiesController < ApplicationController
 
   def show
     @study=Study.find(params[:id])
+    @study.create_from_asset = params[:create_from_asset]
     respond_to do |format|
       format.html
       format.xml
@@ -103,7 +108,11 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
-        format.html { redirect_to(@study) }
+        flash[:notice] = 'The study was successfully created.<br/>'
+        if @study.create_from_asset=="true"
+          flash.now[:notice] << "Now you can create new assay by clicking 'add an assay' button"
+        end
+        format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
         format.xml { render :xml => @study, :status => :created, :location => @study }
       else
         format.html {render :action=>"new"}

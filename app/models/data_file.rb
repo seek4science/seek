@@ -11,6 +11,18 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
+  def convert_to_presentation
+      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
+      presentation = Presentation.new presentation_attrs
+      presentation.policy = self.policy.deep_copy
+      presentation.event_ids = self.event_ids
+      presentation.creators = self.creators
+      presentation.orig_data_file_id= self.id
+      presentation.subscribed = self.subscribed?
+      presentation
+  end
+
+
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
   else

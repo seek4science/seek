@@ -8,7 +8,7 @@
 
     <% if @study.can_edit? -%>
         <li>
-          <%= image_tag_for_key('new', new_assay_path(:study_id=>@study), "Add an assay", nil, 'Add an assay') -%>
+          <%= image_tag_for_key('new', new_assay_path(:study_id=>@study,:create_from_asset=>@study.create_from_asset), "Add an assay", nil, 'Add an assay') -%>
         </li>
     <% end -%>
 

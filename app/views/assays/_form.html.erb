@@ -7,7 +7,7 @@
 <%= javascript_include_tag "sharing.js" %>
 
 <%= f.error_messages -%>
-
+<%= f.hidden_field :create_from_asset %>
 <div style="width: 90%;">
   <% if !@assay.study.nil? and @assay.study.can_view? -%>
     <p>
@@ -33,7 +33,8 @@
       <p>
       <div id="full_study_title" style="display:none; position: absolute; border: 1px solid black; background-color: #FFFF88; padding: 5px; text-align:left;"></div>
     <%= f.label :study -%>
-    <span class="required">*</span><br/>
+    <span class="required">*</span>
+     <%= link_to h(" New Study?"),new_study_path,:popup => true%> <br/>
     <% investigations = Investigation.all.select &:can_view? -%>
       <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
       <% investigations.each do |i| %>
@@ -48,7 +49,7 @@
       <% end %>
     <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" style="width:100%">
         <%= options %>
-      </select>
+    </select>
     </p>
   <%end%>
 
@@ -60,14 +61,14 @@
   <tr>
     <td><%= f.label "#{@assay_type_text.capitalize}: " %>
     <% if User.current_user.can_manage_types? %>
-      <%= link_to h("new assay type?"),new_assay_type_path %>
+      <%= link_to h("New assay type?"),new_assay_type_path,:popup => true %>
     <% end %>
     </td>
     <% unless @assay.is_modelling? -%>
       <td><%= f.label "Technology type: " %>
 
        <% if User.current_user.can_manage_types? %>
-        <%= link_to h("new technology type?"),new_technology_type_path %>
+        <%= link_to h("New technology type?"),new_technology_type_path,:popup => true %>
        <% end %>
 
       </td>
@@ -123,7 +124,7 @@
      button_text=action==:edit ? "Update" : "Create"
      disabled_text=action==:edit ? "Updating..." : "Creating..."
   %>
-  <%= f.submit button_text,:disable_with=>disabled_text -%>
+  <%= f.submit button_text,:disable_with=>disabled_text, :id => "assay_submit_btn", :onclick => "javascript: $('assay_submit_btn').form.submit();return(false);" -%>
   or <%= link_to 'Cancel', (@assay.id ? assay_path(@assay.id) : assays_path) -%>
 </p>
 

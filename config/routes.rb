@@ -1,4 +1,13 @@
 ActionController::Routing::Routes.draw do |map|
+#   map.namespace(:admin) do |admin|
+#    admin.resources :slide_shows do |slide_show|
+#      slide_show.resources :slides, :member => { :move_up => :get, :move_down => :get }
+#    end
+#    admin.resources :slides, :member => { :move_up => :get, :move_down => :get }
+#  end
+
+
+  map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post }
   map.resources :subscriptions
   map.resources :specimens
   map.resources :samples
@@ -98,6 +107,10 @@ ActionController::Routing::Routes.draw do |map|
   #feedback form
   map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get
   map.send_feedback '/home/send_feedback',:controller=>'home',:action=>'send_feedback',:method=>:post
+
+  #link to youtube
+  map.seek_intro_demo 'home/seek_intro_demo',:controller=>'home',:action=>'seek_intro_demo',:method=>:get
+
 
   # favourite groups
   map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }
