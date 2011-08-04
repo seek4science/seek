@@ -71,7 +71,7 @@ module StudiedFactorsHelper
     asset_class = asset_object.class.name.constantize
     fs_or_ec_array= []
     #FIXME: add :include in the query
-    asset_items = asset_class.find(:all, :conditions => ["project_id = ? AND id != ?", asset_object.project_id, asset_object.id])
+    asset_items = asset_class.all.select{|i|i != asset_object and i.project == asset_object.project}
     asset_items.each do |item|
       fs_or_ec_array |= item.send fs_or_ec if item.can_view?
     end
