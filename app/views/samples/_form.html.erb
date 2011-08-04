@@ -39,6 +39,7 @@
   </p>
 
   <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample}-%>
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample}%>
 
   <br style="clear:both"/>
   <p>

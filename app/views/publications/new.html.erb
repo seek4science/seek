@@ -10,19 +10,21 @@
                      :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",
                      :complete => "Element.hide('spinner');$('fetch_button').disabled=false;") do %>
     <p>
-      Please select the project this publication is related to. You must select a project, and it must be a project you are a member of.      
-    </p>
-	<%= select_tag :project_id, options_from_collection_for_select(current_user.person.projects, :id, :name) -%>					 
-    <p>
       Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br/>
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.
     </p>
-    <div id="publication_error" class="error_div" style="display:none"></div>  
+    <div id="publication_error" class="error_div" style="display:none"></div>
 	
     <p>
       <%= select_tag("protocol", options_for_select([["PubMed ID","pubmed"],["DOI","doi"]])) %>
       <%= text_field_tag("key") %>            
     </p>
+
+    <p>
+        Please select the projects this publication is related to. You must select a project, and it must be a project
+        you are a member of.
+    </p>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication} -%>
 	<p>
 		<%= submit_tag 'Fetch',:id=>"fetch_button" %>
 	</p>

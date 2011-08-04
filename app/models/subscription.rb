@@ -21,6 +21,7 @@ class Subscription < ActiveRecord::Base
   end
 
   def frequency
-   ProjectSubscription.find_by_person_id_and_project_id(person_id, subscribable.project.id).try(:frequency) || generic_frequency
+    proj_subs = subscribable.projects.collect {|p|ProjectSubscription.find_by_person_id_and_project_id person_id, p.try(:id) }.compact
+    proj_subs.collect(&:frequency).inject {|fastest, current| FREQUENCIES.index(current) < FREQUENCIES.index(fastest) ? current : fastest} || generic_frequency
   end
 end

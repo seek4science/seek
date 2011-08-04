@@ -113,18 +113,18 @@ module AssetsHelper
 
     case name
       when "DataFile"
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
         related["Publication"][:items] = resource.related_publications
         related["Event"][:items] = resource.events
       when "Sop", "Model"
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
         related["Publication"][:items] = resource.related_publications
       when "Assay"
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Investigation"][:items] = [resource.investigation]
         related["Study"][:items] = [resource.study]
         related["DataFile"][:items] = resource.data_files
@@ -132,13 +132,13 @@ module AssetsHelper
         related["Sop"][:items] = resource.sops
         related["Publication"][:items] = resource.related_publications
       when "Investigation"
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Study"][:items] = resource.studies
         related["Assay"][:items] = resource.assays
         related["DataFile"][:items] = resource.data_files
         related["Sop"][:items] = resource.sops
       when "Study"
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Investigation"][:items] = [resource.investigation]
         related["Assay"][:items] = resource.assays
         related["DataFile"][:items] = resource.data_files
@@ -177,7 +177,7 @@ module AssetsHelper
         related["Publication"][:items] = resource.publications
       when "Publication"
         related["Person"][:items] = resource.creators
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["DataFile"][:items] = resource.related_data_files
         related["Model"][:items] = resource.related_models
         related["Assay"][:items] = resource.related_assays
@@ -190,7 +190,7 @@ module AssetsHelper
 
       when "Event"
         {#"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
-         "Project" => [resource.project],
+         "Project" => resource.projects,
          "DataFile" => resource.data_files,
          "Publication" => resource.publications}.each do |k, v|
           related[k][:items] = v unless v.nil?
@@ -199,14 +199,14 @@ module AssetsHelper
 
         related["Institution"][:items] = [resource.institution]
         related["Person"][:items] = resource.creators
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Sample"][:items] = resource.samples
         related["Sop"][:items] = resource.sops
 
       when "Sample"
         related["Specimen"][:items] = [resource.specimen]
         related["Institution"][:items] = [resource.institution]
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Assay"][:items] = resource.assays
         related["Sop"][:items] = resource.sops
 

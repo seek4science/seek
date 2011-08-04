@@ -52,7 +52,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
     #create bunch of data_files and FSes which belong to the same project and the datafiles can be viewed
     i=0
     while i < 10  do
-      d = Factory(:data_file, :project => data_file.project, :policy => Factory(:all_sysmo_viewable_policy))
+      d = Factory(:data_file, :projects => [data_file.projects.first], :policy => Factory(:all_sysmo_viewable_policy))
       Factory(:studied_factor, :data_file => d, :start_value => i)
       i +=1
     end
@@ -60,7 +60,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
     #create bunch of data_files and FSes which belong to the same project and the datafiles can not be viewed
     i=0
     while i < 10  do
-      d = Factory(:data_file, :project => data_file.project)
+      d = Factory(:data_file, :projects => [Factory(:project),data_file.projects.first])
       Factory(:studied_factor, :data_file => d, :start_value => i)
       i +=1
     end
@@ -71,7 +71,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
         assert_equal fses.count, 10
         fses.each do |fs|
           assert fs.data_file.can_view?
-          assert_equal fs.data_file.project_id,data_file.project_id
+          assert !(fs.data_file.project_ids & data_file.project_ids).empty?
         end
     end
   end

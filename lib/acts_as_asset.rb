@@ -35,7 +35,7 @@ module Acts #:nodoc:
 
 
         validates_presence_of :title
-        validates_presence_of :project
+        validates_presence_of :projects
         
         acts_as_taggable
 
@@ -97,9 +97,9 @@ module Acts #:nodoc:
 
 
       def cache_remote_content_blob
-        if self.content_blob && self.content_blob.url && self.project
+        if self.content_blob && self.content_blob.url && self.projects.first
           begin
-            p=self.project
+            p=self.projects.first
             p.decrypt_credentials
             downloader            =Jerm::DownloaderFactory.create p.name
             resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version

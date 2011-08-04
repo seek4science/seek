@@ -19,6 +19,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "modelling assay validates with schema" do
     a=assays(:modelling_assay_with_data_and_relationship)
+    User.with_current_user(a.study.investigation.contributor) {a.study.investigation.projects << Factory(:project)}
     assert_difference('ActivityLog.count') do
       get :show, :id=>a, :format=>"xml"
     end
@@ -34,7 +35,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assays=assigns(:assays)
     assert assays.include?(assays(:modelling_assay_with_data_and_relationship)), "This test is invalid as the list should include the modelling assay"
-    
+
     validate_xml_against_schema(@response.body)
   end
 
@@ -749,16 +750,21 @@ end
     assert_equal Policy::VISIBLE, assay.policy.access_type
     assert_equal assay.policy.permissions.count, 1
 
-    permission = assay.policy.permissions.first
-    assert_equal permission.contributor_type, 'Project'
-    assert_equal permission.contributor_id, assay.study.investigation.project.id
-    assert_equal permission.policy_id, assay.policy_id
-    assert_equal permission.access_type, Policy::ACCESSIBLE
+    assay.policy.permissions.each do |permission|
+      assert_equal permission.contributor_type, 'Project'
+      assert assay.study.investigation.project_ids.include?(permission.contributor_id)
+      assert_equal permission.policy_id, assay.policy_id
+      assert_equal permission.access_type, Policy::ACCESSIBLE
+    end
   end
 
   test "should update sharing permissions 'with your project and with all SysMO members'" do
     login_as Factory(:user)
-    assay= Factory(:assay, :policy => Factory(:private_policy), :contributor => User.current_user.person)
+    assay= Factory(:assay,
+                   :policy => Factory(:private_policy),
+                   :contributor => User.current_user.person,
+                   :study => (Factory(:study, :investigation => (Factory(:investigation,
+                                                                         :projects => [Factory(:project), Factory(:project)])))))
 
     assert assay.can_manage?
     assert_equal Policy::PRIVATE, assay.policy.sharing_scope
@@ -773,12 +779,13 @@ end
     assert_redirected_to assay_path(assay)
     assert_equal Policy::ALL_SYSMO_USERS, assay.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, assay.policy.access_type
-    assert_equal 1, assay.policy.permissions.length
+    assert_equal 2, assay.policy.permissions.length
 
-    update_permission = assay.policy.permissions.first
-    assert_equal update_permission.contributor_type, 'Project'
-    assert_equal update_permission.contributor_id, assay.project.id
-    assert_equal update_permission.policy_id, assay.policy_id
-    assert_equal update_permission.access_type, Policy::EDITING
+    assay.policy.permissions.each do |update_permission|
+      assert_equal update_permission.contributor_type, 'Project'
+      assert assay.projects.map(&:id).include?(update_permission.contributor_id)
+      assert_equal update_permission.policy_id, assay.policy_id
+      assert_equal update_permission.access_type, Policy::EDITING
+    end
   end
 end

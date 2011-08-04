@@ -72,8 +72,8 @@ class AssayTest < ActiveSupport::TestCase
 
   test "related project" do
     assay=assays(:metabolomics_assay)
-    assert_not_nil assay.project
-    assert_equal projects(:sysmo_project),assay.project
+    assert !assay.projects.empty?
+    assert assay.projects.include?(projects(:sysmo_project))
   end
   
 
@@ -151,11 +151,11 @@ class AssayTest < ActiveSupport::TestCase
     assert !assay.can_delete?
 
     pal = Factory :pal
-    #create an assay with project = to the project for which the pal is a pal
+    #create an assay with projects = to the projects for which the pal is a pal
     assay = Factory(:assay,
                     :study => Factory(:study,
                                       :investigation => Factory(:investigation,
-                                                                :project => (pal.projects.find {|p| p.pals.include? pal}))))
+                                                                :projects => pal.projects)))
     assert !assay.can_delete?(pal.user)
     
     assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))

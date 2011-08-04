@@ -139,6 +139,11 @@ class Person < ActiveRecord::Base
     !projects.empty?
   end
 
+  def member_of?(item_or_array)
+    array = [item_or_array].flatten
+    array.detect {|item| projects.include?(item)}
+  end
+
   def locations
     # infer all person's locations from the institutions where the person is member of
     locations = self.institutions.collect { |i| i.country unless i.country.blank? }

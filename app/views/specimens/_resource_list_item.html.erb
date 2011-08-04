@@ -7,7 +7,7 @@
 
 <div class="list_item_right_column">
 
-  <%= list_item_optional_attribute "Project", resource.project.try(:name), resource.project %>
+  <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
   <%= list_item_organism "Organism",resource.organism,resource.strain,resource.culture_growth_type %>
   <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
 

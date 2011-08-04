@@ -35,7 +35,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   test 'subscribers with a frequency of immediate are sent emails when activity is logged' do
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
-    s = Factory(:subscribable, :project => proj, :policy => Factory(:public_policy))
+    s = Factory(:subscribable, :projects => [Factory(:project), proj], :policy => Factory(:public_policy))
     s.subscribe; s.save!
 
     assert_emails(1) do
@@ -55,7 +55,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   test 'subscribers without a frequency of immediate are not sent emails when activity is logged' do
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'weekly'
-    s = Factory(:subscribable, :project => proj, :policy => Factory(:public_policy))
+    s = Factory(:subscribable, :projects =>[proj], :policy => Factory(:public_policy))
     s.subscribe; s.save!
 
     assert_no_emails do
@@ -66,7 +66,7 @@ class SubscriptionTest < ActiveSupport::TestCase
   test 'subscribers are not sent emails for items they cannot view' do
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
-    s = Factory(:subscribable, :policy => Factory(:private_policy), :contributor => Factory(:user), :project => proj)
+    s = Factory(:subscribable, :policy => Factory(:private_policy), :contributor => Factory(:user), :projects => [proj])
 
     assert_no_emails do
       User.with_current_user(s.contributor) do
@@ -79,7 +79,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     User.current_user = Factory(:person, :notifiee_info => Factory(:notifiee_info, :receive_notifications => false)).user
     proj = Factory(:project)
     current_person.project_subscriptions.create :project => proj, :frequency => 'immediately'
-    s = Factory(:subscribable, :project => proj, :policy => Factory(:public_policy))
+    s = Factory(:subscribable, :projects => [proj], :policy => Factory(:public_policy))
     s.subscribe; s.save!
 
     assert_no_emails do

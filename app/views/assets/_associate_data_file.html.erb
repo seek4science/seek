@@ -11,7 +11,7 @@
       
       <%
         all_data_files=authorised_data_files.sort{|a, b| a.title<=>b.title}
-        project_data_files=all_data_files.select{|df| current_user.person.projects.include?(df.project )}
+        project_data_files=all_data_files.select{|df| current_user.person.member_of?(df.projects)}
         select_truncate_length=120
       -%>
       

@@ -9,9 +9,11 @@ class PublicationTest < ActiveSupport::TestCase
     publication = publications(:one)
     assert publication.events.empty?
     event = events(:event_with_no_files)
-    publication.events << event
-    assert publication.valid?
-    assert publication.save
+    User.with_current_user(publication.contributor) do
+      publication.events << event
+      assert publication.valid?
+      assert publication.save
+    end
     assert_equal 1, publication.events.count
   end
 
@@ -24,7 +26,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_not_equal assay_asset.assay, assay
     assay_asset.asset = publication
     assay_asset.assay = assay
-    assay_asset.save!
+    User.with_current_user(assay.contributor.user) {assay_asset.save!}
     assay_asset.reload
     assert assay_asset.valid?
     assert_equal assay_asset.asset, publication
@@ -83,23 +85,21 @@ class PublicationTest < ActiveSupport::TestCase
   end
   
   test "title trimmed" do
-    x = publications(:one)
-    x.title=" a pub"
-    x.save!
+    x = Factory :publication, :title => " a pub"
     assert_equal("a pub",x.title)
   end
 
   test "validation" do
-    asset=Publication.new :title=>"fred",:project=>projects(:sysmo_project),:doi=>"111"
+    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)],:doi=>"111"
     assert asset.valid?
 
-    asset=Publication.new :title=>"fred",:project=>projects(:sysmo_project),:pubmed_id=>"111"
+    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)],:pubmed_id=>"111"
     assert asset.valid?
 
-    asset=Publication.new :title=>"fred",:project=>projects(:sysmo_project)
+    asset=Publication.new :title=>"fred",:projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
-    asset=Publication.new :project=>projects(:sysmo_project),:doi=>"111"
+    asset=Publication.new :projects=>[projects(:sysmo_project)],:doi=>"111"
     assert !asset.valid?
 
     asset=Publication.new :title=>"fred",:doi=>"111"
@@ -107,21 +107,22 @@ class PublicationTest < ActiveSupport::TestCase
   end
   
   test "creators order is returned in the order they were added" do
-    p=Publication.new(:title=>"The meaining of life",:abstract=>"Chocolate",:pubmed_id=>"777",:project=>projects(:sysmo_project))
-    p.save!
+    p=Factory :publication
     assert_equal 0,p.creators.size
     
     p1=people(:modeller_person)
     p2=people(:fred)    
     p3=people(:aaron_person)
     p4=people(:pal)
-    
-    p.creators << p1
-    p.creators << p2    
-    p.creators << p3
-    p.creators << p4
-    
-    p.save!
+
+    User.with_current_user(p.contributor) do
+      p.creators << p1
+      p.creators << p2
+      p.creators << p3
+      p.creators << p4
+
+      p.save!
+    end
     
     assert_equal 4,p.creators.size
     assert_equal [p1,p2,p3,p4],p.creators
@@ -138,7 +139,7 @@ class PublicationTest < ActiveSupport::TestCase
   def test_project_required
     p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
     assert !p.valid?
-    p.project=projects(:sysmo_project)
+    p.projects=[projects(:sysmo_project)]
     assert p.valid?
   end
   

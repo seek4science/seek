@@ -2,8 +2,8 @@ require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
 
-  def project
-    investigation.nil? ? nil : investigation.project
+  def projects
+    try_block {study.investigation.projects} || []
   end
 
   alias_attribute :contributor, :owner

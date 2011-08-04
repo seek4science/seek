@@ -12,7 +12,7 @@ module AssaysHelper
   #only data files authorised for show, and belonging to projects matching current_user
   def data_files_for_assay_association
     data_files=DataFile.find(:all,:include=>:asset)
-    data_files=data_files.select{|df| current_user.person.projects.include?(df.project)}
+    data_files=data_files.select{|df| current_user.person.member_of?(df.projects)}
     Authorization.authorize_collection("view",data_files,current_user)
   end
 
