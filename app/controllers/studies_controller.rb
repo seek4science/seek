@@ -134,9 +134,10 @@ class StudiesController < ApplicationController
 
   def project_selected_ajax
 
-    if params[:project_id] && params[:project_id]!="0"
-      investigations=Investigation.find(:all,:conditions=>{:project_id=>params[:project_id]})
-      people=Project.find(params[:project_id]).people
+    if project_id = params[:project_id] and params[:project_id]!="0"
+      project = Project.scoped(:include => [:investigations]).find(project_id)
+      investigations= project.investigations
+      people=project.people
     end
 
     investigations||=[]

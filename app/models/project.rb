@@ -94,12 +94,9 @@ class Project < ActiveRecord::Base
 
   def people
     #TODO: look into doing this with a named_scope or direct query
-    res=[]
-    work_groups.each do |wg|
-      wg.people.each {|p| res << p unless res.include? p}
-    end
+    res = work_groups.scoped(:include => :people).collect(&:people).uniq.flatten.compact
     #TODO: write a test to check they are ordered
-    return res.sort{|a,b| (a.last_name.nil? ? a.name : a.last_name) <=> (a.last_name.nil? ? a.name : a.last_name)}
+    res.compact.sort_by{|a| (a.last_name.blank? ? a.name : a.last_name)}
   end
 
   # provides a list of people that are said to be members of this project, but are not associated with any user
