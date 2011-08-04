@@ -25,11 +25,7 @@
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>
           
-	<%= render :partial => "assets/project_selector", :locals => { :resource_type => "Data_file",  # this is only for presentation, not for any processing
-            :selected_project_id => @data_file.project_id,
-            :project_hash => current_user.generate_own_project_id_name_hash
-            }
-    %>
+	<%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } %>
 
 	<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "DataFile",

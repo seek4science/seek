@@ -12,11 +12,10 @@ module PolicyHelper
   # return access_type of your project if this permission is available in the policy
   def your_project_access_type policy = nil, resource = nil
     unless policy.nil? or policy.permissions.empty? or resource.nil? or !(policy.sharing_scope == Policy::ALL_SYSMO_USERS)
-      policy.permissions.each do |permission|
-        if (permission.contributor_type == 'Project') && (permission.contributor_id == (resource.class.name=="Project" ? resource.id : resource.project.try(:id)))
-          return permission.access_type
-        end
-      end
+      my_project_ids = if resource.class == Project then [resource.id] else resource.project_ids end
+      my_project_perms = policy.permissions.select {|p| p.contributor_type == 'Project' and my_project_ids.include? p.contributor_id}
+      access_types = my_project_perms.map(&:access_type)
+      return access_types.first if access_types.all?{|acc| acc == access_types.first}
     end
   end
 end

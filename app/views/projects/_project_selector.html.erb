@@ -1,0 +1,34 @@
+<%# this partial expects the following parameters to be set: -%>
+<%# - "resource_type" - type (string value required) of the current resource -%>
+<%# - project_hash - hash in a form of { <project_id> => <project_name>, [...] } of all projects that the current user is a member of -%>
+<%# - selected_project_id - ID of the project the resource is currently associated with; skip this parameter for a "new" resource -%>
+<%# - disable_project_select - selection should only be available on 'new' action, but not on 'edit'; this parameter has a default of "false" -%>
+
+<% resource ||= nil
+   if resource
+       selected_project_ids ||= resource.project_ids
+       resource_type ||= resource.class.name
+   end
+   selected_project_ids ||= []
+%>
+<% project_hash ||= current_user.generate_own_project_id_name_hash %>
+<% disable_project_select ||= false -%>
+<% allow_nil ||= false %>
+<% possibilities = Project.find(project_hash.keys)%>
+
+<% if disable_project_select %>
+    <div style="margin: 1.5em 0 1em 0; text-align: left;">
+      <% front_part_of_msg = (disable_project_select ? "Previously you have chosen to associate this #{resource_type} with the<br/>project below. You are not allowed to change this. Please<br/>contact administrator to amend the association." : "Please choose a project to associate this #{resource_type} with. You will<br/>not be able to amend this association afterwards.") -%>
+      <%= help_icon("#{front_part_of_msg}") -%>
+      <b>This <%= resource_type -%> is associated with the following projects</b>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource} %>
+    </div>
+<% else %>
+    <% unless allow_nil %>
+        <span class="required">*</span>
+    <% end %>
+    <%= fancy_multiselect resource, :projects, :possibilities => possibilities, :selected => selected_project_ids %>
+<% end -%>
+
+
+

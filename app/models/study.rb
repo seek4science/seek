@@ -4,8 +4,8 @@ class Study < ActiveRecord::Base
 
   belongs_to :investigation
 
-  def project
-    investigation.try :project
+  def projects
+    investigation.try(:projects) || []
   end
 
   acts_as_authorized

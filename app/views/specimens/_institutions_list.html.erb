@@ -1,6 +1,5 @@
 <% institution_value= (@specimen && @specimen.institution) ? @specimen.institution.id : 0 %>
 <% institutions_options = [["No Institution",0]]|ins.collect{|i| [h(i.name),i.id]} %>
-<% project_id||=nil %>
 
 
 <%= select_tag :institution_id,

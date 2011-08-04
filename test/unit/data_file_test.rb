@@ -49,13 +49,16 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=DataFile.new :title=>"fred",:project=>projects(:sysmo_project)
+    asset=DataFile.new :title=>"fred",:projects=>[projects(:sysmo_project)]
     assert asset.valid?
 
-    asset=DataFile.new :project=>projects(:sysmo_project)
+    asset=DataFile.new :projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
     asset=DataFile.new :title=>"fred"
+    assert !asset.valid?
+
+    asset = DataFile.new :title => "fred", :projects => []
     assert !asset.valid?
   end
 
@@ -67,15 +70,17 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file_versions(:picture_v1).use_mime_type_for_avatar?
   end
 
-  test "project" do
+  test "projects" do
     df=data_files(:sysmo_data_file)
     p=projects(:sysmo_project)
-    assert_equal p,df.project
-    assert_equal p,df.latest_version.project
+    assert_equal [p],df.projects
+    assert_equal [p],df.latest_version.projects
   end
   
   def test_defaults_to_private_policy
-    df=DataFile.new(:title=>"A df with no policy",:project=>projects(:sysmo_project))
+    df_hash = Factory.attributes_for(:data_file)
+    df_hash[:policy] = nil
+    df=DataFile.new(df_hash)
     df.save!
     df.reload
     assert_not_nil df.policy

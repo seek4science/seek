@@ -31,9 +31,9 @@
     <p>
       <%= f.label :project %><span class="required">*</span><br/>
       <%
-      selected_project=@study.investigation ? @study.investigation.project.id : 0
+      selected_project=@study.investigation ? @study.investigation.projects.first.id : 0
       projects = current_user.person.projects
-      projects = projects | [@study.investigation.project] if @study.investigation
+      projects = projects | [@study.investigation.projects.first] if @study.investigation
     %>
       <%=
       select_tag :project_id,
@@ -51,7 +51,7 @@
     <p>
       <%= f.label :investigation %><span class="required">*</span><br/>
       <div id="investigation_collection">
-        <% investigations = @study.investigation ? @study.investigation.project.investigations : [] -%>
+        <% investigations = @study.investigation ? @study.investigation.projects.collect(&:investigations).flatten : [] -%>
         <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>investigations} -%>
       </div>
       <br/>
@@ -60,7 +60,7 @@
     <p>
       <%= f.label "Person responsible" %><br/>
       <div id="person_responsible_collection">
-        <% people = @study.investigation ? @study.investigation.project.people : [] -%>
+        <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
         <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
       </div>
     </p>

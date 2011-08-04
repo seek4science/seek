@@ -13,7 +13,7 @@ class AssetTest < ActiveSupport::TestCase
 
   test "default contributor or nil" do
     User.current_user = users(:owner_of_my_first_sop)
-    model = Model.new :title=>"A model",:project=>projects(:sysmo_project)
+    model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil})
     assert_equal users(:owner_of_my_first_sop),model.contributor
     model.contributor = nil
     model.save!

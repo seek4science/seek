@@ -10,9 +10,9 @@
 
       <div id="errorExplanation" class="errorExplanation" style="display:none;"></div>
 
-      Creating a new investigation for the project <b>'<%= h(@investigation.project.name) %>'</b>
+      Creating a new investigation for the project <b>'<%= h(@investigation.projects.first.name) %>'</b>
 
-      <%= hidden_field_tag :project_id,@investigation.project.id %>
+      <%= hidden_field_tag :project_id,@investigation.projects.first.id %>
 
         <p>
           <%= label_tag :title %><br/>

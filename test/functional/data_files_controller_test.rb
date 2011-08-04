@@ -25,7 +25,9 @@ class DataFilesControllerTest < ActionController::TestCase
   test "get XML when not logged in" do
     logout
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+    puts df.versions
     get :show,:id=>df,:format=>"xml"
+    puts @response.body
     perform_api_checks
 
   end
@@ -133,7 +135,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle bad data url" do
-    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:project=>projects(:sysmo_project)}
+    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
@@ -251,7 +253,7 @@ class DataFilesControllerTest < ActionController::TestCase
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 401 url" do
     mock_http
-    df = {:title=>"401",:data_url=>"http://mocked401.com",:project=>projects(:sysmo_project)}
+    df = {:title=>"401",:data_url=>"http://mocked401.com",:projects=>[projects(:sysmo_project)]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -276,7 +278,7 @@ class DataFilesControllerTest < ActionController::TestCase
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 302 url" do
     mock_http
-    df = {:title=>"302",:data_url=>"http://mocked302.com",:project=>projects(:sysmo_project)}
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:projects=>[projects(:sysmo_project)]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -765,7 +767,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     permission = df.policy.permissions.first
     assert_equal permission.contributor_type, 'Project'
-    assert_equal permission.contributor_id, df.project_id
+    assert_equal permission.contributor_id, df.project_ids.first
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::ACCESSIBLE
   end
@@ -794,7 +796,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     update_permission = df.policy.permissions.first
     assert_equal update_permission.contributor_type, 'Project'
-    assert_equal update_permission.contributor_id, df.project_id
+    assert_equal update_permission.contributor_id, df.project_ids.first
     assert_equal update_permission.policy_id, df.policy_id
     assert_equal update_permission.access_type, Policy::EDITING
   end
@@ -825,15 +827,15 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def valid_data_file
-    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:projects=>[projects(:sysmo_project)]}
   end
   
   def valid_data_file_with_http_url
-    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:project=>projects(:sysmo_project)}
+    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:projects=>[projects(:sysmo_project)]}
   end
   
   def valid_data_file_with_ftp_url
-      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
+      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:projects=>[projects(:sysmo_project)]}
   end
   
 end

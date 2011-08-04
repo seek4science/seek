@@ -221,7 +221,7 @@ class PublishingTest < ActionController::TestCase
   private
 
   def data_file_for_publishing(owner=users(:datafile_owner))
-    Factory :data_file, :contributor=>owner, :project=>owner.person.projects.first
+    Factory :data_file, :contributor=>owner, :projects=>owner.person.projects
   end
 
   def isa_with_complex_sharing
@@ -241,9 +241,9 @@ class PublishingTest < ActionController::TestCase
     study.policy.permissions << Factory(:permission,:policy=>study.policy,:contributor=>userC.person,:access_type=>Policy::MANAGING)
     inv.policy.permissions << Factory(:permission, :policy=>inv.policy,:contributor=>userB.person,:access_type=>Policy::MANAGING)
 
-    df1 = Factory :data_file,:contributor=>userB.person,:project=>userB.person.projects.first
-    df2 = Factory :data_file,:contributor=>userC.person,:project=>userC.person.projects.first
-    df3 = Factory :data_file,:contributor=>userA.person,:project=>userA.person.projects.first
+    df1 = Factory :data_file,:contributor=>userB.person,:projects=>userB.person.projects
+    df2 = Factory :data_file,:contributor=>userC.person,:projects=>userC.person.projects
+    df3 = Factory :data_file,:contributor=>userA.person,:projects=>userA.person.projects
 
     df1.policy.permissions << Factory(:permission,:policy=>df1.policy,:contributor=>userD.person, :access_type=>Policy::VISIBLE)
     df2.policy.permissions << Factory(:permission,:policy=>df2.policy,:contributor=>userD.person, :access_type=>Policy::VISIBLE)
@@ -301,7 +301,7 @@ class PublishingTest < ActionController::TestCase
     df = data_file_for_publishing
     other_user = users(:quentin)
     assay = Factory :experimental_assay, :contributor=>df.contributor.person, :study=>Factory(:study,:contributor=>df.contributor.person)
-    other_persons_data_file = Factory :data_file, :contributor=>other_user, :project=>other_user.person.projects.first,:policy=>Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    other_persons_data_file = Factory :data_file, :contributor=>other_user, :projects=>other_user.person.projects,:policy=>Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
     assay.relate(df)
     assay.relate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?

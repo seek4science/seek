@@ -10,7 +10,7 @@
   end
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
-    f.group_memberships {[Factory :group_membership]}
+    f.group_memberships {[Factory.build :group_membership]}
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
@@ -60,7 +60,7 @@
 #Sop
   Factory.define(:sop) do |f|
     f.title "This Sop"
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
 
@@ -122,18 +122,18 @@ end
 
 Factory.define(:modelling_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :modelling_assay_class
-  f.samples {[Factory :sample]}
+  f.samples {[Factory.build :sample]}
 
 end
 
 Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
-  f.after_create{|ma|Factory(:organism,:assay=>ma)}
+  f.after_create{|ma|Factory.build(:organism,:assay=>ma)}
 
 end
 Factory.define(:experimental_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :experimental_assay_class
   f.association :technology_type
-  f.samples {[Factory :sample]}
+  f.samples {[Factory.build :sample]}
 end
 
   Factory.define(:assay, :parent => :modelling_assay) {}
@@ -147,7 +147,7 @@ end
 
 #Investigation
 Factory.define(:investigation) do |f|
-  f.association :project
+  f.projects {[Factory.build(:project)]}
   f.sequence(:title) { |n| "Investigation#{n}" }
 end
 
@@ -166,7 +166,7 @@ Factory.define(:specimen) do |f|
   f.sequence(:donor_number) { |n| "Specimen#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.association :contributor, :factory => :user
-  f.association :project
+  f.projects {[Factory.build(:project)]}
   f.association :institution
   f.association :organism
 end
@@ -183,7 +183,7 @@ end
 #Data File
   Factory.define(:data_file) do |f|
     f.sequence(:title) {|n| "A Data File_#{n}"}
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.association :content_blob, :factory => :content_blob
   end
@@ -191,7 +191,7 @@ end
 #Model
   Factory.define(:model) do |f|
     f.title "A Model"
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
 
@@ -199,7 +199,7 @@ end
   Factory.define(:publication) do |f|
     f.title "A Model"
     f.pubmed_id 1
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
 

@@ -331,7 +331,7 @@ class ApplicationController < ActionController::Base
         if ["show","create","update","destroy"].include?(a)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
-                     :referenced => object.project,
+                     :referenced => object.projects.first,
                      :controller_name=>c,
                      :activity_loggable => object,
                       :data=> object.title)
@@ -343,7 +343,7 @@ class ApplicationController < ActionController::Base
         if ["show","create","update","destroy","download"].include?(a)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
-                     :referenced => object.project,
+                     :referenced => object.projects.first,
                      :controller_name=>c,
                      :activity_loggable => object,
                       :data=> object.title)

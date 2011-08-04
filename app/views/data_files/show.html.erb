@@ -14,14 +14,7 @@
   <div class="main_content_left_box_narrower">
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
     <div class="box_about_actor">
-      <p>
-        <label>Project:</label>
-        <% if @data_file.project.nil? -%>
-          <%= text_or_not_specified nil %>
-        <% else -%>
-          <%= link_to h(@data_file.project.name),@data_file.project %>
-        <% end -%>
-      </p>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @data_file}  %>
       <p>
         <label>File name:</label>
         <%=h @display_data_file.original_filename -%>

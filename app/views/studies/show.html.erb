@@ -37,12 +37,7 @@
       </p>
     </div>
 
-    <div class="project">
-      <p>
-        <label>Project:</label>
-        <%= link_to h(@study.project.name),project_path(@study.project)  %>
-      </p>
-    </div>
+    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>
 
     <div>
       <p>
