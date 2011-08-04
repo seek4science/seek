@@ -18,15 +18,9 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
       get "/#{type_name}/new"
       assert_select "form select[name=?]", "#{type_name.singularize}[project_ids][]"
 
-      types_with_no_select_on_edit_page = %w[models sops]
-
       p 'edit'
       get "/#{type_name}/#{Factory(type_name.singularize.to_sym, :policy => Factory(:public_policy)).id}/edit"
-      unless types_with_no_select_on_edit_page.include? type_name
         assert_select "form select[name=?]", "#{type_name.singularize}[project_ids][]"
-      else
-        assert_select "form b", {:text => 'Projects:'}
-      end
     end
   end
 
