@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110726101845) do
+ActiveRecord::Schema.define(:version => 20110804150945) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -598,8 +598,12 @@ ActiveRecord::Schema.define(:version => 20110726101845) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
+  end
+
+  create_table "presentation_versions_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "version_id"
   end
 
   create_table "presentations", :force => true do |t|
@@ -617,8 +621,12 @@ ActiveRecord::Schema.define(:version => 20110726101845) do
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
-    t.integer  "project_id"
     t.integer  "policy_id"
+  end
+
+  create_table "presentations_projects", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "presentation_id"
   end
 
   create_table "project_subscriptions", :force => true do |t|
