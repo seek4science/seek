@@ -2,7 +2,7 @@
 
 <h1><%= Seek::Config.application_name -%></h1>
 <div class="top_home_panel">
-  <% link_to_demo = link_to h("demo here"),{:action => :seek_intro_demo},:popup => true %>
+  <% link_to_demo = link_to h("demos here"),Seek::Config.seek_video_link,:popup => true %>
   <% info_image = image_tag icon_filename_for_key("seek_information") %>
   <%= simple_format(auto_link(Seek::Config.home_description)) -%>
   <%= simple_format("\n <p> You can learn more about SEEK from the <b> #{link_to_demo}</b>. #{info_image}</p>") %>

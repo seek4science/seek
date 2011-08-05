@@ -223,7 +223,7 @@ module Seek
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
       :header_image_enabled,:header_image_link,:header_image_title,:google_analytics_enabled,
       :google_analytics_tracker_id,:piwik_analytics_enabled,:piwik_analytics_url, :exception_notification_enabled,:exception_notification_recipients,:open_id_authentication_store, :sycamore_enabled,
-      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver,:presentations_enabled]
+      :project_news_enabled,:project_news_feed_urls,:community_news_enabled,:community_news_feed_urls,:is_virtualliver,:presentations_enabled,:seek_video_link]
 
     #Settings that require a conversion to integer
     setting :tag_threshold,:convert=>"to_i"
