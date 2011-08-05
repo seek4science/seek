@@ -34,7 +34,7 @@ Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 
 Seek::Config.default :presentations_enabled,true
-
+Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
 # Branding
 Seek::Config.default :project_name,'SysMO'
 Seek::Config.default :project_type,'Consortium'
