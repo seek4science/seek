@@ -8,6 +8,11 @@
   options_for_select(investigation_options,investigation_value),
   {
     :style=>"width:82%",:disabled=>(investigations.nil? || investigations.empty?),
-    :name=>"study[investigation_id]"
+    :name=>"study[investigation_id]",
+    :onchange=>remote_function(
+          :url=>{:action=>"investigation_selected_ajax"},
+          :with=>"'investigation_id='+this.value",
+          :before=>"show_ajax_loader('person_responsible_collection')"
+        )
   }
 -%>

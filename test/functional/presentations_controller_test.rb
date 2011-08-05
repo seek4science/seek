@@ -17,11 +17,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can create with valid url" do
-    presentation =   Factory.build(:presentation)
-    presentation_attrs = presentation.attributes #.symbolize_keys(turn string key to symbol)
-
-    url ="http://www.virtual-liver.de/images/logo.png"
-    presentation_attrs[:data_url] = url
+    presentation_attrs =   Factory.attributes_for(:presentation, :data => nil, :data_url => "http://www.virtual-liver.de/images/logo.png")
 
     assert_difference "Presentation.count" do
       post :create,:presentation => presentation_attrs
@@ -29,11 +25,11 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can create with local file" do
-    presentation_attrs = Factory.build(:presentation,:contributor=>User.current_user).attributes #.symbolize_keys(turn string key to symbol)
-    presentation_attrs[:data] = fixture_file_upload('files/file_picture.png')
+    presentation_attrs = Factory.attributes_for(:presentation,:contributor=>User.current_user, :data => fixture_file_upload('files/file_picture.png'))
 
     assert_difference "Presentation.count" do
       post :create,:presentation => presentation_attrs
+      puts assigns(:presentation).errors.full_messages
     end
   end
 
@@ -126,7 +122,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test "can subscribe" do
-     presentation = Factory :presentation,:project=>Factory(:project),:contributor=>User.current_user
+     presentation = Factory :presentation,:projects=>[Factory(:project)],:contributor=>User.current_user
      assert_difference "presentation.subscriptions.count" do
         presentation.subscribed = true
         presentation.save
