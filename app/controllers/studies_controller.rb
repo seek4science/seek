@@ -122,30 +122,17 @@ class StudiesController < ApplicationController
 
   end
 
-
   def investigation_selected_ajax
-    if params[:investigation_id] && params[:investigation_id]!="0"
-      investigation=Investigation.find(params[:investigation_id])
-      render :partial=>"assay_list",:locals=>{:investigation=>investigation}
-    else
-      render :partial=>"assay_list",:locals=>{:investigation=>nil}
-    end
-  end
 
-  def project_selected_ajax
-
-    if project_id = params[:project_id] and params[:project_id]!="0"
-      project = Project.scoped(:include => [:investigations]).find(project_id)
-      investigations= project.investigations
-      people=project.people
+    if investigation_id = params[:investigation_id] and params[:investigation_id]!="0"
+      investigation = Investigation.find(investigation_id)
+      people=investigation.projects.collect(&:people).flatten
     end
 
-    investigations||=[]
     people||=[]
 
     render :update do |page|
-      page.replace_html "investigation_collection",:partial=>"studies/investigation_list",:locals=>{:investigations=>investigations,:project_id=>params[:project_id]}
-      page.replace_html "person_responsible_collection",:partial=>"studies/person_responsible_list",:locals=>{:people=>people,:project_id=>params[:project_id]}
+      page.replace_html "person_responsible_collection",:partial=>"studies/person_responsible_list",:locals=>{:people=>people}
     end
 
   end
