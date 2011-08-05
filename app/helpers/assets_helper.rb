@@ -184,7 +184,7 @@ module AssetsHelper
         related["Event"][:items] = resource.events
       when "Presentation"
         related["Person"][:items] = resource.creators
-        related["Project"][:items] = [resource.project]
+        related["Project"][:items] = resource.projects
         related["Publication"][:items] = resource.related_publications
         related["Event"][:items] = resource.events
 

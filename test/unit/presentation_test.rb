@@ -9,7 +9,7 @@ class PresentationTest < ActiveSupport::TestCase
    assert !presentation.valid?
 
    presentation.reload
-   presentation.project = nil
+   presentation.projects.clear
    assert !presentation.valid?
  end
 
