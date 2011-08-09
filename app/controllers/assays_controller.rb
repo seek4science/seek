@@ -95,7 +95,7 @@ class AssaysController < ApplicationController
 
     @assay.owner=current_user.person
 
-    @assay.policy.set_attributes_with_sharing params[:sharing], try_block{@assay.study.investigation.project}
+    @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
 
 
       if @assay.save
@@ -162,7 +162,7 @@ class AssaysController < ApplicationController
     @assay.attributes = params[:assay]
     if params[:sharing]
       @assay.policy_or_default
-      @assay.policy.set_attributes_with_sharing params[:sharing], @assay.project
+      @assay.policy.set_attributes_with_sharing params[:sharing], @assay.projects
     end
 
     respond_to do |format|

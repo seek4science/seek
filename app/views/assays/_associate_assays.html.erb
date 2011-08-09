@@ -6,7 +6,7 @@
             assay.is_modelling?
         end if resource.is_a? Model
 
-    project_assays=all_assays.select{|df| current_user.person.projects.include?(df.project )}
+    project_assays=all_assays.select{|df| current_user.person.member_of?(df.projects)}
     select_truncate_length=120
 %>
 

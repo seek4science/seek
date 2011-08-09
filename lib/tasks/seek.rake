@@ -14,7 +14,7 @@ namespace :seek do
     resources = Sop.find(:all)
     resources |= Model.find(:all)
     resources |= DataFile.find(:all)
-    resources = resources.select { |r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && r.project }
+    resources = resources.select { |r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && !r.projects.empty? }
 
     resources.each do |res|
       res.cache_remote_content_blob

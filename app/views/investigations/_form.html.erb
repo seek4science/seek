@@ -13,10 +13,7 @@
     <%= f.text_area :description,:style => "width: 100%;", :rows => 10 -%>
   </p>
 
-  <p>
-    <%= f.label :project -%><br/>
-    <%= f.collection_select :project_id,current_user.person.projects,:id,:name %>
-  </p>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation} -%><br/>
    <p>
       <%= f.fancy_multiselect :scales,{:possibilities=>sort_scales(Scale.all)}-%>
    </p>

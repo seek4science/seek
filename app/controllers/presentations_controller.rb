@@ -59,7 +59,7 @@ class PresentationsController < ApplicationController
       @presentation = Presentation.new(params[:presentation])
       @presentation.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
-      @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.project
+      @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
 
       update_tags @presentation
       assay_ids = params[:assay_ids] || []
@@ -175,7 +175,7 @@ class PresentationsController < ApplicationController
 
     if params[:sharing]
       @presentation.policy_or_default
-      @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.project
+      @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
     end
 
     assay_ids = params[:assay_ids] || []

@@ -6,7 +6,7 @@ class InvestigationTest < ActiveSupport::TestCase
 
   test "associations" do
     inv=investigations(:metabolomics_investigation)
-    assert_equal projects(:sysmo_project),inv.project
+    assert_equal [projects(:sysmo_project)],inv.projects
     assert inv.studies.include?(studies(:metabolomics_study))    
   end
 
@@ -27,15 +27,13 @@ class InvestigationTest < ActiveSupport::TestCase
   
   #the lib/sysmo/title_trimmer mixin should automatically trim the title :before_save
   test "title trimmed" do
-    inv=Investigation.new(:title=>" Test",:project=>projects(:sysmo_project))
-    inv.save!
-    inv.reload
+    inv=Factory(:investigation, :title=>" Test")
     assert_equal "Test",inv.title
   end
   
   test "validations" do
     
-    inv=Investigation.new(:title=>"Test",:project=>projects(:sysmo_project))
+    inv=Investigation.new(:title=>"Test",:projects=>[projects(:sysmo_project)])
     assert inv.valid?
     inv.title=""
     assert !inv.valid?
@@ -43,10 +41,10 @@ class InvestigationTest < ActiveSupport::TestCase
     assert !inv.valid?
 
     inv.title="Test"
-    inv.project=nil
+    inv.projects=[]
     assert !inv.valid?
 
-    inv.project=projects(:sysmo_project)
+    inv.projects=[projects(:sysmo_project)]
     assert inv.valid?
 
     #duplicate title not valid

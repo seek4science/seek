@@ -13,7 +13,7 @@ module FancyMultiselectHelper
       return super if options.delete :preview_disabled
 
       #skip if controller class does not define a preview method
-      return super unless "#{association.to_s.classify.pluralize}Controller".constantize.method_defined?(:preview)
+      return super unless try_block{"#{association.to_s.classify.pluralize}Controller".constantize.method_defined?(:preview)}
 
       #adds options to the dropdown used to select items to add to the multiselect.
       options[:possibilities_options] = {} unless options[:possibilities_options]
@@ -47,7 +47,7 @@ module FancyMultiselectHelper
 
   module SetDefaults
     def fancy_multiselect object, association, options = {}
-      options[:object_type_text] = object.class.name.underscore.humanize unless options[:object_type_text]
+      options[:object_type_text] = options[:object_class].name.underscore.humanize unless options[:object_type_text]
       object_type_text = options[:object_type_text]
 
       #set default values for locals being sent to the partial
@@ -55,7 +55,7 @@ module FancyMultiselectHelper
       options.reverse_merge! :intro => "The following #{association} are involved in this #{object_type_text}:",
                              :button_text => "Include in the #{object_type_text}",
                              :default_choice_text => "Select #{association} ...",
-                             :name => "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
+                             :name => "#{options[:object_class].name.underscore}[#{association.to_s.singularize}_ids]",
                              :possibilities => [],
                              :value_method => :id,
                              :text_method => :title
@@ -69,7 +69,7 @@ module FancyMultiselectHelper
   module SetDefaultsWithReflection
     def fancy_multiselect object, association, options = {}
 
-      if reflection = object.class.reflect_on_association(association)
+      if reflection = options[:object_class].reflect_on_association(association)
         required_access = reflection.options[:required_access] || :can_view?
         association_class = options.delete(:association_class) || reflection.klass
         options[:possibilities] = association_class.all.select(&required_access.to_sym) unless options[:possibilities]
@@ -82,7 +82,7 @@ module FancyMultiselectHelper
   module FoldingBox
     def fancy_multiselect object, association, options = {}
       hidden = options.delete(:hidden)
-      object_type_text = options[:object_type_text] || object.class.name.underscore.humanize
+      object_type_text = options[:object_type_text] || options[:object_class].name.underscore.humanize
       title = (help_icon("Here you can associate the #{object_type_text} with specific #{association}.") + "#{association.to_s.titleize}")
 
       folding_box "add_#{association}_form", title , :hidden => hidden, :contents => super(object, association, options)
@@ -101,6 +101,19 @@ module FancyMultiselectHelper
     end
   end
 
+  module StringOrObject
+    def fancy_multiselect string_or_object, association, options = {}
+      string_or_object = string_or_object.constantize if string_or_object.is_a? String
+      if string_or_object.is_a? Class
+        options[:object_class] = string_or_object
+        string_or_object = nil
+      else
+        options[:object_class] = string_or_object.class
+      end
+      super(string_or_object, association, options)
+    end
+  end
+
   #commenting some of these out should be ok. The only one relied on by others is SetDefaults (and Base, of course).
   #Changing the order may break things. These are executed starting with the last one, and ending with Base.
   include Base
@@ -110,4 +123,5 @@ module FancyMultiselectHelper
   include SetDefaultsWithReflection
   include FoldingBox
   include AssociationContentFromBlock
+  include StringOrObject
 end

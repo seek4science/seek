@@ -30,14 +30,7 @@
         <% end %>
       </p>
       
-      <p>
-        <label>Project:</label>
-        <% if @publication.project.nil? -%>
-          <%= text_or_not_specified nil %>
-        <% else -%>
-          <%= link_to h(@publication.project.name),@publication.project %>
-        <% end -%>
-      </p>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @publication}%>
 
       <p>
         <label><%= publication_type_text @publication.publication_type -%>:</label>

@@ -38,6 +38,7 @@ class PublicationsController < ApplicationController
   # GET /publications/new
   # GET /publications/new.xml
   def new
+    @publication = Publication.new
     respond_to do |format|
       format.html # new.html.erb
       format.xml 
@@ -184,9 +185,8 @@ class PublicationsController < ApplicationController
     begin
       #trim the PubMed or Doi Id
       params[:key] = params[:key].strip() unless params[:key].blank?
-
+      params[:publication][:project_ids].reject!(&:blank?).map!{|id| id.split(',')}.flatten!
       @publication = Publication.new(params[:publication])
-      @publication.project_id = params[:project_id]
       key = params[:key]
       protocol = params[:protocol]
       pubmed_id = nil
@@ -228,7 +228,8 @@ class PublicationsController < ApplicationController
   #Try and relate non_seek_authors to people in SEEK based on name and project
   def associate_authors
     publication = @publication
-    project = publication.project || current_user.person.projects.first
+    projects = publication.projects
+    projects = current_user.person.projects if projects.empty?
     association = {}
     publication.non_seek_authors.each do |author|
       matches = []
@@ -252,7 +253,7 @@ class PublicationsController < ApplicationController
       
       #If more than one result, filter by project
       if matches.size > 1
-        project_matches = matches.select{|p| p.projects.include?(project)}
+        project_matches = matches.select{|p| p.member_of?(projects)}
         if project_matches.size >= 1 #use this result unless it resulted in no matches
           matches = project_matches
         end

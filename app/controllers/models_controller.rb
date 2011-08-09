@@ -393,7 +393,7 @@ class ModelsController < ApplicationController
       @model = Model.new(params[:model])
       @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.project
+      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
       update_tags @model
       assay_ids = params[:assay_ids] || []
@@ -454,7 +454,7 @@ class ModelsController < ApplicationController
 
     if params[:sharing]
       @model.policy_or_default
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.project
+      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
     end
 
     assay_ids = params[:assay_ids] || []

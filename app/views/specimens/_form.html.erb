@@ -26,17 +26,9 @@
     </p>
 
 
-    <p>
-      <%= f.label :project %><span class="required">*</span><br/>
-      <%
-         selected_project=@specimen.project.try(:id)
-      %>
-      <%=
-          select_tag :project_id,
-                     options_for_select([["Select project ..", 0]]|Project.all.collect { |p| [h(p.name), p.id] }, selected_project),{:style=>"width:90%"}
-      %>
-    </p>
-     <p>
+   <%= render :partial => 'projects/project_selector', :locals => {:resource => @specimen}%>
+
+  <p>
     <%= f.label "Institution" %><span class="required">*</span><br/>
     <%= collection_select(:specimen, :institution_id, Institution.all, :id, :name, {:include_blank => "Please Select"},{:style=>"width:90%"}) %>
   </p>

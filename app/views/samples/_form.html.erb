@@ -37,6 +37,8 @@
     <%= f.label :description -%><br/>
     <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
   </p>
+
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample}%>
   <p>
         <%= f.fancy_multiselect :scales, {:possibilities=>sort_scales(Scale.all)} -%>
   </p>

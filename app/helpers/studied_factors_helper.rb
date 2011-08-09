@@ -66,16 +66,13 @@ module StudiedFactorsHelper
     result
   end
 
-  #get the fses_or_ecs of the project the asset_object belongs to, but dont include the fses_or_ecs of that asset_object
-  def fses_or_ecs_of_project asset_object, fs_or_ec
-    asset_class = asset_object.class.name.constantize
-    fs_or_ec_array= []
-    #FIXME: add :include in the query
-    asset_items = asset_class.find(:all, :conditions => ["project_id = ? AND id != ?", asset_object.project_id, asset_object.id])
-    asset_items.each do |item|
-      fs_or_ec_array |= item.send fs_or_ec if item.can_view?
+  #get the fses_or_ecs of the project the asset belongs to, but dont include the fses_or_ecs of that asset
+  def fses_or_ecs_of_project asset, fs_or_ec
+    neighboring_assets = asset.class.find(:all).select do |a|
+      projects_in_common = (a.projects & asset.projects)
+      a != asset and !projects_in_common.empty?
     end
-    fs_or_ec_array
+    neighboring_assets.select(&:can_view?).collect {|a| a.send(fs_or_ec)}.flatten
   end
 
 end

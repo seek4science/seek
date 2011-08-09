@@ -72,7 +72,7 @@ class ModelsControllerTest < ActionController::TestCase
   end    
   
   test "should correctly handle bad data url" do
-    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:project=>projects(:sysmo_project)}
+    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :model => model, :sharing=>valid_sharing
@@ -653,11 +653,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model
-    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_model_with_url
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
   
 end

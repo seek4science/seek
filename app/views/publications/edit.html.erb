@@ -7,10 +7,7 @@
 <div class="show_basic">    
   <%= error_messages_for('publication', :message => nil) %>
   <% form_tag publication_path(@publication), :method => :put do %>
-    <p>
-      <label>Project:</label><br/>
-      <%= collection_select :publication, :project_id, current_user.person.projects,:id,:name -%>
-    </p>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication}%>
     
     <% if @publication.pubmed_id.nil? && @publication.doi %>
       <p>
@@ -21,7 +18,7 @@
 
     <h2>Associate authors</h2>  
  
-    <% project = @publication.project %>
+    <% projects = @publication.projects %>
     Using the form below, you can link the authors listed in PubMed to people registered in SEEK.<br/><br/>
     
     SEEK will try and suggest the correct person based on the author's name. If this suggestion is incorrect, please select the correct person from the dropdown menu, or choose "None" if this person isn't a member of SEEK.<br/><br/>
@@ -39,7 +36,7 @@
           <% @publication.non_seek_authors.each do |author| %>
           <tr>    
             <td><%= author.last_name + " " + author.first_name -%></td>
-            <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,@author_associations[author.id],project) -%></select></td>
+            <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,@author_associations[author.id],projects) -%></select></td>
           </tr>
           <% end %>
         </table>

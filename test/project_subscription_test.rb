@@ -5,7 +5,7 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   def setup
     User.current_user = Factory(:user)
     @proj = Factory(:project)
-    @subscribables_in_proj = [Factory(:subscribable, :project => @proj), Factory(:subscribable, :project => @proj), Factory(:subscribable, :project => @proj)]
+    @subscribables_in_proj = [Factory(:subscribable, :projects => [Factory(:project),@proj]), Factory(:subscribable, :projects => [@proj,Factory(:project),Factory(:project)]), Factory(:subscribable, :projects => [@proj])]
   end
 
   test 'subscribing to a project subscribes to subscribable items in the project' do
@@ -25,7 +25,7 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
 
   test 'subscribers to a project auto subscribe to new items in the project' do
     current_person.project_subscriptions.create :project => @proj
-    assert Factory(:subscribable, :project => @proj).subscribed?
+    assert Factory(:subscribable, :projects => [Factory(:project),@proj]).subscribed?
   end
 
   test 'individual subscription frequency set by project subscription frequency' do

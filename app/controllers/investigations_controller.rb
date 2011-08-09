@@ -35,7 +35,7 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-    @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
+    @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
     respond_to do |format|
       if @investigation.save
         flash[:notice] = 'The Investigation was successfully created.'
@@ -80,7 +80,7 @@ class InvestigationsController < ApplicationController
 
     if params[:sharing]
       @investigation.policy_or_default
-      @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
+      @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
     end
 
     respond_to do |format|
@@ -99,7 +99,7 @@ class InvestigationsController < ApplicationController
 
   def make_investigation_and_auth
     @investigation=Investigation.new(params[:investigation])
-    unless current_user.person.projects.include?(@investigation.project)
+    unless current_user.person.member_of? @investigation.projects
       respond_to do |format|
         flash[:error] = "You cannot create a investigation for a project you are not a member of."
         format.html { redirect_to investigations_path }

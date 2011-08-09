@@ -24,7 +24,7 @@ class ModelTest < ActiveSupport::TestCase
     assert_not_equal assay_asset.assay, assay
     assay_asset.asset = model
     assay_asset.assay = assay
-    assay_asset.save!
+    User.with_current_user(model.contributor){assay_asset.save!}
     assay_asset.reload
     assert assay_asset.valid?
     assert_equal assay_asset.asset, model
@@ -37,10 +37,10 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=Model.new :title=>"fred",:project=>projects(:sysmo_project)
+    asset=Model.new :title=>"fred",:projects=>[projects(:sysmo_project)]
     assert asset.valid?
 
-    asset=Model.new :project=>projects(:sysmo_project)
+    asset=Model.new :projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
     asset=Model.new :title=>"fred"
@@ -65,24 +65,19 @@ class ModelTest < ActiveSupport::TestCase
     assert model_versions(:teusink_v1).authorization_supported?
   end
   
-  test "project" do
+  test "projects" do
     model=models(:teusink)
     p=projects(:sysmo_project)
-    assert_equal p,model.project
-    assert_equal p,model.latest_version.project
+    assert_equal [p],model.projects
+    assert_equal [p],model.latest_version.projects
   end
 
   test "cache_remote_content" do
     WebMock.allow_net_connect!
-    project = projects(:sysmo_project)
-    
-    model=Model.new(:title=>"test model for caching remote")
-    model.policy = Policy.private_policy
-    model.content_blob = ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png")
-    model.original_filename = "sysmo-logo.png"
-    model.project=project
-    model.save!
-    model.reload
+
+    model = Factory :model,
+        :content_blob => ContentBlob.new(:url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png"),
+        :original_filename => "sysmo-logo.png"
 
     assert !model.content_blob.file_exists?
 
@@ -93,7 +88,7 @@ class ModelTest < ActiveSupport::TestCase
   end
   
   def test_defaults_to_private_policy
-    model=Model.new(:title=>"A sop with no policy",:project=>projects(:sysmo_project))
+    model=Model.new Factory.attributes_for(:model, :policy => nil)
     model.save!
     model.reload
     assert_not_nil model.policy
@@ -157,7 +152,7 @@ class ModelTest < ActiveSupport::TestCase
     end
     assert_nil Model.find_by_id(model.id)
     assert_difference("Model.count",1) do
-      Model.restore_trash!(model.id)
+      disable_authorization_checks {Model.restore_trash!(model.id)}
     end
     assert_not_nil Model.find_by_id(model.id)
   end

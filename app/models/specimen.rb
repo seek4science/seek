@@ -3,7 +3,7 @@ require 'acts_as_authorized'
 require 'subscribable'
 require 'acts_as_scalable'
 class Specimen < ActiveRecord::Base
-   include Subscribable
+  include Subscribable
 
    acts_as_scalable
 
@@ -29,7 +29,7 @@ class Specimen < ActiveRecord::Base
   validates_numericality_of :age, :only_integer => true, :greater_than=> 0, :allow_nil=> true, :message => "is not a positive integer"
   validates_presence_of :donor_number
 
-  validates_presence_of :contributor,:lab_internal_number,:project,:institution,:organism
+  validates_presence_of :contributor,:lab_internal_number,:projects,:institution,:organism
 
   validates_uniqueness_of :donor_number
   def self.sop_sql()

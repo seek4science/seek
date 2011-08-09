@@ -81,9 +81,9 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test "should create" do
     login_as(Factory :user)
-    put :create, :investigation=>Factory(:investigation, :project => User.current_user.person.projects.first).attributes
-    assert_response :success
+    put :create, :investigation=> Factory.attributes_for(:investigation, :projects => [User.current_user.person.projects.first])
     assert assigns(:investigation)
+    assert !assigns(:investigation).new_record?
   end
 
   test "no edit button in show for unauthorized user" do

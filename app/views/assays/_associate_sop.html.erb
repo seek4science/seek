@@ -9,7 +9,7 @@
     <div class="yui-u first" style="width:66%; float:left">
       <%
         all_sops=authorised_sops.sort{|a, b| a.title<=>b.title}   
-        project_sops=all_sops.select{|s| current_user.person.projects.include?(s.project )}
+        project_sops=all_sops.select{|s| current_user.person.member_of?(s.projects)}
         select_truncate_length=120
       -%>
 
