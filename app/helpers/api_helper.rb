@@ -182,12 +182,8 @@ module ApiHelper
     policy_xml builder,object if try_block{current_user.person.is_admin?} && object.respond_to?("policy")
     blob_xml builder,object.content_blob if object.respond_to?("content_blob")
 
-    if object.is_a? ProjectCompat
-      if object.projects.first
-        api_partial builder, object.projects.first
-      else
-        builder.tag! "project",{"xsi:nil"=>"true","xlink:href"=>"","resourceType"=>"Project"}
-      end
+    if object.respond_to? :projects
+        api_partial_collection builder, object.projects
     elsif object.respond_to?("project")
       if object.project
         api_partial builder,object.project
