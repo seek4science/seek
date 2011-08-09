@@ -32,7 +32,7 @@ class StudiesController < ApplicationController
       if investigation.can_edit?
         @study.investigation = investigation
       else
-        flash.now[:error] = "You do now have permission to associate the new study with the investigation '#{investigation.title}'."
+        flash.now[:error] = "You do not have permission to associate the new study with the investigation '#{investigation.title}'."
       end
     end
     investigations = Investigation.all.select &:can_view?
