@@ -1,8 +1,15 @@
 require 'test_helper'
 
 class ScalesControllerTest < ActionController::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  test "index" do
+    get :index
+    assert_response :success
   end
+
+  test "show" do
+    scale = Factory :scale
+    get :show,:id=>scale
+    assert_response :success
+  end
+
 end

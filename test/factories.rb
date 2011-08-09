@@ -299,3 +299,18 @@ end
     f.association :substance, :factory => :compound
     f.association :sop, :factory => :sop
   end
+
+Factory.define(:scalable,:parent=>:data_file){}
+
+#Scale
+Factory.define(:scale) do |f|
+  f.sequence(:title){|n| "Scale #{n}"}
+
+end
+#Scaling
+Factory.define(:scaling) do |f|
+  f.association :person
+  f.association :scalable
+  f.association :scale
+end
+
