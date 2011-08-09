@@ -6,11 +6,11 @@
 </div>
 
 <div class="list_item_right_column">
-<%= list_item_attribute "Project", resource.project.title, resource.project %>
+  <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
 </div>
 
 <div class="list_item_whole_width">
-
+<%= list_item_scale_list resource %>
 <%= list_item_description resource.description %>
 <%= list_item_timestamp resource %>
-</div>    
+</div>

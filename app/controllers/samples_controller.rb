@@ -38,7 +38,7 @@ class SamplesController < ApplicationController
     @sample = Sample.new(params[:sample])
 
     #add policy to sample
-    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.project
+    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
     tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
     sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
     respond_to do |format|
@@ -71,7 +71,7 @@ class SamplesController < ApplicationController
       @sample.attributes = params[:sample]
 
       #update policy to sample
-      @sample.policy.set_attributes_with_sharing params[:sharing], @sample.project
+      @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
       respond_to do |format|
 
       if @sample.save

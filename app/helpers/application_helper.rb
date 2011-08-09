@@ -1,8 +1,29 @@
 # Methods added to this helper will be available to all templates in the application.
-
-module ApplicationHelper  
+module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
+
+
+  def authorized_list items, attribute, sort=true, max_length=75, count_hidden_items=false
+    items = Authorization.authorize_collection("view", items, current_user, count_hidden_items)
+    html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
+    if items.empty?
+      html << "<span class='none_text'>No #{attribute}</span>"
+    else
+      original_size     = items.size
+      items             = items.compact
+      hidden_item_count = original_size - items.size
+      items = items.sort { |a, b| get_object_title(a)<=>get_object_title(b) } if sort
+      items.each do |i|
+        html << (link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i))
+        html << ", " unless items.last==i
+      end
+      if count_hidden_items && hidden_item_count>0
+        html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
+      end
+    end
+    return html
+  end
 
 
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)

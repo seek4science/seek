@@ -1,8 +1,10 @@
 require 'grouped_pagination'
 require 'acts_as_authorized'
-
+require "acts_as_scalable"
 class Sample < ActiveRecord::Base
   include Subscribable
+
+  acts_as_scalable
 
   belongs_to :specimen
   belongs_to :institution

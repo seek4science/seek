@@ -20,10 +20,11 @@
         @person.project_subscriptions.detect { |ps| ps.project == proj } || ProjectSubscription.new(:project => proj, :person => @person).tap(&:mark_for_destruction)
     end %>
     <% f.fields_for :project_subscriptions, project_subscriptions_with_unsubscribed do |sub_form| %>
-        <div id="subscription<%= sub_form.object.project_id %>" style="display:none;">
+        <% project_subscription = sub_form.object %>
+        <div id="subscription<%= project_subscription.project_id %>" style="display:none;">
           <fieldset>
             <%= sub_form.hidden_field :id unless sub_form.object.new_record? %>
-            <legend> Project: <%= sub_form.object.project.name %></legend>
+            <legend> Project: <%= project_subscription.project.name %></legend>
             <%= sub_form.hidden_field :project_id %>
             <br/>
 

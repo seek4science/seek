@@ -14,7 +14,11 @@ module Acts #:nodoc:
     module ClassMethods
       def acts_as_isa
         acts_as_favouritable
-        
+
+        acts_as_taggable
+
+        acts_as_scalable
+
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
         title_trimmer
@@ -39,7 +43,6 @@ module Acts #:nodoc:
         end
         include Acts::Isa::InstanceMethods
         include Subscribable
-
       end
 
       def is_isa?

@@ -11,7 +11,7 @@ teusink:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 2  
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
 
 teusink_with_space:
@@ -25,7 +25,7 @@ teusink_with_space:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
   
 jws_model:
@@ -39,7 +39,7 @@ jws_model:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1  
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: fully_public_policy
   
 francos_model:
@@ -53,7 +53,7 @@ francos_model:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1  
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions  
   
 non_sbml_xml:
@@ -67,7 +67,7 @@ non_sbml_xml:
   result_graph: Grapsh
   last_used_at: 2009-04-02 11:09:18
   version: 1  
-  project: other_project
+  projects: [other_project]
   policy: policy_for_test_with_projects_institutions   
   
 invalid_sbml_xml:
@@ -81,7 +81,7 @@ invalid_sbml_xml:
   result_graph: Grapsh
   last_used_at: 2009-04-02 11:09:18
   version: 1  
-  project: other_project
+  projects: [other_project]
   policy: policy_for_test_with_projects_institutions   
   
 non_jws_dat:
@@ -95,7 +95,7 @@ non_jws_dat:
   result_graph: Grapsh
   last_used_at: 2009-04-02 11:09:18
   version: 1  
-  project: other_project
+  projects: [other_project]
   policy: policy_for_test_with_projects_institutions   
 
 model_with_format_and_type:
@@ -112,7 +112,7 @@ model_with_format_and_type:
   model_format: BioPAX
   version: 1
   uuid: gggg-hhhh-jjjj-kkkk
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: fully_public_policy
 
 model_with_links_in_description:
@@ -126,7 +126,7 @@ model_with_links_in_description:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit
 
 model_with_different_owner:
@@ -140,7 +140,7 @@ model_with_different_owner:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: fully_public_policy
 
 model_with_no_contributor:
@@ -153,7 +153,7 @@ model_with_no_contributor:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit
   
 model_jws_incompatible:
@@ -166,7 +166,7 @@ model_jws_incompatible:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit
   
 private_model:
@@ -179,5 +179,5 @@ private_model:
   result_graph: Grapsh
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: private_policy

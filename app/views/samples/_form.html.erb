@@ -40,9 +40,13 @@
 
   <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample}-%>
 
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample}%>
+  <p>
+        <%= f.fancy_multiselect :scales, {:possibilities=>sort_scales(Scale.all)} -%>
+  </p>
   <br style="clear:both"/>
   <p>
-      <%= render :partial => "assets/sharing_form" -%>
+      <%= render :partial => "assets/sharing_form" if @sample.can_manage?-%>
   </p>
 
   <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>

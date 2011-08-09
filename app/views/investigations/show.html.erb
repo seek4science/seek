@@ -20,6 +20,7 @@
 </ul>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@investigation} %>
 <div class="show_basic">
+    <div class="main_content_left_box_narrower">
     <%= render :partial => "layouts/usage_info", :locals => { :resource => @investigation } -%>
     <p class="id">
         <label>
@@ -27,19 +28,24 @@
         </label>
         <%= @investigation.id -%>
     </p>
-    <p>
-        <b>Project:</b>
-        <%= link_to h(@investigation.project.name),@investigation.project %>
-    </p>
+    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
     <p>
         <b>Description:</b>
         <div id="description" class="box_standout">
             <%= text_or_not_specified(@investigation.description, :description=>true,:auto_link=>true) %>
         </div>
-    </p>	
-    <br/>
-    
-	<%= embedded_isa_svg(@investigation,false) -%>
-	
-    <%= render :partial=>"layouts/items_related_to",:object => @investigation %>
+    </p>
+   </div>
+  <div class="main_content_right_box_wider">
+    <%= render :partial => "assets/resource_scales_box", :locals => {:resource => @investigation} -%>
+  </div>
+
+  <br/>
+
+  <div style="clear:both">
+    <%= embedded_isa_svg(@investigation, false) -%>
+    <%= render :partial=>"layouts/items_related_to", :object => @investigation %>
+  </div>
 </div>
+
+

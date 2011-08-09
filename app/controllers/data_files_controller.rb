@@ -141,7 +141,7 @@ class DataFilesController < ApplicationController
   def upload_for_tool
 
     if handle_data
-
+      params[:data_file][:project_ids] = [params[:data_file][:project_id]] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
@@ -170,7 +170,7 @@ class DataFilesController < ApplicationController
 
       update_tags @data_file
 
-      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
@@ -212,7 +212,7 @@ class DataFilesController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
-    
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml
@@ -244,7 +244,7 @@ class DataFilesController < ApplicationController
 
       if params[:sharing]
         @data_file.policy_or_default
-        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
       end
 
       if @data_file.save

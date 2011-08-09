@@ -9,7 +9,7 @@ class Publication < ActiveRecord::Base
   acts_as_asset
 
   validates_presence_of :title
-  validates_presence_of :project
+  validates_presence_of :projects
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."

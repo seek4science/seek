@@ -66,7 +66,7 @@ class Policy < ActiveRecord::Base
     return policy
   end
 
-  def set_attributes_with_sharing sharing, project
+  def set_attributes_with_sharing sharing, projects
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     self.tap do |policy|
@@ -90,15 +90,12 @@ class Policy < ActiveRecord::Base
         end
 
         #if share with your project is chosen
-        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS) and project
+        if (sharing[:sharing_scope].to_i == Policy::ALL_SYSMO_USERS) and !projects.blank?
           #add Project to contributor_type
           contributor_types << "Project" if !contributor_types.include? "Project"
           #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
-          if !new_permission_data.has_key?('Project')
-            new_permission_data["Project"] = {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}}
-          else
-            new_permission_data["Project"][project.id] = {"access_type" => sharing[:your_proj_access_type].to_i}
-          end
+          new_permission_data["Project"] = {} unless new_permission_data["Project"]
+          projects.each {|project| new_permission_data["Project"][project.id] = {"access_type" => sharing[:your_proj_access_type].to_i}}
         end
 
         # --- Synchronise All Permissions for the Policy ---

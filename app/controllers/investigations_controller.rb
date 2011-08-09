@@ -35,14 +35,19 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-    @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
+    @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
     respond_to do |format|
       if @investigation.save
         flash[:notice] = 'The Investigation was successfully created.'
         if @investigation.create_from_asset=="true"
            flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
         end
-        format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
+        if @investigation.create_from_asset =="true"
+          format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
+        else
+          format.html { redirect_to investigation_path(@investigation) }
+        end
+
         format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
       else
         format.html { render :action => "new" }
@@ -75,7 +80,7 @@ class InvestigationsController < ApplicationController
 
     if params[:sharing]
       @investigation.policy_or_default
-      @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
+      @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
     end
 
     respond_to do |format|
@@ -94,7 +99,7 @@ class InvestigationsController < ApplicationController
 
   def make_investigation_and_auth
     @investigation=Investigation.new(params[:investigation])
-    unless current_user.person.projects.include?(@investigation.project)
+    unless current_user.person.member_of? @investigation.projects
       respond_to do |format|
         flash[:error] = "You cannot create a investigation for a project you are not a member of."
         format.html { redirect_to investigations_path }

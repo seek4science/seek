@@ -27,6 +27,14 @@ class ConfigTest < ActiveSupport::TestCase
      assert_equal true, Seek::Config.presentations_enabled
   end
 
+  test "scales" do
+    assert_equal ["Organ","Tissue","Cellular","Molecular"],Seek::Config.scales
+  end
+
+  test "seek_video_link" do
+    assert_equal "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u", Seek::Config.seek_video_link
+  end
+
   test "email_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
     assert_equal true ,Seek::Config.email_enabled

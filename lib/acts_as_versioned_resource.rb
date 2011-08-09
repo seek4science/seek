@@ -8,7 +8,7 @@
 # * See license.txt for details.
 # ********************************************************************************
 
-
+require 'project_compat'
 module Acts #:nodoc:
   module VersionedResource #:nodoc:
     def self.included(mod)
@@ -20,7 +20,7 @@ module Acts #:nodoc:
 
         belongs_to :contributor, :polymorphic => true
 
-        belongs_to :project
+        include ProjectCompat
 
         belongs_to :policy, :autosave => true
 
@@ -54,6 +54,10 @@ module Acts #:nodoc:
       #assumes all versioned resources are also taggable
       def tag_counts
           self.parent.tag_counts
+      end
+
+      def scales
+        self.parent.scales
       end
 
       #returns a list of the people that can manage this file

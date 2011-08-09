@@ -50,10 +50,7 @@
               <%= text_or_not_specified(@assay.description, :description=>true,:auto_link=>true) %>
           </div>
       </p>
-      <p id="project">
-          <b>Project: </b>
-          <%= projects_link_list [@assay.project] %>
-      </p>
+     <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @assay}  %>
       <p id="investigation">
           <b>Investigation: </b>
           <%= investigation_link(@assay.investigation) %>
@@ -222,12 +219,12 @@
 	  
     </div>
 		
-	
+
     <div class="main_content_right_box_wider">
       <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @assay, :creators => [@assay.owner]} -%>
 
       <%= item_tags_and_tag_entry -%>
-
+      <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @assay}-%>
     </div>
     <div style="clear:both">
         <%= embedded_isa_svg(@assay.study, true, @assay) -%>

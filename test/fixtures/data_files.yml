@@ -7,7 +7,7 @@ picture:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: policy_for_test_with_projects_institutions
 
 private_data_file:
@@ -19,7 +19,7 @@ private_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: myexperiment_project
+  projects: [myexperiment_project]
   policy: private_policy_with_custom_sharing
 
 downloadable_data_file:
@@ -31,7 +31,7 @@ downloadable_data_file:
   content_type: application/vnd.excel
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
   
 url_based_data_file:
@@ -43,7 +43,7 @@ url_based_data_file:
   content_type: images/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
   
 url_no_host_data_file:
@@ -55,7 +55,7 @@ url_no_host_data_file:
   content_type: images/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
   
 url_not_found_data_file:
@@ -67,7 +67,7 @@ url_not_found_data_file:
   content_type: images/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
 
 editable_data_file:
@@ -79,7 +79,7 @@ editable_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: editing_for_all_sysmo_users_policy
 
 sysmo_data_file:
@@ -91,7 +91,7 @@ sysmo_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit  
 
 myexperiment_data_file:
@@ -103,7 +103,7 @@ myexperiment_data_file:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: myexperiment_project
+  projects: [myexperiment_project]
   policy: public_download_with_no_custom_sharing
 
 data_file_with_links_in_description:
@@ -115,7 +115,7 @@ data_file_with_links_in_description:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit
 
 data_file_with_no_contributor:
@@ -126,7 +126,7 @@ data_file_with_no_contributor:
   content_type: text/png
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit
 
 viewable_data_file:
@@ -138,6 +138,6 @@ viewable_data_file:
   content_type: application/vnd.ms-excel
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: policy_for_viewable_data_file
 

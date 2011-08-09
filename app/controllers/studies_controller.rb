@@ -32,7 +32,7 @@ class StudiesController < ApplicationController
       if investigation.can_edit?
         @study.investigation = investigation
       else
-        flash.now[:error] = "You do now have permission to associate the new study with the investigation '#{investigation.title}'."
+        flash.now[:error] = "You do not have permission to associate the new study with the investigation '#{investigation.title}'."
       end
     end
     investigations = Investigation.all.select &:can_view?
@@ -72,7 +72,7 @@ class StudiesController < ApplicationController
 
     if params[:sharing]
       @study.policy_or_default
-      @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+      @study.policy.set_attributes_with_sharing params[:sharing], @study.projects
 
     end
 
@@ -104,7 +104,7 @@ class StudiesController < ApplicationController
   def create
     @study = Study.new(params[:study])
 
-    @study.policy.set_attributes_with_sharing params[:sharing], @study.project
+    @study.policy.set_attributes_with_sharing params[:sharing], @study.projects
 
     respond_to do |format|
       if @study.save
@@ -112,7 +112,11 @@ class StudiesController < ApplicationController
         if @study.create_from_asset=="true"
           flash.now[:notice] << "Now you can create new assay by clicking 'add an assay' button"
         end
+        if @study.create_from_asset =="true"
         format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
+        else
+          format.html { redirect_to study_path(@study)}
+        end
         format.xml { render :xml => @study, :status => :created, :location => @study }
       else
         format.html {render :action=>"new"}
@@ -122,29 +126,17 @@ class StudiesController < ApplicationController
 
   end
 
-
   def investigation_selected_ajax
-    if params[:investigation_id] && params[:investigation_id]!="0"
-      investigation=Investigation.find(params[:investigation_id])
-      render :partial=>"assay_list",:locals=>{:investigation=>investigation}
-    else
-      render :partial=>"assay_list",:locals=>{:investigation=>nil}
-    end
-  end
 
-  def project_selected_ajax
-
-    if params[:project_id] && params[:project_id]!="0"
-      investigations=Investigation.find(:all,:conditions=>{:project_id=>params[:project_id]})
-      people=Project.find(params[:project_id]).people
+    if investigation_id = params[:investigation_id] and params[:investigation_id]!="0"
+      investigation = Investigation.find(investigation_id)
+      people=investigation.projects.collect(&:people).flatten
     end
 
-    investigations||=[]
     people||=[]
 
     render :update do |page|
-      page.replace_html "investigation_collection",:partial=>"studies/investigation_list",:locals=>{:investigations=>investigations,:project_id=>params[:project_id]}
-      page.replace_html "person_responsible_collection",:partial=>"studies/person_responsible_list",:locals=>{:people=>people,:project_id=>params[:project_id]}
+      page.replace_html "person_responsible_collection",:partial=>"studies/person_responsible_list",:locals=>{:people=>people}
     end
 
   end

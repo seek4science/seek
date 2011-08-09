@@ -38,9 +38,7 @@ class SpecimensController < ApplicationController
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) ||[]
     @specimen.sop_ids = sop_ids
 
-    @specimen.project_id = params[:project_id]
-
-    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
+    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
     #Add creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])
     respond_to do |format|
@@ -60,17 +58,11 @@ class SpecimensController < ApplicationController
   end
 
   def update
-
-    #update project
-    @specimen.project_id = params[:project_id]
-
-
     sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?))||[]
-   # @specimen.sop_ids = sop_ids
 
     @specimen.attributes = params[:specimen]
 
-    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.project
+    @specimen.policy.set_attributes_with_sharing params[:sharing], @specimen.projects
 
     #update creators
     AssetsCreator.add_or_update_creator_list(@specimen, params[:creators])

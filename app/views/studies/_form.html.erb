@@ -25,36 +25,15 @@
 
 <div class="fold">
   <div class="foldTitle">
-    Project details
+    Investigation details
   </div>
   <div class="foldContent">
-  	
-    <p>
-      <%= f.label :project %><span class="required">*</span><br/>
-      <%
-      selected_project=@study.investigation ? @study.investigation.project.id : 0
-      projects = current_user.person.projects
-      projects = projects | [@study.investigation.project] if @study.investigation
-    %>
-      <%=
-      select_tag :project_id,
-        options_for_select([["Select project ..",0]]|projects.collect{|p| [h(p.name),p.id]},selected_project),
-        {:onchange=>remote_function(
-          :url=>{:action=>"project_selected_ajax"},
-          :with=>"'project_id='+this.value",
-          :before=>"show_ajax_loader('investigation_collection');show_ajax_loader('person_responsible_collection')"
-        ),:style=>"width:82%"
-
-      }
-    %>
-    </p>
 
     <p>
       <%= f.label :investigation %><span class="required">*</span>
       <%=link_to h("New Investigation?"),new_investigation_path,:popup => true%><br/>
       <div id="investigation_collection">
-        <% investigations = @study.investigation ? @study.investigation.project.investigations : [] -%>
-        <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>investigations} -%>
+        <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
       </div>
       <br/>
     </p>
@@ -62,12 +41,15 @@
     <p>
       <%= f.label "Person responsible" %><br/>
       <div id="person_responsible_collection">
-        <% people = @study.investigation ? @study.investigation.project.people : [] -%>
+        <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
         <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>
       </div>
     </p>
 
   </div>
+  <p>
+      <%= f.fancy_multiselect :scales,{:possibilities=>sort_scales(Scale.all)}-%>
+   </p>
   <p>
     <%= render :partial=>"assets/sharing_form" if @study.can_manage? -%>
   </p>

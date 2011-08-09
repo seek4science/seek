@@ -25,14 +25,13 @@
 
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
         <% if current_user_authorized_to_manage -%>
-        <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Presentation",  # this is only for presentation, not for any processing
-        :selected_project_id => @presentation.project_id,
-        :project_hash => current_user.generate_own_project_id_name_hash,
-        :disable_project_select => true } -%>
+            <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
         <% end -%>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
-
+        <p>
+        <%= fancy_multiselect @presentation,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+        </p>
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "Presentation",
 					:existing_attributions=>Authorization.authorize_collection("view", @presentation.attributions_objects, current_user),
