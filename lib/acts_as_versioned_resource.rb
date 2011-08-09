@@ -56,6 +56,10 @@ module Acts #:nodoc:
           self.parent.tag_counts
       end
 
+      def scales
+        self.parent.scales
+      end
+
       #returns a list of the people that can manage this file
       #which will be the contributor, and those that have manage permissions
       def managers
