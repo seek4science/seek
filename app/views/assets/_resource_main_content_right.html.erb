@@ -8,4 +8,8 @@
 
   <% end -%>
   <%= render :partial => "assets/resource_attributions_box", :locals => { :resource => resource, :attributed_to => Authorization.authorize_collection("view", resource.attributions_objects, current_user, true), :truncate_to => truncate_length_for_boxes } -%>
+
+ <% if resource.class.is_scalable? -%>
+  <%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource}-%>
+ <% end -%>
 </div>

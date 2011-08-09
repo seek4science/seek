@@ -92,7 +92,10 @@ ActionController::Routing::Routes.draw do |map|
   #tags
   map.all_tags '/tags',:controller=>'tags',:action=>'index'
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
-  
+
+  #scales
+  map.resources :scales
+
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
   
   # browsing by countries

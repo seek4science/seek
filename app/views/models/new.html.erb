@@ -31,7 +31,9 @@
             </div>
         </p>
         <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
-
+        <p>
+        <%= fancy_multiselect @model,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+       </p>
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Model"} -%>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
         <p>

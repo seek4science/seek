@@ -1,8 +1,11 @@
 require 'grouped_pagination'
 require 'acts_as_authorized'
 require 'subscribable'
+require 'acts_as_scalable'
 class Specimen < ActiveRecord::Base
    include Subscribable
+
+   acts_as_scalable
 
   before_save  :clear_garbage
 

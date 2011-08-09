@@ -93,6 +93,9 @@
 <div id="add_organism_form">
 <%= render :partial=>"assays/select_organisms" if !Seek::Config.is_virtualliver || @assay.is_modelling?-%>
 </div>
+ <p>
+      <%= f.fancy_multiselect :scales,{:object_type_text=>@assay_text,:possibilities=>sort_scales(Scale.all)} -%>
+ </p>
 
 <br style="clear:both"/>
 

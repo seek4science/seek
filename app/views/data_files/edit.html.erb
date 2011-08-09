@@ -31,6 +31,9 @@
             }
     %>
 
+      <p>
+        <%= fancy_multiselect @data_file, :scales, {:possibilities=>sort_scales(Scale.all)} -%>
+      </p>
 	<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "DataFile",
 					:existing_attributions=>Authorization.authorize_collection("view", @data_file.attributions_objects, current_user),

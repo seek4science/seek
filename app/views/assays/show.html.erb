@@ -152,12 +152,12 @@
 	  
     </div>
 		
-	
+
     <div class="main_content_right_box_wider">
       <%= render :partial => "assets/resource_authors_box", :locals => { :resource => @assay, :creators => [@assay.owner]} -%>
 
       <%= item_tags_and_tag_entry -%>
-
+      <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @assay}-%>
     </div>
     <div style="clear:both">
         <%= embedded_isa_svg(@assay.study, true, @assay) -%>

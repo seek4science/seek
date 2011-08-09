@@ -17,7 +17,7 @@
 
 <div class="show_basic">
 
-  <div class="main_content_left_box">
+  <div class="main_content_left_box_narrower">
 
     <div class="box_about_actor">
 
@@ -53,12 +53,11 @@
 
         <% end %>
       </p>
-
     </div>
   </div>
-  <!--  <div class="main_content_right_box">
-    <#%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project, :drag_id => drag_id } -%>
-  </div>-->
+  <div class="main_content_right_box_wider">
+    <%= render :partial => "assets/resource_scales_box", :locals => { :resource => @sample}-%>
+  </div>
   <div style="clear:both;">
     <p style="margin-top: 1em;">
       <b>About the sample:</b>
@@ -68,7 +67,6 @@
     </div>
     </p>
   </div>
-
 
   <div style="clear:both">
 

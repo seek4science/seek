@@ -37,10 +37,12 @@
     <%= f.label :description -%><br/>
     <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
   </p>
-
+  <p>
+        <%= f.fancy_multiselect :scales, {:possibilities=>sort_scales(Scale.all)} -%>
+  </p>
   <br style="clear:both"/>
   <p>
-      <%= render :partial => "assets/sharing_form" -%>
+      <%= render :partial => "assets/sharing_form" if @sample.can_manage?-%>
   </p>
 
   <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>

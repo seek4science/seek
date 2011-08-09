@@ -32,7 +32,9 @@
         <% end -%>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
-
+        <p>
+        <%= fancy_multiselect @presentation,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+        </p>
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {
 					:resource_type => "Presentation",
 					:existing_attributions=>Authorization.authorize_collection("view", @presentation.attributions_objects, current_user),

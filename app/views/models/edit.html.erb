@@ -41,7 +41,9 @@
         <p>
             <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
         </p>        
-
+        <p>
+        <%= fancy_multiselect @model,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+       </p>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
 		

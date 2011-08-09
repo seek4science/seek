@@ -20,7 +20,9 @@
         </p>
         <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",   # this is only for presentation, not for any processing
         :project_hash => current_user.generate_own_project_id_name_hash } -%>        
-        
+        <p>
+        <%= fancy_multiselect @sop,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
+       </p>
 		<%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Sop",:show_publications=>false} -%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
         <p>

@@ -55,6 +55,11 @@ module ResourceListItemHelper
     list_item_simple_list(resource.tag_counts, "Tags") {|i| link_for_tag(i)}
   end
 
+  def list_item_scale_list resource
+    ordered_scales = sort_scales resource.scales
+    list_item_simple_list(ordered_scales, "Scales") {|i| link_for_scale(i)}
+  end
+
   def list_item_simple_list items, attribute
     html = "<p class=\"list_item_attribute\"><b>#{attribute}:</b> "
     if items.empty?

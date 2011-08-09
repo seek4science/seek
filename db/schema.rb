@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110721101026) do
+ActiveRecord::Schema.define(:version => 20110805142241) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -710,6 +710,21 @@ ActiveRecord::Schema.define(:version => 20110721101026) do
     t.integer  "user_id"
     t.text     "search_query"
     t.text     "search_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "scales", :force => true do |t|
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "scalings", :force => true do |t|
+    t.integer  "scale_id"
+    t.integer  "scalable_id"
+    t.integer  "person_id"
+    t.string   "scalable_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

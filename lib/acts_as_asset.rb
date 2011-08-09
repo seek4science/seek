@@ -38,6 +38,7 @@ module Acts #:nodoc:
         validates_presence_of :project
         
         acts_as_taggable
+        acts_as_scalable
 
         has_many :relationships,
                  :class_name => 'Relationship',
