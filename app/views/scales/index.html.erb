@@ -9,9 +9,9 @@
 </div>
 <div class="list_items_container">
    <ul class="list">
-  <% ordered_scales.each_with_index do |scale| %>
+  <% ordered_scales.each_with_index do |scale,index| %>
   <li>
-  <%= link_to h(scale.first.title),scale.first,{:class => "item_scale_#{scale.second}"} %>
+  <%= link_to h(scale.title),scale,{:class => "item_scale_#{index}"} %>
   </li>
   <% end  %>
   </ul>
