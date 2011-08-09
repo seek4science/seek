@@ -44,19 +44,16 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
-  test "should get new with investigation predefined with project added if not member" do
+  test "should get new with investigation predefined even if not member of project" do
     #this scenario arose whilst fixing the test "should get new with investigation predefined"
-    #when passing the investigation_id, if that is editable but current_user is not a member, then the project of that investigation
-    #should be added to the list
+    #when passing the investigation_id, if that is editable but current_user is not a member,
+    #then the investigation should be added to the list
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?,"model owner should be able to edit this investigation"
     get :new, :investigation_id=>inv
     assert_response :success
 
-    assert_select "select#project_id" do
-      assert_select "option[selected='selected'][value=?]",inv.projects.first.id
-    end
     assert_select "select#study_investigation_id" do
       assert_select "option[selected='selected'][value=?]",inv.id
     end
@@ -70,9 +67,6 @@ class StudiesControllerTest < ActionController::TestCase
     get :new, :investigation_id=>inv
     assert_response :success
 
-    assert_select "select#project_id" do
-      assert_select "option[selected='selected'][value=?]",inv.projects.first.id
-    end
     assert_select "select#study_investigation_id" do
       assert_select "option[selected='selected'][value=?]",inv.id
     end
@@ -86,9 +80,6 @@ class StudiesControllerTest < ActionController::TestCase
     get :new, :investigation_id=>inv
     assert_response :success
 
-    assert_select "select#project_id" do
-      assert_select "option[selected='selected'][value=?]",0
-    end
     assert_select "select#study_investigation_id" do
       assert_select "option[selected='selected'][value=?]",0
     end
