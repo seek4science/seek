@@ -112,7 +112,11 @@ class StudiesController < ApplicationController
         if @study.create_from_asset=="true"
           flash.now[:notice] << "Now you can create new assay by clicking 'add an assay' button"
         end
+        if @study.create_from_asset =="true"
         format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
+        else
+          format.html { redirect_to study_path(@study)}
+        end
         format.xml { render :xml => @study, :status => :created, :location => @study }
       else
         format.html {render :action=>"new"}

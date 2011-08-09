@@ -42,7 +42,12 @@ class InvestigationsController < ApplicationController
         if @investigation.create_from_asset=="true"
            flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
         end
-        format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
+        if @investigation.create_from_asset =="true"
+          format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
+        else
+          format.html { redirect_to investigation_path(@investigation) }
+        end
+
         format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
       else
         format.html { render :action => "new" }
