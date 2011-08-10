@@ -153,4 +153,15 @@ class SpecimensControllerTest < ActionController::TestCase
     assert flash[:error]
     assert_redirected_to specimens_path
   end
+
+  test "should create specimen with strings for confluency, passage, viability, and purity" do
+    attrs = [:confluency, :passage, :viability, :purity]
+    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    post :create, :specimen => specimen
+    assert_response :success
+    assert specimen = assigns(:specimen)
+    attrs.each do |attr|
+      assert_equal "Test", specimen.send(attr)
+    end
+  end
 end
