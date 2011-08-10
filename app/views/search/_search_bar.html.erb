@@ -19,8 +19,8 @@
     <div id="search_box">
       <%= text_field_tag :search_query, @search_query,:size=>30 %>
       <%= select_tag :search_type, options_for_select(search_type_options,@search_type)  %>
+      <%= select_tag :scale_id, (options_for_select({"Scales" => 0}, :selected => "Scales") + options_from_collection_for_select(Scale.all, :id, :title)) %>
       <%= submit_tag "Go" -%>
     </div>
   <% end  -%>
 <% end %>
-
