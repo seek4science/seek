@@ -27,6 +27,8 @@ class SamplesController < ApplicationController
 
   def new
     @sample = Sample.new
+    @sample.from_new_link = params[:from_new_link]
+
     respond_to do |format|
       format.html # new.html.erb
       format.xml
@@ -40,20 +42,27 @@ class SamplesController < ApplicationController
     #add policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
     sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-    respond_to do |format|
-      if @sample.save
+
+    if @sample.save
         sops.each do |s_id|
           s = Sop.find(s_id)
           @sample.associate_sop(s) if s.can_view?
         end
-          flash[:notice] = 'Sample was successfully created.'
-          format.html { redirect_to(@sample) }
-          format.xml  { head :ok }
-      else
-
-        format.html { render :action => "new" }
-      end
+        if @sample.from_new_link=="true"
+           render :partial=>"assets/return_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
+        else
+          respond_to do |format|
+            flash[:notice] = 'Sample was successfully created.'
+            format.html { redirect_to(@sample) }
+            format.xml  { head :ok }
+          end
+        end
+    else
+        respond_to do |format|
+          format.html { render :action => "new" }
+          end
     end
+
   end
 
 
