@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110804150945) do
+ActiveRecord::Schema.define(:version => 20110810093644) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -877,10 +877,10 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.string   "culture_format"
     t.float    "temperature"
     t.float    "ph"
-    t.float    "confluency"
-    t.integer  "passage"
-    t.float    "viability"
-    t.float    "purity"
+    t.string   "confluency"
+    t.string   "passage"
+    t.string   "viability"
+    t.string   "purity"
     t.boolean  "sex"
     t.datetime "born"
   end
