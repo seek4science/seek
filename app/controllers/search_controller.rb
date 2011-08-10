@@ -74,7 +74,7 @@ class SearchController < ApplicationController
         search_in_factors_studied
         search_in_experimental_condition
     end
-    @results.select! {|item| !item.respond_to?(:scale_ids) item.scale_ids.include? params[:scale_id]} unless !params[:scale_id] and params[:scale_id] == 0
+    @results.select! {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? params[:scale_id]} unless !params[:scale_id] and params[:scale_id] == 0
   end
 
   private  
