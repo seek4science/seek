@@ -76,6 +76,7 @@ function validateModelFields(is_new_file) {
 
 function validateDataFileFields(is_new_file) {
     // only make this test if that's a new DataFile
+
     if(is_new_file) {
         if($('data_file_data').value.length == 0 && $('data_file_data_url').value.length == 0) {
             alert("Please specify the file to upload, or provide a URL");
@@ -107,3 +108,4 @@ function validateDataFileFields(is_new_file) {
     $('data_file_submit_btn').form.submit();
     return(true);
 }
+

@@ -138,7 +138,6 @@ class FavouriteGroupsController < ApplicationController
       }
     end
   end
-
   
   def destroy
     # these parameters will be needed for the client-side processing
@@ -157,8 +156,8 @@ class FavouriteGroupsController < ApplicationController
       }
     end
   end
-  
-  
+
+
   private
   
   def find_favourite_group

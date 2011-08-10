@@ -33,7 +33,8 @@
             <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
         </p>
         <p>
-            <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
+
+          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
         </p>
     </div>
     <% end -%>

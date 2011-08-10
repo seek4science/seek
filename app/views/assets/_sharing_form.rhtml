@@ -51,8 +51,7 @@
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
             - Your project, for
-          </label>
-             <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
+       <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource)) -%>
              </select>
              and all <%= Seek::Config.project_name %> users, for
@@ -350,6 +349,7 @@
 
   REVIEW_WORK_GROUP_LINK = '<%= review_work_group_path("type", "id", "access_type") -%>';
 
+  GET_PERMISSION_SUMMARY_LINK = '<%= request_permission_summary_path -%>'
 
 <% @policy.permissions.each do |p| -%>
   <% unless p.marked_for_destruction? %>
@@ -385,3 +385,7 @@
   // build custom permissions list and set relevant other options
   updateCustomSharingSettings();
 </script>
+
+
+
+
