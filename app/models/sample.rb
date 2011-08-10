@@ -5,6 +5,7 @@ class Sample < ActiveRecord::Base
   include Subscribable
 
   acts_as_scalable
+  attr_accessor :from_new_link
 
   belongs_to :specimen
   belongs_to :institution
@@ -18,6 +19,7 @@ class Sample < ActiveRecord::Base
   validates_uniqueness_of :title
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date
+
 
 
   has_and_belongs_to_many :tissue_and_cell_types

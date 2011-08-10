@@ -27,6 +27,8 @@ class SamplesController < ApplicationController
 
   def new
     @sample = Sample.new
+    @sample.from_new_link = params[:from_new_link]
+
     respond_to do |format|
       format.html # new.html.erb
       format.xml
@@ -41,8 +43,8 @@ class SamplesController < ApplicationController
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
     tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
     sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-    respond_to do |format|
-      if @sample.save
+
+    if @sample.save
         tissue_and_cell_types.each do |t|
           t_id, t_title = t.split(",")
           @sample.associate_tissue_and_cell_type(t_id, t_title)
@@ -51,14 +53,21 @@ class SamplesController < ApplicationController
           s = Sop.find(s_id)
           @sample.associate_sop(s) if s.can_view?
         end
+        if @sample.from_new_link=="true"
+           render :partial=>"assets/return_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
+        else
+          respond_to do |format|
         flash[:notice] = 'Sample was successfully created.'
         format.html { redirect_to(@sample) }
         format.xml { head :ok }
-      else
-
-        format.html { render :action => "new" }
-      end
+          end
+        end
+    else
+        respond_to do |format|
+          format.html { render :action => "new" }
+          end
     end
+
   end
 
 
