@@ -25,16 +25,3 @@
     </div>
   <% end  -%>
 <% end %>
-
-class SearchThingy
-   def search(text, type)
-     ... maigic
-   end
-end
-
-Class SearchWithScaleFiltering < SearchThingy
-   def search(text, type, scale)
-     results = super(text, type)
-     results.select(scale)
-   end
-end
