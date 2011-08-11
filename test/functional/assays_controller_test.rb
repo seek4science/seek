@@ -296,6 +296,8 @@ end
       }
       end
 
+      tissue_and_cell_type = Factory(:tissue_and_cell_type)
+
       assert_difference("Assay.count") do
       post :create,:assay=>{:title=>"test",
         :technology_type_id=>technology_types(:gas_chromatography).id,
@@ -303,7 +305,7 @@ end
         :study_id=>studies(:metabolomics_study).id,
         :assay_class=>assay_classes(:modelling_assay_class),
         :owner => Factory(:person)},
-        :assay_organism_ids => [Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,Factory(:tissue_and_cell_type).id,Factory(:tissue_and_cell_type).title].to_s
+        :assay_organism_ids => [Factory(:organism).id,Factory(:strain).title,Factory(:culture_growth_type).title,tissue_and_cell_type.id,tissue_and_cell_type.title].to_s
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
