@@ -1,0 +1,21 @@
+<script type="text/javascript">
+
+    var text,value,child_list_id;
+    text = "<%= child.title %>";
+    value = "<%= child.id %>";
+    child_type = "<%= child.class.name.downcase%>";
+    parent_type ="<%= parent%>";
+    if (!window.opener) {
+        alert("New "+ child_type +" was created but its parent window was closed.");
+        window.close();
+    }
+    child_list_id = window.opener.document.getElementById(parent_type + "_" + child_type + "_id");
+    child_list_id.appendChild(new Option(text, value));
+    child_list_id.selectedIndex = child_list_id.options.length - 1;
+    if (typeof(child_list_id.onchange)=="function"){
+     child_list_id.onchange() ;
+    }
+
+    alert("New "+ child_type +" was created! You can add it to your "+ parent_type +" now.");
+    window.close();
+</script>
