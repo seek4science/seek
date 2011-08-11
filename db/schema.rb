@@ -764,6 +764,21 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "updated_at"
   end
 
+  create_table "scales", :force => true do |t|
+    t.string   "title"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "scalings", :force => true do |t|
+    t.integer  "scale_id"
+    t.integer  "scalable_id"
+    t.integer  "person_id"
+    t.string   "scalable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
     t.text     "data"

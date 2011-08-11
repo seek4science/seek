@@ -25,6 +25,7 @@ class StudiesController < ApplicationController
   def new
     @study = Study.new
     @study.create_from_asset = params[:create_from_asset]
+    @study.new_link_from_assay = params[:new_link_from_assay]
     investigation = nil
     investigation = Investigation.find(params[:investigation_id]) if params[:investigation_id]
     
@@ -106,20 +107,28 @@ class StudiesController < ApplicationController
 
     @study.policy.set_attributes_with_sharing params[:sharing], @study.projects
 
-    respond_to do |format|
-      if @study.save
+
+  if @study.save
+    if @study.new_link_from_assay=="true"
+      render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
+    else
+      respond_to do |format|
         flash[:notice] = 'The study was successfully created.<br/>'
         if @study.create_from_asset=="true"
           flash.now[:notice] << "Now you can create new assay by clicking 'add an assay' button"
-        end
-        format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
+          format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
+        else
+        format.html { redirect_to study_path(@study) }
         format.xml { render :xml => @study, :status => :created, :location => @study }
-      else
+        end
+      end
+    end
+  else
+    respond_to do |format|
         format.html {render :action=>"new"}
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }
       end
     end
-
   end
 
   def investigation_selected_ajax
