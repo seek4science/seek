@@ -49,7 +49,7 @@ class SamplesController < ApplicationController
           @sample.associate_sop(s) if s.can_view?
         end
         if @sample.from_new_link=="true"
-           render :partial=>"assets/return_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
+           render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
         else
           respond_to do |format|
             flash[:notice] = 'Sample was successfully created.'
