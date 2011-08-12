@@ -201,5 +201,13 @@ class Policy < ActiveRecord::Base
     
     return p_settings
   end
+
+  def private?
+    sharing_scope == Policy::PRIVATE and permissions.empty?
+  end
+
+  def public?
+    sharing_scope == Policy::EVERYONE
+  end
   
 end

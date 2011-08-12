@@ -51,6 +51,10 @@ module Acts #:nodoc:
                  :conditions => {:predicate => Relationship::ATTRIBUTED_TO},
                  :dependent  => :destroy
 
+        has_many :inverse_relationships,
+                 :class_name => 'Relationship',
+                 :as => :object,
+                 :dependent => :destroy
 
         has_many :assay_assets, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
         has_many :assays, :through => :assay_assets
