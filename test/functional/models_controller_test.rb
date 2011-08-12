@@ -643,6 +643,22 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "removing an asset should not break show pages for items that have attribution relationships referencing it" do
+    model = Factory :model, :contributor => User.current_user
+    disable_authorization_checks do
+      attribution = Factory :model
+      model.relationships.create :object => attribution, :predicate => Relationship::ATTRIBUTED_TO
+      model.save!
+      attribution.destroy
+    end
+
+    get :show, :id => model.id
+    assert_response :success
+
+    model.reload
+    assert model.relationships.empty?
+  end
+
   test "cannot get preview_publish when not manageable" do
     login_as(:quentin)
     model=models(:teusink)
