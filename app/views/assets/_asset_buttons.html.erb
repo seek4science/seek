@@ -31,7 +31,7 @@
 
   <% if (asset.can_delete? or current_user.try(:admin?)) and asset.respond_to? :convert_to_presentation %>
      <li>
-       <%= image_tag_for_key "arrow_right", {:action => :convert_to_presentation,:id=>asset.id}, nil, {:title => "click it to convert this data file to presentations",:confirm => "Are you sure? The conversion is irreversible!"}, 'Convert to presentation'%>
+       <%= image_tag_for_key "arrow_right", {:controller=>"data_files",:action => "convert_to_presentation",:id=>asset.id}, nil, {:title => "click it to convert this data file to presentations",:confirm => "Are you sure? The conversion is irreversible!"}, 'Convert to presentation'%>
     </li>
   <% end %>
 </ul>
