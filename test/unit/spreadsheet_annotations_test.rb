@@ -7,18 +7,16 @@ class SpreadsheetAnnotationsTest < ActiveSupport::TestCase
   test "saving an annotation to a user" do
     ann = create_annotation(users(:datafile_owner), cell_ranges(:cell_range_1), "annotation", "this is an annotation value")
     assert ann.save
+    ann.reload
+    assert_equal ann.source, users(:datafile_owner)
   end
 
 
   test "source is saved correctly" do
     ann = create_annotation(users(:datafile_owner), cell_ranges(:cell_range_2), "annotation", "this is an annotation value")
+    assert ann.save
+    ann.reload
     assert_equal ann.source, users(:datafile_owner)
-  end
-
-
-  test "annotation cannot be created by anyone who cannot download the datafile" do
-    assert_equal false, create_annotation(users(:quentin), cell_ranges(:cell_range_1), "annotation", "this is an annotation value")
-    assert !ann.save
   end
 
 
