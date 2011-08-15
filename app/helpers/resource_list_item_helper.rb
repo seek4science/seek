@@ -90,7 +90,8 @@ module ResourceListItemHelper
 
   def list_item_authorized_attribute attribute, object, url='undefined', method = :title
     url = object if url == 'undefined'
-    list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, "Not available"
+    not_authorized_text = object.try(:title_is_public?) ? object.title : "Not available"
+    list_item_optional_attribute attribute, object.try(:can_view?) ? object.send(method) : nil, url, not_authorized_text
   end
 
   def list_item_optional_attribute attribute, value, url=nil, missing_value_text="Not specified"
