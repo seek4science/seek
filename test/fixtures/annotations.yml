@@ -3,15 +3,18 @@ annotation_1:
   annotatable: cell_range_1 (CellRange)
   attribute: annotation
   value: annotation_1_content (TextValue)
+  version: 1
 
 annotation_2:
   source: datafile_owner (User)
   annotatable: cell_range_2 (CellRange)
   attribute: annotation
   value: annotation_2_content (TextValue)
+  version: 1
 
 annotation_3:
   source: datafile_owner (User)
   annotatable: cell_range_3 (CellRange)
   attribute: annotation
   value: annotation_3_content (TextValue)
+  version: 1
