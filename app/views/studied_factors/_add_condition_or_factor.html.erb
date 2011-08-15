@@ -30,10 +30,12 @@
     <tr>
       <th>Item</th>
       <th>Unit</th>
-      <th>Start value</th>
-      <th>End value</th>
       <% if entity == "studied_factor" %>
-        <th>SD</th>
+         <th>Start value</th>
+         <th>End value</th>      
+         <th>SD</th>
+      <% elsif entity == 'experimental_condition' %>
+        <th>Value</th> 
       <% end %>
     </tr>
 
@@ -41,16 +43,15 @@
       <% if entity == "studied_factor" %>
         <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
-      <% elsif entity == "experimental_condition" %>
-        <td><%=  f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
+      <% elsif entity == 'experimental_condition' %>
+        <td><%= f.collection_select :measured_item_id, MeasuredItem.find(:all).sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "showOrHideSubstanceTextField('add_condition_or_factor_form')"} %></td>
         <td><%=  f.collection_select :unit_id, Unit.find(:all).sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
       <% end %>
 
       <td><%= f.text_field :start_value,:size=>4 %></td>
 
-      <td><%= f.text_field :end_value,:size=>4 %></td>
-
       <% if entity == "studied_factor" %>
+        <td><%= f.text_field :end_value,:size=>4 %></td>
         <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
@@ -58,21 +59,8 @@
     </tr>
   </table>
 
-  <div id="add_substance_concentration" class="add_substance_concentration" style="display: none;">
-      <div class="substance_condition_factor">
-         <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}-%>
-      </div>
-
-      <input type="button" class= "search_substance_info" value="Search in Sabio-RK" onclick="testAjax()"/>
-      <table class="substance_info">
-        <tr>
-          <th>Substance name</th>
-          <th>Sabiork ID</th>
-          <th>Chebi ID</th>
-          <th>Kegg ID</th>
-          <th>Synonyms</th>
-        </tr>
-      </table>
+  <div class="substance_condition_factor">
+     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}-%>
   </div>
 
   <div class='border_top'>
@@ -82,7 +70,7 @@
 <% end -%>
 
 <% form_remote_tag :url => path_to_create_from_existing do -%>
-   <% fses_or_ecs = fses_or_ecs_of_project asset_object.class.name, controller_name, asset_object.project_id
+   <% fses_or_ecs = fses_or_ecs_of_project asset_object, controller_name
       unless fses_or_ecs.blank? %>
          <div class="conditions_or_factors" >
             <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Or select from:</h4>
@@ -90,7 +78,8 @@
                grouped_fses_or_ecs = Hash[grouped_fses_or_ecs.sort]
                grouped_fses_or_ecs.each do |measured_item, fses_or_ecs|
                 fses_or_ecs = uniq_fs_or_ec fses_or_ecs
-                fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.substance.name.downcase}.to_s + b.measured_item.title)} %>
+                link_table_name = entity + 'links'
+                fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.send(link_table_name).first.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.send(link_table_name).first.substance.name.downcase}.to_s + b.measured_item.title)} %>
                 <ul class="measured_items">
                   <li>
                      <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear')">
@@ -105,11 +94,10 @@
             <%= hidden_field_tag "#{asset}_id", asset_object.id -%>
             <%= hidden_field_tag "version", display_asset.version  -%>
             <div class='border_top' style="float:right;margin-right: 13em; clear: both">
-               <%= submit_tag "Add", :style => "width:50px;font-weight:bold" %>
+               <%= submit_tag "Add", :style => "width:50px;font-weight:bold", :id => 'add_from_existing' %>
             </div>
          </div>
       <% end -%>
 <% end -%>
-
 
 

@@ -14,8 +14,8 @@
 %>
 <% remote_form_for entity, object,
   :url=> path_to_object,
-  :before=>"$('#{entity}_submit').disabled=true;",
-  :loaded=>"$('#{entity}_submit').disabled=false;",
+  :before=>"$('update_#{object.id}').disabled=true;",
+  :loaded=>"$('update_#{object.id}').disabled=false;",
   :html=>{:method=>:put, :id => "edit_condition_or_factor_#{object.id}_form", :style => "display:none"} do |f| -%>
 
 
@@ -43,18 +43,17 @@
 
       <td><%= f.text_field :start_value,:size=>4 %></td>
 
-      <td><%= f.text_field :end_value,:size=>4 %></td>
-
       <% if entity == "studied_factor" %>
-        <td><%= f.text_field :standard_deviation,:size=>4 %></td>
+          <td><%= f.text_field :end_value,:size=>4 %></td>
+          <td><%= f.text_field :standard_deviation,:size=>4 %></td>
       <% end %>
 
-      <td><%= f.submit "Update" %> or <%= link_to_function "Cancel" do |page|
+      <td><%= f.submit "Update", :id => "update_#{object.id}" %> or <%= link_to_function "Cancel" do |page|
           page.visual_effect :fade, "edit_condition_or_factor_#{object.id}_form"
           page["edit_on_#{object.id}"].toggle
           page["edit_off_#{object.id}"].toggle
           end
-      -%></td>
+      -%>
 
       <%= hidden_field_tag "version", display_asset.version -%>
     </tr>
@@ -66,3 +65,5 @@
   </div>
   <%= javascript_tag "showOrHideSubstanceTextField('edit_condition_or_factor_#{object.id}_form')"-%>
 <% end -%>
+
+

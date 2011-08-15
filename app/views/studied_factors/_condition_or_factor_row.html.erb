@@ -14,13 +14,20 @@
 
     <% end %>
     <li id="measured_item">
-      <%if  object.measured_item.title == 'concentration' and object.substance.try(:name)%>
-        <%= h object.substance.name + ' ' + object.measured_item.title  %>
+      <%if  object.measured_item.title == 'concentration' %>
+        <% substance = ''
+           link_table_name = "#{object.class.name.underscore}_links"
+           object.send(link_table_name).each do |ltn|
+             substance.concat(ltn.substance.name + '/')
+           end
+           substance.chop!
+        %>
+        <%= h substance + ' ' + object.measured_item.title  %>
       <%else%>
         <%= h object.measured_item.title %>
       <%end%>
     </li>
-    
+
     <li id="values">
       <!--don't show dimensionless unit-->
       <%= object.unit.symbol == 'dimensionless' ? "#{h object.range_text}" : "#{h object.range_text} #{object.unit.symbol}" %>
@@ -32,7 +39,7 @@
       </li>
     <% end %>
     <% if show_delete %>
-        <li id="delete" class="destroy_condition_or_factor">
+        <li id="delete_<%= object.id -%>" class="destroy_condition_or_factor">
            <%=  link_to_remote image("destroy",:alt=>"Delete",:title=>"Delete this entry"),
              :url => { :action => "destroy", :id => object.id, "#{asset}_id"=>asset_object.id},
              :confirm=>"Are you sure?",:method=>:delete

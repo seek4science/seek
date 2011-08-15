@@ -231,10 +231,10 @@ end
     f.end_value 10
     f.standard_deviation 2
     f.data_file_version 1
-    f.association :measured_item, :factory => :measured_item
-    f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
-    f.association :data_file, :factory => :data_file
+    f.association :measured_item
+    f.association :unit
+    f.studied_factor_links {[StudiedFactorLink.new(:substance => Factory(:compound))]}
+    f.association :data_file
   end
 
   Factory.define(:measured_item) do |f|
@@ -250,13 +250,22 @@ end
     f.sequence(:name) {|n| "glucose #{n}"}
   end
 
- #Experimental condition
+  Factory.define(:studied_factor_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :studied_factor
+  end
+
+  #Experimental condition
   Factory.define(:experimental_condition) do |f|
     f.start_value 1
-    f.end_value 10
     f.sop_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
     f.association :sop, :factory => :sop
+    f.experimental_condition_links {[ExperimentalConditionLink.new(:substance => Factory(:compound))]}
+  end
+
+  Factory.define(:experimental_condition_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :experimental_condition
   end

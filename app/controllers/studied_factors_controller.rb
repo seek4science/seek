@@ -1,4 +1,6 @@
 class StudiedFactorsController < ApplicationController
+  include Seek::FactorStudied
+
   before_filter :login_required
   before_filter :find_data_file_auth
   before_filter :create_new_studied_factor, :only=>[:index]
@@ -17,7 +19,10 @@ class StudiedFactorsController < ApplicationController
     @studied_factor.data_file_version = params[:version]
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
-    @studied_factor.substance = find_or_create_substance new_substances,known_substance_ids_and_types
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types
+    substances.each do |substance|
+      @studied_factor.studied_factor_links.build(:substance => substance )
+    end
 
     render :update do |page|
       if @studied_factor.save
@@ -46,9 +51,12 @@ class StudiedFactorsController < ApplicationController
     studied_factor_ids.each do |id|
       studied_factor = StudiedFactor.find(id)
       new_studied_factor = StudiedFactor.new(:measured_item_id => studied_factor.measured_item_id, :unit_id => studied_factor.unit_id, :start_value => studied_factor.start_value,
-                                             :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation, :substance_type => studied_factor.substance_type, :substance_id => studied_factor.substance_id)
+                                             :end_value => studied_factor.end_value, :standard_deviation => studied_factor.standard_deviation)
       new_studied_factor.data_file=@data_file
       new_studied_factor.data_file_version = params[:version]
+      studied_factor.studied_factor_links.each do |sfl|
+         new_studied_factor.studied_factor_links.build(:substance => sfl.substance)
+      end
       new_studied_factors.push new_studied_factor
     end
     #
@@ -81,15 +89,25 @@ class StudiedFactorsController < ApplicationController
 
     new_substances = params["#{@studied_factor.id}_substance_autocompleter_unrecognized_items"] || []
     known_substance_ids_and_types = params["#{@studied_factor.id}_substance_autocompleter_selected_ids"] || []
-    substance = find_or_create_substance new_substances,known_substance_ids_and_types
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types
 
-    params[:studied_factor][:substance_id] = substance.try :id
-    params[:studied_factor][:substance_type] = substance.class.name == nil.class.name ? nil : substance.class.name
+    #delete the old studied_factor_links
+    @studied_factor.studied_factor_links.each do |sfl|
+      sfl.destroy
+    end
+
+    #create the new studied_factor_links
+    studied_factor_links = []
+    substances.each do |substance|
+      studied_factor_links.push StudiedFactorLink.new(:substance => substance)
+    end
+    @studied_factor.studied_factor_links = studied_factor_links
 
     render :update do |page|
       if  @studied_factor.update_attributes(params[:studied_factor])
         page.visual_effect :fade,"edit_condition_or_factor_#{@studied_factor.id}_form"
-        page.replace_html "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
+        page.call "autocompleters['#{@studied_factor.id}_substance_autocompleter'].deleteAllTokens"
+        page.replace "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
       else
         page.alert(@studied_factor.errors.full_messages)
       end

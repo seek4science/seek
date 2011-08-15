@@ -1,0 +1,7 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+experimental_condition_concentration_glucose_link:
+  substance: compound_glucose
+  substance_type: Compound
+  experimental_condition: experimental_condition_concentration_glucose
+

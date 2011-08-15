@@ -59,7 +59,8 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @publication.save
-        result.authors.each do |author|
+        authors = !result.authors.blank? ? result.authors : (@publication.pubmed_id ? (get_pubmed_authors_from_xml result.xml) : (get_doi_authors_from_xml result.xml))
+        authors.each do |author|
           pa = PublicationAuthor.new()
           pa.publication = @publication
           pa.first_name = author.first_name
@@ -219,7 +220,8 @@ class PublicationsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => result.authors} }
+        authors = !result.authors.blank? ? result.authors : (protocol == "pubmed" ? (get_pubmed_authors_from_xml result.xml) : (get_doi_authors_from_xml result.xml))
+        format.html { render :partial => "publications/publication_preview", :locals => { :publication => @publication, :authors => authors} }
       end
     end
     
@@ -284,13 +286,14 @@ class PublicationsController < ApplicationController
     doi = @publication.doi
     if pubmed_id
       query = PubmedQuery.new("seek",Seek::Config.pubmed_api_email)
-      result = query.fetch(pubmed_id)      
+      result = query.fetch(pubmed_id)
     elsif doi
       query = DoiQuery.new(Seek::Config.crossref_api_email)
       result = query.fetch(doi)
     end      
     unless result.nil?
-      result.authors.each do |author|
+      authors = !result.authors.blank? ? result.authors : (@publication.pubmed_id ? (get_pubmed_authors_from_xml result.xml) : (get_doi_authors_from_xml result.xml))
+      authors.each do |author|
         pa = PublicationAuthor.new()
         pa.publication = @publication
         pa.first_name = author.first_name
@@ -348,5 +351,50 @@ class PublicationsController < ApplicationController
         raise "Error - No publication could be found with that DOI"
       end  
     end
+  end
+  #some PUBMED/DOI fields cant be retrieved from direct calls on the fetching of query result (because the mistakes of parsing xml), but these fields are also store in xml field
+  def get_pubmed_authors_from_xml xml_node
+    authors = []
+    unless xml_node.blank?
+      xml_node.find("//PubmedArticle/MedlineCitation/Article/AuthorList/Author").collect do |author|
+        last_name = ''
+        fore_name = ''
+        initials = ''
+        unless author["ValidYN"] == "N"
+          author.children.each do |child|
+            if child.name == 'LastName'
+              last_name = child.content
+            elsif child.name == 'ForeName'
+              fore_name = child.content
+            elsif child.name == 'Initials'
+              initials = child.content
+            end
+          end
+        end
+        authors.push PubmedAuthor.new(fore_name, last_name, initials)
+      end
+    end
+    return authors
+  end
+
+  def get_doi_authors_from_xml xml_node
+    authors = []
+    unless xml_node.blank?
+      xml_node.find("//journal/journal_article/contributors/person_name").collect do |author|
+        last_name = ''
+        fore_name = ''
+        if author.attributes['contributor_role'] == 'author'
+          author.children.each do |child|
+            if child.name == 'surname'
+              last_name = child.content
+            elsif child.name == 'given_name'
+              fore_name = child.content
+            end
+          end
+          authors.push DoiAuthor.new(fore_name, last_name)
+        end
+      end
+    end
+    return authors
   end
 end

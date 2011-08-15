@@ -1,0 +1,6 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+studied_factor_concentration_glucose_link:
+  substance: compound_glucose
+  substance_type: Compound
+  studied_factor: studied_factor_concentration_glucose

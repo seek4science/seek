@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110721091613) do
+ActiveRecord::Schema.define(:version => 20110727154707) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -254,6 +254,14 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.integer "event_id"
   end
 
+  create_table "experimental_condition_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "experimental_condition_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "experimental_conditions", :force => true do |t|
     t.integer  "measured_item_id"
     t.float    "start_value"
@@ -263,8 +271,6 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "sop_version"
-    t.integer  "substance_id"
-    t.string   "substance_type"
   end
 
   add_index "experimental_conditions", ["sop_id"], :name => "index_experimental_conditions_on_sop_id"
@@ -382,6 +388,22 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.integer  "policy_id"
     t.integer  "contributor_id"
     t.string   "contributor_type"
+  end
+
+  create_table "mapping_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "mapping_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "mappings", :force => true do |t|
+    t.integer  "sabiork_id"
+    t.string   "chebi_id"
+    t.string   "kegg_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "measured_items", :force => true do |t|
@@ -774,6 +796,14 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.datetime "updated_at"
   end
 
+  create_table "studied_factor_links", :force => true do |t|
+    t.string   "substance_type"
+    t.integer  "substance_id"
+    t.integer  "studied_factor_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "studied_factors", :force => true do |t|
     t.integer  "measured_item_id"
     t.float    "start_value"
@@ -785,8 +815,6 @@ ActiveRecord::Schema.define(:version => 20110721091613) do
     t.datetime "updated_at"
     t.float    "standard_deviation"
     t.integer  "data_file_version"
-    t.integer  "substance_id"
-    t.string   "substance_type"
   end
 
   add_index "studied_factors", ["data_file_id"], :name => "index_studied_factors_on_data_file_id"

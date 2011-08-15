@@ -21,6 +21,8 @@ UPDATE_FAVOURITE_GROUP_LINK = null;
 
 REVIEW_WORK_GROUP_LINK = null;
 
+GET_PERMISSION_SUMMARY_LINK = null
+
 
 // declarations for autocompleters
 // (IDs can be any strings - the only constraint is that they should hold unique names for each autocompleter)
@@ -43,6 +45,7 @@ var receivedProjectInstitutions = null;
 
 var currentFavouriteGroupSettings = {};
 
+var people_in_group = null
 
 function init_sharing() {
     DETERMINED_BY_GROUP = parseInt($('const_determined_by_group').value);
@@ -84,8 +87,8 @@ function updateCustomSharingSettings() {
     else {
         $('shared_with_list').innerHTML = shared_with;
     }
-  
-  
+
+
     // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
     $('sharing_permissions_contributor_types').value = "";
     $('sharing_permissions_values').value = "";
@@ -146,7 +149,7 @@ function deleteContributor(contributor_type, contributor_id) {
     // (the key can stay there, even if the count goes down to zero)
     permissions_for_set[contributor_type]--;
   
-    // remove the actual record for the contributor
+    // remove record for the contributor
     for(var i = 0; i < permission_settings[contributor_type].length; i++)
         if(permission_settings[contributor_type][i][1] == contributor_id) {
             permission_settings[contributor_type].splice(i, 1);
@@ -890,6 +893,77 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
   
     return(true);
 }
+
+function permissionSummary(url){
+    //get sharing_scope
+    var sharing_scope_elements = document.getElementsByName('sharing[sharing_scope]')
+    var sharing_scope = ''
+    for(var i = 0; i < sharing_scope_elements.length; i++) {
+        if (sharing_scope_elements[i].checked){
+            sharing_scope = sharing_scope_elements[i].value
+            break;
+        }
+    }
+    //get access_type
+    var access_type = $('access_type_select_'.concat(sharing_scope)).options[$('access_type_select_'.concat(sharing_scope)).selectedIndex].value
+    access_type = parseInt(access_type)
+
+    //if white list is used
+    var use_white_list = $('cb_use_whitelist').checked
+    //if black list is used
+    var use_black_list = $('cb_use_blacklist').checked
+
+    //the project that the item chooses
+    var project_id = $('project_selector').options[$('project_selector').selectedIndex].value
+    project_id = parseInt(project_id)
+    var project_access_type = $('sharing_your_proj_access_type').options[$('sharing_your_proj_access_type').selectedIndex].value
+    project_access_type = parseInt(project_access_type)
+
+    //permission
+    var contributor_types = $('sharing_permissions_contributor_types').value
+    var contributor_values = $('sharing_permissions_values').value
+
+    var sharing_params = {};
+    sharing_params['sharing_scope'] = parseInt(sharing_scope);
+    sharing_params['access_type'] = access_type;
+    sharing_params['project_id'] = project_id;
+    sharing_params['project_access_type'] = project_access_type;
+    sharing_params['contributor_types'] = contributor_types;
+    sharing_params['contributor_values'] = contributor_values;
+    sharing_params['use_whitelist'] = use_white_list;
+    sharing_params['use_blacklist'] = use_black_list;
+
+    var request = new Ajax.Request(GET_PERMISSION_SUMMARY_LINK,
+    {
+        method: 'get',
+        parameters: {
+            sharing:Object.toJSON(sharing_params)
+        },
+        onSuccess: function(transport){
+            // "true" parameter to evalJSON() activates sanitization of input
+            var data = transport.responseText.evalJSON(true);
+            if (data.status == 200) {
+                people_in_group = data.people_in_group;
+            }
+            else {
+                error_status = data.status;
+                error_message = data.error
+                alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
+            }
+        },
+        onFailure: function(transport){
+           alert('Something went wrong, please try again...');
+        }
+
+    });
+    //need to wait until people in group got result from the ajax request, before opening the model dialog
+    var result = window.showModalDialog(url, people_in_group, 'dialogWidth:1000px; dialogHeight:800px; dialogLeft:600; dialogTop:400; resizable:yes')
+    return result
+}
+
+
+
+
 
 
 

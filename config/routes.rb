@@ -24,7 +24,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post, :preview_permissions => :get},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
   end
   
@@ -110,8 +110,10 @@ ActionController::Routing::Routes.draw do |map|
   
   
   # review members of workgroup (also of a project / institution) popup
-  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }  
-  
+  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }
+
+  map.request_permission_summary '/policies/request_permission_summary', :controller => 'policies', :action => 'request_permission_summary', :conditions => { :method => :get }
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
