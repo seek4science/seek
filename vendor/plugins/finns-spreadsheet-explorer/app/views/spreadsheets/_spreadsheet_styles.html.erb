@@ -1,0 +1,11 @@
+<style type="text/css" id="generated_spreadsheet_styles">
+  <% styles.each_key do |style_name| -%>
+    td.<%= style_name -%> {
+    <% styles[style_name].attributes.each_key do |a| -%>
+      <%#Borders are removed here because they break the table layout in chrome and possibly IE-%>
+      <%= a + ": " + styles[style_name][a] + ";" unless a.include?("border")%>
+    <% end %>
+    }
+  <% end %>
+</style>
+  

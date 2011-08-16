@@ -1,0 +1,15 @@
+<div id="annotation_container" style="display:none">
+  <div id="annotation_drag"><a href="#" onclick="$j('#annotation_container').hide();">Close</a></div>
+  <%= render :partial => "spreadsheets/annotation_javascript", :locals => {:annotations => annotations} %>
+  <%= render :partial => "annotations/annotation", :collection => annotations %>
+</div>
+<div id="annotation_overview" class="spreadsheet_popup" style="display:none">
+  <div class="spreadsheet_box_title">
+    <div style="float: left">Listing Annotations</div>
+    <div style="float: right"><a href="#" onclick="$j('#annotation_overview').hide(); return false;">Close</a></div>
+    <br style="clear:both"/>
+  </div>
+  <table>
+    <colgroup><col/><col/><col/></colgroup>
+  </table>
+</div>

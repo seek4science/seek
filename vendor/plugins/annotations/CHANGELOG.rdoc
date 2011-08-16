@@ -1,0 +1,31 @@
+= Changelog
+
+== 0.2
+*Main change*: 
+Annotation values are now polymorphic rather than just plain strings. 
+Some basic +act_as_annotation_value+ models have been introduced for this. 
+Note: this has affected all methods that take in or work with annotation values. 
+See below for further details.
+
+* New mixin module: +acts_as_annotation_value+.
+* New basic annotation value models: +TextValue+ and +NumberValue+ (but note that you can use any model as a value by specifying +acts_as_annotation_value+ on it).
+* Removed +Annotation::find_annotatables_with_attribute_name_and_value+.
+* Removed +Annotation::find_annotatables_with_attribute_names_and_values+.
+* Removed +with_annotations_with_attribute_name_and_value+ in the +acts_as_annotatable+ module.
+* +Annotations::Config::value_restrictions+ has been renamed to +Annotations::Config::content_restrictions+
+* Latest migration version = v3
+* NOTE: the new migration script will keep the old +value+ column data in a new +old_value+ column for EXISTING annotations only. This can be used for verification/text purposes.
+
+== 0.1.1
+* Added +identifier+ to +AnnotationAttribute+. This can be used to specify what ontology term / URI the attribute can be
+  uniquely identified using. See +AnnotationAttribute#before_validation+ for more information on how this identifier
+  will be generated if not specified manually.
+* Changed the +annotations+ association in +act_as_annotation_source+ to +annotations_by+, to fix cases when a model has both
+  +acts_as_annotatable+ AND +acts_as_annotation_source+.
+* Latest migration version = v2
+
+== 0.1.0 (July 23rd 2009)
+* Initial import from the BioCatalogue codebase.
+* Improved documentation. See README.rdoc for more info on features and usage.
+* Latest migration version = v1
+              

@@ -1,0 +1,20 @@
+cell_range_1:
+  worksheet: worksheet_1
+  start_row: 3
+  start_column: 4
+  end_row: 4
+  end_column: 5
+
+cell_range_2:
+  worksheet: worksheet_1
+  start_row: 4
+  start_column: 4
+  end_row: 5
+  end_column: 5
+
+cell_range_3:
+  worksheet: worksheet_2
+  start_row: 10
+  start_column: 2
+  end_row: 13
+  end_column: 4

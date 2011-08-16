@@ -1,7 +1,8 @@
-	# Filters added to this controller apply to all controllers in the application.
+# Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
-
 class ApplicationController < ActionController::Base
+  require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'application_controller')
+
   skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
 
   self.mod_porter_secret = PORTER_SECRET
@@ -115,7 +116,11 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+          if eval("#{controller_name.camelcase}Controller.new").respond_to?("index")
+            redirect_to polymorphic_path(controller_name)
+          else
+            redirect_to root_url
+          end
         end
         format.json { render :json => {:status => 401, :error_message => flash[:error] } }
       end
@@ -202,7 +207,7 @@ class ApplicationController < ActionController::Base
           'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
         'view'
 
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',

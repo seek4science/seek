@@ -1,0 +1,26 @@
+<script type="text/javascript">
+var annotation_sources = [];
+var as;
+
+<% annotations.reverse.group_by(&:source).each do |source, annotation_subset| -%>
+  as = new annotation_source(<%= source.id -%>, '<%= source.class.name -%>', '<%= source.person.name -%>', '<%= polymorphic_path(source.person) -%>');
+  annotation_sources.push(as);
+  <% annotation_subset.each do |a| -%>
+    as.annotations.push(new annotation(<%= a.id -%>, '<%= a.attribute.name -%>', <%= a.annotatable.worksheet.sheet_number -%>, '<%= a.annotatable.cell_range -%>', '<%= h escape_javascript a.value.text -%>', '<%= time_ago_in_words(a.created_at) -%> ago'));
+  <% end -%>
+<% end -%>
+
+$j(document).ready(function () {
+  var oldAnnotatedCells = $j("td.annotated_cell").removeClass("annotated_cell");
+
+  bindAnnotations(annotation_sources);
+
+  //Flash the annotations that were added/deleted
+  var newAnnotatedCells = $j("td.annotated_cell");
+  if(newAnnotatedCells != oldAnnotatedCells) {
+    oldAnnotatedCells.not(newAnnotatedCells).unbind("click").effect("highlight", {color: "#FF0000"}, 600)
+    newAnnotatedCells.not(oldAnnotatedCells).effect("highlight", {color: "#00FF00"}, 600);
+  }
+});
+
+</script>
