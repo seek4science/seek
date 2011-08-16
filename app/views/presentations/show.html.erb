@@ -96,38 +96,4 @@
       }
 
   }
-  function view_presentation() {
-      if (fp == null) {
-          fp = new FlexPaperViewer(
-                  '/swf/FlexPaperViewer',
-                  'viewerPlaceHolder', { config : {
-              SwfFile : '/swf/presentations/<%= @presentation.title %>.swf',
-              Scale : 0.6,
-              ZoomTransition : 'easeOut',
-              ZoomTime : 0.5,
-              ZoomInterval : 0.2,
-              FitPageOnLoad : true,
-              FitWidthOnLoad : false,
-              PrintEnabled : true,
-              FullScreenAsMaxWindow : false,
-              ProgressiveLoading : false,
-              MinZoomSize : 0.2,
-              MaxZoomSize : 5,
-              SearchMatchAll : false,
-              InitViewMode : 'Portrait',
-
-              ViewModeToolsVisible : true,
-              ZoomToolsVisible : true,
-              NavToolsVisible : true,
-              CursorToolsVisible : true,
-              SearchToolsVisible : true,
-
-              localeChain: 'en_US'
-          }});
-      }
-
-
-      toggle_asset_view_link_title();
-
-  }
   </script>
