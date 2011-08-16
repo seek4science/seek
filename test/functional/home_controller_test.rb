@@ -101,7 +101,8 @@ class HomeControllerTest < ActionController::TestCase
     assert_select 'a',:text=>/Forum/,:count=>1
   end
 
-  test "should display home description" do
+unless  Seek::Config.is_virtualliver
+     test "should display home description" do
     Seek::Config.home_description="Blah blah blah - http://www.google.com"
     logout
 
@@ -156,6 +157,8 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
   end
 
+
+
   test "should show the content of project news and community news with the configurable number of entries" do
     #project news
     Seek::Config.project_news_enabled=true
@@ -181,6 +184,7 @@ class HomeControllerTest < ActionController::TestCase
     assert_select 'div#project_news ul>li', 5
     assert_select 'div#community_news ul>li', 7
   end
+end
 
   test 'should show recently added and downloaded items with the filter can_view?' do
     login_as(:aaron)
