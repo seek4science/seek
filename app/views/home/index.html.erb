@@ -5,10 +5,12 @@
       <%= site_annoucements_headline %>
     </p>
   <% end -%>
-
-  <%= render :partial=>"alternative_home_2" -%>
-
-  <% if logged_in? and try_block{current_user.person.member?} -%>
+  <% if Seek::Config.is_virtualliver %>
+  <%= render :partial=>"alternative_home_vl" -%>
+  <% else %>
+    <%= render :partial=>"alternative_home" -%>
+  <% end %>
+  <% if logged_in? and try_block{current_user.person.member?} and !Seek::Config.is_virtualliver-%>
     <h2 style="float:left; margin:1.5em 1.5em 2em">
     <%= link_to "Recent changes in your project and across #{Seek::Config.project_name}", :controller => 'home', :action => 'recent_changes' -%>
     </h2>
