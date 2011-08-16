@@ -87,6 +87,9 @@ ActionController::Routing::Routes.draw do |map|
   map.delete_search '/search/delete',:controller=>'search',:action=>'delete'
   #map.saved_search '/search/:id',:controller=>'search',:action=>'show'
 
+  map.scale_search '/scale_search/' ,:controller=>'home',:action=>"scale_search"
+
+
   map.svg 'svg/:id.:format',:controller=>'svg',:action=>'show'
 
   #tags
