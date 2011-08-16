@@ -3,7 +3,7 @@ module OnlyWritesUnique
   def concat_with_ignore_duplicates *args
     if @reflection.options[:unique]
       load_target
-      args = flatten_deeper(args).reject {|record| target.include? record}
+      args = flatten_deeper(args).reject {|record| target.include? record}.uniq
     end
     concat_without_ignore_duplicates *args
   end
