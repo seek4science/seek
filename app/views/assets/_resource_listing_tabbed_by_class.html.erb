@@ -10,7 +10,11 @@
 <% authorization_already_done ||= false -%>
 
 <script type="text/javascript">
-  tabber_ids.push("<%= tabs_id -%>");  
+  tabber_ids.push("<%= tabs_id -%>");
+
+
+  displayTabs();
+
 </script>
 
 <% total_count = 0 %>
@@ -75,3 +79,4 @@
 <% else -%>
   <span class="none_text">No items.</span>
 <% end -%>
+

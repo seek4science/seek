@@ -34,7 +34,7 @@ Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 
 Seek::Config.default :presentations_enabled,true
-Seek::Config.default :scales,["Organ","Tissue","Cellular","Molecular"]
+Seek::Config.default :scales,["organism","liver","liverLobe","liverLobule","intercellular","cell"]
 
 # Branding
 Seek::Config.default :project_name,'SysMO'

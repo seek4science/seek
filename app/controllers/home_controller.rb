@@ -61,6 +61,49 @@ class HomeController < ApplicationController
     end
   end
 
+
+  def scale_search
+    @scale = Scale.find_by_title(params[:scale_type])
+    scalings = @scale.scalings.select { |s| !s.scalable.nil? }
+    @scaled_objects = scalings.select(&:can_view?).collect { |scaling| scaling.scalable }.uniq
+
+    resource_hash={}
+
+    @scaled_objects.each do |res|
+      resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
+      resource_hash[res.class.name][:items] << res
+    end
+
+
+     render :update  do |page|
+
+      page.replace_html "scaled_items_id", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash,
+                           :narrow_view => true,
+                           :authorization_already_done => true}
+
+
+
+
+#
+#     p "###########################"
+#      page.call 'Element.replace', 'my_element', "My content to replace with."
+#
+#
+#      page.call "Element.append","jQuery(\"#scaled_items_id\").html", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash,
+#                           :narrow_view => true,
+#                           :authorization_already_done => true}
+#
+#      puts page
+#       p "ddddddddddd"
+
+
+
+   end
+
+  end
+
+
+
   private
 
   RECENT_SIZE=3

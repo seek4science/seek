@@ -46,12 +46,19 @@ module Seek
   module Propagators
     def scales_propagate
       if ActiveRecord::Base.connection.table_exists? 'scales'
-        existing_scales = Scale.all.collect(&:title)
-        new_scales = self.scales - existing_scales
+        existing_scale_titles = Scale.all.map(&:title)
+        new_scale_titles = self.scales - existing_scale_titles
+        old_scale_titles = existing_scale_titles - self.scales
+        old_scales = []
+        old_scale_titles.each do |scale|
+          old_scales <<  Scale.find(:all,:conditions=>["BINARY title =?",scale])
+        end
 
-        unless new_scales.blank?
-          new_scales.each do |scale|
-            Scale.create!(:title=>scale)
+        Scale.destroy_all(:id=>old_scales.flatten.map(&:id))
+
+        if !new_scale_titles.blank?
+          new_scale_titles.each do |scale|
+            Scale.create!(:title=>scale) if Scale.find(:first,:conditions=>["BINARY title =?",scale]).nil?
           end
         end
       end
