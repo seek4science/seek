@@ -24,6 +24,14 @@ module Acts
         true
       end
 
+      def private?
+        policy.private?
+      end
+
+      def public?
+        policy.public?
+      end
+
       def default_policy
         Policy.default
       end

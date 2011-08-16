@@ -237,6 +237,10 @@ class Person < ActiveRecord::Base
     can_manage? user
   end
 
+  def title_is_public?
+    true
+  end
+
   private
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
