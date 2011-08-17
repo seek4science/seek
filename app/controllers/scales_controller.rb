@@ -26,13 +26,21 @@ class ScalesController < ApplicationController
    def scale_search
     @scale = Scale.find_by_title(params[:scale_type])
     scalings = @scale.scalings.select { |s| !s.scalable.nil? }
-    @scaled_objects = scalings.collect { |scaling| scaling.scalable }.uniq.select(&:can_view?)
+    @scaled_objects = scalings.collect { |scaling| scaling.scalable }.uniq
 
     resource_hash={}
     @scaled_objects.each do |res|
       resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
       resource_hash[res.class.name][:items] << res
     end
+     resource_hash.each_value do |res|
+        unless res[:items].empty?
+        total_count = res[:items].size
+        res[:items] = res[:items].select &:can_view?
+        res[:hidden_count] = total_count - res[:items].size
+      end
+     end
+
 
     render :update do |page|
       page.replace_html "scaled_items_id", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash, :narrow_view => true, :authorization_already_done => true}
