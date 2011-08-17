@@ -14,7 +14,7 @@
 <% allow_nil ||= false %>
 <% possibilities = Project.all %>
 
-<%= fancy_multiselect resource, :projects, :possibilities => possibilities, :selected => selected_project_ids, :required => allow_nil %>
+<%= fancy_multiselect resource, :projects, :possibilities => possibilities, :selected => selected_project_ids, :required => (!allow_nil) %>
 
 
 
