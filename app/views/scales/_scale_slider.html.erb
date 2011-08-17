@@ -36,23 +36,12 @@
  </div>
 
 <script type="text/javascript">
-    var scales_list,children,index;
-
-    scales_list = document.getElementById("scale_list");
-    children= scales_list.getElementsByTagName("LI");
-
-
-    function scales_onclick(f) {
-        for (index = 0; index < children.length; index++) {
-            children[index].onclick = f
-        }
+    function scales_onclick() {
+        $$('#scale_list li').each(function(item){
+          item.onclick = function(){
+            <%= scale_slider_function %>
+            return false;
+          };
+        });
     }
-
-    <% scale_slider_function ||= false
-   if scale_slider_function  %>
-      scales_onclick(function() {
-        <%= scale_slider_function %>
-        return false;
-      });
-<% end%>
 </script>
