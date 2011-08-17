@@ -1,40 +1,8 @@
 
-<%= javascript_include_tag 'tabber-minimized'%>
-<%= javascript_include_tag 'slider/jquery-1.5.1.min.js','slider/jquery-ui-1.8.14.custom.min.js','slider/liver.js' %>
-<%= stylesheet_link_tag  "slider/liver" %>
-
-<div id="wrapper">
-             <h1>Search Items by Scales</h1>
-			<!--####### THE COMPLETE LIVER-->
-			 <div id="zoom" >
-                 <%= image_tag "slider/vitruvian_man.png",{:alt=>"vitruvian_man.png",:id=>"bild-0"}%>
-                 <%= image_tag "slider/liver2.bmp" ,{:alt=>"liver2.bmp",:id=>"bild-1"}%>
-                 <%= image_tag "slider/lebertem.jpg" ,{:alt=>"liver1.bmp",:id=>"bild-2"}%>
-                 <%= image_tag "slider/Lobule.jpg" ,:alt=>"liver1.bmp",:id=>"bild-3"%>
-                 <%= image_tag "slider/70109-004-41D7A01E.jpg" ,:alt=>"liver1.bmp",:id=>"bild-4"%>
-                 <%= image_tag "slider/Hepatocyte.gif" ,:alt=>"liver-illustration.png",:id=>"bild-5"%>
-			</div>
-
-
-
-			<div id="options">
-				<div id="plus">+</div>
-				<ul id="scale_list" class="step">
-
-					<li id="cell">cell-</li>
-					<li id="intercellular" >intercellular -</li>
-					<li id="liverLobule">liver lobule -</li>
-					<li id="liverLobe">liver lobe -</li>
-					<li id="liver">liver -</li>
-					<li id="organism" >organism -</li>
-
-				</ul>
-				<div id="slider"></div>
-
-				<div id="minus">-</div>
-			</div>
-
- </div>
+<%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => remote_function(
+        :url=>{:action=>'scale_search', :controller=>'scales'},
+        :with=>"'scale_type='+this.id",
+        :before=>"show_ajax_loader('scaled_items_id')")} %>
 
 <!--Inserting the javascripts for loading tabber dynamically-->
  <div id="js_for_tabber"></div>
@@ -51,26 +19,6 @@
                            :authorization_already_done => true} -%>
 
  </div>
-<script type="text/javascript">
-    var scales_list = document.getElementById("scale_list");
-    var children = scale_list.getElementsByTagName("LI");
-    var index = 0;
-
-    function scales_onclick() {
-        for (index = 0; index < children.length; index++) {
-            children[index].onclick = function() {
-
-            <%= remote_function(
-                :url=>{:action=>'scale_search',:controller=>'scales'},
-                :with=>"'scale_type='+this.id",
-                :before=>"show_ajax_loader('scaled_items_id')")%>
-
-
-            }
-        }
-    }
-    scales_onclick();
-</script>
 
 
 
