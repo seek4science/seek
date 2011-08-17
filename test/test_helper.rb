@@ -74,6 +74,9 @@ class ActiveSupport::TestCase
     File.open "#{RAILS_ROOT}/tmp/#{prefix}-graph.html", 'w' do |file|
       RubyProf::GraphHtmlPrinter.new(results).print(file)
     end
+    File.open "#{RAILS_ROOT}/tmp/#{prefix}-flat.txt", 'w' do |file|
+      RubyProf::FlatPrinter.new(results).print(file)
+    end
   end
 
   def run_secondary_tests?
