@@ -13,19 +13,17 @@ jQuery(document).ready(function($) {
             var img = '#' + $(this).attr('id');
             imgarray.push(img);
         });
-        var infoarray = [];
 
-        /* alert(infoarray + imgarray);  */
-
+        // same order as scales_arr
+        imgarray.reverse();
 
         //Variablen festlegen, sichtabres Bild ist immer zuerst Bild-0
-        var curImage = imgarray[0];
-        var curInfo = infoarray[0];
+        var curImage = imgarray[5];
         var previousValue;
         var val;
 
         // slider value<=>scale string
-        var scales_arr = ["organism","liver","liverLobe","liverLobule","intercellular","cell"];
+        var scales_arr = ["cell","intercellular","liverLobule","liverLobe","liver","organism"];//["organism","liver","liverLobe","liverLobule","intercellular","cell"];
         var scale_id;
 
 
@@ -36,7 +34,7 @@ jQuery(document).ready(function($) {
             orientation: "vertical",
             min: 0,
             max: 5,
-            value: 0,
+            value: 5,
             animate:true,
             slide: function (event, ui) {
                 previousValue = val;
@@ -51,20 +49,16 @@ jQuery(document).ready(function($) {
         //valCheck() just checks the variable val and then runs a function called imageSwap, passing in the current image and the image we want to display,
         //then we change the current image to the new image.
         function valCheck() {
-            if (val < previousValue) {
+            if (val > previousValue) {
                 imageSwap3(curImage, imgarray[val]);
                 curImage = imgarray[val];
-                infoSwap(curInfo, infoarray[val]);
-                curInfo = infoarray[val];
-                //alert( val+'<'+previousValue);
+
             }
 
             else {
                 imageSwap(curImage, imgarray[val]);
                 curImage = imgarray[val];
-                infoSwap(curInfo, infoarray[val]);
-                curInfo = infoarray[val];
-                //alert( val+'>'+previousValue);
+
 
             }
 
@@ -116,7 +110,6 @@ jQuery(document).ready(function($) {
         }
 
         function imageSwap3(curImage, newImage) {
-
             $(curImage).css({'opacity':'1'});
             $(newImage).css({'opacity':'0'});
             $(newImage).css({'height':'250%', 'marginLeft':'-120px', 'marginTop':'-222px'});
@@ -180,15 +173,7 @@ jQuery(document).ready(function($) {
 
         }
 
-        //#############
 
-        function infoSwap(curInfo, newInfo) {
-            $(curInfo).fadeOut(2000, function() {
-            });
-            $(newInfo).fadeIn(2000, function() {
-            });
-
-        }
 
         //We�re just setting val to be the same as num and then running valCheck when the user clicks one of the links, otherwise, the images would only swap when the user slides the handle back and forth. Now the image swap will work if the user either clicks the links or moves the slider.
         function moveSlider(e, num) {
@@ -202,22 +187,22 @@ jQuery(document).ready(function($) {
         }
 
         $('#organism').click(function(e) {
-            moveSlider(e, 0);
+            moveSlider(e, 5);
         });
         $('#liver').click(function(e) {
-            moveSlider(e, 1);
-        });
-        $('#liverLobe').click(function(e) {
-            moveSlider(e, 2);
-        });
-        $('#liverLobule').click(function(e) {
-            moveSlider(e, 3);
-        });
-        $('#intercellular').click(function(e) {
             moveSlider(e, 4);
         });
+        $('#liverLobe').click(function(e) {
+            moveSlider(e, 3);
+        });
+        $('#liverLobule').click(function(e) {
+            moveSlider(e, 2);
+        });
+        $('#intercellular').click(function(e) {
+            moveSlider(e, 1);
+        });
         $('#cell').click(function(e) {
-            moveSlider(e, 5);
+            moveSlider(e, 0);
         });
 
         /* The click event is to trigger the remote function for showing items with the default scale when loading the page */

@@ -120,7 +120,7 @@ color:#17B274;
 #zoom{
 	height:300px;
 	width:500px;
-	border: 1px dashed black;
+/*	border: 1px dashed black; */
 	position:absolute;
 	overflow:hidden;
 	clear:left;
@@ -164,12 +164,11 @@ color:#17B274;
 }
 
 #plus{
-	margin-bottom:-20px;
+	margin-top:-30px;
 }
 
 #minus{
-	margin-top:-30px;
-
+    margin-bottom:-20px;
 }
 .step{
 	list-style:none;
