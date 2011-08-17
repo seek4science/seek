@@ -19,7 +19,7 @@ module ScalesHelper
     ordered_scales =  sort_scales resource.scales
     ordered_scales.each do |scale|
       link += link_to h(scale.title), scale
-      link += "," unless scale==ordered_scales.last
+      link += ",<br/>" unless scale==ordered_scales.last
     end
     link
   end

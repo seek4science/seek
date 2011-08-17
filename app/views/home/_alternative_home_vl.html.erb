@@ -4,7 +4,7 @@
 <%= stylesheet_link_tag  "slider/liver" %>
 
 <div id="wrapper">
-
+             <h1>Search Items by Scales</h1>
 			<!--####### THE COMPLETE LIVER-->
 			 <div id="zoom" >
                  <%= image_tag "slider/vitruvian_man.png",{:alt=>"vitruvian_man.png",:id=>"bild-0"}%>
@@ -19,18 +19,14 @@
 
 			<div id="options">
 				<div id="plus">+</div>
-				<ul class="step">
+				<ul id="scale_list" class="step">
 
 					<li id="cell">cell-</li>
-					<li id="intercellular">intercellular -</li>
+					<li id="intercellular" >intercellular -</li>
 					<li id="liverLobule">liver lobule -</li>
 					<li id="liverLobe">liver lobe -</li>
 					<li id="liver">liver -</li>
-					<li id="organism" onclick="alert(this.id); <%= remote_function(
-              :url=>{:action=>'scale_search'},
-              :with=>"'scale_type='+this.id",
-              :before=>"show_ajax_loader('scaled_items_id')"
-              ) %>;return false;" >organism -</li>
+					<li id="organism" >organism -</li>
 
 				</ul>
 				<div id="slider"></div>
@@ -39,6 +35,9 @@
 			</div>
 
  </div>
+
+<!--Inserting the javascripts for loading tabber dynamically-->
+ <div id="js_for_tabber"></div>
 
 
  <div id="scaled_items_id" class="scaled_items">
@@ -52,6 +51,26 @@
                            :authorization_already_done => true} -%>
 
  </div>
+<script type="text/javascript">
+    var scales_list = document.getElementById("scale_list");
+    var children = scale_list.getElementsByTagName("LI");
+    var index = 0;
+
+    function scales_onclick() {
+        for (index = 0; index < children.length; index++) {
+            children[index].onclick = function() {
+
+            <%= remote_function(
+                :url=>{:action=>'scale_search',:controller=>'scales'},
+                :with=>"'scale_type='+this.id",
+                :before=>"show_ajax_loader('scaled_items_id')")%>
+
+
+            }
+        }
+    }
+    scales_onclick();
+</script>
 
 
 

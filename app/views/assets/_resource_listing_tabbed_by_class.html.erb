@@ -11,10 +11,6 @@
 
 <script type="text/javascript">
   tabber_ids.push("<%= tabs_id -%>");
-
-
-  displayTabs();
-
 </script>
 
 <% total_count = 0 %>
@@ -77,6 +73,11 @@
     <% end -%>
   </div>
 <% else -%>
-  <span class="none_text">No items.</span>
+    <% if User.current_user.nil? %>
+        <span class="none_text">You are not authorized to view the related items. Please log in first.</span>
+    <% else %>
+        <span class="none_text">No items.</span>
+    <% end %>
+
 <% end -%>
 

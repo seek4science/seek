@@ -1,0 +1,16 @@
+<script type="text/javascript">
+  /*This function is to force loading tabber for Ajax request. E.g. Searching items with one scale like 'organism'.
+  So whenever the tabber page('assets/resource_listing_tabbed_by_class') is updated, tabs will be loaded dynamically.
+  The old javascript loads the tabber only once when the page is loaded. */
+
+  function load_tabs() {
+      var tabberOptions = {'onLoad':function() {
+          displayTabs();
+      }};
+      tabberAutomatic(tabberOptions);
+  }
+
+  load_tabs();
+
+
+</script>

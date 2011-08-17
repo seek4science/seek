@@ -105,7 +105,7 @@ padding-left:5px;
 }
 
 .scaled_items{
- padding-top: 400px;
+ padding-top: 450px;
 
 }
 
@@ -116,15 +116,6 @@ color:#17B274;
 
 .step li:active{color:#ff0000;}
 
-h1{
-	font-size: 16px;
-	text-align:center;
-}
-
-h2{
-	font-size: 12px;
-	text-align: center;
-}
 
 #zoom{
 	height:300px;
@@ -156,7 +147,7 @@ h2{
 	margin:auto;
 	vertical-align:middle;
 	text-align:center; */
-    padding-top:10px;
+    padding-top:8px;
 	margin-left:100px;
 	height:100%;
 }
@@ -198,30 +189,12 @@ list-style: none;
 }
 
 
-
-
 .close{
 	font-weight:bold;
 	float:right;
 	clear:both;
 }
 
-
-.button{
-	height: 19px;
-	width: 12px;
-	float:left;
-	background:transparent url(../img/button.png) 0 6px no-repeat;
-}
-.information{
-	position: absolute;
-	top:365px;
-}
-
-.title{
-	padding:10px;
-	margin-left:-10px;
-}
 
 
 .slide{
@@ -253,48 +226,9 @@ background:-moz-radial-gradient(center,#fff, #279BD4); /* Firefox */
 
 }
 
-/*SLIDEBOX DESIGN*/
 
-.slidebox h2{
-font-weight:bold;
-font-size: 14px;
-text-align:left;
-}
 
-.gleichung{
-font-style:italic;
-font-size:12px;
-text-align:center;
 
-}
-
-ul.listPaper{
-	float:left;
-	list-style-type: circle;
-}
-
-ul.listSeek{
-	float:left;
-	list-style-type: disc;
-}
-
-.slidebox li{
-padding:4px;
-}
-
-.slidebox img{
-	float:right;
-	clear:left;
-	margin-right: 15px;
-}
-
-.slidebox{
-	height:300px;
-	white-space:normal;
-	padding:10px;
-	width:700px;
-
-}
 
 /* states and images */
 .ui-icon { width: 16px; height: 16px; background-image: url(images/ui-icons_222222_256x240.png); float:left;}

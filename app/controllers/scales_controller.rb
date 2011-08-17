@@ -23,6 +23,24 @@ class ScalesController < ApplicationController
     end
   end
 
+   def scale_search
+    @scale = Scale.find_by_title(params[:scale_type])
+    scalings = @scale.scalings.select { |s| !s.scalable.nil? }
+    @scaled_objects = scalings.collect { |scaling| scaling.scalable }.uniq.select(&:can_view?)
+
+    resource_hash={}
+    @scaled_objects.each do |res|
+      resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
+      resource_hash[res.class.name][:items] << res
+    end
+
+    render :update do |page|
+      page.replace_html "scaled_items_id", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash, :narrow_view => true, :authorization_already_done => true}
+      page.replace_html "js_for_tabber", :partial => "assets/force_loading_tabber"
+    end
+
+   end
+
 
   private
 
