@@ -120,7 +120,7 @@ color:#17B274;
 #zoom{
 	height:300px;
 	width:500px;
-	border: 1px dashed black;
+/*	border: 1px dashed black; */
 	position:absolute;
 	overflow:hidden;
 	clear:left;
