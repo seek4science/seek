@@ -21,15 +21,6 @@ help_attachments:
     - "5"
     - 2010-09-08 13:11:19
     - 2010-09-08 13:11:19
-  - - "4"
-    - "13"
-    - MIAME_metadata
-    - application/vnd.ms-excel
-    - microarray_example_newformat.xls
-    - "102400"
-    - "7"
-    - 2010-11-02 13:43:31
-    - 2010-11-02 13:43:31
   - - "5"
     - "13"
     - Intracellular metabolite mesurements
@@ -39,3 +30,39 @@ help_attachments:
     - "8"
     - 2010-11-02 13:44:55
     - 2010-11-02 13:44:55
+  - - "6"
+    - "13"
+    - Microarray_ArrayExpressFormat
+    - application/vnd.ms-excel
+    - microarray_example_newformat.xls
+    - "95744"
+    - "9"
+    - 2011-01-20 12:31:07
+    - 2011-01-20 12:31:07
+  - - "7"
+    - "13"
+    - Microarray_GEOFormat
+    - application/vnd.ms-excel
+    - GEOFormat.xls
+    - "48640"
+    - "10"
+    - 2011-01-20 12:31:25
+    - 2011-01-20 12:31:25
+  - - "8"
+    - "13"
+    - JERM_MetaboliteExample
+    - application/vnd.ms-excel
+    - JERM_Basic_Data_metabolites2.xls
+    - "35840"
+    - "11"
+    - 2011-01-20 12:31:41
+    - 2011-01-20 12:31:41
+  - - "9"
+    - "13"
+    - Proteomics_PRIDE_MS
+    - application/vnd.ms-excel
+    - JERM_pride4.xls
+    - "94720"
+    - "12"
+    - 2011-01-20 12:31:56
+    - 2011-01-20 12:31:56
