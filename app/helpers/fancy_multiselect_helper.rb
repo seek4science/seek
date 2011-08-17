@@ -87,7 +87,7 @@ module FancyMultiselectHelper
     def fancy_multiselect object, association, options = {}
       hidden = options.delete(:hidden)
       object_type_text = options[:object_type_text] || options[:object_class].name.underscore.humanize
-      title = (help_icon("Here you can associate the #{object_type_text} with specific #{association}.") + "#{association.to_s.titleize}")
+      title = (options[:required] ? '<span class="required">*</span>' : '')+ (help_icon("Here you can associate the #{object_type_text} with specific #{association}.") + "#{association.to_s.titleize}")
 
       folding_box "add_#{association}_form", title , :hidden => hidden, :contents => super(object, association, options)
     end
