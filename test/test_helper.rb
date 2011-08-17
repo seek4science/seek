@@ -71,15 +71,15 @@ class ActiveSupport::TestCase
   def stop_profiling prefix="profile"
     results = RubyProf.stop
 
-    File.open "#{RAILS_ROOT}/tmp/#{prefix}-graph.html", 'w' do |file|
+    File.open "#{Rails.root}/tmp/#{prefix}-graph.html", 'w' do |file|
       RubyProf::GraphHtmlPrinter.new(results).print(file)
     end
-    File.open "#{RAILS_ROOT}/tmp/#{prefix}-flat.txt", 'w' do |file|
+    File.open "#{Rails.root}/tmp/#{prefix}-flat.txt", 'w' do |file|
       RubyProf::FlatPrinter.new(results).print(file)
     end
   end
 
   def run_secondary_tests?
-    @@run_secondary ||= File.exists? "#{RAILS_ROOT}/tmp/run_secondary_tests"
+    @@run_secondary ||= File.exists? "#{Rails.root}/tmp/run_secondary_tests"
   end
 end
