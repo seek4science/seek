@@ -164,12 +164,11 @@ color:#17B274;
 }
 
 #plus{
-	margin-bottom:-20px;
+	margin-top:-30px;
 }
 
 #minus{
-	margin-top:-30px;
-
+    margin-bottom:-20px;
 }
 .step{
 	list-style:none;
