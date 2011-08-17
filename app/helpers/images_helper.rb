@@ -253,6 +253,18 @@ module ImagesHelper
         "misc_icons/green_virus-64x64.png"
       when "publish"
        "crystal_project/22x22/actions/up.png"
+      when "spreadsheet"
+      "famfamfam_silk/table.png"
+      when "spreadsheet_annotation"
+      "famfamfam_silk/tag_blue.png"
+      when "spreadsheet_annotation_edit"
+      "famfamfam_silk/tag_blue_edit.png"
+      when "spreadsheet_annotation_add"
+      "famfamfam_silk/tag_blue_add.png"
+      when "spreadsheet_annotation_destroy"
+      "famfamfam_silk/tag_blue_delete.png"
+      when "spreadsheet_export"
+      "famfamfam_silk/table_go.png"
     else
       return nil
     end

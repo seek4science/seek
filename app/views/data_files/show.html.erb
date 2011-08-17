@@ -1,6 +1,7 @@
 <%= javascript_include_tag "resource" -%>
 <% truncate_length_for_boxes = 22 -%>
 
+
 <%= asset_buttons @data_file,@display_data_file.version -%>
 
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>

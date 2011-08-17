@@ -626,7 +626,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = data_files(:downloadable_data_file)
     df2 = data_files(:sysmo_data_file)
     assert_select "div.list_items_container" do      
-      assert_select "a",:text=>df.title,:count=>1
+      assert_select "a",:text=>df.title,:count=>2
       assert_select "a",:text=>df2.title,:count=>0
     end
   end

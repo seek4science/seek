@@ -5,6 +5,7 @@ class DataFilesController < ApplicationController
   
   include IndexPager
   include SysMODB::SpreadsheetExtractor
+  include SpreadsheetUtil
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
@@ -13,7 +14,7 @@ class DataFilesController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
-  before_filter :find_display_data_file, :only=>[:show,:download]
+  before_filter :find_display_data_file, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
   include Seek::Publishing
@@ -282,6 +283,24 @@ end
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end  
+  
+  def explore
+    if @display_data_file.is_spreadsheet?
+      #Generate Ruby spreadsheet model from XML
+      @spreadsheet = @display_data_file.spreadsheet
+
+      #FIXME: Annotations need to be specific to version
+      @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
+      respond_to do |format|
+        format.html { render :layout=>"minimal" }
+      end
+    else
+     respond_to do |format|
+        flash[:error] = "Unable to view contents of this data file"
+        format.html { redirect_to @display_data_file,:format=>"html" }
+      end
+    end
+  end 
   
   protected    
   
