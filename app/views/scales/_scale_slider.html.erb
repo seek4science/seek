@@ -36,9 +36,11 @@
  </div>
 
 <script type="text/javascript">
-    var scales_list = document.getElementById("scale_list");
-    var children = scale_list.getElementsByTagName("LI");
-    var index = 0;
+    var scales_list,children,index;
+
+    scales_list = document.getElementById("scale_list");
+    children= scales_list.getElementsByTagName("LI");
+
 
     function scales_onclick(f) {
         for (index = 0; index < children.length; index++) {
@@ -50,6 +52,7 @@
    if scale_slider_function  %>
       scales_onclick(function() {
         <%= scale_slider_function %>
+        return false;
       });
 <% end%>
 </script>
