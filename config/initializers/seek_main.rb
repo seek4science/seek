@@ -20,7 +20,7 @@ require 'modporter_extensions'
 
 GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
 
-ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','DataFile', 'Model', 'Sop', 'Publication', 'SavedSearch', 'Organism', 'Event']
+ASSET_ORDER                = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Sample','Specimen','DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
 
 PORTER_SECRET = "" unless defined? PORTER_SECRET
 
