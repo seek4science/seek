@@ -72,12 +72,14 @@ class SearchController < ApplicationController
           @results = Assay.multi_solr_search(downcase_query, :limit=>100, :models=>[Assay]).results
         when ("publications")
           @results = Publication.multi_solr_search(downcase_query, :limit=>100, :models=>[Publication]).results
+        when ("presentations")
+          @results = Presentation.multi_solr_search(downcase_query, :limit=>100, :models=>[Presentation]).results
         when ("specimens")
           @results = Specimen.multi_solr_search(downcase_query, :limit=>100, :models=>[Specimen]).results
         when ("samples")
           @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results
         else
-          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication,Sample,Specimen]
+          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication,Presentation,Sample,Specimen]
           unless Seek::Config.is_virtualliver
             sources.delete(Sample)
             sources.delete(Specimen)
