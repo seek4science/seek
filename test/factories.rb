@@ -193,6 +193,7 @@ end
     f.title "A Model"
     f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
+    f.association :content_blob, :factory => :content_blob
   end
 
 #Publication
@@ -299,3 +300,11 @@ end
     f.association :substance, :factory => :compound
     f.association :sop, :factory => :sop
   end
+
+  Factory.define(:relationship) do |f|
+    f.association :subject, :factory => :model
+    f.association :object, :factory => :model
+    f.predicate Relationship::ATTRIBUTED_TO
+  end
+
+  Factory.define(:attribution, :parent => :relationship) {}

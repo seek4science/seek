@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
   has_many :sops, :as=>:contributor
   has_many :data_files, :as=>:contributor
   has_many :models,:as=>:contributor
-  
+  has_many :presentations,:as=>:contributor
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password

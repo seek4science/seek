@@ -809,6 +809,20 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test "converted presentations have correct attributions" do
+    data_file = Factory :data_file,:contributor=>User.current_user
+    disable_authorization_checks {data_file.relationships.create :object => Factory(:data_file), :subject => data_file, :predicate => Relationship::ATTRIBUTED_TO}
+    df_attributions = data_file.attributions_objects
+    assert_difference("DataFile.count", -1) do
+      assert_difference("Presentation.count") do
+        post :convert_to_presentation, :id=>data_file.id
+      end
+    end
+
+    assert_equal df_attributions, assigns(:presentation).attributions_objects
+    assert !assigns(:presentation).attributions_objects.empty?
+  end
+
   test "report error when file unavailable for download" do
     df = Factory :data_file, :policy=>Factory(:public_policy)
     df.content_blob.dump_data_to_file
