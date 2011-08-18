@@ -1,7 +1,8 @@
-	# Filters added to this controller apply to all controllers in the application.
+# Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
-
 class ApplicationController < ActionController::Base
+  require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'application_controller')
+
   skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
 
   self.mod_porter_secret = PORTER_SECRET
@@ -108,53 +109,6 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  def find_or_create_substance(new_substances, known_substance_ids_and_types)
-    known_substances = []
-    known_substance_ids_and_types.each do |text|
-      id, type = text.split(',')
-      id = id.strip
-      type = type.strip.capitalize.constantize
-      known_substances.push(type.find(id)) if type.find(id)
-    end
-    new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
-    #no substance
-    if (new_substances.size + known_substances.size) == 0
-      nil
-    #one substance
-    elsif (new_substances.size + known_substances.size) == 1
-      if !known_substances.empty?
-        known_substances.first
-      else
-        c = Compound.new(:name => new_substances.first)
-          if  c.save
-            c
-          else
-            nil
-          end
-      end
-    #FIXME: update code when mixture table is created
-    else
-      nil
-    end
-  end
-
-  def no_comma_for_decimal
-    check_string = ''
-    if self.controller_name.downcase == 'studied_factors'
-      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
-    elsif self.controller_name.downcase == 'experimental_conditions'
-      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
-    end
-
-    if check_string.match(',')
-         render :update do |page|
-           page.alert('Please use point instead of comma for decimal number')
-         end
-      return false
-    else
-      return true
-    end
-  end
   private
 
   def project_membership_required
@@ -162,7 +116,11 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+          if eval("#{controller_name.camelcase}Controller.new").respond_to?("index")
+            redirect_to polymorphic_path(controller_name)
+          else
+            redirect_to root_url
+          end
         end
         format.json { render :json => {:status => 401, :error_message => flash[:error] } }
       end
@@ -245,7 +203,7 @@ class ApplicationController < ActionController::Base
           'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
         'view'
 
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
@@ -413,19 +371,7 @@ class ApplicationController < ActionController::Base
         :current_logged_in_user=>current_user
     }
   end
-
-  #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
-  #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
-  def check_if_new_substances_are_known new_substances, known_substances
-    fixed_new_substances = []
-    new_substances.each do |new_substance|
-      substance=Compound.find_by_name(new_substance.strip) || Synonym.find_by_name(new_substance.strip)
-      if substance.nil?
-        fixed_new_substances << new_substance
-      else
-        known_substances << substance unless known_substances.include?(substance)
-      end
-    end
-    return fixed_new_substances, known_substances
-  end
 end
+
+
+

@@ -1,7 +1,7 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
-
+  acts_as_annotation_source
   include SavageBeast::UserInit
 
   acts_as_tagger

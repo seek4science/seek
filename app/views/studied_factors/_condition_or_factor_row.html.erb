@@ -14,13 +14,20 @@
 
     <% end %>
     <li id="measured_item">
-      <%if  object.measured_item.title == 'concentration' and object.substance.try(:name)%>
-        <%= h object.substance.name + ' ' + object.measured_item.title  %>
+      <%if  object.measured_item.title == 'concentration' %>
+        <% substance = ''
+           link_table_name = "#{object.class.name.underscore}_links"
+           object.send(link_table_name).each do |ltn|
+             substance.concat(ltn.substance.name + '/')
+           end
+           substance.chop!
+        %>
+        <%= h substance + ' ' + object.measured_item.title  %>
       <%else%>
         <%= h object.measured_item.title %>
       <%end%>
     </li>
-    
+
     <li id="values">
       <!--don't show dimensionless unit-->
       <%= object.unit.symbol == 'dimensionless' ? "#{h object.range_text}" : "#{h object.range_text} #{object.unit.symbol}" %>

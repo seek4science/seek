@@ -368,9 +368,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_duplicate_conditions_for_new_version
-    s          =sops(:editable_sop)
+    s=sops(:editable_sop)
     condition1 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+                                              :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
@@ -381,9 +381,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_adding_new_conditions_to_different_versions
-    s          =sops(:editable_sop)
-    condition1 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+    s =sops(:editable_sop)
+    condition1 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+                                              :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
@@ -392,8 +392,8 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal condition1, s.find_version(1).experimental_conditions.first
     assert_equal 0, s.find_version(2).experimental_conditions.count
 
-    condition2 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 2, :end_value => 3, :sop_id => s.id, :sop_version => 2)
+    condition2 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+                                              :start_value => 2, :sop_id => s.id, :sop_version => 2)
 
     assert_not_equal 0, s.find_version(2).experimental_conditions.count
     assert_equal condition2, s.find_version(2).experimental_conditions.first

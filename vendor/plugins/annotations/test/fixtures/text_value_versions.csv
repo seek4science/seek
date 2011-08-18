@@ -1,0 +1,35 @@
+id,text_value_id,version,text
+1,1,1,glorious
+2,2,1,dramatic
+3,3,1,exotic
+4,4,1,cryptic
+5,5,1,wizardry
+6,6,1,programming
+7,7,1,software development
+8,8,1,fiction
+9,9,1,scripting languages
+10,10,1,non-fiction
+11,11,1,Brad Pitta
+12,12,1,Angelina Jolly
+13,13,1,Douglas Michaels
+14,14,1,Nicole Mankid
+15,15,1,"J. K. Rowing"
+16,16,1,Something interesting happens
+17,17,1,Harry Potter and the Exploding Men's Locker Room
+18,18,1,"4/5"
+19,19,1,amusing rhetoric
+20,20,1,wizadry
+21,21,1,"Covers the absolute basics of the Ruby programming language."
+22,22,1,"Difficult and rocky trek into the complex language that is Ruby, covering detailed logic and mind numbing syntax."
+23,23,1,Too Little Time
+24,24,1,programming
+25,25,1,"Remember to buy milk!"
+26,26,1,"Thriller+Suspense+Supernatural"
+27,27,1,And It All Falls Down
+28,28,1,Hashes and U
+29,29,1,complex
+30,30,1,dynamic languages
+31,31,1,Ruby Hashes
+32,32,1,"O(x^2)"
+33,33,1,"Conclusion (finally!)"
+34,34,1,long

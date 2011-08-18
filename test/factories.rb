@@ -257,7 +257,7 @@ end
     f.data_file_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
+    f.studied_factor_links {[StudiedFactorLink.new(:substance => Factory(:compound))]}
     f.association :data_file, :factory => :data_file
   end
 
@@ -290,15 +290,19 @@ end
     f.sequence(:name) {|n| "glucose #{n}"}
   end
 
- #Experimental condition
+  Factory.define(:studied_factor_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :studied_factor
+  end
+
+  #Experimental condition
   Factory.define(:experimental_condition) do |f|
     f.start_value 1
-    f.end_value 10
     f.sop_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
     f.association :sop, :factory => :sop
+    f.experimental_condition_links {[ExperimentalConditionLink.new(:substance => Factory(:compound))]}
   end
 
   Factory.define(:relationship) do |f|
@@ -308,3 +312,8 @@ end
   end
 
   Factory.define(:attribution, :parent => :relationship) {}
+
+  Factory.define(:experimental_condition_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :experimental_condition
+  end

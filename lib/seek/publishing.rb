@@ -38,6 +38,13 @@ module Seek
       @asset = eval("@"+c.singularize)
     end
 
+    def preview_permissions
+      set_no_layout
+      respond_to do |format|
+        format.html { render :template=>"layouts/preview_permissions"}
+      end
+    end
+
     private
 
     def deliver_publishing_notifications items_for_notification
