@@ -4,8 +4,6 @@ require 'acts_as_authorized'
 class Sample < ActiveRecord::Base
   include Subscribable
 
-  attr_accessor :from_new_link
-
   belongs_to :specimen
   belongs_to :institution
   has_and_belongs_to_many :assays
@@ -19,7 +17,6 @@ class Sample < ActiveRecord::Base
   validates_uniqueness_of :title
   validates_presence_of :specimen,:lab_internal_number
   validates_presence_of :donation_date
-
 
 
 
