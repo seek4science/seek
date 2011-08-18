@@ -48,7 +48,6 @@ module FancyMultiselectHelper
   module SetDefaults
     def fancy_multiselect object, association, options = {}
       options[:object_type_text] = options[:object_class].name.underscore.humanize unless options[:object_type_text]
-      with_new_link = options[:with_new_link] || false
       object_type_text = options[:object_type_text]
 
       #set default values for locals being sent to the partial
@@ -59,10 +58,7 @@ module FancyMultiselectHelper
                              :name => "#{options[:object_class].name.underscore}[#{association.to_s.singularize}_ids]",
                              :possibilities => [],
                              :value_method => :id,
-                             :text_method => :title,
-                             :with_new_link => with_new_link,
-                             :object_type_text=> object_type_text,
-                             :association=>association
+                             :text_method => :title
 
       options[:selected] = object.send(association).map(&options[:value_method]) unless options[:selected]
 
