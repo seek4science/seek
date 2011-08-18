@@ -4,25 +4,28 @@ module ApplicationHelper
   include FancyMultiselectHelper
 
 
-  def authorized_list items, attribute, sort=true, max_length=75, count_hidden_items=false
-    items = Authorization.authorize_collection("view", items, current_user, count_hidden_items)
+  def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
+    items = all_items.select &:can_view?
+    title_only_items = (all_items - items).select &:title_is_public?
     html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
     if items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
-      original_size     = items.size
-      items             = items.compact
-      hidden_item_count = original_size - items.size
-      items = items.sort { |a, b| get_object_title(a)<=>get_object_title(b) } if sort
-      items.each do |i|
-        html << (link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i))
-        html << ", " unless items.last==i
-      end
+      original_size     = all_items.size
+      hidden_item_count = original_size - (items.size + title_only_items.size)
+
+      items = items.sort_by { |i| get_object_title(i) } if sort
+      title_only_items = title_only_items.sort_by{|i| get_object_title(i)} if sort
+
+      list = items.collect {|i| link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i)}
+      list = list + title_only_items.collect {|i| h(truncate(i.title, :length => max_length))}
+      html << list.join(', ')
+
       if count_hidden_items && hidden_item_count>0
         html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
       end
     end
-    return html
+    html
   end
 
 

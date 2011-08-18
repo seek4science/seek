@@ -25,7 +25,7 @@
           You may:
         <ul style="padding-left:1em;">
           <li>Keep the <%= @resource_type -%> private, and only visible to yourself.</li>
-          <li>Share within your project and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
+          <li>Share within the selected projects and with all other users that are a member of a <%= Seek::Config.project_name %> project.</li>
           <li>Share with the all visitors (including anonymous visitors with no login)</li>
           <li>Define more fine-grained sharing in the <em>Advanced sharing</em>: you can share within your Project/Institution only,<br/> with specific individuals, or set up custom favourite groups for people you regularly need to share with.</li>
         </ul>
@@ -50,7 +50,7 @@
         <p>
           <label>
             <input type="radio" <%= 'checked="checked"' if @sharing_mode == Policy::ALL_SYSMO_USERS -%> id="sharing_scope_<%= Policy::ALL_SYSMO_USERS -%>" name="sharing[sharing_scope]" value="<%= Policy::ALL_SYSMO_USERS -%>" />
-            - Your project, for
+            - Selected projects, for
           </label>
              <select name="sharing[your_proj_access_type]" id="sharing_your_proj_access_type">
                  <%= policy_selection_options([Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING], @resource, your_project_access_type(@policy, @resource)) -%>

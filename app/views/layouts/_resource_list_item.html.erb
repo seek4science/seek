@@ -7,8 +7,16 @@
 <% box_width = 75 %>
 <% box_width += 10 if actions_partial.blank? %>
 <% box_width += 12 if avatar_partial.blank? %>
-
-<div class="list_item">
+<%
+   access_based_css_class = if try_block{resource.private?}
+       "private_list_item"
+   elsif try_block{resource.public?}
+     "public_list_item"
+   else
+     "list_item"
+   end
+%>
+<div class="<%= access_based_css_class%>">
   <% unless avatar_partial.blank? %>
     <div class="list_item_avatar">
       <%= render :partial=> avatar_partial,:locals=>content_locals.merge({:resource => resource}) %>

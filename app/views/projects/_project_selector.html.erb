@@ -13,10 +13,8 @@
 
 <% allow_nil ||= false %>
 <% possibilities = Project.all %>
-<% unless allow_nil %>
-    <span class="required">*</span>
-<% end %>
-<%= fancy_multiselect resource, :projects, :possibilities => possibilities, :selected => selected_project_ids %>
+
+<%= fancy_multiselect resource, :projects, :possibilities => possibilities, :selected => selected_project_ids, :required => allow_nil %>
 
 
 
