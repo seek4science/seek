@@ -1,3 +1,7 @@
+<% current_scale ||= 'all' %>
+<script type="text/javascript">
+  var current_scale = <%= ["cell","intercellular","liverLobule","liverLobe","liver","organism","all"].index(current_scale) -%>;
+</script>
 <%= javascript_include_tag 'slider/jquery-1.5.1.min.js','slider/jquery-ui-1.8.14.custom.min.js','slider/liver.js' %>
 <%= stylesheet_link_tag  "slider/liver" %>
 
