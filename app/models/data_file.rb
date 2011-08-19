@@ -11,6 +11,7 @@ class DataFile < ActiveRecord::Base
   acts_as_asset
   acts_as_trashable
 
+  acts_as_annotatable
   title_trimmer
 
   if Seek::Config.events_enabled

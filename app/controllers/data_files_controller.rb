@@ -109,6 +109,7 @@ class DataFilesController < ApplicationController
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
       update_tags @data_file
+      update_annotations @data_file
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
 
@@ -178,6 +179,8 @@ class DataFilesController < ApplicationController
     end
 
     update_tags @data_file
+    update_annotations @data_file
+
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       @data_file.attributes = params[:data_file]
