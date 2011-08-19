@@ -5,6 +5,10 @@ class HomeController < ApplicationController
 
 
   def index
+    @scale = Scale.find_by_title(params[:scale_type])
+    scalings = @scale ? @scale.scalings : Scale.all.collect(&:scalings).flatten
+    @scaled_objects = scalings.collect(&:scalable).compact.uniq
+
     respond_to do |format|
       format.html # index.html.erb      
     end
