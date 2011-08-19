@@ -260,9 +260,7 @@ module ImagesHelper
       when 'subscribe'
         "famfamfam_silk/email_add.png"
       when 'presentation_avatar'
-        "misc_icons/presentations.png"
-      when 'seek_information'
-        "information.png"
+        "file_icons/ppt.png"
     else
       return nil
     end

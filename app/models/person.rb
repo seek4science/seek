@@ -41,6 +41,7 @@ class Person < ActiveRecord::Base
   has_many :created_models, :through => :assets_creators, :source => :asset, :source_type => "Model"
   has_many :created_sops, :through => :assets_creators, :source => :asset, :source_type => "Sop"
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
+  has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :roles ],:include=>[:disciplines]) if Seek::Config.solr_enabled
 
@@ -194,7 +195,7 @@ class Person < ActiveRecord::Base
   end
 
   def assets
-    created_data_files | created_models | created_sops | created_publications
+    created_data_files | created_models | created_sops | created_publications | created_presentations
   end
 
   def can_be_edited_by?(subject)

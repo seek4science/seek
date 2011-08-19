@@ -184,6 +184,17 @@ unless  Seek::Config.is_virtualliver
     assert_select 'div#project_news ul>li', 5
     assert_select 'div#community_news ul>li', 7
   end
+else
+   test "ids of scales list should be the same as scales defined in Seek::Config.scales" do
+     get :index
+     assert_response :success
+     assert_select 'div#options ul>li',Seek::Config.scales.length do
+       Seek::Config.scales.each do |scale|
+         assert_select "[id=?]",scale
+       end
+     end
+   end
+
 end
 
   test 'should show recently added and downloaded items with the filter can_view?' do

@@ -155,11 +155,13 @@ module AssetsHelper
           related["DataFile"][:items] = resource.user.data_files
           related["Model"][:items] = resource.user.models
           related["Sop"][:items] = resource.user.sops
+          related["Presentation"][:items] = resource.user.presentations
         end
         related["DataFile"][:items] = related["DataFile"][:items] | resource.created_data_files
         related["Model"][:items] = related["Model"][:items] | resource.created_models
         related["Sop"][:items] = related["Sop"][:items] | resource.created_sops
         related["Publication"][:items] = related["Publication"][:items] | resource.created_publications
+        related["Presentation"][:items] = related["Presentation"][:items] | resource.created_presentations
         related["Assay"][:items] = resource.assays
       when "Institution"
         related["Project"][:items] = resource.projects
