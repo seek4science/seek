@@ -59,9 +59,9 @@ class SearchController < ApplicationController
       when ("publications")
         @results = Publication.multi_solr_search(downcase_query, :limit=>100, :models=>[Publication]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       when ("presentations")
-        @results = Specimen.multi_solr_search(downcase_query, :limit=>100, :models=>[Specimen]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+        @results = Presentation.multi_solr_search(downcase_query, :limit=>100, :models=>[Presentation]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       when ("specimens")
-        @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
+        @results = Specimen.multi_solr_search(downcase_query, :limit=>100, :models=>[Specimen]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       when ("samples")
         @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results if (Seek::Config.solr_enabled and !downcase_query.nil? and !downcase_query.strip.empty?)
       else
