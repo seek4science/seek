@@ -8,6 +8,16 @@
 <% tabs_id ||= "resource_list_by_class" -%>
 <% narrow_view ||= false -%>
 <% authorization_already_done ||= false -%>
+<% unless authorization_already_done
+       resource_hash.each_value do |res|
+           unless res[:items].empty?
+               total_count = res[:items].size
+               res[:items] = res[:items].select &:can_view?
+               res[:hidden_count] = total_count - res[:items].size
+           end
+       end
+   end
+%>
 
 <script type="text/javascript">
   tabber_ids.push("<%= tabs_id -%>");
@@ -50,7 +60,7 @@
         <div id="<%= resource_type.downcase.pluralize -%>" class="tabbertab"> 
           <% unless resources.empty? && extra_count < 1 %>
             <h3><%= "#{visible_resource_type} (#{resources.length+extra_count}#{"+"+hidden_count.to_s if hidden_count > 0})" -%></h3>
-            <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => authorization_already_done } -%>
+            <%= render :partial => "assets/resource_list", :locals => { :collection => resources, :narrow_view => narrow_view, :authorization_for_showing_already_done => true } -%>
           <% else %>
             <h3><%= "#{visible_resource_type} (0+#{hidden_count})" -%></h3>
           <% end %>
