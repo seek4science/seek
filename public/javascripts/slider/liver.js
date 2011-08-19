@@ -208,9 +208,6 @@ jQuery(document).ready(function($) {
             moveSlider(e, 6);
         });
 
-        /* The click event is to trigger the remote function for showing items with the default scale when loading the page */
-        var default_slider_value = $("#slider").slider('value');
-        $('#' + scales_arr[default_slider_value]).click();
     });
 
 
