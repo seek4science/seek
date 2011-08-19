@@ -149,6 +149,7 @@ class AssaysController < ApplicationController
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
+    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     @assay.assay_organisms = []
     organisms.each do |text|
@@ -184,7 +185,8 @@ class AssaysController < ApplicationController
         (@assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
 
         # update related publications
-        Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+
+        Relationship.create_or_update_attributions(@assay,publication_params, Relationship::RELATED_TO_PUBLICATION)
 
         #FIXME: required to update timestamp. :touch=>true on AssayAsset association breaks acts_as_trashable
         @assay.updated_at=Time.now
