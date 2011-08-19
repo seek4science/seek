@@ -169,6 +169,8 @@ class PresentationsController < ApplicationController
       params[:presentation][:last_used_at] = Time.now
     end
 
+    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
+
     update_tags @presentation
 
     @presentation.attributes = params[:presentation]
@@ -186,7 +188,7 @@ class PresentationsController < ApplicationController
         Relationship.create_or_update_attributions(@presentation, params[:attributions])
 
         # update related publications
-        Relationship.create_or_update_attributions(@presentation, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@presentation,publication_params, Relationship::RELATED_TO_PUBLICATION)
 
         #update creators
         AssetsCreator.add_or_update_creator_list(@presentation, params[:creators])
