@@ -29,7 +29,7 @@
 }
 
 .ui-slider-vertical {
-    height: 200px;
+    height: 250px;
     width: 0.8em;
 }
 
@@ -131,7 +131,7 @@ color:#17B274;
 
 
 
-#bild-1,#bild-2,#bild-3,#bild-4,#bild-5{
+#bild-1,#bild-2,#bild-3,#bild-4,#bild-5,#bild-6{
 	display:none;
 	height:50%;
 	z-index:1000;

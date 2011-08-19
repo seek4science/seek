@@ -18,12 +18,12 @@ jQuery(document).ready(function($) {
         imgarray.reverse();
 
         //Variablen festlegen, sichtabres Bild ist immer zuerst Bild-0
-        var curImage = imgarray[5];
+        var curImage = imgarray[(imgarray.length - 1)];
         var previousValue;
         var val;
 
         // slider value<=>scale string
-        var scales_arr = ["cell","intercellular","liverLobule","liverLobe","liver","organism"];//["organism","liver","liverLobe","liverLobule","intercellular","cell"];
+        var scales_arr = ["cell","intercellular","liverLobule","liverLobe","liver","organism","all"];//["organism","liver","liverLobe","liverLobule","intercellular","cell"];
         var scale_id;
 
 
@@ -33,8 +33,8 @@ jQuery(document).ready(function($) {
         $("#slider").slider({
             orientation: "vertical",
             min: 0,
-            max: 5,
-            value: 5,
+            max: (scales_arr.length - 1),
+            value: (scales_arr.length - 1),
             animate:true,
             slide: function (event, ui) {
                 previousValue = val;
@@ -203,6 +203,9 @@ jQuery(document).ready(function($) {
         });
         $('#cell').click(function(e) {
             moveSlider(e, 0);
+        });
+        $('#all').click(function(e) {
+            moveSlider(e, 6);
         });
 
         /* The click event is to trigger the remote function for showing items with the default scale when loading the page */

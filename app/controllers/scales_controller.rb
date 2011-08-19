@@ -25,8 +25,8 @@ class ScalesController < ApplicationController
 
    def scale_search
     @scale = Scale.find_by_title(params[:scale_type])
-    scalings = @scale.scalings.select { |s| !s.scalable.nil? }
-    @scaled_objects = scalings.collect { |scaling| scaling.scalable }.uniq
+    scalings = @scale ? @scale.scalings : Scale.all.collect(&:scalings).flatten
+    @scaled_objects = scalings.collect(&:scalable).compact.uniq
 
     resource_hash={}
     @scaled_objects.each do |res|

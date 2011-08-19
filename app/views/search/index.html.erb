@@ -1,4 +1,21 @@
-<div class="show_basic">
+  <% scale_slider_function = capture do %>
+        $$('#search_results > div').invoke('hide');
+        $$('#search_results #' + this.id +'_results').first().show();
+    <% end %>
+    <%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_title} %>
+<div id='search_results'>
+<% (Scale.all.map(&:title) | ['all']).each do |scale|%>
+      <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_title == scale%>>
+          <% resource_hash = classify_for_tabs @results_scaled[scale] -%>
+        <%= render :partial => "assets/resource_listing_tabbed_by_class",
+                   :locals => {:tabs_id => "#{scale}_results_tabs",
+                               :resource_hash => resource_hash,
+                               :narrow_view => true,
+                               :authorization_already_done => true} -%>
+      </div>
+<% end %>
+</div>
+<br />
 <% unless !logged_in? || params[:saved_search] %>
       <div class="box_standout">
         <% tiny_image = image "saved_search_avatar", {:style => "padding: 5px; border:1px solid #CCCCCC;background-color:#FFFFFF;vertical-align:middle;"} %>
@@ -7,11 +24,3 @@
       </div>
 
 <% end %>
-<% if !@results.blank? %>
-    <% resource_hash = classify_for_tabs @results -%>
-    <%= render :partial => "assets/resource_listing_tabbed_by_class",
-               :locals => {:resource_hash => resource_hash,
-                           :narrow_view => true,
-                           :authorization_already_done => true} -%>
-<% end %>
-</div>
