@@ -43,7 +43,7 @@ non_downloadable_data_file:
   content_type: application/vnd.excel
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project]
   policy: private_policy
 
 url_based_data_file:
@@ -162,6 +162,6 @@ downloadable_spreadsheet_data_file:
   content_type: application/vnd.excel
   last_used_at: 2009-04-03 11:09:18
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
 
