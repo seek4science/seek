@@ -45,7 +45,9 @@
         $$('#scale_list li').each(function(item){
           item.onclick = function(){
             <%= scale_slider_function %>
-
+            if($('scale')) {
+                $('scale').value = this.id;
+            }
             return false;
           };
         });
