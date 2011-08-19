@@ -140,7 +140,7 @@ class DataFilesController < ApplicationController
   def upload_for_tool
 
     if handle_data
-      params[:data_file][:project_ids] = [params[:data_file][:project_id]] if params[:data_file][:project_id]
+      params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
