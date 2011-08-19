@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.datetime "updated_at"
     t.string   "http_referer"
     t.string   "user_agent"
-    t.text     "data",                   :limit => 2147483647
+    t.text     "data",                   :limit => 16777215
     t.string   "controller_name"
   end
 
@@ -273,7 +273,7 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -566,7 +566,7 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.integer  "organism_id"
     t.integer  "model_type_id"
     t.integer  "model_format_id"
-    t.integer  "version",                                 :default => 1
+    t.integer  "version"
     t.string   "first_letter",               :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
@@ -621,12 +621,6 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.datetime "updated_at"
   end
 
-  create_table "official_compounds", :force => true do |t|
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
@@ -643,7 +637,7 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
 
   create_table "people", :force => true do |t|
     t.datetime "created_at"
-    t.datetime "updated_at",                                             :null => false
+    t.datetime "updated_at"
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email"
@@ -962,7 +956,7 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
-    t.integer  "version",                        :default => 1
+    t.integer  "version"
     t.string   "first_letter",      :limit => 1
     t.text     "other_creators"
     t.string   "uuid"
