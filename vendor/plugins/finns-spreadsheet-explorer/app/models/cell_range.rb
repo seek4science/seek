@@ -8,10 +8,6 @@ class CellRange < ActiveRecord::Base
 
   belongs_to :worksheet
 
-  #validates_presence_of :worksheet_id, :start_row, :start_column, :end_row, :end_column
-
-  acts_as_solr(:fields => [ :content ]) if Seek::Config.solr_enabled
-
   #DONT HAVE ANY UPPER AND LOWER BOUNDS FOR CELLS - CAN CREATE ANNOTATIONS OUT OF RANGE
 
   validate :valid_cell_range
@@ -45,6 +41,11 @@ class CellRange < ActiveRecord::Base
   def cell_range
     return to_alpha(start_column)+start_row.to_s +
       ((end_column == start_column && end_row == start_row) ? "" : ":" + to_alpha(end_column)+end_row.to_s)
+  end
+
+  def reindexing_consequences
+    blob_id = worksheet.content_blob
+    DataFile.find(:all,:conditions=>["content_blob_id = ?",blob_id])
   end
 
 private

@@ -353,6 +353,7 @@ class PublicationsController < ApplicationController
       end  
     end
   end
+  
   #some PUBMED/DOI fields cant be retrieved from direct calls on the fetching of query result (because the mistakes of parsing xml), but these fields are also store in xml field
   def get_pubmed_authors_from_xml xml_node
     authors = []
