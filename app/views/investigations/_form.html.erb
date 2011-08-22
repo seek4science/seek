@@ -1,7 +1,9 @@
 <%= javascript_include_tag "sharing.js" %>
 <%= f.error_messages -%>
 
- <%= f.hidden_field :create_from_asset %>
+<%= f.hidden_field :create_from_asset %>
+<%= f.hidden_field :new_link_from_study -%>
+
 <div style="width: 98%;">
   <p>
     <%= f.label :title-%><span class="required">*</span><br/>

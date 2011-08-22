@@ -140,7 +140,7 @@ class DataFilesController < ApplicationController
   def upload_for_tool
 
     if handle_data
-      params[:data_file][:project_ids] = [params[:data_file][:project_id]] if params[:data_file][:project_id]
+      params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
@@ -236,6 +236,8 @@ class DataFilesController < ApplicationController
       params[:data_file][:last_used_at] = Time.now
     end
 
+    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
+
     update_tags @data_file
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
@@ -252,7 +254,7 @@ class DataFilesController < ApplicationController
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
         
         # update related publications        
-        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@data_file, publication_params, Relationship::RELATED_TO_PUBLICATION)
         
         
         #update creators

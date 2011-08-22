@@ -448,6 +448,7 @@ class ModelsController < ApplicationController
       params[:model][:last_used_at] = Time.now
     end
 
+    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
     update_tags @model
 
     @model.attributes = params[:model]
@@ -465,7 +466,7 @@ class ModelsController < ApplicationController
         Relationship.create_or_update_attributions(@model, params[:attributions])
         
         # update related publications
-        Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@model,publication_params, Relationship::RELATED_TO_PUBLICATION)
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@model, params[:creators])

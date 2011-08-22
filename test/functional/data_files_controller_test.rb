@@ -25,9 +25,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "get XML when not logged in" do
     logout
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
-    puts df.versions
     get :show,:id=>df,:format=>"xml"
-    puts @response.body
     perform_api_checks
 
   end
@@ -322,7 +320,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create data file for upload tool" do
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :upload_for_tool, :data_file => valid_data_file, :recipient_id => people(:quentin_person).id
+        post :upload_for_tool, :data_file => { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_id=>projects(:sysmo_project).id}, :recipient_id => people(:quentin_person).id
       end
     end
 
