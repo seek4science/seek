@@ -8,7 +8,7 @@ module ApplicationHelper
     items = all_items.select &:can_view?
     title_only_items = (all_items - items).select &:title_is_public?
     html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
-    if items.empty?
+    if items.empty? and title_only_items.empty?
       html << "<span class='none_text'>No #{attribute}</span>"
     else
       original_size     = all_items.size
