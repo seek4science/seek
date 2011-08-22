@@ -67,7 +67,13 @@
           <% unless extra_count < 1 %>
             <div class="list_items_container">
               <div class="hidden_list_item" style="color:#000">
-                <%= link_to "View all "+(extra_count + resources.size).to_s+" items", filter_url(resource_type, item) %>
+                <%= item ||= nil
+                    if item
+                        link_to "View all "+(extra_count + resources.size).to_s+" items", filter_url(resource_type, item)
+                    else
+                        link_to "View all items", eval("#{resource_type.pluralize.underscore}_path")
+                    end
+                        %>
               </div>
               <br style="clear:both"/>
             </div>

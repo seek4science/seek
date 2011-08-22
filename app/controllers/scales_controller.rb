@@ -40,6 +40,14 @@ class ScalesController < ApplicationController
       end
      end
 
+    limit = 20
+    resource_hash.each_key do |key|
+      if limit && resource_hash[key][:items].size > limit
+        resource_hash[key][:extra_count] = resource_hash[key][:items].size - limit
+        resource_hash[key][:items] = resource_hash[key][:items][0...limit]
+      end
+    end
+
 
     render :update do |page|
       page.replace_html "scaled_items_id", :partial=>"assets/resource_listing_tabbed_by_class", :locals =>{:resource_hash=>resource_hash, :narrow_view => true, :authorization_already_done => true}
