@@ -25,8 +25,7 @@ class ScalesController < ApplicationController
 
    def scale_search
     @scale = Scale.find_by_title(params[:scale_type])
-    scalings = @scale ? @scale.scalings : Scale.all.collect(&:scalings).flatten
-    @scaled_objects = scalings.collect(&:scalable).compact.uniq
+    @scaled_objects = @scale ? @scale.scalings.collect(&:scalable).compact.uniq : everything
 
     resource_hash={}
     @scaled_objects.each do |res|
@@ -51,6 +50,12 @@ class ScalesController < ApplicationController
 
 
   private
+
+   def everything
+    user_creatable_classes.inject([]) do |items, klass|
+      items + klass.all
+    end
+  end
 
   #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
   def select_authorised collection
