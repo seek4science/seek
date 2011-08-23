@@ -6,7 +6,7 @@ require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'li
 
 class Annotation < ActiveRecord::Base
 
-  before_save :reindex if Seek::Config.solr_enabled
+  after_save :reindex if Seek::Config.solr_enabled
 
 
   private
