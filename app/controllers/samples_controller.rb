@@ -41,7 +41,7 @@ class SamplesController < ApplicationController
 
     #add policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-    sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+    sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
         sops.each do |s_id|
@@ -67,7 +67,7 @@ class SamplesController < ApplicationController
 
 
   def update
-      sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+      sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
       @sample.attributes = params[:sample]
 
