@@ -42,7 +42,7 @@ class SamplesController < ApplicationController
     #add policy to sample
     @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
     tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
-    sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+    sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
     if @sample.save
         tissue_and_cell_types.each do |t|
@@ -72,7 +72,7 @@ class SamplesController < ApplicationController
 
 
   def update
-      sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
+      sops       = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
 
       tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
       sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
