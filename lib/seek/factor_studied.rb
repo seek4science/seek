@@ -10,8 +10,8 @@ module Seek
     new_substances.each do |new_substance|
        #call the webservice to retrieve the substance annotation from sabiork
        #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_id, kegg_ids
-       #compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(new_substance)
-       compound_annotation = {'recommended_name' => "#{new_substance}", 'synonyms' => ["#{new_substance}_1","#{new_substance}_2"], 'sabiork_id' => 50, 'chebi_id' => "CHEBI:15377", 'kegg_ids' => ["C00001", "C00002"]}
+       compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(new_substance)
+       #compound_annotation = {'recommended_name' => "#{new_substance}", 'synonyms' => ["#{new_substance}_1","#{new_substance}_2"], 'sabiork_id' => 50, 'chebi_id' => "CHEBI:15377", 'kegg_ids' => ["C00001", "C00002"]}
        unless compound_annotation.blank?
          #retrieve or create compound with the recommended_name
          recommended_name = compound_annotation["recommended_name"]
