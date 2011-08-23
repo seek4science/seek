@@ -6,7 +6,7 @@ require 'seek/config'
 #Features enabled
 Seek::Config.default :public_seek_enabled,false
 Seek::Config.default :sycamore_enabled,false
-Seek::Config.default :events_enabled,false
+Seek::Config.default :events_enabled,true
 Seek::Config.default :jerm_enabled,true
 Seek::Config.default :test_enabled, false  #FIXME: whats this used for??
 Seek::Config.default :email_enabled,false
