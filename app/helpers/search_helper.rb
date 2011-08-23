@@ -2,8 +2,8 @@ module SearchHelper
   
   def search_type_options
     types = ["All","People","Institutions","Projects","Sops","Studies","Assays","Samples","Specimens","Investigations","Models","Data files", "Publications","Presentations"]
-    types.delete("Samples") unless Seek::Config.is_virtualliver
-    types.delete("Specimens") unless Seek::Config.is_virtualliver
+#    types.delete("Samples") unless Seek::Config.is_virtualliver
+#    types.delete("Specimens") unless Seek::Config.is_virtualliver
     types
   end
     
