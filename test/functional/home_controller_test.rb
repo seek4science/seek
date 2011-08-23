@@ -188,8 +188,10 @@ else
    test "ids of scales list should be the same as scales defined in Seek::Config.scales" do
      get :index
      assert_response :success
-     assert_select 'div#options ul>li',Seek::Config.scales.length do
-       Seek::Config.scales.each do |scale|
+     scales = ["all"]
+     scales += Seek::Config.scales
+     assert_select 'div#options ul>li',scales.length do
+         scales.each do |scale|
          assert_select "[id=?]",scale
        end
      end
