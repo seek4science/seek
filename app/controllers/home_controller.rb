@@ -6,8 +6,8 @@ class HomeController < ApplicationController
 
   def index
     @scale = Scale.find_by_title(params[:scale_type])
-    scalings = @scale ? @scale.scalings : Scale.all.collect(&:scalings).flatten
-    @scaled_objects = scalings.collect(&:scalable).compact.uniq
+
+    @scaled_objects = @scale ? @scale.scalings.collect(&:scalable).compact.uniq : everything
 
     respond_to do |format|
       format.html # index.html.erb      
@@ -69,7 +69,11 @@ class HomeController < ApplicationController
 
   RECENT_SIZE=3
 
- 
+  def everything
+    user_creatable_classes.inject([]) do |items, klass|
+      items + klass.all
+    end
+  end
 
   def classify_for_tabs result_collection
     #FIXME: this is duplicated in application_helper - but of course you can't call that from within controller

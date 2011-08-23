@@ -34,7 +34,7 @@ jQuery(document).ready(function($) {
             orientation: "vertical",
             min: 0,
             max: (scales_arr.length - 1),
-            value: (scales_arr.length - 1),
+            value: current_scale,
             animate:true,
             slide: function (event, ui) {
                 previousValue = val;
