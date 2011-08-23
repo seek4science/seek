@@ -7,6 +7,12 @@ class InvestigationsController < ApplicationController
   before_filter :make_investigation_and_auth,:only=>[:create]
   before_filter :find_and_auth,:only=>[:edit, :update, :destroy]
 
+  def new_object_based_on_existing_one
+    @existing_investigation =  Investigation.find(params[:id])
+    @investigation = @existing_investigation.clone_with_associations
+    render :action=>"new"
+  end
+
   def destroy    
     @investigation.destroy
 
@@ -17,7 +23,8 @@ class InvestigationsController < ApplicationController
   end
 
   def show
-    @investigation=Investigation.find(params[:id])        
+    @investigation=Investigation.find(params[:id])
+    @investigation.create_from_asset = params[:create_from_asset]
     respond_to do |format|
       format.html
       format.xml
@@ -28,11 +35,14 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-    @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
+    @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
     respond_to do |format|
       if @investigation.save
         flash[:notice] = 'The Investigation was successfully created.'
-        format.html { redirect_to(@investigation) }
+        if @investigation.create_from_asset=="true"
+           flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
+        end
+        format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
         format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
       else
         format.html { render :action => "new" }
@@ -43,7 +53,7 @@ class InvestigationsController < ApplicationController
 
   def new
     @investigation=Investigation.new
-
+    @investigation.create_from_asset = params[:create_from_asset]
     respond_to do |format|
       format.html
       format.xml { render :xml=>@investigation}
@@ -65,7 +75,7 @@ class InvestigationsController < ApplicationController
 
     if params[:sharing]
       @investigation.policy_or_default
-      @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.project
+      @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
     end
 
     respond_to do |format|
@@ -84,7 +94,7 @@ class InvestigationsController < ApplicationController
 
   def make_investigation_and_auth
     @investigation=Investigation.new(params[:investigation])
-    unless current_user.person.projects.include?(@investigation.project)
+    unless current_user.person.member_of? @investigation.projects
       respond_to do |format|
         flash[:error] = "You cannot create a investigation for a project you are not a member of."
         format.html { redirect_to investigations_path }

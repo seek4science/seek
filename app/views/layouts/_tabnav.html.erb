@@ -21,10 +21,10 @@
 
 
          <!-- Samples tab -->
-        <%# tab_definition :controllers=>["samples"] -%>
+        <%= tab_definition :controllers=>["samples"] -%>
 
         <!-- Specimens tab -->
-        <%# tab_definition :controllers=>["specimens"] -%>
+        <%= tab_definition :controllers=>["specimens"] -%>
 
         <!-- Data tab -->
         <%= tab_definition :controllers=>["data_files"], :title=>"Data", :gap_before=>true -%>
@@ -38,10 +38,13 @@
         <!-- Publications tab -->
         <%= tab_definition :controllers=>["publications"] -%>
 
+        <!-- Presentations tab -->
+        <%= tab_definition :controllers=>["presentations"] if Seek::Config.presentations_enabled-%>
+
         <!-- Forums tab -->
         <!-- Be hidden for unlogin user -->
         <% if logged_in? %>
-            <%= tab_definition :controllers=>["forums", "topics"], :gap_before=>true -%>
+            <%# tab_definition :controllers=>["forums", "topics"], :gap_before=>true -%>
         <% end %>
 
         <!-- Events tab -->

@@ -1,3 +1,4 @@
+require 'project_compat'
 module Acts
   module Authorized
     module PolicyBasedAuthorization
@@ -10,7 +11,7 @@ module Acts
           #checks a policy exists, and if missing resorts to using a private policy
           after_initialize :policy_or_default_if_new
 
-          belongs_to :project unless method_defined? :project
+          include ProjectCompat unless method_defined? :projects
 
           belongs_to :policy, :required_access_to_owner => :manage, :autosave => true
         end

@@ -1,7 +1,8 @@
-	# Filters added to this controller apply to all controllers in the application.
+# Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
-
 class ApplicationController < ActionController::Base
+  require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'controllers', 'application_controller')
+
   skip_after_filter :add_piwik_analytics_tracking if Seek::Config.piwik_analytics_enabled == false
 
   self.mod_porter_secret = PORTER_SECRET
@@ -115,7 +116,11 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
+          if eval("#{controller_name.camelcase}Controller.new").respond_to?("index")
+            redirect_to polymorphic_path(controller_name)
+          else
+            redirect_to root_url
+          end
         end
         format.json { render :json => {:status => 401, :error_message => flash[:error] } }
       end
@@ -145,26 +150,22 @@ class ApplicationController < ActionController::Base
       return false
     end
 
-    case Seek::Config.type_managers
-      when "admins"
-      if User.admin_logged_in?
-        return true
-      else
-        error("Admin rights required to manage types", "...")
-        return false
-      end
-      when "pals"
-      if User.admin_logged_in? || User.pal_logged_in?
-        return true
-      else
-        error("Admin or PAL rights required to manage types", "...")
-        return false
-      end
-      when "users"
+    if User.current_user.can_manage_types?
       return true
-      when "none"
-      error("Type management disabled", "...")
-      return false
+    else
+      case Seek::Config.type_managers
+        when "admins"
+          error("Admin rights required to manage types", "...")
+          return false
+
+        when "pals"
+          error("Admin or PAL rights required to manage types", "...")
+          return false
+
+        when "none"
+          error("Type management disabled", "...")
+          return false
+      end
     end
   end
 
@@ -202,7 +203,7 @@ class ApplicationController < ActionController::Base
           'tag', 'items', 'statistics', 'tag_suggestions', 'preview'
         'view'
 
-      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot'
+      when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute','plot', 'explore'
         'download'
 
       when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
@@ -236,7 +237,12 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
-          flash[:error] = "You may not #{action} #{name}:#{params[:id]}"
+          if User.current_user.nil?
+            flash[:error] = "You may not #{action} #{name}:#{params[:id]} , please log in first"
+          else
+            flash[:error] = "You are not authorized to view this  #{name.humanize}"
+          end
+
           format.html do
             case action
               when 'manage'   then redirect_to object
@@ -252,7 +258,11 @@ class ApplicationController < ActionController::Base
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
-        flash[:error] = "Couldn't find the #{name.humanize} or you are not authorized to view it"
+        if eval("@#{name}").nil?
+          flash[:error] = "The #{name.humanize} does not exist!"
+        else
+          flash[:error] = "You are not authorized to view #{name.humanize}"
+        end
         format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false
@@ -284,28 +294,34 @@ class ApplicationController < ActionController::Base
                      :controller_name=>c,
                      :activity_loggable => object)
         end
-        when "investigations","studies","assays"
+        when "investigations","studies","assays","specimens","samples"
         if ["show","create","update","destroy"].include?(a)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
-                     :referenced => object.project,
+                     :referenced => object.projects.first,
                      :controller_name=>c,
-                     :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
+
         end
-        when "data_files","models","sops","publications","events"
+        when "data_files","models","sops","publications","presentations","events"
+          a = "create" if a == "upload_for_tool"
+          a = "update" if a == "new_version"
         if ["show","create","update","destroy","download"].include?(a)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
-                     :referenced => object.project,
+                     :referenced => object.projects.first,
                      :controller_name=>c,
-                     :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
         end
         when "people"
         if ["show","create","update","destroy"].include?(a)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
                      :controller_name=>c,
-                     :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
         end
         when "search"
         if a=="index"

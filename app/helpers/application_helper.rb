@@ -1,8 +1,30 @@
 # Methods added to this helper will be available to all templates in the application.
-
+require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'lib', 'app', 'helpers', 'application_helper')
 module ApplicationHelper  
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
+
+
+  def authorized_list items, attribute, sort=true, max_length=75, count_hidden_items=false
+    items = Authorization.authorize_collection("view", items, current_user, count_hidden_items)
+    html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
+    if items.empty?
+      html << "<span class='none_text'>No #{attribute}</span>"
+    else
+      original_size     = items.size
+      items             = items.compact
+      hidden_item_count = original_size - items.size
+      items = items.sort { |a, b| get_object_title(a)<=>get_object_title(b) } if sort
+      items.each do |i|
+        html << (link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i))
+        html << ", " unless items.last==i
+      end
+      if count_hidden_items && hidden_item_count>0
+        html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
+      end
+    end
+    return html
+  end
 
 
   #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
@@ -14,10 +36,10 @@ module ApplicationHelper
       end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
       classes.delete(Event) unless Seek::Config.events_enabled
       
-      unless Seek::Config.is_virtualliver
-        classes.delete(Sample)
-        classes.delete(Specimen)
-      end
+#      unless Seek::Config.is_virtualliver
+#        classes.delete(Sample)
+#        classes.delete(Specimen)
+#      end
 
       classes
     end    
@@ -463,8 +485,11 @@ module ApplicationHelper
       javascript_include_tag file
     end
   end
+
+
+
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

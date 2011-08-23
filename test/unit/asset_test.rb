@@ -7,13 +7,13 @@ class AssetTest < ActiveSupport::TestCase
   test "creatable classes order" do
     oldval = Seek::Config.is_virtualliver
     Seek::Config.is_virtualliver = true
-    assert_equal [DataFile,Model,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],user_creatable_classes
+    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],user_creatable_classes
     Seek::Config.is_virtualliver = oldval
   end
 
   test "default contributor or nil" do
     User.current_user = users(:owner_of_my_first_sop)
-    model = Model.new :title=>"A model",:project=>projects(:sysmo_project)
+    model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil})
     assert_equal users(:owner_of_my_first_sop),model.contributor
     model.contributor = nil
     model.save!

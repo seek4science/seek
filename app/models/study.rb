@@ -3,7 +3,10 @@ class Study < ActiveRecord::Base
   acts_as_isa
 
   belongs_to :investigation
-  has_one :project, :through=>:investigation
+
+  def projects
+    investigation.try(:projects) || []
+  end
 
   acts_as_authorized
 
@@ -28,6 +31,13 @@ class Study < ActiveRecord::Base
 
   def can_delete? *args
     assays.empty? && super
+  end
+
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = self.policy.deep_copy
+
+    return new_object
   end
 
 end

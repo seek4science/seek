@@ -72,7 +72,7 @@ class ModelsControllerTest < ActionController::TestCase
   end    
   
   test "should correctly handle bad data url" do
-    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:project=>projects(:sysmo_project)}
+    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :model => model, :sharing=>valid_sharing
@@ -643,6 +643,22 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "removing an asset should not break show pages for items that have attribution relationships referencing it" do
+    model = Factory :model, :contributor => User.current_user
+    disable_authorization_checks do
+      attribution = Factory :model
+      model.relationships.create :object => attribution, :predicate => Relationship::ATTRIBUTED_TO
+      model.save!
+      attribution.destroy
+    end
+
+    get :show, :id => model.id
+    assert_response :success
+
+    model.reload
+    assert model.relationships.empty?
+  end
+
   test "cannot get preview_publish when not manageable" do
     login_as(:quentin)
     model=models(:teusink)
@@ -653,11 +669,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model
-    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_model_with_url
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
   
 end

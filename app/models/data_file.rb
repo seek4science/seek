@@ -6,10 +6,25 @@ require 'title_trimmer'
 
 class DataFile < ActiveRecord::Base
 
+  include SpreadsheetUtil
+
   acts_as_asset
   acts_as_trashable
 
   title_trimmer
+
+  def convert_to_presentation
+      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
+      presentation = Presentation.new presentation_attrs
+      presentation.policy = self.policy.deep_copy
+      presentation.event_ids = self.event_ids
+      presentation.project_ids = self.project_ids
+      presentation.creators = self.creators
+      presentation.orig_data_file_id= self.id
+      self.subscriptions.each {|sub| presentation.subscriptions.build :person_id => sub.person_id}
+      presentation
+  end
+
 
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
@@ -34,14 +49,15 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts,:annotations]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
   acts_as_uniquely_identifiable
 
-
   explicit_versioning(:version_column => "version") do
+
+    include SpreadsheetUtil
     acts_as_versioned_resource
     
     belongs_to :content_blob
@@ -78,11 +94,6 @@ class DataFile < ActiveRecord::Base
     return datafiles_with_contributors.to_json
   end
 
-  def self.spreadsheets
-    
-  end
-  
-
   def relationship_type(assay)
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting
     assay_assets.find_by_assay_id(assay.id).relationship_type  
@@ -96,5 +107,15 @@ class DataFile < ActiveRecord::Base
   def self.user_creatable?
     true
   end
-  
+
+  #the annotation string values to be included in search indexing
+  def annotations
+    annotations = []
+    content_blob.worksheets.each do |ws|
+      ws.cell_ranges.each do |cell_range|
+        annotations = annotations | cell_range.annotations.collect{|a| a.value.text}
+      end
+    end
+    annotations
+  end
 end

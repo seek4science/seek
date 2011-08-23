@@ -5,6 +5,7 @@ class DataFilesController < ApplicationController
   
   include IndexPager
   include SysMODB::SpreadsheetExtractor
+  include SpreadsheetUtil
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
@@ -13,10 +14,70 @@ class DataFilesController < ApplicationController
   
   before_filter :find_assets, :only => [ :index ]
   before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
-  before_filter :find_display_data_file, :only=>[:show,:download]
+  before_filter :find_display_data_file, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
   include Seek::Publishing
+
+  def convert_to_presentation
+    @data_file = DataFile.find params[:id]
+    @presentation = @data_file.convert_to_presentation
+
+    class << @presentation
+
+      def clone_versioned_data_file_model versioned_presentation, versioned_data_file
+          versioned_presentation.attributes.keys.each do |key|
+            versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"
+          end
+      end
+
+      def set_new_version
+         self.version = DataFile.find(self.orig_data_file_id).version
+      end
+      def save_version_on_create
+         df_versions = DataFile::Version.find(:all,:conditions=>["data_file_id =?",self.orig_data_file_id])
+         df_versions.each do |df_version|
+            rev = Presentation::Version.new
+            self.clone_versioned_data_file_model(rev,df_version)
+            rev.presentation_id = self.id
+            saved = rev.save
+            if saved
+              # Now update timestamp columns on main model.
+              # Note: main model doesnt get saved yet.
+              update_timestamps(rev, self)
+            end
+         end
+      end
+    end
+
+   saved = nil
+   if current_user.admin? or @data_file.can_delete?
+       saved = disable_authorization_checks { @presentation.save }
+   end
+
+    respond_to do |format|
+
+      if saved
+        disable_authorization_checks do
+          # update attributions
+          Relationship.create_or_update_attributions(@presentation, @data_file.attributions_objects.collect { |a| [a.class.name, a.id] })
+
+          # update related publications
+          Relationship.create_or_update_attributions(@presentation, @data_file.related_publications.collect { |p| ["Publication", p.id.to_json] }, Relationship::RELATED_TO_PUBLICATION) unless @data_file.related_publications.blank?
+
+          @data_file.destroy
+
+          flash[:notice]="Data File '#{@presentation.title}' is successfully converted to Presentation"
+          format.html { redirect_to presentation_path(@presentation) }
+        end
+      else
+        flash.now[:error] = "Data File failed to convert to Presentation!!"
+        format.html {
+          redirect_to data_data_file_path @data_file
+        }
+      end
+    end
+  end
 
   def plot
     sheet = params[:sheet] || 2
@@ -80,7 +141,7 @@ class DataFilesController < ApplicationController
   def upload_for_tool
 
     if handle_data
-
+      params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
       @data_file = DataFile.new params[:data_file]
 
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
@@ -109,7 +170,7 @@ class DataFilesController < ApplicationController
 
       update_tags @data_file
 
-      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
 
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
@@ -151,7 +212,7 @@ class DataFilesController < ApplicationController
     # (this will also trigger timestamp update in the corresponding Asset)
     @data_file.last_used_at = Time.now
     @data_file.save_without_timestamping
-    
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml
@@ -176,6 +237,8 @@ class DataFilesController < ApplicationController
       params[:data_file][:last_used_at] = Time.now
     end
 
+    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
+
     update_tags @data_file
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
@@ -183,7 +246,7 @@ class DataFilesController < ApplicationController
 
       if params[:sharing]
         @data_file.policy_or_default
-        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
+        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
       end
 
       if @data_file.save
@@ -192,7 +255,7 @@ class DataFilesController < ApplicationController
         Relationship.create_or_update_attributions(@data_file, params[:attributions])
         
         # update related publications        
-        Relationship.create_or_update_attributions(@data_file, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@data_file, publication_params, Relationship::RELATED_TO_PUBLICATION)
         
         
         #update creators
@@ -282,6 +345,24 @@ end
       page[:requesting_resource_status].replace_html "An email has been sent on your behalf to <b>#{resource.managers.collect{|m| m.name}.join(", ")}</b> requesting the file <b>#{h(resource.title)}</b>."
     end
   end  
+  
+  def explore
+    if @display_data_file.is_spreadsheet?
+      #Generate Ruby spreadsheet model from XML
+      @spreadsheet = @display_data_file.spreadsheet
+
+      #FIXME: Annotations need to be specific to version
+      @spreadsheet.annotations = @display_data_file.spreadsheet_annotations
+      respond_to do |format|
+        format.html { render :layout=>"minimal" }
+      end
+    else
+     respond_to do |format|
+        flash[:error] = "Unable to view contents of this data file"
+        format.html { redirect_to @display_data_file,:format=>"html" }
+      end
+    end
+  end 
   
   protected    
   

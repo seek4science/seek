@@ -6,7 +6,7 @@ class Investigation < ActiveRecord::Base
   has_many :studies  
 
 
-  validates_presence_of :project
+  validates_presence_of :projects
   validates_uniqueness_of :title
 
   has_many :assays,:through=>:studies
@@ -24,4 +24,12 @@ class Investigation < ActiveRecord::Base
   def sops
     assays.collect{|assay| assay.sops}.flatten.uniq
   end
+
+  def clone_with_associations
+    new_object= self.clone
+    new_object.policy = self.policy.deep_copy
+
+    return new_object
+  end
+
 end

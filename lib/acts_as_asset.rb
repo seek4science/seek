@@ -25,14 +25,17 @@ module Acts #:nodoc:
     end
 
     module ClassMethods
+
       def acts_as_asset
         acts_as_authorized
         does_not_require_can_edit :last_used_at
         acts_as_favouritable
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
+
+
         validates_presence_of :title
-        validates_presence_of :project
+        validates_presence_of :projects
         
         acts_as_taggable
 
@@ -47,6 +50,10 @@ module Acts #:nodoc:
                  :conditions => {:predicate => Relationship::ATTRIBUTED_TO},
                  :dependent  => :destroy
 
+        has_many :inverse_relationships,
+                 :class_name => 'Relationship',
+                 :as => :object,
+                 :dependent => :destroy
 
         has_many :assay_assets, :dependent => :destroy, :as => :asset, :foreign_key => :asset_id
         has_many :assays, :through => :assay_assets
@@ -62,12 +69,15 @@ module Acts #:nodoc:
           extend Acts::Asset::SingletonMethods
         end
         include Acts::Asset::InstanceMethods
-
+        include Subscribable
       end
 
       def is_asset?
         include?(Acts::Asset::InstanceMethods)
       end
+
+
+
     end
 
     module SingletonMethods
@@ -91,9 +101,9 @@ module Acts #:nodoc:
 
 
       def cache_remote_content_blob
-        if self.content_blob && self.content_blob.url && self.project
+        if self.content_blob && self.content_blob.url && self.projects.first
           begin
-            p=self.project
+            p=self.projects.first
             p.decrypt_credentials
             downloader            =Jerm::DownloaderFactory.create p.name
             resource_type         = self.class.name.split("::")[0] #need to handle versions, e.g. Sop::Version
@@ -106,6 +116,17 @@ module Acts #:nodoc:
             puts "Error caching remote data for url=#{self.content_blob.url} #{e.message[0..50]} ..."
           end
         end
+      end
+
+      def project_assays
+        all_assays=Assay.all.select{|assay| assay.can_edit?(User.current_user)}.sort_by &:title
+        all_assays = all_assays.select do |assay|
+          assay.is_modelling?
+        end if self.is_a? Model
+
+        project_assays = all_assays.select { |df| User.current_user.person.projects.include?(df.project) }
+
+        project_assays
       end
 
       # def asset; return self; end

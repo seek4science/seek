@@ -7,7 +7,7 @@
 
 
 <div class="list_item_right_column">
-  <%= list_item_attribute "Project", resource.project.title, resource.project %>
+  <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
   <%= list_item_authorized_attribute "Person responsible", resource.person_responsible %>
 </div>
 

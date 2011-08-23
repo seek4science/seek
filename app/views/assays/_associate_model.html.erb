@@ -10,7 +10,7 @@
     
       <%
         all_models=authorised_models.sort{|a, b| a.title<=>b.title}
-        project_models=all_models.select{|s| current_user.person.projects.include?(s.project )}
+        project_models=all_models.select{|s| current_user.person.member_of?(s.projects)}
         select_truncate_length=120
       -%>
 

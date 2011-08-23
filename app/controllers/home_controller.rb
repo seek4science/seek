@@ -3,6 +3,7 @@ class HomeController < ApplicationController
 
   before_filter :redirect_to_sign_up_when_no_user
 
+
   def index
     respond_to do |format|
       format.html # index.html.erb      
@@ -50,6 +51,12 @@ class HomeController < ApplicationController
 
   def recent_changes
     respond_to do |format|
+      format.html
+    end
+  end
+
+  def seek_intro_demo
+     respond_to do |format|
       format.html
     end
   end

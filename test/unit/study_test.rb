@@ -10,12 +10,12 @@ class StudyTest < ActiveSupport::TestCase
 
     assert_not_nil study.assays
     assert_equal 1,study.assays.size
-    assert_not_nil study.investigation.project
+    assert !study.investigation.projects.empty?
 
     assert study.assays.include?(assays(:metabolomics_assay))
     
-    assert_equal projects(:sysmo_project),study.investigation.project
-    assert_equal projects(:sysmo_project),study.project
+    assert_equal projects(:sysmo_project),study.investigation.projects.first
+    assert_equal projects(:sysmo_project),study.projects.first
     
     assert_equal assay_types(:metabolomics),study.assays.first.assay_type
 
@@ -28,7 +28,7 @@ class StudyTest < ActiveSupport::TestCase
   #only authorized people can delete a study, and a study must have no assays
   test "can delete" do
     project_member = Factory :person
-    study = Factory :study, :contributor => Factory(:person), :investigation => Factory(:investigation, :project => project_member.projects.first)
+    study = Factory :study, :contributor => Factory(:person), :investigation => Factory(:investigation, :projects => project_member.projects)
     assert !study.can_delete?(Factory(:user))
     assert !study.can_delete?(project_member.user)
     assert study.can_delete?(study.contributor)
@@ -58,13 +58,12 @@ class StudyTest < ActiveSupport::TestCase
 
   test "project from investigation" do
     study=studies(:metabolomics_study)
-    assert_equal projects(:sysmo_project), study.project
-    assert_not_nil study.project.name
+    assert_equal projects(:sysmo_project), study.projects.first
+    assert_not_nil study.projects.first.name
   end
 
   test "title trimmed" do
-    s=Study.new(:title=>" title",:investigation=>investigations(:metabolomics_investigation))
-    s.save!
+    s=Factory(:study, :title=>" title")
     assert_equal("title",s.title)
   end
   

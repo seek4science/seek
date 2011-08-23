@@ -88,7 +88,7 @@
           <xsd:element name="blob" type="Blob" minOccurs="1"
                        maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
-                       minOccurs="1" maxOccurs="1"></xsd:element>
+                       minOccurs="1" maxOccurs="unbounded"></xsd:element>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
@@ -171,7 +171,7 @@
 						minOccurs="1" maxOccurs="1"></xsd:element>
                     <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
-                       maxOccurs="1" minOccurs="1"></xsd:element>
+                       maxOccurs="unbounded" minOccurs="1"></xsd:element>
           <xsd:element name="associated" type="AssociatedItems"
                        minOccurs="1" maxOccurs="1"></xsd:element>
         </xsd:sequence>
@@ -232,7 +232,7 @@
                        minOccurs="1" maxOccurs="1"></xsd:element>
                     <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
-                       maxOccurs="1" minOccurs="1"></xsd:element>
+                       maxOccurs="unbounded" minOccurs="1"></xsd:element>
           <xsd:element name="associated" type="AssociatedItems"
                        minOccurs="1" maxOccurs="1"></xsd:element>
         </xsd:sequence>
@@ -295,7 +295,7 @@
                        minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
-                       maxOccurs="1" minOccurs="1"></xsd:element>
+                       maxOccurs="unbounded" minOccurs="1"></xsd:element>
           <xsd:element name="assay_class" type="ResourceLink"
                        maxOccurs="1" minOccurs="1"></xsd:element>
           <xsd:element name="assay_type" type="ResourceLink"
@@ -410,7 +410,7 @@
                        maxOccurs="1"></xsd:element>
           <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
-                       minOccurs="1" maxOccurs="1"></xsd:element>
+                       minOccurs="1" maxOccurs="unbounded"></xsd:element>
 
           <xsd:element name="associated" type="AssociatedItems"
                        minOccurs="1" maxOccurs="1"></xsd:element>
@@ -470,8 +470,8 @@
                        minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="creators" type="Creators" minOccurs="1"
                        maxOccurs="1"></xsd:element>
-          <xsd:element name="project" type="ProjectItem" minOccurs="1"
-						maxOccurs="1" nillable="true"></xsd:element>
+          <xsd:element name="project" type="ProjectItem" minOccurs="0"
+						maxOccurs="unbounded" nillable="true"></xsd:element>
           <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="associated" type="AssociatedItems"
                        minOccurs="1" maxOccurs="1"></xsd:element>
@@ -582,7 +582,7 @@
                        maxOccurs="1"></xsd:element>
           <xsd:element name="policy" type="xsd:anyType" minOccurs="0" maxOccurs="1"></xsd:element>
           <xsd:element name="project" type="ProjectItem"
-                       minOccurs="1" maxOccurs="1"></xsd:element>
+                       minOccurs="1" maxOccurs="unbounded"></xsd:element>
           <xsd:element name="doi" type="xsd:string" minOccurs="1"
                        maxOccurs="1" nillable="true"></xsd:element>
           <xsd:element name="pubmed_id" type="xsd:string"
@@ -668,6 +668,50 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <xsd:element name="presentations" type="Presentations"></xsd:element>
+  <xsd:element name="presentation" type="Presentation"></xsd:element>
+
+  <xsd:complexType name="Presentation">
+    <xsd:complexContent>
+      <xsd:extension base="AssetType">
+        <xsd:sequence>
+          <xsd:element name="filename" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
+          <xsd:element name="associated" type="AssociatedItems"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Presentations">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalIndex">
+        <xsd:sequence>
+          <xsd:element name="parameters" type="Parameters"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="statistics" type="PagedStatistics"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="items" type="PresentationItems"
+                       maxOccurs="1" minOccurs="1"></xsd:element>
+          <xsd:element name="related" type="xsd:anyType"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="PresentationItems">
+    <xsd:sequence>
+      <xsd:element name="presentation" type="AssetItem" maxOccurs="unbounded"
+                   minOccurs="0"></xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
   <xsd:element name="events" type="Events"></xsd:element>
   <xsd:element name="event" type="Event"></xsd:element>
 
@@ -680,8 +724,8 @@
                        maxOccurs="1"></xsd:element>
                         <xsd:element name="submitter" type="Submitter"
 						minOccurs="1" maxOccurs="1"></xsd:element>
-          <xsd:element name="project" type="ProjectItem" minOccurs="1"
-						maxOccurs="1" nillable="true"></xsd:element>
+          <xsd:element name="project" type="ProjectItem" minOccurs="0"
+						maxOccurs="unbounded" nillable="true"></xsd:element>
           <xsd:element name="start_date" minOccurs="1"
                        maxOccurs="1"></xsd:element>
           <xsd:element name="end_date" minOccurs="1"
@@ -1256,6 +1300,8 @@
       <xsd:enumeration value="Events"></xsd:enumeration>
       <xsd:enumeration value="DataFile"></xsd:enumeration>
       <xsd:enumeration value="DataFiles"></xsd:enumeration>
+      <xsd:enumeration value="Presentation"></xsd:enumeration>
+      <xsd:enumeration value="Presentations"></xsd:enumeration>
       <xsd:enumeration value="Assay"></xsd:enumeration>
       <xsd:enumeration value="Assays"></xsd:enumeration>
       <xsd:enumeration value="Study"></xsd:enumeration>
@@ -1292,6 +1338,7 @@
       <xsd:element name="people" type="AssociatedPeople"></xsd:element>
       <xsd:element name="models" type="AssociatedModels"></xsd:element>
       <xsd:element name="samples" type="AssociatedSamples"></xsd:element>
+      <xsd:element name="presentations" type="AssociatedPresentations"></xsd:element>
       <xsd:element name="investigations" type="AssociatedInvestigations"></xsd:element>
       <xsd:element name="institutions" type="AssociatedInstitutions"></xsd:element>
       <xsd:element name="assays" type="AssociatedAssays"></xsd:element>
@@ -1392,6 +1439,17 @@
       <xsd:extension base="AssociatedLinks">
         <xsd:sequence>
           <xsd:element name="data_file" type="ResourceLink"
+                       minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="AssociatedPresentations">
+    <xsd:complexContent>
+      <xsd:extension base="AssociatedLinks">
+        <xsd:sequence>
+          <xsd:element name="presentation" type="ResourceLink"
                        minOccurs="0" maxOccurs="unbounded"></xsd:element>
         </xsd:sequence>
       </xsd:extension>

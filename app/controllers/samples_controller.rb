@@ -3,8 +3,27 @@ class SamplesController < ApplicationController
   include IndexPager
   before_filter :find_assets, :only => [:index]
   before_filter :find_and_auth, :only => [:show, :edit, :update, :destroy]
-  before_filter :virtualliver_only
+  #before_filter :virtualliver_only
 
+
+  def new_object_based_on_existing_one
+    @existing_sample =  Sample.find(params[:id])
+    @sample = @existing_sample.clone_with_associations
+
+    unless @sample.specimen.can_view?
+      @sample.specimen = nil
+      flash.now[:notice] = "The specimen of the existing sample cannot be viewed, please specify your own specimen! <br/> "
+    end
+
+    @existing_sample.sop_masters.each do |s|
+       if !s.sop.can_view?
+       flash.now[:notice] << "Some or all sops of the existing sample cannot be viewed, you may specify your own! <br/>"
+        break
+      end
+    end
+    render :action=>"new"
+
+  end
 
   def new
     @sample = Sample.new
@@ -17,13 +36,16 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(params[:sample])
-    @sample.contributor = current_user
-    @sample.strain_ids = params[:sample_strain_ids]||[]
+
     #add policy to sample
-    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.project
-    @sample.policy.set_attributes_with_sharing params[:sharing],@sample.project
+    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
+    sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
     respond_to do |format|
       if @sample.save
+        sops.each do |s_id|
+          s = Sop.find(s_id)
+          @sample.associate_sop(s) if s.can_view?
+        end
           flash[:notice] = 'Sample was successfully created.'
           format.html { redirect_to(@sample) }
           format.xml  { head :ok }
@@ -36,18 +58,27 @@ class SamplesController < ApplicationController
 
 
   def update
-
-      @sample.strain_ids = params[:sample_strain_ids]
+      sops       = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
 
       @sample.attributes = params[:sample]
 
       #update policy to sample
-      @sample.policy.set_attributes_with_sharing params[:sharing],@sample.project
+      @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
       respond_to do |format|
 
       if @sample.save
 
-          flash[:notice] = 'Sample was successfully created.'
+        if sops.blank?
+          @sample.sop_masters= []
+          @sample.save
+        else
+          sops.each do |s_id|
+          s = Sop.find(s_id)
+          @sample.associate_sop(s) if s.can_view?
+        end
+        end
+
+          flash[:notice] = 'Sample was successfully updated.'
           format.html { redirect_to(@sample) }
           format.xml  { head :ok }
 
@@ -69,10 +100,5 @@ class SamplesController < ApplicationController
     end
   end
 
-  def strains_selected_ajax
-      if params[:sample_strain_ids] && params[:sample_strain_ids]!="0"
-      @sample.strains = Strain.find(params[:sample_strain_ids])
-     end
-  end
 
 end

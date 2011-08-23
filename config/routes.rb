@@ -1,4 +1,14 @@
 ActionController::Routing::Routes.draw do |map|
+#   map.namespace(:admin) do |admin|
+#    admin.resources :slide_shows do |slide_show|
+#      slide_show.resources :slides, :member => { :move_up => :get, :move_down => :get }
+#    end
+#    admin.resources :slides, :member => { :move_up => :get, :move_down => :get }
+#  end
+
+
+  map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post }
+  map.resources :subscriptions
   map.resources :specimens
   map.resources :samples
 
@@ -24,7 +34,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post, :preview_permissions => :get},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post, :explore=>:get},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
   end
   
@@ -98,6 +108,10 @@ ActionController::Routing::Routes.draw do |map|
   map.feedback '/home/feedback',:controller=>'home',:action=>'feedback',:method=>:get
   map.send_feedback '/home/send_feedback',:controller=>'home',:action=>'send_feedback',:method=>:post
 
+  #link to youtube
+  map.seek_intro_demo 'home/seek_intro_demo',:controller=>'home',:action=>'seek_intro_demo',:method=>:get
+
+
   # favourite groups
   map.new_favourite_group '/favourite_groups/new', :controller => 'favourite_groups', :action => 'new', :conditions => { :method => :post }
   map.create_favourite_group '/favourite_groups/create', :controller => 'favourite_groups', :action => 'create', :conditions => { :method => :post }
@@ -110,7 +124,11 @@ ActionController::Routing::Routes.draw do |map|
   
   
   # review members of workgroup (also of a project / institution) popup
-  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }
+  map.review_work_group '/work_groups/review/:type/:id/:access_type', :controller => 'work_groups', :action => 'review_popup', :conditions => { :method => :post }  
+  
+  #create new specimen based existing one
+  #map.new_specimen_based_on_existing_one '/specimens/new_specimen_based_on_existing_one/:id',:controller=>'specimens',:action=>'new_specimen_based_on_existing_one', :conditions => { :method => :post }
+  map.new_object_based_on_existing_one ':controller_name/new_object_based_on_existing_one/:id',:controller=>'#{controller_name}',:action=>'new_object_based_on_existing_one', :conditions => { :method => :post }
 
   map.request_permission_summary '/policies/request_permission_summary', :controller => 'policies', :action => 'request_permission_summary', :conditions => { :method => :get }
 

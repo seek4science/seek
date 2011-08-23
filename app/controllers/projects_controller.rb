@@ -102,7 +102,7 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new(params[:project])
 
-    @project.default_policy.set_attributes_with_sharing params[:sharing], @project
+    @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
 
 
     respond_to do |format|
@@ -127,7 +127,7 @@ class ProjectsController < ApplicationController
     avatar_id = params[:project].delete(:avatar_id).to_i
     @project.avatar_id = ((avatar_id.kind_of?(Numeric) && avatar_id > 0) ? avatar_id : nil)
 
-    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], @project if params[:sharing]
+    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], [@project] if params[:sharing]
 
     respond_to do |format|
       if @project.update_attributes(params[:project])

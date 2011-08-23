@@ -102,7 +102,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should correctly handle bad data url" do
-    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:project=>projects(:sysmo_project)}
+    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -111,7 +111,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
 
     #not even a valid url
-    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:project=>projects(:sysmo_project)}
+    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -121,7 +121,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not create invalid sop" do
-    sop={:title=>"Test",:project=>projects(:sysmo_project)}
+    sop={:title=>"Test",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -697,11 +697,11 @@ class SopsControllerTest < ActionController::TestCase
   private
 
   def valid_sop_with_url
-    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
+    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_sop
-    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
+    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:projects=>[projects(:sysmo_project)]}
   end
 
 end

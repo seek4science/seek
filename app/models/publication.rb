@@ -10,7 +10,7 @@ class Publication < ActiveRecord::Base
   acts_as_asset
 
   validates_presence_of :title
-  validates_presence_of :project
+  validates_presence_of :projects
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
@@ -83,6 +83,10 @@ class Publication < ActiveRecord::Base
   
   def related_assays
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
+  end
+  
+  def self.subscribers_are_notified_of? action
+    action == 'create'
   end
   
   private

@@ -1,0 +1,11 @@
+annotation_1_content:
+  version: 1
+  text: "HELLO WORLD"
+
+annotation_2_content:
+  version: 1
+  text: "GOODBYE WORLD"
+
+annotation_3_content:
+  version: 1
+  text: "fish"

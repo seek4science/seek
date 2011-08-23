@@ -1,4 +1,4 @@
-<% project_events = Event.all.select(&:can_view?).sort_by(&:title).select {|e| e.project == resource.project} %>
+<% project_events = Event.all.select(&:can_view?).sort_by(&:title).select {|e| !(e.projects & resource.projects).empty?} %>
 
 <% fancy_multiselect resource, :events do %>
     <br/>
