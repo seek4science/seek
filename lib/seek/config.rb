@@ -217,7 +217,7 @@ module Seek
     extend CustomAccessors
 
     #Basic settings
-    settings = [:home_description, :public_seek_enabled, :events_enabled, :bioportal_api_key, :jerm_enabled, :test_enabled, :email_enabled, :no_reply, :jws_enabled,
+    settings = [:home_description, :public_seek_enabled, :events_enabled, :bioportal_api_key, :jerm_enabled, :email_enabled, :no_reply, :jws_enabled,
       :jws_online_root, :hide_details_enabled, :activation_required_enabled, :project_name, :smtp, :default_pages, :project_type, :project_link, :header_image_enabled, :header_image,
       :type_managers_enabled, :type_managers, :pubmed_api_email, :crossref_api_email,:site_base_host, :copyright_addendum_enabled, :copyright_addendum_content, :noreply_sender, :solr_enabled,
       :application_name,:application_title,:project_long_name,:project_title,:dm_project_name,:dm_project_title,:dm_project_link,:application_title,:header_image_link,:header_image_title,
