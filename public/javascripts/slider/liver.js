@@ -23,7 +23,7 @@ jQuery(document).ready(function($) {
         var val;
 
         // slider value<=>scale string
-        var scales_arr = ["cell","intercellular","liverLobule","liverLobe","liver","organism","all"];//["organism","liver","liverLobe","liverLobule","intercellular","cell"];
+        var scales_arr = ["cell","intercellular","liverLobule","liver","organism","all"];//["organism","liver","liverLobe","liverLobule","intercellular","cell"];
         var scale_id;
 
 
@@ -187,12 +187,9 @@ jQuery(document).ready(function($) {
         }
 
         $('#organism').click(function(e) {
-            moveSlider(e, 5);
-        });
-        $('#liver').click(function(e) {
             moveSlider(e, 4);
         });
-        $('#liverLobe').click(function(e) {
+        $('#liver').click(function(e) {
             moveSlider(e, 3);
         });
         $('#liverLobule').click(function(e) {
@@ -205,7 +202,7 @@ jQuery(document).ready(function($) {
             moveSlider(e, 0);
         });
         $('#all').click(function(e) {
-            moveSlider(e, 6);
+            moveSlider(e, 5);
         });
 
     });
