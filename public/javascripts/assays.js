@@ -85,7 +85,7 @@ function updateSops() {
         id=sop[1];
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         sop_text += '<li>' + titleText + 
-          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '&nbsp;&nbsp;<small style="vertical-align: middle;">' +
           '[<a href=\"\" onclick=\"javascript:removeSop('+i+'); return(false);\">remove</a>]</small></li>';
         sop_ids.push(id);
     }
@@ -165,7 +165,7 @@ function updateDataFiles() {
         relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         data_file_text += '<li>' + titleText + relationshipText +
-        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeDataFile('+i+'); return(false);">remove</a>]</small></li>';
     }
     
@@ -240,7 +240,7 @@ function updateModels() {
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         model_text += '<li>' + titleText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeModel('+i+'); return(false);">remove</a>]</small></li>';
         model_ids.push(id);
     }
@@ -329,7 +329,7 @@ function updateAssays() {
         relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         assay_text += '<li>' + titleText + relationshipText +
-        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeAssay('+i+'); return(false);">remove</a>]</small></li>';
     }
     assay_text += '</ul>';
@@ -443,7 +443,7 @@ function updateOrganisms() {
         }
         titleText +=  '</span>';
         organism_text += '<li>' + titleText +
-          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '&nbsp;&nbsp;<small style="vertical-align: middle;">' +
           '[<a href=\"\" onclick=\"javascript:removeOrganism('+i+'); return(false);\">remove</a>]</small></li>';
     }
 

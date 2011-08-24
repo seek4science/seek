@@ -46,7 +46,7 @@ function updatePublications() {
         relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         publication_text += '<li>' + titleText + relationshipText +
-        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removePublication('+i+'); return(false);">remove</a>]</small></li>';
     }
     
