@@ -11,15 +11,51 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
+   def included_to_be_copied? symbol
+     case symbol.to_s
+       when "activity_logs","versions","attributions","relationships","taggings","tag_taggings","tags","base_tags"
+         return false
+       else
+         return true
+     end
+   end
+
   def convert_to_presentation
-      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
-      presentation = Presentation.new presentation_attrs
+
+     presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
+     presentation = Presentation.new presentation_attrs
+
+      DataFile.reflect_on_all_associations.each do |a|
+       if presentation.respond_to? "#{a.name.to_s.singularize}_ids=".to_sym and a.macro!=:belongs_to and included_to_be_copied?(a.name)
+
+         p "#{a.macro}  #{a.name}"
+
+          association = self.send a.name
+
+         if a.options.include? :as
+
+           if !association.blank?
+
+             p "as ###################### "
+             association.each do |item|
+               attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
+              presentation.send("#{a.name}".to_sym).send :build,attrs
+             end
+           end
+         else
+
+          p "#{a.name.to_s.singularize}_ids="
+          presentation.send "#{a.name.to_s.singularize}_ids=".to_sym, association.map(&:id)
+          p eval "#{a.name.to_s.singularize}_ids"
+         end
+
+         p eval "presentation.#{a.name}"
+         p eval "self.#{a.name}"
+       end
+     end
+
       presentation.policy = self.policy.deep_copy
-      presentation.event_ids = self.event_ids
-      presentation.project_ids = self.project_ids
-      presentation.creators = self.creators
       presentation.orig_data_file_id= self.id
-      self.subscriptions.each {|sub| presentation.subscriptions.build :person_id => sub.person_id}
       presentation
   end
 
