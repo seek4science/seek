@@ -13,6 +13,43 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
+   def included_to_be_copied? symbol
+     case symbol.to_s
+       when "activity_logs","versions","attributions","relationships"
+         return false
+       else
+         return true
+     end
+   end
+
+  def convert_to_presentation
+
+     presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
+     presentation = Presentation.new presentation_attrs
+
+      DataFile.reflect_on_all_associations.each do |a|
+       if presentation.respond_to? "#{a.name.to_s.singularize}_ids=".to_sym and a.macro!=:belongs_to and !a.options.include? :through and included_to_be_copied?(a.name)
+          association = self.send a.name
+
+         if a.options.include? :as
+           if !association.blank?
+             association.each do |item|
+               attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
+              presentation.send("#{a.name}".to_sym).send :build,attrs
+             end
+           end
+         else
+          presentation.send "#{a.name.to_s.singularize}_ids=".to_sym, association.map(&:id)
+         end
+       end
+     end
+
+      presentation.policy = self.policy.deep_copy
+      presentation.orig_data_file_id= self.id
+      presentation
+  end
+
+
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
   else
@@ -93,18 +130,6 @@ class DataFile < ActiveRecord::Base
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     true
-  end
-
-  def convert_to_presentation
-      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
-      presentation = Presentation.new presentation_attrs
-      presentation.policy = self.policy.deep_copy
-      presentation.event_ids = self.event_ids
-      presentation.project_ids = self.project_ids
-      presentation.creators = self.creators
-      presentation.orig_data_file_id= self.id
-      self.subscriptions.each {|sub| presentation.subscriptions.build :person_id => sub.person_id}
-      presentation
   end
 
   #the annotation string values to be included in search indexing
