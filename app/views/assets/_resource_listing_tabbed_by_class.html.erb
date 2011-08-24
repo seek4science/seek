@@ -18,6 +18,16 @@
        end
    end
 %>
+<% limit ||= nil
+   if limit
+       resource_hash.each_key do |key|
+      if limit && resource_hash[key][:items].size > limit
+        resource_hash[key][:extra_count] = resource_hash[key][:items].size - limit
+        resource_hash[key][:items] = resource_hash[key][:items][0...limit]
+      end
+    end
+   end
+%>
 
 <script type="text/javascript">
   tabber_ids.push("<%= tabs_id -%>");
