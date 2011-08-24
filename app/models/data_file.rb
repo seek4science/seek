@@ -13,19 +13,6 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
-  def convert_to_presentation
-      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
-      presentation = Presentation.new presentation_attrs
-      presentation.policy = self.policy.deep_copy
-      presentation.event_ids = self.event_ids
-      presentation.project_ids = self.project_ids
-      presentation.creators = self.creators
-      presentation.orig_data_file_id= self.id
-      self.subscriptions.each {|sub| presentation.subscriptions.build :person_id => sub.person_id}
-      presentation
-  end
-
-
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
   else
@@ -49,7 +36,7 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts,:annotations]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts,:annotations,:fs_search_fields]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
@@ -108,6 +95,18 @@ class DataFile < ActiveRecord::Base
     true
   end
 
+  def convert_to_presentation
+      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
+      presentation = Presentation.new presentation_attrs
+      presentation.policy = self.policy.deep_copy
+      presentation.event_ids = self.event_ids
+      presentation.project_ids = self.project_ids
+      presentation.creators = self.creators
+      presentation.orig_data_file_id= self.id
+      self.subscriptions.each {|sub| presentation.subscriptions.build :person_id => sub.person_id}
+      presentation
+  end
+
   #the annotation string values to be included in search indexing
   def annotations
     annotations = []
@@ -117,5 +116,19 @@ class DataFile < ActiveRecord::Base
       end
     end
     annotations
+  end
+
+  #factors studied, and related compound text that should be included in search
+  def fs_search_fields
+    flds = studied_factors.collect do |fs|
+      [fs.measured_item.title,
+       fs.substances.collect{|sub|
+         [sub.title,
+          sub.synonyms.collect{|syn| syn.title},
+          sub.mappings.collect{|mapping| ["CHEBI:#{mapping.chebi_id}",mapping.chebi_id]}
+         ]}
+      ]
+    end
+    flds.flatten.uniq
   end
 end
