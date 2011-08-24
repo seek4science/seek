@@ -12,7 +12,11 @@
 %>
 
 <% allow_nil ||= false %>
-<% possibilities = Project.all %>
+
+<%   
+   possibilities = Seek::Config.is_virtualliver ? Project.all : User.current_user.person.projects
+%>
+
 
 <%= fancy_multiselect resource, :projects, :possibilities => possibilities, :selected => selected_project_ids, :required => (!allow_nil) %>
 
