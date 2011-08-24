@@ -27,30 +27,18 @@ class DataFile < ActiveRecord::Base
 
       DataFile.reflect_on_all_associations.each do |a|
        if presentation.respond_to? "#{a.name.to_s.singularize}_ids=".to_sym and a.macro!=:belongs_to and !a.options.include? :through and included_to_be_copied?(a.name)
-
-         p "#{a.macro}  #{a.name}"
-
           association = self.send a.name
 
          if a.options.include? :as
-
            if !association.blank?
-
-             p "as ###################### "
              association.each do |item|
                attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
               presentation.send("#{a.name}".to_sym).send :build,attrs
              end
            end
          else
-
-          p "#{a.name.to_s.singularize}_ids="
           presentation.send "#{a.name.to_s.singularize}_ids=".to_sym, association.map(&:id)
-          p eval "#{a.name.to_s.singularize}_ids"
          end
-
-         p eval "presentation.#{a.name}"
-         p eval "self.#{a.name}"
        end
      end
 
