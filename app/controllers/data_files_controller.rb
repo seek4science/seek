@@ -25,19 +25,19 @@ class DataFilesController < ApplicationController
 
     class << @presentation
 
-      Presentation.class_eval do
-        after_create :create_taggings
-      end
-
-      def create_taggings
-        df = DataFile.find self.orig_data_file_id
-
-        df.taggings.each do |tagging|
-           tagging.taggable = self
-           tagging.save
-        end
-
-      end
+#      Presentation.class_eval do
+#        after_create :create_taggings
+#      end
+#
+#      def create_taggings
+#        df = DataFile.find self.orig_data_file_id
+#
+#        df.taggings.each do |tagging|
+#           tagging.taggable = self
+#           tagging.save
+#        end
+#
+#      end
       def clone_versioned_data_file_model versioned_presentation, versioned_data_file
           versioned_presentation.attributes.keys.each do |key|
             versioned_presentation.send("#{key}=", eval("versioned_data_file.#{key}")) if versioned_data_file.respond_to? key.to_sym  and key!="id"

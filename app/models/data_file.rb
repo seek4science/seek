@@ -13,7 +13,7 @@ class DataFile < ActiveRecord::Base
 
    def included_to_be_copied? symbol
      case symbol.to_s
-       when "activity_logs","versions","attributions","relationships","taggings","tag_taggings","tags","base_tags"
+       when "activity_logs","versions","attributions","relationships"
          return false
        else
          return true
@@ -26,7 +26,7 @@ class DataFile < ActiveRecord::Base
      presentation = Presentation.new presentation_attrs
 
       DataFile.reflect_on_all_associations.each do |a|
-       if presentation.respond_to? "#{a.name.to_s.singularize}_ids=".to_sym and a.macro!=:belongs_to and included_to_be_copied?(a.name)
+       if presentation.respond_to? "#{a.name.to_s.singularize}_ids=".to_sym and a.macro!=:belongs_to and !a.options.include? :through and included_to_be_copied?(a.name)
 
          p "#{a.macro}  #{a.name}"
 
