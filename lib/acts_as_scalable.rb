@@ -12,9 +12,9 @@ module Acts
     module ClassMethods
       def acts_as_scalable
 
-        before_save :set_scaler
+        after_save :set_scaler
         has_many :scales,:through=>:scalings,:source=>:scale
-        has_many :scalings,:as => :scalable, :dependent => :destroy, :include => :scale
+        has_many :scalings,:as => :scalable, :dependent => :destroy, :include => :scale,:before_add => proc {|item, scaling| scaling.scalable = item}
 
         class_eval do
           extend Acts::Scalable::SingletonMethods

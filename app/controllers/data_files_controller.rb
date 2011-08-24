@@ -22,6 +22,7 @@ class DataFilesController < ApplicationController
     @data_file = DataFile.find params[:id]
     @presentation = @data_file.convert_to_presentation
 
+
     class << @presentation
 
       def clone_versioned_data_file_model versioned_presentation, versioned_data_file
@@ -49,10 +50,13 @@ class DataFilesController < ApplicationController
       end
     end
 
+
    saved = nil
-   if current_user.admin? or @data_file.can_delete?
-       saved = disable_authorization_checks { @presentation.save }
-   end
+    if current_user.admin? or @data_file.can_delete?
+      disable_authorization_checks {
+        saved = @presentation.save
+      }
+    end
 
     respond_to do |format|
 
