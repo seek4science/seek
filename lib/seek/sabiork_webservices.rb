@@ -4,15 +4,36 @@ require 'libxml'
 module Seek
   class SabiorkWebservices
     def get_compound_annotation compound_name
-      url=URI.encode(webservice_base_url+"suggestions/compounds?searchCompounds=#{compound_name}")
+      url=URI.encode(webservice_base_url+"compounds?compoundName=#{compound_name}")
       doc = get_xml_doc url
-      compound_annotations = {}
-      unless doc.blank?
-        doc.find("/suggestionsResource_Compounds/Compound").collect do |node|
-          #compound_annotations.push node.child.content
+      compound_annotations = {'synonyms' => [], 'chebi_ids' => [], 'kegg_ids' => []}
+      unless doc.blank? or (doc.find('//Compound/sabioID').collect.blank?)
+        #name
+        doc.find('//Compound/Names/name').collect do |node|
+          if node['type'] == 'Recommended'
+             compound_annotations['recommended_name'] = node.content
+          else
+            compound_annotations['synonyms'] |= [node.content]
+          end
         end
+        #return nil if the xml doesnt contain the recommended name
+        if compound_annotations['recommended_name'].blank?
+          return nil
+        end
+        #sabiork id
+        compound_annotations['sabiork_id'] = doc.find_first("//Compound/sabioID").content
+        #chebi_ids
+        doc.find('//Compound/ChebiIDs/chebi').collect do |node|
+          compound_annotations['chebi_ids'] |= [node.content]
+        end
+        #kegg_ids
+        doc.find('//Compound/KEGGIDs/kegg').collect do |node|
+          compound_annotations['kegg_ids'] |= [node.content]
+        end
+        compound_annotations
+      else
+        return nil
       end
-      compound_annotations
     end
 
     def webservice_base_url

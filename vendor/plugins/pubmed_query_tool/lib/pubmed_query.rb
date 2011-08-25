@@ -116,7 +116,7 @@ class PubmedQuery
       raise
     end
   end
-  
+
   #Takes a <PubmedArticle> XML block and converts the contents into a PubmedRecord object
   def parse_article(article)
     begin
