@@ -736,6 +736,17 @@ end
     end
   end
 
+  test 'edit assay with selected projects scope policy' do
+    proj = User.current_user.person.projects.first
+    assay = Factory(:assay, :contributor => User.current_user.person,
+                    :study => Factory(:study, :investigation => Factory(:investigation, :projects => [proj])),
+                    :policy => Factory(:policy,
+                                       :sharing_scope => Policy::ALL_SYSMO_USERS,
+                                       :access_type => Policy::NO_ACCESS,
+                                       :permissions => [Factory(:permission, :contributor => proj, :access_type => Policy::EDITING)]))
+    get :edit, :id => assay.id
+  end
+
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
     a = {:title=>"test", :technology_type_id=>technology_types(:gas_chromatography).id, :assay_type_id=>assay_types(:metabolomics).id,
