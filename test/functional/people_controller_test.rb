@@ -78,6 +78,20 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal "T", assigns(:person).first_letter
     assert_not_nil Person.find(assigns(:person).id).notifiee_info
   end
+
+  def test_should_create_person_with_project
+    work_group_id = Factory(:work_group).id
+    assert_difference('Person.count') do
+      assert_difference('NotifieeInfo.count') do
+        post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com", :work_group_ids => [work_group_id] }
+      end
+    end
+
+    assert_redirected_to person_path(assigns(:person))
+    assert_equal "T", assigns(:person).first_letter
+    assert_equal [work_group_id], assigns(:person).work_group_ids
+    assert_not_nil Person.find(assigns(:person).id).notifiee_info
+  end
   
   def test_created_person_should_receive_notifications
     post :create, :person => {:first_name=>"test", :email=>"hghg@sdfsd.com" }
