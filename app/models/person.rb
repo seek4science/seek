@@ -204,7 +204,7 @@ class Person < ActiveRecord::Base
 
  
   def can_view? user = User.current_user
-    not user.nil?
+    !user.nil? || !Seek::Config.is_virtualliver
   end
 
   def can_edit? user = User.current_user

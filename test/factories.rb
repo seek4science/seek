@@ -317,3 +317,19 @@ end
     f.association :substance, :factory => :compound
     f.association :experimental_condition
   end
+
+  Factory.define :synonym do |f|
+    f.name "toffee"
+    f.association :substance, :factory=>:compound
+  end
+
+  Factory.define :mapping_link do |f|
+    f.association :substance, :factory=>:compound
+    f.association :mapping,:factory=>:mapping
+  end
+
+  Factory.define :mapping do |f|
+    f.chebi_id "12345"
+    f.kegg_id "6789"
+    f.sabiork_id "4"
+  end

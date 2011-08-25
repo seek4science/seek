@@ -31,7 +31,7 @@ Rails::Initializer.run do |config|
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
-  config.load_paths += %W(#{RAILS_ROOT}/app/sweepers )
+  config.load_paths += %W(#{Rails.root}/app/sweepers #{Rails.root}/app/reindexers)
 
   # Force all environments to use the same logger level
   # (by default production uses :info, the others :debug)
@@ -72,7 +72,13 @@ Rails::Initializer.run do |config|
   # config.active_record.schema_format = :sql
 
   # Activate observers that should always be running
-  # config.active_record.observers = :cacher, :garbage_collector
+  config.active_record.observers = :annotation_reindexer,
+      :measured_item_reindexer,
+      :studied_factor_reindexer,
+      :experimental_condition_reindexer,
+      :mapping_reindexer,
+      :mapping_link_reindexer,
+      :compound_reindexer
 
 end
 

@@ -13,15 +13,39 @@ class DataFile < ActiveRecord::Base
 
   title_trimmer
 
+   def included_to_be_copied? symbol
+     case symbol.to_s
+       when "activity_logs","versions","attributions","relationships"
+         return false
+       else
+         return true
+     end
+   end
+
   def convert_to_presentation
-      presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
-      presentation = Presentation.new presentation_attrs
+
+     presentation_attrs = self.attributes.delete_if{|k,v|k=="template_id" || k =="id"}
+     presentation = Presentation.new presentation_attrs
+
+      DataFile.reflect_on_all_associations.each do |a|
+       if presentation.respond_to? "#{a.name.to_s.singularize}_ids=".to_sym and a.macro!=:belongs_to and !a.options.include? :through and included_to_be_copied?(a.name)
+          association = self.send a.name
+
+         if a.options.include? :as
+           if !association.blank?
+             association.each do |item|
+               attrs = item.attributes.delete_if{|k,v|k=="id" || k =="#{a.options[:as]}_id" || k =="#{a.options[:as]}_type"}
+              presentation.send("#{a.name}".to_sym).send :build,attrs
+             end
+           end
+         else
+          presentation.send "#{a.name.to_s.singularize}_ids=".to_sym, association.map(&:id)
+         end
+       end
+     end
+
       presentation.policy = self.policy.deep_copy
-      presentation.event_ids = self.event_ids
-      presentation.project_ids = self.project_ids
-      presentation.creators = self.creators
       presentation.orig_data_file_id= self.id
-      self.subscriptions.each {|sub| presentation.subscriptions.build :person_id => sub.person_id}
       presentation
   end
 
@@ -49,7 +73,7 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts,:annotations]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts,:annotations,:fs_search_fields]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
@@ -117,5 +141,19 @@ class DataFile < ActiveRecord::Base
       end
     end
     annotations
+  end
+
+  #factors studied, and related compound text that should be included in search
+  def fs_search_fields
+    flds = studied_factors.collect do |fs|
+      [fs.measured_item.title,
+       fs.substances.collect{|sub|
+         [sub.title,
+          sub.synonyms.collect{|syn| syn.title},
+          sub.mappings.collect{|mapping| ["CHEBI:#{mapping.chebi_id}",mapping.chebi_id]}
+         ]}
+      ]
+    end
+    flds.flatten.uniq
   end
 end

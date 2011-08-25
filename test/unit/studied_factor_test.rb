@@ -107,6 +107,9 @@ class StudiedFactorTest < ActiveSupport::TestCase
       assert_equal fs.studied_factor_links.count, 2
       assert_equal fs.studied_factor_links.first.substance, compound1
       assert_equal fs.studied_factor_links[1].substance, compound2
+      assert_equal 2,fs.substances.count
+      assert fs.substances.include? compound1
+      assert fs.substances.include? compound2
     end
   end
 
