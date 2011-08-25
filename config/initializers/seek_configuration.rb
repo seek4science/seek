@@ -64,3 +64,4 @@ Seek::Config.default :pubmed_api_email,nil
 Seek::Config.default :crossref_api_email,nil
 Seek::Config.default :site_base_host,"http://localhost:3000"
 Seek::Config.default :open_id_authentication_store,:memory
+Seek::Config.default :sabiork_ws_base_url, "http://hitssv506.h-its.org/sabioRestWebServices/"

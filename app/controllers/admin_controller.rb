@@ -145,6 +145,7 @@ class AdminController < ApplicationController
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
     Seek::Config.tag_threshold = params[:tag_threshold] if only_integer params[:tag_threshold], "tag threshold"
     Seek::Config.max_visible_tags = params[:max_visible_tags] if only_positive_integer params[:max_visible_tags], "maximum visible tags"
+    Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     update_flag = (params[:pubmed_api_email] == '' ||(check_valid_email params[:pubmed_api_email], "pubmed api email")) && (params[:crossref_api_email] == '' || (check_valid_email params[:crossref_api_email], "crossref api email")) && (only_integer params[:tag_threshold], "tag threshold") && (only_positive_integer params[:max_visible_tags], "maximum visible tags")
     update_redirect_to update_flag,'others'
   end

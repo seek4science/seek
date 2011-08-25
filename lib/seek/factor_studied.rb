@@ -95,12 +95,31 @@ module Seek
        end
      end
      mapping_links = []
-     kegg_ids.each do |kegg_id|
-       #only create new mapping when it doesn't exist
-       chebi_ids.each do |chebi_id|
-         mappings = Mapping.find(:all, :conditions => ['sabiork_id = ? AND chebi_id = ? AND kegg_id = ?', sabiork_id, chebi_id, kegg_id])
-         mapping = mappings.blank? ? Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id) :  mappings.first
-         mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+     #sabiork always has, but not for kegg_ids and chebi_ids
+     if kegg_ids.blank?
+       if chebi_ids.blank?
+          mapping = new_or_update_mapping sabiork_id
+          mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+       else
+         chebi_ids.each do |chebi_id|
+           mapping = new_or_update_mapping sabiork_id, chebi_id
+           mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+         end
+       end
+     else
+       if chebi_ids.blank?
+         kegg_ids.each do |kegg_id|
+           mapping = new_or_update_mapping sabiork_id, nil, kegg_id
+           mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+         end
+       else
+         kegg_ids.each do |kegg_id|
+         #only create new mapping when it doesn't exist
+           chebi_ids.each do |chebi_id|
+             mapping = new_or_update_mapping sabiork_id, chebi_id, kegg_id
+             mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
+         end
        end
      end
      compound.mapping_links = mapping_links
@@ -122,6 +141,12 @@ module Seek
           compound.synonyms << Synonym.new(:name => s, :substance => compound)
        end
      compound
+  end
+
+  def new_or_update_mapping sabiork_id, chebi_id=nil, kegg_id=nil
+     mappings = Mapping.find(:all, :conditions => ['sabiork_id = ? AND chebi_id = ? AND kegg_id = ?', sabiork_id, chebi_id, kegg_id])
+     mapping = mappings.blank? ? Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id) :  mappings.first
+     mapping
   end
   end
 
