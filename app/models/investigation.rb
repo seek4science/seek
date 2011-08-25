@@ -32,6 +32,7 @@ class Investigation < ActiveRecord::Base
     new_object= self.clone
     new_object.policy = self.policy.deep_copy
     new_object.project_ids= self.project_ids
+    new_object.scale_ids = self.scale_ids
     return new_object
   end
 

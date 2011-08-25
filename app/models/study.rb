@@ -38,6 +38,7 @@ class Study < ActiveRecord::Base
   def clone_with_associations
     new_object= self.clone
     new_object.policy = self.policy.deep_copy
+    new_object.scale_ids = self.scale_ids
 
     return new_object
   end
