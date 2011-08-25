@@ -134,7 +134,7 @@ color:#17B274;
 #bild-1,#bild-2,#bild-3,#bild-4,#bild-5,#bild-6{
 	display:none;
 	height:50%;
-	z-index:1000;
+	z-index:0;
 }
 
 #box-1,#box-2,#box-3,#box-4,#box-5{
