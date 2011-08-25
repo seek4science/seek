@@ -6,6 +6,10 @@ class Assay < ActiveRecord::Base
     try_block {study.investigation.projects} || []
   end
 
+  def project_ids
+    projects.map(&:id)
+  end
+
   alias_attribute :contributor, :owner
   acts_as_authorized
 
