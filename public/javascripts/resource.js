@@ -7,6 +7,7 @@ function showResourceVersion(form) {
 // ***************  Resource Upload Validation  *****************
 
 function validateSopFields(is_new_file) {
+
     // only make this test if that's a new SOP
     if(is_new_file) {
         if($('sop_data').value.length == 0 && $('sop_data_url').value.length == 0) {
@@ -21,6 +22,10 @@ function validateSopFields(is_new_file) {
         alert("Please specify the title for the SOP!");
         $('sop_title').focus();
         return(false);
+    }
+
+    if (!checkProjectExists("sop")) {
+        return (false);
     }
 
     // check if no tokens remain in the attributions autocompleter
@@ -57,6 +62,10 @@ function validateModelFields(is_new_file) {
         return(false);
     }
 
+    if (!checkProjectExists("model")) {
+        return (false);
+    }
+
     // check if no tokens remain in the attributions autocompleter
     // (only do this if the fold with attributions is expanded)
     if($('attributions_fold_content').style.display == "block" &&
@@ -89,6 +98,10 @@ function validateDataFileFields(is_new_file) {
         alert("Please specify the title for the Data file!");
         $('data_file_title').focus();
         return(false);
+    }
+
+    if (!checkProjectExists("data_file")) {
+        return (false);
     }
 
     // check if no tokens remain in the attributions autocompleter
@@ -125,6 +138,10 @@ function validatePresentationFields(is_new_file) {
         return(false);
     }
 
+    if (!checkProjectExists("presentation")) {
+        return (false);
+    }
+
     // check if no tokens remain in the attributions autocompleter
     // (only do this if the fold with attributions is expanded)
     if($('attributions_fold_content').style.display == "block" &&
@@ -139,5 +156,14 @@ function validatePresentationFields(is_new_file) {
     $('presentation_submit_btn').disabled = true;
     $('presentation_submit_btn').value = (is_new_file ? "Uploading and Saving..." : "Updating...");
     $('presentation_submit_btn').form.submit();
+    return(true);
+}
+
+function checkProjectExists(prefix) {
+    el=prefix+"_project_ids";
+    if ($F(el).length < 1) {
+        alert("Please specify at least one project");
+        return (false);       
+    }
     return(true);
 }
