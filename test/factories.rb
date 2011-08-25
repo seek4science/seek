@@ -67,6 +67,8 @@
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
     f.name "test policy"
+    f.sharing_scope Policy::PRIVATE
+    f.access_type Policy::NO_ACCESS
   end
 
   Factory.define(:private_policy, :parent => :policy) do |f|

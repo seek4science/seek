@@ -6,6 +6,10 @@ class Assay < ActiveRecord::Base
     try_block {study.investigation.projects} || []
   end
 
+  def project_ids
+    projects.map(&:id)
+  end
+
   alias_attribute :contributor, :owner
   acts_as_authorized
 
@@ -149,23 +153,6 @@ class Assay < ActiveRecord::Base
     type = is_modelling? ? "modelling" : "experimental"
     "assay_#{type}_avatar"
   end
-
-  def samples_are_missing?
-    return samples.blank?
-  end
-
-  def organisms_are_missing?
-    return assay_organisms.blank?
-  end
-
-
-  def validate
-
-    errors.add_to_base "Please specify either sample or organisms for assay!" if is_modelling? and samples_are_missing? and organisms_are_missing?
-
-  end
-
-
 
   def clone_with_associations
     new_object= self.clone
