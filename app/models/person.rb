@@ -52,7 +52,7 @@ class Person < ActiveRecord::Base
 
   alias_attribute :webpage,:web_page
 
-  has_many :project_subscriptions
+  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person}
   accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
 
   has_many :subscriptions

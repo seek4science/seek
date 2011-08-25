@@ -67,6 +67,7 @@ class Sample < ActiveRecord::Base
     new_object= self.clone
     new_object.policy = self.policy.deep_copy
     new_object.sop_masters = self.try(:sop_masters)
+    new_object.project_ids = self.project_ids
     return new_object
   end
 end
