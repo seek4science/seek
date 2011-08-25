@@ -3,7 +3,7 @@
         $$('#search_results #' + this.id +'_results').first().show();
     <% end %>
     <%= render :partial => 'scales/scale_slider', :locals => {:scale_slider_function => scale_slider_function, :current_scale => @scale_title} %>
-<div id='search_results'>
+<div id='search_results' class="scaled_items">
 <% (Scale.all.map(&:title) | ['all']).each do |scale|%>
       <div id='<%= scale %>_results' <%= "style='display: none'" unless @scale_title == scale%>>
           <% resource_hash = classify_for_tabs @results_scaled[scale] -%>
