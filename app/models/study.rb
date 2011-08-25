@@ -8,6 +8,10 @@ class Study < ActiveRecord::Base
     investigation.try(:projects) || []
   end
 
+  def project_ids
+    projects.map(&:id)
+  end
+
   acts_as_authorized
 
   has_many :assays
