@@ -68,35 +68,65 @@ module SpreadsheetUtil
       end
       workbook.styles[style.name] = style
     end
-    
+
+
     doc.find("//sheet").each do |s|
       unless s["hidden"] == "true" || s["very_hidden"] == "true"
         sheet = Sheet.new(s["name"])
         workbook.sheets << sheet
         #Load into memory
-        max_row = 0
-        max_col = 0
-        s.find("./columns/column").each do |c|
+        max_row = 10
+        max_col = 10
+        no_of_columns = 10
+
+        #Grab columns
+        columns = s.find("./columns/column")
+        col_index = 0
+        #Add columns
+        columns.each do |c|
           col_index = c["index"].to_i
           col = Column.new(col_index, c["width"])
-          sheet.columns << col          
+          sheet.columns << col
           if max_col < col_index
             max_col = col_index
           end
         end
-        s.find("./rows/row").each do |r|
+        #Pad columns (so it's at least 10 cols wide')
+        if col_index < max_col
+          for i in (col_index..max_col)
+            col = Column.new(i, 2964.to_s)
+            sheet.columns << col
+          end
+          max_col = 10
+        else
+          max_col = col_index
+        end
+
+        #Grab rows
+        rows = s.find("./rows/row")
+        row_index = 0
+        #Add rows
+        rows.each do |r|
           row_index = r["index"].to_i
           row = Row.new(row_index, r["height"])
           sheet.rows[row_index] = row
           if max_row < row_index
             max_row = row_index
           end
+          #Add cells
           r.find("./cell").each do |c|
             col_index = c["column"].to_i
             content = c.content
             content = content.to_f if c["type"] == "numeric"
-            cell = Cell.new(content, row_index, col_index, c["formula"], c["style"])
+            cell = Cell.new(content, max_row, max_col, c["formula"], c["style"])
             row.cells[col_index] = cell
+          end
+        end
+        #Pad rows
+        if rows.size < max_row
+          for i in (rows.size..max_row)
+            row = Row.new(i, 1000.to_s)
+            sheet.rows << row
           end
         end
         sheet.last_row = max_row
@@ -105,8 +135,9 @@ module SpreadsheetUtil
     end 
     
     workbook
-  end 
-  
+  end
+
+
   #Turns a numeric column ID into an Excel letter representation
   #eg. 1 > A, 10 > J, 28 > AB etc.
   def to_alpha(col)
