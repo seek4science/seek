@@ -1,9 +1,10 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
+require 'lib/seek/factor_studied.rb'
 
 namespace :seek do
-
+  include Seek::FactorStudied
   desc 'an alternative to the doc:seek task'
   task(:docs=>["doc:seek"]) do
 
@@ -38,6 +39,30 @@ namespace :seek do
       end
     end
   end    
+
+  desc "seeds database with compounds, synonyms and mappings"
+  task(:populate_compounds=>:environment) do
+    compound_list = []
+    File.open('config/default_data/compound.list').each do |compound|
+      unless compound.blank?
+        compound_list.push(compound.chomp) if !compound_list.include?(compound.chomp)
+      end
+    end
+
+    unless compound_list.blank?
+      compound_object_list = find_or_new_substances  compound_list, []
+      count = 0
+      compound_object_list.each do |co|
+        if co.save
+          count += 1
+        else
+          puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
+        end
+      end
+      puts "#{count.to_s} compounds were created"
+
+    end
+  end
 
   desc 're-extracts bioportal information about all organisms, overriding the cached details'
   task(:refresh_organism_concepts=>:environment) do

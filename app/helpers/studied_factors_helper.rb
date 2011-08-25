@@ -19,7 +19,7 @@ module StudiedFactorsHelper
       synonyms.each do |synonym|
         s = Substance.new
         s.id = synonym.id.to_s + ',Synonym'
-        s.name = synonym.name + " (#{synonym.substance.name})"
+        s.name = synonym.name + " (#{try_block{synonym.substance.name}.to_s})"
         all_substances.push s
       end
       all_substances

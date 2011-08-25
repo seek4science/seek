@@ -9,9 +9,9 @@ module Seek
 
     new_substances.each do |new_substance|
        #call the webservice to retrieve the substance annotation from sabiork
-       #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_id, kegg_ids
+       #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_ids, kegg_ids
        compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(new_substance)
-       #compound_annotation = {'recommended_name' => "#{new_substance}", 'synonyms' => ["#{new_substance}_1","#{new_substance}_2"], 'sabiork_id' => 50, 'chebi_id' => "CHEBI:15377", 'kegg_ids' => ["C00001", "C00002"]}
+       #compound_annotation = {'recommended_name' => "#{new_substance}", 'synonyms' => ["#{new_substance}_1","#{new_substance}_2"], 'sabiork_id' => 50, 'chebi_ids' => [CHEBI:15377], 'kegg_ids' => ["C00001", "C00002"]}
        unless compound_annotation.blank?
          #retrieve or create compound with the recommended_name
          recommended_name = compound_annotation["recommended_name"]
@@ -86,7 +86,7 @@ module Seek
   def new_or_update_mapping_links compound, compound_annotation
     #create the mappings and mapping_links
      sabiork_id = compound_annotation["sabiork_id"]
-     chebi_id = compound_annotation["chebi_id"]
+     chebi_ids = compound_annotation["chebi_ids"]
      kegg_ids = compound_annotation["kegg_ids"]
      #destroy the mapping_links if the recommended_compound exists
      if !compound.new_record?
@@ -97,9 +97,11 @@ module Seek
      mapping_links = []
      kegg_ids.each do |kegg_id|
        #only create new mapping when it doesn't exist
-       mappings = Mapping.find(:all, :conditions => ['sabiork_id = ? AND chebi_id = ? AND kegg_id = ?', sabiork_id, chebi_id, kegg_id])
-       mapping = mappings.blank? ? Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id) :  mappings.first
-       mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+       chebi_ids.each do |chebi_id|
+         mappings = Mapping.find(:all, :conditions => ['sabiork_id = ? AND chebi_id = ? AND kegg_id = ?', sabiork_id, chebi_id, kegg_id])
+         mapping = mappings.blank? ? Mapping.new(:sabiork_id => sabiork_id, :chebi_id => chebi_id, :kegg_id => kegg_id) :  mappings.first
+         mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+       end
      end
      compound.mapping_links = mapping_links
      compound
