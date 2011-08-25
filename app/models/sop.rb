@@ -80,7 +80,7 @@ class Sop < ActiveRecord::Base
        ec.substances.collect{|sub|
          [sub.title,
           sub.synonyms.collect{|syn| syn.title},
-          sub.mappings.collect{|mapping| ["CHEBI:#{mapping.chebi_id}",mapping.chebi_id]}
+          sub.mappings.collect{|mapping| ["CHEBI:#{mapping.chebi_id}",mapping.chebi_id,mapping.sabiork_id.to_s]}
          ]}
       ]
     end

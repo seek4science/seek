@@ -233,7 +233,7 @@ class DataFileTest < ActiveSupport::TestCase
       sf2 = Factory :studied_factor_link,:substance=>Factory(:compound,:name=>"iron")
       comp=sf2.substance
       Factory :synonym,:name=>"metal",:substance=>comp
-      Factory :mapping_link,:substance=>comp,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789")
+      Factory :mapping_link,:substance=>comp,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789",:sabiork_id=>111)
       studied_factor = Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
       assert df.fs_search_fields.include?("sugar")
       assert df.fs_search_fields.include?("metal")
@@ -241,7 +241,8 @@ class DataFileTest < ActiveSupport::TestCase
       assert df.fs_search_fields.include?("concentration")
       assert df.fs_search_fields.include?("CHEBI:12345")
       assert df.fs_search_fields.include?("12345")
-      assert_equal 6,df.fs_search_fields.count
+      assert df.fs_search_fields.include?("111")
+      assert_equal 7,df.fs_search_fields.count
     end
   end
   
