@@ -1401,6 +1401,7 @@ div.preview_box {
   display: inline-block;
   padding: 1em 1em 1em 1em;
   border: 1px solid #999;
+  overflow: hidden;
 }
 
 .pale_text {
