@@ -77,11 +77,13 @@ class Sop < ActiveRecord::Base
   def exp_conditions_search_fields
     flds = experimental_conditions.collect do |ec|
       [ec.measured_item.title,
-       ec.substances.collect{|sub|
-         [sub.title,
-          sub.synonyms.collect{|syn| syn.title},
-          sub.mappings.collect{|mapping| ["CHEBI:#{mapping.chebi_id}",mapping.chebi_id,mapping.sabiork_id.to_s]}
-         ]}
+       ec.substances.collect do |sub|
+         #FIXME: this makes the assumption that the synonym.substance appears like a Compound
+         sub = sub.substance if sub.is_a?(Synonym)
+         [sub.title] |
+             (sub.respond_to?(:synonyms) ? sub.synonyms.collect { |syn| syn.title } : []) |
+             (sub.respond_to?(:mappings) ? sub.mappings.collect { |mapping| ["CHEBI:#{mapping.chebi_id}", mapping.chebi_id, mapping.sabiork_id.to_s, mapping.kegg_id] } : [])
+       end
       ]
     end
     flds.flatten.uniq

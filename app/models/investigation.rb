@@ -3,6 +3,9 @@ class Investigation < ActiveRecord::Base
   acts_as_isa
   acts_as_authorized
 
+
+  attr_accessor :new_link_from_study
+
   has_many :studies  
 
 
