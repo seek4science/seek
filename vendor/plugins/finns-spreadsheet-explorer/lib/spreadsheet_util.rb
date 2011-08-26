@@ -75,8 +75,8 @@ module SpreadsheetUtil
         sheet = Sheet.new(s["name"])
         workbook.sheets << sheet
         #Load into memory
-        max_row = 10
-        max_col = 10
+        min_rows = 10
+        min_cols = 10
 
         #Grab columns
         columns = s.find("./columns/column")
@@ -88,14 +88,14 @@ module SpreadsheetUtil
           sheet.columns << col
         end
         #Pad columns (so it's at least 10 cols wide)
-        if col_index+1 < max_col
-          for i in (col_index+1..max_col)
+        if col_index+1 < min_cols
+          for i in (col_index+1..min_cols)
             col = Column.new(i, 2964.to_s)
             sheet.columns << col
           end
-          max_col = 10
+          min_cols = 10
         else
-          max_col = col_index+1
+          min_cols = col_index+1
         end
 
         #Grab rows
@@ -111,22 +111,22 @@ module SpreadsheetUtil
             col_index = c["column"].to_i
             content = c.content
             content = content.to_f if c["type"] == "numeric"
-            cell = Cell.new(content, max_row, max_col, c["formula"], c["style"])
+            cell = Cell.new(content, min_rows, min_cols, c["formula"], c["style"])
             row.cells[col_index] = cell
           end
         end
         #Pad rows
-        if row_index < max_row
-          for i in (row_index..max_row)
+        if row_index < min_rows
+          for i in (row_index..min_rows)
             row = Row.new(i, 1000.to_s)
             sheet.rows << row
           end
-          max_row = 10
+          min_rows = 10
         else
-          max_row = row_index
+          min_rows = row_index
         end
-        sheet.last_row = max_row
-        sheet.last_col = max_col
+        sheet.last_row = min_rows
+        sheet.last_col = min_cols
       end
     end 
     
