@@ -216,6 +216,6 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test "sabiork_ws_base_url" do
-    assert_equal "http://hitssv506.h-its.org/sabioRestWebServices/",Seek::Config.sabiork_ws_base_url
+    assert_equal "http://sabiork.h-its.org/sabioRestWebServices/",Seek::Config.sabiork_ws_base_url
   end
 end
