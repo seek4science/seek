@@ -31,7 +31,7 @@ module DotGenerator
     end
 
     def attributes_string
-      "[#{attributes.collect { |field, value| "#{field}=\"#{value}\"" }.join(',')}]" unless attributes.blank?
+      "[#{attributes.collect { |field, value| "#{field}=\"#{h(value).gsub(/\r|\n/," ")}\"" }.join(',')}]" unless attributes.blank?
     end
 
     def to_s

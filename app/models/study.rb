@@ -2,10 +2,16 @@ require 'acts_as_authorized'
 class Study < ActiveRecord::Base  
   acts_as_isa
 
+  attr_accessor :new_link_from_assay
+
   belongs_to :investigation
 
   def projects
     investigation.try(:projects) || []
+  end
+
+  def project_ids
+    projects.map(&:id)
   end
 
   acts_as_authorized

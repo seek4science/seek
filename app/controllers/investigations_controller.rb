@@ -25,6 +25,7 @@ class InvestigationsController < ApplicationController
   def show
     @investigation=Investigation.find(params[:id])
     @investigation.create_from_asset = params[:create_from_asset]
+
     respond_to do |format|
       format.html
       format.xml
@@ -36,24 +37,36 @@ class InvestigationsController < ApplicationController
 
   def create
     @investigation.policy.set_attributes_with_sharing params[:sharing], @investigation.projects
-    respond_to do |format|
-      if @investigation.save
-        flash[:notice] = 'The Investigation was successfully created.'
-        if @investigation.create_from_asset=="true"
-           flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
+
+    if @investigation.save
+       if @investigation.new_link_from_study=="true"
+          render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
+       else
+        respond_to do |format|
+          flash[:notice] = 'The Investigation was successfully created.'
+          if @investigation.create_from_asset=="true"
+             flash.now[:notice] << "<br/> Now you can create new study for your assay by clicking 'add a study' button"
+            format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
+          else
+            format.html { redirect_to investigation_path(@investigation) }
+            format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
+          end
         end
-        format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
-        format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
-      else
-        format.html { render :action => "new" }
-        format.xml { render :xml => @investigation.errors, :status => :unprocessable_entity }
-      end
+       end
+    else
+      respond_to do |format|
+      format.html { render :action => "new" }
+      format.xml { render :xml => @investigation.errors, :status => :unprocessable_entity }
     end
+    end
+
   end
 
   def new
     @investigation=Investigation.new
     @investigation.create_from_asset = params[:create_from_asset]
+    @investigation.new_link_from_study = params[:new_link_from_study]
+
     respond_to do |format|
       format.html
       format.xml { render :xml=>@investigation}
