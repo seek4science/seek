@@ -78,7 +78,8 @@ Rails::Initializer.run do |config|
       :experimental_condition_reindexer,
       :mapping_reindexer,
       :mapping_link_reindexer,
-      :compound_reindexer
+      :compound_reindexer,
+      :synonym_reindexer
 
 end
 
