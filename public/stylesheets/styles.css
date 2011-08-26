@@ -1518,7 +1518,7 @@ ul.condition_or_factor_row li {
     float:left;
     padding: 0 1em 0.25em 1em;
     text-align:left;
-    border-bottom: dotted #999 1px;
+    border-bottom: dotted #d3d3d3 1px;
     min-height: 2em;
 }
 

@@ -215,7 +215,7 @@ class Person < ActiveRecord::Base
   requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
 
   def can_manage? user = User.current_user
-    user.is_admin?
+    user.nil? ? false : (user.is_admin?)
   end
 
   def can_destroy? user = User.current_user
