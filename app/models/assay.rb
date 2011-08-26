@@ -165,4 +165,8 @@ class Assay < ActiveRecord::Base
 
     return new_object
   end
+
+  def validate
+    errors.add_to_base "You cannot associate a modelling analysis with a sample" if is_modelling? && !samples.empty?
+  end
 end
