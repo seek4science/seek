@@ -143,15 +143,17 @@ class DataFile < ActiveRecord::Base
     annotations
   end
 
-  #factors studied, and related compound text that should be included in search
+    #factors studied, and related compound text that should be included in search
   def fs_search_fields
     flds = studied_factors.collect do |fs|
       [fs.measured_item.title,
-       fs.substances.collect{|sub|
-         [sub.title,
-          sub.synonyms.collect{|syn| syn.title},
-          sub.mappings.collect{|mapping| ["CHEBI:#{mapping.chebi_id}",mapping.chebi_id,mapping.sabiork_id.to_s]}
-         ]}
+       fs.substances.collect do |sub|
+         #FIXME: this makes the assumption that the synonym.substance appears like a Compound
+         sub = sub.substance if sub.is_a?(Synonym)
+         [sub.title] |
+             (sub.respond_to?(:synonyms) ? sub.synonyms.collect { |syn| syn.title } : []) |
+             (sub.respond_to?(:mappings) ? sub.mappings.collect { |mapping| ["CHEBI:#{mapping.chebi_id}", mapping.chebi_id, mapping.sabiork_id.to_s, mapping.kegg_id] } : [])
+       end
       ]
     end
     flds.flatten.uniq
