@@ -42,6 +42,8 @@ class SearchController < ApplicationController
     end
 
     downcase_query = @search_query.downcase
+    downcase_query.gsub!(":","")
+    downcase_query.gsub!(":","")
 
     @results=[]
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
