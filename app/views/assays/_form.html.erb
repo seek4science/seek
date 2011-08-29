@@ -85,9 +85,7 @@
 <% if Seek::Config.is_virtualliver -%>
 
 <br style="clear:both"/>
- <% unless @assay.is_modelling?  %>
-     <span class="required">*</span>
- <% end %>
+
  <%= f.fancy_multiselect :samples, :object_type_text => @assay_text -%>
 <% end %>
 <div id="add_organism_form">
@@ -202,7 +200,7 @@
       }
   }
 
-  <%if @assay.is_modelling?%>
+
       Event.observe(window, 'load', function() {
           Event.observe('assay_sample_ids', 'fancySelect:update', function(){
             check_show_organism_form();
@@ -217,6 +215,5 @@
           $('assay_sample_ids').fire('fancySelect:update');
           updateOrganisms();
       });
-  <% end %>
 
 </script>

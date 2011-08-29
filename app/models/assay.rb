@@ -59,7 +59,6 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  validates_presence_of :samples  if Seek::Config.is_virtualliver
   has_many :relationships,
     :class_name => 'Relationship',
     :as => :subject,
