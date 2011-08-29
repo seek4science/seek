@@ -1,64 +1,49 @@
+<%= javascript_include_tag "resoource.js"%>
 <style>
-  div.preview_permission {
-      padding-left:  3em
-  }
-
-  ul.people_list {
-      padding-left: 1em;
-  }
   ul.people_list li.name {
       color: #ff8c00;
   }
   p.private {
       color: red;
+      font-size: medium;
+      font-weight: bold;
+      margin-left: 3em;
   }
   p.public{
       color: #0000ff;
+      font-weight: bold;
   }
 </style>
 
-<div class='preview_permission'>
+<div class="redbox_contents" style="width:500px;">
+    <div class="body">
     <h1>You will share this item with:</h1>
     <%unless people_in_group.blank?
       people_in_group.each do |key, value|
        case key
         when 1 %>
-            <h2>People can view:</h2>
-            <ul class='people_list'>
-              <% value.each do |person| %>
-              <li class='name'> <%= person[1]%></li>
-              <% end %>
-            </ul>
+            <h2>People can view summary only:</h2>
+            <%= display_people_list value-%>
         <%when 2 %>
-            <h2>People can download:</h2>
-            <ul class='people_list'>
-              <% value.each do |person| %>
-              <li class='name'> <%= person[1]%></li>
-              <% end %>
-            </ul>
+            <h2>People can view summary and get contents:</h2>
+            <%= display_people_list value-%>
         <%when 3%>
-            <h2>People can edit:</h2>
-            <ul class='people_list'>
-              <% value.each do |person| %>
-              <li class='name'> <%= person[1]%></li>
-              <% end %>
-            </ul>
+            <h2>People can view and edit summary and contents:</h2>
+            <%= display_people_list value-%>
         <%when 4%>
             <h2>People can manage:</h2>
-            <ul class='people_list'>
-              <% value.each do |person| %>
-              <li class='name'> <%= person[1]%></li>
-              <% end %>
-            </ul>
+            <%= display_people_list value-%>
         <%when 5%>
-            <p class='public'>All visitors (including anonymous visitors with no login) that can <%= Policy.get_access_type_wording(value, nil) -%>  <p>
+            <p class='public'>All visitors (including anonymous visitors with no login) that can <%= Policy.get_access_type_wording(value, nil).downcase -%>  <p>
        <%end%>
     <%end%>
     <%else%>
         <p class='private'>You keep this item private (only visible to you)</p>
     <%end%>
 
-    <br/>
-    <input type=button value='OK' onclick="window.returnValue = true; window.close()">
-    <input type=button value='Change Permission' onclick="window.returnValue = false; window.close()">
+    <div align="center" style="margin-top: 1em">
+      <input type=button value='Change Permission' onclick="RedBox.close()">
+      <input type=button value='OK' style="width: 5em" onclick="updateResource(false)">
+    </div>
+  </div>
 </div>

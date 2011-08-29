@@ -50,21 +50,25 @@ module Seek
         #get sharing_scope and access_type
         sharing_scope = params["sharing_scope"].to_i
         access_type = params["access_type"].to_i
-        project_id = params["project_id"].blank? ? nil : params["project_id"].to_i
+
         your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
+        project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
 
         contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
         new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
 
         #if share with your project is chosen
-        if (sharing_scope == Policy::ALL_SYSMO_USERS) and project_id
-          #add Project to contributor_type
-          contributor_types << "Project" if !contributor_types.include? "Project"
-          #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
-          if !new_permission_data.has_key?('Project')
-            new_permission_data["Project"] = {project_id => {"access_type" => your_proj_access_type}}
-          else
-            new_permission_data["Project"][project_id] = {"access_type" => your_proj_access_type}
+        if (sharing_scope == Policy::ALL_SYSMO_USERS) and !project_ids.blank?
+          project_ids.each do |project_id|
+            project_id = project_id.to_i
+            #add Project to contributor_type
+            contributor_types << "Project" if !contributor_types.include? "Project"
+            #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
+            if !new_permission_data.has_key?('Project')
+              new_permission_data["Project"] = {project_id => {"access_type" => your_proj_access_type}}
+            else
+              new_permission_data["Project"][project_id] = {"access_type" => your_proj_access_type}
+            end
           end
         end
 
@@ -104,14 +108,14 @@ module Seek
         end
 
         #if blacklist/whitelist is used
-        if (params["use_whitelist"].to_i == 1)
+        if (params["use_whitelist"] == 'true')
           people_in_whitelist = get_people_in_FG(nil, true, nil)
           unless people_in_whitelist.blank?
             people_in_group['WhiteList'] |= people_in_whitelist
           end
         end
         #if blacklist/whitelist is used
-        if (params["use_blacklist"].to_i == 1)
+        if (params["use_blacklist"] == 'true')
           people_in_blacklist = get_people_in_FG(nil, nil, true)
           unless people_in_blacklist.blank?
             people_in_group['BlackList'] |= people_in_blacklist
