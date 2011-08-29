@@ -24,6 +24,7 @@ class Sample < ActiveRecord::Base
 
 
 
+
   has_and_belongs_to_many :tissue_and_cell_types
 
   def self.sop_sql()
