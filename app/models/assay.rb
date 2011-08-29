@@ -58,8 +58,8 @@ class Assay < ActiveRecord::Base
   validates_presence_of :study, :message=>" must be selected"
   validates_presence_of :owner
   validates_presence_of :assay_class
-  validates_presence_of :samples,:unless => :is_modelling?
-  has_many :relationships, 
+  validates_presence_of :samples  if Seek::Config.is_virtualliver
+  has_many :relationships,
     :class_name => 'Relationship',
     :as => :subject,
     :dependent => :destroy
@@ -181,7 +181,7 @@ class Assay < ActiveRecord::Base
 
   def validate
 
-    errors.add_to_base "Please specify either sample or organisms for assay!" if is_modelling? and samples_are_missing? and organisms_are_missing?
+    errors.add_to_base "Please specify either sample or organisms for assay!" if Seek::Config.is_virtualliver and samples_are_missing? and organisms_are_missing?
 
   end
 
