@@ -57,9 +57,9 @@ class SamplesController < ApplicationController
            render :partial=>"assets/back_to_fancy_parent",:locals=>{:child=>@sample,:parent=>"assay"}
         else
           respond_to do |format|
-        flash[:notice] = 'Sample was successfully created.'
-        format.html { redirect_to(@sample) }
-        format.xml { head :ok }
+            flash[:notice] = 'Sample was successfully created.'
+            format.html { redirect_to(@sample) }
+            format.xml  { head :ok }
           end
         end
     else
