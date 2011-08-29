@@ -164,7 +164,7 @@ class Assay < ActiveRecord::Base
 
   def validate
 
-    errors.add_to_base "Please specify either samples or organisms for assay!" if Seek::Config.is_virtualliver and samples_are_missing? and organisms_are_missing?
+    errors.add_to_base "Please specify either samples or organisms for assay!" if samples_are_missing? and organisms_are_missing?
 
   end
 
