@@ -3,7 +3,7 @@ require 'libxml'
 
 module Seek
   class SabiorkWebservices
-     def get_compound_annotation compound_name
+    def get_compound_annotation compound_name
       url=URI.encode(webservice_base_url+"compounds?compoundName=#{compound_name}")
       doc = get_xml_doc url
       compound_annotations = {'synonyms' => [], 'chebi_ids' => [], 'kegg_ids' => []}
@@ -35,8 +35,8 @@ module Seek
       else
         return nil
       end
+     end
 
-    end
     def webservice_base_url
       Seek::Config.sabiork_ws_base_url
     end

@@ -40,6 +40,7 @@ namespace :seek do
     end
   end    
 
+  #adding the new compounds and their annotations if they dont exist
   desc "seeds database with compounds, synonyms and mappings"
   task(:populate_compounds=>:environment) do
     compound_list = []
@@ -61,6 +62,30 @@ namespace :seek do
       end
       puts "#{count.to_s} compounds were created"
 
+    end
+  end
+
+  #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
+  desc "update the compounds, synonyms and mappings"
+  task(:update_compounds=>:environment) do
+    compound_list = []
+    File.open('config/default_data/compound.list').each do |compound|
+      unless compound.blank?
+        compound_list.push(compound.chomp) if !compound_list.include?(compound.chomp)
+      end
+    end
+
+    unless compound_list.blank?
+      compound_object_list = update_substances compound_list
+      count = 0
+      compound_object_list.each do |co|
+        if co.save
+          count += 1
+        else
+          puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
+        end
+      end
+      puts "#{count.to_s} compounds were updated"
     end
   end
 

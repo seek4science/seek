@@ -38,6 +38,36 @@ module Seek
     result
   end
 
+  def update_substances(substances)
+    result = []
+    unless substances.blank?
+      substances.each do |substance|
+         #call the webservice to retrieve the substance annotation from sabiork
+         #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_ids, kegg_ids
+         compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(substance)
+         #compound_annotation = {'recommended_name' => "#{new_substance}", 'synonyms' => ["#{new_substance}_1","#{new_substance}_2"], 'sabiork_id' => 50, 'chebi_ids' => [CHEBI:15377], 'kegg_ids' => ["C00001", "C00002"]}
+         unless compound_annotation.blank?
+           #retrieve or create compound with the recommended_name
+           recommended_name = compound_annotation["recommended_name"]
+           c = Compound.find_by_name(recommended_name) ? Compound.find_by_name(recommended_name) : Compound.new(:name => recommended_name)
+
+           #create new or update mappings and mapping_links
+           c = new_or_update_mapping_links c, compound_annotation
+
+           #create new or update synonyms
+           c = new_or_update_synonyms c, compound_annotation
+
+           result.push c
+         else
+           #if the webservice doesn't return any value: find the compound or create compound with the name substance
+           c = Compound.find_by_name(substance) ? Compound.find_by_name(substance) : Compound.new(:name => substance)
+           result.push c
+         end
+      end
+    end
+    result
+  end
+
   def no_comma_for_decimal
     check_string = ''
     if self.controller_name.downcase == 'studied_factors'

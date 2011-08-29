@@ -23,7 +23,6 @@
 2-Phosphoglycerate
 2-Phosphoglyceric acid
 3PG
-3PG
 3-Phospho-D-glycerate
 3-phospho-D-glyceric acid
 3-Phospho-D-glyceroyl phosphate
@@ -50,7 +49,6 @@ Alanine
 alpha-D-Glucopyranose
 alpha-D-Glucopyranose 6-phosphate
 alpha-D-Glucose
-alpha-D-Glucose 6-phosphate
 alpha-D-Glucose 6-phosphate
 alpha-D-ribose 5-phosphate
 alpha-Ketopropionic acid
@@ -101,7 +99,6 @@ D-Glycerate 2-phosphate
 D-Glycerate 3-phosphate
 DHAP
 Dihydroxyacetone phosphate
-Dihydroxyacetone phosphate
 Diphosphopyridine nucleotide
 DPN
 DPNH
@@ -130,7 +127,6 @@ Glycerate 1,3-bisphosphate
 Glycerate 2-phosphate
 Glycerate 3-phosphate
 glycerol
-Glycerone phosphate
 Glycerone phosphate
 Glycine
 GTP
@@ -175,7 +171,6 @@ Ornithine
 Orthophosphate
 oxaloacetate
 oxaloacetic acid
-PEP
 PEP
 Phenylalanine
 Phosphate

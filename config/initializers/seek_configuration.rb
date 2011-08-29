@@ -14,7 +14,7 @@ Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
 Seek::Config.default :solr_enabled,false
 Seek::Config.default :jws_enabled, true
 Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk"
-Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
+Seek::Config.default :sabiork_ws_base_url, "http://hitssv506.h-its.org/sabioRestWebServices/"
 Seek::Config.default :exception_notification_enabled,false
 Seek::Config.default :exception_notification_recipients,""
 Seek::Config.default :hide_details_enabled,false

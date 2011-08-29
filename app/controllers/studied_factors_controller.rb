@@ -20,6 +20,7 @@ class StudiedFactorsController < ApplicationController
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
     substances = find_or_new_substances new_substances,known_substance_ids_and_types
+    #substances = update_substances ['Acetate']
     substances.each do |substance|
       @studied_factor.studied_factor_links.build(:substance => substance )
     end
