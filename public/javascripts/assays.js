@@ -272,12 +272,6 @@ function updateModels() {
         }        
     }
 
-    if (models_assets.length>=1) {
-        Effect.Fade("add_model_elements");
-    }
-    else {
-        Effect.Appear("add_model_elements");
-    }
 }
 
 function check_show_add_assay() {
