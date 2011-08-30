@@ -46,9 +46,9 @@
         </p>
 
         <% end -%>
-        <%= preview_permission_popup_link('data_file', preview_permissions_data_files_path)-%>
+        <%= preview_permission_popup_link('data_file', url_for(:controller => 'policies', :action => 'preview_permissions'), false)-%>
         <p>
-            <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(false); return(false);" -%> or <%= link_to "Cancel", data_file_path(@data_file) -%>
+            <%= f.submit "Update", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(false, 'data_file'); return(false);" -%> or <%= link_to "Cancel", data_file_path(@data_file) -%>
         </p>
         </div>
     <% end %>

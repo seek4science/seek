@@ -1,4 +1,8 @@
 <%= javascript_include_tag "resoource.js"%>
+<%
+   is_new_file = params[:is_new_file]
+   resource_name = params[:resource_name]
+%>
 <style>
   ul.people_list li.name {
       color: #ff8c00;
@@ -18,11 +22,11 @@
 <div class="redbox_contents" style="width:500px;">
     <div class="body">
     <h1>You will share this item with:</h1>
-    <%unless people_in_group.blank?
-      people_in_group.each do |key, value|
+    <%unless grouped_people_by_access_type.blank?
+      grouped_people_by_access_type.each do |key, value|
        case key
         when 1 %>
-            <h2>People can view summary only:</h2>
+            <h2>People can view summary:</h2>
             <%= display_people_list value-%>
         <%when 2 %>
             <h2>People can view summary and get contents:</h2>
@@ -43,7 +47,7 @@
 
     <div align="center" style="margin-top: 1em">
       <input type=button value='Change Permission' onclick="RedBox.close()">
-      <input type=button value='OK' style="width: 5em" onclick="updateResource(false)">
+      <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
     </div>
   </div>
 </div>

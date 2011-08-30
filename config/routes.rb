@@ -34,7 +34,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :saved_searches
 
-  map.resources :data_files, :collection=>{:test_asset_url=>:post, :preview_permissions => :get},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
+  map.resources :data_files, :collection=>{:test_asset_url=>:post},:member => {:download => :get,:plot=>:get, :data => :get,:preview_publish=>:get,:publish=>:post, :request_resource=>:post, :update_tags_ajax=>:post},:new=>{:upload_for_tool => :post}  do |data_file|
     data_file.resources :studied_factors, :collection =>{:create_from_existing=>:post}
   end
   
@@ -129,8 +129,7 @@ ActionController::Routing::Routes.draw do |map|
   #create new specimen based existing one
   #map.new_specimen_based_on_existing_one '/specimens/new_specimen_based_on_existing_one/:id',:controller=>'specimens',:action=>'new_specimen_based_on_existing_one', :conditions => { :method => :post }
   map.new_object_based_on_existing_one ':controller_name/new_object_based_on_existing_one/:id',:controller=>'#{controller_name}',:action=>'new_object_based_on_existing_one', :conditions => { :method => :post }
-
-  map.request_permission_summary '/policies/request_permission_summary', :controller => 'policies', :action => 'request_permission_summary', :conditions => { :method => :get }
+  #map.preview_permissions ':controller_name/preview_permissions', :controller=>'controller_name', :action=>'preview_permissions', :conditions => { :method => :post }
 
   # The priority is based upon order of creation: first created -> highest priority.
 

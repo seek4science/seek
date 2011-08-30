@@ -62,6 +62,11 @@
 
 
 <p style="margin-top: 2em; text-align: center;">
-  <%= f.submit(action==:edit ? "Update" : "Create", :disable_with=>(action==:edit ? "Updating..." : "Creating...")) -%>
+  <%
+     button_text=action==:edit ? "Update" : "Create"
+     is_new_file=action==:edit ? false : true
+  %>
+  <%= preview_permission_popup_link('study', url_for(:controller => 'policies', :action => 'preview_permissions'), is_new_file)-%>
+  <%= f.submit button_text, :id => "study_submit_btn", :onclick => "javascript: clickLink($('preview_permission'));return(false);" -%>
   or <%= link_to 'Cancel', (@study.id ? study_path(@study.id) : studies_path) -%>
 </p>
