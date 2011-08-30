@@ -172,17 +172,17 @@ class AvatarsController < ApplicationController
     
     # check that nested route is used, not a direct link
     if (@avatar_for.nil? || @avatar_for_id.nil?)
-      flash[:error] = "Please use nested routes. Avatars are only available for people, projects and institutions."
-      redirect_to(person_path(current_user.person))
+      flash[:error] = "Avatars are only available for people, projects and institutions."
+      redirect_to(root_path)
       return false
     end
     
     begin
       # this will find person/project/institution which "owns" in the URL (if it is correct)
-      @avatar_owner_instance = eval("#{@avatar_for}.find(#{@avatar_for_id})")
+      @avatar_owner_instance = @avatar_for.constantize.find(@avatar_for_id)
     rescue ActiveRecord::RecordNotFound
-      flash[:error] = "Could not find #{@avatar_for.downcase} specified in the URL."
-      redirect_to(person_path(current_user.person))
+      flash[:error] = "Could not find the #{@avatar_for.downcase} for this avatar."
+      redirect_to(root_path)
       return false
     end
   end
@@ -217,7 +217,7 @@ class AvatarsController < ApplicationController
       @avatar = Avatar.find( params[:id], :conditions => { :owner_type => @avatar_for, :owner_id => @avatar_for_id } )
     rescue ActiveRecord::RecordNotFound
       flash[:error] = "Avatar not found or belongs to a different #{@avatar_for.downcase}."
-      redirect_to(person_path(current_user.person))
+      redirect_to(root_path)
       return false
     end
     

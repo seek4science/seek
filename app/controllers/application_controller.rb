@@ -296,6 +296,7 @@ class ApplicationController < ActionController::Base
         end
         when "investigations","studies","assays","specimens","samples"
         if ["show","create","update","destroy"].include?(a)
+          check_log_exists(a,c,object)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
                      :referenced => object.projects.first,
@@ -308,6 +309,7 @@ class ApplicationController < ActionController::Base
           a = "create" if a == "upload_for_tool"
           a = "update" if a == "new_version"
         if ["show","create","update","destroy","download"].include?(a)
+          check_log_exists(a,c,object)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
                      :referenced => object.projects.first,
@@ -331,6 +333,17 @@ class ApplicationController < ActionController::Base
                      :data => {:search_query=>object,:result_count=>@results.count})
         end
       end
+    end
+  end
+
+  def check_log_exists action,controllername,object
+    if action=="create"
+      a=ActivityLog.find(:first,:conditions=>{
+          :activity_loggable_type=>object.class.name,
+          :activity_loggable_id=>object.id,
+          :controller_name=>controllername,
+          :action=>"create"})
+      raise Exception.new "Duplicate create activity log about to be created for #{object.class.name}:#{object.id}" unless a.nil?
     end
   end
 
