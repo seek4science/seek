@@ -18,4 +18,23 @@ namespace :seek_dev do
     end
     
   end
+
+  desc 'finds duplicate create activity records for the same item'
+  task(:duplicate_creates=>:environment) do
+    duplicates = ActivityLog.find(:all,
+                                  :select=>"id,created_at,activity_loggable_type,activity_loggable_id,action,count(activity_loggable_id+activity_loggable_type) as dup_count",
+                                  :conditions=>"action='create' and controller_name!='sessions'",
+                                  :group=>"activity_loggable_type,activity_loggable_id having dup_count>1"
+    )
+    if !duplicates.empty?
+      puts "Found duplicates:"
+      duplicates.each do |duplicate|
+        matches = ActivityLog.find(:all,:conditions=>{:activity_loggable_id=>duplicate.activity_loggable_id,:activity_loggable_type=>duplicate.activity_loggable_type,:action=>"create"},:order=>"created_at ASC")
+        puts "ID:#{duplicate.id}\tLoggable ID:#{duplicate.activity_loggable_id}\tLoggable Type:#{duplicate.activity_loggable_type}\tCount:#{matches.count}\tCreated ats:#{matches.collect{|m| m.created_at}.join(", ")}"
+      end
+    else
+      puts "No duplicates found"
+    end
+  end
+
 end

@@ -115,6 +115,7 @@ module NewBamboo #:nodoc:
         # Creates a new record in the activity_logs table if applicable
         def activity_log_create
           write_activity_log(:create)
+          raise Exception.new "Shouldn't be calling activity_log_create"
         end
 
         def activity_log_update
