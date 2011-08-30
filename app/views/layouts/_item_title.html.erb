@@ -5,7 +5,21 @@ avatar=resource_title_draggable_avatar item
 title_prefix||="" 
 title_postfix||=""
 %>
-<div class="contribution_title">    
+<div style='font-size: 140%; text-align: center;'>
+  <%=
+      if item.respond_to? :private? and item.respond_to? :public? and try_block{item.can_manage?}
+          if item.private?
+              "This item is <span style='color: red; font-weight: bold;'>Private</span> (only you can view it)"
+          elsif item.public?
+              "This item is <span style='color: green; font-weight: bold;'>Public</span> (all visitors, even without a login, may view this item)"
+          else
+              "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
+          end
+      end
+  %>
+</div>
+
+<div class="contribution_title">
     <% unless avatar.blank? -%>
     <span class="contribution_title_image"><%= avatar -%>
     </span>
