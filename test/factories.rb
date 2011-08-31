@@ -346,3 +346,16 @@ end
     f.kegg_id "6789"
     f.sabiork_id "4"
   end
+
+  Factory.define :site_announcement do |f|
+    f.sequence(:title) {|n| "Announcement #{n}"}
+    f.sequence(:body) {|n| "This is the body for announcement #{n}"}
+    f.association :announcer,:factory=>:admin
+    f.is_headline false
+    f.expires_at 5.days.since
+    f.email_notification false
+  end
+
+  Factory.define :headline_announcement,:parent=>:site_announcement do |f|
+    f.is_headline true
+  end

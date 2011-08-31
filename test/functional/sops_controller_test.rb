@@ -42,6 +42,29 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    sop=Factory(:sop,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,sop.contributor
+    assert sop.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",sop_path(sop),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
+  end
+
   test "request file button visibility when logged in and out" do
 
     sop = Factory :sop,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)

@@ -66,8 +66,8 @@ namespace :seek do
   end
 
   #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
-  desc "update the compounds, synonyms and mappings"
-  task(:update_compounds=>:environment) do
+  desc "adds or updates the compounds, synonyms and mappings using the Sabio-RK webservices"
+  task(:compounds=>:environment) do
     compound_list = []
     File.open('config/default_data/compound.list').each do |compound|
       unless compound.blank?
@@ -98,14 +98,14 @@ namespace :seek do
 
   desc 'seeds the database with the controlled vocabularies'
   task(:seed=>:environment) do
-    tasks=["seed_sqlite","load_help_docs"]
+    tasks=["seed_testing","compounds","load_help_docs"]
     tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
   end
 
-  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678)'
-  task(:seed_sqlite=>:environment) do
+  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
+  task(:seed_testing=>:environment) do
     tasks=["refresh_controlled_vocabs", "default_tags", "graft_new_assay_types"]
     tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
@@ -143,7 +143,7 @@ namespace :seek do
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains","compounds"]
+    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
     other_tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
@@ -252,12 +252,6 @@ namespace :seek do
     revert_fixtures_identify
     AssayClass.delete_all
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "assay_classes")
-  end
-
-   task(:compounds=>:environment) do
-    revert_fixtures_identify
-    Compound.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "compounds")
   end
 
   #Update the sharing_scope in the policies table, because of removing CUSTOM_PERMISSIONS_ONLY and ALL_REGISTERED_USERS scopes

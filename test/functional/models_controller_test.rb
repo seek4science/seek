@@ -31,6 +31,29 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash[:error]    
   end
+
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    model=Factory(:model,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,model.contributor
+    assert model.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",model_path(model),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
+  end
   
   test "shouldn't show hidden items in index" do
     login_as(:aaron)

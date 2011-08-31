@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
+require 'uuidtools'
 
 namespace :seek_dev do
   desc 'A simple task for quickly setting up a project and institution, and assigned the first user to it. This is useful for quickly setting up the database when testing. Need to create a default user before running this task'
@@ -34,6 +35,15 @@ namespace :seek_dev do
       end
     else
       puts "No duplicates found"
+    end
+  end
+
+  desc 'create 50 randomly named unlinked projects'
+  task(:random_projects=>:environment) do
+    (0...50).to_a.each do
+      title=("A".."Z").to_a[rand(26)]+" #{UUIDTools::UUID.random_create.to_s}"
+      p=Project.create :title=>title
+      p.save!
     end
   end
 
