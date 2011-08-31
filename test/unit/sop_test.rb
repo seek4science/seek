@@ -37,8 +37,9 @@ class SopTest < ActiveSupport::TestCase
     asset=Sop.new :projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
+    #VL only:allow no projects
     asset=Sop.new :title=>"fred"
-    assert !asset.valid?
+    assert asset.valid?
   end
 
   test "assay association" do

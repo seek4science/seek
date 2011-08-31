@@ -43,8 +43,9 @@ class ModelTest < ActiveSupport::TestCase
     asset=Model.new :projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
+    #VL only: allow no projects
     asset=Model.new :title=>"fred"
-    assert !asset.valid?
+    assert asset.valid?
   end
 
   test "is asset?" do

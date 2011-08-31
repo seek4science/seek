@@ -24,7 +24,7 @@
         Please select the projects this publication is related to. You must select a project, and it must be a project
         you are a member of.
     </p>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication} -%>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => true} -%>
 	<p>
 		<%= submit_tag 'Fetch',:id=>"fetch_button" %>
 	</p>

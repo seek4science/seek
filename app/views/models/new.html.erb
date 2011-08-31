@@ -24,7 +24,7 @@
                     Other information 
                 </div>
                 <div class="foldContent">
-                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model } -%>
+                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
                     <%= render :partial=>"model_metadata" -%>
                 </div>
             </div>

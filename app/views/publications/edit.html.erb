@@ -7,7 +7,7 @@
 <div class="show_basic">    
   <%= error_messages_for('publication', :message => nil) %>
   <% form_tag publication_path(@publication), :method => :put do %>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication}%>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => true}%>
     
     <% if @publication.pubmed_id.nil? && @publication.doi %>
       <p>

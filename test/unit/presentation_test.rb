@@ -9,8 +9,10 @@ class PresentationTest < ActiveSupport::TestCase
    assert !presentation.valid?
 
    presentation.reload
+
+   # VL only:allow no projects
    presentation.projects.clear
-   assert !presentation.valid?
+   assert presentation.valid?
  end
 
   test "default_policy_is_private" do

@@ -25,7 +25,7 @@
     <%# only the owner should be able to change sharing permissions -%>
     <% if current_user_authorized_to_manage -%>
           
-	<%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } %>
+	<%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } %>
 
       <p>
         <%= fancy_multiselect @data_file, :scales, {:possibilities=>sort_scales(Scale.all)} -%>

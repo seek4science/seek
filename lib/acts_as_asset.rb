@@ -35,8 +35,7 @@ module Acts #:nodoc:
 
 
         validates_presence_of :title
-        validates_presence_of :projects
-        
+
         acts_as_taggable
         acts_as_scalable
 

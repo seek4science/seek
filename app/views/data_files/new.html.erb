@@ -19,7 +19,7 @@
             <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
             <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
-        <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } -%>
+        <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file,:allow_nil=>true } -%>
 
       <p>
         <%= fancy_multiselect @data_file,:scales, {:possibilities=>sort_scales(Scale.all)} -%>

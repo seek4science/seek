@@ -18,7 +18,7 @@
             <% sop_description_value = (params[:sop].blank? || params[:sop][:description].blank?) ? nil : params[:sop][:description] -%>
             <%= text_area_tag 'sop[description]', sop_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
-        <%= render :partial => "projects/project_selector", :locals => { :resource => @sop } -%>
+        <%= render :partial => "projects/project_selector", :locals => { :resource => @sop,:allow_nil=> true} -%>
         <p>
         <%= fancy_multiselect @sop,:scales, {:possibilities=>sort_scales(Scale.all)} -%>
        </p>

@@ -27,9 +27,9 @@
                     Other information 
                 </div>
                 <div class="foldContent">
-                    <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
+                    <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector was disabled) -%>
                     <% if current_user_authorized_to_manage -%>
-                      <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :disable_project_select => true } -%>
+                      <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
                     <% end -%>
                     <%= render :partial=>"model_metadata" -%>
                 </div>

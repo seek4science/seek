@@ -55,11 +55,13 @@ class DataFileTest < ActiveSupport::TestCase
     asset=DataFile.new :projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
+    #VL only:allow no projects
     asset=DataFile.new :title=>"fred"
-    assert !asset.valid?
+    assert asset.valid?
+
 
     asset = DataFile.new :title => "fred", :projects => []
-    assert !asset.valid?
+    assert asset.valid?
   end
 
   def test_avatar_key

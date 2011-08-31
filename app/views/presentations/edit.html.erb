@@ -25,7 +25,7 @@
 
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
         <% if current_user_authorized_to_manage -%>
-            <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation} -%>
+            <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
         <% end -%>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
