@@ -73,7 +73,7 @@ class PoliciesController < ApplicationController
 
     #return the hash: key is access_type, value is the array of people
     def request_permission_summary
-        #get sharing_scope and access_type
+        #get params
         sharing_scope = params["sharing_scope"].to_i
         access_type = params["access_type"].to_i
 
@@ -83,7 +83,26 @@ class PoliciesController < ApplicationController
         contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
         new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
 
-        #if share with your project is chosen
+        #build the hash containing contributor_type as key and the people in these groups as value
+        people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => []}
+        #the result return: a hash contain the access_type as key, and array of people as value
+        grouped_people_by_access_type = {}
+
+        #Process policy
+        #if the item is shared to all sysmo members
+        if (sharing_scope == Policy::ALL_SYSMO_USERS)
+           people_in_network = get_people_in_network access_type
+             unless people_in_network.blank?
+               people_in_group['Network'] |= people_in_network
+             end
+        end
+        #if public scope is chosen
+        if (sharing_scope == Policy::EVERYONE)
+          grouped_people_by_access_type[Policy::PUBLISHING] = access_type
+        end
+
+        #Process permissions
+        #if share with your project and with all_sysmo_user is chosen
         if (sharing_scope == Policy::ALL_SYSMO_USERS) and !project_ids.blank?
           project_ids.each do |project_id|
             project_id = project_id.to_i
@@ -98,8 +117,6 @@ class PoliciesController < ApplicationController
           end
         end
 
-        #build the hash containing contributor_type as key and the people in these groups as value
-        people_in_group = {'Person' => [], 'FavouriteGroup' => [], 'WorkGroup' => [], 'Project' => [], 'WhiteList' => [], 'BlackList' => [],'Network' => []}
         contributor_types.each do |contributor_type|
            case contributor_type
              when 'Person'
@@ -148,44 +165,46 @@ class PoliciesController < ApplicationController
           end
         end
 
-        #if the item is shared to all sysmo members
-        if (sharing_scope == Policy::ALL_SYSMO_USERS)
-           people_in_network = get_people_in_network access_type
-             unless people_in_network.blank?
-               people_in_group['Network'] |= people_in_network
-             end
-        end
-
         #Now make the people in group unique by choosing the highest access_type
         people_in_group['FavouriteGroup']  = remove_duplicate(people_in_group['FavouriteGroup'])
         people_in_group['WorkGroup']  = remove_duplicate(people_in_group['WorkGroup'])
         people_in_group['Project']  = remove_duplicate(people_in_group['Project'])
 
-        #Now process precedence with the order [network, project, wg, fg, person, whitelist, blacklist]
+        #Now process precedence with the order [network, project, wg, fg, person]
         filtered_people = people_in_group['Network']
         filtered_people = precedence(filtered_people, people_in_group['Project'])
         filtered_people = precedence(filtered_people, people_in_group['WorkGroup'])
         filtered_people = precedence(filtered_people, people_in_group['FavouriteGroup'])
         filtered_people = precedence(filtered_people, people_in_group['Person'])
-        filtered_people = precedence(filtered_people, people_in_group['WhiteList'])
-        filtered_people = remove_element_from_blacklist(filtered_people, people_in_group['BlackList'])
+
+        #add people in white list
+        filtered_people = add_people_in_whitelist(filtered_people, people_in_group['WhiteList'])
+        #remove people in blacklist
+        filtered_people = remove_people_in_blacklist(filtered_people, people_in_group['BlackList'])
+
         #remove current_user
         filtered_people = filtered_people.reject{|person| person[0] == current_user.id}
+
         #sort people by name
         filtered_people = filtered_people.sort{|a,b| a[1] <=> b[1]}
+
         #group people by access_type
-        grouped_people_by_access_type = filtered_people.group_by{|person| person[2]}
-        #if public scope is chosen
-        if (sharing_scope == Policy::EVERYONE)
-          grouped_people_by_access_type[5] = access_type
-        end
+        grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
+
         #sort by key of the hash
         grouped_people_by_access_type = Hash[grouped_people_by_access_type.sort]
+        #add people in backlist to the group of access_type=Policy::NO_ACCESS
+        unless people_in_group['BlackList'].blank?
+          if grouped_people_by_access_type[Policy::NO_ACCESS].blank?
+            grouped_people_by_access_type[Policy::NO_ACCESS] = people_in_group['BlackList']
+          else
+            grouped_people_by_access_type[Policy::NO_ACCESS] |= people_in_group['BlackList']
+          end
+        end
 
         return grouped_people_by_access_type
     end
 
-    protected
     def get_person person_id, access_type
       person = Person.find(person_id)
       if person
@@ -252,17 +271,19 @@ class PoliciesController < ApplicationController
     end
 
     #remove duplicate by taking the one with the highest access_type
-    def remove_duplicate array
+    def remove_duplicate people_list
        result = []
-       array.each do |a|
-           result.push(get_max_access_type(array, a))
+       #first replace each person in the people list with the highest access_type of this person
+       people_list.each do |person|
+           result.push(get_max_access_type_element(people_list, person))
        end
+       #remove the duplication
        result = result.inject([]) { |result,i| result << i unless result.include?(i); result }
        result
 
     end
 
-    def get_max_access_type(array, element)
+    def get_max_access_type_element(array, element)
        array.each do |a|
           if (element[0] == a[0] && element[2] < a[2])
               element = a;
@@ -271,8 +292,10 @@ class PoliciesController < ApplicationController
        return element
     end
 
+    #array2 has precedence
     def precedence array1, array2
-       result = array2
+      result = []
+      result |= array2
        array1.each do |a1|
          check = false
          array2.each do |a2|
@@ -288,23 +311,32 @@ class PoliciesController < ApplicationController
        return result
     end
 
-    #remove elements which are in blacklist
-    def remove_element_from_blacklist(array, blacklist)
-       result = array
-       array.each do |a|
+    #remove people which are in blacklist from the people list
+    def remove_people_in_blacklist(people_list, blacklist)
+       result = []
+       result |= people_list
+       people_list.each do |person|
          check = false
-         blacklist.each do |bl|
-          if (a[0] == bl[0])
-              check = true
-              break
+         blacklist.each do |person_in_bl|
+          if (person[0] == person_in_bl[0])
+            check = true
+            break
           end
          end
          if check
-            result.delete a
+            result.delete person
          end
        end
        return result
     end
 
-
+    #add people which are in whitelist to the people list
+    def add_people_in_whitelist(people_list, whitelist)
+       result = []
+       result |= people_list
+       result |= whitelist
+       return remove_duplicate(result)
+    end
 end
+
+
