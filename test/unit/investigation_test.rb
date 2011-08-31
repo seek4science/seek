@@ -40,9 +40,10 @@ class InvestigationTest < ActiveSupport::TestCase
     inv.title=nil
     assert !inv.valid?
 
+    # allow empty projects
     inv.title="Test"
     inv.projects=[]
-    assert !inv.valid?
+    assert inv.valid?
 
     inv.projects=[projects(:sysmo_project)]
     assert inv.valid?
