@@ -76,7 +76,8 @@ module Annotations
         end
         
       end
-      
+
+
       # This module contains instance methods
       module InstanceMethods
         

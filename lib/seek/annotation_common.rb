@@ -51,7 +51,7 @@ module Seek
 
 
       entity_annotations.each do |existing_ann| #for each existing annotation
-        unless annotations.include? existing_ann #unless we're keeping it
+        unless known_annotations.include? existing_ann #unless we're keeping it
           existing_ann.delete #delete it.
         end
       end
@@ -91,11 +91,11 @@ module Seek
       end
 
 
-      entity_annotations = Annotation.all.select { |x| x.annotatable == entity }
+      entity_annotations = Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.type}'")
 
-      entity_annotations.each do |existing_ann| #for each existing annotation
-        unless annotations.include? existing_ann #unless we're keeping it
-          existing_ann.delete #delete it.
+      entity_annotations.each do |existing_ann|     #Delete all annotations for this entity that
+        unless annotations.include? existing_ann  #are no longer on the list
+          existing_ann.delete
         end
       end
 
@@ -121,25 +121,16 @@ module Seek
       #double checks and resolves if any new tags are actually known. This can occur when the tag has been typed completely rather than
       #relying on autocomplete. If not fixed, this could have an impact on preserving tag ownership.
       def check_if_new_annotations_are_known new_annotations, known_annotations
-
-        fixed_new_annotations = []
+         fixed_new_tags = []
         new_annotations.each do |new_ann|
-          #find any existing annotations of the same name
-          ann = []
-          Annotation.all.each do |each_ann|
-            ann << new_ann if ((new_ann == each_ann.value.text)) # && (new_ann.attribute.name == "tag"))
-          end
-          #ann=Annotation.find_annotatables_with_attribute_name_and_value("tag", new_ann.strip)
+          ann=Annotation.find(:all, :conditions => "value_id = '#{new_ann.value_id}'")
           if ann.nil?
-            fixed_new_annotations << new_ann
+            fixed_new_tags << new_ann
           else
-            known_annotations << new_ann unless known_annotations.include?(ann)
-
+            known_annotations << ann unless known_annotations.include?(ann)
           end
         end
-
         return new_annotations, known_annotations
-
       end
     end
   end

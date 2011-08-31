@@ -7,7 +7,7 @@ require 'title_trimmer'
 class Model < ActiveRecord::Base
 
   title_trimmer
-  
+  acts_as_annotatable
   acts_as_asset
   acts_as_trashable  
   

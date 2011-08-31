@@ -6,7 +6,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :strains
 
-  map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_tags_ajax=>:post}
+  map.resources :publications,:collection=>{:fetch_preview=>:post},:member=>{:disassociate_authors=>:post,:update_annotations_ajax=>:post}
 
   map.resources :assay_types, :collection=>{:manage=>:get}
 
@@ -20,7 +20,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :studies
 
-  map.resources :assays,:member=>{:update_tags_ajax=>:post}
+  map.resources :assays,:member=>{:update_annotations_ajax=>:post}
 
   map.resources :saved_searches
 
@@ -39,7 +39,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   map.resources :models, 
-    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_tags_ajax=>:post },
+    :member => { :download => :get, :execute=>:post, :request_resource=>:post,:preview_publish=>:get,:publish=>:post, :builder=>:get, :submit_to_jws=>:post, :simulate=>:post, :update_annotations_ajax=>:post },
     :collection=>{:build=>:get}
 
   map.resources :people, :collection=>{:select=>:get,:get_work_group =>:get} do |person|
@@ -53,7 +53,7 @@ ActionController::Routing::Routes.draw do |map|
     project.resources :avatars, :member => { :select => :post }, :collection => { :new => :post }
   end
 
-  map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post } do |sop|
+  map.resources :sops, :member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_annotations_ajax=>:post } do |sop|
     sop.resources :experimental_conditions, :collection =>{:create_from_existing=>:post}
   end
 
@@ -84,7 +84,12 @@ ActionController::Routing::Routes.draw do |map|
   #tags
   map.all_tags '/tags',:controller=>'tags',:action=>'index'
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
-  
+
+  #annotations
+  map.show_anns '/anns',:controller=>'anns',:action=>'index'
+  map.show_ann '/annotations/:id',:controller=>'annotations',:action=>'show'
+
+
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'
   
   # browsing by countries

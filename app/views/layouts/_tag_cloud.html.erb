@@ -23,8 +23,7 @@
     <% if !tags.blank? -%>
         <div class="popularity">
           <% tags.each do |ann| -%>
-              <% link = "http://www.google.com" -%>
-              <%= link_to ann.value.text , link -%>
+              <%= link_for_ann ann, :truncate_length=>40 -%>
           <% end -%>
     </div>
     <% else -%>

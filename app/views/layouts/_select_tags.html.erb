@@ -10,9 +10,9 @@
 
 <%
 suggested_limit ||= 30
-suggested_tags = all_tags.sort{|a,b| a.count <=> b.count}[0...suggested_limit]
-suggested_tags.sort!{|a,b| a.name <=> b.name}
-all_tags.sort!{|a,b| a.name <=> b.name}
+suggested_tags = all_tags.sort{|a,b| a.id <=> b.id}[0...suggested_limit]
+suggested_tags.sort!{|a,b| a.value.text <=> b.value.text}
+all_tags.sort!{|a,b| a.value.text <=> b.value.text}
 no_tags_message ||= ""
 owned_tags ||= nil
 %>
@@ -30,9 +30,9 @@ owned_tags ||= nil
   </div>
 </div>
 
-<% if suggested_limit > 0 && suggested_tags.count > 0 -%>
+<% if suggested_limit > 0 && suggested_tags.id > 0 -%>
 <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-  <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "#{name}_tag_suggestions", :duration => 0.4) %>
+  <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "#{name.to_s}_tag_suggestions", :duration => 0.4) %>
 </p>
 
 <div id="<%= name -%>_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
@@ -40,9 +40,10 @@ owned_tags ||= nil
 	  <div id="<%= name -%>_select_tags" class="hTagcloud">
 	    <div class="popularity">
 	      <% unless suggested_tags.blank? -%>
-	        <% overall_tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-	          <%= link_to tag.name, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class -%>
-	        <% end -%>
+	        <%# overall_tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+              <% suggested_tags.each do |tag| -%>
+	            <%= link_to tag.value.text, "http://google.com" -%> <!-- #"javascript:addListTag('#{name}',#{tag.id});", :class => css_class -->
+	          <% end -%>
 	      <% end -%>
 	    </div>
 	  </div>
@@ -51,4 +52,5 @@ owned_tags ||= nil
 
 <% end -%>
 
-<%= render :partial=>"tagging/autocompleter_javascript", :locals=>{:name=>name,:all_tags=>all_tags,:owned_tags=>owned_tags,:item_tags=>item_tags} %>
+<%= render :partial=>"annotations/autocompleter_javascript", :locals=>{:name=>name, :all_annotations=>all_tags,:owned_annotations=>owned_tags,:item_annotations=>item_tags} %>
+

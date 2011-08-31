@@ -2,7 +2,8 @@ class AssaysController < ApplicationController
 
   include DotGenerator
   include IndexPager
-  include Seek::TaggingCommon
+  #include Seek::TaggingCommon
+  include Seek::AnnotationCommon
 
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]

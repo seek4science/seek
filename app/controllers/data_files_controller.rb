@@ -9,11 +9,12 @@ class DataFilesController < ApplicationController
   include MimeTypesHelper  
   include DotGenerator  
   include Seek::AssetsCommon
+  include Seek::AnnotationCommon
 
   #before_filter :login_required
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_tags_ajax]
+  before_filter :find_and_auth, :except => [ :index, :new, :upload_for_tool, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_data_file, :only=>[:show,:download,:explore]
 
   #has to come after the other filters
@@ -108,7 +109,7 @@ class DataFilesController < ApplicationController
       @data_file = DataFile.new params[:data_file]
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
-      update_tags @data_file
+      #update_tags @data_file
       update_annotations @data_file
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
@@ -178,7 +179,7 @@ class DataFilesController < ApplicationController
       params[:data_file][:last_used_at] = Time.now
     end
 
-    update_tags @data_file
+    #update_tags @data_file
     update_annotations @data_file
 
     assay_ids = params[:assay_ids] || []

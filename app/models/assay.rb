@@ -1,7 +1,7 @@
 require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
-
+  acts_as_annotatable
   def project
     investigation.nil? ? nil : investigation.project
   end
@@ -15,6 +15,8 @@ class Assay < ActiveRecord::Base
 
 
   acts_as_taggable
+  acts_as_annotatable
+
   belongs_to :institution
   belongs_to :sample
   belongs_to :assay_type
