@@ -5,6 +5,12 @@
   <%= simple_format(auto_link(Seek::Config.home_description)) -%>
 </div>
 
+<% if SiteAnnouncement.headline_announcement -%>
+    <p class="box_standout headline_announcement">
+      <%= site_annoucements_headline %>
+    </p>
+<% end -%>
+
 <%= render :partial=>"home_news_feeds" -%>
 
 <br/>
