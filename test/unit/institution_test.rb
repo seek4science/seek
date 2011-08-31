@@ -52,15 +52,8 @@ class InstitutionTest < ActiveSupport::TestCase
     assert i.can_be_edited_by?(u),"Institution :two should be editable by user :project_manager"
 
     i=institutions(:one)
-    p i.projects.map(&:title)
-    p u.person.projects.map(&:title)
-    p u.can_edit_institutions?
-    assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :project_manager since this institution is not participating in any of his projects"
+    assert !i.can_be_edited_by?(u),"Institution :one should not be editable by user :project_manager as he is not a member"
 
-    i=Factory(:institution, :projects => [u.person.projects.first])
-    assert i.can_be_edited_by?(u), "This institution should be editable by user :project_manager since one of this institution is participating in one of his projects"
-
-    i=institutions(:one)
     u=users(:quentin)
     assert i.can_be_edited_by?(u),"Institution :one should be editable by user :quentin as he's an admin"
 
