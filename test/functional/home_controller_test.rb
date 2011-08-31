@@ -139,26 +139,6 @@ class HomeControllerTest < ActionController::TestCase
     assert_select "div[class='yui-u home_panel'][style='display:none']", :count => 1
   end
 
-  test "should display the link 'Recent changes in your project and across SysMo' only for SysMO project members" do
-    login_as(:aaron)
-    get :index
-    assert_response :success
-
-    assert_select "h2",:text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 1
-
-    logout
-    get :index
-    assert_response :success
-
-    assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
-
-    login_as(:registered_user_with_no_projects)
-    get :index
-    assert_response :success
-
-    assert_select "h2", :text => "Recent changes in your project and across #{Seek::Config.project_name}", :count => 0
-  end
-
   test "should show the content of project news and community news with the configurable number of entries" do
     #project news
     Seek::Config.project_news_enabled=true
