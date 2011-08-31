@@ -222,5 +222,23 @@ class HomeControllerTest < ActionController::TestCase
     assert_select 'div#recently_added ul>li', recently_added_item_logs.count
     assert_select 'div#recently_downloaded ul>li', recently_downloaded_item_logs.count
   end
+
+  test "should show headline announcement" do
+    login_as :aaron
+    ann=Factory :headline_announcement
+
+    get :index
+    assert_response :success
+    assert_select "p.headline_announcement" do
+
+    end
+
+    #now expire it
+    ann.expires_at=1.day.ago
+    ann.save!
+    get :index
+    assert_select :success
+    assert_select "p.headline_announcement",:count=>0
+  end
   
 end
