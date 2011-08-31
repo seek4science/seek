@@ -32,7 +32,7 @@
       <th>Unit</th>
       <% if entity == "studied_factor" %>
          <th>Start value</th>
-         <th>End value</th>      
+         <th>End value</th>
          <th>SD</th>
       <% elsif entity == 'experimental_condition' %>
         <th>Value</th> 
@@ -77,8 +77,13 @@
             <% grouped_fses_or_ecs = fses_or_ecs.group_by{|fs_or_ec| fs_or_ec.measured_item.title}
                grouped_fses_or_ecs = Hash[grouped_fses_or_ecs.sort]
                grouped_fses_or_ecs.each do |measured_item, fses_or_ecs|
+                link_table_name = entity + '_links'
+                #remove the fs_or_ecs which have the concentration of no substance
+                if measured_item == 'concentration'
+                   fses_or_ecs = fses_or_ecs.reject{|fs_or_ec| fs_or_ec.send(link_table_name).blank?}
+                end
                 fses_or_ecs = uniq_fs_or_ec fses_or_ecs
-                link_table_name = entity + 'links'
+
                 fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.send(link_table_name).first.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.send(link_table_name).first.substance.name.downcase}.to_s + b.measured_item.title)} %>
                 <ul class="measured_items">
                   <li>

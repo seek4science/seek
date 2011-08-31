@@ -1,31 +1,31 @@
 metabolomics_investigation:  
   title: Metabolomics Investigation
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: editing_for_all_sysmo_users_policy
 
 metabolomics_investigation2:
   title: Metabolomics Investigation2
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: editing_for_all_sysmo_users_policy
 
 investigation_with_no_assays:
   title: Investigation with no Assays
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: editing_for_all_sysmo_users_policy
 
 investigation_with_no_study:
   title: Investigation with no Study
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: editing_for_all_sysmo_users_policy
 
 investigation_with_links_in_description:
   title: Investigation with links in description
-  project: sysmo_project
+  projects: [sysmo_project]
   description: Visit my site http://www.sysmo-db.org
   policy: editing_for_all_sysmo_users_policy
 
 junk_investigation:
   title: I collect junk
-  project: other_project
+  projects: [other_project]
   description: Visit my site http://www.sysmo-db.org
   policy: editing_for_all_sysmo_users_policy

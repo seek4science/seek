@@ -80,11 +80,11 @@ module Acts
           self.class.reflect_on_all_associations(:belongs_to).each do |reflection|
             options = reflection.options.reverse_merge :required_access => :view, :required_access_to_owner => :edit
             if changed.include? reflection.primary_key_name.to_s
-              unless can_perform? options[:required_access_to_owner]
+              unless !options[:required_access_to_owner] or can_perform? options[:required_access_to_owner]
                 errors.add_to_base "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
                 return true
               end
-              unless !send(reflection.name) or send(reflection.name).can_perform? options[:required_access]
+              unless !send(reflection.name) or !options[:required_access] or send(reflection.name).can_perform? options[:required_access]
                 errors.add reflection.primary_key_name.to_s, "must be a #{reflection.name.to_s.humanize} you can #{options[:required_access].to_s}"
                 return true
               end
@@ -103,7 +103,7 @@ module Acts
             if targets = association_instance_get(reflection.name)
               targets = [targets] unless reflection.collection?
               if targets.detect { |record| record.changed_for_autosave? }
-                if !can_perform?(options[:required_access_to_owner])
+                if options[:required_access_to_owner] and !can_perform?(options[:required_access_to_owner])
                   errors.add_to_base "You are not permitted to #{options[:required_access_to_owner]} #{self.class.name.underscore.humanize}-#{id}"
                   return true
                 end

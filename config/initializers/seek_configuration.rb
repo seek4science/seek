@@ -3,18 +3,18 @@
 
 require 'seek/config'
 
-#Features enabled
+#Main settings
 Seek::Config.default :public_seek_enabled,false
 Seek::Config.default :sycamore_enabled,false
-Seek::Config.default :events_enabled,false
+Seek::Config.default :events_enabled,true
 Seek::Config.default :jerm_enabled,true
-Seek::Config.default :test_enabled, false  #FIXME: whats this used for??
 Seek::Config.default :email_enabled,false
 Seek::Config.default :smtp, {:address => '', :port => '25', :domain => '', :authentication => :plain, :user_name => '', :password => ''}
 Seek::Config.default :noreply_sender, 'no-reply@sysmo-db.org'
 Seek::Config.default :solr_enabled,false
 Seek::Config.default :jws_enabled, true
 Seek::Config.default :jws_online_root,"http://jjj.mib.ac.uk"
+Seek::Config.default :sabiork_ws_base_url, "http://hitssv506.h-its.org/sabioRestWebServices/"
 Seek::Config.default :exception_notification_enabled,false
 Seek::Config.default :exception_notification_recipients,""
 Seek::Config.default :hide_details_enabled,false
@@ -33,6 +33,7 @@ Seek::Config.default :community_news_feed_urls,''
 Seek::Config.default :community_news_number_of_entries,10
 Seek::Config.default :home_description, 'Some (configurable) information about the project and what we do goes here.'
 
+Seek::Config.default :presentations_enabled,true
 
 # Branding
 Seek::Config.default :project_name,'SysMO'

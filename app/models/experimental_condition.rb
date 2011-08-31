@@ -21,4 +21,8 @@ class ExperimentalCondition < ActiveRecord::Base
   def self.human_attribute_name(attribute)
     HUMANIZED_COLLUMNS[attribute.to_sym] || super
   end
+
+  def substances
+    experimental_condition_links.collect{|l| l.substance}
+  end
 end

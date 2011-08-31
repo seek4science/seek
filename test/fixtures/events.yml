@@ -9,7 +9,7 @@ event_with_no_files:
   url: http://www.google.com
   description: MyText
   title: MyString
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: managing_for_all_sysmo_users_policy
   contributor: datafile_owner (User)
 
@@ -22,6 +22,6 @@ private_event:
   url: http://www.google.com
   description: MyText
   title: MyString
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: private_policy
   contributor: datafile_owner (User)

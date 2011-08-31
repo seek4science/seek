@@ -28,7 +28,7 @@ class Person < ActiveRecord::Base
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships
 
-  has_many :work_groups, :through=>:group_memberships
+  has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}}
   has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
 
@@ -41,6 +41,7 @@ class Person < ActiveRecord::Base
   has_many :created_models, :through => :assets_creators, :source => :asset, :source_type => "Model"
   has_many :created_sops, :through => :assets_creators, :source => :asset, :source_type => "Sop"
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
+  has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :roles ],:include=>[:disciplines]) if Seek::Config.solr_enabled
 
@@ -50,6 +51,18 @@ class Person < ActiveRecord::Base
   named_scope :admins,:conditions=>{:is_admin=>true}
 
   alias_attribute :webpage,:web_page
+
+  has_many :project_subscriptions, :before_add => proc {|person, ps| ps.person = person}
+  accepts_nested_attributes_for :project_subscriptions, :allow_destroy => true
+
+  has_many :subscriptions
+  before_create :set_default_subscriptions
+
+  def set_default_subscriptions
+    projects.each do |proj|
+      project_subscriptions.build :project => proj
+    end
+  end
 
   #FIXME: change userless_people to use this scope - unit tests
   named_scope :not_registered,:include=>:user,:conditions=>"users.person_id IS NULL"
@@ -115,19 +128,21 @@ class Person < ActiveRecord::Base
   end
 
   def institutions
-    res=[]
-    work_groups.collect {|wg| res << wg.institution unless res.include?(wg.institution) }
-    return res
+    work_groups.scoped(:include => :institution).collect {|wg| wg.institution }.uniq
   end
 
   def projects
-    res=[]
-    work_groups.collect {|wg| res << wg.project unless res.include?(wg.project) }
-    return res
+    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
+    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
   end
 
   def member?
     !projects.empty?
+  end
+
+  def member_of?(item_or_array)
+    array = [item_or_array].flatten
+    array.detect {|item| projects.include?(item)}
   end
 
   def locations
@@ -180,11 +195,16 @@ class Person < ActiveRecord::Base
   end
 
   def assets
-    created_data_files | created_models | created_sops | created_publications
+    created_data_files | created_models | created_sops | created_publications | created_presentations
   end
 
   def can_be_edited_by?(subject)
     subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
+  end
+
+ 
+  def can_view? user = User.current_user
+    !user.nil? || !Seek::Config.is_virtualliver
   end
 
   def can_edit? user = User.current_user
@@ -195,7 +215,7 @@ class Person < ActiveRecord::Base
   requires_can_manage :is_admin, :can_edit_projects, :can_edit_institutions
 
   def can_manage? user = User.current_user
-    user.is_admin?
+    user.nil? ? false : (user.is_admin?)
   end
 
   def can_destroy? user = User.current_user

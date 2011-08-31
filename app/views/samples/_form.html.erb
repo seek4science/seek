@@ -7,7 +7,7 @@
 
 <h2>Sample Details</h2>
 
-<div style="width: 85%;">
+<div style="width: 95%;">
 
   <p>
     <%= f.label "Sample name:" -%><span class="required">*</span><br/>
@@ -16,11 +16,11 @@
 
   <p>
     <%= f.label "Choose a specimen" %> <span class="required">*</span><br/>
-    <%= collection_select(:sample, :specimen_id, Specimen.all, :id, :title) %>
+    <%= collection_select(:sample, :specimen_id, Specimen.all.select{|s|s.can_view?} , :id, :title,{:include_blank =>"Please Select..."},{:style=>"width:90%"}) %>
   </p>
 
   <p>
-    <%= f.label :explantation -%><br/>
+    <%= f.label "Explantation time" -%><br/>
     <%= f.text_field :explantation, :style => "width: 350px;" -%>
   </p>
 
@@ -38,11 +38,14 @@
     <%= f.text_area :comments, :style => "width: 85%;", :rows => 5 -%>
   </p>
 
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample}%>
+
   <br style="clear:both"/>
   <p>
       <%= render :partial => "assets/sharing_form" -%>
   </p>
 
+  <%= fancy_multiselect @sample, :sops, :name => 'sample_sop_ids', :association_class=>Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sop_masters.map(&:sop_id) %>
 </div>
 
 

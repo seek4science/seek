@@ -25,11 +25,12 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
   end
 
   test 'should create the experimental condition with the concentration of the compound' do
+    WebMock.allow_net_connect!
     sop=sops(:editable_sop)
     mi = measured_items(:concentration)
     unit = units(:gram)
     ec = {:measured_item_id => mi.id, :start_value => 1, :unit => unit}
-    compound_name = 'iron'
+    compound_name = 'ATP'
     compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(compound_name)
 
     post :create, :experimental_condition => ec, :sop_id => sop.id, :version => sop.version, :substance_autocompleter_unrecognized_items => [compound_name]
@@ -42,12 +43,14 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal substance.name, compound_annotation['recommended_name']
     mappings = substance.mapping_links.collect{|ml| ml.mapping}
     kegg_ids = []
+    chebi_ids = []
     mappings.each do |m|
-      assert_equal m.sabiork_id, compound_annotation['sabiork_id']
-      assert_equal m.chebi_id, compound_annotation['chebi_id']
-      kegg_ids.push m.kegg_id
+      assert_equal m.sabiork_id, compound_annotation['sabiork_id'].to_i
+      kegg_ids.push m.kegg_id if (!kegg_ids.include?m.kegg_id and !m.kegg_id.blank?)
+      chebi_ids.push m.chebi_id if (!chebi_ids.include?m.chebi_id and !m.chebi_id.blank?)
     end
     assert_equal kegg_ids, compound_annotation['kegg_ids']
+    assert_equal chebi_ids, compound_annotation['chebi_ids']
 
     synonyms = substance.synonyms.collect{|s| s.name}
     assert_equal synonyms, compound_annotation['synonyms']

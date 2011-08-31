@@ -19,6 +19,8 @@ module Acts #:nodoc:
 
         title_trimmer
 
+        attr_accessor :create_from_asset
+
         validates_presence_of :title
 
         has_many :favourites,
@@ -36,6 +38,7 @@ module Acts #:nodoc:
           extend Acts::Isa::SingletonMethods
         end
         include Acts::Isa::InstanceMethods
+        include Subscribable
 
       end
 

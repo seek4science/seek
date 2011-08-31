@@ -67,7 +67,7 @@ function updateCustomSharingSettings() {
         for(var i = 0; i < permission_settings[contributor_type].length; i++) {
             shared_with += '<b>' + contributor_type + '</b>: ' + permission_settings[contributor_type][i][0]
             + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>'
-            + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+            + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
             if (permission_settings[contributor_type][i].length<4 || permission_settings[contributor_type][i][3]==true) {
                 shared_with += '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">remove</a>]'
             }
@@ -458,7 +458,7 @@ function updateGroupMembers() {
         member_name = autocompleters[f_group_autocompleter_id].getValueFromJsonArray(autocompleters[f_group_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
         group_members += member_name
         + '&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(currentFavouriteGroupSettings[id]) +')</span>'
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:editGroupMember('+ id +', ' + currentFavouriteGroupSettings[id] + '); return(false);">edit</a>]</small>'
         + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:deleteGroupMember('+ id +'); return(false);">remove</a>]</small><br/>';
@@ -894,9 +894,8 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
     return(true);
 }
 
-function permissionSummary(url){
-    //get sharing_scope
-    var sharing_scope_elements = document.getElementsByName('sharing[sharing_scope]')
+function selectedSharingScope(){
+   var sharing_scope_elements = document.getElementsByName('sharing[sharing_scope]')
     var sharing_scope = ''
     for(var i = 0; i < sharing_scope_elements.length; i++) {
         if (sharing_scope_elements[i].checked){
@@ -904,62 +903,21 @@ function permissionSummary(url){
             break;
         }
     }
-    //get access_type
-    var access_type = $('access_type_select_'.concat(sharing_scope)).options[$('access_type_select_'.concat(sharing_scope)).selectedIndex].value
-    access_type = parseInt(access_type)
-
-    //if white list is used
-    var use_white_list = $('cb_use_whitelist').checked
-    //if black list is used
-    var use_black_list = $('cb_use_blacklist').checked
-
-    //the project that the item chooses
-    var project_id = $('project_selector').options[$('project_selector').selectedIndex].value
-    project_id = parseInt(project_id)
-    var project_access_type = $('sharing_your_proj_access_type').options[$('sharing_your_proj_access_type').selectedIndex].value
-    project_access_type = parseInt(project_access_type)
-
-    //permission
-    var contributor_types = $('sharing_permissions_contributor_types').value
-    var contributor_values = $('sharing_permissions_values').value
-
-    var sharing_params = {};
-    sharing_params['sharing_scope'] = parseInt(sharing_scope);
-    sharing_params['access_type'] = access_type;
-    sharing_params['project_id'] = project_id;
-    sharing_params['project_access_type'] = project_access_type;
-    sharing_params['contributor_types'] = contributor_types;
-    sharing_params['contributor_values'] = contributor_values;
-    sharing_params['use_whitelist'] = use_white_list;
-    sharing_params['use_blacklist'] = use_black_list;
-
-    var request = new Ajax.Request(GET_PERMISSION_SUMMARY_LINK,
-    {
-        method: 'get',
-        parameters: {
-            sharing:Object.toJSON(sharing_params)
-        },
-        onSuccess: function(transport){
-            // "true" parameter to evalJSON() activates sanitization of input
-            var data = transport.responseText.evalJSON(true);
-            if (data.status == 200) {
-                people_in_group = data.people_in_group;
-            }
-            else {
-                error_status = data.status;
-                error_message = data.error
-                alert('An error occurred...\n\nHTTP Status: ' + error_status + '\n' + error_message);
-            }
-        },
-        onFailure: function(transport){
-           alert('Something went wrong, please try again...');
-        }
-
-    });
-    //need to wait until people in group got result from the ajax request, before opening the model dialog
-    var result = window.showModalDialog(url, people_in_group, 'dialogWidth:1000px; dialogHeight:800px; dialogLeft:600; dialogTop:400; resizable:yes')
-    return result
+    return escape(sharing_scope)
 }
+
+function selectedAccessType(sharing_scope){
+//get access_type
+    var access_type
+    //private
+    if (parseInt(sharing_scope) == 0)
+        access_type = $('access_type_select_'.concat(sharing_scope)).value
+    else
+        access_type = $('access_type_select_'.concat(sharing_scope)).options[$('access_type_select_'.concat(sharing_scope)).selectedIndex].value
+    return escape(access_type)
+}
+
+
 
 
 

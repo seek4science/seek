@@ -16,7 +16,7 @@ class Sop < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
 
-  acts_as_solr(:fields=>[:description, :title, :original_filename,:tag_counts]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description, :title, :original_filename,:tag_counts,:exp_conditions_search_fields]) if Seek::Config.solr_enabled
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
                
@@ -71,6 +71,22 @@ class Sop < ActiveRecord::Base
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     true
+  end
+
+  #experimental_conditions, and related compound text that should be included in search
+  def exp_conditions_search_fields
+    flds = experimental_conditions.collect do |ec|
+      [ec.measured_item.title,
+       ec.substances.collect do |sub|
+         #FIXME: this makes the assumption that the synonym.substance appears like a Compound
+         sub = sub.substance if sub.is_a?(Synonym)
+         [sub.title] |
+             (sub.respond_to?(:synonyms) ? sub.synonyms.collect { |syn| syn.title } : []) |
+             (sub.respond_to?(:mappings) ? sub.mappings.collect { |mapping| ["CHEBI:#{mapping.chebi_id}", mapping.chebi_id, mapping.sabiork_id.to_s, mapping.kegg_id] } : [])
+       end
+      ]
+    end
+    flds.flatten.uniq
   end
     
 end

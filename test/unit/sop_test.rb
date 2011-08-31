@@ -6,7 +6,7 @@ class SopTest < ActiveSupport::TestCase
   test "project" do
     s=sops(:editable_sop)
     p=projects(:sysmo_project)
-    assert_equal p,s.project
+    assert_equal p,s.projects.first
   end
 
   test "sort by updated_at" do
@@ -26,16 +26,15 @@ class SopTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed 
-    sop=Sop.new(:title=>" test sop",:project=>projects(:sysmo_project))
-    sop.save!
+    sop=Factory(:sop, :title => " test sop")
     assert_equal("test sop",sop.title)
   end
 
   test "validation" do
-    asset=Sop.new :title=>"fred",:project=>projects(:sysmo_project)
+    asset=Sop.new :title=>"fred",:projects=>[projects(:sysmo_project)]
     assert asset.valid?
 
-    asset=Sop.new :project=>projects(:sysmo_project)
+    asset=Sop.new :projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
     asset=Sop.new :title=>"fred"
@@ -50,7 +49,7 @@ class SopTest < ActiveSupport::TestCase
     assert_not_equal assay_asset.assay, assay
     assay_asset.asset = sop
     assay_asset.assay = assay
-    assay_asset.save!
+    User.with_current_user(assay.contributor.user){assay_asset.save!}
     assay_asset.reload
     assert assay_asset.valid?
     assert_equal assay_asset.asset, sop
@@ -67,7 +66,7 @@ class SopTest < ActiveSupport::TestCase
   end
   
   def test_defaults_to_private_policy
-    sop=Sop.new(:title=>"A sop with no policy",:project=>projects(:sysmo_project))
+    sop=Sop.new Factory.attributes_for(:sop).tap{|h|h[:policy] = nil}
     sop.save!
     sop.reload
     assert_not_nil sop.policy
@@ -80,7 +79,7 @@ class SopTest < ActiveSupport::TestCase
 
   def test_version_created_for_new_sop
 
-    sop=Sop.new(:title=>"test sop",:project=>projects(:sysmo_project))
+    sop=Factory(:sop)
 
     assert sop.save
 
@@ -143,8 +142,8 @@ class SopTest < ActiveSupport::TestCase
   def test_project_for_sop_and_sop_version_match
     sop=sops(:my_first_sop)
     project=projects(:sysmo_project)
-    assert_equal project,sop.project
-    assert_equal project,sop.latest_version.project
+    assert_equal project,sop.projects.first
+    assert_equal project,sop.latest_version.projects.first
   end
 
   test "sop with no contributor" do
@@ -182,7 +181,7 @@ class SopTest < ActiveSupport::TestCase
     end
     assert_nil Sop.find_by_id(sop.id)
     assert_difference("Sop.count",1) do
-      Sop.restore_trash!(sop.id)
+      disable_authorization_checks {Sop.restore_trash!(sop.id)}
     end
     assert_not_nil Sop.find_by_id(sop.id)
   end

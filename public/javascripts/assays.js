@@ -44,7 +44,10 @@ function addNewInvestigation(new_investigation) {
 }
 
 function addSop(title,id) {
+    if(checkNotInList(id,sops_assets)) {
     sops_assets.push([title,id]);
+     }
+
 }
 
 function addSelectedSop() {
@@ -58,9 +61,11 @@ function addSelectedSop() {
         updateSops();
     }
     else {
-        alert('The following Sop had already been added:\n\n' +
-            title);
+    alert('The following Sop had already been added:\n\n' +
+        title);
     }
+
+
 }
 
 function removeSop(index) {
@@ -80,7 +85,7 @@ function updateSops() {
         id=sop[1];
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         sop_text += '<li>' + titleText + 
-          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '&nbsp;&nbsp;<small style="vertical-align: middle;">' +
           '[<a href=\"\" onclick=\"javascript:removeSop('+i+'); return(false);\">remove</a>]</small></li>';
         sop_ids.push(id);
     }
@@ -115,7 +120,9 @@ function updateSops() {
 
 //Data files
 function addDataFile(title,id,relationshipType) {
-    data_files_assets.push([title,id,relationshipType]);
+     if(checkNotInList(id,data_files_assets)) {
+        data_files_assets.push([title,id,relationshipType]);
+     }
 }
 
 function addSelectedDataFile() {
@@ -158,7 +165,7 @@ function updateDataFiles() {
         relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         data_file_text += '<li>' + titleText + relationshipText +
-        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeDataFile('+i+'); return(false);">remove</a>]</small></li>';
     }
     
@@ -193,7 +200,9 @@ function updateDataFiles() {
 
 //Models
 function addModel(title,id) {
+    if(checkNotInList(id,models_assets)) {
     models_assets.push([title,id]);
+    }
 }
 
 function addSelectedModel() {
@@ -231,7 +240,7 @@ function updateModels() {
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         model_text += '<li>' + titleText
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeModel('+i+'); return(false);">remove</a>]</small></li>';
         model_ids.push(id);
     }
@@ -320,7 +329,7 @@ function updateAssays() {
         relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         assay_text += '<li>' + titleText + relationshipText +
-        '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeAssay('+i+'); return(false);">remove</a>]</small></li>';
     }
     assay_text += '</ul>';
@@ -362,8 +371,31 @@ function removeAssay(index) {
     updateAssays();
 }
 
+function checkOrganismNotInList(title,id,strain,culture_growth) {
+        toAdd = true;
+
+        for (var i = 0; i < organisms.length; i++){
+            if (organisms[i][0] == title
+                    && organisms[i][1] == id
+                    && organisms[i][2] == strain
+                    && organisms[i][3] == culture_growth) {
+
+                toAdd = false;
+                break;
+            }
+        }
+        if (!toAdd) {
+            alert("Organism already exists!");
+        }
+        return toAdd;
+    }
+
 function addOrganism(title,id,strain,culture_growth) {
-    organisms.push([title,id,strain,culture_growth]);
+    if(checkOrganismNotInList(title,id,strain,culture_growth)){
+       organisms.push([title,id,strain,culture_growth]);
+       updateOrganisms();
+    }
+
 }
 
 function addSelectedOrganism() {
@@ -371,20 +403,24 @@ function addSelectedOrganism() {
     selected_option=$("possible_organisms").options[selected_option_index];
     title=selected_option.text;
     id=selected_option.value;
-    strain=$('strain').value
+    strain=$('strain').value;
 
     selected_option_index=$('culture_growth').selectedIndex;
     selected_option=$('culture_growth').options[selected_option_index];
-    culture_growth=selected_option.text    
-    
+    if (selected_option_index==0) {
+      culture_growth="";
+    }else{
+        culture_growth=selected_option.text;
+    }
+
     addOrganism(title,id,strain,culture_growth);
-    updateOrganisms();
-    
+
 }
 
 function removeOrganism(index) {
     // remove according to the index
     organisms.splice(index, 1);
+
     // update the page
     updateOrganisms();
 }
@@ -396,18 +432,18 @@ function updateOrganisms() {
         organism=organisms[i];
         title=organism[0];
         id=organism[1];
-        strain=organism[2]
-        culture_growth=organism[3]
+        strain=organism[2];
+        culture_growth=organism[3];
         titleText = '<span title="' + title + '">' + title.truncate(100);
         if (strain.length>0) {
-            titleText += ":"+strain
+            titleText += ":"+ "<span class='assay_strain_info'> " + strain+ "</span>";
         }
         if (culture_growth.length>0 && culture_growth!='Not specified') {
             titleText += " <span class='assay_item_sup_info'>("+culture_growth+")</span>";
         }
         titleText +=  '</span>';
         organism_text += '<li>' + titleText +
-          '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">' +
+          '&nbsp;&nbsp;<small style="vertical-align: middle;">' +
           '[<a href=\"\" onclick=\"javascript:removeOrganism('+i+'); return(false);\">remove</a>]</small></li>';
     }
 
@@ -427,8 +463,8 @@ function updateOrganisms() {
     for (i=0;i<organisms.length;i++) {
         organism=organisms[i];
         id=organism[1];
-        strain=organism[2]
-        culture_growth=organism[3]
+        strain=organism[2];
+        culture_growth=organism[3];
         o=document.createElement('option');
         o.value=id;
         o.text=id;

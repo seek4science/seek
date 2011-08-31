@@ -1,0 +1,53 @@
+<%= javascript_include_tag "resoource.js"%>
+<%
+   is_new_file = params[:is_new_file]
+   resource_name = params[:resource_name]
+%>
+<style>
+  ul.people_list li.name {
+      color: #ff8c00;
+  }
+  p.private {
+      color: red;
+      font-size: medium;
+      font-weight: bold;
+      margin-left: 3em;
+  }
+  p.public{
+      color: #0000ff;
+      font-weight: bold;
+  }
+</style>
+
+<div class="redbox_contents" style="width:500px;">
+    <div class="body">
+    <h1>You will share this item with:</h1>
+    <%unless grouped_people_by_access_type.blank?
+      grouped_people_by_access_type.each do |key, value|
+       case key
+        when 1 %>
+            <h2>People can view summary:</h2>
+            <%= display_people_list value-%>
+        <%when 2 %>
+            <h2>People can view summary and get contents:</h2>
+            <%= display_people_list value-%>
+        <%when 3%>
+            <h2>People can view and edit summary and contents:</h2>
+            <%= display_people_list value-%>
+        <%when 4%>
+            <h2>People can manage:</h2>
+            <%= display_people_list value-%>
+        <%when 5%>
+            <p class='public'>All visitors (including anonymous visitors with no login) that can <%= Policy.get_access_type_wording(value, nil).downcase -%>  <p>
+       <%end%>
+    <%end%>
+    <%else%>
+        <p class='private'>You keep this item private (only visible to you)</p>
+    <%end%>
+
+    <div align="center" style="margin-top: 1em">
+      <input type=button value='Change Permission' onclick="RedBox.close()">
+      <input type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">
+    </div>
+  </div>
+</div>

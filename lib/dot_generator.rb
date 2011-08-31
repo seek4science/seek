@@ -31,7 +31,7 @@ module DotGenerator
     end
 
     def attributes_string
-      "[#{attributes.collect { |field, value| "#{field}=\"#{value}\"" }.join(',')}]" unless attributes.blank?
+      "[#{attributes.collect { |field, value| "#{field}=\"#{h(value).gsub(/\r|\n/," ")}\"" }.join(',')}]" unless attributes.blank?
     end
 
     def to_s
@@ -221,7 +221,7 @@ module DotGenerator
       title = node.find_first("svg:title").content
       unless title.include?("--")
         object_class, object_id = title.split("_")
-        if ["Sop", "Model", "DataFile", "Publication", "Study", "Assay", "Investigation"].include?(object_class)
+        if ["Sop", "Model", "DataFile", "Publication", "Study", "Assay", "Investigation", "Presentation"].include?(object_class)
           a = node.find_first(".//svg:a")
           polygon = a.find_first(".//svg:polygon")
           points = polygon.attributes["points"]

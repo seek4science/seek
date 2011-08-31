@@ -25,7 +25,9 @@ class DataFilesControllerTest < ActionController::TestCase
   test "get XML when not logged in" do
     logout
     df = Factory(:data_file,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+    puts df.versions
     get :show,:id=>df,:format=>"xml"
+    puts @response.body
     perform_api_checks
 
   end
@@ -46,6 +48,29 @@ class DataFilesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:data_files)
+  end
+
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    df=Factory(:data_file,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,df.contributor
+    assert df.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",data_file_path(df),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
   end
 
   test 'shouldnt show upload button for non-project member and non-login user' do
@@ -133,7 +158,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   test "should correctly handle bad data url" do
-    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:project=>projects(:sysmo_project)}
+    df={:title=>"Test",:data_url=>"http:/sdfsdfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
@@ -251,7 +276,7 @@ class DataFilesControllerTest < ActionController::TestCase
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 401 url" do
     mock_http
-    df = {:title=>"401",:data_url=>"http://mocked401.com",:project=>projects(:sysmo_project)}
+    df = {:title=>"401",:data_url=>"http://mocked401.com",:projects=>[projects(:sysmo_project)]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -276,7 +301,7 @@ class DataFilesControllerTest < ActionController::TestCase
   #This test is quite fragile, because it relies on an external resource
   test "should create and redirect on download for 302 url" do
     mock_http
-    df = {:title=>"302",:data_url=>"http://mocked302.com",:project=>projects(:sysmo_project)}
+    df = {:title=>"302",:data_url=>"http://mocked302.com",:projects=>[projects(:sysmo_project)]}
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -320,7 +345,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create data file for upload tool" do
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :upload_for_tool, :data_file => valid_data_file, :recipient_id => people(:quentin_person).id
+        post :upload_for_tool, :data_file => { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project_id=>projects(:sysmo_project).id}, :recipient_id => people(:quentin_person).id
       end
     end
 
@@ -765,7 +790,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     permission = df.policy.permissions.first
     assert_equal permission.contributor_type, 'Project'
-    assert_equal permission.contributor_id, df.project_id
+    assert_equal permission.contributor_id, df.project_ids.first
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::ACCESSIBLE
   end
@@ -794,9 +819,33 @@ class DataFilesControllerTest < ActionController::TestCase
 
     update_permission = df.policy.permissions.first
     assert_equal update_permission.contributor_type, 'Project'
-    assert_equal update_permission.contributor_id, df.project_id
+    assert_equal update_permission.contributor_id, df.project_ids.first
     assert_equal update_permission.policy_id, df.policy_id
     assert_equal update_permission.access_type, Policy::EDITING
+  end
+
+
+  test "can move to presentations" do
+    data_file = Factory :data_file,:contributor=>User.current_user
+    assert_difference("DataFile.count", -1) do
+      assert_difference("Presentation.count") do
+        post :convert_to_presentation, :id=>data_file
+      end
+    end
+  end
+
+  test "converted presentations have correct attributions" do
+    data_file = Factory :data_file,:contributor=>User.current_user
+    disable_authorization_checks {data_file.relationships.create :object => Factory(:data_file), :subject => data_file, :predicate => Relationship::ATTRIBUTED_TO}
+    df_attributions = data_file.attributions_objects
+    assert_difference("DataFile.count", -1) do
+      assert_difference("Presentation.count") do
+        post :convert_to_presentation, :id=>data_file.id
+      end
+    end
+
+    assert_equal df_attributions, assigns(:presentation).attributions_objects
+    assert !assigns(:presentation).attributions_objects.empty?
   end
 
   test "report error when file unavailable for download" do
@@ -825,15 +874,15 @@ class DataFilesControllerTest < ActionController::TestCase
   end
   
   def valid_data_file
-    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data=>fixture_file_upload('files/file_picture.png'),:projects=>[projects(:sysmo_project)]}
   end
   
   def valid_data_file_with_http_url
-    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:project=>projects(:sysmo_project)}
+    { :title=>"Test HTTP",:data_url=>"http://mockedlocation.com/a-piccy.png",:projects=>[projects(:sysmo_project)]}
   end
   
   def valid_data_file_with_ftp_url
-      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:project=>projects(:sysmo_project)}
+      { :title=>"Test FTP",:data_url=>"ftp://ftp.mirrorservice.org/sites/amd64.debian.net/robots.txt",:projects=>[projects(:sysmo_project)]}
   end
   
 end

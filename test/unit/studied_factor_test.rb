@@ -43,7 +43,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
     #create bunch of data_files and FSes which belong to the same project and the datafiles can be viewed
     i=0
     while i < 10  do
-      d = Factory(:data_file, :project => data_file.project, :policy => Factory(:all_sysmo_viewable_policy))
+      d = Factory(:data_file, :projects => [data_file.projects.first], :policy => Factory(:all_sysmo_viewable_policy))
       Factory(:studied_factor, :data_file => d, :start_value => i)
       i +=1
     end
@@ -51,7 +51,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
     #create bunch of data_files and FSes which belong to the same project and the datafiles can not be viewed
     i=0
     while i < 10  do
-      d = Factory(:data_file, :project => data_file.project)
+      d = Factory(:data_file, :projects => [Factory(:project),data_file.projects.first])
       Factory(:studied_factor, :data_file => d, :start_value => i)
       i +=1
     end
@@ -62,7 +62,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
         assert_equal fses.count, 10
         fses.each do |fs|
           assert fs.data_file.can_view?
-          assert_equal fs.data_file.project_id,data_file.project_id
+          assert !(fs.data_file.project_ids & data_file.project_ids).empty?
         end
     end
   end
@@ -107,6 +107,9 @@ class StudiedFactorTest < ActiveSupport::TestCase
       assert_equal fs.studied_factor_links.count, 2
       assert_equal fs.studied_factor_links.first.substance, compound1
       assert_equal fs.studied_factor_links[1].substance, compound2
+      assert_equal 2,fs.substances.count
+      assert fs.substances.include? compound1
+      assert fs.substances.include? compound2
     end
   end
 

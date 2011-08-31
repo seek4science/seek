@@ -68,45 +68,71 @@ module SpreadsheetUtil
       end
       workbook.styles[style.name] = style
     end
-    
+
+
     doc.find("//sheet").each do |s|
       unless s["hidden"] == "true" || s["very_hidden"] == "true"
         sheet = Sheet.new(s["name"])
         workbook.sheets << sheet
         #Load into memory
-        max_row = 0
-        max_col = 0
-        s.find("./columns/column").each do |c|
+        min_rows = 10
+        min_cols = 10
+
+        #Grab columns
+        columns = s.find("./columns/column")
+        col_index = 0
+        #Add columns
+        columns.each do |c|
           col_index = c["index"].to_i
           col = Column.new(col_index, c["width"])
-          sheet.columns << col          
-          if max_col < col_index
-            max_col = col_index
-          end
+          sheet.columns << col
         end
-        s.find("./rows/row").each do |r|
+        #Pad columns (so it's at least 10 cols wide)
+        if col_index+1 < min_cols
+          for i in (col_index+1..min_cols)
+            col = Column.new(i, 2964.to_s)
+            sheet.columns << col
+          end
+          min_cols = 10
+        else
+          min_cols = col_index+1
+        end
+
+        #Grab rows
+        rows = s.find("./rows/row")
+        row_index = 0
+        #Add rows
+        rows.each do |r|
           row_index = r["index"].to_i
           row = Row.new(row_index, r["height"])
           sheet.rows[row_index] = row
-          if max_row < row_index
-            max_row = row_index
-          end
+          #Add cells
           r.find("./cell").each do |c|
             col_index = c["column"].to_i
             content = c.content
             content = content.to_f if c["type"] == "numeric"
-            cell = Cell.new(content, row_index, col_index, c["formula"], c["style"])
+            cell = Cell.new(content, min_rows, min_cols, c["formula"], c["style"])
             row.cells[col_index] = cell
           end
         end
-        sheet.last_row = max_row
-        sheet.last_col = max_col
+        #Pad rows
+        if row_index < min_rows
+          for i in (row_index..min_rows)
+            row = Row.new(i, 1000.to_s)
+            sheet.rows << row
+          end
+          min_rows = 10
+        else
+          min_rows = row_index
+        end
+        sheet.last_row = min_rows
+        sheet.last_col = min_cols
       end
     end 
     
     workbook
-  end 
-  
+  end
+
   #Turns a numeric column ID into an Excel letter representation
   #eg. 1 > A, 10 > J, 28 > AB etc.
   def to_alpha(col)

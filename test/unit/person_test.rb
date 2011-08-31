@@ -318,5 +318,12 @@ class PersonTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+
+  test 'projects method notices changes via both group_memberships and work_groups' do
+    person = Factory.build(:person, :group_memberships => [Factory(:group_membership)])
+    group_membership_projects = person.group_memberships.map(&:work_group).map(&:project).uniq.sort_by(&:title)
+    work_group_projects = person.work_groups.map(&:project).uniq.sort_by(&:title)
+    assert_equal (group_membership_projects | work_group_projects), person.projects.sort_by(&:title)
+  end
   
 end

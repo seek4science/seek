@@ -24,10 +24,7 @@
       
         <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
         <% if current_user_authorized_to_manage -%>
-        <%= render :partial => "assets/project_selector", :locals => { :resource_type => "SOP",  # this is only for presentation, not for any processing
-        :selected_project_id => @sop.project_id,
-        :project_hash => current_user.generate_own_project_id_name_hash,
-        :disable_project_select => true } -%>
+            <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :disable_project_select => true } -%>
         <% end -%>
         <%# only the owner should be able to change sharing permissions -%>
         <% if current_user_authorized_to_manage -%>
@@ -44,7 +41,8 @@
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop, :show_relationships => false} -%>
         <% end -%>
         <p>
-            <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateSopFields(false); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>
+          <%= preview_permission_popup_link('sop', url_for(:controller => 'policies', :action => 'preview_permissions'), false)-%>
+          <%= f.submit "Update", :id => "sop_submit_btn", :onclick => "javascript: validateResourceFields(false, 'sop'); return(false);" -%> or <%= link_to "Cancel", sop_path(@sop) -%>
         </p>
 		</div>
         <% end %>    

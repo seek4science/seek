@@ -11,14 +11,7 @@
         <label>Title:</label>
         <%=h @event.title -%>
       </p>
-      <p>
-        <label>Project:</label>
-        <% if @event.project.nil? -%>
-            <%= text_or_not_specified nil %>
-        <% else -%>
-            <%= link_to h(@event.project.name), @event.project %>
-        <% end -%>
-      </p>
+      <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event}%>
       <% unless @event.contributor.nil? then %>
           <p>
             <label>Uploader:</label>

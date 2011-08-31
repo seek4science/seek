@@ -71,6 +71,7 @@
 <p>
     <%= check_box_tag "receive_notifications",true,person.notifiee_info.receive_notifications -%>&nbsp;I wish to receive occasional email announcements?&nbsp;
 </p>
+   <%= render :partial=>"people/subscriptions",:locals=>{:f=>f} %>
 <br/>
 <% end -%>
 <%# show avatar selection only when the project exists AND when current user is allowed to edit it -%>
