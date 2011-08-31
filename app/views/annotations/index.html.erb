@@ -1,0 +1,10 @@
+<%# cache "super_tag_cloud" do -%>
+<div class="contribution_title">
+  <h1>All tags</h1>
+</div>
+<div class="show_basic">
+
+   <%= render :partial=>"layouts/tag_cloud",:locals=>{:tags=>ActsAsTaggableOn::Tag.all_tags_for_cloud,:show_overall_count=>true,:id=>"super_tag_cloud",:tags_smaller=>false} %>
+
+</div>
+<%# end -%>
