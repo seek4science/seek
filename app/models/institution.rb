@@ -29,7 +29,8 @@ class Institution < ActiveRecord::Base
 
    def can_be_edited_by?(subject)
     subject == nil ? false : (subject.is_admin? ||
-          (self.people.include?(subject.person) && (subject.can_edit_institutions? || subject.is_project_manager?)))
+          (subject.can_edit_institutions? && self.people.include?(subject.person)) ||
+          (subject.is_project_manager? && !(subject.person.projects & projects).empty?))
   end
 
   # get a listing of all known institutions
