@@ -303,6 +303,21 @@ end
     end
     a=assigns(:assay)
     assert_redirected_to assay_path(a)
+    #create assay with samples and organisms
+    assert_difference('ActivityLog.count') do
+    assert_difference("Assay.count") do
+      post :create,:assay=>{:title=>"test",
+        :technology_type_id=>technology_types(:gas_chromatography).id,
+        :assay_type_id=>assay_types(:metabolomics).id,
+        :study_id=>studies(:metabolomics_study).id,
+        :assay_class=>assay_classes(:experimental_assay_class),
+        :owner => Factory(:person),
+        :sample_ids=>[Factory(:sample).id]
+      },:assay_organism_ids=>[Factory(:organism).id.to_s,"",""].join(",").to_a
+    end
+    end
+    a=assigns(:assay)
+    assert_redirected_to assay_path(a)
   end
 
   test "should delete assay with study" do
