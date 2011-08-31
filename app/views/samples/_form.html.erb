@@ -37,10 +37,10 @@
   </p>
 
 
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>true}%>
 
   <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample}-%>
 
-  <%= render :partial => 'projects/project_selector', :locals => {:resource => @sample}%>
   <p>
         <%= f.fancy_multiselect :scales, {:possibilities=>sort_scales(Scale.all)} -%>
   </p>

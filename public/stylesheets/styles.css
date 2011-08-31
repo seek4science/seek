@@ -824,16 +824,6 @@ div.list_item, div.private_list_item, div.public_list_item {
     float: left;
 }
 
-div.private_list_item {
-    border:2px solid red;
-    border-right: 17px solid red;
-}
-
-div.public_list_item {
-    border:2px solid green;
-    border-right: 17px solid green;
-}
-
 div.list_item_content {
     width: 75%;
     float: left;
