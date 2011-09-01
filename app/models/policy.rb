@@ -40,6 +40,7 @@ class Policy < ActiveRecord::Base
   ACCESSIBLE = 2            # accessible and visible
   EDITING = 3               # accessible, visible and editing
   MANAGING = 4              # any actions that owner of the asset can perform (including "destroy"ing)
+  PUBLISHING = 5            # publish the item
     
   # "true" value for flag-type fields
   TRUE_VALUE = 1

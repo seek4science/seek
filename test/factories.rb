@@ -228,6 +228,17 @@ end
     f.association :institution
   end
 
+  Factory.define(:favourite_group) do |f|
+    f.association :user
+    f.name 'A Favourite Group'
+  end
+
+  Factory.define(:favourite_group_membership) do |f|
+    f.association :person
+    f.association :favourite_group
+    f.access_type 1
+  end
+
   Factory.define(:organism) do |f|
     f.title "An Organism"
   end
