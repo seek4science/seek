@@ -5,7 +5,6 @@ class PoliciesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include SharingFormTestHelper
 
   def setup
     login_as(:datafile_owner)
@@ -90,6 +89,35 @@ class PoliciesControllerTest < ActionController::TestCase
 
     filtered_people.each do |person|
       assert !black_list_ids.include?(person[1])
+    end
+  end
+
+  test'should add people who are in the whitelist' do
+    #create bundle of people
+    people_with_access_type = []
+    i = 0
+    while i<10
+      people_with_access_type.push [i, 'name' + i.to_s, 1]
+      i +=1
+    end
+    #create a whitelist
+    whitelist = []
+    i = 0
+    while i<5
+      random_id = rand(15)
+      whitelist.push [random_id, 'name' + random_id.to_s, rand(5)]
+      i +=1
+    end
+    whitelist.uniq!
+    pc =  PoliciesController.new()
+    whitelist =  pc.remove_duplicate(whitelist)
+    whitelist_added= whitelist.select{|person| person[0]>9}
+    filtered_people = pc.add_people_in_whitelist(people_with_access_type, whitelist)
+
+    assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
+
+    filtered_people.each do |person|
+      assert person[2] >= 1
     end
   end
 

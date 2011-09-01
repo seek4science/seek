@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'policies_controller'
 
 class PolicyTest < ActiveSupport::TestCase
 
