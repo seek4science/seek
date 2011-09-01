@@ -1,6 +1,7 @@
 require 'acts_as_authorized'
 class Assay < ActiveRecord::Base
   acts_as_isa
+  acts_as_taggable
 
   def projects
     try_block {study.investigation.projects} || []
