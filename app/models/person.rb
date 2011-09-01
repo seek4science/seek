@@ -202,23 +202,6 @@ class Person < ActiveRecord::Base
     subject == nil ? false : ((subject.is_admin? || subject.is_project_manager?) && (self.user.nil? || !self.is_admin?))
   end
 
-  def subscriptions_setting  subscriptions_attributes
-       subscriptions_attributes.reject{|s|s["subscribed_resource_types"].blank?}.each do |st|
-          subscription = self.subscriptions.detect{|s|s.project_id==st["project_id"].to_i}
-          if subscription
-            subscription.subscribed_resource_types = st["subscribed_resource_types"]
-            subscription.subscription_type = st["subscription_type"]
-            subscription.subscribed_resource_types.each do |srt|
-               eval(srt).find(:all).select(&:can_edit?).each do |object|
-                 object.current_user_subscribed= true
-                 object.subscription_type= subscription.subscription_type
-               end
-            end
-            subscription.save!
-          end
-       end
-  end
-
   def can_view? user = User.current_user
     not user.nil?
   end
