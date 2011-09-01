@@ -10,9 +10,9 @@ module Acts
       end
 
       def current_user_must_be_member_of_associated_project
-        if User.current_user.nil? || User.current_user.person.nil? || !User.current_user.person.member_of?(projects)
-          errors.add(:projects, "You must be a member of one of the the associated project")
-        end
+#        if User.current_user.nil? || User.current_user.person.nil? || !User.current_user.person.member_of?(projects)
+#          errors.add(:projects, "You must be a member of one of the the associated project")
+#        end
       end
     end
   end
