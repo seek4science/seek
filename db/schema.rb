@@ -621,6 +621,12 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "updated_at"
   end
 
+  create_table "official_compounds", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
@@ -637,7 +643,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
 
   create_table "people", :force => true do |t|
     t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "updated_at",                                             :null => false
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email"
@@ -870,21 +876,6 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer  "user_id"
     t.text     "search_query"
     t.text     "search_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "scales", :force => true do |t|
-    t.string   "title"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "scalings", :force => true do |t|
-    t.integer  "scale_id"
-    t.integer  "scalable_id"
-    t.integer  "person_id"
-    t.string   "scalable_type"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
