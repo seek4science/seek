@@ -53,6 +53,17 @@ class InvestigationTest < ActiveSupport::TestCase
 
   end
 
+  test "validate project membership" do
+    inv=Investigation.new(:title=>"Test",:projects=>[projects(:sysmo_project)])
+    assert !inv.valid?
+
+    User.with_current_user users(:pal_user) do
+      assert inv.valid?
+      inv.projects=[projects(:empty_project)]
+      assert !inv.valid?
+    end
+  end
+
   test "unauthorized users can't delete" do
     investigation = Factory :investigation
     assert !investigation.can_delete?(Factory(:user))
