@@ -1105,9 +1105,6 @@ div#existing_strains {
 .assay_strain_info {
     color: #f93fec;
 }
-.assay_tissue_and_cell_type_info {
-    color: #dd283c;
-}
 
 .system_message {
     border-color: red;

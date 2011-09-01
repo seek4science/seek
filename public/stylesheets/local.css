@@ -7,3 +7,7 @@ div.public_list_item {
     border:2px solid green;
     border-right: 17px solid green;
 }
+
+.assay_tissue_and_cell_type_info {
+    color: #dd283c;
+}
