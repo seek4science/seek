@@ -9,6 +9,9 @@
  html_options ||= ''
  association_step_content ||= nil
 
+ with_new_link ||=false
+ new_association_path = eval "new_#{association.to_s.singularize}_path(:from_new_link=>#{with_new_link})"
+
  default_choice = [default_choice_text, 0]
  collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
  possibilities_collection_id = "possible_#{collection_id}"
@@ -26,6 +29,11 @@
         <span class="none_text">Loading...</span>
       </div>
       <div class="association_step">
+        <% if with_new_link  %>
+         <p style="color: #666666;">
+             You may select an existing  <%= association.to_s.singularize %> Or create <%= link_to h("New #{association.to_s.singularize.capitalize} Here"), new_association_path,:popup => true%>  for the <%= object_type_text -%>.
+        </p>
+        <% end  %>
          <%= select_tag possibilities_collection_id,
              options_for_select([default_choice]|possibilities.collect{|o| [truncate(h(o.send(text_method)), :length=>120), o.send(value_method)]}),
              possibilities_options -%>

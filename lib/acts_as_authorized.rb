@@ -32,6 +32,10 @@ module Acts #:nodoc:
         false
       end
 
+      def title_is_public?
+        false
+      end
+
       def publish!
         if can_manage?
           policy.access_type=Policy::ACCESSIBLE
