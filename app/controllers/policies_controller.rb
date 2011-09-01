@@ -191,16 +191,17 @@ class PoliciesController < ApplicationController
         #group people by access_type
         grouped_people_by_access_type.merge!(filtered_people.group_by{|person| person[2]})
 
+        #only store (people in backlist) + (people in people_in_group['Person'] with no access) to the group of access_type=Policy::NO_ACCESS
+        people_with_no_access = []
+        people_with_no_access.concat(people_in_group['BlackList']) unless people_in_group['BlackList'].blank?
+        people_with_no_access.concat(people_in_group['Person'].group_by{|person| person[2]}[Policy::NO_ACCESS]) unless people_in_group['Person'].group_by{|person| person[2]}[Policy::NO_ACCESS].blank?
+        people_with_no_access.uniq!
+        unless people_with_no_access.blank?
+           grouped_people_by_access_type[Policy::NO_ACCESS] = people_with_no_access.sort{|a,b| a[1] <=> b[1]}
+        end
+
         #sort by key of the hash
         grouped_people_by_access_type = Hash[grouped_people_by_access_type.sort]
-        #add people in backlist to the group of access_type=Policy::NO_ACCESS
-        unless people_in_group['BlackList'].blank?
-          if grouped_people_by_access_type[Policy::NO_ACCESS].blank?
-            grouped_people_by_access_type[Policy::NO_ACCESS] = people_in_group['BlackList']
-          else
-            grouped_people_by_access_type[Policy::NO_ACCESS] |= people_in_group['BlackList']
-          end
-        end
 
         return grouped_people_by_access_type
     end
