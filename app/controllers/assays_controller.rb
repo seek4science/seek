@@ -119,13 +119,6 @@ class AssaysController < ApplicationController
           @assay.relate(s) if s.can_view?
         end
 
-#    organisms.each do |text|
-#      o_id, strain, culture_growth_type_text,t_id,t_title=text.split(",")
-#      culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
-#      @assay.associate_organism(o_id, strain, culture_growth,t_id,t_title)
-#    end
-
-
         # update related publications
         Relationship.create_or_update_attributions(@assay, params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first] }, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
 

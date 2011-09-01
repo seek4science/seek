@@ -28,9 +28,6 @@ module ApplicationHelper
     html
   end
 
-
-
-
   def tabbar
     Seek::Config.is_virtualliver ? render(:partial=>"layouts/tabnav_dropdown") : render(:partial=>"layouts/tabnav")
   end
