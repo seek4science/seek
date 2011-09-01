@@ -5,12 +5,10 @@ class PoliciesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
 
   def setup
     login_as(:datafile_owner)
-    @object=data_files(:picture)
   end
 
   #Tests for preview permission
