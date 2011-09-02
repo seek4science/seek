@@ -22,6 +22,10 @@
 
   <body id="body" style="background: #CCC">
 
+    <div id="custom-doc" class="">
+
+
+
     <div class="spreadsheet_layout">
       <div id="hd">
         <% if logged_in? %>
@@ -31,6 +35,13 @@
           | <%= image_tag_for_key "logout", logout_path, "Logout", {}, "Logout" -%>
         </div>
         <% end %>
+        <div id="header">
+            <%= render :partial=>"layouts/header_main" %>
+        </div>
+        <%= tabbar %>
+        <div id="topbar">
+            <%= render :partial=>"search/search_bar" %>
+        </div>
       </div>
       <br style="clear:both"/>
 
@@ -56,6 +67,8 @@
 
       <div id="ft">
         <%= render :partial=>"layouts/footer" %>
+      </div>
+
       </div>
 
     </div>
