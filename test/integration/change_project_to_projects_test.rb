@@ -7,7 +7,12 @@ class ChangeProjectToProjectsTest < ActionController::IntegrationTest
   def setup
     User.current_user = Factory(:user, :login => 'test')
     post '/sessions/create', :login => 'test', :password => 'blah'
+    @is_vl=Seek::Config.is_virtualliver
     Seek::Config.is_virtualliver = true
+  end
+
+  def teardown
+    Seek::Config.is_virtualliver=@is_vl
   end
 
   test 'form allows setting project_ids' do
