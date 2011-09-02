@@ -54,7 +54,6 @@ module Acts #:nodoc:
       module ClassMethods
         def acts_as_authorized
           include Acts::Authorized::PolicyBasedAuthorization
-          include Acts::Authorized::ProjectMembershipValidation if method_defined? :projects
         end
 
         def authorization_supported?
@@ -67,7 +66,6 @@ end
 
 require 'authorization_enforcement'
 require 'policy_based_authorization'
-require 'project_membership_validation'
 
 ActiveRecord.module_eval do
   include Acts::Authorized
