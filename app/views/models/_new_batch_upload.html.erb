@@ -1,0 +1,11 @@
+	<% fields_for @attachment do |attachment| -%>
+	<p>
+		<label for="attachment_data">Attach Files:</label>
+		<%= attachment.file_field :data %>
+	</p>
+	<% end -%>
+	<ul id="pending_files"></ul>
+	<script type="text/javascript">
+		var multi_selector = new MultiSelector($('pending_files'), 5);
+		multi_selector.addElement($('attachment_data'));
+	</script>

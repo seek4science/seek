@@ -371,6 +371,7 @@ class ModelsController < ApplicationController
   # GET /models/new.xml
   def new    
     @model=Model.new
+    @attachment = Attachment.new
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
@@ -383,6 +384,8 @@ class ModelsController < ApplicationController
   
   # GET /models/1/edit
   def edit
+    @newfile = Attachment.new
+		@allowed = 5 - @model.attachments.count
     
   end
   
@@ -399,6 +402,9 @@ class ModelsController < ApplicationController
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
+
+           process_file_uploads
+
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
@@ -461,6 +467,8 @@ class ModelsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @model.save
+
+        process_file_uploads
 
         # update attributions
         Relationship.create_or_update_attributions(@model, params[:attributions])
@@ -565,5 +573,17 @@ class ModelsController < ApplicationController
       return false
     end
   end
-  
+
+  protected
+
+	def process_file_uploads
+    p params[:attachment]
+		i = 0
+		while !params[:attachment].nil? && params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
+			@attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
+      #@attachment = Attachment.create!
+			@model.attachments << @attachment
+			i += 1
+		end
+	end
 end

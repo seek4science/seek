@@ -6,7 +6,7 @@ ActionController::Routing::Routes.draw do |map|
 #    admin.resources :slides, :member => { :move_up => :get, :move_down => :get }
 #  end
 
-
+  map.resources :attachments
   map.resources :presentations,:member => { :download => :get, :new_version=>:post, :preview_publish=>:get,:publish=>:post,:request_resource=>:post, :update_tags_ajax=>:post }
   map.resources :subscriptions
   map.resources :specimens

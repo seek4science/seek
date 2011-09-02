@@ -1,0 +1,14 @@
+
+#pending_files { list-style:none;padding:0;border-bottom:1px solid #aaa; }
+#pending_files li { padding:0 0 0.5em 21px;background:url('/images/famfamfam_silk/folder_page.png') no-repeat 0 2px; }
+#pending_files li a { color:red;text-decoration:none;font-size:11px;margin-left:1em; }
+/*#pending_files li a:hover { background:red;color:#fff; }*/
+#container {
+
+     width:auto;
+     height:auto;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+

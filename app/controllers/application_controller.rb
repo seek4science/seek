@@ -49,6 +49,10 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
+  def application_root
+    return  "http://#{base_host}"
+  end
+  helper_method :application_root
 
   def self.fast_auto_complete_for(object, method, options = {})
     define_method("auto_complete_for_#{object}_#{method}") do
@@ -428,4 +432,15 @@ class ApplicationController < ActionController::Base
     end
     return fixed_new_substances, known_substances
   end
+
+  protected
+
+	def process_file_uploads object
+		i = 0
+		while params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
+			@attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
+			object.attachments << @attachment
+			i += 1
+		end
+	end
 end
