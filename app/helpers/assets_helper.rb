@@ -194,7 +194,8 @@ module AssetsHelper
         {#"Person" => [resource.contributor.try :person], #assumes contributor is a person. Currently that should always be the case, but that could change.
          "Project" => resource.projects,
          "DataFile" => resource.data_files,
-         "Publication" => resource.publications}.each do |k, v|
+         "Publication" => resource.publications,
+        "Presentation"=> resource.presentations }.each do |k, v|
           related[k][:items] = v unless v.nil?
         end
       when "Specimen"
