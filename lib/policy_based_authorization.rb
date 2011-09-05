@@ -21,7 +21,7 @@ module Acts
       end
 
       def contributor_credited?
-        true
+        !respond_to?(:creators) or creators.empty?
       end
 
       def private?
