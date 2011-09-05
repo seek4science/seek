@@ -859,6 +859,23 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error].match(/Unable to find a copy of the file for download/)
   end
 
+  test "explore latest version" do
+    get :explore,:id=>data_files(:downloadable_spreadsheet_data_file)
+    assert_response :success
+  end
+
+  test "explore earlier version" do
+    get :explore,:id=>data_files(:downloadable_spreadsheet_data_file),:version=>1
+    assert_response :success
+  end
+
+  test "gracefully handles explore with no spreadsheet" do
+    df=data_files(:picture)
+    get :explore,:id=>df,:version=>1
+    assert_redirected_to data_file_path(df,:version=>1)
+    assert_not_nil flash[:error]
+  end
+
   private
 
   def mock_http
