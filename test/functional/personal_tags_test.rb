@@ -16,7 +16,7 @@ class PersonalTagsTest < ActionController::TestCase
 
   test "personal tags are shown" do
     person=people(:pal)
-    assert person.user.owned_tags.collect(&:name).include?("cricket"), "This person must own the tag fishing for this test to work."
+    assert person.user.owned_tags.collect(&:name).include?("cricket"), "This person must own the tag cricket for this test to work."
     tag=tags(:cricket)
     get :show,:id=>person
     assert :success
@@ -25,25 +25,27 @@ class PersonalTagsTest < ActionController::TestCase
 
   test "tags_updated_correctly" do
     p=people(:aaron_person)
-    p.expertise_list="one,two,three"
-    p.tool_list="four"
+    p.expertise = ["one","two","three"]
+    p.tools = ["four"]
     assert p.save
-    assert_equal ["one","two","three"],p.expertise_list
-    assert_equal ["four"],p.tool_list
+    assert_equal ["one","three","two"],p.expertise.collect{|t| t.value.text }.sort
+    assert_equal ["four"],p.tools.collect{|t| t.value.text}.sort
 
     p=Person.find(p.id)
-    assert_equal ["one","two","three"],p.expertise_list
-    assert_equal ["four"],p.tool_list
+    assert_equal ["one","three","two"],p.expertise.collect{|t| t.value.text }.sort
+    assert_equal ["four"],p.tools.collect{|t| t.value.text}.sort
 
-    one=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"one"})
-    two=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"two"})
-    four=ActsAsTaggableOn::Tag.find(:first,:conditions=>{:name=>"four"})
+    expertise_annotations = p.expertise.sort_by{|e| e.value.text}
+    one=expertise_annotations[0]
+    two=expertise_annotations[2]
+    three=expertise_annotations[1]
+    four=p.tools.first
     post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:tools_autocompleter_selected_ids=>[four.id],:tools_autocompleter_unrecognized_items=>"three"
 
     p=Person.find(p.id)
 
-    assert_equal ["one","two"],p.expertise_list
-    assert_equal ["four","three"],p.tool_list
+    assert_equal ["one","two"],p.expertise.collect{|t| t.value.text }.sort
+    assert_equal ["four","three"],p.tools.collect{|t| t.value.text}.sort
   end
 
 end

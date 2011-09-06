@@ -359,3 +359,20 @@ end
   Factory.define :headline_announcement,:parent=>:site_announcement do |f|
     f.is_headline true
   end
+
+  Factory.define :annotation do |f|
+    f.sequence(:value) {|n| "anno #{n}"}
+    f.association :source, :factory=>:person
+  end
+
+  Factory.define :tag,:parent=>:annotation do |f|
+    f.attribute_name "tag"
+  end
+
+  Factory.define :expertise,:parent=>:annotation do |f|
+    f.attribute_name "expertise"
+  end
+
+  Factory.define :tool,:parent=>:annotation do |f|
+    f.attribute_name "tool"
+  end

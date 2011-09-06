@@ -268,26 +268,26 @@ class PeopleController < ApplicationController
 
   def set_tools_and_expertise person,params
 
-      tags=""
+      tags=[]
       params[:tools_autocompleter_selected_ids].each do |selected_id|        
-        tag=ActsAsTaggableOn::Tag.find(selected_id)        
-        tags << tag.name << ","
+        tag=Annotation.find(selected_id)
+        tags << tag.value.text
       end unless params[:tools_autocompleter_selected_ids].nil?
       params[:tools_autocompleter_unrecognized_items].each do |item|
-        tags << item << ","
+        tags << item
       end unless params[:tools_autocompleter_unrecognized_items].nil?
 
-      person.tool_list=tags
+      person.tools = tags
     
-      tags=""
+      tags= []
       params[:expertise_autocompleter_selected_ids].each do |selected_id|
-        tag=ActsAsTaggableOn::Tag.find(selected_id)
-        tags << tag.name << ","
+        tag=Annotation.find(selected_id)
+        tags << tag.value.text
       end unless params[:expertise_autocompleter_selected_ids].nil?
       params[:expertise_autocompleter_unrecognized_items].each do |item|
-        tags << item << ","
+        tags << item
       end unless params[:expertise_autocompleter_unrecognized_items].nil?
-      person.expertise_list=tags
+      person.expertise=tags
 
       #FIXME: don't like this, but is a temp solution for handling lack of observer callback when removing a tag. Also should only expire when they have changed.
       expire_fragment("sidebar_tag_cloud")
