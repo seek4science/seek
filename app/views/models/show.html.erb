@@ -76,10 +76,8 @@
           <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
           <div id="thumbnail">
 
-            <% attach = @model.id_image==0?  @model.attachments.detect { |a| a.content_type.index("image")==0 } : @model.attachments.find_by_id(@model.id_image)
-              # attach_path = attach.nil? ? "" : "#{application_root}#{attach.public_filename(:thumb)}" %>
+            <% attach = @model.attachments.find_by_id(@model.id_image) %>
 
-            <%#= image_tag attach_path,{:class=>"cloud-zoom"} %>
             <% unless attach.nil? %>
             <a href='<%= application_root %><%= attach.public_filename %>' rel="lightbox">
               <img src="<%= application_root %><%= attach.public_filename(:thumb) %>" alt='' align="center" title="click it to zoom" style=" vertical-align:middle;border: 0;"/>
@@ -118,21 +116,3 @@
 
 <script type="text/javascript" src="/javascripts/zoom/scriptaculous.js?load=builder"></script>
 
-<script type="text/javascript">
-
-//   new Zoomer('linkID',{
-//    afterZoomIn: function () {
-//
-//
-//    },
-//    afterZoomOut: function () {
-//        alert("Zoomed out");
-//    }
-////});
-//         Event.observe(window, 'load', function() {
-//                setupZoom();
-//         });
-
-
-
-</script>

@@ -44,7 +44,6 @@ function MultiSelector(list_target, max) {
         new_row_radio.name = 'model[id_image]';
         new_row_radio.id = 'model_id_image';
         new_row_radio.title = "selected as image";
-        new_row_radio.value = "yes";
 
         var new_row_button = document.createElement('a');
         new_row_button.title = 'Remove This Image';
@@ -62,7 +61,8 @@ function MultiSelector(list_target, max) {
 
         var img_type = new_row.innerHTML.split('.')[new_row.innerHTML.split('.').length-1];
         if(img_type=="jpg" || img_type=="jpeg" ||img_type=="bmp" ||img_type=="png" ||img_type=="gif" ||img_type=="tif" ||img_type=="tiff"){
-        new_row.appendChild(new_row_radio);
+            new_row_radio.value = new_row.innerHTML;
+            new_row.appendChild(new_row_radio);
         }
 
         new_row.appendChild(new_row_button);
