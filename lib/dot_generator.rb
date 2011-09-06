@@ -8,7 +8,9 @@ module DotGenerator
                   'Investigation'=>"#C7E9C0",
                   'Study'=>"#91c98b",
                   'Assay'=>"#64b466",
-                  'Publication'=>"#84B5FD"}
+                  'Publication'=>"#84B5FD",
+                  'Presentation' => "cadetblue2"}
+  FILL_COLOURS.default = "cadetblue"
 
   def dot_header title
     dot = "graph #{title} {"
@@ -31,7 +33,7 @@ module DotGenerator
     end
 
     def attributes_string
-      "[#{attributes.collect { |field, value| "#{field}=\"#{value}\"" }.join(',')}]" unless attributes.blank?
+      "[#{attributes.collect { |field, value| "#{field}=\"#{h(value).gsub(/\r|\n/," ")}\"" }.join(',')}]" unless attributes.blank?
     end
 
     def to_s

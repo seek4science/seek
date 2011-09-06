@@ -44,19 +44,16 @@ class StudiesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:study)
   end
 
-  test "should get new with investigation predefined with project added if not member" do
+  test "should get new with investigation predefined even if not member of project" do
     #this scenario arose whilst fixing the test "should get new with investigation predefined"
-    #when passing the investigation_id, if that is editable but current_user is not a member, then the project of that investigation
-    #should be added to the list
+    #when passing the investigation_id, if that is editable but current_user is not a member,
+    #then the investigation should be added to the list
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?,"model owner should be able to edit this investigation"
     get :new, :investigation_id=>inv
     assert_response :success
 
-    assert_select "select#project_id" do
-      assert_select "option[selected='selected'][value=?]",inv.project.id
-    end
     assert_select "select#study_investigation_id" do
       assert_select "option[selected='selected'][value=?]",inv.id
     end
@@ -70,9 +67,6 @@ class StudiesControllerTest < ActionController::TestCase
     get :new, :investigation_id=>inv
     assert_response :success
 
-    assert_select "select#project_id" do
-      assert_select "option[selected='selected'][value=?]",inv.project.id
-    end
     assert_select "select#study_investigation_id" do
       assert_select "option[selected='selected'][value=?]",inv.id
     end
@@ -81,14 +75,11 @@ class StudiesControllerTest < ActionController::TestCase
   test "should not allow linking to an investigation from a project you are not a member of" do
     login_as(:owner_of_my_first_sop)
     inv = investigations(:metabolomics_investigation)
-    assert !inv.project.people.include?(people(:person_for_owner_of_my_first_sop)), "this person should not be a member of the investigations project"
+    assert !inv.projects.map(&:people).flatten.include?(people(:person_for_owner_of_my_first_sop)), "this person should not be a member of the investigations project"
     assert !inv.can_edit?(users(:owner_of_my_first_sop))
     get :new, :investigation_id=>inv
     assert_response :success
 
-    assert_select "select#project_id" do
-      assert_select "option[selected='selected'][value=?]",0
-    end
     assert_select "select#study_investigation_id" do
       assert_select "option[selected='selected'][value=?]",0
     end
@@ -308,6 +299,18 @@ class StudiesControllerTest < ActionController::TestCase
     project=projects(:sysmo_project)
     get :index, :filter => {:project => project.id}
     assert_response :success
+  end
+
+
+  test 'edit study with selected projects scope policy' do
+    proj = User.current_user.person.projects.first
+    study = Factory(:study, :contributor => User.current_user.person,
+                    :investigation => Factory(:investigation, :projects => [proj]),
+                    :policy => Factory(:policy,
+                                       :sharing_scope => Policy::ALL_SYSMO_USERS,
+                                       :access_type => Policy::NO_ACCESS,
+                                       :permissions => [Factory(:permission, :contributor => proj, :access_type => Policy::EDITING)]))
+    get :edit, :id => study.id
   end
 
 

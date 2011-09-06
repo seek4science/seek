@@ -19,7 +19,7 @@ module StudiedFactorsHelper
       synonyms.each do |synonym|
         s = Substance.new
         s.id = synonym.id.to_s + ',Synonym'
-        s.name = synonym.name + " (#{synonym.substance.name})"
+        s.name = synonym.name + " (#{try_block{synonym.substance.name}.to_s})"
         all_substances.push s
       end
       all_substances
@@ -27,12 +27,15 @@ module StudiedFactorsHelper
 
    def tagged_substances resource
       tagged_substances = []
-      if !resource.nil? && !resource.substance.nil?
-        substance = resource.substance
-        s = Substance.new
-        s.id = substance.id.to_s + ",#{substance.class.name}"
-        s.name = substance.name
-        tagged_substances.push s
+      link_table_name = (resource.class.name == 'StudiedFactor') ? 'studied_factor_links' : 'experimental_condition_links'
+      if !resource.nil?
+        (resource.send link_table_name).each do |ltn|
+          substance = ltn.substance
+          s = Substance.new
+          s.id = substance.id.to_s + ",#{substance.class.name}"
+          s.name = substance.name
+          tagged_substances.push s
+        end
       end
       tagged_substances
    end
@@ -56,8 +59,11 @@ module StudiedFactorsHelper
   def uniq_fs_or_ec fs_or_ec_array=[]
     result = []
     uniq_fs_or_ec_field_array = []
+    link_table_name = try_block{fs_or_ec_array.first.class.name == 'StudiedFactor'} ? 'studied_factor_links' : 'experimental_condition_links'
     fs_or_ec_array.each do |fs_or_ec|
-      compare_field = [fs_or_ec.measured_item_id, fs_or_ec.start_value, fs_or_ec.end_value, fs_or_ec.unit_id, try_block{fs_or_ec.standard_deviation}, fs_or_ec.substance_id, fs_or_ec.substance_type]
+      substances = fs_or_ec.send(link_table_name).collect{|ltn| ltn.substance}
+      substances = substances.sort{|a,b| a.id <=> b.id}
+      compare_field = [fs_or_ec.measured_item_id, fs_or_ec.start_value, try_block{fs_or_ec.end_value}, fs_or_ec.unit_id, try_block{fs_or_ec.standard_deviation}, substances]
       if !uniq_fs_or_ec_field_array.include?compare_field
         uniq_fs_or_ec_field_array.push compare_field
         result.push fs_or_ec
@@ -66,15 +72,17 @@ module StudiedFactorsHelper
     result
   end
 
-  def fses_or_ecs_of_project asset, fs_or_ec, project_id
-    asset_class = asset.constantize
-    fs_or_ec_array= []
-    #FIXME: add :include in the query
-    asset_items = asset_class.find(:all, :conditions => ["project_id = ?", project_id])
-    asset_items.each do |item|
-      fs_or_ec_array |= item.send fs_or_ec if item.can_view?
+  #get the fses_or_ecs of the project the asset belongs to, but dont include the fses_or_ecs of that asset
+  def fses_or_ecs_of_project asset, fs_or_ec
+    neighboring_assets = asset.class.find(:all).select do |a|
+      projects_in_common = (a.projects & asset.projects)
+      a != asset and !projects_in_common.empty?
     end
-    fs_or_ec_array
+    neighboring_assets.select(&:can_view?).collect {|a| a.send(fs_or_ec)}.flatten
   end
 
 end
+
+
+
+

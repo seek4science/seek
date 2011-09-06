@@ -55,5 +55,4 @@ class PolicyTest < ActiveSupport::TestCase
     assert Policy::PRIVATE < Policy::ALL_SYSMO_USERS
     assert Policy::ALL_SYSMO_USERS < Policy::EVERYONE
   end
-
 end

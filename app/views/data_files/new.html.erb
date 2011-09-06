@@ -19,8 +19,7 @@
             <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
             <%= text_area_tag 'data_file[description]', data_file_description_value, :style => "width: 100%;", :rows => 10 -%>
         </p>
-        <%= render :partial => "assets/project_selector", :locals => { :resource_type => "DataFile",   # this is only for presentation, not for any processing
-        :project_hash => current_user.generate_own_project_id_name_hash } -%>
+        <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file } -%>
         
       
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "DataFile"} -%>
@@ -33,7 +32,8 @@
             <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file, :show_relationships=>true} -%>
         </p>
         <p>
-            <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateDataFileFields(true); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
+          <%= preview_permission_popup_link('data_file', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
+          <%= submit_tag "Upload and Save", :id => "data_file_submit_btn", :onclick => "javascript: validateResourceFields(true,'data_file'); return(false);" -%> or <%= link_to 'Cancel', data_files_path -%>
         </p>
     </div>
     <% end -%>

@@ -104,7 +104,7 @@ class WorkGroupsController < ApplicationController
     end
   end
   
-  
+
   private
   
   def find_work_group

@@ -10,7 +10,7 @@ my_first_sop_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: my_first_sop
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: private_policy_for_asset_of_my_first_sop  
 
 sop_with_fully_public_policy_v1:
@@ -25,7 +25,7 @@ sop_with_fully_public_policy_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_fully_public_policy
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: fully_public_policy
 
 sop_with_download_for_all_sysmo_users_policy_v1:
@@ -40,7 +40,7 @@ sop_with_download_for_all_sysmo_users_policy_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_download_for_all_sysmo_users_policy
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
 
 
@@ -56,7 +56,7 @@ sop_with_all_sysmo_users_policy_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_all_sysmo_users_policy
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: editing_for_all_sysmo_users_policy
 
 sop_with_custom_permissions_policy_v1:
@@ -71,7 +71,7 @@ sop_with_custom_permissions_policy_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_custom_permissions_policy
   version: 1
-  project: other_project #not linked to any project for now
+  projects: [other_project] #not linked to any project for now
   policy: private_policy_using_custom_sharing
 
 private_sop_v1:
@@ -86,7 +86,7 @@ private_sop_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: private_sop
   version: 1
-  project: sysmo_project # not linked to any project for now
+  projects: [sysmo_project] # not linked to any project for now
   policy: private_policy
 
 sop_with_complex_permissions_v1:
@@ -101,7 +101,7 @@ sop_with_complex_permissions_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_complex_permissions
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: policy_with_complex_permissions
 
 sop_with_private_policy_and_custom_sharing_v1:
@@ -116,7 +116,7 @@ sop_with_private_policy_and_custom_sharing_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_private_policy_and_custom_sharing
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: private_policy_with_custom_sharing
 
 sop_with_public_download_and_no_custom_sharing_v1:
@@ -131,7 +131,7 @@ sop_with_public_download_and_no_custom_sharing_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   version: 1
   sop: sop_with_public_download_and_no_custom_sharing
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: public_download_with_no_custom_sharing
 
 sop_that_uses_whitelist_blacklist_and_custom_sharing_v1:
@@ -146,7 +146,7 @@ sop_that_uses_whitelist_blacklist_and_custom_sharing_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_that_uses_whitelist_blacklist_and_custom_sharing
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: whitelist_blacklist_and_custom_sharing
 
 sop_for_test_with_workgroups_v1:
@@ -161,7 +161,7 @@ sop_for_test_with_workgroups_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_for_test_with_workgroups
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: policy_for_worgroup_sharing_tests
 
 sop_for_test_with_workgroups_no_custom_sharing_v1:
@@ -176,7 +176,7 @@ sop_for_test_with_workgroups_no_custom_sharing_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_for_test_with_workgroups_no_custom_sharing
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: policy_for_worgroup_sharing_tests_no_custom_sharing
 
 sop_for_test_with_projects_institutions_v1:
@@ -191,7 +191,7 @@ sop_for_test_with_projects_institutions_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_for_test_with_projects_institutions
   version: 1
-  project: other_project # not linked to any project for now
+  projects: [other_project] # not linked to any project for now
   policy: policy_for_test_with_projects_institutions
   
 downloadable_sop_v1:
@@ -206,7 +206,7 @@ downloadable_sop_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: downloadable_sop
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_download
   
 downloadable_sop_v2:
@@ -221,7 +221,7 @@ downloadable_sop_v2:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: downloadable_sop
   version: 2
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_download  
 
 editable_sop_v1:
@@ -236,7 +236,7 @@ editable_sop_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: editable_sop
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit
   
 sop_with_links_in_description_v1:
@@ -251,7 +251,7 @@ sop_with_links_in_description_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_links_in_description
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit
 
 sop_with_no_contributor_v1:
@@ -265,5 +265,5 @@ sop_with_no_contributor_v1:
   last_used_at: <%= 1.days.ago.to_s :db %>
   sop: sop_with_no_contributor
   version: 1
-  project: sysmo_project
+  projects: [sysmo_project]
   policy: sysmo_member_edit

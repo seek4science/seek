@@ -1,9 +1,10 @@
 require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
+require 'lib/seek/factor_studied.rb'
 
 namespace :seek do
-
+  include Seek::FactorStudied
   desc 'an alternative to the doc:seek task'
   task(:docs=>["doc:seek"]) do
 
@@ -14,7 +15,7 @@ namespace :seek do
     resources = Sop.find(:all)
     resources |= Model.find(:all)
     resources |= DataFile.find(:all)
-    resources = resources.select { |r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && r.project }
+    resources = resources.select { |r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && !r.projects.empty? }
 
     resources.each do |res|
       res.cache_remote_content_blob
@@ -39,6 +40,55 @@ namespace :seek do
     end
   end    
 
+  #adding the new compounds and their annotations if they dont exist
+  desc "seeds database with compounds, synonyms and mappings"
+  task(:populate_compounds=>:environment) do
+    compound_list = []
+    File.open('config/default_data/compound.list').each do |compound|
+      unless compound.blank?
+        compound_list.push(compound.chomp) if !compound_list.include?(compound.chomp)
+      end
+    end
+
+    unless compound_list.blank?
+      compound_object_list = find_or_new_substances  compound_list, []
+      count = 0
+      compound_object_list.each do |co|
+        if co.save
+          count += 1
+        else
+          puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
+        end
+      end
+      puts "#{count.to_s} compounds were created"
+
+    end
+  end
+
+  #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
+  desc "adds or updates the compounds, synonyms and mappings using the Sabio-RK webservices"
+  task(:compounds=>:environment) do
+    compound_list = []
+    File.open('config/default_data/compound.list').each do |compound|
+      unless compound.blank?
+        compound_list.push(compound.chomp) if !compound_list.include?(compound.chomp)
+      end
+    end
+
+    unless compound_list.blank?
+      compound_object_list = update_substances compound_list
+      count = 0
+      compound_object_list.each do |co|
+        if co.save
+          count += 1
+        else
+          puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
+        end
+      end
+      puts "#{count.to_s} compounds were updated"
+    end
+  end
+
   desc 're-extracts bioportal information about all organisms, overriding the cached details'
   task(:refresh_organism_concepts=>:environment) do
     Organism.all.each do |o|
@@ -48,14 +98,14 @@ namespace :seek do
 
   desc 'seeds the database with the controlled vocabularies'
   task(:seed=>:environment) do
-    tasks=["seed_sqlite","load_help_docs"]
+    tasks=["seed_testing","compounds","load_help_docs"]
     tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
   end
 
-  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678)'
-  task(:seed_sqlite=>:environment) do
+  desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
+  task(:seed_testing=>:environment) do
     tasks=["refresh_controlled_vocabs", "default_tags", "graft_new_assay_types"]
     tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
@@ -93,7 +143,7 @@ namespace :seek do
 
   desc 'refreshes, or creates, the standard initial controlled vocublaries'
   task(:refresh_controlled_vocabs=>:environment) do
-    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains","compounds"]
+    other_tasks=["culture_growth_types", "model_types", "model_formats", "assay_types", "disciplines", "organisms", "technology_types", "recommended_model_environments", "measured_items", "units", "roles", "assay_classes", "relationship_types", "strains"]
     other_tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
@@ -204,12 +254,6 @@ namespace :seek do
     Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "assay_classes")
   end
 
-   task(:compounds=>:environment) do
-    revert_fixtures_identify
-    Compound.delete_all
-    Fixtures.create_fixtures(File.join(RAILS_ROOT, "config/default_data"), "compounds")
-  end
-
   #Update the sharing_scope in the policies table, because of removing CUSTOM_PERMISSIONS_ONLY and ALL_REGISTERED_USERS scopes
   task(:update_sharing_scope=>:environment) do
     # sharing_scope
@@ -217,6 +261,21 @@ namespace :seek do
     custom_permissions_only_scope = 1
     all_sysmo_users_scope = 2
     all_registered_users_scope = 3
+    every_one = 4
+
+    #First, need to update the sharing_scope of publication_policy from 3 to 4
+    policies = Policy.find(:all, :conditions => ["name = ? AND sharing_scope = ?", 'publication_policy', all_registered_users_scope])
+    unless policies.nil?
+      count = 0
+      policies.each do |policy|
+        policy.sharing_scope = every_one
+        policy.save
+        count += 1
+      end
+      puts "Done - #{count} publication_policies changed scope from ALL_REGISTERED_USERS to EVERYONE."
+    else
+      puts "Couldn't find any policies with ALL_REGISTERED_USERS scope and publication_policy"
+    end
 
     #update  ALL_REGISTERED_USERS to ALL_SYSMO_USERS
     policies = Policy.find(:all, :conditions => ["sharing_scope = ?", all_registered_users_scope])
@@ -457,6 +516,33 @@ namespace :seek do
     if tag.taggings.detect { |tagging| tagging.context==context && tagging.taggable_type==taggable_type }.nil?
       tagging=ActsAsTaggableOn::Tagging.new(:tag_id=>tag.id, :context=>context, :taggable_type=>taggable_type)
       tagging.save!
+    end
+  end
+
+
+  desc "Send mail daily to users"
+  task :send_daily_subscription => :environment do
+    send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at=?', Date.yesterday]), 'daily'
+  end
+
+  desc "Send mail weekly to users"
+  task :send_weekly_subscription => :environment do
+    send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 7.days.ago]), 'weekly'
+  end
+
+  desc "Send mail monthly to users"
+  task :send_monthly_subscription => :environment do
+     send_subscription_mails ActivityLog.scoped(:include => :activity_loggable, :conditions => ['created_at>=?', 30.days.ago]), 'monthly'
+  end
+
+  private
+
+  def send_subscription_mails logs, frequency
+    Person.scoped(:include => :subscriptions).select{|p|p.receive_notifications?}.each do |person|
+      activity_logs = person.subscriptions.scoped(:include => :subscribable).select{|s|s.frequency == frequency}.collect do |sub|
+         logs.select{|log|log.activity_loggable.try(:can_view?, person.user) and log.activity_loggable.subscribable? and log.activity_loggable.subscribers_are_notified_of?(log.action) and log.activity_loggable == sub.subscribable}
+      end.flatten(1)
+      SubMailer.deliver_send_digest_subscription person, activity_logs unless activity_logs.blank?
     end
   end
 

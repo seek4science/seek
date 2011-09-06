@@ -1,0 +1,11 @@
+<% list_item ||= false%>
+<% unless list_item then %>
+    <p>
+      <%= authorized_list resource.projects, 'Projects' %>
+    </p>
+<% else %>
+      <%= list_item_authorized_list resource.projects, 'Projects' %>
+<% end %>
+
+
+

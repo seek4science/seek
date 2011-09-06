@@ -11,12 +11,6 @@ class SamplesControllerTest < ActionController::TestCase
     @object = Factory(:sample,:contributor => User.current_user,
             :title=> "test1",
             :policy => policies(:policy_for_viewable_data_file))
-    @is_vl=Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver=true
-  end
-
-  def teardown
-    Seek::Config.is_virtualliver=@is_vl
   end
 
   test "index xml validates with schema" do
@@ -57,9 +51,7 @@ class SamplesControllerTest < ActionController::TestCase
       post :create, :sample => {:title => "test",
                                 :lab_internal_number =>"Do232",
                                 :donation_date => Date.today,
-                                :specimen => Factory(:specimen, :contributor => User.current_user)
-                                }
-
+                                :specimen => Factory(:specimen, :contributor => User.current_user)}
     end
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
@@ -80,7 +72,7 @@ class SamplesControllerTest < ActionController::TestCase
   test "should update" do
     s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy))
     assert_not_equal "test", s.title
-    put "update", :id=>s, :sample =>{:title =>"test"},:sample_strain_ids => [Factory(:strain).id, Factory(:strain).id]
+    put "update", :id=>s, :sample =>{:title =>"test"}
     s = assigns(:sample)
     assert_redirected_to sample_path(s)
     assert_equal "test", s.title
@@ -135,7 +127,7 @@ class SamplesControllerTest < ActionController::TestCase
   end
 
   test "should not destroy sample related to an existing assay" do
-    s = Factory :sample, :assays => [Factory :assay], :contributor => Factory(:user)
+    s = Factory :sample, :assays => [Factory :experimental_assay], :contributor => Factory(:user)
     assert_no_difference("Sample.count") do
       delete :destroy, :id => s.id
     end

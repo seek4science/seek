@@ -24,7 +24,9 @@ module ImagesHelper
     inner = "#{img_tag} #{label}" unless label == nil
     
     if (url)
-      if (remote)
+      if (remote==:function)
+        inner = link_to_function inner, url, url_options
+      elsif (remote)
         inner = link_to_remote(inner, url, url_options);
       else
         inner = link_to(inner, url, url_options)
@@ -265,6 +267,12 @@ module ImagesHelper
       "famfamfam_silk/tag_blue_delete.png"
       when "spreadsheet_export"
       "famfamfam_silk/table_go.png"
+      when 'unsubscribe'
+        "famfamfam_silk/email_delete.png"
+      when 'subscribe'
+        "famfamfam_silk/email_add.png"
+      when 'presentation_avatar','presentation','presentations'
+        "file_icons/ppt.png"
     else
       return nil
     end

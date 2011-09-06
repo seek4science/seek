@@ -42,6 +42,29 @@ class SopsControllerTest < ActionController::TestCase
 
   end
 
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    sop=Factory(:sop,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,sop.contributor
+    assert sop.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",sop_path(sop),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
+  end
+
   test "request file button visibility when logged in and out" do
 
     sop = Factory :sop,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
@@ -102,7 +125,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should correctly handle bad data url" do
-    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:project=>projects(:sysmo_project)}
+    sop={:title=>"Test", :data_url=>"http:/sdfsdfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -111,7 +134,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
 
     #not even a valid url
-    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:project=>projects(:sysmo_project)}
+    sop={:title=>"Test", :data_url=>"s  df::sd:dfds.com/sdf.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -121,7 +144,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not create invalid sop" do
-    sop={:title=>"Test",:project=>projects(:sysmo_project)}
+    sop={:title=>"Test",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :sop => sop, :sharing=>valid_sharing
@@ -368,9 +391,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_duplicate_conditions_for_new_version
-    s          =sops(:editable_sop)
+    s=sops(:editable_sop)
     condition1 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+                                              :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
@@ -381,9 +404,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_adding_new_conditions_to_different_versions
-    s          =sops(:editable_sop)
-    condition1 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 1, :end_value => 2, :sop_id => s.id, :sop_version => s.version)
+    s =sops(:editable_sop)
+    condition1 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+                                              :start_value => 1, :sop_id => s.id, :sop_version => s.version)
     assert_difference("Sop::Version.count", 1) do
       post :new_version, :id=>s, :sop=>{:data=>fixture_file_upload('files/file_picture.png')}, :revision_comment=>"This is a new revision" #v2
     end
@@ -392,8 +415,8 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal condition1, s.find_version(1).experimental_conditions.first
     assert_equal 0, s.find_version(2).experimental_conditions.count
 
-    condition2 = ExperimentalCondition.create(:unit        => units(:gram), :measured_item => measured_items(:weight),
-                                              :start_value => 2, :end_value => 3, :sop_id => s.id, :sop_version => 2)
+    condition2 = ExperimentalCondition.create(:unit => units(:gram), :measured_item => measured_items(:weight),
+                                              :start_value => 2, :sop_id => s.id, :sop_version => 2)
 
     assert_not_equal 0, s.find_version(2).experimental_conditions.count
     assert_equal condition2, s.find_version(2).experimental_conditions.first
@@ -697,11 +720,11 @@ class SopsControllerTest < ActionController::TestCase
   private
 
   def valid_sop_with_url
-    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
+    {:title=>"Test", :data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_sop
-    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:project=>projects(:sysmo_project)}
+    {:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:projects=>[projects(:sysmo_project)]}
   end
 
 end

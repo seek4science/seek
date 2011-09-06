@@ -49,13 +49,16 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test "validation" do
-    asset=DataFile.new :title=>"fred",:project=>projects(:sysmo_project)
+    asset=DataFile.new :title=>"fred",:projects=>[projects(:sysmo_project)]
     assert asset.valid?
 
-    asset=DataFile.new :project=>projects(:sysmo_project)
+    asset=DataFile.new :projects=>[projects(:sysmo_project)]
     assert !asset.valid?
 
     asset=DataFile.new :title=>"fred"
+    assert !asset.valid?
+
+    asset = DataFile.new :title => "fred", :projects => []
     assert !asset.valid?
   end
 
@@ -67,15 +70,17 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file_versions(:picture_v1).use_mime_type_for_avatar?
   end
 
-  test "project" do
+  test "projects" do
     df=data_files(:sysmo_data_file)
     p=projects(:sysmo_project)
-    assert_equal p,df.project
-    assert_equal p,df.latest_version.project
+    assert_equal [p],df.projects
+    assert_equal [p],df.latest_version.projects
   end
   
   def test_defaults_to_private_policy
-    df=DataFile.new(:title=>"A df with no policy",:project=>projects(:sysmo_project))
+    df_hash = Factory.attributes_for(:data_file)
+    df_hash[:policy] = nil
+    df=DataFile.new(df_hash)
     df.save!
     df.reload
     assert_not_nil df.policy
@@ -131,7 +136,7 @@ class DataFileTest < ActiveSupport::TestCase
     end
     assert_nil DataFile.find_by_id(df.id)
     assert_difference("DataFile.count",1) do
-      DataFile.restore_trash!(df.id)
+      disable_authorization_checks {DataFile.restore_trash!(df.id)}
     end
     assert_not_nil DataFile.find_by_id(df.id)
   end
@@ -192,4 +197,81 @@ class DataFileTest < ActiveSupport::TestCase
     assert !df.update_attributes(:title => "Updated Title")
     assert_equal unupdated_title, df.reload.title
   end
+
+  test "convert to presentation" do
+    user = Factory :user
+    User.with_current_user(user) {
+      data_file = Factory :data_file,:contributor=>user
+      presentation = Factory.build :presentation,:contributor=>user
+      data_file_converted = data_file.convert_to_presentation
+
+      assert_equal "Presentation", data_file_converted.class.name
+      assert_equal presentation.attributes.keys, data_file_converted.attributes.keys
+      data_file_converted.valid?
+      assert data_file_converted.valid?
+
+      data_file_converted.save!
+      data_file_converted.reload
+
+      assert_equal data_file.policy.sharing_scope, data_file_converted.policy.sharing_scope
+      assert_equal data_file.policy.access_type, data_file_converted.policy.access_type
+      assert_equal data_file.policy.use_whitelist, data_file_converted.policy.use_whitelist
+      assert_equal data_file.policy.use_blacklist, data_file_converted.policy.use_blacklist
+      assert_equal data_file.policy.permissions, data_file_converted.policy.permissions
+
+      assert_equal data_file.subscriptions.map(&:person_id), data_file_converted.subscriptions(&:person_id)
+      assert_equal data_file.event_ids, data_file_converted.event_ids
+      assert_equal data_file.creators, data_file_converted.creators
+    }
+  end
+
+  test "fs_search_fields" do
+    user = Factory :user
+    User.with_current_user user do
+      df = Factory :data_file,:contributor=>user
+      sf1 = Factory :studied_factor_link,:substance=>Factory(:compound,:name=>"sugar")
+      sf2 = Factory :studied_factor_link,:substance=>Factory(:compound,:name=>"iron")
+      comp=sf2.substance
+      Factory :synonym,:name=>"metal",:substance=>comp
+      Factory :mapping_link,:substance=>comp,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789",:sabiork_id=>111)
+      studied_factor = Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
+      assert df.fs_search_fields.include?("sugar")
+      assert df.fs_search_fields.include?("metal")
+      assert df.fs_search_fields.include?("iron")
+      assert df.fs_search_fields.include?("concentration")
+      assert df.fs_search_fields.include?("CHEBI:12345")
+      assert df.fs_search_fields.include?("12345")
+      assert df.fs_search_fields.include?("111")
+      assert df.fs_search_fields.include?("789")
+      assert_equal 8,df.fs_search_fields.count
+    end
+  end
+
+  test "fs_search_fields_with_synonym_substance" do
+    user = Factory :user
+    User.with_current_user user do
+      df = Factory :data_file,:contributor=>user
+      suger = Factory(:compound,:name=>"sugar")
+      iron = Factory(:compound,:name=>"iron")
+      metal = Factory :synonym,:name=>"metal",:substance=>iron
+      Factory :mapping_link,:substance=>iron,:mapping=>Factory(:mapping,:chebi_id=>"12345",:kegg_id=>"789",:sabiork_id=>111)
+      
+      sf1 = Factory :studied_factor_link,:substance=>suger
+      sf2 = Factory :studied_factor_link, :substance=>metal
+
+
+
+      Factory :studied_factor,:studied_factor_links=>[sf1,sf2],:data_file=>df
+      assert df.fs_search_fields.include?("sugar")
+      assert df.fs_search_fields.include?("metal")
+      assert df.fs_search_fields.include?("iron")
+      assert df.fs_search_fields.include?("concentration")
+      assert df.fs_search_fields.include?("CHEBI:12345")
+      assert df.fs_search_fields.include?("12345")
+      assert df.fs_search_fields.include?("111")
+      assert df.fs_search_fields.include?("789")
+      assert_equal 8,df.fs_search_fields.count
+    end
+  end
+  
 end

@@ -97,7 +97,7 @@ class SopsController < ApplicationController
       @sop = Sop.new(params[:sop])
       @sop.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
-      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.project
+      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
       update_tags @sop
       assay_ids = params[:assay_ids] || []
@@ -145,7 +145,7 @@ class SopsController < ApplicationController
 
     if params[:sharing]
       @sop.policy_or_default
-      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.project
+      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
     end
 
     respond_to do |format|

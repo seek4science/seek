@@ -34,7 +34,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should not relate assays thay are not authorized for edit during create publication" do
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id },:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 3,:projects=>[projects(:sysmo_project)]},:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -46,7 +46,7 @@ class PublicationsControllerTest < ActionController::TestCase
     login_as(:model_owner) #can edit assay
     assay=assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 3,:project_id=>projects(:sysmo_project).id },:assay_ids=>[assay.id.to_s]
+      post :create, :publication => {:pubmed_id => 3,:projects=>[projects(:sysmo_project)] },:assay_ids=>[assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -57,7 +57,7 @@ class PublicationsControllerTest < ActionController::TestCase
   
   test "should create doi publication" do
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1371/journal.pone.0004803",:project_id=>projects(:sysmo_project).id } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, :publication => {:doi => "10.1371/journal.pone.0004803", :projects=>[projects(:sysmo_project)] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -185,10 +185,11 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test "should update project" do
     p = publications(:one)
-    assert_equal projects(:sysmo_project), p.project   
-    put :update, :id => p.id, :author => {}, :publication => {:project_id => projects(:one).id}  
+    assert_equal projects(:sysmo_project), p.projects.first
+    put :update, :id => p.id, :author => {}, :publication => {:project_ids => [projects(:one).id]}
     assert_redirected_to publication_path(p)
-    assert_equal projects(:one), Publication.find(p.id).project
+    p.reload
+    assert_equal [projects(:one)], p.projects
   end
 
   test "should destroy publication" do
