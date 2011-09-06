@@ -5,22 +5,28 @@ module ApplicationHelper
   include FancyMultiselectHelper
 
 
-  #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
-  #returns a list of all types that respond_to and return true for user_creatable?
-  def user_creatable_classes
-    @@creatable_model_classes ||= begin
-      classes=Seek::Util.persistent_classes.select do |c|
-        c.respond_to?("user_creatable?") && c.user_creatable?
-      end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
-      classes.delete(Event) unless Seek::Config.events_enabled
-      
-      unless Seek::Config.is_virtualliver
-        classes.delete(Sample)
-        classes.delete(Specimen)
-      end
+  def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
+    items = all_items.select &:can_view?
+    title_only_items = (all_items - items).select &:title_is_public?
+    html  = "<b>#{(items.size > 1 ? attribute.pluralize : attribute)}:</b> "
+    if items.empty? and title_only_items.empty?
+      html << "<span class='none_text'>No #{attribute}</span>"
+    else
+      original_size     = all_items.size
+      hidden_item_count = original_size - (items.size + title_only_items.size)
 
-      classes
-    end    
+      items = items.sort_by { |i| get_object_title(i) } if sort
+      title_only_items = title_only_items.sort_by{|i| get_object_title(i)} if sort
+
+      list = items.collect {|i| link_to h(truncate(i.title, :length=>max_length)), show_resource_path(i), :title=>get_object_title(i)}
+      list = list + title_only_items.collect {|i| h(truncate(i.title, :length => max_length))}
+      html << list.join(', ')
+
+      if count_hidden_items && hidden_item_count>0
+        html << "<span class=\"none_text\">#{items.size > 0 ? " and " : ""}#{hidden_item_count} hidden #{hidden_item_count > 1 ? "items" :"item"}</span>"
+      end
+    end
+    html
   end
 
   def tabbar
@@ -325,7 +331,23 @@ module ApplicationHelper
       #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
     )
   end
-  
+
+  def preview_permission_popup_link resource_name, url, is_new_file
+     return link_to_remote_redbox("preview permission",
+      { :url => url ,
+        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
+        :with => "'sharing_scope=' + selectedSharingScope() + '&access_type=' + selectedAccessType(selectedSharingScope())
+        + '&use_whitelist=' + $('cb_use_whitelist').checked + '&use_blacklist=' + $('cb_use_blacklist').checked
+        + '&project_ids=' + escape($F('#{resource_name}' + '_project_ids')) + '&project_access_type=' + $F('sharing_your_proj_access_type')
+        + '&contributor_types=' + $F('sharing_permissions_contributor_types') + '&contributor_values=' + $F('sharing_permissions_values')
+        + '&resource_name=' + '#{resource_name}' + '&is_new_file=' + '#{is_new_file}'"},
+      { :id => 'preview_permission',
+        :style => 'display:none'
+      } #,
+      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+    )
+  end
   #Return whether or not to hide contact details from this user
   #Current decided by Seek::Config.hide_details_enabled in config.rb
   #Defaults to false
@@ -463,8 +485,18 @@ module ApplicationHelper
       javascript_include_tag file
     end
   end
+
+  def display_people_list people
+    html = '<ul>'
+    people.each do |person|
+       html<< "<li><a href='#{person_path(person[0])}' target='_blank'>#{person[1]}</a></li>"
+    end
+    html << '</ul>'
+  end
+
+
   private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies"}
+  PAGE_TITLES={"home"=>"Home", "projects"=>"Projects","institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search","assays"=>"Assays","sops"=>"SOPs","models"=>"Models","data_files"=>"Data","publications"=>"Publications","investigations"=>"Investigations","studies"=>"Studies","specimens"=>"Specimens","samples"=>"Samples","presentations"=>"Presentations"}
 end
 
 class ApplicationFormBuilder< ActionView::Helpers::FormBuilder

@@ -45,7 +45,7 @@ class EventsController < ApplicationController
     publication_ids = params.delete(:related_publication_ids) || []
     @event.publications = Publication.find(publication_ids)
 
-    @event.policy.set_attributes_with_sharing params[:sharing], @event.project
+    @event.policy.set_attributes_with_sharing params[:sharing], @event.projects
 
     respond_to do | format |
       if @event.save
@@ -75,7 +75,7 @@ class EventsController < ApplicationController
 
     if params[:sharing]
       @event.policy_or_default
-      @event.policy.set_attributes_with_sharing params[:sharing], @event.project
+      @event.policy.set_attributes_with_sharing params[:sharing], @event.projects
     end
 
     respond_to do | format |

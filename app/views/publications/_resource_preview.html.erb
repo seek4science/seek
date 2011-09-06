@@ -4,7 +4,7 @@
       <%= h resource.title -%>
     </p>
     
-    <%= list_item_optional_attribute "Project", resource.project.try(:title), resource.project -%>
+    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} -%>
     
     <p class="list_item_attribute">
       <b>Author<%= resource.creators.size + resource.non_seek_authors.size > 1 ? "s" : "" -%>:</b>

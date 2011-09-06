@@ -22,8 +22,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
   
   def test_first_letter_ignore_space
-    inv=Investigation.new(:title=>" Inv",:project=>projects(:sysmo_project))
-    inv.save!    
+    inv=Factory :investigation, :title=>" Inv"
     assert_equal "I",inv.first_letter
   end
   

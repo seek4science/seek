@@ -16,6 +16,11 @@ class UsersControllerTest < ActionController::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
   end
+
+
+  test "creatable classes order" do
+    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],@controller.send(:user_creatable_classes)
+  end
   
   def test_title
     get :new

@@ -23,6 +23,9 @@ class ConfigTest < ActiveSupport::TestCase
     Seek::Config.is_virtualliver = original_value
   end
 
+  test "presentations enabled" do
+     assert_equal true, Seek::Config.presentations_enabled
+  end
 
   test "email_enabled" do
     #NOTE: this is the value in seek_testing.rb, the actual default is 'false'
@@ -211,5 +214,8 @@ class ConfigTest < ActiveSupport::TestCase
     Seek::Config.home_description = "A new description"
     assert_equal "A new description", Seek::Config.home_description
   end
-  
+
+  test "sabiork_ws_base_url" do
+    assert_equal "http://sabiork.h-its.org/sabioRestWebServices/",Seek::Config.sabiork_ws_base_url
+  end
 end

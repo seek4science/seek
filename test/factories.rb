@@ -10,7 +10,7 @@
   end
 
   Factory.define(:person_in_project, :parent => :brand_new_person) do |f|
-    f.group_memberships {[Factory :group_membership]}
+    f.group_memberships {[Factory.build :group_membership]}
   end
 
   Factory.define(:person, :parent => :person_in_project) do |f|
@@ -60,13 +60,15 @@
 #Sop
   Factory.define(:sop) do |f|
     f.title "This Sop"
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
 
 #Policy
   Factory.define(:policy, :class => Policy) do |f|
     f.name "test policy"
+    f.sharing_scope Policy::PRIVATE
+    f.access_type Policy::NO_ACCESS
   end
 
   Factory.define(:private_policy, :parent => :policy) do |f|
@@ -107,7 +109,7 @@ Factory.define(:assay_base, :class => Assay) do |f|
     f.association :contributor, :factory => :person
   f.association :study
   f.association :assay_type
-  f.association :sample
+
 end
 
 Factory.define(:modelling_assay_class, :class => AssayClass) do |f|
@@ -122,11 +124,18 @@ end
 
 Factory.define(:modelling_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :modelling_assay_class
+  f.samples {[Factory.build :sample]}
+
 end
 
+Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
+  f.after_create{|ma|Factory.build(:organism,:assay=>ma)}
+
+end
 Factory.define(:experimental_assay, :parent => :assay_base) do |f|
   f.association :assay_class, :factory => :experimental_assay_class
   f.association :technology_type
+  f.samples {[Factory.build :sample]}
 end
 
   Factory.define(:assay, :parent => :modelling_assay) {}
@@ -140,7 +149,7 @@ end
 
 #Investigation
 Factory.define(:investigation) do |f|
-  f.association :project
+  f.projects {[Factory.build(:project)]}
   f.sequence(:title) { |n| "Investigation#{n}" }
 end
 
@@ -149,13 +158,19 @@ Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
 end
 
+#Culture growth type
+Factory.define(:culture_growth_type) do |f|
+  f.title "a culture_growth_type"
+end
+
 #Specimen
 Factory.define(:specimen) do |f|
   f.sequence(:donor_number) { |n| "Specimen#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.association :contributor, :factory => :user
-  f.association :project
+  f.projects {[Factory.build(:project)]}
   f.association :institution
+  f.association :organism
 end
 
 #Sample
@@ -163,7 +178,6 @@ Factory.define(:sample) do |f|
   f.sequence(:title) { |n| "Sample#{n}" }
   f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
   f.donation_date Date.today
-  f.strains { [Factory :strain] }
   f.association :specimen
 end
 
@@ -171,7 +185,7 @@ end
 #Data File
   Factory.define(:data_file) do |f|
     f.sequence(:title) {|n| "A Data File_#{n}"}
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
     f.association :content_blob, :factory => :content_blob
   end
@@ -179,17 +193,26 @@ end
 #Model
   Factory.define(:model) do |f|
     f.title "A Model"
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
+    f.association :content_blob, :factory => :content_blob
   end
 
 #Publication
   Factory.define(:publication) do |f|
     f.title "A Model"
     f.pubmed_id 1
-    f.association :project
+    f.projects {[Factory.build(:project)]}
     f.association :contributor, :factory => :user
   end
+#Presentation
+Factory.define(:presentation) do |f|
+  f.title "A Presentation"
+  f.projects {[Factory.build :project]}
+ # f.data_url "http://www.virtual-liver.de/images/logo.png"
+  f.association :contributor,:factory=>:user
+  f.association :content_blob, :factory => :content_blob
+end
 
 #Misc
   Factory.define(:group_membership) do |f|
@@ -205,6 +228,17 @@ end
     f.association :institution
   end
 
+  Factory.define(:favourite_group) do |f|
+    f.association :user
+    f.name 'A Favourite Group'
+  end
+
+  Factory.define(:favourite_group_membership) do |f|
+    f.association :person
+    f.association :favourite_group
+    f.access_type 1
+  end
+
   Factory.define(:organism) do |f|
     f.title "An Organism"
   end
@@ -215,6 +249,8 @@ end
     f.end_date 1.days.from_now
   end
 
+#Content_blob
+#either url or data should be provided for assets
   Factory.define(:content_blob) do |f|
     f.uuid UUIDTools::UUID.random_create.to_s
     f.sequence(:data) {|n| "data [#{n}]" }
@@ -223,6 +259,7 @@ end
   Factory.define(:activity_log) do |f|
     f.action "create"
     f.association :activity_loggable, :factory => :data_file
+    f.association :culprit, :factory => :user
   end
 
   #Factor studied
@@ -233,10 +270,26 @@ end
     f.data_file_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
+    f.studied_factor_links {[StudiedFactorLink.new(:substance => Factory(:compound))]}
     f.association :data_file, :factory => :data_file
   end
 
+  Factory.define(:project_subscription) do |f|
+    f.association :person
+    f.association :project
+  end
+
+  Factory.define(:subscription) do |f|
+    f.association :person
+    f.association :subscribable
+  end
+
+  Factory.define(:subscribable, :parent => :data_file){}
+
+  Factory.define(:notifiee_info) do |f|
+    f.association :notifiee, :factory => :person
+  end
+    
   Factory.define(:measured_item) do |f|
     f.title 'concentration'
   end
@@ -250,13 +303,59 @@ end
     f.sequence(:name) {|n| "glucose #{n}"}
   end
 
- #Experimental condition
+  Factory.define(:studied_factor_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :studied_factor
+  end
+
+  #Experimental condition
   Factory.define(:experimental_condition) do |f|
     f.start_value 1
-    f.end_value 10
     f.sop_version 1
     f.association :measured_item, :factory => :measured_item
     f.association :unit, :factory => :unit
-    f.association :substance, :factory => :compound
     f.association :sop, :factory => :sop
+    f.experimental_condition_links {[ExperimentalConditionLink.new(:substance => Factory(:compound))]}
+  end
+
+  Factory.define(:relationship) do |f|
+    f.association :subject, :factory => :model
+    f.association :object, :factory => :model
+    f.predicate Relationship::ATTRIBUTED_TO
+  end
+
+  Factory.define(:attribution, :parent => :relationship) {}
+
+  Factory.define(:experimental_condition_link) do |f|
+    f.association :substance, :factory => :compound
+    f.association :experimental_condition
+  end
+
+  Factory.define :synonym do |f|
+    f.name "toffee"
+    f.association :substance, :factory=>:compound
+  end
+
+  Factory.define :mapping_link do |f|
+    f.association :substance, :factory=>:compound
+    f.association :mapping,:factory=>:mapping
+  end
+
+  Factory.define :mapping do |f|
+    f.chebi_id "12345"
+    f.kegg_id "6789"
+    f.sabiork_id "4"
+  end
+
+  Factory.define :site_announcement do |f|
+    f.sequence(:title) {|n| "Announcement #{n}"}
+    f.sequence(:body) {|n| "This is the body for announcement #{n}"}
+    f.association :announcer,:factory=>:admin
+    f.is_headline false
+    f.expires_at 5.days.since
+    f.email_notification false
+  end
+
+  Factory.define :headline_announcement,:parent=>:site_announcement do |f|
+    f.is_headline true
   end

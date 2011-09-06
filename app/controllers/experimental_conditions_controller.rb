@@ -1,4 +1,6 @@
 class ExperimentalConditionsController < ApplicationController
+  include Seek::FactorStudied
+
   before_filter :login_required
   before_filter :find_and_auth_sop  
   before_filter :create_new_condition, :only=>[:index]
@@ -17,7 +19,10 @@ class ExperimentalConditionsController < ApplicationController
     @experimental_condition.sop_version = params[:version]
     new_substances = params[:substance_autocompleter_unrecognized_items] || []
     known_substance_ids_and_types = params[:substance_autocompleter_selected_ids] || []
-    @experimental_condition.substance = find_or_create_substance new_substances, known_substance_ids_and_types
+    substances = find_or_new_substances new_substances,known_substance_ids_and_types
+    substances.each do |substance|
+      @experimental_condition.experimental_condition_links.build(:substance => substance )
+    end
     
     render :update do |page|
       if @experimental_condition.save
@@ -45,10 +50,12 @@ class ExperimentalConditionsController < ApplicationController
     #create the new FSes based on the selected FSes
     experimental_condition_ids.each do |id|
       experimental_condition = ExperimentalCondition.find(id)
-      new_experimental_condition = ExperimentalCondition.new(:measured_item_id => experimental_condition.measured_item_id, :unit_id => experimental_condition.unit_id, :start_value => experimental_condition.start_value,
-                                             :end_value => experimental_condition.end_value, :substance_type => experimental_condition.substance_type, :substance_id => experimental_condition.substance_id)
+      new_experimental_condition = ExperimentalCondition.new(:measured_item_id => experimental_condition.measured_item_id, :unit_id => experimental_condition.unit_id, :start_value => experimental_condition.start_value)
       new_experimental_condition.sop=@sop
       new_experimental_condition.sop_version = params[:version]
+      experimental_condition.experimental_condition_links.each do |ecl|
+         new_experimental_condition.experimental_condition_links.build(:substance => ecl.substance)
+      end
       new_experimental_conditions.push new_experimental_condition
     end
     #
@@ -57,7 +64,7 @@ class ExperimentalConditionsController < ApplicationController
           if ec.save
             page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>ec,:locals=>{:asset => 'sop', :show_delete=>true}
           else
-            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, values: #{ec.start_value}-#{ec.end_value}#{ec.unit.title}, SD: #{ec.standard_deviation}")
+            page.alert("can not create factor studied: item: #{try_block{ec.substance.name}} #{ec.measured_item.title}, value: #{ec.start_value}}#{ec.unit.title}")
           end
         end
         page.visual_effect :highlight,"condition_or_factor_rows"
@@ -81,15 +88,25 @@ class ExperimentalConditionsController < ApplicationController
 
       new_substances = params["#{@experimental_condition.id}_substance_autocompleter_unrecognized_items"] || []
       known_substance_ids_and_types = params["#{@experimental_condition.id}_substance_autocompleter_selected_ids"] || []
-      substance = find_or_create_substance new_substances,known_substance_ids_and_types
+      substances = find_or_new_substances new_substances,known_substance_ids_and_types
 
-      params[:experimental_condition][:substance_id] = substance.try :id
-      params[:experimental_condition][:substance_type] = substance.class.name == nil.class.name ? nil : substance.class.name
+      #delete the old experimental_condition_links
+      @experimental_condition.experimental_condition_links.each do |ecl|
+        ecl.destroy
+      end
+
+      #create the new experimental_condition_links
+      experimental_condition_links = []
+      substances.each do |substance|
+        experimental_condition_links.push ExperimentalConditionLink.new(:substance => substance)
+      end
+      @experimental_condition.experimental_condition_links = experimental_condition_links
 
       render :update do |page|
         if  @experimental_condition.update_attributes(params[:experimental_condition])
           page.visual_effect :fade,"edit_condition_or_factor_#{@experimental_condition.id}_form"
-          page.replace_html "condition_or_factor_row_#{@experimental_condition.id}", :partial => 'studied_factors/condition_or_factor_row', :object => @experimental_condition, :locals=>{:asset => 'sop', :show_delete=>true}
+          page.call "autocompleters['#{@experimental_condition.id}_substance_autocompleter'].deleteAllTokens"
+          page.replace "condition_or_factor_row_#{@experimental_condition.id}", :partial => 'studied_factors/condition_or_factor_row', :object => @experimental_condition, :locals=>{:asset => 'sop', :show_delete=>true}
         else
           page.alert(@experimental_condition.errors.full_messages)
         end

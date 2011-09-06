@@ -73,6 +73,4 @@ private
     end
     remote_options
   end
-  
-  
 end

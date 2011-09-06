@@ -1,4 +1,5 @@
 <%
+ investigations = investigations | [@study.investigation] if @study.investigation
  investigations = investigations.select &:can_edit?
  investigation_value=(@study && @study.investigation) ? @study.investigation.id : 0
  investigation_options = [["Select an investigation..",0]]|investigations.collect{|t| [h(t.title),t.id]}
@@ -8,6 +9,11 @@
   options_for_select(investigation_options,investigation_value),
   {
     :style=>"width:82%",:disabled=>(investigations.nil? || investigations.empty?),
-    :name=>"study[investigation_id]"
+    :name=>"study[investigation_id]",
+    :onchange=>remote_function(
+          :url=>{:action=>"investigation_selected_ajax"},
+          :with=>"'investigation_id='+this.value",
+          :before=>"show_ajax_loader('person_responsible_collection')"
+        )
   }
 -%>

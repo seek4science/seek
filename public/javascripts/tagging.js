@@ -23,4 +23,3 @@ function addLastTag(autocompleter_id){
     return false;
   }
 
-

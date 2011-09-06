@@ -31,6 +31,29 @@ class ModelsControllerTest < ActionController::TestCase
     end
     assert_not_nil flash[:error]    
   end
+
+  test 'creators show in list item' do
+    p1=Factory :person
+    p2=Factory :person
+    model=Factory(:model,:title=>"ZZZZZ",:creators=>[p2],:contributor=>p1.user,:policy=>Factory(:public_policy, :access_type=>Policy::VISIBLE))
+
+    get :index,:page=>"Z"
+
+    #check the test is behaving as expected:
+    assert_equal p1.user,model.contributor
+    assert model.creators.include?(p2)
+    assert_select ".list_item_title a[href=?]",model_path(model),"ZZZZZ","the data file for this test should appear as a list item"
+
+    #check for avatars
+    assert_select ".list_item_avatar" do
+      assert_select "a[href=?]",person_path(p2) do
+        assert_select "img"
+      end
+      assert_select "a[href=?]",person_path(p1) do
+        assert_select "img"
+      end
+    end
+  end
   
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
@@ -72,7 +95,7 @@ class ModelsControllerTest < ActionController::TestCase
   end    
   
   test "should correctly handle bad data url" do
-    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:project=>projects(:sysmo_project)}
+    model={:title=>"Test",:data_url=>"http://sdfsdfkh.com/sdfsd.png",:projects=>[projects(:sysmo_project)]}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, :model => model, :sharing=>valid_sharing
@@ -643,6 +666,22 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "removing an asset should not break show pages for items that have attribution relationships referencing it" do
+    model = Factory :model, :contributor => User.current_user
+    disable_authorization_checks do
+      attribution = Factory :model
+      model.relationships.create :object => attribution, :predicate => Relationship::ATTRIBUTED_TO
+      model.save!
+      attribution.destroy
+    end
+
+    get :show, :id => model.id
+    assert_response :success
+
+    model.reload
+    assert model.relationships.empty?
+  end
+
   test "cannot get preview_publish when not manageable" do
     login_as(:quentin)
     model=models(:teusink)
@@ -653,11 +692,11 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def valid_model
-    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data=>fixture_file_upload('files/little_file.txt'),:projects=>[projects(:sysmo_project)]}
   end
 
   def valid_model_with_url
-    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:project=>projects(:sysmo_project)}
+    { :title=>"Test",:data_url=>"http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png",:projects=>[projects(:sysmo_project)]}
   end
   
 end

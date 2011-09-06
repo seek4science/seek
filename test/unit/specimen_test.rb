@@ -20,7 +20,7 @@ class SpecimenTest < ActiveSupport::TestCase
 
 
     specimen.reload
-    specimen.project= nil
+    User.with_current_user(specimen.contributor){specimen.projects = []}
     assert !specimen.valid?
 
     specimen.reload
