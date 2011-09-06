@@ -11,7 +11,7 @@ SEEK will try and suggest the correct person based on the author's name. If this
     <% authors.each do |author| %>
     <tr>    
       <td><%= author.last_name + " " + author.first_name -%></td>
-      <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,author_associations[author.id],project) -%></select></td>
+      <td><select name="author[<%= author.id -%>]"><option value="">None</option><%= people_by_project_options(Project.all,author_associations[author.id],[project]) -%></select></td>
     </tr>
     <% end %>
   </table>

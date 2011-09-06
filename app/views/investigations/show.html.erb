@@ -1,4 +1,5 @@
 <ul class="sectionIcons">
+    <%= render :partial => "subscriptions/subscribe", :locals => {:object => @investigation} %>
     <% if @investigation.can_manage? -%>
       <li><%= image_tag_for_key('manage', edit_investigation_path, nil, nil, 'Manage investigation') -%></li>
     <% elsif @investigation.can_edit?-%>
@@ -7,11 +8,15 @@
 
     <% if @investigation.can_edit? -%>
       <li>
-        <%= image_tag_for_key('new', new_study_path(:investigation_id=>@investigation), "Add a study", nil, "Add a study") -%>
+        <%= image_tag_for_key('new', new_study_path(:investigation_id=>@investigation,:create_from_asset=>@investigation.create_from_asset), "Add a study", nil, "Add a study") -%>
       </li>
     <% end -%>
   
     <%= delete_ISA_icon @investigation,current_user -%>
+   <% if logged_in? and current_user.person.member? %>
+      <li><%= image_tag_for_key('new', new_object_based_on_existing_one_path(:controller_name=>"investigations",:id=>@investigation.id), nil, nil, 'New investigation based on this one') %></li>
+    <% end %>
+
 </ul>
 <%= render :partial => "layouts/item_title",:locals=>{:item=>@investigation} %>
 <div class="show_basic">
@@ -22,10 +27,7 @@
         </label>
         <%= @investigation.id -%>
     </p>
-    <p>
-        <b>Project:</b>
-        <%= link_to h(@investigation.project.name),@investigation.project %>
-    </p>
+    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
     <p>
         <b>Description:</b>
         <div id="description" class="box_standout">

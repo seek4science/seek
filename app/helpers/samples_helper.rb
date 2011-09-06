@@ -1,19 +1,20 @@
 module SamplesHelper
+   def samples_link_list samples
+    #FIXME: make more generic and share with other model link list helper methods
+    samples=samples.select{|s| !s.nil?} #remove nil items
+    return "<span class='none_text'>Not Specified</span>" if samples.empty?
 
-
-  def sample_strain_list_item sample_strain
-    result = link_to h(sample_strain.title),sample_strain
-
-    return result
-  end
-  def sample_strains_list sample_strains,none_text="Not specified"
     result=""
-    result="<span class='none_text'>#{none_text}</span>" if sample_strains.empty?
-    sample_strains.each do |ao|
-      result += sample_strain_list_item ao
-      result += ", " unless ao==sample_strains.last
-    end
-    result
+    result += "<table cellpadding='10'>"
+     samples.each do |sample|
+
+       result += "<tr><td style='text-align:left;'>"
+      result += link_to h(sample.title.capitalize),sample
+
+      result += "</td></tr>"
+     end
+     result += "</table>"
+    return result
   end
 
 end

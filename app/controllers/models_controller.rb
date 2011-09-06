@@ -393,7 +393,7 @@ class ModelsController < ApplicationController
       @model = Model.new(params[:model])
       @model.content_blob = ContentBlob.new(:tmp_io_object => @tmp_io_object,:url=>@data_url)
 
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.project
+      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
 
       update_annotations @model
       assay_ids = params[:assay_ids] || []
@@ -449,12 +449,13 @@ class ModelsController < ApplicationController
     end
 
     update_annotations @model
+    publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
     @model.attributes = params[:model]
 
     if params[:sharing]
       @model.policy_or_default
-      @model.policy.set_attributes_with_sharing params[:sharing], @model.project
+      @model.policy.set_attributes_with_sharing params[:sharing], @model.projects
     end
 
     assay_ids = params[:assay_ids] || []
@@ -465,7 +466,7 @@ class ModelsController < ApplicationController
         Relationship.create_or_update_attributions(@model, params[:attributions])
         
         # update related publications
-        Relationship.create_or_update_attributions(@model, params[:related_publication_ids].collect {|i| ["Publication", i.split(",").first]}, Relationship::RELATED_TO_PUBLICATION) unless params[:related_publication_ids].nil?
+        Relationship.create_or_update_attributions(@model,publication_params, Relationship::RELATED_TO_PUBLICATION)
         
         #update creators
         AssetsCreator.add_or_update_creator_list(@model, params[:creators])

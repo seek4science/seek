@@ -169,7 +169,7 @@ module Seek
             params[symb][:original_filename] = (params[symb][:data]).original_filename
             @tmp_io_object = params[symb][:data]
           elsif !(params[symb][:data_url]).blank?
-            make_local_copy = params[symb][:local_copy]=="1"
+            make_local_copy = (params[symb][:local_copy]=="1")
             @data_url=params[symb][:data_url]
             code = url_response_code @data_url
             if (code == "200")

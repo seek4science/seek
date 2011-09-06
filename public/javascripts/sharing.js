@@ -21,6 +21,8 @@ UPDATE_FAVOURITE_GROUP_LINK = null;
 
 REVIEW_WORK_GROUP_LINK = null;
 
+GET_PERMISSION_SUMMARY_LINK = null
+
 
 // declarations for autocompleters
 // (IDs can be any strings - the only constraint is that they should hold unique names for each autocompleter)
@@ -43,6 +45,7 @@ var receivedProjectInstitutions = null;
 
 var currentFavouriteGroupSettings = {};
 
+var people_in_group = null
 
 function init_sharing() {
     DETERMINED_BY_GROUP = parseInt($('const_determined_by_group').value);
@@ -64,7 +67,7 @@ function updateCustomSharingSettings() {
         for(var i = 0; i < permission_settings[contributor_type].length; i++) {
             shared_with += '<b>' + contributor_type + '</b>: ' + permission_settings[contributor_type][i][0]
             + '&nbsp;&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(permission_settings[contributor_type][i][2]) +')</span>'
-            + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+            + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
             if (permission_settings[contributor_type][i].length<4 || permission_settings[contributor_type][i][3]==true) {
                 shared_with += '[<a href="" onclick="javascript:deleteContributor(\''+ contributor_type +'\', '+ permission_settings[contributor_type][i][1] +'); return(false);">remove</a>]'
             }
@@ -84,8 +87,8 @@ function updateCustomSharingSettings() {
     else {
         $('shared_with_list').innerHTML = shared_with;
     }
-  
-  
+
+
     // UPDATE THE FIELDS WHICH WILL BE SUBMITTED WITH THE PAGE
     $('sharing_permissions_contributor_types').value = "";
     $('sharing_permissions_values').value = "";
@@ -146,7 +149,7 @@ function deleteContributor(contributor_type, contributor_id) {
     // (the key can stay there, even if the count goes down to zero)
     permissions_for_set[contributor_type]--;
   
-    // remove the actual record for the contributor
+    // remove record for the contributor
     for(var i = 0; i < permission_settings[contributor_type].length; i++)
         if(permission_settings[contributor_type][i][1] == contributor_id) {
             permission_settings[contributor_type].splice(i, 1);
@@ -455,7 +458,7 @@ function updateGroupMembers() {
         member_name = autocompleters[f_group_autocompleter_id].getValueFromJsonArray(autocompleters[f_group_autocompleter_id].itemIDsToJsonArrayIDs([id])[0], 'name');
         group_members += member_name
         + '&nbsp;<span style="color: #5F5F5F;">('+ accessTypeTranslation(currentFavouriteGroupSettings[id]) +')</span>'
-        + '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:editGroupMember('+ id +', ' + currentFavouriteGroupSettings[id] + '); return(false);">edit</a>]</small>'
         + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:deleteGroupMember('+ id +'); return(false);">remove</a>]</small><br/>';
@@ -891,47 +894,34 @@ function replaceWhitelistBlacklistRedboxURL(grp_name) {
     return(true);
 }
 
-function showOrHideSubstanceTextField(form_id){
-    //check if the selected entry is concentration
-    var elements =  $(form_id).getElements();
-    var item;
-    var substance_autocomplete;
-    for (var i=0;i<elements.length;i++)
-    {
-      var id = elements[i].id;
-      if (id.match('measured_item_id'))
-        item = elements[i];
-      if (id.match('autocomplete_input'))
-        substance_autocomplete = elements[i];
+function selectedSharingScope(){
+   var sharing_scope_elements = document.getElementsByName('sharing[sharing_scope]')
+    var sharing_scope = ''
+    for(var i = 0; i < sharing_scope_elements.length; i++) {
+        if (sharing_scope_elements[i].checked){
+            sharing_scope = sharing_scope_elements[i].value
+            break;
+        }
     }
-
-    //check if the selected item is concentration
-    var selectedIndex = item.selectedIndex;
-    var option_select = item.options[selectedIndex];
-
-    if (option_select.text == 'concentration'){
-         substance_autocomplete.disabled = false;
-        Effect.Appear('add_substance_concentration', { duration: 5 });
-
-    }else{
-        //clear all the substances when disable
-        var autocompleter_id = substance_autocomplete.id.replace('autocomplete_input', '');
-        autocompleter_id = autocompleter_id.concat('autocompleter');
-        autocompleters[autocompleter_id].deleteAllTokens();
-        substance_autocomplete.disabled = true;
-        Effect.Fade('add_substance_concentration', { duration: 2 });
-    }
+    return escape(sharing_scope)
 }
 
-function testAjax(){
-new Ajax.Request('http://hitssv506.h-its.org/sabioRestWebServices/suggestions/compounds?searchCompounds=water', {
-  method: 'GET',
-  onSuccess: function(transport) {
-    alert('sucess')
-    alert(transport.responseText)
-
-  },
-  onFailure: function(){ alert('Something went wrong...') }
-});
+function selectedAccessType(sharing_scope){
+//get access_type
+    var access_type
+    //private
+    if (parseInt(sharing_scope) == 0)
+        access_type = $('access_type_select_'.concat(sharing_scope)).value
+    else
+        access_type = $('access_type_select_'.concat(sharing_scope)).options[$('access_type_select_'.concat(sharing_scope)).selectedIndex].value
+    return escape(access_type)
 }
+
+
+
+
+
+
+
+
 

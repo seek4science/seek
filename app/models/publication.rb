@@ -1,6 +1,7 @@
 require 'acts_as_asset'
 require 'grouped_pagination'
 require 'title_trimmer'
+require 'libxml'
 
 class Publication < ActiveRecord::Base
   
@@ -9,7 +10,7 @@ class Publication < ActiveRecord::Base
   acts_as_asset
 
   validates_presence_of :title
-  validates_presence_of :project
+  validates_presence_of :projects
   validate :check_identifier_present
   #validates_uniqueness_of :pubmed_id, :message => "publication has already been registered with that ID."
   #validates_uniqueness_of :doi, :message => "publication has already been registered with that ID."
@@ -60,9 +61,9 @@ class Publication < ActiveRecord::Base
     self.title = pubmed_record.title.chop #remove full stop
     self.abstract = pubmed_record.abstract
     self.published_date = pubmed_record.date_published
-    self.journal = pubmed_record.journal
-    self.pubmed_id = pubmed_record.pmid    
-  end 
+    self.journal = pubmed_record.journal || (get_journal_from_xml pubmed_record.xml)
+    self.pubmed_id = pubmed_record.pmid
+  end
   
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title
@@ -84,6 +85,10 @@ class Publication < ActiveRecord::Base
     self.backwards_relationships.select {|a| a.subject_type == "Assay"}.collect { |a| a.subject }
   end
   
+  def self.subscribers_are_notified_of? action
+    action == 'create'
+  end
+  
   private
   
   def check_identifier_present
@@ -99,4 +104,12 @@ class Publication < ActiveRecord::Base
   def self.user_creatable?
     true
   end
+  #some PUBMED/DOI fields cant be retrieved from direct calls on the fetching of query result, but these fields are also store in xml field
+  def get_journal_from_xml xml_node
+    unless xml_node.blank?
+      namespace = "//PubmedArticle/MedlineCitation/Article/Journal/Title"
+      return try_block{xml_node.find_first(namespace).content}
+    end
+  end
 end
+

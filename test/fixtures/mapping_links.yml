@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  substance_type: MyString
+  substance_id: 1
+  mapping_id: 1
+
+two:
+  substance_type: MyString
+  substance_id: 1
+  mapping_id: 1

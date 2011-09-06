@@ -92,7 +92,7 @@ module SpreadsheetUtil
            col = Column.new(i, 2964.to_s)
            sheet.columns << col
          end
-         col_index = 10
+         min_cols = 10
        else
          min_cols = col_index
        end
@@ -109,7 +109,7 @@ module SpreadsheetUtil
            col_index = c["column"].to_i
            content = c.content
            content = content.to_f if c["type"] == "numeric"
-           cell = Cell.new(content, row_index, col_index-1, c["formula"], c["style"])
+           cell = Cell.new(content, row_index, col_index, c["formula"], c["style"])
            row.cells[col_index] = cell
          end
        end
@@ -131,7 +131,7 @@ module SpreadsheetUtil
    workbook
  end
   #Turns a numeric column ID into an Excel letter representation
- #eg. 1 > A, 10 > J, 28 > AB etc.
+  #eg. 1 > A, 10 > J, 28 > AB etc.
   def to_alpha(col)
     result = ""
     col = col-1

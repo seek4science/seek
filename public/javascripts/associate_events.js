@@ -34,7 +34,7 @@ function updateEvents() {
         var id = event[1];
         titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
         event_text += '<li>' + titleText +
-                '&nbsp;&nbsp;&nbsp;<small style="vertical-align: middle;">'
+                '&nbsp;&nbsp;<small style="vertical-align: middle;">'
                 + '[<a href="" onclick="javascript:events_array.splice(' + i + ', 1);updateEvents(); return(false);">remove</a>]</small></li>';
     }
 

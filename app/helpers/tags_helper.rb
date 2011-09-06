@@ -68,7 +68,10 @@ module TagsHelper
     length=options[:truncate_length]
     length||=150
     link = show_ann_path(tag)
-    link_to h(truncate(tag.value.text,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(tag.value.text)
+
+    text = tag.value.text
+
+    link_to h(truncate(text,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(text)
   end
 
 

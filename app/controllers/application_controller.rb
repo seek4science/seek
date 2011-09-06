@@ -109,53 +109,6 @@ class ApplicationController < ActionController::Base
     reset_session
   end
 
-  def find_or_create_substance(new_substances, known_substance_ids_and_types)
-    known_substances = []
-    known_substance_ids_and_types.each do |text|
-      id, type = text.split(',')
-      id = id.strip
-      type = type.strip.capitalize.constantize
-      known_substances.push(type.find(id)) if type.find(id)
-    end
-    new_substances, known_substances = check_if_new_substances_are_known new_substances, known_substances
-    #no substance
-    if (new_substances.size + known_substances.size) == 0
-      nil
-    #one substance
-    elsif (new_substances.size + known_substances.size) == 1
-      if !known_substances.empty?
-        known_substances.first
-      else
-        c = Compound.new(:name => new_substances.first)
-          if  c.save
-            c
-          else
-            nil
-          end
-      end
-    #FIXME: update code when mixture table is created
-    else
-      nil
-    end
-  end
-
-  def no_comma_for_decimal
-    check_string = ''
-    if self.controller_name.downcase == 'studied_factors'
-      check_string.concat(params[:studied_factor][:start_value].to_s + params[:studied_factor][:end_value].to_s + params[:studied_factor][:standard_deviation].to_s)
-    elsif self.controller_name.downcase == 'experimental_conditions'
-      check_string.concat(params[:experimental_condition][:start_value].to_s + params[:experimental_condition][:end_value].to_s)
-    end
-
-    if check_string.match(',')
-         render :update do |page|
-           page.alert('Please use point instead of comma for decimal number')
-         end
-      return false
-    else
-      return true
-    end
-  end
   private
 
   def project_membership_required
@@ -163,11 +116,7 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          if eval("#{controller_name.camelcase}Controller.new").respond_to?("index")
-            redirect_to polymorphic_path(controller_name)
-          else
-            redirect_to root_url
-          end
+          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
         end
         format.json { render :json => {:status => 401, :error_message => flash[:error] } }
       end
@@ -197,26 +146,22 @@ class ApplicationController < ActionController::Base
       return false
     end
 
-    case Seek::Config.type_managers
-      when "admins"
-      if User.admin_logged_in?
-        return true
-      else
-        error("Admin rights required to manage types", "...")
-        return false
-      end
-      when "pals"
-      if User.admin_logged_in? || User.pal_logged_in?
-        return true
-      else
-        error("Admin or PAL rights required to manage types", "...")
-        return false
-      end
-      when "users"
+    if User.current_user.can_manage_types?
       return true
-      when "none"
-      error("Type management disabled", "...")
-      return false
+    else
+      case Seek::Config.type_managers
+        when "admins"
+          error("Admin rights required to manage types", "...")
+          return false
+
+        when "pals"
+          error("Admin or PAL rights required to manage types", "...")
+          return false
+
+        when "none"
+          error("Type management disabled", "...")
+          return false
+      end
     end
   end
 
@@ -288,7 +233,12 @@ class ApplicationController < ActionController::Base
       else
         respond_to do |format|
           #TODO: can_*? methods should report _why_ you can't do what you want. Perhaps something similar to how active_record_object.save stores 'why' in active_record_object.errors
-          flash[:error] = "You may not #{action} #{name}:#{params[:id]}"
+          if User.current_user.nil?
+            flash[:error] = "You may not #{action} #{name}:#{params[:id]} , please log in first"
+          else
+            flash[:error] = "You are not authorized to view this  #{name.humanize}"
+          end
+
           format.html do
             case action
               when 'manage'   then redirect_to object
@@ -304,7 +254,11 @@ class ApplicationController < ActionController::Base
       end
     rescue ActiveRecord::RecordNotFound
       respond_to do |format|
-        flash[:error] = "Couldn't find the #{name.humanize} or you are not authorized to view it"
+        if eval("@#{name}").nil?
+          flash[:error] = "The #{name.humanize} does not exist!"
+        else
+          flash[:error] = "You are not authorized to view #{name.humanize}"
+        end
         format.html { redirect_to eval "#{self.controller_name}_path" }
       end
       return false
@@ -336,28 +290,36 @@ class ApplicationController < ActionController::Base
                      :controller_name=>c,
                      :activity_loggable => object)
         end
-        when "investigations","studies","assays"
+        when "investigations","studies","assays","specimens","samples"
         if ["show","create","update","destroy"].include?(a)
+          check_log_exists(a,c,object)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
-                     :referenced => object.project,
+                     :referenced => object.projects.first,
                      :controller_name=>c,
-                     :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
+
         end
-        when "data_files","models","sops","publications","events"
+        when "data_files","models","sops","publications","presentations","events"
+          a = "create" if a == "upload_for_tool"
+          a = "update" if a == "new_version"
         if ["show","create","update","destroy","download"].include?(a)
+          check_log_exists(a,c,object)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
-                     :referenced => object.project,
+                     :referenced => object.projects.first,
                      :controller_name=>c,
-                     :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
         end
         when "people"
         if ["show","create","update","destroy"].include?(a)
           ActivityLog.create(:action => a,
                      :culprit => current_user,
                      :controller_name=>c,
-                     :activity_loggable => object)
+                     :activity_loggable => object,
+                      :data=> object.title)
         end
         when "search"
         if a=="index"
@@ -369,6 +331,33 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+
+  def check_log_exists action,controllername,object
+    if action=="create"
+      a=ActivityLog.find(:first,:conditions=>{
+          :activity_loggable_type=>object.class.name,
+          :activity_loggable_id=>object.id,
+          :controller_name=>controllername,
+          :action=>"create"})
+      raise Exception.new "Duplicate create activity log about to be created for #{object.class.name}:#{object.id}" unless a.nil?
+    end
+  end
+
+  #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
+  #returns a list of all types that respond_to and return true for user_creatable?
+  def user_creatable_classes
+    @@creatable_model_classes ||= begin
+      classes=Seek::Util.persistent_classes.select do |c|
+        c.respond_to?("user_creatable?") && c.user_creatable?
+      end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+      classes.delete(Event) unless Seek::Config.events_enabled
+
+      classes
+    end
+  end
+
+
+  helper_method :user_creatable_classes
 
   def permitted_filters
     #placed this in a seperate method so that other controllers could override it if necessary
@@ -407,19 +396,7 @@ class ApplicationController < ActionController::Base
         :current_logged_in_user=>current_user
     }
   end
-
-  #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
-  #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
-  def check_if_new_substances_are_known new_substances, known_substances
-    fixed_new_substances = []
-    new_substances.each do |new_substance|
-      substance=Compound.find_by_name(new_substance.strip) || Synonym.find_by_name(new_substance.strip)
-      if substance.nil?
-        fixed_new_substances << new_substance
-      else
-        known_substances << substance unless known_substances.include?(substance)
-      end
-    end
-    return new_substances, known_substances
-  end
 end
+
+
+

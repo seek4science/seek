@@ -8,10 +8,6 @@ class CellRange < ActiveRecord::Base
 
   belongs_to :worksheet
 
-  #validates_presence_of :worksheet_id, :start_row, :start_column, :end_row, :end_column
-
-  acts_as_solr(:fields => [ :content ]) if Seek::Config.solr_enabled
-
   #DONT HAVE ANY UPPER AND LOWER BOUNDS FOR CELLS - CAN CREATE ANNOTATIONS OUT OF RANGE
 
   validate :valid_cell_range

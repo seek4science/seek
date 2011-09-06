@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
   has_many :sops, :as=>:contributor
   has_many :data_files, :as=>:contributor
   has_many :models,:as=>:contributor
-  
+  has_many :presentations,:as=>:contributor
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password
@@ -44,6 +44,31 @@ class User < ActiveRecord::Base
   acts_as_uniquely_identifiable
 
   cattr_accessor :current_user
+
+  def can_manage_types?
+    unless Seek::Config.type_managers_enabled
+      return false
+    end
+
+    case Seek::Config.type_managers
+      when "admins"
+      if User.admin_logged_in?
+        return true
+      else
+        return false
+      end
+      when "pals"
+      if User.admin_logged_in? || User.pal_logged_in?
+        return true
+      else
+        return false
+      end
+      when "users"
+      return true
+      when "none"
+      return false
+    end
+  end
 
   def self.admin_logged_in?
     self.logged_in_and_registered? && self.current_user.person.is_admin?

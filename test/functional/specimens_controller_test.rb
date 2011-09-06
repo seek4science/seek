@@ -11,12 +11,6 @@ class SpecimensControllerTest < ActionController::TestCase
     @object = Factory(:specimen, :contributor => User.current_user,
             :donor_number => "test1",
             :policy => policies(:policy_for_viewable_data_file))
-    @is_vl=Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver=true
-  end
-  
-  def teardown
-    Seek::Config.is_virtualliver = @is_vl
   end
 
   test "index xml validates with schema" do
@@ -58,8 +52,10 @@ class SpecimensControllerTest < ActionController::TestCase
       post :create, :specimen => {:donor_number => "running mouse NO.1",
                                   :lab_internal_number =>"Do232",
                                   :contributor => Factory(:user),
-                                  :institution => Factory(:institution)},
-           :project_id => Factory(:project).id
+                                  :institution => Factory(:institution),
+                                  :organism => Factory(:organism),
+                                  :project_ids => [Factory(:project).id]}
+
     end
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
@@ -83,7 +79,7 @@ class SpecimensControllerTest < ActionController::TestCase
     creator1= Factory(:person,:last_name =>"test1")
     creator2 = Factory(:person,:last_name =>"test2")
     assert_not_equal "test", specimen.donor_number
-    put "update", :id=>specimen.id, :specimen =>{:donor_number =>"test",:project_id => Factory(:project).id},
+    put "update", :id=>specimen.id, :specimen =>{:donor_number =>"test",:project_ids => [Factory(:project).id]},
         :creators => [[creator1.name,creator1.id],[creator2.name,creator2.id]].to_json
     s = assigns(:specimen)
     assert_redirected_to specimen_path(s)
@@ -150,5 +146,16 @@ class SpecimensControllerTest < ActionController::TestCase
     end
     assert flash[:error]
     assert_redirected_to specimens_path
+  end
+
+  test "should create specimen with strings for confluency, passage, viability, and purity" do
+    attrs = [:confluency, :passage, :viability, :purity]
+    specimen= Factory.attributes_for :specimen, :confluency => "Test", :passage => "Test", :viability => "Test", :purity => "Test"
+    post :create, :specimen => specimen
+    assert_response :success
+    assert specimen = assigns(:specimen)
+    attrs.each do |attr|
+      assert_equal "Test", specimen.send(attr)
+    end
   end
 end

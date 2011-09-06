@@ -24,8 +24,7 @@
                     Other information 
                 </div>
                 <div class="foldContent">
-                    <%= render :partial => "assets/project_selector", :locals => { :resource_type => "Model",   # this is only for presentation, not for any processing
-                    :project_hash => current_user.generate_own_project_id_name_hash } -%>
+                  <%= render :partial => "projects/project_selector", :locals => { :resource => @model } -%>
                     <%= render :partial=>"model_metadata" -%>
                 </div>
             </div>
@@ -35,7 +34,8 @@
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Model"} -%>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
         <p>
-            <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
+          <%= preview_permission_popup_link('model', url_for(:controller => 'policies', :action => 'preview_permissions'), true)-%>
+          <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateResourceFields(true, 'model'); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
         </p>
 		</div>
         <% end -%>    

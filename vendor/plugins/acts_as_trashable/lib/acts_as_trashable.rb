@@ -9,7 +9,7 @@ module ActsAsTrashable
     def acts_as_trashable
       extend ClassMethods
       include InstanceMethods
-      after_destroy :store_trash
+      before_destroy :store_trash
     end
   end
   
@@ -40,7 +40,7 @@ module ActsAsTrashable
       end
     end
     
-    # Call this method to temporarily disable the trash feature within a block.
+    # Call this me  thod to temporarily disable the trash feature within a block.
     def disable_trash
       save_val = @acts_as_trashable_disabled
       begin
