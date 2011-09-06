@@ -28,3 +28,7 @@ function showOrHideSubstanceTextField(form_id){
         substance_autocomplete.disabled = true;
     }
 }
+
+function getCompoundName(){
+    $F('compound_title')
+}

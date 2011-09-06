@@ -66,7 +66,7 @@ class StudiedFactorsController < ApplicationController
         if sf.save
           page.insert_html :bottom,"condition_or_factor_rows",:partial=>"studied_factors/condition_or_factor_row",:object=>sf,:locals=>{:asset => 'data_file', :show_delete=>true}
         else
-          page.alert("can not create factor studied: item: #{try_block{sf.substance.name}} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}")
+          page.alert("can not create factor studied: item: #{try_block{sf.substances.collect{|s| s.title + '/'}}} #{sf.measured_item.title}, values: #{sf.start_value}-#{sf.end_value}#{sf.unit.title}, SD: #{sf.standard_deviation}")
         end
       end
       page.visual_effect :highlight,"condition_or_factor_rows"

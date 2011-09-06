@@ -80,6 +80,8 @@ ActionController::Routing::Routes.draw do |map|
   
   #forum attachments
   map.resources :forum_attachments, :member => {:download => :get}, :only => [:create, :destroy]
+
+  map.resources :compounds
   
   # search and saved searches
   map.search '/search/',:controller=>'search',:action=>'index'

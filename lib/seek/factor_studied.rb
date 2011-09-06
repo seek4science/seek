@@ -86,7 +86,6 @@ module Seek
     end
   end
 
-    protected
   #double checks and resolves if any new compounds are actually known. This can occur when the compound has been typed completely rather than
   #relying on autocomplete. If not fixed, this could have an impact on preserving compound ownership.
   def check_if_new_substances_are_known new_substances, known_substances
@@ -125,33 +124,60 @@ module Seek
        end
      end
      mapping_links = []
-     #sabiork always has, but not for kegg_ids and chebi_ids
-     if kegg_ids.blank?
-       if chebi_ids.blank?
-          mapping = new_or_update_mapping sabiork_id
-          mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+     #not always every ids are provided, proceed 8 possibilities of the 3 ids combination
+     if sabiork_id.blank?
+       if kegg_ids.blank?
+         unless chebi_ids.blank?
+           chebi_ids.each do |chebi_id|
+             mapping = new_or_update_mapping sabiork_id, chebi_id
+             mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
+         end
        else
-         chebi_ids.each do |chebi_id|
-           mapping = new_or_update_mapping sabiork_id, chebi_id
-           mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+         if chebi_ids.blank?
+           kegg_ids.each do |kegg_id|
+             mapping = new_or_update_mapping sabiork_id, nil, kegg_id
+             mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
+         else
+           kegg_ids.each do |kegg_id|
+           #only create new mapping when it doesn't exist
+             chebi_ids.each do |chebi_id|
+               mapping = new_or_update_mapping sabiork_id, chebi_id, kegg_id
+               mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+             end
+           end
          end
        end
      else
-       if chebi_ids.blank?
-         kegg_ids.each do |kegg_id|
-           mapping = new_or_update_mapping sabiork_id, nil, kegg_id
-           mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+        if kegg_ids.blank?
+         if chebi_ids.blank?
+            mapping = new_or_update_mapping sabiork_id
+            mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+         else
+           chebi_ids.each do |chebi_id|
+             mapping = new_or_update_mapping sabiork_id, chebi_id
+             mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
          end
        else
-         kegg_ids.each do |kegg_id|
-         #only create new mapping when it doesn't exist
-           chebi_ids.each do |chebi_id|
-             mapping = new_or_update_mapping sabiork_id, chebi_id, kegg_id
+         if chebi_ids.blank?
+           kegg_ids.each do |kegg_id|
+             mapping = new_or_update_mapping sabiork_id, nil, kegg_id
              mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+           end
+         else
+           kegg_ids.each do |kegg_id|
+           #only create new mapping when it doesn't exist
+             chebi_ids.each do |chebi_id|
+               mapping = new_or_update_mapping sabiork_id, chebi_id, kegg_id
+               mapping_links.push MappingLink.new(:substance => compound, :mapping => mapping)
+             end
            end
          end
        end
      end
+
      compound.mapping_links = mapping_links
      compound
   end

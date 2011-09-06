@@ -332,7 +332,7 @@ end
   end
 
   Factory.define :synonym do |f|
-    f.name "toffee"
+    f.name "coffee"
     f.association :substance, :factory=>:compound
   end
 
