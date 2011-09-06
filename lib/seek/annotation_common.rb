@@ -31,7 +31,7 @@ module Seek
 
       existing_anns = [] # entity.annotations_with_attribute_and_by_source("tag", owner) #get_annotations_owned_by(owner, entity)
       entity_annotations = entity.annotations #Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.class}' AND source_id = '#{current_user.id}'")
-      owner_tags = Annotation.find(:all, :conditions => "source_id = #{current_user.id}")
+      owner_tags = current_user.annotations_by
 
       new_annotations = params[:tag_autocompleter_unrecognized_items] || []
       known_annotation_ids = params[:tag_autocompleter_selected_ids] || []
@@ -91,9 +91,9 @@ module Seek
         end
       end
 
-      #Add any known_annotations to the Annotation table with a reference to the existing text value.
+      #If we have any annotations that already exist,
       Annotation.all.each do |existing_ann|
-        if known_annotations.include?existing_ann
+        if !known_annotations.include?existing_ann
           @annotation = Annotation.new(:source => current_user, :annotatable => entity, :attribute_name => "tag", :value => existing_ann.value)
           if @annotation.save
             save_successful = true

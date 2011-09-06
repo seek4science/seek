@@ -4,26 +4,12 @@
    model_class=entity.camelize.constantize
    #FIXME: this is required for some cases where the page is rendered from an error, but the @entity doesn't exist. Mainly when rendering from a caught Exception AssetsCommon.handle_data
    #the correct fix is to fix AssetsCommon.handle_data to correctly create an instance of @entity
+
    object ||= model_class.new
-   #item_tags = object.tag_counts
-   #item_tags = [] if object.id.nil? #acts-as-taggable-on appears to have a bug, where for new items .tag_counts includes some tags from other items
    type_name = text_for_resource(object)
-
-   #item_tags = Annotation.find(:all, :conditions => "annotatable_type = '#{object.class}' AND annotatable_id = '#{object.id}'") #object.annotations
-   item_tags = object.annotations
-   aggregated_asset_annotations = item_tags
-   aggregated_asset_annotations = []
-    #returns all the classes for models that return true for is_asset?
-
-#    asset_model_classes ||= Seek::Util.persistent_classes.select do |c|
-#        !c.nil? && c.is_asset?
-#    end
-
-   #asset_model_classes.each{|object|aggregated_asset_annotations << Annotation.find(:all, :conditions => "annotatable_type = '#{object.class}' AND annotatable_id = '#{object.id}'")}
-
-
-   owned_annotations = Annotation.find(:all, :conditions => "source_id = '#{current_user.id}'")
-
+   item_tags = Annotation.find(:all, :conditions => "annotatable_type = '#{object.class.name}' AND annotatable_id = '#{object.id}'")
+   owned_annotations = current_user.annotations_by
+   #remove duplicates
    tags = []
    tag_values = []
    Annotation.all.each do |tag|

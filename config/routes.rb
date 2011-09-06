@@ -96,7 +96,7 @@ ActionController::Routing::Routes.draw do |map|
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
 
   #annotations
-  map.show_anns '/anns',:controller=>'anns',:action=>'index'
+  map.all_anns '/annotations',:controller=>'annotations',:action=>'index'
   map.show_ann '/annotations/:id',:controller=>'annotations',:action=>'show'
 
 

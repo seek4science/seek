@@ -42,7 +42,7 @@ owned_tags ||= nil
 	      <% unless suggested_tags.blank? -%>
 	        <%# overall_tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
               <% suggested_tags.each do |tag| -%>
-	            <%= link_to tag.value.text, "http://google.com" -%> <!-- #"javascript:addListTag('#{name}',#{tag.id});", :class => css_class -->
+	            <%= link_to tag.value.text, "javascript:addListTag('#{name}',#{tag.id});"-%>
 	          <% end -%>
 	      <% end -%>
 	    </div>
