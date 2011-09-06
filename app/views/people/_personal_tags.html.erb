@@ -2,6 +2,16 @@
    tags=[]
    if !person.user.nil?
        tags=current_user.annotations_by #person.user.owned_tags
+
+       tag_values = []
+       annotations = []
+       tags.each do |tag|
+         if !(tag_values.include?(tag.value.id))
+           annotations << tag
+           tag_values << tag.value.id
+         end
+       end
+       tags = annotations
    end
 -%>
 
