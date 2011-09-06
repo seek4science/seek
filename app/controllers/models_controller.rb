@@ -584,8 +584,13 @@ class ModelsController < ApplicationController
       #@attachment = Attachment.create!
 			@model.attachments << @attachment
       @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
-			@model.save!
       i += 1
-		end
+    end
+
+    if @model.id_image.nil?
+       @model.id_image = @model.attachments.detect { |a| a.content_type.index("image")==0 }.try(:id)
+    end
+
+    @model.save!
 	end
 end
