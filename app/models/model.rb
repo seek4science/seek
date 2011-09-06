@@ -10,10 +10,11 @@ class Model < ActiveRecord::Base
   
   acts_as_asset
   acts_as_trashable  
-  
+
+
   validates_presence_of :title
 
-  has_many  :attachments, :as => :attachable, :dependent => :destroy
+  has_many  :attachments, :as => :attachable, :dependent => :destroy,:uniq => true
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."

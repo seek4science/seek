@@ -1,6 +1,8 @@
 // -------------------------
 // Multiple File Upload
 // -------------------------
+
+
 function MultiSelector(list_target, max) {
     this.list_target = list_target;
     this.count = 0;
@@ -37,6 +39,13 @@ function MultiSelector(list_target, max) {
     };
     this.addListRow = function(element) {
         var new_row = document.createElement('li');
+        var new_row_radio =  document.createElement('input');
+        new_row_radio.type='radio';
+        new_row_radio.name = 'model[id_image]';
+        new_row_radio.id = 'model_id_image';
+        new_row_radio.title = "selected as image";
+        new_row_radio.value = "yes";
+
         var new_row_button = document.createElement('a');
         new_row_button.title = 'Remove This Image';
         new_row_button.href = '#';
@@ -49,7 +58,13 @@ function MultiSelector(list_target, max) {
             this.parentNode.element.multi_selector.current_element.disabled = false;
             return false;
         };
-        new_row.innerHTML = element.value.split('/')[element.value.split('/').length - 1];
+        new_row.innerHTML =  element.value.split('/')[element.value.split('/').length - 1];
+
+        var img_type = new_row.innerHTML.split('.')[new_row.innerHTML.split('.').length-1];
+        if(img_type=="jpg" || img_type=="jpeg" ||img_type=="bmp" ||img_type=="png" ||img_type=="gif" ||img_type=="tif" ||img_type=="tiff"){
+        new_row.appendChild(new_row_radio);
+        }
+
         new_row.appendChild(new_row_button);
         this.list_target.appendChild(new_row);
     };

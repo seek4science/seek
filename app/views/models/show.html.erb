@@ -76,7 +76,7 @@
           <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
           <div id="thumbnail">
 
-            <% attach = @model.attachments.detect { |a| a.content_type.index("image")==0 }
+            <% attach = @model.id_image==0?  @model.attachments.detect { |a| a.content_type.index("image")==0 } : @model.attachments.find_by_id(@model.id_image)
               # attach_path = attach.nil? ? "" : "#{application_root}#{attach.public_filename(:thumb)}" %>
 
             <%#= image_tag attach_path,{:class=>"cloud-zoom"} %>
@@ -132,5 +132,7 @@
 //         Event.observe(window, 'load', function() {
 //                setupZoom();
 //         });
+
+
 
 </script>

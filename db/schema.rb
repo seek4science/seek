@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110810093644) do
+ActiveRecord::Schema.define(:version => 20110906133647) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -116,6 +116,24 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.integer "creator_id"
     t.string  "asset_type"
   end
+
+  create_table "attachments", :force => true do |t|
+    t.integer  "size"
+    t.integer  "height"
+    t.integer  "width"
+    t.integer  "parent_id"
+    t.integer  "attachable_id"
+    t.integer  "position"
+    t.string   "content_type"
+    t.string   "filename"
+    t.string   "thumbnail"
+    t.string   "attachable_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "attachments", ["attachable_id", "attachable_type"], :name => "index_attachments_on_attachable_id_and_attachable_type"
+  add_index "attachments", ["parent_id"], :name => "index_attachments_on_parent_id"
 
   create_table "avatars", :force => true do |t|
     t.string   "owner_type"
@@ -449,6 +467,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "id_image"
   end
 
   add_index "model_versions", ["contributor_id", "contributor_type"], :name => "index_model_versions_on_contributor_id_and_contributor_type"
@@ -480,6 +499,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "id_image"
   end
 
   add_index "models", ["contributor_id", "contributor_type"], :name => "index_models_on_contributor_id_and_contributor_type"

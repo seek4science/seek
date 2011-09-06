@@ -52,7 +52,10 @@
     	-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
 
-        <%= render :partial => "models/edit_batch_upload" %>
+
+        <%= render :partial => "models/edit_batch_upload", :locals => {:resource=>@model} %>
+
+
 
 
         <% end -%>

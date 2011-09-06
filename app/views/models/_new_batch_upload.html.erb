@@ -1,3 +1,11 @@
+<div class="fold">
+  <div class="foldTitle">
+    <%= help_icon("Here you upload multiple files for the #{resource.class.name}.") -%>
+    Attachments
+  </div>
+  <div class="foldContent">
+
+     <p>If you don't choose any file as the image. By default, the first uploaded image file will be selected as the image for the <%= resource.class.name %>.</p>
 	<% fields_for @attachment do |attachment| -%>
 	<p>
 		<label for="attachment_data">Attach Files:</label>
@@ -5,6 +13,9 @@
 	</p>
 	<% end -%>
 	<ul id="pending_files"></ul>
+
+  </div>
+</div>
 	<script type="text/javascript">
 		var multi_selector = new MultiSelector($('pending_files'), 5);
 		multi_selector.addElement($('attachment_data'));

@@ -36,16 +36,9 @@
         <%= render :partial=>"assets/asset_form_bottom", :locals=> {:resource_type => "Model"} -%>
         <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
 
-        <p>
-            <div class="fold">
-                <div class="foldTitle">
-                    Attachments
-                </div>
-                <div class="foldContent">
-                 <%= render :partial => "models/new_batch_upload" %>
-                </div>
-            </div>
-        </p>
+
+         <%= render :partial => "models/new_batch_upload" %>
+
         <p>
             <%= submit_tag "Upload and Save", :id => "model_submit_btn", :onclick => "javascript: validateModelFields(true); return(false);" -%>&nbsp;or <%= link_to 'Cancel', models_path -%>
         </p>
