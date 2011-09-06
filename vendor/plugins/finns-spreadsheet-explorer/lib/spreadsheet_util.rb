@@ -92,7 +92,7 @@ module SpreadsheetUtil
            col = Column.new(i, 2964.to_s)
            sheet.columns << col
          end
-         min_cols = 10
+         col_index = 10
        else
          min_cols = col_index
        end
@@ -109,7 +109,7 @@ module SpreadsheetUtil
            col_index = c["column"].to_i
            content = c.content
            content = content.to_f if c["type"] == "numeric"
-           cell = Cell.new(content, row_index, col_index, c["formula"], c["style"])
+           cell = Cell.new(content, row_index, col_index-1, c["formula"], c["style"])
            row.cells[col_index] = cell
          end
        end

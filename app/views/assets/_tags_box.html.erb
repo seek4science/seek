@@ -12,11 +12,17 @@
    title||="Tags"
 
    item_anns = []
-   annotations = Annotation.all
 
-   annotations.each do |x|
-     item_anns << x if ((x.annotatable.id == object.id))
+   annotations = []
+   tag_values = []
+   Annotation.all.each do |tag|
+     if !(tag_values.include?(tag.value.id))
+       annotations << tag
+       tag_values << tag.value.id
+     end
    end
+
+   item_anns = Annotation.find(:all, :conditions => "annotatable_id = '#{object.id}' AND annotatable_type = '#{object.class}'")
 
                                                         #all annotations in general
    #object.annotations_with_attribute_and_by_source("tag", current_user); #annotations.select{|ann|(ann.source == current_user)}  #all annotations for current item

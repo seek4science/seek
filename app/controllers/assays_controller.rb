@@ -35,7 +35,7 @@ class AssaysController < ApplicationController
     data_file_ids = params[:data_file_ids] || []
     model_ids     = params[:assay_model_ids] || []
 
-    update_tags @assay
+    update_annotations @assay #update_tags @assay
 
     @assay.owner=current_user.person
 
@@ -85,8 +85,8 @@ class AssaysController < ApplicationController
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
 
-    update_tags @assay
-
+    #update_tags @assay
+    update_annotations @assay
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     @assay.attributes = params[:assay]
     if params[:sharing]

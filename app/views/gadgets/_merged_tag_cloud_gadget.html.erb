@@ -14,7 +14,6 @@
            count=0
            all_tags=[]
            show_tags=[]
-           hidden_tags = false
 
            tag_cloud = Annotation.all
            no_of_tags = tag_cloud.size
@@ -24,14 +23,22 @@
              all_tags << tag_cloud[i]
            end
 
-           #   all_tags= tag_cloud.select{|tag| tag.overall_total>=Seek::Config.tag_threshold}
-           #   show_tags= tag_cloud.sort{|a,b| b.overall_total<=>a.overall_total}[0...Seek::Config.max_visible_tags]
+           #filter out annotations with the same text as another annotation
+           tags = []
+           tag_values = []
+           all_tags.each do |tag|
+             if !(tag_values.include?(tag.value.id))
+                tags << tag
+                tag_values << tag.value.id
+              end
+            end
+
            hidden_tags=all_tags.size != show_tags.size
            hidden_class="merged_tag_hidden"
           %>
 
-          <% unless all_tags.blank? -%>
-          <% all_tags.each do |ann| -%>
+          <% unless tags.blank? -%>
+          <% tags.each do |ann| -%>
               <%= link_for_ann ann, :truncate_length=>40 -%>
           <% end -%>
 

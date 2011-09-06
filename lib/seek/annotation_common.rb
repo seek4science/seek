@@ -30,9 +30,8 @@ module Seek
       return false if owner.nil?
 
       existing_anns = [] # entity.annotations_with_attribute_and_by_source("tag", owner) #get_annotations_owned_by(owner, entity)
-      entity_annotations = Annotation.all.select { |x| x.annotatable == entity }
-
-      owner_tags = Annotation.all.select { |ann| ann.source_id == current_user.id }
+      entity_annotations = Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.class}' AND source_id = '#{current_user.id}'")
+      owner_tags = Annotation.find(:all, :conditions => "source_id = #{current_user.id}")
 
       new_annotations = params[:tag_autocompleter_unrecognized_items] || []
       known_annotation_ids = params[:tag_autocompleter_selected_ids] || []
@@ -47,8 +46,6 @@ module Seek
           anns_to_keep << ann if existing_anns.include?(ann)
         end
       end
-
-
 
       entity_annotations.each do |existing_ann| #for each existing annotation
         unless known_annotations.include? existing_ann #unless we're keeping it
@@ -79,37 +76,42 @@ module Seek
       known_annotation_ids=params[:tag_autocompleter_selected_ids] || []
       known_annotations = known_annotation_ids.collect { |id| Annotation.find(id) }
 
+      annotations = []
+      save_successful = true
+
+      #all annotations for this entity object
+      entity_annotations = Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.class}' AND source_id = '#{current_user.id}'")
+
       new_annotations, known_annotations = check_if_new_annotations_are_known new_annotations, known_annotations
 
-      annotations = []
-      known_annotations.each do |ann|
-        annotations << ann unless ann.nil?
-      end unless known_annotation_ids.nil?
-
-      new_annotations.each do |ann|
-        annotations << ann
-      end
-
-
-      entity_annotations = Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.type}'")
-
-      entity_annotations.each do |existing_ann|     #Delete all annotations for this entity that
-        unless annotations.include? existing_ann  #are no longer on the list
-          existing_ann.delete
+      #delete any annotations that have been removed from the list
+      entity_annotations.each do |existing_ann|
+        if !known_annotations.include?(existing_ann)
+          existing_ann.delete #been deleted from the list
         end
       end
 
-      save_successful = true
+      #Add any known_annotations to the Annotation table with a reference to the existing text value.
+      Annotation.all.each do |existing_ann|
+        if known_annotations.include?existing_ann
+          @annotation = Annotation.new(:source => current_user, :annotatable => entity, :attribute_name => "tag", :value => existing_ann.value)
+          if @annotation.save
+            save_successful = true
+          end
+        end
+      end
 
+      #create new annotations for the new annotations and create new annotations for the existing ones
       new_annotations.each do |ann|
-          @annotation = Annotation.new(:source => owner,
+          @annotation = Annotation.new(:source => current_user,
                                        :annotatable => entity,
                                        :attribute_name => "tag",
                                        :value => ann)
+          @annotation.save
           if !@annotation.save
             save_successful= false
           end
-        end
+      end
 
 
         expire_annotation_fragments
@@ -121,16 +123,17 @@ module Seek
       #double checks and resolves if any new tags are actually known. This can occur when the tag has been typed completely rather than
       #relying on autocomplete. If not fixed, this could have an impact on preserving tag ownership.
       def check_if_new_annotations_are_known new_annotations, known_annotations
-         fixed_new_tags = []
-        new_annotations.each do |new_ann|
-          ann=Annotation.find(:all, :conditions => "value_id = '#{new_ann.value_id}'")
-          if ann.nil?
-            fixed_new_tags << new_ann
-          else
-            known_annotations << ann unless known_annotations.include?(ann)
-          end
+
+
+        if !new_annotations.empty?
+            Annotation.all.each do |old_ann|
+              new_annotations.each{ |x| known_annotations << old_ann if x == old_ann.value.text}
+            end
         end
-        return new_annotations, known_annotations
+
+        return new_annotations.flatten, known_annotations
       end
-    end
-  end
+
+
+    end#annotationhelper
+  end#seek

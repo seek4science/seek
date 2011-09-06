@@ -83,6 +83,7 @@ module TagsHelper
     tags = []
     (asset_model_classes | [Assay]).each do |c|
       tags |= c.tag_counts if c.taggable?
+      aggregated_asset_annotations |= Annotation.find(:all, :conditions => "annotatable_type = '#{c.class}' AND annotatable_id = '#{c.id}'")
     end
     tags
   end

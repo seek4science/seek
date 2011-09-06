@@ -110,7 +110,12 @@ class DataFilesController < ApplicationController
       @data_file.content_blob = ContentBlob.new :tmp_io_object => @tmp_io_object, :url=>@data_url
 
       #update_tags @data_file
-      update_annotations @data_file
+
+      if !(update_annotations @data_file)
+        flash[:error] = "Problem saving annotations. Please try again."
+      else
+        flash[:notice] = "Annotations saved."
+      end
 
       @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.project
 
@@ -180,7 +185,12 @@ class DataFilesController < ApplicationController
     end
 
     #update_tags @data_file
-    update_annotations @data_file
+      if !(update_annotations @data_file)
+        flash[:error] = "Problem saving annotations. Please try again."
+      else
+        flash[:notice] = "Annotations saved."
+      end
+
 
     assay_ids = params[:assay_ids] || []
     respond_to do |format|

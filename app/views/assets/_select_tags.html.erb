@@ -5,25 +5,34 @@
    #FIXME: this is required for some cases where the page is rendered from an error, but the @entity doesn't exist. Mainly when rendering from a caught Exception AssetsCommon.handle_data
    #the correct fix is to fix AssetsCommon.handle_data to correctly create an instance of @entity
    object ||= model_class.new
-   item_tags = object.tag_counts
-   item_tags = [] if object.id.nil? #acts-as-taggable-on appears to have a bug, where for new items .tag_counts includes some tags from other items
+   #item_tags = object.tag_counts
+   #item_tags = [] if object.id.nil? #acts-as-taggable-on appears to have a bug, where for new items .tag_counts includes some tags from other items
    type_name = text_for_resource(object)
 
+   #item_tags = Annotation.find(:all, :conditions => "annotatable_type = '#{object.class}' AND annotatable_id = '#{object.id}'") #object.annotations
    item_tags = object.annotations
-
    aggregated_asset_annotations = item_tags
-   #aggregated_asset_annotations = []
-   #(asset_model_classes | [Assay]).each do |c|
-   #   aggregated_asset_annotations |= c.annotations if !c.annotatable.nil?
-   # end
-     #returns all the classes for models that return true for is_asset?
-  #  def asset_model_classes
-  #    @@asset_model_classes ||= Seek::Util.persistent_classes.select do |c|
-  #      !c.nil? && c.is_asset?
-  #    end
-  #  end
+   aggregated_asset_annotations = []
+    #returns all the classes for models that return true for is_asset?
 
-   owned_annotations = Annotation.all.select { |x| x.source == current_user }
+#    asset_model_classes ||= Seek::Util.persistent_classes.select do |c|
+#        !c.nil? && c.is_asset?
+#    end
+
+   #asset_model_classes.each{|object|aggregated_asset_annotations << Annotation.find(:all, :conditions => "annotatable_type = '#{object.class}' AND annotatable_id = '#{object.id}'")}
+
+
+   owned_annotations = Annotation.find(:all, :conditions => "source_id = '#{current_user.id}'")
+
+   tags = []
+   tag_values = []
+   Annotation.all.each do |tag|
+     if !(tag_values.include?(tag.value.id))
+       tags << tag
+       tag_values << tag.value.id
+     end
+   end
+
 
 %>
 
@@ -46,6 +55,6 @@
           Tags should be separated by a comma, and known tags will appear in the drop-down box as you type.
       <% end %>
     </p>
-    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>aggregated_asset_annotations, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>
+    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>tags, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>
   </div>
 </div>
