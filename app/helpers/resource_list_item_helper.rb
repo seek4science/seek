@@ -52,7 +52,7 @@ module ResourceListItemHelper
   end
 
   def list_item_tag_list resource
-    list_item_simple_list(Annotation.find(:all, :conditions => "annotatable_type = '#{resource.type}' AND annotatable_id = '#{resource.id}'"), "Tags") {|i| link_for_ann(i)}
+    list_item_simple_list(Annotation.find(:all, :conditions => "annotatable_type = '#{resource.class.name}' AND annotatable_id = '#{resource.id}'"), "Tags") {|i| link_for_ann(i)}
   end
 
   def list_item_simple_list items, attribute
