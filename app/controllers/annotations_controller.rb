@@ -14,7 +14,7 @@ class AnnotationsController < ApplicationController
 
       @other_tagging_assets = []
       @other_tagging_annotations.each do |annotation|
-        @other_tagging_assets << (annotation.annotatable_type).find(annotation.annotatable_id)
+        @other_tagging_assets << Object.const_get(annotation.annotatable_type.to_s).find(annotation.annotatable_id)
       end
 
 

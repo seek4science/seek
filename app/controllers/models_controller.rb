@@ -8,7 +8,7 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_tags_ajax]
+  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_annotations_ajax]
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
@@ -395,7 +395,7 @@ class ModelsController < ApplicationController
 
       @model.policy.set_attributes_with_sharing params[:sharing], @model.project
 
-      update_tags @model
+      update_annotations @model
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
@@ -448,7 +448,7 @@ class ModelsController < ApplicationController
       params[:model][:last_used_at] = Time.now
     end
 
-    update_tags @model
+    update_annotations @model
 
     @model.attributes = params[:model]
 

@@ -30,7 +30,7 @@ module Seek
       return false if owner.nil?
 
       existing_anns = [] # entity.annotations_with_attribute_and_by_source("tag", owner) #get_annotations_owned_by(owner, entity)
-      entity_annotations = Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.class}' AND source_id = '#{current_user.id}'")
+      entity_annotations = entity.annotations #Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.class}' AND source_id = '#{current_user.id}'")
       owner_tags = Annotation.find(:all, :conditions => "source_id = #{current_user.id}")
 
       new_annotations = params[:tag_autocompleter_unrecognized_items] || []
@@ -80,7 +80,7 @@ module Seek
       save_successful = true
 
       #all annotations for this entity object
-      entity_annotations = Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.class}' AND source_id = '#{current_user.id}'")
+      entity_annotations = entity.annotations
 
       new_annotations, known_annotations = check_if_new_annotations_are_known new_annotations, known_annotations
 
@@ -131,7 +131,7 @@ module Seek
             end
         end
 
-        return new_annotations.flatten, known_annotations
+        return new_annotations, known_annotations
       end
 
 
