@@ -4,13 +4,6 @@ class AssetTest < ActiveSupport::TestCase
   fixtures :all
   include ApplicationHelper
 
-  test "creatable classes order" do
-    oldval = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],user_creatable_classes
-    Seek::Config.is_virtualliver = oldval
-  end
-
   test "default contributor or nil" do
     User.current_user = users(:owner_of_my_first_sop)
     model = Model.new(Factory.attributes_for(:model).tap{|h|h[:contributor] = nil})
