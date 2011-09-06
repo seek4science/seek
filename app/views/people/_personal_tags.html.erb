@@ -1,7 +1,7 @@
 <%
    tags=[]
    if !person.user.nil?
-       tags=person.user.owned_tags
+       tags=current_user.annotations_by #person.user.owned_tags
    end
 -%>
 

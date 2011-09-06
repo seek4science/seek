@@ -11,9 +11,10 @@ class AnnotationsController < ApplicationController
       @original_tag = Annotation.find(params[:id])
       @other_tagging_annotations = Annotation.find(:all, :conditions=> "value_id = '#{@original_tag.value_id}'")
 
+
       @other_tagging_assets = []
       @other_tagging_annotations.each do |annotation|
-        @other_tagging_assets << (annotation.source_type).find(annotation.source_id)
+        @other_tagging_assets << (annotation.annotatable_type).find(annotation.annotatable_id)
       end
 
 
