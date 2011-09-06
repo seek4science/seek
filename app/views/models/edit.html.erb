@@ -8,7 +8,7 @@
 </ul>
 <h1>Editing Model: <%= link_to(h(@model.title), model_path(@model)) -%></h1>
 <div class="show_basic">
-    <% form_for(@model) do |f| %>
+    <% form_for(@model ,:html => {:multipart => true, :method => :put}) do |f| %>
     <div class="asset_form">
         <%= f.error_messages %>
         <p>
@@ -53,6 +53,12 @@
 				} 
     	-%>
 		<%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
+
+
+        <%= render :partial => "models/edit_batch_upload", :locals => {:resource=>@model} %>
+
+
+
 
         <% end -%>
         <p>

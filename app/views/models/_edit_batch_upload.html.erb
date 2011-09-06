@@ -1,0 +1,33 @@
+<%= javascript_include_tag :defaults %>
+
+
+<div class="fold">
+  <div class="foldTitle">
+    <%= help_icon("Here you upload multiple files for the #{resource.class.name}.") -%>
+    Attachments
+  </div>
+  <div class="foldContent">
+
+     <p>If you don't choose any file as the image. By default, the first uploaded image file will be selected as the image for the <%= resource.class.name %>.</p>
+    <% fields_for @newfile do |newfile| -%>
+        <p>
+          <label for="newfile_data">Attach Files:</label>
+
+          <input id="newfile_data" type="file"
+                 <% if resource.attachments.count >= 5 -%> disabled
+                 <% end -%>>
+        </p>
+    <% end -%>
+    <ul id="pending_files">
+      <% if resource.attachments.size > 0 -%>
+          <%= render :partial => "attachment", :collection => resource.attachments, :locals => {:resource=>resource} %>
+      <% end -%>
+    </ul>
+
+  </div>
+</div>
+
+<script type="text/javascript">
+    var multi_selector = new MultiSelector($('pending_files'), <%= @allowed %>);
+    multi_selector.addElement($('newfile_data'));
+</script>

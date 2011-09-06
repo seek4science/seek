@@ -1,0 +1,19 @@
+<% attach_path = "#{application_root}#{attachment.public_filename}"
+
+%>
+
+
+
+
+
+<li id="attachment_<%= attachment.id %>" ><%#= attachment.filename %>
+
+
+<%= link_to attachment.filename,attach_path,{:style=>"color:#0000CC;"} %>
+<% if resource.respond_to? :id_image and attachment.content_type.index('image')==0 %>
+  <%= radio_button resource.class.name.downcase,:id_image,attachment.id,{:title=>'selected as image'}%>
+<% end %>
+
+
+  <%= link_to_remote "Remove", :url  => attachment_path(:id => attachment), :method => :delete, :html => { :title  => "Remove this attachment" } %>
+</li>

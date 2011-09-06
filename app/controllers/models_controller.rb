@@ -8,7 +8,7 @@ class ModelsController < ApplicationController
   before_filter :pal_or_admin_required,:only=> [:create_model_metadata,:update_model_metadata,:delete_model_metadata ]
   
   before_filter :find_assets, :only => [ :index ]
-  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_tags_ajax]
+  before_filter :find_and_auth, :except => [ :build,:index, :new, :create,:create_model_metadata,:update_model_metadata,:delete_model_metadata,:request_resource,:preview,:test_asset_url, :update_tags_ajax] if @model.nil?
   before_filter :find_display_model, :only=>[:show,:download,:execute,:builder,:simulate,:submit_to_jws]
     
   before_filter :jws_enabled,:only=>[:builder,:simulate,:submit_to_jws]
@@ -352,7 +352,8 @@ class ModelsController < ApplicationController
   def show
     # store timestamp of the previous last usage
     @last_used_before_now = @model.last_used_at
-    
+
+
     # update timestamp in the current Model record
     # (this will also trigger timestamp update in the corresponding Asset)
     @model.last_used_at = Time.now
@@ -371,6 +372,7 @@ class ModelsController < ApplicationController
   # GET /models/new.xml
   def new    
     @model=Model.new
+    @attachment = Attachment.new
     respond_to do |format|
       if current_user.person.member?
         format.html # new.html.erb
@@ -383,7 +385,9 @@ class ModelsController < ApplicationController
   
   # GET /models/1/edit
   def edit
-    
+    @newfile = Attachment.new
+		@allowed = 5 - @model.attachments.count
+
   end
   
   # POST /models
@@ -399,6 +403,9 @@ class ModelsController < ApplicationController
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @model.save
+
+           process_file_uploads
+
           # update attributions
           Relationship.create_or_update_attributions(@model, params[:attributions])
           
@@ -461,6 +468,8 @@ class ModelsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @model.save
+
+        process_file_uploads
 
         # update attributions
         Relationship.create_or_update_attributions(@model, params[:attributions])
@@ -545,7 +554,7 @@ class ModelsController < ApplicationController
   end
   
   def find_display_model
-    if @model
+      if @model
       @display_model = params[:version] ? @model.find_version(params[:version]) : @model.latest_version
     end
   end
@@ -565,5 +574,18 @@ class ModelsController < ApplicationController
       return false
     end
   end
-  
+
+  protected
+
+	def process_file_uploads
+		i = 0
+		while !params[:attachment].nil? && params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
+			@attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
+      #@attachment = Attachment.create!
+			@model.attachments << @attachment
+      @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
+			@model.save!
+      i += 1
+		end
+	end
 end

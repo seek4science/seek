@@ -1,4 +1,6 @@
-<%= javascript_include_tag "resource" -%>
+
+<%= javascript_include_tag "resource" ,"zoom/lightbox"-%>
+<%= stylesheet_link_tag "lightbox" %>
 
 <%= asset_buttons @model,@display_model.version -%>
 
@@ -70,6 +72,25 @@
                 <b>Execution or visualisation environment:</b>
                 <%= model_environment_text @display_model %>
             </p>
+          <p>
+          <b>Model visualization</b>(<span style="font-style:italic;">click it to zoom</span>)<br/>
+          <div id="thumbnail">
+
+            <% attach = @model.id_image==0?  @model.attachments.detect { |a| a.content_type.index("image")==0 } : @model.attachments.find_by_id(@model.id_image)
+              # attach_path = attach.nil? ? "" : "#{application_root}#{attach.public_filename(:thumb)}" %>
+
+            <%#= image_tag attach_path,{:class=>"cloud-zoom"} %>
+            <% unless attach.nil? %>
+            <a href='<%= application_root %><%= attach.public_filename %>' rel="lightbox">
+              <img src="<%= application_root %><%= attach.public_filename(:thumb) %>" alt='' align="center" title="click it to zoom" style=" vertical-align:middle;border: 0;"/>
+            </a>
+            <% else %>
+            <span class="none_text">None</span>
+            <% end %>
+
+
+           </div>
+         </p>
             <br/>
             <p>
                 <b>Description:</b>
@@ -83,6 +104,7 @@
                 </p>
                 <% end -%>
             </p>
+
             <p>
                 <%= embedded_isa_svg(@model, true, @model) -%>
             </p>
@@ -93,3 +115,24 @@
         <%= render :partial=>"layouts/items_related_to",:object => @model %>
     </div>
 </div>
+
+<script type="text/javascript" src="/javascripts/zoom/scriptaculous.js?load=builder"></script>
+
+<script type="text/javascript">
+
+//   new Zoomer('linkID',{
+//    afterZoomIn: function () {
+//
+//
+//    },
+//    afterZoomOut: function () {
+//        alert("Zoomed out");
+//    }
+////});
+//         Event.observe(window, 'load', function() {
+//                setupZoom();
+//         });
+
+
+
+</script>

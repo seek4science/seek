@@ -1,0 +1,6 @@
+page.hide "attachment_#{@attachment.id.to_s}"
+page.remove "attachment_#{@attachment.id.to_s}"
+page.assign 'multi_selector.max', @allowed
+if @allowed < 5
+  page << "if ($('newfile_data').disabled) { $('newfile_data').disabled = false };"
+end
