@@ -813,7 +813,7 @@ a.asset img.avatar {
     min-height: 3em;
 }
 
-div.list_item {
+div.list_item, div.private_list_item, div.public_list_item {
     width: 95%;
     background-color: #F0F0F0;
     margin-top: 6px;

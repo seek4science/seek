@@ -9,13 +9,9 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-    @object=Factory(:experimental_assay, :policy => Factory(:public_policy))
-    #Seek::Config.is_virtualliver=true
+    @object=Factory(:experimental_assay, :policy => Factory(:public_policy))    
   end
 
-  def teardown
-    #Seek::Config.is_virtualliver=false
-  end
 
   test "modelling assay validates with schema" do
     a=assays(:modelling_assay_with_data_and_relationship)

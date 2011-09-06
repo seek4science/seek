@@ -116,11 +116,7 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of known projects, institutions or work groups are allowed to create new content."
       respond_to do |format|
         format.html do
-          if eval("#{controller_name.camelcase}Controller.new").respond_to?("index")
-            redirect_to polymorphic_path(controller_name)
-          else
-            redirect_to root_url
-          end
+          try_block {redirect_to eval("#{controller_name}_path")} or redirect_to root_url
         end
         format.json { render :json => {:status => 401, :error_message => flash[:error] } }
       end
@@ -346,6 +342,22 @@ class ApplicationController < ActionController::Base
       raise Exception.new "Duplicate create activity log about to be created for #{object.class.name}:#{object.id}" unless a.nil?
     end
   end
+
+  #List of activerecord model classes that are directly creatable by a standard user (e.g. uploading a new DataFile, creating a new Assay, but NOT creating a new Project)
+  #returns a list of all types that respond_to and return true for user_creatable?
+  def user_creatable_classes
+    @@creatable_model_classes ||= begin
+      classes=Seek::Util.persistent_classes.select do |c|
+        c.respond_to?("user_creatable?") && c.user_creatable?
+      end.sort_by{|a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1,a.name]}
+      classes.delete(Event) unless Seek::Config.events_enabled
+
+      classes
+    end
+  end
+
+
+  helper_method :user_creatable_classes
 
   def permitted_filters
     #placed this in a seperate method so that other controllers could override it if necessary

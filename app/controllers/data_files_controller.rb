@@ -363,7 +363,7 @@ end
     else
      respond_to do |format|
         flash[:error] = "Unable to view contents of this data file"
-        format.html { redirect_to @display_data_file,:format=>"html" }
+        format.html { redirect_to data_file_path(@data_file,:version=>@display_data_file.version) }
       end
     end
   end 

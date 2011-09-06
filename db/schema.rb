@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110804150945) do
+ActiveRecord::Schema.define(:version => 20110810093644) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -621,6 +621,12 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.datetime "updated_at"
   end
 
+  create_table "official_compounds", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
@@ -637,7 +643,7 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
 
   create_table "people", :force => true do |t|
     t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "updated_at",                                             :null => false
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email"
@@ -987,10 +993,10 @@ ActiveRecord::Schema.define(:version => 20110804150945) do
     t.string   "culture_format"
     t.float    "temperature"
     t.float    "ph"
-    t.float    "confluency"
-    t.integer  "passage"
-    t.float    "viability"
-    t.float    "purity"
+    t.string   "confluency"
+    t.string   "passage"
+    t.string   "viability"
+    t.string   "purity"
     t.boolean  "sex"
     t.datetime "born"
   end

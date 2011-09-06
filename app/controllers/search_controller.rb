@@ -76,10 +76,7 @@ class SearchController < ApplicationController
           @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results
         else
           sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication,Presentation,Sample,Specimen]
-          unless Seek::Config.is_virtualliver
-          #  sources.delete(Sample)
-          #  sources.delete(Specimen)
-          end
+
           @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>sources).results
       end
     end
