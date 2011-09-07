@@ -22,8 +22,8 @@
   <div class="hTagcloud">
     <% if !tags.blank? -%>
         <div class="popularity">
-          <% tags.each do |ann| -%>
-              <%= link_for_ann ann, :truncate_length=>40 -%>
+          <% ann_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |ann, css_class| -%>
+              <%= link_for_ann ann, :truncate_length=>40, :class => css_class -%>
           <% end -%>
     </div>
     <% else -%>

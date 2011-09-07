@@ -7,7 +7,7 @@
 
    object ||= model_class.new
    type_name = text_for_resource(object)
-   item_tags = Annotation.find(:all, :conditions => "annotatable_type = '#{object.class.name}' AND annotatable_id = '#{object.id}'")
+   item_tags = object.annotations
    owned_annotations = current_user.annotations_by
    #remove duplicates
    tags = []

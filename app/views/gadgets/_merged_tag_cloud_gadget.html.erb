@@ -26,21 +26,33 @@
            #filter out annotations with the same text as another annotation
            tags = []
            tag_values = []
+           tag_count = []
            all_tags.each do |tag|
              if !(tag_values.include?(tag.value.id))
                 tags << tag
                 tag_values << tag.value.id
-              end
+             end
             end
 
            hidden_tags=all_tags.size != show_tags.size
            hidden_class="merged_tag_hidden"
           %>
 
-          <% unless tags.blank? -%>
-          <% tags.each do |ann| -%>
-              <%= link_for_ann ann, :truncate_length=>40 -%>
-          <% end -%>
+
+              <% unless tags.blank? -%>
+                <% overall_tag_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+                  <%# if show_tag?(tag) -%>
+                    <%
+                      hide_tag=!show_tags.include?(tag)
+                      tag_class="#{css_class}"
+                      tag_class << " #{hidden_class}" if hide_tag
+                      style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
+                    %>
+                    <%= link_for_ann tag,:truncate_length=>40, :class => tag_class,:style=>"#{style}" -%>
+                  <% end -%>
+                <% end -%>
+
+
 
               <% if hidden_tags -%>
                   <div class="expand_collapse_tags_button">
@@ -59,7 +71,7 @@
                     %>
                   </div>
               <% end -%>
-          <% end -%>
+
         </div>
       </div>
     </div>
