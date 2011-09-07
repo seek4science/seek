@@ -8,6 +8,7 @@ class Person < ActiveRecord::Base
   before_save :first_person_admin
 
   acts_as_notifiee
+  acts_as_annotatable
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
   #load the configuration for the pagination
@@ -31,8 +32,6 @@ class Person < ActiveRecord::Base
   has_many :work_groups, :through=>:group_memberships, :before_add => proc {|person, wg| person.project_subscriptions.build :project => wg.project unless person.project_subscriptions.detect {|ps| ps.project == wg.project}}
   has_many :studies, :foreign_key => :person_responsible_id
   has_many :assays,:foreign_key => :owner_id
-
-  acts_as_taggable_on :tools, :expertise
 
   has_one :user, :dependent=>:destroy
 
@@ -226,7 +225,55 @@ class Person < ActiveRecord::Base
     true
   end
 
+  def expertise= tags
+    update_annotations tags,"expertise"
+  end
+
+  def tools= tags
+    update_annotations tags,"tool"
+  end
+
+  def expertise
+    annotations_with_attribute("expertise")
+  end
+
+  def tools
+    annotations_with_attribute("tool")
+  end
+
   private
+
+  def update_annotations tags,attr
+    #remove non matching
+    current = self.annotations_with_attribute(attr)
+    for_removal = []
+    current.each do |cur|
+      unless tags.include?(cur.value.text)
+        for_removal << cur
+      end
+    end
+    tags.each do |tag|
+      exists = TextValue.find(:first,:conditions=>{:text=>tag})
+      if exists
+        if exists.annotations.select{|a| a.annotatable==self && a.attribute.name==attr}.empty?
+          annotation = Annotation.new(:source => self,
+                         :annotatable => self,
+                         :attribute_name => attr,
+                         :value => exists)
+          annotation.save!
+        end
+      else
+        annotation = Annotation.new(:source => self,
+                       :annotatable => self,
+                       :attribute_name => attr,
+                       :value => tag)
+        annotation.save!
+      end
+    end
+    for_removal.each do |annotation|
+      annotation.destroy
+    end
+  end
 
   #a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin
