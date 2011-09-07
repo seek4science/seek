@@ -7,18 +7,11 @@
 
    object ||= model_class.new
    type_name = text_for_resource(object)
-   item_tags = Annotation.find(:all, :conditions => "annotatable_type = '#{object.class.name}' AND annotatable_id = '#{object.id}'")
+
    owned_annotations = current_user.annotations_by
    #remove duplicates
-   tags = []
-   tag_values = []
-   Annotation.all.each do |tag|
-     if !(tag_values.include?(tag.value.id))
-       tags << tag
-       tag_values << tag.value.id
-     end
-   end
-
+   all_tags = Annotation.with_attribute_name("tag")
+   item_tags = object.annotations
 
 %>
 
@@ -41,6 +34,6 @@
           Tags should be separated by a comma, and known tags will appear in the drop-down box as you type.
       <% end %>
     </p>
-    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>tags, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>
+    <%= render :partial=>"layouts/select_tags", :locals=>{:all_tags=>all_tags, :owned_tags=>owned_annotations, :item_tags=>item_tags, :name=>"tag"} -%>
   </div>
 </div>

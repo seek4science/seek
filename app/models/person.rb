@@ -252,6 +252,7 @@ class Person < ActiveRecord::Base
         for_removal << cur
       end
     end
+
     tags.each do |tag|
       exists = TextValue.find(:first,:conditions=>{:text=>tag})
       if exists

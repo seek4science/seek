@@ -29,42 +29,52 @@ module Seek
 
       return false if owner.nil?
 
-      existing_anns = [] # entity.annotations_with_attribute_and_by_source("tag", owner) #get_annotations_owned_by(owner, entity)
-      entity_annotations = entity.annotations #Annotation.find(:all, :conditions => "annotatable_id = '#{entity.id}' AND annotatable_type = '#{entity.class}' AND source_id = '#{current_user.id}'")
-      owner_tags = current_user.annotations_by
+      attr="tag"
 
-      new_annotations = params[:tag_autocompleter_unrecognized_items] || []
-      known_annotation_ids = params[:tag_autocompleter_selected_ids] || []
-      known_annotations = known_annotation_ids.collect{ |id| Annotation.find(id) }
+      #FIXME: this is currently more or less a copy of Person.update_annotations - need consolidating
 
-      anns_to_keep = []
-      new_names = []
+#      new_annotations = params[:tag_autocompleter_unrecognized_items] || []
+#      known_annotation_ids=params[:tag_autocompleter_selected_ids] || []
+#      known_annotations = known_annotation_ids.collect { |id| Annotation.find(id) }
 
-      known_annotations.each do |ann|
-        if !ann.nil?
-          new_names << ann.value.text unless ann.nil? || (existing_anns.include?(ann) && !owner_tags.include(ann))
-          anns_to_keep << ann if existing_anns.include?(ann)
+      tags=[]
+      params[:tag_autocompleter_selected_ids].each do |selected_id|
+        tag=Annotation.find(selected_id)
+        tags << tag.value.text
+      end unless params[:tag_autocompleter_selected_ids].nil?
+      params[:tag_autocompleter_unrecognized_items].each do |item|
+        tags << item
+      end unless params[:tag_autocompleter_unrecognized_items].nil?
+
+      current = entity.annotations_with_attribute(attr)
+      for_removal = []
+      current.each do |cur|
+        unless tags.include?(cur.value.text)
+          for_removal << cur
         end
       end
 
-      entity_annotations.each do |existing_ann| #for each existing annotation
-        unless known_annotations.include? existing_ann #unless we're keeping it
-          existing_ann.delete #delete it.
+      tags.each do |tag|
+        exists = TextValue.find(:first,:conditions=>{:text=>tag})
+        if exists
+          if exists.annotations.select{|a| a.annotatable==entity && a.attribute.name==attr}.empty?
+            annotation = Annotation.new(:source => owner,
+                           :annotatable => entity,
+                           :attribute_name => attr,
+                           :value => exists)
+            annotation.save!
+          end
+        else
+          annotation = Annotation.new(:source => owner,
+                         :annotatable => entity,
+                         :attribute_name => attr,
+                         :value => tag)
+          annotation.save!
         end
       end
-
-      save_failed = false
-
-      new_annotations.each do |ann|
-        @annotation = Annotation.new(:source => current_user,
-                                     :annotatable => entity,
-                                     :attribute_name => "tag",
-                                     :value => ann)
-        if !@annotation.save
-          save_failed = true
-        end
+      for_removal.each do |annotation|
+        annotation.destroy
       end
-      return save_failed
     end
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults

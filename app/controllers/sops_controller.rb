@@ -99,7 +99,7 @@ class SopsController < ApplicationController
 
       @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
 
-      update_tags @sop
+      update_annotations @sop
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @sop.save
@@ -138,7 +138,7 @@ class SopsController < ApplicationController
       params[:sop][:last_used_at] = Time.now
     end
 
-    update_tags @sop
+    update_annotations @sop
     assay_ids = params[:assay_ids] || []
 
     @sop.attributes = params[:sop]
