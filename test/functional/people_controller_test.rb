@@ -36,7 +36,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert :success
     assert_select "div#personal_tags a[href=?]",show_tag_path(tag),:text=>tag.name,:count=>1
   end
-  
+
   def test_first_registered_person_is_admin
     Person.destroy_all
     assert_equal 0,Person.count,"There should be no people in the database"
@@ -319,5 +319,19 @@ class PeopleControllerTest < ActionController::TestCase
     assert assigns(:people)
     assert assigns(:people).include?(people(:person_for_model_owner))
   end
-  
+
+  test "admin can manage person" do
+    login_as(:quentin)
+    person = people(:aaron_person)
+    assert person.can_manage?
+  end
+
+  test "non-admin users + anonymous users can not manage person " do
+    login_as(:aaron)
+    person =  people(:quentin_person)
+    assert !person.can_manage?
+
+    logout
+    assert !person.can_manage?
+  end
 end
