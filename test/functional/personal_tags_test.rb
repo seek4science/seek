@@ -25,23 +25,23 @@ class PersonalTagsTest < ActionController::TestCase
 
   test "expertise and tools displayed correctly" do
     p=Factory :person
-    Factory :expertise,:value=>"fishing",:source=>p,:annotatable=>p
-    Factory :expertise,:value=>"bowling",:source=>p,:annotatable=>p
-    Factory :tool,:value=>"spade",:source=>p,:annotatable=>p
-    Factory :tool,:value=>"fishing",:source=>p,:annotatable=>p
+    fishing_exp=Factory :expertise,:value=>"fishing",:source=>p,:annotatable=>p
+    bowling=Factory :expertise,:value=>"bowling",:source=>p,:annotatable=>p
+    spade=Factory :tool,:value=>"spade",:source=>p,:annotatable=>p
+    fishing_tool=Factory :tool,:value=>"fishing",:source=>p,:annotatable=>p
 
     get :show,:id=>p
     assert_response :success
 
     assert_select "div#expertise" do
       assert_select "p#expertise" do
-        assert_select "a",:text=>"fishing",:count=>1
-        assert_select "a",:text=>"bowling",:count=>1
+        assert_select "a[href=?]",show_ann_path(fishing_exp),:text=>"fishing",:count=>1
+        assert_select "a[href=?]",show_ann_path(bowling),:text=>"bowling",:count=>1
         assert_select "a",:text=>"spade",:count=>0
       end
       assert_select "p#tools" do
-        assert_select "a",:text=>"spade",:count=>1
-        assert_select "a",:text=>"fishing",:count=>1
+        assert_select "a[href=?]",show_ann_path(spade),:text=>"spade",:count=>1
+        assert_select "a[href=?]",show_ann_path(fishing_tool),:text=>"fishing",:count=>1
         assert_select "a",:text=>"bowling",:count=>0
       end
 
