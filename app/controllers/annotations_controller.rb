@@ -9,12 +9,13 @@ class AnnotationsController < ApplicationController
   unloadable
   def show
       @original_tag = Annotation.find(params[:id])
-      @other_tagging_annotations = Annotation.find(:all, :conditions=> "value_id = '#{@original_tag.value_id}'")
+      @other_tagging_annotations = @original_tag.value.annotations
 
 
       @other_tagging_assets = []
       @other_tagging_annotations.each do |annotation|
-        @other_tagging_assets << Object.const_get(annotation.annotatable_type.to_s).find(annotation.annotatable_id)
+        annotatable=annotation.annotatable
+        @other_tagging_assets << annotatable unless @other_tagging_assets.include?(annotatable)
       end
 
 
