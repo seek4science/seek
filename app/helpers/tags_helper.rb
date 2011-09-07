@@ -41,15 +41,8 @@ module TagsHelper
     end
   end
 
-
   def overall_tag_cloud(tags, classes,&block)
     tag_cloud(tags,classes,:overall_total, &block)
-  end
-  
-
-  def tags_for_context context
-    #Tag.find(:all).select{|t| !t.taggings.detect{|tg| tg.context==context.to_s}.nil? }
-    Tag.find(:all,:group=>"tags.id",:joins=>:taggings,:conditions=>["taggings.context = ?",context.to_s])
   end
 
   def show_tag?(tag)
@@ -73,7 +66,6 @@ module TagsHelper
 
     link_to h(truncate(text,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(text)
   end
-
 
   def list_item_tags_list tags,options={}
     tags.map do |t|
