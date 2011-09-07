@@ -15,42 +15,41 @@ suggested_tags.sort!{|a,b| a.value.text <=> b.value.text}
 all_tags.sort!{|a,b| a.value.text <=> b.value.text}
 no_tags_message ||= ""
 owned_tags ||= nil
+item_tags = Annotation.all
 %>
 
-<div id="facebook" class="clearfix">
-  <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
-    <span class="tokenizer_stretcher">^_^</span>
-    <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
-    <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
-      <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
+  <div id="facebook" class="clearfix">
+    <div tabindex="-1" id="<%= name -%>_ids" class="clearfix tokenizer" onclick="$('<%= name -%>_autocomplete_input').focus();">
+      <span class="tokenizer_stretcher">^_^</span>
+      <span class="tab_stop"><input type="text" id="<%= name -%>_hidden_input" tabindex="-1"></span>
+      <div id="<%= name -%>_autocomplete_display" class="tokenizer_input">
+        <input type="text" size="1" tabindex="" id="<%= name -%>_autocomplete_input" onBlur="addLastTag('<%= name -%>_autocompleter');"/>
+      </div>
+    </div>
+    <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
+      <div class="typeahead_message"><%= no_tags_message -%></div>
     </div>
   </div>
-  <div id="<%= name -%>_autocomplete_populate" class="clearfix autocomplete typeahead_list" style="width: 600px; height: auto; overflow-y: hidden;display:none">
-    <div class="typeahead_message"><%= no_tags_message -%></div>
-  </div>
-</div>
 
-<% if suggested_limit > 0 && suggested_tags.count > 0 -%>
-<p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
-  <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "#{name.to_s}_tag_suggestions", :duration => 0.4) %>
-</p>
+  <% if suggested_limit > 0 && suggested_tags.count > 0 -%>
+  <p style="font-size: 93%; margin-bottom: 0.2em; padding: 0 inherit; text-align: right; vertical-align: middle;">
+    <%= link_to_function "View suggestions" + expand_image("0.3em"), visual_effect(:toggle_blind, "#{name}_tag_suggestions", :duration => 0.4) %>
+  </p>
 
-<div id="<%= name -%>_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
-  <div class="tags_smaller">
-	  <div id="<%= name -%>_select_tags" class="hTagcloud">
-	    <div class="popularity">
-	      <% unless suggested_tags.blank? -%>
-	        <%# overall_tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-              <% suggested_tags.each do |tag| -%>
-	            <%= link_to tag.value.text, "javascript:addListTag('#{name}',#{tag.id});"-%>
+  <div id="<%= name -%>_tag_suggestions" style="font-size: 93%; color: #333333; display: none; text-align: center; margin-top: 0.5em; padding: 0.3em;">
+    <div class="tags_smaller">
+  	  <div id="<%= name -%>_select_tags" class="hTagcloud">
+  	    <div class="popularity">
+  	      <% unless suggested_tags.blank? -%>
+              <% overall_tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+	            <%= link_to tag.value.text, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class-%>
 	          <% end -%>
-	      <% end -%>
-	    </div>
-	  </div>
-	</div>
-</div>
+  	      <% end -%>
+  	    </div>
+  	  </div>
+  	</div>
+  </div>
 
-<% end -%>
-
+  <% end -%>
 <%= render :partial=>"annotations/autocompleter_javascript", :locals=>{:name=>name, :all_annotations=>all_tags,:owned_annotations=>owned_tags,:item_annotations=>item_tags} %>
 

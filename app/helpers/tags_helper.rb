@@ -13,21 +13,6 @@ module TagsHelper
   end
 
   def tag_cloud(tags, classes,counter_method=:count)
-    tags = tags.sort_by{|t| t.name.downcase}
-    max_count = tags.max_by(&counter_method).send(counter_method).to_f
-    if max_count < 1
-      max_count = 1
-    end
-
-
-    tags.each do |tag|
-      index = ((tag.send(counter_method) / max_count) * (classes.size - 1)).round
-      yield tag, classes[index]
-    end
-  end
-
-
-  def ann_cloud(tags, classes,counter_method=:count)
     tags = tags.sort_by{|t| t.value.text.downcase}
     max_count = tags.max_by(&counter_method).send(counter_method).to_f
     if max_count < 1
@@ -41,8 +26,32 @@ module TagsHelper
     end
   end
 
-  def overall_tag_cloud(tags, classes,&block)
-    tag_cloud(tags,classes,:overall_total, &block)
+
+  def ann_cloud(tags, classes, counter_method=:count)
+    tags = tags.sort_by{|t| t.value.text.downcase}
+
+    max_count = 0
+
+    tags.each do |tag|
+      tag_count = tag.value.annotations.count
+      max_count = tag_count if max_count < tag_count
+    end
+
+    tags.each do |tag|
+      index = ((tag.value.annotations.count / max_count) * (classes.size - 1)).round
+      yield tag, classes[index]
+    end
+  end
+
+
+  def overall_tag_cloud(tags,classes,&block)
+    ann_cloud(tags, classes, &block)
+  end
+  
+
+  def tags_for_context context
+    #Tag.find(:all).select{|t| !t.taggings.detect{|tg| tg.context==context.to_s}.nil? }
+    Tag.find(:all,:group=>"tags.id",:joins=>:taggings,:conditions=>["taggings.context = ?",context.to_s])
   end
 
   def show_tag?(tag)
@@ -66,6 +75,7 @@ module TagsHelper
 
     link_to h(truncate(text,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(text)
   end
+
 
   def list_item_tags_list tags,options={}
     tags.map do |t|
