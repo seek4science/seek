@@ -3,7 +3,6 @@ require 'test_helper'
 #tests related to people and tags, split from main PeopleControllerTest
 class PersonalTagsTest < ActionController::TestCase
 
-
   tests PeopleController
 
   fixtures :all
@@ -15,12 +14,17 @@ class PersonalTagsTest < ActionController::TestCase
   end
 
   test "personal tags are shown" do
-    person=people(:pal)
-    assert person.user.owned_tags.collect(&:name).include?("cricket"), "This person must own the tag cricket for this test to work."
-    tag=tags(:cricket)
-    get :show,:id=>person
+    p=Factory :person
+    p2=Factory :person
+    sop = Factory :sop,:contributor=>p
+    cricket = Factory :tag,:annotatable=>sop,:source=>p.user,:value=>"cricket"
+    frog = Factory :tag,:annotatable=>sop,:source=>p2.user,:value=>"frog"
+
+    get :show,:id=>p
     assert :success
-    assert_select "div#personal_tags a[href=?]",show_tag_path(tag),:text=>tag.name,:count=>1
+
+    assert_select "div#personal_tags a[href=?]",show_ann_path(cricket),:text=>"cricket",:count=>1
+    assert_select "div#personal_tags a[href=?]",show_ann_path(frog),:text=>"frog",:count=>0
   end
 
   test "expertise and tools displayed correctly" do
