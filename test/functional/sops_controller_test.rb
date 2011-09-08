@@ -671,7 +671,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as p1.user
 
-    Factory :tag,:source=>p1.user,:annotatable=>sop,:value=>"fish"
+    fish = Factory :tag,:source=>p1.user,:annotatable=>sop,:value=>"fish"
     golf = Factory :tag,:source=>p1.user,:annotatable=>sop,:value=>"golf"
     Factory :tag,:source=>p2.user,:annotatable=>sop,:value=>"fish"
     Factory :tag,:source=>p2.user,:annotatable=>sop,:value=>"soup"

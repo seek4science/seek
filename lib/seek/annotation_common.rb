@@ -55,7 +55,7 @@ module Seek
       end
 
       tags.each do |tag|
-        exists = TextValue.find(:first,:conditions=>{:text=>tag})
+        exists = TextValue.find(:all,:conditions=>{:text=>tag}).select{|tv| !tv.annotations.select{|a| a.attribute.name == attr}.empty?}.first
         if exists
           if exists.annotations.select{|a| a.annotatable==entity && a.attribute.name==attr}.empty?
             annotation = Annotation.new(:source => owner,
