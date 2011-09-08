@@ -553,24 +553,32 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "update tags with ajax" do
-    sop=sops(:downloadable_sop)
-    golf_tags=tags(:golf)
-    user=users(:quentin)
+    p = Factory :person
 
-    assert sop.tag_counts.empty?, "This sop should have no tags for the test"
+    login_as p.user
 
-    #another owners tags. that should be preserved
-    user2 = users(:aaron)
-    user2.tag sop,:with=>"golf, sparrow",:on=>:tags
+    p2 = Factory :person
+    sop = Factory :sop,:contributor=>p.user
 
-    assert_difference("ActsAsTaggableOn::Tag.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+
+    assert sop.annotations.empty?,"this sop should have no tags for the test"
+
+    golf = Factory :tag,:annotatable=>sop,:source=>p2.user,:value=>"golf"
+    Factory :tag,:annotatable=>sop,:source=>p2.user,:value=>"sparrow"
 
     sop.reload
-    assert_equal ["golf","soup","sparrow"],sop.tag_counts.collect(&:name).sort
-    assert_equal ["golf","soup"],sop.owner_tags_on(user,:tags).collect(&:name).sort
-    assert_equal ["golf","sparrow"],sop.owner_tags_on(user2,:tags).collect(&:name).sort
+
+    assert_equal ["golf","sparrow"],sop.annotations.collect{|a| a.value.text}.sort
+    assert_equal [],sop.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],sop.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>sop,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.id]}
+
+    sop.reload
+
+    assert_equal ["golf","soup","sparrow"],sop.annotations.collect{|a| a.value.text}.uniq.sort
+    assert_equal ["golf","soup"],sop.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
+    assert_equal ["golf","sparrow"],sop.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
   end
 
