@@ -9,32 +9,33 @@ class SopsAnnotationTest < ActionController::TestCase
   tests SopsController
 
   test "update tags with ajax only applied when viewable" do
-    login_as(:aaron)
-    user=users(:aaron)
-    sop=sops(:sop_with_fully_public_policy)
-    assert sop.tag_counts.empty?,"This should have no tags for this test to work"
-    golf_tags=tags(:golf)
+    p=Factory :person
+    p2=Factory :person
+    viewable_sop=Factory :sop,:contributor=>p2,:policy=>Factory(:publicly_viewable_policy)
+    dummy_sop=Factory :sop
 
-    assert_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    login_as p.user
 
-    sop.reload
+    assert viewable_sop.can_view?(p.user)
+    assert !viewable_sop.can_edit?(p.user)
 
-    assert_equal ["golf"],sop.tag_counts.collect(&:name)
+    golf=Factory :tag,:annotatable=>dummy_sop,:source=>p2,:value=>"golf"
 
-    sop=sops(:private_sop)
-    assert sop.tag_counts.empty?,"This should have no tags for this test to work"
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_sop,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.id]}
 
-    assert !sop.can_view?(user),"Aaron should not be able to view this item for this test to be valid"
+    viewable_sop.reload
 
-    assert_no_difference("ActsAsTaggableOn::Tagging.count") do
-      xml_http_request :post, :update_tags_ajax,{:id=>sop.id,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf_tags.id]}
-    end
+    assert_equal ["golf"],viewable_sop.annotations.collect{|a| a.value.text}
 
-    sop.reload
+    private_sop=Factory :sop,:contributor=>p2,:policy=>Factory(:private_policy)
 
-    assert sop.tag_counts.empty?,"This should still have no tags"
+    assert !private_sop.can_view?(p.user)
+    assert !private_sop.can_edit?(p.user)
+
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_sop,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.id]}
+
+    private_sop.reload
+    assert private_sop.annotations.empty?
 
   end
 
