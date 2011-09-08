@@ -28,4 +28,35 @@ class AnnotationsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "index" do
+    p=Factory :person
+    df=Factory :data_file,:contributor=>p
+    tool=Factory :tool,:value=>"fork",:source=>p.user,:annotatable=>p
+    tag=Factory :tag,:value=>"fishing",:source=>p.user,:annotatable=>df
+
+    login_as p.user
+    get :index
+    assert_response :success
+
+    assert_select "div#super_tag_cloud a[href=?]",show_ann_path(tag),:text=>"fishing",:count=>1
+    assert_select "div#super_tag_cloud a[href=?]",show_ann_path(tool),:text=>"fork",:count=>1
+  end
+
+  test "dont show duplicates for same tag for expertise and tools" do
+    p=Factory :person
+    tool=Factory :tool,:value=>"xxxxx",:source=>p.user,:annotatable=>p
+    exp=Factory :expertise,:value=>"xxxxx",:source=>p.user,:annotatable=>p
+
+    login_as p.user
+    get :index
+    assert_response :success
+
+
+    get :show,:id=>tool
+    assert_response :success
+    assert_select "div.list_items_container" do
+      assert_select "a",:text=>p.name,:count=>1
+    end
+  end
+
 end
