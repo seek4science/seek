@@ -115,6 +115,7 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_assign_expertise
     p=Factory :person
+    User.current_user = p.user
     assert_equal 0,p.expertise.size
     assert_difference("Annotation.count",2) do
       assert_difference("TextValue.count",2) do
@@ -147,6 +148,7 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_assigns_tools
     p=Factory :person
+    User.current_user = p.user
     assert_equal 0,p.tools.size
     assert_difference("Annotation.count",2) do
       assert_difference("TextValue.count",2) do
@@ -177,6 +179,7 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_removes_previously_assigned
     p=Factory :person
+    User.current_user = p.user
     p.tools = ["one","two"]
     assert_equal 2,p.tools.size
     p.tools = ["three"]
@@ -193,6 +196,7 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_expertise_and_tools_with_same_name
     p=Factory :person
+    User.current_user = p.user
 
     assert_difference("Annotation.count",2) do
       assert_difference("TextValue.count",2) do

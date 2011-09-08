@@ -23,49 +23,6 @@ module Seek
     end
 
     protected
-    #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
-    #New tags are assigned to the owner, which defaults to the current user.
-    def update_annotations entity, owner=User.current_user
-
-      return false if owner.nil?
-
-      attr="tag"
-
-      #FIXME: this is currently more or less a copy of Person.update_annotations - need consolidating
-
-      tags = resolve_tags_from_params params
-
-      current = entity.annotations_with_attribute(attr)
-      for_removal = []
-      current.each do |cur|
-        unless tags.include?(cur.value.text)
-          for_removal << cur
-        end
-      end
-
-      tags.each do |tag|
-        exists = TextValue.find(:all, :conditions=>{:text=>tag}).select { |tv| !tv.annotations.select { |a| a.attribute.name == attr }.empty? }.first
-        if exists
-          if exists.annotations.select { |a| a.annotatable==entity && a.attribute.name==attr }.empty?
-            annotation = Annotation.new(:source => owner,
-                                        :annotatable => entity,
-                                        :attribute_name => attr,
-                                        :value => exists)
-            annotation.save!
-          end
-        else
-          annotation = Annotation.new(:source => owner,
-                                      :annotatable => entity,
-                                      :attribute_name => attr,
-                                      :value => tag)
-          annotation.save!
-        end
-      end
-      for_removal.each do |annotation|
-        annotation.destroy
-      end
-    end
-
     def resolve_tags_from_params params
       tags=[]
       params[:tag_autocompleter_selected_ids].each do |selected_id|
@@ -76,6 +33,17 @@ module Seek
         tags << item
       end unless params[:tag_autocompleter_unrecognized_items].nil?
       tags
+    end
+
+    #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
+    #New tags are assigned to the owner, which defaults to the current user.
+    def update_annotations entity, owner=User.current_user
+
+      return false if owner.nil?
+
+      tags = resolve_tags_from_params params
+
+      entity.annotate_with tags
     end
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
@@ -127,4 +95,5 @@ module Seek
 
 
   end
+
 end

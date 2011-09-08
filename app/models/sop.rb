@@ -8,7 +8,7 @@ class Sop < ActiveRecord::Base
 
   acts_as_asset
   acts_as_trashable
-  acts_as_annotatable
+
   title_trimmer
 
   validates_presence_of :title

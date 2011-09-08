@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SopsAnnotationTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
 

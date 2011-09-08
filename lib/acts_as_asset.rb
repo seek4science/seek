@@ -30,6 +30,8 @@ module Acts #:nodoc:
         acts_as_authorized
         does_not_require_can_edit :last_used_at
         acts_as_favouritable
+        acts_as_annotatable
+        include Seek::Taggable
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
 
