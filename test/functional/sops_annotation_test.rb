@@ -186,6 +186,24 @@ class SopsAnnotationTest < ActionController::TestCase
 
   end
 
+  test "create sop with tags" do
+    p = Factory :person
+    login_as p.user
+
+    another_sop = Factory :sop,:contributor=>p.user
+    golf = Factory :tag,:source=>p.user,:annotatable=>another_sop,:value=>"golf"
+
+    sop={:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:projects=>[p.projects.first]}
+
+    assert_difference("Sop.count") do
+      put :create,:sop=>sop,:sharing=>valid_sharing,:tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>[golf.id]
+    end
+
+    assert_redirected_to sop_path(assigns(:sop))
+    sop=assigns(:sop)
+    assert_equal ["fish","golf"],sop.tags_as_text_array.sort
+  end
+
   test "tag cloud shown on show page" do
     p=Factory :person
     login_as p.user

@@ -7,6 +7,9 @@ module Seek
 
     def annotate_with tags, attr="tag", owner=User.current_user,as_owner=false
 
+      #FIXME: yuck! - this is required so that self has an id and can be assigned to an Annotation.annotatable due to SYSMO-752
+      return unless self.save
+
       current = self.annotations_with_attribute(attr)
       current = current.select{|c| c.source==owner} if as_owner
       for_removal = []
