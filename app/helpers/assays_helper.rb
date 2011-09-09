@@ -94,18 +94,12 @@ module AssaysHelper
 
     result +="<span class='none_text'>#{none_text}</span>" if assay_samples.blank? and assay_organisms.blank?
 
-    organisms = assay_samples.collect{|as|as.specimen.organism}+assay_organisms.collect(&:organism)
-    strains = assay_samples.collect{|as|as.specimen.strain}+assay_organisms.collect(&:strain)
-    culture_growth_types = assay_samples.collect{|as|as.specimen.culture_growth_type}+assay_organisms.collect(&:culture_growth_type)
-
-    total = assay_samples.count + assay_organisms.count
-    i=0
-    while i< total
-      result += "<br/>" if i==0
-      organism = organisms[i]
-      strain = strains[i]
-      sample = assay_samples[i]
-      culture_growth_type = culture_growth_types[i]
+    assay_samples.each do |as|
+      result += "<br/>" if as==assay_samples.first
+      organism = as.specimen.organism
+      strain = as.specimen.strain
+      sample = as
+      culture_growth_type = as.specimen.culture_growth_type
 
       if organism
       result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
@@ -124,10 +118,30 @@ module AssaysHelper
       if culture_growth_type
         result += " (#{culture_growth_type.title})"
       end
-      result += ",<br/>" unless i==total-1
-      i+=1
+      result += ",<br/>" unless as==assay_samples.last and assay_organisms.blank?
+    end
+
+    assay_organisms.each do |ao|
+      organism = ao.organism
+      strain = ao.strain
+      culture_growth_type = ao.culture_growth_type
+
+      if organism
+      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      end
+
+      if strain
+        result += " : "
+        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+      result += ",<br/>" unless ao==assay_organisms.last
     end
     result += "</p>"
+
     return result
   end
 
