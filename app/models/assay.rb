@@ -20,6 +20,7 @@ class Assay < ActiveRecord::Base
 
   acts_as_taggable
   acts_as_annotatable
+  include Seek::Taggable
 
   belongs_to :institution
   has_and_belongs_to_many :samples
