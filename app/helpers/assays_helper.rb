@@ -114,6 +114,7 @@ module AssaysHelper
       organism = as.specimen.organism
       strain = as.specimen.strain
       sample = as
+
       culture_growth_type = as.specimen.culture_growth_type
 
       if organism
@@ -139,6 +140,7 @@ module AssaysHelper
     assay_organisms.each do |ao|
       organism = ao.organism
       strain = ao.strain
+      tissue_and_cell_type = ao.tissue_and_cell_type
       culture_growth_type = ao.culture_growth_type
 
        result += "<br/>" if assay_samples.blank? and ao==assay_organisms.first
@@ -149,6 +151,11 @@ module AssaysHelper
       if strain
         result += " : "
         result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if tissue_and_cell_type
+          result += " : "
+          result += link_to h(tissue_and_cell_type.title),tissue_and_cell_type,{:class => "assay_tissue_and_cell_type_info"}
       end
 
       if culture_growth_type
