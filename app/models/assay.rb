@@ -17,8 +17,6 @@ class Assay < ActiveRecord::Base
     User.current_user.try :person
   end
 
-
-  acts_as_taggable
   acts_as_annotatable
   include Seek::Taggable
 

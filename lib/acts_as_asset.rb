@@ -31,7 +31,6 @@ module Acts #:nodoc:
         does_not_require_can_edit :last_used_at
         acts_as_favouritable
 
-        acts_as_taggable
         acts_as_annotatable
         include Seek::Taggable
 
