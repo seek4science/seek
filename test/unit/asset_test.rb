@@ -110,5 +110,20 @@ class AssetTest < ActiveSupport::TestCase
     assert model.managers.empty?
   end
 
+  test "tags as text array" do
+    model = Factory :model
+    u = Factory :user
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"aaa"
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"bbb"
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"ddd"
+    Factory :tag,:annotatable=>model,:source=>u,:value=>"ccc"
+    assert_equal ["aaa","bbb","ccc","ddd"],model.tags_as_text_array.sort
+
+    p = Factory :person
+    Factory :expertise,:annotatable=>p,:source=>u,:value=>"java"
+    Factory :tool,:annotatable=>p,:source=>u,:value=>"trowel"
+    assert_equal ["java","trowel"],p.tags_as_text_array.sort
+  end
+
 
 end

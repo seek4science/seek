@@ -11,7 +11,6 @@ class DataFile < ActiveRecord::Base
   acts_as_asset
   acts_as_trashable
 
-  acts_as_annotatable
   title_trimmer
 
    def included_to_be_copied? symbol
@@ -74,7 +73,7 @@ class DataFile < ActiveRecord::Base
 
   belongs_to :content_blob #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
 
-  acts_as_solr(:fields=>[:description,:title,:original_filename,:tag_counts,:annotation_search_fields,:fs_search_fields]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields=>[:description,:title,:original_filename,:searchable_tags,:spreadsheet_annotation_search_fields,:fs_search_fields]) if Seek::Config.solr_enabled
 
   has_many :studied_factors, :conditions =>  'studied_factors.data_file_version = #{self.version}'
 
@@ -134,7 +133,7 @@ class DataFile < ActiveRecord::Base
   end
 
   #the annotation string values to be included in search indexing
-  def annotation_search_fields
+  def spreadsheet_annotation_search_fields
     annotations = []
     unless content_blob.nil?
       content_blob.worksheets.each do |ws|

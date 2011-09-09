@@ -49,5 +49,13 @@ module Seek
       end
     end
 
+    def searchable_tags
+      tags_as_text_array
+    end
+
+    def tags_as_text_array
+      self.annotations.collect{|a| a.value.text}
+    end
+
   end
 end
