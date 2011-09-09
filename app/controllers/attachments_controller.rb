@@ -6,7 +6,7 @@ class AttachmentsController < ApplicationController
 		asset = @attachment.attachable
     asset.id_image = nil
     asset.save!
-		@allowed = 5 - asset.attachments.count
+		@allowed = Seek::Config.max_attachments_num - asset.attachments.count
 	end
 
   def index

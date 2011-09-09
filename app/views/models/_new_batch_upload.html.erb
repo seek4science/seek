@@ -9,7 +9,7 @@
 	<% fields_for @attachment do |attachment| -%>
 	<p>
 		<label for="attachment_data">Attach Files:</label>
-		<%= attachment.file_field :data %>
+		<%= attachment.file_field :data %>(<span style="color: red;font-style: italic;">MAX. <%= Seek::Config.max_attachments_num %> files</span>)
 	</p>
 	<% end -%>
 	<ul id="pending_files"></ul>
@@ -17,6 +17,6 @@
   </div>
 </div>
 	<script type="text/javascript">
-		var multi_selector = new MultiSelector($('pending_files'), 5);
+		var multi_selector = new MultiSelector($('pending_files'),<%= Seek::Config.max_attachments_num %> );
 		multi_selector.addElement($('attachment_data'));
 	</script>

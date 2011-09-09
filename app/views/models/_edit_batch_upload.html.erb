@@ -14,8 +14,8 @@
           <label for="newfile_data">Attach Files:</label>
 
           <input id="newfile_data" type="file"
-                 <% if resource.attachments.count >= 5 -%> disabled
-                 <% end -%>>
+                 <% if resource.attachments.count >= Seek::Config.max_attachments_num -%> disabled
+                 <% end -%>>(<span style="color: red;font-style: italic;">MAX. <%= Seek::Config.max_attachments_num %> files</span>)
         </p>
     <% end -%>
     <ul id="pending_files">
