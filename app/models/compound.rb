@@ -13,6 +13,14 @@ class Compound < ActiveRecord::Base
     mapping_links.collect{|ml| ml.mapping}
   end
 
+  def studied_factors
+    studied_factor_links.collect{|sfl| sfl.studied_factor}
+  end
+
+  def experimental_conditions
+    experimental_condition_links.collect{|ecl| ecl.experimental_condition}
+  end
+
   def data_files
     studied_factor_links.collect{|sf| sf.studied_factor.data_file}
   end

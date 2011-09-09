@@ -14,5 +14,13 @@ class Synonym < ActiveRecord::Base
     experimental_condition_links.collect{|ec| ec.experimental_condition.sop}
   end
 
+  def studied_factors
+    studied_factor_links.collect{|sfl| sfl.studied_factor}
+  end
+
+  def experimental_conditions
+    experimental_condition_links.collect{|ecl| ecl.experimental_condition}
+  end
+
 end
 

@@ -287,5 +287,19 @@ class PeopleControllerTest < ActionController::TestCase
     assert assigns(:people)
     assert assigns(:people).include?(people(:person_for_model_owner))
   end
-  
+
+  test "admin can manage person" do
+    login_as(:quentin)
+    person = people(:aaron_person)
+    assert person.can_manage?
+  end
+
+  test "non-admin users + anonymous users can not manage person " do
+    login_as(:aaron)
+    person =  people(:quentin_person)
+    assert !person.can_manage?
+
+    logout
+    assert !person.can_manage?
+  end
 end

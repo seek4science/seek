@@ -81,6 +81,7 @@ module StudiedFactorsHelper
     neighboring_assets.select(&:can_view?).collect {|a| a.send(fs_or_ec)}.flatten
   end
 
+
 end
 
 

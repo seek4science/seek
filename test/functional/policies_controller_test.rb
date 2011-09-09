@@ -97,7 +97,7 @@ class PoliciesControllerTest < ActionController::TestCase
     people_with_access_type = []
     i = 0
     while i<10
-      people_with_access_type.push [i, 'name' + i.to_s, 1]
+      people_with_access_type.push [i, 'name' + i.to_s, rand(4) + 1]
       i +=1
     end
     #create a whitelist
@@ -105,20 +105,16 @@ class PoliciesControllerTest < ActionController::TestCase
     i = 0
     while i<5
       random_id = rand(15)
-      whitelist.push [random_id, 'name' + random_id.to_s, rand(5)]
+      whitelist.push [random_id, 'name' + random_id.to_s, 2]
       i +=1
     end
-    whitelist.uniq!
     pc =  PoliciesController.new()
     whitelist =  pc.remove_duplicate(whitelist)
     whitelist_added= whitelist.select{|person| person[0]>9}
+    puts whitelist_added.inspect
     filtered_people = pc.add_people_in_whitelist(people_with_access_type, whitelist)
-
+    puts filtered_people
     assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
-
-    filtered_people.each do |person|
-      assert person[2] >= 1
-    end
   end
 
   test 'should show the preview permission when choosing public scope' do
