@@ -8,7 +8,7 @@ module Seek
     def annotate_with tags, attr="tag", owner=User.current_user,as_owner=false
 
       #FIXME: yuck! - this is required so that self has an id and can be assigned to an Annotation.annotatable due to SYSMO-752
-      return unless self.save
+      return if self.new_record? && !self.save
 
       current = self.annotations_with_attribute(attr)
       current = current.select{|c| c.source==owner} if as_owner
@@ -50,6 +50,9 @@ module Seek
       for_removal.each do |annotation|
         annotation.destroy
       end
+
+#      expire_fragment("sidebar_tag_cloud")
+#      expire_fragment("super_tag_cloud")
     end
 
     def searchable_tags

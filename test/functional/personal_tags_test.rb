@@ -77,4 +77,20 @@ class PersonalTagsTest < ActionController::TestCase
     assert_equal ["four","three"],p.tools.collect{|t| t.value.text}.sort
   end
 
+  test "expertise and tools do not appear in personal tag cloud" do
+    p = Factory :person
+    login_as p.user
+
+    exp=Factory :expertise,:source=>p.user,:annotatable=>p,:value=>"an_expertise"
+    tool=Factory :tool,:source=>p.user,:annotatable=>p,:value=>"a_tool"
+    tag=Factory :tag,:source=>p.user,:annotatable=>p,:value=>"a_tag"
+
+    get :show,:id=>p
+    assert :success
+
+    assert_select "div#personal_tags a[href=?]",show_ann_path(tag),:text=>"a_tag",:count=>1
+    assert_select "div#personal_tags a[href=?]",show_ann_path(tool),:text=>"a_tool",:count=>0
+    assert_select "div#personal_tags a[href=?]",show_ann_path(exp),:text=>"an_expertise",:count=>0
+  end
+
 end

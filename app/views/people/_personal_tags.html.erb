@@ -1,7 +1,8 @@
 <%
    tags=[]
+
    if !person.user.nil?
-       tags=person.user.annotations_by #person.user.owned_tags
+       tags = person.user.annotations_by.with_attribute_name("tag")
 
        tag_values = []
        annotations = []
