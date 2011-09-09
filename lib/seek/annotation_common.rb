@@ -51,46 +51,9 @@ module Seek
     def update_owned_annotations entity, owner=User.current_user
       return false if owner.nil?
 
-      attr="tag"
-
-      #FIXME: this is currently more or less a copy of Person.update_annotations - need consolidating
-
       tags = resolve_tags_from_params params
 
-      current = entity.annotations_with_attribute(attr)
-      current = current.select{|c| c.source==owner}
-
-      for_removal = []
-      current.each do |cur|
-        unless tags.include?(cur.value.text)
-          for_removal << cur
-        end
-      end
-
-      tags.each do |tag|
-        exists = TextValue.find(:all, :conditions=>{:text=>tag}).select{ |tv| !tv.annotations.select { |a| a.attribute.name == attr }.empty?}
-        # text_value exists for this attr
-        if !exists.empty?
-          # isn't already used as an annotation for this entity with this owner
-          exists_for_owner=exists.select{|e| e.annotations{|a| a.annotatable==entity && a.source==owner}.empty?}
-          if exists_for_owner.empty?
-            annotation = Annotation.new(:source => owner,
-                                        :annotatable => entity,
-                                        :attribute_name => attr,
-                                        :value => exists.first)
-            annotation.save!
-          end
-        else
-          annotation = Annotation.new(:source => owner,
-                                      :annotatable => entity,
-                                      :attribute_name => attr,
-                                      :value => tag)
-          annotation.save!
-        end
-      end
-      for_removal.each do |annotation|
-        annotation.destroy
-      end
+      entity.annotate_as_owner tags
     end
 
 
