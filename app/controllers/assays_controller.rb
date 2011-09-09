@@ -2,7 +2,6 @@ class AssaysController < ApplicationController
 
   include DotGenerator
   include IndexPager
-  #include Seek::TaggingCommon
   include Seek::AnnotationCommon
 
   before_filter :find_assets, :only=>[:index]
@@ -154,8 +153,8 @@ class AssaysController < ApplicationController
           @assay.associate_organism(o_id, strain, culture_growth)
         end
 
-    #update_tags @assay
     update_annotations @assay
+
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     @assay.attributes = params[:assay]
     if params[:sharing]
