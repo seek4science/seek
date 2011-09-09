@@ -88,6 +88,48 @@ module AssaysHelper
     Assay.all.select{|assay| assay.can_edit?(current_user)}
   end
 
+  def list_assay_samples_and_organisms attribute,assay_samples,assay_organisms, none_text="Not Specified"
+
+    result= "<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
+
+    result +="<span class='none_text'>#{none_text}</span>" if assay_samples.blank? and assay_organisms.blank?
+
+    organisms = assay_samples.collect{|as|as.specimen.organism}+assay_organisms.collect(&:organism)
+    strains = assay_samples.collect{|as|as.specimen.strain}+assay_organisms.collect(&:strain)
+    culture_growth_types = assay_samples.collect{|as|as.specimen.culture_growth_type}+assay_organisms.collect(&:culture_growth_type)
+
+    total = assay_samples.count + assay_organisms.count
+    i=0
+    while i< total
+      result += "<br/>" if i==0
+      organism = organisms[i]
+      strain = strains[i]
+      sample = assay_samples[i]
+      culture_growth_type = culture_growth_types[i]
+
+      if organism
+      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      end
+
+      if strain
+        result += " : "
+        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if sample
+        result += " : "
+        result += link_to h(sample.title),sample
+      end
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+      result += ",<br/>" unless i==total-1
+      i+=1
+    end
+    result += "</p>"
+    return result
+  end
 
   def list_assay_samples attribute,assay_samples, none_text="Not Specified"
 
