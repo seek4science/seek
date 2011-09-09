@@ -141,6 +141,7 @@ module AssaysHelper
       strain = ao.strain
       culture_growth_type = ao.culture_growth_type
 
+       result += "<br/>" if assay_samples.blank? and ao==assay_organisms.first
       if organism
       result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
       end
