@@ -25,11 +25,7 @@
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true}%>
 
-  <% if !resource.assay_organisms.blank? %>
-  <%= list_assay_organisms("Samples",resource.assay_organisms) %>
-  <% else %>
-  <%= list_assay_samples "Samples",resource.samples%>
-  <% end %>
+  <%= list_assay_samples_and_organisms "Samples",resource.samples,resource.assay_organisms %>
 
   <%= list_item_authorized_list resource.sops, "SOPs", true, 50, true %>
 

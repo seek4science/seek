@@ -103,6 +103,62 @@ module AssaysHelper
     Assay.all.select{|assay| assay.can_edit?(current_user)}
   end
 
+  def list_assay_samples_and_organisms attribute,assay_samples,assay_organisms, none_text="Not Specified"
+
+    result= "<p class=\"list_item_attribute\"> <b>#{attribute}</b>: "
+
+    result +="<span class='none_text'>#{none_text}</span>" if assay_samples.blank? and assay_organisms.blank?
+
+    assay_samples.each do |as|
+      result += "<br/>" if as==assay_samples.first
+      organism = as.specimen.organism
+      strain = as.specimen.strain
+      sample = as
+      culture_growth_type = as.specimen.culture_growth_type
+
+      if organism
+      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      end
+
+      if strain
+        result += " : "
+        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if sample
+        result += " : "
+        result += link_to h(sample.title),sample
+      end
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+      result += ",<br/>" unless as==assay_samples.last and assay_organisms.blank?
+    end
+
+    assay_organisms.each do |ao|
+      organism = ao.organism
+      strain = ao.strain
+      culture_growth_type = ao.culture_growth_type
+
+      if organism
+      result += link_to h(organism.title),organism,{:class => "assay_organism_info"}
+      end
+
+      if strain
+        result += " : "
+        result += link_to h(strain.title),strain,{:class => "assay_strain_info"}
+      end
+
+      if culture_growth_type
+        result += " (#{culture_growth_type.title})"
+      end
+      result += ",<br/>" unless ao==assay_organisms.last
+    end
+    result += "</p>"
+
+    return result
+  end
 
   def list_assay_samples attribute,assay_samples, none_text="Not Specified"
 
