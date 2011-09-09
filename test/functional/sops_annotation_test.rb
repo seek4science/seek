@@ -186,4 +186,41 @@ class SopsAnnotationTest < ActionController::TestCase
 
   end
 
+  test "tag cloud shown on show page" do
+    p=Factory :person
+    login_as p.user
+    sop = Factory :sop,:contributor=>p.user
+
+    get :show,:id=>sop
+    assert_response :success
+
+    assert_select "div#tag_cloud" do
+      assert_select "p",:text=>/not yet been tagged/,:count=>1
+    end
+
+    sop.annotate_with ["fish","sparrow","sprocket"]
+
+    get :show,:id=>sop
+    assert_response :success
+
+    assert_select "div#tag_cloud" do
+      assert_select "a",:text=>"fish",:count=>1
+      assert_select "a",:text=>"sparrow",:count=>1
+      assert_select "a",:text=>"sprocket",:count=>1
+    end
+  end
+
+  test "form includes tag section" do
+    p=Factory :person
+    login_as p.user
+    get :new
+    assert_response :success
+    assert_select "input#tag_autocomplete_input"
+
+    sop=Factory :sop,:contributor=>p.user
+    get :edit,:id=>sop
+    assert_response :success
+    assert_select "input#tag_autocomplete_input"
+  end
+
 end
