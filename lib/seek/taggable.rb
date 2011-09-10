@@ -51,8 +51,6 @@ module Seek
         annotation.destroy
       end
 
-#      expire_fragment("sidebar_tag_cloud")
-#      expire_fragment("super_tag_cloud")
     end
 
     def searchable_tags
