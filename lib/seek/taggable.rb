@@ -8,7 +8,7 @@ module Seek
 
     def tag_with_params params,attr="tag",owner=User.current_user
       tags = resolve_tags_from_params params,attr
-      tag_as_user_with tags,attr,owner
+      tag_with tags,attr,owner
     end
 
     def resolve_tags_from_params params,attr
