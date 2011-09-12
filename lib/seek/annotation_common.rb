@@ -43,7 +43,7 @@ module Seek
 
       tags = resolve_tags_from_params params
 
-      entity.annotate_with tags
+      entity.tag_with tags
     end
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
@@ -53,7 +53,7 @@ module Seek
 
       tags = resolve_tags_from_params params
 
-      entity.annotate_as_owner tags
+      entity.tag_as_user_with tags
     end
 
 

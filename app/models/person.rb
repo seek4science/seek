@@ -227,11 +227,11 @@ class Person < ActiveRecord::Base
   end
 
   def expertise= tags
-    annotate_with tags,"expertise"
+    tag_with tags,"expertise"
   end
 
   def tools= tags
-    annotate_with tags,"tool"
+    tag_with tags,"tool"
   end
 
   def expertise

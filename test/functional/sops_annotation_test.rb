@@ -216,7 +216,7 @@ class SopsAnnotationTest < ActionController::TestCase
       assert_select "p",:text=>/not yet been tagged/,:count=>1
     end
 
-    sop.annotate_with ["fish","sparrow","sprocket"]
+    sop.tag_with ["fish","sparrow","sprocket"]
 
     get :show,:id=>sop
     assert_response :success
