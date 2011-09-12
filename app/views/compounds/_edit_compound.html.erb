@@ -14,8 +14,8 @@
    unless mappings.blank?
       sabiork_id = mappings.first.sabiork_id.to_s
       mappings.each do |m|
-        chebi_ids.concat(m.chebi_id + '; ') if try_block{m.chebi_id}
-        kegg_ids.concat(m.kegg_id + '; ') if try_block{m.kegg_id}
+        chebi_ids.concat(m.chebi_id + '; ') if (try_block{m.chebi_id} and !chebi_ids.match(m.chebi_id + '; '))
+        kegg_ids.concat(m.kegg_id + '; ') if (try_block{m.kegg_id} and !kegg_ids.match(m.kegg_id + '; '))
       end
       chebi_ids.chomp!('; ')
       kegg_ids.chomp!('; ')
