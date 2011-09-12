@@ -70,14 +70,14 @@
       </p>
       <% end -%>
 
-     <%  if !@assay.assay_organisms.blank? && @assay.samples.blank?%>
+
       <p id="organism">
           <b>Organisms: </b>
           <%= show_assay_organisms_list @assay.assay_organisms %>
       </p>
-    <% end %>
 
-     <%  if @assay.assay_organisms.blank? && !@assay.samples.blank? %>
+
+
      <p id="specimens">
        <b>Specimens: </b>
        <% specimens = [] %>
@@ -97,8 +97,7 @@
      <p id="Samples">
        <b>Samples: </b>
        <%= samples_link_list @assay.samples%>
-         </p>
-     <% end -%>
+     </p>
 
 
      <%# FIXME: should be in a css file rather than in the middle of a page -%>
