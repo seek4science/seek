@@ -1,6 +1,30 @@
 module Seek
   module Taggable
 
+    def tag_as_user_with_params params,attr="tag",owner=User.current_user
+      tags = resolve_tags_from_params params,attr
+      tag_as_user_with tags,attr,owner
+    end
+
+    def tag_with_params params,attr="tag",owner=User.current_user
+      tags = resolve_tags_from_params params,attr
+      tag_as_user_with tags,attr,owner
+    end
+
+    def resolve_tags_from_params params,attr
+      selected_key = "#{attr}_autocompleter_selected_ids".to_sym
+      unrecognized_key = "#{attr}_autocompleter_unrecognized_items".to_sym
+      tags=[]
+      params[selected_key].each do |selected_id|
+        tag=Annotation.find(selected_id)
+        tags << tag.value.text
+      end unless params[selected_key].nil?
+      params[unrecognized_key].each do |item|
+        tags << item
+      end unless params[unrecognized_key].nil?
+      tags
+    end
+
     def tag_as_user_with tags, attr="tag", owner=User.current_user
       tag_with tags,attr,owner,true
     end

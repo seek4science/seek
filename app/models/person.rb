@@ -227,11 +227,20 @@ class Person < ActiveRecord::Base
   end
 
   def expertise= tags
-    tag_with tags,"expertise"
+    if tags.kind_of? Hash
+      tag_with_params tags,"expertise"
+    else
+      tag_with tags,"expertise"
+    end
   end
 
   def tools= tags
-    tag_with tags,"tool"
+    if tags.kind_of? Hash
+      tag_with_params tags,"tool"
+    else
+      tag_with tags,"tool"
+    end
+
   end
 
   def expertise

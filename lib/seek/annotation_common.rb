@@ -23,37 +23,21 @@ module Seek
     end
 
     protected
-    def resolve_tags_from_params params
-      tags=[]
-      params[:tag_autocompleter_selected_ids].each do |selected_id|
-        tag=Annotation.find(selected_id)
-        tags << tag.value.text
-      end unless params[:tag_autocompleter_selected_ids].nil?
-      params[:tag_autocompleter_unrecognized_items].each do |item|
-        tags << item
-      end unless params[:tag_autocompleter_unrecognized_items].nil?
-      tags
-    end
 
     #Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
     #New tags are assigned to the owner, which defaults to the current user.
     def update_annotations entity, owner=User.current_user
-
-      return false if owner.nil?
-
-      tags = resolve_tags_from_params params
-
-      entity.tag_with tags
+      unless owner.nil?
+        entity.tag_with_params params
+      end
     end
 
     #Updates tags for a given owner using the params passed through the tagging web interface. This just updates the tags for a given owner, which defaults
     #to the current user - it doesn't affect other peoples tags for that item.
     def update_owned_annotations entity, owner=User.current_user
-      return false if owner.nil?
-
-      tags = resolve_tags_from_params params
-
-      entity.tag_as_user_with tags
+      unless owner.nil?
+        entity.tag_as_user_with_params params
+      end
     end
 
 

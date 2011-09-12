@@ -69,7 +69,7 @@ class PersonalTagsTest < ActionController::TestCase
     two=expertise_annotations[2]
     three=expertise_annotations[1]
     four=p.tools.first
-    post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:tools_autocompleter_selected_ids=>[four.id],:tools_autocompleter_unrecognized_items=>"three"
+    post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:tool_autocompleter_selected_ids=>[four.id],:tool_autocompleter_unrecognized_items=>"three"
     assert_redirected_to p
     p=Person.find(p.id)
 
