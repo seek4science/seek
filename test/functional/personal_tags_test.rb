@@ -23,8 +23,8 @@ class PersonalTagsTest < ActionController::TestCase
     get :show,:id=>p
     assert :success
 
-    assert_select "div#personal_tags a[href=?]",show_ann_path(cricket),:text=>"cricket",:count=>1
-    assert_select "div#personal_tags a[href=?]",show_ann_path(frog),:text=>"frog",:count=>0
+    assert_select "div#personal_tags a[href=?]",show_ann_path(cricket.value),:text=>"cricket",:count=>1
+    assert_select "div#personal_tags a[href=?]",show_ann_path(frog.value),:text=>"frog",:count=>0
   end
 
   test "expertise and tools displayed correctly" do
@@ -39,13 +39,13 @@ class PersonalTagsTest < ActionController::TestCase
 
     assert_select "div#expertise" do
       assert_select "p#expertise" do
-        assert_select "a[href=?]",show_ann_path(fishing_exp),:text=>"fishing",:count=>1
-        assert_select "a[href=?]",show_ann_path(bowling),:text=>"bowling",:count=>1
+        assert_select "a[href=?]",show_ann_path(fishing_exp.value),:text=>"fishing",:count=>1
+        assert_select "a[href=?]",show_ann_path(bowling.value),:text=>"bowling",:count=>1
         assert_select "a",:text=>"spade",:count=>0
       end
       assert_select "p#tools" do
-        assert_select "a[href=?]",show_ann_path(spade),:text=>"spade",:count=>1
-        assert_select "a[href=?]",show_ann_path(fishing_tool),:text=>"fishing",:count=>1
+        assert_select "a[href=?]",show_ann_path(spade.value),:text=>"spade",:count=>1
+        assert_select "a[href=?]",show_ann_path(fishing_tool.value),:text=>"fishing",:count=>1
         assert_select "a",:text=>"bowling",:count=>0
       end
 
@@ -57,24 +57,24 @@ class PersonalTagsTest < ActionController::TestCase
     p.expertise = ["one","two","three"]
     p.tools = ["four"]
     assert p.save
-    assert_equal ["one","three","two"],p.expertise.collect{|t| t.value.text }.sort
-    assert_equal ["four"],p.tools.collect{|t| t.value.text}.sort
+    assert_equal ["one","three","two"],p.expertise.collect{|t| t.text }.sort
+    assert_equal ["four"],p.tools.collect{|t| t.text}.sort
 
     p=Person.find(p.id)
-    assert_equal ["one","three","two"],p.expertise.collect{|t| t.value.text }.sort
-    assert_equal ["four"],p.tools.collect{|t| t.value.text}.sort
+    assert_equal ["one","three","two"],p.expertise.collect{|t| t.text }.sort
+    assert_equal ["four"],p.tools.collect{|t| t.text}.sort
 
-    expertise_annotations = p.expertise.sort_by{|e| e.value.text}
+    expertise_annotations = p.expertise.sort_by{|e| e.text}
     one=expertise_annotations[0]
     two=expertise_annotations[2]
     three=expertise_annotations[1]
     four=p.tools.first
-    post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:tool_autocompleter_selected_ids=>[four.id],:tool_autocompleter_unrecognized_items=>"three"
+    post :update, :id=>p.id, :person=>{}, :expertise_autocompleter_selected_ids=>[one.id,two.id],:expertise_autocompleter_unrecognized_items=>"five",:tool_autocompleter_selected_ids=>[four.id],:tool_autocompleter_unrecognized_items=>"three"
     assert_redirected_to p
     p=Person.find(p.id)
 
-    assert_equal ["one","two"],p.expertise.collect{|t| t.value.text }.sort
-    assert_equal ["four","three"],p.tools.collect{|t| t.value.text}.sort
+    assert_equal ["five","one","two"],p.expertise.collect{|t| t.text }.sort
+    assert_equal ["four","three"],p.tools.collect{|t| t.text}.sort
   end
 
   test "expertise and tools do not appear in personal tag cloud" do
@@ -88,9 +88,9 @@ class PersonalTagsTest < ActionController::TestCase
     get :show,:id=>p
     assert :success
 
-    assert_select "div#personal_tags a[href=?]",show_ann_path(tag),:text=>"a_tag",:count=>1
-    assert_select "div#personal_tags a[href=?]",show_ann_path(tool),:text=>"a_tool",:count=>0
-    assert_select "div#personal_tags a[href=?]",show_ann_path(exp),:text=>"an_expertise",:count=>0
+    assert_select "div#personal_tags a[href=?]",show_ann_path(tag.value),:text=>"a_tag",:count=>1
+    assert_select "div#personal_tags a[href=?]",show_ann_path(tool.value),:text=>"a_tool",:count=>0
+    assert_select "div#personal_tags a[href=?]",show_ann_path(exp.value),:text=>"an_expertise",:count=>0
   end
 
 end

@@ -95,7 +95,7 @@ class PersonTest < ActiveSupport::TestCase
     Factory :expertise,:value=>"golf",:annotatable=>p
     Factory :tool,:value=>"sbml",:annotatable=>p
     assert_equal 1, p.expertise.size
-    assert_equal "golf",p.expertise[0].value.text
+    assert_equal "golf",p.expertise[0].text
   end
 
   def test_tools
@@ -110,7 +110,7 @@ class PersonTest < ActiveSupport::TestCase
     Factory :tool,:value=>"sbml",:annotatable=>p
     Factory :expertise,:value=>"fishing",:annotatable=>p
     assert_equal 1, p.tools.size
-    assert_equal "sbml",p.tools[0].value.text
+    assert_equal "sbml",p.tools[0].text
   end
 
   def test_assign_expertise
@@ -124,8 +124,8 @@ class PersonTest < ActiveSupport::TestCase
     end
 
     assert_equal 2,p.expertise.size
-    assert p.expertise.collect{|e| e.value.text}.include?("golf")
-    assert p.expertise.collect{|e| e.value.text}.include?("fishing")
+    assert p.expertise.collect{|e| e.text}.include?("golf")
+    assert p.expertise.collect{|e| e.text}.include?("fishing")
 
     assert_difference("Annotation.count",-1) do
       assert_no_difference("TextValue.count") do
@@ -134,7 +134,7 @@ class PersonTest < ActiveSupport::TestCase
     end
 
     assert_equal 1,p.expertise.size
-    assert_equal "golf",p.expertise[0].value.text
+    assert_equal "golf",p.expertise[0].text
 
     p2=Factory :person
     assert_difference("Annotation.count") do
@@ -157,8 +157,8 @@ class PersonTest < ActiveSupport::TestCase
     end
 
     assert_equal 2,p.tools.size
-    assert p.tools.collect{|e| e.value.text}.include?("golf")
-    assert p.tools.collect{|e| e.value.text}.include?("fishing")
+    assert p.tools.collect{|e| e.text}.include?("golf")
+    assert p.tools.collect{|e| e.text}.include?("fishing")
 
     assert_difference("Annotation.count",-1) do
       assert_no_difference("TextValue.count") do
@@ -167,7 +167,7 @@ class PersonTest < ActiveSupport::TestCase
     end
 
     assert_equal 1,p.tools.size
-    assert_equal "golf",p.tools[0].value.text
+    assert_equal "golf",p.tools[0].text
 
     p2=Factory :person
     assert_difference("Annotation.count") do
@@ -184,14 +184,14 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 2,p.tools.size
     p.tools = ["three"]
     assert_equal 1,p.tools.size
-    assert_equal "three",p.tools[0].value.text
+    assert_equal "three",p.tools[0].text
     
     p=Factory :person
     p.expertise = ["aaa","bbb"]
     assert_equal 2,p.expertise.size
     p.expertise = ["ccc"]
     assert_equal 1,p.expertise.size
-    assert_equal "ccc",p.expertise[0].value.text
+    assert_equal "ccc",p.expertise[0].text
   end
 
   def test_expertise_and_tools_with_same_name

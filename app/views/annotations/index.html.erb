@@ -5,13 +5,13 @@
 <div class="show_basic">
    <%
 
-     tags = Annotation.all
+     tags = Annotation.all.collect{|a| a.value}
      tag_values = []
      annotations = []
      tags.each do |tag|
-       if !(tag_values.include?(tag.value.id))
+       if !(tag_values.include?(tag.id))
          annotations << tag
-         tag_values << tag.value.id
+         tag_values << tag.id
        end
      end
      tags = annotations

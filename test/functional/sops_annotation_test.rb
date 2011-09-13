@@ -22,7 +22,7 @@ class SopsAnnotationTest < ActionController::TestCase
 
     golf=Factory :tag,:annotatable=>dummy_sop,:source=>p2,:value=>"golf"
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_sop,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_sop,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
     viewable_sop.reload
 
@@ -33,7 +33,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert !private_sop.can_view?(p.user)
     assert !private_sop.can_edit?(p.user)
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>private_sop,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_sop,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
     private_sop.reload
     assert private_sop.annotations.empty?
@@ -60,7 +60,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal [],sop.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
     assert_equal ["golf","sparrow"],sop.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>sop,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>sop,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
     sop.reload
 
@@ -84,7 +84,7 @@ class SopsAnnotationTest < ActionController::TestCase
     sop.reload
     assert_equal ["apple","fish"],sop.annotations.collect{|a| a.value.text}.sort
 
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.id],:sop=>{}, :sharing=>valid_sharing
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id],:sop=>{}, :sharing=>valid_sharing
     sop.reload
 
     assert_equal ["golf","soup"],sop.annotations.collect{|a| a.value.text}.sort
@@ -113,7 +113,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal ["apple"],sop.annotations.select{|a|a.source==p3.user}.collect{|a| a.value.text}
     assert_equal ["apple","fish","golf"],sop.annotations.collect{|a| a.value.text}.uniq.sort
 
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.id],:sop=>{}, :sharing=>valid_sharing
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id],:sop=>{}, :sharing=>valid_sharing
     sop.reload
 
     assert_equal ["soup"],sop.annotations.select{|a|a.source==p1.user}.collect{|a| a.value.text}
@@ -146,7 +146,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal ["fish","golf"],sop.annotations.select{|a|a.source==p1.user}.collect{|a| a.value.text}.sort
     assert_equal ["apple","golf"],sop.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.id],:sop=>{}, :sharing=>valid_sharing
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id],:sop=>{}, :sharing=>valid_sharing
     sop.reload
 
     assert_equal ["golf"],sop.annotations.select{|a|a.source==p1.user}.collect{|a| a.value.text}.sort
@@ -177,7 +177,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal ["fish","golf"],sop.annotations.select{|a|a.source==p1.user}.collect{|a| a.value.text}.sort
     assert_equal ["fish","soup"],sop.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
-    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>[golf.id],:sop=>{}, :sharing=>valid_sharing
+    put :update, :id => sop, :tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>[golf.value.id],:sop=>{}, :sharing=>valid_sharing
 
     sop.reload
 
@@ -196,7 +196,7 @@ class SopsAnnotationTest < ActionController::TestCase
     sop={:title=>"Test", :data=>fixture_file_upload('files/file_picture.png'),:projects=>[p.projects.first]}
 
     assert_difference("Sop.count") do
-      put :create,:sop=>sop,:sharing=>valid_sharing,:tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>[golf.id]
+      put :create,:sop=>sop,:sharing=>valid_sharing,:tag_autocompleter_unrecognized_items=>["fish"],:tag_autocompleter_selected_ids=>[golf.value.id]
     end
 
     assert_redirected_to sop_path(assigns(:sop))
@@ -252,6 +252,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_select "div#tag_cloud" do
       assert_select "a",:text=>/coffee/,:count=>1
     end
+
   end
 
   test "form includes tag section" do

@@ -15,7 +15,7 @@
            all_tags=[]
            show_tags=[]
 
-           tag_cloud = Annotation.all
+           tag_cloud = Annotation.all.collect{|a| a.value}
            no_of_tags = tag_cloud.size
 
            for i in (Seek::Config.tag_threshold...no_of_tags)
@@ -26,11 +26,11 @@
            #filter out annotations with the same text as another annotation
            tags = []
            tag_values = []
-           tag_count = []
+             
            all_tags.each do |tag|
-             if !(tag_values.include?(tag.value.id))
+             if !(tag_values.include?(tag.id))
                 tags << tag
-                tag_values << tag.value.id
+                tag_values << tag.id
              end
             end
 

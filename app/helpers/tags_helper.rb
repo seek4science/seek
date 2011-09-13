@@ -28,17 +28,17 @@ module TagsHelper
 
 
   def ann_cloud(tags, classes, counter_method=:count)
-    tags = tags.sort_by{|t| t.value.text.downcase}
+    tags = tags.sort_by{|t| t.text.downcase}
 
     max_count = 0
 
     tags.each do |tag|
-      tag_count = tag.value.annotations.count
+      tag_count = tag.annotations.count
       max_count = tag_count if max_count < tag_count
     end
 
     tags.each do |tag|
-      index = ((tag.value.annotations.count / max_count) * (classes.size - 1)).round
+      index = ((tag.annotations.count / max_count) * (classes.size - 1)).round
       yield tag, classes[index]
     end
   end
@@ -71,7 +71,7 @@ module TagsHelper
     length||=150
     link = show_ann_path(tag)
 
-    text = tag.value.text
+    text = tag.text
 
     link_to h(truncate(text,:length=>length)), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],:title=>tooltip_title_attrib(text)
   end

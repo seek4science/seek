@@ -244,11 +244,11 @@ class Person < ActiveRecord::Base
   end
 
   def expertise
-    annotations_with_attribute("expertise")
+    annotations_with_attribute("expertise").collect{|a| a.value}
   end
 
   def tools
-    annotations_with_attribute("tool")
+    annotations_with_attribute("tool").collect{|a| a.value}
   end
 
   private

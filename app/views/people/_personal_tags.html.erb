@@ -12,7 +12,7 @@
            tag_values << tag.value.id
          end
        end
-       tags = annotations
+       tags = annotations.collect{|a| a.value}
    end
 -%>
 

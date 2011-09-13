@@ -711,7 +711,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     golf=Factory :tag,:annotatable=>dummy_df,:source=>p2,:value=>"golf"
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>viewable_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
     viewable_df.reload
 
@@ -722,7 +722,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !private_df.can_view?(p.user)
     assert !private_df.can_edit?(p.user)
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>private_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>private_df,:tag_autocompleter_unrecognized_items=>[],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
     private_df.reload
     assert private_df.annotations.empty?
@@ -748,7 +748,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [],df.annotations.select{|a| a.source==p.user}.collect{|a| a.value.text}.sort
     assert_equal ["golf","sparrow"],df.annotations.select{|a|a.source==p2.user}.collect{|a| a.value.text}.sort
 
-    xml_http_request :post, :update_annotations_ajax,{:id=>df,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.id]}
+    xml_http_request :post, :update_annotations_ajax,{:id=>df,:tag_autocompleter_unrecognized_items=>["soup"],:tag_autocompleter_selected_ids=>[golf.value.id]}
 
     df.reload
 

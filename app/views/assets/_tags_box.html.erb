@@ -19,6 +19,10 @@
    all_item_tags = object.annotations.with_attribute_name("tag")
    owner_item_tags = all_item_tags.by_source(User.name,User.current_user.id)
 
+   all_item_tags = all_item_tags.collect{|a| a.value}.uniq
+   owner_item_tags = owner_item_tags.collect{|a| a.value}.uniq
+   annotations = annotations.collect{|a| a.value}.uniq
+
    create_tag_link_text = owner_item_tags.empty? ? "Add your tags" : "Update your tags"
 %>
 

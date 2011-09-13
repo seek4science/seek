@@ -38,8 +38,8 @@ class AnnotationsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select "div#super_tag_cloud a[href=?]",show_ann_path(tag),:text=>"fishing",:count=>1
-    assert_select "div#super_tag_cloud a[href=?]",show_ann_path(tool),:text=>"fork",:count=>1
+    assert_select "div#super_tag_cloud a[href=?]",show_ann_path(tag.value),:text=>"fishing",:count=>1
+    assert_select "div#super_tag_cloud a[href=?]",show_ann_path(tool.value),:text=>"fork",:count=>1
   end
 
   test "dont show duplicates for same tag for expertise and tools" do

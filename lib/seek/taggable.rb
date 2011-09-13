@@ -16,8 +16,8 @@ module Seek
       unrecognized_key = "#{attr}_autocompleter_unrecognized_items".to_sym
       tags=[]
       params[selected_key].each do |selected_id|
-        tag=Annotation.find(selected_id)
-        tags << tag.value.text
+        tag=TextValue.find(selected_id)
+        tags << tag.text
       end unless params[selected_key].nil?
       params[unrecognized_key].each do |item|
         tags << item
