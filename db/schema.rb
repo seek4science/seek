@@ -193,6 +193,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
   end
 
   create_table "cell_ranges", :force => true do |t|
+    t.integer  "cell_range_id"
     t.integer  "worksheet_id"
     t.integer  "start_row"
     t.integer  "start_column"
@@ -620,6 +621,12 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
     t.datetime "updated_at"
   end
 
+  create_table "official_compounds", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.integer  "ncbi_id"
@@ -636,7 +643,7 @@ ActiveRecord::Schema.define(:version => 20110810093644) do
 
   create_table "people", :force => true do |t|
     t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "updated_at",                                             :null => false
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email"
