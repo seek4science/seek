@@ -212,6 +212,11 @@ class SopsAnnotationTest < ActionController::TestCase
     get :show,:id=>sop
     assert_response :success
 
+    assert_select "div#tags_box" do
+      assert_select "a",:text=>/Add your tags/,:count=>1
+      assert_select "a",:text=>/Update your tags/,:count=>0
+    end
+
     assert_select "div#tag_cloud" do
       assert_select "p",:text=>/not yet been tagged/,:count=>1
     end
@@ -221,10 +226,31 @@ class SopsAnnotationTest < ActionController::TestCase
     get :show,:id=>sop
     assert_response :success
 
+    assert_select "div#tags_box" do
+      assert_select "a",:text=>/Add your tags/,:count=>0
+      assert_select "a",:text=>/Update your tags/,:count=>1
+    end
+
     assert_select "div#tag_cloud" do
       assert_select "a",:text=>"fish",:count=>1
       assert_select "a",:text=>"sparrow",:count=>1
       assert_select "a",:text=>"sprocket",:count=>1
+    end
+  end
+
+  test "asset tag cloud shouldn't duplicate tags for different owners" do
+    p=Factory :person
+    p2=Factory :person
+    login_as p.user
+    sop = Factory :sop,:contributor=>p.user
+    Factory :tag,:source=>p.user,:annotatable=>sop,:value=>"coffee"
+    Factory :tag,:source=>p2.user,:annotatable=>sop,:value=>"coffee"
+
+    get :show,:id=>sop
+    assert_response :success
+
+    assert_select "div#tag_cloud" do
+      assert_select "a",:text=>/coffee/,:count=>1
     end
   end
 

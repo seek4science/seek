@@ -1,17 +1,11 @@
 <%
    entity=controller_name.singularize
    object=eval("@"+entity)
-   model_class=entity.camelize.constantize
 
-   #tags=object.tag_counts
-   #all_tags=aggregated_asset_tags
    no_tags_message||=""
    name||="tag"
-   #item_tags = ""
-   #item_tags = object.owner_tags_on(current_user, :tags)
-   title||="Tags"
 
-   item_anns = []
+   title||="Tags"
 
    annotations = []
    tag_values = []
@@ -22,12 +16,10 @@
      end
    end
 
-   item_anns = Annotation.find(:all, :conditions => "annotatable_id = '#{object.id}' AND annotatable_type = '#{object.class}'")
+   all_item_tags = object.annotations.with_attribute_name("tag")
+   owner_item_tags = all_item_tags.by_source(User.name,User.current_user.id)
 
-                                                        #all annotations in general
-   #object.annotations_with_attribute_and_by_source("tag", current_user); #annotations.select{|ann|(ann.source == current_user)}  #all annotations for current item
-
-   create_tag_link_text = item_anns.empty? ? "Add your tags" : "Update your tags"
+   create_tag_link_text = owner_item_tags.empty? ? "Add your tags" : "Update your tags"
 %>
 
 <p class="heading">
@@ -35,14 +27,14 @@
   <%= h(title) -%>
 </p>
 
-<%= render :partial=>"layouts/tag_cloud", :locals=>{:tags=>item_anns, :show_overall_count=>false, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
-
+<%= render :partial=>"layouts/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>false, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
 
 <small>
   [
   <%= link_to_function create_tag_link_text, visual_effect(:toggle_blind, "create_a_tag", :duration=>0.3) %>
   ]
 </small>
+
 <div id="create_a_tag" style="display:none;">
 
   <% form_remote_tag :url =>{:action=>:update_annotations_ajax},
@@ -71,4 +63,4 @@
       </p>
   <% end -%>
 </div>
-<%= render :partial=>"annotations/autocompleter_javascript", :locals=>{:name=>name, :all_annotations=>annotations, :item_annotations=>item_anns} %>
+<%= render :partial=>"annotations/autocompleter_javascript", :locals=>{:name=>name, :all_annotations=>annotations, :item_annotations=>owner_item_tags} %>
