@@ -41,7 +41,7 @@ owned_tags ||= nil
 	    <div class="popularity">
 	      <% unless suggested_tags.blank? -%>
 	        <% overall_tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
-	          <%= link_to tag.name, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class -%>
+	          <%= link_to tag.name, "javascript:addListTag('#{name}',#{tag.object_id});", :class => css_class -%>
 	        <% end -%>
 	      <% end -%>
 	    </div>
