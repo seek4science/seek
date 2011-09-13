@@ -386,7 +386,7 @@ class ModelsController < ApplicationController
   # GET /models/1/edit
   def edit
     @newfile = Attachment.new
-		@allowed = 5 - @model.attachments.count
+		@allowed = Seek::Config.max_attachments_num - @model.attachments.count
 
   end
   

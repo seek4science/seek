@@ -67,3 +67,4 @@ Seek::Config.default :crossref_api_email,nil
 Seek::Config.default :site_base_host,"http://localhost:3000"
 Seek::Config.default :open_id_authentication_store,:memory
 Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
+Seek::Config.default :max_attachments_num,100
