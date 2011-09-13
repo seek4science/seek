@@ -47,6 +47,13 @@ module TagsHelper
   def overall_tag_cloud(tags,classes,&block)
     ann_cloud(tags, classes, &block)
   end
+
+  def fetch_tags_for_item object,attribute="tag"
+    all_tags = Annotation.with_attribute_name(attribute).collect{|a| a.value}.uniq
+    item_tags = object.annotations.with_attribute_name(attribute).collect{|a| a.value}.uniq
+
+    return all_tags,item_tags
+  end
   
 
   def tags_for_context context

@@ -3,4 +3,8 @@
   <%= help_icon("A comma seperated list of keywords that describe your tools and techniques.<br/>Please let the suggestions guide you, but feel free to add your own if necessary.") %>
 </label>
 
-<%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>Annotation.with_attribute_name("tool"), :item_tags=>@person.tools, :name=>"tool", :no_tags_message=>"Type the tools or techniques you use regularly" } -%>
+<%
+    all_tags,item_tags = fetch_tags_for_item @person,"tool"
+%>
+
+<%= render :partial=>"layouts/select_tags",:locals=>{:all_tags=>all_tags, :item_tags=>item_tags, :name=>"tool", :no_tags_message=>"Type the tools or techniques you use regularly" } -%>

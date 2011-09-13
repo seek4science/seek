@@ -8,12 +8,9 @@
    object ||= model_class.new
    type_name = text_for_resource(object)
 
-   owned_annotations = current_user.annotations_by
+   owned_annotations = current_user.annotations_by.collect{|a| a.value}
    #remove duplicates
-   all_tags = Annotation.with_attribute_name("tag")
-   item_tags = object.annotations.with_attribute_name("tag")
-  #FIXME: need to filter out duplicate TextValue's
-
+   all_tags,item_tags = fetch_tags_for_item(object)
 %>
 
 
