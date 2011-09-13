@@ -98,8 +98,8 @@ ActionController::Routing::Routes.draw do |map|
   map.show_tag '/tags/:id',:controller=>'tags',:action=>'show'
 
   #annotations
-  map.all_anns '/annotations',:controller=>'annotations',:action=>'index'
-  map.show_ann '/annotations/:id',:controller=>'annotations',:action=>'show'
+  map.all_anns '/tags',:controller=>'tags',:action=>'index'
+  map.show_ann '/tags/:id',:controller=>'tags',:action=>'show'
 
 
   map.jerm '/jerm/',:controller=>'jerm',:action=>'index'

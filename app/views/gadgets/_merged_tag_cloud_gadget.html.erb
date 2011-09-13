@@ -15,7 +15,7 @@
            all_tags=[]
            show_tags=[]
 
-           tag_cloud = Annotation.all.collect{|a| a.value}
+           tag_cloud = TextValue.all_tags
            no_of_tags = tag_cloud.size
 
            for i in (Seek::Config.tag_threshold...no_of_tags)
