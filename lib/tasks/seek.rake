@@ -40,31 +40,6 @@ namespace :seek do
     end
   end    
 
-  #adding the new compounds and their annotations if they dont exist
-  desc "seeds database with compounds, synonyms and mappings"
-  task(:populate_compounds=>:environment) do
-    compound_list = []
-    File.open('config/default_data/compound.list').each do |compound|
-      unless compound.blank?
-        compound_list.push(compound.chomp) if !compound_list.include?(compound.chomp)
-      end
-    end
-
-    unless compound_list.blank?
-      compound_object_list = find_or_new_substances  compound_list, []
-      count = 0
-      compound_object_list.each do |co|
-        if co.save
-          count += 1
-        else
-          puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
-        end
-      end
-      puts "#{count.to_s} compounds were created"
-
-    end
-  end
-
   #update the old compounds and their annotations, add the new compounds and their annotations if they dont exist
   desc "adds or updates the compounds, synonyms and mappings using the Sabio-RK webservices"
   task(:compounds=>:environment) do
@@ -77,15 +52,25 @@ namespace :seek do
 
     unless compound_list.blank?
       compound_object_list = update_substances compound_list
-      count = 0
+      count_new = 0
+      count_update=0
       compound_object_list.each do |co|
-        if co.save
-          count += 1
+        if co.new_record?
+          if co.save
+            count_new += 1
+          else
+            puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
+          end
         else
-          puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
+          if co.save
+            count_update += 1
+          else
+            puts "the compound #{try_block{co.name}} couldn't be updated: #{co.errors.full_messages}"
+          end
         end
       end
-      puts "#{count.to_s} compounds were updated"
+      puts "#{count_new.to_s} compounds were created"
+      puts "#{count_update.to_s} compounds were updated"
     end
   end
 

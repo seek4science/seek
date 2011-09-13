@@ -25,7 +25,8 @@ module Seek
 
          #if new_substance is a new synonym of an existing compound,need to save that compound and return that synonym to the result
          if !c.new_record? and c.save
-            result.push Synonym.find(:all, :conditions => ['name = ? AND substance_type = ? AND substance_id = ?', new_substance,c.class.name, c.id]).first
+            s = c.synonyms.select{|s| s.title == new_substance}
+            result.push s.first unless s.first.blank?
          else
            result.push c
          end
