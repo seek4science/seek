@@ -52,7 +52,7 @@ module Annotations
         # object, valid +annotatable+ object, valid +attribute+ and so on).
         def has_duplicate_annotation?(annotation)
           return false unless annotation.value.is_a?(self)
-          
+
           val_table_name = self.table_name
           
           existing = Annotation.find(:all,
@@ -76,7 +76,8 @@ module Annotations
         end
         
       end
-      
+
+
       # This module contains instance methods
       module InstanceMethods
         

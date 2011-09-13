@@ -110,6 +110,10 @@ module Acts #:nodoc:
       def show_contributor_avatars?
         parent.show_contributor_avatars?
       end
+
+      def annotations
+        parent.annotations if parent.respond_to? :annotations
+      end
     end
   end
 end

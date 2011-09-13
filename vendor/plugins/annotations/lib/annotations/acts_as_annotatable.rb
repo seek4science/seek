@@ -32,7 +32,7 @@ module Annotations
                                            :annotatable_id => id },
                           :order => "updated_at DESC")
         end
-        
+
         # Helper finder to get all annotations for all objects of the mixin annotatable type, by the source specified.
         # E.g: Book.find_annotations_by('User', 10) will give all annotations for all Books by User with ID 10. 
         def find_annotations_by(source_type, source_id)

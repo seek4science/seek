@@ -2,7 +2,7 @@ class PublicationsController < ApplicationController
   
   include IndexPager
   include DotGenerator
-  include Seek::TaggingCommon
+  include Seek::AssetsCommon
   
   require 'pubmed_query_tool'
   
@@ -122,7 +122,7 @@ class PublicationsController < ApplicationController
       valid = false
     end
 
-    update_tags @publication
+    update_annotations @publication
 
     assay_ids = params[:assay_ids] || []
 
