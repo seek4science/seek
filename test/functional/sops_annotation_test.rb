@@ -243,8 +243,9 @@ class SopsAnnotationTest < ActionController::TestCase
     p2=Factory :person
     login_as p.user
     sop = Factory :sop,:contributor=>p.user
-    Factory :tag,:source=>p.user,:annotatable=>sop,:value=>"coffee"
-    Factory :tag,:source=>p2.user,:annotatable=>sop,:value=>"coffee"
+    
+    coffee = Factory :tag,:source=>p.user,:annotatable=>sop,:value=>"coffee"
+    Factory :tag,:source=>p2.user,:annotatable=>sop,:value=>coffee.value
 
     get :show,:id=>sop
     assert_response :success
