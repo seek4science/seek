@@ -1,5 +1,8 @@
 <%= javascript_include_tag :defaults %>
-
+ <%
+    @newfile ||= Attachment.new
+    @allowed ||= Seek::Config.max_attachments_num - resource.attachments.count
+ %>
 
 <div class="fold">
   <div class="foldTitle">
@@ -18,16 +21,16 @@
                  <% end -%>>(<span style="color: red;font-style: italic;">MAX. <%= Seek::Config.max_attachments_num %> files</span>)
         </p>
     <% end -%>
-    <ul id="pending_files">
+    <table id="pending_files">
       <% if resource.attachments.size > 0 -%>
           <%= render :partial => "attachment", :collection => resource.attachments, :locals => {:resource=>resource} %>
       <% end -%>
-    </ul>
+    </table>
 
   </div>
 </div>
 
 <script type="text/javascript">
-    var multi_selector = new MultiSelector($('pending_files'), <%= @allowed %>);
+    var multi_selector = new MultiSelector($('pending_files'), <%= @allowed %>,'<%=resource.class.name.downcase%>','id_image');
     multi_selector.addElement($('newfile_data'));
 </script>
