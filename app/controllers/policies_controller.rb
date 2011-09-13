@@ -78,7 +78,20 @@ class PoliciesController < ApplicationController
         access_type = params["access_type"].to_i
 
         your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
-        project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
+        #when resource is study, id of the investigation is sent, so get the project_ids from the investigation
+        project_ids = []
+        if (params[:resource_name] == 'study') and (!params["project_ids"].blank?)
+          investigation = Investigation.find_by_id(try_block{params["project_ids"].to_i})
+          project_ids = try_block{investigation.projects.collect{|p| p.id}}
+
+        #when resource is assay, id of the study is sent, so get the project_ids from the study
+        elsif (params[:resource_name] == 'assay') and (!params["project_ids"].blank?)
+          study = Study.find_by_id(try_block{params["project_ids"].to_i})
+          project_ids = try_block{study.projects.collect{|p| p.id}}
+        #normal case, the project_ids is sent
+        else
+          project_ids = params["project_ids"].blank? ? [] : params["project_ids"].split(',')
+        end
 
         contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
         new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])

@@ -51,7 +51,6 @@ function checkProjectExists(prefix) {
 
 function clickLink(link) {
     var cancelled = false;
-
     if (document.createEvent) {
         var event = document.createEvent("MouseEvents");
         event.initMouseEvent("click", true, true, window,
