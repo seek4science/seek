@@ -84,14 +84,20 @@
 </table>
 
 <br style="clear:both"/>
- <% if @assay.is_modelling?  -%>
-    <div id="add_organism_form">
-        <%= render :partial=>"assays/select_organisms" if !Seek::Config.is_virtualliver || @assay.is_modelling?-%>
-    </div>
- <% else -%>
-     <%= f.fancy_multiselect :samples, :object_type_text => @assay_text, :required=>true -%>
- <% end -%>
 
+<% if Seek::Config.is_virtualliver %>
+    <% if @assay.is_modelling?  -%>
+        <div id="add_organism_form">
+            <%= render :partial=>"assays/select_organisms" if !Seek::Config.is_virtualliver || @assay.is_modelling?-%>
+        </div>
+     <% else -%>
+         <%= f.fancy_multiselect :samples, :object_type_text => @assay_text, :required=>true -%>
+     <% end -%>
+<% else %>
+  <div id="add_organism_form">
+     <%= render :partial=>"assays/select_organisms" -%>
+  </div>
+<% end %>
 
 <br style="clear:both"/>
 
