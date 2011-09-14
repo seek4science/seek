@@ -10,7 +10,7 @@
 
 <%
 suggested_limit ||= 30
-suggested_tags = all_tags.sort{|a,b| a.id <=> b.id}[0...suggested_limit]
+suggested_tags = all_tags.sort{|a,b| a.tag_count <=> b.tag_count}[0...suggested_limit]
 suggested_tags.sort!{|a,b| a.text <=> b.text}
 all_tags.sort!{|a,b| a.text <=> b.text}
 no_tags_message ||= ""
@@ -41,7 +41,7 @@ owned_tags ||= nil
   	  <div id="<%= name -%>_select_tags" class="hTagcloud">
   	    <div class="popularity">
   	      <% unless suggested_tags.blank? -%>
-              <% overall_tag_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+              <% ann_cloud suggested_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
 	            <%= link_to tag.text, "javascript:addListTag('#{name}',#{tag.id});", :class => css_class-%>
 	          <% end -%>
   	      <% end -%>
