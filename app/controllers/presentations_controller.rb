@@ -61,7 +61,7 @@ class PresentationsController < ApplicationController
 
       @presentation.policy.set_attributes_with_sharing params[:sharing], @presentation.projects
 
-      update_tags @presentation
+      update_annotations @presentation
       assay_ids = params[:assay_ids] || []
       respond_to do |format|
         if @presentation.save
@@ -171,7 +171,7 @@ class PresentationsController < ApplicationController
 
     publication_params    = params[:related_publication_ids].nil?? [] : params[:related_publication_ids].collect { |i| ["Publication", i.split(",").first]}
 
-    update_tags @presentation
+    update_annotations @presentation
 
     @presentation.attributes = params[:presentation]
 

@@ -47,7 +47,6 @@ module Acts #:nodoc:
       end
 
       def is_published?
-        #FIXME: a temporary work-around for the lack of ability to use can_download? as a non logged in user (passing nil defaults to User.current_user)
         can_download? nil
       end
 

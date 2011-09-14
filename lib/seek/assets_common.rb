@@ -3,7 +3,7 @@ module Seek
     require 'net/ftp'
 
     include Seek::TaggingCommon
-
+    include Seek::AnnotationCommon
     #required to get the icon_filename_for_key
     include ImagesHelper    
 

@@ -2,7 +2,7 @@ class AssaysController < ApplicationController
 
   include DotGenerator
   include IndexPager
-  include Seek::TaggingCommon
+  include Seek::AnnotationCommon
 
   before_filter :find_assets, :only=>[:index]
   before_filter :find_and_auth, :only=>[:edit, :update, :destroy, :show]
@@ -91,7 +91,7 @@ class AssaysController < ApplicationController
     end
 
 
-    update_tags @assay
+    update_annotations @assay
 
     @assay.owner=current_user.person
 
@@ -130,9 +130,8 @@ class AssaysController < ApplicationController
         respond_to do |format|
         format.html { render :action => "new" }
         format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
-        end
-     end
-
+      end
+    end
   end
 
   def update
@@ -141,6 +140,7 @@ class AssaysController < ApplicationController
     #DOES resolve differences for assets now
     organisms             = params[:assay_organism_ids]||[]
 
+    organisms             = params[:assay_organism_ids] || []
     sop_ids               = params[:assay_sop_ids] || []
     data_file_ids         = params[:data_file_ids] || []
     model_ids             = params[:assay_model_ids] || []
@@ -152,7 +152,8 @@ class AssaysController < ApplicationController
           culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
           @assay.associate_organism(o_id, strain, culture_growth)
         end
-    update_tags @assay
+
+    update_annotations @assay
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     @assay.attributes = params[:assay]
