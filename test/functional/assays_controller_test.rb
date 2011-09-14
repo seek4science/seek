@@ -239,7 +239,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal s, assigns(:assay).study
   end
 
-  test "should not create experimental assay without sample" do
+=begin
+test "should not create experimental assay without sample" do
     assert_no_difference('ActivityLog.count') do
       assert_no_difference("Assay.count") do
         post :create, :assay=>{:title=>"test",
@@ -267,8 +268,33 @@ class AssaysControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(a)
     #assert_equal organisms(:yeast),a.organism
   end
+=end
 
   test "should create modelling assay without organisms" do
+
+    assert_difference("Assay.count") do
+      post :create, :assay=>{:title=>"test",
+                             :technology_type_id=>technology_types(:gas_chromatography).id,
+                             :assay_type_id=>assay_types(:metabolomics).id,
+                             :study_id=>studies(:metabolomics_study).id,
+                             :assay_class=>assay_classes(:experimental_assay_class),
+                             :owner => Factory(:person)}
+    end
+
+    assert_difference("Assay.count") do
+      post :create, :assay=>{:title=>"test",
+                             :technology_type_id=>technology_types(:gas_chromatography).id,
+                             :assay_type_id=>assay_types(:metabolomics).id,
+                             :study_id=>studies(:metabolomics_study).id,
+                             :assay_class=>assay_classes(:experimental_assay_class),
+                             :owner => Factory(:person)},
+           :assay_organism_ids => [Factory(:organism).id, Factory(:strain).title, Factory(:culture_growth_type).title].to_s
+    end
+    a=assigns(:assay)
+    assert_redirected_to assay_path(a)
+  end
+
+  test "should create experimental assay without organisms" do
 
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",

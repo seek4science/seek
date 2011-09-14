@@ -1,7 +1,8 @@
 require "test_helper"
 
 class SamplesControllerTest < ActionController::TestCase
-  fixtures :all
+=begin
+fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
   # Called before every test method runs. Can be used
@@ -134,4 +135,5 @@ class SamplesControllerTest < ActionController::TestCase
     assert flash[:error]
     assert_redirected_to samples_path
   end
+=end
 end

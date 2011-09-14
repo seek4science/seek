@@ -2,6 +2,7 @@ require "test_helper"
 
 class SampleTest < ActiveSupport::TestCase
 
+=begin
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
@@ -30,10 +31,6 @@ class SampleTest < ActiveSupport::TestCase
     #s.reload
     #s.strains=[]
     #assert !s.valid?
-
-
-
   end
-
-
+=end
 end
