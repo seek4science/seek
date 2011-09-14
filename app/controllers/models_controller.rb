@@ -580,15 +580,14 @@ class ModelsController < ApplicationController
 	def process_file_uploads
 		i = 0
 		while !params[:attachment].nil? && params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
-			@attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
-      #@attachment = Attachment.create!
-			@model.attachments << @attachment
+      @attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
+      @model.attachments << @attachment
       @model.id_image = @attachment.id if @attachment.is_image? and !@model.id_image.nil? and !@model.attachments.map(&:id).include? @model.id_image.to_i
       i += 1
     end
 
-    if @model.id_image.nil?
-       @model.id_image = @model.attachments.detect { |a| a.content_type.index("image")==0 }.try(:id)
+    if @model.id_image.nil? || @model.id_image==0
+       @model.id_image = @model.attachments.detect { |a| a.is_image? == true }.try(:id)
     end
 
     @model.save!

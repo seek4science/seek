@@ -79,8 +79,8 @@
             <% attach = @model.attachments.find_by_id(@model.id_image) %>
 
             <% unless attach.nil? %>
-            <a href='<%= application_root %><%= attach.public_filename %>' rel="lightbox">
-              <img src="<%= application_root %><%= attach.public_filename(:thumb) %>" alt='' align="center" title="click it to zoom" style=" vertical-align:middle;border: 0;"/>
+            <a href='<%= attach.public_filename %>' rel="lightbox">
+              <img src="<%= application_root %><%= attach.public_filename(:thumb)%>" alt='' align="center" title="click it to zoom" style=" vertical-align:middle;border: 0;"/>
             </a>
             <% else %>
             <span class="none_text">None</span>
