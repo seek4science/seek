@@ -453,14 +453,4 @@ class ApplicationController < ActionController::Base
     return fixed_new_substances, known_substances
   end
 
-  protected
-
-	def process_file_uploads object
-		i = 0
-		while params[:attachment]['file_'+i.to_s] != "" && !params[:attachment]['file_'+i.to_s].nil?
-			@attachment = Attachment.new(Hash["uploaded_data" => params[:attachment]['file_'+i.to_s]])
-			object.attachments << @attachment
-			i += 1
-		end
-	end
 end
