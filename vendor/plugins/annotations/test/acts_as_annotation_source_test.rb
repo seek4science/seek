@@ -11,23 +11,34 @@ class ActsAsAnnotationSourceTest < ActiveSupport::TestCase
   
   def test_annotations_by_class_method
     assert_equal 7, User.annotations_by(users(:john).id).length
+    assert_equal 7, User.annotations_by(users(:john).id, true).length
     assert_equal 6, User.annotations_by(users(:jane).id).length
+    assert_equal 6, User.annotations_by(users(:jane).id, true).length
     assert_equal 3, Group.annotations_by(groups(:sci_fi_geeks).id).length
+    assert_equal 3, Group.annotations_by(groups(:sci_fi_geeks).id, true).length
     assert_equal 4, Group.annotations_by(groups(:classical_fans).id).length
+    assert_equal 4, Group.annotations_by(groups(:classical_fans).id, true).length
   end
   
   def test_annotations_for_class_method
     assert_equal 4, User.annotations_for("Book", books(:h).id).length
+    assert_equal 4, User.annotations_for("Book", books(:h).id, true).length
     assert_equal 1, User.annotations_for("Chapter", chapters(:bh_c10).id).length
+    assert_equal 1, User.annotations_for("Chapter", chapters(:bh_c10).id, true).length
     assert_equal 1, Group.annotations_for("Book", books(:r).id).length
+    assert_equal 1, Group.annotations_for("Book", books(:r).id, true).length
     assert_equal 1, Group.annotations_for("Chapter", chapters(:br_c2).id).length
+    assert_equal 1, Group.annotations_for("Chapter", chapters(:br_c2).id, true).length
   end
   
   def test_latest_annotations_instance_method
     assert_equal 6, users(:jane).latest_annotations.length
+    assert_equal 6, users(:jane).latest_annotations(nil, true).length
     assert_equal 3, groups(:sci_fi_geeks).latest_annotations.length
+    assert_equal 3, groups(:sci_fi_geeks).latest_annotations(nil, true).length
     
     assert_equal 3, users(:john).latest_annotations(3).length
+    assert_equal 3, users(:john).latest_annotations(3, true).length
   end
   
   def test_annotation_source_name_instance_method

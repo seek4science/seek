@@ -31,7 +31,7 @@ module Acts #:nodoc:
         does_not_require_can_edit :last_used_at
         acts_as_favouritable
 
-        acts_as_annotatable
+        acts_as_annotatable :name_field=>:tag
         include Seek::Taggable
 
         default_scope :order => "#{self.table_name}.updated_at DESC"

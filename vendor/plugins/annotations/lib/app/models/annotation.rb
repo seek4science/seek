@@ -1,8 +1,6 @@
 class Annotation < ActiveRecord::Base
   include AnnotationsVersionFu
   
-  before_validation :process_value_adjustments
-  
   belongs_to :annotatable, 
              :polymorphic => true
   
@@ -20,8 +18,8 @@ class Annotation < ActiveRecord::Base
   belongs_to :version_creator, 
              :class_name => Annotations::Config.user_model_name
   
-  validates_associated :attribute
-
+  before_validation :process_value_generation
+  
   validates_presence_of :source_type,
                         :source_id,
                         :annotatable_type,
@@ -35,7 +33,8 @@ class Annotation < ActiveRecord::Base
            :check_duplicate,
            :check_limit_per_source,
            :check_content_restrictions
-           
+  
+  
   # ========================
   # Versioning configuration
   # ------------------------
@@ -73,6 +72,12 @@ class Annotation < ActiveRecord::Base
   end
   
   # ========================
+  
+  # Named scope to allow you to include the value records too.
+  # Use this to *potentially* improve performance.
+  named_scope :include_values, lambda {
+    { :include => [ :value ] }
+  }
   
   # Finder to get all annotations by a given source.
   named_scope :by_source, lambda { |source_type, source_id| 
@@ -126,20 +131,11 @@ class Annotation < ActiveRecord::Base
     self.attribute = AnnotationAttribute.find_or_create_by_name(attr_name)
   end
   
-  alias_method :original_value=, :value=
+  alias_method :original_set_value=, :value=
   def value=(value_in)
-    val = nil
-    case value_in
-    when String, Symbol
-      val = TextValue.new :text => value_in.to_s
-    when Numeric
-      val = NumberValue.new :number => value_in
-    when ActiveRecord::Base
-      val = value_in
-    else
-      self.errors.add(:value, "is not a valid value object")
-    end
-    self.original_value = val
+    # Store this raw value in a temporary variable for 
+    # later processing before the object is saved.
+    @raw_value = value_in
   end
   
   def value_content
@@ -188,15 +184,48 @@ class Annotation < ActiveRecord::Base
            self.value.class.respond_to?(:is_annotation_value)
   end
   
-  def process_value_adjustments
+  def process_value_generation
+    if defined?(@raw_value) && !@raw_value.blank?
+      val = process_value_adjustments(@raw_value)
+      val = try_use_value_factory(val)
+      
+      # Now run default value generation logic
+      # (as a fallback for default cases)
+      case val
+        when String, Symbol
+          val = TextValue.new :text => val.to_s
+        when Numeric
+          val = NumberValue.new :number => val
+        when ActiveRecord::Base
+          # Do nothing
+        else
+          self.errors.add(:value, "is not a valid value object")
+      end
+      
+      # Set it on the ActiveRecord level now
+      self.original_set_value = val
+      
+      # Reset the internal raw value too, in case this is rerun
+      @raw_value = val
+    end
+    
+    return true
+  end
+  
+  def process_value_adjustments(value_in)
+    value_out = value_in
+    
     attr_name = self.attribute_name.downcase
+    
+    value_in = value_out.to_s if value_out.is_a?(Symbol)
+    
     # Make lowercase or uppercase if required
-    if ok_value_object_type? && self.value.ann_content.is_a?(String)
+    if value_out.is_a?(String)
       if Annotations::Config::attribute_names_for_values_to_be_downcased.include?(attr_name)
-        self.value.ann_content = self.value.ann_content.downcase
+        value_out = value_out.downcase
       end
       if Annotations::Config::attribute_names_for_values_to_be_upcased.include?(attr_name)
-        self.value.ann_content = self.value.ann_content.upcase
+        value_out = value_out.upcase
       end
       
       # Apply strip text rules
@@ -204,13 +233,25 @@ class Annotation < ActiveRecord::Base
         if attr_name == attr.downcase
           if strip_rules.is_a? Array
             strip_rules.each do |s|
-              self.value.ann_content = self.value.ann_content.gsub(s, '')
+              value_out = value_out.gsub(s, '')
             end
           elsif strip_rules.is_a? String or strip_rules.is_a? Regexp
-            self.value.ann_content = self.value.ann_content.gsub(strip_rules, '')
+            value_out = value_out.gsub(strip_rules, '')
           end
         end
       end
+    end
+    
+    return value_out
+  end
+  
+  def try_use_value_factory(value_in)
+    attr_name = self.attribute_name.downcase
+    
+    if Annotations::Config::value_factories.has_key?(attr_name)
+      return Annotations::Config::value_factories[attr_name].call(value_in)
+    else
+      return value_in
     end
   end
   
@@ -237,17 +278,23 @@ class Annotation < ActiveRecord::Base
   end
   
   def check_value
+    ok = true
     if self.value.nil?
       self.errors.add(:value, "object must be provided")
-      return false
+      ok = false
+    elsif !ok_value_object_type?
+      self.errors.add(:value, "must be a valid annotation value object")
+      ok = false
     else
-      if ok_value_object_type?
-        return true
-      else
-        self.errors.add(:value, "must be a valid annotation value object")
-        return false
+      attr_name = self.attribute_name.downcase
+      if Annotations::Config::valid_value_types.has_key?(attr_name) &&
+          !([ Annotations::Config::valid_value_types[attr_name] ].flatten.include?(self.value.class.name))
+        self.errors.add_to_base("Annotation value is of an invalid type for attribute name: '#{attr_name}'. Provided value is a #{self.value.class.name}.")
+        ok = false
       end
     end
+    
+    return ok
   end
   
   # This method checks whether duplicates are allowed for this particular annotation type (ie: 
