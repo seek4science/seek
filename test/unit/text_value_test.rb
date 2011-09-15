@@ -66,4 +66,20 @@ class TextValueTest < ActiveSupport::TestCase
     assert_equal blah.value,TextValue.all_tags("desc")[0]
   end
 
+  test "has attribute_name?" do
+    sop = Factory :sop
+    u = Factory :user
+    coffee = Factory :tag,:annotatable=>sop,:source=>u,:value=>"coffee",:attribute_name=>"tag"
+    Factory :tag,:annotatable=>sop,:source=>u,:value=>coffee.value,:attribute_name=>"title"
+    tv=TextValue.create :text=>"frog"
+    AnnotationValueSeed.create :value=>tv,:attribute=>AnnotationAttribute.find_or_create_by_name("tag")
+
+    assert tv.has_attribute_name?("tag")
+    assert !tv.has_attribute_name?("title")
+
+    assert coffee.value.has_attribute_name?("tag")
+    assert coffee.value.has_attribute_name?("title")
+    assert !coffee.value.has_attribute_name?("description")
+  end
+
 end

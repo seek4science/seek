@@ -23,19 +23,19 @@ namespace :seek do
   end
 
   desc "adds the default tags"
-  task(:default_tags=>:environment) do
+  task(:tags=>:environment) do
 
     File.open('config/default_data/expertise.list').each do |item|
       unless item.blank?
         item=item.chomp
-        create_tag item, "expertise", "Person"
+        create_tag item, "expertise"
       end
     end
 
     File.open('config/default_data/tools.list').each do |item|
       unless item.blank?
         item=item.chomp
-        create_tag item, "tools", "Person"
+        create_tag item, "tool"
       end
     end
   end    
@@ -91,7 +91,7 @@ namespace :seek do
 
   desc 'seeds the database without the loading of help document, which is currently not working for SQLITE3 (SYSMO-678). Also skips adding compounds from sabio-rk'
   task(:seed_testing=>:environment) do
-    tasks=["refresh_controlled_vocabs", "default_tags", "graft_new_assay_types"]
+    tasks=["refresh_controlled_vocabs", "tags", "graft_new_assay_types"]
     tasks.each do |task|
       Rake::Task["seek:#{task}"].execute
     end
@@ -150,7 +150,6 @@ namespace :seek do
     private_data=data.select { |d| !d.can_view? User.first }
     puts "#{private_data.size} private Data files being removed"
     private_data.each { |d| d.destroy }
-
   end
 
   task(:strains=>:environment) do
@@ -492,15 +491,10 @@ namespace :seek do
     end
   end
 
-  def create_tag name, context, taggable_type
-    tag=ActsAsTaggableOn::Tag.find :first, :conditions=>{:name=>name}
-    if tag.nil?
-      tag=ActsAsTaggableOn::Tag.new(:name=>name)
-      tag.save!
-    end
-    if tag.taggings.detect { |tagging| tagging.context==context && tagging.taggable_type==taggable_type }.nil?
-      tagging=ActsAsTaggableOn::Tagging.new(:tag_id=>tag.id, :context=>context, :taggable_type=>taggable_type)
-      tagging.save!
+  def create_tag text, attribute
+    text_value = TextValue.find_or_create_by_text(text)
+    unless text_value.has_attribute_name?(attribute)
+      seed = AnnotationValueSeed.create :value=>text_value, :attribute=>AnnotationAttribute.find_or_create_by_name(attribute)
     end
   end
 

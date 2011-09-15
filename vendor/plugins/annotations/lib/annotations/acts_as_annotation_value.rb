@@ -90,6 +90,11 @@ module Annotations
       # This module contains instance methods
       module InstanceMethods
 
+        #Whether this value exists with a given attribute name
+        def has_attribute_name? attr
+          !annotations.with_attribute_name(attr).empty? || !annotation_value_seeds.with_attribute_name(attr).empty?
+        end
+
         #The total number of annotations that match one or more attribute names.
         def annotation_count attributes
           attributes = Array(attributes)
