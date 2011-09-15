@@ -2,12 +2,12 @@ require "test_helper"
 
 class SpecimensControllerTest < ActionController::TestCase
 
-=begin
 fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
 
   def setup
+    Seek::Config.is_virtualliver = true
     login_as :owner_of_fully_public_policy
     @object = Factory(:specimen, :contributor => User.current_user,
             :donor_number => "test1",
@@ -159,5 +159,4 @@ fixtures :all
       assert_equal "Test", specimen.send(attr)
     end
   end
-=end
 end
