@@ -1,7 +1,13 @@
 module SearchHelper
   
   def search_type_options
-    ["All","People","Institutions","Projects","SOPs","Studies","Assays","Samples","Specimens","Investigations","Models","Data files", "Publications","Presentations"]
+    search_type_options = ["People","Institutions","Projects","SOPs","Studies","Assays", "Investigations","Models","Data files", "Publications","Presentations"]
+    if Seek::Config.is_virtualliver
+       search_type_options |= ["Samples","Specimens"]
+    end
+    search_type_options.sort!
+    search_type_options.insert(0, 'All')
+    return search_type_options
   end
     
   def saved_search_image_tag saved_search
