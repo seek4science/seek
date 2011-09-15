@@ -38,8 +38,8 @@ module TagsHelper
   end
 
   def fetch_tags_for_item object,attribute="tag"
-    all_tags = Annotation.with_attribute_name(attribute).collect{|a| a.value}.uniq
-    item_tags = object.annotations.with_attribute_name(attribute).collect{|a| a.value}.uniq
+    all_tags = TextValue.all_tags attribute
+    item_tags = object.annotations.with_attribute_name(attribute).include_values.collect{|a| a.value}.uniq
 
     return all_tags,item_tags
   end
