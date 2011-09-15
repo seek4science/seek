@@ -23,8 +23,6 @@ class Model < ActiveRecord::Base
   belongs_to :model_format
   
   acts_as_solr(:fields=>[:description,:title,:original_filename,:organism_name,:searchable_tags]) if Seek::Config.solr_enabled
-
-  acts_as_uniquely_identifiable
   
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource

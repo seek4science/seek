@@ -22,8 +22,6 @@ class Sop < ActiveRecord::Base
                
   has_many :experimental_conditions, :conditions =>  'experimental_conditions.sop_version = #{self.version}'
 
-  acts_as_uniquely_identifiable  
-
   explicit_versioning(:version_column => "version") do
     
     acts_as_versioned_resource

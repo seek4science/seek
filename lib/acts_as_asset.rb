@@ -27,18 +27,19 @@ module Acts #:nodoc:
     module ClassMethods
 
       def acts_as_asset
+        include Seek::Taggable
+
         acts_as_authorized
-        does_not_require_can_edit :last_used_at
+        acts_as_uniquely_identifiable
+        acts_as_annotatable :name_field=>:tag
         acts_as_favouritable
 
-        acts_as_annotatable :name_field=>:tag
-        include Seek::Taggable
+        does_not_require_can_edit :last_used_at
 
         default_scope :order => "#{self.table_name}.updated_at DESC"
 
         validates_presence_of :title
         validates_presence_of :projects
-
 
         has_many :relationships,
                  :class_name => 'Relationship',

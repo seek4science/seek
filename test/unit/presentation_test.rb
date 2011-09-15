@@ -56,6 +56,11 @@ class PresentationTest < ActiveSupport::TestCase
 
   end
 
+  test "has uuid" do
+    presentation = Factory :presentation
+    assert_not_nil presentation.uuid
+  end
+
 
 
 
