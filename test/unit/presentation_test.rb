@@ -42,6 +42,9 @@ class PresentationTest < ActiveSupport::TestCase
     new_attrs = presentation.attributes
     new_attrs.delete("version")
 
+    old_attrs.delete("updated_at")
+    new_attrs.delete("updated_at")
+
     assert_equal old_attrs,new_attrs
   end
 
