@@ -45,6 +45,9 @@ class PresentationTest < ActiveSupport::TestCase
     old_attrs.delete("updated_at")
     new_attrs.delete("updated_at")
 
+    old_attrs.delete("created_at")
+    new_attrs.delete("created_at")
+
     assert_equal old_attrs,new_attrs
   end
 
