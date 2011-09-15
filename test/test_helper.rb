@@ -22,6 +22,15 @@ Factory.class_eval do
   class_alias_method_chain :build, :privileged_mode
 end
 
+Kernel.class_eval do
+  def as_virtualliver
+    vl = Seek::Config.is_virtualliver
+    Seek::Config.is_virtualliver=true
+    yield
+    Seek::Config.is_virtualliver=vl
+  end
+end
+
 class ActiveSupport::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the

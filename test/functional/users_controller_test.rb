@@ -19,7 +19,9 @@ class UsersControllerTest < ActionController::TestCase
 
 
   test "creatable classes order" do
-    assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],@controller.send(:user_creatable_classes)
+    as_virtualliver do
+      assert_equal [DataFile,Model,Presentation,Publication,Sop,Assay,Investigation,Study,Event,Sample,Specimen],@controller.send(:user_creatable_classes)
+    end
   end
   
   def test_title
