@@ -4,7 +4,7 @@ class CellRange < ActiveRecord::Base
 
   include SpreadsheetUtil
 
-  acts_as_annotatable
+  acts_as_annotatable :name_field=>:annotation
 
   belongs_to :worksheet
 

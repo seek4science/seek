@@ -27,6 +27,19 @@ class TextValueTest < ActiveSupport::TestCase
     assert_equal 5,text_value.annotation_count(["tag","desc"])
   end
 
+  test "all tags includes seed values" do
+    sop = Factory :sop
+    u = Factory :user
+    coffee = Factory :tag,:annotatable=>sop,:source=>u,:value=>"coffee",:attribute_name=>"tag"
+    tv=TextValue.create :text=>"frog"
+    AnnotationValueSeed.create :value=>tv,:attribute=>AnnotationAttribute.find_or_create_by_name("tag")
+
+    assert_equal 2,TextValue.all_tags.count
+
+    assert_equal ["coffee","frog"],TextValue.all_tags.collect{|tv| tv.text}.sort
+
+  end
+
   test "all tags" do
     sop = Factory :sop
     sop1 = Factory :sop

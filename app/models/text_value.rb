@@ -5,15 +5,7 @@ require_dependency File.join(Rails.root, 'vendor', 'plugins', 'annotations', 'li
 class TextValue < ActiveRecord::Base
 
   def self.all_tags attributes=["tag","expertise","tool"]
-    attributes = Array(attributes)
-    attributes.reduce([]){|tags,attr| tags | Annotation.with_attribute_name(attr).collect{|ann| ann.value}}.uniq
-  end
-
-  def annotation_count attributes
-    attributes = Array(attributes)
-    attributes.reduce(0) do |sum,attr|
-      sum + annotations.with_attribute_name(attr).count
-    end
+    self.with_attribute_names attributes
   end
 
   def tag_count

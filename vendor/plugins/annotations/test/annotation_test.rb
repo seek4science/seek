@@ -46,6 +46,11 @@ class AnnotationTest < ActiveSupport::TestCase
     assert_equal annotation_attributes(:aa_tag), annotations(:br_tag_1).attribute
   end
   
+  def test_include_values_named_scope
+    assert_equal 20, Annotation.include_values.length
+    assert_not_nil Annotation.include_values.find(annotations(:bh_title_1).id)
+  end
+  
   def test_by_source_named_scope_finder
     assert_equal 7, Annotation.by_source('User', users(:john).id).length
     assert_equal 6, Annotation.by_source('User', users(:jane).id).length
@@ -90,27 +95,7 @@ class AnnotationTest < ActiveSupport::TestCase
     assert_equal ann.attribute, attr
   end
   
-  def test_value_setter
-    value1 = "Hellow orld"
-    ann1 = Annotation.new
-    ann1.value = value1
-    assert_not_nil ann1.value
-    assert_kind_of TextValue, ann1.value
-    
-    value2 = TextValue.new :text => "Hellow cruel orld"
-    ann2 = Annotation.new
-    ann2.value = value2
-    assert_not_nil ann2.value
-    assert_kind_of TextValue, ann2.value
-    
-    value3 = NumberValue.new :number => 42
-    ann3 = Annotation.new
-    ann3.value = value3
-    assert_not_nil ann3.value
-    assert_kind_of NumberValue, ann3.value
-  end
-  
-  def test_annotation_create
+  def test_annotation_create_with_implicit_value
     source = users(:john)
     
     ann = Annotation.new(:attribute_name => "tag",
@@ -129,6 +114,31 @@ class AnnotationTest < ActiveSupport::TestCase
     assert_equal "User", ann_again.source_type
     assert_equal "TextValue", ann_again.value_type
     assert_not_nil ann_again.value
+    assert_equal "hot", ann_again.value_content
+  end
+  
+  def test_annotation_create_with_explicit_value
+    source = users(:john)
+    
+    val = NumberValue.new :number => 0
+    
+    ann = Annotation.new(:attribute_name => "rating",
+                         :value => val,
+                         :source_type => source.class.name, 
+                         :source_id => source.id,
+                         :annotatable_type => "Book",
+                         :annotatable_id => 1)
+    
+    assert ann.valid?
+    assert ann.save
+    
+    ann_again = Annotation.find_by_id(ann.id)
+    
+    assert_not_nil ann_again
+    assert_equal "User", ann_again.source_type
+    assert_equal "NumberValue", ann_again.value_type
+    assert_not_nil ann_again.value
+    assert_equal 0, ann_again.value_content
   end
   
   def test_cannot_create_annotation_with_invalid_annotatable
@@ -195,7 +205,9 @@ class AnnotationTest < ActiveSupport::TestCase
     
     assert ann.invalid?    # TODO: check for the specific error, not just that it's invalid!
     assert !ann.save
-    
   end
-  
+
+  def test_reload_versioned_columns
+    assert Annotation.reload_versioned_columns_info
+  end  
 end

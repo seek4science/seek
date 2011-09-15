@@ -8,7 +8,7 @@ class Person < ActiveRecord::Base
   before_save :first_person_admin
 
   acts_as_notifiee
-  acts_as_annotatable
+  acts_as_annotatable :name_field=>:expertise
   include Seek::Taggable
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people

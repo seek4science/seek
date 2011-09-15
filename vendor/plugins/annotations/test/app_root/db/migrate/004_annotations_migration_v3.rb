@@ -4,7 +4,7 @@ class AnnotationsMigrationV3 < ActiveRecord::Migration
     change_table :annotations do |t|
       t.rename :value, :old_value
       t.remove :value_type
-      t.string :value_type, :limit => 50, :null => false, :default => "FIXME"
+      t.string :value_type, :limit => 50, :null => false, :default => "TextValue"
       t.integer :value_id, :null => false, :default => 0
     end
     change_column :annotations, :old_value, :string, :null => true
@@ -13,7 +13,7 @@ class AnnotationsMigrationV3 < ActiveRecord::Migration
     change_table :annotation_versions do |t|
       t.rename :value, :old_value
       t.remove :value_type
-      t.string :value_type, :limit => 50, :null => false, :default => "FIXME"
+      t.string :value_type, :limit => 50, :null => false, :default => "TextValue"
       t.integer :value_id, :null => false, :default => 0
     end
     change_column :annotation_versions, :old_value, :string, :null => true
