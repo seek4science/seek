@@ -99,6 +99,12 @@ class Annotation < ActiveRecord::Base
       :joins => :attribute,
       :order => "created_at DESC" }
   }
+
+  # Finder to get all annotations for a given value_type.
+  named_scope :with_value_type, lambda { |value_type|
+    { :conditions => { :value_type =>  value_type },
+      :order => "created_at DESC" }
+  }
   
   # Helper class method to look up an annotatable object
   # given the annotatable class name and ID. 
