@@ -50,28 +50,26 @@ namespace :seek do
       end
     end
 
-    unless compound_list.blank?
-      compound_object_list = update_substances compound_list
-      count_new = 0
-      count_update=0
-      compound_object_list.each do |co|
-        if co.new_record?
-          if co.save
-            count_new += 1
-          else
-            puts "the compound #{try_block{co.name}} couldn't be created: #{co.errors.full_messages}"
-          end
+    count_new = 0
+    count_update=0
+    compound_list.each do |compound|
+      compound_object = update_substance compound
+      if compound_object.new_record?
+        if compound_object.save
+          count_new += 1
         else
-          if co.save
-            count_update += 1
-          else
-            puts "the compound #{try_block{co.name}} couldn't be updated: #{co.errors.full_messages}"
-          end
+          puts "the compound #{try_block{compound_object.name}} couldn't be created: #{compound_object.errors.full_messages}"
+        end
+      else
+        if compound_object.save
+          count_update += 1
+        else
+          puts "the compound #{try_block{compound_object.name}} couldn't be updated: #{compound_object.errors.full_messages}"
         end
       end
-      puts "#{count_new.to_s} compounds were created"
-      puts "#{count_update.to_s} compounds were updated"
     end
+    puts "#{count_new.to_s} compounds and synonyms were created"
+    puts "#{count_update.to_s} compounds and synonyms were updated"
   end
 
   desc 're-extracts bioportal information about all organisms, overriding the cached details'

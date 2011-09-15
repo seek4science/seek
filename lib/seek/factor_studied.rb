@@ -39,10 +39,8 @@ module Seek
     result
   end
 
-  def update_substances(substances)
-    result = []
-    unless substances.blank?
-      substances.each do |substance|
+  def update_substance(substance)
+    unless substance.blank?
          #call the webservice to retrieve the substance annotation from sabiork
          #the annotation is stored in a hash, which keys: recommended_name, synonyms, sabiork_id, chebi_ids, kegg_ids
          compound_annotation = Seek::SabiorkWebservices.new().get_compound_annotation(substance)
@@ -58,15 +56,13 @@ module Seek
            #create new or update synonyms
            c = new_or_update_synonyms c, compound_annotation
 
-           result.push c
+           return c
          else
            #if the webservice doesn't return any value: find the compound or create compound with the name substance
            c = Compound.find_by_name(substance) ? Compound.find_by_name(substance) : Compound.new(:name => substance)
-           result.push c
+           return c
          end
-      end
     end
-    result
   end
 
   def no_comma_for_decimal
