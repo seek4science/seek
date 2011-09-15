@@ -1,7 +1,6 @@
 require "test_helper"
 
 class SpecimenTest < ActiveSupport::TestCase
-=begin
 fixtures :all
 
   test "validation" do
@@ -34,5 +33,4 @@ fixtures :all
     assert_equal "#{specimen.age} (weeks)",specimen.age_in_weeks
   end
 
-=end
 end

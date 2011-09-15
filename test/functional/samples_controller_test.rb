@@ -1,13 +1,13 @@
 require "test_helper"
 
 class SamplesControllerTest < ActionController::TestCase
-=begin
 fixtures :all
   include AuthenticatedTestHelper
   include RestTestCases
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
+    Seek::Config.is_virtualliver = true
     login_as Factory(:user,:person => Factory(:person,:is_admin=> false))
     @object = Factory(:sample,:contributor => User.current_user,
             :title=> "test1",
@@ -135,5 +135,4 @@ fixtures :all
     assert flash[:error]
     assert_redirected_to samples_path
   end
-=end
 end
