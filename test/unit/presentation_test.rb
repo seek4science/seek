@@ -38,10 +38,11 @@ class PresentationTest < ActiveSupport::TestCase
     assert_equal 1,old_attrs["version"]
     assert_equal 2, presentation.version
 
-    old_other_attrs = old_attrs.select{|k,v|k!="version"}
-    new_other_attrs = presentation.attributes.select{|k,v|k!="version"}
+    old_attrs.delete("version")
+    new_attrs = presentation.attributes
+    new_attrs.delete("version")
 
-    assert_equal old_other_attrs,new_other_attrs
+    assert_equal old_attrs,new_attrs
   end
 
   test "event association" do
