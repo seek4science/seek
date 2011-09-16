@@ -82,7 +82,7 @@ module Seek
     end
 
     def tags_as_text_array
-      self.annotations.collect{|a| a.value.text}
+      self.annotations.include_values.collect{|a| a.value.text}
     end
 
   end

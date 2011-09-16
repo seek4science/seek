@@ -8,7 +8,7 @@ class Person < ActiveRecord::Base
   before_save :first_person_admin
 
   acts_as_notifiee
-  acts_as_annotatable :name_field=>:expertise
+  acts_as_annotatable :name_field=>:name
   include Seek::Taggable
 
   #grouped_pagination :pages=>("A".."Z").to_a #shouldn't need "Other" tab for people
@@ -43,7 +43,7 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
-  acts_as_solr(:fields => [ :first_name, :last_name,:expertise,:tools,:locations, :roles ],:include=>[:disciplines]) if Seek::Config.solr_enabled
+  acts_as_solr(:fields => [ :first_name, :last_name,:searchable_tags,:locations, :roles ],:include=>[:disciplines]) if Seek::Config.solr_enabled
 
   named_scope :without_group, :include=>:group_memberships, :conditions=>"group_memberships.person_id IS NULL"
   named_scope :registered,:include=>:user,:conditions=>"users.person_id != 0"
