@@ -77,8 +77,8 @@ class SearchController < ApplicationController
         when ("samples")
           @results = Sample.multi_solr_search(downcase_query, :limit=>100, :models=>[Sample]).results
         else
-          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Sample, Specimen, Event]
-
+          sources = [Person, Project, Institution, Sop, Model, Study, DataFile, Assay, Investigation, Publication, Presentation, Event]
+          sources |= [Sample, Specimen] if Seek::Config.is_virtualliver
           @results = Person.multi_solr_search(downcase_query, :limit=>100, :models=>sources).results
       end
     end
