@@ -202,4 +202,5 @@ module Seek
      mapping
   end
 
+  end
 end
