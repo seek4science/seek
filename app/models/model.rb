@@ -15,7 +15,7 @@ class Model < ActiveRecord::Base
   validates_presence_of :title
 
   has_many  :attachments, :as => :attachable, :dependent => :destroy,:uniq => true
-
+  accepts_nested_attributes_for :attachments
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
 

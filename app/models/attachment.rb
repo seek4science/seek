@@ -9,6 +9,8 @@ class Attachment < ActiveRecord::Base
                  :max_size => 100.gigabytes,
                  :thumbnails => { :thumb => [200, 150], :geometry => 'x50' }
 
+  validates_as_attachment
+
   #include all image types,but attachment.image? with content types defined in attachment_fu,e.g. tif image not included
   def is_image?
     self.content_type.index('image')== 0
